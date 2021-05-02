@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:AJR, Roberto Fresca
 /*******************************************************************************
@@ -82,7 +83,7 @@ protected:
 private:
 	template <int P> void input_select_w(u8 data);
 	u8 player_inputs_r();
-	void bank_select_w(u8 data);
+	void outport_w(u8 data);
 	u8 bank_r(offs_t offset);
 
 	void mem_map(address_map &map);
@@ -129,10 +130,23 @@ u8 tvg01_state::player_inputs_r()
 	return result;
 }
 
-void tvg01_state::bank_select_w(u8 data)
+void tvg01_state::outport_w(u8 data)
 {
+/*  - bits -
+    7654 3210
+    ---- xxxx   bank selector.
+    ---x ----   hopper motor.
+    --x- ----   credits in counter.
+    -x-- ----   credits out counter.
+    x--- ----   unknown.
+*/
 	m_bank_select = data;
 	m_hopper->motor_w(BIT(data, 4));
+
+//  the following counters are adding +1 on each reset.
+//  find why...
+	machine().bookkeeping().coin_counter_w(0, data & 0x20);  // Coins In counter.
+	machine().bookkeeping().coin_counter_w(1, data & 0x40);  // Coins Out counter (only in payout mode).
 }
 
 u8 tvg01_state::bank_r(offs_t offset)
@@ -292,7 +306,7 @@ void tvg01_state::theboat(machine_config &config)
 
 	i8255_device &ppi1(I8255(config, "ppi1"));  // D8255AC-2
 	ppi1.in_pa_callback().set_ioport("INP0");
-	ppi1.out_pb_callback().set(FUNC(tvg01_state::bank_select_w));
+	ppi1.out_pb_callback().set(FUNC(tvg01_state::outport_w));
 
 	i8255_device &ppi2(I8255(config, "ppi2"));  // D8255AC-2
 	ppi2.out_pa_callback().set(FUNC(tvg01_state::input_select_w<0>));

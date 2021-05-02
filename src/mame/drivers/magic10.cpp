@@ -138,7 +138,6 @@ Both setups show different variants for components layout, memory size, NVRAM, e
 
 #define CPU_CLOCK    MAIN_CLOCK/2
 
-
 class magic10_state : public driver_device
 {
 public:
@@ -166,6 +165,9 @@ public:
 	void init_magic10();
 	void init_hotslot();
 	void init_altaten();
+
+	DECLARE_READ_LINE_MEMBER(hopper_r);
+    DECLARE_READ_LINE_MEMBER(ticket_r);
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
@@ -202,6 +204,9 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<8> m_lamps;
+	uint16_t m_hopper_state;
+	uint16_t m_ticket_state;
+
 };
 
 
@@ -336,8 +341,10 @@ void magic10_state::magic10_out_w(uint16_t data)
   7654 3210
   =========
   ---- ---x  Payout lamp.
-  ---- -x--  Coin counter.
-
+  ---- --x-  Ticket Motor.
+  ---- -x--  Coin In counter.
+  ---- x---  Ticket Coin Out.
+  -x-- ----  Hopper Coin Out
 */
 
 //  popmessage("lamps: %02X", data);
@@ -351,7 +358,26 @@ void magic10_state::magic10_out_w(uint16_t data)
 	m_lamps[6] = BIT(data, 6);      /* Lamp 7 - PLAY (BET/TAKE/CANCEL) */
 	m_lamps[7] = BIT(data, 8);      /* Lamp 8 - PAYOUT/SUPERGAME */
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x400);
+	machine().bookkeeping().coin_counter_w(0, data & 0x0400);  // Coin In.
+	machine().bookkeeping().coin_counter_w(6, data & 0x0200);  // Ticket Out.
+	machine().bookkeeping().coin_counter_w(7, data & 0x4000);  // Hopper Out.
+
+	m_hopper_state = (data & 0x4000) >> 14; 
+	m_ticket_state = (data & 0x0200) >> 9; 
+}
+
+/*****************/
+/* Pseudo Hopper */
+/*****************/
+
+READ_LINE_MEMBER(magic10_state::hopper_r)
+{
+    return m_hopper_state & 0x0001;
+}
+
+READ_LINE_MEMBER(magic10_state::ticket_r)
+{
+    return m_ticket_state & 0x0001;
 }
 
 /***************************
@@ -440,7 +466,7 @@ void magic10_state::sgsafari_map(address_map &map)
 	map(0x102000, 0x103fff).ram().w(FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
 	map(0x200000, 0x203fff).ram().share("nvram");
 	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500002, 0x500003).portr("DSW1");
+	map(0x500002, 0x500003).portr("IN1_DSW1");
 	map(0x500008, 0x500009).w(FUNC(magic10_state::magic10_out_w));
 	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x50000e, 0x50000f).portr("IN0");
@@ -478,7 +504,8 @@ static INPUT_PORTS_START( magic10 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(magic10_state, ticket_r) PORT_NAME("TKTSW")
+	//PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 
@@ -486,10 +513,29 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Logo" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(magic10_state, hopper_r) PORT_NAME("HPSW")
+//	PORT_DIPNAME( 0x0004, 0x0004, "0004" )
+//	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+//	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+//	PORT_DIPNAME( 0x0008, 0x0008, "0008" )
+//	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+//	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) // empty dispenser
-	PORT_DIPNAME( 0x00ee, 0x00ee, "Disable Free Play" )
-	PORT_DIPSETTING(      0x00ee, DEF_STR( Off ) )
+
+	PORT_DIPNAME( 0x00ec, 0x00ec, "Disable Free Play - Enable Credit Collect" )
+	PORT_DIPSETTING(      0x00ec, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+/*	PORT_DIPNAME( 0x0020, 0x0020, "0020" )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "0040" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "0080" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+*/
 	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
@@ -656,20 +702,28 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Half Gamble")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet / Take / Cancel)")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("REVISAR_1") PORT_CODE(KEYCODE_K)
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Coin 1")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin 2")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(magic10_state, ticket_r) PORT_NAME("TKTSW")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout / Super Game")
 
-	PORT_START("DSW1")
+	PORT_START("IN1_DSW1")
 	// TODO: defaults are hardwired with aforementioned startup code, is it intentional?
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(magic10_state, hopper_r) PORT_NAME("HPSW")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_DIPNAME( 0x0300,   0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(        0x0300, DEF_STR( Easy ) )
 	PORT_DIPSETTING(        0x0200, DEF_STR( Normal ) )

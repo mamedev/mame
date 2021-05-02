@@ -1026,6 +1026,7 @@ public:
 	void super21p(machine_config &config);
 	void caspoker(machine_config &config);
 	void icp_ext(machine_config &config);
+	void trilancek(machine_config &config);
 
 	void init_vkdlswwh();
 	void init_icp1db();
@@ -1116,6 +1117,7 @@ private:
 	void witchcrd_map(address_map &map);
 	void super21p_map(address_map &map);
 	void icp_ext_map(address_map &map);
+	void trilancek_map(address_map &map);
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -1190,7 +1192,8 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 
 	int attr = m_colorram[tile_index];
 	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+//	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+	int bank = ((attr & 0xc0 ) >> 5 ) + ((attr & 0x02 )>> 1 );
 	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
@@ -1858,6 +1861,19 @@ void goldnpkr_state::icp_ext_map(address_map &map)
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
 	map(0x6000, 0x7fff).rom();
+}
+
+void goldnpkr_state::trilancek_map(address_map &map)
+{
+//	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x2000, 0xffff).rom();  // the whole addressing
 }
 
 
@@ -4100,6 +4116,77 @@ static INPUT_PORTS_START( super21p )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( trilancek )
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )						PORT_NAME("Bet/Relance")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )					PORT_NAME("Service")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )					PORT_NAME("Deal/Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_IMPULSE(3) PORT_NAME("Manual Collect")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )                   PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )                    PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("IN0-3 01") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("IN0-3 02") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("IN0-3 10") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	// only bits 4-7 are connected here and were routed to SW1 1-4
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -4118,7 +4205,8 @@ static const gfx_layout tilelayout =
 static const gfx_layout fixedtilelayout =
 {
 	8, 8,
-	0x100,
+//	0x100,
+	RGN_FRAC(1,3),
 	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -4165,6 +4253,17 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_caspoker )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 128, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 128, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_trilancek )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx5", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx7", 0, fixedtilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx8", 0, fixedtilelayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -4328,6 +4427,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, CPU_CLOCK);
+//	R65C02(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldnpkr_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -4623,6 +4723,22 @@ void goldnpkr_state::caspoker(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+
+void goldnpkr_state::trilancek(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::trilancek_map);
+
+	// video hardware
+	m_gfxdecode->set_info(gfx_trilancek);
+	m_palette->set_init(FUNC(goldnpkr_state::witchcrd_palette));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*********************************************
@@ -11326,7 +11442,6 @@ ROM_END
   and one big relay, with unknown purposes. Etched "PS Public Softwear".
 
 */
-
 ROM_START( super21p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "13.ic4", 0xa000, 0x2000, CRC(6f414354) SHA1(290e97b876ce7aa9e273fe5f597caaa2e31992a8) ) // ok
@@ -11364,6 +11479,163 @@ ROM_START( super21p )
 	ROM_LOAD( "82s129_1.ic31", 0x0000, 0x0100, CRC(c3d777b4) SHA1(5a3c0325dcbddde3f8ae2ffbc1cb56cfccda308d) )
 	ROM_LOAD( "82s129_2.ic30", 0x0100, 0x0100, CRC(c9c12b13) SHA1(e0b26febb265af01f2caa891e14f4999400820b8) )
 	ROM_LOAD( "82s129_3.ic29", 0x0200, 0x0100, CRC(f079b80c) SHA1(c76706ad90a67ea7eda4e191840f95e18f3788d0) )
+ROM_END
+
+
+/*
+  Tri Lance Poker
+
+  There is an extra cards GFX bitplane
+  in the 1st half of the char ROM.
+
+*/
+ROM_START( trilance )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c64.bin",    0x2000, 0x2000, CRC(531f0788) SHA1(683dfa4de258f848c0aa1a5491a3feafba631c1f) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "2732.bin",      0x1000, 0x0800, CRC(97efa603) SHA1(c8d42fa0f0ca18a725f63b98f046caec01074d47) )  // text chars.
+	ROM_CONTINUE(              0x1000, 0x0800 )                                                                // 2nd half: text chars.
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716_1.bin",    0x0000, 0x0800, CRC(124f131f) SHA1(35b18d1d6b0146ecc5b52f3222a270c6b868742a) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "2716_2.bin",    0x0800, 0x0800, CRC(bc8e0d1f) SHA1(9e8e8e5c54f66948a782071d72ce129126d85e64) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "2716_3.bin",    0x1000, 0x0800, CRC(c8ac16d7) SHA1(90c77e4659c6c52ae87d73ea353cbebf953714b9) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.bin",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump needed
+ROM_END
+
+ROM_START( trilancea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c64.bin",    0x2000, 0x2000, CRC(531f0788) SHA1(683dfa4de258f848c0aa1a5491a3feafba631c1f) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                  0x0000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "2732_3_4.bin",  0x1000, 0x0800, CRC(97efa603) SHA1(c8d42fa0f0ca18a725f63b98f046caec01074d47) )  // 1st half: unknown cards bitplane.
+	ROM_CONTINUE(              0x1000, 0x0800 )                                                                // 2nd half: text chars.
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716_1.bin",    0x0000, 0x0800, CRC(124f131f) SHA1(35b18d1d6b0146ecc5b52f3222a270c6b868742a) )  // cards deck gfx, bitplane 1
+	ROM_LOAD( "2716_2.bin",    0x0800, 0x0800, CRC(bc8e0d1f) SHA1(9e8e8e5c54f66948a782071d72ce129126d85e64) )  // cards deck gfx, bitplane 2
+	ROM_LOAD( "2716_3.bin",    0x1000, 0x0800, CRC(c8ac16d7) SHA1(90c77e4659c6c52ae87d73ea353cbebf953714b9) )  // cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.bin",      0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump needed
+ROM_END
+
+ROM_START( trilancek )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512.u5",    0x0000, 0x10000, CRC(1beede75) SHA1(de364f8048d758b69aa904ccdaa079a47260f4a7) )
+
+/*
+     OFFSET         ROM 27512.u19 (2nd half)          ROM 27512.u20 (2nd half)          ROM 27512.u21 (2nd half)  
+  -------------+---------------------------------+---------------------------------+---------------------------------
+    0000-07ff    empty                             cards plane 2                     text chars
+    0800-0fff    empty                             empty                             cards plane 3
+    1000-17ff    empty                             alternate cardset? + GP           alt text chars (wing)
+    1800-1fff    empty                             alternate cardset?                few first tiles (selctor?)
+    2000-27ff    empty                             unk gfx                           title Grand Prix 91
+    2800-2fff    empty                             car title lower part              empty
+    3000-37ff    empty                             car title upper part              title Golden Poker
+    3800-3fff    empty                             empty                             empty
+    4000-47ff    cards plane 1                                                       empty
+    4800-4fff    title Wild Joker                                                    alternate cardset
+    5000-57ff    alternate cardset? (century)                                        empty
+    5800-5fff    no se, parecen abejitas                                             figuras upper
+    6000-67ff    alternate cardset?                                                  empty
+    6800-6fff    figuras upper                                                       figuras lower
+    7000-77ff    figuras lower                                                       empty
+    7800-7fff    GP title                                                            GP + bandera
+*/
+	ROM_REGION( 0x18000, "gfxpool", 0 )
+	ROM_LOAD( "27512.u19",    0x00000, 0x8000, CRC(2d3f9798) SHA1(861abd8f9674bed1fb80cab641e40c143f4c2ceb) )  // 27512, first half FF filled.
+	ROM_CONTINUE(             0x00000, 0x8000 )                                                                // 2nd half: data starts at $4000.
+	ROM_LOAD( "27512.u20",    0x08000, 0x8000, CRC(a0a7d392) SHA1(45afce9ef8290094bc967180c000e85b0181b5d3) )  // 27512, identical quarters
+	ROM_CONTINUE(             0x08000, 0x8000 )                                                                // 2nd half: 2 identical quarters.
+	ROM_LOAD( "27512.u21",    0x10000, 0x8000, CRC(14f06474) SHA1(929dfc5571ddde8102ede91c665d50a03f0c0f8f) )  // 27512, first half FF filled.
+	ROM_CONTINUE(             0x10000, 0x8000 )                                                                // 2nd half: all is valid data.
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_FILL(            0x00000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x10000, 0x1000, 0x0800 )  // src-dest-size
+
+//	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+//	ROM_COPY( "gfxpool", 0x04000, 0x0000, 0x0800 ) // src-dest-size
+//	ROM_COPY( "gfxpool", 0x08000, 0x0800, 0x0800 ) // src-dest-size
+//	ROM_COPY( "gfxpool", 0x10800, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x18000, "gfx2", 0 )  // cards
+	ROM_FILL(            0x00000, 0x10000, 0x0000 )  // filling the R-G bitplanes
+	ROM_LOAD( "m27c512.u20",    0x10000, 0x8000, CRC(0000d392) SHA1(45afce9ef8290094bc967180c000e85b0181b5d3) )  // 27512, identical quarters
+	ROM_CONTINUE(               0x10000, 0x8000 )                                                                // 2nd half: all is valid data.
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // alt chars (wing)
+	ROM_FILL(            0x00000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x11000, 0x1000, 0x0800 )  // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // special numbers and car card
+	ROM_COPY( "gfxpool", 0x02000, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x0a000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x14800, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx5", 0 )  // car title upper part
+	ROM_COPY( "gfxpool", 0x03000, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x03000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x15800, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx7", 0 )  // car title medium part
+	//ROM_COPY( "gfxpool", 0x02800, 0x0000, 0x0800 ) // src-dest-size
+	//ROM_COPY( "gfxpool", 0x02800, 0x0800, 0x0800 ) // src-dest-size
+	//ROM_COPY( "gfxpool", 0x16800, 0x1000, 0x0800 ) // src-dest-size
+    
+	ROM_FILL(            0x00000, 0x1000, 0x0000 )  // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x13000, 0x1000, 0x0800 )  // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx6", 0 )  // car title lower part + GP
+	ROM_COPY( "gfxpool", 0x03800, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x03800, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x17800, 0x1000, 0x0800 ) // src-dest-size
+	//ROM_COPY( "gfxpool", 0x07000, 0x0000, 0x0800 ) // src-dest-size
+	//ROM_COPY( "gfxpool", 0x0f000, 0x0800, 0x0800 ) // src-dest-size
+	//ROM_COPY( "gfxpool", 0x17000, 0x1000, 0x0800 ) // src-dest-size
+
+	ROM_REGION( 0x1800, "gfx8", 0 )  // few tiles (selector?)
+	ROM_COPY( "gfxpool", 0x01000, 0x0000, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x09000, 0x0800, 0x0800 ) // src-dest-size
+	ROM_COPY( "gfxpool", 0x11800, 0x1000, 0x0800 ) // src-dest-size
+
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tsp24s10.u8",  0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump needed
+ROM_END
+
+
+/*
+  Tri Lance Poker alternate
+
+  dunno... testing
+  
+*/
+ROM_START( trilancec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "game_27128.15a",   0x2000, 0x2000, CRC(00000788) SHA1(683dfa4de258f848c0aa1a5491a3feafba631c1f) )
+	ROM_CONTINUE(                 0x2000, 0x2000 )                                                                // identical halves.
+	ROM_LOAD( "game_2732.16a",    0x7000, 0x1000, CRC(00000788) SHA1(683dfa4de258f848c0aa1a5491a3feafba631c1f) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "2.7a",    0x2000, 0x1000, CRC(000044d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    // chars / cards deck gfx, bitplane 3
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "0.5a",    0x0000, 0x1000, CRC(000006c4) SHA1(45b874554fb487173acf12daa4ff99e49e335362) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "1.6a",    0x1000, 0x1000, CRC(0000c680) SHA1(3723f66e1def3908f2e6ba2989def229d9846b02) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",    0x2800, 0x2000, 0x0800 )    // cards deck gfx, bitplane 3. found in the 2nd quarter of the chars rom
+
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s129.bin",      0x0000, 0x0100, CRC(0000066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )  // PROM dump needed
 ROM_END
 
 
@@ -11963,6 +12235,13 @@ GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init
 GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
 GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
 GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
+
+GAME(  198?, trilance,  0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Tri Lance Poker (set 1)",                 MACHINE_NOT_WORKING )
+GAME(  198?, trilancea, 0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Tri Lance Poker (set 2)",                 MACHINE_NOT_WORKING )
+
+GAME(  198?, trilancec, 0,        geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Tri Lance Poker alt",                    0 )
+
+GAME(  198?, trilancek, 0,        trilancek, trilancek, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Tri Lance Poker (kanda)",                 MACHINE_NOT_WORKING )
 
 GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )   // lacks of 2nd program ROM.
