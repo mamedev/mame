@@ -179,7 +179,7 @@ void changyu_state::changyu2(machine_config &config)
 {
 	changyu(config);
 
-	I87C51(config.replace(), "mcu", XTAL(8'000'000)).set_disable(); // not dumped yet
+	I87C51(config.replace(), "mcu", XTAL(8'000'000));
 
 	YM2413(config, "ymsnd", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -225,7 +225,7 @@ ROM_START( changyu2 ) // 999 ROM999 II BY HUANGYEH string
 	ROM_LOAD( "95.bin", 0x00000, 0x10000, CRC(c3a8061f) SHA1(8e2b2509de32b90c0ac5f3eabb8d256a1fbb393e) ) // 27C512
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "99c.bin", 0x00000, 0x1000, NO_DUMP ) // needs decap
+	ROM_LOAD( "99c.bin", 0x00000, 0x1000, CRC(8d52dc7d) SHA1(84ae3d95696aec6a13401ea46f7b13410dc9c31b) ) // decapped
 
 	ROM_REGION(0x20000, "gfx1", 0)
 	ROM_LOAD( "91.bin",  0x00000, 0x08000, CRC(747c98e3) SHA1(30926ee500c6ee21b7e73424afc76f34d84cb896) ) // 27256
