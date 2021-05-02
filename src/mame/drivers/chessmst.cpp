@@ -251,6 +251,8 @@ void chessmst_state::pio1_port_b_dm_w(uint8_t data)
 
 	m_direct_led[0] = BIT(data, 5); // monitor
 	m_direct_led[1] = BIT(data, 6); // playmode
+
+	// d4 and d7 also go to cartslot, but unused
 }
 
 uint8_t chessmst_state::pio2_port_a_r()

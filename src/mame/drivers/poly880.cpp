@@ -339,19 +339,19 @@ void poly880_state::poly880(machine_config &config)
 	config.set_default_layout(layout_poly880);
 
 	// devices
-	Z80CTC(config, m_ctc, XTAL(7'372'800)/16);
+	Z80CTC(config, m_ctc, XTAL(7'372'800)/8);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(poly880_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
-	Z80PIO(config, m_pio[0], XTAL(7'372'800)/16);
+	Z80PIO(config, m_pio[0], XTAL(7'372'800)/8);
 	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_pio[0]->out_pa_callback().set(FUNC(poly880_state::pio1_pa_w));
 	m_pio[0]->in_pb_callback().set(FUNC(poly880_state::pio1_pb_r));
 	m_pio[0]->out_pb_callback().set(FUNC(poly880_state::pio1_pb_w));
 
-	Z80PIO(config, m_pio[1], XTAL(7'372'800)/16);
+	Z80PIO(config, m_pio[1], XTAL(7'372'800)/8);
 	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	CASSETTE(config, m_cassette);

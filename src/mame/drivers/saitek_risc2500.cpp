@@ -4,9 +4,9 @@
 
 Saitek RISC 2500, Mephisto Montreux
 
-The chess engine is also compatible with Tasc's The ChessMachine software.
-The hardware+software appears to have been subcontracted to Tasc. It has
-similarities with Tasc R30.
+The chess engine (The King) is also compatible with Tasc's The ChessMachine
+software. The hardware+software appears to have been subcontracted to Tasc.
+It has similarities with Tasc R30.
 
 To make sure it continues the game at next power-on, press the OFF button before
 exiting MAME. If nvram is broken somehow, boot with the BACK button held down.
