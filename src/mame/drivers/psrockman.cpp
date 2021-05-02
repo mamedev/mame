@@ -118,9 +118,9 @@ void psrockman_state::psrockman(machine_config &config)
 	ym.port_a_read_callback().set_ioport("DSW1"); // guess
 	ym.port_b_read_callback().set_ioport("DSW2"); // guess
 	ym.irq_handler().set_inputline("maincpu", 0); // TODO: with this the game says 係員をお呼びください (Please call staff) over and over
-	ym.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ym.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);; // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock frequency & pin 7 not verified
 }
 
 
