@@ -4626,28 +4626,22 @@
 		</element>
 
 		<element name="lamp20" ref="reel_lamp_layer_0" state="0">
-			<bounds x="168.0000" y="235.0000" width="70" height="70">
-			</bounds>
+			<bounds x="168.0000" y="235.0000" width="70" height="70"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_1" state="0">
-			<bounds x="172.0000" y="238.0000" width="62" height="62">
-			</bounds>
+			<bounds x="172.0000" y="238.0000" width="62" height="62"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_2" state="0">
-			<bounds x="176.0000" y="241.0000" width="54" height="54">
-			</bounds>
+			<bounds x="176.0000" y="241.0000" width="54" height="54"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_3" state="0">
-			<bounds x="180.0000" y="244.0000" width="46" height="46">
-			</bounds>
+			<bounds x="180.0000" y="244.0000" width="46" height="46"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_4" state="0">
-			<bounds x="184.0000" y="247.0000" width="38" height="38">
-			</bounds>
+			<bounds x="184.0000" y="247.0000" width="38" height="38"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_5" state="0">
-			<bounds x="188" y="255" width="30" height="30">
-			</bounds>
+			<bounds x="188" y="255" width="30" height="30"/>
 		</element>
 		<element name="sreel4" ref="reel3" state="0">
 			<bounds x="167" y="235" width="70" height="70"/>

@@ -1701,106 +1701,82 @@
 	</element>
 	<element name="lamp_230_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_230_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_231_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_231_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_232_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_232_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="2">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_233_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_233_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="1">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_229_1_border" defstate="0">
@@ -5509,36 +5485,28 @@
 			<bounds x="154" y="304" width="14" height="28"/>
 		</element>
 		<element name="lamp230" ref="lamp_230_1_border" state="0">
-			<bounds x="212" y="530" width="37" height="47">
-			</bounds>
+			<bounds x="212" y="530" width="37" height="47"/>
 		</element>
 		<element name="lamp230" ref="lamp_230_1" state="0">
-			<bounds x="214" y="532" width="33" height="43">
-			</bounds>
+			<bounds x="214" y="532" width="33" height="43"/>
 		</element>
 		<element name="lamp231" ref="lamp_231_1_border" state="0">
-			<bounds x="175" y="530" width="37" height="47">
-			</bounds>
+			<bounds x="175" y="530" width="37" height="47"/>
 		</element>
 		<element name="lamp231" ref="lamp_231_1" state="0">
-			<bounds x="177" y="532" width="33" height="43">
-			</bounds>
+			<bounds x="177" y="532" width="33" height="43"/>
 		</element>
 		<element name="lamp232" ref="lamp_232_1_border" state="0">
-			<bounds x="138" y="530" width="37" height="47">
-			</bounds>
+			<bounds x="138" y="530" width="37" height="47"/>
 		</element>
 		<element name="lamp232" ref="lamp_232_1" state="0">
-			<bounds x="140" y="532" width="33" height="43">
-			</bounds>
+			<bounds x="140" y="532" width="33" height="43"/>
 		</element>
 		<element name="lamp233" ref="lamp_233_1_border" state="0">
-			<bounds x="101" y="530" width="37" height="47">
-			</bounds>
+			<bounds x="101" y="530" width="37" height="47"/>
 		</element>
 		<element name="lamp233" ref="lamp_233_1" state="0">
-			<bounds x="103" y="532" width="33" height="43">
-			</bounds>
+			<bounds x="103" y="532" width="33" height="43"/>
 		</element>
 		<element name="lamp229" ref="lamp_229_1_border" state="0">
 			<bounds x="151" y="498" width="52" height="32"/>

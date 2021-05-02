@@ -2370,444 +2370,342 @@
 
 	<element name="lamp_55_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_55_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Mixed Bar &#xA3;15">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_60_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_60_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Grapes &#xA3;25">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_64_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_64_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X JPM &#xA3;50">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_68_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_68_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Single Bar &#xA3;75">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_142_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_142_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Triple Bar &#xA3;150">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_140_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_140_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4x GUAB &#xA3;250">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_92_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_92_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Double Bar &#xA3;100">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_242_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_242_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Cherry &#xA3;1">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_240_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_240_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Mixed Bar &#xA3;1.20">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_230_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_230_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Grapes &#xA3;1.60">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_228_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_228_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X JPM &#xA3;2">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_221_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_221_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Single Bar &#xA3;3">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_219_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_219_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Double Bar &#xA3;4">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_217_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_217_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Triple Bar &#xA3;5">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_215_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_215_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X GUAB &#xA3;6">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_49_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_49_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="3X Cashpot &#xA3;8">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="lamp_51_1_border" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.00">
-			</color>
+			<color red="0.50" green="0.50" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.12" blue="0.00">
-			</color>
+			<color red="0.12" green="0.12" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="lamp_51_1" defstate="0">
 		<rect state="1">
-			<color red="1.00" green="1.00" blue="0.00">
-			</color>
+			<color red="1.00" green="1.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.25" blue="0.00">
-			</color>
+			<color red="0.25" green="0.25" blue="0.00"/>
 		</rect>
 		<text string="4X Cherry &#xA3;10">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 
@@ -3093,36 +2991,28 @@
 	</element>
 	<element name="colour_button_172_border">
 		<rect state="1">
-			<color red="0.50" green="0.00" blue="0.00">
-			</color>
+			<color red="0.50" green="0.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.12" green="0.00" blue="0.00">
-			</color>
+			<color red="0.12" green="0.00" blue="0.00"/>
 		</rect>
 	</element>
 	<element name="colour_button_172">
 		<rect state="1">
-			<color red="1.00" green="0.00" blue="0.00">
-			</color>
+			<color red="1.00" green="0.00" blue="0.00"/>
 		</rect>
 		<rect state="0">
-			<color red="0.25" green="0.00" blue="0.00">
-			</color>
+			<color red="0.25" green="0.00" blue="0.00"/>
 		</rect>
 		<text string="&#xA3;1">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 	<element name="label_148">
 		<text string="4X Cashpot">
-			<color red="0.0" green="0.0" blue="0.0">
-			</color>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90">
-			</bounds>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
 
@@ -5302,12 +5192,10 @@
 			<bounds x="176" y="447" width="80" height="160"/>
 		</element>
 		<element name="lamp14" ref="colour_button_171_border" state="0" inputtag="COINS" inputmask="0x01">
-			<bounds x="723" y="6" width="52" height="27">
-			</bounds>
+			<bounds x="723" y="6" width="52" height="27"/>
 		</element>
 		<element name="lamp14" ref="colour_button_171" state="0" inputtag="COINS" inputmask="0x01">
-			<bounds x="725" y="8" width="48" height="23">
-			</bounds>
+			<bounds x="725" y="8" width="48" height="23"/>
 		</element>
 
 		<element name="lamp2" ref="reel_lamp_layer_0" state="0">
@@ -5746,140 +5634,106 @@
 			<bounds x="193" y="411" width="298" height="15"/>
 		</element>
 		<element name="lamp55" ref="lamp_55_1_border" state="0">
-			<bounds x="775" y="208" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="208" width="142" height="37"/>
 		</element>
 		<element name="lamp55" ref="lamp_55_1" state="0">
-			<bounds x="777" y="210" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="210" width="138" height="33"/>
 		</element>
 		<element name="lamp60" ref="lamp_60_1_border" state="0">
-			<bounds x="775" y="174" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="174" width="142" height="37"/>
 		</element>
 		<element name="lamp60" ref="lamp_60_1" state="0">
-			<bounds x="777" y="176" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="176" width="138" height="33"/>
 		</element>
 		<element name="lamp64" ref="lamp_64_1_border" state="0">
-			<bounds x="775" y="140" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="140" width="142" height="37"/>
 		</element>
 		<element name="lamp64" ref="lamp_64_1" state="0">
-			<bounds x="777" y="142" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="142" width="138" height="33"/>
 		</element>
 		<element name="lamp68" ref="lamp_68_1_border" state="0">
-			<bounds x="775" y="106" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="106" width="142" height="37"/>
 		</element>
 		<element name="lamp68" ref="lamp_68_1" state="0">
-			<bounds x="777" y="108" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="108" width="138" height="33"/>
 		</element>
 		<element name="lamp142" ref="lamp_142_1_border" state="0">
-			<bounds x="775" y="38" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="38" width="142" height="37"/>
 		</element>
 		<element name="lamp142" ref="lamp_142_1" state="0">
-			<bounds x="777" y="40" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="40" width="138" height="33"/>
 		</element>
 		<element name="lamp140" ref="lamp_140_1_border" state="0">
-			<bounds x="775" y="4" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="4" width="142" height="37"/>
 		</element>
 		<element name="lamp140" ref="lamp_140_1" state="0">
-			<bounds x="777" y="6" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="6" width="138" height="33"/>
 		</element>
 		<element name="lamp92" ref="lamp_92_1_border" state="0">
-			<bounds x="775" y="72" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="72" width="142" height="37"/>
 		</element>
 		<element name="lamp92" ref="lamp_92_1" state="0">
-			<bounds x="777" y="74" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="74" width="138" height="33"/>
 		</element>
 		<element name="lamp242" ref="lamp_242_1_border" state="0">
-			<bounds x="775" y="548" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="548" width="102" height="37"/>
 		</element>
 		<element name="lamp242" ref="lamp_242_1" state="0">
-			<bounds x="777" y="550" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="550" width="98" height="33"/>
 		</element>
 		<element name="lamp240" ref="lamp_240_1_border" state="0">
-			<bounds x="775" y="514" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="514" width="102" height="37"/>
 		</element>
 		<element name="lamp240" ref="lamp_240_1" state="0">
-			<bounds x="777" y="516" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="516" width="98" height="33"/>
 		</element>
 		<element name="lamp230" ref="lamp_230_1_border" state="0">
-			<bounds x="775" y="480" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="480" width="102" height="37"/>
 		</element>
 		<element name="lamp230" ref="lamp_230_1" state="0">
-			<bounds x="777" y="482" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="482" width="98" height="33"/>
 		</element>
 		<element name="lamp228" ref="lamp_228_1_border" state="0">
-			<bounds x="775" y="446" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="446" width="102" height="37"/>
 		</element>
 		<element name="lamp228" ref="lamp_228_1" state="0">
-			<bounds x="777" y="448" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="448" width="98" height="33"/>
 		</element>
 		<element name="lamp221" ref="lamp_221_1_border" state="0">
-			<bounds x="775" y="412" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="412" width="102" height="37"/>
 		</element>
 		<element name="lamp221" ref="lamp_221_1" state="0">
-			<bounds x="777" y="414" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="414" width="98" height="33"/>
 		</element>
 		<element name="lamp219" ref="lamp_219_1_border" state="0">
-			<bounds x="775" y="378" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="378" width="102" height="37"/>
 		</element>
 		<element name="lamp219" ref="lamp_219_1" state="0">
-			<bounds x="777" y="380" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="380" width="98" height="33"/>
 		</element>
 		<element name="lamp217" ref="lamp_217_1_border" state="0">
-			<bounds x="775" y="344" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="344" width="102" height="37"/>
 		</element>
 		<element name="lamp217" ref="lamp_217_1" state="0">
-			<bounds x="777" y="346" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="346" width="98" height="33"/>
 		</element>
 		<element name="lamp215" ref="lamp_215_1_border" state="0">
-			<bounds x="775" y="310" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="310" width="102" height="37"/>
 		</element>
 		<element name="lamp215" ref="lamp_215_1" state="0">
-			<bounds x="777" y="312" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="312" width="98" height="33"/>
 		</element>
 		<element name="lamp49" ref="lamp_49_1_border" state="0">
-			<bounds x="775" y="276" width="102" height="37">
-			</bounds>
+			<bounds x="775" y="276" width="102" height="37"/>
 		</element>
 		<element name="lamp49" ref="lamp_49_1" state="0">
-			<bounds x="777" y="278" width="98" height="33">
-			</bounds>
+			<bounds x="777" y="278" width="98" height="33"/>
 		</element>
 		<element name="lamp51" ref="lamp_51_1_border" state="0">
-			<bounds x="775" y="242" width="142" height="37">
-			</bounds>
+			<bounds x="775" y="242" width="142" height="37"/>
 		</element>
 		<element name="lamp51" ref="lamp_51_1" state="0">
-			<bounds x="777" y="244" width="138" height="33">
-			</bounds>
+			<bounds x="777" y="244" width="138" height="33"/>
 		</element>
 		<element name="lamp227" ref="lamp_227_1_border" state="0">
 			<bounds x="807" y="583" width="42" height="19"/>

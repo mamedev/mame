@@ -4927,28 +4927,22 @@
 			<bounds x="5" y="180" width="80" height="80"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_0" state="0">
-			<bounds x="5.0000" y="180.0000" width="80" height="80">
-			</bounds>
+			<bounds x="5.0000" y="180.0000" width="80" height="80"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_1" state="0">
-			<bounds x="13.0000" y="188.0000" width="72" height="72">
-			</bounds>
+			<bounds x="13.0000" y="188.0000" width="72" height="72"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_2" state="0">
-			<bounds x="21.0000" y="196.0000" width="64" height="64">
-			</bounds>
+			<bounds x="21.0000" y="196.0000" width="64" height="64"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_3" state="0">
-			<bounds x="29.0000" y="204.0000" width="56" height="56">
-			</bounds>
+			<bounds x="29.0000" y="204.0000" width="56" height="56"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_4" state="0">
-			<bounds x="37.0000" y="212.0000" width="48" height="48">
-			</bounds>
+			<bounds x="37.0000" y="212.0000" width="48" height="48"/>
 		</element>
 		<element name="lamp20" ref="reel_lamp_layer_5" state="0">
-			<bounds x="45" y="200" width="40" height="40">
-			</bounds>
+			<bounds x="45" y="200" width="40" height="40"/>
 		</element>
 		<element name="sreel4" ref="reel3" state="0">
 			<bounds x="5" y="180" width="80" height="80"/>
