@@ -238,7 +238,7 @@ protected:
 			AY8910(config, m_ssg, device_t::clock());
 			m_ssg->set_psg_type(ay8910_device::PSG_TYPE_YM);
 			if (SSGStreams == 1)
-				m_ssg->set_flags(AY8910_SINGLE_OUTPUT);
+				m_ssg->set_flags(AY8910_SINGLE_OUTPUT | AY8910_LEGACY_OUTPUT);
 
 			// configure the callbacks to route through our callbacks
 			m_ssg->port_a_read_callback().set([this] () { return m_io_read[0].isnull() ? 0 : m_io_read[0](0); });
