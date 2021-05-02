@@ -932,4 +932,147 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
+	<software name="institute">
+		<description>Institute</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4080">
+				<rom name="institute.bee" size="0x4080" crc="6612741d" sha1="0a92c9e679527f2824aa591799fcaa83d1b25e1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeksil">
+		<description>Jeksils Revenge</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5480">
+				<rom name="jeksil.mwb" size="0x5480" crc="25b94613" sha1="4f292fe80fd78e75a16d7c1fefad610356fd811b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungle">
+		<description>Jungle Raiders</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x174d">
+				<rom name="jungle.bee" size="0x174d" crc="acf1fd7e" sha1="2c1a08f3138fdbf64788be6db7e9b8c7c9ffb9f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killbees">
+		<description>Killer Bees</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5f00">
+				<rom name="killbees.mwb" size="0x5f00" crc="a2cba4ee" sha1="daa49a0513a62fd99ddd251fa78ff6939870a901"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="killbeet">
+		<description>Killer Beetles</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x196e">
+				<rom name="killer.bee" size="0x196e" crc="263cb3b0" sha1="9ed8970460eba6fb6f69ce294390e4d675200500"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingtut">
+		<description>King Tut</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3730">
+				<rom name="kingtut.bee" size="0x3730" crc="7a171014" sha1="7155243fe36c9c6fe3c2e0ac1404be7d201e0c1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfu">
+		<description>Kung Fu</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2c80">
+				<rom name="jungle.bee" size="0x2c80" crc="29814d07" sha1="2164505d1a06d7b7290c42f0ef2301eace85bc18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laserb">
+		<description>Laser Blazer</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1100">
+				<rom name="laserb.bee" size="0x1100" crc="4c159ca9" sha1="ce87fe2337835903a6215483d67ff792338f9739"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemon">
+		<description>Lemonade Stall</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="lemonade.mwb" size="0x3300" crc="8c610cff" sha1="ded0d1b60013f95e1aeab1b38bd990567edc38e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lexone">
+		<description>Land of Lex</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2900">
+				<rom name="lexone.mwb" size="0x2900" crc="df9c7d07" sha1="b31f3586ed75b7cff28dee7e3aec4f1a6fef7d48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lracer">
+		<description>Lightracer</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0500">
+				<rom name="lightracer.bin" size="0x0500" crc="40ca44cb" sha1="cde8d861f05e9c5c3ffb74059cfc607f64e7eaec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lostisld">
+		<description>Lost Island</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x7019">
+				<rom name="lostisland.bin" size="0x7019" crc="85402957" sha1="d722de16e279784076c48d00cbbb029c915923db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunarl">
+		<description>Lunar Lander</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0dd2">
+				<rom name="lunarl.bin" size="0x0dd2" crc="c941d173" sha1="cb90c4ddc619afee683a71e8e0f7f2e5f8db380d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
