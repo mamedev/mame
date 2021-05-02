@@ -384,7 +384,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 
 	<software name="cricket">
 		<description>Cricket</description>
-		<year>1984</year><!-- year of port unknown-->
+		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0380">
@@ -395,11 +395,165 @@ Quickloads do not work on disk-based microbees, or on premium models.
 
 	<software name="cuppin">
 		<description>Cuppin</description>
-		<year>198?</year><!-- year of port unknown-->
+		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0300">
 				<rom name="cuppin.bin" size="0x0300" crc="34cc241d" sha1="2d9a5869c441d4a5778bfa69b12fb1214ed74606"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtrap">
+		<description>Deathtrap</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1180">
+				<rom name="deathtrap.bin" size="0x1180" crc="7689652a" sha1="66b1838ad5583258c285aa77d21df2f3fe665d88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Micro Defender</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d20">
+				<rom name="defender.bin" size="0x3d20" crc="36f807be" sha1="2f79dc655e98415e524a32a426bf3245e9f630df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defense">
+		<description>Defense Command</description>
+		<year>1982</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x383e">
+				<rom name="defense.bee" size="0x383e" crc="889dd651" sha1="1843cc8bc2415c1b8589e303ba1c3417811b08d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="depthc1">
+		<description>Depth Charge</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1000">
+				<rom name="depthcharge.bee" size="0x1000" crc="a4f2c04b" sha1="7b535ff586e27d384c0128927990f065e52d9766"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="depthc2">
+		<description>Depth Charge (alt)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0d97">
+				<rom name="depthcharge.bin" size="0x0d97" crc="c710d958" sha1="9a9c7071a6bd5110bd06e2592189dfea608f3fd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destroyer">
+		<description>Destroyer</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0ff3">
+				<rom name="destroyer.bin" size="0x0ff3" crc="3b293d1c" sha1="8f5f3dab157cf984500c721607ef6b66d9b8a9c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dodgem">
+		<description>Dodgem</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0580">
+				<rom name="dodgem.mwb" size="0x0580" crc="4c33d9b5" sha1="e22505c0b4ef2cdc9cd32dd573478a5fdf7f269b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donjon">
+		<description>Donjon</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4c00">
+				<rom name="donjon.mwb" size="0x4c00" crc="769c4d4b" sha1="dbe5d183d0b219c244421b9d634f25a75b20ce52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donut">
+		<description>Donut Dilemma</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3278">
+				<rom name="donut.bee" size="0x3278" crc="923ae618" sha1="c59a619ccb3d55781d2308b7a227b7f181e8757e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="draughts">
+		<description>Draughts Plus</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2f00">
+				<rom name="draughts.bin" size="0x2f00" crc="1fb9bd84" sha1="1326eaac8edd0dad8a5f571a92a8f6fc9f97cbfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="driver"><!-- crashes due to bad programming -->
+		<description>Driver</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0780">
+				<rom name="driver.mwb" size="0x0780" crc="8e5127e0" sha1="b7d2a0b7f1167c447d167c0dfc4f5c6f43899f4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="droids">
+		<description>Droids</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2980">
+				<rom name="donut.bee" size="0x2980" crc="6c86fe4e" sha1="d99949719b4ad06244afcdb2fca4e73f61da1abd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunkhan">
+		<description>Dungeons of Khan</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5d00">
+				<rom name="dunkhan.mwb" size="0x5d00" crc="48783d2c" sha1="ede1a7e97f2651dfa9dd6940752213d447473d18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swordq">
+		<description>Sword Quest</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5800">
+				<rom name="swordquest.mwb" size="0x5800" crc="05d74c8c" sha1="ffd7884c60b24773152cdd73632f48a410e0c048"/>
 			</dataarea>
 		</part>
 	</software>
