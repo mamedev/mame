@@ -2425,6 +2425,29 @@ ROM_START( pzlbreak )
 	ROM_LOAD( "3.ua5", 0x080000, 0x80000, CRC(6cdb73e9) SHA1(649e91ee54de2b359a207bed4d950db95515a3d8) )
 ROM_END
 
+ROM_START( pzlbreaka )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uh12", 0x00001, 0x20000, CRC(c8a82ca8) SHA1(ee19c253af9c7c8a33435d9d2494c50f16033572) )
+	ROM_LOAD16_BYTE( "ui12", 0x00000, 0x20000, CRC(2f66c4ce) SHA1(4349f093ce1267c2ebcbf1233082661604f10851) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "u1", 0x00000, 0x10000 , CRC(1ad646b7) SHA1(0132baa097e48df2450afdcd316375dc546ea4d0) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) // Intel 87C52 MCU Code
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASEFF ) // Data from Shared RAM
+	// this is not a real rom but instead the data extracted from shared ram, the MCU puts it there
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, BAD_DUMP CRC(092cb794) SHA1(eb2b336d97b440453ca37ee7605654b35dfb6bad) ) // extracted from the parent set, so marked as bad
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "uj15", 0x00000, 0x20000, CRC(5cdffcc5) SHA1(793a20bd0480cfea0dbf9397797428f6d105f724) ) // 1xxxxxxxxxxxxxxxx = 0xFF and half sized compared to the parent
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "ua4", 0x000000, 0x80000, CRC(d211705a) SHA1(b3a7f8198dc8c034b17b843b2ab0298426de3f55) )
+	ROM_LOAD( "ua5", 0x080000, 0x80000, CRC(eb3044bc) SHA1(c00e7b112b82c8eeb59c2a96168ea5156347f05e) ) // some differences compared to the parent
+ROM_END
+
 
 ROM_START( toppyrap )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
@@ -2984,7 +3007,8 @@ GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_co
 GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, pzlbreaka,  pzlbreak, semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, empty_init,    ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinklea,   twinkle,  semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 2)", MACHINE_SUPPORTS_SAVE )

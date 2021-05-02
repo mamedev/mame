@@ -455,7 +455,6 @@ MACHINES["MPCC68561"] = true
 MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
-MACHINES["AAKARTDEV"] = true
 MACHINES["ACIA6850"] = true
 MACHINES["ACORN_IOC"] = true
 MACHINES["ACORN_MEMC"] = true
@@ -1484,7 +1483,6 @@ function createProjects_mame_mess(_target, _subtarget)
 if (_subtarget=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
 files {
-	MAME_DIR .. "src/mame/machine/archimds.cpp",
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",

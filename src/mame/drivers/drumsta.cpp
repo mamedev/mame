@@ -42,7 +42,6 @@ void drumsta_state::drumsta_data(address_map &map)
 	map(0x0001, 0x0001).noprw();
 	map(0x0003, 0x0003).noprw();
 	map(0x000e, 0x000f).noprw();
-	map(0x0015, 0x0015).noprw();
 	map(0x0060, 0x031f).ram();
 	map(0xb000, 0xb7ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 }

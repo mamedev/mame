@@ -176,8 +176,8 @@ MODEL-1 CPU BOARD 837-8886171-6298C (C) SEGA 1992
 |       LED11         LED6 LED7 LED8 LED9 LED10                                                |---------------|                  |
 |---------------------------------------------------------------------------------------------------------------------------------|
 Notes:
-      84256         - Fujitsu 84256A-70LL 32k x8 SRAM (x6, DIP28)
-      HM658128      - Hitachi HM658128ALP-10 16k x8 SRAM (x2, DIP32)
+      84256         - Fujitsu MB84256A-70LL 32k x8 SRAM (x6, DIP28)
+      HM658128      - Hitachi HM658128ALP-10 128k x8 PSRAM (x2, DIP32)
       M5M5178       - Mitsubishi M5M5178AP-25 8k x8 SRAM (x4, DIP28)
       CN1, CN2      - Connectors to join CPU board to Video board
       CN3           - Connector for power and input/output controls (joins small adapter board to a larger filter board)
@@ -267,9 +267,9 @@ VIDEO PCB
 |  HM65256         HM65256          HM65256        HM65256                                        CN4          CN3      LED1      |
 |---------------------------------------------------------------------------------------------------------------------------------|
 Notes:
-      HM65256  - Hitachi HM65256BLSP-10 32k x8 SRAM (x34, DIP28)
-      HM658128 - Hitachi HM658128ALP-10 16k x8 SRAM (x10, DIP32)
-      HM658512 - Hitachi HM658512LP-8 64k x8 SRAM (x2, DIP32)
+      HM65256  - Hitachi HM65256BLSP-10 32k x8 PSRAM (x34, DIP28)
+      HM658128 - Hitachi HM658128ALP-10 128k x8 PSRAM (x10, DIP32)
+      HM658512 - Hitachi HM658512LP-8 512k x8 PSRAM (x2, DIP32)
       M5M5178  - Mitsubishi M5M5178AP-25 8k x8 SRAM (x7, DIP28)
       CY7B185  - Cypress CY7B185 8k x8 SRAM (x4, DIP28)
       J1       - Jumper, set to 2-3
@@ -1714,7 +1714,7 @@ void model1_state::model1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // exact type uncertain
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x MB84256A-70LL + battery
 
 	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
 	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);

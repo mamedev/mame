@@ -988,6 +988,7 @@ spikes91                        // bootleg
 spikes91b                       // bootleg
 spinlbrk                        // (c) 1990 V-System Co. (World)
 spinlbrkj                       // (c) 1990 V-System Co. (Japan)
+spinlbrkjp                      // (c) 1990 V-System Co. (Japan, prototype)
 spinlbrku                       // (c) 1990 V-System Co. (US)
 svolly91                        // (c) 1991 Video System Co. (Japan)
 turbofrc                        // (c) 1991 Video System Co.
@@ -9845,7 +9846,8 @@ comg240                         // (c) 1985 Cal Omega / Casino Electronics Inc.
 comg246                         // (c) 1985 Cal Omega Inc.
 comg272a                        // (c) 1985 Cal Omega Inc.
 comg272b                        // (c) 1985 Cal Omega Inc.
-comg5108                        // (c) 1985 Casino Electronics Inc.
+comg5107                        // (c) 1988 Casino Electronics Inc.
+comg5108                        // (c) 1988 Casino Electronics Inc.
 comg903d                        // (c) 198? Cal Omega Inc.
 comg905d                        // (c) 198? Cal Omega Inc.
 elgrande                        // (c) 1982 Tuni Electro Service / E.T. Marketing
@@ -38435,6 +38437,7 @@ moremore                        // (c) 1999 SemiCom + Exit
 moremorp                        // (c) 1999 SemiCom + Exit
 multi96                         // (c) 1996 Barko Corp
 pzlbreak                        // (c) 1997 SemiCom
+pzlbreaka                       // (c) 1997 SemiCom
 snowbro3                        // (c) 2002 Syrmex
 snowbros                        // MIN16-02 (c) 1990 Toaplan + Romstar license
 snowbrosa                       // MIN16-02 (c) 1990 Toaplan + Romstar license

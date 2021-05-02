@@ -47,7 +47,6 @@ void basssta_state::bassstr_data(address_map &map)
 	map(0x0001, 0x0001).noprw();
 	map(0x0003, 0x0003).noprw();
 	map(0x000f, 0x000f).noprw();
-	map(0x0015, 0x0015).noprw();
 	map(0x001f, 0x001f).noprw();
 	map(0x0060, 0x03cf).ram();
 	map(0x8000, 0x87ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
@@ -59,7 +58,7 @@ void basssta_state::sbasssta_data(address_map &map)
 	map(0x0001, 0x0001).nopw();
 	map(0x0003, 0x0003).nopw();
 	map(0x000f, 0x000f).noprw();
-	map(0x0012, 0x0015).noprw();
+	map(0x0014, 0x0014).noprw();
 	map(0x001c, 0x001c).nopr();
 	map(0x001e, 0x001e).nopw();
 	map(0x001f, 0x001f).noprw();
