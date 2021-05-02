@@ -48,6 +48,8 @@ struct arbitrary_datetime
 	int hour;           // hour (0-23)
 	int minute;         // minute (0-59)
 	int second;         // second (0-59)
+
+	static struct arbitrary_datetime now();
 };
 
 

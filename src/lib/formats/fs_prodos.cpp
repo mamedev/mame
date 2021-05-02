@@ -62,7 +62,7 @@ bool fs_prodos::can_format() const
 
 bool fs_prodos::can_read() const
 {
-	return false;
+	return true;
 }
 
 bool fs_prodos::can_write() const
@@ -79,7 +79,12 @@ std::vector<fs_meta_description> fs_prodos::volume_meta_description() const
 {
 	std::vector<fs_meta_description> res;
 	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return n.size() <= 15; }, "Volume name, up to 15 characters"));
+	res.emplace_back(fs_meta_description(fs_meta_name::os_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return std::get<uint64_t>(m) <= 255; }, "Creator OS version"));
+	res.emplace_back(fs_meta_description(fs_meta_name::os_minimum_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return std::get<uint64_t>(m) <= 255; }, "Minimum OS version"));
 
+	auto now = util::arbitrary_datetime::now();
+	res.emplace_back(fs_meta_description(fs_meta_name::creation_date, fs_meta_type::date, now, false, nullptr, "Creation time"));
+	res.emplace_back(fs_meta_description(fs_meta_name::modification_date, fs_meta_type::date, now, false, nullptr, "Modification time"));
 	return res;
 }
 
@@ -99,6 +104,10 @@ void fs_prodos::impl::format(const fs_meta_data &meta)
 {
 	std::string volume_name = std::get<std::string>(meta.find(fs_meta_name::name)->second);
 	u32 blocks = m_blockdev.block_count();
+
+	// Maximum usable partition size = 32M - 512 bytes (65535 blocks)
+	if(blocks >= 0x10000)
+		blocks = 0xffff;
 
 	m_blockdev.get(0).copy(0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs
 	m_blockdev.get(1).fill(0x00);                             // No SOS boot sector
@@ -131,11 +140,101 @@ void fs_prodos::impl::format(const fs_meta_data &meta)
 	kblk4.w16l(0x00, 0x0004);                                 // Backwards block pointer of the fourth volume block
 	kblk4.w16l(0x02, 0x0000);                                 // Forwards block pointer of the fourth volume block (null)
 
-	auto fmap = m_blockdev.get(6);
-	u8 *fdata = fmap.data();
-	// Mark blocks 7 to max as free
-	for(u32 i = 7; i != blocks; i++)
-		fdata[i >> 3] |= 0x80 >> (i & 7);
+	u32 fmap_block_count = (blocks + 4095) / 4096;
+	u32 first_free_block = 6 + fmap_block_count;
+
+	// Mark blocks from first_free_block to blocks-1 (the last one) as free
+	for(u32 i = 0; i != fmap_block_count; i++) {
+		auto fmap = m_blockdev.get(6 + i);
+		u8 *fdata = fmap.data();
+		u32 start = i ? 0 : first_free_block;
+		u32 end = i != fmap_block_count - 1 ? 4095 : (blocks - 1) & 4095;
+		end += 1;
+		u32 sb = start >> 3;
+		u32 si = start & 7;
+		u32 eb = end >> 3;
+		u32 ei = end & 7;
+		if(sb == eb)
+			fdata[sb] = (0xff >> si) & ~(0xff >> ei);
+		else {
+			fdata[sb] = 0xff >> si;
+			if(eb != 512)
+				fdata[eb] = ~(0xff >> ei);
+			if(eb - sb > 1)
+				memset(fdata+sb, 0xff, eb-sb-1);
+		}
+	}
+}
+
+fs_prodos::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512), m_root(true)
+{	
+}
+
+util::arbitrary_datetime fs_prodos::impl::prodos_to_dt(u32 date)
+{
+	util::arbitrary_datetime dt;
+	dt.second       = 0;
+	dt.minute       = ((date >> 16) & 0x3f);
+	dt.hour         = ((date >> 24) & 0x1f);
+	dt.day_of_month = ((date >> 0) & 0x1f);
+	dt.month        = ((date >> 5) & 0x0f) + 1;
+	dt.year         = ((date >> 9) & 0x7f) + 1900;
+	if (dt.year <= 1949)
+		dt.year += 100;
+
+	return dt;
+}
+
+fs_meta_data fs_prodos::impl::metadata()
+{
+	fs_meta_data res;
+	auto bdir = m_blockdev.get(2);
+	int len = bdir.r8(0x04) & 0xf;
+	res[fs_meta_name::name] = bdir.rstr(0x05, len);
+	res[fs_meta_name::os_version] = uint64_t(bdir.r8(0x20));
+	res[fs_meta_name::os_minimum_version] = uint64_t(bdir.r8(0x21));
+	res[fs_meta_name::creation_date] = prodos_to_dt(bdir.r32l(0x1c));
+	res[fs_meta_name::modification_date] = prodos_to_dt(bdir.r32l(0x16));
+	return res;	
+}
+
+filesystem_t::dir_t fs_prodos::impl::root()
+{
+	if(!m_root)
+		m_root = new root_dir(*this);
+	return m_root.strong();
+}
+
+void fs_prodos::impl::drop_root_ref()
+{
+	m_root = nullptr;
+}
+
+
+void fs_prodos::impl::root_dir::drop_weak_references()
+{
+	m_fs.drop_root_ref();
+}
+
+fs_meta_data fs_prodos::impl::root_dir::metadata()
+{
+	return fs_meta_data();
+}
+
+std::vector<fs_dir_entry> fs_prodos::impl::root_dir::contents()
+{
+	std::vector<fs_dir_entry> res;
+	return res;
+}
+
+filesystem_t::file_t fs_prodos::impl::root_dir::file_get(uint64_t key)
+{
+	return nullptr;
+}
+
+filesystem_t::dir_t fs_prodos::impl::root_dir::dir_get(uint64_t key)
+{
+	return nullptr;
 }
 
 const filesystem_manager_type FS_PRODOS = &filesystem_manager_creator<fs_prodos>;;

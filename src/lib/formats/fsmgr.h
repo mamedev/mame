@@ -9,6 +9,7 @@
 #pragma once
 
 #include "flopimg.h"
+#include "timeconv.h"
 
 #include <variant>
 #include <unordered_map>
@@ -18,17 +19,19 @@ enum class fs_meta_name {
 	length,
 	loading_address,
 	locked,
-	sequential,
 	modification_date,
 	name,
+	os_minimum_version,
+	os_version,
+	sequential,
 	size_in_blocks,
 };
 
 enum class fs_meta_type {
-	string,
-	number,
 	date,
 	flag,
+	number,
+	string,
 };
 
 enum class fs_dir_entry_type {
@@ -37,7 +40,7 @@ enum class fs_dir_entry_type {
 	system_file,
 };
 
-using fs_meta = std::variant<std::string, uint64_t, bool>;
+using fs_meta = std::variant<std::string, uint64_t, bool, util::arbitrary_datetime>;
 using fs_meta_data = std::unordered_map<fs_meta_name, fs_meta>;
 
 const char *fs_meta_get_name(fs_meta_name name);
