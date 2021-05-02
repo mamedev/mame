@@ -2612,16 +2612,16 @@ Dumper's notes:
 -early version has game crashing bugs and other glitches.
 -the mask ROMs match the regular version.
 -RAM & ROM check is not shown.
--Japan warning seems much slower to pass.
+-region warning seems much slower to pass.
 -attract mode starts in the jungle, old dumps all start with a building with fences
 */
 
-ROM_START( spinlbrkjp ) // the labels are official Video System without numbering and handwritten on top
+ROM_START( spinlbrkup ) // the labels are official Video System without numbering and handwritten on top
 	ROM_REGION( 0x60000, "maincpu", 0 ) // these differ quite a lot
 	ROM_LOAD16_BYTE( "spb0-e.ic98",  0x00000, 0x10000, CRC(421eaff2) SHA1(e0ffd37fa8361a544cd7a66da0b802367adccd7d) )
-	ROM_LOAD16_BYTE( "sbp1-o.ic94",  0x00001, 0x10000, CRC(9576d508) SHA1(426a630a7a5bdaa0316391582b25274a6d923c79) )
+	ROM_LOAD16_BYTE( "spb0-o.ic104", 0x00001, 0x10000, CRC(9576d508) SHA1(426a630a7a5bdaa0316391582b25274a6d923c79) )
 	ROM_LOAD16_BYTE( "sbp1-e.ic93",  0x20000, 0x10000, CRC(d6444d1e) SHA1(2aa80b8cf3c44e4a583b57f4a6cc673d984f3a05) )
-	ROM_LOAD16_BYTE( "spb0-o.ic104", 0x20001, 0x10000, CRC(a3f7bd8e) SHA1(dc393b4911c6acadb97b0380db15ae5c972a3505) )
+	ROM_LOAD16_BYTE( "sbp1-o.ic94",  0x20001, 0x10000, CRC(a3f7bd8e) SHA1(dc393b4911c6acadb97b0380db15ae5c972a3505) )
 
 	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "11-14-15.00.music.ic117", 0x00000, 0x08000, CRC(6b8c8f09) SHA1(d57699ea82f5e48ed8c9909a040c2fa6f988f8b3) ) // this differs quite a lot
@@ -3225,7 +3225,7 @@ void aerofgt_state::init_kickball()
 GAME( 1990, spinlbrk,   0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrku,  spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrkj,  spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkjp, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
+GAME( 1990, spinlbrkup, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
 
 GAME( 1991, pspikes,   0,         pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesk,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
