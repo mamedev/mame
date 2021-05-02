@@ -585,7 +585,7 @@ void taitob_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("audiobank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ymfm_device_standalone_base::read), FUNC(ymfm_device_standalone_base::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym_generic::read), FUNC(ym_generic::write));
 	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */
