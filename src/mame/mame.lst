@@ -1335,8 +1335,9 @@ amspdwya                        // no copyright notice, but (c) 1987 Enerdyne Te
 @source:amstr_pc.cpp
 pc20                            // 1988 Amstrad PC20
 pc200                           // 1988 Sinclair PC200
-pc2086                          //
-pc3086                          //
+pc2086                          // Amstrad PC2086
+pc3086                          // Amstrad PC3086
+pc5086                          // Amstrad PC5086
 ppc512                          // 1987 Amstrad PPC512
 ppc640                          // 1987 Amstrad PPC640
 
@@ -33512,6 +33513,7 @@ ataripc1                        // Atari PC1
 ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
+comdesk                         // Compaq Deskpro
 comport                         // Compaq Portable
 coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
@@ -33559,11 +33561,16 @@ nms9100                         // Philips NMS 9100 series
 to16                            // Thomson TO16
 alphatp10                       // Triumph-Adler Alphatronic P10
 alphatp50                       // Triumph-Adler Alphatronic P50
+ta1700pc                        // Triumph-Adler TA 1700-PC
 sergeysxt                       // Sergey's XT
 xiprocessor                     // Xi processor board
 micro88                         // Micro 8088
 mononuxt                        // monotech NuXT
 mononuxt2                       // monotech NuXT v2
+earthst                         // Alloy EarthStation-I
+vpcii                           // Victor VPC II
+fraking                         // Frael King
+mpu9088vf                       // MY-COM MPU-9088-VF SAN-MS94VO
 
 @source:pc100.cpp
 pc100                           //
