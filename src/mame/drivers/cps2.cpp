@@ -104,7 +104,7 @@ Notes:
       5863      - Sony CXK5863BP-35 8k x8 SRAM (DIP28)
       8464      - Fujitsu MB8464A-10L 8k x8 SRAM (SOP28)
       HM514260  - Hitachi HM514260AJ8 256k x 16 DRAM (SOJ40)
-      HM658128  - Hitachi HM658128ADFP-10 128k x8 SRAM (SOP32)
+      HM658128  - Hitachi HM658128ADFP-10 128k x8 PSRAM (SOP32)
       M5195B    - Mitsubishi Electric Corp. M5195B Voltage Detection and System Reset IC (SIP5)
       LM833     - National Semiconductor LM833 Dual Audio Operational Amplifier (DIP8)
       TDA1543   - Philips TDA1543 Dual 16-bit DAC (DIP8)

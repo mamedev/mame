@@ -267,9 +267,9 @@ VIDEO PCB
 |  HM65256         HM65256          HM65256        HM65256                                        CN4          CN3      LED1      |
 |---------------------------------------------------------------------------------------------------------------------------------|
 Notes:
-      HM65256  - Hitachi HM65256BLSP-10 32k x8 SRAM (x34, DIP28)
-      HM658128 - Hitachi HM658128ALP-10 16k x8 SRAM (x10, DIP32)
-      HM658512 - Hitachi HM658512LP-8 64k x8 SRAM (x2, DIP32)
+      HM65256  - Hitachi HM65256BLSP-10 32k x8 PSRAM (x34, DIP28)
+      HM658128 - Hitachi HM658128ALP-10 128k x8 PSRAM (x10, DIP32)
+      HM658512 - Hitachi HM658512LP-8 512k x8 PSRAM (x2, DIP32)
       M5M5178  - Mitsubishi M5M5178AP-25 8k x8 SRAM (x7, DIP28)
       CY7B185  - Cypress CY7B185 8k x8 SRAM (x4, DIP28)
       J1       - Jumper, set to 2-3
