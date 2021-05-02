@@ -22,29 +22,9 @@ license:CC0
 			<color red="0.0" green="1.0" blue="0.0" />
 		</disk>
 	</element>
-
-	<element name="ledr2o">
-		<disk>
-			<color red="0.20" green="0.0" blue="0.0" />
-		</disk>
-	</element>
-	<element name="ledr2" defstate="0">
-		<disk state="0">
-			<color red="0.0" green="0.0" blue="0.0" />
-		</disk>
-		<disk state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</disk>
-	</element>
-
-	<element name="ledyo">
-		<disk>
-			<color red="0.20" green="0.20" blue="0.0" />
-		</disk>
-	</element>
 	<element name="ledy" defstate="0">
 		<disk state="0">
-			<color red="0.0" green="0.0" blue="0.0" />
+			<color red="0.20" green="0.20" blue="0.0" />
 		</disk>
 		<disk state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
@@ -484,18 +464,13 @@ license:CC0
 		<element name="8.1" ref="ledr"> <bounds x="113" y="63" width="2" height="2" /></element>
 		<element name="8.0" ref="ledr"> <bounds x="113" y="70" width="2" height="2" /></element>
 
-		<element ref="ledr2o"> <bounds x="108" y="10" width="2" height="2" /></element>
-		<element name="dled0" ref="ledr2" blend="add"> <bounds x="108" y="10" width="2" height="2" /></element>
-		<element name="9.1" ref="ledr2" blend="add"> <bounds x="108" y="10" width="2" height="2" /></element>
-
-		<element ref="ledyo"> <bounds x="120" y="10" width="2" height="2" /></element>
-		<element name="dled1" ref="ledy" blend="add"> <bounds x="120" y="10" width="2" height="2" /></element>
-		<element name="9.2" ref="ledy" blend="add"> <bounds x="120" y="10" width="2" height="2" /></element>
+		<element name="9.1" ref="ledr"> <bounds x="108" y="10" width="2" height="2" /></element>
+		<element name="9.3" ref="ledg"> <bounds x="114" y="10" width="2" height="2" /></element>
+		<element name="9.2" ref="ledy"> <bounds x="120" y="10" width="2" height="2" /></element>
 
 		<element name="9.6" ref="ledg"> <bounds x="108" y="14" width="2" height="2" /></element>
 		<element name="9.5" ref="ledg"> <bounds x="114" y="14" width="2" height="2" /></element>
 		<element name="9.4" ref="ledg"> <bounds x="120" y="14" width="2" height="2" /></element>
-		<element name="9.3" ref="ledg"> <bounds x="114" y="10" width="2" height="2" /></element>
 
 		<element name="9.0" ref="ledr"> <bounds x="115.5" y="75" width="2" height="2" /></element>
 

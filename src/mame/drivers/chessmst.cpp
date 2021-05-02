@@ -10,6 +10,7 @@ BTANB:
 - chessmst corner leds flicker sometimes
 
 TODO:
+- split driver? much difference between chessmst/chessmstdm
 - chessmsta isn't working, needs a redump of u2616. Program differences are
   minor so it seems to boot fine if you take 064/065 from chessmst, but will
   probably have some problems.
@@ -96,6 +97,7 @@ private:
 
 	uint16_t m_matrix = 0;
 	uint8_t m_led_data = 0;
+	uint8_t m_led_data2 = 0;
 	uint8_t m_digit_matrix = 0;
 	int m_digit_dot = 0;
 	uint16_t m_digit_data = 0;
@@ -108,6 +110,7 @@ void chessmst_state::machine_start()
 
 	save_item(NAME(m_matrix));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_led_data2));
 	save_item(NAME(m_digit_matrix));
 	save_item(NAME(m_digit_dot));
 	save_item(NAME(m_digit_data));
@@ -219,7 +222,7 @@ void chessmst_state::digits_w(uint8_t data)
 
 void chessmst_state::update_leds()
 {
-	m_led_pwm->matrix(m_matrix, m_led_data);
+	m_led_pwm->matrix(m_matrix, m_led_data | m_led_data2);
 }
 
 void chessmst_state::pio1_port_a_w(uint8_t data)
@@ -231,10 +234,8 @@ void chessmst_state::pio1_port_a_w(uint8_t data)
 void chessmst_state::pio1_port_b_w(uint8_t data)
 {
 	m_matrix = (m_matrix & 0xff) | ((data & 0x03)<<8);
+	m_led_data2 = ~data >> 1 & 6;
 	update_leds();
-
-	m_direct_led[0] = BIT(~data, 2); // check
-	m_direct_led[1] = BIT(~data, 3); // cm
 
 	m_speaker->level_w(BIT(data, 6));
 }
@@ -311,7 +312,7 @@ void chessmst_state::chessmst(machine_config &config)
 	SENSORBOARD(config, m_board);
 	m_board->set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->set_delay(attotime::from_msec(100));
+	m_board->set_delay(attotime::from_msec(150));
 
 	// video hardware
 	PWM_DISPLAY(config, m_led_pwm).set_size(10, 8);
