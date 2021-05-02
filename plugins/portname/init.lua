@@ -25,6 +25,7 @@ exports.license = "The BSD 3-Clause License"
 exports.author = { name = "Carl" }
 
 local portname = exports
+local util = require("util")
 
 function portname.startplugin()
 	local json = require("json")
@@ -129,7 +130,7 @@ function portname.startplugin()
 			local function check_path(path)
 				local attr = lfs.attributes(path)
 				if not attr then
-					lfs.mkdir(path)
+					util.mkdir_recursive(path)
 					if not lfs.attributes(path) then
 						manager.machine:popmessage(_("Failed to save input name file"))
 						emu.print_verbose("portname: unable to create path " .. path .. "\n")
