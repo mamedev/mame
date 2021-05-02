@@ -71,7 +71,7 @@ advantage of the greater processing power and hardware capabilities offered.
 The official MAME binaries are compiled and designed to run on a standard
 Windows-based system. The minimum requirements for Windows are:
 
-* Intel Core series CPU or equivalent, at least 2.0 GHz
+* Intel Core 2-series CPU or equivalent, at least 2.0 GHz
 * 64-bit OS (Windows 7 or later on Windows, 10.9 or later on Mac)
 * 4 GB RAM
 * DirectX 9.0c for Windows
