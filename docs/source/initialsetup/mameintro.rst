@@ -46,9 +46,12 @@ can help to improve the emulation of a supported system, or if you can directly
 contribute fixes and/or addition to the current source, you can do any of the
 following:
 
-    * Send in a pull request (for code) or open an issue (information) on our Github page.
-    * Post the information or code on the `MAME Forums <https://forum.mamedev.org/>`_
-    * Follow the instructions on our `contact page <https://www.mamedev.org/contact.html>`_
+    * Send in a pull request (for code) or open an issue (information) on our
+      GitHub page.
+    * Post the information or code on the
+      `MAME Forums <https://forum.mamedev.org/>`_
+    * Follow the instructions on our
+      `contact page <https://www.mamedev.org/contact.html>`_
 
 
 Supported OS
@@ -56,8 +59,7 @@ Supported OS
 
 The current source code can be directly compiled under all the main OSes:
 Microsoft Windows (both with DirectX/BGFX native support or with SDL support),
-Linux, FreeBSD, and macOS. Also, both 32-bit and 64-bit are supported, but
-be aware 64-bit often shows a significant speed increase over 32-bit.
+Linux, FreeBSD, and macOS.
 
 System Requirements
 -------------------
@@ -70,7 +72,7 @@ The official MAME binaries are compiled and designed to run on a standard
 Windows-based system. The minimum requirements for Windows are:
 
 * Intel Core series CPU or equivalent, at least 2.0 GHz
-* 32-bit OS (Vista SP1 or later on Windows, 10.9 or later on Mac)
+* 64-bit OS (Windows 7 or later on Windows, 10.9 or later on Mac)
 * 4 GB RAM
 * DirectX 9.0c for Windows
 * A Direct3D, or OpenGL capable graphics card

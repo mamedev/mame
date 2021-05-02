@@ -280,9 +280,13 @@ need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
 
 Next you’ll need to get SDL2 installed.
 
-* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *macOS* .dmg file
+* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the
+  *macOS* .dmg file
 * If the .dmg doesn't auto-open, open it
-* Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder. You will have to authenticate with your user password.
+* Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left
+  pane of a **Finder** window, then open the **Library** folder and drag the
+  **SDL2.framework** folder from the SDL disk image into the **Frameworks**
+  folder. You will have to authenticate with your user password.
 
 Lastly to begin compiling, use Terminal to navigate to where you have the MAME
 source tree (*cd* command) and follow the normal compilation instructions from
@@ -314,11 +318,7 @@ MAME directory):
 
 .. code-block:: bash
 
-The SOURCES parameter should have the path to at least one driver .cpp file. The
-make process will attempt to locate and include all dependencies necessary to
-produce a complete build including the specified driver(s). However, sometimes
-it is necessary to manually specify additional files (using commas) if this
-process misses something. E.g.:
+emmake make SUBTARGET=pacmantest SOURCES=src/mame/drivers/pacman.cpp
 
 The **SOURCES** parameter should have the path to at least one driver **.cpp**
 file.  The make process will attempt to locate and include all dependencies
@@ -340,17 +340,11 @@ as described earlier.
 When the compilation reaches the emcc phase, you may see a number of
 *"unresolved symbol"* warnings. At the moment, this is expected for
 OpenGL-related functions such as glPointSize. Any others may indicate that an
-additional dependency file needs to be specified in the SOURCES list.
+additional dependency file needs to be specified in the **SOURCES** list.
 Unfortunately this process is not automated and you will need to search the
 source tree to locate the files supplying the missing symbols. You may also be
 able to get away with ignoring the warnings if the code path referencing them
 is not used at run-time.
-
-If all goes well, a .js file will be output to the current directory. This file
-cannot be run by itself, but requires an HTML loader to provide it with a canvas
-to output to and pass in command-line parameters. The
-`Emularity project <https://github.com/db48x/emularity>`_ provides such a
-loader.
 
 There are example .html files in that repository which can be edited to point
 to your newly compiled MAME js filename and pass in whatever parameters you
@@ -359,7 +353,8 @@ desire. You will then need to place all of the following on a web server:
 If all goes well, a **.js** file will be output to the current directory.  This
 file cannot be run by itself, but requires an HTML loader to provide it with a
 canvas to draw to and to pass in command-line parameters.  The
-`Emularity project <https://github.com/db48x/emularity>`_ provides such a loader.
+`Emularity project <https://github.com/db48x/emularity>`_ provides such a
+loader.
 
 There are example **.html** files in that repository which can be edited to
 point to your newly compiled MAME **.js** file and pass in whatever parameters
