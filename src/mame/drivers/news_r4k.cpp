@@ -59,8 +59,8 @@
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and probably DMA for sound, floppy, etc.)
  *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
- *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: not emulated
- *   - Sony CXD8418Q WSC-PARK3: not emulated (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
+ *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
+ *   - Sony CXD8418Q WSC-PARK3: not emulated, but some of the general platform functions might be from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
  *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
@@ -73,6 +73,11 @@
 #include "emu.h"
 
 // Devices
+
+// There are two MIPSIII/R4000 implementations in MAME
+// The default one has DRC and is faster, but the other one has some different features
+// Uncomment the following line and rebuild to switch implementations. This driver supports
+// both, as long as the #define is used to select which implementation to use.
 // #define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
@@ -246,18 +251,23 @@ protected:
     // Interrupts and other platform state
     bool m_int_state[6] = {false, false, false, false, false, false};
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
-    uint32_t m_intst[6] = {0, 0, 3, 0, 0, 0}; // test
+    uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
     // Freerun timer (1us period)
     // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
     emu_timer *m_freerun_timer;
-    emu_timer *m_timer0_timer;
     uint32_t freerun_timer_val;
-    const int FREERUN_FREQUENCY = 1000000;
+    const int FREERUN_FREQUENCY = 1000000; // Hz
     TIMER_CALLBACK_MEMBER(freerun_clock);
-    TIMER_CALLBACK_MEMBER(timer0_clock);
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
+
+    // Hardware timer TIMER0 (10ms period)
+    // TODO: Is this programmable somehow?
+    emu_timer *m_timer0_timer;
+    const int TIMER0_FREQUENCY = 100; // Hz, From NetBSD
+    TIMER_CALLBACK_MEMBER(timer0_clock);
+    void timer0_w(offs_t offset, uint32_t data);
 
     // APbus control (should be split into a device eventually)
     uint8_t apbus_cmd_r(offs_t offset);
@@ -405,7 +415,7 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
 
     // Hardware timers
-    map(0x1f800000, 0x1f800003).lw32(NAME([this](offs_t offset, uint32_t data) { m_intst[2] = 0x0; int_check(); })); // TIMER0
+    map(0x1f800000, 0x1f800003).w(FUNC(news_r4k_state::timer0_w)); // TIMER0
     map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w)); // FREERUN
 
     // Timekeeper NVRAM and RTC
@@ -452,8 +462,6 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // TODO: lp (0x1ed30000)
 
-    // TODO: fd (floppy disk) FIFO (0x1ed20000)
-
     // fd controller register mapping
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
@@ -468,7 +476,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // Map FDCAUX interrupt read (still need to implement button interrupt mask from 208-20b)
     map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
 
-    // Map FDC FIFO TODO: is it aligned so CH0 is 1ed00000?
+    // Map FDC FIFO TODO: is it aligned so CH0 is 1ed00000? Seems likely since that is the `sb` address
     map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
 
     // Assign debug mappings
@@ -610,9 +618,15 @@ TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
     freerun_timer_val++;
 }
 
+/*
+ * timer0_clock
+ *
+ * Method to handle a tick of the hardware clock.
+ */
 TIMER_CALLBACK_MEMBER(news_r4k_state::timer0_clock)
 {
-    m_intst[2] = 0x1;
+    // Whenever this timer elapses, we need to trigger timer0 interrupt
+    m_intst[2] |= irq2_number::TIMER0;
     int_check();
 }
 
@@ -625,7 +639,7 @@ void news_r4k_state::machine_reset()
 {
     freerun_timer_val = 0;
     m_freerun_timer->adjust(attotime::zero, 0, attotime::from_hz(FREERUN_FREQUENCY));
-    m_timer0_timer->adjust(attotime::zero, 0, attotime::from_hz(100)); // THIS IS WRONG
+    m_timer0_timer->adjust(attotime::zero, 0, attotime::from_hz(TIMER0_FREQUENCY));
 }
 
 /*
@@ -748,6 +762,18 @@ void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
 }
 
 /*
+ * timer0_w
+ *
+ * Clears the TIMER0 interrupt - why this exists instead of just using INTCLR, I have no idea (yet).
+ * See https://github.com/NetBSD/src/blob/05082e19134c05f2f4b6eca73223cdc6b5ab09bf/sys/arch/newsmips/newsmips/news5000.c#L114
+ */
+void news_r4k_state::timer0_w(offs_t offset, uint32_t data)
+{
+    m_intst[2] &= ~0x1;
+    int_check();
+}
+
+/*
  * inten_w
  *
  * Update the enable status of the interrupt indicated by `offset`.
@@ -790,12 +816,10 @@ void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
     // LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
     if (state)
     {
-        LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
         m_intst[irq] |= mask;
     }
     else
     {
-        LOG("generic_irq_w: INTST%d IRQ %d cleared to %d\n", irq, mask, state);
         m_intst[irq] &= ~mask;
     }
     int_check();
@@ -824,7 +848,7 @@ void news_r4k_state::int_check()
     // These map to the 6 INTST/EN/CLR groups on the NEWS platform
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c
     // and https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
-    // This still needs to be tested - may or may not be fully accurate.
+    // This has been tested with a few different devices and seems OK so far, but there might be some things missing.
     for (int i = 0; i < 6; i++)
     {
         int state = m_intst[i] & m_inten[i];

@@ -43,10 +43,10 @@ protected:
 
     // Address maps
     void sonic_bus_map(address_map &map);
+    address_space_config main_bus_config;
     address_space_config sonic_config;
-	address_space_config main_bus_config;
     uint32_t sonic_r(offs_t offset, uint32_t mem_mask);
-	void sonic_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+    void sonic_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
     struct WscSonicRegisters
 	{
