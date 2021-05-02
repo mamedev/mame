@@ -26387,7 +26387,7 @@ license:CC0
 	</software>
 
 	<software name="tgamedmo">
-		<description>The Game (self-running demo) (cleanly cracked)</description>
+		<description>The Game (Self-Running Demo) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Random House</publisher>
 		<info name="release" value="2016-09-05"/>
@@ -42086,6 +42086,128 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="socmate analogies games (4am crack).dsk" size="143360" crc="0470999a" sha1="99e351816e7c5391f09b24f17d15efd2e3d27428"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strsrcdm">
+		<description>Star Search (Self-Running Demo) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Mark Goles"/>
+		<!--"Star Search" is a 1981 self-running demo developed by Mark Goles and distributed by Earthware Computer Services. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star search self-running demo (4am crack) side a.dsk" size="143360" crc="e6482d15" sha1="461b1cf88bc373b455ab03788be903bbedbc9386"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="star search self-running demo (4am crack) side b.dsk" size="143360" crc="fe50796b" sha1="509b98da10af36a1acb1f7c78489c091e5a9e670"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoomastr">
+		<description>Zoo Master (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Kevin Ryan"/>
+		<!--"Zoo Master" is a 1983 action game developed by Kevin Ryan and distributed by Earthware Computer Services.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoo master (4am crack).dsk" size="143360" crc="58e50374" sha1="a2420b04b5422c703b35fa6851f6cb18809d314c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blkbelt">
+		<description>Black Belt (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Earthware Computer Services</publisher>
+		<info name="release" value="2021-04-29"/>
+		<info name="programmer" value="Kevin Ryan"/>
+		<!--"Black Belt" is a 1984 sports game developed by Kevin Ryan and distributed by Earthware Computer Services.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="black belt (4am crack).dsk" size="143360" crc="6ba73711" sha1="f9f1bab379e6802c488e9c704870561018a162c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccscbd">
+		<description>Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Uncle Clyde's Consonant Slides: Consonant Blends and Digraphs" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - consonant blends and digraphs (4am crack).dsk" size="143360" crc="dec1edfc" sha1="93088790186e6c08bd762196f80d1d5f57837da1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsec">
+		<description>Uncle Clyde's Consonant Slides: Ending Consonants (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Uncle Clyde's Consonant Slides: Ending Consonants" is a 1993 educational program developed and distributed by Micrograms. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - ending consonants (4am crack).dsk" size="143360" crc="67153156" sha1="211cd07bb41d1dc7b98c2e30dfceb5550676f78f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chschkbk">
+		<description>Chess, Checkers, and Backgammon (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Box Office</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Chess, Checkers, and Backgammon" is a 1987 compilation of board games developed and distributed by Box Office. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="chess, checkers, and backgammon (4am crack).dsk" size="143360" crc="ab1dc1bb" sha1="f19b9a05cc8b2bd6d56c0b4007c381387fe69262"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divsklls">
+		<description>Division Skills (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Division Skills" is a 1982 educational program developed and distributed by Milton Bradley. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="division skills (4am crack).dsk" size="143360" crc="9e728c36" sha1="59a4e0758dcfd2d110de99e81594f9dda1b4da1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vocsklls">
+		<description>Vocabulary Skills (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-05-09"/>
+		<!--"Vocabulary Skills" is a 1982 educational program developed and distributed by Milton Bradley. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vocabulary skills (4am crack).dsk" size="143360" crc="ee2bf37f" sha1="b3ad2f51f97062628092af27cc661f35d46eff6f"/>
 			</dataarea>
 		</part>
 	</software>
