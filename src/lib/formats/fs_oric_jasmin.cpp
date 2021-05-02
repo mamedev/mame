@@ -70,7 +70,7 @@ bool fs_oric_jasmin::can_write() const
 std::vector<fs_meta_description> fs_oric_jasmin::volume_meta_description() const
 {
 	std::vector<fs_meta_description> res;
-	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return n.size() <= 8; }, "Volume name, up to 8 characters"));
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
 
 	return res;
 }
@@ -99,8 +99,8 @@ bool fs_oric_jasmin::validate_filename(std::string name)
 std::vector<fs_meta_description> fs_oric_jasmin::file_meta_description() const
 {
 	std::vector<fs_meta_description> res;
-	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return validate_filename(n); }, "File name, 8.3"));
-	res.emplace_back(fs_meta_description(fs_meta_name::loading_address, fs_meta_type::number, 0x501, false, [](const fs_meta &m) { uint64_t n = std::get<uint64_t>(m); return n < 0x10000; }, "Loading address of the file"));
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "", false, [](const fs_meta &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
+	res.emplace_back(fs_meta_description(fs_meta_name::loading_address, fs_meta_type::number, 0x501, false, [](const fs_meta &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
 	res.emplace_back(fs_meta_description(fs_meta_name::length, fs_meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
 	res.emplace_back(fs_meta_description(fs_meta_name::size_in_blocks, fs_meta_type::number, 0, true, nullptr, "Number of blocks used by the file"));
 	res.emplace_back(fs_meta_description(fs_meta_name::locked, fs_meta_type::flag, false, false, nullptr, "File locked"));
@@ -111,7 +111,7 @@ std::vector<fs_meta_description> fs_oric_jasmin::file_meta_description() const
 
 void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 {
-	std::string volume_name = std::get<std::string>(meta.find(fs_meta_name::name)->second);
+	std::string volume_name = meta.find(fs_meta_name::name)->second.as_string();
 	u32 blocks = m_blockdev.block_count();
 
 	m_blockdev.fill(0x6c);

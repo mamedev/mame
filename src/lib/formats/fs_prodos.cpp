@@ -78,9 +78,9 @@ char fs_prodos::directory_separator() const
 std::vector<fs_meta_description> fs_prodos::volume_meta_description() const
 {
 	std::vector<fs_meta_description> res;
-	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return n.size() <= 15; }, "Volume name, up to 15 characters"));
-	res.emplace_back(fs_meta_description(fs_meta_name::os_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return std::get<uint64_t>(m) <= 255; }, "Creator OS version"));
-	res.emplace_back(fs_meta_description(fs_meta_name::os_minimum_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return std::get<uint64_t>(m) <= 255; }, "Minimum OS version"));
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { return m.as_string().size() <= 15; }, "Volume name, up to 15 characters"));
+	res.emplace_back(fs_meta_description(fs_meta_name::os_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return m.as_number() <= 255; }, "Creator OS version"));
+	res.emplace_back(fs_meta_description(fs_meta_name::os_minimum_version, fs_meta_type::number, 5, false, [](const fs_meta &m) { return m.as_number() <= 255; }, "Minimum OS version"));
 
 	auto now = util::arbitrary_datetime::now();
 	res.emplace_back(fs_meta_description(fs_meta_name::creation_date, fs_meta_type::date, now, false, nullptr, "Creation time"));
@@ -102,7 +102,7 @@ std::vector<fs_meta_description> fs_prodos::directory_meta_description() const
 
 void fs_prodos::impl::format(const fs_meta_data &meta)
 {
-	std::string volume_name = std::get<std::string>(meta.find(fs_meta_name::name)->second);
+	std::string volume_name = meta.find(fs_meta_name::name)->second.as_string();
 	u32 blocks = m_blockdev.block_count();
 
 	// Maximum usable partition size = 32M - 512 bytes (65535 blocks)

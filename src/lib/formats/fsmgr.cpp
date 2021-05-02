@@ -279,11 +279,11 @@ const char *fs_meta_get_name(fs_meta_name name)
 std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
 {
 	switch(type) {
-	case fs_meta_type::string: return std::get<std::string>(m);
-	case fs_meta_type::number: return util::string_format("0x%x", std::get<uint64_t>(m));
-	case fs_meta_type::flag:   return std::get<bool>(m) ? "t" : "f";
+	case fs_meta_type::string: return m.as_string();
+	case fs_meta_type::number: return util::string_format("0x%x", m.as_number());
+	case fs_meta_type::flag:   return m.as_flag() ? "t" : "f";
 	case fs_meta_type::date:   {
-		auto dt = std::get<util::arbitrary_datetime>(m);
+		auto dt = m.as_date();
 		return util::string_format("%04d-%02d-%02d %02d:%02d:%02d",
 								   dt.year, dt.month, dt.day_of_month,
 								   dt.hour, dt.minute, dt.second);

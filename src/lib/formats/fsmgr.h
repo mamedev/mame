@@ -40,7 +40,24 @@ enum class fs_dir_entry_type {
 	system_file,
 };
 
-using fs_meta = std::variant<std::string, uint64_t, bool, util::arbitrary_datetime>;
+class fs_meta {
+public:
+	fs_meta() { value = false; }
+	fs_meta(std::string str) { value = str; }
+	fs_meta(bool b) { value = b; }
+	fs_meta(uint64_t num) { value = num; }
+	fs_meta(int64_t num) { value = uint64_t(num); }
+	fs_meta(util::arbitrary_datetime dt) { value = dt; }
+
+	util::arbitrary_datetime as_date() const { return *std::get_if<util::arbitrary_datetime>(&value); }
+	bool as_flag() const { return *std::get_if<bool>(&value); }
+	uint64_t as_number() const { return *std::get_if<uint64_t>(&value); }
+	std::string as_string() const { return *std::get_if<std::string>(&value); }
+
+private:
+	std::variant<std::string, uint64_t, bool, util::arbitrary_datetime> value;
+};
+
 using fs_meta_data = std::unordered_map<fs_meta_name, fs_meta>;
 
 const char *fs_meta_get_name(fs_meta_name name);
