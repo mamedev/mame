@@ -55,7 +55,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - There is sort of protection routine at 0x4120 which has an effect when
     player loses a life on reaching first bonus stage or after. If values read
     from 0x6008 to 0x600b don't match values from ROM area 0x33c0-0x33ff,
-    the game resets. See 'exerion_protection_r' read handler.
+    the game resets. See 'protection_r' read handler.
   - There is an unknown routine at 0x5f70 which is called when the game boots
     which reads value from 0x600c and see if it matches a hardcoded value (0xbe).
     If they don't match, the game resets after displaying the high-scores table.
@@ -70,7 +70,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 2) 'exeriont'
 
-  - The coin insertion routine is fixed in this set (see the subttle changes
+  - The coin insertion routine is fixed in this set (see the subtle changes
     in the code from 0x0077 to 0x0082).
   - The routine at 0x28b8 is the same as in 'exerion' (same hardcoded value).
   - The routine at 0x07d8 is the same as in 'exerion' (same hardcoded value).
@@ -134,17 +134,16 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *
  *************************************/
 
-/* Players inputs are muxed at 0xa000 */
-CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
+// Players inputs are muxed at 0xa000
+CUSTOM_INPUT_MEMBER(exerion_state::controls_r)
 {
-	static const char *const inname[2] = { "P1", "P2" };
-	return ioport(inname[m_cocktail_flip])->read() & 0x3f;
+	return m_inputs[m_cocktail_flip]->read() & 0x3f;
 }
 
 
 INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 {
-	/* coin insertion causes an NMI */
+	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -156,29 +155,29 @@ INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
  *
  *************************************/
 
-/* This is the first of many Exerion "features". No clue if it's */
-/* protection or some sort of timer. */
-uint8_t exerion_state::exerion_porta_r()
+// This is the first of many Exerion "features". No clue if it's
+// protection or some sort of timer.
+uint8_t exerion_state::porta_r()
 {
 	m_porta ^= 0x40;
 	return m_porta;
 }
 
 
-void exerion_state::exerion_portb_w(uint8_t data)
+void exerion_state::portb_w(uint8_t data)
 {
-	/* pull the expected value from the ROM */
-	m_porta = memregion("maincpu")->base()[0x5f76];
+	// pull the expected value from the ROM
+	m_porta = m_maincpu_region[0x5f76];
 	m_portb = data;
 
 	logerror("Port B = %02X\n", data);
 }
 
 
-uint8_t exerion_state::exerion_protection_r(offs_t offset)
+uint8_t exerion_state::protection_r(offs_t offset)
 {
 	if (m_maincpu->pc() == 0x4143)
-		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
+		return m_maincpu_region[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
 		return m_main_ram[0x8 + offset];
 }
@@ -194,15 +193,15 @@ uint8_t exerion_state::exerion_protection_r(offs_t offset)
 void exerion_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x67ff).ram().share("main_ram");
-	map(0x6008, 0x600b).r(FUNC(exerion_state::exerion_protection_r));
-	map(0x8000, 0x87ff).ram().share("videoram");
-	map(0x8800, 0x887f).ram().share("spriteram");
+	map(0x6000, 0x67ff).ram().share(m_main_ram);
+	map(0x6008, 0x600b).r(FUNC(exerion_state::protection_r));
+	map(0x8000, 0x87ff).ram().share(m_videoram);
+	map(0x8800, 0x887f).ram().share(m_spriteram);
 	map(0x8880, 0x8bff).ram();
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa800, 0xa800).portr("DSW0");
 	map(0xb000, 0xb000).portr("DSW1");
-	map(0xc000, 0xc000).w(FUNC(exerion_state::exerion_videoreg_w));
+	map(0xc000, 0xc000).w(FUNC(exerion_state::videoreg_w));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd000, 0xd001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0xd800, 0xd801).w("ay2", FUNC(ay8910_device::address_data_w));
@@ -222,8 +221,8 @@ void exerion_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x8000, 0x800c).w(FUNC(exerion_state::exerion_video_latch_w));
-	map(0xa000, 0xa000).r(FUNC(exerion_state::exerion_video_timing_r));
+	map(0x8000, 0x800c).w(FUNC(exerion_state::video_latch_w));
+	map(0xa000, 0xa000).r(FUNC(exerion_state::video_timing_r));
 }
 
 
@@ -234,10 +233,10 @@ void exerion_state::sub_map(address_map &map)
  *
  *************************************/
 
-/* verified from Z80 code */
+// verified from Z80 code
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exerion_state, exerion_controls_r)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exerion_state, controls_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -248,15 +247,15 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-//  PORT_DIPSETTING(    0x05, "5" )                         /* duplicated setting */
-//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicated setting */
+	PORT_DIPSETTING(    0x05, "5" )                         // duplicated setting
+	PORT_DIPSETTING(    0x06, "5" )                         // duplicated setting
 	PORT_DIPSETTING(    0x07, "254 (Cheat)")
 	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )       /* see notes */
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )       // see notes
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -267,7 +266,7 @@ static INPUT_PORTS_START( exerion )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          /* see notes */
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          // see notes
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
@@ -279,9 +278,9 @@ static INPUT_PORTS_START( exerion )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exerion_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exerion_state, coin_inserted, 0)
 
-	PORT_START("P1")          /* fake input port */
+	PORT_START("P1")          // fake input port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -289,7 +288,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
-	PORT_START("P2")          /* fake input port */
+	PORT_START("P2")          // fake input port
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -318,7 +317,7 @@ static const gfx_layout charlayout =
 };
 
 
-/* 16 x 16 sprites -- requires reorganizing characters in init_exerion() */
+// 16 x 16 sprites -- requires reorganizing characters in init_exerion()
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -334,9 +333,9 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_exerion )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,     256, 64 )
-	GFXDECODE_SCALE( "gfx2", 0, spritelayout,     256, 64, 2, 2 )
+	GFXDECODE_ENTRY( "fgchars", 0, charlayout,         0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     256, 64 )
+	GFXDECODE_SCALE( "sprites", 0, spritelayout,     256, 64, 2, 2 )
 GFXDECODE_END
 
 
@@ -359,8 +358,6 @@ void exerion_state::machine_start()
 
 void exerion_state::machine_reset()
 {
-	int i;
-
 	m_porta = 0;
 	m_portb = 0;
 	m_cocktail_flip = 0;
@@ -368,7 +365,7 @@ void exerion_state::machine_reset()
 	m_sprite_palette = 0;
 	m_char_bank = 0;
 
-	for (i = 0; i < 13; i++)
+	for (int i = 0; i < 13; i++)
 		m_background_latches[i] = 0;
 }
 
@@ -381,16 +378,16 @@ void exerion_state::exerion(machine_config &config)
 	sub.set_addrmap(AS_PROGRAM, &exerion_state::sub_map);
 
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART);
-	m_screen->set_screen_update(FUNC(exerion_state::screen_update_exerion));
+	m_screen->set_screen_update(FUNC(exerion_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exerion);
-	PALETTE(config, m_palette, FUNC(exerion_state::exerion_palette), 256*3, 32);
+	PALETTE(config, m_palette, FUNC(exerion_state::palette), 256*3, 32);
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -398,8 +395,8 @@ void exerion_state::exerion(machine_config &config)
 	AY8910(config, "ay1", EXERION_AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	ay8910_device &ay2(AY8910(config, "ay2", EXERION_AY8910_CLOCK));
-	ay2.port_a_read_callback().set(FUNC(exerion_state::exerion_porta_r));
-	ay2.port_b_write_callback().set(FUNC(exerion_state::exerion_portb_w));
+	ay2.port_a_read_callback().set(FUNC(exerion_state::porta_r));
+	ay2.port_b_write_callback().set(FUNC(exerion_state::portb_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
@@ -423,28 +420,30 @@ ROM_START( exerion )
 	ROM_LOAD( "exerion.08",   0x2000, 0x2000, CRC(dcadc1df) SHA1(91388f617cfaa4289ca1c84c697fcfdd8834ae15) )
 	ROM_LOAD( "exerion.09",   0x4000, 0x2000, CRC(34cc4d14) SHA1(511c9de038f7bcaf6f7c96f2cbbe50a80673fa72) )
 
-	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
+	ROM_REGION( 0x02000, "fgchars", 0 )
+	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
-	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
+	ROM_REGION( 0x04000, "sprites", 0 )
+	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )
-	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
+	ROM_REGION( 0x08000, "bgdata", 0 )
+	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) )
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
-	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
-	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
-	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) /* bg char lookup table */
-	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
+	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
 ROM_END
 
 
@@ -453,28 +452,30 @@ ROM_START( exeriont )
 	ROM_LOAD( "prom5.4p",     0x0000, 0x4000, CRC(58b4dc1b) SHA1(3e34d1eda0b0537dac1062e96259d4cc7c64049c) )
 	ROM_LOAD( "prom6.4s",     0x4000, 0x2000, CRC(fca18c2d) SHA1(31077dada3ed4aa2e26af933f589e01e0c71e5cd) )
 
-	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
+	ROM_REGION( 0x02000, "fgchars", 0 )
+	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
-	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
+	ROM_REGION( 0x04000, "sprites", 0 )
+	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )
-	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
+	ROM_REGION( 0x08000, "bgdata", 0 )
+	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) )
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
-	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
-	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
-	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) /* bg char lookup table */
-	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
+	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
 ROM_END
 
 
@@ -483,29 +484,68 @@ ROM_START( exerionb )
 	ROM_LOAD( "eb5.bin",      0x0000, 0x4000, CRC(da175855) SHA1(11ea46fd1d504e16e5ffc604d74c1ce210d6be1c) )
 	ROM_LOAD( "eb6.bin",      0x4000, 0x2000, CRC(0dbe2eff) SHA1(5b0e5e8453619beec46c4350d1b2ed571fe3dc24) )
 
-	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for the second CPU */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "exerion.05",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
-	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) ) /* fg chars */
+	ROM_REGION( 0x02000, "fgchars", 0 )
+	ROM_LOAD( "exerion.06",   0x00000, 0x2000, CRC(435a85a4) SHA1(f6846bfee11df754405d4d796e7d8ac0321b6eb6) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
-	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) ) /* sprites */
+	ROM_REGION( 0x04000, "sprites", 0 )
+	ROM_LOAD( "exerion.11",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
 	ROM_LOAD( "exerion.10",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )
-	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) ) /* bg data */
+	ROM_REGION( 0x08000, "bgdata", 0 )
+	ROM_LOAD( "exerion.03",   0x00000, 0x2000, CRC(790595b8) SHA1(8016ac2394b25db38e962bcff4805380082f6683) )
 	ROM_LOAD( "exerion.04",   0x02000, 0x2000, CRC(d7abd0b9) SHA1(ca6413ecd324cf84e11b703a4eda2c1e6d28ff15) )
 	ROM_LOAD( "exerion.01",   0x04000, 0x2000, CRC(5bb755cb) SHA1(ec92c518c116a78dbb23381468cefb3f930212cc) )
 	ROM_LOAD( "exerion.02",   0x06000, 0x2000, CRC(a7ecbb70) SHA1(3c359d5bb21290a45d3eb18fea2b1f9439b931be) )
 
-	ROM_REGION( 0x0420, "proms", 0 )
-	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
-	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
-	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
-	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) /* bg char lookup table */
-	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
+	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
 ROM_END
+
+
+ROM_START( exerionb2 )
+	ROM_REGION( 0x6000, "maincpu", 0 ) // slight differences compared to the original, not only the usual copyright removal but also some routines modified / added
+	ROM_LOAD( "e7.bin",      0x0000, 0x2000, CRC(349fc44e) SHA1(f0f60528366c860f532e8580310c4fb4eae9e8d6) )
+	ROM_LOAD( "e8.bin",      0x2000, 0x2000, CRC(b7b5eb9b) SHA1(6980ba29ac9178adf93f6b89dff52d9aa8db17ae) )
+	ROM_LOAD( "e9.bin",      0x4000, 0x2000, CRC(11a30c5a) SHA1(1fa512af5771939d54cea76c7d9c09a6ab39aca9) )
+
+	ROM_REGION( 0x2000, "sub", 0 ) // same as the original
+	ROM_LOAD( "e5.bin",   0x0000, 0x2000, CRC(32f6bff5) SHA1(a4d0289f9d1d9eea7ca9a32a0616af48da74b401) )
+
+	ROM_REGION( 0x02000, "fgchars", 0 ) // slight differences compared to the original
+	ROM_LOAD( "e6.bin",   0x00000, 0x2000, CRC(24a2ceb5) SHA1(77fa649e75fe549091cf401307c583e9b6acfdce) )
+
+	ROM_REGION( 0x04000, "sprites", 0 ) // same as the original
+	ROM_LOAD( "e11.bin",   0x00000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
+	ROM_LOAD( "e10.bin",   0x02000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
+
+	ROM_REGION( 0x08000, "bgdata", ROMREGION_ERASE00 ) // smaller ROMs, but same contents but for 3.bin
+	ROM_LOAD( "6.bin",   0x00000, 0x1000, CRC(e0dceacc) SHA1(ac1c08c71878dc10d762da811dbc565248006941) )
+	ROM_LOAD( "7.bin",   0x01000, 0x1000, CRC(544d4194) SHA1(a37c69b74c09f60e91a12894b595adcddcb475d9) )
+	ROM_LOAD( "5.bin",   0x02000, 0x1000, CRC(7cf28a3c) SHA1(064d05461320d4cd9c0d172551a85aae1ee29f02) )
+	ROM_LOAD( "4.bin",   0x03000, 0x1000, CRC(c7e8a4eb) SHA1(5852ff31c0350a1d66b0c7781b3d3f3e0b003f9b) )
+	ROM_LOAD( "2.bin",   0x04000, 0x1000, CRC(bda08550) SHA1(74528cdb30cee079647201f6e6227425d8a0a947) )
+	ROM_LOAD( "3.bin",   0x05000, 0x1000, CRC(bc8510c4) SHA1(b2fe8cdebd555b9f0f585e017b1ce2e7e4956599) ) // slight differences compared to the original
+	ROM_LOAD( "1.bin",   0x06000, 0x1000, CRC(33c73949) SHA1(fac662bd9c0ed769a3574074aba9ab4e0d7aaf33) )
+
+	ROM_REGION( 0x0320, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, BAD_DUMP CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, BAD_DUMP CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, BAD_DUMP CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, BAD_DUMP CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 ) // not dumped for this set
+	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, BAD_DUMP CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
+ROM_END
+
 
 ROM_START( irion )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -513,21 +553,23 @@ ROM_START( irion )
 	ROM_LOAD( "3.bin",        0x2000, 0x2000, CRC(0625bb49) SHA1(111edb1da2153c853d89e56a89ef813cee559730) )
 	ROM_LOAD( "4.bin",        0x4000, 0x2000, CRC(918a9b1d) SHA1(e515f1b9c5ddda8115e68e8a499b252b09774bb6) )
 
-	ROM_REGION( 0x02000, "gfx1", 0 )
+	ROM_REGION( 0x02000, "fgchars", 0 )
 	ROM_LOAD( "1.bin",        0x0000, 0x2000, CRC(56cd5ebf) SHA1(58d84c2dc3b3bac7371da5b9a230fa581ead31dc) )
 
-	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_REGION( 0x04000, "sprites", 0 )
 	ROM_LOAD( "5.bin",        0x0000, 0x2000, CRC(80312de0) SHA1(4fa3bb9d5c62e41a54e8909f8d3b47637137e913) )
 	ROM_LOAD( "6.bin",        0x2000, 0x2000, CRC(f0633a09) SHA1(8989bcb12abadde34777f7c189cfa6e2dfe92d62) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x08000, "bgdata", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0420, "proms", 0 ) // these are assumed to be on the board - the game won't run without them
-	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) /* palette */
-	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) /* fg char lookup table */
-	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) /* sprite lookup table */
-	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) /* bg char lookup table */
-	ROM_LOAD( "exerion.k4",   0x0320, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) ) /* bg char mixer */
+	ROM_REGION( 0x0320, "proms", 0 ) // these are assumed to be on the board - the game won't run without them
+	ROM_LOAD( "exerion.e1",   0x0000, 0x0020, CRC(2befcc20) SHA1(a24d3f691413378fde545a6ddcef7e5118e74019) ) // palette
+	ROM_LOAD( "exerion.i8",   0x0020, 0x0100, CRC(31db0e08) SHA1(1041a778e86d3fe6f057cf40a0a08b30760f3887) ) // fg char lookup table
+	ROM_LOAD( "exerion.h10",  0x0120, 0x0100, CRC(63b4c555) SHA1(30243041be4fa77ada71e8b29d721cad51640c29) ) // sprite lookup table
+	ROM_LOAD( "exerion.i3",   0x0220, 0x0100, CRC(fe72ab79) SHA1(048a72e6db4768df687df927acaa70ef906b3dc0) ) // bg char lookup table
+
+	ROM_REGION( 0x0100, "bg_char_mixer_prom", 0 )
+	ROM_LOAD( "exerion.k4",   0x0000, 0x0100, CRC(ffc2ba43) SHA1(03be1c41d6ac3fc11439caef04ef5ffa60d6aec4) )
 ROM_END
 
 
@@ -539,43 +581,43 @@ ROM_END
 
 void exerion_state::init_exerion()
 {
-	/* allocate some temporary space */
+	// allocate some temporary space
 	std::vector<uint8_t> temp(0x10000);
 
-	/* make a temporary copy of the character data */
+	// make a temporary copy of the character data
 	uint8_t *src = &temp[0];
-	uint8_t *dst = memregion("gfx1")->base();
-	uint32_t length = memregion("gfx1")->bytes();
+	uint8_t *dst = memregion("fgchars")->base();
+	uint32_t length = memregion("fgchars")->bytes();
 	memcpy(src, dst, length);
 
-	/* decode the characters */
-	/* the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2 */
-	/* we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
+	// decode the characters
+	// the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2
+	// we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-						   ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-						   ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-						   ((oldaddr     ) & 0x0001);        /* keep h2 */
+		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       // keep n8-n4
+						   ((oldaddr << 3) & 0x00f0) |       // move n3-n0
+						   ((oldaddr >> 4) & 0x000e) |       // move v2-v0
+						   ((oldaddr     ) & 0x0001);        // keep h2
 		dst[newaddr] = src[oldaddr];
 	}
 
-	/* make a temporary copy of the sprite data */
+	// make a temporary copy of the sprite data
 	src = &temp[0];
-	dst = memregion("gfx2")->base();
-	length = memregion("gfx2")->bytes();
+	dst = memregion("sprites")->base();
+	length = memregion("sprites")->bytes();
 	memcpy(src, dst, length);
 
-	/* decode the sprites */
-	/* the bits in the ROMs are ordered: n9 n8 n3 n7-n6 n5 n4 v3-v2 v1 v0 n2-n1 n0 h3 h2 */
-	/* we want them ordered like this:   n9 n8 n7 n6-n5 n4 n3 n2-n1 n0 v3 v2-v1 v0 h3 h2 */
+	// decode the sprites
+	// the bits in the ROMs are ordered: n9 n8 n3 n7-n6 n5 n4 v3-v2 v1 v0 n2-n1 n0 h3 h2
+	// we want them ordered like this:   n9 n8 n7 n6-n5 n4 n3 n2-n1 n0 v3 v2-v1 v0 h3 h2
 	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-						   ((oldaddr >> 4) & 0x0200) |       /* move n3 */
-						   ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-						   ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-						   ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       // move n7-n4
+						   ((oldaddr >> 4) & 0x0200) |       // move n3
+						   ((oldaddr << 4) & 0x01c0) |       // move n2-n0
+						   ((oldaddr >> 3) & 0x003c) |       // move v3-v0
+						   ((oldaddr     ) & 0xc003);        // keep n9-n8 h3-h2
 		dst[newaddr] = src[oldaddr];
 	}
 }
@@ -585,11 +627,11 @@ void exerion_state::init_exerionb()
 {
 	uint8_t *ram = memregion("maincpu")->base();
 
-	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */
+	// the program ROMs have data lines D1 and D2 swapped. Decode them.
 	for (int addr = 0; addr < 0x6000; addr++)
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
-	/* also convert the gfx as in Exerion */
+	// also convert the gfx as in Exerion
 	init_exerion();
 }
 
@@ -599,14 +641,14 @@ void exerion_state::init_irion()
 	init_exerionb();
 
 	// a further unscramble of gfx2
-	uint8_t *ram = memregion("gfx2")->base();
-	for (u16 i = 0; i < 0x4000; i += 0x400)
+	uint8_t *ram = memregion("sprites")->base();
+	for (uint16_t i = 0; i < 0x4000; i += 0x400)
 	{
-		for (u16 j = 0; j < 0x200; j++)
+		for (uint16_t j = 0; j < 0x200; j++)
 		{
-			u8 k = ram[i+j];
-			ram[i+j] = ram[i+j+0x200];
-			ram[i+j+0x200] = k;
+			uint8_t k = ram[i + j];
+			ram[i + j] = ram[i + j + 0x200];
+			ram[i + j + 0x200] = k;
 		}
 	}
 }
@@ -619,7 +661,8 @@ void exerion_state::init_irion()
  *
  *************************************/
 
-GAME( 1983, exerion,  0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exeriont, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exerionb, exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg", "Exerion (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, irion,    exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerion,   0,       exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco", "Exerion", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exeriont,  exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "Jaleco (Taito America license)", "Exerion (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb,  exerion, exerion, exerion, exerion_state, init_exerionb, ROT90, "bootleg", "Exerion (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exerionb2, exerion, exerion, exerion, exerion_state, init_exerion,  ROT90, "bootleg", "Exerion (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, irion,     exerion, irion,   exerion, exerion_state, init_irion,    ROT90, "bootleg", "Irion", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
