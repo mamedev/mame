@@ -1167,29 +1167,6 @@ ROM_START(thrilldbe)
 	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
 ROM_END
 
-ROM_START(thrilldbu) // GE713UF sticker, does not have the chip at 2G since it uses the rev A network board
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
-	ROM_LOAD16_WORD_SWAP("713ab01.27p", 0x000000, 0x200000, CRC(a005d728) SHA1(8e265b1bb3adb7db2d342d3c0e3361a7174cb54d) )
-
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
-	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
-	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
-
-	ROM_REGION32_BE(0x800000, "user5", 0) // CG Board texture roms
-	ROM_LOAD32_WORD_SWAP( "713a13.8x",  0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
-	ROM_LOAD32_WORD_SWAP( "713a14.16x", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
-
-	ROM_REGION(0x80000, "audiocpu", 0) // 68k program roms
-	ROM_LOAD16_WORD_SWAP( "713a08.7s", 0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0) // PCM sample roms
-	ROM_LOAD( "713a09.16p", 0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
-	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
-
-	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713uab_m48t58y.35d", 0x000000, 0x002000, NO_DUMP )
-ROM_END
-
 } // Anonymous namespace
 
 
@@ -1203,4 +1180,3 @@ GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_racingj, ROT0
 GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAE)",          GAME_FLAGS )
 GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (JAB)",          GAME_FLAGS )
 GAME( 1998, thrilldbe,  thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (EAB)",          GAME_FLAGS )
-GAME( 1998, thrilldbu,  thrilld, thrilld, nwktr, nwktr_state, init_thrilld, ROT0, "Konami", "Thrill Drive (?AB)",          GAME_FLAGS ) // needs m48t58 dump, version to be verified when it boots

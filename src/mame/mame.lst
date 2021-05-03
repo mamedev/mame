@@ -16605,6 +16605,7 @@ sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
 terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
 terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
+thrilldbu                       // GE713UF (c)1998 ?AB
 
 @source:hotblock.cpp
 hotblock                        // (c) 1993 Nics? / NIX?
@@ -33092,7 +33093,6 @@ racingj2j                       // GX888 (c)1999 (JAE)
 thrilld                         // GX713 (c)1998 Japan JAE
 thrilldb                        // GX713 (c)1998 Japan JAB
 thrilldbe                       // GX713 (c)1998 Europe EAB
-thrilldbu                       // GX713 (c)1998 ?AB
 
 @source:nycaptor.cpp
 bronx                           // bootleg
