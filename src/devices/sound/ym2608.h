@@ -15,7 +15,7 @@
 
 DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 
-class ym2608_device : public ymfm_device_base<ymfm::ym2608, 1>, public device_rom_interface<21>
+class ym2608_device : public ymfm_device_base<ymfm::ym2608, ymfm::ym2608::SSG_OUTPUTS>, public device_rom_interface<21>
 {
 public:
 	// constructor

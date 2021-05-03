@@ -11,6 +11,9 @@
 #include "ay8910.h"
 
 
+#define USE_BUILTIN_SSG (1)
+
+
 //*********************************************************
 //  MACROS
 //*********************************************************
@@ -194,35 +197,35 @@ public:
 	// read access, handled by the chip implementation
 	virtual u8 read(offs_t offset) override
 	{
-		m_stream->update();
+		update_streams();
 		return m_chip.read(offset);
 	}
 
 	// (almost) all chips have a status register
 	u8 status_r()
 	{
-		m_stream->update();
+		update_streams();
 		return m_chip.read_status();
 	}
 
 	// write access, handled by the chip implementation
 	virtual void write(offs_t offset, u8 data) override
 	{
-		m_stream->update();
+		update_streams();
 		m_chip.write(offset, data);
 	}
 
 	// (almost) all chips have a register/address latch
 	void address_w(u8 data)
 	{
-		m_stream->update();
+		update_streams();
 		m_chip.write_address(data);
 	}
 
 	// (almost) all chips have a data latch
 	void data_w(u8 data)
 	{
-		m_stream->update();
+		update_streams();
 		m_chip.write_data(data);
 	}
 
@@ -234,7 +237,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override
 	{
 		// if there are SSG streams, create an AY8910 device
-		if (SSGStreams > 0)
+		if (SSGStreams > 0 && !USE_BUILTIN_SSG)
 		{
 			AY8910(config, m_ssg, device_t::clock());
 			m_ssg->set_psg_type(ay8910_device::PSG_TYPE_YM);
@@ -283,8 +286,13 @@ protected:
 	template<bool SSGPresent = (SSGStreams != 0)>
 	std::enable_if_t<SSGPresent, void> device_start_ssg()
 	{
-		m_ssg_stream = stream_alloc(SSGStreams, SSGStreams, SAMPLE_RATE_INPUT_ADAPTIVE);
-		m_chip.ssg_override(*this);
+		if (!USE_BUILTIN_SSG)
+		{
+			m_ssg_stream = stream_alloc(SSGStreams, SSGStreams, SAMPLE_RATE_INPUT_ADAPTIVE);
+			m_chip.ssg_override(*this);
+		}
+		else
+			m_ssg_stream = stream_alloc(0, SSGStreams, m_chip.sample_rate_ssg(device_t::clock()));
 	}
 
 	// device reset
@@ -310,7 +318,10 @@ protected:
 	template<bool SSGPresent = (SSGStreams != 0)>
 	std::enable_if_t<SSGPresent, void> device_clock_changed_ssg()
 	{
-		m_ssg->set_unscaled_clock(ymfm::ssg_engine::CLOCK_DIVIDER * m_chip.sample_rate_ssg(device_t::clock()));
+		if (!USE_BUILTIN_SSG)
+			m_ssg->set_unscaled_clock(ymfm::ssg_engine::CLOCK_DIVIDER * m_chip.sample_rate_ssg(device_t::clock()));
+		else
+			m_ssg_stream->set_sample_rate(m_chip.sample_rate_ssg(device_t::clock()));
 	}
 
 	virtual void device_post_load() override
@@ -334,9 +345,49 @@ protected:
 		}
 		else if (&stream == m_ssg_stream)
 		{
-			for (int index = 0; index < SSGStreams; index++)
-				outputs[index] = inputs[index];
+			if (!USE_BUILTIN_SSG)
+			{
+				for (int index = 0; index < SSGStreams; index++)
+					outputs[index] = inputs[index];
+			}
+			else
+			{
+				sound_stream_update_ssg(stream, outputs);
+			}
 		}
+	}
+
+	// if SSGStreams is non-zero, configure the SSG clock based on our
+	// clock change; otherwise, do nothing
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<!SSGPresent, void> sound_stream_update_ssg(sound_stream &stream, std::vector<write_stream_view> &outputs)
+	{
+	}
+
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<SSGPresent, void> sound_stream_update_ssg(sound_stream &stream, std::vector<write_stream_view> &outputs)
+	{
+		int32_t output[ChipClass::SSG_OUTPUTS];
+		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		{
+			m_chip.generate_ssg(output);
+			for (int index = 0; index < ChipClass::SSG_OUTPUTS; index++)
+				outputs[index].put_int(sampindex, output[index], 32768);
+		}
+	}
+
+	// update streams
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<!SSGPresent, void> update_streams()
+	{
+		m_stream->update();
+	}
+
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<SSGPresent, void> update_streams()
+	{
+		m_stream->update();
+		m_ssg_stream->update();
 	}
 
 	// internal state

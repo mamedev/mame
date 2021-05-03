@@ -58,7 +58,14 @@ void ssg_registers::register_save(device_t &device)
 //-------------------------------------------------
 
 ssg_engine::ssg_engine(fm_interface &intf) :
-	m_intf(intf)
+	m_intf(intf),
+	m_tone_count{ 0,0,0 },
+	m_tone_state{ 0,0,0 },
+	m_envelope_count(0),
+	m_envelope_state(0),
+	m_noise_count(0),
+	m_noise_state(1),
+	m_override(nullptr)
 {
 }
 
@@ -85,7 +92,7 @@ void ssg_engine::reset()
 	m_envelope_count = 0;
 	m_envelope_state = 0;
 	m_noise_count = 0;
-	m_noise_state = 0;
+	m_noise_state = 1;
 }
 
 
@@ -136,12 +143,13 @@ void ssg_engine::register_save(device_t &device)
 
 void ssg_engine::clock()
 {
-	// clock tones; tone period units are clock/16 but since we run at clock/8,
-	// our counters need a right shfit prior to compare
+	// clock tones; tone period units are clock/16 but since we run at clock/8
+	// that works out for us to toggle the state (50% duty cycle) at twice the
+	// programmed period
 	for (int chan = 0; chan < 3; chan++)
 	{
 		m_tone_count[chan]++;
-		if ((m_tone_count[chan] >> 1) >= m_regs.ch_tone_period(chan))
+		if (m_tone_count[chan] >= m_regs.ch_tone_period(chan))
 		{
 			m_tone_state[chan] ^= 1;
 			m_tone_count[chan] = 0;
@@ -175,14 +183,14 @@ void ssg_engine::clock()
 
 void ssg_engine::output(int32_t outputs[OUTPUTS])
 {
-	// volume to amplitude table, derived from the datasheet; this is basically
-	// just pow(2, -(vol ^ 31) * 0.25) scaled to 0..32767
+	// volume to amplitude table, taken from MAME's implementation but biased
+	// so that 0 == 0
 	static int16_t const s_amplitudes[32] =
 	{
-		    0,    29,    64,   105,   153,   211,   280,   362,
-		  459,   575,   713,   876,  1071,  1302,  1578,  1905,
-		 2294,  2757,  3308,  3962,  4741,  5667,  6768,  8077,
-		 9634, 11486, 13688, 16307, 19421, 23125, 27529, 32767
+		     0,   32,   78,  141,  178,  222,  262,  306,
+		   369,  441,  509,  585,  701,  836,  965, 1112,
+		  1334, 1595, 1853, 2146, 2576, 3081, 3576, 4135,
+		  5000, 6006, 7023, 8155, 9963,11976,14132,16382
 	};
 
 	// compute the envelope volume
@@ -211,7 +219,7 @@ void ssg_engine::output(int32_t outputs[OUTPUTS])
 
 		// if neither tone nor noise enabled, return 0
 		uint32_t volume;
-		if ((noise_on & tone_on) == 0)
+		if ((noise_on | tone_on) == 0)
 			volume = 0;
 
 		// if the envelope is enabled, use its amplitude
@@ -221,7 +229,11 @@ void ssg_engine::output(int32_t outputs[OUTPUTS])
 		// otherwise, scale the tone amplitude up to match envelope values
 		// according to the datasheet, amplitude 15 maps to envelope 31
 		else
-			volume = m_regs.ch_amplitude(chan) * 2 + 1;
+		{
+			volume = m_regs.ch_amplitude(chan) * 2;
+			if (volume != 0)
+				volume |= 1;
+		}
 
 		// convert to amplitude
 		outputs[chan] = s_amplitudes[volume];

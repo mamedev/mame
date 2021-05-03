@@ -14,7 +14,7 @@
 
 DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
 
-class ym2203_device : public ymfm_device_base<ymfm::ym2203, 3>
+class ym2203_device : public ymfm_device_base<ymfm::ym2203, ymfm::ym2203::SSG_OUTPUTS>
 {
 public:
 	// constructor

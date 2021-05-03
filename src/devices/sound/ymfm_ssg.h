@@ -167,7 +167,6 @@ private:
 	uint32_t m_noise_state;                 // current noise state
 	ssg_registers m_regs;                   // registers
 	ssg_override *m_override;               // override interface
-	static int16_t const s_amplitudes[32];  // amplitude table
 };
 
 }

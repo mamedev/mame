@@ -274,8 +274,8 @@ public:
 	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]);
+	void generate(int32_t output[OUTPUTS]);
+	void generate_ssg(int32_t output[SSG_OUTPUTS]);
 
 protected:
 	// internal updates
@@ -305,7 +305,7 @@ class ym2608
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
+	static constexpr uint32_t SSG_OUTPUTS = 1;
 
 	// constructor
 	ym2608(fm_interface &intf);
@@ -342,8 +342,8 @@ public:
 	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[1]);
+	void generate(int32_t output[OUTPUTS]);
+	void generate_ssg(int32_t output[SSG_OUTPUTS]);
 
 protected:
 	// internal updates
@@ -367,7 +367,7 @@ class ym2610
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
+	static constexpr uint32_t SSG_OUTPUTS = 1;
 
 	// constructor
 	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
@@ -404,8 +404,8 @@ public:
 	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[1]);
+	void generate(int32_t output[OUTPUTS]);
+	void generate_ssg(int32_t output[SSG_OUTPUTS]);
 
 protected:
 	// internal state
@@ -463,7 +463,7 @@ public:
 	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
+	void generate(int32_t output[OUTPUTS]);
 
 protected:
 	// internal state
@@ -482,7 +482,7 @@ public:
 	ym3438(fm_interface &intf) : ym2612(intf) { }
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
+	void generate(int32_t output[OUTPUTS]);
 };
 
 
@@ -494,7 +494,7 @@ public:
 	ymf276(fm_interface &intf) : ym2612(intf) { }
 
 	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
+	void generate(int32_t output[OUTPUTS]);
 };
 
 }
