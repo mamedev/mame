@@ -10271,9 +10271,11 @@ ccmk2a                          //
 chmate                          //
 
 @source:chessmst.cpp
-chessmst                        //
-chessmsta                       //
-chessmstdm                      //
+chessmst
+chessmsta
+
+@source:chessmstdm.cpp
+chessmstdm
 
 @source:chexx.cpp
 chexx83                         // 1983 ICE

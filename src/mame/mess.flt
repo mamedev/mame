@@ -170,6 +170,7 @@ channelf.cpp
 chaos.cpp
 chessmate.cpp
 chessmst.cpp
+chessmstdm.cpp
 cit101.cpp
 cit101xl.cpp
 cit1500.cpp
