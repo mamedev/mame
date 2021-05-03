@@ -491,6 +491,8 @@ Dipswitch on CRT-352 MEM is labeled SW1
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
+namespace {
+
 class merit3xx_state : public driver_device
 {
 public:
@@ -508,6 +510,8 @@ protected:
 private:
 	MC6845_UPDATE_ROW(update_row);
 
+	void ppi1_pa_w(u8 data);
+
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -519,11 +523,16 @@ void merit3xx_state::machine_start()
 {
 	memory_region *rom = memregion("maincpu");
 	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
-	m_rombank->set_entry(1);
 }
 
 MC6845_UPDATE_ROW(merit3xx_state::update_row)
 {
+}
+
+void merit3xx_state::ppi1_pa_w(u8 data)
+{
+	// OK for ma6710; others likely need something very different
+	m_rombank->set_entry((data & 0x04) >> 1 | (~data & 0x01));
 }
 
 void merit3xx_state::main_map(address_map &map)
@@ -556,7 +565,9 @@ void merit3xx_state::merit3xx(machine_config &config)
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	I8255(config, "ppi0");
-	I8255(config, "ppi1");
+
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.out_pa_callback().set(FUNC(merit3xx_state::ppi1_pa_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10_MHz_XTAL, 616, 0, 512, 270, 0, 256);
@@ -651,6 +662,8 @@ ROM_START( ma7558 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(142c5cea) SHA1(39d787109e0b782fda5a18ff3a56cf8428cb2437) )
 	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
 ROM_END
+
+} // anonymous namespace
 
 // CRT-300 games
 GAME( 1989, ma6710, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
