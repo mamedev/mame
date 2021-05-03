@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ymadpcm.h"
+#include "ymfm_adpcm.h"
 
 #ifdef MAME_EMU_SAVE_H
 #define ADPCM_A_NAME(x) x, "adpcma." #x

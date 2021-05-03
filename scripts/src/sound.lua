@@ -1220,13 +1220,15 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 		MAME_DIR .. "src/devices/sound/ym2610.h",
 		MAME_DIR .. "src/devices/sound/ym2612.cpp",
 		MAME_DIR .. "src/devices/sound/ym2612.h",
-		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
-		MAME_DIR .. "src/devices/sound/ymadpcm.h",
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
 		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_adpcm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_adpcm.h",
 		MAME_DIR .. "src/devices/sound/ymfm_opn.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm_opn.h",
+		MAME_DIR .. "src/devices/sound/ymfm_ssg.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_ssg.h",
 	}
 end
 
@@ -1242,11 +1244,11 @@ if (SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null or SOUNDS["YM3812"]~=null or
 		MAME_DIR .. "src/devices/sound/ymf262.h",
 		MAME_DIR .. "src/devices/sound/ym2413.cpp",
 		MAME_DIR .. "src/devices/sound/ym2413.h",
-		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
-		MAME_DIR .. "src/devices/sound/ymadpcm.h",
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
 		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_adpcm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_adpcm.h",
 		MAME_DIR .. "src/devices/sound/ymfm_opl.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm_opl.h",
 	}

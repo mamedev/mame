@@ -7,58 +7,11 @@
 #pragma once
 
 #include "ymfm.h"
-#include "ymadpcm.h"
+#include "ymfm_adpcm.h"
+#include "ymfm_ssg.h"
 
 namespace ymfm
 {
-
-//*********************************************************
-//  SSG ENGINE
-//*********************************************************
-
-// ======================> ssg_engine
-
-// this class represents a built-in overridable SSG implementation; at this
-// time it is not implemented, so you will have to add your own, or else live
-// with no SSG audio
-class ssg_engine
-{
-public:
-	static constexpr uint32_t OUTPUTS = ssg_interface::OUTPUTS;
-
-	// constructor: if you pass an ssg_interface, that will override
-	ssg_engine() : m_intf(&m_default_intf) { }
-
-	// engine override
-	void override(ssg_interface &intf) { m_intf = &intf; }
-
-	// reset
-	void reset() { m_intf->ssg_reset(); }
-
-	// save/restore
-	void save_restore(fm_saved_state &state) { m_intf->ssg_save_restore(state); }
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device) { m_intf->ssg_register_save(device); }
-#endif
-
-	// set the clock prescale value
-	void set_clock_prescale(uint8_t clock_divider) { m_intf->ssg_set_clock_prescale(clock_divider); }
-
-	// read access
-	uint8_t read(uint8_t offset) { return m_intf->ssg_read(offset); }
-
-	// write access
-	void write(uint8_t offset, uint8_t data) { m_intf->ssg_write(offset, data); }
-
-	// generate one sample
-	void generate(int32_t output[OUTPUTS]) { m_intf->ssg_generate(output); }
-
-private:
-	// internal state
-	ssg_interface *m_intf;
-	ssg_interface m_default_intf;
-};
-
 
 //*********************************************************
 //  REGISTER CLASSES
@@ -294,7 +247,7 @@ public:
 	ym2203(fm_interface &intf);
 
 	// configuration
-	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
+	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();
@@ -307,7 +260,7 @@ public:
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale; }
+	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale / ssg_engine::CLOCK_DIVIDER; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -322,7 +275,7 @@ public:
 
 	// generate one sample of sound
 	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]) { m_ssg.generate(output); }
+	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]);
 
 protected:
 	// internal updates
@@ -358,7 +311,7 @@ public:
 	ym2608(fm_interface &intf);
 
 	// configuration
-	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
+	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();
@@ -371,7 +324,7 @@ public:
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock / scale; }
+	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock / scale / ssg_engine::CLOCK_DIVIDER; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -390,7 +343,7 @@ public:
 
 	// generate one sample of sound
 	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]) { m_ssg.generate(output); }
+	void generate_ssg(int32_t output[1]);
 
 protected:
 	// internal updates
@@ -420,7 +373,7 @@ public:
 	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
 
 	// configuration
-	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
+	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();
@@ -433,7 +386,7 @@ public:
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / 4; }
+	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / 4 / ssg_engine::CLOCK_DIVIDER; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -452,7 +405,7 @@ public:
 
 	// generate one sample of sound
 	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]) { m_ssg.generate(output); }
+	void generate_ssg(int32_t output[1]);
 
 protected:
 	// internal state

@@ -431,7 +431,8 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 
 ym2203::ym2203(fm_interface &intf) :
 	m_address(0),
-	m_fm(intf)
+	m_fm(intf),
+	m_ssg(intf)
 {
 }
 
@@ -607,9 +608,25 @@ void ym2203::generate(int32_t output[fm_engine::OUTPUTS])
 	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
 
 	// convert to 10.3 floating point value for the DAC and back
-	// YM2151 is stereo
 	for (int index = 0; index < fm_engine::OUTPUTS; index++)
 		output[index] = roundtrip_fp(output[index]);
+}
+
+
+//-------------------------------------------------
+//  generate_ssg - generate one sample of SSG
+//  sound
+//-------------------------------------------------
+
+void ym2203::generate_ssg(int32_t output[ssg_engine::OUTPUTS])
+{
+	// clock the SSG
+	m_ssg.clock();
+
+	// YM2203 keeps the three SSG outputs independent
+	for (int index = 0; index < ssg_engine::OUTPUTS; index++)
+		output[index] = 0;
+	m_ssg.output(output);
 }
 
 
@@ -622,10 +639,6 @@ void ym2203::update_prescale(uint8_t newval)
 {
 	// inform the FM engine and refresh our clock rate
 	m_fm.set_clock_prescale(newval);
-
-	// also scale the SSG streams
-	// mapping is (FM->SSG): 6->4, 3->2, 2->1
-	m_ssg.set_clock_prescale(2 * newval / 3);
 }
 
 
@@ -643,6 +656,7 @@ ym2608::ym2608(fm_interface &intf) :
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c),
 	m_fm(intf),
+	m_ssg(intf),
 	m_adpcm_a(intf, 0),
 	m_adpcm_b(intf)
 {
@@ -984,7 +998,7 @@ void ym2608::generate(int32_t output[fm_engine::OUTPUTS])
 	// clock the ADPCM-B engine every cycle
 	m_adpcm_b.clock(0x01);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
+	// update the FM content
 	for (int index = 0; index < fm_engine::OUTPUTS; index++)
 		output[index] = 0;
 	m_fm.output(output, 1, 32767, fmmask);
@@ -992,6 +1006,25 @@ void ym2608::generate(int32_t output[fm_engine::OUTPUTS])
 	// mix in the ADPCM
 	m_adpcm_a.output(output, 0x3f);
 	m_adpcm_b.output(output, 2, 0x01);
+}
+
+
+//-------------------------------------------------
+//  generate_ssg - generate one sample of SSG
+//  sound
+//-------------------------------------------------
+
+void ym2608::generate_ssg(int32_t output[ssg_engine::OUTPUTS])
+{
+	// clock the SSG
+	m_ssg.clock();
+
+	// YM2608 combines the three SSG outputs internally
+	int32_t temp_output[ssg_engine::OUTPUTS] = { 0 };
+	m_ssg.output(temp_output);
+
+	// just average for now; who knows what the real chip does
+	output[0] = (temp_output[0] + temp_output[1] + temp_output[2]) / 3;
 }
 
 
@@ -1004,10 +1037,6 @@ void ym2608::update_prescale(uint8_t newval)
 {
 	// inform the FM engine and refresh our clock rate
 	m_fm.set_clock_prescale(newval);
-
-	// also scale the SSG streams
-	// mapping is (FM->SSG): 6->4, 3->2, 2->1
-	m_ssg.set_clock_prescale(2 * newval / 3);
 }
 
 
@@ -1026,6 +1055,7 @@ ym2610::ym2610(fm_interface &intf, uint8_t channel_mask) :
 	m_eos_status(0x00),
 	m_flag_mask(0xbf),
 	m_fm(intf),
+	m_ssg(intf),
 	m_adpcm_a(intf, 8),
 	m_adpcm_b(intf, 8)
 {
@@ -1317,6 +1347,25 @@ void ym2610::generate(int32_t output[fm_engine::OUTPUTS])
 	// mix in the ADPCM
 	m_adpcm_a.output(output, 0x3f);
 	m_adpcm_b.output(output, 2, 0x01);
+}
+
+
+//-------------------------------------------------
+//  generate_ssg - generate one sample of SSG
+//  sound
+//-------------------------------------------------
+
+void ym2610::generate_ssg(int32_t output[1])
+{
+	// clock the SSG
+	m_ssg.clock();
+
+	// YM2610 combines the three SSG outputs internally
+	int32_t temp_output[ssg_engine::OUTPUTS] = { 0 };
+	m_ssg.output(temp_output);
+
+	// just average for now; who knows what the real chip does
+	output[0] = (temp_output[0] + temp_output[1] + temp_output[2]) / 3;
 }
 
 

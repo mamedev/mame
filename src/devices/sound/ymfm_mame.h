@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ymfm.h"
+#include "ymfm_ssg.h"
 #include "ay8910.h"
 
 
@@ -29,7 +30,7 @@
 // ======================> ym_generic
 
 // inner base class for a standalone FM device
-class ym_generic : public device_t, public device_sound_interface, public ymfm::fm_interface, public ymfm::ssg_interface
+class ym_generic : public device_t, public device_sound_interface, public ymfm::fm_interface, public ymfm::ssg_override
 {
 public:
 	// constructor
@@ -127,13 +128,13 @@ protected:
 		m_ssg->reset();
 	}
 
-	virtual uint8_t ssg_read(uint8_t offset) override
+	virtual uint8_t ssg_read(uint32_t offset) override
 	{
 		m_ssg->address_w(offset);
 		return m_ssg->data_r();
 	}
 
-	virtual void ssg_write(uint8_t offset, uint8_t data) override
+	virtual void ssg_write(uint32_t offset, uint8_t data) override
 	{
 		m_ssg->address_w(offset);
 		m_ssg->data_w(data);
@@ -309,7 +310,7 @@ protected:
 	template<bool SSGPresent = (SSGStreams != 0)>
 	std::enable_if_t<SSGPresent, void> device_clock_changed_ssg()
 	{
-		m_ssg->set_unscaled_clock(m_chip.sample_rate_ssg(device_t::clock()));
+		m_ssg->set_unscaled_clock(ymfm::ssg_engine::CLOCK_DIVIDER * m_chip.sample_rate_ssg(device_t::clock()));
 	}
 
 	virtual void device_post_load() override

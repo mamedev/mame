@@ -7,7 +7,7 @@
 #pragma once
 
 #include "ymfm.h"
-#include "ymadpcm.h"
+#include "ymfm_adpcm.h"
 
 namespace ymfm
 {
