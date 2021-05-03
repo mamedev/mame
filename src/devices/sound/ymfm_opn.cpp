@@ -422,6 +422,161 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 
 
 //*********************************************************
+//  YM2149
+//*********************************************************
+
+//-------------------------------------------------
+//  ym2149 - constructor
+//-------------------------------------------------
+
+ym2149::ym2149(fm_interface &intf) :
+	m_address(0),
+	m_ssg(intf)
+{
+}
+
+
+//-------------------------------------------------
+//  reset - reset the system
+//-------------------------------------------------
+
+void ym2149::reset()
+{
+	// reset the engines
+	m_ssg.reset();
+}
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void ym2149::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_address);
+	m_ssg.save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void ym2149::register_save(device_t &device)
+{
+	device.save_item(YMFM_NAME(m_address));
+	m_ssg.register_save(device);
+}
+#endif
+
+
+//-------------------------------------------------
+//  read_data - read the data register
+//-------------------------------------------------
+
+uint8_t ym2149::read_data()
+{
+	return m_ssg.read(m_address & 0x0f);
+}
+
+
+//-------------------------------------------------
+//  read - handle a read from the device
+//-------------------------------------------------
+
+uint8_t ym2149::read(uint32_t offset)
+{
+	uint8_t result = 0xff;
+	switch (offset & 3)	// BC2,BC1
+	{
+		case 0: // inactive
+			break;
+
+		case 1: // address
+			break;
+
+		case 2: // inactive
+			break;
+
+		case 3: // read
+			result = read_data();
+			break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_address - handle a write to the address
+//  register
+//-------------------------------------------------
+
+void ym2149::write_address(uint8_t data)
+{
+	// just set the address
+	m_address = data;
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the register
+//  interface
+//-------------------------------------------------
+
+void ym2149::write_data(uint8_t data)
+{
+	m_ssg.write(m_address & 0x0f, data);
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the register
+//  interface
+//-------------------------------------------------
+
+void ym2149::write(uint32_t offset, uint8_t data)
+{
+	switch (offset & 3)	// BC2,BC1
+	{
+		case 0: // address
+			write_address(data);
+			break;
+
+		case 1: // inactive
+			break;
+
+		case 2: // write
+			write_data(data);
+			break;
+
+		case 3: // address
+			write_address(data);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  generate_ssg - generate one sample of SSG
+//  sound
+//-------------------------------------------------
+
+void ym2149::generate_ssg(int32_t output[SSG_OUTPUTS])
+{
+	// clock the SSG
+	m_ssg.clock();
+
+	// YM2149 keeps the three SSG outputs independent
+	for (int index = 0; index < SSG_OUTPUTS; index++)
+		output[index] = 0;
+	m_ssg.output(output);
+}
+
+
+
+//*********************************************************
 //  YM2203
 //*********************************************************
 

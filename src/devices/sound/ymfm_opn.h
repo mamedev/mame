@@ -231,6 +231,55 @@ using opna_registers = opn_registers_base<true>;
 
 
 //*********************************************************
+//  SSG IMPLEMENTATION CLASSES
+//*********************************************************
+
+// ======================> ym2149
+
+class ym2149
+{
+public:
+	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
+
+	// constructor
+	ym2149(fm_interface &intf);
+
+	// configuration
+	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
+
+	// reset
+	void reset();
+
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
+
+	// pass-through helpers
+	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER; }
+
+	// read access
+	uint8_t read_data();
+	uint8_t read(uint32_t offset);
+
+	// write access
+	void write_address(uint8_t data);
+	void write_data(uint8_t data);
+	void write(uint32_t offset, uint8_t data);
+
+	// generate one sample of sound
+	void generate_ssg(int32_t output[SSG_OUTPUTS]);
+
+protected:
+	// internal state
+	uint8_t m_address;               // address register
+	ssg_engine m_ssg;                // SSG engine
+};
+
+
+
+//*********************************************************
 //  OPN IMPLEMENTATION CLASSES
 //*********************************************************
 
