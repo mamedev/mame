@@ -21,8 +21,8 @@ public:
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
-	auto port_a_read_callback() { return io_write_handler(0); }
-	auto port_b_read_callback() { return io_write_handler(1); }
+	auto port_a_read_callback() { return io_read_handler(0); }
+	auto port_b_read_callback() { return io_read_handler(1); }
 	auto port_a_write_callback() { return io_write_handler(0); }
 	auto port_b_write_callback() { return io_write_handler(1); }
 };

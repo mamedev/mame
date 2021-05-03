@@ -26,7 +26,7 @@ public:
 	auto port_write_handler() { return io_write_handler(); }
 
 	// write access, handled by the chip implementation
-	void write(offs_t offset, u8 data);
+	virtual void write(offs_t offset, u8 data) override;
 	void address_w(u8 data);
 	void data_w(u8 data);
 
