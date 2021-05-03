@@ -489,6 +489,7 @@ Dipswitch on CRT-352 MEM is labeled SW1
 #include "machine/microtch.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "video/bt47x.h"
 #include "video/mc6845.h"
 
 namespace {
@@ -548,8 +549,12 @@ void merit3xx_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x17).rw("uart", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x18, 0x1b).m("ramdac", FUNC(bt476_device::map));
 	map(0x40, 0x40).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
 	map(0x41, 0x41).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
+	//map(0x80, 0x80).r("ssg", FUNC(ym2149_device::data_r));
+	//map(0x80, 0x81).w("ssg", FUNC(ym2149_device::address_data_w));
 }
 
 static INPUT_PORTS_START( merit3xx )
@@ -578,6 +583,10 @@ void merit3xx_state::merit3xx(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(merit3xx_state::update_row));
+
+	BT476(config, "ramdac", 10_MHz_XTAL);
+
+	NS16550(config, "uart", 1.8432_MHz_XTAL);
 }
 
 
