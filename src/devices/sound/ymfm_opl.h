@@ -115,7 +115,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -329,7 +329,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -477,13 +477,13 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ym3526(fm_interface &intf);
+	ym3526(ymfm_interface &intf);
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -525,13 +525,13 @@ public:
 	static constexpr uint8_t ALL_IRQS = STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_EOS | fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB;
 
 	// constructor
-	y8950(fm_interface &intf);
+	y8950(ymfm_interface &intf);
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -576,13 +576,13 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ym3812(fm_interface &intf);
+	ym3812(ymfm_interface &intf);
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -624,13 +624,13 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ymf262(fm_interface &intf);
+	ymf262(ymfm_interface &intf);
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -674,7 +674,7 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	opll_base(fm_interface &intf, uint8_t const *data);
+	opll_base(ymfm_interface &intf, uint8_t const *data);
 
 	// configuration
 	void set_instrument_data(uint8_t const *data) { m_fm.regs().set_instrument_data(data); }
@@ -683,7 +683,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -717,7 +717,7 @@ class ym2413 : public opll_base
 {
 public:
 	// constructor
-	ym2413(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+	ym2413(ymfm_interface &intf, uint8_t const *instrument_data = nullptr);
 
 private:
 	// internal state
@@ -731,7 +731,7 @@ class ym2423 : public opll_base
 {
 public:
 	// constructor
-	ym2423(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+	ym2423(ymfm_interface &intf, uint8_t const *instrument_data = nullptr);
 
 private:
 	// internal state
@@ -745,7 +745,7 @@ class ymf281 : public opll_base
 {
 public:
 	// constructor
-	ymf281(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+	ymf281(ymfm_interface &intf, uint8_t const *instrument_data = nullptr);
 
 private:
 	// internal state
@@ -759,7 +759,7 @@ class ds1001 : public opll_base
 {
 public:
 	// constructor
-	ds1001(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+	ds1001(ymfm_interface &intf, uint8_t const *instrument_data = nullptr);
 
 private:
 	// internal state

@@ -449,7 +449,7 @@ opl_registers_base<Revision>::opl_registers_base() :
 //-------------------------------------------------
 
 template<int Revision>
-void opl_registers_base<Revision>::save(fm_interface &intf)
+void opl_registers_base<Revision>::save(ymfm_interface &intf)
 {
 	intf.save_item(YMFM_NAME(m_lfo_am_counter));
 	intf.save_item(YMFM_NAME(m_lfo_pm_counter));
@@ -800,7 +800,7 @@ opll_registers::opll_registers() :
 //  save - register for save states
 //-------------------------------------------------
 
-void opll_registers::save(fm_interface &intf)
+void opll_registers::save(ymfm_interface &intf)
 {
 	intf.save_item(YMFM_NAME(m_lfo_am_counter));
 	intf.save_item(YMFM_NAME(m_lfo_pm_counter));
@@ -1085,7 +1085,7 @@ opq_registers::opq_registers() :
 //  save - register for save states
 //-------------------------------------------------
 
-void opq_registers::save(fm_interface &intf)
+void opq_registers::save(ymfm_interface &intf)
 {
 	intf.save_item(YMFM_NAME(m_lfo_counter));
 	intf.save_item(YMFM_NAME(m_lfo_am));

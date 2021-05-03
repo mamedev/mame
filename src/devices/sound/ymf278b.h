@@ -9,7 +9,7 @@
 #include "ymfm_opl.h"
 #include "dirom.h"
 
-class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface<22>, public ymfm::fm_interface
+class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface<22>, public ymfm::ymfm_interface
 {
 public:
 	static constexpr u8 STATUS_BUSY = 0x01;

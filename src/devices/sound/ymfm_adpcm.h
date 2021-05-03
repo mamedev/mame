@@ -54,7 +54,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -112,7 +112,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -150,13 +150,13 @@ public:
 	static constexpr int CHANNELS = adpcm_a_registers::CHANNELS;
 
 	// constructor
-	adpcm_a_engine(fm_interface &intf, uint32_t addrshift);
+	adpcm_a_engine(ymfm_interface &intf, uint32_t addrshift);
 
 	// reset our status
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -179,14 +179,14 @@ public:
 	}
 
 	// return a reference to our interface
-	fm_interface &intf() { return m_intf; }
+	ymfm_interface &intf() { return m_intf; }
 
 	// return a reference to our registers
 	adpcm_a_registers &regs() { return m_regs; }
 
 private:
 	// internal state
-	fm_interface &m_intf;                                 // reference to the interface
+	ymfm_interface &m_intf;                                 // reference to the interface
 	std::unique_ptr<adpcm_a_channel> m_channel[CHANNELS]; // array of channels
 	adpcm_a_registers m_regs;                             // registers
 };
@@ -244,7 +244,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -300,7 +300,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -361,13 +361,13 @@ public:
 	static constexpr int CHANNELS = adpcm_b_registers::CHANNELS;
 
 	// constructor
-	adpcm_b_engine(fm_interface &intf, uint32_t addrshift = 0);
+	adpcm_b_engine(ymfm_interface &intf, uint32_t addrshift = 0);
 
 	// reset our status
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -388,14 +388,14 @@ public:
 	uint8_t status() const { return m_channel[0]->status(); }
 
 	// return a reference to our interface
-	fm_interface &intf() { return m_intf; }
+	ymfm_interface &intf() { return m_intf; }
 
 	// return a reference to our registers
 	adpcm_b_registers &regs() { return m_regs; }
 
 private:
 	// internal state
-	fm_interface &m_intf;                                 // reference to our interface
+	ymfm_interface &m_intf;                                 // reference to our interface
 	std::unique_ptr<adpcm_b_channel> m_channel[CHANNELS]; // array of channels
 	adpcm_b_registers m_regs;                             // registers
 };

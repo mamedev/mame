@@ -15,15 +15,15 @@
 
 DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 
-class ym2608_device : public ymfm_device_base<ymfm::ym2608, ymfm::ym2608::SSG_OUTPUTS>, public device_rom_interface<21>
+class ym2608_device : public ymfm_ssg_device_base<ymfm::ym2608>, public device_rom_interface<21>
 {
 public:
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
-	auto port_a_read_callback() { return io_write_handler(0); }
-	auto port_b_read_callback() { return io_write_handler(1); }
+	auto port_a_read_callback() { return io_read_handler(0); }
+	auto port_b_read_callback() { return io_read_handler(1); }
 	auto port_a_write_callback() { return io_write_handler(0); }
 	auto port_b_write_callback() { return io_write_handler(1); }
 
@@ -36,9 +36,9 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	virtual uint8_t adpcm_a_read(uint32_t address) override;
-	virtual uint8_t adpcm_b_read(uint32_t address) override;
-	virtual void adpcm_b_write(uint32_t address, u8 data) override;
+	virtual uint8_t ymfm_adpcm_a_read(uint32_t address) override;
+	virtual uint8_t ymfm_adpcm_b_read(uint32_t address) override;
+	virtual void ymfm_adpcm_b_write(uint32_t address, u8 data) override;
 
 	// internal state
 	required_memory_region m_internal; // internal memory region

@@ -13,9 +13,9 @@
 // ======================> ym2610_device_base
 
 template<typename ChipClass>
-class ym2610_device_base : public ymfm_device_base<ChipClass, ChipClass::SSG_OUTPUTS>, public device_memory_interface
+class ym2610_device_base : public ymfm_ssg_device_base<ChipClass>, public device_memory_interface
 {
-	using parent = ymfm_device_base<ChipClass, 1>;
+	using parent = ymfm_ssg_device_base<ChipClass>;
 
 public:
 	// constructor
@@ -30,8 +30,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	virtual uint8_t adpcm_a_read(offs_t address) override;
-	virtual uint8_t adpcm_b_read(offs_t address) override;
+	virtual uint8_t ymfm_adpcm_a_read(offs_t address) override;
+	virtual uint8_t ymfm_adpcm_b_read(offs_t address) override;
 
 	// internal state
 	address_space_config const m_adpcm_a_config; // address space 0 config (ADPCM-A)

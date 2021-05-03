@@ -70,7 +70,7 @@ void opm_registers::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void opm_registers::save_restore(fm_saved_state &state)
+void opm_registers::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_lfo_counter);
 	state.save_restore(m_lfo_am);
@@ -392,7 +392,7 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 //  ym2151 - constructor
 //-------------------------------------------------
 
-ym2151::ym2151(fm_interface &intf, opm_variant variant) :
+ym2151::ym2151(ymfm_interface &intf, opm_variant variant) :
 	m_variant(variant),
 	m_address(0),
 	m_fm(intf)
@@ -415,7 +415,7 @@ void ym2151::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2151::save_restore(fm_saved_state &state)
+void ym2151::save_restore(ymfm_saved_state &state)
 {
 	m_fm.save_restore(state);
 	state.save_restore(m_address);

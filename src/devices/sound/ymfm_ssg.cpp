@@ -29,7 +29,7 @@ void ssg_registers::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ssg_registers::save_restore(fm_saved_state &state)
+void ssg_registers::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_regdata);
 }
@@ -57,7 +57,7 @@ void ssg_registers::register_save(device_t &device)
 //  ssg_engine - constructor
 //-------------------------------------------------
 
-ssg_engine::ssg_engine(fm_interface &intf) :
+ssg_engine::ssg_engine(ymfm_interface &intf) :
 	m_intf(intf),
 	m_tone_count{ 0,0,0 },
 	m_tone_state{ 0,0,0 },
@@ -100,7 +100,7 @@ void ssg_engine::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ssg_engine::save_restore(fm_saved_state &state)
+void ssg_engine::save_restore(ymfm_saved_state &state)
 {
 	// save register state
 	m_regs.save_restore(state);

@@ -110,7 +110,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &save);
 #endif
@@ -242,7 +242,7 @@ public:
 	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
 
 	// constructor
-	ym2149(fm_interface &intf);
+	ym2149(ymfm_interface &intf);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
@@ -251,7 +251,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -293,7 +293,7 @@ public:
 	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
 
 	// constructor
-	ym2203(fm_interface &intf);
+	ym2203(ymfm_interface &intf);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
@@ -302,7 +302,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -357,7 +357,7 @@ public:
 	static constexpr uint32_t SSG_OUTPUTS = 1;
 
 	// constructor
-	ym2608(fm_interface &intf);
+	ym2608(ymfm_interface &intf);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
@@ -366,7 +366,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -419,7 +419,7 @@ public:
 	static constexpr uint32_t SSG_OUTPUTS = 1;
 
 	// constructor
-	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
+	ym2610(ymfm_interface &intf, uint8_t channel_mask = 0x36);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
@@ -428,7 +428,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -472,7 +472,7 @@ class ym2610b : public ym2610
 {
 public:
 	// constructor
-	ym2610b(fm_interface &intf) : ym2610(intf, 0x3f) { }
+	ym2610b(ymfm_interface &intf) : ym2610(intf, 0x3f) { }
 };
 
 
@@ -485,13 +485,13 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ym2612(fm_interface &intf);
+	ym2612(ymfm_interface &intf);
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -528,7 +528,7 @@ protected:
 class ym3438 : public ym2612
 {
 public:
-	ym3438(fm_interface &intf) : ym2612(intf) { }
+	ym3438(ymfm_interface &intf) : ym2612(intf) { }
 
 	// generate one sample of sound
 	void generate(int32_t output[OUTPUTS]);
@@ -540,7 +540,7 @@ public:
 class ymf276 : public ym2612
 {
 public:
-	ymf276(fm_interface &intf) : ym2612(intf) { }
+	ymf276(ymfm_interface &intf) : ym2612(intf) { }
 
 	// generate one sample of sound
 	void generate(int32_t output[OUTPUTS]);

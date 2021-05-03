@@ -82,7 +82,7 @@ void opl_registers_base<Revision>::reset()
 //-------------------------------------------------
 
 template<int Revision>
-void opl_registers_base<Revision>::save_restore(fm_saved_state &state)
+void opl_registers_base<Revision>::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_lfo_am_counter);
 	state.save_restore(m_lfo_pm_counter);
@@ -450,7 +450,7 @@ void opll_registers::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void opll_registers::save_restore(fm_saved_state &state)
+void opll_registers::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_lfo_am_counter);
 	state.save_restore(m_lfo_pm_counter);
@@ -724,7 +724,7 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 //  ym3526 - constructor
 //-------------------------------------------------
 
-ym3526::ym3526(fm_interface &intf) :
+ym3526::ym3526(ymfm_interface &intf) :
 	m_address(0),
 	m_fm(intf)
 {
@@ -746,7 +746,7 @@ void ym3526::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym3526::save_restore(fm_saved_state &state)
+void ym3526::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
@@ -871,7 +871,7 @@ void ym3526::generate(int32_t output[fm_engine::OUTPUTS])
 //  y8950 - constructor
 //-------------------------------------------------
 
-y8950::y8950(fm_interface &intf) :
+y8950::y8950(ymfm_interface &intf) :
 	m_address(0),
 	m_io_ddr(0),
 	m_fm(intf),
@@ -896,7 +896,7 @@ void y8950::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void y8950::save_restore(fm_saved_state &state)
+void y8950::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	state.save_restore(m_io_ddr);
@@ -1118,7 +1118,7 @@ void y8950::generate(int32_t output[fm_engine::OUTPUTS])
 //  ym3812 - constructor
 //-------------------------------------------------
 
-ym3812::ym3812(fm_interface &intf) :
+ym3812::ym3812(ymfm_interface &intf) :
 	m_address(0),
 	m_fm(intf)
 {
@@ -1140,7 +1140,7 @@ void ym3812::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym3812::save_restore(fm_saved_state &state)
+void ym3812::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
@@ -1265,7 +1265,7 @@ void ym3812::generate(int32_t output[fm_engine::OUTPUTS])
 //  ymf262 - constructor
 //-------------------------------------------------
 
-ymf262::ymf262(fm_interface &intf) :
+ymf262::ymf262(ymfm_interface &intf) :
 	m_address(0),
 	m_fm(intf)
 {
@@ -1287,7 +1287,7 @@ void ymf262::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ymf262::save_restore(fm_saved_state &state)
+void ymf262::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
@@ -1452,7 +1452,7 @@ void ymf262::generate(int32_t output[fm_engine::OUTPUTS])
 //  opll_base - constructor
 //-------------------------------------------------
 
-opll_base::opll_base(fm_interface &intf, uint8_t const *instrument_data) :
+opll_base::opll_base(ymfm_interface &intf, uint8_t const *instrument_data) :
 	m_address(0),
 	m_fm(intf)
 {
@@ -1475,7 +1475,7 @@ void opll_base::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void opll_base::save_restore(fm_saved_state &state)
+void opll_base::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
@@ -1569,7 +1569,7 @@ void opll_base::generate(int32_t output[fm_engine::OUTPUTS])
 //  ym2413 - constructor
 //-------------------------------------------------
 
-ym2413::ym2413(fm_interface &intf, uint8_t const *instrument_data) :
+ym2413::ym2413(ymfm_interface &intf, uint8_t const *instrument_data) :
 	opll_base(intf, (instrument_data != nullptr) ? instrument_data : s_default_instruments)
 {
 };
@@ -1607,7 +1607,7 @@ uint8_t const ym2413::s_default_instruments[] =
 //  ym2423 - constructor
 //-------------------------------------------------
 
-ym2423::ym2423(fm_interface &intf, uint8_t const *instrument_data) :
+ym2423::ym2423(ymfm_interface &intf, uint8_t const *instrument_data) :
 	opll_base(intf, (instrument_data != nullptr) ? instrument_data : s_default_instruments)
 {
 };
@@ -1647,7 +1647,7 @@ uint8_t const ym2423::s_default_instruments[] =
 //  ymf281 - constructor
 //-------------------------------------------------
 
-ymf281::ymf281(fm_interface &intf, uint8_t const *instrument_data) :
+ymf281::ymf281(ymfm_interface &intf, uint8_t const *instrument_data) :
 	opll_base(intf, (instrument_data != nullptr) ? instrument_data : s_default_instruments)
 {
 };
@@ -1685,7 +1685,7 @@ uint8_t const ymf281::s_default_instruments[] =
 //  ds1001 - constructor
 //-------------------------------------------------
 
-ds1001::ds1001(fm_interface &intf, uint8_t const *instrument_data) :
+ds1001::ds1001(ymfm_interface &intf, uint8_t const *instrument_data) :
 	opll_base(intf, (instrument_data != nullptr) ? instrument_data : s_default_instruments)
 {
 };

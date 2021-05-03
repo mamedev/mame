@@ -82,7 +82,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -126,7 +126,7 @@ public:
 	static constexpr int CLOCK_DIVIDER = 8;
 
 	// constructor
-	ssg_engine(fm_interface &intf);
+	ssg_engine(ymfm_interface &intf);
 
 	// configure an override
 	void override(ssg_override &override) { m_override = &override; }
@@ -135,7 +135,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -151,14 +151,14 @@ public:
 	void write(uint32_t regnum, uint8_t data);
 
 	// return a reference to our interface
-	fm_interface &intf() { return m_intf; }
+	ymfm_interface &intf() { return m_intf; }
 
 	// return a reference to our registers
 	ssg_registers &regs() { return m_regs; }
 
 private:
 	// internal state
-	fm_interface &m_intf;                   // reference to the interface
+	ymfm_interface &m_intf;                   // reference to the interface
 	uint32_t m_tone_count[3];               // current tone counter
 	uint32_t m_tone_state[3];               // current tone state
 	uint32_t m_envelope_count;              // envelope counter

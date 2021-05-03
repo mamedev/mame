@@ -35,24 +35,24 @@ void y8950_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  adpcm_b_read - callback to read data for the
-//  ADPCM-B engine; in this case, from our default
-//  address space
+//  ymfm_adpcm_b_read - callback to read data for
+//  the ADPCM-B engine; in this case, from our
+//  default address space
 //-------------------------------------------------
 
-uint8_t y8950_device::adpcm_b_read(uint32_t offset)
+uint8_t y8950_device::ymfm_adpcm_b_read(uint32_t offset)
 {
 	return read_byte(offset);
 }
 
 
 //-------------------------------------------------
-//  adpcm_b_write - callback to write data to the
-//  ADPCM-B engine; in this case, to our default
-//  address space
+//  ymfm_adpcm_b_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
 //-------------------------------------------------
 
-void y8950_device::adpcm_b_write(uint32_t offset, uint8_t data)
+void y8950_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
 {
 	space().write_byte(offset, data);
 }

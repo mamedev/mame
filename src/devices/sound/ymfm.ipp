@@ -394,7 +394,7 @@ void fm_operator<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_operator<RegisterType>::save_restore(fm_saved_state &state)
+void fm_operator<RegisterType>::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_phase);
 	state.save_restore(m_env_attenuation);
@@ -821,7 +821,7 @@ void fm_channel<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::save_restore(fm_saved_state &state)
+void fm_channel<RegisterType>::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_feedback[0]);
 	state.save_restore(m_feedback[1]);
@@ -1166,7 +1166,7 @@ void fm_channel<RegisterType>::output_rhythm_ch8(uint32_t phase_select, int32_t 
 //-------------------------------------------------
 
 template<class RegisterType>
-fm_engine_base<RegisterType>::fm_engine_base(fm_interface &intf) :
+fm_engine_base<RegisterType>::fm_engine_base(ymfm_interface &intf) :
 	m_intf(intf),
 	m_env_counter(0),
 	m_status(0),
@@ -1226,7 +1226,7 @@ void fm_engine_base<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_engine_base<RegisterType>::save_restore(fm_saved_state &state)
+void fm_engine_base<RegisterType>::save_restore(ymfm_saved_state &state)
 {
 	// save our data
 	state.save_restore(m_env_counter);

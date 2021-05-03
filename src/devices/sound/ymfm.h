@@ -6,9 +6,14 @@
 
 #pragma once
 
+#include <assert.h>
+#include <stdint.h>
+#include <string.h>
+#include <algorithm>
 #include <array>
+#include <memory>
+#include <string>
 #include <vector>
-
 
 namespace ymfm
 {
@@ -29,204 +34,14 @@ enum envelope_state : uint32_t
 };
 
 
-//*********************************************************
-//  INTERFACE CLASSES
-//*********************************************************
-
-// forward declarations
-template<class RegisterType> class fm_engine_base;
-
-
-// ======================> fm_saved_state
-
-// this class contains a managed vector of bytes that is used to
-// save and restore state
-class fm_saved_state
+// three different keyon sources; actual keyon is an OR over all of these
+enum keyon_type : uint32_t
 {
-public:
-	// construction
-	fm_saved_state(bool saving) :
-		m_offset(saving ? -1 : 0)
-	{
-	}
-
-	// are we saving or restoring?
-	bool saving() const { return (m_offset < 0); }
-
-	// retrieve the buffer
-	std::vector<uint8_t> &buffer() { return m_buffer; }
-
-	// generic save/restore
-	template<typename DataType>
-	void save_restore(DataType &data)
-	{
-		if (saving())
-			save(data);
-		else
-			restore(data);
-	}
-
-public:
-	// save data to the buffer
-	void save(bool &data) { append(data ? 1 : 0); }
-	void save(int8_t &data) { append(data); }
-	void save(uint8_t &data) { append(data); }
-	void save(int16_t &data) { append(data).append(data >> 8); }
-	void save(uint16_t &data) { append(data).append(data >> 8); }
-	void save(int32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
-	void save(uint32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
-	void save(envelope_state &data) { append(uint8_t(data)); }
-	template<typename DataType, int Count> void save(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) save(data[index]); }
-
-	// restore data from the buffer
-	void restore(bool &data) { data = read() ? true : false; }
-	void restore(int8_t &data) { data = read(); }
-	void restore(uint8_t &data) { data = read(); }
-	void restore(int16_t &data) { data = read(); data |= read() << 8; }
-	void restore(uint16_t &data) { data = read(); data |= read() << 8; }
-	void restore(int32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
-	void restore(uint32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
-	void restore(envelope_state &data) { data = envelope_state(read()); }
-	template<typename DataType, int Count> void restore(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) restore(data[index]); }
-
-	// internal helper
-	fm_saved_state &append(uint8_t data) { m_buffer.push_back(data); return *this; }
-	uint8_t read() { return (m_offset < m_buffer.size()) ? m_buffer[m_offset++] : 0; }
-
-	// internal state
-	std::vector<uint8_t> m_buffer;
-	int32_t m_offset;
+	KEYON_NORMAL = 0,
+	KEYON_RHYTHM = 1,
+	KEYON_CSM = 2
 };
 
-
-// ======================> fm_engine_callbacks
-
-// this class represents functions in the engine that the fm_interface
-// needs to be able to call; it is represented here as a separate
-// interface that is independent of the actual engine implementation
-class fm_engine_callbacks
-{
-public:
-	// timer callback; called by the interface when a timer fires
-	virtual void engine_timer_expired(uint32_t tnum) = 0;
-
-	// check interrupts; called by the interface after synchronization
-	virtual void engine_check_interrupts() = 0;
-
-	// mode register write; called by the interface after synchronization
-	virtual void engine_mode_write(uint8_t data) = 0;
-};
-
-
-// ======================> fm_interface
-
-// this class represents the interface between the fm_engine and the
-// outside world; it provides hooks for timers, synchronization, and
-// IRQ signaling
-class fm_interface
-{
-	// the engine is our friend
-	template<typename RegisterType> friend class fm_engine_base;
-
-public:
-	// constructor
-	fm_interface() { }
-
-	// destructor
-	virtual ~fm_interface() { }
-
-	template<typename... Params>
-	void log(char const *fmt, Params &&... args)
-	{
-//		LOG("%s: ", m_device.tag());
-//		LOG(fmt, std::forward<Params>(args)...);
-	}
-
-	// the following functions must be implemented by any derived classes
-
-	// the engine calls this to schedule a synchronized write to the mode
-	// register with the provided data; in response, the interface should
-	// clock through any unprocessed stream data and then call the
-	// m_callbacks->engine_mode_write() method with the provided data
-	virtual void ymfm_sync_mode_write(uint8_t data) { m_engine->engine_mode_write(data); }
-
-	// the engine calls this to schedule a synchronized interrupt check;
-	// in response, the interface should clock through any unprocessed
-	// stream data and then call the m_callbacks->engine_check_interrupts() method
-	virtual void ymfm_sync_check_interrupts() { m_engine->engine_check_interrupts(); }
-
-	// the engine calls this to set one of two timers which should fire after
-	// the given number of clocks; when the timer fires, it must call the
-	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
-	// negative means to disable the timer
-	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) { }
-
-	// the engine calls this to set the time when the busy signal will next
-	// be dropped, which is the current time plus the given number of clocks
-	virtual void ymfm_set_busy_end(uint32_t clocks) { }
-
-	// the engine calls this to query whether the current time is before the
-	// last set end-of-busy time
-	virtual bool ymfm_is_busy() { return false; }
-
-	// the engine calls this when the external IRQ state changes; in
-	// response, the interface should perform any IRQ signaling that needs
-	// to happen as a result
-	virtual void ymfm_update_irq(bool asserted) { }
-
-	// the engine calls this when the clock prescale factor changes; this means
-	// that the output frequency will be affected, and the output sample rate
-	// needs to be recomputed
-	virtual void ymfm_prescale_changed() { }
-
-	// the engine calls this when a write to an output port is issued
-	virtual void ymfm_io_write(uint8_t port, uint8_t data) { }
-
-	// the engine calls this when a read from an input port is issued
-	virtual uint8_t ymfm_io_read(uint8_t port) { return 0; }
-
-	// the engine calls this to read data for the ADPCM-A engine
-	virtual uint8_t adpcm_a_read(uint32_t offset) { return 0; }
-
-	// the engine calls this to read or write data for the APDCM-B engine
-	virtual uint8_t adpcm_b_read(uint32_t offset) { return 0; }
-	virtual void adpcm_b_write(uint32_t offset, uint8_t data) { }
-
-protected:
-	// pointer to engine callbacks -- this is set direclty by the engine at
-	// construction time
-	fm_engine_callbacks *m_engine;
-};
-
-
-// ======================> ssg_interface
-
-// this class represents an interface to an external SSG implementation; MAME
-// makes use of this for incorporating its own AY-8910 implementation
-class ssg_interface
-{
-public:
-	static constexpr uint32_t OUTPUTS = 3;
-
-	// default reset implementation
-	virtual void ssg_reset() { }
-
-	// save/restore
-	virtual void ssg_save_restore(fm_saved_state &state) { }
-#ifdef MAME_EMU_SAVE_H
-	virtual void ssg_register_save(device_t &device) { }
-#endif
-
-	// default prescale changer (SSG clock is 2*clock/clock_divider)
-	virtual void ssg_set_clock_prescale(uint8_t clock_divider) { }
-
-	// default register read/write implementation
-	virtual uint8_t ssg_read(uint8_t offset) { return 0; }
-	virtual void ssg_write(uint8_t offset, uint8_t data) { }
-
-	// default single sample generator
-	virtual void ssg_generate(int32_t output[OUTPUTS]) { }
-};
 
 
 //*********************************************************
@@ -344,10 +159,209 @@ inline int16_t roundtrip_fp(int32_t value)
 }
 
 
+
 //*********************************************************
-//  REGISTER CLASSES
+//  INTERFACE CLASSES
 //*********************************************************
 
+// forward declarations
+template<class RegisterType> class fm_engine_base;
+
+
+// ======================> ymfm_saved_state
+
+// this class contains a managed vector of bytes that is used to save and
+// restore state
+class ymfm_saved_state
+{
+public:
+	// construction
+	ymfm_saved_state(bool saving) :
+		m_offset(saving ? -1 : 0)
+	{
+	}
+
+	// are we saving or restoring?
+	bool saving() const { return (m_offset < 0); }
+
+	// retrieve the buffer
+	std::vector<uint8_t> &buffer() { return m_buffer; }
+
+	// generic save/restore
+	template<typename DataType>
+	void save_restore(DataType &data)
+	{
+		if (saving())
+			save(data);
+		else
+			restore(data);
+	}
+
+public:
+	// save data to the buffer
+	void save(bool &data) { write(data ? 1 : 0); }
+	void save(int8_t &data) { write(data); }
+	void save(uint8_t &data) { write(data); }
+	void save(int16_t &data) { write(data).write(data >> 8); }
+	void save(uint16_t &data) { write(data).write(data >> 8); }
+	void save(int32_t &data) { write(data).write(data >> 8).write(data >> 16).write(data >> 24); }
+	void save(uint32_t &data) { write(data).write(data >> 8).write(data >> 16).write(data >> 24); }
+	void save(envelope_state &data) { write(uint8_t(data)); }
+	template<typename DataType, int Count>
+	void save(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) save(data[index]); }
+
+	// restore data from the buffer
+	void restore(bool &data) { data = read() ? true : false; }
+	void restore(int8_t &data) { data = read(); }
+	void restore(uint8_t &data) { data = read(); }
+	void restore(int16_t &data) { data = read(); data |= read() << 8; }
+	void restore(uint16_t &data) { data = read(); data |= read() << 8; }
+	void restore(int32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
+	void restore(uint32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
+	void restore(envelope_state &data) { data = envelope_state(read()); }
+	template<typename DataType, int Count>
+	void restore(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) restore(data[index]); }
+
+	// internal helper
+	ymfm_saved_state &write(uint8_t data) { m_buffer.push_back(data); return *this; }
+	uint8_t read() { return (m_offset < m_buffer.size()) ? m_buffer[m_offset++] : 0; }
+
+	// internal state
+	std::vector<uint8_t> m_buffer;
+	int32_t m_offset;
+};
+
+
+// ======================> ymfm_engine_callbacks
+
+// this class represents functions in the engine that the ymfm_interface
+// needs to be able to call; it is represented here as a separate interface
+// that is independent of the actual engine implementation
+class ymfm_engine_callbacks
+{
+public:
+	// timer callback; called by the interface when a timer fires
+	virtual void engine_timer_expired(uint32_t tnum) = 0;
+
+	// check interrupts; called by the interface after synchronization
+	virtual void engine_check_interrupts() = 0;
+
+	// mode register write; called by the interface after synchronization
+	virtual void engine_mode_write(uint8_t data) = 0;
+};
+
+
+// ======================> ymfm_interface
+
+// this class represents the interface between the fm_engine and the outside
+// world; it provides hooks for timers, synchronization, and IRQ signaling
+class ymfm_interface
+{
+	// the engine is our friend
+	template<typename RegisterType> friend class fm_engine_base;
+
+public:
+	// constructor
+	ymfm_interface() { }
+
+	// destructor
+	virtual ~ymfm_interface() { }
+
+	// logging helper
+	template<typename... Params>
+	void log(char const *fmt, Params &&... args)
+	{
+		char buffer[256];
+		sprintf_s(buffer, fmt, std::forward<Params>(args)...);
+		ymfm_log(buffer);
+	}
+
+	// the following functions must be implemented by any derived classes; the
+	// default implementations are sufficient for some minimal operation, but will
+	// likely need to be overridden to integrate with the outside world; they are
+	// all prefixed with ymfm_ to reduce the likelihood of namespace collisions
+
+	// the chip implementation calls this when a write happens to the mode
+	// register, which could affect timers and interrupts; our responsibility
+	// is to ensure the system is up to date before calling the engine's
+	// engine_mode_write() method
+	virtual void ymfm_sync_mode_write(uint8_t data) { m_engine->engine_mode_write(data); }
+
+	// the chip implementation calls this when the chip's status has changed,
+	// which may affect the interrupt state; our responsibility is to ensure
+	// the system is up to date before calling the engine's
+	// engine_check_interrupts() method
+	virtual void ymfm_sync_check_interrupts() { m_engine->engine_check_interrupts(); }
+
+	// the chip implementation calls this when one of the two internal timers
+	// has changed state; our responsibility is to arrange to call the engine's
+	// engine_timer_expired() method after the provided number of clocks; if
+	// duration_in_clocks is negative, we should cancel any outstanding timers
+	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) { }
+
+	// the chip implementation calls this when the state of the IRQ signal has
+	// changed due to a status change; our responsibility is to respons as
+	// needed to the change in IRQ state, signaling any consumers
+	virtual void ymfm_update_irq(bool asserted) { }
+
+	// the chip implementation calls this to indicate that the chip should be
+	// considered in a busy state until the given number of clocks has passed;
+	// our responsibility is to compute and remember the ending time based on
+	// the chip's clock for later checking
+	virtual void ymfm_set_busy_end(uint32_t clocks) { }
+
+	// the chip implementation calls this to see if the chip is still currently
+	// is a busy state, as specified by a previous call to ymfm_set_busy_end();
+	// our responsibility is to compare the current time against the previously
+	// noted busy end time and return true if we haven't yet passed it
+	virtual bool ymfm_is_busy() { return false; }
+
+	// the chip implementation calls this whenever the internal clock prescaler
+	// changes; our responsibility is to adjust our clocking of the chip in
+	// response to produce the correct output rate
+	virtual void ymfm_prescale_changed() { }
+
+	// the chip implementation calls this whenever a new value is written to
+	// one of the chip's output ports (only applies to some chip types); our
+	// responsibility is to pass the written data on to any consumers
+	virtual void ymfm_io_write(uint8_t port, uint8_t data) { }
+
+	// the chip implementation calls this whenever an on-chip register is read
+	// which returns data from one of the chip's input ports; our responsibility
+	// is to produce the current input value so that it can be reflected by the
+	// read operation
+	virtual uint8_t ymfm_io_read(uint8_t port) { return 0; }
+
+	// the chip implementation calls this whenever the ADPCM-A engine needs to
+	// fetch data for sound generation; our responsibility is to read the data
+	// from the appropriate ROM/RAM at the given offset and return it
+	virtual uint8_t ymfm_adpcm_a_read(uint32_t offset) { return 0; }
+
+	// the chip implementation calls this whenever the ADPCM-B engine needs to
+	// fetch data for sound generation; our responsibility is to read the data
+	// from the appropriate ROM/RAM at the given offset and return it
+	virtual uint8_t ymfm_adpcm_b_read(uint32_t offset) { return 0; }
+
+	// the chip implementation calls this whenever the ADPCM-B engine requests
+	// a write to the sound data; our responsibility is to write the data to
+	// the appropriate RAM at the given offset
+	virtual void ymfm_adpcm_b_write(uint32_t offset, uint8_t data) { }
+
+	// the chip implementation calls this to log warnings or other information;
+	// our responsibility is to either ignore it or surface it for debugging
+	virtual void ymfm_log(char const *string) { }
+
+protected:
+	// pointer to engine callbacks -- this is set directly by the engine at
+	// construction time
+	ymfm_engine_callbacks *m_engine;
+};
+
+
+
+//*********************************************************
+//  CORE IMPLEMENTATION
+//*********************************************************
 
 // ======================> opdata_cache
 
@@ -374,8 +388,8 @@ struct opdata_cache
 // ======================> fm_registers_base
 
 // base class for family-specific register classes; this provides a few
-// constants, common defaults, and helpers, but mostly each derived
-// class is responsible for defining all commonly-called methods
+// constants, common defaults, and helpers, but mostly each derived class is
+// responsible for defining all commonly-called methods
 class fm_registers_base
 {
 public:
@@ -416,10 +430,10 @@ public:
 	static constexpr bool MODULATOR_DELAY = false;
 
 	// system-wide register defaults
-	uint32_t status_mask() const                { return 0; } // OPL only
-	uint32_t irq_reset() const                  { return 0; } // OPL only
-	uint32_t noise_enable() const               { return 0; } // OPM only
-	uint32_t rhythm_enable() const              { return 0; } // OPL only
+	uint32_t status_mask() const                     { return 0; } // OPL only
+	uint32_t irq_reset() const                       { return 0; } // OPL only
+	uint32_t noise_enable() const                    { return 0; } // OPM only
+	uint32_t rhythm_enable() const                   { return 0; } // OPL only
 
 	// per-operator register defaults
 	uint32_t op_ssg_eg_enable(uint32_t opoffs) const { return 0; } // OPN(A) only
@@ -447,15 +461,6 @@ protected:
 //  CORE ENGINE CLASSES
 //*********************************************************
 
-// three different keyon sources; actual keyon is an OR over all of these
-enum keyon_type : uint32_t
-{
-	KEYON_NORMAL = 0,
-	KEYON_RHYTHM = 1,
-	KEYON_CSM = 2
-};
-
-
 // ======================> fm_operator
 
 // fm_operator represents an FM operator (or "slot" in FM parlance), which
@@ -471,7 +476,7 @@ public:
 	fm_operator(fm_engine_base<RegisterType> &owner, uint32_t opoffs);
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -550,7 +555,7 @@ public:
 	fm_channel(fm_engine_base<RegisterType> &owner, uint32_t choffs);
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -629,7 +634,7 @@ private:
 // form a Yamaha FM core; chips that implement other engines (ADPCM, wavetable,
 // etc) take this output and combine it with the others externally
 template<class RegisterType>
-class fm_engine_base : public fm_engine_callbacks
+class fm_engine_base : public ymfm_engine_callbacks
 {
 public:
 	// expose some constants from the registers
@@ -645,10 +650,10 @@ public:
 	static constexpr uint8_t STATUS_IRQ = RegisterType::STATUS_IRQ;
 
 	// constructor
-	fm_engine_base(fm_interface &intf);
+	fm_engine_base(ymfm_interface &intf);
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -689,7 +694,7 @@ public:
 	uint32_t sample_rate(uint32_t baseclock) const { return baseclock / (m_clock_prescale * OPERATORS); }
 
 	// return the owning device
-	fm_interface &intf() const { return m_intf; }
+	ymfm_interface &intf() const { return m_intf; }
 
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
@@ -714,7 +719,7 @@ protected:
 	void update_timer(uint32_t which, uint32_t enable);
 
 	// internal state
-	fm_interface &m_intf;            // reference to the system interface
+	ymfm_interface &m_intf;            // reference to the system interface
 	uint32_t m_env_counter;          // envelope counter; low 2 bits are sub-counter
 	uint8_t m_status;                // current status register
 	uint8_t m_clock_prescale;        // prescale factor (2/3/6)

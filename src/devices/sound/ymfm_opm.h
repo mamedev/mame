@@ -101,7 +101,7 @@ public:
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &save);
 #endif
@@ -229,13 +229,13 @@ public:
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ym2151(fm_interface &intf) : ym2151(intf, VARIANT_YM2151) { }
+	ym2151(ymfm_interface &intf) : ym2151(intf, VARIANT_YM2151) { }
 
 	// reset
 	void reset();
 
 	// save/restore
-	void save_restore(fm_saved_state &state);
+	void save_restore(ymfm_saved_state &state);
 #ifdef MAME_EMU_SAVE_H
 	void register_save(device_t &device);
 #endif
@@ -265,7 +265,7 @@ protected:
 	};
 
 	// internal constructor
-	ym2151(fm_interface &intf, opm_variant variant);
+	ym2151(ymfm_interface &intf, opm_variant variant);
 
 	// internal state
 	opm_variant m_variant;           // chip variant
@@ -288,7 +288,7 @@ class ym2164 : public ym2151
 {
 public:
 	// constructor
-	ym2164(fm_interface &intf) : ym2151(intf, VARIANT_YM2164) { }
+	ym2164(ymfm_interface &intf) : ym2151(intf, VARIANT_YM2164) { }
 };
 
 }

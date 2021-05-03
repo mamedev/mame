@@ -49,7 +49,7 @@ void opn_registers_base<IsOpnA>::reset()
 //-------------------------------------------------
 
 template<bool IsOpnA>
-void opn_registers_base<IsOpnA>::save_restore(fm_saved_state &state)
+void opn_registers_base<IsOpnA>::save_restore(ymfm_saved_state &state)
 {
 	if (IsOpnA)
 	{
@@ -429,7 +429,7 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 //  ym2149 - constructor
 //-------------------------------------------------
 
-ym2149::ym2149(fm_interface &intf) :
+ym2149::ym2149(ymfm_interface &intf) :
 	m_address(0),
 	m_ssg(intf)
 {
@@ -451,7 +451,7 @@ void ym2149::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2149::save_restore(fm_saved_state &state)
+void ym2149::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_ssg.save_restore(state);
@@ -584,7 +584,7 @@ void ym2149::generate_ssg(int32_t output[SSG_OUTPUTS])
 //  ym2203 - constructor
 //-------------------------------------------------
 
-ym2203::ym2203(fm_interface &intf) :
+ym2203::ym2203(ymfm_interface &intf) :
 	m_address(0),
 	m_fm(intf),
 	m_ssg(intf)
@@ -608,7 +608,7 @@ void ym2203::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2203::save_restore(fm_saved_state &state)
+void ym2203::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
@@ -806,7 +806,7 @@ void ym2203::update_prescale(uint8_t newval)
 //  ym2608 - constructor
 //-------------------------------------------------
 
-ym2608::ym2608(fm_interface &intf) :
+ym2608::ym2608(ymfm_interface &intf) :
 	m_address(0),
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c),
@@ -850,7 +850,7 @@ void ym2608::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2608::save_restore(fm_saved_state &state)
+void ym2608::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	state.save_restore(m_irq_enable);
@@ -1204,7 +1204,7 @@ void ym2608::update_prescale(uint8_t newval)
 //  ym2610 - constructor
 //-------------------------------------------------
 
-ym2610::ym2610(fm_interface &intf, uint8_t channel_mask) :
+ym2610::ym2610(ymfm_interface &intf, uint8_t channel_mask) :
 	m_address(0),
 	m_fm_mask(channel_mask),
 	m_eos_status(0x00),
@@ -1239,7 +1239,7 @@ void ym2610::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2610::save_restore(fm_saved_state &state)
+void ym2610::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	state.save_restore(m_eos_status);
@@ -1533,7 +1533,7 @@ void ym2610::generate_ssg(int32_t output[SSG_OUTPUTS])
 //  ym2612 - constructor
 //-------------------------------------------------
 
-ym2612::ym2612(fm_interface &intf) :
+ym2612::ym2612(ymfm_interface &intf) :
 	m_address(0),
 	m_dac_data(0),
 	m_dac_enable(0),
@@ -1557,7 +1557,7 @@ void ym2612::reset()
 //  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2612::save_restore(fm_saved_state &state)
+void ym2612::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	state.save_restore(m_dac_data);

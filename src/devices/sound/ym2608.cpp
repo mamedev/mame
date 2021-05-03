@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 //-------------------------------------------------
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ymfm_device_base<ymfm::ym2608, 1>(mconfig, tag, owner, clock, YM2608, 1, 2),
+	ymfm_ssg_device_base<ymfm::ym2608>(mconfig, tag, owner, clock, YM2608),
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal")
 {
@@ -65,36 +65,36 @@ void ym2608_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  adpcm_a_read - callback to read data for the
-//  ADPCM-A engine; in this case, from the internal
-//  ROM containing drum samples
+//  ymfm_adpcm_a_read - callback to read data for
+//  the ADPCM-A engine; in this case, from the
+//  internal ROM containing drum samples
 //-------------------------------------------------
 
-uint8_t ym2608_device::adpcm_a_read(uint32_t offset)
+uint8_t ym2608_device::ymfm_adpcm_a_read(uint32_t offset)
 {
 	return m_internal->as_u8(offset % m_internal->bytes());
 }
 
 
 //-------------------------------------------------
-//  adpcm_b_read - callback to read data for the
-//  ADPCM-B engine; in this case, from our default
-//  address space
+//  ymfm_adpcm_b_read - callback to read data for
+//  the ADPCM-B engine; in this case, from our
+//  default address space
 //-------------------------------------------------
 
-uint8_t ym2608_device::adpcm_b_read(uint32_t offset)
+uint8_t ym2608_device::ymfm_adpcm_b_read(uint32_t offset)
 {
 	return space(0).read_byte(offset);
 }
 
 
 //-------------------------------------------------
-//  adpcm_b_write - callback to write data to the
-//  ADPCM-B engine; in this case, to our default
-//  address space
+//  ymfm_adpcm_b_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
 //-------------------------------------------------
 
-void ym2608_device::adpcm_b_write(uint32_t offset, uint8_t data)
+void ym2608_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
 {
 	space(0).write_byte(offset, data);
 }

@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610B OPNB2")
 
 template<typename ChipClass>
 ym2610_device_base<ChipClass>::ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-	ymfm_device_base<ChipClass, 1>(mconfig, tag, owner, clock, type, 1, 0),
+	ymfm_ssg_device_base<ChipClass>(mconfig, tag, owner, clock, type),
 	device_memory_interface(mconfig, *this),
 	m_adpcm_a_config("adpcm-a", ENDIANNESS_LITTLE, 8, 24, 0),
 	m_adpcm_b_config("adpcm-b", ENDIANNESS_LITTLE, 8, 24, 0),
@@ -69,26 +69,26 @@ void ym2610_device_base<ChipClass>::device_start()
 
 
 //-------------------------------------------------
-//  adpcm_a_read - callback to read data for the
-//  ADPCM-A engine; in this case, from address
+//  ymfm_adpcm_a_read - callback to read data for
+//  the ADPCM-A engine; in this case, from address
 //  space 0
 //-------------------------------------------------
 
 template<typename ChipClass>
-uint8_t ym2610_device_base<ChipClass>::adpcm_a_read(uint32_t offset)
+uint8_t ym2610_device_base<ChipClass>::ymfm_adpcm_a_read(uint32_t offset)
 {
 	return space(0).read_byte(offset);
 }
 
 
 //-------------------------------------------------
-//  adpcm_b_read - callback to read data for the
-//  ADPCM-B engine; in this case, from address
+//  ymfm_adpcm_b_read - callback to read data for
+//  the ADPCM-B engine; in this case, from address
 //  space 1
 //-------------------------------------------------
 
 template<typename ChipClass>
-uint8_t ym2610_device_base<ChipClass>::adpcm_b_read(uint32_t offset)
+uint8_t ym2610_device_base<ChipClass>::ymfm_adpcm_b_read(uint32_t offset)
 {
 	return space(1).read_byte(offset);
 }

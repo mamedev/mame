@@ -27,8 +27,8 @@ public:
 
 	// write access, handled by the chip implementation
 	virtual void write(offs_t offset, u8 data) override;
-	void address_w(u8 data);
-	void data_w(u8 data);
+	virtual void address_w(u8 data) override;
+	virtual void data_w(u8 data) override;
 
 	// reset line, active LOW
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
