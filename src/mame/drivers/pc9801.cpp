@@ -1885,6 +1885,9 @@ void pc9801_state::ppi_sys_beep_portc_w(uint8_t data)
 void pc9801_state::ppi_sys_dac_portc_w(uint8_t data)
 {
 	m_dac_disable = BIT(data, 3);
+	// TODO: some models have a finer grained volume control at I/O port 0xae8e
+	// (98NOTE only?)
+	m_dac->set_output_gain(0, m_dac_disable ? 0.0 : 1.0);
 }
 
 /*
@@ -2446,7 +2449,7 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_dac_portc_w));
-	m_pit8253->out_handler<1>().set([this](int state) { if(!m_dac_disable) { m_dac->write(state); }});
+	m_pit8253->out_handler<1>().set([this](int state) { m_dac->level_w(state); });
 
 	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
@@ -2462,7 +2465,8 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
 
-	DAC_1BIT(config, m_dac, 0).set_output_range(0, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+//	DAC_1BIT(config, m_dac, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.40);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16);
 }
 

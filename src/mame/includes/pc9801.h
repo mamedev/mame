@@ -30,7 +30,7 @@
 #include "bus/scsi/scsihd.h"
 
 #include "sound/beep.h"
-#include "sound/dac.h"
+//#include "sound/dac.h"
 #include "sound/spkrdev.h"
 #include "sound/ym2608.h"
 
@@ -178,7 +178,8 @@ private:
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
 	optional_device<beep_device> m_beeper;
-	optional_device<dac_bit_interface> m_dac;
+//	optional_device<dac_1bit_device> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
 	required_device<gfxdecode_device> m_gfxdecode;
