@@ -495,27 +495,52 @@ class merit3xx_state : public driver_device
 {
 public:
 	merit3xx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rombank(*this, "rombank")
 	{ }
 
 	void merit3xx(machine_config &config);
 
-private:
-	required_device<cpu_device> m_maincpu;
+protected:
+	virtual void machine_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+private:
+	MC6845_UPDATE_ROW(update_row);
+
 	void main_map(address_map &map);
+	void io_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_rombank;
 };
 
-
-uint32_t merit3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void merit3xx_state::machine_start()
 {
-	return 0;
+	memory_region *rom = memregion("maincpu");
+	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
+	m_rombank->set_entry(1);
+}
+
+MC6845_UPDATE_ROW(merit3xx_state::update_row)
+{
 }
 
 void merit3xx_state::main_map(address_map &map)
 {
+	map(0x0000, 0x7fff).bankr("rombank");
+	map(0x8000, 0x9fff).ram().share("nvram");
+	map(0xc000, 0xdfff).ram().share("charram");
+	map(0xe000, 0xffff).ram().share("attrram");
+}
+
+void merit3xx_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
+	map(0x41, 0x41).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 }
 
 static INPUT_PORTS_START( merit3xx )
@@ -526,6 +551,22 @@ void merit3xx_state::merit3xx(machine_config &config)
 {
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::io_map);
+
+	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	I8255(config, "ppi0");
+	I8255(config, "ppi1");
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(10_MHz_XTAL, 616, 0, 512, 270, 0, 256);
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+
+	hd6845s_device &crtc(HD6845S(config, "crtc", 10_MHz_XTAL / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(merit3xx_state::update_row));
 }
 
 
