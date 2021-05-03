@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
-Chess-Master Diamond (G-5004-500)
+Chess-Master Diamond (G-5004-500), by VEB Mikroelektronik "Karl Marx" Erfurt
 
 The chess engine is a continuation of the older Chess-Master model. So it
 plays quite weak when compared with other chess computers from 1987.
@@ -10,7 +10,7 @@ plays quite weak when compared with other chess computers from 1987.
 Hardware notes:
 - UA880 Z80 @ 4MHz
 - 2*Z80 PIO
-- 16KB ROM (2*U2364D), 1.5KB RAM (6*U214D)
+- 16KB ROM (2*U2364D), 3KB RAM (6*U224D)
 - 4-digit 16seg display
 - module slot for opening book/endgame
 - chessboard with 64 hall sensors, 64+2 leds, beeper
