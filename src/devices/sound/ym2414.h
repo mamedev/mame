@@ -26,5 +26,4 @@ public:
 	auto port_write_handler() { return io_write_handler(); }
 };
 
-
 #endif // MAME_SOUND_YM2414_H

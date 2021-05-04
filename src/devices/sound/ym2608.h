@@ -27,6 +27,15 @@ public:
 	auto port_a_write_callback() { return io_write_handler(0); }
 	auto port_b_write_callback() { return io_write_handler(1); }
 
+	// additional register reads
+	u8 data_r() { return update_streams().read_data(); }
+	u8 status_hi_r() { return update_streams().read_status_hi(); }
+	u8 data_hi_r() { return update_streams().read_data_hi(); }
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
+
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

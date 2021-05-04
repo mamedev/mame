@@ -30,18 +30,18 @@
 //  MAME INTERFACES
 //*********************************************************
 
-// ======================> ym_generic
+// ======================> ym_generic_device
 
 // generic base class for a standalone FM device; this class contains the shared
 // configuration helpers, timers, and ymfm interface implementation; it also
 // specifies pure virtual functions for read/write access, which means it
 // can be used as a generic proxy for systems that have multiple FM types that are
 // swappable
-class ym_generic : public device_t, public device_sound_interface, public ymfm::ymfm_interface
+class ym_generic_device : public device_t, public device_sound_interface, public ymfm::ymfm_interface
 {
 public:
 	// constructor
-	ym_generic(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ym_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_timer{ nullptr, nullptr },
@@ -72,7 +72,7 @@ protected:
 	// engine_mode_write() method
 	virtual void ymfm_sync_mode_write(uint8_t data) override
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(ym_generic::fm_mode_write), this), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(ym_generic_device::fm_mode_write), this), data);
 	}
 
 	// the chip implementation calls this when the chip's status has changed,
@@ -85,7 +85,7 @@ protected:
 		// otherwise, do it directly
 		auto &scheduler = machine().scheduler();
 		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(ym_generic::fm_check_interrupts), this));
+			scheduler.synchronize(timer_expired_delegate(FUNC(ym_generic_device::fm_check_interrupts), this));
 		else
 			m_engine->engine_check_interrupts();
 	}
@@ -160,7 +160,7 @@ protected:
 	{
 		// allocate our timers
 		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym_generic::fm_timer_handler), this));
+			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym_generic_device::fm_timer_handler), this));
 
 		// resolve the handlers
 		m_update_irq.resolve();
@@ -193,58 +193,32 @@ protected:
 // from eitehr ymfm_device_base or ymfm_ssg_device_base, depending on whether
 // they include an SSG or not
 template<typename ChipClass>
-class ymfm_device_base : public ym_generic
+class ymfm_device_base : public ym_generic_device
 {
 public:
 	// constructor
 	ymfm_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		ym_generic(mconfig, tag, owner, clock, type),
+		ym_generic_device(mconfig, tag, owner, clock, type),
 		m_stream(nullptr),
 		m_chip(*this)
 	{
 	}
 
-	// read access, handled by the chip implementation
-	virtual u8 read(offs_t offset) override
-	{
-		update_streams();
-		return m_chip.read(offset);
-	}
+	// read access: update the streams before performing the read
+	virtual u8 read(offs_t offset) override { return update_streams().read(offset); }
+	virtual u8 status_r() override { return update_streams().read_status(); }
 
-	// (almost) all chips have a status register
-	virtual u8 status_r() override
-	{
-		update_streams();
-		return m_chip.read_status();
-	}
-
-	// write access, handled by the chip implementation
-	virtual void write(offs_t offset, u8 data) override
-	{
-		update_streams();
-		m_chip.write(offset, data);
-	}
-
-	// (almost) all chips have a register/address latch
-	virtual void address_w(u8 data) override
-	{
-		update_streams();
-		m_chip.write_address(data);
-	}
-
-	// (almost) all chips have a data latch
-	virtual void data_w(u8 data) override
-	{
-		update_streams();
-		m_chip.write_data(data);
-	}
+	// write access: update the strams before performing the write
+	virtual void write(offs_t offset, u8 data) override { update_streams().write(offset, data); }
+	virtual void address_w(u8 data) override { update_streams().write_address(data); }
+	virtual void data_w(u8 data) override { update_streams().write_data(data); }
 
 protected:
 	// handle device start
 	virtual void device_start() override
 	{
 		// let our parent do its startup
-		ym_generic::device_start();
+		ym_generic_device::device_start();
 
 		// allocate our stream
 		m_stream = device_sound_interface::stream_alloc(0, ChipClass::OUTPUTS, m_chip.sample_rate(device_t::clock()));
@@ -284,9 +258,10 @@ protected:
 	}
 
 	// update streams
-	virtual void update_streams()
+	virtual ChipClass &update_streams()
 	{
 		m_stream->update();
+		return m_chip;
 	}
 
 	// internal state
@@ -312,6 +287,9 @@ public:
 		m_ssg_stream(nullptr)
 	{
 	}
+
+	// configuration helpers
+	void set_flags(int flags) { /* not supported when using internal SSG */ }
 
 protected:
 	// handle device start
@@ -350,10 +328,10 @@ protected:
 	}
 
 	// internal helper to update all our streams
-	virtual void update_streams() override
+	virtual ChipClass &update_streams() override
 	{
-		parent::update_streams();
 		m_ssg_stream->update();
+		return parent::update_streams();
 	}
 
 	// internal state
@@ -382,6 +360,9 @@ public:
 		m_ssg(*this, "ssg")
 	{
 	}
+
+	// configuration helpers
+	void set_flags(int flags) { m_ssg->set_flags(flags); }
 
 protected:
 	// SSG overrides
@@ -462,10 +443,10 @@ protected:
 	}
 
 	// internal helper to update all our streams
-	virtual void update_streams() override
+	virtual ChipClass &update_streams() override
 	{
-		parent::update_streams();
 		m_ssg_stream->update();
+		return parent::update_streams();
 	}
 
 	template<int Index>

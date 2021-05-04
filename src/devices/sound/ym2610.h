@@ -16,10 +16,20 @@ template<typename ChipClass>
 class ym2610_device_base : public ymfm_ssg_device_base<ChipClass>, public device_memory_interface
 {
 	using parent = ymfm_ssg_device_base<ChipClass>;
+	using parent::update_streams;
 
 public:
 	// constructor
 	ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+
+	// additional register reads
+	u8 data_r() { return update_streams().read_data(); }
+	u8 status_hi_r() { return update_streams().read_status_hi(); }
+	u8 data_hi_r() { return update_streams().read_data_hi(); }
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 
 protected:
 	// device-level overrides
@@ -61,6 +71,5 @@ class ym2610b_device : public ym2610_device_base<ymfm::ym2610b>
 public:
 	ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
 
 #endif // MAME_SOUND_YM2610_H

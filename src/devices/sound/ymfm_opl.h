@@ -253,6 +253,7 @@ using opl3_registers = opl_registers_base<3>;
 using opl4_registers = opl_registers_base<4>;
 
 
+
 // ======================> opll_registers
 
 //
@@ -766,9 +767,6 @@ private:
 	static uint8_t const s_default_instruments[];
 };
 
-
-
 }
-
 
 #endif // MAME_SOUND_YMFM_OPL_H

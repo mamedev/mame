@@ -183,6 +183,7 @@ SOUNDS["BEEP"] = true
 SOUNDS["DISCRETE"] = true
 SOUNDS["AY8910"] = true
 SOUNDS["YM2151"] = true
+SOUNDS["YM2414"] = true
 SOUNDS["YM2203"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["YM2608"] = true

@@ -27,6 +27,9 @@ public:
 	auto keyboard_read() { return io_read_handler(1); }
 	auto keyboard_write() { return io_write_handler(1); }
 
+	// additional register reads
+	u8 data_r() { return update_streams().read_data(); }
+
 protected:
 	// ROM device overrides
 	virtual void rom_bank_updated() override;

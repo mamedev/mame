@@ -21,5 +21,4 @@ public:
 	ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-
 #endif // MAME_SOUND_YM3812_H

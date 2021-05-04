@@ -25,6 +25,9 @@ public:
 	auto port_b_read_callback() { return io_read_handler(1); }
 	auto port_a_write_callback() { return io_write_handler(0); }
 	auto port_b_write_callback() { return io_write_handler(1); }
+
+	// data register read
+	u8 data_r() { return update_streams().read_data(); }
 };
 
 #endif // MAME_SOUND_YM2203_H

@@ -1715,4 +1715,7 @@ uint8_t const ds1001::s_default_instruments[] =
 };
 
 
+template class opl_registers_base<4>;
+template class fm_engine_base<opl4_registers>;
+
 }

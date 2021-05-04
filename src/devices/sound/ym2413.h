@@ -97,5 +97,4 @@ protected:
 	required_region_ptr<u8> m_internal; // internal memory region
 };
 
-
 #endif // MAME_SOUND_YM2413_H

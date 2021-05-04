@@ -19,7 +19,10 @@ class ymf262_device : public ymfm_device_base<ymfm::ymf262>
 public:
 	// constructor
 	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
 
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
+};
 
 #endif // MAME_SOUND_YMF262_H

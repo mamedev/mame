@@ -19,6 +19,10 @@ class ym2612_device : public ymfm_device_base<ymfm::ym2612>
 public:
 	// constructor
 	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 };
 
 
@@ -31,6 +35,10 @@ class ym3438_device : public ymfm_device_base<ymfm::ym3438>
 public:
 	// constructor
 	ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 };
 
 
@@ -43,7 +51,10 @@ class ymf276_device : public ymfm_device_base<ymfm::ymf276>
 public:
 	// constructor
 	ymf276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
 
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
+};
 
 #endif // MAME_SOUND_YM2612_H
