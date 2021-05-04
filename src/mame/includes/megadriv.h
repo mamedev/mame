@@ -40,8 +40,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
-		m_ymsnd_2612(*this,"ymsnd_2612"),
-		m_ymsnd_3438(*this,"ymsnd_3438"),
+		m_ymsnd(*this,"ymsnd"),
 		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
 		m_megadrive_ram(*this,"megadrive_ram"),
@@ -53,8 +52,7 @@ public:
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
-	optional_device<ym2612_device> m_ymsnd_2612;
-	optional_device<ym3438_device> m_ymsnd_3438;
+	optional_device<ym_generic_device> m_ymsnd;
 	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
@@ -101,8 +99,6 @@ struct genesis_z80_vars
 	uint8_t megadriv_z80_vdp_read(offs_t offset);
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
-	uint8_t ymsnd_read(offs_t offset);
-	void ymsnd_write(offs_t offset, uint8_t data);
 
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];
@@ -141,9 +137,9 @@ struct genesis_z80_vars
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
 	void megadriv_timers(machine_config &config);
-	void md_ntsc(machine_config &config, bool ym3438 = false);
+	void md_ntsc(machine_config &config);
 	void md2_ntsc(machine_config &config);
-	void md_pal(machine_config &config, bool ym3438 = false);
+	void md_pal(machine_config &config);
 	void md2_pal(machine_config &config);
 	void md_bootleg(machine_config &config);
 
