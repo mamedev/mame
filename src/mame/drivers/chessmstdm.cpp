@@ -19,6 +19,7 @@ Hardware notes:
 - chessboard with 64 hall sensors, 64+2 leds, beeper
 
 TODO:
+- hotswapping module doesn't work since MAME forces a hard reset
 - the 555 only connects to BSTB pin, why is the data_b_write workaround needed?
 
 ******************************************************************************/
@@ -34,6 +35,7 @@ TODO:
 #include "sound/beep.h"
 #include "video/pwm.h"
 
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -79,6 +81,7 @@ private:
 	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
+	void reset_w(u8 data = 0);
 	u8 reset_r();
 	void digits_w(u8 data);
 	void pio1_port_a_w(u8 data);
@@ -123,14 +126,17 @@ void chessmstdm_state::machine_reset()
     I/O
 ******************************************************************************/
 
+void chessmstdm_state::reset_w(u8 data)
+{
+	// accessing 9cxx asserts a reset
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine_reset();
+}
+
 u8 chessmstdm_state::reset_r()
 {
-	// reading from 9cxx asserts a reset
 	if (!machine().side_effects_disabled())
-	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		machine_reset();
-	}
+		reset_w();
 
 	return 0xff;
 }
@@ -217,7 +223,7 @@ void chessmstdm_state::chessmstdm_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x8000, 0x8bff).ram();
-	map(0x9c00, 0x9c00).mirror(0x0300).r(FUNC(chessmstdm_state::reset_r));
+	map(0x9c00, 0x9c00).mirror(0x0300).rw(FUNC(chessmstdm_state::reset_r), FUNC(chessmstdm_state::reset_w));
 }
 
 void chessmstdm_state::chessmstdm_io(address_map &map)
@@ -249,7 +255,7 @@ INPUT_CHANGED_MEMBER(chessmstdm_state::view_button)
 {
 	// pressing both monitor+view buttons buttons causes a reset
 	if ((m_inputs[1]->read() & 0x03) == 0x03)
-		reset_r();
+		reset_w();
 }
 
 static INPUT_PORTS_START( chessmstdm )
@@ -320,7 +326,7 @@ void chessmstdm_state::chessmstdm(machine_config &config)
 	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	// cartridge
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "chessmstdm_cart").set_reset_on_load(false);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "chessmstdm_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("chessmstdm");
 }
 

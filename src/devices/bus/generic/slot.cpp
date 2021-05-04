@@ -18,6 +18,10 @@
    e.g. APF cart slot device for an example of a simple device with multiple
    pcbs supported)
 
+   TODO:
+   - add support for hotswapping (ie. don't force a hard reset), it's doable for
+     generic rom cartridges, but then you still can't swap from empty slot
+
  ***********************************************************************************************************/
 
 
@@ -95,19 +99,6 @@ void device_generic_cart_interface::rom_alloc(u32 size, int width, endianness_t 
 	m_rom_size = size;
 }
 
-void device_generic_cart_interface::rom_free(char const *tag)
-{
-	if (m_rom)
-	{
-		std::string fulltag(tag);
-		fulltag.append(GENERIC_ROM_REGION_TAG);
-		device().logerror("Deallocating ROM region with tag '%s'\n", fulltag);
-		device().machine().memory().region_free(fulltag.c_str());
-		m_rom = nullptr;
-		m_rom_size = 0;
-	}
-}
-
 void device_generic_cart_interface::ram_alloc(u32 size)
 {
 	if (!m_ram.empty())
@@ -136,7 +127,6 @@ generic_slot_device::generic_slot_device(machine_config const &mconfig, device_t
 	m_default_card("rom"),
 	m_extensions("bin"),
 	m_must_be_loaded(false),
-	m_reset_on_load(true),
 	m_width(GENERIC_ROM8_WIDTH),
 	m_endianness(ENDIANNESS_LITTLE),
 	m_cart(nullptr),
@@ -200,8 +190,6 @@ void generic_slot_device::call_unload()
 {
 	if (!m_device_image_unload.isnull())
 		return m_device_image_unload(*this);
-	else if (m_cart)
-		rom_free();
 }
 
 

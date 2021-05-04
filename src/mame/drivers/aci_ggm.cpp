@@ -37,6 +37,8 @@ Other games:
 - *Lunar Lander (unreleased?)
 
 TODO:
+- it doesn't have nvram, it's a workaround for MAME forcing a hard reset when
+  swapping in a new cartridge
 - what's VIA PB0 for? game toggles it once per irq
 - identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
 - confirm display AP segment, is it used anywhere?
@@ -51,6 +53,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
@@ -187,8 +190,6 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 
 DEVICE_IMAGE_UNLOAD_MEMBER(ggm_state::unload_cart)
 {
-	m_cart->rom_free();
-
 	// unmap extra ram
 	if (image.get_feature("ram"))
 	{
@@ -268,7 +269,7 @@ void ggm_state::main_map(address_map &map)
 {
 	// external slot has potential bus conflict with RAM/VIA
 	map(0x0000, 0xffff).r(FUNC(ggm_state::cartridge_r));
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x8000, 0x800f).m(m_via, FUNC(via6522_device::map));
 }
 
@@ -443,6 +444,8 @@ void ggm_state::ggm(machine_config &config)
 	m_via->cb2_handler().set(FUNC(ggm_state::shift_data_w));
 	TIMER(config, m_ca1_off).configure_generic(FUNC(ggm_state::ca1_off));
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xff, 0x3fff);
@@ -458,7 +461,6 @@ void ggm_state::ggm(machine_config &config)
 	m_cart->set_device_load(FUNC(ggm_state::load_cart));
 	m_cart->set_device_unload(FUNC(ggm_state::unload_cart));
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_reset_on_load(false);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");
 }
