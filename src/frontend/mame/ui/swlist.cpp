@@ -113,6 +113,8 @@ void menu_software_parts::populate(float &customtop, float &custombottom)
 			item_append(m_info->shortname(), menu_part_name, 0, &entry);
 		}
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 
@@ -234,6 +236,8 @@ void menu_software_list::populate(float &customtop, float &custombottom)
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
 		item_append(entry.short_name, entry.long_name, 0, &entry);
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 
@@ -395,6 +399,8 @@ void menu_software::populate(float &customtop, float &custombottom)
 				}
 				have_compatible = true;
 			}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 

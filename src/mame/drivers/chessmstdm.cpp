@@ -7,6 +7,9 @@ Chess-Master Diamond (G-5004-500), by VEB Mikroelektronik "Karl Marx" Erfurt
 The chess engine is a continuation of the older Chess-Master model. So it
 plays quite weak when compared with other chess computers from 1987.
 
+PM10 and PM11 modules were included (not separate purchases). No other modules
+were released. The player is supposed to hotswap them with the [CH M] option.
+
 Hardware notes:
 - UA880 Z80 @ 4MHz
 - 2*Z80 PIO
@@ -16,6 +19,7 @@ Hardware notes:
 - chessboard with 64 hall sensors, 64+2 leds, beeper
 
 TODO:
+- hotswapping module doesn't work since MAME forces a hard reset
 - the 555 only connects to BSTB pin, why is the data_b_write workaround needed?
 
 ******************************************************************************/
@@ -31,6 +35,7 @@ TODO:
 #include "sound/beep.h"
 #include "video/pwm.h"
 
+#include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
@@ -54,7 +59,8 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(monitor_button);
+	DECLARE_INPUT_CHANGED_MEMBER(view_button);
 
 	void chessmstdm(machine_config &config);
 
@@ -75,6 +81,8 @@ private:
 	void chessmstdm_mem(address_map &map);
 	void chessmstdm_io(address_map &map);
 
+	void reset_w(u8 data = 0);
+	u8 reset_r();
 	void digits_w(u8 data);
 	void pio1_port_a_w(u8 data);
 	void pio1_port_b_w(u8 data);
@@ -117,6 +125,21 @@ void chessmstdm_state::machine_reset()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+void chessmstdm_state::reset_w(u8 data)
+{
+	// accessing 9cxx asserts a reset
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	machine_reset();
+}
+
+u8 chessmstdm_state::reset_r()
+{
+	if (!machine().side_effects_disabled())
+		reset_w();
+
+	return 0xff;
+}
 
 void chessmstdm_state::update_digits()
 {
@@ -200,6 +223,7 @@ void chessmstdm_state::chessmstdm_mem(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	map(0x8000, 0x8bff).ram();
+	map(0x9c00, 0x9c00).mirror(0x0300).rw(FUNC(chessmstdm_state::reset_r), FUNC(chessmstdm_state::reset_w));
 }
 
 void chessmstdm_state::chessmstdm_io(address_map &map)
@@ -209,7 +233,7 @@ void chessmstdm_state::chessmstdm_io(address_map &map)
 	//map(0x00, 0x03).mirror(0x70) read/write to both PIOs, but not used by software
 	map(0x04, 0x07).mirror(0x70).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).mirror(0x70).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x4c, 0x4c).mirror(0x03).w(FUNC(chessmstdm_state::digits_w));
+	map(0x4c, 0x4c).mirror(0x33).w(FUNC(chessmstdm_state::digits_w));
 }
 
 
@@ -218,14 +242,20 @@ void chessmstdm_state::chessmstdm_io(address_map &map)
     Input Ports
 ******************************************************************************/
 
-INPUT_CHANGED_MEMBER(chessmstdm_state::reset_button)
+INPUT_CHANGED_MEMBER(chessmstdm_state::monitor_button)
+{
+	// releasing monitor button clears reset
+	if (!newval && oldval)
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
+	view_button(field, param, oldval, newval);
+}
+
+INPUT_CHANGED_MEMBER(chessmstdm_state::view_button)
 {
 	// pressing both monitor+view buttons buttons causes a reset
-	const bool reset = (m_inputs[1]->read() & 0x03) == 0x03;
-	m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? ASSERT_LINE : CLEAR_LINE);
-
-	if (reset)
-		machine_reset();
+	if ((m_inputs[1]->read() & 0x03) == 0x03)
+		reset_w();
 }
 
 static INPUT_PORTS_START( chessmstdm )
@@ -240,8 +270,8 @@ static INPUT_PORTS_START( chessmstdm )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Enter")                   PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, reset_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")    PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, reset_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, monitor_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")    PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmstdm_state, view_button, 0)
 INPUT_PORTS_END
 
 
