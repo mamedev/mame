@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_BUS_PCE_CTRL_JOYPAD_H
-#define MAME_BUS_PCE_CTRL_JOYPAD_H
+#ifndef MAME_BUS_PCE_CTRL_JOYPAD2_H
+#define MAME_BUS_PCE_CTRL_JOYPAD2_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ protected:
 DECLARE_DEVICE_TYPE(PCE_JOYPAD2,          pce_joypad2_device)
 
 
-#endif // MAME_BUS_PCE_CTRL_JOYPAD_H
+#endif // MAME_BUS_PCE_CTRL_JOYPAD2_H
