@@ -503,7 +503,8 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
-	void merit3xx(machine_config &config);
+	void merit300(machine_config &config);
+	void merit350(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -512,9 +513,12 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 
 	void ppi1_pa_w(u8 data);
+	void crt350_rombank_w(u8 data);
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
+	void crt350_main_map(address_map &map);
+	void crt350_io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_rombank;
@@ -524,6 +528,7 @@ void merit3xx_state::machine_start()
 {
 	memory_region *rom = memregion("maincpu");
 	m_rombank->configure_entries(0, rom->bytes() / 0x8000, rom->base(), 0x8000);
+	m_rombank->set_entry(0);
 }
 
 MC6845_UPDATE_ROW(merit3xx_state::update_row)
@@ -532,8 +537,12 @@ MC6845_UPDATE_ROW(merit3xx_state::update_row)
 
 void merit3xx_state::ppi1_pa_w(u8 data)
 {
-	// OK for ma6710; others likely need something very different
 	m_rombank->set_entry((data & 0x04) >> 1 | (~data & 0x01));
+}
+
+void merit3xx_state::crt350_rombank_w(u8 data)
+{
+	m_rombank->set_entry(data & 0x07);
 }
 
 void merit3xx_state::main_map(address_map &map)
@@ -557,11 +566,23 @@ void merit3xx_state::io_map(address_map &map)
 	//map(0x80, 0x81).w("ssg", FUNC(ym2149_device::address_data_w));
 }
 
+void merit3xx_state::crt350_main_map(address_map &map)
+{
+	main_map(map);
+	map(0xa000, 0xbfff).ram();
+}
+
+void merit3xx_state::crt350_io_map(address_map &map)
+{
+	io_map(map);
+	map(0x20, 0x20).w(FUNC(merit3xx_state::crt350_rombank_w));
+}
+
 static INPUT_PORTS_START( merit3xx )
 INPUT_PORTS_END
 
 
-void merit3xx_state::merit3xx(machine_config &config)
+void merit3xx_state::merit300(machine_config &config)
 {
 	Z80(config, m_maincpu, 10_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::main_map);
@@ -589,6 +610,16 @@ void merit3xx_state::merit3xx(machine_config &config)
 	NS16550(config, "uart", 1.8432_MHz_XTAL);
 }
 
+void merit3xx_state::merit350(machine_config &config)
+{
+	merit300(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &merit3xx_state::crt350_main_map);
+	m_maincpu->set_addrmap(AS_IO, &merit3xx_state::crt350_io_map);
+
+	subdevice<i8255_device>("ppi1")->out_pa_callback().set_nop();
+}
+
 
 
 ROM_START( ma6710 )
@@ -613,10 +644,10 @@ ROM_START( ma7551 )
 	ROM_LOAD( "u9_7551-21-r2p.u9",   0x08000, 0x08000, CRC(2e669bc9) SHA1(376e808a62e92169a5ae34b9ef808fe4eda6c13c) )
 	ROM_LOAD( "u10_7551-21-r2p.u10", 0x10000, 0x08000, CRC(e9425269) SHA1(030a3d9beafd08c5a571672fb6987525c8d9a0f5) )
 	// u11 not populated
-	ROM_LOAD( "u12_7551-21-r2p.u12", 0x20000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) )
-	ROM_LOAD( "u13_7551-21-r2p.u13", 0x28000, 0x08000, CRC(9194d993) SHA1(52d094f55c329a7f0b4bf1dd02a7784e9a9faa12) )
-	ROM_LOAD( "u14_7551-21-r2p.u14", 0x30000, 0x08000, CRC(fe993b57) SHA1(4c872b3dff278298558493f6fd9a64be63613956) )
-	ROM_LOAD( "u15_7551-21-r2p.u15", 0x38000, 0x08000, CRC(31283190) SHA1(153601d5df7fbbc116f876399ce194797175be2f) )
+	ROM_LOAD( "u15_7551-21-r2p.u15", 0x20000, 0x08000, CRC(31283190) SHA1(153601d5df7fbbc116f876399ce194797175be2f) )
+	ROM_LOAD( "u14_7551-21-r2p.u14", 0x28000, 0x08000, CRC(fe993b57) SHA1(4c872b3dff278298558493f6fd9a64be63613956) )
+	ROM_LOAD( "u13_7551-21-r2p.u13", 0x30000, 0x08000, CRC(9194d993) SHA1(52d094f55c329a7f0b4bf1dd02a7784e9a9faa12) )
+	ROM_LOAD( "u12_7551-21-r2p.u12", 0x38000, 0x08000, CRC(8ca19c9c) SHA1(a694a9be8b6d2beea8ee171dcfb2fa64eb6af14c) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "u46_nc+.u46", 0x00000, 0x10000, CRC(5140ca67) SHA1(0f5f7062cd874529630fd6f58e640c11f0692786) )
@@ -635,10 +666,10 @@ ROM_START( ma7556 )
 	ROM_LOAD( "u9_7556-01-r0_ef1e.u9",   0x08000, 0x08000, CRC(142370d6) SHA1(cb32f204b7bf78874990ef438fd5115cc3ed140e) )
 	ROM_LOAD( "u10_7556-01-r0_ef8f.u10", 0x10000, 0x08000, CRC(f2dfb326) SHA1(b50a234ad649d41fb50c6eec345fa9414de6cec9) )
 	// u11 not populated
-	ROM_LOAD( "u12_7556-00-r2.u12",      0x20000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) )
-	ROM_LOAD( "u13_7556-01-r0_7c21.u13", 0x28000, 0x08000, CRC(5288eecc) SHA1(efd569beb22b8a9354520e7755bd797724593a0a) )
-	ROM_LOAD( "u14_7556-01-r0_dff2.u14", 0x30000, 0x08000, CRC(9e5518c1) SHA1(37ed33118d87f0699845f84c820569666ac8c533) )
-	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x38000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
+	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x20000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
+	ROM_LOAD( "u14_7556-01-r0_dff2.u14", 0x28000, 0x08000, CRC(9e5518c1) SHA1(37ed33118d87f0699845f84c820569666ac8c533) )
+	ROM_LOAD( "u13_7556-01-r0_7c21.u13", 0x30000, 0x08000, CRC(5288eecc) SHA1(efd569beb22b8a9354520e7755bd797724593a0a) )
+	ROM_LOAD( "u12_7556-00-r2.u12",      0x38000, 0x08000, CRC(34357c5d) SHA1(f71db3cd5ced70a709ecb8de1328c12666abc047) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to labeled: U46  MLT8  cs:8bbe
@@ -657,10 +688,10 @@ ROM_START( ma7558 )
 	ROM_LOAD( "u9_7558-01-r0_ds_e651.u9",   0x08000, 0x08000, CRC(e02f8c98) SHA1(d04351535f86907129b97811a02a590f96f108b9) )
 	ROM_LOAD( "u10_7558-01-r0_ds_88b5.u10", 0x10000, 0x08000, CRC(33994802) SHA1(041190e01115abd7e629335486f7ba3070a29635) )
 	// u11 not populated
-	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x20000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) )
-	ROM_LOAD( "u13_7558-01-r0_ds_a833.u13", 0x28000, 0x08000, CRC(55accddc) SHA1(33c845b3b730126a1e3e26483a05e2e186925199) )
-	ROM_LOAD( "u14_7558-01-r0_ds_a309.u14", 0x30000, 0x08000, CRC(25431b2b) SHA1(9ecd04b00d6531f41913f67fef848f2d1e6d7766) )
-	ROM_LOAD( "u15_7558-01-r0_ds_cfba.u15", 0x38000, 0x08000, CRC(fb698a84) SHA1(57d8ff484691b0227034815bac0c4d99bae7d067) )
+	ROM_LOAD( "u15_7558-01-r0_ds_cfba.u15", 0x20000, 0x08000, CRC(fb698a84) SHA1(57d8ff484691b0227034815bac0c4d99bae7d067) )
+	ROM_LOAD( "u14_7558-01-r0_ds_a309.u14", 0x28000, 0x08000, CRC(25431b2b) SHA1(9ecd04b00d6531f41913f67fef848f2d1e6d7766) )
+	ROM_LOAD( "u13_7558-01-r0_ds_a833.u13", 0x30000, 0x08000, CRC(55accddc) SHA1(33c845b3b730126a1e3e26483a05e2e186925199) )
+	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x38000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to labeled: U46  MLT8  cs:8bbe
@@ -675,9 +706,9 @@ ROM_END
 } // anonymous namespace
 
 // CRT-300 games
-GAME( 1989, ma6710, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
+GAME( 1989, ma6710, 0, merit300, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 6710-13", MACHINE_IS_SKELETON )
 
 // CRT-350 games
-GAME( 199?, ma7551, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551", MACHINE_IS_SKELETON )
-GAME( 199?, ma7556, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556", MACHINE_IS_SKELETON )
-GAME( 199?, ma7558, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558", MACHINE_IS_SKELETON )
+GAME( 199?, ma7551, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551", MACHINE_IS_SKELETON )
+GAME( 199?, ma7556, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556", MACHINE_IS_SKELETON )
+GAME( 199?, ma7558, 0, merit350, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558", MACHINE_IS_SKELETON )
