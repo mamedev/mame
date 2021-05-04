@@ -58,6 +58,7 @@ SOUNDS["X1_010"] = true
 SOUNDS["Y8950"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2414"] = true
+SOUNDS["YM3806"] = true
 SOUNDS["YM2203"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["YM2608"] = true

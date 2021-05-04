@@ -541,7 +541,7 @@ void adpcm_b_channel::clock()
 				m_accumulator = 0;
 				m_prev_accum = 0;
 				m_status = (m_status & ~STATUS_PLAYING) | STATUS_EOS;
-				m_owner.intf().log("ADPCM EOS\n");
+				m_owner.intf().log("%s\n", "ADPCM EOS");
 				return;
 			}
 		}
@@ -629,7 +629,7 @@ uint8_t adpcm_b_channel::read(uint32_t regnum)
 		if (at_end())
 		{
 			m_status = STATUS_EOS | STATUS_BRDY;
-			m_owner.intf().log("ADPCM EOS\n");
+			m_owner.intf().log("%s\n", "ADPCM EOS");
 		}
 
 		// otherwise, write the data and signal ready
@@ -704,7 +704,7 @@ void adpcm_b_channel::write(uint32_t regnum, uint8_t value)
 			// did we hit the end? if so, signal EOS
 			if (at_end())
 			{
-				m_owner.intf().log("ADPCM EOS\n");
+				m_owner.intf().log("%s\n", "ADPCM EOS");
 				m_status = STATUS_EOS | STATUS_BRDY;
 			}
 

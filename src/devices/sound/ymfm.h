@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 #include <algorithm>
 #include <array>
@@ -269,10 +270,11 @@ public:
 
 	// logging helper
 	template<typename... Params>
-	void log(char const *fmt, Params &&... args)
+	void log(Params &&... args)
 	{
 		char buffer[256];
-		sprintf_s(buffer, fmt, std::forward<Params>(args)...);
+		snprintf(buffer, sizeof(buffer), std::forward<Params>(args)...);
+		buffer[sizeof(buffer) - 1] = 0;
 		ymfm_log(buffer);
 	}
 
