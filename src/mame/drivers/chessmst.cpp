@@ -180,6 +180,7 @@ void chessmst_state::chessmst_io(address_map &map)
 
 INPUT_CHANGED_MEMBER(chessmst_state::halt_button)
 {
+	// halt button goes to PIO(0) ASTB pin
 	m_pio[0]->strobe_a(newval);
 	reset_button(field, param, oldval, newval);
 }
@@ -203,8 +204,8 @@ static INPUT_PORTS_START( chessmst )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game / 0 / Pawn")   PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Halt")  PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, halt_button, 0) // -> PIO(0) ASTB pin
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0) // -> Z80 RESET pin if HALT is pressed too
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Halt")  PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, halt_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, reset_button, 0)
 INPUT_PORTS_END
 
 

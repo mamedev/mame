@@ -64,6 +64,7 @@ public:
 	virtual void write_ram(offs_t offset, u8 data);
 
 	virtual void rom_alloc(u32 size, int width, endianness_t end, char const *tag);
+	virtual void rom_free(char const *tag);
 	virtual void ram_alloc(u32 size);
 
 	u8 *get_rom_base()  { return m_rom; }
@@ -114,7 +115,8 @@ public:
 	void set_interface(char const *interface) { m_interface = interface; }
 	void set_default_card(char const *def) { m_default_card = def; }
 	void set_extensions(char const *exts) { m_extensions = exts; }
-	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; }
+	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; } // default false
+	void set_reset_on_load(bool reset) { m_reset_on_load = reset; } // default true
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
 
@@ -126,7 +128,7 @@ public:
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual bool is_reset_on_load() const noexcept override { return m_reset_on_load; }
 	virtual char const *image_interface() const noexcept override { return m_interface; }
 	virtual char const *file_extensions() const noexcept override { return m_extensions; }
 
@@ -145,7 +147,8 @@ public:
 	virtual void write_ram(offs_t offset, u8 data);
 
 	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
-	virtual void ram_alloc(u32 size)  { if (m_cart) m_cart->ram_alloc(size); }
+	virtual void rom_free() { if (m_cart) m_cart->rom_free(tag()); }
+	virtual void ram_alloc(u32 size) { if (m_cart) m_cart->ram_alloc(size); }
 
 	u8* get_rom_base()
 	{
@@ -182,6 +185,7 @@ protected:
 	char const *m_default_card;
 	char const *m_extensions;
 	bool m_must_be_loaded;
+	bool m_reset_on_load;
 	int m_width;
 	endianness_t m_endianness;
 	device_generic_cart_interface *m_cart;
