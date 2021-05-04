@@ -12,6 +12,7 @@ exports.description = "Hiscore"
 exports.license = "WTFPL license"
 exports.author = { name = "borgar@borgar.net" }
 local hiscore = exports
+local util = require("util")
 
 local hiscore_plugin_path = ""
 
@@ -171,7 +172,7 @@ function hiscore.startplugin()
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
-		lfs.mkdir( hiscore_path );
+		util.mkdir_recursive( hiscore_path );
 		output = io.open(get_file_name(), "wb");
 	  end
 	  emu.print_verbose("hiscore: write_scores output")
