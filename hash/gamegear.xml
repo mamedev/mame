@@ -2290,6 +2290,8 @@ a certain item) -->
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (usa, europe) (beta).bin" size="262144" crc="331904c0" sha1="b24aa3e31efbf09e8d0d9ae9d07b4d219b648f96"/>
 			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2301,6 +2303,8 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (usa, europe).bin" size="262144" crc="1307a290" sha1="baebe28fc7549cbb06c94fcb36a3c40231933c01"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
 			</dataarea>
 		</part>
 	</software>
