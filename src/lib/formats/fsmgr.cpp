@@ -18,24 +18,27 @@ void fs_refcounted_inner::ref_weak()
 	m_weak_ref ++;
 }
 
-void fs_refcounted_inner::unref()
+bool fs_refcounted_inner::unref()
 {
 	m_ref --;
 	if(m_ref == 0) {
-		if(m_weak_ref) {
+		if(m_weak_ref)
 			drop_weak_references();
-			if(m_weak_ref)
-				fatalerror("drop_weak_references kept %d active references\n", m_weak_ref);
-		} else
+		else 
 			delete this;
+		return true;
 	}
+	return false;
 }
 
-void fs_refcounted_inner::unref_weak()
+bool fs_refcounted_inner::unref_weak()
 {
 	m_weak_ref --;
-	if(m_weak_ref == 0 && m_ref == 0)
+	if(m_weak_ref == 0 && m_ref == 0) {
 		delete this;
+		return true;
+	}
+	return false;
 }
 
 
@@ -266,12 +269,13 @@ const char *fs_meta_get_name(fs_meta_name name)
 	case fs_meta_name::length: return "length";
 	case fs_meta_name::loading_address: return "loading_address";
 	case fs_meta_name::locked: return "locked";
-	case fs_meta_name::sequential: return "sequential";
 	case fs_meta_name::modification_date: return "modification_date";
 	case fs_meta_name::name: return "name";
-	case fs_meta_name::size_in_blocks: return "size_in_blocks";
-	case fs_meta_name::os_version: return "os_version";
 	case fs_meta_name::os_minimum_version: return "os_minimum_version";
+	case fs_meta_name::os_version: return "os_version";
+	case fs_meta_name::rsrc_length: return "rsrc_length";
+	case fs_meta_name::sequential: return "sequential";
+	case fs_meta_name::size_in_blocks: return "size_in_blocks";
 	}
 	return "";
 }
