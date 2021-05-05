@@ -50,8 +50,8 @@ protected:
 	void buttonset_update();
 
 	// internal states
-	u8 m_button_sel = 0;
-	bool m_prev_clr = false;
+	u8 m_button_sel = 0; // buttonset select, autofire counter (74xx163 Q1-Q3 pin)
+	bool m_prev_rst = false; // previous Reset pin state
 
 	// devices
 	required_device_array<ls157_device, 3> m_muxer;

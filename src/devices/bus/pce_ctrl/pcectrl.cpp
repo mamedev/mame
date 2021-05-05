@@ -9,7 +9,8 @@
 	PC engine emulation (mame\*\pce.*)
 	by Charles MacDonald, Wilbert Pol, Angelo Salese
 
-    Controller port interface:
+    Controller port interface layout:
+
     DIN-8 interface for TurboGrafx-16:
 
        /-------------\

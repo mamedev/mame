@@ -45,8 +45,8 @@ private:
 	required_device_array<pce_control_port_device, 5> m_subctrl_port;
 
 	// internal states
-	u8 m_read_state = 0;
-	bool m_prev_sel = false;
+	u8 m_port_sel = 0; // select port to read
+	bool m_prev_clk = false; // previous Clock pin state
 };
 
 

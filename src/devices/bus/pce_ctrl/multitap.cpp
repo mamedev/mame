@@ -38,8 +38,8 @@ pce_multitap_device::pce_multitap_device(const machine_config &mconfig, const ch
 	device_t(mconfig, PCE_MULTITAP, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl%u", 1U),
-	m_read_state(0),
-	m_prev_sel(0)
+	m_port_sel(0),
+	m_prev_clk(0)
 {
 }
 
@@ -61,8 +61,8 @@ void pce_multitap_device::device_add_mconfig(machine_config &config)
 
 void pce_multitap_device::device_start()
 {
-	save_item(NAME(m_read_state));
-	save_item(NAME(m_prev_sel));
+	save_item(NAME(m_port_sel));
+	save_item(NAME(m_prev_clk));
 }
 
 
@@ -72,8 +72,8 @@ void pce_multitap_device::device_start()
 
 void pce_multitap_device::device_reset()
 {
-	m_read_state = 0;
-	m_prev_sel = false;
+	m_port_sel = 0;
+	m_prev_clk = false;
 }
 
 
@@ -84,8 +84,8 @@ void pce_multitap_device::device_reset()
 u8 pce_multitap_device::peripheral_r()
 {
 	u8 data = 0xf;
-	if (m_read_state < 5) // up to 5 controller ports
-		data = m_subctrl_port[m_read_state]->port_r();
+	if (m_port_sel < 5) // up to 5 controller ports
+		data = m_subctrl_port[m_port_sel]->port_r();
 
 	return data;
 }
@@ -101,10 +101,10 @@ void pce_multitap_device::clk_w(int state)
 		elem->clk_w(state);
 
 	// bump counter on a low-to-high transition of Clock bit
-	if ((!m_prev_sel) && state)
-		m_read_state = (m_read_state + 1) & 7;
+	if ((!m_prev_clk) && state)
+		m_port_sel = (m_port_sel + 1) & 7;
 
-	m_prev_sel = state;
+	m_prev_clk = state;
 }
 
 
@@ -119,5 +119,5 @@ void pce_multitap_device::rst_w(int state)
 
 	// clear counter if Reset bit is set
 	if (state)
-		m_read_state = 0;
+		m_port_sel = 0;
 }

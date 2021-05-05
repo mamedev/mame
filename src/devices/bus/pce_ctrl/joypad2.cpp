@@ -24,6 +24,9 @@
 
     Everything else PI-PD001 supports Autofire.
 
+    TODO:
+	- Needs verifications for Part numbers
+
 **********************************************************************/
 
 #include "emu.h"
@@ -88,7 +91,7 @@ pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char
 
 void pce_joypad2_device::device_add_mconfig(machine_config &config)
 {
-	LS157(config, m_muxer); // TODO: actual part number
+	LS157(config, m_muxer);
 	m_muxer->a_in_callback().set_ioport("BUTTONS");
 	m_muxer->b_in_callback().set_ioport("DIRECTION");
 }

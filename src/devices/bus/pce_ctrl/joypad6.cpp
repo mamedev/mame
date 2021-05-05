@@ -17,6 +17,9 @@
     NEC Arcade Pad 6 (PCE-TP1)
     - Supports autofire for Button I-VI, Bundled in PC Engine Duo-RX
 
+    TODO:
+	- Needs verifications for Part numbers
+
 **********************************************************************/
 
 #include "emu.h"
@@ -93,15 +96,15 @@ pce_joypad6_device::pce_joypad6_device(const machine_config &mconfig, const char
 
 void pce_joypad6_device::device_add_mconfig(machine_config &config)
 {
-	LS157(config, m_muxer[0]); // TODO: actual part number
+	LS157(config, m_muxer[0]);
 	m_muxer[0]->a_in_callback().set_ioport("BUTTONS_0");
 	m_muxer[0]->b_in_callback().set_ioport("DIRECTION");
 
-	LS157(config, m_muxer[1]); // TODO: actual part number
+	LS157(config, m_muxer[1]);
 	m_muxer[1]->a_in_callback().set_ioport("BUTTONS_1");
 	m_muxer[1]->b_in_callback().set_constant(0x0); //6-button pad header
 
-	LS157(config, m_muxer[2]); // TODO: actual part number
+	LS157(config, m_muxer[2]);
 	m_muxer[2]->a_in_callback().set(m_muxer[0], FUNC(ls157_device::output_r));
 	m_muxer[2]->b_in_callback().set(m_muxer[1], FUNC(ls157_device::output_r));
 }
@@ -114,7 +117,7 @@ void pce_joypad6_device::device_add_mconfig(machine_config &config)
 void pce_joypad6_device::device_start()
 {
 	save_item(NAME(m_button_sel));
-	save_item(NAME(m_prev_clr));
+	save_item(NAME(m_prev_rst));
 }
 
 
@@ -125,7 +128,7 @@ void pce_joypad6_device::device_start()
 void pce_joypad6_device::device_reset()
 {
 	m_button_sel = 0;
-	m_prev_clr = false;
+	m_prev_rst = false;
 }
 
 
@@ -159,10 +162,10 @@ void pce_joypad6_device::rst_w(int state)
 {
 	m_muxer[0]->strobe_w(state);
 	m_muxer[1]->strobe_w(state);
-	if ((!m_prev_clr) && state)
-		m_button_sel = (m_button_sel + 1) & 0x7; // Toggle buttons/autofire, connected to 74xx163 (TODO: Actual part number); QD pin not used
+	if ((!m_prev_rst) && state)
+		m_button_sel = (m_button_sel + 1) & 0x7; // Toggle buttons/autofire, connected to 74xx163; QD pin not used
 
-	m_prev_clr = state;
+	m_prev_rst = state;
 	buttonset_update();
 }
 
