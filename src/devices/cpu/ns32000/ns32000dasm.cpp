@@ -63,7 +63,7 @@
 
 #define Format14i(x)     ((x >> 8) & 0x01)
 #define Format14op(x)    ((x >> 10) & 0x0f)
-#define Format14short(x) ((x >> 15) & 0x1f)
+#define Format14short(x) ((x >> 15) & 0x0f)
 #define Format14gen1(x)  ((x >> 19) & 0x1f)
 
 // instructions
@@ -440,7 +440,7 @@ inline std::string ns32000_disassembler::get_options(uint8_t opts)
 	if ((opts & 0x02) == 0x02) options.append("B,");
 	if ((opts & 0x0c) == 0x04) options.append("W,");
 	if ((opts & 0x0c) == 0x0c) options.append("U,");
-	if (options.back() == ',') options.pop_back();
+	if (!options.empty()) options.pop_back();
 
 	return options;
 }
@@ -790,7 +790,7 @@ offs_t ns32000_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream_gen(stream, Format7gen1(opcode), Format7i(opcode), operand_class::SOURCE, pc, opcodes);
 			util::stream_format(stream, ", ");
 			stream_gen(stream, Format7gen2(opcode), Format7i(opcode), operand_class::DESTINATION, pc, opcodes);
-			util::stream_format(stream, ", %d", get_disp(pc, opcodes));
+			util::stream_format(stream, ", %d", get_disp(pc, opcodes) / (Format7i(opcode) + 1) + 1);
 			break;
 		case 0x02: case 0x03:
 			util::stream_format(stream, "%-8s ", mnemonic);
