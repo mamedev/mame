@@ -522,7 +522,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2980">
-				<rom name="donut.bee" size="0x2980" crc="6c86fe4e" sha1="d99949719b4ad06244afcdb2fca4e73f61da1abd"/>
+				<rom name="droids.com" size="0x2980" crc="6c86fe4e" sha1="d99949719b4ad06244afcdb2fca4e73f61da1abd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1380,7 +1380,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1d00">
-				<rom name="rotate.bin" size="0x1d00" crc="536f1985" sha1="24c9d0675d4ce9ad8cd7df5d867e63d03cf92970"/>
+				<rom name="chess.bin" size="0x1d00" crc="536f1985" sha1="24c9d0675d4ce9ad8cd7df5d867e63d03cf92970"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1762,7 +1762,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<sharedfeat name="compatibility" value="2" />
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1680">
-				<rom name="kingkong.bee" size="0x1680" crc="f1077bd1" sha1="1b90ae3d5bfa5dc043918fe730b76b649464984e"/>
+				<rom name="bricks.mwb" size="0x1680" crc="f1077bd1" sha1="1b90ae3d5bfa5dc043918fe730b76b649464984e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1966,7 +1966,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0ee7">
-				<rom name="msinv2.bee" size="0x0ee7" crc="09c3e1f5" sha1="87ff672dc4ba5ea95d715589e4044e9dcadae67c"/>
+				<rom name="ctarget.bee" size="0x0ee7" crc="09c3e1f5" sha1="87ff672dc4ba5ea95d715589e4044e9dcadae67c"/>
 			</dataarea>
 		</part>
 	</software>
