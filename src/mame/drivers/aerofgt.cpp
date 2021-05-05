@@ -16,6 +16,12 @@ Driver by Nicola Salmoria
 Notes:
 - Sprite zoom is probably not 100% accurate.
   In pspikes, the zooming text during attract mode is horrible.
+- spinlbrk: enemy sprites sometimes shows 1 pixel off on bottom if they are
+  covered by big objects, such as:
+  - tank boss in stage 1;
+  - trenches in Greece stage;
+  chip 0 draws player sprite, chip 1 all enemies. Most likely a btanb.
+
 
 pspikes/turbofrc/aerofgtb write to two addresses which look like control
 registers for a video generator. Maybe they control the display size/position.
@@ -1943,6 +1949,10 @@ void aerofgt_state::aerofgtb(machine_config &config)
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
+	// sprites are y offset one pixel, confirmed by:
+	// - takeoff plane during intro (trees shows a gap to the left);
+	// - the two towers in Tokyo stage, upper part cuts off compared to basement;
+	// - going full left/right with player plane shows asymmetrical behaviour;
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
