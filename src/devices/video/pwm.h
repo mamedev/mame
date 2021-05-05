@@ -35,9 +35,15 @@ public:
 	void set_bri_one(u8 i, double level) { m_levels[i] = level; }
 	void segmask_one(u8 y, u64 mask) { m_segmask[y] = mask; }
 
+	// matrix accessors
 	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata);
 	void matrix(u64 rowsel, u64 rowdata) { matrix_partial(0, m_height, rowsel, rowdata); }
 	void clear() { matrix(0, 0); }
+
+	void write_my(u64 y) { matrix(y, m_rowdata_last); }
+	void write_mx(u64 x) { matrix(m_rowsel, x); }
+	u64 read_my() { return m_rowsel; }
+	u64 read_mx() { return m_rowdata_last; }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
@@ -81,6 +87,7 @@ private:
 	u64 m_segmask[0x40];
 	u64 m_rowsel;
 	u64 m_rowdata[0x40];
+	u64 m_rowdata_last;
 
 	double m_bri[0x40][0x41];
 	attotime m_sync_time;
