@@ -1229,4 +1229,147 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
+	<software name="bandit">
+		<description>One Arm Bandit</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1217">
+				<rom name="bandit.bin" size="0x1217" crc="6b98a63f" sha1="00d54a4dbd92600f274aa6256cf904c0e8302bdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outhouse">
+		<description>Outhouse</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x68cf">
+				<rom name="outhouse.bee" size="0x68cf" crc="9d82809a" sha1="6b2028d0970f5b6d9c56889637de0ee57317ecf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applepan">
+		<description>Apple Panic</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3900">
+				<rom name="panic.com" size="0x3900" crc="4e6049f9" sha1="43e809aa9385d8a6b60daeab9c260275ea9d273b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penetr">
+		<description>Penetrator</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3c80">
+				<rom name="penetr.bee" size="0x3c80" crc="36e50f69" sha1="f5300ac810e8f05e48cbad1b497a2a090567186d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picklett">
+		<description>Pick Letter</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0280">
+				<rom name="pickletter.bin" size="0x0280" crc="0894f591" sha1="a2e957d9b30904bba2e55d2e41ba03008126629b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x19f5">
+				<rom name="pinball.bin" size="0x19f5" crc="206f77e4" sha1="7ce2d36455917e48ea6495644cefd693c00e9d3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rats3d">
+		<description>Rats 3-D</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1900">
+				<rom name="rats.mwb" size="0x1900" crc="633a384a" sha1="ddd25070142802a3e2f151cf8e7b41aab6fdb90a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reefrun">
+		<description>Reef Runners</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0700">
+				<rom name="reefrun.bee" size="0x0700" crc="058f3718" sha1="1f71e75bbfd20914681df7b0b3b4cc9c662d208f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reeler">
+		<description>Lucky Bar Poker Machine</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2380">
+				<rom name="reeler.bee" size="0x2380" crc="86cbad56" sha1="bc0289a7a294e7359aa958272b716e2ecded4ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteorr">
+		<description>Meteor Rescue</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2680">
+				<rom name="meteorr.bee" size="0x2680" crc="29c6776c" sha1="4aa4db02220ed3bda0a488461f5428ce6281765b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1580">
+				<rom name="reversi.mwb" size="0x1580" crc="0ed899de" sha1="3c2331668f91845be58ae0390524fb863627b1b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotf">
+		<description>Robot Fire</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1580">
+				<rom name="robotf.bee" size="0x1580" crc="85fbf5e3" sha1="ab54c5d098e2892afa51700754477a6a69c417ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rotate">
+		<description>Rotate</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0a17">
+				<rom name="rotate.bin" size="0x0a17" crc="ded1e8da" sha1="76e591447022619b4c413fee834c2fbec0afe524"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
