@@ -384,7 +384,6 @@ void lc80_state::lc80(machine_config &config)
 
 	RAM(config, m_ram).set_extra_options("1K,2K,3K,4K");
 	m_ram->set_default_size("1K");
-	m_ram->set_default_value(0xff);
 }
 
 void lc80_state::lc80a(machine_config &config)
