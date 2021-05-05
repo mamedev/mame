@@ -417,17 +417,6 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
-	<software name="microdef">
-		<description>Micro Defender</description>
-		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="quik" interface="mbee_quik">
-			<dataarea name="quik" size="0x3d20">
-				<rom name="microdef.bin" size="0x3d20" crc="36f807be" sha1="2f79dc655e98415e524a32a426bf3245e9f630df"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="defense">
 		<description>Defense Command</description>
 		<year>1982</year>
@@ -1357,8 +1346,8 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
-			<dataarea name="quik" size="0x1580">
-				<rom name="robotf.bee" size="0x1580" crc="85fbf5e3" sha1="ab54c5d098e2892afa51700754477a6a69c417ff"/>
+			<dataarea name="quik" size="0x1d90">
+				<rom name="robotf.bee" size="0x1d90" crc="85fbf5e3" sha1="ab54c5d098e2892afa51700754477a6a69c417ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1809,6 +1798,175 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2600">
 				<rom name="3dox.mwb" size="0x2600" crc="ea240a96" sha1="5aede95820c643e80e4cff510f0866d0e88635c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greataus"><!-- colour -->
+		<description>Great Australian Car Rally</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5b00">
+				<rom name="car32.mwb" size="0x5b00" crc="484d031c" sha1="e52c5933367e80f28cc07ccc48bad5e4cbe9e2fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bismark"><!-- colour -->
+		<description>Sink the Bismark</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0c00">
+				<rom name="cbismark.mwb" size="0x0c00" crc="42118be1" sha1="2dcc9f10a4b66edf98b3a2c3fdadb23f16f2be74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickout"><!-- colour -->
+		<description>Brick-out</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0a80">
+				<rom name="cbrikout.mwb" size="0x0a80" crc="ad27dfa1" sha1="4207800b89c68f94ea5673333c8c6b2222111bd3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugduel"><!-- colour -->
+		<description>Bug Duel</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1380">
+				<rom name="cbugduel.mwb" size="0x1380" crc="f0df9f29" sha1="2cc7587ef8f0c7814c268337e88a471de5ee730d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microdef"><!-- colour -->
+		<description>Micro Defender</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4694">
+				<rom name="defend2.bee" size="0x4694" crc="5ae63fd1" sha1="fab2306df5ab0e04fd3e4148bbdfa660b0a627ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kilopede"><!-- colour -->
+		<description>Kilopede</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1d80">
+				<rom name="kilopede.bin" size="0x1d80" crc="404698aa" sha1="05e80e331e711db96da831c1b66881d2f467e471"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leaping"><!-- colour -->
+		<description>Leaping Lunar Limmo</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1a80">
+				<rom name="leaping.mwb" size="0x1a80" crc="0cf4ad3e" sha1="99e6bd25df1c3e374e86568ba25073d7b7b477f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munch"><!-- colour -->
+		<description>Munch</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="munch.com" size="0x3000" crc="0b6fb488" sha1="0d91b70039cfb261a8095fd5dffdb7c0290ea4f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotman"><!-- colour -->
+		<description>Robot Man</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2280">
+				<rom name="robotman.bin" size="0x2280" crc="e8508bb4" sha1="adb21b1ba014f0978903b0415d33d93ad4260a9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotman2"><!-- colour -->
+		<description>Robotman (alt)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2220">
+				<rom name="robotman2.bin" size="0x2220" crc="5ccbe695" sha1="5d53bc8bfe7f3fce7f01310bc0bd9b3c522b12b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scavenge"><!-- colour -->
+		<description>Scavenger I</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5b00">
+				<rom name="scavenge.com" size="0x5b00" crc="292a00db" sha1="27d18722ee3cdc9facc50fa50b3e85ddded10084"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrambler"><!-- colour -->
+		<description>Scrambler</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3fa1">
+				<rom name="scrambler.bin" size="0x3fa1" crc="16dc3f4d" sha1="1d7e9dbe983c9796e8f5daf832b25f825936c0c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slalom"><!-- colour -->
+		<description>Slalom</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0c73">
+				<rom name="slalom.bin" size="0x0c73" crc="4f202cbb" sha1="154f6f10f08bd69423eea0a28defb0ccb3b13a83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msinv2"><!-- colour -->
+		<description>Microspace Invaders II</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3100">
+				<rom name="msinv2.bee" size="0x3100" crc="d65e36cb" sha1="ff9eaad5e09afc599c5a621837502500cddef2db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctarget"><!-- colour -->
+		<description>Target (colour version)</description>
+		<year>2015</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0ee7">
+				<rom name="msinv2.bee" size="0x0ee7" crc="09c3e1f5" sha1="87ff672dc4ba5ea95d715589e4044e9dcadae67c"/>
 			</dataarea>
 		</part>
 	</software>
