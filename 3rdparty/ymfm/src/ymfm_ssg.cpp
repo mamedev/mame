@@ -1,12 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_ssg.h"
-
-#ifdef MAME_EMU_SAVE_H
-#define SSG_NAME(x) x, "ssg." #x
-#endif
 
 namespace ymfm
 {
@@ -33,19 +28,6 @@ void ssg_registers::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_regdata);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ssg_registers::register_save(device_t &device)
-{
-	device.save_item(SSG_NAME(m_regdata));
-}
-#endif
 
 
 
@@ -113,28 +95,6 @@ void ssg_engine::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_noise_count);
 	state.save_restore(m_noise_state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ssg_engine::register_save(device_t &device)
-{
-	// save register state
-	m_regs.register_save(device);
-
-	// save engine state
-	device.save_item(SSG_NAME(m_tone_count));
-	device.save_item(SSG_NAME(m_tone_state));
-	device.save_item(SSG_NAME(m_envelope_count));
-	device.save_item(SSG_NAME(m_envelope_state));
-	device.save_item(SSG_NAME(m_noise_count));
-	device.save_item(SSG_NAME(m_noise_state));
-}
-#endif
 
 
 //-------------------------------------------------

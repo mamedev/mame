@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_opq.h"
 #include "ymfm.ipp"
 
@@ -65,21 +64,6 @@ void opq_registers::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_lfo_am);
 	state.save_restore(m_regdata);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void opq_registers::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_lfo_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_regdata));
-}
-#endif
 
 
 //-------------------------------------------------
@@ -392,19 +376,6 @@ void ym3806::save_restore(ymfm_saved_state &state)
 {
 	m_fm.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym3806::register_save(device_t &device)
-{
-	m_fm.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------

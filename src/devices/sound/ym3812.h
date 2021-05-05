@@ -7,7 +7,7 @@
 #pragma once
 
 #include "ymfm_mame.h"
-#include "ymfm_opl.h"
+#include "ymfm/src/ymfm_opl.h"
 
 
 // ======================> ym3812_device

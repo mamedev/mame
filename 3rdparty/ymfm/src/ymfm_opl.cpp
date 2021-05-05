@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_opl.h"
 #include "ymfm.ipp"
 
@@ -90,24 +89,6 @@ void opl_registers_base<Revision>::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_noise_lfsr);
 	state.save_restore(m_regdata);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-template<int Revision>
-void opl_registers_base<Revision>::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_lfo_am_counter));
-	device.save_item(YMFM_NAME(m_lfo_pm_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_regdata));
-}
-#endif
 
 
 //-------------------------------------------------
@@ -461,23 +442,6 @@ void opll_registers::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void opll_registers::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_lfo_am_counter));
-	device.save_item(YMFM_NAME(m_lfo_pm_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_regdata));
-}
-#endif
-
-
-//-------------------------------------------------
 //  operator_map - return an array of operator
 //  indices for each channel; for OPLL this is fixed
 //-------------------------------------------------
@@ -754,20 +718,6 @@ void ym3526::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym3526::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_fm.register_save(device);
-}
-#endif
-
-
-//-------------------------------------------------
 //  read_status - read the status register
 //-------------------------------------------------
 
@@ -902,21 +852,6 @@ void y8950::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_io_ddr);
 	m_fm.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void y8950::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	device.save_item(YMFM_NAME(m_io_ddr));
-	m_fm.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -1148,20 +1083,6 @@ void ym3812::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym3812::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_fm.register_save(device);
-}
-#endif
-
-
-//-------------------------------------------------
 //  read_status - read the status register
 //-------------------------------------------------
 
@@ -1292,20 +1213,6 @@ void ymf262::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ymf262::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_fm.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -1480,20 +1387,6 @@ void opll_base::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void opll_base::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_fm.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------

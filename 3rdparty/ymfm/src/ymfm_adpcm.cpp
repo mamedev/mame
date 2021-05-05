@@ -1,13 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_adpcm.h"
-
-#ifdef MAME_EMU_SAVE_H
-#define ADPCM_A_NAME(x) x, "adpcma." #x
-#define ADPCM_B_NAME(x) x, "adpcmb." #x
-#endif
 
 namespace ymfm
 {
@@ -49,19 +43,6 @@ void adpcm_a_registers::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_regdata);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_a_registers::register_save(device_t &device)
-{
-	device.save_item(ADPCM_A_NAME(m_regdata));
-}
-#endif
 
 
 //*********************************************************
@@ -115,24 +96,6 @@ void adpcm_a_channel::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_accumulator);
 	state.save_restore(m_step_index);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_a_channel::register_save(device_t &device)
-{
-	device.save_item(ADPCM_A_NAME(m_playing), m_choffs);
-	device.save_item(ADPCM_A_NAME(m_curnibble), m_choffs);
-	device.save_item(ADPCM_A_NAME(m_curbyte), m_choffs);
-	device.save_item(ADPCM_A_NAME(m_curaddress), m_choffs);
-	device.save_item(ADPCM_A_NAME(m_accumulator), m_choffs);
-	device.save_item(ADPCM_A_NAME(m_step_index), m_choffs);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -309,24 +272,6 @@ void adpcm_a_engine::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_a_engine::register_save(device_t &device)
-{
-	// save register state
-	m_regs.register_save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->register_save(device);
-}
-#endif
-
-
-//-------------------------------------------------
 //  clock - master clocking function
 //-------------------------------------------------
 
@@ -406,19 +351,6 @@ void adpcm_b_registers::save_restore(ymfm_saved_state &state)
 }
 
 
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_b_registers::register_save(device_t &device)
-{
-	device.save_item(ADPCM_B_NAME(m_regdata));
-}
-#endif
-
-
 
 //*********************************************************
 // ADPCM "B" CHANNEL
@@ -479,27 +411,6 @@ void adpcm_b_channel::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_prev_accum);
 	state.save_restore(m_adpcm_step);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_b_channel::register_save(device_t &device)
-{
-	device.save_item(ADPCM_B_NAME(m_status));
-	device.save_item(ADPCM_B_NAME(m_curnibble));
-	device.save_item(ADPCM_B_NAME(m_curbyte));
-	device.save_item(ADPCM_B_NAME(m_dummy_read));
-	device.save_item(ADPCM_B_NAME(m_position));
-	device.save_item(ADPCM_B_NAME(m_curaddress));
-	device.save_item(ADPCM_B_NAME(m_accumulator));
-	device.save_item(ADPCM_B_NAME(m_prev_accum));
-	device.save_item(ADPCM_B_NAME(m_adpcm_step));
-}
-#endif
 
 
 //-------------------------------------------------
@@ -804,24 +715,6 @@ void adpcm_b_engine::save_restore(ymfm_saved_state &state)
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		m_channel[chnum]->save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void adpcm_b_engine::register_save(device_t &device)
-{
-	// save our state
-	m_regs.register_save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------

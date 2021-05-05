@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_opn.h"
 #include "ymfm.ipp"
 
@@ -58,25 +57,6 @@ void opn_registers_base<IsOpnA>::save_restore(ymfm_saved_state &state)
 	}
 	state.save_restore(m_regdata);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-template<bool IsOpnA>
-void opn_registers_base<IsOpnA>::register_save(device_t &device)
-{
-	if (IsOpnA)
-	{
-		device.save_item(YMFM_NAME(m_lfo_counter));
-		device.save_item(YMFM_NAME(m_lfo_am));
-	}
-	device.save_item(YMFM_NAME(m_regdata));
-}
-#endif
 
 
 //-------------------------------------------------
@@ -459,20 +439,6 @@ void ym2149::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2149::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_ssg.register_save(device);
-}
-#endif
-
-
-//-------------------------------------------------
 //  read_data - read the data register
 //-------------------------------------------------
 
@@ -614,21 +580,6 @@ void ym2203::save_restore(ymfm_saved_state &state)
 	m_fm.save_restore(state);
 	m_ssg.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2203::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	m_fm.register_save(device);
-	m_ssg.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -861,26 +812,6 @@ void ym2608::save_restore(ymfm_saved_state &state)
 	m_adpcm_a.save_restore(state);
 	m_adpcm_b.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2608::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	device.save_item(YMFM_NAME(m_irq_enable));
-	device.save_item(YMFM_NAME(m_flag_control));
-
-	m_fm.register_save(device);
-	m_ssg.register_save(device);
-	m_adpcm_a.register_save(device);
-	m_adpcm_b.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -1253,26 +1184,6 @@ void ym2610::save_restore(ymfm_saved_state &state)
 
 
 //-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2610::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	device.save_item(YMFM_NAME(m_eos_status));
-	device.save_item(YMFM_NAME(m_flag_mask));
-
-	m_fm.register_save(device);
-	m_ssg.register_save(device);
-	m_adpcm_a.register_save(device);
-	m_adpcm_b.register_save(device);
-}
-#endif
-
-
-//-------------------------------------------------
 //  read_status - read the status register
 //-------------------------------------------------
 
@@ -1564,22 +1475,6 @@ void ym2612::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_dac_enable);
 	m_fm.save_restore(state);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2612::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_address));
-	device.save_item(YMFM_NAME(m_dac_data));
-	device.save_item(YMFM_NAME(m_dac_enable));
-	m_fm.register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------

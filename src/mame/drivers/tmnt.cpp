@@ -73,8 +73,8 @@ Updates:
 #include "sound/okim6295.h"
 #include "sound/samples.h"
 #include "sound/ym2151.h"
-#include "sound/ymfm.h"
 #include "speaker.h"
+#include "ymfm/src/ymfm.h"
 
 
 uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)

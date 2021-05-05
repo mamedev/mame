@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "ymfm.h"
-#include "ymfm_ssg.h"
+#include "ymfm/src/ymfm.h"
+#include "ymfm/src/ymfm_ssg.h"
 #include "ay8910.h"
 
 
@@ -223,8 +223,12 @@ protected:
 		// allocate our stream
 		m_stream = device_sound_interface::stream_alloc(0, ChipClass::OUTPUTS, m_chip.sample_rate(device_t::clock()));
 
-		// register for save states
-		m_chip.register_save(*this);
+		// compute the size of the save buffer by doing an initial save
+		ymfm::ymfm_saved_state state(m_save_blob, true);
+		m_chip.save_restore(state);
+
+		// now register the blob for save, on the assumption the size won't change
+		save_item(NAME(m_save_blob));
 	}
 
 	// device reset
@@ -239,9 +243,27 @@ protected:
 		m_stream->set_sample_rate(m_chip.sample_rate(device_t::clock()));
 	}
 
+	// handle pre-saving by filling the blob
+	virtual void device_pre_save() override
+	{
+		// remember the original blob size
+		auto orig_size = m_save_blob.size();
+
+		// save the state
+		ymfm::ymfm_saved_state state(m_save_blob, true);
+		m_chip.save_restore(state);
+
+		// ensure that the size didn't change since we first allocated
+		if (m_save_blob.size() != orig_size)
+			throw emu_fatalerror("State size changed for ymfm chip");
+	}
+
+	// handle post-loading by restoring from the blob
 	virtual void device_post_load() override
 	{
-		m_chip.invalidate_caches();
+		// populate the state from the blob
+		ymfm::ymfm_saved_state state(m_save_blob, false);
+		m_chip.save_restore(state);
 	}
 
 	// sound overrides
@@ -265,8 +287,9 @@ protected:
 	}
 
 	// internal state
-	sound_stream *m_stream;          // sound stream
-	ChipClass m_chip;                // core chip implementation
+	sound_stream *m_stream;           // sound stream
+	ChipClass m_chip;                 // core chip implementation
+	std::vector<uint8_t> m_save_blob; // state saving buffer
 };
 
 

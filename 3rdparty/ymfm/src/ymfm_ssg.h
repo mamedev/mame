@@ -83,9 +83,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// direct read/write access
 	uint8_t read(uint32_t index) { return m_regdata[index]; }
@@ -136,9 +133,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// master clocking function
 	void clock();

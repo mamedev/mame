@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm.h"
 #include "ymfm.ipp"
 

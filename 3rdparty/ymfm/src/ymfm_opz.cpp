@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#include "emu.h"
 #include "ymfm_opz.h"
 #include "ymfm.ipp"
 
@@ -143,26 +142,6 @@ void opz_registers::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_regdata);
 	state.save_restore(m_phase_substep);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void opz_registers::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_lfo_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_noise_counter));
-	device.save_item(YMFM_NAME(m_noise_state));
-	device.save_item(YMFM_NAME(m_noise_lfo));
-	device.save_item(YMFM_NAME(m_regdata));
-	device.save_item(YMFM_NAME(m_phase_substep));
-}
-#endif
 
 
 //-------------------------------------------------
@@ -591,20 +570,6 @@ void ym2414::save_restore(ymfm_saved_state &state)
 	m_fm.save_restore(state);
 	state.save_restore(m_address);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-void ym2414::register_save(device_t &device)
-{
-	m_fm.register_save(device);
-	device.save_item(YMFM_NAME(m_address));
-}
-#endif
 
 
 //-------------------------------------------------

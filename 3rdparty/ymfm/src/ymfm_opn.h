@@ -111,9 +111,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &save);
-#endif
 
 	// map channel number to register offset
 	static constexpr uint32_t channel_offset(uint32_t chnum)
@@ -252,9 +249,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// pass-through helpers
 	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER; }
@@ -303,9 +297,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
@@ -367,9 +358,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
@@ -429,9 +417,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
@@ -492,9 +477,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }

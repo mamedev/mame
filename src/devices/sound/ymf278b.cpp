@@ -938,8 +938,12 @@ void ymf278b_device::device_start()
 		// resolve the handlers
 		m_update_irq.resolve();
 
-		// register for save states
-		m_fm.register_save(*this);
+		// compute the size of the save buffer by doing an initial save
+		ymfm::ymfm_saved_state state(m_save_blob, true);
+		m_fm.save_restore(state);
+
+		// now register the blob for save, on the assumption the size won't change
+		save_item(NAME(m_save_blob));
 	}
 }
 
@@ -954,3 +958,27 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	, m_update_irq(*this)
 {
 }
+
+// handle pre-saving by filling the blob
+void ymf278b_device::device_pre_save()
+{
+	// remember the original blob size
+	auto orig_size = m_save_blob.size();
+
+	// save the state
+	ymfm::ymfm_saved_state state(m_save_blob, true);
+	m_fm.save_restore(state);
+
+	// ensure that the size didn't change since we first allocated
+	if (m_save_blob.size() != orig_size)
+		throw emu_fatalerror("State size changed for ymfm chip");
+}
+
+// handle post-loading by restoring from the blob
+void ymf278b_device::device_post_load()
+{
+	// populate the state from the blob
+	ymfm::ymfm_saved_state state(m_save_blob, false);
+	m_fm.save_restore(state);
+}
+

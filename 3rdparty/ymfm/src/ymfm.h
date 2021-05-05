@@ -6,12 +6,10 @@
 
 #pragma once
 
-#include <assert.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <cassert>
+#include <cstdint>
+#include <cstdio>
 #include <algorithm>
-#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -48,6 +46,45 @@ enum keyon_type : uint32_t
 //*********************************************************
 //  GLOBAL HELPERS
 //*********************************************************
+
+//-------------------------------------------------
+//  count_leading_zeros - return the number of
+//  leading zeros in a 32-bit value; CPU-optimized
+//  versions for various architectures are included
+//  below
+//-------------------------------------------------
+
+#if defined(__GNUC__)
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	if (value == 0)
+		return 32;
+	return __builtin_clz(value);
+}
+
+#elif defined(_MSC_VER)
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	unsigned long index;
+	return _BitScanReverse(&index, value) ? (31U - index) : 32U;
+}
+
+#else
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	if (value == 0)
+		return 32;
+	uint8_t count;
+	for (count = 0; int32_t(value) >= 0; count++)
+		value <<= 1;
+	return count;
+}
+
+#endif
+
 
 //-------------------------------------------------
 //  bitfield - extract a bitfield from the given
@@ -177,16 +214,16 @@ class ymfm_saved_state
 {
 public:
 	// construction
-	ymfm_saved_state(bool saving) :
+	ymfm_saved_state(std::vector<uint8_t> &buffer, bool saving) :
+		m_buffer(buffer),
 		m_offset(saving ? -1 : 0)
 	{
+		if (saving)
+			buffer.resize(0);
 	}
 
 	// are we saving or restoring?
 	bool saving() const { return (m_offset < 0); }
-
-	// retrieve the buffer
-	std::vector<uint8_t> &buffer() { return m_buffer; }
 
 	// generic save/restore
 	template<typename DataType>
@@ -228,7 +265,7 @@ public:
 	uint8_t read() { return (m_offset < m_buffer.size()) ? m_buffer[m_offset++] : 0; }
 
 	// internal state
-	std::vector<uint8_t> m_buffer;
+	std::vector<uint8_t> &m_buffer;
 	int32_t m_offset;
 };
 
@@ -479,9 +516,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// reset the operator state
 	void reset();
@@ -558,9 +592,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// reset the channel state
 	void reset();
@@ -656,9 +687,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// reset the overall state
 	void reset();

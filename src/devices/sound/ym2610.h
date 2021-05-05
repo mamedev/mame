@@ -7,7 +7,7 @@
 #pragma once
 
 #include "ymfm_mame.h"
-#include "ymfm_opn.h"
+#include "ymfm/src/ymfm_opn.h"
 
 
 // ======================> ym2610_device_base

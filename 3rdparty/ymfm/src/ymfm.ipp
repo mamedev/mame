@@ -1,11 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifdef MAME_EMU_SAVE_H
-#include "ymfm_mame.h"
-ALLOW_SAVE_TYPE(ymfm::envelope_state);
-#endif
-
 namespace ymfm
 {
 
@@ -403,25 +398,6 @@ void fm_operator<RegisterType>::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_key_state);
 	state.save_restore(m_keyon_live);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-template<class RegisterType>
-void fm_operator<RegisterType>::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_phase), m_opoffs);
-	device.save_item(YMFM_NAME(m_env_attenuation), m_opoffs);
-	device.save_item(YMFM_NAME(m_env_state), m_opoffs);
-	device.save_item(YMFM_NAME(m_ssg_inverted), m_opoffs);
-	device.save_item(YMFM_NAME(m_key_state), m_opoffs);
-	device.save_item(YMFM_NAME(m_keyon_live), m_opoffs);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -827,21 +803,6 @@ void fm_channel<RegisterType>::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_feedback[1]);
 	state.save_restore(m_feedback_in);
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-template<class RegisterType>
-void fm_channel<RegisterType>::register_save(device_t &device)
-{
-	device.save_item(YMFM_NAME(m_feedback), m_choffs);
-	device.save_item(YMFM_NAME(m_feedback_in), m_choffs);
-}
-#endif
 
 
 //-------------------------------------------------
@@ -1251,37 +1212,6 @@ void fm_engine_base<RegisterType>::save_restore(ymfm_saved_state &state)
 	// invalidate any caches
 	invalidate_caches();
 }
-
-
-//-------------------------------------------------
-//  register_save - register for save states
-//  (MAME-specific)
-//-------------------------------------------------
-
-#ifdef MAME_EMU_SAVE_H
-template<class RegisterType>
-void fm_engine_base<RegisterType>::register_save(device_t &device)
-{
-	// save our data
-	device.save_item(YMFM_NAME(m_env_counter));
-	device.save_item(YMFM_NAME(m_status));
-	device.save_item(YMFM_NAME(m_clock_prescale));
-	device.save_item(YMFM_NAME(m_irq_mask));
-	device.save_item(YMFM_NAME(m_irq_state));
-	device.save_item(YMFM_NAME(m_timer_running));
-
-	// save the register/family data
-	m_regs.register_save(device);
-
-	// save channel data
-	for (int chnum = 0; chnum < CHANNELS; chnum++)
-		m_channel[chnum]->register_save(device);
-
-	// save operator data
-	for (int opnum = 0; opnum < OPERATORS; opnum++)
-		m_operator[opnum]->register_save(device);
-}
-#endif
 
 
 //-------------------------------------------------

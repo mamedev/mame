@@ -55,9 +55,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// map channel number to register offset
 	static constexpr uint32_t channel_offset(uint32_t chnum)
@@ -113,9 +110,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// signal key on/off
 	void keyonoff(bool on);
@@ -157,9 +151,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// master clocking function
 	uint32_t clock(uint32_t chanmask);
@@ -245,9 +236,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// direct read/write access
 	void write(uint32_t index, uint8_t data) { m_regdata[index] = data; }
@@ -301,9 +289,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// signal key on/off
 	void keyonoff(bool on);
@@ -368,9 +353,6 @@ public:
 
 	// save/restore
 	void save_restore(ymfm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
 
 	// master clocking function
 	void clock(uint32_t chanmask);

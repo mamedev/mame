@@ -6,7 +6,7 @@
 #pragma once
 
 #include "ymfm_mame.h"
-#include "ymfm_opl.h"
+#include "ymfm/src/ymfm_opl.h"
 #include "dirom.h"
 
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface<22>, public ymfm::ymfm_interface
@@ -33,6 +33,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_pre_save() override;
+	virtual void device_post_load() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -137,6 +139,7 @@ private:
 	attotime m_busy_end;             // busy end time
 	emu_timer *m_timer[2];           // two timers
 	devcb_write_line m_update_irq;   // IRQ update callback
+	std::vector<uint8_t> m_save_blob;// save state blob for FM
 
 	// perform a synchronized write
 	virtual void ymfm_sync_mode_write(uint8_t data) override
