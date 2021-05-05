@@ -1947,11 +1947,13 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
+	m_spr_old[0]->set_offsets(0, -1);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
 	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
+	m_spr_old[1]->set_offsets(0, -1);
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
@@ -3186,13 +3188,15 @@ GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_state, empty_in
 GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_state, empty_init,      ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
-// according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5.000 versus 500)
-// -> our three sets all gives 5k points, huh?
+// according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5'000 versus 500)
+// -> our three sets all gives 5k points, therefore they are supposedly all old revs
 GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
+// sonicwi looks oldest set, aerofgt is slightly easier, aerofgtb/aerofgtc are noticeably harder
+// aerofgtb sports an extra srl->rr in Z80 code at PC=1a8a compared to all other sets, bugfix rev?
 GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
 GAME( 1992, aerofgtb,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
 GAME( 1992, aerofgtc,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
