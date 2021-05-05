@@ -2509,6 +2509,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hornet.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.h",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.cpp",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.h",
 	MAME_DIR .. "src/mame/drivers/hyperspt.cpp",
 	MAME_DIR .. "src/mame/includes/hyperspt.h",
 	MAME_DIR .. "src/mame/audio/hyprolyb.cpp",

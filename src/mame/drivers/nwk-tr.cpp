@@ -273,6 +273,7 @@ Thrill Drive 713A13  -       713A14  -
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
 #include "machine/k033906.h"
+#include "machine/konami_gn676_lan.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
 //#include "machine/x76f041.h"
@@ -324,6 +325,10 @@ public:
 	void init_racingj();
 	void init_thrilld();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -345,11 +350,6 @@ private:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	emu_timer *m_sound_irq_timer;
-	int m_fpga_uploaded;
-	int m_lanc2_ram_r;
-	int m_lanc2_ram_w;
-	uint8_t m_lanc2_reg[3];
-	std::unique_ptr<uint8_t[]> m_lanc2_ram;
 	std::unique_ptr<uint32_t[]> m_sharc0_dataram;
 	std::unique_ptr<uint32_t[]> m_sharc1_dataram;
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -361,10 +361,6 @@ private:
 	void nwktr_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
-	uint32_t lanc1_r(offs_t offset);
-	void lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t lanc2_r(offs_t offset, uint32_t mem_mask = ~0);
-	void lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dsp_dataram0_r(offs_t offset);
 	void dsp_dataram0_w(offs_t offset, uint32_t data);
 	uint32_t dsp_dataram1_r(offs_t offset);
@@ -376,12 +372,9 @@ private:
 	double adc12138_input_callback(uint8_t input);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void lanc2_init();
 
 	void nwktr_map(address_map &map);
 	void sharc0_map(address_map &map);
@@ -530,148 +523,6 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 }
 
 
-void nwktr_state::lanc2_init()
-{
-	m_fpga_uploaded = 0;
-	m_lanc2_ram_r = 0;
-	m_lanc2_ram_w = 0;
-	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
-}
-
-uint32_t nwktr_state::lanc1_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0x40/4:
-		{
-			uint32_t r = 0;
-
-			r |= (m_fpga_uploaded) ? (1 << 6) : 0;
-			r |= 1 << 5;
-
-			return (r) << 24;
-		}
-
-		default:
-		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-			return 0xffffffff;
-		}
-	}
-}
-
-void nwktr_state::lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-}
-
-uint32_t nwktr_state::lanc2_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= m_lanc2_ram[m_lanc2_ram_r & 0x7fff];
-			m_lanc2_ram_r++;
-		}
-		else
-		{
-			r |= 0xffffff00;
-		}
-	}
-
-	if (offset == 4)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= 0x00000000;
-		}
-	}
-
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-
-	return r;
-}
-
-void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			uint8_t value = data >> 24;
-
-			value = ((value >> 7) & 0x01) |
-					((value >> 5) & 0x02) |
-					((value >> 3) & 0x04) |
-					((value >> 1) & 0x08) |
-					((value << 1) & 0x10) |
-					((value << 3) & 0x20) |
-					((value << 5) & 0x40) |
-					((value << 7) & 0x80);
-
-			m_fpga_uploaded = 1;
-			m_lanc2_reg[0] = (uint8_t)(data >> 24);
-
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, m_maincpu->pc());
-		}
-		else if (ACCESSING_BITS_8_15)
-		{
-			m_lanc2_ram_r = 0;
-			m_lanc2_ram_w = 0;
-			m_lanc2_reg[1] = (uint8_t)(data >> 8);
-		}
-		else if (ACCESSING_BITS_16_23)
-		{
-			if (m_lanc2_reg[0] != 0)
-			{
-				m_lanc2_ram[2] = (data >> 20) & 0xf;
-				m_lanc2_ram[3] = 0;
-			}
-			m_lanc2_reg[2] = (uint8_t)(data >> 16);
-		}
-		else if (ACCESSING_BITS_0_7)
-		{
-			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
-			m_lanc2_ram_w++;
-		}
-		else
-		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-		}
-	}
-	if (offset == 4)
-	{
-		// TODO: The data below would normally be present on the serialflash at 2G.
-
-		if (strcmp(machine().system().name, "thrilld") == 0 ||
-			strcmp(machine().system().name, "thrilldb") == 0 ||
-			strcmp(machine().system().name, "thrilldbe") == 0)
-		{
-			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;      // G*71
-			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;      // 3
-			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;      // --**
-			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;      // *
-
-			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;      // GC71
-			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;      // 3
-			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;      //   JA
-			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;      // A
-		}
-		else if (strcmp(machine().system().name, "racingj2") == 0)
-		{
-			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;      // GE88
-			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;      // 8 00
-			m_work_ram[(0x3ffc80/4) + 2] = 0x39374541;      // 97EA
-			m_work_ram[(0x3ffc80/4) + 3] = 0x410058da;      // A
-		}
-	}
-
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-}
-
 /*****************************************************************************/
 
 TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
@@ -729,8 +580,8 @@ void nwktr_state::nwktr_map(address_map &map)
 	map(0x7d010000, 0x7d01ffff).w(FUNC(nwktr_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)); // M48T58Y RTC/NVRAM
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040000, 0x7d04ffff).rw(FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw(FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
+	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f000000, 0x7f1fffff).rom().region("user1", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
@@ -961,6 +812,8 @@ void nwktr_state::nwktr(machine_config &config)
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
+
+	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
 }
 
 void nwktr_state::thrilld(machine_config &config)
@@ -978,8 +831,6 @@ void nwktr_state::init_nwktr()
 {
 	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
 	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
-
-	lanc2_init();
 }
 
 void nwktr_state::init_racingj()

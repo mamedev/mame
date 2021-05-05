@@ -351,16 +351,17 @@ Jumpers set on GFX PCB to scope monitor:
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
+#include "machine/ds2401.h"
 #include "machine/eepromser.h"
 #include "machine/k033906.h"
+#include "machine/konami_gn676_lan.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
-#include "machine/ds2401.h"
 #include "machine/watchdog.h"
-#include "sound/rf5c400.h"
 #include "sound/k056800.h"
-#include "video/voodoo.h"
+#include "sound/rf5c400.h"
 #include "video/k037122.h"
+#include "video/voodoo.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -405,6 +406,7 @@ public:
 	{ }
 
 	void hornet(machine_config &config);
+	void hornet_lan(machine_config &config);
 	void terabrst(machine_config &config);
 	void sscope(machine_config &config);
 	void sscope2(machine_config &config);
@@ -487,6 +489,7 @@ private:
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
 	void hornet_map(address_map &map);
+	void hornet_lan_map(address_map &map);
 	void terabrst_map(address_map &map);
 	void sscope_map(address_map &map);
 	void sscope2_map(address_map &map);
@@ -789,6 +792,14 @@ void hornet_state::hornet_map(address_map &map)
 	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);       /* Data ROM */
 	map(0x7f000000, 0x7f3fffff).rom().region("user1", 0);
 	map(0x7fc00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
+}
+
+void hornet_state::hornet_lan_map(address_map &map)
+{
+	hornet_map(map);
+
+	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
 }
 
 void hornet_state::terabrst_map(address_map &map)
@@ -1195,6 +1206,15 @@ void hornet_state::hornet(machine_config &config)
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(1);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HORNET);
+}
+
+void hornet_state::hornet_lan(machine_config &config)
+{
+	hornet(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_lan_map);
+
+	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_workram);
 }
 
 void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O board
@@ -1732,13 +1752,13 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,  0,        hornet,   gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,   nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,   nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrst,  0,        terabrst, terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, terabrsta, terabrst, terabrst, terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,  0,        hornet,     gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbpa,   nbapbp,   hornet,     nbapbp,   hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrst,  0,        terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, terabrsta, terabrst, terabrst,   terabrst, hornet_state, init_hornet, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // identifies as NWK-LC system
-GAME(  1998, thrilldbu, thrilld,  hornet,   gradius4, hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // resets after checking wheels, needs proper analog inputs, but the reset probably isn't related
+GAME(  1998, thrilldbu, thrilld,  hornet_lan, hornet,   hornet_state, init_hornet, ROT0, "Konami", "Thrill Drive (ver UFB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN ) // heavy GFX glitches, fails wheel motor test, for now it's possible to get in game by switching "SW:2" to on
 
 // The region comes from the Timekeeper NVRAM, without a valid default all sets except 'xxD, Ver 1.33' will init their NVRAM to UAx versions, the xxD set seems to incorrectly init it to JXD, which isn't a valid
 // version, and thus can't be booted.  If you copy the NVRAM from another already initialized set, it will boot as UAD.
