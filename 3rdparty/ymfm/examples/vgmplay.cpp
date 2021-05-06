@@ -136,7 +136,10 @@ public:
 		{
 			auto front = m_queue.front();
 			m_chip.write(0 + 2 * ((front.first >> 8) & 1), front.first & 0xff);
-			m_chip.write(1 + 2 * ((front.first >> 8) & 1), front.second);
+			if (m_type != CHIP_YM2149)
+				m_chip.write(1 + 2 * ((front.first >> 8) & 1), front.second);
+			else
+				m_chip.write(2, front.second);
 			m_queue.erase(m_queue.begin());
 		}
 		return m_queue.empty();
@@ -477,6 +480,8 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 	if (offset + 4 > data_start)
 		return data_start;
 	dummy = parse_uint32(buffer, offset);
+	if ((dummy & 0xff) != 0)
+		printf("Volume modifier: %02X (=%d)\n", dummy & 0xff, int(pow(2, double(dummy & 0xff) / 0x20)));
 
 	// +80: GameBoy DMG clock
 	if (offset + 4 > data_start)
