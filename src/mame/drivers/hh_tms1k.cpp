@@ -86,6 +86,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ *MP3407   TMS1100   1979, General Electric The Great Awakening (model 7-4880)
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
