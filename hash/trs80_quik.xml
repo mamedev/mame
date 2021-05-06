@@ -670,4 +670,137 @@ between them.
 		</part>
 	</software>
 
+	<software name="gobbler1">
+		<description>Gobbling Box (1)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x20e4">
+				<rom name="gobbler.cmd" size="0x20e4" crc="345125fe" sha1="1426e56cf9b265d3c7db3a5a121051a6ebb1e83e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobbler2">
+		<description>Gobbling Box (2)</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x20e4">
+				<rom name="gobblerj.cmd" size="0x20e4" crc="fc03bd6f" sha1="545b37ab73a94205274da69d4a7f06086ff29261"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfght1">
+		<description>Gunfighter (1)</description>
+		<year>1981</year>
+		<publisher>Tandy Corp</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0ef9">
+				<rom name="gunfght1.cmd" size="0x0ef9" crc="f044978c" sha1="77f8fb0edd14c5c3c712e812575ef757da10a243"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfght2">
+		<description>Gunfighter (2)</description>
+		<year>1981</year>
+		<publisher>Tandy Corp</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0f34">
+				<rom name="gunfght2.cmd" size="0x0f34" crc="77671172" sha1="0ac04922451a1d597d840671f88d6c30495ab9e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunfght3">
+		<description>Gunfighter (3)</description>
+		<year>1981</year>
+		<publisher>Tandy Corp</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1000">
+				<rom name="gunfght3.cmd" size="0x1000" crc="f317ed12" sha1="3edc575519fd43d3b73ea5b711e786beb6b29007"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt">
+		<description>Haunted House</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press Enter" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x19cb">
+				<rom name="haunt.cmd" size="0x19cb" crc="d819a85e" sha1="fce473bfd696fc2f60316ad58be761c5d9cb86bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaiv">
+		<description>Warriors of Ras 2: Kaiv</description>
+		<year>1982</year>
+		<publisher>Med Systems Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x9100">
+				<rom name="kaiv.cmd" size="0x9100" crc="0b8122b0" sha1="3dc4281a2fc5e3f8c73035c6e325653a4368c0ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knossos">
+		<description>Knossos</description>
+		<year>1981</year>
+		<publisher>Med Systems Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1f00">
+				<rom name="knossos.cmd" size="0x1f00" crc="00ddd641" sha1="42d7ff475280c587237551dee650293be3e3e1dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchord3">
+		<description>Micro Chord</description>
+		<year>1982</year>
+		<publisher>Cornsoft Group Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2400">
+				<rom name="mchord3.cmd" size="0x2400" crc="d06c81fa" sha1="92d3b2a452a3ffbd55f09efc7cb2e82d7d417ad0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutinv1">
+		<description>Mutant Invasion (1)</description>
+		<year>1982</year>
+		<publisher>Micro-Systems Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1600">
+				<rom name="mutinv1.cmd" size="0x1600" crc="1e11f7ae" sha1="587b646b48027cb144723e3feabfe1f8f71195b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mutinv2">
+		<description>Mutant Invasion (2)</description>
+		<year>1982</year>
+		<publisher>Micro-Systems Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1600">
+				<rom name="mutinv2.cmd" size="0x1600" crc="88af7efe" sha1="17774d35fb5b315840202ca7123934e77752b6bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arrowofd">
+		<description>Mysterious Adventures 3: Arrow of Death (Pt 1)</description>
+		<year>1981</year>
+		<publisher>Molimerx Ltd</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x41f8">
+				<rom name="arrowofd.cmd" size="0x41f8" crc="24a68a90" sha1="53fd69424088555a851a43482343b232c9fc60cf"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
