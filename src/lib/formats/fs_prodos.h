@@ -14,13 +14,38 @@ class fs_prodos : public filesystem_manager_t {
 public:
 	class impl : public filesystem_t {
 	public:
-		impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512) {}
+		class root_dir : public idir_t {
+		public:
+			root_dir(impl &i) : m_fs(i) {}
+			virtual ~root_dir() = default;
+
+			virtual void drop_weak_references() override;
+
+			virtual fs_meta_data metadata() override;
+			virtual std::vector<fs_dir_entry> contents() override;
+			virtual file_t file_get(uint64_t key) override;
+			virtual dir_t dir_get(uint64_t key) override;
+
+		private:
+			impl &m_fs;
+		};
+
+		impl(fsblk_t &blockdev);
 		virtual ~impl() = default;
 		
 		virtual void format(const fs_meta_data &meta) override;
 
+		virtual fs_meta_data metadata() override;
+		virtual dir_t root() override;
+
+		void drop_root_ref();
+
+		static util::arbitrary_datetime prodos_to_dt(u32 date);
+
 	private:
 		static const u8 boot[512];
+
+		dir_t m_root;
 	};
 
 	fs_prodos() : filesystem_manager_t() {}

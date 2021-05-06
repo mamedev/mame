@@ -72,6 +72,9 @@ public:
 	void alphatp50(machine_config &config);
 	void mbc16lt(machine_config &config);
 	void modernxt(machine_config &config);
+	void earthst(machine_config &config);
+	void vpcii(machine_config &config);
+	void fraking(machine_config &config);
 
 	void init_bondwell();
 
@@ -1906,6 +1909,20 @@ ROM_START( alphatp50 )
 ROM_END
 
 
+/************************************************ Triumph-Adler TA 1700-PC ***
+Another 80186 PC compatible from Triumph-Adler, looks very similar to the P50 that is already in MAME.
+In this case, a hard card with a Lapine 20MB harddisk is inside, and the floppy controller is included
+on the mainboard on the area that is left blank on the P50.
+
+Both mainboards are B301-30747
+*****************************************************************************/
+
+ROM_START( ta1700pc )
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROMX_LOAD("ta1700pc_ceab06_02_103.bin", 0x8000, 0x4000, CRC(2a6a116a) SHA1(459c7533f56c358a9f63469ad43904f3bdf851ae), ROM_SKIP(1))
+	ROMX_LOAD("ta1700pc_ceab07_02_104.bin", 0x8001, 0x4000, CRC(4313d4db) SHA1(36ece348c2369be6bb2d6895fb7e99d3fa944ac5), ROM_SKIP(1))
+ROM_END
+
 /********************************************************** Sanyo MBC-16LT ***
 Form factor: Laptop
 Motherboard ID: SPC-500B, ROM BIOS Version 1.03, at least a Version 1.06 exists as well
@@ -2117,6 +2134,143 @@ ROM_START( mononuxt2 ) // constant beep but boots, keyboard not working
 	ROM_LOAD( "nuxt_128k image_0.9.8_hybrid.bin", 0x00000, 0x20000, CRC(ca22cc53) SHA1(57e04285ca7920afe38366c90d6f0359b398367b))
 ROM_END
 
+/**************************************************** Alloy EarthStation-I ***
+
+This is an x86-compatible, ARCnet based thin client built into an AT-style keyboard.
+It needs to get a V40 CPU and an emulation of the Arcnet part.
+
+Form factor: keyboard
+CPU: NEC V40
+RAM: 256K, 512K, 768KB
+Video: NCR7280 based, Hercules, CGA, MCGA (an enhanced CGA mode, not the PS/2 one)
+Connectors: LPT1, COM1, Arcnet (BNC)
+Mass storage: No internal mass storage possible, boot via Arcnet or a project like BootLPT/86
+
+*****************************************************************************/
+
+void pc_state::earthst(machine_config &config)
+{
+	/* basic machine hardware */
+	v20_device &maincpu(V20(config, "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
+
+	/* keyboard */
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("768K").set_extra_options("512K");
+}
+
+ROM_START( earthst )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("earthstation.bin", 0x8000, 0x8000, CRC(a56d3d6d) SHA1(98b17579b15e4da69054ab971ce6cebe06d05c51))
+ROM_END
+
+
+/*********************************************************** Victor VPC II ***
+
+Some of the information found online is contradictory, especially when it comes to
+distinguish between the VPC II, VPC IIc and VPC IIe models.
+The computer was originally shipped with a Hercules/CGA card and a monochrome monitor.
+It's possible that the "c" and "e" denote CGA and EGA color monitors respectively.
+
+Form factor: desktop
+CPU: 8086 at 4.77 or 7.16MHz
+RAM: depending on the mainboard version, the RAM can be 64KB-256KB
+     or up to 640KB
+Video: CGA/Hercules or EGA
+On board: ser, par, Bus mouse (c model)
+Mass storage: 1 or 2 Floppy 5,25" 360KB, optional 15MB, 20MB or 30MB HD
+
+*****************************************************************************/
+void pc_state::vpcii(machine_config &config)
+{
+	pccga(config);
+
+	i8086_cpu_device &maincpu(I8086(config.replace(), "maincpu", XTAL(14'318'181)/3)); // 4.77 MHz, Crystal needs to be verified; other examples ran at 7.16MHz
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+}
+
+ROM_START( vpcii ) // The BIOS was dumped the "MESS" way using DOS DEBUG
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROM_LOAD("victor_vpcii_bios.bin", 0xc000, 0x4000, CRC(6a214121) SHA1(5426ce641bd7dc03e8189b0a4736e0d70232335b))
+ROM_END
+
+
+/************************************************************** Frael King ***
+
+Form factor: Desktop
+CPU: NEC V20 @ 8MHz
+RAM: 256KB (King 1) or 512KB (King 2), upgradeable to 768KB
+Video: CGA (on board)
+Keyboard: 84 keys with 10 function keys
+On board: par, cass, RF out, beeper
+Mass storage: none (King 1), 720KB floppy (King 2)
+One ISA slot, riser card with 3 slots, one occupied by the floppy controller (King 2)
+
+The original HD capable FD controller needs to be emulated in order to boot the course
+disks for the IT class that the King was used for in Italy.
+The King 1 used ROM Basic, with audio cassette as mass storage.
+If you bought the King 1, you could send the computer in to the factory to have it upgraded
+to King 2 specs, they would upgrade the RAM and add the floppy drive and controller.
+No HD capable 8bit ISA Floppy controller present in MAME works with the King, so the floppy
+crive is set to DD for the time being.
+
+*****************************************************************************/
+
+void pc_state::fraking(machine_config &config)
+{
+	pccga(config);
+
+	v20_device &maincpu(V20(config.replace(), "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
+	subdevice<isa8_slot_device>("isa3")->set_default_option(nullptr);
+	subdevice<isa8_slot_device>("isa5")->set_default_option(nullptr);
+	subdevice<ram_device>(RAM_TAG)->set_default_size("768K");
+}
+
+ROM_START( fraking ) // boots but doesn't fall back to ROM BASIC
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "3.40", "3.40")
+	ROMX_LOAD("king3-40.rom", 0x00000, 0x20000, CRC(7d64186c) SHA1(6e3c0d836903bda8c2512fde3bb2ba432705ce27), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "3.42", "3.42")
+	ROMX_LOAD("king3-42.rom", 0x00000, 0x20000, CRC(7c040fda) SHA1(c5aaa795d773d41c086a80bc43ee7200f53c3a0c), ROM_BIOS(1))
+ROM_END
+
+
+/******************************************************* MY-COM MPU-9088-VF ***
+
+*****************************************************************************/
+
+ROM_START( mpu9088vf ) // From a motherboard marked MY-COM MPU-9088-VF SAN-MS94VO
+	ROM_REGION(0x10000, "bios", 0) // ROM BASIC doesn't load
+	ROM_LOAD( "27256-mpu-9088-vf_rom2.bin", 0x6000, 0x8000, CRC(e077c7c8) SHA1(f58f57f522b48f3aa4c381afb42e04795bcfbbad))
+	ROM_LOAD( "27128-mpu-9088-vf_rom1.bin", 0xc000, 0x4000, CRC(a211e539) SHA1(1a45627fb34e38f6e3485c1526ff1d9a645c8683))
+ROM_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2129,6 +2283,7 @@ COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state,
 COMP( 1990, mc1702,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
 COMP( 198?, olystar20f,     ibm5150, 0,      olystar20f,     pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olystar 20F",           MACHINE_NOT_WORKING )
 COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1987, earthst,        ibm5150, 0,      earthst,        pccga,    pc_state, empty_init,    "Alloy",                           "EarthStation-I",        MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
@@ -2143,6 +2298,7 @@ COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state,
 COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
+COMP( 1989, fraking,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
@@ -2154,6 +2310,7 @@ COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, ledgmodd,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model D",          MACHINE_NOT_WORKING )
 COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model M",          MACHINE_NOT_WORKING )
 COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mpu9088vf,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "MY-COM",                          "MPU-9088-VF",           MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )
@@ -2169,7 +2326,9 @@ COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state,
 COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
 COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       0 )
 COMP( 1985, alphatp50,      ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P50",       0 )
+COMP( 1984, ta1700pc,       ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "TA 1700-PC",            0 )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
+COMP( 1987, vpcii,          ibm5150, 0,      vpcii,          pccga,    pc_state, empty_init,    "Victor",                          "VPC II",                MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )

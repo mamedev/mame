@@ -1,3 +1,4 @@
+local util = require("util")
 local lib = {}
 
 local function get_settings_path()
@@ -70,7 +71,7 @@ function lib:save_settings(buttons)
 	local path = get_settings_path()
 	local attr = lfs.attributes(path)
 	if not attr then
-		lfs.mkdir(path)
+		util.mkdir_recursive(path)
 	elseif attr.mode ~= 'directory' then
 		return
 	end

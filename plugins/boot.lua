@@ -1,6 +1,6 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Miodrag Milanovic
-require('lfs')
+_G.lfs = require("lfs")
 
 _G._ = emu.lang_translate
 _G.emu.plugin = {} -- table to contain plugin interfaces

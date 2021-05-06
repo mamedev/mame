@@ -1,6 +1,8 @@
 -- to use this get the package from http://greatstone.free.fr/hi2txt/
 -- extract the hi2txt.zip and place it in your history path
 
+local util = require("util")
+
 local dat = {}
 local env = {}
 local output
@@ -1206,7 +1208,7 @@ function dat.check(set, softlist)
 		local scrpath = path:match("[^;]*") .. "/"
 		local scrfile = io.open(scrpath .. set .. ".lua", "w+")
 		if not scrfile then
-			lfs.mkdir(scrpath)
+			util.mkdir_recursive(scrpath)
 			scrfile = io.open(scrpath .. set .. ".lua", "w+")
 		end
 		if scrfile then

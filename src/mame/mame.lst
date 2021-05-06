@@ -988,8 +988,8 @@ spikes91                        // bootleg
 spikes91b                       // bootleg
 spinlbrk                        // (c) 1990 V-System Co. (World)
 spinlbrkj                       // (c) 1990 V-System Co. (Japan)
-spinlbrkjp                      // (c) 1990 V-System Co. (Japan, prototype)
 spinlbrku                       // (c) 1990 V-System Co. (US)
+spinlbrkup                      // (c) 1990 V-System Co. (US, prototype)
 svolly91                        // (c) 1991 Video System Co. (Japan)
 turbofrc                        // (c) 1991 Video System Co.
 turbofrco                       // (c) 1991 Video System Co.
@@ -1335,8 +1335,9 @@ amspdwya                        // no copyright notice, but (c) 1987 Enerdyne Te
 @source:amstr_pc.cpp
 pc20                            // 1988 Amstrad PC20
 pc200                           // 1988 Sinclair PC200
-pc2086                          //
-pc3086                          //
+pc2086                          // Amstrad PC2086
+pc3086                          // Amstrad PC3086
+pc5086                          // Amstrad PC5086
 ppc512                          // 1987 Amstrad PPC512
 ppc640                          // 1987 Amstrad PPC640
 
@@ -10270,9 +10271,11 @@ ccmk2a                          //
 chmate                          //
 
 @source:chessmst.cpp
-chessmst                        //
-chessmsta                       //
-chessmstdm                      //
+chessmst
+chessmsta
+
+@source:chessmstdm.cpp
+chessmstdm
 
 @source:chexx.cpp
 chexx83                         // 1983 ICE
@@ -13412,6 +13415,7 @@ exl100                          //
 @source:exerion.cpp
 exerion                         // (c) 1983 Jaleco
 exerionb                        // bootleg
+exerionb2                       // bootleg
 exeriont                        // (c) 1983 Jaleco + Taito America license
 irion                           //
 
@@ -16604,6 +16608,7 @@ sscopeb                         // GX830 (c)1999
 sscopec                         // GX830 (c)1999
 terabrst                        // GX715 (c)1998 USA UEL 1998/07/17
 terabrsta                       // GX715 (c)1998 Asia AAA 1998/02/25
+thrilldbu                       // GE713UF (c)1998 ?AB
 
 @source:hotblock.cpp
 hotblock                        // (c) 1993 Nics? / NIX?
@@ -17192,6 +17197,7 @@ shufshot138                     // (c) Strata/Incredible Technologies
 shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill100                     // (c) 1992 Strata/Incredible Technologies
+timekill120                     // (c) 1992 Strata/Incredible Technologies
 timekill121                     // (c) 1992 Strata/Incredible Technologies
 timekill121a                    // (c) 1992 Strata/Incredible Technologies
 timekill131                     // (c) 1992 Strata/Incredible Technologies
@@ -17507,11 +17513,11 @@ j6arcadeb                       //
 j6arcadec                       //
 j6arcaded                       //
 j6arcadee                       //
+j6arcadef                       //
 j6arcadeg                       //
 j6arcadeh                       //
 j6arcadei                       //
 j6arcadej                       //
-j6arcadek                       //
 j6bags                          // Three Bags Full (JPM)
 j6bbankr                        // Big Banker (Crystal)
 j6big50                         // Big 50 (JPM)
@@ -19625,13 +19631,13 @@ turboex
 
 @source:leapfrog_leappad.cpp
 leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprises, Inc.
-leappadca                       // (c) 2004 LeapFrog
 mfleappad                       // (c) 2002 LeapFrog
-mfleappadus                     // (c) 2004 LeapFrog
-ltleappad
+ltleappad                       // (c) 2005 LeapFrog
 
 @source:leapster.cpp
 leapster                        //
+leapster2                       //
+leapsterlmx                     //
 leapstertv                      //
 
 @source:learnwin.cpp
@@ -33094,7 +33100,6 @@ racingj2j                       // GX888 (c)1999 (JAE)
 thrilld                         // GX713 (c)1998 Japan JAE
 thrilldb                        // GX713 (c)1998 Japan JAB
 thrilldbe                       // GX713 (c)1998 Europe EAB
-thrilldbu                       // GX713 (c)1998 ?AB
 
 @source:nycaptor.cpp
 bronx                           // bootleg
@@ -33562,11 +33567,16 @@ nms9100                         // Philips NMS 9100 series
 to16                            // Thomson TO16
 alphatp10                       // Triumph-Adler Alphatronic P10
 alphatp50                       // Triumph-Adler Alphatronic P50
+ta1700pc                        // Triumph-Adler TA 1700-PC
 sergeysxt                       // Sergey's XT
 xiprocessor                     // Xi processor board
 micro88                         // Micro 8088
 mononuxt                        // monotech NuXT
 mononuxt2                       // monotech NuXT v2
+earthst                         // Alloy EarthStation-I
+vpcii                           // Victor VPC II
+fraking                         // Frael King
+mpu9088vf                       // MY-COM MPU-9088-VF SAN-MS94VO
 
 @source:pc100.cpp
 pc100                           //
@@ -35419,6 +35429,9 @@ psionxp                         //
 
 @source:psion5.cpp
 psion5mx                        //
+
+@source:psrockman.cpp
+psrockmn                        //
 
 @source:psx.cpp
 psa                             // 1995 Sony PlayStation (Asia-Pacific)

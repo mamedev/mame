@@ -3914,35 +3914,35 @@ ROM_END
 // this differs by 2 bytes from arca10_2.bin, and fails checksum test
 //ROM_LOAD16_BYTE( "arcadia.p2",   0x000001, 0x020000, CRC(1533ea6f) SHA1(0dff53bcee961781312eb108cd705664f772ce1d) )
 
-ROM_START( j6arcadeg )
+ROM_START( j6arcadef )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "arca10a1.bin", 0x000000, 0x020000, CRC(1ea7eeff) SHA1(8b8a1b0543d53d95fd2fd44add1114c6ad48b6c7) )
 	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
 	j6arcade_sound
 ROM_END
 
-ROM_START( j6arcadeh )
+ROM_START( j6arcadeg )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "arca10n1.bin", 0x000000, 0x020000, CRC(7d55965a) SHA1(96ca11708bbba84ccbb0c43b6ddaca8c9285ffb8) )
 	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
 	j6arcade_sound
 ROM_END
 
-ROM_START( j6arcadei )
+ROM_START( j6arcadeh )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "arca10np.bin", 0x000000, 0x020000, CRC(96cbc262) SHA1(0fdb783443240db94bf22a09f2177de958a2ecfe) )
 	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
 	j6arcade_sound
 ROM_END
 
-ROM_START( j6arcadej )
+ROM_START( j6arcadei )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "arca10p1.bin", 0x000000, 0x020000, CRC(a7fd7aa6) SHA1(9f083900ee50d1669f23eecc7d6d7779d2a27301) )
 	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
 	j6arcade_sound
 ROM_END
 
-ROM_START( j6arcadek )
+ROM_START( j6arcadej )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF ) // overdumps? might be useful to verify which p2 is correct tho
 	ROM_LOAD16_BYTE( "arcadiaarca10-1.bin", 0x000000, 0x080000, CRC(998ae103) SHA1(cabbd7ec8dcaf5107de0c23a8d67680254acbe5d) )
 	ROM_LOAD16_BYTE( "arcadiaarca10-2.bin", 0x000001, 0x080000, CRC(98c15e57) SHA1(3207c9760ca1b9f11b24253d6c974e4efeb0c46c) )
@@ -12009,12 +12009,12 @@ GAME(  199?, j6wildwe,     j6wildw,    impact_nonvideo, j6wildw, jpmimpct_state,
 GAME(  199?, j6wildwf,     j6wildw,    impact_nonvideo, j6wildw, jpmimpct_state, empty_init, ROT0, "Ace", "Wild West (Ace) (IMPACT) (set 7)", GAME_FLAGS )
 GAME(  199?, j6wildwg,     j6wildw,    impact_nonvideo, j6wildw, jpmimpct_state, empty_init, ROT0, "Ace", "Wild West (Ace) (IMPACT) (set 8, Whitbread)", GAME_FLAGS )
 
-GAMEL( 199?, j6wizard,     0,          impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 C 8) (set 1)", GAME_FLAGS, layout_j6wizardd )
-GAMEL( 199?, j6wizarda,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7P C 8) (set 2, Protocol)", GAME_FLAGS, layout_j6wizardd )
-GAMEL( 199?, j6wizardb,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 AC 8) (set 3)", GAME_FLAGS, layout_j6wizardd )
-GAMEL( 199?, j6wizardc,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 C 8) (set 4, Whitbread)", GAME_FLAGS, layout_j6wizardd )
-GAMEL( 199?, j6wizardd,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 4 C 5) (set 5)", GAME_FLAGS, layout_j6wizardd )
-GAMEL( 199?, j6wizarde,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 5 C 6) (set 6)", GAME_FLAGS, layout_j6wizardd )
+GAMEL( 199?, j6wizard,     0,          impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 C 8) (set 1)", GAME_FLAGS_WORKING, layout_j6wizardd )
+GAMEL( 199?, j6wizarda,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7P C 8) (set 2, Protocol)", GAME_FLAGS_WORKING, layout_j6wizardd )
+GAMEL( 199?, j6wizardb,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 AC 8) (set 3)", GAME_FLAGS_WORKING, layout_j6wizardd )
+GAMEL( 199?, j6wizardc,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 7 C 8) (set 4, Whitbread)", GAME_FLAGS_WORKING, layout_j6wizardd )
+GAMEL( 199?, j6wizardd,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 4 C 5) (set 5)", GAME_FLAGS_WORKING, layout_j6wizardd )
+GAMEL( 199?, j6wizarde,    j6wizard,   impact_nonvideo, j6wizard, jpmimpct_state, empty_init, ROT0, "JPM", "Wizard Of Odds (JPM) (IMPACT) (WZ 5 C 6) (set 6)", GAME_FLAGS_WORKING, layout_j6wizardd )
 
 GAME(  199?, j6hikar,      0,          impact_nonvideo, j6hikar, jpmimpct_state, empty_init, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6hikara,     j6hikar,    impact_nonvideo, j6hikar, jpmimpct_state, empty_init, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
@@ -12093,19 +12093,19 @@ GAME(  199?, j6tutti,      0,          impact_nonvideo, jpmimpct_non_video_input
 
 GAME(  199?, j6acehi,      0,          impact_nonvideo, j6acehi, jpmimpct_state, empty_init, ROT0, "Ace", "Aces High (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6arcade,     0,          impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadea,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadec,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
-GAMEL( 199?, j6arcaded,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadee,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeg,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadeh,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
-GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5, Protocol)", GAME_FLAGS, layout_j6arcadee )
-GAMEL( 199?, j6arcadek,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6, Protocol)", GAME_FLAGS, layout_j6arcadee )
+GAMEL( 199?, j6arcade,     0,          impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR9 C10, V9, set 1)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadea,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR9 A C10, V9, set 2)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadeb,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR9 C10, V9, set 3)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadec,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR9 P, V9, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
+GAMEL( 199?, j6arcaded,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR9 P C10, V9, set 5, Protocol)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadee,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 C11, V10, set 1, Protocol)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadef,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 A C11, V10, set 2, Protocol)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadeg,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 C11, V10, set 3, Protocol)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadeh,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 P, V10, set 4, Protocol)", GAME_FLAGS, layout_j6arcadee ) // gives error 71 00 even with datapak attached?
+GAMEL( 199?, j6arcadei,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 P C11, V10, set 5, Protocol)", GAME_FLAGS_WORKING, layout_j6arcadee )
+GAMEL( 199?, j6arcadej,    j6arcade,   impact_nonvideo, j6arcade, jpmimpct_state, empty_init, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (AR10 C11, V10, set 6, Protocol?)", GAME_FLAGS_WORKING, layout_j6arcadee )
 
-GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh )
+GAMEL( 199?, j6colcsh,     0,          impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6colcsh ) //inputs
 GAMEL( 199?, j6colcsha,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colcshb,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6colcsh )
 GAMEL( 199?, j6colcshc,    j6colcsh,   impact_nonvideo, j6colcsh, jpmimpct_state, empty_init, ROT0, "JPM", "Coliseum Cash (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6colcsh )

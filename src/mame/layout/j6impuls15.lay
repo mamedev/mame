@@ -161,8 +161,7 @@
 	</element>
 	<element name="lamp_109_1" defstate="0">
 		<rect state="1">
-			<color red="0.50" green="0.50" blue="0.50">
-			</color>
+			<color red="0.50" green="0.50" blue="0.50"/>
 		</rect>
 		<rect state="0">
 			<color red="0.13" green="0.13" blue="0.13"/>

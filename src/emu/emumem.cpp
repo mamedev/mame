@@ -309,8 +309,6 @@ void memory_manager::initialize()
 		allocate(memory);
 	}
 
-	allocate(m_machine.m_dummy_space);
-
 	// construct and preprocess the address_map for each space
 	for (auto const memory : memories)
 		memory->prepare_maps();
