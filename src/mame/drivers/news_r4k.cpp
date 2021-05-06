@@ -336,6 +336,7 @@ void news_r4k_state::machine_common(machine_config &config)
     // SONIC ethernet controller
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
+
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>)); // TODO: WSC-SONIC might do some interrupt processing
     m_sonic->set_bus(m_sonic3, 1);
@@ -466,10 +467,12 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
-    // Note: for this to work, line 411 in upd765.cpp must be commented out. The NEWS monitor ROM uses that bit as some kind of
-    // ready signal even though the documentation for the chip says it is used for a second drive. It must be clear for the 5000X.
-    // I need to find a way to patch that behavior for this machine only, maybe by intercepting `sra` reads.
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
+
+    // The NEWS monitor ROM FDC routines won't run if DRV2 is inactive.
+    // Why, I'm not sure yet, because the 5000X only has a single floppy drive.
+    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset) { return m_fdc->sra_r() & ~0x40; })).umask32(0x000000ff);
+
     //map(0x1ed60200, 0x1ed60207).noprw(); // TODO: Floppy aux registers
     map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset) { return 0x1; }));
 

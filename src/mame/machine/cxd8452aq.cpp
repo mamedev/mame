@@ -34,8 +34,8 @@ device_memory_interface::space_config_vector cxd8452aq_device::memory_space_conf
 {
     // Uses the same trick that the Jazz MCT-ADR driver uses to translate accesses from the SONIC to the system bus
 	return space_config_vector{
-		std::make_pair(0, &sonic_config),
-		std::make_pair(1, &main_bus_config)
+		std::make_pair(0, &main_bus_config),
+		std::make_pair(1, &sonic_config)
 	};
 }
 
@@ -53,13 +53,15 @@ void cxd8452aq_device::sonic_bus_map(address_map &map)
 
 uint32_t cxd8452aq_device::sonic_r(offs_t offset, uint32_t mem_mask)
 {
-    offset &= 0xfff00000;// get rid of upper order bits
+    offset &= ~0xffff0000; // get rid of upper order bits
+    offset |= 0x1e620000; // Convert to NWS-5000X address
     return space(0).read_dword(offset, mem_mask);
 }
 
 void cxd8452aq_device::sonic_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-    offset &= 0xfff00000;// get rid of upper order bits
+    offset &= ~0xffff0000; // get rid of upper order bits
+    offset |= 0x1e620000; // Convert to NWS-5000X address
 	space(0).write_dword(offset, data, mem_mask);
 }
 

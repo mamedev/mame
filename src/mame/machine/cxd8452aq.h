@@ -31,8 +31,8 @@ public:
 
     void map(address_map &map);
 
-    uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(0).read_word(offset, mem_mask); }
-	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(0).write_word(offset, data, mem_mask); }
+    uint32_t cpu_r(offs_t offset, uint32_t mem_mask) { return space(0).read_dword(offset, mem_mask); }
+	void cpu_w(offs_t offset, uint32_t data, uint32_t mem_mask) { space(0).write_dword(offset, data, mem_mask); }
 
 protected:
     // overrides
