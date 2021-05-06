@@ -803,4 +803,111 @@ between them.
 		</part>
 	</software>
 
+	<software name="raakatu1">
+		<description>Raaka-tu (1)</description>
+		<year>1981</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3e5e">
+				<rom name="raakatu1.cmd" size="0x3e5e" crc="6c39826f" sha1="93b815ba2c0e7c2e66e93c6fb4e1f3be1bd010ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raakatu2">
+		<description>Raaka-tu (2)</description>
+		<year>1981</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x411c">
+				<rom name="raakatu2.cmd" size="0x411c" crc="173f98df" sha1="639a5b548ce34e548aa020e3d766b33ac8142c2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raakatu3">
+		<description>Raaka-tu (3)</description>
+		<year>1981</year>
+		<publisher>Radio Shack</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="raakatu3.cmd" size="0x3f00" crc="74909b30" sha1="9870e3d13e2a57dee94e0414b18284fe3cd25e22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrivet1">
+		<description>Revenge of Rivet Race (1)</description>
+		<year>1983</year>
+		<publisher>Quality Software and Consulting Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x6300">
+				<rom name="rrivet1.cmd" size="0x6300" crc="c8a067fc" sha1="d1a1a68b5da4ec6dfe19ec0d44a4b5040e268ab6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrivet2">
+		<description>Revenge of Rivet Race (2)</description>
+		<year>1983</year>
+		<publisher>Quality Software and Consulting Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x6300">
+				<rom name="rrivet2.cmd" size="0x6300" crc="87657fb0" sha1="9c239c626b238a39de21ab992c2f31b372ff82a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrivet3">
+		<description>Revenge of Rivet Race (3)</description>
+		<year>1983</year>
+		<publisher>Quality Software and Consulting Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x6218">
+				<rom name="rrivet3.cmd" size="0x6218" crc="45d02007" sha1="135012ec6b686ad3f04f42b8badcecb0e55f7b03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sraiders">
+		<description>Space Raiders</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="When asked to enter the password, press any key" />
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x42be">
+				<rom name="sraiders.cmd" size="0x42be" crc="d9b853a1" sha1="ebf4bcb5d53a557029a38d9e1460a5f0f2e2a8ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trollsg">
+		<description>Trolls Gold</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="When asked to PRESS ENTER? type something then hit Enter" />
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3c6f">
+				<rom name="trollsg5.cmd" size="0x3c6f" crc="fc9d3b2d" sha1="25cac341cee06876ddc71a9043c08174ce27319d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsman">
+		<description>TRS MAN</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2f00">
+				<rom name="trsman.cmd" size="0x2f00" crc="b1ff2077" sha1="1c3c1ac00c80464b26cf31597f5451df1779b055"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
