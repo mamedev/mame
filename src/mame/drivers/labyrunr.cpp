@@ -16,7 +16,7 @@
 
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 #include "speaker.h"
 

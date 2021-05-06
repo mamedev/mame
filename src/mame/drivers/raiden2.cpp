@@ -175,8 +175,8 @@ Protection Notes:
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "machine/r2crypt.h"
 
 #include "debugger.h"

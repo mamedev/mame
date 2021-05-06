@@ -24,7 +24,7 @@
 #include "machine/clock.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 

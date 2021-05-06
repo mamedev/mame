@@ -542,7 +542,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
 #include "sound/rf5c68.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #include "layout/generic.h"

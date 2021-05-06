@@ -547,7 +547,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "finallap.lh"

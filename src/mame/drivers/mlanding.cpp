@@ -57,7 +57,7 @@
 #include "machine/z80ctc.h"
 #include "machine/taitoio_yoke.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"

@@ -72,7 +72,7 @@ Updates:
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/samples.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 #include "ymfm/src/ymfm.h"
 

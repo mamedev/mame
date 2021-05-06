@@ -43,7 +43,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"

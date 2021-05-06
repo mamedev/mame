@@ -13,7 +13,7 @@
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"

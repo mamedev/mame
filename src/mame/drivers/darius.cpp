@@ -138,7 +138,7 @@ sounds.
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

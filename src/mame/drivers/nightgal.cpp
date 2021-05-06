@@ -30,7 +30,7 @@ TODO:
 #include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "emupal.h"

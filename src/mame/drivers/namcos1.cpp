@@ -339,7 +339,7 @@ C - uses sub board with support for player 3 and 4 controls
 #include "includes/namcos1.h"
 
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

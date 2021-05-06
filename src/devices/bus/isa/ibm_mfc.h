@@ -16,7 +16,7 @@
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

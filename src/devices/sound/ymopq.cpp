@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ym3806.h"
+#include "ymopq.h"
 
 
 DEFINE_DEVICE_TYPE(YM3806, ym3806_device, "ym3806", "YM3806 OPN")

@@ -87,7 +87,7 @@
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

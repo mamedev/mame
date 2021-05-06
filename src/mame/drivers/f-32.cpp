@@ -31,7 +31,7 @@ f5
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

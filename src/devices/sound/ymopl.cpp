@@ -2,18 +2,118 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ym2413.h"
+#include "ymopl.h"
 
 
-DEFINE_DEVICE_TYPE(YM2413, ym2413_device, "ym2413", "YM2413 OPLL")
-DEFINE_DEVICE_TYPE(YM2423, ym2423_device, "ym2423", "YM2423 OPLL-X")
-DEFINE_DEVICE_TYPE(YMF281, ymf281_device, "ymf281", "YMF281 OPLLP")
-DEFINE_DEVICE_TYPE(DS1001, ds1001_device, "ds1001", "Yamaha DS1001 / Konami 053982")
+//*********************************************************
+//  YM3526 DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YM3526, ym3526_device, "ym3526", "YM3526 OPL")
+
+//-------------------------------------------------
+//  ym3526_device - constructor
+//-------------------------------------------------
+
+ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ym3526>(mconfig, tag, owner, clock, YM3526)
+{
+}
+
+
+
+//*********************************************************
+//  Y8950 DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL MSX-Audio")
+
+//-------------------------------------------------
+//  y8950_device - constructor
+//-------------------------------------------------
+
+y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::y8950>(mconfig, tag, owner, clock, Y8950),
+	device_rom_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  rom_bank_updated - refresh the stream if the
+//  ROM banking changes
+//-------------------------------------------------
+
+void y8950_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
+//  ymfm_adpcm_b_read - callback to read data for
+//  the ADPCM-B engine; in this case, from our
+//  default address space
+//-------------------------------------------------
+
+uint8_t y8950_device::ymfm_adpcm_b_read(uint32_t offset)
+{
+	return read_byte(offset);
+}
+
+
+//-------------------------------------------------
+//  ymfm_adpcm_b_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
+//-------------------------------------------------
+
+void y8950_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
+{
+	space().write_byte(offset, data);
+}
+
+
+
+//*********************************************************
+//  YM3812 DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YM3812, ym3812_device, "ym3812", "YM3812 OPL2")
+
+//-------------------------------------------------
+//  ym3812_device - constructor
+//-------------------------------------------------
+
+ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ym3812>(mconfig, tag, owner, clock, YM3812)
+{
+}
+
+
+
+//*********************************************************
+//  YMF262 DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
+
+//-------------------------------------------------
+//  ymf262_device - constructor
+//-------------------------------------------------
+
+ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ymf262>(mconfig, tag, owner, clock, YMF262)
+{
+}
+
 
 
 //*********************************************************
 //  YM2413 DEVICE
 //*********************************************************
+
+DEFINE_DEVICE_TYPE(YM2413, ym2413_device, "ym2413", "YM2413 OPLL")
 
 //-------------------------------------------------
 //  ym2413_device - constructor
@@ -61,6 +161,8 @@ const tiny_rom_entry *ym2413_device::device_rom_region() const
 //  YM2423 DEVICE (OPLL-X)
 //*********************************************************
 
+DEFINE_DEVICE_TYPE(YM2423, ym2423_device, "ym2423", "YM2423 OPLL-X")
+
 //-------------------------------------------------
 //  ym2423_device - constructor
 //-------------------------------------------------
@@ -107,6 +209,8 @@ const tiny_rom_entry *ym2423_device::device_rom_region() const
 //  YMF281 DEVICE (OPLLP)
 //*********************************************************
 
+DEFINE_DEVICE_TYPE(YMF281, ymf281_device, "ymf281", "YMF281 OPLLP")
+
 //-------------------------------------------------
 //  ymf281_device - constructor
 //-------------------------------------------------
@@ -152,6 +256,8 @@ const tiny_rom_entry *ymf281_device::device_rom_region() const
 //*********************************************************
 //  DS1001 DEVICE (Konami VRC7)
 //*********************************************************
+
+DEFINE_DEVICE_TYPE(DS1001, ds1001_device, "ds1001", "Yamaha DS1001 / Konami 053982")
 
 //-------------------------------------------------
 //  ds1001_device - constructor

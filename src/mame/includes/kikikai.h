@@ -4,7 +4,7 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/m6800/m6801.h"
 
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 

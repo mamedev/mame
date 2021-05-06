@@ -2,16 +2,14 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ym2151.h"
-
-
-DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "YM2151 OPM")
-DEFINE_DEVICE_TYPE(YM2164, ym2164_device, "ym2164", "YM2164 OPP")
+#include "ymopm.h"
 
 
 //*********************************************************
 //  YM2151 DEVICE
 //*********************************************************
+
+DEFINE_DEVICE_TYPE(YM2151, ym2151_device, "ym2151", "YM2151 OPM")
 
 //-------------------------------------------------
 //  ym2151_device - constructor
@@ -70,6 +68,8 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 //*********************************************************
 //  YM2164 DEVICE
 //*********************************************************
+
+DEFINE_DEVICE_TYPE(YM2164, ym2164_device, "ym2164", "YM2164 OPP")
 
 //-------------------------------------------------
 //  ym2164_device - constructor

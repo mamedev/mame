@@ -95,8 +95,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
-#include "sound/ym3812.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "speaker.h"
 
