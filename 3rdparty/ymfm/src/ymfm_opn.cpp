@@ -525,6 +525,18 @@ void ym2149::write(uint32_t offset, uint8_t data)
 
 
 //-------------------------------------------------
+//  generate - generate one sample of FM sound
+//-------------------------------------------------
+
+void ym2149::generate(int32_t output[OUTPUTS])
+{
+	// no FM output, just send 0
+	for (int index = 0; index < OUTPUTS; index++)
+		output[index] = 0;
+}
+
+
+//-------------------------------------------------
 //  generate_ssg - generate one sample of SSG
 //  sound
 //-------------------------------------------------

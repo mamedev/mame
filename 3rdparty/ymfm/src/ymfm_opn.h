@@ -233,9 +233,12 @@ using opna_registers = opn_registers_base<true>;
 
 // ======================> ym2149
 
+// ym2149 is just an SSG with no FM part, but we expose FM-like parts so that it
+// integrates smoothly with everything else; they just don't do anything
 class ym2149
 {
 public:
+	static constexpr uint32_t OUTPUTS = ssg_engine::OUTPUTS;
 	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
 
 	// constructor
@@ -251,6 +254,7 @@ public:
 	void save_restore(ymfm_saved_state &state);
 
 	// pass-through helpers
+	uint32_t sample_rate(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER / 8; }
 	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER; }
 
 	// read access
@@ -263,6 +267,7 @@ public:
 	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
+	void generate(int32_t output[OUTPUTS]);
 	void generate_ssg(int32_t output[SSG_OUTPUTS]);
 
 protected:
