@@ -11,6 +11,14 @@
 #include "emu.h"
 #include "iwm.h"
 
+#define LOG_CONTROL (1 << 1U)
+#define LOG_MODE    (1 << 2U)
+#define VERBOSE     0
+#include "logmacro.h"
+
+#define LOGCNTRL(...) LOGMASKED(LOG_CONTROL, __VA_ARGS__)
+#define LOGMODE(...)  LOGMASKED(LOG_MODE,    __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(IWM, iwm_device, "iwm", "Apple IWM floppy controller")
 
 iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock) :
@@ -106,7 +114,7 @@ void iwm_device::set_floppy(floppy_image_device *floppy)
 	sync();
 	flush_write();
 
-	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
+	LOG("floppy %s\n", floppy ? floppy->tag() : "-");
 
 	if(m_floppy && (m_control & 0x10))
 		m_floppy->mon_w(true);
@@ -255,7 +263,7 @@ u8 iwm_device::control(int offset, u8 data)
 		if(s == 0xc0 && m_active)
 			slot = "write load / write data";
 
-		logerror("%s control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
+		LOGCNTRL("%s control %c%c %c%c %c%c%c%c (%s) [%s, %s] whd=%02x data=%02x\n",
 				 machine().time().to_string(),
 				 m_control & 0x80 ? '1' : '0',
 				 m_control & 0x40 ? '1' : '0',
@@ -288,7 +296,7 @@ void iwm_device::mode_w(u8 data)
 {
 	m_mode = data;
 	m_status = (m_status & 0xe0) | (data & 0x1f);
-	logerror("mode %02x%s%s%s%s%s%s%s\n", m_mode,
+	LOGMODE("mode %02x%s%s%s%s%s%s%s\n", m_mode,
 			 m_mode & 0x80 ? " b7" : "",
 			 m_mode & 0x40 ? " mz-reset" : "",
 			 m_mode & 0x20 ? " test" : " normal",
