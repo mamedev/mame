@@ -19,11 +19,11 @@ All Platforms
   difficult to troubleshoot problems.
 
 * If you want to add various additional tools to the compile, such as
-  *CHDMAN*, add a **TOOLS=1** to your make statement, like
+  *chdman*, add a **TOOLS=1** to your make command, like
   **make REGENIE=1 TOOLS=1**
 
 * You can do driver specific builds by using *SOURCES=<driver>* in your
-  make statement.  For instance, building Pac-Man by itself would be
+  make command.  For instance, building Pac-Man by itself would be
   **make SOURCES=src/mame/drivers/pacman.cpp REGENIE=1** including the
   necessary *REGENIE* for rebuilding the settings.
 
@@ -33,7 +33,7 @@ All Platforms
   An excessive number of concurrent jobs may increase compilation time.
   The optimal number depends on many factors, including number of CPU
   cores, available RAM, disk and filesystem performance, and memory
-  bandwidh.* For instance, **make -j5** is a good starting point on a
+  bandwidth.* For instance, **make -j5** is a good starting point on a
   system with a quad-core CPU.
 
 * Debugging information can be added to a compile using *SYMBOLS=1*
@@ -160,7 +160,11 @@ Building with Microsoft Visual Studio
 * Adding **MSBUILD=1** to the make options will build the solution using
   the Microsoft Build Engine after generating the project files.  Note that this
   requires paths and environment variables to be configured so the correct
-  Visual Studio tools can be located.
+  Visual Studio tools can be located; please refer to the Microsoft-provided
+  instructions on `using the Microsoft C++ toolset from the command line
+  <https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line>`_.
+  You may find it easier to not use **MSBUILD=1** and load the project file into
+  Visual Studio’s GUI for compilation.
 * The MSYS2 environment is still required to generate the project files, convert
   built-in layouts, compile UI translations, etc.
 
@@ -264,7 +268,8 @@ Apple macOS
 -----------
 
 You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
-Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
+Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
+need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
 
 * Install **Xcode** from the Mac App Store or `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
 * To find the corresponding Xcode for your MacOS release please visit `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of Xcode available to you.
@@ -275,9 +280,13 @@ Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
 
 Next you’ll need to get SDL2 installed.
 
-* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *Mac OS X* .dmg file
-* If the .dmg doesn’t auto-open, open it
-* Click “Macintosh HD” (your Mac’s hard disk) in the Locations sidebar of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder. You will have to authenticate with your user password.
+* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the
+  *macOS* .dmg file
+* If the .dmg doesn’t open automatically, open it
+* Click “Macintosh HD” (or whatever your Mac’s hard disk is named) in the left
+  pane of a **Finder** window, then open the **Library** folder and drag the
+  **SDL2.framework** folder from the SDL disk image into the **Frameworks**
+  folder. You will have to authenticate with your user password.
 
 Lastly to begin compiling, use Terminal to navigate to where you have the MAME
 source tree (*cd* command) and follow the normal compilation instructions from
@@ -290,13 +299,13 @@ Emscripten Javascript and HTML
 ------------------------------
 
 First, download and install Emscripten 1.37.29 or later by following the
-instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_
+instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_.
 
 Once Emscripten has been installed, it should be possible to compile MAME
-out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME compile
-is too large to load into a web browser at once, you will want to use the
-**SOURCES** parameter to compile only a subset of the project, e.g. (in the mame
-directory):
+out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME
+compile is too large to load into a web browser at once, you will want to use
+the SOURCES parameter to compile only a subset of the project, e.g. (in the
+MAME directory):
 
 .. code-block:: bash
 
@@ -316,12 +325,12 @@ The value of the **SUBTARGET** parameter serves only to differentiate multiple
 builds and need not be set to any specific value.
 
 Emscripten supports compiling to WebAssembly with a JavaScript loader instead of
-all-JavaScript, and in later versions this is actually the default.  To force
+all-JavaScript, and in later versions this is actually the default. To force
 WebAssembly on or off, add **WEBASSEMBLY=1** or **WEBASSEMBLY=0** to the make
-command line.
+command line, respectively.
 
-Other make parameters can also be used, e.g. **-j** for parallel compilation, as
-described earlier.
+Other make parameters can also be used, e.g. **-j** for multithreaded
+compilation as described earlier.
 
 When the compilation reaches the emcc phase, you may see a number of
 *"unresolved symbol"* warnings.  At the moment, this is expected for
@@ -335,7 +344,8 @@ not used at run-time.
 If all goes well, a **.js** file will be output to the current directory.  This
 file cannot be run by itself, but requires an HTML loader to provide it with a
 canvas to draw to and to pass in command-line parameters.  The
-`Emularity project <https://github.com/db48x/emularity>`_ provides such a loader.
+`Emularity project <https://github.com/db48x/emularity>`_ provides such a
+loader.
 
 There are example **.html** files in that repository which can be edited to
 point to your newly compiled MAME **.js** file and pass in whatever parameters
@@ -367,36 +377,61 @@ Compiling the Documentation
 Compiling the documentation will require you to install several packages
 depending on your operating system.
 
-On Debian/Ubuntu flavors of Linux, you’ll need python3-sphinx/python-sphinx
-and the python3-pip/python-pip packages, depending on whether you’re using
-Python 3 or Python 2::
+.. _compiling-docs-windows:
+
+Compiling the Documentation on Microsoft Windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On Windows, you’ll need a couple of packages from the MSYS2 environment. You
+can install these packages with
+
+.. code-block:: bash
+
+    pacman -S mingw-w64-x86_64-librsvg mingw-w64-x86_64-python-sphinx mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter
+
+Note that no LaTeX packages currently exist for MSYS2 so you will not be able to
+generate a PDF file without using external tools.
+
+.. _compiling-docs-debian:
+
+Compiling the Documentation on Debian and Ubuntu
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On Debian/Ubuntu flavors of Linux, you’ll need **python3-sphinx/python-sphinx**
+and the **python3-pip/python-pip** packages:
+
+.. code-block:: bash
 
     sudo apt-get install python3-sphinx python3-pip
-
-or::
-
-    sudo apt-get install python-sphinx python-pip
-
-You’ll then need to install the SVG handler::
-
     pip3 install sphinxcontrib-svg2pdfconverter
 
-or::
+or
 
+.. code-block:: bash
+
+    sudo apt-get install python-sphinx python-pip
     pip install sphinxcontrib-svg2pdfconverter
 
 depending on whether you’re using Python 3 or Python 2.
 
-If you intend on making a PDF via LaTeX, you’ll need to install a LaTeX
-distribution such as TeX Live::
+On Debian, you’ll need to install the **librsvg2-bin** package:
 
-    sudo apt-get install latexmk texlive texlive-science texlive-formats-extra
+.. code-block:: bash
 
-From this point, you can do **make html** or **make latexpdf** from the docs
-folder to generate the output of your choice.  Typing **make** by itself will
-tell you all available formats.  The output will be in the docs/build folder in
-a subfolder based on the type chosen (e.g. **make html** will create
-*docs/build/html* containing the output).
+    sudo apt-get install librsvg2-bin
+
+If you intend to make a PDF via LaTeX, you’ll need to install a LaTeX
+distribution such as TeX Live:
+
+.. code-block:: bash
+
+    sudo apt-get install librsvg2-bin latexmk texlive texlive-science texlive-formats-extra
+
+From this point you can do ``make html`` or ``make latexpdf`` from the **docs**
+folder to generate the output of your choice. Typing ``make`` by itself will
+tell you all available formats. The output will be in the docs/build folder in
+a subfolder based on the type chosen (e.g. ``make html`` will create
+*docs/build/html* with the output.)
 
 
 .. _compiling-options:
@@ -464,7 +499,7 @@ NO_USE_PORTAUDIO
    Set to **1** to disable building the PortAudio sound output module.
 USE_QTDEBUG
    Set to **1** to include the Qt debugger on platforms where it’s not built by
-   default (e.g. Windows or MacOS), or to **0** to disable it.  You’ll need to
+   default (e.g. Windows or macOS), or to **0** to disable it.  You’ll need to
    install Qt development libraries and tools to build the Qt debugger.  The
    process depends on the platform.
 
