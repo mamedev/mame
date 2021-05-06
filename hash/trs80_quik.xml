@@ -18,6 +18,9 @@ Quickloads cannot be used on trs80m4 due to memory issues.
 A CMD file is an executable file found on TRS-80 floppy disks. Some don't require a disk to work,
 simply needing a Level 2-based machine to run on. That is what you'll find in this list.
 
+Note: references to different versions are not real version numbers. It's just to differentiate
+between them.
+
 -->
 <softwarelist name="trs80_quik" description="Radio Shack TRS-80 quickload">
 
@@ -30,6 +33,207 @@ simply needing a Level 2-based machine to run on. That is what you'll find in th
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv01">
+		<description>Adventureland</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3df8">
+				<rom name="adv01.cmd" size="0x3df8" crc="8e8506dd" sha1="a3ff286a9ad79b645a61af1c9267f958f88a172e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv02">
+		<description>Pirate Adventure</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="adv02.cmd" size="0x3f00" crc="f8e9e9b4" sha1="efa9b897f23a6aee03afd26e5c4bc794b23cdb81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv04a">
+		<description>Voodoo Castle (1)</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3e0b">
+				<rom name="adv04a.cmd" size="0x3e0b" crc="4492ba50" sha1="0da46f26b25305d45a217224dcc7e3e309c4916c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv04b">
+		<description>Voodoo Castle (2)</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="adv04b.cmd" size="0x3f00" crc="643bd4a5" sha1="56827cf8dc2b507480d869259ee3393cfe45259a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv05">
+		<description>The Count</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x6599">
+				<rom name="adv05.cmd" size="0x6599" crc="e4fd63c7" sha1="9d2519cf02e421bc39d7478a48a8cb3836c94577"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ashka">
+		<description>Dungeon of Ashka</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3200">
+				<rom name="ashka.cmd" size="0x3200" crc="bab98f05" sha1="9417700ce7a1a75184d339203a7d358ebaba8613"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atc1">
+		<description>Air Traffic Control (1)</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0900">
+				<rom name="atc1.cmd" size="0x0900" crc="616dc1bd" sha1="11bedf66dfe25d40c9043594034d45d706d1334c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atc3">
+		<description>Air Traffic Control (3)</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0900">
+				<rom name="atc3.cmd" size="0x0900" crc="d31119a9" sha1="68685dfe66c160adc516b77fb3f872cf8af1aa90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgam1">
+		<description>Backgammon (1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1c00">
+				<rom name="backgam1.cmd" size="0x1c00" crc="fbed2d5b" sha1="1e92b43f1181ed7a6d97df652f2546c3711a9bdf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgam2">
+		<description>Backgammon (2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1c00">
+				<rom name="backgam2.cmd" size="0x1c00" crc="04f1b0f0" sha1="9f9cdf5af20efd3fb2b0671c4c559b444532170e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgam3">
+		<description>Backgammon (3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1f00">
+				<rom name="backgam3.cmd" size="0x1f00" crc="ec206e36" sha1="99765ba3c8b82e971f75ef603b2ccd54057c144b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backgam4">
+		<description>Backgammon (4)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1b88">
+				<rom name="backgam4.cmd" size="0x1b88" crc="af951959" sha1="d579b5a744258d3f1714fc8628a6546b9306ff05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bedlam1">
+		<description>Bedlam (1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3e5e">
+				<rom name="bedlam1a.cmd" size="0x3e5e" crc="fc1480a8" sha1="49aab5528b0dd4e12673c92bdee9bc12cc3a9556"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bedlam2">
+		<description>Bedlam (2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3e80">
+				<rom name="bedlam1b.cmd" size="0x3e80" crc="6d91ee9c" sha1="338c1b6c5cf76d0e9422c3cf09ce7416031af110"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bedlam3">
+		<description>Bedlam (3)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,H,M" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4200">
+				<rom name="bedlam1c.cmd" size="0x4200" crc="f062a345" sha1="0432528a05997171a9e57a39a5f04ce2d61cb55b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakdwn">
+		<description>Breakdown</description>
+		<year>2018</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x166b">
+				<rom name="breakdwn.cmd" size="0x166b" crc="b5c9c470" sha1="c9ceee8735bf43f4cff21f6a4340fef57a19d807"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Breakout</description>
+		<year>1980</year>
+		<publisher>Software Innovations</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0a00">
+				<rom name="breakout.cmd" size="0x0a00" crc="8a6fe37d" sha1="ec122f0f3c524a07f27a1aea7b6a14fcea201ccf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakthru">
+		<description>Break Thru</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1900">
+				<rom name="breakthru.cmd" size="0x1900" crc="129fbe09" sha1="49addc723e53eadcbea318f8dd0826b5fcb111e3"/>
 			</dataarea>
 		</part>
 	</software>
