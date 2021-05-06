@@ -238,4 +238,92 @@ between them.
 		</part>
 	</software>
 
+	<software name="carace">
+		<description>Car Racer</description>
+		<year>19??</year>
+		<publisher>Software Innovations</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1600">
+				<rom name="breakthru.cmd" size="0x1600" crc="59dee7e6" sha1="03660dd4ce087508f68983de15583ff496bdb802"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caterplr1"><!-- needs [3] for correct graphics -->
+		<description>Caterpillar (1)</description>
+		<year>1982</year>
+		<publisher>Soft Sector Marketing Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2700">
+				<rom name="catr3ss1.cmd" size="0x2700" crc="2dded693" sha1="2c6f2c8d00002901ad27ef76f98751fda308bf33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caterplr3"><!-- needs [3] for correct graphics -->
+		<description>Caterpillar (3)</description>
+		<year>1982</year>
+		<publisher>Soft Sector Marketing Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2700">
+				<rom name="catr3ss3.cmd" size="0x2700" crc="c95c612d" sha1="b7aa77af9d6e469a1ba5babc94ef4560ce5d202d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmic">
+		<description>Cosmic Fighter</description>
+		<year>1980</year>
+		<publisher>Big Five Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2aac">
+				<rom name="cosmic3a.cmd" size="0x2aac" crc="455b04dc" sha1="522582ba7c3741661402ea261a80e3afbe2e058b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmici">
+		<description>Cosmic Intruders</description>
+		<year>1980</year>
+		<publisher>Software Innovations</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1300">
+				<rom name="cosmici.cmd" size="0x1300" crc="45bd2335" sha1="30d278c26852fab5d96785aeca334e60cc9a8d99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crane">
+		<description>Scrap Crane</description>
+		<year>1979</year>
+		<publisher>Device Oriented Games Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0800">
+				<rom name="crane.cmd" size="0x0800" crc="746d5257" sha1="dff9c8e137bbb4e2392947c6adebef077e2581ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crowley">
+		<description>Crowley Manor</description>
+		<year>1981</year>
+		<publisher>Adventure Int'l</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4110">
+				<rom name="crowley.cmd" size="0x4110" crc="a09d0faf" sha1="724e92efc3a2bbf0cfe3f1a7a818ced90ae8c20b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demise">
+		<description>Demise</description>
+		<year>1981</year>
+		<publisher>Acorn Software Products Inc</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x29d2">
+				<rom name="demise3.cmd" size="0x29d2" crc="18f1efc1" sha1="e849d4833ae22d734c62cf58440f0cb45b295f57"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
