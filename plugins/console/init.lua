@@ -13,8 +13,6 @@ local history_file = "console_history"
 
 local history_fullpath = nil
 
-local util = require("util")
-
 function console.startplugin()
 	local conth = emu.thread()
 	local ln_started = false
@@ -300,8 +298,7 @@ end
 setmetatable(console, {
 		     __gc = function ()
 			     if history_fullpath then
-					 util.create_parent_dirs(history_fullpath)
-					 local ln = require("linenoise")
+				     local ln = require("linenoise")
 				     ln.savehistory(history_fullpath)
 			     end
 end})

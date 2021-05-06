@@ -1,7 +1,6 @@
 local sql = require("lsqlite3")
 local datfile = {}
 local db
-local util = require("util")
 
 local function check_db(msg)
 	if db:errcode() > sql.OK then
@@ -13,10 +12,7 @@ do
 	local dbpath = emu.subst_env(mame_manager.ui.options.entries.historypath:value():match("([^;]+)"))
 	db = sql.open(dbpath .. "/history.db")
 	if not db then
-		local success, err = util.mkdir_recursive(dbpath)
-		if not success then
-			emu.print_error("Unable to create parent directories for history database: " .. err)
-		end
+		lfs.mkdir(dbpath)
 		db = sql.open(dbpath .. "/history.db")
 		if not db then
 			emu.print_error("Unable to create history.db\n")
