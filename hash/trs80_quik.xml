@@ -24,19 +24,6 @@ between them.
 -->
 <softwarelist name="trs80_quik" description="Radio Shack TRS-80 quickload">
 
-	<software name="frogger">
-		<description>Frogger</description>
-		<year>1981</year>
-		<publisher>Misosys</publisher>
-		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H" /><!-- 3: some sounds missing -->
-		<part name="quik" interface="trs80_quik">
-			<dataarea name="quik" size="0x3000">
-				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="adv01">
 		<description>Adventureland</description>
 		<year>1979</year>
@@ -322,6 +309,363 @@ between them.
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x29d2">
 				<rom name="demise3.cmd" size="0x29d2" crc="18f1efc1" sha1="e849d4833ae22d734c62cf58440f0cb45b295f57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fstroid1">
+		<description>Fasteroids (1)</description>
+		<year>1981</year>
+		<publisher>Adventureworld</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="fstroid1.cmd" size="0x3f00" crc="0c7c8b70" sha1="a614cb1458a9abd7ef8ddfb75c7204563080dd9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fstroid2">
+		<description>Fasteroids (2)</description>
+		<year>1981</year>
+		<publisher>Adventureworld</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="fstroid2.cmd" size="0x3f00" crc="694846ba" sha1="067bce8e71c07ca75fffffc85f93bea475d16a81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fstroid3">
+		<description>Fasteroids (3)</description>
+		<year>1981</year>
+		<publisher>Adventureworld</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3e26">
+				<rom name="fstroid3.cmd" size="0x3e26" crc="22b6c6ee" sha1="19b6d4eab75754c3d64cbf9204ecaeb149efc6d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flysauc1">
+		<description>Flying Saucers (1)</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1100">
+				<rom name="flysauc1.cmd" size="0x1100" crc="2b32ff4b" sha1="57cafbfdf1e83391b433be63a152a6b95027f91b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flysauc2">
+		<description>Flying Saucers (2)</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1100">
+				<rom name="flysauc2.cmd" size="0x1100" crc="d7e18e42" sha1="d4660411a6fc0ef9049d091d3450a83bb81b2948"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flysauc3">
+		<description>Flying Saucers (3)</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x140f">
+				<rom name="flysauc3.cmd" size="0x140f" crc="0fbea275" sha1="8daca361aa2ba3f6e6aaaa8247c0062a8b82f86d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flysauc4">
+		<description>Flying Saucers (4)</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0e00">
+				<rom name="flysauc4.cmd" size="0x0e00" crc="609c2f6a" sha1="ad6c3b474af38541d0885df7f423a6987ed3ad95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flysauc5">
+		<description>Flying Saucers (5)</description>
+		<year>19??</year>
+		<publisher>Radio Shack</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0d7b">
+				<rom name="flysauc5.cmd" size="0x0d7b" crc="d1352a5a" sha1="a45c6d82f1a0db6f9ef9b8cfa401381d02adf024"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frograce">
+		<description>Frog Race</description>
+		<year>1982</year>
+		<publisher>Algray Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0c81">
+				<rom name="frograce.cmd" size="0x0c81" crc="7fdef483" sha1="82bc2dc5c6ba295712128e00a7500a2da19c3ac3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger1">
+		<description>Frogger (1)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3256">
+				<rom name="frogger1.cmd" size="0x3256" crc="64f592b7" sha1="41ec2e8bf8e0ea37d4620026183092c38d6f8f76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger2">
+		<description>Frogger (2)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger2.cmd" size="0x3000" crc="eec61bf9" sha1="2e1df95218ca421099e5ca5ac0fdb1e1199372f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger3">
+		<description>Frogger (3)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x33f4">
+				<rom name="frogger3.cmd" size="0x33f4" crc="3e6d36a7" sha1="693fcf5798b1b5f9db7de2cc1ae558fefaace1a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger4">
+		<description>Frogger (4)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger5">
+		<description>Frogger (5)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger5.cmd" size="0x3000" crc="03573bc4" sha1="496b922b1932dbb5bed6870a0e6428897f2afff4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger6">
+		<description>Frogger (6)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger6.cmd" size="0x3000" crc="4ab1a2c5" sha1="f533224621a75a850f7e7bd158655ef7cd74c6f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger7">
+		<description>Frogger (7)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x35e1">
+				<rom name="frogger7.cmd" size="0x35e1" crc="2c0aa48d" sha1="cf7e3c9c8d4d7966a8dbc43c53a87efdd7174c8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger8">
+		<description>Frogger (8)</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- [3]: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger8.cmd" size="0x3000" crc="550b42af" sha1="4056b075238e45742712f47f6da88f764ff2615a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1a">
+		<description>Flight Simulator (1)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4123">
+				<rom name="fs1a.cmd" size="0x4123" crc="535de824" sha1="1e6c58505615538450532b64386fdaf772180f0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1b">
+		<description>Flight Simulator (2)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="fs1b.cmd" size="0x3300" crc="e9885bfe" sha1="c84cc717b681f17e2e14b7af59a46ff0b775206a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1c">
+		<description>Flight Simulator (3)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="fs1c.cmd" size="0x3300" crc="5fb071ed" sha1="d7d902f0397f83d109a042c14bda5a809a8b08a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1d">
+		<description>Flight Simulator (4)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="fs1d.cmd" size="0x3300" crc="881d50aa" sha1="19e6d7f50443c8b2a79baca409dafea67d680fb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1e">
+		<description>Flight Simulator (5)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3400">
+				<rom name="fs1e.cmd" size="0x3400" crc="f77e671a" sha1="86c7e4a60e77eae33d4eb65047431460dc055965"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1f">
+		<description>Flight Simulator (6)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4180">
+				<rom name="fs1f.cmd" size="0x4180" crc="87893f72" sha1="77c4c8fa1015199ec8cbaeb15fc3d7d44b4928ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1g">
+		<description>Flight Simulator (7)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="fs1g.cmd" size="0x3300" crc="493ac1e1" sha1="cb7da3c9e350c6e4e0c65d743a8f047eb1e21cfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1h">
+		<description>Flight Simulator (8)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2a00">
+				<rom name="fs1h.cmd" size="0x2a00" crc="a2a17ffd" sha1="eac12e48826f2b4f946354dc2ddc93f363c6151d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1i">
+		<description>Flight Simulator (9)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3300">
+				<rom name="fs1i.cmd" size="0x3300" crc="5b040aa8" sha1="f71d8e00171eb35d17866e6ce2ed5d7bee01804d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1j">
+		<description>Flight Simulator (10)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="fs1j.cmd" size="0x3f00" crc="0239ac84" sha1="b1ab43dd5b783b6bab1a9b29ca9431ea96fa8de1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1k">
+		<description>Flight Simulator (11)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3f10">
+				<rom name="fs1k.cmd" size="0x3f10" crc="52b40dae" sha1="dbb1a8619116d9dabb06e3d477e42af029ed9be6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1l">
+		<description>Flight Simulator (12)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4000">
+				<rom name="fs1l.cmd" size="0x4000" crc="ccfc6fe7" sha1="dfe8a325142b243ddac0663ea6e1afdc509fd828"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1m">
+		<description>Flight Simulator (13)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x4000">
+				<rom name="fs1m.cmd" size="0x4000" crc="dfe7cb53" sha1="241576666983c5665a4a1df60612da86bbb69082"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1p">
+		<description>Flight Simulator (14)</description>
+		<year>19??</year>
+		<publisher>Microsoft</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3266">
+				<rom name="fs1p.cmd" size="0x3266" crc="589ac67f" sha1="2b9f34372d7af4d02fc962a85acd5e728529c626"/>
 			</dataarea>
 		</part>
 	</software>
