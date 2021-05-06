@@ -396,12 +396,12 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 				image.fread( &addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-				if (address < 0x3c00)
+				ptr = program.get_write_ptr(address);
+				if (!ptr)
 				{
 					image.message("Attempting to write outside of RAM");
 					return image_init_result::FAIL;
 				}
-				ptr = program.get_write_ptr(address);
 				image.fread( ptr, block_length);
 			}
 			break;
