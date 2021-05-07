@@ -28,6 +28,7 @@ between them.
 		<description>Adventureland</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3df8">
 				<rom name="adv01.cmd" size="0x3df8" crc="8e8506dd" sha1="a3ff286a9ad79b645a61af1c9267f958f88a172e"/>
@@ -39,6 +40,7 @@ between them.
 		<description>Pirate Adventure</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3f00">
 				<rom name="adv02.cmd" size="0x3f00" crc="f8e9e9b4" sha1="efa9b897f23a6aee03afd26e5c4bc794b23cdb81"/>
@@ -50,6 +52,7 @@ between them.
 		<description>Voodoo Castle (1)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3e0b">
 				<rom name="adv04a.cmd" size="0x3e0b" crc="4492ba50" sha1="0da46f26b25305d45a217224dcc7e3e309c4916c"/>
@@ -61,6 +64,7 @@ between them.
 		<description>Voodoo Castle (2)</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3f00">
 				<rom name="adv04b.cmd" size="0x3f00" crc="643bd4a5" sha1="56827cf8dc2b507480d869259ee3393cfe45259a"/>
@@ -72,6 +76,7 @@ between them.
 		<description>The Count</description>
 		<year>1979</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x6599">
 				<rom name="adv05.cmd" size="0x6599" crc="e4fd63c7" sha1="9d2519cf02e421bc39d7478a48a8cb3836c94577"/>
@@ -83,6 +88,7 @@ between them.
 		<description>Dungeon of Ashka</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3200">
 				<rom name="ashka.cmd" size="0x3200" crc="bab98f05" sha1="9417700ce7a1a75184d339203a7d358ebaba8613"/>
@@ -196,6 +202,7 @@ between them.
 		<description>Breakdown</description>
 		<year>2018</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x166b">
 				<rom name="breakdwn.cmd" size="0x166b" crc="b5c9c470" sha1="c9ceee8735bf43f4cff21f6a4340fef57a19d807"/>
@@ -207,6 +214,7 @@ between them.
 		<description>Breakout</description>
 		<year>1980</year>
 		<publisher>Software Innovations</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x0a00">
 				<rom name="breakout.cmd" size="0x0a00" crc="8a6fe37d" sha1="ec122f0f3c524a07f27a1aea7b6a14fcea201ccf"/>
@@ -218,6 +226,7 @@ between them.
 		<description>Break Thru</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x1900">
 				<rom name="breakthru.cmd" size="0x1900" crc="129fbe09" sha1="49addc723e53eadcbea318f8dd0826b5fcb111e3"/>
@@ -240,6 +249,7 @@ between them.
 		<description>Caterpillar (1)</description>
 		<year>1982</year>
 		<publisher>Soft Sector Marketing Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x2700">
 				<rom name="catr3ss1.cmd" size="0x2700" crc="2dded693" sha1="2c6f2c8d00002901ad27ef76f98751fda308bf33"/>
@@ -251,6 +261,7 @@ between them.
 		<description>Caterpillar (3)</description>
 		<year>1982</year>
 		<publisher>Soft Sector Marketing Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x2700">
 				<rom name="catr3ss3.cmd" size="0x2700" crc="c95c612d" sha1="b7aa77af9d6e469a1ba5babc94ef4560ce5d202d"/>
@@ -262,6 +273,7 @@ between them.
 		<description>Cosmic Fighter</description>
 		<year>1980</year>
 		<publisher>Big Five Software</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x2aac">
 				<rom name="cosmic3a.cmd" size="0x2aac" crc="455b04dc" sha1="522582ba7c3741661402ea261a80e3afbe2e058b"/>
@@ -674,6 +686,7 @@ between them.
 		<description>Gobbling Box (1)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x20e4">
 				<rom name="gobbler.cmd" size="0x20e4" crc="345125fe" sha1="1426e56cf9b265d3c7db3a5a121051a6ebb1e83e"/>
@@ -685,6 +698,7 @@ between them.
 		<description>Gobbling Box (2)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x20e4">
 				<rom name="gobblerj.cmd" size="0x20e4" crc="fc03bd6f" sha1="545b37ab73a94205274da69d4a7f06086ff29261"/>
@@ -741,6 +755,7 @@ between them.
 		<description>Warriors of Ras 2: Kaiv</description>
 		<year>1982</year>
 		<publisher>Med Systems Software</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x9100">
 				<rom name="kaiv.cmd" size="0x9100" crc="0b8122b0" sha1="3dc4281a2fc5e3f8c73035c6e325653a4368c0ed"/>
@@ -752,6 +767,7 @@ between them.
 		<description>Knossos</description>
 		<year>1981</year>
 		<publisher>Med Systems Software</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x1f00">
 				<rom name="knossos.cmd" size="0x1f00" crc="00ddd641" sha1="42d7ff475280c587237551dee650293be3e3e1dd"/>
@@ -763,6 +779,7 @@ between them.
 		<description>Micro Chord</description>
 		<year>1982</year>
 		<publisher>Cornsoft Group Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x2400">
 				<rom name="mchord3.cmd" size="0x2400" crc="d06c81fa" sha1="92d3b2a452a3ffbd55f09efc7cb2e82d7d417ad0"/>
@@ -785,6 +802,7 @@ between them.
 		<description>Mutant Invasion (2)</description>
 		<year>1982</year>
 		<publisher>Micro-Systems Software</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x1600">
 				<rom name="mutinv2.cmd" size="0x1600" crc="88af7efe" sha1="17774d35fb5b315840202ca7123934e77752b6bd"/>
@@ -843,6 +861,7 @@ between them.
 		<description>Revenge of Rivet Race (1)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x6300">
 				<rom name="rrivet1.cmd" size="0x6300" crc="c8a067fc" sha1="d1a1a68b5da4ec6dfe19ec0d44a4b5040e268ab6"/>
@@ -854,6 +873,7 @@ between them.
 		<description>Revenge of Rivet Race (2)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x6300">
 				<rom name="rrivet2.cmd" size="0x6300" crc="87657fb0" sha1="9c239c626b238a39de21ab992c2f31b372ff82a6"/>
@@ -865,6 +885,7 @@ between them.
 		<description>Revenge of Rivet Race (3)</description>
 		<year>1983</year>
 		<publisher>Quality Software and Consulting Inc</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x6218">
 				<rom name="rrivet3.cmd" size="0x6218" crc="45d02007" sha1="135012ec6b686ad3f04f42b8badcecb0e55f7b03"/>
@@ -876,6 +897,7 @@ between them.
 		<description>Earthquake San Francisco 1906 (1)</description>
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x43dd">
 				<rom name="sanfran1.cmd" size="0x43dd" crc="190bf5ad" sha1="f82b7457c9332cf262ff08d96d6e5f4e2554e570"/>
@@ -922,6 +944,7 @@ between them.
 		<description>Starfighter</description>
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x8800">
 				<rom name="starfght.cmd" size="0x8800" crc="dea25d0b" sha1="a662b5670e75f4099bcf75b0098527b61204e579"/>
@@ -944,6 +967,7 @@ between them.
 		<description>Mysterious Adventures 2: The Time Machine</description>
 		<year>1981</year>
 		<publisher>Molimerx Ltd</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3c2a">
 				<rom name="timemach.cmd" size="0x3c2a" crc="8ce48bfd" sha1="b3f1145a9624da04949787e58685f9eaadfb981e"/>
@@ -1001,6 +1025,7 @@ between them.
 		<description>Tron (3)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x0efb">
 				<rom name="tron3.cmd" size="0x0efb" crc="a7b89b7c" sha1="a907267d923ee08b2285e36edc7579862e1c8407"/>
