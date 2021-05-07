@@ -814,6 +814,7 @@ between them.
 		<description>Mysterious Adventures 3: Arrow of Death (Pt 1)</description>
 		<year>1981</year>
 		<publisher>Molimerx Ltd</publisher>
+		<sharedfeat name="compatibility" value="1,3,H" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x41f8">
 				<rom name="arrowofd.cmd" size="0x41f8" crc="24a68a90" sha1="53fd69424088555a851a43482343b232c9fc60cf"/>
@@ -1063,6 +1064,54 @@ between them.
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x0600">
 				<rom name="trssynth.cmd" size="0x0600" crc="db8246ae" sha1="c29a9202434741b242ad51959bda5193ee10d9cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fort">
+		<description>Nazi Security Fort</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="3" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x2053">
+				<rom name="fort.cmd" size="0x2053" crc="0a78aa8e" sha1="9b8cf8d9313a8f360d40f49767745a6e505ac945"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trap">
+		<description>Trap</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="3" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1500">
+				<rom name="trap31.cmd" size="0x1500" crc="588bdb35" sha1="4d4ecd067875853d8669f78322abf3599d34ba03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trap2">
+		<description>Trap v2.0 (1)</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="3" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1033">
+				<rom name="trap32a.cmd" size="0x1033" crc="3c021174" sha1="bb8b340d8d107a1db5ac54ebbf7818eedb12204a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trap2a">
+		<description>Trap v2.0 (2)</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="3" />
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1132">
+				<rom name="trap32b.cmd" size="0x1132" crc="dab96ee1" sha1="90a37e47e45a6d59ba13e41af97e44b0017d5b7f"/>
 			</dataarea>
 		</part>
 	</software>
