@@ -99,7 +99,7 @@ bool opq_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 
 	// detune/multiple share a register based on the MSB of what is written
 	// remap the multiple values to 100-11F
-	if ((index & 0x1f) == 0x40 && bitfield(data, 7))
+	if ((index & 0xe0) == 0x40 && bitfield(data, 7))
 		index += 0xc0;
 
 	// handle writes to the key on index
