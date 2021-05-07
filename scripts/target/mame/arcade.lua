@@ -4679,6 +4679,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",
+	MAME_DIR .. "src/mame/drivers/missamer.cpp",
 	MAME_DIR .. "src/mame/drivers/mephistp.cpp",
 	MAME_DIR .. "src/mame/drivers/mrgame.cpp",
 	MAME_DIR .. "src/mame/drivers/nsm.cpp",

@@ -9257,7 +9257,6 @@ michkit1                        //
 michkitb                        //
 michnew                         //
 michstake                       //
-missamer                        //
 montana                         //
 newdixie                        //
 penalty                         //
@@ -23391,6 +23390,9 @@ mirage                          // (c) 1994 Mitchell
 @source:mirax.cpp
 mirax                           // (c) 1985 Current Technologies
 miraxa                          // (c) 1985 Current Technologies
+
+@source:missamer.cpp
+missamer                        // (c) 1984 Sirmo
 
 @source:missb2.cpp
 bublpong                        // bootleg on enhanced hardware
