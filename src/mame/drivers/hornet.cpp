@@ -395,7 +395,8 @@ public:
 		m_comm_board_rom(*this, "comm_board"),
 		m_comm_bank(*this, "comm_bank"),
 		m_lan_ds2401(*this, "lan_serial_id"),
-		m_watchdog(*this, "watchdog")
+		m_watchdog(*this, "watchdog"),
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void hornet(machine_config &config);
@@ -436,6 +437,7 @@ private:
 	optional_memory_bank m_comm_bank;
 	optional_device<ds2401_device> m_lan_ds2401;
 	required_device<watchdog_timer_device> m_watchdog;
+	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer;
 	std::unique_ptr<uint8_t[]> m_jvs_sdata;
@@ -444,12 +446,6 @@ private:
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
 
-	uint32_t hornet_k037122_sram_r(offs_t offset);
-	void hornet_k037122_sram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t hornet_k037122_char_r(offs_t offset);
-	void hornet_k037122_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t hornet_k037122_reg_r(offs_t offset);
-	void hornet_k037122_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -467,8 +463,7 @@ private:
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
@@ -485,59 +480,12 @@ private:
 };
 
 
-
-
-uint32_t hornet_state::hornet_k037122_sram_r(offs_t offset)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	return k037122->sram_r(offset);
-}
-
-void hornet_state::hornet_k037122_sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	k037122->sram_w(offset, data, mem_mask);
-}
-
-
-uint32_t hornet_state::hornet_k037122_char_r(offs_t offset)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	return k037122->char_r(offset);
-}
-
-void hornet_state::hornet_k037122_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	k037122->char_w(offset, data, mem_mask);
-}
-
-uint32_t hornet_state::hornet_k037122_reg_r(offs_t offset)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	return k037122->reg_r(offset);
-}
-
-void hornet_state::hornet_k037122_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k037122_device *k037122 = m_konppc->get_cgboard_id() ? m_k037122[1] : m_k037122[0];
-	k037122->reg_w(offset, data, mem_mask);
-}
-
+template <uint8_t Which>
 uint32_t hornet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_voodoo[0]->voodoo_update(bitmap, cliprect);
+	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
 
-	m_k037122[0]->tile_draw(screen, bitmap, cliprect);
-
-	return 0;
-}
-
-uint32_t hornet_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_voodoo[1]->voodoo_update(bitmap, cliprect);
-
-	m_k037122[1]->tile_draw(screen, bitmap, cliprect);
+	m_k037122[Which]->tile_draw(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -666,6 +614,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
+			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 	}
 }
@@ -754,14 +703,15 @@ void hornet_state::soundtimer_count_w(uint16_t data)
 void hornet_state::hornet_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share(m_workram);
-	map(0x74000000, 0x740000ff).rw(FUNC(hornet_state::hornet_k037122_reg_r), FUNC(hornet_state::hornet_k037122_reg_w));
-	map(0x74020000, 0x7403ffff).rw(FUNC(hornet_state::hornet_k037122_sram_r), FUNC(hornet_state::hornet_k037122_sram_w));
-	map(0x74040000, 0x7407ffff).rw(FUNC(hornet_state::hornet_k037122_char_r), FUNC(hornet_state::hornet_k037122_char_w));
+	map(0x74000000, 0x7407ffff).view(m_cg_view);
+	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k037122[0], FUNC(k037122_device::reg_r), FUNC(k037122_device::reg_w));
+	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k037122[0], FUNC(k037122_device::sram_r), FUNC(k037122_device::sram_w));
+	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k037122[0], FUNC(k037122_device::char_r), FUNC(k037122_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(hornet_state::sysreg_r));
 	map(0x7d010000, 0x7d01ffff).w(FUNC(hornet_state::sysreg_w));
-	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  /* M48T58Y RTC/NVRAM */
+	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));  // M48T58Y RTC/NVRAM
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7e000000, 0x7e7fffff).rom().region("datarom", 0);
 	map(0x7f000000, 0x7f3fffff).rom().region("prgrom", 0);
@@ -785,6 +735,10 @@ void hornet_state::terabrst_map(address_map &map)
 void hornet_state::sscope_map(address_map &map) //placeholder; may remove if mapping the second ADC12138 isn't necessary
 {
 	hornet_map(map);
+
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k037122[1], FUNC(k037122_device::reg_r), FUNC(k037122_device::reg_w));
+	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k037122[1], FUNC(k037122_device::sram_r), FUNC(k037122_device::sram_w));
+	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k037122[1], FUNC(k037122_device::char_r), FUNC(k037122_device::char_w));
 }
 
 void hornet_state::sscope2_map(address_map &map)
@@ -1133,7 +1087,7 @@ void hornet_state::hornet(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	screen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
-	screen.set_screen_update(FUNC(hornet_state::screen_update));
+	screen.set_screen_update(FUNC(hornet_state::screen_update<0>));
 
 	PALETTE(config, "palette").set_entries(65536);
 
@@ -1214,12 +1168,12 @@ void hornet_state::sscope(machine_config &config)
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
-	lscreen.set_screen_update(FUNC(hornet_state::screen_update));
+	lscreen.set_screen_update(FUNC(hornet_state::screen_update<0>));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for scope
 	// scope screen is 15khz, verified default parameter in both 037122 and voodoo, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	rscreen.set_raw(XTAL(64'000'000) / 4, 1017, 106, 106 + 768, 262, 17, 17 + 236);
-	rscreen.set_screen_update(FUNC(hornet_state::screen_update_rscreen));
+	rscreen.set_screen_update(FUNC(hornet_state::screen_update<1>));
 
 /*  ADC12138(config, m_adc12138_2, 0);
     m_adc12138->set_ipt_convert_callback(FUNC(hornet_state::sscope_input_callback)); */

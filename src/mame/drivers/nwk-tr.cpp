@@ -307,7 +307,8 @@ public:
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void thrilld(machine_config &config);
@@ -339,15 +340,10 @@ private:
 	output_finder<2> m_pcb_digit;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer;
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t k001604_tile_r(offs_t offset);
-	void k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t k001604_char_r(offs_t offset);
-	void k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t k001604_reg_r(offs_t offset);
-	void k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void soundtimer_en_w(uint16_t data);
@@ -369,42 +365,6 @@ void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-}
-
-uint32_t nwktr_state::k001604_tile_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	return k001604->tile_r(offset);
-}
-
-void nwktr_state::k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	k001604->tile_w(offset, data, mem_mask);
-}
-
-uint32_t nwktr_state::k001604_char_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	return k001604->char_r(offset);
-}
-
-void nwktr_state::k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	k001604->char_w(offset, data, mem_mask);
-}
-
-uint32_t nwktr_state::k001604_reg_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	return k001604->reg_r(offset);
-}
-
-void nwktr_state::k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604[1] : m_k001604[0]);
-	k001604->reg_w(offset, data, mem_mask);
 }
 
 template <uint8_t Which>
@@ -479,6 +439,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_konppc->set_cgboard_id((data >> 4) & 3);
+			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 
 		default:
@@ -534,10 +495,14 @@ void nwktr_state::machine_start()
 void nwktr_state::ppc_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share(m_work_ram);
-	map(0x74000000, 0x740000ff).rw(FUNC(nwktr_state::k001604_reg_r), FUNC(nwktr_state::k001604_reg_w));
+	map(0x74000000, 0x7407ffff).view(m_cg_view);
+	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
 	map(0x74010000, 0x7401ffff).ram().w(FUNC(nwktr_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(FUNC(nwktr_state::k001604_tile_r), FUNC(nwktr_state::k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(FUNC(nwktr_state::k001604_char_r), FUNC(nwktr_state::k001604_char_w));
+	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
