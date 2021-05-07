@@ -380,12 +380,18 @@ public:
 	ymfm_ssg_external_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type),
 		m_ssg_stream(nullptr),
-		m_ssg(*this, "ssg")
+		m_ssg(*this, "ssg"),
+		m_ssg_flags(((ChipClass::SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
 	{
 	}
 
 	// configuration helpers
-	void set_flags(int flags) { m_ssg->set_flags(flags); }
+	void set_flags(int flags)
+	{
+		m_ssg_flags = (m_ssg_flags & AY8910_SINGLE_OUTPUT) | (flags & ~AY8910_SINGLE_OUTPUT);
+		if (m_ssg)
+			m_ssg->set_flags(m_ssg_flags);
+	}
 
 protected:
 	// SSG overrides
@@ -411,7 +417,7 @@ protected:
 	{
 		AY8910(config, m_ssg, device_t::clock());
 		m_ssg->set_psg_type(ay8910_device::PSG_TYPE_YM);
-		m_ssg->set_flags(((ChipClass::SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT);
+		m_ssg->set_flags(m_ssg_flags);
 
 		// configure the callbacks to route through our callbacks
 		m_ssg->port_a_read_callback().set(FUNC(ymfm_ssg_external_device_base::io_reader<0>));
@@ -488,6 +494,7 @@ protected:
 	// internal state
 	sound_stream *m_ssg_stream;           // SSG sound stream
 	required_device<ay8910_device> m_ssg; // our embedded SSG device
+	int m_ssg_flags;                      // SSG flags
 };
 
 
