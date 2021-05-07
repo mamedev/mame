@@ -231,7 +231,7 @@ between them.
 		<publisher>Software Innovations</publisher>
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x1600">
-				<rom name="breakthru.cmd" size="0x1600" crc="59dee7e6" sha1="03660dd4ce087508f68983de15583ff496bdb802"/>
+				<rom name="carace.cmd" size="0x1600" crc="59dee7e6" sha1="03660dd4ce087508f68983de15583ff496bdb802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -872,6 +872,39 @@ between them.
 		</part>
 	</software>
 
+	<software name="eqsf1">
+		<description>Earthquake San Francisco 1906 (1)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x43dd">
+				<rom name="sanfran1.cmd" size="0x43dd" crc="190bf5ad" sha1="f82b7457c9332cf262ff08d96d6e5f4e2554e570"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eqsf2">
+		<description>Earthquake San Francisco 1906 (2)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x43dd">
+				<rom name="sanfran2.cmd" size="0x43dd" crc="15343a85" sha1="44e6e8164451111b1a6255293e7864bb168ba0fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble">
+		<description>Arcade Bomber Scramble</description>
+		<year>1981</year>
+		<publisher>Kansas Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1c00">
+				<rom name="scramble.cmd" size="0x1c00" crc="5762de1d" sha1="f67282e593c691e0f95ebf42d7e4e18fc466b563"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sraiders">
 		<description>Space Raiders</description>
 		<year>1983</year>
@@ -881,6 +914,50 @@ between them.
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x42be">
 				<rom name="sraiders.cmd" size="0x42be" crc="d9b853a1" sha1="ebf4bcb5d53a557029a38d9e1460a5f0f2e2a8ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfght">
+		<description>Starfighter</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x8800">
+				<rom name="starfght.cmd" size="0x8800" crc="dea25d0b" sha1="a662b5670e75f4099bcf75b0098527b61204e579"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankzone">
+		<description>Tank Zone 2000</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x5000">
+				<rom name="tankzon3.cmd" size="0x5000" crc="57c9757f" sha1="a1d0db5798f11e161d4af368e6f12e600ce9fec5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timemach">
+		<description>Mysterious Adventures 2: The Time Machine</description>
+		<year>1981</year>
+		<publisher>Molimerx Ltd</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3c2a">
+				<rom name="timemach.cmd" size="0x3c2a" crc="8ce48bfd" sha1="b3f1145a9624da04949787e58685f9eaadfb981e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tram">
+		<description>Tram</description>
+		<year>1982</year>
+		<publisher>Micro-Systems Software</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x1800">
+				<rom name="tram.cmd" size="0x1800" crc="38ae51f4" sha1="57684c51beff8855ac9dbc2385870448006a9cf5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -898,6 +975,50 @@ between them.
 		</part>
 	</software>
 
+	<software name="tron1">
+		<description>Tron (1)</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0f80">
+				<rom name="tron1.cmd" size="0x0f80" crc="27a7230c" sha1="f49458bc598732c2c5cc0705399322d745456d55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tron2">
+		<description>Tron (2)</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0f00">
+				<rom name="tron2.cmd" size="0x0f00" crc="4c28d7c6" sha1="db67465439c7405a421ac4aa988231ad5fd5ae21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tron3">
+		<description>Tron (3)</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0efb">
+				<rom name="tron3.cmd" size="0x0efb" crc="a7b89b7c" sha1="a907267d923ee08b2285e36edc7579862e1c8407"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tron4">
+		<description>Tron (4)</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0f00">
+				<rom name="tron4.cmd" size="0x0f00" crc="4a707378" sha1="5aea78d62815f7bc17b551e09d6e992205d50c39"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trsman">
 		<description>TRS MAN</description>
 		<year>19??</year>
@@ -906,6 +1027,17 @@ between them.
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x2f00">
 				<rom name="trsman.cmd" size="0x2f00" crc="b1ff2077" sha1="1c3c1ac00c80464b26cf31597f5451df1779b055"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trssynth">
+		<description>TRS-80 Synthsizer</description>
+		<year>1980</year>
+		<publisher>Breeze Computing</publisher>
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x0600">
+				<rom name="trssynth.cmd" size="0x0600" crc="db8246ae" sha1="c29a9202434741b242ad51959bda5193ee10d9cc"/>
 			</dataarea>
 		</part>
 	</software>
