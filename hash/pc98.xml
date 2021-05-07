@@ -5474,8 +5474,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- This game plays sampled voices through the beeper, but it doesn't work in MAME - it just outputs a constant beep -->
-	<!-- (has a DAC1BIT tester at boot, may be useful) -->
+	<!-- boot OK -->
+	<!-- Has a DAC1BIT sampling tester on boot, needs +18 [tempo]/low [volume] on RS class to match 3 secs as claimed (confirm via real HW). -->
 	<software name="arquelph" supported="partial">
 		<description>Arquelphos</description>
 		<year>1993</year>
@@ -7286,7 +7286,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK on RS class, on intro uses DAC1BIT and some text doesn't seem to be drawn? -->
+	<!-- boot OK on RS class, on intro some text doesn't seem to be drawn given the DAC1BIT clicks. -->
 	<!-- black screen after Cocktail Soft logo on VM class (btanb?) -->
 	<software name="bishotsu" supported="partial">
 		<description>Bishoujo Tsuushin - Chat no Susume</description>
@@ -7603,7 +7603,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep (DAC1BIT) -->
+	<!-- boot OK, DAC1BIT sounds awful on anything, cfr. title screen (tested VM class, RS class and 9821 class) -->
 	<software name="blockouta" cloneof="blockout" supported="partial">
 		<description>Block Out (Patched?)</description>
 		<year>1991</year>
@@ -20933,7 +20933,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- boot OK, has heavy GFX issues if EGC is detected. -->
-	<!-- Uses DAC1BIT for speech -->
+	<!-- Uses DAC1BIT for speech, sounds too slow for VM class -->
 	<!-- Has extensive system check, NESA bus for instance -->
 	<software name="hypbingo" supported="partial">
 		<description>Gals Talk Hyper Bingo</description>
@@ -23399,7 +23399,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK, beeps out when it's supposed to play samples (DAC1BIT) -->
+	<!-- boot OK, DAC1BIT sounds very aliased on RS class (btanb?) -->
 	<software name="hercequa" supported="partial">
 		<description>Hercequary</description>
 		<year>1994</year>
@@ -28339,8 +28339,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 	<!-- all three Madou Monogatari sports a "Madou Monogatari 1-2-3" title screen -->
 	<!-- verify if these were really released as stand alone. -->
 
-	<!-- boot OK, uses DAC1BIT samples -->
-	<software name="madoum1" supported="partial">
+	<!-- boot OK -->
+	<software name="madoum1" supported="yes">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28360,8 +28360,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK, uses DAC1BIT samples -->
-	<software name="madoum2" supported="partial">
+	<!-- boot OK -->
+	<software name="madoum2" supported="yes">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28381,8 +28381,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK, uses DAC1BIT samples -->
-	<software name="madoum3" supported="partial">
+	<!-- boot OK -->
+	<software name="madoum3" supported="yes">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -36345,8 +36345,9 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- boot OK, beeps out when it's supposed to play samples (DAC1BIT) -->
-	<software name="puyopuyo" supported="partial">
+	<!-- boot OK -->
+	<!-- Has DAC1BIT Note class switch option, has Epson class mixing option -->
+	<software name="puyopuyo" supported="yes">
 		<description>Puyo Puyo</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -69101,8 +69102,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<!-- boot OK, beeps on intro/start of stages (DAC1BIT) -->
-	<software name="transbor" supported="partial">
+	<!-- boot OK -->
+	<software name="transbor" supported="yes">
 		<description>TransbOrder</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>

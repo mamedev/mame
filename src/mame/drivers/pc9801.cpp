@@ -15,8 +15,7 @@
     - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a
-      dac_bit_interface instead (cfr. DAC1BIT in SW list);
+	- DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
     - Remove kludge for POR bit in a20_ctrl_w fn;
