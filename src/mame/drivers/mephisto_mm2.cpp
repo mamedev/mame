@@ -110,7 +110,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_outlatch(*this, "outlatch")
 		, m_display(*this, "display")
-		, m_dac(*this, "dac")
 		, m_keys(*this, "KEY.%u", 0)
 	{ }
 
@@ -131,7 +130,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<hc259_device> m_outlatch;
 	required_device<mephisto_display1_device> m_display;
-	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_keys;
 
 	void bup_mem(address_map &map);
@@ -314,7 +312,7 @@ void mm2_state::rebel5(machine_config &config)
 	m_outlatch->q_out_cb<3>().set_output("led103");
 	m_outlatch->q_out_cb<4>().set_output("led104");
 	m_outlatch->q_out_cb<5>().set_output("led105");
-	m_outlatch->q_out_cb<6>().set(m_dac, FUNC(dac_bit_interface::write));
+	m_outlatch->q_out_cb<6>().set("dac", FUNC(dac_1bit_device::write));
 	m_outlatch->q_out_cb<7>().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
@@ -323,7 +321,7 @@ void mm2_state::rebel5(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 void mm2_state::mm5p(machine_config &config)
