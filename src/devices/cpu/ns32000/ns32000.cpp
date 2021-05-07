@@ -992,7 +992,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					bool const dst = condition(quick);
 					gen_write(mode[0], dst);
 
-					tex = mode[0].tea + dst ? 10 : 9;
+					tex = mode[0].tea + (dst ? 10 : 9);
 				}
 				break;
 			case 4:
@@ -1129,7 +1129,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_psr &= ~src;
 
-							tex = mode[0].tea + (size == SIZE_B) ? 18 : 30;
+							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
 						}
 						else
 							interrupt(ILL, m_pc);
@@ -1169,7 +1169,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_psr |= src;
 
-							tex = mode[0].tea + (size == SIZE_B) ? 18 : 30;
+							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
 						}
 						else
 							interrupt(ILL, m_pc);
@@ -1575,7 +1575,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						if (translate)
 							data = space(0).read_byte(m_r[3] + u8(data));
 
-						tex += top(size, m_r[1]) + translate ? top(SIZE_B) + 27 : (backward || uw) ? 24 : 13;
+						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 27 : (backward || uw) ? 24 : 13);
 
 						bool const match = !((m_r[4] ^ data) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1627,7 +1627,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						if (translate)
 							src1 = space(0).read_byte(m_r[3] + u8(src1));
 
-						tex += top(size, m_r[1]) + top(size, m_r[2]) + translate ? top(SIZE_B) + 38 : 35;
+						tex += top(size, m_r[1]) + top(size, m_r[2]) + (translate ? top(SIZE_B) + 38 : 35);
 
 						bool const match = !((m_r[4] ^ src1) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1694,7 +1694,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						if (translate)
 							data = space(0).read_byte(m_r[3] + u8(data));
 
-						tex += top(size, m_r[1]) + translate ? top(SIZE_B) + 30 : 27;
+						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 30 : 27);
 
 						bool const match = !((m_r[4] ^ data) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1950,7 +1950,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						else
 							gen_write(mode[1], std::abs(src));
 
-						tex = mode[0].tea + mode[1].tea + (src < 0) ? 9 : 8;
+						tex = mode[0].tea + mode[1].tea + ((src < 0) ? 9 : 8);
 					}
 					break;
 				case 0xd:
@@ -2614,7 +2614,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						{
 							m_psr |= PSR_F;
 
-							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + (src >= lower) ? 7 : 10;
+							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
 						}
 					}
 					break;
