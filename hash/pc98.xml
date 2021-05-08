@@ -49369,12 +49369,15 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="zeta">
+	<!-- boot OK -->
+	<software name="zeta" supported="yes">
 		<description>Zeta</description>
 		<year>1991</year>
 		<publisher>トンキンハウス (Tonkin House)</publisher>
 		<info name="alt_title" value="ゼータ" />
+		<info name="developer" value="Will" />
 		<info name="release" value="19911010" />
+		<!-- boot order is trusted, would otherwise moan that file is missing after new game intro (without chance of a disk swap) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk S1"/>
 			<dataarea name="flop" size="1281968">
@@ -49382,15 +49385,15 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk S2"/>
-			<dataarea name="flop" size="1281968">
-				<rom name="zeta_s2.d88" size="1281968" crc="c1de4377" sha1="e409d06f16a787650ba39974616e0d03957825b1" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D1"/>
 			<dataarea name="flop" size="1281968">
 				<rom name="zeta_d1.d88" size="1281968" crc="1501f5cc" sha1="6dafbc36800b2ad36ab6b9f8dff37679fed23c1a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk S2"/>
+			<dataarea name="flop" size="1281968">
+				<rom name="zeta_s2.d88" size="1281968" crc="c1de4377" sha1="e409d06f16a787650ba39974616e0d03957825b1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
