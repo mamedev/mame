@@ -1816,6 +1816,8 @@ files {
 	MAME_DIR .. "src/mame/machine/macpci.cpp",
 	MAME_DIR .. "src/mame/machine/cuda.cpp",
 	MAME_DIR .. "src/mame/machine/cuda.h",
+	MAME_DIR .. "src/mame/machine/macscsi.cpp",
+	MAME_DIR .. "src/mame/machine/macscsi.h",
 	MAME_DIR .. "src/mame/drivers/iphone2g.cpp",
 	MAME_DIR .. "src/mame/drivers/superga2.cpp",
 }
