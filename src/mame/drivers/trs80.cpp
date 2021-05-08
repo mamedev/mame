@@ -646,7 +646,7 @@ ROM_END
 
 void trs80_state::init_trs80l2()
 {
-	m_mode = 2;
+	m_7bit = true;
 }
 
 
