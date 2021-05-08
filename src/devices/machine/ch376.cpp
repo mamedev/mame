@@ -426,7 +426,7 @@ bool ch376_device::generateNextDirEntry()
 	if (ourEntry->type == osd::directory::entry::entry_type::DIR)
 	{
 		strncpy(reinterpret_cast<char *>(&m_dataBuffer[1]), ourEntry->name, 8);
-		m_dataBuffer[0xc] == 0x10;	// directory type
+		m_dataBuffer[0xc] = 0x10;	// directory type
 	}
 	else if (ourEntry->type == osd::directory::entry::entry_type::FILE)
 	{
