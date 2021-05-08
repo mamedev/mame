@@ -28,7 +28,8 @@ Portorose 32 Bit:
 Genius 68030:
 - M68EC030RP40B, 33.3330MHz XTAL, 6.144MHz XTAL
 - 256KB ROM (M27C2001)
-- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20)
+- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20), note: chess engine resides in the
+  256KB RAM, probably because the EPROM is too slow for this CPU at full speed.
 
 Display Modul:
 - HD44780, 2-line LCD display
@@ -42,8 +43,9 @@ Undocumented buttons:
 - holding CLEAR on boot will clear the battery backed RAM
 
 TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates),
-  especially gen32 is way too fast when comparing sound pitch
+- match I/S= diag speed test with real hardware (good test for proper waitstates)
+- gen32 waitstates emulation is preliminary (without it, sound pitch is too high
+  and lcd write speed too fast)
 
 ===============================================================================
 
@@ -103,6 +105,7 @@ public:
 	mmodular_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "maincpu"),
 		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_board(*this, "board"),
 		m_bav_busy(*this, "bav_busy"),
@@ -127,6 +130,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	optional_region_ptr<u32> m_rom;
 	memory_share_creator<u8> m_nvram;
 	required_device<mephisto_board_device> m_board;
 	required_device<timer_device> m_bav_busy;
@@ -142,6 +146,7 @@ private:
 	void gen32_mem(address_map &map);
 
 	// I/O handlers
+	u32 rom_r(offs_t offset);
 	void bavaria_w(u8 data);
 	u8 bavaria1_r();
 	u8 bavaria2_r();
@@ -170,6 +175,16 @@ void mmodular_state::machine_reset()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+u32 mmodular_state::rom_r(offs_t offset)
+{
+	// waitstates for gen32 (preliminary)
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-20);
+
+	return m_rom[offset];
+}
+
 
 // Bavaria board
 
@@ -304,7 +319,7 @@ void mmodular_state::van32_mem(address_map &map)
 
 void mmodular_state::gen32_mem(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).rom();
+	map(0x00000000, 0x0003ffff).r(FUNC(mmodular_state::rom_r));
 	map(0x40000000, 0x4007ffff).ram();
 	map(0x80000000, 0x8003ffff).ram();
 	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
@@ -466,7 +481,6 @@ void mmodular_state::gen32(machine_config &config)
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25); // problem with waitstates
 	config.set_default_layout(layout_mephisto_gen32);
 }
 
@@ -596,23 +610,23 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT CMP MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  lyon32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  lyon32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, van32,   0,      0, van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,   van32,  0, van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   0,      0, van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   van32,  0, van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1993, gen32,   0,      0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, gen32a,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, gen32l,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1996, lond32,  0,      0, van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
-CONS( 1996, lond16,  lond32, 0, van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
+CONS( 1996, lond32,  0,      0, van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
+CONS( 1996, lond16,  lond32, 0, van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16

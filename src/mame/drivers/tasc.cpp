@@ -375,7 +375,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1995, tascr30,  0,       0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, tascr30a, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.20)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1993, tascr30b, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // competed in several chesscomputer tournaments
-CONS( 1993, tascr30g, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (Gideon 2.1, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // made in 1993, later released in 2012
+CONS( 1995, tascr30,  0,       0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.50)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, tascr30a, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.20)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, tascr30b, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // competed in several chesscomputer tournaments
+CONS( 1993, tascr30g, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (Gideon 2.1, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // made in 1993, later released in 2012

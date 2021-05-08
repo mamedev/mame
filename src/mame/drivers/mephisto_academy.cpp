@@ -136,7 +136,7 @@ void academy_state::academy(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HC259(config, m_outlatch); // SN74HC259N
-	m_outlatch->parallel_out_cb().set("display:dac", FUNC(dac_byte_interface::write)).rshift(2).mask(0x03);
+	m_outlatch->parallel_out_cb().set("display:dac", FUNC(speaker_sound_device::level_w)).rshift(2).mask(0x03);
 
 	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal
