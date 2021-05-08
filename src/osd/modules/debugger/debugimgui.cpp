@@ -1108,7 +1108,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 		if(ImGui::InputText("##mountpath",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
 			m_filelist_refresh = true;
 		ImGui::Separator();
-		if(ImGui::ListBoxHeader("##filelist",m_filelist.size(),15))
+		if(ImGui::BeginListBox("##filelist",ImVec2(0, 0)))
 		{
 			for(auto f = m_filelist.begin();f != m_filelist.end();++f)
 			{
@@ -1138,7 +1138,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 					}
 				}
 			}
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 		ImGui::Separator();
 		if(ImGui::Button("Cancel##mount"))
