@@ -838,6 +838,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/at28c64b.h,MACHINES["AT28C64B"] = true
+---------------------------------------------------
+
+if (MACHINES["AT28C64B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/at28c64b.cpp",
+		MAME_DIR .. "src/devices/machine/at28c64b.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/at29x.h,MACHINES["AT29X"] = true
 ---------------------------------------------------
 
@@ -981,6 +993,17 @@ if (MACHINES["CDP1879"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/ch376.h,MACHINES["CH376"] = true
+---------------------------------------------------
+
+if (MACHINES["CH376"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ch376.cpp",
+		MAME_DIR .. "src/devices/machine/ch376.h",
+	}
+end
 
 ---------------------------------------------------
 --
