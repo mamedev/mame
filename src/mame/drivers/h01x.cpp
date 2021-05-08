@@ -106,8 +106,6 @@ void h01x_state::h01x(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10.6445_MHz_XTAL, 336, 0, 336, 192, 0, 192);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	//screen.set_palette("palette");
-
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	MC6845(config, m_crtc, 10.6445_MHz_XTAL / 8);   // freq guess

@@ -145,7 +145,6 @@ trs80l2:   works
 
 sys80:     works
            investigate expansion-box
-           add 32 / 64 cpl switch
 
 ht1080z    works
            verify clock for AY-3-8910
@@ -279,13 +278,12 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)          PORT_CHAR('Z') PORT_CHAR('z')
 	// These keys produce output on all systems, the shift key having no effect. They display arrow symbols and underscore.
 	// On original TRS80, shift cancels all keys except F3 which becomes backspace.
-	// On the radionic, Shift works, and the symbols display correctly.
-	// PORT_CHAR('_') is correct for all systems, however the others are only for radionic.
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_F1)  PORT_CHAR('[') PORT_CHAR('{')  // radionic: F1
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_F2) PORT_CHAR('\\') PORT_CHAR('}') // radionic: F2 ; sys80 mkII: F2 ; lnw80: F1
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_F3)  PORT_CHAR(']') PORT_CHAR('|')  // radionic: F3 ; sys80 mkII: F3
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_F4)  PORT_CHAR('^')                 // radionic: F4 ; sys80 mkII: F4 ; lnw80: F2
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_F5)  PORT_CHAR('_')                 // radionic: LF ; sys80 mkII: F1 ; lnw80: _
+	// PORT_CHAR('_') is correct for all systems.
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_F2)   // sys80 mkII: F2
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_F3)   // sys80 mkII: F3
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_F4)  // sys80 mkII: F4
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_F5)         PORT_CHAR('_')  // sys80 mkII: F1
 
 	PORT_START("LINE4") // Number pad: System 80 Mk II only
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)          PORT_CHAR('0')
@@ -349,6 +347,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(sys80)
 	PORT_INCLUDE (trs80l2)
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(    0x08, 0x00,   "Video Cut")  // Toggle switch on the back
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x08, DEF_STR( On ) )
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Page") PORT_CODE(KEYCODE_F6) PORT_TOGGLE  // extra keys above the main keyboard
+	//PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F7) PORT_TOGGLE  // this turns on the tape motor
 	PORT_START("BAUD")
 	PORT_DIPNAME( 0xff, 0x06, "Baud Rate")
 	PORT_DIPSETTING(    0x00, "110")
@@ -501,6 +505,7 @@ void trs80_state::sys80(machine_config &config)
 {
 	model1(config);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::sys80_io);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_sys80));
 
 	config.device_remove("brg");
 	CLOCK(config, m_uart_clock, 19200 * 16);
