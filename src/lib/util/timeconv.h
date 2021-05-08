@@ -48,6 +48,8 @@ struct arbitrary_datetime
 	int hour;           // hour (0-23)
 	int minute;         // minute (0-59)
 	int second;         // second (0-59)
+
+	static struct arbitrary_datetime now();
 };
 
 
@@ -87,16 +89,16 @@ public:
 	//  with a different scale to this arbitrary_clock's scale
 	//---------------------------------------------------------
 
-	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
-	static time_point from_arbitrary_time_point(const std::chrono::time_point<arbitrary_clock<Rep2, Y2, M2, D2, H2, N2, S2, Ratio2> > &tp)
+	template<typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
+	static time_point from_arbitrary_time_point(const std::chrono::time_point<arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2> > &tp)
 	{
 		arbitrary_datetime dt;
-		dt.year = Y2;
-		dt.month = M2;
-		dt.day_of_month = D2;
-		dt.hour = H2;
-		dt.minute = N2;
-		dt.second = S2;
+		dt.year = YY;
+		dt.month = MM;
+		dt.day_of_month = DD;
+		dt.hour = HH;
+		dt.minute = NN;
+		dt.second = SS;
 
 		const duration adjustment = duration_from_arbitrary_datetime(dt, false);
 		const duration result_duration = std::chrono::duration_cast<duration>(tp.time_since_epoch() + adjustment);
@@ -109,10 +111,10 @@ public:
 	//  of this scale to one of different scale
 	//---------------------------------------------------------
 
-	template<typename Rep2, int Y2, int M2, int D2, int H2, int N2, int S2, typename Ratio2>
-	static std::chrono::time_point<arbitrary_clock<Rep2, Y2, M2, D2, H2, N2, S2, Ratio2> > to_arbitrary_time_point(const time_point &tp)
+	template<typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
+	static std::chrono::time_point<arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2> > to_arbitrary_time_point(const time_point &tp)
 	{
-		return arbitrary_clock<Rep2, Y2, M2, D2, H2, N2, S2, Ratio2>::from_arbitrary_time_point(tp);
+		return arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2>::from_arbitrary_time_point(tp);
 	}
 
 

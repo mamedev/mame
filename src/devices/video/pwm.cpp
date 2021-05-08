@@ -84,6 +84,7 @@ void pwm_display_device::device_start()
 
 	// initialize
 	m_rowsel = 0;
+	m_rowdata_last = 0;
 	std::fill(std::begin(m_rowdata), std::end(m_rowdata), 0);
 
 	for (auto &bri : m_bri)
@@ -105,6 +106,7 @@ void pwm_display_device::device_start()
 	save_item(NAME(m_segmask));
 	save_item(NAME(m_rowsel));
 	save_item(NAME(m_rowdata));
+	save_item(NAME(m_rowdata_last));
 
 	save_item(NAME(m_bri));
 	save_item(NAME(m_sync_time));
@@ -161,6 +163,7 @@ void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 row
 
 	// update selected rows
 	u64 rowmask = (u64(1) << m_width) - 1;
+	m_rowdata_last = rowdata & rowmask;
 	for (int y = start; y < (start + height) && y < m_height; y++)
 	{
 		m_rowdata[y] = (rowsel & 1) ? (rowdata & rowmask) : 0;

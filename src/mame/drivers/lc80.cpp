@@ -120,10 +120,7 @@ private:
 	void pio1_pb_w(u8 data);
 	u8 pio2_pb_r();
 
-	void update_display();
-
-	u8 m_digit = 0;
-	u8 m_segment = 0;
+	u8 m_matrix = 0;
 };
 
 
@@ -236,11 +233,6 @@ WRITE_LINE_MEMBER(lc80_state::ctc_z2_w)
 
 // Z80-PIO Interface
 
-void lc80_state::update_display()
-{
-	m_display->matrix(m_digit >> 1, m_segment);
-}
-
 void lc80_state::pio1_pa_w(u8 data)
 {
 	/*
@@ -258,8 +250,7 @@ void lc80_state::pio1_pa_w(u8 data)
 
 	*/
 
-	m_segment = bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2);
-	update_display();
+	m_display->write_mx(bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2));
 }
 
 u8 lc80_state::pio1_pb_r()
@@ -289,11 +280,11 @@ void lc80_state::pio1_pb_w(u8 data)
 	m_cassette->output(BIT(data, 1) ? +1.0 : -1.0);
 
 	// speaker
-	m_speaker->level_w(!BIT(data, 1));
+	m_speaker->level_w(BIT(~data, 1));
 
 	// 7segs/led/keyboard
-	m_digit = ~data;
-	update_display();
+	m_display->write_my(~data >> 1);
+	m_matrix = ~data >> 2 & 0x3f;
 }
 
 u8 lc80_state::pio2_pb_r()
@@ -316,7 +307,7 @@ u8 lc80_state::pio2_pb_r()
 	u8 data = 0;
 
 	for (int i = 0; i < 6; i++)
-		if (BIT(m_digit, i+2))
+		if (BIT(m_matrix, i))
 			data |= m_inputs[i]->read() << 4;
 
 	return data ^ 0xf0;
@@ -347,8 +338,7 @@ void lc80_state::machine_start()
 	program.install_ram(start, start + m_ram->size() - 1, mirror, m_ram->pointer());
 
 	// register for state saving
-	save_item(NAME(m_digit));
-	save_item(NAME(m_segment));
+	save_item(NAME(m_matrix));
 }
 
 
@@ -394,7 +384,6 @@ void lc80_state::lc80(machine_config &config)
 
 	RAM(config, m_ram).set_extra_options("1K,2K,3K,4K");
 	m_ram->set_default_size("1K");
-	m_ram->set_default_value(0xff);
 }
 
 void lc80_state::lc80a(machine_config &config)

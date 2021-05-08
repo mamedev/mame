@@ -73,10 +73,10 @@ ROM_START(ajofrin)
 	ROM_LOAD("ajofr_90percent_4k.bin", 0x0000, 0x1000, CRC(9e1fd7fe) SHA1(e7a5a2a10d17537edb039ac0f53358ee35465c90))
 
 	ROM_REGION(0x400, "audiocpu", 0)
-	ROM_LOAD( "d8748.bin", 0x000, 0x400, NO_DUMP )
+	ROM_LOAD( "ajo_d8748.bin", 0x000, 0x400, CRC(414dc0e3) SHA1(016ed2aa36b36a637163ac7cba0a944a258c02a4))
 ROM_END
 
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT MACHINE  INPUT    CLASS               INIT        ROT   COMPANY               FULLNAME        FLAGS
-GAME( 198?, ajofrin, 0,     ajofrin, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, ajofrin, 0,     ajofrin, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City", MACHINE_IS_SKELETON_MECHANICAL )

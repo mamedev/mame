@@ -455,7 +455,6 @@ MACHINES["MPCC68561"] = true
 MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
-MACHINES["AAKARTDEV"] = true
 MACHINES["ACIA6850"] = true
 MACHINES["ACORN_IOC"] = true
 MACHINES["ACORN_MEMC"] = true
@@ -1484,7 +1483,6 @@ function createProjects_mame_mess(_target, _subtarget)
 if (_subtarget=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
 files {
-	MAME_DIR .. "src/mame/machine/archimds.cpp",
 	MAME_DIR .. "src/mame/machine/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amiga.cpp",
 	MAME_DIR .. "src/mame/video/amigaaga.cpp",
@@ -2516,9 +2514,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "h01x")
 files {
-	MAME_DIR .. "src/mame/includes/h01x.h",
 	MAME_DIR .. "src/mame/drivers/h01x.cpp",
-	MAME_DIR .. "src/mame/video/h01x.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "hartung")
@@ -4224,6 +4220,7 @@ files {
 createMESSProjects(_target, _subtarget, "veb")
 files {
 	MAME_DIR .. "src/mame/drivers/chessmst.cpp",
+	MAME_DIR .. "src/mame/drivers/chessmstdm.cpp",
 	MAME_DIR .. "src/mame/drivers/kc.cpp",
 	MAME_DIR .. "src/mame/includes/kc.h",
 	MAME_DIR .. "src/mame/machine/kc.cpp",

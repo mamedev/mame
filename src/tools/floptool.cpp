@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    main.c
-
-    Floptool command line front end
-
-    20/07/2011 Initial version by Miodrag Milanovic
+	(Floppy) image command-line manager
 
 ***************************************************************************/
 
@@ -274,11 +270,11 @@ static const fs_info *find_fs_by_name(const char *name)
 static void display_usage()
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]\n");
-	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
-	fprintf(stderr, "       floptool.exe create output_format filesystem <outputfile>\n");
-	fprintf(stderr, "       floptool.exe dir input_format filesystem <image>\n");
-	fprintf(stderr, "       floptool.exe read input_format filesystem <image> <path> <outputfile>\n");
+	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]                                 -- Identify a floppy image format\n");
+	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>     -- Convert a floppy image\n");
+	fprintf(stderr, "       floptool.exe flopcreate output_format filesystem <outputfile>                       -- Create a preformatted floppy image\n");
+	fprintf(stderr, "       floptool.exe flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n");
+	fprintf(stderr, "       floptool.exe flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n");
 }
 
 static void display_formats()
@@ -295,7 +291,7 @@ static void display_formats()
 			sk = sz;
 	}
 
-	fprintf(stderr, "Supported formats:\n\n");
+	fprintf(stderr, "Supported floppy formats:\n\n");
 	for(const auto &e : formats_by_category)
 		if(!e.second.empty()) {
 			fprintf(stderr, "%s:\n", e.first.c_str());
@@ -304,7 +300,7 @@ static void display_formats()
 		}
 
 	fprintf(stderr, "\n\n");
-	fprintf(stderr, "Supported filesystems:\n\n");
+	fprintf(stderr, "Supported floppy filesystems:\n\n");
 	for(const auto &e : fs_by_category)
 		if(!e.second.empty()) {
 			fprintf(stderr, "%s:\n", e.first.c_str());
@@ -548,61 +544,12 @@ static void dir_scan(u32 depth, filesystem_t::dir_t dir, std::vector<std::vector
 	}
 }
 
-static int dir(int argc, char *argv[])
+static int generic_dir(const filesystem_manager_t *fm, fsblk_t &blockdev)
 {
-	if (argc!=5) {
-		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
-		return 1;
-	}
-
-	auto format = find_format_by_name(argv[2]);
-	if(!format) {
-		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
-		return 1;
-	}
-
-	auto fs = find_fs_by_name(argv[3]);
-	if(!fs) {
-		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
-		return 1;
-	}
-
-	if(!fs->m_manager || !fs->m_manager->can_read()) {
-		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
-		return 1;
-	}
-
-	char msg[4096];
-	sprintf(msg, "Error opening %s for reading", argv[4]);
-	FILE *f = fopen(argv[4], "rb");
-	if (!f) {
-		perror(msg);
-		return 1;
-	}
-	io_generic io;
-	io.file = f;
-	io.procs = &stdio_ioprocs_noclose;
-	io.filler = 0xff;
-
-	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
-	if(!format->load(&io, floppy_image::FF_UNKNOWN, variants, &image)) {
-		fprintf(stderr, "Error: parsing input file as '%s' failed\n", format->name());
-		return 1;
-	}
-
-	std::vector<u8> img;
-	auto iog = ram_open(img);
-	auto load_format = fs->m_type();
-	load_format->save(iog, variants, &image);
-	delete load_format;
-	delete iog;
-
-	fsblk_vec_t blockdev(img);
-	auto load_fs = fs->m_manager->mount(blockdev);
-	auto vmetad = fs->m_manager->volume_meta_description();
-	auto fmetad = fs->m_manager->file_meta_description();
-	auto dmetad = fs->m_manager->directory_meta_description();
+	auto load_fs = fm->mount(blockdev);
+	auto vmetad = fm->volume_meta_description();
+	auto fmetad = fm->file_meta_description();
+	auto dmetad = fm->directory_meta_description();
 
 	auto vmeta = load_fs->metadata();
 	if(!vmeta.empty()) {
@@ -653,10 +600,9 @@ static int dir(int argc, char *argv[])
 	return 0;
 }
 
-
-static int doread(int argc, char *argv[])
+static int flopdir(int argc, char *argv[])
 {
-	if (argc!=7) {
+	if (argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
 		display_usage();
 		return 1;
@@ -671,6 +617,102 @@ static int doread(int argc, char *argv[])
 	auto fs = find_fs_by_name(argv[3]);
 	if(!fs) {
 		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for reading", argv[4]);
+	FILE *f = fopen(argv[4], "rb");
+	if (!f) {
+		perror(msg);
+		return 1;
+	}
+	io_generic io;
+	io.file = f;
+	io.procs = &stdio_ioprocs_noclose;
+	io.filler = 0xff;
+
+	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
+	if(!format->load(&io, floppy_image::FF_UNKNOWN, variants, &image)) {
+		fprintf(stderr, "Error: parsing input file as '%s' failed\n", format->name());
+		return 1;
+	}
+
+	std::vector<u8> img;
+	auto iog = ram_open(img);
+	auto load_format = fs->m_type();
+	load_format->save(iog, variants, &image);
+	delete load_format;
+	delete iog;
+
+	fsblk_vec_t blockdev(img);
+	return generic_dir(fs->m_manager, blockdev);
+	
+	return 0;
+}
+
+// Should use chd&friends instead, but one thing at a time
+
+static int hddir(int argc, char *argv[])
+{
+	if (argc!=4) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	auto fs = find_fs_by_name(argv[2]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for reading", argv[3]);
+	FILE *f = fopen(argv[3], "rb");
+	if (!f) {
+		perror(msg);
+		return 1;
+	}
+	fseek(f, 0, SEEK_END);
+	size_t size = ftell(f);
+	rewind(f);
+	std::vector<u8> img(size);
+	fread(img.data(), size, 1, f);
+	fclose(f);
+
+	fsblk_vec_t blockdev(img);
+	return generic_dir(fs->m_manager, blockdev);
+}
+
+
+static int flopread(int argc, char *argv[])
+{
+	if (argc!=7) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	auto format = find_format_by_name(argv[2]);
+	if(!format) {
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	auto fs = find_fs_by_name(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
 		return 1;
 	}
 
@@ -777,19 +819,26 @@ int CLIB_DECL main(int argc, char *argv[])
 		return 0;
 	}
 
-	if (!core_stricmp("identify", argv[1]))
-		return identify(argc, argv);
-	else if (!core_stricmp("convert", argv[1]))
-		return convert(argc, argv);
-	else if (!core_stricmp("create", argv[1]))
-		return create(argc, argv);
-	else if (!core_stricmp("dir", argv[1]))
-		return dir(argc, argv);
-	else if (!core_stricmp("read", argv[1]))
-		return doread(argc, argv);
-	else {
-		fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
-		display_usage();
+	try {
+		if (!core_stricmp("identify", argv[1]))
+			return identify(argc, argv);
+		else if (!core_stricmp("convert", argv[1]))
+			return convert(argc, argv);
+		else if (!core_stricmp("create", argv[1]))
+			return create(argc, argv);
+		else if (!core_stricmp("flopdir", argv[1]))
+			return flopdir(argc, argv);
+		else if (!core_stricmp("flopread", argv[1]))
+			return flopread(argc, argv);
+		else if (!core_stricmp("hddir", argv[1]))
+			return hddir(argc, argv);
+		else {
+			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
+			display_usage();
+			return 1;
+		}
+	} catch(const emu_fatalerror &err) {
+		fprintf(stderr, "Error: %s", err.what());
 		return 1;
 	}
 }

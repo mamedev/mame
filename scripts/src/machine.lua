@@ -634,18 +634,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/aakart.h,MACHINES["AAKARTDEV"] = true
----------------------------------------------------
-
-if (MACHINES["AAKARTDEV"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/aakart.cpp",
-		MAME_DIR .. "src/devices/machine/aakart.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 

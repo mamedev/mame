@@ -31,7 +31,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
  *************************************/
 
 
-uint8_t trs80_state::port_e8_r()
+u8 trs80_state::port_e8_r()
 {
 /* not emulated
     d7 Clear-to-Send (CTS), Pin 5
@@ -44,7 +44,7 @@ uint8_t trs80_state::port_e8_r()
 	return 0;
 }
 
-uint8_t trs80_state::port_ea_r()
+u8 trs80_state::port_ea_r()
 {
 /* UART Status Register
     d7 Data Received ('1'=condition true)
@@ -54,7 +54,7 @@ uint8_t trs80_state::port_ea_r()
     d3 Parity Error ('1'=condition true)
     d2..d0 Not used */
 
-	uint8_t data=7;
+	u8 data=7;
 	m_uart->write_swe(0);
 	data |= m_uart->tbmt_r() ? 0x40 : 0;
 	data |= m_uart->dav_r( ) ? 0x80 : 0;
@@ -66,12 +66,12 @@ uint8_t trs80_state::port_ea_r()
 	return data;
 }
 
-void trs80_state::port_e8_w(uint8_t data)
+void trs80_state::port_e8_w(u8 data)
 {
 	m_reg_load = BIT(data, 1);
 }
 
-void trs80_state::port_ea_w(uint8_t data)
+void trs80_state::port_ea_w(u8 data)
 {
 	if (m_reg_load)
 
@@ -111,7 +111,7 @@ void trs80_state::port_ea_w(uint8_t data)
 }
 
 
-uint8_t trs80_state::sys80_f9_r()
+u8 trs80_state::sys80_f9_r()
 {
 /* UART Status Register - d6..d4 not emulated
     d7 Transmit buffer empty (inverted)
@@ -123,7 +123,7 @@ uint8_t trs80_state::sys80_f9_r()
     d1 Overrun
     d0 Data Available */
 
-	uint8_t data = 0x70;
+	u8 data = 0x70;
 	m_uart->write_swe(0);
 	data |= m_uart->tbmt_r() ? 0 : 0x80;
 	data |= m_uart->dav_r( ) ? 0x01 : 0;
@@ -135,16 +135,16 @@ uint8_t trs80_state::sys80_f9_r()
 	return data;
 }
 
-uint8_t trs80_state::port_ff_r()
+u8 trs80_state::port_ff_r()
 {
 /* ModeSel and cassette data
     d7 cassette data from tape
     d6 modesel setting */
 
-	return (BIT(m_mode, 0) ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
+	return (m_cpl ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
 }
 
-void trs80_state::sys80_f8_w(uint8_t data)
+void trs80_state::sys80_f8_w(u8 data)
 {
 /* not emulated
     d2 reset UART (XR pin)
@@ -152,7 +152,7 @@ void trs80_state::sys80_f8_w(uint8_t data)
     d0 RTS */
 }
 
-void trs80_state::sys80_fe_w(uint8_t data)
+void trs80_state::sys80_fe_w(u8 data)
 {
 /* not emulated
     d4 select internal or external cassette player */
@@ -160,7 +160,7 @@ void trs80_state::sys80_fe_w(uint8_t data)
 	m_tape_unit = BIT(data, 4) ? 2 : 1;
 }
 
-void trs80_state::port_ff_w(uint8_t data)
+void trs80_state::port_ff_w(u8 data)
 {
 /* Standard output port of Model I
     d3 ModeSel bit
@@ -173,7 +173,7 @@ void trs80_state::port_ff_w(uint8_t data)
 	m_cassette->output(levels[data & 3]);
 	m_cassette_data = false;
 
-	m_mode = (m_mode & 0xfe) | BIT(data, 3);
+	m_cpl = BIT(data, 3);
 
 	static const double speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
@@ -240,19 +240,19 @@ void trs80_state::fdc_w(offs_t offset, u8 data)
 	m_fdc->write(offset, data ^ 0xff);
 }
 
-uint8_t trs80_state::printer_r()
+u8 trs80_state::printer_r()
 {
 	return m_cent_status_in->read();
 }
 
-void trs80_state::printer_w(uint8_t data)
+void trs80_state::printer_w(u8 data)
 {
 	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }
 
-void trs80_state::cassunit_w(uint8_t data)
+void trs80_state::cassunit_w(u8 data)
 {
 /* not emulated
     01 for unit 1 (default)
@@ -261,7 +261,7 @@ void trs80_state::cassunit_w(uint8_t data)
 	m_tape_unit = data;
 }
 
-uint8_t trs80_state::irq_status_r()
+u8 trs80_state::irq_status_r()
 {
 /* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
     d7 = RTC
@@ -277,7 +277,7 @@ uint8_t trs80_state::irq_status_r()
 }
 
 
-void trs80_state::motor_w(uint8_t data)
+void trs80_state::motor_w(u8 data)
 {
 	m_fdd = nullptr;
 
@@ -301,7 +301,7 @@ void trs80_state::motor_w(uint8_t data)
 /*************************************
  *      Keyboard         *
  *************************************/
-uint8_t trs80_state::keyboard_r(offs_t offset)
+u8 trs80_state::keyboard_r(offs_t offset)
 {
 	u8 i, result = 0;
 
@@ -319,19 +319,18 @@ uint8_t trs80_state::keyboard_r(offs_t offset)
 
 void trs80_state::machine_start()
 {
-	save_item(NAME(m_mode));
+	save_item(NAME(m_cpl));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_tape_unit));
 	save_item(NAME(m_reg_load));
 	save_item(NAME(m_cassette_data));
 	save_item(NAME(m_old_cassette_val));
-	save_item(NAME(m_size_store));
+	save_item(NAME(m_cols));
 	save_item(NAME(m_timeout));
 
-	m_size_store = 0xff;
-	m_tape_unit=1;
-	m_reg_load=1;
+	m_tape_unit = 1;
+	m_reg_load = 1;
 
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80_state::cassette_data_callback),this));
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
@@ -340,6 +339,8 @@ void trs80_state::machine_start()
 void trs80_state::machine_reset()
 {
 	m_cassette_data = false;
+	m_cols = 0xff;
+	m_cpl = 0;
 	// if machine has a uart but no brg, the baud is determined by dipswitch
 	if (m_io_baud)
 	{
@@ -373,13 +374,14 @@ void trs80_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
+// TODO: If you get "Attempting to write outside of RAM" enough times in succession, MAME will exit unexpectedly (no error).
 QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	uint8_t type, length;
-	uint8_t data[0x100];
-	uint8_t addr[2];
+	u8 type, length;
+	u8 data[0x100];
+	u8 addr[2];
 	void *ptr;
 
 	while (!image.image_feof())
@@ -396,12 +398,12 @@ QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 				image.fread( &addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-				if (address < 0x3c00)
+				ptr = program.get_write_ptr(address);
+				if (!ptr)
 				{
 					image.message("Attempting to write outside of RAM");
 					return image_init_result::FAIL;
 				}
-				ptr = program.get_write_ptr(address);
 				image.fread( ptr, block_length);
 			}
 			break;

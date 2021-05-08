@@ -84,13 +84,11 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	void f3_eeprom(machine_config &config);
 	void f3(machine_config &config);
 	void f3_224a(machine_config &config);
 	void bubsympb(machine_config &config);
 	void f3_224b(machine_config &config);
 	void f3_224c(machine_config &config);
-	void f3_224b_eeprom(machine_config &config);
 
 	void init_commandw();
 	void init_pbobble2();

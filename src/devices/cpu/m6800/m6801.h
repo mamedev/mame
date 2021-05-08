@@ -124,6 +124,8 @@ protected:
 	devcb_write_line m_out_sc2_func;
 	devcb_write_line m_out_sertx_func;
 
+	int m_sclk_divider;
+
 	/* internal registers */
 	uint8_t   m_port_ddr[4];
 	uint8_t   m_port_data[4];
@@ -167,7 +169,7 @@ protected:
 	virtual void set_timer_event();
 	virtual void modified_counters();
 	virtual void check_timer_event();
-	void set_rmcr(uint8_t data);
+	virtual void set_rmcr(uint8_t data);
 	virtual void write_port2();
 	int m6800_rx();
 	void serial_transmit();
@@ -281,12 +283,21 @@ protected:
 	uint8_t ocr2l_r();
 	void ocr2l_w(uint8_t data);
 
+	void increment_t2cnt(int amount);
+	uint8_t t2cnt_r();
+	void t2cnt_w(uint8_t data);
+	void tconr_w(uint8_t data);
+	uint8_t tcsr3_r();
+	void tcsr3_w(uint8_t data);
+
 	virtual void m6800_check_irq2() override;
 	virtual void modified_tcsr() override;
 	virtual void set_timer_event() override;
 	virtual void modified_counters() override;
+	virtual void increment_counter(int amount) override;
 	virtual void check_timer_event() override;
 	virtual void CLEANUP_COUNTERS() override;
+	virtual void set_rmcr(uint8_t data) override;
 
 	devcb_read8::array<2> m_in_portx_func;
 	devcb_write8::array<3> m_out_portx_func;
@@ -297,6 +308,12 @@ protected:
 	uint8_t m_tcsr2;
 	uint8_t m_pending_tcsr2;
 	PAIR    m_output_compare2;
+
+	uint8_t m_t2cnt;
+	uint8_t m_tconr;
+	uint8_t m_tcsr3;
+	bool m_tout3;
+	bool m_t2cnt_written;
 };
 
 

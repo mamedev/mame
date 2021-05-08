@@ -9,7 +9,84 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/h01x.h"
+#include "screen.h"
+#include "speaker.h"
+#include "emupal.h"
+#include "cpu/z80/z80.h"
+#include "video/mc6845.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
+#include "imagedev/cassette.h"
+#include "formats/trs_cas.h"
+
+class h01x_state : public driver_device
+{
+public:
+	h01x_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_vram(*this, "vram")
+		, m_rom(*this, "maincpu")
+		, m_hzrom(*this, "hzrom")
+		, m_exrom(*this, "exrom")
+		, m_palette(*this, "palette")
+		, m_crtc(*this, "crtc")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_io_keyboard(*this, "LINE%u", 0U)
+	{ }
+
+	void h01x(machine_config &config);
+	void h01b(machine_config &config);
+	void nf500a(machine_config &config);
+	void h01jce(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void h01x_mem_map(address_map &map);
+	void h01x_io_map(address_map &map);
+
+	uint32_t screen_update_h01x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint8_t mem_0000_r(offs_t offset);
+	void mem_0000_w(uint8_t data);
+	uint8_t mem_4000_r(offs_t offset);
+	void mem_4000_w(offs_t offset, uint8_t data);
+	uint8_t mem_8000_r(offs_t offset);
+	void mem_8000_w(offs_t offset, uint8_t data);
+	uint8_t mem_c000_r(offs_t offset);
+	void mem_c000_w(offs_t offset, uint8_t data);
+
+	void port_70_w(uint8_t data);
+	uint8_t port_50_r();
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<ram_device> m_vram;
+	required_region_ptr<u8> m_rom;
+	required_region_ptr<u8> m_hzrom;
+	optional_region_ptr<u8> m_exrom;
+	required_device<palette_device> m_palette;
+	required_device<mc6845_device> m_crtc;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport_array<11> m_io_keyboard;
+
+	uint8_t m_bank = 0;
+	MC6845_UPDATE_ROW(crtc_update_row);
+
+	uint8_t *m_ram_ptr, *m_vram_ptr;
+
+	TIMER_CALLBACK_MEMBER(cassette_data_callback);
+	bool m_cassette_data = 0;
+	emu_timer *m_cassette_data_timer;
+	double m_old_cassette_val = 0;
+};
+
 
 static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
 
@@ -28,10 +105,16 @@ void h01x_state::h01x(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10.6445_MHz_XTAL, 336, 0, 336, 192, 0, 192);
-	screen.set_screen_update(FUNC(h01x_state::screen_update_h01x));
-	screen.set_palette("palette");
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	//screen.set_palette("palette");
 
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+
+	MC6845(config, m_crtc, 10.6445_MHz_XTAL / 8);   // freq guess
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(4);
+	m_crtc->set_update_row_callback(FUNC(h01x_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -79,8 +162,8 @@ void h01x_state::h01x_io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x60, 0x60).w(FUNC(h01x_state::port_60_w));
-	map(0x64, 0x64).w(FUNC(h01x_state::port_64_w));
+	map(0x60, 0x60).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x64, 0x64).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x50, 0x50).r(FUNC(h01x_state::port_50_r));
 	map(0x70, 0x70).w(FUNC(h01x_state::port_70_w));
 }
@@ -341,34 +424,13 @@ static INPUT_PORTS_START( h01x )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("LINE10")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 
@@ -376,6 +438,10 @@ INPUT_PORTS_END
 
 void h01x_state::machine_start()
 {
+	save_item(NAME(m_bank));
+	save_item(NAME(m_cassette_data));
+	save_item(NAME(m_old_cassette_val));
+
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback), this));
 	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(11025));
 }
@@ -384,39 +450,27 @@ void h01x_state::machine_reset()
 {
 	m_bank = 0x00;
 
-	m_rom_ptr = m_rom->base();
-	m_hzrom_ptr = m_hzrom->base();
-
 	m_ram_ptr = m_ram->pointer();
-	m_ram_size = m_ram->size();
-
 	m_vram_ptr = m_vram->pointer();
 }
 
-void h01x_state::video_start()
+MC6845_UPDATE_ROW( h01x_state::crtc_update_row )
 {
-}
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	u32 *p = &bitmap.pix(y);
 
-void h01x_state::init_h01x()
-{
-}
+	for (u16 x = 0; x < x_count; x++)
+	{
+		u16 mem = ((ma+x)*16 + ra) & 0x3fff;
+		u8 gfx = 0;
+		if (ra < 16)
+			gfx = m_vram_ptr[mem] ^ ((x == cursor_x) ? 15 : 0);
 
-/*
-uint32_t h01x_state::screen_update_h01x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-    return 0;
-}
-*/
-
-/* Port handlers */
-void h01x_state::port_60_w(uint8_t data)
-{
-	// MC6845P idx
-}
-
-void h01x_state::port_64_w(uint8_t data)
-{
-	// MC6845P data
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
+	}
 }
 
 void h01x_state::port_70_w(uint8_t data)
@@ -443,7 +497,7 @@ uint8_t h01x_state::port_50_r()
 // 0x0000 --- 0x3FFF
 uint8_t h01x_state::mem_0000_r(offs_t offset)
 {
-	return m_rom_ptr[offset];
+	return m_rom[offset];
 }
 
 void h01x_state::mem_0000_w(uint8_t data)
@@ -466,7 +520,7 @@ uint8_t h01x_state::mem_8000_r(offs_t offset)
 {
 	switch (m_bank) {
 	case 0xc0:
-		return m_hzrom_ptr[offset];
+		return m_hzrom[offset];
 	case 0x40:
 		if ((offset & 0xf000) == 0x3000) {
 			u8 result = 0xff;
@@ -496,7 +550,7 @@ void h01x_state::mem_8000_w(offs_t offset, uint8_t data)
 uint8_t h01x_state::mem_c000_r(offs_t offset)
 {
 	if (m_bank == 0xc0)
-		return m_hzrom_ptr[offset + 0x4000];
+		return m_hzrom[offset + 0x4000];
 	else if (m_bank == 0x40)
 		return m_vram_ptr[offset];
 	else
@@ -512,9 +566,6 @@ void h01x_state::mem_c000_w(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(h01x_state::cassette_data_callback)
 {
-	/* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
-	    1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
-
 	double new_val = m_cassette->input();
 
 	/* Check for HI-LO transition */
@@ -582,10 +633,9 @@ ROM_END
 
 // Incomplete features:
 // Cassette I/O is incomplete, and the TRS-80 main CPU frequency is used
-// MC6845P video chip functionality is not emulated
 // JCE's 16KB extended ROM functionality is not understood, functionality is unemulated
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT           COMPANY                                      FULLNAME     FLAGS
-COMP( 1985, h01b,    0,      0,      h01b,    h01b,    h01x_state,   init_h01x,     "China H Computer Company",                  "H-01B",     0 )
-COMP( 1985, nf500a,  0,      0,      nf500a,  h01x,    h01x_state,   init_h01x,     "China State-owned 830 Factory",             "NF500A",    0 )
-COMP( 1987, h01jce,  0,      0,      h01jce,  h01x,    h01x_state,   init_h01x,     "China Jiangmen Computer Equipment Factory", "H-01 JCE",  0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                      FULLNAME     FLAGS
+COMP( 1985, h01b,    0,      0,      h01b,    h01b,    h01x_state,   empty_init,   "China H Computer Company",                  "H-01B",     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, nf500a,  0,      0,      nf500a,  h01x,    h01x_state,   empty_init,   "China State-owned 830 Factory",             "NF500A",    MACHINE_SUPPORTS_SAVE )
+COMP( 1987, h01jce,  0,      0,      h01jce,  h01x,    h01x_state,   empty_init,   "China Jiangmen Computer Equipment Factory", "H-01 JCE",  MACHINE_SUPPORTS_SAVE )

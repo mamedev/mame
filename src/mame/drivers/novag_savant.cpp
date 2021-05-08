@@ -25,6 +25,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
@@ -89,7 +90,7 @@ private:
 	void nvram_w(offs_t offset, u8 data);
 	u8 nvram_r(offs_t offset);
 	u8 stall_r(offs_t offset);
-	void stall_w(offs_t offset, u8 data);
+	void stall_w(offs_t offset, u8 data = 0);
 	u8 mcustatus_r();
 
 	void lcd1_output_w(u64 data);
@@ -102,22 +103,15 @@ private:
 	void lcd_w(u8 data);
 	u8 input_r();
 
-	bool m_wait_in;
-	u8 m_inp_mux;
-	u8 m_databus;
-	u8 m_control;
-	u64 m_lcd_data;
+	bool m_wait_in = false;
+	u8 m_inp_mux = 0;
+	u8 m_databus = 0;
+	u8 m_control = 0;
+	u64 m_lcd_data = 0;
 };
 
 void savant_state::machine_start()
 {
-	// zerofill
-	m_wait_in = false;
-	m_inp_mux = 0;
-	m_databus = 0;
-	m_control = 0;
-	m_lcd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_wait_in));
 	save_item(NAME(m_inp_mux));
@@ -156,8 +150,11 @@ void savant_state::stall_w(offs_t offset, u8 data)
 
 u8 savant_state::stall_r(offs_t offset)
 {
-	m_wait_in = true;
-	stall_w(offset, 0);
+	if (!machine().side_effects_disabled())
+	{
+		m_wait_in = true;
+		stall_w(offset);
+	}
 
 	// return value is databus (see control_w)
 	return 0;
