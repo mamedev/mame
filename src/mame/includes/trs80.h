@@ -41,7 +41,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "flop%u", 0U)
+		, m_floppy(*this, "floppy%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_baud(*this, "BAUD")
@@ -98,7 +98,7 @@ protected:
 	u16 m_timeout = 600;
 	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_shared_ptr<u8> m_p_videoram;

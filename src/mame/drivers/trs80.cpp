@@ -154,6 +154,7 @@ ht1080z    works
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 
 
@@ -319,6 +320,9 @@ static INPUT_PORTS_START( trs80 )
 	PORT_START("LINE7")
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
+
+	PORT_START("RESET") // special button
+	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)
@@ -458,6 +462,10 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::m1_io);
 	m_maincpu->set_periodic_int(FUNC(trs80_state::rtc_interrupt), attotime::from_hz(40));
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
@@ -505,6 +513,8 @@ void trs80_state::sys80(machine_config &config)
 {
 	model1(config);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::sys80_io);
+	m_maincpu->halt_cb().set_nop(); // TODO: asserts HLTA on expansion bus instead
+
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_sys80));
 
 	config.device_remove("brg");
