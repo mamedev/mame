@@ -347,7 +347,7 @@ private:
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
 	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
-	static const int MAX_TEXTURE_SCALES = 16;
+	static constexpr int MAX_TEXTURE_SCALES = 20;
 
 	// a scaled_texture contains a single scaled entry for a texture
 	struct scaled_texture
