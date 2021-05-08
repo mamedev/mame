@@ -374,6 +374,7 @@ void trs80_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
+// TODO: If you get "Attempting to write outside of RAM" enough times in succession, MAME will exit unexpectedly (no error).
 QUICKLOAD_LOAD_MEMBER(trs80_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
