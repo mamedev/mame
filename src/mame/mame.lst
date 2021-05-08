@@ -36728,6 +36728,8 @@ sbowling                        // KB  (c) 1982 Taito Corporation
 
 @source:sbrain.cpp
 sbrain                          //
+sagafox                         //
+sagafoxf80                      //
 
 @source:sbrkout.cpp
 sbrkout                         // 033453-033455    1978/09 [6502]
