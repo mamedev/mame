@@ -3790,18 +3790,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5380.h,MACHINES["NCR5380"] = true
----------------------------------------------------
-
-if (MACHINES["NCR5380"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/ncr5380.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5380.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/ncr5380n.h,MACHINES["NCR5380N"] = true
 ---------------------------------------------------
 
