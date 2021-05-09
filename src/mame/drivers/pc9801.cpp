@@ -2448,7 +2448,8 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_dac_portc_w));
-	m_pit8253->out_handler<1>().set([this](int state) { m_dac->level_w(state); });
+	// TODO: verify if it needs invert();
+	m_pit8253->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
 
 	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
