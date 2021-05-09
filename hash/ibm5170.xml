@@ -11100,6 +11100,50 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="elvira2_525">
+		<description>Elvira II: Jaws of Cerberus (5.25" HD)</description>
+		<year>1991</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="362023e3" sha1="a2494b47ef732dc1f50a1d4a009a355e64d1b0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="da6d97f5" sha1="95c54b267ef8bc909fdb005b759a11ff1ce81991"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="f84f1271" sha1="d6da3b9360ce1b49f4bd375a0fef53aad2cc041f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvira2it" cloneof="elvira2_525">
+		<description>Elvira II: Jaws of Cerberus (Italy)</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3dd97ff0" sha1="348da2bfbbf3a19581be8b1d9249fe556ce6a60d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="52ccd466" sha1="3c3e63f5c2d42375dd42cd575d933fbbd5b86f1d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="585c7964" sha1="27a3374476988f4d75a1d7b56c84ab6636a995a9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epcrashb">
 		<description>Epic Pinball: Crash and Burn</description>
 		<year>1994</year>
@@ -12671,6 +12715,24 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (5.25'').img" size="1228800" crc="323b0332" sha1="dd3dc2df11745e4858dfee1025f42d98e6970b4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemac">
+		<description>Joe &amp; Mac: Caveman Ninja</description>
+		<year>1994</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="Data East" />
+		<info name="version" value="version 1.000.060" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Joe and Mac [New World Computing] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="75eb415b" sha1="c882f8a6cb9b616b15e3fcf1de46124f735a067b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Joe and Mac [New World Computing] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="bf703a53" sha1="edd25e6505774e34cde6d3d6e20ef60c44fbc277"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16462,6 +16524,33 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Warlords II - Scenario Builder [SSG] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="9181c3ea" sha1="00724a3f800f82a176ab9242cd42a87042f97b54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waxworks">
+		<description>WaxWorks</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="c9ad3e52" sha1="8d03b1d4614fc7c17f8353f1d12e6c4e4d251200"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="c34c7c70" sha1="5a0c66f17ba80d9fc58400090131794ce0fe01b4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="51341c68" sha1="2f58bc66d52ddfe2bb66beb49dee7094aaf7e640"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="09d0c4c4" sha1="d936e2cd7ae0cab668d5bf7d62ee6e843061d699"/>
 			</dataarea>
 		</part>
 	</software>
