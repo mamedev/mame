@@ -1,11 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:zzemu-cn
+// copyright-holders:zzemu-cn, Robbbert
 /***************************************************************************
-        NF500A (TRS80 Level II Basic)
+NF500A (TRS80 Level II Basic)
         09/01/2019
 
-        H-01B (TRS80 Level II Basic)
+H-01B (TRS80 Level II Basic)
         10/05/2019
+
+Despite the references to the TRS-80, the machines are entirely incompatible.
+
+TODO:
+- Need schematics and technical info.
+- Need confirmation of clock speeds for each machine.
+  (Cassettes made on machines of different clocks are not shareable)
+- JCE's 16KB extended ROM functionality is not understood, functionality is
+  unemulated
+- Need software.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -17,7 +28,6 @@
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 #include "imagedev/cassette.h"
-#include "formats/trs_cas.h"
 
 class h01x_state : public driver_device
 {
@@ -49,8 +59,6 @@ protected:
 private:
 	void h01x_mem_map(address_map &map);
 	void h01x_io_map(address_map &map);
-
-	uint32_t screen_update_h01x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t mem_0000_r(offs_t offset);
 	void mem_0000_w(uint8_t data);
@@ -84,7 +92,6 @@ private:
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	bool m_cassette_data = 0;
 	emu_timer *m_cassette_data_timer;
-	double m_old_cassette_val = 0;
 };
 
 
@@ -93,7 +100,7 @@ static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
 void h01x_state::h01x(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6); // TRS-80 clock frequency
+	Z80(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h01x_state::h01x_mem_map);
 	m_maincpu->set_addrmap(AS_IO, &h01x_state::h01x_io_map);
 
@@ -122,7 +129,6 @@ void h01x_state::h01x(machine_config &config)
 	/* devices */
 	CASSETTE(config, m_cassette);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 }
 
@@ -130,21 +136,21 @@ void h01x_state::h01b(machine_config &config)
 {
 	// H-01B CPU: 2MHz ROM: 16KB + 32KB
 	h01x(config);
-	//m_maincpu->set_clock(16_MHz_XTAL/8); using TRS-80 clock frequency until original cassettes can be found
+	m_maincpu->set_clock(16_MHz_XTAL/8);  // to confirm
 }
 
 void h01x_state::nf500a(machine_config &config)
 {
 	// NF-500A CPU: 4MHz ROM: 16KB + 32KB
 	h01x(config);
-	//m_maincpu->set_clock(16_MHz_XTAL/4); using TRS-80 clock frequency until original cassettes can be found
+	m_maincpu->set_clock(16_MHz_XTAL/4);  // to confirm
 }
 
 void h01x_state::h01jce(machine_config &config)
 {
 	// JCE CPU: 4MHz ROM: 16KB + 32KB + 16KB
 	h01x(config);
-	//m_maincpu->set_clock(16_MHz_XTAL/4); using TRS-80 clock frequency until original cassettes can be found
+	m_maincpu->set_clock(16_MHz_XTAL/4);  // to confirm
 }
 
 void h01x_state::h01x_mem_map(address_map &map)
@@ -438,10 +444,9 @@ void h01x_state::machine_start()
 {
 	save_item(NAME(m_bank));
 	save_item(NAME(m_cassette_data));
-	save_item(NAME(m_old_cassette_val));
 
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback), this));
-	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(11025));
+	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));
 }
 
 void h01x_state::machine_reset()
@@ -480,14 +485,11 @@ void h01x_state::port_70_w(uint8_t data)
 
 	// bit4, cassette
 	m_cassette->output(BIT(data, 4) ? 1.0 : -1.0);
-	m_cassette_data = false;
 }
 
 uint8_t h01x_state::port_50_r()
 {
 	// bit 7, cassette input
-	//return (m_cassette->input() > 0.04) ? 0x7f : 0xff;
-
 	return m_cassette_data ? 0xff : 0x7f;
 }
 
@@ -564,13 +566,10 @@ void h01x_state::mem_c000_w(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(h01x_state::cassette_data_callback)
 {
-	double new_val = m_cassette->input();
+	m_cassette_data = false;
 
-	/* Check for HI-LO transition */
-	if (m_old_cassette_val > -0.2 && new_val < -0.2)
+	if (m_cassette->input() > 0.2)
 		m_cassette_data = true;
-
-	m_old_cassette_val = new_val;
 }
 
 
@@ -628,10 +627,6 @@ ROM_END
 // H-01B  : H-01型中文教育电脑 普乐电器公司制造
 // NF500A : H-01型汉字微电脑   中国科学院H电脑公司
 // JCE    : H-01型中文普及电脑 北岳电子有限公司制造
-
-// Incomplete features:
-// Cassette I/O is incomplete, and the TRS-80 main CPU frequency is used
-// JCE's 16KB extended ROM functionality is not understood, functionality is unemulated
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT          COMPANY                                      FULLNAME     FLAGS
 COMP( 1985, h01b,    0,      0,      h01b,    h01b,    h01x_state,   empty_init,   "China H Computer Company",                  "H-01B",     MACHINE_SUPPORTS_SAVE )
