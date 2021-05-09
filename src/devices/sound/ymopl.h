@@ -77,7 +77,7 @@ public:
 
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
-	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data(data); }
 };
 
 

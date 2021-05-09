@@ -1,17 +1,30 @@
+//
+// Simple vgm renderer.
+//
+// Leverages em_inflate tiny inflater from https://github.com/emmanuel-marty/em_inflate
+//
 // Compile with:
 //
-//   g++ --std=c++17 -I../src vgmplay.cpp ../src/ymfm_opl.cpp ../src/ymfm_opm.cpp ../src/ymfm_opn.cpp ../src/ymfm_adpcm.cpp ../src/ymfm_ssg.cpp -o vgmplay.exe
+//   g++ --std=c++17 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
-//   cl -I..\src vgmplay.cpp ..\src\ymfm_opl.cpp ..\src\ymfm_opm.cpp ..\src\ymfm_opn.cpp ..\src\ymfm_adpcm.cpp ..\src\ymfm_ssg.cpp /Od /Zi /std:c++17 /EHsc
+//   clang --std=c++17 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//
+// or:
+//
+//   cl -I..\..\src vgmrender.cpp em_inflate.cpp ..\..\src\ymfm_opl.cpp ..\..\src\ymfm_opm.cpp ..\..\src\ymfm_opn.cpp ..\..\src\ymfm_adpcm.cpp ..\..\src\ymfm_ssg.cpp /Od /Zi /std:c++17 /EHsc
 //
 
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <cmath>
 #include <cstdio>
 #include <cstdint>
 #include <cstring>
 #include <list>
 
+#include "em_inflate.h"
 #include "ymfm_opl.h"
 #include "ymfm_opm.h"
 #include "ymfm_opn.h"
@@ -96,12 +109,17 @@ public:
 		memcpy(&m_pcm_data[base], src, length);
 	}
 
+	// seek within the PCM stream
+	void seek_pcm(uint32_t pos) { m_pcm_offset = pos; }
+	uint8_t read_pcm() { return (m_pcm_offset < m_pcm_data.size()) ? m_pcm_data[m_pcm_offset++] : 0; }
+
 protected:
 	// internal state
 	chip_type m_type;
 	std::vector<uint8_t> m_adpcm_a_data;
 	std::vector<uint8_t> m_adpcm_b_data;
 	std::vector<uint8_t> m_pcm_data;
+	uint32_t m_pcm_offset;
 };
 
 
@@ -149,9 +167,9 @@ public:
 	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) override
 	{
 		for ( ; m_pos <= output_start; m_pos += m_step)
-			m_chip.generate(m_output);
-		*buffer++ += m_output[0];
-		*buffer++ += m_output[ChipType::OUTPUTS > 1 ? 1 : 0];
+			m_chip.generate(&m_output);
+		*buffer++ += m_output.data[0];
+		*buffer++ += m_output.data[ChipType::OUTPUTS > 1 ? 1 : 0];
 	}
 
 protected:
@@ -176,7 +194,7 @@ protected:
 	// internal state
 	ChipType m_chip;
 	uint32_t m_clock;
-	int32_t m_output[ChipType::OUTPUTS];
+	typename ChipType::output_data m_output;
 	emulated_time m_step;
 	emulated_time m_pos;
 	std::vector<std::pair<uint32_t, uint8_t>> m_queue;
@@ -190,6 +208,7 @@ class vgm_chip_ssg : public vgm_chip<ChipType>
 {
 	using parent = vgm_chip<ChipType>;
 	using parent::m_chip;
+	using parent::m_clock;
 
 public:
 	// construction
@@ -208,10 +227,10 @@ public:
 
 		// generate the SSG
 		for ( ; m_pos_ssg <= output_start; m_pos_ssg += m_step_ssg)
-			m_chip.generate_ssg(m_output_ssg);
-		int32_t sum = m_output_ssg[0];
+			m_chip.generate_ssg(&m_output_ssg);
+		int32_t sum = m_output_ssg.data[0];
 		if (ChipType::SSG_OUTPUTS == 3)
-			sum += m_output_ssg[1] + m_output_ssg[2];
+			sum += m_output_ssg.data[1] + m_output_ssg.data[2];
 		*buffer++ += sum;
 		*buffer++ += sum;
 	}
@@ -226,7 +245,7 @@ protected:
 
 private:
 	// internal state
-	int32_t m_output_ssg[ChipType::SSG_OUTPUTS];
+	typename ChipType::output_data_ssg m_output_ssg;
 	emulated_time m_step_ssg;
 	emulated_time m_pos_ssg;
 };
@@ -285,6 +304,25 @@ void add_chips_ssg(uint32_t clock, chip_type type, char const *chipname)
 	printf("Adding %s%s @ %dHz\n", (numchips == 2) ? "2 x " : "", chipname, clockval);
 	for (int index = 0; index < numchips; index++)
 		active_chips.push_back(new vgm_chip_ssg<ChipType>(clockval, type));
+
+	if (type == CHIP_YM2608)
+	{
+		FILE *rom = fopen("ym2608_adpcm_rom.bin", "rb");
+		if (rom == nullptr)
+			fprintf(stderr, "Warning: YM2608 enabled but ym2608_adpcm_rom.bin not found\n");
+		else
+		{
+			fseek(rom, 0, SEEK_END);
+			uint32_t size = ftell(rom);
+			fseek(rom, 0, SEEK_SET);
+			std::vector<uint8_t> temp(size);
+			fread(&temp[0], 1, size, rom);
+			fclose(rom);
+			for (auto chip : active_chips)
+				if (chip->type() == type)
+					chip->write_adpcm_a(0, size, &temp[0]);
+		}
+	}
 }
 
 
@@ -700,7 +738,7 @@ void write_chip_hi(chip_type type, uint8_t index, uint32_t reg, uint8_t data)
 //  in the vgmplay file
 //-------------------------------------------------
 
-void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t output_rate, std::vector<int16_t> &wav_buffer)
+void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t output_rate, std::vector<int32_t> &wav_buffer)
 {
 	// set the offset to the data start and go
 	uint32_t offset = data_start;
@@ -842,11 +880,9 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 				uint32_t size = parse_uint32(buffer, offset);
 				uint32_t start, length;
 				uint32_t localoffset = offset;
-				vgm_chip_base *chip;
 
 				switch (type)
 				{
-					case 0x00: // YM2612 PCM data for use with associated commands
 					case 0x01: // RF5C68 PCM data for use with associated commands
 					case 0x02: // RF5C164 PCM data for use with associated commands
 					case 0x03: // PWM PCM data for use with associated commands
@@ -856,12 +892,20 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 					case 0x07: // NES APU DPCM data for use with associated commands
 						break;
 
+					case 0x00: // YM2612 PCM data for use with associated commands
+					{
+						vgm_chip_base *chip = find_chip(CHIP_YM2612, 0);
+						if (chip != nullptr)
+							chip->write_pcm(0, size - 8, &buffer[localoffset]);
+						break;
+					}
+
 					case 0x82: // YM2610 ADPCM ROM data
 						length = parse_uint32(buffer, localoffset);
 						start = parse_uint32(buffer, localoffset);
 						for (int index = 0; index < 2; index++)
 						{
-							chip = find_chip(CHIP_YM2610, index);
+							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
 							if (chip != nullptr)
 								chip->write_adpcm_a(start, size - 8, &buffer[localoffset]);
 						}
@@ -872,7 +916,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						start = parse_uint32(buffer, localoffset);
 						for (int index = 0; index < 2; index++)
 						{
-							chip = find_chip(CHIP_YM2608, index);
+							vgm_chip_base *chip = find_chip(CHIP_YM2608, index);
 							if (chip != nullptr)
 								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
 						}
@@ -883,7 +927,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						start = parse_uint32(buffer, localoffset);
 						for (int index = 0; index < 2; index++)
 						{
-							chip = find_chip(CHIP_YM2610, index);
+							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
 							if (chip != nullptr)
 								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
 						}
@@ -894,7 +938,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						start = parse_uint32(buffer, localoffset);
 						for (int index = 0; index < 2; index++)
 						{
-							chip = find_chip(CHIP_Y8950, index);
+							vgm_chip_base *chip = find_chip(CHIP_Y8950, index);
 							if (chip != nullptr)
 								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
 						}
@@ -943,7 +987,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 
 			// AY8910, write value dd to register aa
 			case 0xa0:
-				write_chip(CHIP_YM2149, 0, buffer[offset], buffer[offset + 1]);
+				write_chip(CHIP_YM2149, buffer[offset] >> 7, buffer[offset] & 0x7f, buffer[offset + 1]);
 				offset += 2;
 				break;
 
@@ -951,6 +995,16 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			case 0x78:	case 0x79:	case 0x7a:	case 0x7b:	case 0x7c:	case 0x7d:	case 0x7e:	case 0x7f:
 				delay = (cmd & 15) + 1;
 				break;
+
+			case 0x80:	case 0x81:	case 0x82:	case 0x83:	case 0x84:	case 0x85:	case 0x86:	case 0x87:
+			case 0x88:	case 0x89:	case 0x8a:	case 0x8b:	case 0x8c:	case 0x8d:	case 0x8e:	case 0x8f:
+			{
+				vgm_chip_base *chip = find_chip(CHIP_YM2612, 0);
+				if (chip != nullptr)
+					chip->write(0x2a, chip->read_pcm());
+				delay = cmd & 15;
+				break;
+			}
 
 			// ignored, consume one byte
 			case 0x30:	case 0x31:	case 0x32:	case 0x33:	case 0x34:	case 0x35:	case 0x36:	case 0x37:
@@ -1007,9 +1061,14 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 
 			// ignored, consume four bytes
 			case 0xe0:	// dddddddd: Seek to offset dddddddd (Intel byte order) in PCM data bank of data block type 0 (YM2612).
-				printf("E0: YM2612 PCMseen\n");
+			{
+				vgm_chip_base *chip = find_chip(CHIP_YM2612, 0);
+				uint32_t pos = parse_uint32(buffer, offset);
+				if (chip != nullptr)
+					chip->seek_pcm(pos);
 				offset += 4;
 				break;
+			}
 			case 0xe1:	// mmll aadd: C352, write value aadd to register mmll
 			case 0xe2:	case 0xe3:	case 0xe4:	case 0xe5:	case 0xe6:	case 0xe7:
 			case 0xe8:	case 0xe9:	case 0xea:	case 0xeb:	case 0xec:	case 0xed:	case 0xee:	case 0xef:
@@ -1031,8 +1090,8 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 				chip->generate(output_pos, output_step, outputs);
 			}
 			output_pos += output_step;
-			wav_buffer.push_back(int16_t(std::clamp(outputs[0], -32768, 32767)));
-			wav_buffer.push_back(int16_t(std::clamp(outputs[1], -32768, 32767)));
+			wav_buffer.push_back(outputs[0]);
+			wav_buffer.push_back(outputs[1]);
 		}
 	}
 }
@@ -1043,8 +1102,21 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 //  stereo data
 //-------------------------------------------------
 
-int write_wav(char const *filename, uint32_t output_rate, std::vector<int16_t> &wav_buffer)
+int write_wav(char const *filename, uint32_t output_rate, std::vector<int32_t> &wav_buffer_src)
 {
+	// determine normalization parameters
+	int32_t max_scale = 0;
+	for (int index = 0; index < wav_buffer_src.size(); index++)
+	{
+		int32_t absval = std::abs(wav_buffer_src[index]);
+		max_scale = std::max(max_scale, absval);
+	}
+
+	// now convert
+	std::vector<int16_t> wav_buffer(wav_buffer_src.size());
+	for (int index = 0; index < wav_buffer_src.size(); index++)
+		wav_buffer[index] = wav_buffer_src[index] * 26000 / max_scale;
+
 	// write the WAV file
 	FILE *out = fopen(filename, "wb");
 	if (out == nullptr)
@@ -1221,7 +1293,7 @@ int main(int argc, char *argv[])
 	// if invalid syntax, show usage
 	if (argerr || filename == nullptr || outfilename == nullptr)
 	{
-		fprintf(stderr, "Usage: vgmplay <inputfile> -o <outputfile> [-r <rate>]\n");
+		fprintf(stderr, "Usage: vgmrender <inputfile> -o <outputfile> [-r <rate>]\n");
 		return 1;
 	}
 
@@ -1248,6 +1320,31 @@ int main(int argc, char *argv[])
 	}
 	fclose(file);
 
+	// check for gzip-format
+	if (buffer.size() >= 10 && buffer[0] == 0x1f && buffer[1] == 0x8b && buffer[2] == 0x08)
+	{
+		// copy the raw data to a new buffer
+		std::vector<uint8_t> compressed = buffer;
+
+		// determine uncompressed size and resize the buffer
+		uint8_t *end = &compressed[compressed.size()];
+		uint32_t uncompressed = end[-4] | (end[-3] << 8) | (end[-2] << 16) | (end[-1] << 24);
+		if (size < compressed.size() || size > 32*1024*1024)
+		{
+			fprintf(stderr, "File '%s' appears to be a compressed file but has unexpected size of %d\n", filename, size);
+			return 4;
+		}
+		buffer.resize(uncompressed);
+
+		// decompress the data
+		auto result = em_inflate(&compressed[0], compressed.size(), &buffer[0], buffer.size());
+		if (result == -1)
+		{
+			fprintf(stderr, "Error decompressing data from file\n");
+			return 4;
+		}
+	}
+
 	// check the ID
 	uint32_t offset = 0;
 	if (buffer.size() < 64 || buffer[0] != 'V' || buffer[1] != 'g' || buffer[2] != 'm' || buffer[3] != ' ')
@@ -1267,7 +1364,7 @@ int main(int argc, char *argv[])
 	}
 
 	// generate the output
-	std::vector<int16_t> wav_buffer;
+	std::vector<int32_t> wav_buffer;
 	generate_all(buffer, data_start, output_rate, wav_buffer);
 
 	int err = write_wav(outfilename, output_rate, wav_buffer);

@@ -1,8 +1,35 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// BSD 3-Clause License
+//
+// Copyright (c) 2021, Aaron Giles
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ymfm_opl.h"
-#include "ymfm.ipp"
+#include "ymfm_fm.ipp"
 
 namespace ymfm
 {
@@ -754,6 +781,10 @@ uint8_t ym3526::read(uint32_t offset)
 
 void ym3526::write_address(uint8_t data)
 {
+	// YM3526 doesn't expose a busy signal, and the datasheets don't indicate
+	// delays, but all other OPL chips need 12 cycles for address writes
+	m_fm.intf().ymfm_set_busy_end(12);
+
 	// just set the address
 	m_address = data;
 }
@@ -766,6 +797,10 @@ void ym3526::write_address(uint8_t data)
 
 void ym3526::write_data(uint8_t data)
 {
+	// YM3526 doesn't expose a busy signal, and the datasheets don't indicate
+	// delays, but all other OPL chips need 84 cycles for data writes
+	m_fm.intf().ymfm_set_busy_end(84);
+
 	// write to FM
 	m_fm.write(m_address, data);
 }
@@ -792,23 +827,24 @@ void ym3526::write(uint32_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  generate - generate one sample of sound
+//  generate - generate samples of sound
 //-------------------------------------------------
 
-void ym3526::generate(int32_t output[fm_engine::OUTPUTS])
+void ym3526::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; mixing details for YM3526 need verification
+		output->clear();
+		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
 
-	// convert to 10.3 floating point value for the DAC and back
-	// YM2151 is stereo
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// YM3526 uses an external DAC (YM3014) with mantissa/exponent format
+		// convert to 10.3 floating point value and back to simulate truncation
+		output->roundtrip_fp();
+	}
 }
 
 
@@ -935,6 +971,10 @@ uint8_t y8950::read(uint32_t offset)
 
 void y8950::write_address(uint8_t data)
 {
+	// Y8950 doesn't expose a busy signal, but it does indicate that
+	// address writes should be no faster than every 12 clocks
+	m_fm.intf().ymfm_set_busy_end(12);
+
 	// just set the address
 	m_address = data;
 }
@@ -947,6 +987,11 @@ void y8950::write_address(uint8_t data)
 
 void y8950::write_data(uint8_t data)
 {
+	// Y8950 doesn't expose a busy signal, but it does indicate that
+	// data writes should be no faster than every 12 clocks for
+	// registers 00-1A, or every 84 clocks for other registers
+	m_fm.intf().ymfm_set_busy_end((m_address <= 0x1a) ? 12 : 84);
+
 	// handle special addresses
 	switch (m_address)
 	{
@@ -1017,30 +1062,29 @@ void y8950::write(uint32_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  generate - generate one sample of sound
+//  generate - generate samples of sound
 //-------------------------------------------------
 
-void y8950::generate(int32_t output[fm_engine::OUTPUTS])
+void y8950::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
+		m_adpcm_b.clock();
 
-	// clock the ADPCM-B engine every cycle
-	m_adpcm_b.clock(0x01);
+		// update the FM content; clipping need verification
+		output->clear();
+		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
 
-	// update the FM content; clipping is unknown
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, fm_engine::ALL_CHANNELS);
+		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
+		// not sure how it's wired up internally
+		m_adpcm_b.output(*output, 3);
 
-	// mix in the ADPCM; ADPCM-B is stereo, but only one channel
-	// not sure how it's wired up internally
-	m_adpcm_b.output(output, 3, 0x01);
-
-	// convert to 10.3 floating point value for the DAC and back
-	// Y8950 is mono
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// Y8950 uses an external DAC (YM3014) with mantissa/exponent format
+		// convert to 10.3 floating point value and back to simulate truncation
+		output->roundtrip_fp();
+	}
 }
 
 
@@ -1105,7 +1149,7 @@ uint8_t ym3812::read(uint32_t offset)
 			result = read_status();
 			break;
 
-		case 1: // when A0=1 datasheet says "the data on the bus are not guaranteed"
+		case 1: // "inhibit" according to datasheet
 			break;
 	}
 	return result;
@@ -1119,6 +1163,10 @@ uint8_t ym3812::read(uint32_t offset)
 
 void ym3812::write_address(uint8_t data)
 {
+	// YM3812 doesn't expose a busy signal, but it does indicate that
+	// address writes should be no faster than every 12 clocks
+	m_fm.intf().ymfm_set_busy_end(12);
+
 	// just set the address
 	m_address = data;
 }
@@ -1131,6 +1179,10 @@ void ym3812::write_address(uint8_t data)
 
 void ym3812::write_data(uint8_t data)
 {
+	// YM3812 doesn't expose a busy signal, but it does indicate that
+	// data writes should be no faster than every 84 clocks
+	m_fm.intf().ymfm_set_busy_end(84);
+
 	// write to FM
 	m_fm.write(m_address, data);
 }
@@ -1157,23 +1209,24 @@ void ym3812::write(uint32_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  generate - generate one sample of sound
+//  generate - generate samples of sound
 //-------------------------------------------------
 
-void ym3812::generate(int32_t output[fm_engine::OUTPUTS])
+void ym3812::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; mixing details for YM3812 need verification
+		output->clear();
+		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
 
-	// convert to 10.3 floating point value for the DAC and back
-	// YM2151 is stereo
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// YM3812 uses an external DAC (YM3014) with mantissa/exponent format
+		// convert to 10.3 floating point value and back to simulate truncation
+		output->roundtrip_fp();
+	}
 }
 
 
@@ -1255,6 +1308,10 @@ uint8_t ymf262::read(uint32_t offset)
 
 void ymf262::write_address(uint8_t data)
 {
+	// YMF262 doesn't expose a busy signal, but it does indicate that
+	// address writes should be no faster than every 32 clocks
+	m_fm.intf().ymfm_set_busy_end(32);
+
 	// just set the address
 	m_address = data;
 }
@@ -1267,6 +1324,10 @@ void ymf262::write_address(uint8_t data)
 
 void ymf262::write_data(uint8_t data)
 {
+	// YMF262 doesn't expose a busy signal, but it does indicate that
+	// data writes should be no faster than every 32 clocks
+	m_fm.intf().ymfm_set_busy_end(32);
+
 	// write to FM
 	m_fm.write(m_address, data);
 }
@@ -1279,6 +1340,10 @@ void ymf262::write_data(uint8_t data)
 
 void ymf262::write_address_hi(uint8_t data)
 {
+	// YMF262 doesn't expose a busy signal, but it does indicate that
+	// address writes should be no faster than every 32 clocks
+	m_fm.intf().ymfm_set_busy_end(32);
+
 	// just set the address
 	m_address = data | 0x100;
 
@@ -1286,18 +1351,6 @@ void ymf262::write_address_hi(uint8_t data)
 	// except for register 0x105
 	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
 		m_address &= 0xff;
-}
-
-
-//-------------------------------------------------
-//  write_data_hi - handle a write to the upper
-//  data register
-//-------------------------------------------------
-
-void ymf262::write_data_hi(uint8_t data)
-{
-	// write to FM
-	m_fm.write(m_address, data);
 }
 
 
@@ -1323,7 +1376,182 @@ void ymf262::write(uint32_t offset, uint8_t data)
 			break;
 
 		case 3: // data port
-			write_data_hi(data);
+			write_data(data);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  generate - generate samples of sound
+//-------------------------------------------------
+
+void ymf262::generate(output_data *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
+
+		// update the FM content; mixing details for YMF262 need verification
+		output->clear();
+		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+
+		// YMF262 output is 16-bit offset serial via YAC512 DAC
+		output->clamp16();
+	}
+}
+
+
+
+//*********************************************************
+//  YMF278B
+//*********************************************************
+
+//-------------------------------------------------
+//  ymf278b - constructor
+//-------------------------------------------------
+
+ymf278b::ymf278b(ymfm_interface &intf) :
+	m_address(0),
+	m_fm(intf)
+{
+}
+
+
+//-------------------------------------------------
+//  reset - reset the system
+//-------------------------------------------------
+
+void ymf278b::reset()
+{
+	// reset the engines
+	m_fm.reset();
+}
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void ymf278b::save_restore(ymfm_saved_state &state)
+{
+	state.save_restore(m_address);
+	m_fm.save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  read_status - read the status register
+//-------------------------------------------------
+
+uint8_t ymf278b::read_status()
+{
+	return m_fm.status();
+}
+
+
+//-------------------------------------------------
+//  read - handle a read from the device
+//-------------------------------------------------
+
+uint8_t ymf278b::read(uint32_t offset)
+{
+	uint8_t result = 0xff;
+	switch (offset & 7)
+	{
+		case 0: // status port
+			result = read_status();
+			break;
+
+		case 5: // PCM data port (not supported for now)
+			//result = read_data_pcm();
+			break;
+
+		default:
+			m_fm.intf().log("Unexpected read from ymf278b offset %d\n", offset & 3);
+			break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_address - handle a write to the address
+//  register
+//-------------------------------------------------
+
+void ymf278b::write_address(uint8_t data)
+{
+	// just set the address
+	m_address = data;
+}
+
+
+//-------------------------------------------------
+//  write_data - handle a write to the data
+//  register
+//-------------------------------------------------
+
+void ymf278b::write_data(uint8_t data)
+{
+	// write to FM
+	m_fm.write(m_address, data);
+}
+
+
+//-------------------------------------------------
+//  write_address_hi - handle a write to the upper
+//  address register
+//-------------------------------------------------
+
+void ymf278b::write_address_hi(uint8_t data)
+{
+	// just set the address
+	m_address = data | 0x100;
+
+	// YMF262, in compatibility mode, treats the upper bit as masked
+	// except for register 0x105; assuming YMF278B works the same way?
+	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
+		m_address &= 0xff;
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the register
+//  interface
+//-------------------------------------------------
+
+void ymf278b::write(uint32_t offset, uint8_t data)
+{
+	switch (offset & 7)
+	{
+		case 0: // address port
+			write_address(data);
+			break;
+
+		case 1: // data port
+			write_data(data);
+			break;
+
+		case 2: // address port
+			write_address_hi(data);
+			break;
+
+		case 3: // data port
+			write_data(data);
+			break;
+
+		case 4: // PCM address port (not supported for now)
+			//write_address_pcm(data);
+			break;
+
+		case 5: // PCM address port (not supported for now)
+			//write_data_pcm(data);
+			break;
+
+		default:
+			m_fm.intf().log("Unexpected write to ymf278b offset %d\n", offset & 7);
 			break;
 	}
 }
@@ -1333,20 +1561,20 @@ void ymf262::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ymf262::generate(int32_t output[fm_engine::OUTPUTS])
+void ymf278b::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; mixing details for YMF278B need verification
+		output->clear();
+		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
 
-	// convert to 10.3 floating point value for the DAC and back
-	// YM2151 is stereo
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// YMF278B output is 16-bit 2s complement serial
+		output->clamp16();
+	}
 }
 
 
@@ -1396,6 +1624,10 @@ void opll_base::save_restore(ymfm_saved_state &state)
 
 void opll_base::write_address(uint8_t data)
 {
+	// OPLL doesn't expose a busy signal, but datasheets are pretty consistent
+	// in indicating that address writes should be no faster than every 12 clocks
+	m_fm.intf().ymfm_set_busy_end(12);
+
 	// just set the address
 	m_address = data;
 }
@@ -1408,6 +1640,10 @@ void opll_base::write_address(uint8_t data)
 
 void opll_base::write_data(uint8_t data)
 {
+	// OPLL doesn't expose a busy signal, but datasheets are pretty consistent
+	// in indicating that address writes should be no faster than every 84 clocks
+	m_fm.intf().ymfm_set_busy_end(84);
+
 	// write to FM
 	m_fm.write(m_address, data);
 }
@@ -1437,21 +1673,24 @@ void opll_base::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void opll_base::generate(int32_t output[fm_engine::OUTPUTS])
+void opll_base::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; OPLL has a built-in 9-bit DAC
+		output->clear();
+		m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
 
-	// convert to 10.3 floating point value for the DAC and back
-	// YM2151 is stereo
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// final output is multiplexed; we don't simulate that here except
+		// to average over everything
+		output->data[0] = (output->data[0] << 7) / 9;
+		output->data[1] = (output->data[1] << 7) / 9;
+	}
 }
+
 
 
 //*********************************************************
@@ -1490,6 +1729,7 @@ uint8_t const ym2413::s_default_instruments[] =
 	0x01, 0x01, 0x00, 0x00, 0xC8, 0xD8, 0xA7, 0x48, //rhythm 2
 	0x05, 0x01, 0x00, 0x00, 0xF8, 0xAA, 0x59, 0x55  //rhythm 3
 };
+
 
 
 //*********************************************************
@@ -1532,6 +1772,7 @@ uint8_t const ym2423::s_default_instruments[] =
 };
 
 
+
 //*********************************************************
 //  YMF281
 //*********************************************************
@@ -1570,6 +1811,7 @@ uint8_t const ymf281::s_default_instruments[] =
 };
 
 
+
 //*********************************************************
 //  DS1001
 //*********************************************************
@@ -1606,9 +1848,5 @@ uint8_t const ds1001::s_default_instruments[] =
 	0x01, 0x01, 0x00, 0x00, 0xC8, 0xD8, 0xA7, 0x48, //rhythm 2
 	0x05, 0x01, 0x00, 0x00, 0xF8, 0xAA, 0x59, 0x55  //rhythm 3
 };
-
-
-template class opl_registers_base<4>;
-template class fm_engine_base<opl4_registers>;
 
 }

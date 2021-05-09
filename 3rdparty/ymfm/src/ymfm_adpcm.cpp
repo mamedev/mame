@@ -1,5 +1,32 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// BSD 3-Clause License
+//
+// Copyright (c) 2021, Aaron Giles
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ymfm_adpcm.h"
 
@@ -197,7 +224,8 @@ bool adpcm_a_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void adpcm_a_channel::output(int32_t outputs[2]) const
+template<int NumOutputs>
+void adpcm_a_channel::output(ymfm_output<NumOutputs> &output) const
 {
 	// volume combines instrument and total levels
 	int vol = (m_regs.ch_instrument_level(m_choffs) ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
@@ -216,10 +244,10 @@ void adpcm_a_channel::output(int32_t outputs[2]) const
 	int16_t value = ((int16_t(m_accumulator << 4) * mul) >> shift) & ~3;
 
 	// apply to left/right as appropriate
-	if (m_regs.ch_pan_left(m_choffs))
-		outputs[0] += value;
-	if (m_regs.ch_pan_right(m_choffs))
-		outputs[1] += value;
+	if (NumOutputs == 1 || m_regs.ch_pan_left(m_choffs))
+		output.data[0] += value;
+	if (NumOutputs > 1 && m_regs.ch_pan_right(m_choffs))
+		output.data[1] += value;
 }
 
 
@@ -293,7 +321,8 @@ uint32_t adpcm_a_engine::clock(uint32_t chanmask)
 //  update - master update function
 //-------------------------------------------------
 
-void adpcm_a_engine::output(int32_t outputs[2], uint32_t chanmask)
+template<int NumOutputs>
+void adpcm_a_engine::output(ymfm_output<NumOutputs> &output, uint32_t chanmask)
 {
 	// mask out some channels for debug purposes
 	chanmask &= global_chanmask;
@@ -301,8 +330,11 @@ void adpcm_a_engine::output(int32_t outputs[2], uint32_t chanmask)
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (bitfield(chanmask, chnum))
-			m_channel[chnum]->output(outputs);
+			m_channel[chnum]->output(output);
 }
+
+template void adpcm_a_engine::output<1>(ymfm_output<1> &output, uint32_t chanmask);
+template void adpcm_a_engine::output<2>(ymfm_output<2> &output, uint32_t chanmask);
 
 
 //-------------------------------------------------
@@ -498,7 +530,8 @@ void adpcm_b_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void adpcm_b_channel::output(int32_t outputs[2], uint32_t rshift) const
+template<int NumOutputs>
+void adpcm_b_channel::output(ymfm_output<NumOutputs> &output, uint32_t rshift) const
 {
 	// mask out some channels for debug purposes
 	if ((global_chanmask & 0x80) == 0)
@@ -511,10 +544,10 @@ void adpcm_b_channel::output(int32_t outputs[2], uint32_t rshift) const
 	result = (result * int32_t(m_regs.level())) >> (8 + rshift);
 
 	// apply to left/right
-	if (m_regs.pan_left())
-		outputs[0] += result;
-	if (m_regs.pan_right())
-		outputs[1] += result;
+	if (NumOutputs == 1 || m_regs.pan_left())
+		output.data[0] += result;
+	if (NumOutputs > 1 && m_regs.pan_right())
+		output.data[1] += result;
 }
 
 
@@ -683,7 +716,7 @@ adpcm_b_engine::adpcm_b_engine(ymfm_interface &intf, uint32_t addrshift) :
 	m_intf(intf)
 {
 	// create the channel (only one supported for now, but leaving possibilities open)
-	m_channel[0] = std::make_unique<adpcm_b_channel>(*this, addrshift);
+	m_channel = std::make_unique<adpcm_b_channel>(*this, addrshift);
 }
 
 
@@ -697,8 +730,7 @@ void adpcm_b_engine::reset()
 	m_regs.reset();
 
 	// reset each channel
-	for (auto &chan : m_channel)
-		chan->reset();
+	m_channel->reset();
 }
 
 
@@ -712,8 +744,7 @@ void adpcm_b_engine::save_restore(ymfm_saved_state &state)
 	m_regs.save_restore(state);
 
 	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save_restore(state);
+	m_channel->save_restore(state);
 }
 
 
@@ -721,12 +752,10 @@ void adpcm_b_engine::save_restore(ymfm_saved_state &state)
 //  clock - master clocking function
 //-------------------------------------------------
 
-void adpcm_b_engine::clock(uint32_t chanmask)
+void adpcm_b_engine::clock()
 {
 	// clock each channel, setting a bit in result if it finished
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (bitfield(chanmask, chnum))
-			m_channel[chnum]->clock();
+	m_channel->clock();
 }
 
 
@@ -734,13 +763,15 @@ void adpcm_b_engine::clock(uint32_t chanmask)
 //  output - master output function
 //-------------------------------------------------
 
-void adpcm_b_engine::output(int32_t outputs[2], uint32_t rshift, uint32_t chanmask)
+template<int NumOutputs>
+void adpcm_b_engine::output(ymfm_output<NumOutputs> &output, uint32_t rshift)
 {
 	// compute the output of each channel
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (bitfield(chanmask, chnum))
-			m_channel[chnum]->output(outputs, rshift);
+	m_channel->output(output, rshift);
 }
+
+template void adpcm_b_engine::output<1>(ymfm_output<1> &output, uint32_t rshift);
+template void adpcm_b_engine::output<2>(ymfm_output<2> &output, uint32_t rshift);
 
 
 //-------------------------------------------------
@@ -754,7 +785,7 @@ void adpcm_b_engine::write(uint32_t regnum, uint8_t data)
 	m_regs.write(regnum, data);
 
 	// let the channel handle any special writes
-	m_channel[0]->write(regnum, data);
+	m_channel->write(regnum, data);
 }
 
 }

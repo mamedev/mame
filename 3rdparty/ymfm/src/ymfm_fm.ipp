@@ -1,5 +1,32 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// BSD 3-Clause License
+//
+// Copyright (c) 2021, Aaron Giles
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace ymfm
 {
@@ -862,7 +889,7 @@ void fm_channel<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::output_2op(int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax) const
+void fm_channel<RegisterType>::output_2op(output_data &output, uint32_t rshift, int32_t clipmax) const
 {
 	// The first 2 operators should be populated
 	assert(m_op[0] != nullptr);
@@ -904,7 +931,7 @@ void fm_channel<RegisterType>::output_2op(int32_t outputs[RegisterType::OUTPUTS]
 	}
 
 	// add to the output
-	add_to_output(m_choffs, outputs, result);
+	add_to_output(m_choffs, output, result);
 }
 
 
@@ -916,7 +943,7 @@ void fm_channel<RegisterType>::output_2op(int32_t outputs[RegisterType::OUTPUTS]
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::output_4op(int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax) const
+void fm_channel<RegisterType>::output_4op(output_data &output, uint32_t rshift, int32_t clipmax) const
 {
 	// all 4 operators should be populated
 	assert(m_op[0] != nullptr);
@@ -1021,7 +1048,7 @@ void fm_channel<RegisterType>::output_4op(int32_t outputs[RegisterType::OUTPUTS]
 		result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
 
 	// add to the output
-	add_to_output(m_choffs, outputs, result);
+	add_to_output(m_choffs, output, result);
 }
 
 
@@ -1032,7 +1059,7 @@ void fm_channel<RegisterType>::output_4op(int32_t outputs[RegisterType::OUTPUTS]
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::output_rhythm_ch6(int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax) const
+void fm_channel<RegisterType>::output_rhythm_ch6(output_data &output, uint32_t rshift, int32_t clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	uint32_t am_offset = m_regs.lfo_am_offset(m_choffs);
@@ -1055,7 +1082,7 @@ void fm_channel<RegisterType>::output_rhythm_ch6(int32_t outputs[RegisterType::O
 	int32_t result = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset) >> rshift;
 
 	// add to the output
-	add_to_output(m_choffs, outputs, result * 2);
+	add_to_output(m_choffs, output, result * 2);
 }
 
 
@@ -1067,7 +1094,7 @@ void fm_channel<RegisterType>::output_rhythm_ch6(int32_t outputs[RegisterType::O
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::output_rhythm_ch7(uint32_t phase_select, int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax) const
+void fm_channel<RegisterType>::output_rhythm_ch7(uint32_t phase_select, output_data &output, uint32_t rshift, int32_t clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	uint32_t am_offset = m_regs.lfo_am_offset(m_choffs);
@@ -1087,7 +1114,7 @@ void fm_channel<RegisterType>::output_rhythm_ch7(uint32_t phase_select, int32_t 
 	result = std::clamp<int32_t>(result, -clipmax - 1, clipmax);
 
 	// add to the output
-	add_to_output(m_choffs, outputs, result * 2);
+	add_to_output(m_choffs, output, result * 2);
 }
 
 
@@ -1098,7 +1125,7 @@ void fm_channel<RegisterType>::output_rhythm_ch7(uint32_t phase_select, int32_t 
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::output_rhythm_ch8(uint32_t phase_select, int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax) const
+void fm_channel<RegisterType>::output_rhythm_ch8(uint32_t phase_select, output_data &output, uint32_t rshift, int32_t clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	uint32_t am_offset = m_regs.lfo_am_offset(m_choffs);
@@ -1113,7 +1140,7 @@ void fm_channel<RegisterType>::output_rhythm_ch8(uint32_t phase_select, int32_t 
 	result = std::clamp<int32_t>(result, -clipmax - 1, clipmax);
 
 	// add to the output
-	add_to_output(m_choffs, outputs, result * 2);
+	add_to_output(m_choffs, output, result * 2);
 }
 
 
@@ -1267,7 +1294,7 @@ uint32_t fm_engine_base<RegisterType>::clock(uint32_t chanmask)
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_engine_base<RegisterType>::output(int32_t outputs[RegisterType::OUTPUTS], uint32_t rshift, int32_t clipmax, uint32_t chanmask) const
+void fm_engine_base<RegisterType>::output(output_data &output, uint32_t rshift, int32_t clipmax, uint32_t chanmask) const
 {
 	// mask out some channels for debug purposes
 	chanmask &= global_chanmask;
@@ -1292,15 +1319,15 @@ void fm_engine_base<RegisterType>::output(int32_t outputs[RegisterType::OUTPUTS]
 			if (bitfield(chanmask, chnum))
 			{
 				if (chnum == 6)
-					m_channel[chnum]->output_rhythm_ch6(outputs, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch6(output, rshift, clipmax);
 				else if (chnum == 7)
-					m_channel[chnum]->output_rhythm_ch7(phase_select, outputs, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch7(phase_select, output, rshift, clipmax);
 				else if (chnum == 8)
-					m_channel[chnum]->output_rhythm_ch8(phase_select, outputs, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch8(phase_select, output, rshift, clipmax);
 				else if (m_channel[chnum]->is4op())
-					m_channel[chnum]->output_4op(outputs, rshift, clipmax);
+					m_channel[chnum]->output_4op(output, rshift, clipmax);
 				else
-					m_channel[chnum]->output_2op(outputs, rshift, clipmax);
+					m_channel[chnum]->output_2op(output, rshift, clipmax);
 			}
 	}
 	else
@@ -1310,9 +1337,9 @@ void fm_engine_base<RegisterType>::output(int32_t outputs[RegisterType::OUTPUTS]
 			if (bitfield(chanmask, chnum))
 			{
 				if (m_channel[chnum]->is4op())
-					m_channel[chnum]->output_4op(outputs, rshift, clipmax);
+					m_channel[chnum]->output_4op(output, rshift, clipmax);
 				else
-					m_channel[chnum]->output_2op(outputs, rshift, clipmax);
+					m_channel[chnum]->output_2op(output, rshift, clipmax);
 			}
 	}
 }

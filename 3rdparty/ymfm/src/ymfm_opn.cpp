@@ -1,8 +1,35 @@
-// license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// BSD 3-Clause License
+//
+// Copyright (c) 2021, Aaron Giles
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ymfm_opn.h"
-#include "ymfm.ipp"
+#include "ymfm_fm.ipp"
 
 namespace ymfm
 {
@@ -528,11 +555,11 @@ void ym2149::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of FM sound
 //-------------------------------------------------
 
-void ym2149::generate(int32_t output[OUTPUTS])
+void ym2149::generate(output_data *output, uint32_t numsamples)
 {
-	// no FM output, just send 0
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = 0;
+	// no FM output, just clear
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		output->clear();
 }
 
 
@@ -541,15 +568,16 @@ void ym2149::generate(int32_t output[OUTPUTS])
 //  sound
 //-------------------------------------------------
 
-void ym2149::generate_ssg(int32_t output[SSG_OUTPUTS])
+void ym2149::generate_ssg(output_data_ssg *output, uint32_t numsamples)
 {
-	// clock the SSG
-	m_ssg.clock();
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the SSG
+		m_ssg.clock();
 
-	// YM2149 keeps the three SSG outputs independent
-	for (int index = 0; index < SSG_OUTPUTS; index++)
-		output[index] = 0;
-	m_ssg.output(output);
+		// YM2149 keeps the three SSG outputs independent
+		m_ssg.output(*output);
+	}
 }
 
 
@@ -715,19 +743,20 @@ void ym2203::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ym2203::generate(int32_t output[OUTPUTS])
+void ym2203::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
+		output->clear();
+		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
 
-	// convert to 10.3 floating point value for the DAC and back
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = roundtrip_fp(output[index]);
+		// convert to 10.3 floating point value for the DAC and back
+		output->roundtrip_fp();
+	}
 }
 
 
@@ -736,15 +765,16 @@ void ym2203::generate(int32_t output[OUTPUTS])
 //  sound
 //-------------------------------------------------
 
-void ym2203::generate_ssg(int32_t output[SSG_OUTPUTS])
+void ym2203::generate_ssg(output_data_ssg *output, uint32_t numsamples)
 {
-	// clock the SSG
-	m_ssg.clock();
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the SSG
+		m_ssg.clock();
 
-	// YM2203 keeps the three SSG outputs independent
-	for (int index = 0; index < SSG_OUTPUTS; index++)
-		output[index] = 0;
-	m_ssg.output(output);
+		// YM2203 keeps the three SSG outputs independent
+		m_ssg.output(*output);
+	}
 }
 
 
@@ -1080,30 +1110,32 @@ void ym2608::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ym2608::generate(int32_t output[OUTPUTS])
+void ym2608::generate(output_data *output, uint32_t numsamples)
 {
 	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
 	uint32_t fmmask = bitfield(m_irq_enable, 7) ? 0x3f : 0x07;
 
-	// clock the system
-	uint32_t env_counter = m_fm.clock(fm_engine::ALL_CHANNELS);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		uint32_t env_counter = m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// clock the ADPCM-A engine on every envelope cycle
-	// (channels 4 and 5 clock every 2 envelope clocks)
-	if (bitfield(env_counter, 0, 2) == 0)
-		m_adpcm_a.clock(bitfield(env_counter, 2) ? 0x0f : 0x3f);
+		// clock the ADPCM-A engine on every envelope cycle
+		// (channels 4 and 5 clock every 2 envelope clocks)
+		if (bitfield(env_counter, 0, 2) == 0)
+			m_adpcm_a.clock(bitfield(env_counter, 2) ? 0x0f : 0x3f);
 
-	// clock the ADPCM-B engine every cycle
-	m_adpcm_b.clock(0x01);
+		// clock the ADPCM-B engine every cycle
+		m_adpcm_b.clock();
 
-	// update the FM content
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, fmmask);
+		// update the FM content
+		output->clear();
+		m_fm.output(*output, 1, 32767, fmmask);
 
-	// mix in the ADPCM
-	m_adpcm_a.output(output, 0x3f);
-	m_adpcm_b.output(output, 2, 0x01);
+		// mix in the ADPCM
+		m_adpcm_a.output(*output, 0x3f);
+		m_adpcm_b.output(*output, 2);
+	}
 }
 
 
@@ -1112,17 +1144,20 @@ void ym2608::generate(int32_t output[OUTPUTS])
 //  sound
 //-------------------------------------------------
 
-void ym2608::generate_ssg(int32_t output[SSG_OUTPUTS])
+void ym2608::generate_ssg(output_data_ssg *output, uint32_t numsamples)
 {
-	// clock the SSG
-	m_ssg.clock();
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the SSG
+		m_ssg.clock();
 
-	// YM2608 combines the three SSG outputs internally
-	int32_t temp_output[ssg_engine::OUTPUTS] = { 0 };
-	m_ssg.output(temp_output);
+		// YM2608 combines the three SSG outputs internally
+		ssg_engine::output_data temp_output;
+		m_ssg.output(temp_output);
 
-	// just average for now; who knows what the real chip does
-	output[0] = temp_output[0] + temp_output[1] + temp_output[2];
+		// just average for now; who knows what the real chip does
+		output->data[0] = temp_output.data[0] + temp_output.data[1] + temp_output.data[2];
+	}
 }
 
 
@@ -1403,28 +1438,30 @@ void ym2610::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ym2610::generate(int32_t output[OUTPUTS])
+void ym2610::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	uint32_t env_counter = m_fm.clock(m_fm_mask);
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		uint32_t env_counter = m_fm.clock(m_fm_mask);
 
-	// clock the ADPCM-A engine on every envelope cycle
-	if (bitfield(env_counter, 0, 2) == 0)
-		m_eos_status |= m_adpcm_a.clock(0x3f);
+		// clock the ADPCM-A engine on every envelope cycle
+		if (bitfield(env_counter, 0, 2) == 0)
+			m_eos_status |= m_adpcm_a.clock(0x3f);
 
-	// clock the ADPCM-B engine every cycle
-	m_adpcm_b.clock(0x01);
-	if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
-		m_eos_status |= 0x80;
+		// clock the ADPCM-B engine every cycle
+		m_adpcm_b.clock();
+		if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
+			m_eos_status |= 0x80;
 
-	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = 0;
-	m_fm.output(output, 1, 32767, m_fm_mask);
+		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
+		output->clear();
+		m_fm.output(*output, 1, 32767, m_fm_mask);
 
-	// mix in the ADPCM
-	m_adpcm_a.output(output, 0x3f);
-	m_adpcm_b.output(output, 2, 0x01);
+		// mix in the ADPCM
+		m_adpcm_a.output(*output, 0x3f);
+		m_adpcm_b.output(*output, 2);
+	}
 }
 
 
@@ -1433,17 +1470,20 @@ void ym2610::generate(int32_t output[OUTPUTS])
 //  sound
 //-------------------------------------------------
 
-void ym2610::generate_ssg(int32_t output[SSG_OUTPUTS])
+void ym2610::generate_ssg(output_data_ssg *output, uint32_t numsamples)
 {
-	// clock the SSG
-	m_ssg.clock();
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the SSG
+		m_ssg.clock();
 
-	// YM2610 combines the three SSG outputs internally
-	int32_t temp_output[ssg_engine::OUTPUTS] = { 0 };
-	m_ssg.output(temp_output);
+		// YM2610 combines the three SSG outputs internally
+		ssg_engine::output_data temp_output;
+		m_ssg.output(temp_output);
 
-	// just average for now; who knows what the real chip does
-	output[0] = temp_output[0] + temp_output[1] + temp_output[2];
+		// just average for now; who knows what the real chip does
+		output->data[0] = temp_output.data[0] + temp_output.data[1] + temp_output.data[2];
+	}
 }
 
 
@@ -1637,46 +1677,47 @@ void ym2612::write(uint32_t offset, uint8_t data)
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ym2612::generate(int32_t output[OUTPUTS])
+void ym2612::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
-
-	// update the FM channels; YM2612 is 9-bit with intermediate clipping
-	if (!m_dac_enable)
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
-		// DAC disabled: all 6 channels sum together
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = 0;
-		m_fm.output(output, 5, 256, fm_engine::ALL_CHANNELS);
-	}
-	else
-	{
-		// DAC enabled: start with DAC value then add the first 5 channels only
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = int16_t(m_dac_data << 7) >> 7;
-		m_fm.output(output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
-	}
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// hiccup in the internal YM2612 DAC means that there is a rather large
-	// step between 0 and -1 (close to 6x the normal step); the approximation
-	// below gives a reasonable estimation of this discontinuity, which was
-	// fixed in the YM3438
-	if (output[0] < 0)
-		output[0] -= 2;
-	else
-		output[0] += 3;
-	if (output[1] < 0)
-		output[1] -= 2;
-	else
-		output[1] += 3;
+		// update the FM channels; YM2612 is 9-bit with intermediate clipping
+		if (!m_dac_enable)
+		{
+			// DAC disabled: all 6 channels sum together
+			output->clear();
+			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
+		}
+		else
+		{
+			// DAC enabled: start with DAC value then add the first 5 channels only
+			output->init(int16_t(m_dac_data << 7) >> 7);
+			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
+		}
 
-	// output is technically multiplexed rather than mixed, but that requires
-	// a better sound mixer than we usually have, so just average over the six
-	// channels; also apply a 64/65 factor to account for the discontinuity
-	// adjustment above
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = (output[index] << 7) * 64 / (6 * 65);
+		// hiccup in the internal YM2612 DAC means that there is a rather large
+		// step between 0 and -1 (close to 6x the normal step); the approximation
+		// below gives a reasonable estimation of this discontinuity, which was
+		// fixed in the YM3438
+		if (output->data[0] < 0)
+			output->data[0] -= 2;
+		else
+			output->data[0] += 3;
+		if (output->data[1] < 0)
+			output->data[1] -= 2;
+		else
+			output->data[1] += 3;
+
+		// output is technically multiplexed rather than mixed, but that requires
+		// a better sound mixer than we usually have, so just average over the six
+		// channels; also apply a 64/65 factor to account for the discontinuity
+		// adjustment above
+		output->data[0] = (output->data[0] << 7) * 64 / (6 * 65);
+		output->data[1] = (output->data[1] << 7) * 64 / (6 * 65);
+	}
 }
 
 
@@ -1684,31 +1725,32 @@ void ym2612::generate(int32_t output[OUTPUTS])
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ym3438::generate(int32_t output[OUTPUTS])
+void ym3438::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
-
-	// update the FM channels; YM2612 is 9-bit with intermediate clipping
-	if (!m_dac_enable)
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
-		// DAC disabled: all 6 channels sum together
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = 0;
-		m_fm.output(output, 5, 256, fm_engine::ALL_CHANNELS);
-	}
-	else
-	{
-		// DAC enabled: start with DAC value then add the first 5 channels only
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = int16_t(m_dac_data << 7) >> 7;
-		m_fm.output(output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
-	}
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// YM3438 doesn't have the same DAC discontinuity, though its output is
-	// multiplexed like the YM2612
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = (output[index] << 7) / 6;
+		// update the FM channels; YM2612 is 9-bit with intermediate clipping
+		if (!m_dac_enable)
+		{
+			// DAC disabled: all 6 channels sum together
+			output->clear();
+			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
+		}
+		else
+		{
+			// DAC enabled: start with DAC value then add the first 5 channels only
+			output->init(int16_t(m_dac_data << 7) >> 7);
+			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
+		}
+
+		// YM3438 doesn't have the same DAC discontinuity, though its output is
+		// multiplexed like the YM2612
+		output->data[0] = (output->data[0] << 7) / 6;
+		output->data[1] = (output->data[1] << 7) / 6;
+	}
 }
 
 
@@ -1716,30 +1758,31 @@ void ym3438::generate(int32_t output[OUTPUTS])
 //  generate - generate one sample of sound
 //-------------------------------------------------
 
-void ymf276::generate(int32_t output[OUTPUTS])
+void ymf276::generate(output_data *output, uint32_t numsamples)
 {
-	// clock the system
-	m_fm.clock(fm_engine::ALL_CHANNELS);
-
-	// update the FM channels; YMF276 is 14-bit with intermediate clipping
-	if (!m_dac_enable)
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
-		// DAC disabled: all 6 channels sum together
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = 0;
-		m_fm.output(output, 0, 8191, fm_engine::ALL_CHANNELS);
-	}
-	else
-	{
-		// DAC enabled: start with DAC value then add the first 5 channels only
-		for (int index = 0; index < OUTPUTS; index++)
-			output[index] = int16_t(m_dac_data << 7) >> 2;
-		m_fm.output(output, 0, 8191, fm_engine::ALL_CHANNELS ^ (1 << 5));
-	}
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-	// YMF276 is properly mixed; it shifts down 1 bit before clamping
-	for (int index = 0; index < OUTPUTS; index++)
-		output[index] = std::clamp(output[index] >> 1, -32768, 32767);
+		// update the FM channels; YMF276 is 14-bit with intermediate clipping
+		if (!m_dac_enable)
+		{
+			// DAC disabled: all 6 channels sum together
+			output->clear();
+			m_fm.output(*output, 0, 8191, fm_engine::ALL_CHANNELS);
+		}
+		else
+		{
+			// DAC enabled: start with DAC value then add the first 5 channels only
+			output->init(int16_t(m_dac_data << 7) >> 2);
+			m_fm.output(*output, 0, 8191, fm_engine::ALL_CHANNELS ^ (1 << 5));
+		}
+
+		// YMF276 is properly mixed; it shifts down 1 bit before clamping
+		output->data[0] = std::clamp(output->data[0] >> 1, -32768, 32767);
+		output->data[1] = std::clamp(output->data[1] >> 1, -32768, 32767);
+	}
 }
 
 }

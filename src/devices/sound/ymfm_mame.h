@@ -269,13 +269,22 @@ protected:
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
+		// local buffer to hold samples
+		constexpr int MAX_SAMPLES = 256;
+		typename ChipClass::output_data output[MAX_SAMPLES];
+
+		// parameters
+		int const outcount = std::min(outputs.size(), std::size(output[0].data));
+		int const numsamples = outputs[0].samples();
+
 		// generate the FM/ADPCM stream
-		int32_t output[ChipClass::OUTPUTS];
-		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		for (int sampindex = 0; sampindex < numsamples; sampindex += MAX_SAMPLES)
 		{
-			m_chip.generate(output);
-			for (int index = 0; index < ChipClass::OUTPUTS; index++)
-				outputs[index].put_int(sampindex, output[index], 32768);
+			int cursamples = std::min(numsamples - sampindex, MAX_SAMPLES);
+			m_chip.generate(output, cursamples);
+			for (int outnum = 0; outnum < outcount; outnum++)
+				for (int index = 0; index < cursamples; index++)
+					outputs[outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
 		}
 	}
 
@@ -340,13 +349,22 @@ protected:
 		if (&stream != m_ssg_stream)
 			return parent::sound_stream_update(stream, inputs, outputs);
 
-		// generate samples until the buffer is filled
-		int32_t output[ChipClass::SSG_OUTPUTS];
-		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		// local buffer to hold samples
+		constexpr int MAX_SAMPLES = 256;
+		typename ChipClass::output_data_ssg output[MAX_SAMPLES];
+
+		// parameters
+		int const outcount = std::min(outputs.size(), std::size(output[0].data));
+		int const numsamples = outputs[0].samples();
+
+		// generate the FM/ADPCM stream
+		for (int sampindex = 0; sampindex < numsamples; sampindex += MAX_SAMPLES)
 		{
-			m_chip.generate_ssg(output);
-			for (int index = 0; index < ChipClass::SSG_OUTPUTS; index++)
-				outputs[index].put_int(sampindex, output[index], 32768);
+			int cursamples = std::min(numsamples - sampindex, MAX_SAMPLES);
+			m_chip.generate_ssg(output, cursamples);
+			for (int outnum = 0; outnum < outcount; outnum++)
+				for (int index = 0; index < cursamples; index++)
+					outputs[outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
 		}
 	}
 

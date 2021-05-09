@@ -1,56 +1,79 @@
 # ymfm
 
-[ymfm](http://julialang.org/utf8proc/) is a C++ library that contains implementations
-for a wide variety of Yamaha FM sound chips.
+[ymfm](https://github.com/aaronsgiles/ymfm) is a collection of BSD-licensed Yamaha FM sound cores (OPM, OPN, OPL, and others), written by [Aaron Giles](https://aarongiles.com)
 
+## Supported environments
 
-library that provides Unicode normalization, case-folding, and other
-operations for data in the [UTF-8
-encoding](http://en.wikipedia.org/wiki/UTF-8).  It was [initially
-developed](http://www.public-software-group.org/utf8proc) by Jan
-Behrens and the rest of the [Public Software
-Group](http://www.public-software-group.org/), who deserve *nearly all
-of the credit* for this package.  With the blessing of the Public
-Software Group, the [Julia developers](http://julialang.org/) have
-taken over development of utf8proc, since the original developers have
-moved to other projects.
+This code should compile cleanly in any environment that has C++17 support.
+It has been tested on gcc, clang, and Microsoft Visual C++ 2019.
 
-(utf8proc is used for basic Unicode
-support in the [Julia language](http://julialang.org/), and the Julia
-developers became involved because they wanted to add Unicode 7 support and other features.)
+## Supported chip families
 
-(The original utf8proc package also includes Ruby and PostgreSQL plug-ins.
-We removed those from utf8proc in order to focus exclusively on the C
-library for the time being, but plan to add them back in or release them as separate packages.)
+Currently, support is present for the following chips (organized by header file):
 
-The utf8proc package is licensed under the
-free/open-source [MIT "expat"
-license](http://opensource.org/licenses/MIT) (plus certain Unicode
-data governed by the similarly permissive [Unicode data
-license](http://www.unicode.org/copyright.html#Exhibit1)); please see
-the included `LICENSE.md` file for more detailed information.
+* ymfm_opm.h:
+	* YM2151 (OPM)
+	* YM2164 (OPP)
+* ymfm_opn.h:
+	* YM2149 (SSG)
+	* YM2203 (OPN)
+	* YM2608 (OPNA)
+	* YM2610 (OPNB)
+	* YM2610B (OPNB2)
+	* YM2612 (OPN2)
+	* YM3438 (OPN2C)
+	* YMF276 (OPN2L)
+* ymfm_opl.h:
+	* YM3526 (OPL)
+	* Y8950 (MSX-Audio)
+	* YM3812 (OPL2)
+	* YMF262 (OPL3)
+	* YMF278B (OPL4) -- partial (only the FM side)
+	* YM2413 (OPLL)
+	* YM2423 (OPLL-X)
+	* YMF281 (OPLLP)
+	* DS1001 (Konami 053982)
+* ymfm_opq.h:
+	* YM3806 (OPQ) -- preliminary
+* ymfm_opz.h:
+	* YM2414 (OPZ) -- preliminary
 
-## Quick Start
+## General approach
 
-To compiler
+Check out the [examples directory](https://github.com/aaronsgiles/ymfm/tree/main/examples) for some example usage patterns.
+I'm not a big fan of makefiles for simple things, so instructions on how to compile each example are provided at the top.
 
-## General Information
+### Clocking
 
-## C Library
+The general philosophy of the emulators provided here is that they are clock-independent.
+Much like the actual chips, you (the consumer) control the clock; the chips themselves have no idea what time it is.
+They just tick forward each time you ask them to.
 
-The documentation for the C library is found in the `utf8proc.h` header file.
-`utf8proc_map` is function you will most likely be using for mapping UTF-8
-strings, unless you want to allocate memory yourself.
+The way you move things along is via the `generate()` function, which ticks the internal system forward one or more samples, and writes out an array out chip-specific `output_data`.
+But what, exactly, is a "sample", and how long is it?
 
-## To Do
+This is where the external clock comes in.
+Most of the Yamaha chips are externally clocked in the MHz range.
+They then divide that clock by a factor (sometimes dynamically controllable), and then the internal operators are pipelined to further divide the clock.
 
-See the Github [issues list](https://github.com/JuliaLang/utf8proc/issues).
+For example, the YM2151 internally divides the clock by 2, and has 32 operators to iterate through.
+Thus, for a nominal input lock of 3.58MHz, you end up at around a 55.9kHz sample rate.
+Fortunately, all the chip implementations can compute this for you; just pass the raw external clock value to the `sample_rate()` method and it will hand you back the output sample rate you want.
 
-## Contact
+Then call `generate()` that many times per second to output the results.
 
-Bug reports, feature requests, and other queries can be filed at
-the [utf8proc issues page on Github](https://github.com/JuliaLang/utf8proc/issues).
+But what if I want to output at a "normal" rate, like 44.1kHz?
+Sorry, you'll have to rate convert as needed.
 
-## See also
+### Reading and Writing
 
-An independent Lua translation of this library, [lua-mojibake](https://github.com/differentprogramming/lua-mojibake), is also available.
+To read or write to the chips, you can call the `read()` and `write()` methods.
+The offset provided corresponds to the addressing input lines in a (hopefully) logical way.
+
+For reads, almost all chips have a status register, which you can read via `read_status()`.
+Some chips have a data port that can be read via `read_data()`.
+And chips with extended addressing may also have `read_status_hi()` and `read_data_hi()`.
+
+For writes, almost all chips have an address register and a data register, and so you can reliably count on there being a `write_address()` and `write_data()` method as well.
+If the chip supports extended addressing, it may also have `write_address_hi()` and `write_data_hi()`.
+
