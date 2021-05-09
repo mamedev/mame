@@ -457,6 +457,41 @@ void nscsi_cdrom_device::scsi_command()
 		break;
 	}
 
+	case SC_READ_DISC_INFORMATION:
+		LOG("command READ DISC INFORMATION\n");
+		std::fill_n(scsi_cmdbuf, 34, 0);
+		scsi_cmdbuf[1] = 32;
+		scsi_cmdbuf[2] = 2; // disc is complete
+		scsi_cmdbuf[3] = 1; // first track
+		scsi_cmdbuf[4] = 1; // number of sessions (TODO: session support for CHDv6)
+		scsi_cmdbuf[5] = 1; // first track in last session
+		scsi_cmdbuf[6] = cdrom_get_last_track(cdrom);   // last track in last session
+		scsi_cmdbuf[8] = 0; // CD-ROM, not XA
+
+		// lead in start time in MSF
+		{
+			u32 tstart = cdrom_get_track_start(cdrom, 0);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[16] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[17] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[18] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[19] = (tstart & 0xff);
+
+			// lead-out start time in MSF
+			tstart = cdrom_get_track_start(cdrom, 0xaa);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[20] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[21] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[22] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[23] = (tstart & 0xff);
+		}
+
+		scsi_data_in(0, 34);
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	case SC_PREVENT_ALLOW_MEDIUM_REMOVAL:
 		// TODO: support eject prevention
 		LOG("command %s MEDIUM REMOVAL\n", (scsi_cmdbuf[4] & 0x1) ? "PREVENT" : "ALLOW");
