@@ -28,25 +28,25 @@ DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor N
 enum psr_mask : u16
 {
 	// accessible in user mode
-	PSR_C = 0x0001, // carry/borrow condition
-	PSR_T = 0x0002, // trace trap enable
-	PSR_L = 0x0004, // less than condition
-					// unused
-					// unused
-	PSR_F = 0x0020, // general condition
-	PSR_Z = 0x0040, // zero condition
-	PSR_N = 0x0080, // negative condition
+	PSR_C   = 0x0001, // carry/borrow condition
+	PSR_T   = 0x0002, // trace trap enable
+	PSR_L   = 0x0004, // less than condition
+					  // unused
+					  // unused
+	PSR_F   = 0x0020, // general condition
+	PSR_Z   = 0x0040, // zero condition
+	PSR_N   = 0x0080, // negative condition
 
 	// accessible in supervisor mode
-	PSR_U = 0x0100, // user mode
-	PSR_S = 0x0200, // stack pointer select
-	PSR_P = 0x0400, // prevent multiple trace trap
-	PSR_I = 0x0800, // interrupt enable
-					// unused
-					// unused
-					// unused
-					// unused
-	PSR_M = 0x0fe7, // write mask
+	PSR_U   = 0x0100, // user mode
+	PSR_S   = 0x0200, // stack pointer select
+	PSR_P   = 0x0400, // prevent multiple trace trap
+	PSR_I   = 0x0800, // interrupt enable
+					  // unused
+					  // unused
+					  // unused
+					  // unused
+	PSR_MSK = 0x0fe7, // write mask
 };
 
 enum cfg_mask : u32
@@ -720,11 +720,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					sp += 4;
 					m_mod = space(0).read_word_unaligned(sp);
 					sp += 2;
-					m_psr = space(0).read_word_unaligned(sp) & PSR_M;
+					m_psr = space(0).read_word_unaligned(sp) & PSR_MSK;
 					sp += 2;
-
-					// FIXME: turn off trace trap pending
-					m_psr &= ~PSR_P;
 
 					m_sb = space(0).read_dword_unaligned(m_mod);
 
@@ -747,7 +744,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					sp += 4;
 					m_mod = space(0).read_word_unaligned(sp);
 					sp += 2;
-					m_psr = space(0).read_word_unaligned(sp) & PSR_M;
+					m_psr = space(0).read_word_unaligned(sp) & PSR_MSK;
 					sp += 2;
 
 					m_sb = space(0).read_dword_unaligned(m_mod);
@@ -948,9 +945,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 				switch (quick)
 				{
-				case 0x0: // US
-					// TODO: user stack pointer?
-					gen_write(mode[0], m_sp1);
+				case 0x0: // UPSR
+					gen_write(mode[0], u8(m_psr));
 					break;
 				case 0x8: // FP
 					gen_write(mode[0], m_fp);
@@ -1042,7 +1038,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				switch (quick)
 				{
 				case 0x0: // UPSR
-					m_psr = ((m_psr & 0xff00) | u8(gen_read(mode[0]))) & PSR_M;
+					m_psr = ((m_psr & 0xff00) | u8(gen_read(mode[0]))) & PSR_MSK;
 					break;
 				case 0x8: // FP
 					m_fp = gen_read(mode[0]);
@@ -1059,9 +1055,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						u32 const src = gen_read(mode[0]);
 
 						if (size == SIZE_B)
-							m_psr = ((m_psr & 0xff00) | u8(src)) & PSR_M;
+							m_psr = ((m_psr & 0xff00) | u8(src)) & PSR_MSK;
 						else
-							m_psr = src & PSR_M;
+							m_psr = src & PSR_MSK;
 					}
 					else
 						interrupt(ILL, m_pc);
@@ -1167,7 +1163,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						{
 							u16 const src = gen_read(mode[0]);
 
-							m_psr |= src;
+							m_psr |= src & PSR_MSK;
 
 							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
 						}
