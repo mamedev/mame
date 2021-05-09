@@ -18,6 +18,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
   - "Outrunners",
   - "Sports Illustrated Golf",
   - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
+
+Hung Tao Hsin games are possibly pirate bootlegs though they may be officially licensed as with the Taiwanese Aaronix SMS games. All are slightly modified versions of existing SMS carts.
 -->
 
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
@@ -190,7 +192,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-11"/>
-		<info name="alt_title" value="空中出擊" />
+		<info name="alt_title" value="空中出擊 (Kōng zhòng chūjí)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -295,7 +297,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-10"/>
-		<info name="alt_title" value="天空魔城 Alex Kido"/>
+		<info name="alt_title" value="天空魔城 (Tiānkōng mó chéng) Alex Kido"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -421,7 +423,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-02"/>
-		<info name="alt_title" value="十字剣 Alocos" />
+		<info name="alt_title" value="十字剣 (Shízì jiàn) Alocos" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -1059,7 +1061,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-19"/>
-		<info name="alt_title" value="サ！熱血高手" />
+		<info name="alt_title" value="サ！熱血高手 (Sa! Rèxuè gāoshǒu)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -2215,7 +2217,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-03"/>
-		<info name="alt_title" value="Astro Adventure 宇宙大冒險" />
+		<info name="alt_title" value="Astro Adventure 宇宙大冒險 (Yǔzhòu dà màoxiǎn)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -2314,7 +2316,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-02"/>
-		<info name="alt_title" value="双截龍" />
+		<info name="alt_title" value="双截龍 (Shuāng jiélóng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -2831,7 +2833,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-01"/>
-		<info name="alt_title" value="Bubble Dragon 超級泡泡" />
+		<info name="alt_title" value="Bubble Dragon 超級泡泡龍 (Chāojí pào pào lóng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -2862,7 +2864,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-46"/>
-		<info name="alt_title" value="世界の末日" />
+		<info name="alt_title" value="世界の末日 (Shìjièno mòrì)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -3397,7 +3399,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-04"/>
-		<info name="alt_title" value="北斗の拳 Northern Ken" />
+		<info name="alt_title" value="北斗の拳 (Běidǒuno quán) Northern Ken" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -4024,7 +4026,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-21"/>
-		<info name="alt_title" value="魔界列傳" />
+		<info name="alt_title" value="魔界列傳 (Mójiè lièzhuàn)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -4363,7 +4365,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-05"/>
-		<info name="alt_title" value="月風魔傳" />
+		<info name="alt_title" value="月風魔傳 (Yuè fēngmó chuán)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -6169,7 +6171,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-23"/>
-		<info name="alt_title" value="銀色先鋒" />
+		<info name="alt_title" value="銀色先鋒 (Yínsè xiānfēng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -6719,7 +6721,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-28"/>
-		<info name="alt_title" value="䧳雄雙俠" />
+		<info name="alt_title" value="䧳雄雙俠 (Cí xióng shuāng xiá)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -6996,7 +6998,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-01"/>
-		<info name="alt_title" value="異形" />
+		<info name="alt_title" value="異形 (Yìxíng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
@@ -7066,7 +7068,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-09"/>
-		<info name="alt_title" value="虎胆妙算" />
+		<info name="alt_title" value="虎胆妙算 (Hǔ dǎn miào suàn)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -7125,7 +7127,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-07"/>
-		<info name="alt_title" value="上尉命令" />
+		<info name="alt_title" value="上尉命令 (Shàngwèi mìnglìng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -7168,7 +7170,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 256-06"/>
-		<info name="alt_title" value="快打小子 Action Boy" />
+		<info name="alt_title" value="快打小子 (Kuài dǎ xiǎozi) Action Boy" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="32768">
@@ -7211,7 +7213,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-06"/>
-		<info name="alt_title" value="影舞者" />
+		<info name="alt_title" value="影舞者 (Yǐng wǔ zhě)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
@@ -7225,7 +7227,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-47"/>
-		<info name="alt_title" value="鬼影獸の王" />
+		<info name="alt_title" value="鬼影獸の王 (Guǐ yǐng shòuno wáng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -8780,7 +8782,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 401-02"/>
-		<info name="alt_title" value="突撃飛龍" />
+		<info name="alt_title" value="突撃飛龍 (Tūjī fēilóng)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="524288">
@@ -8806,7 +8808,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-31"/>
-		<info name="alt_title" value="紅色十月大反擊" />
+		<info name="alt_title" value="紅色十月大反擊 (Hóngsè shí yuè dà fǎnjí)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
@@ -9724,7 +9726,7 @@ a certain item) -->
 		<year>199?</year>
 		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 201-03"/>
-		<info name="alt_title" value="藍色霹靂號" />
+		<info name="alt_title" value="藍色霹靂號 (Lán sè pīlì hào)" />
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
