@@ -2,24 +2,25 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    ch376.h
+    ch376.cpp
 
-	"File manage and control chip CH376"
-	https://www.mpja.com/download/ch376ds1.pdf
+    "File manage and control chip CH376"
+    https://www.mpja.com/download/ch376ds1.pdf
+    https://github.com/djuseeq/Ch376msc/blob/master/src/CommDef.h
 
-	This is a module intended to offload USB and USB mass storage
-	I/O from a small microcontroller or microprocessor.
+    This is a module intended to offload USB and USB mass storage
+    I/O from a small microcontroller or microprocessor.
 
-	It has 3 host interfaces:
-		1) A regular 8-bit bus with 8 data lines, an address line,
-		   chip select, read enable, and write enable lines
-		2) An SPI bus interface (SCS, SCK, MOSI, MISO lines)
-		3) An asynchronous serial interface (TxD and RxD lines)
+    It has 3 host interfaces:
+        1) A regular 8-bit bus with 8 data lines, an address line,
+           chip select, read enable, and write enable lines
+        2) An SPI bus interface (SCS, SCK, MOSI, MISO lines)
+        3) An asynchronous serial interface (TxD and RxD lines)
 
-	And 2 guest interfaces: USB 2.0 and a second 4-wire SPI bus for SD/MMC/TF cards.
+    And 2 guest interfaces: USB 2.0 and a second 4-wire SPI bus for SD/MMC/TF cards.
 
-	The module can give high level directory/open/close/read/write access to
-	files on a FAT12, FAT16, or FAT32 filesystem.
+    The module can give high level directory/open/close/read/write access to
+    files on a FAT12, FAT16, or FAT32 filesystem.
 
 ***************************************************************************/
 
@@ -44,7 +45,11 @@ static constexpr u8 STATUS_USB_INT_DISK_WRITE = 0x1e;
 static constexpr u8 STATUS_USB_INT_DISK_ERR = 0x1f;
 static constexpr u8 STATUS_ERR_MISS_FILE = 0x42;
 
+// despite the name, this isn't a command
+static constexpr u8 CMD_RET_SUCCESS = 0x51;
+
 static constexpr u8 CMD_GET_IC_VER = 0x01;
+static constexpr u8 CMD_CHECK_EXIST = 0x06;
 static constexpr u8 CMD_GET_FILE_SIZE = 0x0c;
 static constexpr u8 CMD_SET_USB_MODE = 0x15;
 static constexpr u8 CMD_GET_STATUS = 0x22;
@@ -144,8 +149,18 @@ void ch376_device::write(offs_t offset, u8 data)
 		m_last_command = data;
 		switch (data)
 		{
+			case 0x16:  // not a documented valid command, but apparently used by the BBC Micro software
+				m_dataBuffer[0] = m_int_status = STATUS_USB_INT_CONNECT;
+				m_dataPtr = 0;
+				m_dataLen = 1;
+				break;
+
+			case CMD_CHECK_EXIST:
+				m_state = STATE_CHECK_EXIST;
+				break;
+
 			case CMD_GET_IC_VER:
-				m_dataBuffer[0] = 0x41;	//
+				m_dataBuffer[0] = 0x41;
 				m_dataPtr = 0;
 				m_dataLen = 1;
 				break;
@@ -187,13 +202,13 @@ void ch376_device::write(offs_t offset, u8 data)
 
 			case CMD_FILE_OPEN:
 				/*
-					CH376 allows paths with a leading / or \ to indicate the root of the SD card.
-					Directories are chained by an unusual method: start with the root dir (leading path separator),
-					then open each subdirectory without a leading path separator, and finally open the file without
-					a leading path separator.
+				    CH376 allows paths with a leading / or \ to indicate the root of the SD card.
+				    Directories are chained by an unusual method: start with the root dir (leading path separator),
+				    then open each subdirectory without a leading path separator, and finally open the file without
+				    a leading path separator.
 
-					The BOOTI card ignores directories entirely, so the implmentation here is not tested with that
-					scenario but it should work.
+				    The BOOTI card ignores directories entirely, so the implmentation here is not tested with that
+				    scenario but it should work.
 				*/
 				if (m_file_name[strlen(m_file_name) - 1] == '*')
 				{
@@ -258,7 +273,7 @@ void ch376_device::write(offs_t offset, u8 data)
 				{
 					m_int_status = STATUS_USB_INT_DISK_READ;
 				}
-				else	// end of directory
+				else    // end of directory
 				{
 					m_int_status = STATUS_ERR_MISS_FILE;
 				}
@@ -327,8 +342,17 @@ void ch376_device::write(offs_t offset, u8 data)
 	{
 		switch (m_state)
 		{
+			case STATE_CHECK_EXIST:
+				m_data = (data ^ 0xff);
+				m_state = STATE_IDLE;
+				break;
+
 			case STATE_USB_MODE_SET:
 				m_state = STATE_IDLE;
+				if ((data == 0x6) || (data == 0x7))
+				{
+					m_data = CMD_RET_SUCCESS;
+				}
 				break;
 
 			case STATE_SET_FILE_NAME:
@@ -426,7 +450,7 @@ bool ch376_device::generateNextDirEntry()
 	if (ourEntry->type == osd::directory::entry::entry_type::DIR)
 	{
 		strncpy(reinterpret_cast<char *>(&m_dataBuffer[1]), ourEntry->name, 8);
-		m_dataBuffer[0xc] = 0x10;	// directory type
+		m_dataBuffer[0xc] = 0x10;   // directory type
 	}
 	else if (ourEntry->type == osd::directory::entry::entry_type::FILE)
 	{
@@ -438,6 +462,13 @@ bool ch376_device::generateNextDirEntry()
 				dotIdx = idx;
 				break;
 			}
+		}
+
+		// is this an 8.3 filename?  CH376 can only really cope with 8.3, so
+		// skip this entry and recurse to get the next one.
+		if (dotIdx > 8)
+		{
+			return generateNextDirEntry();
 		}
 
 		int baseLen = std::min(8, dotIdx);
@@ -465,7 +496,7 @@ bool ch376_device::generateNextDirEntry()
 			}
 		}
 
-		m_dataBuffer[0xc] = 0;	// no attributes
+		m_dataBuffer[0xc] = 0;  // no attributes
 
 		if (ourEntry->size >= u64(0x100000000))
 		{
@@ -482,7 +513,7 @@ bool ch376_device::generateNextDirEntry()
 			m_dataBuffer[0x20] = ((ourEntry->size >> 24) & 0xff);
 		}
 	}
-	else	// not a file or directory, recurse and hope the next one's better
+	else    // not a file or directory, recurse and hope the next one's better
 	{
 		return generateNextDirEntry();
 	}
