@@ -3116,17 +3116,17 @@
 		</reel>
 	</element>
 	<element name="reel1" defstate="0">
-		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon,Bell,Pear(1),Cherry,Bell,Grapes(2),Cherry,Melon,Blue 7,Grapes(1),Gem,Grapes(1),Cherry,Blue 7,Cherry">
+		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon,Bell,Pear(1),Cherry,Bell,Grapes(2),Cherry,Melon,Blue 7,Grapes(1),Gem,Grapes(3),Cherry,Blue 7,Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
 	<element name="reel2" defstate="0">
-		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon(1),Bell,Pear,Cherry,Bell(2),Grapes,Cherry,Melon(1),Red 7,Grapes,Gem(2),Grapes,Cherry,Blue 7,Cherry">
+		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7,Melon(1),Bell,Pear,Cherry,Bell(2),Grapes,Cherry,Melon(4),Red 7,Grapes,Gem(2),Grapes,Cherry,Blue 7,Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
 	<element name="reel3" defstate="0">
-		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7(2),Melon,Bell,Pear,Cherry(1),Bell,Grapes,Cherry(2),Melon,Blue 7,Grapes,Gem,Grapes,Cherry(3),Blue 7,Cherry(2)">
+		<reel reelreversed="0" stateoffset="-5461" numsymbolsvisible="3" symbollist="Red 7(2),Melon,Bell(1),Pear,Cherry,Bell(1),Grapes,Cherry,Melon,Blue 7(3),Grapes,Gem,Grapes,Cherry,Blue 7(2),Cherry">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>

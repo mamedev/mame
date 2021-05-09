@@ -9257,7 +9257,6 @@ michkit1                        //
 michkitb                        //
 michnew                         //
 michstake                       //
-missamer                        //
 montana                         //
 newdixie                        //
 penalty                         //
@@ -17197,6 +17196,7 @@ shufshot138                     // (c) Strata/Incredible Technologies
 shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill100                     // (c) 1992 Strata/Incredible Technologies
+timekill120                     // (c) 1992 Strata/Incredible Technologies
 timekill121                     // (c) 1992 Strata/Incredible Technologies
 timekill121a                    // (c) 1992 Strata/Incredible Technologies
 timekill131                     // (c) 1992 Strata/Incredible Technologies
@@ -17444,6 +17444,7 @@ olympic                         //
 
 @source:joctronic.cpp
 bldyrolr                        //
+jpinball                        // (c) 1986 Joctronic
 punkywil                        //
 slalom03                        //
 walkyria                        //
@@ -23390,6 +23391,9 @@ mirage                          // (c) 1994 Mitchell
 @source:mirax.cpp
 mirax                           // (c) 1985 Current Technologies
 miraxa                          // (c) 1985 Current Technologies
+
+@source:missamer.cpp
+missamer                        // (c) 1984 Sirmo
 
 @source:missb2.cpp
 bublpong                        // bootleg on enhanced hardware
@@ -31605,6 +31609,7 @@ adillor                         // (c) 1997
 airco22b                        // (c) 1995
 alpinerc                        // (c) 1994
 alpinerd                        // (c) 1994
+alpinerjc                       // (c) 1994
 alpinesa                        // (c) 1996
 alpinr2a                        // (c) 1995
 alpinr2b                        // (c) 1995

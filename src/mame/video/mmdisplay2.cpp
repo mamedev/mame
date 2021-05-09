@@ -35,7 +35,7 @@ mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig
 
 void mephisto_display2_device::device_add_mconfig(machine_config &config)
 {
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -50,9 +50,11 @@ void mephisto_display2_device::device_add_mconfig(machine_config &config)
 	m_lcd->set_lcd_size(2, 16);
 	m_lcd->set_pixel_update_cb(FUNC(mephisto_display2_device::lcd_pixel_update));
 
-	/* sound hardware */
+	// sound hardware (using filtered dac because of aliasing)
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_dac->set_levels(4, speaker_levels);
 }
 
 void mephisto_display2_device::lcd_palette(palette_device &palette) const
@@ -105,7 +107,7 @@ void mephisto_display2_device::io_w(u8 data)
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcd->write(BIT(data, 0), m_latch);
 
-	m_dac->write(data >> 2 & 3);
+	m_dac->level_w(data >> 2 & 3);
 
 	m_ctrl = data;
 }

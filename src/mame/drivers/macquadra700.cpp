@@ -26,8 +26,7 @@
 #include "sound/asc.h"
 #include "formats/ap_dsk35.h"
 
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
+#include "bus/nscsi/devices.h"
 
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/nubus_48gc.h"
@@ -934,12 +933,6 @@ static void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
 	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
 	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
-}
-
-static void mac_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
 }
 
 void macquadra_state::macqd700(machine_config &config)

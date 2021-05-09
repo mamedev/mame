@@ -7,7 +7,6 @@ Novag Super Nova & related chess computers. I believe the series started with
 Primo. The chess engine is by David Kittinger.
 
 TODO:
-- remove timer hack for supremo (missing extra timer emulation in MCU core)
 - NMI on power-off switch, it sets 0x14 bit 7 for standby power (see below)
 - add nvram, MCU is missing standby power emulation
 - beeps are glitchy, as if interrupted for too long
@@ -324,10 +323,6 @@ void snova_state::supremo(machine_config &config)
 	m_maincpu->set_clock(8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snova_state::supremo_map);
 
-	// THIS IS A HACK, vector @ 0xffec, use ROM_COPY
-	const attotime irq_period = attotime::from_ticks(4 * 128 * 11, 8_MHz_XTAL);
-	m_maincpu->set_periodic_int(FUNC(snova_state::irq0_line_hold), irq_period);
-
 	config.set_default_layout(layout_novag_supremo);
 
 	config.device_remove("rs232");
@@ -350,8 +345,6 @@ ROM_END
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
-
-	ROM_COPY("maincpu", 0xffec, 0xfff8, 2) // HACK
 
 	ROM_REGION( 50926, "screen", 0 )
 	ROM_LOAD("nsnova.svg", 0, 50926, CRC(5ffa1b53) SHA1(8b1f862bfdf0be837a4e8dc94fea592d6ffff629) )

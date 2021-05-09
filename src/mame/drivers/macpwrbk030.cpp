@@ -106,9 +106,10 @@
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
-#include "machine/ncr5380.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/macscsi.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/devices.h"
 #include "sound/asc.h"
 #include "formats/ap_dsk35.h"
 
@@ -117,9 +118,9 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define C7M (7833600)
-#define C15M (C7M*2)
-#define C32M (C15M*2)
+#define C32M (31.3344_MHz_XTAL)
+#define C15M (C32M/2)
+#define C7M (C32M/4)
 
 class macpb030_state : public driver_device
 {
@@ -131,7 +132,8 @@ public:
 		m_via1(*this, "via1"),
 		m_via2(*this, "via2"),
 		m_macadb(*this, "macadb"),
-		m_ncr5380(*this, "ncr5380"),
+		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -164,7 +166,8 @@ private:
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<macadb_device> m_macadb;
-	required_device<ncr5380_device> m_ncr5380;
+	required_device<ncr53c80_device> m_ncr5380;
+	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -217,6 +220,7 @@ private:
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask);
 	uint32_t scsi_drq_r(offs_t offset, uint32_t mem_mask = ~0);
 	void scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void scsi_berr_w(uint8_t data);
 	u16 mac_scc_r(offs_t offset)
 	{
 		mac_via_sync();
@@ -607,12 +611,9 @@ u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
 
 	//printf("scsi_r: offset %x mask %x\n", offset, mem_mask);
 
-	if ((reg == 6) && (offset == 0x130))
-	{
-		reg = R5380_CURDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 6) && (offset == 0x130);
 
-	return m_ncr5380->ncr5380_read_reg(reg) << 8;
+	return m_scsihelp->read_wrapper(pseudo_dma, reg) << 8;
 }
 
 void macpb030_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
@@ -621,12 +622,9 @@ void macpb030_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 
 	//printf("scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
-	m_ncr5380->ncr5380_write_reg(reg, data>>8);
+	m_scsihelp->write_wrapper(pseudo_dma, reg, data>>8);
 }
 
 uint32_t macpb030_state::scsi_drq_r(offs_t offset, uint32_t mem_mask)
@@ -634,13 +632,13 @@ uint32_t macpb030_state::scsi_drq_r(offs_t offset, uint32_t mem_mask)
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			return m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24;
+			return m_scsihelp->read_wrapper(true, 6)<<24;
 
 		case 0xffff0000:
-			return (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16);
+			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16);
 
 		case 0xffffffff:
-			return (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<8) | m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK);
+			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16) | (m_scsihelp->read_wrapper(true, 6)<<8) | m_scsihelp->read_wrapper(true, 6);
 
 		default:
 			logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
@@ -654,25 +652,30 @@ void macpb030_state::scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
 			break;
 
 		case 0xffff0000:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>16);
 			break;
 
 		case 0xffffffff:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>8);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data&0xff);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>16);
+			m_scsihelp->write_wrapper(true, 0, data>>8);
+			m_scsihelp->write_wrapper(true, 0, data&0xff);
 			break;
 
 		default:
 			logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
 			break;
 	}
+}
+
+void macpb030_state::scsi_berr_w(uint8_t data)
+{
+	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 }
 
 uint8_t macpb030_state::mac_gsc_r(offs_t offset)
@@ -919,12 +922,26 @@ void macpb030_state::macpb140(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(macpb030_state::scsi_berr_w));
 
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
@@ -957,6 +974,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_ram->set_extra_options("4M,6M,8M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
@@ -1015,12 +1033,26 @@ void macpb030_state::macpb160(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(macpb030_state::scsi_berr_w));
 
 	SCC85C30(config, m_scc, C7M);
 	//  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
@@ -1053,6 +1085,7 @@ void macpb030_state::macpb160(machine_config &config)
 	m_ram->set_extra_options("4M,6M,8M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 void macpb030_state::macpb180(machine_config &config)

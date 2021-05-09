@@ -29,4 +29,10 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("cdu561_25", CDU561_25);
 	device.option_add("smoc501", SMOC501);
 	device.option_add("aplcd150", APPLECD150);
-};
+}
+
+void mac_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM_APPLE);
+}

@@ -458,6 +458,7 @@ windows_options::windows_options()
 	set_default_value(OPTION_SNAPSHOT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + snapshot_directory());
 	set_default_value(OPTION_DIFF_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory());
 	set_default_value(OPTION_COMMENT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory());
+	set_default_value(OPTION_SHARE_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + share_directory());
 
 	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()));
 	set_default_value(OPTION_MEDIAPATH, osd::text::from_wstring((LPCWSTR)path->Data()) + media_path());

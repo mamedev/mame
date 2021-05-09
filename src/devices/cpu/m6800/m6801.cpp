@@ -82,6 +82,7 @@ enum
 #define TAKE_OCI enter_interrupt("take OCI\n",0xfff4)
 #define TAKE_TOI enter_interrupt("take TOI\n",0xfff2)
 #define TAKE_SCI enter_interrupt("take SCI\n",0xfff0)
+#define TAKE_CMI enter_interrupt("take CMI\n",0xffec)
 
 /* mnemonics for the Timer Control and Status Register bits */
 #define TCSR_OLVL 0x01
@@ -276,9 +277,9 @@ void hd6301x_cpu_device::hd6301x_io(address_map &map)
 	map(0x0018, 0x0018).rw(FUNC(hd6301x_cpu_device::p7_data_r), FUNC(hd6301x_cpu_device::p7_data_w)); // TODO: external except in single-chip mode
 	map(0x0019, 0x0019).rw(FUNC(hd6301x_cpu_device::ocr2h_r), FUNC(hd6301x_cpu_device::ocr2h_w));
 	map(0x001a, 0x001a).rw(FUNC(hd6301x_cpu_device::ocr2l_r), FUNC(hd6301x_cpu_device::ocr2l_w));
-	//map(0x001b, 0x001b).rw(FUNC(hd6301x_cpu_device::tcsr3_r), FUNC(hd6301x_cpu_device::tcsr3_w));
-	//map(0x001c, 0x001c).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::tconr_w));
-	//map(0x001d, 0x001d).rw(FUNC(hd6301x_cpu_device::t2cnt_r), FUNC(hd6301x_cpu_device::t2cnt_w));
+	map(0x001b, 0x001b).rw(FUNC(hd6301x_cpu_device::tcsr3_r), FUNC(hd6301x_cpu_device::tcsr3_w));
+	map(0x001c, 0x001c).rw(FUNC(hd6301x_cpu_device::ff_r), FUNC(hd6301x_cpu_device::tconr_w));
+	map(0x001d, 0x001d).rw(FUNC(hd6301x_cpu_device::t2cnt_r), FUNC(hd6301x_cpu_device::t2cnt_w));
 	//map(0x001f, 0x001f).rw(FUNC(hd6301x_cpu_device::tstreg_r), FUNC(hd6301x_cpu_device::tstreg_w));
 }
 
@@ -318,6 +319,7 @@ m6801_cpu_device::m6801_cpu_device(const machine_config &mconfig, device_type ty
 	, m_out_port_func(*this)
 	, m_out_sc2_func(*this)
 	, m_out_sertx_func(*this)
+	, m_sclk_divider(8)
 {
 }
 
@@ -356,6 +358,7 @@ hd6301x_cpu_device::hd6301x_cpu_device(const machine_config &mconfig, device_typ
 	, m_in_portx_func(*this)
 	, m_out_portx_func(*this)
 {
+	m_sclk_divider = 16;
 }
 
 hd6301x0_cpu_device::hd6301x0_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -432,6 +435,10 @@ void hd6301x_cpu_device::m6800_check_irq2()
 	else if ((m_tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
 	{
 		TAKE_TOI;
+	}
+	else if ((m_tcsr3 & 0xc0) == 0xc0)
+	{
+		TAKE_CMI;
 	}
 	else if (((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) == (M6801_TRCSR_RIE|M6801_TRCSR_RDRF)) ||
 				((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
@@ -572,7 +579,7 @@ void hd6301x_cpu_device::check_timer_event()
 		modified_tcsr();
 	}
 
-	if (m_irq2 & (TCSR_OCF | TCSR_TOF))
+	if ((m_irq2 & (TCSR_OCF | TCSR_TOF)) || (m_tcsr3 & 0xc0) == 0xc0)
 	{
 		if (m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
@@ -588,6 +595,40 @@ void m6801_cpu_device::increment_counter(int amount)
 	m6800_cpu_device::increment_counter(amount);
 	CTD += amount;
 	if (CTD >= m_timer_next)
+		check_timer_event();
+}
+
+void hd6301x_cpu_device::increment_counter(int amount)
+{
+	m6800_cpu_device::increment_counter(amount);
+	if (m_t2cnt_written)
+		m_t2cnt_written = false;
+	else if (BIT(m_tcsr3, 4))
+	{
+		switch (m_tcsr3 & 0x03)
+		{
+		case 0x00:
+			// Timer 2 input = E clock
+			increment_t2cnt(amount);
+			break;
+
+		case 0x01:
+			// Timer 2 input = E clock/8
+			increment_t2cnt((amount + (CTD & 0x0007)) >> 3);
+			break;
+
+		case 0x02:
+			// Timer 2 input = E clock/128
+			increment_t2cnt((amount + (CTD & 0x007f)) >> 7);
+			break;
+
+		case 0x03:
+			// Timer 2 input = external Tclk
+			break;
+		}
+	}
+	CTD += amount;
+	if (CTD >= m_timer_next || (m_tcsr3 & 0xc0) == 0xc0)
 		check_timer_event();
 }
 
@@ -644,6 +685,44 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 			m_sci_timer->adjust(period, 0, period);
 			m_use_ext_serclock = false;
 		}
+		break;
+	}
+}
+
+void hd6301x_cpu_device::set_rmcr(uint8_t data)
+{
+	if (m_rmcr == data) return;
+
+	m_rmcr = data;
+
+	switch ((m_rmcr & 0x1c) >> 2)
+	{
+	case 0: // TODO: clock sync
+	case 3:
+	case 7: // external clock
+		LOGSER("SCI: Using external serial clock: true\n");
+		m_use_ext_serclock = true;
+		m_sci_timer->enable(false);
+		break;
+
+	case 1:
+	case 2:
+	case 4: // TODO: clock sync
+	case 5:
+	case 6:
+		if (BIT(m_rmcr, 5))
+		{
+			LOGSER("SCI: Using Timer 2 clock\n");
+			m_sci_timer->enable(false);
+		}
+		else
+		{
+			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
+			attotime period = cycles_to_attotime(divisor);
+			LOGSER("SCI: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
+			m_sci_timer->adjust(period, 0, period);
+		}
+		m_use_ext_serclock = false;
 		break;
 	}
 }
@@ -991,6 +1070,12 @@ void hd6301x_cpu_device::device_start()
 	save_item(NAME(m_tcsr2));
 	save_item(NAME(m_pending_tcsr2));
 	save_item(NAME(m_output_compare2.d));
+
+	save_item(NAME(m_t2cnt));
+	save_item(NAME(m_tconr));
+	save_item(NAME(m_tcsr3));
+	save_item(NAME(m_tout3));
+	save_item(NAME(m_t2cnt_written));
 }
 
 void m6801_cpu_device::device_reset()
@@ -1043,6 +1128,12 @@ void hd6301x_cpu_device::device_reset()
 	m_tcsr2 = 0x00;
 	m_pending_tcsr2 = 0x00;
 	OC2D = 0xffff;
+
+	m_t2cnt = 0x00;
+	m_tconr = 0xff;
+	m_tcsr3 = 0x00;
+	m_tout3 = false;
+	m_t2cnt_written = false;
 }
 
 
@@ -1085,6 +1176,11 @@ void hd6301x_cpu_device::write_port2()
 	{
 		data = (data & 0xef) | (m_tx << 4);
 		ddr |= 0x10;
+	}
+	if ((m_tcsr3 & 0x0c) != 0)
+	{
+		data = (data & 0xbf) | (m_tout3 << 6);
+		ddr |= 0x40;
 	}
 
 	m_out_port_func[1](0, data, ddr);
@@ -1540,6 +1636,93 @@ void hd6301x_cpu_device::ocr2l_w(uint8_t data)
 }
 
 
+void hd6301x_cpu_device::increment_t2cnt(int amount)
+{
+	if (amount > uint8_t(m_tconr - m_t2cnt))
+	{
+		if (m_t2cnt > m_tconr)
+		{
+			amount -= 256 - m_t2cnt;
+			m_t2cnt = 0;
+		}
+		m_t2cnt = (m_t2cnt + amount) % (m_tconr + 1);
+
+		if (BIT(m_tcsr3, 3))
+		{
+			if (m_tout3 != BIT(m_tcsr3, 2))
+			{
+				m_tout3 = BIT(m_tcsr3, 2);
+				m_port2_written = true;
+				write_port2();
+			}
+		}
+		else if (BIT(m_tcsr3, 2))
+		{
+			m_tout3 = !m_tout3;
+			m_port2_written = true;
+			write_port2();
+		}
+
+		if (BIT(m_rmcr, 5) && !m_use_ext_serclock)
+		{
+			if (m_ext_serclock + amount >= 32)
+			{
+				m_ext_serclock = (m_ext_serclock + amount) % 32;
+				serial_transmit();
+				serial_receive();
+			}
+			else
+				m_ext_serclock += amount;
+		}
+
+		m_tcsr3 |= 0x80;
+	 	m_timer_next = 0; // HACK
+	}
+	else
+		m_t2cnt += amount;
+}
+
+uint8_t hd6301x_cpu_device::t2cnt_r()
+{
+	return m_t2cnt;
+}
+
+void hd6301x_cpu_device::t2cnt_w(uint8_t data)
+{
+	m_t2cnt = data;
+	m_t2cnt_written = true;
+}
+
+void hd6301x_cpu_device::tconr_w(uint8_t data)
+{
+	m_tconr = data;
+}
+
+uint8_t hd6301x_cpu_device::tcsr3_r()
+{
+	return m_tcsr3;
+}
+
+void hd6301x_cpu_device::tcsr3_w(uint8_t data)
+{
+	uint8_t tout3_last_enable = (m_tcsr3 & 0x0c) != 0;
+
+	// Bit 5 does not exist and Bit 7 can only be written with 0
+	m_tcsr3 = data & (0x5f | (m_tcsr3 & 0x80));
+
+	if (m_tout3 && !BIT(data, 4))
+	{
+		m_tout3 = false;
+		write_port2();
+	}	
+	else if (tout3_last_enable ? (data & 0x0c) == 0 : (data & 0x0c) != 0)
+	{
+		m_port2_written = true;
+		write_port2();
+	}
+}
+
+
 uint8_t m6801_cpu_device::sci_rmcr_r()
 {
 	return m_rmcr;
@@ -1655,7 +1838,7 @@ void m6801_cpu_device::m6801_clock_serial()
 	{
 		m_ext_serclock++;
 
-		if (m_ext_serclock >= 8)
+		if (m_ext_serclock >= m_sclk_divider)
 		{
 			m_ext_serclock = 0;
 			serial_transmit();

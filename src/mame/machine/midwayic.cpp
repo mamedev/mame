@@ -807,7 +807,7 @@ void midway_ioasic_device::ioasic_reset()
 
 void midway_ioasic_device::update_ioasic_irq()
 {
-	uint16_t fifo_state = fifo_status_r(machine().dummy_space());
+	uint16_t fifo_state = get_fifo_status();
 	uint16_t irqbits = 0x2000;
 	uint8_t new_state;
 
@@ -908,7 +908,7 @@ uint16_t midway_ioasic_device::fifo_r()
 }
 
 
-uint16_t midway_ioasic_device::fifo_status_r(address_space &space)
+uint16_t midway_ioasic_device::get_fifo_status()
 {
 	uint16_t result = 0;
 
@@ -919,9 +919,17 @@ uint16_t midway_ioasic_device::fifo_status_r(address_space &space)
 	if (m_fifo_bytes >= FIFO_SIZE || m_force_fifo_full)
 		result |= 0x20;
 
-	/* kludge alert: if we're reading this from the DCS CPU itself, and we recently cleared */
-	/* the FIFO, and we're within 16 instructions of the read that cleared the FIFO, make */
-	/* sure the FIFO clear bit is set */
+	return result;
+}
+
+
+uint16_t midway_ioasic_device::fifo_status_r(address_space &space)
+{
+	uint16_t result = get_fifo_status();
+
+	// kludge alert: if we're reading this from the DCS CPU itself, and we recently cleared
+	// the FIFO, and we're within 16 instructions of the read that cleared the FIFO, make
+	// sure the FIFO clear bit is set
 	if (m_fifo_force_buffer_empty_pc && &space.device() == m_dcs_cpu)
 	{
 		offs_t currpc = m_dcs_cpu->pc();

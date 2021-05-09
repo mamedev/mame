@@ -195,6 +195,7 @@ protected:
 private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
+	uint16_t get_fifo_status();
 
 	required_ioport m_io_dips;
 	required_ioport m_io_system;

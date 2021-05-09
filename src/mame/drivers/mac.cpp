@@ -20,9 +20,7 @@
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/swim2.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/scsicd.h"
+#include "bus/nscsi/devices.h"
 
 // NuBus and 030/040 PDS cards
 #include "bus/nubus/nubus_48gc.h"
@@ -50,9 +48,9 @@
 #include "speaker.h"
 #include "mac.lh"
 
-#define C7M (7833600)
-#define C15M    (C7M*2)
-#define C32M    (C15M*2)
+#define C32M    (31.3344_MHz_XTAL)
+#define C15M    (C32M/2)
+#define C7M     (C32M/4)
 
 // do this here - screen_update is called each scanline when stepping in the
 // debugger, which means you can't escape the VIA2 IRQ handler
@@ -495,7 +493,7 @@ void mac_state::macii_map(address_map &map)
 	map(0x50006000, 0x50006003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50006060, 0x50006063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
 	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
@@ -509,7 +507,7 @@ void mac_state::maciici_map(address_map &map)
 	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
 	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
 	map(0x50024000, 0x50024007).w(FUNC(mac_state::rbv_ramdac_w)).mirror(0x00f00000);
@@ -526,7 +524,7 @@ void mac_state::macse30_map(address_map &map)
 	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
 	map(0x50006000, 0x50007fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x50012060, 0x50012063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(FUNC(mac_state::macii_scsi_drq_r), FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
 	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000); // mirror
@@ -637,15 +635,27 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 
 void mac_state::add_scsi(machine_config &config, bool cdrom)
 {
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-	if (cdrom)
-		scsibus.set_slot_device(3, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, cdrom ? "cdrom" : nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac_state::mac_scsi_irq));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
-	m_ncr5380->irq_callback().set(FUNC(mac_state::mac_scsi_irq));
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(mac_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }

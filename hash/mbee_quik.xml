@@ -12,7 +12,9 @@ Compatibility flags:
 If no flag is specified, it's assumed it works on all of them.
 
 mbee runs at 2MHz and is monochrome. The others run almost twice as fast, and have colour. Since most programs
-are monochrome, the colour machines may exhibit coloured or black areas.
+are monochrome, the colour machines may exhibit coloured or black areas. It's recommended to run monochrome
+programs on "mbee" so they run at the correct speed. However you can use the other systems if needed. Colour programs
+should be run on colour systems, but most should work on "mbee" where they will appear in monochrome.
 
 Quickloads do not work on disk-based microbees, or on premium models.
 
@@ -66,7 +68,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="alienc">
 		<description>Alien Cresta</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2032">
 				<rom name="alien.bee" size="0x2032" crc="85d5dff6" sha1="59fcbf3880aafc6e9c8acfd383d708188cf3f16c"/>
@@ -121,7 +123,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="battle">
 		<description>Battle Station</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0d99">
 				<rom name="battle.bee" size="0x0d99" crc="3bda1a0c" sha1="2e88b696b037221578693f9606f151a1857e713a"/>
@@ -242,7 +244,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="bunyip">
 		<description>Bunyip Adventure</description>
 		<year>1984</year>
-		<publisher>Grotnik</publisher>
+		<publisher>Grotnik Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x6d20">
 				<rom name="bunyip.bin" size="0x6d20" crc="f433a6bb" sha1="18dde6c1f7a48fa8d57902d55636c7ed6572b800"/>
@@ -264,7 +266,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="canmis">
 		<description>Cannibals and Missionaries</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Honeysoft</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1900">
 				<rom name="canmis.mwb" size="0x1900" crc="3cb36b06" sha1="a3bf58128c8ad895e19b331032c5e6f11cfee395"/>
@@ -308,7 +310,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="centiped">
 		<description>Centipede Attack</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x103b">
 				<rom name="centiped.bee" size="0x103b" crc="ee69a9a5" sha1="2f21568013d1fa0a2c0e163edfa12ed3867f0341"/>
@@ -341,7 +343,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="chomp">
 		<description>Chomp</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Super Software Inc</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3740">
 				<rom name="chomp.bee" size="0x3740" crc="6febbfa0" sha1="01341a7edb52a0fa2723cf82e93bcec85e1b2d71"/>
@@ -349,13 +351,13 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
-	<software name="chopper">
+	<software name="chopperp">
 		<description>Chopper Pilot</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x4180">
-				<rom name="chopper.mwb" size="0x4180" crc="01d7353a" sha1="272b1f3c0422e23d49f448525e889a7a6e69b769"/>
+				<rom name="chopperp.mwb" size="0x4180" crc="01d7353a" sha1="272b1f3c0422e23d49f448525e889a7a6e69b769"/>
 			</dataarea>
 		</part>
 	</software>
@@ -415,21 +417,10 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
-	<software name="defender">
-		<description>Micro Defender</description>
-		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="quik" interface="mbee_quik">
-			<dataarea name="quik" size="0x3d20">
-				<rom name="defender.bin" size="0x3d20" crc="36f807be" sha1="2f79dc655e98415e524a32a426bf3245e9f630df"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="defense">
 		<description>Defense Command</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x383e">
 				<rom name="defense.bee" size="0x383e" crc="889dd651" sha1="1843cc8bc2415c1b8589e303ba1c3417811b08d2"/>
@@ -495,7 +486,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="donut">
 		<description>Donut Dilemma</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Fun Division</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3278">
 				<rom name="donut.bee" size="0x3278" crc="923ae618" sha1="c59a619ccb3d55781d2308b7a227b7f181e8757e"/>
@@ -528,10 +519,10 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="droids">
 		<description>Droids</description>
 		<year>1985</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Wasp Soft</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2980">
-				<rom name="donut.bee" size="0x2980" crc="6c86fe4e" sha1="d99949719b4ad06244afcdb2fca4e73f61da1abd"/>
+				<rom name="droids.com" size="0x2980" crc="6c86fe4e" sha1="d99949719b4ad06244afcdb2fca4e73f61da1abd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +541,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="swordq">
 		<description>Sword Quest</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Honeysoft</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x5800">
 				<rom name="swordquest.mwb" size="0x5800" crc="05d74c8c" sha1="ffd7884c60b24773152cdd73632f48a410e0c048"/>
@@ -583,7 +574,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="engineer">
 		<description>Engineer</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Beesware</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2f00">
 				<rom name="engineer.mwb" size="0x2f00" crc="44bfd530" sha1="e2065bb7170032f8c2f85dd9d28e885f566de069"/>
@@ -638,7 +629,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="fishing">
 		<description>Fishing</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>G:NE Schools Computer Association</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3280">
 				<rom name="fishing.mwb" size="0x3280" crc="f959c0d5" sha1="b918c2f72bc28f4f34f4bf9dafe502804cbed624"/>
@@ -715,7 +706,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="galaxy">
 		<description>Galaxy Invasion</description>
 		<year>1980</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2500">
 				<rom name="galaxy.bee" size="0x2500" crc="09d723b1" sha1="60868bea52c6a707771d57a4f6d43851d5939cdf"/>
@@ -726,7 +717,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="galaxy2">
 		<description>Galaxy Invasion 2</description>
 		<year>1980</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x28fd">
 				<rom name="galaxy2.bee" size="0x28fd" crc="18f77975" sha1="b1290ae68d8ac521e27cc19961c519f92fe758ef"/>
@@ -737,7 +728,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="galaxyp">
 		<description>Galaxy Invasion Plus</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2bbd">
 				<rom name="galaxyp.bee" size="0x2bbd" crc="7f74b51b" sha1="a668faca08b36bbd4a4f42647ee946a2a58edc78"/>
@@ -748,7 +739,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="ghost">
 		<description>Ghost Hunter</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1ddf">
 				<rom name="ghost.bee" size="0x1ddf" crc="810ab06e" sha1="86207ddb56aefd5ccf0636fe60d4785de1710dce"/>
@@ -770,7 +761,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="goldust">
 		<description>Gold-Dust Island</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Jacaranda Wiley</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x6400">
 				<rom name="goldust.mwb" size="0x6400" crc="34746812" sha1="de3a9f9eed58588c38ab548eae4075248e58052e"/>
@@ -803,7 +794,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="grotnik">
 		<description>Grotnik Wars</description>
 		<year>1984</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Grotnik Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1d00">
 				<rom name="grotnik.com" size="0x1d00" crc="7e75c456" sha1="d9b777ff45ed43841108aab2674773e988f77dfe"/>
@@ -913,7 +904,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="hoppy">
 		<description>Hoppy</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1f42">
 				<rom name="hoppy.bee" size="0x1f42" crc="d9f7aa71" sha1="3879abed2b1f06cf8c3d26eff5b6bb20fd0f9765"/>
@@ -935,7 +926,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="institute">
 		<description>Institute</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Med Systems Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x4080">
 				<rom name="institute.bee" size="0x4080" crc="6612741d" sha1="0a92c9e679527f2824aa591799fcaa83d1b25e1a"/>
@@ -957,7 +948,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="jungle">
 		<description>Jungle Raiders</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x174d">
 				<rom name="jungle.bee" size="0x174d" crc="acf1fd7e" sha1="2c1a08f3138fdbf64788be6db7e9b8c7c9ffb9f7"/>
@@ -968,7 +959,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="killbees">
 		<description>Killer Bees</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dreamcards</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x5f00">
 				<rom name="killbees.mwb" size="0x5f00" crc="a2cba4ee" sha1="daa49a0513a62fd99ddd251fa78ff6939870a901"/>
@@ -979,7 +970,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="killbeet">
 		<description>Killer Beetles</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dubois and McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x196e">
 				<rom name="killer.bee" size="0x196e" crc="263cb3b0" sha1="9ed8970460eba6fb6f69ce294390e4d675200500"/>
@@ -1078,7 +1069,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="merlin">
 		<description>Merlin</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dreamcards</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x7300">
 				<rom name="merlin.mwb" size="0x7300" crc="5fb22cd7" sha1="e356f19691dd17e59d4fbb5a5ddb9fcd34780e71"/>
@@ -1089,7 +1080,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="meteor1">
 		<description>Meteor Mission</description>
 		<year>1980</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0d22">
 				<rom name="meteor1.bee" size="0x0d22" crc="c7c8ee5e" sha1="b09647d0bbddfcb0078186f9bde2e254580def02"/>
@@ -1100,7 +1091,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="meteor2">
 		<description>Meteor Mission 2</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Five Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2e41">
 				<rom name="meteor2.bee" size="0x2e41" crc="e705e1b0" sha1="da2449c4b6548e56af03d731f4bbdf51ebed9ecc"/>
@@ -1144,7 +1135,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="minedrop">
 		<description>Mine Drop</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>M.B.Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3400">
 				<rom name="minedrop.bee" size="0x3400" crc="d067a3de" sha1="d1ea4bf5cb47b8d4473f54b8a4b1b5ba3d8e635f"/>
@@ -1155,7 +1146,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="minedrop2">
 		<description>Mine Drop II</description>
 		<year>1983</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Dreamcards</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3980">
 				<rom name="minedrop2.bin" size="0x3980" crc="80a2922f" sha1="0ff8e13ca9edf93de0212ea3aa821efd1d2498f2"/>
@@ -1177,7 +1168,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 	<software name="missilew">
 		<description>Missile Wars</description>
 		<year>1982</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Big Bee Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1980">
 				<rom name="missilewars.bin" size="0x1980" crc="0fa84b91" sha1="4467b5218f9bd42efa0afaaec933b6114e670648"/>
@@ -1225,6 +1216,745 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x3f00">
 				<rom name="museum.mwb" size="0x3f00" crc="4e33c686" sha1="fa835d604638162b912edb6aab17bd47fc79d722"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bandit">
+		<description>One Arm Bandit</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1217">
+				<rom name="bandit.bin" size="0x1217" crc="6b98a63f" sha1="00d54a4dbd92600f274aa6256cf904c0e8302bdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outhouse">
+		<description>Outhouse</description>
+		<year>1982</year>
+		<publisher>Soft Sector Marketing</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x68cf">
+				<rom name="outhouse.bee" size="0x68cf" crc="9d82809a" sha1="6b2028d0970f5b6d9c56889637de0ee57317ecf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="applepan">
+		<description>Apple Panic</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3900">
+				<rom name="panic.com" size="0x3900" crc="4e6049f9" sha1="43e809aa9385d8a6b60daeab9c260275ea9d273b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penetr">
+		<description>Penetrator</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3c80">
+				<rom name="penetr.bee" size="0x3c80" crc="36e50f69" sha1="f5300ac810e8f05e48cbad1b497a2a090567186d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picklett">
+		<description>Pick Letter</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0280">
+				<rom name="pickletter.bin" size="0x0280" crc="0894f591" sha1="a2e957d9b30904bba2e55d2e41ba03008126629b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinball">
+		<description>Pinball</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x19f5">
+				<rom name="pinball.bin" size="0x19f5" crc="206f77e4" sha1="7ce2d36455917e48ea6495644cefd693c00e9d3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rats3d">
+		<description>Rats 3-D</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1900">
+				<rom name="rats.mwb" size="0x1900" crc="633a384a" sha1="ddd25070142802a3e2f151cf8e7b41aab6fdb90a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reefrun">
+		<description>Reef Runners</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0700">
+				<rom name="reefrun.bee" size="0x0700" crc="058f3718" sha1="1f71e75bbfd20914681df7b0b3b4cc9c662d208f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reeler">
+		<description>Lucky Bar Poker Machine</description>
+		<year>1983</year>
+		<publisher>Microworld</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2380">
+				<rom name="reeler.bee" size="0x2380" crc="86cbad56" sha1="bc0289a7a294e7359aa958272b716e2ecded4ffa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteorr">
+		<description>Meteor Rescue</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2680">
+				<rom name="meteorr.bee" size="0x2680" crc="29c6776c" sha1="4aa4db02220ed3bda0a488461f5428ce6281765b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1580">
+				<rom name="reversi.mwb" size="0x1580" crc="0ed899de" sha1="3c2331668f91845be58ae0390524fb863627b1b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotf">
+		<description>Robot Fire</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1d90">
+				<rom name="robotf.bee" size="0x1d90" crc="85fbf5e3" sha1="ab54c5d098e2892afa51700754477a6a69c417ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rotate">
+		<description>Rotate</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0a17">
+				<rom name="rotate.bin" size="0x0a17" crc="ded1e8da" sha1="76e591447022619b4c413fee834c2fbec0afe524"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sabre">
+		<description>Sabre of Sultar</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5d80">
+				<rom name="sabreofs.mwb" size="0x5d80" crc="aef4bb9a" sha1="3a03e6b715eb6c7e7f6f31f5df43d1c1bd58206b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>Sargon Chess</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1d00">
+				<rom name="chess.bin" size="0x1d00" crc="536f1985" sha1="24c9d0675d4ce9ad8cd7df5d867e63d03cf92970"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seadog">
+		<description>Seadog</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="seadog.mwb" size="0x3f00" crc="a31aae2e" sha1="e813449bcf5727a31b52dd67b61a5d0836afbd13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seadrag">
+		<description>Sea Dragon</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d4f">
+				<rom name="seadrag.bee" size="0x3d4f" crc="950f36b2" sha1="7a3d83e865dd0e2b00299ee7f000ff51a746ef02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shipwreck">
+		<description>Shipwreck Island</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3600">
+				<rom name="shipwreck.mwb" size="0x3600" crc="2a6b91d0" sha1="defc05cb023ceab992b1bf616722d1c1c2644817"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slide">
+		<description>Slide</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0a00">
+				<rom name="slide.mwb" size="0x0a00" crc="b7fddcbd" sha1="2a0d11b414faca54b0cba3a02f2826639bf665e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snake">
+		<description>Snake</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0880">
+				<rom name="snake.mwb" size="0x0880" crc="26199ac3" sha1="c2649324ddd4458fab7542692e4f53d2574c9691"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="solit">
+		<description>Solitaire</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1020">
+				<rom name="solit.bin" size="0x1020" crc="4aee0137" sha1="3b09a3669a93982ee2ae19a74cf34cccdaea5faa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spatrol">
+		<description>Space Patrol</description>
+		<year>1983</year>
+		<publisher>Digital Concept Computer Enterprises</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3680">
+				<rom name="spatrol.bee" size="0x3680" crc="5e5e3c74" sha1="4c1c4b67cecacc5979feff9a489d6f057642450b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slanes">
+		<description>Space Lanes</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1000">
+				<rom name="slanes.bee" size="0x1000" crc="50987f20" sha1="f0ead1b4a442092bed7f251a4bc43ec2131a396a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subatom">
+		<description>Subatomic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2c80">
+				<rom name="subatomic.bee" size="0x2c80" crc="84eb4846" sha1="1e73ace5171d0dcbb72ba03fa261dad0b15f9d97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subterra">
+		<description>Subterra</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1c80">
+				<rom name="subterra.mwb" size="0x1c80" crc="b9e694be" sha1="bdd306e7a7bc8a8c1fd531950a4c2a0b288f24e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survival">
+		<description>Survival</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2880">
+				<rom name="survival.mwb" size="0x2880" crc="238a6956" sha1="690f8ed075892de6939e373142ab2010322ccc4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sydney">
+		<description>Sydney Approach</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2020">
+				<rom name="sydney.bin" size="0x2020" crc="5927e6bc" sha1="397944c6cbbc2bee743cb6b7ab40300a03612952"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank Battle</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1380">
+				<rom name="tank.mwb" size="0x1380" crc="f1602dc5" sha1="6f69d999999689a6d6ae12f470805cb5931c4eef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="target">
+		<description>Target</description>
+		<year>1980</year>
+		<publisher>Applied Technology Microworld</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0c80">
+				<rom name="target.bee" size="0x0c80" crc="2162ef4a" sha1="a91a36a0efc0fb38058e9f1654e798233321c548"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tandyinv">
+		<description>Tandy Invaders</description>
+		<year>1979</year>
+		<publisher>Tandy Electronics</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0e1d">
+				<rom name="ti.bee" size="0x0e1d" crc="42ae94ea" sha1="75b14126831db3b2d415fdbe0835060663da5322"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toady">
+		<description>Toady</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3180">
+				<rom name="toady.mwb" size="0x3180" crc="e0b16f6d" sha1="882ca159dd49fac01889131f6be19617af23b73f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uworld">
+		<description>Underworld of Kin</description>
+		<year>1983</year>
+		<publisher>Digital Concepts Computer Enterprises</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5ea0">
+				<rom name="uworld.bin" size="0x5ea0" crc="bbc540a6" sha1="80724a21c1f1de4e5bf415c82f12d8fc743e8349"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="valley">
+		<description>Valley</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5500">
+				<rom name="valley.mwb" size="0x5500" crc="9f624003" sha1="25067474af74ef293fc1adc5a30d76ae0005af63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viper">
+		<description>Viper</description>
+		<year>1983</year>
+		<publisher>Subatomic Software</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2480">
+				<rom name="viper.mwb" size="0x2480" crc="e8201d92" sha1="0a6aebb7624d3cfc27182cdcd40dde0e298c1723"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volcano">
+		<description>Volcano Hunter</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x461b">
+				<rom name="volcano.com" size="0x461b" crc="94893a68" sha1="2ba912ad25524bb7955f0e85b48893828d1e42c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waverton">
+		<description>Waverton Castle</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2580">
+				<rom name="waverton.mwb" size="0x2580" crc="020cbec6" sha1="24f2b5bab879769b570ee854501445e2b4f2553c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardsc">
+		<description>Wizards Castle</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5400">
+				<rom name="wizardsc.bin" size="0x5400" crc="3c48fa0a" sha1="e37404198864496349911e2f41f97ebcb2cb9dd2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="worms">
+		<description>Worms</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0700">
+				<rom name="worms.mwb" size="0x0700" crc="d6bcfdf3" sha1="c42a2ad6c808e2aa27a7a21352653bafc2e6fabb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormsq">
+		<description>Worm Squirm</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x03b2">
+				<rom name="wormsq.bin" size="0x03b2" crc="408baaf3" sha1="d35c84c408eacf83a8216675dde942554f21842a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yacht">
+		<description>Yacht Race</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2e80">
+				<rom name="yacht.mwb" size="0x2e80" crc="aa4d4fb9" sha1="1c0caa5ddb1d0accfddd5b0648b9472ae8046fcc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="z80nim">
+		<description>Z80 Nim</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0200">
+				<rom name="z80nim.bin" size="0x0200" crc="af2b273c" sha1="54256b9389c07a4f6f0c5f2687160022f9d2dcda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zok">
+		<description>Starship Zok VII</description>
+		<year>1985</year>
+		<publisher>Care Project</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3100">
+				<rom name="zok.mwb" size="0x3100" crc="22851055" sha1="f9bfa66fc5bfad1e9b940256ee48295af579ca30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopper">
+		<description>Chopper</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<info name="usage" value="Press W to raise the chopper. Then W up; Z = down; , = left; . = right; Space = shoot" />
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="chopper.bee" size="0x3000" crc="eb0f4ce2" sha1="2ccbb82030f72061a5e0cfa09ae72df4571c0c5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender">
+		<description>Defender</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3a00">
+				<rom name="defender.bee" size="0x3a00" crc="017fa5f0" sha1="8e4d2e401865bb43b481396867bd46cba2b3fa66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3380">
+				<rom name="frogger.bee" size="0x3380" crc="ac56ce3a" sha1="5dc8d41b34368c444535619cb55cd013421e9230"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingkong">
+		<description>King Kong</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3100">
+				<rom name="kingkong.bee" size="0x3100" crc="160b9fdf" sha1="ae27fbcb9c25cdd2639bb1872143636878f5f061"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starstrk">
+		<description>Star Striker</description>
+		<year>1984</year>
+		<publisher>Mytek</publisher>
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3880">
+				<rom name="starstrk.bee" size="0x3880" crc="9c970d18" sha1="300f00c0f0367d9d362c0ee8aaabba9c6dee34d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trains">
+		<description>Trains</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="1" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2280">
+				<rom name="trains.bee" size="0x2280" crc="f28473e0" sha1="edf35f5304ff8efa554190378e80ff187be17f02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="economy">
+		<description>Australian Economy</description>
+		<year>198?</year>
+		<publisher>Applied Technology</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5b00">
+				<rom name="economy.mwb" size="0x5b00" crc="58437762" sha1="537c447ac2213036ae8a313a68282d96d30f7b2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1day">
+		<description>One Day Cricket</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2f80">
+				<rom name="1daycricket.mwb" size="0x2f80" crc="f2d96dac" sha1="46c34f15678c98d7eb6eda99844a46a639d08d8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dox">
+		<description>3D Noughts and Crosses</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2600">
+				<rom name="3dox.mwb" size="0x2600" crc="ea240a96" sha1="5aede95820c643e80e4cff510f0866d0e88635c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="greataus"><!-- colour -->
+		<description>Great Australian Car Rally</description>
+		<year>1985</year>
+		<publisher>Goodison Software</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5b00">
+				<rom name="car32.mwb" size="0x5b00" crc="484d031c" sha1="e52c5933367e80f28cc07ccc48bad5e4cbe9e2fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bismark"><!-- colour -->
+		<description>Sink the Bismark</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0c00">
+				<rom name="cbismark.mwb" size="0x0c00" crc="42118be1" sha1="2dcc9f10a4b66edf98b3a2c3fdadb23f16f2be74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickout"><!-- colour -->
+		<description>Brick-out</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0a80">
+				<rom name="cbrikout.mwb" size="0x0a80" crc="ad27dfa1" sha1="4207800b89c68f94ea5673333c8c6b2222111bd3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugduel"><!-- colour -->
+		<description>Bug Duel</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1380">
+				<rom name="cbugduel.mwb" size="0x1380" crc="f0df9f29" sha1="2cc7587ef8f0c7814c268337e88a471de5ee730d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microdef"><!-- colour -->
+		<description>Micro Defender</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4694">
+				<rom name="defend2.bee" size="0x4694" crc="5ae63fd1" sha1="fab2306df5ab0e04fd3e4148bbdfa660b0a627ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kilopede"><!-- colour -->
+		<description>Kilopede</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1d80">
+				<rom name="kilopede.bin" size="0x1d80" crc="404698aa" sha1="05e80e331e711db96da831c1b66881d2f467e471"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leaping"><!-- colour -->
+		<description>Leaping Lunar Limmo</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1a80">
+				<rom name="leaping.mwb" size="0x1a80" crc="0cf4ad3e" sha1="99e6bd25df1c3e374e86568ba25073d7b7b477f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munch"><!-- colour -->
+		<description>Munch</description>
+		<year>1983</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="munch.com" size="0x3000" crc="0b6fb488" sha1="0d91b70039cfb261a8095fd5dffdb7c0290ea4f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotman"><!-- colour -->
+		<description>Robot Man</description>
+		<year>198?</year>
+		<publisher>Honeysoft</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2280">
+				<rom name="robotman.bin" size="0x2280" crc="e8508bb4" sha1="adb21b1ba014f0978903b0415d33d93ad4260a9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotman2"><!-- colour -->
+		<description>Robotman (alt)</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2220">
+				<rom name="robotman2.bin" size="0x2220" crc="5ccbe695" sha1="5d53bc8bfe7f3fce7f01310bc0bd9b3c522b12b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scavenge"><!-- colour -->
+		<description>Scavenger I</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="2" />
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5b00">
+				<rom name="scavenge.com" size="0x5b00" crc="292a00db" sha1="27d18722ee3cdc9facc50fa50b3e85ddded10084"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrambler"><!-- colour -->
+		<description>Scrambler</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3fa1">
+				<rom name="scrambler.bin" size="0x3fa1" crc="16dc3f4d" sha1="1d7e9dbe983c9796e8f5daf832b25f825936c0c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slalom"><!-- colour -->
+		<description>Slalom</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0c73">
+				<rom name="slalom.bin" size="0x0c73" crc="4f202cbb" sha1="154f6f10f08bd69423eea0a28defb0ccb3b13a83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msinv2"><!-- colour -->
+		<description>Microspace Invaders II</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3100">
+				<rom name="msinv2.bee" size="0x3100" crc="d65e36cb" sha1="ff9eaad5e09afc599c5a621837502500cddef2db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctarget"><!-- colour -->
+		<description>Target (colour version)</description>
+		<year>2015</year>
+		<publisher>Applied Technology Microworld</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0ee7">
+				<rom name="ctarget.bee" size="0x0ee7" crc="09c3e1f5" sha1="87ff672dc4ba5ea95d715589e4044e9dcadae67c"/>
 			</dataarea>
 		</part>
 	</software>

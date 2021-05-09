@@ -458,6 +458,7 @@ MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
+--MACHINES["AT28C64B"] = true
 MACHINES["AT29X"] = true
 MACHINES["AT45DBXX"] = true
 MACHINES["ATAFLASH"] = true
@@ -467,6 +468,7 @@ MACHINES["BANKDEV"] = true
 --MACHINES["BIM68153"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
+--MACHINES["CH376"] = true
 MACHINES["CHESSMACHINE"] = true
 MACHINES["CMOS40105"] = true
 MACHINES["CDU76S"] = true
@@ -587,7 +589,6 @@ MACHINES["MSM5832"] = true
 MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
---MACHINES["NCR5380"] = true
 MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
@@ -2510,6 +2511,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hornet.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.h",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.cpp",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.h",
 	MAME_DIR .. "src/mame/drivers/hyperspt.cpp",
 	MAME_DIR .. "src/mame/includes/hyperspt.h",
 	MAME_DIR .. "src/mame/audio/hyprolyb.cpp",
@@ -4678,6 +4681,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",
+	MAME_DIR .. "src/mame/drivers/missamer.cpp",
 	MAME_DIR .. "src/mame/drivers/mephistp.cpp",
 	MAME_DIR .. "src/mame/drivers/mrgame.cpp",
 	MAME_DIR .. "src/mame/drivers/nsm.cpp",

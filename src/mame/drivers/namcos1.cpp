@@ -1614,8 +1614,8 @@ ROM_START( galaga88 )
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	ROM_LOAD_512( "g81_p5.bin",      0x280000, CRC(4fbd3f6c) SHA1(40d8dadc0a36b4c1886778cfc8d380a34aea2505) )
-	ROM_LOAD_512( "g8x_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Unknown number for the "x" */
-	ROM_LOAD_512( "g8x_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Unknown number for the "x" */
+	ROM_LOAD_512( "g82_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Confirmed "G82" on original US PCB */
+	ROM_LOAD_512( "g82_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Confirmed "G82" on original US PCB */
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */

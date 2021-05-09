@@ -109,33 +109,6 @@ public:
 
 
 
-// ======================> dummy_space_device
-
-// a dummy address space for passing to handlers outside of the memory system
-
-class dummy_space_device : public device_t,
-	public device_memory_interface
-{
-public:
-	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
-
-	void dummy(address_map &map);
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-private:
-	const address_space_config  m_space_config;
-};
-
-
-
 // ======================> running_machine
 
 typedef delegate<void ()> machine_notify_delegate;
@@ -248,7 +221,6 @@ public:
 	void set_rtc_datetime(const system_time &systime);
 
 	// misc
-	address_space &dummy_space() const { return m_dummy_space.space(AS_PROGRAM); }
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
@@ -399,9 +371,6 @@ private:
 
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;
-
-	// configuration state
-	dummy_space_device m_dummy_space;
 
 #if defined(__EMSCRIPTEN__)
 private:

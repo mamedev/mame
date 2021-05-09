@@ -72,7 +72,6 @@ exports.license = "The BSD 3-Clause License"
 exports.author = { name = "Carl" }
 
 local cheat = exports
-local util = require("util")
 
 function cheat.set_folder(path)
 	cheat.path = path
@@ -160,7 +159,7 @@ function cheat.startplugin()
 			local path = emu.subst_env(manager.machine.options.entries.cheatpath:value():match("([^;]+)"))
 			local attr = lfs.attributes(path)
 			if not attr then
-				util.mkdir_recursive(path)
+				lfs.mkdir(path)
 			elseif attr.mode ~= "directory" then -- uhhh?
 				return
 			end
@@ -168,7 +167,7 @@ function cheat.startplugin()
 				local softpath = path .. "/" .. cheatname:match("([^/]+)")
 				local attr = lfs.attributes(softpath)
 				if not attr then
-					util.mkdir_recursive(softpath)
+					lfs.mkdir(softpath)
 				elseif attr.mode ~= "directory" then -- uhhh?
 					return
 				end

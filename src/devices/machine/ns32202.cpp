@@ -177,10 +177,10 @@ template <unsigned ST1> void ns32202_device::map(address_map &map)
 	map(0x19, 0x19).rw(FUNC(ns32202_device::csvh_r<0>), FUNC(ns32202_device::csvh_w<0>));
 	map(0x1a, 0x1a).rw(FUNC(ns32202_device::csvl_r<1>), FUNC(ns32202_device::csvl_w<1>));
 	map(0x1b, 0x1b).rw(FUNC(ns32202_device::csvh_r<1>), FUNC(ns32202_device::csvh_w<1>));
-	map(0x1c, 0x1c).rw(FUNC(ns32202_device::lccvl_r), FUNC(ns32202_device::lccvl_w));
-	map(0x1d, 0x1d).rw(FUNC(ns32202_device::lccvh_r), FUNC(ns32202_device::lccvh_w));
-	map(0x1e, 0x1e).rw(FUNC(ns32202_device::hccvl_r), FUNC(ns32202_device::hccvl_w));
-	map(0x1f, 0x1f).rw(FUNC(ns32202_device::hccvh_r), FUNC(ns32202_device::hccvh_w));
+	map(0x1c, 0x1c).rw(FUNC(ns32202_device::ccvl_r<0>), FUNC(ns32202_device::ccvl_w<0>));
+	map(0x1d, 0x1d).rw(FUNC(ns32202_device::ccvh_r<0>), FUNC(ns32202_device::ccvh_w<0>));
+	map(0x1e, 0x1e).rw(FUNC(ns32202_device::ccvl_r<1>), FUNC(ns32202_device::ccvl_w<1>));
+	map(0x1f, 0x1f).rw(FUNC(ns32202_device::ccvh_r<1>), FUNC(ns32202_device::ccvh_w<1>));
 }
 
 template void ns32202_device::map<0>(address_map &map);
@@ -254,7 +254,7 @@ template void ns32202_device::ir_w<15>(int state);
 void ns32202_device::interrupt(void *ptr, s32 param)
 {
 	// check for unmasked pending interrupts
-	if (!(m_ipnd & m_imsk))
+	if (!(m_ipnd & ~m_imsk))
 		return;
 
 	if (m_mctl & MCTL_NTAR)
@@ -311,7 +311,7 @@ u8 ns32202_device::interrupt_acknowledge(bool side_effects)
 	side_effects &= !machine().side_effects_disabled();
 	u8 vector = m_hvct | 0x0f;
 
-	if ((m_ipnd & m_imsk) && m_fprt)
+	if ((m_ipnd & ~m_imsk) && m_fprt)
 	{
 		// find highest priority unmasked pending interrupt
 		u16 mask = m_fprt;
