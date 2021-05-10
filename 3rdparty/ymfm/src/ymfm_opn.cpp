@@ -1350,7 +1350,7 @@ void ym2610::write_data(uint8_t data)
 			data = (data | 0x20) & ~0x40;
 		m_adpcm_b.write(m_address & 0x0f, data);
 	}
-	else if (m_address == 0x29)
+	else if (m_address == 0x1c)
 	{
 		// 1C: EOS flag reset
 		m_flag_mask = ~data;
@@ -1458,9 +1458,10 @@ void ym2610::generate(output_data *output, uint32_t numsamples)
 		output->clear();
 		m_fm.output(*output, 1, 32767, m_fm_mask);
 
-		// mix in the ADPCM
+		// mix in the ADPCM and clamp
 		m_adpcm_a.output(*output, 0x3f);
 		m_adpcm_b.output(*output, 2);
+		output->clamp16();
 	}
 }
 
@@ -1694,7 +1695,9 @@ void ym2612::generate(output_data *output, uint32_t numsamples)
 		else
 		{
 			// DAC enabled: start with DAC value then add the first 5 channels only
-			output->init(int16_t(m_dac_data << 7) >> 7);
+			int32_t dacval = int16_t(m_dac_data << 7) >> 7;
+			output->data[0] = m_fm.regs().ch_output_0(0x102) ? dacval : 0;
+			output->data[1] = m_fm.regs().ch_output_1(0x102) ? dacval : 0;
 			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
 		}
 
@@ -1742,7 +1745,9 @@ void ym3438::generate(output_data *output, uint32_t numsamples)
 		else
 		{
 			// DAC enabled: start with DAC value then add the first 5 channels only
-			output->init(int16_t(m_dac_data << 7) >> 7);
+			int32_t dacval = int16_t(m_dac_data << 7) >> 7;
+			output->data[0] = m_fm.regs().ch_output_0(0x102) ? dacval : 0;
+			output->data[1] = m_fm.regs().ch_output_1(0x102) ? dacval : 0;
 			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
 		}
 
@@ -1775,7 +1780,9 @@ void ymf276::generate(output_data *output, uint32_t numsamples)
 		else
 		{
 			// DAC enabled: start with DAC value then add the first 5 channels only
-			output->init(int16_t(m_dac_data << 7) >> 2);
+			int32_t dacval = int16_t(m_dac_data << 7) >> 7;
+			output->data[0] = m_fm.regs().ch_output_0(0x102) ? dacval : 0;
+			output->data[1] = m_fm.regs().ch_output_1(0x102) ? dacval : 0;
 			m_fm.output(*output, 0, 8191, fm_engine::ALL_CHANNELS ^ (1 << 5));
 		}
 
