@@ -139,6 +139,7 @@ public:
 		m_step(0x100000000ull / m_chip.sample_rate(clock)),
 		m_pos(0)
 	{
+		m_chip.reset();
 	}
 
 	// handle a register write: just queue for now

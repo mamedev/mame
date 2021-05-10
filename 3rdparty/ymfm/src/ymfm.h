@@ -76,10 +76,10 @@ int16_t roundtrip_fp(int32_t value);
 template<int NumOutputs>
 struct ymfm_output
 {
-	void clear() { init(0); }
-	void init(int32_t value) { for (int index = 0; index < NumOutputs; index++) data[index] = value; }
-	void clamp16() { for (int index = 0; index < NumOutputs; index++) data[index] = std::clamp(data[index], -32768, 32767); }
-	void roundtrip_fp() { for (int index = 0; index < NumOutputs; index++) data[index] = ymfm::roundtrip_fp(data[index]); }
+	ymfm_output &clear() { return init(0);}
+	ymfm_output &init(int32_t value) { for (int index = 0; index < NumOutputs; index++) data[index] = value; return *this; }
+	ymfm_output &clamp16() { for (int index = 0; index < NumOutputs; index++) data[index] = std::clamp(data[index], -32768, 32767); return *this; }
+	ymfm_output &roundtrip_fp() { for (int index = 0; index < NumOutputs; index++) data[index] = ymfm::roundtrip_fp(data[index]); return *this; }
 	int32_t data[NumOutputs];
 };
 

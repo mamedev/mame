@@ -1685,34 +1685,27 @@ void ym2612::generate(output_data *output, uint32_t numsamples)
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the FM channels; YM2612 is 9-bit with intermediate clipping
-		if (!m_dac_enable)
+		// sum individual channels to apply DAC discontinuity on each
+		output->clear();
+		output_data temp;
+
+		// first do FM-only channels
+		int const last_fm_channel = m_dac_enable ? 5 : 6;
+		for (int chan = 0; chan < last_fm_channel; chan++)
 		{
-			// DAC disabled: all 6 channels sum together
-			output->clear();
-			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
-		}
-		else
-		{
-			// DAC enabled: start with DAC value then add the first 5 channels only
-			int32_t dacval = int16_t(m_dac_data << 7) >> 7;
-			output->data[0] = m_fm.regs().ch_output_0(0x102) ? dacval : 0;
-			output->data[1] = m_fm.regs().ch_output_1(0x102) ? dacval : 0;
-			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS ^ (1 << 5));
+			m_fm.output(temp.clear(), 5, 256, 1 << chan);
+			output->data[0] += dac_discontinuity(temp.data[0]);
+			output->data[1] += dac_discontinuity(temp.data[1]);
 		}
 
-		// hiccup in the internal YM2612 DAC means that there is a rather large
-		// step between 0 and -1 (close to 6x the normal step); the approximation
-		// below gives a reasonable estimation of this discontinuity, which was
-		// fixed in the YM3438
-		if (output->data[0] < 0)
-			output->data[0] -= 2;
-		else
-			output->data[0] += 3;
-		if (output->data[1] < 0)
-			output->data[1] -= 2;
-		else
-			output->data[1] += 3;
+		// add in DAC
+		if (m_dac_enable)
+		{
+			// DAC enabled: start with DAC value then add the first 5 channels only
+			int32_t dacval = dac_discontinuity(int16_t(m_dac_data << 7) >> 7);
+			output->data[0] += m_fm.regs().ch_output_0(0x102) ? dacval : dac_discontinuity(0);
+			output->data[1] += m_fm.regs().ch_output_1(0x102) ? dacval : dac_discontinuity(0);
+		}
 
 		// output is technically multiplexed rather than mixed, but that requires
 		// a better sound mixer than we usually have, so just average over the six
