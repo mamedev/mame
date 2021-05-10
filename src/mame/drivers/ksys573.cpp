@@ -388,7 +388,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #define LOGJVS(...)      LOGMASKED(LOG_JVS, __VA_ARGS__)
 #define LOGIOBOARD(...)  LOGMASKED(LOG_IOBOARD, __VA_ARGS__)
 
-#define ATAPI_CYCLES_PER_SECTOR ( 5000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
+#define ATAPI_CYCLES_PER_SECTOR ( 30000 )  // plenty of time to allow DMA setup etc.  BIOS requires this be at least 2000, individual games may vary.
 
 /*
  * Class declaration for sys573_jvs_host
