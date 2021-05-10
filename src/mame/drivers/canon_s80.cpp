@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:FelipeSanches
 /*
- * canon_s80.c
+ * canon_s80.cpp
  *
  *    CANON S-80 electronic typewriter
  *
@@ -21,6 +21,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class canons80_state : public driver_device
 {
 public:
@@ -29,7 +32,6 @@ public:
 	{ }
 
 	void canons80(machine_config &config);
-	void init_canons80();
 
 private:
 	HD44780_PIXEL_UPDATE(pixel_update);
@@ -56,8 +58,8 @@ void canons80_state::canons80_map(address_map &map)
 
 void canons80_state::canons80(machine_config &config)
 {
-	/* basic machine hardware */
-	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 5000000)); /* hd63a01xop 5 MHz guessed: TODO: check on PCB */
+	// basic machine hardware
+	hd6301x0_cpu_device &maincpu(HD6301X0(config, "maincpu", 5000000)); // hd63a01xop 5 MHz guessed: TODO: check on PCB
 	maincpu.set_addrmap(AS_PROGRAM, &canons80_state::canons80_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -74,9 +76,6 @@ void canons80_state::canons80(machine_config &config)
 	PALETTE(config, "palette").set_entries(2);
 }
 
-void canons80_state::init_canons80()
-{
-}
 
 ROM_START( canons80 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -88,5 +87,19 @@ ROM_START( canons80 )
 	ROM_LOAD( "canon_8735kx_nh4-0029_064.ic6", 0x0000, 0x8000, CRC(b6cd2ff7) SHA1(e47a136300c826e480fac1be7fc090523078a2a6) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY  FULLNAME                            FLAGS */
-COMP( 1988, canons80, 0,      0,      canons80, 0,     canons80_state, init_canons80, "Canon", "Canon S-80 electronic typewriter", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+ROM_START( canonts3 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "hd63a1x0p.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_FILL( 0xffe, 1, 0x40 )
+	ROM_FILL( 0xfff, 1, 0x00 )
+
+	ROM_REGION( 0x8000, "external", 0 )
+	ROM_LOAD( "nh4-0268.ic6", 0x0000, 0x8000, CRC(bbdd9f74) SHA1(347fa0d37f4df0c175ff1d7feb634f681739804f) )
+ROM_END
+
+} // Anonymous namespace
+
+
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY  FULLNAME                                  FLAGS
+COMP( 1988, canons80, 0,      0,      canons80, 0,     canons80_state, empty_init, "Canon", "Canon S-80 electronic typewriter",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, canonts3, 0,      0,      canons80, 0,     canons80_state, empty_init, "Canon", "Canon Typestar 3",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

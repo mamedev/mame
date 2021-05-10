@@ -9874,6 +9874,7 @@ can09                           //
 
 @source:canon_s80.cpp
 canons80                        //
+canonts3                        //
 
 @source:canyon.cpp
 canyon                          // 009493-009504    1977/10 [6502]
