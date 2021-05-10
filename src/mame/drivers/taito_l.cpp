@@ -68,7 +68,6 @@ puzznici note
 
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 
 #include "screen.h"
 #include "speaker.h"

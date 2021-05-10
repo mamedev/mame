@@ -233,7 +233,6 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "speaker.h"
 
 

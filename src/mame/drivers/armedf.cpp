@@ -322,7 +322,6 @@ Notes:
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0

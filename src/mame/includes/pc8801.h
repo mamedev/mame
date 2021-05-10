@@ -23,7 +23,6 @@
 #include "machine/upd765.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"

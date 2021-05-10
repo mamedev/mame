@@ -85,7 +85,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "machine/input_merger.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 

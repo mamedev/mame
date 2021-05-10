@@ -98,7 +98,6 @@
 #include "sound/rf5c68.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 #include "speaker.h"
 
 

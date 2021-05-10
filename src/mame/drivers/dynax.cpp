@@ -88,7 +88,6 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 
 #include "layout/generic.h"
 #include "speaker.h"

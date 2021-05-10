@@ -51,7 +51,6 @@ To do:
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 
 #include "speaker.h"
 

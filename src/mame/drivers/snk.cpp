@@ -579,8 +579,6 @@ TODO:
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "speaker.h"
 
 

@@ -1424,7 +1424,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
 #include "diserial.h"

@@ -17,7 +17,6 @@
 #include "sound/dac.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "video/snk68_spr.h"

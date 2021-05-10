@@ -69,7 +69,6 @@ Notes:
 #include "sound/ics2115.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
-#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "emupal.h"

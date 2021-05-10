@@ -168,7 +168,6 @@ Added Multiple Coin Feature:
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 #include "speaker.h"
 
 

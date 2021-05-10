@@ -507,7 +507,6 @@
 #include "machine/6821pia.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
-#include "sound/ymopn.h"
 #include "sound/ymopl.h"
 
 #include "speaker.h"
