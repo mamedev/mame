@@ -51,8 +51,8 @@ public:
 
 	void sys80(machine_config &config);
 	void sys80p(machine_config &config);
-	void trs80(machine_config &config);
-	void model1(machine_config &config);
+	void level1(machine_config &config);
+	void level2(machine_config &config);
 	void ht1080z(machine_config &config);
 
 	void init_trs80l2();
