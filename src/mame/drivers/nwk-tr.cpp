@@ -308,6 +308,7 @@ public:
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_cg_view(*this, "cg_view")
 	{ }
 
@@ -340,6 +341,7 @@ private:
 	output_finder<2> m_pcb_digit;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer;
@@ -533,7 +535,7 @@ void nwktr_state::sound_memmap(address_map &map)
 void nwktr_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share("sharc0_dataram").umask32(0x0000ffff);
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
@@ -544,7 +546,7 @@ void nwktr_state::sharc0_map(address_map &map)
 void nwktr_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share("sharc1_dataram").umask32(0x0000ffff);
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
@@ -663,8 +665,8 @@ void nwktr_state::nwktr(machine_config &config)
 	ADC12138(config, m_adc12138, 0);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	K033906(config, "k033906_1", 0, "voodoo0");
-	K033906(config, "k033906_2", 0, "voodoo1");
+	K033906(config, "k033906_1", 0, m_voodoo[0]);
+	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
