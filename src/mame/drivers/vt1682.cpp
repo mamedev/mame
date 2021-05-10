@@ -574,7 +574,7 @@ private:
 
 	void vt1682_timer_enable_trampoline_w(uint8_t data)
 	{
-		// this is used for raster interrpt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
+		// this is used for raster interrupt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
 		LOGMASKED(LOG_OTHER, "%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
 		m_system_timer_dev->vt1682_timer_enable_w(data);
 	};
@@ -6085,7 +6085,7 @@ ROM_START( zone7in1p )
 ROM_END
 
 ROM_START( dance555 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "39vf6401.u3", 0x000000, 0x800000, CRC(13b1ccef) SHA1(3eb494816a1781a5e6a45bd0562b2b8326598ef7) )
 ROM_END
 
@@ -6173,13 +6173,13 @@ ROM_START( 110dance )
 ROM_END
 
 ROM_START( lxts3 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "lexibooktoystory_mx29lv640mt_00c2227e.bin", 0x00000, 0x800000, CRC(91344ae7) SHA1(597fc4a27dd1fb6e6f5fda1c4ea237c07e9dba71))
 ROM_END
 
 
 ROM_START( gm235upc )
-	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "39vf3201.u3", 0x00000, 0x400000, CRC(182f8a2c) SHA1(7be56e1063cc8dbb78c419f5adc05b8cd65c8e2f))
 	// also has RAM
 ROM_END
