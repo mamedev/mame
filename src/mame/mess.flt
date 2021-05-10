@@ -1019,6 +1019,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp
