@@ -14,10 +14,10 @@ class fs_prodos : public filesystem_manager_t {
 public:
 	class impl : public filesystem_t {
 	public:
-		class root_dir : public idir_t {
+		class dir : public idir_t {
 		public:
-			root_dir(impl &i) : m_fs(i) {}
-			virtual ~root_dir() = default;
+			dir(impl &fs, u16 base_block, u16 key = 0) : m_fs(fs), m_base_block(base_block), m_key(key) { (void)m_key; }
+			virtual ~dir() = default;
 
 			virtual void drop_weak_references() override;
 
@@ -28,6 +28,30 @@ public:
 
 		private:
 			impl &m_fs;
+			u16 m_base_block;
+			u16 m_key;
+
+			std::pair<fsblk_t::block_t, const u8 *> get_entry_ro(uint64_t key);
+			std::pair<fsblk_t::block_t, u8 *> get_entry(uint64_t key);
+		};
+
+		class file : public ifile_t {
+		public:
+			file(impl &fs, const u8 *entry, u16 key);
+			virtual ~file() = default;
+
+			virtual void drop_weak_references() override;
+
+			virtual fs_meta_data metadata() override;
+			virtual std::vector<u8> read_all() override;
+			virtual std::vector<u8> read(u64 start, u64 length) override;
+
+		private:
+			impl &m_fs;
+			u16 m_key;
+			u8 m_entry[39];
+
+			std::vector<u16> build_block_table();
 		};
 
 		impl(fsblk_t &blockdev);

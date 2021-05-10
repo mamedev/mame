@@ -424,12 +424,16 @@ static void trs80_floppies(device_slot_interface &device)
 }
 
 
-void trs80_state::trs80(machine_config &config)       // the original model I, level I, with no extras
+void trs80_state::level1(machine_config &config)      // the original model I, level I, with no extras
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::trs80_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::trs80_io);
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -455,17 +459,13 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("0");
 }
 
-void trs80_state::model1(machine_config &config)      // model I, level II
+void trs80_state::level2(machine_config &config)      // model I, level II
 {
-	trs80(config);
+	level1(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::m1_io);
 	m_maincpu->set_periodic_int(FUNC(trs80_state::rtc_interrupt), attotime::from_hz(40));
-	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
-	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
@@ -511,7 +511,7 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 void trs80_state::sys80(machine_config &config)
 {
-	model1(config);
+	level2(config);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::sys80_io);
 	m_maincpu->halt_cb().set_nop(); // TODO: asserts HLTA on expansion bus instead
 
@@ -666,8 +666,8 @@ void trs80_state::init_trs80l2()
 
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1977, trs80,       0,        0,       level1,   trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1978, trs80l2,     0,        0,       level2,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

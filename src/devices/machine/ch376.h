@@ -4,9 +4,9 @@
 
     ch376.h
 
-	"File manage and control chip CH376"
-	This is a module intended to offload USB and USB mass storage
-	I/O from a small microcontroller or microprocessor.
+    "File manage and control chip CH376"
+    This is a module intended to offload USB and USB mass storage
+    I/O from a small microcontroller or microprocessor.
 
 ***************************************************************************/
 
@@ -52,7 +52,8 @@ private:
 		STATE_READ_SIZE2,
 		STATE_WRITE_SIZE_REPLY,
 		STATE_READ_WRITE_DATA,
-		STATE_GET_FILE_SIZE
+		STATE_GET_FILE_SIZE,
+		STATE_CHECK_EXIST
 	};
 
 	bool generateNextDirEntry();

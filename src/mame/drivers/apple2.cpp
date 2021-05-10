@@ -96,6 +96,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
 #include "bus/a2bus/uniprint.h"
+#include "bus/a2bus/booti.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1338,6 +1339,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
 	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
+	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
 }
 
 void apple2_state::apple2_common(machine_config &config)
