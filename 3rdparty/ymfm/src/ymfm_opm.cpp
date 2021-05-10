@@ -528,9 +528,8 @@ void ym2151::generate(output_data *output, uint32_t numsamples)
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; OPM is full 14-bit with no intermediate clipping
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// YM2151 uses an external DAC (YM3012) with mantissa/exponent format
 		// convert to 10.3 floating point value and back to simulate truncation

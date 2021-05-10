@@ -463,8 +463,7 @@ void ym3806::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; YM3806 is full 14-bit with no intermediate clipping
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// YM3608 appears to go through a YM3012 DAC, which means we want to apply
 		// the FP truncation logic to the outputs

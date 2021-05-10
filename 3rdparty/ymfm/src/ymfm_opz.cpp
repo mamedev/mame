@@ -745,8 +745,7 @@ void ym2414::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; YM2414 is full 14-bit with no intermediate clipping
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// unsure about YM2414 outputs; assume it is like YM2151
 		output->roundtrip_fp();

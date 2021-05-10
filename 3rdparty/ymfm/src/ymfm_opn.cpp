@@ -750,9 +750,8 @@ void ym2203::generate(output_data *output, uint32_t numsamples)
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		// update the FM content; OPN is full 14-bit with no intermediate clipping
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
 		output->roundtrip_fp();
@@ -1128,9 +1127,8 @@ void ym2608::generate(output_data *output, uint32_t numsamples)
 		// clock the ADPCM-B engine every cycle
 		m_adpcm_b.clock();
 
-		// update the FM content
-		output->clear();
-		m_fm.output(*output, 1, 32767, fmmask);
+		// update the FM content; OPNA is 13-bit with no intermediate clipping
+		m_fm.output(output->clear(), 1, 32767, fmmask);
 
 		// mix in the ADPCM
 		m_adpcm_a.output(*output, 0x3f);
@@ -1454,9 +1452,8 @@ void ym2610::generate(output_data *output, uint32_t numsamples)
 		if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
 			m_eos_status |= 0x80;
 
-		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-		output->clear();
-		m_fm.output(*output, 1, 32767, m_fm_mask);
+		// update the FM content; OPNB is 13-bit with no intermediate clipping
+		m_fm.output(output->clear(), 1, 32767, m_fm_mask);
 
 		// mix in the ADPCM and clamp
 		m_adpcm_a.output(*output, 0x3f);
@@ -1689,7 +1686,7 @@ void ym2612::generate(output_data *output, uint32_t numsamples)
 		output->clear();
 		output_data temp;
 
-		// first do FM-only channels
+		// first do FM-only channels; OPN2 is 9-bit with intermediate clipping
 		int const last_fm_channel = m_dac_enable ? 5 : 6;
 		for (int chan = 0; chan < last_fm_channel; chan++)
 		{
@@ -1728,12 +1725,11 @@ void ym3438::generate(output_data *output, uint32_t numsamples)
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the FM channels; YM2612 is 9-bit with intermediate clipping
+		// first do FM-only channels; OPN2C is 9-bit with intermediate clipping
 		if (!m_dac_enable)
 		{
 			// DAC disabled: all 6 channels sum together
-			output->clear();
-			m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
+			m_fm.output(output->clear(), 5, 256, fm_engine::ALL_CHANNELS);
 		}
 		else
 		{
@@ -1763,12 +1759,11 @@ void ymf276::generate(output_data *output, uint32_t numsamples)
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the FM channels; YMF276 is 14-bit with intermediate clipping
+		// first do FM-only channels; OPN2L is 14-bit with intermediate clipping
 		if (!m_dac_enable)
 		{
 			// DAC disabled: all 6 channels sum together
-			output->clear();
-			m_fm.output(*output, 0, 8191, fm_engine::ALL_CHANNELS);
+			m_fm.output(output->clear(), 0, 8191, fm_engine::ALL_CHANNELS);
 		}
 		else
 		{

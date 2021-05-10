@@ -838,8 +838,7 @@ void ym3526::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YM3526 need verification
-		output->clear();
-		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// YM3526 uses an external DAC (YM3014) with mantissa/exponent format
 		// convert to 10.3 floating point value and back to simulate truncation
@@ -1074,8 +1073,7 @@ void y8950::generate(output_data *output, uint32_t numsamples)
 		m_adpcm_b.clock();
 
 		// update the FM content; clipping need verification
-		output->clear();
-		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
 		// not sure how it's wired up internally
@@ -1220,8 +1218,7 @@ void ym3812::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YM3812 need verification
-		output->clear();
-		m_fm.output(*output, 1, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// YM3812 uses an external DAC (YM3014) with mantissa/exponent format
 		// convert to 10.3 floating point value and back to simulate truncation
@@ -1394,8 +1391,7 @@ void ymf262::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YMF262 need verification
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// YMF262 output is 16-bit offset serial via YAC512 DAC
 		output->clamp16();
@@ -1569,8 +1565,7 @@ void ymf278b::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YMF278B need verification
-		output->clear();
-		m_fm.output(*output, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// YMF278B output is 16-bit 2s complement serial
 		output->clamp16();
@@ -1681,8 +1676,7 @@ void opll_base::generate(output_data *output, uint32_t numsamples)
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; OPLL has a built-in 9-bit DAC
-		output->clear();
-		m_fm.output(*output, 5, 256, fm_engine::ALL_CHANNELS);
+		m_fm.output(output->clear(), 5, 256, fm_engine::ALL_CHANNELS);
 
 		// final output is multiplexed; we don't simulate that here except
 		// to average over everything
