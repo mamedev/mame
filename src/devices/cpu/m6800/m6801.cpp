@@ -512,7 +512,7 @@ void m6801_cpu_device::check_timer_event()
 	{
 		TOH++;  // next IRQ point
 #if 0
-		CLEANUP_COUNTERS();
+		cleanup_counters();
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
@@ -572,7 +572,7 @@ void hd6301x_cpu_device::check_timer_event()
 	{
 		TOH++;  // next IRQ point
 #if 0
-		CLEANUP_COUNTERS();
+		cleanup_counters();
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
@@ -632,7 +632,7 @@ void hd6301x_cpu_device::increment_counter(int amount)
 		check_timer_event();
 }
 
-void m6801_cpu_device::EAT_CYCLES()
+void m6801_cpu_device::eat_cycles()
 {
 	int cycles_to_eat = std::min(int(m_timer_next - CTD), m_icount);
 	if (cycles_to_eat > 0)
@@ -640,7 +640,7 @@ void m6801_cpu_device::EAT_CYCLES()
 }
 
 /* cleanup high-word of counters */
-void m6801_cpu_device::CLEANUP_COUNTERS()
+void m6801_cpu_device::cleanup_counters()
 {
 	OCH -= CTH;
 	TOH -= CTH;
@@ -650,10 +650,10 @@ void m6801_cpu_device::CLEANUP_COUNTERS()
 		check_timer_event();
 }
 
-void hd6301x_cpu_device::CLEANUP_COUNTERS()
+void hd6301x_cpu_device::cleanup_counters()
 {
 	OC2H -= CTH;
-	m6801_cpu_device::CLEANUP_COUNTERS();
+	m6801_cpu_device::cleanup_counters();
 }
 
 void m6801_cpu_device::set_rmcr(uint8_t data)
@@ -788,7 +788,7 @@ void m6801_cpu_device::serial_transmit()
 				// send stop bit '1'
 				m_tx = 1;
 
-				CHECK_IRQ_LINES();
+				check_irq_lines();
 
 				m_txbits = M6801_SERIAL_START;
 
@@ -876,7 +876,7 @@ void m6801_cpu_device::serial_receive()
 
 						LOGRX("SCI Receive Overrun Error\n");
 
-						CHECK_IRQ_LINES();
+						check_irq_lines();
 					}
 					else
 					{
@@ -890,7 +890,7 @@ void m6801_cpu_device::serial_receive()
 							// set RDRF flag
 							m_trcsr |= M6801_TRCSR_RDRF;
 
-							CHECK_IRQ_LINES();
+							check_irq_lines();
 						}
 					}
 				}
@@ -908,7 +908,7 @@ void m6801_cpu_device::serial_receive()
 
 					LOGRX("SCI Receive Framing Error\n");
 
-					CHECK_IRQ_LINES();
+					check_irq_lines();
 				}
 
 				m_rxbits = M6801_SERIAL_START;
@@ -1051,11 +1051,8 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_use_ext_serclock));
 
 	save_item(NAME(m_latch09));
-
 	save_item(NAME(m_timer_over.d));
-
 	save_item(NAME(m_timer_next));
-
 	save_item(NAME(m_sc1_state));
 }
 
@@ -1714,7 +1711,7 @@ void hd6301x_cpu_device::tcsr3_w(uint8_t data)
 	{
 		m_tout3 = false;
 		write_port2();
-	}	
+	}
 	else if (tout3_last_enable ? (data & 0x0c) == 0 : (data & 0x0c) != 0)
 	{
 		m_port2_written = true;
@@ -1867,7 +1864,7 @@ std::unique_ptr<util::disasm_interface> hd6301_cpu_device::create_disassembler()
 	return std::make_unique<m680x_disassembler>(6301);
 }
 
-void hd6301_cpu_device::TAKE_TRAP()
+void hd6301_cpu_device::take_trap()
 {
 	enter_interrupt("take TRAP\n",0xffee);
 }

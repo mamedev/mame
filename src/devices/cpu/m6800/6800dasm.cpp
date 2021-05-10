@@ -45,7 +45,7 @@ const char *const m680x_disassembler::op_name_str[] = {
 /*
  * This table defines the opcodes:
  * byte meaning
- * 0    token (menmonic)
+ * 0    token (mnemonic)
  * 1    addressing mode
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
