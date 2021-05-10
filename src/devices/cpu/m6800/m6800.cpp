@@ -24,33 +24,6 @@ TODO:
 - Verify invalid opcodes for the different CPU types.
 - A lot more work and cleanups, especially for the 6801 derivatives.
 
-History
-991031  ZV
-    Added NSC-8105 support
-
-990319  HJB
-    Fixed wrong LSB/MSB order for push/pull word.
-    Subtract .extra_cycles at the beginning/end of the exectution loops.
-
-990316  HJB
-    Renamed to 6800, since that's the basic CPU.
-    Added different cycle count tables for M6800/2/8, M6801/3 and m68xx.
-
-990314  HJB
-    Also added the M6800 subtype.
-
-990311  HJB
-    Added _info functions. Now uses static m6808_Regs struct instead
-    of single statics. Changed the 16 bit registers to use the generic
-    PAIR union. Registers defined using macros. Split the core into
-    four execution loops for M6802, M6803, M6808 and HD63701.
-    TST, TSTA and TSTB opcodes reset carry flag.
-
-990301  HJB
-    Modified the interrupt handling. No more pending interrupt checks.
-    WAI opcode saves state, when an interrupt is taken (IRQ or OCI),
-    the state is only saved if not already done by WAI.
-
 *****************************************************************************/
 
 /*
