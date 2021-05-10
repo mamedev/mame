@@ -430,6 +430,10 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::trs80_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::trs80_io);
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -462,10 +466,6 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::m1_io);
 	m_maincpu->set_periodic_int(FUNC(trs80_state::rtc_interrupt), attotime::from_hz(40));
-	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
-	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
