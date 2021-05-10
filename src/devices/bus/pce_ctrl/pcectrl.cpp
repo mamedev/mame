@@ -44,8 +44,8 @@
     3: O1 (Read bit 1)
     4: O2 (Read bit 2)
     5: O3 (Read bit 3)
-    6: Clock (Write bit 0)
-    7: Reset (Write bit 1)
+    6: SEL (Write bit 0)
+    7: CLR (Write bit 1)
     8: GND
 
 **********************************************************************/
@@ -143,36 +143,37 @@ u8 pce_control_port_device::port_r()
 
 
 //-------------------------------------------------
-//  clk_w - Clock pin write
+//  sel_w - SEL pin write
 //-------------------------------------------------
 
-void pce_control_port_device::clk_w(int state)
+void pce_control_port_device::sel_w(int state)
 {
 	if (m_device)
-		m_device->clk_w(state);
+		m_device->sel_w(state);
 }
 
 
 //-------------------------------------------------
-//  rst_w - Reset pin write
+//  clr_w - CLR pin write
 //-------------------------------------------------
 
-void pce_control_port_device::rst_w(int state)
+void pce_control_port_device::clr_w(int state)
 {
 	if (m_device)
-		m_device->rst_w(state);
+		m_device->clr_w(state);
 }
 
-
-//-------------------------------------------------
-//  SLOT_INTERFACE( pce_control_port_devices )
-//-------------------------------------------------
 
 void pce_control_port_devices(device_slot_interface &device)
 {
-	device.option_add("joypad2",  PCE_JOYPAD2);
-	device.option_add("joypad6",  PCE_JOYPAD6);
-	device.option_add("multitap", PCE_MULTITAP);
+	// 2 Button Joypad/Joysticks
+	device.option_add("joypad2",       PCE_JOYPAD2); // bundled pad for White PC Engine
+	device.option_add("joypad2_turbo", PCE_JOYPAD2_TURBO); // Turbo pad and compatibles
+	// 6 Button Joypad/Joysticks
+	device.option_add("avenue_pad_6",  PCE_AVENUE_PAD_6);
+	device.option_add("arcade_pad_6",  PCE_ARCADE_PAD_6);
+
+	device.option_add("multitap",      PCE_MULTITAP);
 	// 3 Button Joypad/Joysticks (ex: Avenue Pad 3)
 	// Pachinko Controller (CJPC-101)
 	// PC Engine Mouse (PI-PD10)

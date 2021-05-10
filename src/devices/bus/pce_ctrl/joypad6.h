@@ -21,21 +21,18 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pce_joypad6_device
+// ======================> pce_joypad6_base_device
 
-class pce_joypad6_device : public device_t,
+class pce_joypad6_base_device : public device_t,
 							public device_pce_control_port_interface
 {
 public:
-	// construction/destruction
-	pce_joypad6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_INPUT_CHANGED_MEMBER(joypad_mode_changed);
 
 protected:
+	// construction/destruction
+	pce_joypad6_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -43,15 +40,15 @@ protected:
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;
-	virtual void clk_w(int state) override;
-	virtual void rst_w(int state) override;
+	virtual void sel_w(int state) override;
+	virtual void clr_w(int state) override;
 
 	// button handlers
 	void buttonset_update();
 
 	// internal states
-	u8 m_button_sel = 0; // buttonset select, autofire counter (74xx163 Q1-Q3 pin)
-	bool m_prev_rst = false; // previous Reset pin state
+	u8 m_counter = 0; // buttonset select, autofire counter (74xx163 QA-QB pin)
+	bool m_prev_clr = false; // previous CLR pin state
 
 	// devices
 	required_device_array<ls157_device, 3> m_muxer;
@@ -61,8 +58,48 @@ protected:
 };
 
 
+// ======================> pce_avenue_pad_6_device
+
+class pce_avenue_pad_6_device : public pce_joypad6_base_device
+{
+public:
+	// construction/destruction
+	pce_avenue_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
+	// construction/destruction
+	pce_avenue_pad_6_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	template<unsigned Buttonset> u8 buttons_r();
+
+	// IO ports
+	required_ioport_array<2> m_buttons_io;
+	required_ioport m_turbo_io;
+};
+
+
+// ======================> pce_arcade_pad_6_device
+
+class pce_arcade_pad_6_device : public pce_avenue_pad_6_device
+{
+public:
+	// construction/destruction
+	pce_arcade_pad_6_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+
 // device type definition
-DECLARE_DEVICE_TYPE(PCE_JOYPAD6, pce_joypad6_device)
+DECLARE_DEVICE_TYPE(PCE_AVENUE_PAD_6, pce_avenue_pad_6_device)
+DECLARE_DEVICE_TYPE(PCE_ARCADE_PAD_6, pce_arcade_pad_6_device)
 
 
 #endif // MAME_BUS_PCE_CTRL_JOYPAD6_H

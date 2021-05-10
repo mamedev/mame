@@ -37,8 +37,8 @@ protected:
 
 	// device_pce_control_port_interface overrides
 	virtual u8 peripheral_r() override;
-	virtual void clk_w(int state) override;
-	virtual void rst_w(int state) override;
+	virtual void sel_w(int state) override;
+	virtual void clr_w(int state) override;
 
 private:
 	// controller ports
@@ -46,7 +46,7 @@ private:
 
 	// internal states
 	u8 m_port_sel = 0; // select port to read
-	bool m_prev_clk = false; // previous Clock pin state
+	bool m_prev_sel = false; // previous SEL pin state
 };
 
 

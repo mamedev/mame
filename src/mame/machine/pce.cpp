@@ -122,8 +122,8 @@ void pce_state::machine_reset()
 /* todo: how many input ports does the PCE have? */
 void pce_state::controller_w(u8 data)
 {
-	m_port_ctrl->clk_w(BIT(data, 0));
-	m_port_ctrl->rst_w(BIT(data, 1));
+	m_port_ctrl->sel_w(BIT(data, 0));
+	m_port_ctrl->clr_w(BIT(data, 1));
 }
 
 u8 pce_state::controller_r()

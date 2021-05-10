@@ -39,7 +39,7 @@ pce_multitap_device::pce_multitap_device(const machine_config &mconfig, const ch
 	device_pce_control_port_interface(mconfig, *this),
 	m_subctrl_port(*this, "ctrl%u", 1U),
 	m_port_sel(0),
-	m_prev_clk(0)
+	m_prev_sel(0)
 {
 }
 
@@ -62,7 +62,7 @@ void pce_multitap_device::device_add_mconfig(machine_config &config)
 void pce_multitap_device::device_start()
 {
 	save_item(NAME(m_port_sel));
-	save_item(NAME(m_prev_clk));
+	save_item(NAME(m_prev_sel));
 }
 
 
@@ -73,7 +73,7 @@ void pce_multitap_device::device_start()
 void pce_multitap_device::device_reset()
 {
 	m_port_sel = 0;
-	m_prev_clk = false;
+	m_prev_sel = false;
 }
 
 
@@ -92,30 +92,30 @@ u8 pce_multitap_device::peripheral_r()
 
 
 //-------------------------------------------------
-//  clk_w - Clock pin write, with port select
+//  sel_w - SEL pin write, with port select
 //-------------------------------------------------
 
-void pce_multitap_device::clk_w(int state)
+void pce_multitap_device::sel_w(int state)
 {
 	for (auto & elem : m_subctrl_port)
-		elem->clk_w(state);
+		elem->sel_w(state);
 
-	// bump counter on a low-to-high transition of Clock bit
-	if ((!m_prev_clk) && state)
+	// bump counter on a low-to-high transition of SEL bit
+	if ((!m_prev_sel) && state)
 		m_port_sel = (m_port_sel + 1) & 7;
 
-	m_prev_clk = state;
+	m_prev_sel = state;
 }
 
 
 //-------------------------------------------------
-//  rst_w - Reset pin write, with reset multitap
+//  clr_w - CLR pin write, with reset multitap
 //-------------------------------------------------
 
-void pce_multitap_device::rst_w(int state)
+void pce_multitap_device::clr_w(int state)
 {
 	for (auto & elem : m_subctrl_port)
-		elem->rst_w(state);
+		elem->clr_w(state);
 
 	// clear counter if Reset bit is set
 	if (state)

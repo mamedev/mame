@@ -40,8 +40,8 @@ public:
 
 	u8 port_r();
 
-	void clk_w(int state);
-	void rst_w(int state);
+	void sel_w(int state);
+	void clr_w(int state);
 
 protected:
 	// device-level overrides
@@ -61,8 +61,8 @@ public:
 	virtual ~device_pce_control_port_interface();
 
 	virtual u8 peripheral_r() { return 0xf; }
-	virtual void clk_w(int state) {}
-	virtual void rst_w(int state) {}
+	virtual void sel_w(int state) {}
+	virtual void clr_w(int state) {}
 
 protected:
 	device_pce_control_port_interface(const machine_config &mconfig, device_t &device);

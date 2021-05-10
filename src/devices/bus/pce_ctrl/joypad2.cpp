@@ -15,7 +15,8 @@
     No autofire, Bundled in PC Engine
 
     NEC Turbo Pad (PI-PD002 and Later models)
-    Add autofire support
+    Add autofire support, Bundled in PC Engine CoreGrafx and later
+    models
 
     NEC Turbo Stick (PI-PD4)
     Arcade joystick variation of Turbo Pad, with Seperated autofire
@@ -38,7 +39,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PCE_JOYPAD2, pce_joypad2_device, "pce_joypad2", "NEC PC Engine/TurboGrafx-16 2 Button Joypad")
+DEFINE_DEVICE_TYPE(PCE_JOYPAD2,       pce_joypad2_device,       "pce_joypad2",       "NEC PC Engine Pad")
+DEFINE_DEVICE_TYPE(PCE_JOYPAD2_TURBO, pce_joypad2_turbo_device, "pce_joypad2_turbo", "NEC PC Engine/TurboGrafx-16 2 Button Joypad")
 
 
 static INPUT_PORTS_START( pce_joypad2 )
@@ -57,6 +59,21 @@ static INPUT_PORTS_START( pce_joypad2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( pce_joypad2_turbo )
+	PORT_INCLUDE( pce_joypad2 )
+
+	PORT_START("TURBO")
+	PORT_CONFNAME( 0x03, 0x00, "Button I Turbo" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, "Slow" )
+	PORT_CONFSETTING(    0x03, "Fast" )
+	PORT_CONFNAME( 0x0c, 0x00, "Button II Turbo" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, "Slow" )
+	PORT_CONFSETTING(    0x0c, "Fast" )
+INPUT_PORTS_END
+
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -64,6 +81,12 @@ INPUT_PORTS_END
 ioport_constructor pce_joypad2_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pce_joypad2 );
+}
+
+
+ioport_constructor pce_joypad2_turbo_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( pce_joypad2_turbo );
 }
 
 
@@ -76,10 +99,27 @@ ioport_constructor pce_joypad2_device::device_input_ports() const
 //  pce_joypad2_device - constructor
 //-------------------------------------------------
 
-pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, PCE_JOYPAD2, tag, owner, clock),
+pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_pce_control_port_interface(mconfig, *this),
 	m_muxer(*this, "mux")
+{
+}
+
+pce_joypad2_device::pce_joypad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	pce_joypad2_device(mconfig, PCE_JOYPAD2, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  pce_joypad2_turbo_device - constructor
+//-------------------------------------------------
+
+pce_joypad2_turbo_device::pce_joypad2_turbo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	pce_joypad2_device(mconfig, PCE_JOYPAD2_TURBO, tag, owner, clock),
+	m_buttons_io(*this, "BUTTONS"),
+	m_turbo_io(*this, "TURBO")
 {
 }
 
@@ -97,12 +137,36 @@ void pce_joypad2_device::device_add_mconfig(machine_config &config)
 }
 
 
+void pce_joypad2_turbo_device::device_add_mconfig(machine_config &config)
+{
+	pce_joypad2_device::device_add_mconfig(config);
+	m_muxer->a_in_callback().set(FUNC(pce_joypad2_turbo_device::buttons_r));
+}
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pce_joypad2_device::device_start()
 {
+}
+
+
+void pce_joypad2_turbo_device::device_start()
+{
+	pce_joypad2_device::device_start();
+	save_item(NAME(m_counter));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void pce_joypad2_turbo_device::device_reset()
+{
+	m_counter = 0;
 }
 
 
@@ -117,20 +181,57 @@ u8 pce_joypad2_device::peripheral_r()
 
 
 //-------------------------------------------------
-//  clk_w - MUXer select pin write
+//  sel_w - MUXer select pin write
 //-------------------------------------------------
 
-void pce_joypad2_device::clk_w(int state)
+void pce_joypad2_device::sel_w(int state)
 {
 	m_muxer->select_w(state);
 }
 
 
 //-------------------------------------------------
-//  rst_w - MUXer strobe pin write
+//  clr_w - MUXer strobe pin write
 //-------------------------------------------------
 
-void pce_joypad2_device::rst_w(int state)
+void pce_joypad2_device::clr_w(int state)
 {
 	m_muxer->strobe_w(state);
+}
+
+
+void pce_joypad2_turbo_device::clr_w(int state)
+{
+	pce_joypad2_device::clr_w(state);
+	m_counter = (m_counter + 1) & 7; // QA, QD pin not connected
+}
+
+
+//-------------------------------------------------
+//  buttons_r - read button with autofire counter
+//-------------------------------------------------
+
+u8 pce_joypad2_turbo_device::buttons_r()
+{
+	u8 ret = m_buttons_io->read() & 0xf;
+	const u8 turbo = m_turbo_io->read() & 0xff;
+	for (int i = 0; i < 2; i++)
+	{
+		const u8 enable_bit = 1 + (i << 1);
+		const u8 rate_bit = (i << 1);
+		if (BIT(turbo, enable_bit)) // enable autofire
+		{
+			if (BIT(turbo, rate_bit)) // Fast
+			{
+				if (BIT(m_counter, 1)) // QB pin from 74xx163
+					ret |= (1 << i);
+			}
+			else // Slow
+			{
+				if (BIT(m_counter, 2)) // OC pin from 74xx163
+					ret |= (1 << i);
+			}
+		}
+	}
+	return ret;
 }
