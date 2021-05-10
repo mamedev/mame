@@ -2255,7 +2255,7 @@ project "wdlfft"
 
 
 --------------------------------------------------
--- ymfm library objects (from Cockos WDL)
+-- ymfm library objects
 --------------------------------------------------
 
 project "ymfm"

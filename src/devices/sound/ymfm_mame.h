@@ -17,16 +17,6 @@
 
 
 //*********************************************************
-//  MACROS
-//*********************************************************
-
-// special naming helper to keep our namespace isolated from other
-// same-named objects in the device's namespace
-#define YMFM_NAME(x) x, "ymfm." #x
-
-
-
-//*********************************************************
 //  MAME INTERFACES
 //*********************************************************
 
@@ -187,8 +177,7 @@ protected:
 // ======================> ymfm_device_base
 
 // this template provides most of the basics used by device objects in MAME
-// that wrap ymfm chips; it implements the ymfm_interface, offers binding to
-// external callbacks, and provides basic read/write functions; however, this
+// that wrap ymfm chips; it provides basic read/write functions; however, this
 // class is not intended to be used directly -- rather, devices should inherit
 // from eitehr ymfm_device_base or ymfm_ssg_device_base, depending on whether
 // they include an SSG or not
@@ -329,7 +318,7 @@ protected:
 	{
 		// SSG streams are expected to be first, so allocate our stream then
 		// call the parent afterwards
-		m_ssg_stream = device_sound_interface::stream_alloc(0, ChipClass::SSG_OUTPUTS, m_chip.sample_rate_ssg(device_t::clock()));\
+		m_ssg_stream = device_sound_interface::stream_alloc(0, ChipClass::SSG_OUTPUTS, m_chip.sample_rate_ssg(device_t::clock()));
 		parent::device_start();
 	}
 
@@ -496,12 +485,14 @@ protected:
 		return parent::update_streams();
 	}
 
+	// I/O reader trampoline
 	template<int Index>
 	uint8_t io_reader()
 	{
 		return m_io_read[Index].isnull() ? 0 : m_io_read[Index](0);
 	}
 
+	// I/O writer trampoline
 	template<int Index>
 	void io_writer(uint8_t data)
 	{
@@ -524,6 +515,5 @@ using ymfm_ssg_device_base = ymfm_ssg_internal_device_base<ChipClass>;
 template<typename ChipClass>
 using ymfm_ssg_device_base = ymfm_ssg_external_device_base<ChipClass>;
 #endif
-
 
 #endif // MAME_SOUND_YMFM_H
