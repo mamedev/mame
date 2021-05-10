@@ -682,10 +682,21 @@ int sdl_window_info::complete_create()
 	osd_rect work = monitor()->usuable_position_size();
 
 	// create the SDL window
-	auto sdlwindow = SDL_CreateWindow(title().c_str(),
+	SDL_Window *sdlwindow;
+	const char *attach_window = downcast<sdl_options &>(machine().options()).attach_window();
+	if (attach_window && *attach_window)
+	{
+		unsigned long long attach_window_value = std::stoull(attach_window, nullptr, 0);
+		sdlwindow = SDL_CreateWindowFrom((void *)attach_window_value);
+	}
+	else
+	{
+		sdlwindow = SDL_CreateWindow(title().c_str(),
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), m_extra_flags);
+	}
+
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 
