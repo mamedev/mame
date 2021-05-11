@@ -179,7 +179,7 @@ protected:
 // this template provides most of the basics used by device objects in MAME
 // that wrap ymfm chips; it provides basic read/write functions; however, this
 // class is not intended to be used directly -- rather, devices should inherit
-// from eitehr ymfm_device_base or ymfm_ssg_device_base, depending on whether
+// from either ymfm_device_base or ymfm_ssg_device_base, depending on whether
 // they include an SSG or not
 template<typename ChipClass>
 class ymfm_device_base : public ym_generic_device
@@ -346,7 +346,7 @@ protected:
 		int const outcount = std::min(outputs.size(), std::size(output[0].data));
 		int const numsamples = outputs[0].samples();
 
-		// generate the FM/ADPCM stream
+		// generate the SSG stream
 		for (int sampindex = 0; sampindex < numsamples; sampindex += MAX_SAMPLES)
 		{
 			int cursamples = std::min(numsamples - sampindex, MAX_SAMPLES);
@@ -395,7 +395,10 @@ public:
 	// configuration helpers
 	void set_flags(int flags)
 	{
-		m_ssg_flags = (m_ssg_flags & AY8910_SINGLE_OUTPUT) | (flags & ~AY8910_SINGLE_OUTPUT);
+		// don't allow some flags to be changed
+		flags &= ~(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW);
+		flags |= m_ssg_flags & AY8910_SINGLE_OUTPUT;
+		m_ssg_flags = flags;
 		if (m_ssg)
 			m_ssg->set_flags(m_ssg_flags);
 	}
@@ -422,8 +425,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override
 	{
-		AY8910(config, m_ssg, device_t::clock());
-		m_ssg->set_psg_type(ay8910_device::PSG_TYPE_YM);
+		YM2149(config, m_ssg, device_t::clock());
 		m_ssg->set_flags(m_ssg_flags);
 
 		// configure the callbacks to route through our callbacks
