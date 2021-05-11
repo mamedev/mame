@@ -1843,4 +1843,12 @@ uint8_t const ds1001::s_default_instruments[] =
 	0x05, 0x01, 0x00, 0x00, 0xF8, 0xAA, 0x59, 0x55  //rhythm 3
 };
 
+
+//*********************************************************
+//  EXPLICIT INSTANTIATION
+//*********************************************************
+
+template class opl_registers_base<4>;
+template class fm_engine_base<opl_registers_base<4>>;
+
 }

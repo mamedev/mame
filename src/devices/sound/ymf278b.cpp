@@ -335,16 +335,16 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; clipping is unknown
-		s32 sums[fm_engine::OUTPUTS] = { 0 };
-		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
+		fm_engine::output_data sums;
+		m_fm.output(sums.clear(), 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
-		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
-		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1]) * fmr);
+		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums.data[0]) * fml);
+		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums.data[1]) * fmr);
 
 		// DO0 output: FM channels 2+3 only
-		outputs[2].put_int(i, sums[2], 32768);
-		outputs[3].put_int(i, sums[3], 32768);
+		outputs[2].put_int(i, sums.data[2], 32768);
+		outputs[3].put_int(i, sums.data[3], 32768);
 
 		// DO1 output: wavetable channels 2+3 only
 		outputs[4].put_int(i, *mixp++, 32768);
@@ -981,4 +981,3 @@ void ymf278b_device::device_post_load()
 	ymfm::ymfm_saved_state state(m_save_blob, false);
 	m_fm.save_restore(state);
 }
-
