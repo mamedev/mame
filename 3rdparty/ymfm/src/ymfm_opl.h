@@ -403,7 +403,7 @@ public:
 	// set the instrument data
 	void set_instrument_data(uint8_t const *data)
 	{
-		memcpy(&m_instdata[0], data, INSTDATA_SIZE);
+		std::copy_n(data, INSTDATA_SIZE, &m_instdata[0]);
 	}
 
 	// system-wide registers

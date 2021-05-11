@@ -453,14 +453,21 @@ private:
 	// helper to add values to the outputs based on channel enables
 	void add_to_output(uint32_t choffs, output_data &output, int32_t value) const
 	{
+		// create these constants to appease overzealous compilers checking array
+		// bounds in unreachable code (looking at you, clang)
+		constexpr int out0_index = 0;
+		constexpr int out1_index = 1 % RegisterType::OUTPUTS;
+		constexpr int out2_index = 2 % RegisterType::OUTPUTS;
+		constexpr int out3_index = 3 % RegisterType::OUTPUTS;
+
 		if (RegisterType::OUTPUTS == 1 || m_regs.ch_output_0(choffs))
-			output.data[0] += value;
+			output.data[out0_index] += value;
 		if (RegisterType::OUTPUTS >= 2 && m_regs.ch_output_1(choffs))
-			output.data[1] += value;
+			output.data[out1_index] += value;
 		if (RegisterType::OUTPUTS >= 3 && m_regs.ch_output_2(choffs))
-			output.data[2] += value;
+			output.data[out2_index] += value;
 		if (RegisterType::OUTPUTS >= 4 && m_regs.ch_output_3(choffs))
-			output.data[3] += value;
+			output.data[out3_index] += value;
 	}
 
 	// internal state

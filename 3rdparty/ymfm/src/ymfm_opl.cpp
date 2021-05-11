@@ -68,24 +68,35 @@ opl_registers_base<Revision>::opl_registers_base() :
 	m_noise_lfsr(1),
 	m_lfo_am(0)
 {
+	// create these pointers to appease overzealous compilers checking array
+	// bounds in unreachable code (looking at you, clang)
+	uint16_t *wf0 = &m_waveform[0][0];
+	uint16_t *wf1 = &m_waveform[1 % WAVEFORMS][0];
+	uint16_t *wf2 = &m_waveform[2 % WAVEFORMS][0];
+	uint16_t *wf3 = &m_waveform[3 % WAVEFORMS][0];
+	uint16_t *wf4 = &m_waveform[4 % WAVEFORMS][0];
+	uint16_t *wf5 = &m_waveform[5 % WAVEFORMS][0];
+	uint16_t *wf6 = &m_waveform[6 % WAVEFORMS][0];
+	uint16_t *wf7 = &m_waveform[7 % WAVEFORMS][0];
+
 	// create the waveforms
 	for (int index = 0; index < WAVEFORM_LENGTH; index++)
-		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
+		wf0[index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
 	if (WAVEFORMS >= 4)
 	{
-		uint16_t zeroval = m_waveform[0][0];
+		uint16_t zeroval = wf0[0];
 		for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		{
-			m_waveform[1][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
-			m_waveform[2][index] = m_waveform[0][index] & 0x7fff;
-			m_waveform[3][index] = bitfield(index, 8) ? zeroval : (m_waveform[0][index] & 0x7fff);
+			wf1[index] = bitfield(index, 9) ? zeroval : wf0[index];
+			wf2[index] = wf0[index] & 0x7fff;
+			wf3[index] = bitfield(index, 8) ? zeroval : (wf0[index] & 0x7fff);
 			if (WAVEFORMS >= 8)
 			{
-				m_waveform[4][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index * 2];
-				m_waveform[5][index] = bitfield(index, 9) ? zeroval : m_waveform[0][(index * 2) & 0x1ff];
-				m_waveform[6][index] = bitfield(index, 9) << 15;
-				m_waveform[7][index] = (zeroval - m_waveform[0][(index / 2)]) | (bitfield(index, 9) << 15);
+				wf4[index] = bitfield(index, 9) ? zeroval : wf0[index * 2];
+				wf5[index] = bitfield(index, 9) ? zeroval : wf0[(index * 2) & 0x1ff];
+				wf6[index] = bitfield(index, 9) << 15;
+				wf7[index] = (zeroval - wf0[(index / 2)]) | (bitfield(index, 9) << 15);
 			}
 		}
 	}
