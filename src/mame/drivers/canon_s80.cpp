@@ -48,11 +48,12 @@ HD44780_PIXEL_UPDATE(canons80_state::pixel_update)
 
 void canons80_state::canons80_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("maincpu", FUNC(hd6301x0_cpu_device::m6801_io));
+	map(0x0000, 0x001f).m("maincpu", FUNC(hd6301x0_cpu_device::hd6301x_io));
 	map(0x0040, 0x00ff).ram();
 	map(0x0100, 0x07ff).ram();
 	map(0x2000, 0x2001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x4000, 0x7fff).rom().region("external", 0x4000);
+	map(0x8000, 0xbfff).rom().region("external", 0);
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -80,6 +81,10 @@ void canons80_state::canons80(machine_config &config)
 ROM_START( canons80 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "hd63a1x0p.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_FILL( 0xfec, 1, 0x42 )
+	ROM_FILL( 0xfed, 1, 0x98 )
+	ROM_FILL( 0xff4, 1, 0x76 )
+	ROM_FILL( 0xff5, 1, 0x75 )
 	ROM_FILL( 0xffe, 1, 0x40 )
 	ROM_FILL( 0xfff, 1, 0x00 )
 
@@ -90,6 +95,10 @@ ROM_END
 ROM_START( canonts3 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "hd63a1x0p.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_FILL( 0xfec, 1, 0x42 )
+	ROM_FILL( 0xfed, 1, 0x99 )
+	ROM_FILL( 0xff4, 1, 0x77 )
+	ROM_FILL( 0xff5, 1, 0x65 )
 	ROM_FILL( 0xffe, 1, 0x40 )
 	ROM_FILL( 0xfff, 1, 0x00 )
 
