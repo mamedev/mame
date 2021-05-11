@@ -226,24 +226,28 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
-#include "machine/konppc.h"
 #include "machine/adc1038.h"
-#include "machine/k056230.h"
+#include "machine/eepromser.h"
 #include "machine/k033906.h"
-#include "sound/rf5c400.h"
+#include "machine/k056230.h"
+#include "machine/konppc.h"
 #include "sound/k056800.h"
-#include "video/voodoo.h"
+#include "sound/rf5c400.h"
 #include "video/k001005.h"
 #include "video/k001006.h"
 #include "video/k001604.h"
+#include "video/voodoo.h"
 
 #include "emupal.h"
 #include "layout/generic.h"
 #include "speaker.h"
 
+
+namespace {
+
+#define DEBUG_GTI (0)
 
 class gticlub_state : public driver_device
 {
@@ -252,8 +256,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp"),
-		m_dsp2(*this, "dsp2"),
+		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
 		m_k056800(*this, "k056800"),
 		m_gn680(*this, "gn680"),
 		m_adc1038(*this, "adc1038"),
@@ -262,21 +265,16 @@ public:
 		m_konppc(*this, "konppc"),
 		m_k056230(*this, "k056230"),
 		m_k001005(*this, "k001005"),
-		m_k001006_1(*this, "k001006_1"),
-		m_k001006_2(*this, "k001006_2"),
-		m_k001604_1(*this, "k001604_1"),
-		m_k001604_2(*this, "k001604_2"),
-		m_lscreen(*this, "lscreen"),
-		m_rscreen(*this, "rscreen"),
+		m_k001006(*this, "k001006%u", 1U),
+		m_k001604(*this, "k001604%u", 1U),
 		m_voodoo(*this, "voodoo%u", 0U),
 		m_work_ram(*this, "work_ram"),
 		m_generic_paletteram_32(*this, "paletteram"),
-		m_analog0(*this, "AN0"),
-		m_analog1(*this, "AN1"),
-		m_analog2(*this, "AN2"),
-		m_analog3(*this, "AN3"),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
+		m_analog(*this, "AN%u", 0U),
 		m_ports(*this, "IN%u", 0),
-		m_pcb_digit(*this, "pcbdigit%u", 0U)
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void thunderh(machine_config &config);
@@ -291,6 +289,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -298,8 +297,7 @@ private:
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<adsp21062_device> m_dsp;
-	optional_device<adsp21062_device> m_dsp2;
+	optional_device_array<adsp21062_device, 2> m_dsp;
 	required_device<k056800_device> m_k056800;
 	optional_device<cpu_device> m_gn680;
 	required_device<adc1038_device> m_adc1038;
@@ -308,49 +306,30 @@ private:
 	required_device<konppc_device> m_konppc;
 	required_device<k056230_device> m_k056230;
 	optional_device<k001005_device> m_k001005;
-	optional_device<k001006_device> m_k001006_1;
-	optional_device<k001006_device> m_k001006_2;
-	optional_device<k001604_device> m_k001604_1;
-	optional_device<k001604_device> m_k001604_2;
-	optional_device<screen_device> m_lscreen;
-	optional_device<screen_device> m_rscreen;
+	optional_device_array<k001006_device, 2> m_k001006;
+	optional_device_array<k001604_device, 2> m_k001604;
 	optional_device_array<voodoo_device, 2> m_voodoo;
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
-	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
 	output_finder<2> m_pcb_digit;
+	memory_view m_cg_view;
 
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gticlub_k001604_tile_r(offs_t offset);
-	void gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gticlub_k001604_char_r(offs_t offset);
-	void gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t gticlub_k001604_reg_r(offs_t offset);
-	void gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void gn680_sysctrl_w(uint16_t data);
-	uint32_t dsp_dataram0_r(offs_t offset);
-	void dsp_dataram0_w(offs_t offset, uint32_t data);
-	uint32_t dsp_dataram1_r(offs_t offset);
-	void dsp_dataram1_w(offs_t offset, uint32_t data);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
 
-	DECLARE_MACHINE_RESET(gticlub);
-	DECLARE_MACHINE_RESET(hangplt);
-	DECLARE_VIDEO_START(gticlub);
-	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
 	int adc1038_input_callback(int input);
 
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <uint8_t Which> uint32_t screen_update_two_screens(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void gticlub_map(address_map &map);
 	void hangplt_map(address_map &map);
@@ -361,8 +340,12 @@ private:
 	void sound_memmap(address_map &map);
 
 	emu_timer *m_sound_irq_timer;
-	std::unique_ptr<uint32_t[]> m_sharc_dataram_0;
-	std::unique_ptr<uint32_t[]> m_sharc_dataram_1;
+
+#if DEBUG_GTI
+	uint8_t m_tick = 0;
+	int8_t m_debug_tex_page = 0;
+	int8_t m_debug_tex_palette = 0;
+#endif
 };
 
 
@@ -372,54 +355,6 @@ void gticlub_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	data = m_generic_paletteram_32[offset];
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
-
-WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_0)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-uint32_t gticlub_state::gticlub_k001604_tile_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->tile_r(offset);
-}
-
-void gticlub_state::gticlub_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->tile_w(offset, data, mem_mask);
-}
-
-
-uint32_t gticlub_state::gticlub_k001604_char_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->char_r(offset);
-}
-
-void gticlub_state::gticlub_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->char_w(offset, data, mem_mask);
-}
-
-uint32_t gticlub_state::gticlub_k001604_reg_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->reg_r(offset);
-}
-
-void gticlub_state::gticlub_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(offset, data, mem_mask);
-}
-
 
 /******************************************************************/
 
@@ -471,16 +406,17 @@ void gticlub_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 4:
-			if (data & 0x80)    /* CG Board 1 IRQ Ack */
+			if (data & 0x80)    // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 
-			if (data & 0x40)    /* CG Board 0 IRQ Ack */
+			if (data & 0x40)    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_adc1038->di_write((data >> 0) & 1);
 			m_adc1038->clk_write((data >> 1) & 1);
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
+			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 
 		default:
@@ -524,10 +460,10 @@ void gticlub_state::machine_start()
 {
 	m_pcb_digit.resolve();
 
-	/* set conservative DRC options */
+	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	/* configure fast RAM regions for DRC */
+	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
@@ -535,40 +471,45 @@ void gticlub_state::machine_start()
 
 void gticlub_state::gticlub_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share("work_ram");        /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
+	map(0x00000000, 0x000fffff).ram().share(m_work_ram);
+	map(0x74000000, 0x7407ffff).view(m_cg_view);
+	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share(m_generic_paletteram_32);
+	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
-	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
-	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
+	map(0x78040000, 0x7804000f).rw(m_k001006[0], FUNC(k001006_device::read), FUNC(k001006_device::write));
+	map(0x78080000, 0x7808000f).rw(m_k001006[1], FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
-	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
+	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
+	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 void gticlub_state::hangplt_map(address_map &map)
 {
-	map(0x00000000, 0x000fffff).ram().share("work_ram");        /* Work RAM */
-	map(0x74000000, 0x740000ff).rw(FUNC(gticlub_state::gticlub_k001604_reg_r), FUNC(gticlub_state::gticlub_k001604_reg_w));
-	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(FUNC(gticlub_state::gticlub_k001604_tile_r), FUNC(gticlub_state::gticlub_k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(FUNC(gticlub_state::gticlub_k001604_char_r), FUNC(gticlub_state::gticlub_k001604_char_w));
+	map(0x00000000, 0x000fffff).ram().share(m_work_ram);
+	map(0x74000000, 0x7407ffff).view(m_cg_view);
+	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	map(0x74010000, 0x7401ffff).ram().w(FUNC(gticlub_state::paletteram32_w)).share(m_generic_paletteram_32);
+	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
 	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
-	map(0x7f800000, 0x7f9fffff).rom().region("user1", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
+	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
+	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 /**********************************************************************/
@@ -578,7 +519,7 @@ void gticlub_state::sound_memmap(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
-	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      /* Ricoh RF5C400 */
+	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));      // Ricoh RF5C400
 	map(0x500000, 0x500001).w(FUNC(gticlub_state::soundtimer_en_w)).nopr();
 	map(0x600000, 0x600001).w(FUNC(gticlub_state::soundtimer_count_w)).nopr();
 }
@@ -605,30 +546,10 @@ void gticlub_state::gn680_memmap(address_map &map)
 
 /*****************************************************************************/
 
-uint32_t gticlub_state::dsp_dataram0_r(offs_t offset)
-{
-	return m_sharc_dataram_0[offset] & 0xffff;
-}
-
-void gticlub_state::dsp_dataram0_w(offs_t offset, uint32_t data)
-{
-	m_sharc_dataram_0[offset] = data;
-}
-
-uint32_t gticlub_state::dsp_dataram1_r(offs_t offset)
-{
-	return m_sharc_dataram_1[offset] & 0xffff;
-}
-
-void gticlub_state::dsp_dataram1_w(offs_t offset, uint32_t data)
-{
-	m_sharc_dataram_1[offset] = data;
-}
-
 void gticlub_state::sharc_map(address_map &map)
 {
 	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x500000, 0x5fffff).rw(FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
+	map(0x500000, 0x5fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x600000, 0x6fffff).rw(m_k001005, FUNC(k001005_device::read), FUNC(k001005_device::write));
 	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 }
@@ -636,25 +557,25 @@ void gticlub_state::sharc_map(address_map &map)
 void gticlub_state::hangplt_sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(FUNC(gticlub_state::dsp_dataram0_r), FUNC(gticlub_state::dsp_dataram0_w));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w("voodoo0", FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_0_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
-	map(0x3600000, 0x37fffff).bankr("bank5");
+	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
 }
 
 void gticlub_state::hangplt_sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(FUNC(gticlub_state::dsp_dataram1_r), FUNC(gticlub_state::dsp_dataram1_w));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w("voodoo1", FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_1_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
-	map(0x3600000, 0x37fffff).bankr("bank6");
+	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
 }
 
 /*****************************************************************************/
@@ -691,7 +612,7 @@ static INPUT_PORTS_START( gticlub )
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("AN0")   /* mask default type             sens delta min max */
+	PORT_START("AN0")   // mask default type             sens delta min max
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x004,0x3fb) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 
 	PORT_START("AN1")
@@ -820,89 +741,68 @@ static INPUT_PORTS_START( hangplt )
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_NAME("Control Bar") PORT_MINMAX(0x100,0x2ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_REVERSE
 INPUT_PORTS_END
 
-/* PowerPC interrupts
-
-    IRQ0:  Vblank
-    IRQ2:  LANC
-    DMA0
-
-*/
-INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
-{
-	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-}
-
-
 int gticlub_state::adc1038_input_callback(int input)
 {
 	switch (input)
 	{
-	case 0:  return m_analog0->read();
-	case 1:  return m_analog1->read();
-	case 2:  return m_analog2->read();
-	case 3:  return m_analog3->read();
+	case 0:  return m_analog[0]->read();
+	case 1:  return m_analog[1]->read();
+	case 2:  return m_analog[2]->read();
+	case 3:  return m_analog[3]->read();
 	default: return 0;
 	}
 }
 
-MACHINE_RESET_MEMBER(gticlub_state,gticlub)
+void gticlub_state::machine_reset()
 {
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-
-VIDEO_START_MEMBER(gticlub_state,gticlub)
-{
-	/*
-	tick = 0;
-	debug_tex_page = 0;
-	debug_tex_palette = 0;
-	*/
+	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	if (m_dsp[1].found())
+		m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_k001604_1->draw_back_layer(bitmap, cliprect);
+	m_k001604[0]->draw_back_layer(bitmap, cliprect);
 
 	m_k001005->draw(bitmap, cliprect);
 
-	m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
+	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);
 
-#if 0
-	tick++;
-	if( tick >= 5 ) {
-		tick = 0;
+#if DEBUG_GTI // TODO: won't compile since k001006 has been devicified and its palette is private
+	m_tick++;
+	if( m_tick >= 5 ) {
+		m_tick = 0;
 
 		if( machine().input().code_pressed(KEYCODE_O) )
-			debug_tex_page++;
+			m_debug_tex_page++;
 
 		if( machine().input().code_pressed(KEYCODE_I) )
-			debug_tex_page--;
+			m_debug_tex_page--;
 
 		if (machine().input().code_pressed(KEYCODE_U))
-			debug_tex_palette++;
+			m_debug_tex_palette++;
 		if (machine().input().code_pressed(KEYCODE_Y))
-			debug_tex_palette--;
+			m_debug_tex_palette--;
 
-		if (debug_tex_page < 0)
-			debug_tex_page = 32;
-		if (debug_tex_page > 32)
-			debug_tex_page = 0;
+		if (m_debug_tex_page < 0)
+			m_debug_tex_page = 32;
+		if (m_debug_tex_page > 32)
+			m_debug_tex_page = 0;
 
-		if (debug_tex_palette < 0)
-			debug_tex_palette = 15;
-		if (debug_tex_palette > 15)
-			debug_tex_palette = 0;
+		if (m_debug_tex_palette < 0)
+			m_debug_tex_palette = 15;
+		if (m_debug_tex_palette > 15)
+			m_debug_tex_palette = 0;
 	}
 
-	if (debug_tex_page > 0)
+	if (m_debug_tex_page > 0)
 	{
 		char string[200];
 		int x,y;
-		int index = (debug_tex_page - 1) * 0x40000;
-		int pal = debug_tex_palette & 7;
-		int tp = (debug_tex_palette >> 3) & 1;
-		uint8_t *rom = machine.root_device().memregion("gfx1")->base();
+		int index = (m_debug_tex_page - 1) * 0x40000;
+		int pal = m_debug_tex_palette & 7;
+		int tp = (m_debug_tex_palette >> 3) & 1;
+		uint8_t *rom = memregion("textures")->base();
 
 		for (y=0; y < 384; y++)
 		{
@@ -913,57 +813,53 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 			}
 		}
 
-		sprintf(string, "Texture page %d\nPalette %d", debug_tex_page, debug_tex_palette);
+		sprintf(string, "Texture page %d\nPalette %d", m_debug_tex_page, m_debug_tex_palette);
 		//popmessage("%s", string);
 	}
 #endif
 
-	//m_dsp->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
-	m_dsp->set_flag_input(1, ASSERT_LINE);
+	//m_dsp[0]->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
+	m_dsp[0]->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }
 
-uint32_t gticlub_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+template <uint8_t Which>
+uint32_t gticlub_state::screen_update_two_screens(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-//  m_k001604_1->draw_back_layer(bitmap, cliprect);
-	m_voodoo[0]->voodoo_update(bitmap, cliprect);
-	m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
+//  m_k001604[Which]->draw_back_layer(bitmap, cliprect);
+	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
+	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 
 	return 0;
 }
 
-uint32_t gticlub_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->pen(0), cliprect);
+/* PowerPC interrupts
 
-//  m_k001604_2->draw_back_layer(bitmap, cliprect);
-	m_voodoo[1]->voodoo_update(bitmap, cliprect);
-	m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
+    IRQ0:  Vblank
+    IRQ2:  LANC
+    DMA0
 
-	return 0;
-}
+*/
 
 void gticlub_state::gticlub(machine_config &config)
 {
-	/* basic machine hardware */
-	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	// basic machine hardware
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   // PowerPC 403GA 32MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::gticlub_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gticlub_state::gticlub_vblank));
+	m_maincpu->set_vblank_int("screen", FUNC(gticlub_state::irq0_line_assert));
 
-	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    // 16MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	ADSP21062(config, m_dsp, XTAL(36'000'000));
-	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
+	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
+	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp[0]->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
-
-	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
 	ADC1038(config, m_adc1038, 0);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
@@ -971,7 +867,7 @@ void gticlub_state::gticlub(machine_config &config)
 
 	K056230(config, m_k056230, "maincpu");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 384);
@@ -980,24 +876,22 @@ void gticlub_state::gticlub(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(65536);
 
-	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
+	K001604(config, m_k001604[0], 0);
+	m_k001604[0]->set_layer_size(1);
+	m_k001604[0]->set_roz_size(1);
+	m_k001604[0]->set_txt_mem_offset(0);
+	m_k001604[0]->set_roz_mem_offset(0);
+	m_k001604[0]->set_palette(m_palette);
 
-	K001604(config, m_k001604_1, 0);
-	m_k001604_1->set_layer_size(1);
-	m_k001604_1->set_roz_size(1);
-	m_k001604_1->set_txt_mem_offset(0);
-	m_k001604_1->set_roz_mem_offset(0);
-	m_k001604_1->set_palette(m_palette);
+	K001005(config, m_k001005, 0, m_k001006[0]);
 
-	K001005(config, m_k001005, 0, "k001006_1");
-
-	K001006(config, m_k001006_1, 0);
-	m_k001006_1->set_gfx_region("gfx1");
+	K001006(config, m_k001006[0], 0);
+	m_k001006[0]->set_gfx_region("textures");
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	K001006(config, m_k001006_2, 0);
-	m_k001006_2->set_gfx_region("gfx1");
+	K001006(config, m_k001006[1], 0);
+	m_k001006[1]->set_gfx_region("textures");
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
@@ -1032,40 +926,31 @@ void gticlub_state::slrasslt(machine_config &config)
 
 	m_adc1038->set_gti_club_hack(false);
 
-	m_k001604_1->set_layer_size(0);
-	m_k001604_1->set_roz_size(0);
-	m_k001604_1->set_txt_mem_offset(16384);
-}
-
-
-MACHINE_RESET_MEMBER(gticlub_state,hangplt)
-{
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_k001604[0]->set_layer_size(0);
+	m_k001604[0]->set_roz_size(0);
+	m_k001604[0]->set_txt_mem_offset(16384);
 }
 
 void gticlub_state::hangplt(machine_config &config)
 {
-	/* basic machine hardware */
-	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	// basic machine hardware
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   // PowerPC 403GA 32MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::hangplt_map);
 
-	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    // 16MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	ADSP21062(config, m_dsp, XTAL(36'000'000));
-	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc0_map);
+	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
+	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp[0]->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc0_map);
 
-	ADSP21062(config, m_dsp2, XTAL(36'000'000));
-	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp2->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
+	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
+	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp[1]->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
-
-	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
 	ADC1038(config, m_adc1038, 0);
 	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
@@ -1076,47 +961,47 @@ void gticlub_state::hangplt(machine_config &config)
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp);
-	m_voodoo[0]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_0));
+	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp2);
-	m_voodoo[1]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_1));
+	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
-	K033906(config, "k033906_1", 0, "voodoo0");
-	K033906(config, "k033906_2", 0, "voodoo1");
+	K033906(config, "k033906_1", 0, m_voodoo[0]);
+	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
-	/* video hardware */
+	// video hardware
 	PALETTE(config, m_palette).set_entries(65536);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_size(512, 384);
 	lscreen.set_visarea(0, 511, 0, 383);
-	lscreen.set_screen_update(FUNC(gticlub_state::screen_update_lscreen));
+	lscreen.set_screen_update(FUNC(gticlub_state::screen_update_two_screens<0>));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_size(512, 384);
 	rscreen.set_visarea(0, 511, 0, 383);
-	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_rscreen));
+	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_two_screens<1>));
 
-	K001604(config, m_k001604_1, 0);
-	m_k001604_1->set_layer_size(0);
-	m_k001604_1->set_roz_size(1);
-	m_k001604_1->set_txt_mem_offset(0);
-	m_k001604_1->set_roz_mem_offset(16384);
-	m_k001604_1->set_palette(m_palette);
+	K001604(config, m_k001604[0], 0);
+	m_k001604[0]->set_layer_size(0);
+	m_k001604[0]->set_roz_size(1);
+	m_k001604[0]->set_txt_mem_offset(0);
+	m_k001604[0]->set_roz_mem_offset(16384);
+	m_k001604[0]->set_palette(m_palette);
 
-	K001604(config, m_k001604_2, 0);
-	m_k001604_2->set_layer_size(0);
-	m_k001604_2->set_roz_size(1);
-	m_k001604_2->set_txt_mem_offset(0);
-	m_k001604_2->set_roz_mem_offset(16384);
-	m_k001604_2->set_palette(m_palette);
+	K001604(config, m_k001604[1], 0);
+	m_k001604[1]->set_layer_size(0);
+	m_k001604[1]->set_roz_size(1);
+	m_k001604[1]->set_txt_mem_offset(0);
+	m_k001604[1]->set_roz_mem_offset(16384);
+	m_k001604[1]->set_palette(m_palette);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
@@ -1135,27 +1020,27 @@ void gticlub_state::hangplt(machine_config &config)
 
 /*************************************************************************/
 
-ROM_START( gticlub ) /* Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00(EUR) */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( gticlub ) // Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00(EUR)
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE("688eaa01.21u", 0x000000, 0x80000, CRC(824944ad) SHA1(a7bb86a2495e0579f5d82808aeed4895be2dbe3b) )
 	ROM_LOAD32_BYTE("688eaa02.19u", 0x000001, 0x80000, CRC(88e7bfb9) SHA1(fc0e945291204ee0c82bbd2c81ff241e1565c6ae) )
 	ROM_LOAD32_BYTE("688eaa03.21r", 0x000002, 0x80000, CRC(ea1c696b) SHA1(fd778afaa1de3a35b38a67b8e4c9a08fe9cf1b9e) )
 	ROM_LOAD32_BYTE("688eaa04.19r", 0x000003, 0x80000, CRC(94fa2334) SHA1(04edf840f841b9713fa93e7ebb6aad2000b738c0) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
 	ROM_LOAD( "688a12.2s", 0x600000, 0x200000, CRC(510c70e3) SHA1(5af77bc98772ab7961308c3af0a80cb1bca690e3) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "688a13.18d", 0x000000, 0x200000, CRC(c8f04f91) SHA1(9da8cc3a94dbf0a1fce87c2bc9249df712ae0b0d) )
 	ROM_LOAD64_WORD( "688a14.13d", 0x000002, 0x200000, CRC(b9932735) SHA1(2492244d2acb350974202a6718bc7121325d2121) )
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
@@ -1165,27 +1050,27 @@ ROM_START( gticlub ) /* Euro version EAA - Reports: GTI CLUB(TM) System ver 1.00
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
 ROM_END
 
-ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02(USA) */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( gticlubu ) // USA version UAA - Reports: GTI CLUB(TM) System ver 1.02(USA)
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE("688uaa01.21u", 0x000000, 0x80000, CRC(4e2ea7ad) SHA1(cc517df7c4df098896a2a88843fef97c9beb46f3) )
 	ROM_LOAD32_BYTE("688uaa02.19u", 0x000001, 0x80000, CRC(c0212ce1) SHA1(7716acfa1b1391e9d7a321ed46785c144d27fdd8) )
 	ROM_LOAD32_BYTE("688uaa03.21r", 0x000002, 0x80000, CRC(030246fe) SHA1(70d3591159b07aaeca60141db44f7c28d1b2dac9) )
 	ROM_LOAD32_BYTE("688uaa04.19r", 0x000003, 0x80000, CRC(9394e0b2) SHA1(9ff4ff22a307352bf127fc2b5ef9c56ecacf0aab) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
 	ROM_LOAD( "688a12.2s", 0x600000, 0x200000, CRC(510c70e3) SHA1(5af77bc98772ab7961308c3af0a80cb1bca690e3) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "688a13.18d", 0x000000, 0x200000, CRC(c8f04f91) SHA1(9da8cc3a94dbf0a1fce87c2bc9249df712ae0b0d) )
 	ROM_LOAD64_WORD( "688a14.13d", 0x000002, 0x200000, CRC(b9932735) SHA1(2492244d2acb350974202a6718bc7121325d2121) )
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
@@ -1195,27 +1080,27 @@ ROM_START( gticlubu ) /* USA version UAA - Reports: GTI CLUB(TM) System ver 1.02
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
 ROM_END
 
-ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.00(ASI) */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( gticluba ) // Asia version AAA - Reports: GTI CLUB(TM) System ver 1.00(ASI)
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE("688aaa01.21u", 0x000000, 0x80000, CRC(06a56474) SHA1(3a457b885a35e3ee030fd51d847bcf75fce46208) )
 	ROM_LOAD32_BYTE("688aaa02.19u", 0x000001, 0x80000, CRC(3c1e714a) SHA1(557f8542b855b2b35f242c8db7396017aca6dbd8) )
 	ROM_LOAD32_BYTE("688aaa03.21r", 0x000002, 0x80000, CRC(e060580b) SHA1(50242f3f3b949cc03082e4e75d9dcc89e17f0a75) )
 	ROM_LOAD32_BYTE("688aaa04.19r", 0x000003, 0x80000, CRC(928c23cd) SHA1(cce54398e1e5b98bfb717839cc422f1f60502788) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
 	ROM_LOAD( "688a12.2s", 0x600000, 0x200000, CRC(510c70e3) SHA1(5af77bc98772ab7961308c3af0a80cb1bca690e3) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "688a13.18d", 0x000000, 0x200000, CRC(c8f04f91) SHA1(9da8cc3a94dbf0a1fce87c2bc9249df712ae0b0d) )
 	ROM_LOAD64_WORD( "688a14.13d", 0x000002, 0x200000, CRC(b9932735) SHA1(2492244d2acb350974202a6718bc7121325d2121) )
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
@@ -1225,27 +1110,27 @@ ROM_START( gticluba ) /* Asia version AAA - Reports: GTI CLUB(TM) System ver 1.0
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
 ROM_END
 
-ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.00(JPN) */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( gticlubj ) // Japan version JAA - Reports: GTI CLUB(TM) System ver 1.00(JPN)
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE("688jaa01.21u", 0x000000, 0x80000, CRC(1492059c) SHA1(176dbd87f23f4cd8e1397e67da501738e20e5a57) )
 	ROM_LOAD32_BYTE("688jaa02.19u", 0x000001, 0x80000, CRC(7896dd69) SHA1(a3ab7b872132a5e66238e414f4b497cf7beb8b1c) )
 	ROM_LOAD32_BYTE("688jaa03.21r", 0x000002, 0x80000, CRC(94e2be50) SHA1(f206ac201903f3aae29196ab6fccdef104859346) )
 	ROM_LOAD32_BYTE("688jaa04.19r", 0x000003, 0x80000, CRC(ff539bb6) SHA1(1a225eca4377d82a2b6cb99c1d16580b9ccf2f08) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "688a09.9s", 0x000000, 0x200000, CRC(fb582963) SHA1(ce8fe6a4d7ac7d7f4b6591f9150b1d351e636354) )
 	ROM_LOAD( "688a10.7s", 0x200000, 0x200000, CRC(b3ddc5f1) SHA1(a3f76c86e85eb17f20efb037c1ad64e9cb8566c8) )
 	ROM_LOAD( "688a11.5s", 0x400000, 0x200000, CRC(fc706183) SHA1(c8ce6de0588be1023ef48577bc88a4e5effdcd25) )
 	ROM_LOAD( "688a12.2s", 0x600000, 0x200000, CRC(510c70e3) SHA1(5af77bc98772ab7961308c3af0a80cb1bca690e3) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "688a13.18d", 0x000000, 0x200000, CRC(c8f04f91) SHA1(9da8cc3a94dbf0a1fce87c2bc9249df712ae0b0d) )
 	ROM_LOAD64_WORD( "688a14.13d", 0x000002, 0x200000, CRC(b9932735) SHA1(2492244d2acb350974202a6718bc7121325d2121) )
 	ROM_LOAD64_WORD( "688a15.9d",  0x000004, 0x200000, CRC(8aadee51) SHA1(be9020a47583da9d4ff586d227836dc5b7dc31f0) )
@@ -1255,175 +1140,175 @@ ROM_START( gticlubj ) /* Japan version JAA - Reports: GTI CLUB(TM) System ver 1.
 	ROM_LOAD( "gticlub.nv", 0x0000, 0x0100, CRC(ee5c9149) SHA1(cf4fda82c7d01eab664f21b062c55a3dd0234556) )
 ROM_END
 
-ROM_START( thunderh ) /* Euro version EAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( thunderh ) // Euro version EAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "680eaa01.21u", 0x000000, 0x080000, CRC(796e2678) SHA1(8051a228aa6d1a3f1fef26de15f4fdb785c2c8ee) )
 	ROM_LOAD32_BYTE( "680eaa02.19u", 0x000001, 0x080000, CRC(767e6db0) SHA1(0f29f56fe485f30100ce54e64bda5d5a124c1d09) )
 	ROM_LOAD32_BYTE( "680eaa03.21r", 0x000002, 0x080000, CRC(5a5b59b5) SHA1(542c0722437f40829559b09120fde995246d52ae) )
 	ROM_LOAD32_BYTE( "680eaa04.19r", 0x000003, 0x080000, CRC(4a973a5c) SHA1(1d84f6416c3b5a85d7ebfbc15fc08e0dd8dc2414) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "680a05.14u", 0x000000, 0x200000, CRC(0c9f334d) SHA1(99ac622a04a7140244d81031df69a796b6fd2657) )
 	ROM_LOAD32_WORD_SWAP( "680a06.12u", 0x000002, 0x200000, CRC(83074217) SHA1(bbf782ac125cd98d9147ef4e0373bf61f74726f7) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       // GN680 program
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "680a09.9s", 0x000000, 0x200000, CRC(71c2b049) SHA1(ce360172c8774b31edf16a80104c35b1caf26cd9) )
 	ROM_LOAD( "680a10.7s", 0x200000, 0x200000, CRC(19882bf3) SHA1(7287da58853c84cbadbfb42bed37f2b0032c4b4d) )
 	ROM_LOAD( "680a11.5s", 0x400000, 0x200000, CRC(0c74fe3f) SHA1(2e69f8d37552a74bbda65b134f747b4380ed33b0) )
 	ROM_LOAD( "680a12.2s", 0x600000, 0x200000, CRC(b052919d) SHA1(a61c8eaf378ab7d780478db61217302d1b9f8f73) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "680a13.18d", 0x000000, 0x200000, CRC(233f9074) SHA1(78ce42c35407d61df37cc0d16cdee84f8de968fa) )
 	ROM_LOAD64_WORD( "680a14.13d", 0x000002, 0x200000, CRC(9ae15033) SHA1(12e291114629632b81f53811a6c8666aff4e92f3) )
 	ROM_LOAD64_WORD( "680a15.9d",  0x000004, 0x200000, CRC(dc47c86f) SHA1(71af9b21f1ecc063135f501b1561869ee910c236) )
 	ROM_LOAD64_WORD( "680a16.4d",  0x000006, 0x200000, CRC(ea388143) SHA1(3de5314a009d702186d5e285c8edefdd48139eab) )
 ROM_END
 
-ROM_START( thunderhu ) /* USA version UAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( thunderhu ) // USA version UAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "680uaa01.21u", 0x000000, 0x080000, CRC(f2bb2ba1) SHA1(311e88d63179486014376c4af4ff0ef28673ee5a) )
 	ROM_LOAD32_BYTE( "680uaa02.19u", 0x000001, 0x080000, CRC(52f617b5) SHA1(fda3133d3a7e04eb4432c69becdcf1872b3660d9) )
 	ROM_LOAD32_BYTE( "680uaa03.21r", 0x000002, 0x080000, CRC(086a0574) SHA1(32fb93dbb93d2fe6af743ea4310b50a6cd03647d) )
 	ROM_LOAD32_BYTE( "680uaa04.19r", 0x000003, 0x080000, CRC(85e1f8e3) SHA1(9172c54b6663f1bf390795068271198083a6860d) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "680a05.14u", 0x000000, 0x200000, CRC(0c9f334d) SHA1(99ac622a04a7140244d81031df69a796b6fd2657) )
 	ROM_LOAD32_WORD_SWAP( "680a06.12u", 0x000002, 0x200000, CRC(83074217) SHA1(bbf782ac125cd98d9147ef4e0373bf61f74726f7) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "gn680", 0)       /* GN680 program */
+	ROM_REGION(0x20000, "gn680", 0)       // GN680 program
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "680a09.9s", 0x000000, 0x200000, CRC(71c2b049) SHA1(ce360172c8774b31edf16a80104c35b1caf26cd9) )
 	ROM_LOAD( "680a10.7s", 0x200000, 0x200000, CRC(19882bf3) SHA1(7287da58853c84cbadbfb42bed37f2b0032c4b4d) )
 	ROM_LOAD( "680a11.5s", 0x400000, 0x200000, CRC(0c74fe3f) SHA1(2e69f8d37552a74bbda65b134f747b4380ed33b0) )
 	ROM_LOAD( "680a12.2s", 0x600000, 0x200000, CRC(b052919d) SHA1(a61c8eaf378ab7d780478db61217302d1b9f8f73) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "680a13.18d", 0x000000, 0x200000, CRC(233f9074) SHA1(78ce42c35407d61df37cc0d16cdee84f8de968fa) )
 	ROM_LOAD64_WORD( "680a14.13d", 0x000002, 0x200000, CRC(9ae15033) SHA1(12e291114629632b81f53811a6c8666aff4e92f3) )
 	ROM_LOAD64_WORD( "680a15.9d",  0x000004, 0x200000, CRC(dc47c86f) SHA1(71af9b21f1ecc063135f501b1561869ee910c236) )
 	ROM_LOAD64_WORD( "680a16.4d",  0x000006, 0x200000, CRC(ea388143) SHA1(3de5314a009d702186d5e285c8edefdd48139eab) )
 ROM_END
 
-ROM_START( slrasslt ) /* USA version UAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( slrasslt ) // USA version UAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "792uaa01.21u", 0x000000, 0x080000, CRC(c73bf7fb) SHA1(ffe0fea155473827929339a9261a158287ce30a8) ) // ROM check screen shows version as:  SOLAR ASSAULT DR2  VER UA-A
 	ROM_LOAD32_BYTE( "792uaa02.19u", 0x000001, 0x080000, CRC(a940bb9b) SHA1(65a60157697a21cc2485c02c689c9addb3ac91f1) ) // Based on "Revised" code but title screen only shows Solar Assault
 	ROM_LOAD32_BYTE( "792uaa03.21r", 0x000002, 0x080000, CRC(363e8411) SHA1(b9c70033d8e3de4b339b61a66172bfecb7c2b3ab) )
 	ROM_LOAD32_BYTE( "792uaa04.19r", 0x000003, 0x080000, CRC(7910d99c) SHA1(e2114d369060528998b58331d590c086d306f541) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "792a05.14u", 0x000000, 0x200000, CRC(9a27edfc) SHA1(c028b6440eb1b0c814c4db45918e580662ac2d9a) )
 	ROM_LOAD32_WORD_SWAP( "792a06.12u", 0x000002, 0x200000, CRC(c272f171) SHA1(df492287eadc5e8668fe46cfa3ed3ca77c57feca) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "792a07.10k", 0x000000, 0x080000, CRC(89a65ad1) SHA1(d814ef0b560c8e68da57ad5c6096e4fc05e9913e) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "792a09.9s", 0x000000, 0x200000, CRC(7d7ea427) SHA1(a9a311a7c17223cc87140fe2890e20a321464831) )
 	ROM_LOAD( "792a10.7s", 0x200000, 0x200000, CRC(e585e5d9) SHA1(ec44ad324a66eeea4c45933dda5a8a9a4398879d) )
 	ROM_LOAD( "792a11.5s", 0x400000, 0x200000, CRC(c9c3a04c) SHA1(f834659f67712c9fcd93b7407669d7f35517b790) )
 	ROM_LOAD( "792a12.2s", 0x600000, 0x200000, CRC(da8fcdd5) SHA1(daa7b3a086ada69e93c3d7cd9130befc79e422dc) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "792a13.18d", 0x000000, 0x200000, CRC(16d6a134) SHA1(3f53f3c6759d7c5f40aa25a598df899fbac35a60) )
 	ROM_LOAD64_WORD( "792a14.13d", 0x000002, 0x200000, CRC(cf57e830) SHA1(607b4dec3b8180a63e29d9dab1ca28d7226dda1e) )
 	ROM_LOAD64_WORD( "792a15.9d",  0x000004, 0x200000, CRC(1c5531cb) SHA1(1b514f181c92e16d07bfe4719604f1e4caf15377) )
 	ROM_LOAD64_WORD( "792a16.4d",  0x000006, 0x200000, CRC(df89e392) SHA1(af37c5460d43bf8d8a1ab4213c4528083a7363c2) )
 
-	ROM_REGION16_BE(0x100, "eeprom", 0) /* default eeprom with magic number */
+	ROM_REGION16_BE(0x100, "eeprom", 0) // default eeprom with magic number
 	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0100, CRC(51eb4d93) SHA1(bc1359daccad80b0e16eb144a0bae715a4fb2e8d) )
 ROM_END
 
-ROM_START( slrassltj ) /* Japan version JAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( slrassltj ) // Japan version JAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "792jaa01.21u", 0x000000, 0x080000, CRC(112717c6) SHA1(be5066e1aefef20b6eab2340abc1bdc3d7a5a6e3) ) // ROM check screen shows version as:  SOLAR ASSAULT DR2  VER JA-A
 	ROM_LOAD32_BYTE( "792jaa02.19u", 0x000001, 0x080000, CRC(c48582bd) SHA1(194dfd51704ed5eeecb2b56b6bbf651c7cf7701e) ) // Title screen shows Solar Assault Revised
 	ROM_LOAD32_BYTE( "792jaa03.21r", 0x000002, 0x080000, CRC(e691009d) SHA1(c8ae58fd280a18151b0e33511269c3685e30fe63) )
 	ROM_LOAD32_BYTE( "792jaa04.19r", 0x000003, 0x080000, CRC(1e73a145) SHA1(e519d17d22b5a61570a9bf72ea840f6398928952) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "792a05.14u", 0x000000, 0x200000, CRC(9a27edfc) SHA1(c028b6440eb1b0c814c4db45918e580662ac2d9a) )
 	ROM_LOAD32_WORD_SWAP( "792a06.12u", 0x000002, 0x200000, CRC(c272f171) SHA1(df492287eadc5e8668fe46cfa3ed3ca77c57feca) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "792a07.10k", 0x000000, 0x080000, CRC(89a65ad1) SHA1(d814ef0b560c8e68da57ad5c6096e4fc05e9913e) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "792a09.9s", 0x000000, 0x200000, CRC(7d7ea427) SHA1(a9a311a7c17223cc87140fe2890e20a321464831) )
 	ROM_LOAD( "792a10.7s", 0x200000, 0x200000, CRC(e585e5d9) SHA1(ec44ad324a66eeea4c45933dda5a8a9a4398879d) )
 	ROM_LOAD( "792a11.5s", 0x400000, 0x200000, CRC(c9c3a04c) SHA1(f834659f67712c9fcd93b7407669d7f35517b790) )
 	ROM_LOAD( "792a12.2s", 0x600000, 0x200000, CRC(da8fcdd5) SHA1(daa7b3a086ada69e93c3d7cd9130befc79e422dc) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "792a13.18d", 0x000000, 0x200000, CRC(16d6a134) SHA1(3f53f3c6759d7c5f40aa25a598df899fbac35a60) )
 	ROM_LOAD64_WORD( "792a14.13d", 0x000002, 0x200000, CRC(cf57e830) SHA1(607b4dec3b8180a63e29d9dab1ca28d7226dda1e) )
 	ROM_LOAD64_WORD( "792a15.9d",  0x000004, 0x200000, CRC(1c5531cb) SHA1(1b514f181c92e16d07bfe4719604f1e4caf15377) )
 	ROM_LOAD64_WORD( "792a16.4d",  0x000006, 0x200000, CRC(df89e392) SHA1(af37c5460d43bf8d8a1ab4213c4528083a7363c2) )
 
-	ROM_REGION16_BE(0x100, "eeprom", 0) /* default eeprom with magic number */
+	ROM_REGION16_BE(0x100, "eeprom", 0) // default eeprom with magic number
 	ROM_LOAD16_WORD( "eeprom-slrasslt.bin", 0x0000, 0x0100, CRC(407871d6) SHA1(17a311c412f450edb206750bf7d1055bd16a2135) )
 ROM_END
 
-ROM_START( slrassltj1 ) /* Japan version JAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( slrassltj1 ) // Japan version JAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "672jaa_a01.21u", 0x000000, 0x080000, CRC(e2821f51) SHA1(20c6c2402ba2b564b8f77bcf452abe2d7e023417) ) // ROM check screen shows version as:  SOLAR ASSAULT VER JA-A
 	ROM_LOAD32_BYTE( "672jaa_a02.19u", 0x000001, 0x080000, CRC(e3ac7031) SHA1(268588ac6e80463e51a399f53b2396b23faaddba) ) // Title screen shows subtitle "GRADIUS"
 	ROM_LOAD32_BYTE( "672jaa_a03.21r", 0x000002, 0x080000, CRC(52711d79) SHA1(8c89fbff9de21cc1e5f17c4ea08870faea648465) )
 	ROM_LOAD32_BYTE( "672jaa_a04.19r", 0x000003, 0x080000, CRC(f7419454) SHA1(44cef7f1181cb9c11b013ab0b7e26aa1e95d3746) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "672a05.14u", 0x000000, 0x200000, CRC(f6f296e4) SHA1(2ba4ede36f3392aa53a730614272fa80df65281c) )
 	ROM_LOAD32_WORD_SWAP( "672a06.12u", 0x000002, 0x200000, CRC(2126227f) SHA1(22615023025453772239b4b21e276fbcbb1cc2bf) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)      // 68k program
 	ROM_LOAD16_WORD_SWAP( "672a07.10k", 0x000000, 0x080000, CRC(a757309d) SHA1(bc1c8b327815f70bc8bf94adafc8bb0c215e7d1f) )
 
-	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
+	ROM_REGION16_LE(0x800000, "rfsnd", 0)    // sound roms
 	ROM_LOAD( "672a09.9s", 0x000000, 0x200000, CRC(484355ef) SHA1(2af65565d10b058ab95888f36ff28bb7909181d5) )
 	ROM_LOAD( "672a10.7s", 0x200000, 0x200000, CRC(1ec1d5d1) SHA1(ebf5417a117f352fff36806a748305270adb70d8) )
 	ROM_LOAD( "672a11.5s", 0x400000, 0x200000, CRC(1126753e) SHA1(c7b91e2514329799944e1eb608b5b7e2eb87bea9) )
 	ROM_LOAD( "672a12.2s", 0x600000, 0x200000, CRC(432ec7fd) SHA1(a671625400f3837cbe8ddb06dbc37c574d75e281) )
 
-	ROM_REGION(0x800000, "gfx1", 0) /* texture roms */
+	ROM_REGION(0x800000, "textures", 0) // texture roms
 	ROM_LOAD64_WORD( "672a13.18d", 0x000000, 0x200000, CRC(ded2f06d) SHA1(851a896e156fb736bcb7cdfc7db2340bb819c092) )
 	ROM_LOAD64_WORD( "672a14.13d", 0x000002, 0x200000, CRC(cd311cfc) SHA1(ead708eaa4e3f1f2b9a17c41ddd0fbc016911527) )
 	ROM_LOAD64_WORD( "672a15.9d",  0x000004, 0x200000, CRC(7bb6c271) SHA1(9eb928a52e482b7718c723fa8a14b2c2faaf4425) )
 	ROM_LOAD64_WORD( "672a16.4d",  0x000006, 0x200000, CRC(6fa5c0ee) SHA1(ee40179a46f8529fab1c58c05f413a516e7d53ff) )
 
-	ROM_REGION16_BE(0x100, "eeprom", 0) /* default eeprom with magic number */
+	ROM_REGION16_BE(0x100, "eeprom", 0) // default eeprom with magic number
 	ROM_LOAD16_WORD( "eeprom-slrassltj.bin", 0x0000, 0x0100, CRC(407871d6) SHA1(17a311c412f450edb206750bf7d1055bd16a2135) )
 ROM_END
 
-ROM_START( hangplt ) /* Japan version JAB */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( hangplt ) // Japan version JAB
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "685jab01.21u", 0x000000, 0x080000, CRC(f98a3e82) SHA1(94ebaa172b0e98c5cd08efaea5f56e707e5032b4) )
 	ROM_LOAD32_BYTE( "685jab02.19u", 0x000001, 0x080000, CRC(20730cdc) SHA1(71b2cf7077ab7db875f9030e21afd05905f57ce5) )
 	ROM_LOAD32_BYTE( "685jab03.21r", 0x000002, 0x080000, CRC(77fa2248) SHA1(a662b84945b3d268fed15952cc793d821233735e) )
 	ROM_LOAD32_BYTE( "685jab04.19r", 0x000003, 0x080000, CRC(ab6773df) SHA1(91d3f849a1cc5fa4b2fbd876d53402a548198c41) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "685a05.14u", 0x000000, 0x200000, CRC(ba1c8f40) SHA1(ce4ed641c1d6d44447eaaada16f305f1d7fb9ee2) )
 	ROM_LOAD32_WORD_SWAP( "685a06.12u", 0x000002, 0x200000, CRC(2429935c) SHA1(4da9e169adcac81ea1bc135d727c2bd13ad372fa) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)  // 68k program
 	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* sound roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   // sound roms
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "user5", 0)    /* texture roms */
+	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1431,25 +1316,25 @@ ROM_START( hangplt ) /* Japan version JAB */
 	ROM_LOAD( "hangplt.nv", 0x0000, 0x0100, CRC(30285221) SHA1(a08d06a0d7966f483e4c691a9bd5a98e48294aab) )
 ROM_END
 
-ROM_START( hangpltu ) /* USA version UAA */
-	ROM_REGION32_BE(0x200000, "user1", 0)    /* PowerPC program roms */
+ROM_START( hangpltu ) // USA version UAA
+	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
 	ROM_LOAD32_BYTE( "685uaa01.21u", 0x000000, 0x080000, CRC(83a5b866) SHA1(6859590f212c7debb19924f0174e4cd1bfc011bc) )
 	ROM_LOAD32_BYTE( "685uaa02.19u", 0x000001, 0x080000, CRC(765906d6) SHA1(9085a2346756b3b628fef91b7afc131aba434654) )
 	ROM_LOAD32_BYTE( "685uaa03.21r", 0x000002, 0x080000, CRC(cb0147a3) SHA1(7bcab760c01ea7e24f4ca5793e081aafa97f68a3) )
 	ROM_LOAD32_BYTE( "685uaa04.19r", 0x000003, 0x080000, CRC(a5fda56b) SHA1(4d86f488f411ec16fa3be830206a44214941d1fe) )
 
-	ROM_REGION32_BE(0x400000, "user2", 0)   /* data roms */
+	ROM_REGION32_BE(0x400000, "datarom", 0)   // data roms
 	ROM_LOAD32_WORD_SWAP( "685a05.14u", 0x000000, 0x200000, CRC(ba1c8f40) SHA1(ce4ed641c1d6d44447eaaada16f305f1d7fb9ee2) )
 	ROM_LOAD32_WORD_SWAP( "685a06.12u", 0x000002, 0x200000, CRC(2429935c) SHA1(4da9e169adcac81ea1bc135d727c2bd13ad372fa) )
 
-	ROM_REGION(0x80000, "audiocpu", 0)  /* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)  // 68k program
 	ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   /* sound roms */
+	ROM_REGION16_LE(0x1000000, "rfsnd", 0)   // sound roms
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "user5", 0)    /* texture roms */
+	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1460,24 +1345,20 @@ ROM_END
 
 void gticlub_state::init_gticlub()
 {
-	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
-
-	m_dsp->enable_recompiler();
+	m_dsp[0]->enable_recompiler();
 }
 
 void gticlub_state::init_hangplt_common()
 {
-	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
-	m_sharc_dataram_1 = std::make_unique<uint32_t[]>(0x100000/4);
+	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
+	m_konppc->set_cgboard_texture_bank(1, "slave_cgboard_bank", memregion("master_cgboard")->base());
 }
 
 void gticlub_state::init_hangplt() //fixme: remove hacks and actually emulate the step lock. Possibly similar to Alpine Racer 1/2 and Alpine Surfer?
 {
 	init_hangplt_common();
 
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("prgrom")->base();
 	rom[(0x153ac^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
@@ -1486,10 +1367,13 @@ void gticlub_state::init_hangpltu()
 {
 	init_hangplt_common();
 
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("prgrom")->base();
 	rom[(0x153d0^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
+
+} // Anonymous namespace
+
 
 /*************************************************************************/
 

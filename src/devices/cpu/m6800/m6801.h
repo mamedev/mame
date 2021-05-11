@@ -162,8 +162,8 @@ protected:
 
 	virtual void m6800_check_irq2() override;
 	virtual void increment_counter(int amount) override;
-	virtual void EAT_CYCLES() override;
-	virtual void CLEANUP_COUNTERS() override;
+	virtual void eat_cycles() override;
+	virtual void cleanup_counters() override;
 
 	virtual void modified_tcsr();
 	virtual void set_timer_event();
@@ -209,7 +209,7 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual void TAKE_TRAP() override;
+	virtual void take_trap() override;
 };
 
 
@@ -296,7 +296,7 @@ protected:
 	virtual void modified_counters() override;
 	virtual void increment_counter(int amount) override;
 	virtual void check_timer_event() override;
-	virtual void CLEANUP_COUNTERS() override;
+	virtual void cleanup_counters() override;
 	virtual void set_rmcr(uint8_t data) override;
 
 	devcb_read8::array<2> m_in_portx_func;

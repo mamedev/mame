@@ -377,6 +377,7 @@ public:
 	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800"),
@@ -418,6 +419,7 @@ private:
 	static const int m_sound_timer_usec = 2800;
 
 	required_shared_ptr<uint32_t> m_workram;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
 	required_device<ppc4xx_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
@@ -811,9 +813,9 @@ void hornet_state::gn680_memmap(address_map &map)
 void hornet_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share("sharc0_dataram").umask32(0x0000ffff);
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw("voodoo0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).rw(m_voodoo[0], FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
 	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
@@ -822,9 +824,9 @@ void hornet_state::sharc0_map(address_map &map)
 void hornet_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share("sharc1_dataram").umask32(0x0000ffff);
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw("voodoo1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).rw(m_voodoo[1], FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
@@ -1081,7 +1083,7 @@ void hornet_state::hornet(machine_config &config)
 	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_1", 0, m_voodoo[0]);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1160,7 +1162,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
-	K033906(config, "k033906_2", 0, "voodoo1");
+	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
 	config.device_remove("screen");

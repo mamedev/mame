@@ -9874,6 +9874,7 @@ can09                           //
 
 @source:canon_s80.cpp
 canons80                        //
+canonts3                        //
 
 @source:canyon.cpp
 canyon                          // 009493-009504    1977/10 [6502]
@@ -40400,6 +40401,9 @@ tek4109a                        //
 
 @source:tek440x.cpp
 tek4404                         // (c) 1984 Tektronix
+
+@source:tekigw.cpp
+tek6130                         // Tektronix 6130
 
 @source:tekxp33x.cpp
 tekxp330                        //

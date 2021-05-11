@@ -288,7 +288,7 @@ void seeq8003_device::transmit(void *ptr, int param)
 		dump_bytes(buf, length);
 
 		// transmit the frame
-		send(buf, length);
+		send(buf, length, 4);
 
 		// TODO: transmit errors/TxRET
 
