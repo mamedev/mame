@@ -203,7 +203,7 @@ void pce_state::tg16(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("tg16");
 
 	// turbo pad bundled
-	PCE_CONTROL_PORT(config.replace(), m_port_ctrl, pce_control_port_devices, "joypad2_turbo");
+	m_port_ctrl->set_default_option("joypad2_turbo");
 }
 
 
