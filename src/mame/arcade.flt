@@ -797,6 +797,7 @@ minivadr.cpp
 minivideo.cpp
 mirage.cpp
 mirax.cpp
+missamer.cpp
 missb2.cpp
 missbamby.cpp
 missile.cpp
@@ -1002,6 +1003,7 @@ pse.cpp
 psikyo.cpp
 psikyo4.cpp
 psikyosh.cpp
+psrockman.cpp
 psychic5.cpp
 pturn.cpp
 pubtimed.cpp
@@ -1043,6 +1045,7 @@ renegade.cpp
 retofinv.cpp
 rf51w14cg.cpp
 rfslots8085.cpp
+rfslotsmcs48.cpp
 rfslotspcpent.cpp
 rgum.cpp
 rltennis.cpp

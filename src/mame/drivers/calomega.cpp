@@ -258,6 +258,8 @@
    46.0x| Gaming Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
    47.0x| 4-Card Indian Bingo      |    ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
    48.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+        |                          |         |         |          |         |          |         |               |      |      |
+   51.07| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
    51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
         |                          |         |         |          |         |          |         |               |      |      |
  * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
@@ -441,6 +443,18 @@
 
     DRIVER UPDATES
     --------------
+
+
+    [2021-05]
+
+    General improvements...
+    - Fixed inputs on Cal Omega - Game 12.5 (Bingo).
+    - Inputs for Cal Omega - Game 13.4 (Nudge). Promoted to WORKING.
+    - Inputs for Cal Omega - Game 17.6 (Nudge). Promoted to WORKING.
+    - Inputs for Cal Omega - Game 18.1 (Nudge). Promoted to WORKING.
+    - Added new set: CEI 51.07 (CEI 906-III Poker).
+    - Fixed/added technical notes.
+
 
     [2021-04-26]
 
@@ -1662,22 +1676,22 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Door Open") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet/Play")    PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Start")       PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double Down") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hit")         PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Stand")       PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet/Play")    PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )        PORT_NAME("Start")       PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Hit")         PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")       PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service/Clear") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service/Clear") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2033,7 +2047,7 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( comg125 )	// nudge bingo
+static INPUT_PORTS_START( nudgensw )	// nudge bingo
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Up") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Up") PORT_CODE(KEYCODE_S)
@@ -2163,6 +2177,19 @@ static INPUT_PORTS_START( comg125 )	// nudge bingo
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( nudgesw )
+
+	PORT_INCLUDE( nudgensw )
+
+	PORT_MODIFY("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Options" )  			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Play 1" )
+	PORT_DIPSETTING(    0x40, "Play 1 to 3" )
+	PORT_DIPSETTING(    0x80, "Play 1 to 4" )
+	PORT_DIPSETTING(    0xc0, "Play 1 to 8" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( comg128 )
 	PORT_START("IN0-0")
@@ -4277,7 +4304,7 @@ ROM_END
 
 ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // checked in offset $8034
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
 	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
 	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
 	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
@@ -4288,7 +4315,24 @@ ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
 	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
-	ROM_REGION( 0x200, "proms", 0 )  // from other set, second half is empty
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5107 )  // Cal Omega v51.07 (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. same as the 51.08 set
+	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
+	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
+	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
+	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
 	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
@@ -4582,51 +4626,6 @@ void calomega_state::init_sys905()
 	save_item(NAME(m_s905_mux_data));
 }
 
-void calomega_state::init_comg080()
-{
-	init_sys903();
-
-	/* Injecting missing Start and NMI vectors...
-	   Start = $2042;  NMI = $26f8;
-	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
-	*/
-	uint8_t *PRGROM = memregion( "maincpu" )->base();
-
-	PRGROM[0x3ff8] = 0x8e;  // checked by code
-	PRGROM[0x3ff9] = 0x97;  // checked by code
-
-	PRGROM[0x3ffc] = 0x42;  // start vector
-	PRGROM[0x3ffd] = 0x20;
-	PRGROM[0x3ffe] = 0xf8;  // NMI vector
-	PRGROM[0x3fff] = 0x26;
-}
-
-void calomega_state::init_comg5108()
-{
-	uint8_t *PRGROM = memregion( "maincpu" )->base();
-	PRGROM[0xc080] = 0xff;   // CHECKSUM ERROR FLAG - No changes for now.
-	// Debug
-	// PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
-	// PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
-	// PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
-	// PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
-	// PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
-}
-
-void calomega_state::init_cas21iwc()
-{
-	uint8_t *PRGROM = memregion( "maincpu" )->base();
-
-	PRGROM[0xB603] = 0xff;    // Checksum flag. No changes for now.
-}
-
-void calomega_state::init_pokeriwc()
-{
-	uint8_t *PRGROM = memregion( "maincpu" )->base();
-
-	PRGROM[0x8000] = 0xa2;    // Checksum flag. No changes for now.
-}
-
 void calomega_state::init_comg079()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
@@ -4754,6 +4753,33 @@ void calomega_state::init_comg079()
     PRGROM[0x2E6F] = 0x09;
 }
 
+void calomega_state::init_comg080()
+{
+	init_sys903();
+
+	/* Injecting missing Start and NMI vectors...
+	   Start = $2042;  NMI = $26f8;
+	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
+	*/
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x3ff8] = 0x8e;  // checked by code
+	PRGROM[0x3ff9] = 0x97;  // checked by code
+
+	PRGROM[0x3ffc] = 0x42;  // start vector
+	PRGROM[0x3ffd] = 0x20;
+	PRGROM[0x3ffe] = 0xf8;  // NMI vector
+	PRGROM[0x3fff] = 0x26;
+}
+
+void calomega_state::init_comg176()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x25df] = 0x00;    // patching the checksum flag.
+}
+
+// for debug purposes...
 void calomega_state::init_any()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
@@ -4773,10 +4799,10 @@ GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080
 GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
-GAME( 1982, comg125,  0,        sys903,   comg125,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg125,  0,        sys903,   nudgesw,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg134,  0,        sys903,   nudgensw, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg157,  0,        sys903,   comg157,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg159,  0,        sys905,   comg159,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
@@ -4784,8 +4810,8 @@ GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,
 GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg172,  0,        sys905,   comg172,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg181,  0,        sys903,   nudgesw,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
@@ -4806,7 +4832,8 @@ GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,
 GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 //************* 906-III games **************
-GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, init_comg5108, ROT0, "Casino Electronics Inc.",              "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5107, 0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 903/904/905 3rd part games *******
 GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                 MACHINE_SUPPORTS_SAVE )
@@ -4817,6 +4844,6 @@ GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mo
 GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                              MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 906-III family 3rd part games *******
-GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, init_cas21iwc, ROT0, "UCMC/IWC",                               "Casino 21 UCMC/IWC (ver 30.08)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03 20-6-91)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init, ROT0, "UCMC/IWC",                               "Casino 21 UCMC/IWC (ver 30.08)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, empty_init, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, empty_init, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03 20-6-91)",           MACHINE_SUPPORTS_SAVE )

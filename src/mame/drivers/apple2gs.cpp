@@ -124,6 +124,7 @@
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
+#include "bus/a2bus/booti.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -4771,6 +4772,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
+	device.option_add("booti", A2BUS_BOOTI);	 /* Booti Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

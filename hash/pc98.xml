@@ -7286,7 +7286,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK on RS class, on intro uses PCM1BIT and some text doesn't seem to be drawn? -->
+	<!-- boot OK on RS class, on intro uses DAC1BIT and some text doesn't seem to be drawn? -->
 	<!-- black screen after Cocktail Soft logo on VM class (btanb?) -->
 	<software name="bishotsu" supported="partial">
 		<description>Bishoujo Tsuushin - Chat no Susume</description>
@@ -7603,7 +7603,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep (PCM1BIT) -->
+	<!-- This game is supposed to play sound effects through the beeper, but in MAME it just outputs a constant beep (DAC1BIT) -->
 	<software name="blockouta" cloneof="blockout" supported="partial">
 		<description>Block Out (Patched?)</description>
 		<year>1991</year>
@@ -16327,7 +16327,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Sprites leave "trails" on screen -->
+	<!-- boot OK, on VM class and RS class sprites leave "trails" on screen (GRCG or EGC regression) -->
 	<software name="dbuster" supported="partial">
 		<description>Dragon Buster</description>
 		<year>1989</year>
@@ -28336,8 +28336,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- no bitmap GFXs during gameplay -->
-	<software name="madoum1" supported="no">
+	<!-- all three Madou Monogatari sports a "Madou Monogatari 1-2-3" title screen -->
+	<!-- verify if these were really released as stand alone. -->
+
+	<!-- boot OK, uses DAC1BIT samples -->
+	<software name="madoum1" supported="partial">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28357,8 +28360,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- no bitmap GFXs during gameplay -->
-	<software name="madoum2" supported="no">
+	<!-- boot OK, uses DAC1BIT samples -->
+	<software name="madoum2" supported="partial">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28378,7 +28381,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madoum3">
+	<!-- boot OK, uses DAC1BIT samples -->
+	<software name="madoum3" supported="partial">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>

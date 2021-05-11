@@ -12,7 +12,7 @@
     - Interrupt handling needs more testing.
 
     Known Winchester:
-    - NEC D3126 -chs 4,615,17 -ss 256 (not yet imaged)
+    - NEC D3126 -chs 615,4,17 -ss 256 (not yet imaged)
 
 **********************************************************************/
 
@@ -95,8 +95,8 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 		});
 
 	PIA6821(config, m_pia_sasi, 0);
-	m_pia_sasi->readpa_handler().set(FUNC(bbc_cumana68k_device::sasi_r));
-	m_pia_sasi->writepa_handler().set(FUNC(bbc_cumana68k_device::sasi_w));
+	m_pia_sasi->readpa_handler().set(m_sasi, FUNC(nscsi_callback_device::read));
+	m_pia_sasi->writepa_handler().set(m_sasi, FUNC(nscsi_callback_device::write));
 	m_pia_sasi->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_sasi_pb_w));
 	m_pia_sasi->readca1_handler().set(m_sasi, FUNC(nscsi_callback_device::req_r));
 	m_pia_sasi->readcb1_handler().set_constant(1); // tied to +5V
@@ -106,8 +106,8 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	m_pia_sasi->irqb_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_pia_rtc, 0);
-	m_pia_rtc->readpa_handler().set(FUNC(bbc_cumana68k_device::rtc_r));
-	m_pia_rtc->writepa_handler().set(FUNC(bbc_cumana68k_device::rtc_w));
+	m_pia_rtc->readpa_handler().set([this]() { return m_mc146818_data; });
+	m_pia_rtc->writepa_handler().set([this](uint8_t data) { m_mc146818_data = data; });
 	m_pia_rtc->writepb_handler().set(FUNC(bbc_cumana68k_device::pia_rtc_pb_w));
 	m_pia_rtc->ca2_handler().set(FUNC(bbc_cumana68k_device::rtc_ce_w));
 	m_pia_rtc->cb2_handler().set(FUNC(bbc_cumana68k_device::reset68008_w));
@@ -152,6 +152,12 @@ bbc_cumana68k_device::bbc_cumana68k_device(const machine_config &mconfig, const 
 	, m_fdc(*this, "wd2797")
 	, m_floppy(*this, "wd2797:%u", 0)
 	, m_sasi(*this, "sasi:7:scsicb")
+	, m_masknmi(0)
+	, m_mc146818_data(0)
+	, m_mc146818_as(0)
+	, m_mc146818_ds(0)
+	, m_mc146818_rw(0)
+	, m_mc146818_ce(0)
 {
 }
 
@@ -247,27 +253,6 @@ void bbc_cumana68k_device::mem6502_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-uint8_t bbc_cumana68k_device::sasi_r()
-{
-	return m_sasi->read();
-}
-
-void bbc_cumana68k_device::sasi_w(uint8_t data)
-{
-	m_sasi->write(data);
-}
-
-
-uint8_t bbc_cumana68k_device::rtc_r()
-{
-	return m_mc146818_data;
-}
-
-void bbc_cumana68k_device::rtc_w(uint8_t data)
-{
-	m_mc146818_data = data;
-}
 
 WRITE_LINE_MEMBER(bbc_cumana68k_device::rtc_ce_w)
 {

@@ -40,10 +40,15 @@ public:
 
 	void drdy_w(int state);
 	void brdy_w(int state);
+	void sc_w(int state);
 
 	// actually inputs to the controller from the drive
 	int sc_r();
 	int tk000_r();
+
+	// HACK: head selection is not actually controlled by the wd1010, but this emulation currently
+	// works as if it does; this function allows heads beyond the 3-bit range of the sdh register.
+	void head_w(uint8_t head) { m_head = head; }
 
 protected:
 	// device-level overrides
@@ -102,7 +107,7 @@ private:
 	int get_lbasector();
 
 	// extract values from sdh
-	int head() { return (m_sdh >> 0) & 0x07; }
+	int head() { return m_head; }
 	int drive() { return (m_sdh >> 3) & 0x03; }
 	int sector_size()
 	{
@@ -151,6 +156,7 @@ private:
 	uint16_t m_cylinder;
 	uint8_t m_sdh;
 	uint8_t m_status;
+	uint8_t m_head;
 };
 
 // device type definition

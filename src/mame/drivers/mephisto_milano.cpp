@@ -124,7 +124,8 @@ u8 milano_state::keys_r(offs_t offset)
 
 void milano_state::milano_mem(address_map &map)
 {
-	map(0x0000, 0x1fbf).ram().share("nvram");
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x1fc0, 0x1fff).unmaprw();
 	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display2_device::latch_w));
 	map(0x1fd0, 0x1fd0).w(FUNC(milano_state::board_w));
 	map(0x1fe0, 0x1fe0).r(FUNC(milano_state::board_r));

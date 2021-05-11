@@ -35,7 +35,8 @@ It has a nice calculator style keypad attached to it.
 The memory can be expanded. There's an export version with more RAM/ROM by
 default and a faster U880D CPU (3300.0kHz XTAL). It included a chess program
 called SC-80 that can be started by executing ADR C800. Press ADR again for
-NEW GAME, and use the 1-8 number keys for A1-H8.
+NEW GAME, and use the 1-8 number keys for A1-H8. A keypad overlay was included.
+The SC-80 chess engine appears to be the same one as in Chess-Master.
 
 
 TODO:
@@ -60,6 +61,7 @@ TODO:
 
 #include "speaker.h"
 
+// internal artwork
 #include "lc80.lh"
 
 
@@ -118,10 +120,7 @@ private:
 	void pio1_pb_w(u8 data);
 	u8 pio2_pb_r();
 
-	void update_display();
-
-	u8 m_digit = 0;
-	u8 m_segment = 0;
+	u8 m_matrix = 0;
 };
 
 
@@ -189,7 +188,7 @@ static INPUT_PORTS_START( lc80 )
 
 	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
 
@@ -206,12 +205,12 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DAT") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 
-	PORT_START("RESET")
+	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_reset, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
 INPUT_PORTS_END
@@ -234,11 +233,6 @@ WRITE_LINE_MEMBER(lc80_state::ctc_z2_w)
 
 // Z80-PIO Interface
 
-void lc80_state::update_display()
-{
-	m_display->matrix(m_digit >> 1, m_segment);
-}
-
 void lc80_state::pio1_pa_w(u8 data)
 {
 	/*
@@ -256,27 +250,12 @@ void lc80_state::pio1_pa_w(u8 data)
 
 	*/
 
-	m_segment = bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2);
-	update_display();
+	m_display->write_mx(bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2));
 }
 
 u8 lc80_state::pio1_pb_r()
 {
-	/*
-
-	    bit     description
-
-	    PB0     tape input
-	    PB1     tape output
-	    PB2     digit 0
-	    PB3     digit 1
-	    PB4     digit 2
-	    PB5     digit 3
-	    PB6     digit 4
-	    PB7     digit 5
-
-	*/
-
+	// PB0: tape input
 	return (m_cassette->input() < +0.0);
 }
 
@@ -286,7 +265,7 @@ void lc80_state::pio1_pb_w(u8 data)
 
 	    bit     description
 
-	    PB0     tape input
+	    PB0     tape input (pio1_pb_r)
 	    PB1     tape output, speaker output, OUT led
 	    PB2     digit 0
 	    PB3     digit 1
@@ -301,11 +280,11 @@ void lc80_state::pio1_pb_w(u8 data)
 	m_cassette->output(BIT(data, 1) ? +1.0 : -1.0);
 
 	// speaker
-	m_speaker->level_w(!BIT(data, 1));
+	m_speaker->level_w(BIT(~data, 1));
 
 	// 7segs/led/keyboard
-	m_digit = ~data;
-	update_display();
+	m_display->write_my(~data >> 1);
+	m_matrix = ~data >> 2 & 0x3f;
 }
 
 u8 lc80_state::pio2_pb_r()
@@ -328,7 +307,7 @@ u8 lc80_state::pio2_pb_r()
 	u8 data = 0;
 
 	for (int i = 0; i < 6; i++)
-		if (BIT(m_digit, i+2))
+		if (BIT(m_matrix, i))
 			data |= m_inputs[i]->read() << 4;
 
 	return data ^ 0xf0;
@@ -359,8 +338,7 @@ void lc80_state::machine_start()
 	program.install_ram(start, start + m_ram->size() - 1, mirror, m_ram->pointer());
 
 	// register for state saving
-	save_item(NAME(m_digit));
-	save_item(NAME(m_segment));
+	save_item(NAME(m_matrix));
 }
 
 
@@ -406,7 +384,6 @@ void lc80_state::lc80(machine_config &config)
 
 	RAM(config, m_ram).set_extra_options("1K,2K,3K,4K");
 	m_ram->set_default_size("1K");
-	m_ram->set_default_value(0xff);
 }
 
 void lc80_state::lc80a(machine_config &config)
@@ -444,8 +421,8 @@ void lc80_state::lc80e(machine_config &config)
 
 ROM_START( lc80 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
-	ROM_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
+	ROM_LOAD( "bm075.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
+	ROM_LOAD( "bm076.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
 ROM_END
 
 ROM_START( lc80a )

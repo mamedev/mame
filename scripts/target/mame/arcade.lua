@@ -441,7 +441,6 @@ MACHINES["TTL74259"] = true
 MACHINES["TTL7474"] = true
 MACHINES["KBDC8042"] = true
 MACHINES["I8257"] = true
-MACHINES["AAKARTDEV"] = true
 --MACHINES["ACIA6850"] = true
 MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
@@ -459,6 +458,7 @@ MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
 MACHINES["AT_KEYBC"] = true
 MACHINES["AT28C16"] = true
+--MACHINES["AT28C64B"] = true
 MACHINES["AT29X"] = true
 MACHINES["AT45DBXX"] = true
 MACHINES["ATAFLASH"] = true
@@ -468,6 +468,7 @@ MACHINES["BANKDEV"] = true
 --MACHINES["BIM68153"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
+--MACHINES["CH376"] = true
 MACHINES["CHESSMACHINE"] = true
 MACHINES["CMOS40105"] = true
 MACHINES["CDU76S"] = true
@@ -588,7 +589,6 @@ MACHINES["MSM5832"] = true
 MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
---MACHINES["NCR5380"] = true
 MACHINES["NCR5380N"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
@@ -1045,8 +1045,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ertictac.cpp",
 	MAME_DIR .. "src/mame/drivers/ssfindo.cpp",
 	MAME_DIR .. "src/mame/drivers/aristmk5.cpp",
-	MAME_DIR .. "src/mame/machine/archimds.cpp",
-	MAME_DIR .. "src/mame/includes/archimds.h",
 }
 
 createMAMEProjects(_target, _subtarget, "adp")
@@ -1570,6 +1568,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mitchell.cpp",
 	MAME_DIR .. "src/mame/includes/mitchell.h",
 	MAME_DIR .. "src/mame/video/mitchell.cpp",
+	MAME_DIR .. "src/mame/drivers/psrockman.cpp",
 	MAME_DIR .. "src/mame/drivers/sf.cpp",
 	MAME_DIR .. "src/mame/drivers/sidearms.cpp",
 	MAME_DIR .. "src/mame/includes/sidearms.h",
@@ -2511,6 +2510,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/hornet.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.cpp",
 	MAME_DIR .. "src/mame/machine/konppc.h",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.cpp",
+	MAME_DIR .. "src/mame/machine/konami_gn676_lan.h",
 	MAME_DIR .. "src/mame/drivers/hyperspt.cpp",
 	MAME_DIR .. "src/mame/includes/hyperspt.h",
 	MAME_DIR .. "src/mame/audio/hyprolyb.cpp",
@@ -4679,6 +4680,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ltd.cpp",
 	MAME_DIR .. "src/mame/drivers/macp.cpp",
 	MAME_DIR .. "src/mame/drivers/micropin.cpp",
+	MAME_DIR .. "src/mame/drivers/missamer.cpp",
 	MAME_DIR .. "src/mame/drivers/mephistp.cpp",
 	MAME_DIR .. "src/mame/drivers/mrgame.cpp",
 	MAME_DIR .. "src/mame/drivers/nsm.cpp",
@@ -5076,6 +5078,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/re900.cpp",
 	MAME_DIR .. "src/mame/drivers/rf51w14cg.cpp",
 	MAME_DIR .. "src/mame/drivers/rfslots8085.cpp",
+	MAME_DIR .. "src/mame/drivers/rfslotsmcs48.cpp",
 	MAME_DIR .. "src/mame/drivers/rfslotspcpent.cpp",
 	MAME_DIR .. "src/mame/drivers/rgum.cpp",
 	MAME_DIR .. "src/mame/drivers/roul.cpp",

@@ -96,6 +96,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
 #include "bus/a2bus/uniprint.h"
+#include "bus/a2bus/booti.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -1338,6 +1339,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
 	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
+	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
 }
 
 void apple2_state::apple2_common(machine_config &config)
@@ -1822,7 +1824,7 @@ COMP( 1982, microeng, apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace1000,   apple2, 0,      apple2p,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )

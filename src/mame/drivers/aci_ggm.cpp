@@ -25,8 +25,9 @@ Known chess cartridges (*denotes not dumped):
 - Steinitz Edition-4 - Master Chess
 - *Monitor Edition - Master Kriegspiel
 
-The opening/endgame cartridges are meant to be ejected/inserted while
-playing (put the power switch in "MEM" first).
+The opening/endgame cartridges are meant to be ejected/inserted while playing:
+switch power switch to MEM, swap cartridge, switch power switch back to ON.
+In other words, don't power cycle the machine (or MAME).
 
 Other games:
 - *Borchek Edition - Master Checkers
@@ -36,6 +37,8 @@ Other games:
 - *Lunar Lander (unreleased?)
 
 TODO:
+- it doesn't have nvram, it's a workaround for MAME forcing a hard reset when
+  swapping in a new cartridge
 - what's VIA PB0 for? game toggles it once per irq
 - identify XTAL (2MHz CPU/VIA is correct, compared to video reference)
 - confirm display AP segment, is it used anywhere?
@@ -105,7 +108,8 @@ private:
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_cart);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_cart);
 	u8 cartridge_r(offs_t offset);
 
 	void select_w(u8 data);
@@ -165,7 +169,7 @@ void ggm_state::update_reset(ioport_value state)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 {
 	u32 size = m_cart->common_get_size("rom");
 	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0xffff;
@@ -182,6 +186,16 @@ DEVICE_IMAGE_LOAD_MEMBER(ggm_state::cartridge)
 		m_maincpu->space(AS_PROGRAM).install_ram(0x0800, 0x0fff, m_extram);
 
 	return image_init_result::PASS;
+}
+
+DEVICE_IMAGE_UNLOAD_MEMBER(ggm_state::unload_cart)
+{
+	// unmap extra ram
+	if (image.get_feature("ram"))
+	{
+		m_maincpu->space(AS_PROGRAM).nop_readwrite(0x0800, 0x0fff);
+		memset(m_extram, 0, m_extram.bytes());
+	}
 }
 
 u8 ggm_state::cartridge_r(offs_t offset)
@@ -444,7 +458,8 @@ void ggm_state::ggm(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm");
-	m_cart->set_device_load(FUNC(ggm_state::cartridge));
+	m_cart->set_device_load(FUNC(ggm_state::load_cart));
+	m_cart->set_device_unload(FUNC(ggm_state::unload_cart));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");

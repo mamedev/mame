@@ -22,6 +22,7 @@ public:
 		MN1880_SP, MN1880_SPA, MN1880_SPB,
 		MN1880_LP, MN1880_LPA, MN1880_LPB,
 		MN1880_DIVIDER1, MN1880_DIVIDER2,
+		MN1880_IE0, MN1880_IE1,
 		MN1880_CPUM
 	};
 
@@ -171,6 +172,10 @@ private:
 	static void setl(u16 &pr, u8 data) { pr = (pr & 0xff00) | data; }
 	static void seth(u16 &pr, u8 data) { pr = (pr & 0x00ff) | (data << 8); }
 
+	u8 ie0_r();
+	void ie0_w(u8 data);
+	u8 ie1_r();
+	void ie1_w(u8 data);
 	u8 cpum_r();
 	void cpum_w(u8 data);
 
@@ -189,7 +194,7 @@ private:
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
-	// internal state
+	// execution state
 	cpu_registers m_cpu[2];
 	bool m_cpu_select;
 	u8 m_cpum;
@@ -199,6 +204,9 @@ private:
 	u16 m_tmp2;
 	bool m_output_queued;
 	s32 m_icount;
+
+	// interrupt state
+	u8 m_ie[2];
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)

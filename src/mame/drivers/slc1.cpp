@@ -19,7 +19,7 @@ This computer is both a Z80 trainer, and a chess computer. The keyboard
 
     There is no chess board attached. You supply your own and you sync the
     pieces and the computer instructions. The chess engine was copied from
-    Fidelity's Sensory Chess Challenger 8.
+    Fidelity's Sensory Chess Challenger 8. Even the TTL I/O is the same.
 
     When started, it is in Chess mode. Press 11111 to switch to Trainer mode.
 
@@ -51,7 +51,7 @@ Test Paste:
 TODO:
     - Pasting doesn't work, probably too slow.
     - The handwritten schematics and prototype by Dr.Scheuschner show 4 extra
-      keys (R, MEM, N, Y), but they aren't in the final version.
+      keys (R, MEM, N, Y) and 8 7segs, but they aren't in the final version.
 
 ***************************************************************************/
 
@@ -63,6 +63,7 @@ TODO:
 
 #include "speaker.h"
 
+// internal artwork
 #include "slc1.lh"
 
 
@@ -77,7 +78,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_inputs(*this, "IN.%u", 0U)
 		, m_display(*this, "display")
-		, m_busyled(*this, "busyled")
+		, m_busyled(*this, "busy_led")
 	{ }
 
 	void slc1(machine_config &config);
@@ -97,8 +98,8 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
+	u8 input_r();
+	void control_w(offs_t offset, u8 data);
 
 	u8 m_select = 0;
 	u8 m_segment = 0;
@@ -113,11 +114,12 @@ void slc1_state::machine_start()
 }
 
 
+
 /***************************************************************************
     I/O
 ***************************************************************************/
 
-void slc1_state::io_w(offs_t offset, u8 data)
+void slc1_state::control_w(offs_t offset, u8 data)
 {
 	// d0-d3: 7442 or equivalent
 	m_select = data & 0xf;
@@ -137,7 +139,7 @@ void slc1_state::io_w(offs_t offset, u8 data)
 	m_busyled = BIT(data, 4);
 }
 
-u8 slc1_state::io_r(offs_t offset)
+u8 slc1_state::input_r()
 {
 	u8 data = 0;
 
@@ -149,8 +151,9 @@ u8 slc1_state::io_r(offs_t offset)
 }
 
 
+
 /***************************************************************************
-    Address Map
+    Address Maps
 ***************************************************************************/
 
 void slc1_state::mem_map(address_map &map)
@@ -163,12 +166,13 @@ void slc1_state::mem_map(address_map &map)
 void slc1_state::io_map(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x07).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map(0x00, 0x07).rw(FUNC(slc1_state::input_r), FUNC(slc1_state::control_w));
 }
 
 
+
 /**************************************************************************
-    Keyboard Layout
+    Input Ports
 ***************************************************************************/
 
 INPUT_CHANGED_MEMBER(slc1_state::trigger_reset)
@@ -200,8 +204,9 @@ static INPUT_PORTS_START( slc1 )
 INPUT_PORTS_END
 
 
+
 /***************************************************************************
-    Machine driver
+    Machine Config
 ***************************************************************************/
 
 void slc1_state::slc1(machine_config &config)
@@ -222,8 +227,9 @@ void slc1_state::slc1(machine_config &config)
 }
 
 
+
 /***************************************************************************
-    Game driver
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START(slc1)
@@ -236,6 +242,11 @@ ROM_END
 
 } // anonymous namespace
 
+
+
+/***************************************************************************
+    Drivers
+***************************************************************************/
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY               FULLNAME */
 COMP( 1989, slc1, 0,      0,      slc1,    slc1,  slc1_state, empty_init, "Dieter Scheuschner", "Schach- und Lerncomputer SLC 1", MACHINE_SUPPORTS_SAVE )

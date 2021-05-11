@@ -239,8 +239,8 @@ function console.startplugin()
 		end
 		if (not started) then
 			-- options are not available in startplugin, so we load the history here
-			local historypath = emu.subst_env(manager.ui.options.entries.historypath:value():match("([^;]+)"))
-			history_fullpath = historypath .. '/console_history'
+			local homepath = emu.subst_env(manager.options.entries.homepath:value():match("([^;]+)"))
+			history_fullpath = homepath .. '/' .. history_file
 			ln.loadhistory(history_fullpath)
 			started = true
 		end
@@ -298,7 +298,7 @@ end
 setmetatable(console, {
 		     __gc = function ()
 			     if history_fullpath then
-				     ln = require("linenoise")
+				     local ln = require("linenoise")
 				     ln.savehistory(history_fullpath)
 			     end
 end})

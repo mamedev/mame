@@ -42,7 +42,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-private:
 	enum addr_mode_type : unsigned
 	{
 		IMM,
@@ -69,6 +68,24 @@ private:
 		SIZE_Q = 7,
 	};
 
+	// time needed to read or write a memory operand
+	unsigned top(size_code const size, u32 const address = 0) const
+	{
+		// TODO: mmu cycles
+		static constexpr unsigned tmmu = 0;
+
+		switch (size)
+		{
+		case SIZE_B: return 3 + tmmu;
+		case SIZE_W: return (address & 1) ? 7 + 2 * tmmu : 3 + tmmu;
+		case SIZE_D: return (address & 1) ? 11 + 3 * tmmu : 7 + 2 * tmmu;
+		case SIZE_Q: return (address & 1) ? 19 + 5 * tmmu : 15 + 4 * tmmu;
+		}
+
+		// can't happen
+		return 0;
+	}
+
 	struct addr_mode
 	{
 		addr_mode(unsigned gen)
@@ -78,6 +95,7 @@ private:
 			, base(0)
 			, disp(0)
 			, imm(0)
+			, tea(0)
 		{};
 
 		void read_i(size_code code)  { access = READ;    size = code; }
@@ -97,6 +115,7 @@ private:
 		u32 base;
 		u32 disp;
 		u64 imm;
+		unsigned tea;
 	};
 
 	// instruction decoding helpers
@@ -115,6 +134,7 @@ private:
 	void interrupt(unsigned const vector, u32 const return_address, bool const trap = true);
 	u16 slave(addr_mode op1, addr_mode op2);
 
+private:
 	// configuration
 	address_space_config m_program_config;
 	address_space_config m_interrupt_config;
@@ -124,7 +144,7 @@ private:
 	// emulation state
 	int m_icount;
 
-	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::cache m_bus[16];
+	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
 
 	u32 m_pc;      // program counter
 	u32 m_sb;      // static base

@@ -1257,42 +1257,42 @@ void alto2_cpu_device::watch_write(uint32_t addr, uint32_t data)
 }
 #endif
 
-/** @brief fatal exit on unitialized dynamic phase BUS source */
+/** @brief fatal exit on uninitialized dynamic phase BUS source */
 void alto2_cpu_device::bs_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
 			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
-/** @brief fatal exit on unitialized latching phase BUS source */
+/** @brief fatal exit on uninitialized latching phase BUS source */
 void alto2_cpu_device::bs_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
 			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
-/** @brief fatal exit on unitialized dynamic phase F1 function */
+/** @brief fatal exit on uninitialized dynamic phase F1 function */
 void alto2_cpu_device::f1_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
 			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
-/** @brief fatal exit on unitialized latching phase F1 function */
+/** @brief fatal exit on uninitialized latching phase F1 function */
 void alto2_cpu_device::f1_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
 			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
-/** @brief fatal exit on unitialized dynamic phase F2 function */
+/** @brief fatal exit on uninitialized dynamic phase F2 function */
 void alto2_cpu_device::f2_early_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
 			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
-/** @brief fatal exit on unitialized latching phase F2 function */
+/** @brief fatal exit on uninitialized latching phase F2 function */
 void alto2_cpu_device::f2_late_bad()
 {
 	throw emu_fatalerror(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",

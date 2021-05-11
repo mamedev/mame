@@ -4,13 +4,13 @@ license:CC0
 -->
 <mamelayout version="2">
 	<element name="digit">
-	<led7seg>
+		<led7seg>
 			<color red="1.0" green="0.0" blue="0.0" />
-	</led7seg>
+		</led7seg>
 	</element>
 	<element name ="bezelblock">
 		<rect state ="0">
-		<bounds x="0" y="0" width="1" height="1" />
+			<bounds x="0" y="0" width="1" height="1" />
 			<color red="0" green="0" blue="0" />
 		</rect>
 	</element>
@@ -464,12 +464,12 @@ license:CC0
 		</element>
 
 		<repeat count="16">
-			<param name="n" start="15" increment="-1" />
-			<param name="x" start="17" increment="7" />
+			<param name="n" start="15" increment="-1"/>
+			<param name="x" start="17" increment="7"/>
 			<element name="vfd~n~" ref="vfd0" state="0">
 				<animate name="vfdduty0" />
-				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"></color>
-				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"></color>
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"/>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"/>
 				<bounds x="~x~" y="0" width="7" height="24"/>
 			</element>
 		</repeat>

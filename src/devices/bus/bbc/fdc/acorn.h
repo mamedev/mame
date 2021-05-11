@@ -50,8 +50,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(side_w);
 
 	required_device<i8271_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 };
 
 class bbc_acorn1770_device :
@@ -78,8 +77,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	required_device<wd1770_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 	int m_fdc_ie;
 };

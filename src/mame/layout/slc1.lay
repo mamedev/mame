@@ -22,8 +22,10 @@ license:CC0
 	</element>
 
 	<view name="Internal Layout">
+		<bounds left="8" right="120" top="-2" bottom="44" />
+
 		<element name="busy_led" ref="led">
-			<bounds x="110" y="36" width="8" height="8" />
+			<bounds x="110" y="34" width="8" height="8" />
 		</element>
 
 		<element name="digit6" ref="digit">

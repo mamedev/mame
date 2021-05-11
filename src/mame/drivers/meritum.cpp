@@ -55,43 +55,27 @@ For Model III:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-#include "bus/rs232/rs232.h"
+#include "includes/trs80.h"
 #include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "sound/spkrdev.h"
-#include "screen.h"
-#include "speaker.h"
 #include "emupal.h"
 
-class meritum_state : public driver_device
+class meritum_state : public trs80_state
 {
 public:
 	meritum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
+		: trs80_state(mconfig, type, tag)
 		, m_screen(*this, "screen")
-		, m_p_chargen(*this, "chargen")
-		, m_p_videoram(*this, "videoram")
-		, m_speaker(*this, "speaker")
-		, m_cassette(*this, "cassette")
-		, m_io_keyboard(*this, "LINE%u", 0)
 	{ }
 
 	void meritum1(machine_config &config);
 	void meritum2(machine_config &config);
+	void meritumn(machine_config &config);
 
 private:
-	void port_ff_w(u8 data);
-	u8 port_ff_r();
-	u8 keyboard_r(offs_t offset);
 
-	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	u32 screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -100,26 +84,13 @@ private:
 	void mem_map2(address_map &map);
 	void io_map2(address_map &map);
 
-	bool m_mode;
-	bool m_size_store;
-	bool m_cassette_data;
-	emu_timer *m_cassette_data_timer;
-	double m_old_cassette_val;
-	void machine_start() override;
-	void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_region_ptr<u8> m_p_chargen;
-	required_shared_ptr<u8> m_p_videoram;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
-	required_ioport_array<8> m_io_keyboard;
 };
 
 void meritum_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(meritum_state::keyboard_r));
+	map(0x3800, 0x38ff).r(FUNC(meritum_state::keyboard_r));
 	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
 	map(0x4000, 0x7fff).ram();
 }
@@ -212,10 +183,10 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)     PORT_CHAR(13)
 	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)      PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)       PORT_CHAR(UCHAR_MAMEKEY(F9))
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_TAB)       PORT_CHAR(UCHAR_MAMEKEY(UP), '[')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_TAB)       PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP), '[')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_OPENBRACE)  PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 8)
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_QUOTE)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 9)
 	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)     PORT_CHAR(' ')
 
 	PORT_START("LINE7")
@@ -224,19 +195,19 @@ static INPUT_PORTS_START( meritum )
 	PORT_BIT(0xFC, 0x00, IPT_UNUSED)
 
 	PORT_START("NMI")
-	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_BACKSPACE) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
+	PORT_BIT(0x01, 0x01, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<1>)
 INPUT_PORTS_END
 
 u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// lores characters are in the character generator. Each character is 6x12 (basic characters are 6x7 excluding descenders/ascenders).
 	u16 sy=0,ma=0;
-	const u8 cols = m_mode ? 32 : 64;
-	const u8 skip = m_mode ? 2 : 1;
+	const u8 cols = m_cpl ? 32 : 64;
+	const u8 skip = m_cpl ? 2 : 1;
 
-	if (m_mode != m_size_store)
+	if (cols != m_cols)
 	{
-		m_size_store = m_mode;
+		m_cols = cols;
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
@@ -278,12 +249,12 @@ u32 meritum_state::screen_update_meritum1(screen_device &screen, bitmap_ind16 &b
 u32 meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u16 sy=0,ma=0;
-	const u8 cols = m_mode ? 32 : 64;
-	const u8 skip = m_mode ? 2 : 1;
+	const u8 cols = m_cpl ? 32 : 64;
+	const u8 skip = m_cpl ? 2 : 1;
 
-	if (m_mode != m_size_store)
+	if (cols != m_cols)
 	{
-		m_size_store = m_mode;
+		m_cols = cols;
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
@@ -312,153 +283,6 @@ u32 meritum_state::screen_update_meritum2(screen_device &screen, bitmap_ind16 &b
 		ma+=64;
 	}
 	return 0;
-}
-
-TIMER_CALLBACK_MEMBER(meritum_state::cassette_data_callback)
-{
-	double new_val = (m_cassette->input());
-
-	/* Check for HI-LO transition */
-	if ( m_old_cassette_val > -0.2 && new_val < -0.2 )
-		m_cassette_data = true;        /* 500 baud */
-
-	m_old_cassette_val = new_val;
-}
-
-u8 meritum_state::port_ff_r()
-{
-/* ModeSel and cassette data
-    d7 cassette data from tape
-    d6 modesel setting */
-
-	return (m_mode ? 0 : 0x40) | (m_cassette_data ? 0x80 : 0) | 0x3f;
-}
-
-void meritum_state::port_ff_w(u8 data)
-{
-/* Standard output port of Model I
-    d3 ModeSel bit
-    d2 Relay
-    d1, d0 Cassette output */
-
-	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	m_cassette->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
-	m_cassette->output(levels[data & 3]);
-	m_cassette_data = false;
-
-	m_mode = BIT(data, 3);
-
-	static double const speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	m_speaker->set_levels(4, speaker_levels);
-	m_speaker->level_w(data & 3); // see note about the speaker
-}
-
-u8 meritum_state::keyboard_r(offs_t offset)
-{
-	u8 i, result = 0;
-
-	for (i = 0; i < 8; i++)
-		if (BIT(offset, i))
-			result |= m_io_keyboard[i]->read();
-
-	return result;
-}
-
-void meritum_state::machine_start()
-{
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(meritum_state::cassette_data_callback),this));
-	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
-	save_item(NAME(m_mode));
-	save_item(NAME(m_size_store));
-	save_item(NAME(m_cassette_data));
-	save_item(NAME(m_old_cassette_val));
-}
-
-void meritum_state::machine_reset()
-{
-	m_cassette_data = false;
-	m_size_store = true;
-	m_mode = false;
-}
-
-#define CMD_TYPE_OBJECT_CODE                            0x01
-#define CMD_TYPE_TRANSFER_ADDRESS                       0x02
-#define CMD_TYPE_END_OF_PARTITIONED_DATA_SET_MEMBER     0x04
-#define CMD_TYPE_LOAD_MODULE_HEADER                     0x05
-#define CMD_TYPE_PARTITIONED_DATA_SET_HEADER            0x06
-#define CMD_TYPE_PATCH_NAME_HEADER                      0x07
-#define CMD_TYPE_ISAM_DIRECTORY_ENTRY                   0x08
-#define CMD_TYPE_END_OF_ISAM_DIRECTORY_ENTRY            0x0a
-#define CMD_TYPE_PDS_DIRECTORY_ENTRY                    0x0c
-#define CMD_TYPE_END_OF_PDS_DIRECTORY_ENTRY             0x0e
-#define CMD_TYPE_YANKED_LOAD_BLOCK                      0x10
-#define CMD_TYPE_COPYRIGHT_BLOCK                        0x1f
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
-{
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	uint8_t type, length;
-	uint8_t data[0x100];
-	uint8_t addr[2];
-	void *ptr;
-
-	while (!image.image_feof())
-	{
-		image.fread( &type, 1);
-		image.fread( &length, 1);
-
-		switch (type)
-		{
-			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
-			{
-				length -= 2;
-				u16 block_length = length ? length : 256;
-				image.fread( &addr, 2);
-				u16 address = (addr[1] << 8) | addr[0];
-				logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-				if (address < 0x3c00)
-				{
-					image.message("Attempting to write outside of RAM");
-					return image_init_result::FAIL;
-				}
-				ptr = program.get_write_ptr(address);
-				image.fread( ptr, block_length);
-			}
-			break;
-
-			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
-			{
-				image.fread( &addr, 2);
-				u16 address = (addr[1] << 8) | addr[0];
-				logerror("/CMD transfer address %04x\n", address);
-				m_maincpu->set_state_int(Z80_PC, address);
-			}
-			return image_init_result::PASS;
-
-		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
-			image.fread( &data, length);
-			logerror("/CMD load module header '%s'\n", data);
-			break;
-
-		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info
-			image.fread( &data, length);
-			logerror("/CMD copyright block '%s'\n", data);
-			break;
-
-		default:
-			image.fread( &data, length);
-			logerror("/CMD unsupported block type %u!\n", type);
-			image.message("Unsupported or invalid block type");
-			return image_init_result::FAIL;
-		}
-	}
-
-	return image_init_result::PASS;
 }
 
 
@@ -533,7 +357,7 @@ void meritum_state::meritum1(machine_config &config)
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
 	quickload.set_load_callback(FUNC(meritum_state::quickload_cb));
 	quickload.set_interface("trs80_quik");
-	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M");
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M1");
 }
 
 void meritum_state::meritum2(machine_config &config)
@@ -543,7 +367,13 @@ void meritum_state::meritum2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &meritum_state::io_map2);
 	I8255(config, "flopppi", 0); // floppy disk interface
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum2));
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("trs80_quik").set_filter("M2");
+}
 
+void meritum_state::meritumn(machine_config &config)
+{
+	meritum2(config);
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("trs80_quik").set_filter("MN");
 }
 
 
@@ -567,6 +397,8 @@ ROM_START( meritum1 )
 	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "char_gen.ic72", 0x0000, 0x0400, CRC(626fb8b1) SHA1(1274d14efad46e5397bd9952e1277ebee44e0491))
 	ROM_CONTINUE( 0x0800, 0x0400)
+	ROM_RELOAD(   0x0400, 0x0400)
+	ROM_CONTINUE( 0x0c00, 0x0400)
 ROM_END
 
 ROM_START( meritum2)
@@ -601,4 +433,4 @@ ROM_END
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS
 COMP( 1983, meritum1,    0,        trs80l2,  meritum1, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 1)",           MACHINE_SUPPORTS_SAVE )
 COMP( 1985, meritum2,    meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1985, meritum_net, meritum1, 0,        meritum2, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, meritum_net, meritum1, 0,        meritumn, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)", MACHINE_SUPPORTS_SAVE )

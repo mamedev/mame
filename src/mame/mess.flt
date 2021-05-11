@@ -170,6 +170,7 @@ channelf.cpp
 chaos.cpp
 chessmate.cpp
 chessmst.cpp
+chessmstdm.cpp
 cit101.cpp
 cit101xl.cpp
 cit1500.cpp
@@ -929,7 +930,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -1019,6 +1019,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp
@@ -1174,6 +1175,7 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr60.cpp
 ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp

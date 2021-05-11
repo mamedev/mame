@@ -12311,9 +12311,9 @@ GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
+GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Jordan I.S. / Seta",        "Arbalester" , 0) // Developed by Jordan for Seta, Country/License: DSW
 
-GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
+GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Jordan I.S. / Seta",        "Meta Fox" , 0) // Developed by Jordan for Seta, Country/License: DSW
 
 /* 68000 */
 
