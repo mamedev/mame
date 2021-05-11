@@ -15,8 +15,7 @@
     - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a
-      dac_bit_interface instead (cfr. DAC1BIT in SW list);
+	- DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
     - Remove kludge for POR bit in a20_ctrl_w fn;
@@ -1877,9 +1876,17 @@ ch3 SCSI
 *
 ****************************************/
 
-void pc9801_state::ppi_sys_portc_w(uint8_t data)
+void pc9801_state::ppi_sys_beep_portc_w(uint8_t data)
 {
 	m_beeper->set_state(!(data & 0x08));
+}
+
+void pc9801_state::ppi_sys_dac_portc_w(uint8_t data)
+{
+	m_dac_disable = BIT(data, 3);
+	// TODO: some models have a finer grained volume control at I/O port 0xae8e
+	// (98NOTE only?)
+	m_dac->set_output_gain(0, m_dac_disable ? 0.0 : 1.0);
 }
 
 /*
@@ -2083,6 +2090,8 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 {
 	MACHINE_START_CALL_MEMBER(pc9801_common);
 
+	save_item(NAME(m_dac_disable));
+
 	m_sys_type = 0x80 >> 6;
 }
 
@@ -2111,8 +2120,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9821ap2)
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
 	memset(m_tvram.get(), 0, sizeof(uint16_t) * 0x2000);
-
-	m_beeper->set_state(0);
 
 	m_nmi_ff = 0;
 	m_mouse.control = 0xff;
@@ -2143,6 +2150,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 
 	for(i=0;i<0x1000;i++)
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
+	
+	m_beeper->set_state(0);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
@@ -2162,6 +2171,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 		else
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
 	}
+	
+	m_dac_disable = true;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -2348,7 +2359,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_ppi_sys->in_pa_callback().set_ioport("DSW2");
 	m_ppi_sys->in_pb_callback().set_ioport("DSW1");
 	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
-	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
+//	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
 
 	I8255(config, m_ppi_prn, 0);
 	// TODO: check this one
@@ -2393,7 +2404,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc9801);
 }
 
@@ -2405,6 +2415,7 @@ void pc9801_state::pc9801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
+	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_beep_portc_w));
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
@@ -2424,6 +2435,7 @@ void pc9801_state::pc9801(machine_config &config)
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_w));
 
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
@@ -2435,6 +2447,9 @@ void pc9801_state::pc9801rs(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
+	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_dac_portc_w));
+	// TODO: verify if it needs invert();
+	m_pit8253->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
 
 	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
@@ -2450,6 +2465,8 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
 
+//	DAC_1BIT(config, m_dac, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.40);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16);
 }
 
