@@ -5,9 +5,9 @@
     NEC PC Engine/TurboGrafx-16 2 button joypad emulation
 
     Based on SMS controller port emulation (devices\bus\sms_ctrl\*.*)
-	by Fabio Priuli,
-	PC engine emulation (mame\*\pce.*)
-	by Charles MacDonald, Wilbert Pol, Angelo Salese
+    by Fabio Priuli,
+    PC engine emulation (mame\*\pce.*)
+    by Charles MacDonald, Wilbert Pol, Angelo Salese
 
     First party models:
 
@@ -20,13 +20,13 @@
 
     NEC Turbo Stick (PI-PD4)
     Arcade joystick variation of Turbo Pad, with Seperated autofire
-	buttons.
+    buttons.
     Turbo Stick for TurboGrafx-16 has slow motion.
 
     Everything else PI-PD001 supports Autofire.
 
     TODO:
-	- Needs verifications for Part numbers
+    - Needs verifications for Part numbers
 
 **********************************************************************/
 

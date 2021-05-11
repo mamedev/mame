@@ -5,21 +5,21 @@
     NEC PC Engine/TurboGrafx-16 6 button joypad emulation
 
     Based on SMS controller port emulation (devices\bus\sms_ctrl\*.*)
-	by Fabio Priuli,
-	PC engine emulation (mame\*\pce.*)
-	by Charles MacDonald, Wilbert Pol, Angelo Salese
+    by Fabio Priuli,
+    PC engine emulation (mame\*\pce.*)
+    by Charles MacDonald, Wilbert Pol, Angelo Salese
 
     There's 2 officially licensed 6 button joypad models:
 
     NEC Avenue Pad 6 (NAPD-1002)
-	- Supports autofire for Button I, II, Run (slow motion)
+    - Supports autofire for Button I, II, Run (slow motion)
 
     NEC Arcade Pad 6 (PCE-TP1)
     - Supports autofire for Button I-VI, Bundled in PC Engine Duo-RX
 
     TODO:
-	- Needs verifications for Part numbers
-	- Verify DTC114Y function for Slow motion in Avenue Pad 6
+    - Needs verifications for Part numbers
+    - Verify DTC114Y function for Slow motion in Avenue Pad 6
 
 **********************************************************************/
 

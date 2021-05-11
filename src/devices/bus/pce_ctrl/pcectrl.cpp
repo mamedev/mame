@@ -5,9 +5,9 @@
     NEC PC Engine/TurboGrafx-16 controller port emulation
 
     Based on SMS controller port emulation (devices\bus\sms_ctrl\*.*)
-	by Fabio Priuli,
-	PC engine emulation (mame\*\pce.*)
-	by Charles MacDonald, Wilbert Pol, Angelo Salese
+    by Fabio Priuli,
+    PC engine emulation (mame\*\pce.*)
+    by Charles MacDonald, Wilbert Pol, Angelo Salese
 
     Controller port interface layout:
 

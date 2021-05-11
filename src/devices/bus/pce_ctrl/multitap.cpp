@@ -5,9 +5,9 @@
     NEC PC Engine/TurboGrafx-16 Multi Tap emulation
 
     Based on SMS controller port emulation (devices\bus\sms_ctrl\*.*)
-	by Fabio Priuli,
-	PC engine emulation (mame\*\pce.*)
-	by Charles MacDonald, Wilbert Pol, Angelo Salese
+    by Fabio Priuli,
+    PC engine emulation (mame\*\pce.*)
+    by Charles MacDonald, Wilbert Pol, Angelo Salese
 
     First party model (PI-PD003, and US released TurboTap and DuoTap)
     has allowed up to 5 controllers, Third-party Multi Taps are has
