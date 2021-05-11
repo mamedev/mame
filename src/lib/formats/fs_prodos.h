@@ -45,13 +45,17 @@ public:
 			virtual fs_meta_data metadata() override;
 			virtual std::vector<u8> read_all() override;
 			virtual std::vector<u8> read(u64 start, u64 length) override;
+			virtual std::vector<u8> rsrc_read_all() override;
+			virtual std::vector<u8> rsrc_read(u64 start, u64 length) override;
 
 		private:
 			impl &m_fs;
 			u16 m_key;
 			u8 m_entry[39];
 
-			std::vector<u16> build_block_table();
+			std::vector<uint16_t> get_file_blocks(uint8_t type, u16 block, u32 length);
+			std::pair<std::vector<uint16_t>, uint32_t> data_blocks();
+			std::pair<std::vector<uint16_t>, uint32_t> rsrc_blocks();
 		};
 
 		impl(fsblk_t &blockdev);
@@ -80,6 +84,7 @@ public:
 	virtual bool can_format() const override;
 	virtual bool can_read() const override;
 	virtual bool can_write() const override;
+	virtual bool has_rsrc() const override;
 	virtual char directory_separator() const override;
 
 	virtual std::vector<fs_meta_description> volume_meta_description() const override;

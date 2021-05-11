@@ -652,8 +652,6 @@ static int flopdir(int argc, char *argv[])
 
 	fsblk_vec_t blockdev(img);
 	return generic_dir(fs->m_manager, blockdev);
-	
-	return 0;
 }
 
 // Should use chd&friends instead, but one thing at a time
@@ -693,6 +691,118 @@ static int hddir(int argc, char *argv[])
 
 	fsblk_vec_t blockdev(img);
 	return generic_dir(fs->m_manager, blockdev);
+}
+
+
+
+
+static int generic_read(const filesystem_manager_t *fm, fsblk_t &blockdev, const char *srcpath, const char *dstpath)
+{
+	auto load_fs = fm->mount(blockdev);
+
+	std::string opath = srcpath;
+	std::vector<std::string> path;
+	if(fm->has_subdirectories()) {
+		std::string element;
+		char sep = fm->directory_separator();
+		for(char c : opath) {
+			if(c == sep) {
+				if(!element.empty()) {
+					path.push_back(element);
+					element.clear();
+				}
+			} else
+				element += c;
+		}
+		if(!element.empty())
+			path.push_back(element);
+
+	} else
+		path.push_back(opath);
+
+	auto dir = load_fs->root();
+	std::string apath;
+	for(unsigned int i = 0; i < path.size() - 1; i++) {
+		auto c = dir.contents();
+		unsigned int j;
+		for(j = 0; j != c.size(); j++)
+			if(c[j].m_name == path[i])
+				break;
+		if(j == c.size()) {
+			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fm->directory_separator(), path[i].c_str());
+			return 1;
+		}
+		if(c[j].m_type != fs_dir_entry_type::dir) {
+			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fm->directory_separator(), path[i].c_str());
+			return 1;
+		}
+		dir = dir.dir_get(c[j].m_key);
+		apath += fm->directory_separator() + path[i];
+	}
+
+	auto c = dir.contents();
+	unsigned int j;
+	for(j = 0; j != c.size(); j++)
+		if(c[j].m_name == path.back())
+			break;
+	if(j == c.size()) {
+		fprintf(stderr, "Error: file %s%c%s not found\n", apath.c_str(), fm->directory_separator(), path.back().c_str());
+		return 1;
+	}
+	auto file = dir.file_get(c[j].m_key);
+	auto meta = file.metadata();
+
+	if(meta.find(fs_meta_name::length) == meta.end()) {
+		fprintf(stderr, "Error: %s%c%s is not a readable file\n", apath.c_str(), fm->directory_separator(), path.back().c_str());
+		return 1;
+	}
+
+	auto filedata = file.read_all();
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for writing", dstpath);
+	auto fo = fopen(dstpath, "wb");
+	if (!fo) {
+		perror(msg);
+		return 1;
+	}
+
+	fwrite(filedata.data(), filedata.size(), 1, fo);
+	fclose(fo);
+
+	bool has_rsrc = fm->has_rsrc() && meta.find(fs_meta_name::rsrc_length) != meta.end();
+
+	if(has_rsrc) {
+		const char *d = dstpath + strlen(dstpath);
+		while(d != dstpath && d[-1] != '/')
+			d--;
+		std::string dpath(dstpath, d);
+		dpath += "._";
+		dpath += d;
+
+		sprintf(msg, "Error opening %s for writing", dstpath);
+		auto fo = fopen(dpath.c_str(), "wb");
+		if (!fo) {
+			perror(msg);
+			return 1;
+		}
+
+		filedata = file.rsrc_read_all();
+		u8 head[0x2a];
+		filesystem_t::w32b(head+0x00, 0x00051607);      // Magic
+		filesystem_t::w32b(head+0x04, 0x00020000);      // Version
+		filesystem_t::fill(head+0x08, 0, 16);           // Filler
+		filesystem_t::w16b(head+0x18, 1);               // Number of entries
+		filesystem_t::w32b(head+0x1a, 2);               // Resource fork
+		filesystem_t::w32b(head+0x22, 0x2a);            // Offset in the file
+		filesystem_t::w32b(head+0x26, filedata.size()); // Length
+
+		fwrite(head, 0x2a, 1, fo);
+		fwrite(filedata.data(), filedata.size(), 1, fo);
+		fclose(fo);
+	}
+
+	return 0;
 }
 
 
@@ -747,66 +857,47 @@ static int flopread(int argc, char *argv[])
 	delete iog;
 
 	fsblk_vec_t blockdev(img);
-	auto load_fs = fs->m_manager->mount(blockdev);
+	return generic_read(fs->m_manager, blockdev, argv[5], argv[6]);
+}
 
-	std::string opath = argv[5];
-	std::vector<std::string> path;
-	if(fs->m_manager->has_subdirectories()) {
-		abort();
 
-	} else
-		path.push_back(opath);
+// Should use chd&friends instead, but one thing at a time
 
-	auto dir = load_fs->root();
-	std::string apath;
-	for(unsigned int i = 0; i < path.size() - 1; i++) {
-		auto c = dir.contents();
-		unsigned int j;
-		for(j = 0; j != c.size(); j++)
-			if(c[j].m_name == path[i])
-				break;
-		if(j == c.size()) {
-			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fs->m_manager->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		if(c[j].m_type != fs_dir_entry_type::dir) {
-			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fs->m_manager->directory_separator(), path[i].c_str());
-			return 1;
-		}
-		dir = dir.dir_get(c[j].m_key);
-		apath += fs->m_manager->directory_separator() + path[i];
-	}
-
-	auto c = dir.contents();
-	unsigned int j;
-	for(j = 0; j != c.size(); j++)
-		if(c[j].m_name == path.back())
-			break;
-	if(j == c.size()) {
-		fprintf(stderr, "Error: file %s%c%s not found\n", apath.c_str(), fs->m_manager->directory_separator(), path.back().c_str());
-		return 1;
-	}
-	auto file = dir.file_get(c[j].m_key);
-	auto meta = file.metadata();
-
-	if(meta.find(fs_meta_name::length) == meta.end()) {
-		fprintf(stderr, "Error: %s%c%s is not a readable file\n", apath.c_str(), fs->m_manager->directory_separator(), path.back().c_str());
+static int hdread(int argc, char *argv[])
+{
+	if (argc!=6) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
 		return 1;
 	}
 
-	auto filedata = file.read_all();
+	auto fs = find_fs_by_name(argv[2]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
 
-	sprintf(msg, "Error opening %s for writing", argv[6]);
-	auto fo = fopen(argv[6], "wb");
-	if (!fo) {
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for reading", argv[3]);
+	FILE *f = fopen(argv[3], "rb");
+	if (!f) {
 		perror(msg);
 		return 1;
 	}
+	fseek(f, 0, SEEK_END);
+	size_t size = ftell(f);
+	rewind(f);
+	std::vector<u8> img(size);
+	fread(img.data(), size, 1, f);
+	fclose(f);
 
-	fwrite(filedata.data(), filedata.size(), 1, fo);
-	fclose(fo);
-
-	return 0;
+	fsblk_vec_t blockdev(img);
+	return generic_read(fs->m_manager, blockdev, argv[4], argv[5]);
 }
 
 
@@ -832,6 +923,8 @@ int CLIB_DECL main(int argc, char *argv[])
 			return flopread(argc, argv);
 		else if (!core_stricmp("hddir", argv[1]))
 			return hddir(argc, argv);
+		else if (!core_stricmp("hdread", argv[1]))
+			return hdread(argc, argv);
 		else {
 			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
 			display_usage();
