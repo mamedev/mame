@@ -76,7 +76,7 @@ int16_t roundtrip_fp(int32_t value);
 template<int NumOutputs>
 struct ymfm_output
 {
-	ymfm_output &clear() { return init(0);}
+	ymfm_output &clear() { return init(0); }
 	ymfm_output &init(int32_t value) { for (int index = 0; index < NumOutputs; index++) data[index] = value; return *this; }
 	ymfm_output &clamp16() { for (int index = 0; index < NumOutputs; index++) data[index] = std::clamp(data[index], -32768, 32767); return *this; }
 	ymfm_output &roundtrip_fp() { for (int index = 0; index < NumOutputs; index++) data[index] = ymfm::roundtrip_fp(data[index]); return *this; }
@@ -175,19 +175,13 @@ public:
 // ======================> ymfm_interface
 
 // this class represents the interface between the fm_engine and the outside
-// world; it provides hooks for timers, synchronization, and IRQ signaling
+// world; it provides hooks for timers, synchronization, and I/O
 class ymfm_interface
 {
 	// the engine is our friend
 	template<typename RegisterType> friend class fm_engine_base;
 
 public:
-	// constructor
-	ymfm_interface() { }
-
-	// destructor
-	virtual ~ymfm_interface() { }
-
 	// logging helper
 	template<typename... Params>
 	void log(Params &&... args)
@@ -247,7 +241,7 @@ public:
 	//
 
 	// the chip implementation calls this when the state of the IRQ signal has
-	// changed due to a status change; our responsibility is to respons as
+	// changed due to a status change; our responsibility is to respond as
 	// needed to the change in IRQ state, signaling any consumers
 	virtual void ymfm_update_irq(bool asserted) { }
 
@@ -286,93 +280,6 @@ protected:
 	// construction time
 	ymfm_engine_callbacks *m_engine;
 };
-
-
-/*
-// ======================> ymfm_clocked_interface
-
-// this class represents the interface between the fm_engine and the outside
-// world; it provides hooks for timers, synchronization, and IRQ signaling
-class ymfm_clocked_interface : public ymfm_interface
-{
-	static constexpr uint64_t MAX_TIME = 0xffffffffffffffffull;
-
-public:
-	// constructor
-	ymfm_clocked_interface() :
-		m_last_update(0),
-		m_busy_end(MAX_TIME),
-		m_timer_end{ MAX_TIME, MAX_TIME }
-	{
-	}
-
-	// destructor
-	virtual ~ymfm_clocked_interface() { }
-
-	// to use this interface, you must provide a method to return the current
-	// time
-	virtual uint64_t ymfm_get_time() = 0;
-
-	// the chip implementation calls this when a write happens to the mode
-	// register, which could affect timers and interrupts; our responsibility
-	// is to ensure the system is up to date before calling the engine's
-	// engine_mode_write() method
-	virtual void ymfm_sync_mode_write(uint8_t data)
-	{
-		m_engine->engine_mode_write(data);
-	}
-
-	// the chip implementation calls this when the chip's status has changed,
-	// which may affect the interrupt state; our responsibility is to ensure
-	// the system is up to date before calling the engine's
-	// engine_check_interrupts() method
-	virtual void ymfm_sync_check_interrupts()
-	{
-		m_engine->engine_check_interrupts();
-	}
-
-	// the chip implementation calls this when one of the two internal timers
-	// has changed state; our responsibility is to arrange to call the engine's
-	// engine_timer_expired() method after the provided number of clocks; if
-	// duration_in_clocks is negative, we should cancel any outstanding timers
-	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) override
-	{
-		if (duration_in_clocks >= 0)
-			m_timer_end[tnum] = ymfm_get_time() + duration_in_clocks;
-		else
-			m_timer_end[tnum] = MAX_TIME;
-	}
-
-	// the chip implementation calls this to indicate that the chip should be
-	// considered in a busy state until the given number of clocks has passed;
-	// our responsibility is to compute and remember the ending time based on
-	// the chip's clock for later checking
-	virtual void ymfm_set_busy_end(uint32_t clocks) override
-	{
-		m_busy_end = ymfm_get_time() + clocks;
-	}
-
-	// the chip implementation calls this to see if the chip is still currently
-	// is a busy state, as specified by a previous call to ymfm_set_busy_end();
-	// our responsibility is to compare the current time against the previously
-	// noted busy end time and return true if we haven't yet passed it
-	virtual bool ymfm_is_busy() override
-	{
-		return (ymfm_get_time() < m_busy_end);
-	}
-
-	// the chip implementation calls this whenever the internal clock prescaler
-	// changes; our responsibility is to adjust our clocking of the chip in
-	// response to produce the correct output rate
-	virtual void ymfm_prescale_changed() { }
-
-protected:
-	uint64_t m_last_update;
-	uint64_t m_busy_end;
-	uint64_t m_timer_end[2];
-	std::vector<int32_t> m_buffer;
-};
-*/
 
 }
 
