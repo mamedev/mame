@@ -29,6 +29,15 @@
 #include "ymfm_opm.h"
 #include "ymfm_opn.h"
 
+// enable this to run the nuked OPN2 core in parallel; output is not captured,
+// but logging can be added to observe behaviors
+#define RUN_NUKED_OPN2 (0)
+#if (RUN_NUKED_OPN2)
+namespace nuked {
+#include "test/ym3438.h"
+}
+#endif
+
 
 
 //*********************************************************
@@ -70,7 +79,8 @@ class vgm_chip_base
 public:
 	// construction
 	vgm_chip_base(uint32_t clock, chip_type type) :
-		m_type(type)
+		m_type(type),
+		m_external(nullptr)
 	{
 	}
 
@@ -120,6 +130,7 @@ protected:
 	std::vector<uint8_t> m_adpcm_b_data;
 	std::vector<uint8_t> m_pcm_data;
 	uint32_t m_pcm_offset;
+	void *m_external;
 };
 
 
@@ -140,6 +151,14 @@ public:
 		m_pos(0)
 	{
 		m_chip.reset();
+#if (RUN_NUKED_OPN2)
+		if (type == CHIP_YM2612)
+		{
+			m_external = new nuked::ym3438_t;
+			nuked::OPN2_SetChipType(nuked::ym3438_mode_ym2612);
+			nuked::OPN2_Reset((nuked::ym3438_t *)m_external);
+		}
+#endif
 	}
 
 	// handle a register write: just queue for now
@@ -159,7 +178,28 @@ public:
 				m_chip.write(1 + 2 * ((front.first >> 8) & 1), front.second);
 			else
 				m_chip.write(2, front.second);
+#if (RUN_NUKED_OPN2)
+			if (m_external != nullptr)
+			{
+				nuked::OPN2_Write((nuked::ym3438_t *)m_external, 0 + 2 * ((front.first >> 8) & 1), front.first & 0xff);
+				nuked::Bit16s buffer[4];
+				for (int clocks = 0; clocks < 12; clocks++)
+					nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
+				nuked::OPN2_Write((nuked::ym3438_t *)m_external, 1 + 2 * ((front.first >> 8) & 1), front.second);
+			}
+#endif
 			m_queue.erase(m_queue.begin());
+		}
+		else
+		{
+#if (RUN_NUKED_OPN2)
+			if (m_external != nullptr)
+			{
+				nuked::Bit16s buffer[4];
+				for (int clocks = 0; clocks < 12; clocks++)
+					nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
+			}
+#endif
 		}
 		return m_queue.empty();
 	}
@@ -167,10 +207,20 @@ public:
 	// generate one output sample of output
 	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) override
 	{
+#if (!RUN_NUKED_OPN2)
 		for ( ; m_pos <= output_start; m_pos += m_step)
+#endif
 			m_chip.generate(&m_output);
 		*buffer++ += m_output.data[0];
 		*buffer++ += m_output.data[ChipType::OUTPUTS > 1 ? 1 : 0];
+#if (RUN_NUKED_OPN2)
+		if (m_external != nullptr)
+		{
+			nuked::Bit16s buffer[4];
+			for (int clocks = 0; clocks < 24 - 12; clocks++)
+				nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
+		}
+#endif
 	}
 
 protected:
@@ -1371,3 +1421,9 @@ int main(int argc, char *argv[])
 	int err = write_wav(outfilename, output_rate, wav_buffer);
 	return err;
 }
+
+#if (RUN_NUKED_OPN2)
+namespace nuked {
+#include "test/ym3438.c"
+}
+#endif

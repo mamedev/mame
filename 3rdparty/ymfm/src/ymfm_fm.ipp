@@ -535,16 +535,17 @@ void fm_operator<RegisterType>::keyonoff(uint32_t on, keyon_type type)
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_operator<RegisterType>::start_attack()
+void fm_operator<RegisterType>::start_attack(bool is_restart)
 {
 	// don't change anything if already in attack state
 	if (m_env_state == EG_ATTACK)
 		return;
 	m_env_state = EG_ATTACK;
 
-	// generally not inverted at start, except if SSG-EG is
-	// enabled and one of the inverted modes is specified
-	if (RegisterType::EG_HAS_SSG)
+	// generally not inverted at start, except if SSG-EG is enabled and
+	// one of the inverted modes is specified; leave this alone on a
+	// restart, as it is managed by the clock_ssg_eg_state() code
+	if (RegisterType::EG_HAS_SSG && !is_restart)
 		m_ssg_inverted = m_regs.op_ssg_eg_enable(m_opoffs) & bitfield(m_regs.op_ssg_eg_mode(m_opoffs), 2);
 
 	// reset the phase when we start an attack
@@ -651,7 +652,7 @@ void fm_operator<RegisterType>::clock_ssg_eg_state()
 
 		// restart attack if in decay/sustain states
 		if (m_env_state == EG_DECAY || m_env_state == EG_SUSTAIN)
-			start_attack();
+			start_attack(true);
 
 		// phase is reset to 0 regardless in modes 0/4
 		if (bitfield(mode, 1) == 0)
@@ -698,7 +699,8 @@ void fm_operator<RegisterType>::clock_envelope(uint32_t env_counter)
 		return;
 
 	// determine the increment based on the non-fractional part of env_counter
-	uint32_t increment = attenuation_increment(rate, bitfield(env_counter, 11, 3));
+	uint32_t relevant_bits = bitfield(env_counter, (rate_shift <= 11) ? 11 : rate_shift, 3);
+	uint32_t increment = attenuation_increment(rate, relevant_bits);
 
 	// attack is the only one that increases
 	if (m_env_state == EG_ATTACK)

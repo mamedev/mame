@@ -360,7 +360,7 @@ public:
 
 private:
 	// start the attack phase
-	void start_attack();
+	void start_attack(bool is_restart = false);
 
 	// start the release phase
 	void start_release();
