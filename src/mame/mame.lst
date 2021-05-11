@@ -12047,6 +12047,10 @@ shackled                        // (c) 1986 Data East USA (US)
 srdarwin                        // (c) 1987 Data East Corporation (World)
 srdarwinj                       // (c) 1987 Data East Corporation (Japan)
 
+@source:decmate2.cpp
+decmate2                        //
+decmate3                        //
+
 @source:deco_ld.cpp
 begas                           // (c) 1983
 begas1                          // (c) 1983

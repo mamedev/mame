@@ -99,6 +99,7 @@ CPUS["F8"] = true
 CPUS["LH5801"] = true
 CPUS["PATINHOFEIO"] = true
 CPUS["PDP1"] = true
+CPUS["PDP8"] = true
 CPUS["TX0"] = true
 CPUS["SATURN"] = true
 CPUS["SC61860"] = true
@@ -2217,6 +2218,7 @@ files {
 createMESSProjects(_target, _subtarget, "dec")
 files {
 	MAME_DIR .. "src/mame/drivers/dct11em.cpp",
+	MAME_DIR .. "src/mame/drivers/decmate2.cpp",
 	MAME_DIR .. "src/mame/drivers/decstation.cpp",
 	MAME_DIR .. "src/mame/machine/decioga.cpp",
 	MAME_DIR .. "src/mame/machine/decioga.h",
