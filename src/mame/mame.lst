@@ -12167,6 +12167,7 @@ decocass                        //
 decomult                        //
 
 @source:decstation.cpp
+ds2100                          // 1989 Digital Equipment Corporation (DECstation 2100)
 ds3100                          // 1989 Digital Equipment Corporation (DECstation 3100)
 ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
 
