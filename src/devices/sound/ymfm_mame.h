@@ -395,7 +395,8 @@ public:
 	// configuration helpers
 	void set_flags(int flags)
 	{
-		// don't allow some flags to be changed
+		// don't allow some flags to be changed: there is no pin26 in the embedded chip,
+		// and the number of outputs is configured by the chip itself
 		flags &= ~(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW);
 		flags |= m_ssg_flags & AY8910_SINGLE_OUTPUT;
 		m_ssg_flags = flags;

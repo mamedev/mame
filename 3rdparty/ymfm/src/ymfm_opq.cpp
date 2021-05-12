@@ -428,7 +428,7 @@ uint8_t ym3806::read(uint32_t offset)
 	switch (offset & 1)
 	{
 		case 0: // data port (unused)
-			m_fm.intf().log("Unexpected read from YM3806 offset %d\n", offset & 3);
+			debug::log_unexpected_read_write("Unexpected read from YM3806 offset %d\n", offset & 3);
 			break;
 
 		case 1: // status port, YM2203 compatible

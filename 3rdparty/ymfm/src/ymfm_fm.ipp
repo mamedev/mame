@@ -32,14 +32,6 @@ namespace ymfm
 {
 
 //*********************************************************
-//  DEBUGGING
-//*********************************************************
-
-// set this mask to only play certain channels
-constexpr uint32_t global_chanmask = 0xffffffff;
-
-
-//*********************************************************
 //  GLOBAL TABLE LOOKUPS
 //*********************************************************
 
@@ -570,9 +562,13 @@ void fm_operator<RegisterType>::start_release()
 		return;
 	m_env_state = EG_RELEASE;
 
-	// adjust attenuation if inverted due to SSG-EG
+	// if attenuation if inverted due to SSG-EG, snap the inverted attenuation
+	// as the starting point
 	if (RegisterType::EG_HAS_SSG && m_ssg_inverted)
-		m_env_attenuation = 0x200 - m_env_attenuation;
+	{
+		m_env_attenuation = (0x200 - m_env_attenuation) & 0x3ff;
+		m_ssg_inverted = false;
+	}
 }
 
 
@@ -839,11 +835,16 @@ void fm_channel<RegisterType>::save_restore(ymfm_saved_state &state)
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_channel<RegisterType>::keyonoff(uint32_t states, keyon_type type)
+void fm_channel<RegisterType>::keyonoff(uint32_t states, keyon_type type, uint32_t chnum)
 {
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(bitfield(states, opnum), type);
+
+	if (debug::LOG_KEYON_EVENTS && ((debug::GLOBAL_FM_CHANNEL_MASK >> chnum) & 1) != 0)
+		for (int opnum = 0; opnum < std::size(m_op); opnum++)
+			if (m_op[opnum] != nullptr)
+				debug::log_keyon("%c%s\n", bitfield(states, opnum) ? '+' : '-', m_regs.log_keyon(m_choffs, m_op[opnum]->opoffs()).c_str());
 }
 
 
@@ -1299,7 +1300,7 @@ template<class RegisterType>
 void fm_engine_base<RegisterType>::output(output_data &output, uint32_t rshift, int32_t clipmax, uint32_t chanmask) const
 {
 	// mask out some channels for debug purposes
-	chanmask &= global_chanmask;
+	chanmask &= debug::GLOBAL_FM_CHANNEL_MASK;
 
 	// mask out inactive channels
 	chanmask &= m_active_channels;
@@ -1354,6 +1355,8 @@ void fm_engine_base<RegisterType>::output(output_data &output, uint32_t rshift, 
 template<class RegisterType>
 void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 {
+	debug::log_fm_write("%03X = %02X\n", regnum, data);
+
 	// special case: writes to the mode register can impact IRQs;
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
@@ -1374,21 +1377,14 @@ void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 		if (keyon_channel < CHANNELS)
 		{
 			// normal channel on/off
-			m_channel[keyon_channel]->keyonoff(keyon_opmask, KEYON_NORMAL);
+			m_channel[keyon_channel]->keyonoff(keyon_opmask, KEYON_NORMAL, keyon_channel);
 		}
 		else if (CHANNELS >= 9 && keyon_channel == RegisterType::RHYTHM_CHANNEL)
 		{
 			// special case for the OPL rhythm channels
-			m_channel[6]->keyonoff(bitfield(keyon_opmask, 4) ? 3 : 0, KEYON_RHYTHM);
-			m_channel[7]->keyonoff(bitfield(keyon_opmask, 0) | (bitfield(keyon_opmask, 3) << 1), KEYON_RHYTHM);
-			m_channel[8]->keyonoff(bitfield(keyon_opmask, 2) | (bitfield(keyon_opmask, 1) << 1), KEYON_RHYTHM);
-		}
-
-		// log key on events under certain conditions
-	//  if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enable() && ((m_regs.lfo_am_enable() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-	//  if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
-	//      (m_regs.waveform_enable() && m_regs.waveform() != 0))
-		{
+			m_channel[6]->keyonoff(bitfield(keyon_opmask, 4) ? 3 : 0, KEYON_RHYTHM, 6);
+			m_channel[7]->keyonoff(bitfield(keyon_opmask, 0) | (bitfield(keyon_opmask, 3) << 1), KEYON_RHYTHM, 7);
+			m_channel[8]->keyonoff(bitfield(keyon_opmask, 2) | (bitfield(keyon_opmask, 1) << 1), KEYON_RHYTHM, 8);
 		}
 	}
 }
@@ -1472,7 +1468,7 @@ void fm_engine_base<RegisterType>::engine_timer_expired(uint32_t tnum)
 	if (tnum == 0 && m_regs.csm())
 		for (int chnum = 0; chnum < CHANNELS; chnum++)
 			if (bitfield(RegisterType::CSM_TRIGGER_MASK, chnum))
-				m_channel[chnum]->keyonoff(1, KEYON_CSM);
+				m_channel[chnum]->keyonoff(1, KEYON_CSM, chnum);
 
 	// reset
 	m_timer_running[tnum] = false;

@@ -500,10 +500,6 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	uint32_t chnum = choffs;
 	uint32_t opnum = opoffs;
 
-	// don't log masked channels
-	if (((global_chanmask >> chnum) & 1) == 0)
-		return "";
-
 	char buffer[256];
 	char *end = &buffer[0];
 
@@ -622,7 +618,7 @@ uint8_t ym2414::read(uint32_t offset)
 	switch (offset & 1)
 	{
 		case 0: // data port (unused)
-			m_fm.intf().log("Unexpected read from YM2414 offset %d\n", offset & 3);
+			debug::log_unexpected_read_write("Unexpected read from YM2414 offset %d\n", offset & 3);
 			break;
 
 		case 1: // status port, YM2203 compatible

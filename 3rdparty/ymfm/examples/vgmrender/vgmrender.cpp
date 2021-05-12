@@ -38,6 +38,9 @@ namespace nuked {
 }
 #endif
 
+// enable this to capture each chip at its native rate as well
+#define CAPTURE_NATIVE (0 || RUN_NUKED_OPN2)
+
 
 
 //*********************************************************
@@ -79,17 +82,16 @@ class vgm_chip_base
 public:
 	// construction
 	vgm_chip_base(uint32_t clock, chip_type type) :
-		m_type(type),
-		m_external(nullptr)
+		m_type(type)
 	{
 	}
 
 	// simple getters
 	chip_type type() const { return m_type; }
+	virtual uint32_t sample_rate() const = 0;
 
 	// required methods for derived classes to implement
 	virtual void write(uint32_t reg, uint8_t data) = 0;
-	virtual bool process() = 0;
 	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) = 0;
 
 	// write data to the ADPCM-A buffer
@@ -130,7 +132,15 @@ protected:
 	std::vector<uint8_t> m_adpcm_b_data;
 	std::vector<uint8_t> m_pcm_data;
 	uint32_t m_pcm_offset;
-	void *m_external;
+#if (CAPTURE_NATIVE)
+public:
+	std::vector<int32_t> m_native_data;
+#endif
+#if (RUN_NUKED_OPN2)
+public:
+	nuked::ym3438_t *m_external = nullptr;
+	std::vector<int32_t> m_nuked_data;
+#endif
 };
 
 
@@ -156,9 +166,14 @@ public:
 		{
 			m_external = new nuked::ym3438_t;
 			nuked::OPN2_SetChipType(nuked::ym3438_mode_ym2612);
-			nuked::OPN2_Reset((nuked::ym3438_t *)m_external);
+			nuked::OPN2_Reset(m_external);
 		}
 #endif
+	}
+
+	virtual uint32_t sample_rate() const override
+	{
+		return m_chip.sample_rate(m_clock);
 	}
 
 	// handle a register write: just queue for now
@@ -167,60 +182,73 @@ public:
 		m_queue.push_back(std::make_pair(reg, data));
 	}
 
-	// process one queued entry; return true if there is more to process
-	virtual bool process() override
-	{
-		if (!m_queue.empty())
-		{
-			auto front = m_queue.front();
-			m_chip.write(0 + 2 * ((front.first >> 8) & 1), front.first & 0xff);
-			if (m_type != CHIP_YM2149)
-				m_chip.write(1 + 2 * ((front.first >> 8) & 1), front.second);
-			else
-				m_chip.write(2, front.second);
-#if (RUN_NUKED_OPN2)
-			if (m_external != nullptr)
-			{
-				nuked::OPN2_Write((nuked::ym3438_t *)m_external, 0 + 2 * ((front.first >> 8) & 1), front.first & 0xff);
-				nuked::Bit16s buffer[4];
-				for (int clocks = 0; clocks < 12; clocks++)
-					nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
-				nuked::OPN2_Write((nuked::ym3438_t *)m_external, 1 + 2 * ((front.first >> 8) & 1), front.second);
-			}
-#endif
-			m_queue.erase(m_queue.begin());
-		}
-		else
-		{
-#if (RUN_NUKED_OPN2)
-			if (m_external != nullptr)
-			{
-				nuked::Bit16s buffer[4];
-				for (int clocks = 0; clocks < 12; clocks++)
-					nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
-			}
-#endif
-		}
-		return m_queue.empty();
-	}
-
 	// generate one output sample of output
 	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) override
 	{
-#if (!RUN_NUKED_OPN2)
+		uint32_t addr1 = 0xffff, addr2 = 0xffff;
+		uint8_t data1 = 0, data2 = 0;
+
+		// see if there is data to be written; if so, extract it and dequeue
+		if (!m_queue.empty())
+		{
+			auto front = m_queue.front();
+			addr1 = 0 + 2 * ((front.first >> 8) & 1);
+			data1 = front.first & 0xff;
+			addr2 = (m_type == CHIP_YM2149) ? 2 : (1 + 2 * ((front.first >> 8) & 1));
+			data2 = front.second;
+			m_queue.erase(m_queue.begin());
+		}
+
+		// write to the chip
+		if (addr1 != 0xffff)
+		{
+			m_chip.write(addr1, data1);
+			m_chip.write(addr2, data2);
+		}
+
+		// generate at the appropriate sample rate
 		for ( ; m_pos <= output_start; m_pos += m_step)
-#endif
+		{
 			m_chip.generate(&m_output);
+
+#if (CAPTURE_NATIVE)
+			// if capturing native, append each generated sample
+			m_native_data.push_back(m_output.data[0]);
+			m_native_data.push_back(m_output.data[ChipType::OUTPUTS > 1 ? 1 : 0]);
+#endif
+
+#if (RUN_NUKED_OPN2)
+			// if running nuked, capture its output as well
+			if (m_external != nullptr)
+			{
+				int32_t sum[2] = { 0 };
+				if (addr1 != 0xffff)
+					nuked::OPN2_Write(m_external, addr1, data1);
+				nuked::Bit16s buffer[2];
+				for (int clocks = 0; clocks < 12; clocks++)
+				{
+					nuked::OPN2_Clock(m_external, buffer);
+					sum[0] += buffer[0];
+					sum[1] += buffer[1];
+				}
+				if (addr2 != 0xffff)
+					nuked::OPN2_Write(m_external, addr2, data2);
+				for (int clocks = 0; clocks < 12; clocks++)
+				{
+					nuked::OPN2_Clock(m_external, buffer);
+					sum[0] += buffer[0];
+					sum[1] += buffer[1];
+				}
+				addr1 = addr2 = 0xffff;
+				m_nuked_data.push_back(sum[0] / 24);
+				m_nuked_data.push_back(sum[1] / 24);
+			}
+#endif
+		}
+
+		// add the final result to the buffer
 		*buffer++ += m_output.data[0];
 		*buffer++ += m_output.data[ChipType::OUTPUTS > 1 ? 1 : 0];
-#if (RUN_NUKED_OPN2)
-		if (m_external != nullptr)
-		{
-			nuked::Bit16s buffer[4];
-			for (int clocks = 0; clocks < 24 - 12; clocks++)
-				nuked::OPN2_Clock((nuked::ym3438_t *)m_external, buffer);
-		}
-#endif
 	}
 
 protected:
@@ -405,7 +433,7 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 	// +0C: SN76489 clock
 	uint32_t clock = parse_uint32(buffer, offset);
 	if (clock != 0)
-		fprintf(stderr, "Warning: clock for SN76489 specified, but not supported\n");
+		fprintf(stderr, "Warning: clock for SN76489 specified (%d), but not supported\n", clock);
 
 	// +10: YM2413 clock
 	clock = parse_uint32(buffer, offset);
@@ -1135,11 +1163,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			bool more_remaining = false;
 			int32_t outputs[2] = { 0 };
 			for (auto chip : active_chips)
-			{
-				if (!chip->process())
-					more_remaining = true;
 				chip->generate(output_pos, output_step, outputs);
-			}
 			output_pos += output_step;
 			wav_buffer.push_back(outputs[0]);
 			wav_buffer.push_back(outputs[1]);
@@ -1419,6 +1443,32 @@ int main(int argc, char *argv[])
 	generate_all(buffer, data_start, output_rate, wav_buffer);
 
 	int err = write_wav(outfilename, output_rate, wav_buffer);
+
+#if (CAPTURE_NATIVE)
+	{
+		int chipnum = 0;
+		for (auto chip : active_chips)
+			if (err == 0 && chip->m_native_data.size() > 0)
+			{
+				char filename[20];
+				sprintf(filename, "native-%d.wav", chipnum++);
+				err = write_wav(filename, chip->sample_rate(), chip->m_native_data);
+			}
+	}
+#endif
+#if (RUN_NUKED_OPN2)
+	{
+		int chipnum = 0;
+		for (auto chip : active_chips)
+			if (err == 0 && chip->m_nuked_data.size() > 0)
+			{
+				char filename[20];
+				sprintf(filename, "nuked-%d.wav", chipnum++);
+				err = write_wav(filename, chip->sample_rate(), chip->m_nuked_data);
+			}
+	}
+#endif
+
 	return err;
 }
 

@@ -946,7 +946,7 @@ uint8_t y8950::read_data()
 			break;
 
 		default:
-			m_fm.intf().log("Unexpected read from Y8950 data port %02X\n", m_address);
+			debug::log_unexpected_read_write("Unexpected read from Y8950 data port %02X\n", m_address);
 			break;
 	}
 	return result;
@@ -1302,7 +1302,7 @@ uint8_t ymf262::read(uint32_t offset)
 		case 1:
 		case 2:
 		case 3:
-			m_fm.intf().log("Unexpected read from YMF262 offset %d\n", offset & 3);
+			debug::log_unexpected_read_write("Unexpected read from YMF262 offset %d\n", offset & 3);
 			break;
 	}
 	return result;
@@ -1476,7 +1476,7 @@ uint8_t ymf278b::read(uint32_t offset)
 			break;
 
 		default:
-			m_fm.intf().log("Unexpected read from ymf278b offset %d\n", offset & 3);
+			debug::log_unexpected_read_write("Unexpected read from ymf278b offset %d\n", offset & 3);
 			break;
 	}
 	return result;
@@ -1558,7 +1558,7 @@ void ymf278b::write(uint32_t offset, uint8_t data)
 			break;
 
 		default:
-			m_fm.intf().log("Unexpected write to ymf278b offset %d\n", offset & 7);
+			debug::log_unexpected_read_write("Unexpected write to ymf278b offset %d\n", offset & 7);
 			break;
 	}
 }

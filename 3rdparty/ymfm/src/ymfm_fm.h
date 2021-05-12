@@ -358,6 +358,11 @@ public:
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
+	// simple getters for debugging
+	envelope_state debug_eg_state() const { return m_env_state; }
+	uint16_t debug_eg_attenuation() const { return m_env_attenuation; }
+	opdata_cache &debug_cache() { return m_cache; }
+
 private:
 	// start the attack phase
 	void start_attack(bool is_restart = false);
@@ -421,7 +426,7 @@ public:
 	}
 
 	// signal key on/off to our operators
-	void keyonoff(uint32_t states, keyon_type type);
+	void keyonoff(uint32_t states, keyon_type type, uint32_t chnum);
 
 	// prepare prior to clocking
 	bool prepare();
@@ -448,6 +453,9 @@ public:
 
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
+
+	// simple getters for debugging
+	fm_operator<RegisterType> *debug_operator(int index) const { return m_op[index]; }
 
 private:
 	// helper to add values to the outputs based on channel enables
@@ -554,6 +562,11 @@ public:
 	// invalidate any caches
 	void invalidate_caches() { m_modified_channels = RegisterType::ALL_CHANNELS; }
 
+	// simple getters for debugging
+	fm_channel<RegisterType> *debug_channel(int index) const { return m_channel[index].get(); }
+	fm_operator<RegisterType> *debug_operator(int index) const { return m_operator[index].get(); }
+
+public:
 	// timer callback; called by the interface when a timer fires
 	virtual void engine_timer_expired(uint32_t tnum) override;
 
