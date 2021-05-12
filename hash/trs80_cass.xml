@@ -360,8 +360,8 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 	</software>
 	<software name="cosmic">
 		<description>Cosmic</description><!-- Game has no title, used name of file -->
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Instant Software</publisher>
 		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then COSMIC then / then G. Arrows to alter viewpoint, Space to fire." />
 		<sharedfeat name="compatibility" value="1,3,4,H" />
 		<part name="cass" interface="trs80_cass">
@@ -498,7 +498,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		</part>
 	</software>
 	<software name="penetr">
-		<description>Penetrator</description>
+		<description>Penetrator</description><!-- [3,4]:most sounds are missing -->
 		<year>19??</year>
 		<publisher>Beam Software</publisher>
 		<info name="author" value="Philip Mitchell" />
@@ -535,7 +535,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 			</dataarea>
 		</part>
 	</software>
-	<software name="galaxy">
+	<software name="galaxy2">
 		<description>Galaxy Invasion (2)</description>
 		<year>1980</year>
 		<publisher>Big Five Software</publisher>
@@ -655,7 +655,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<year>1978</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="Joshua Lavinsky" />
-		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SPWAR then /" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then SPWAR" />
 		<sharedfeat name="compatibility" value="1,3,4,H" />
 		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x11c2">
@@ -707,8 +707,8 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="John Olsen" />
-		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then TAXI then /" />
-		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<info name="usage" value="Enter, SYSTEM then TAXI then /" />
+		<sharedfeat name="compatibility" value="1,H" />
 		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x4260">
 				<rom name="taxi.cas" size="0x4260" crc="6c6b5e8b" sha1="8098eff4133aacb6a4ab9994e75eb3f022b0f9ba"/>
@@ -719,8 +719,8 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		<description>Lowercase conversion</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt), Enter, SYSTEM then ULCBAS then /" />
-		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<info name="usage" value="Enter, SYSTEM then ULCBAS then /" />
+		<sharedfeat name="compatibility" value="1,H" />
 		<part name="cass" interface="trs80_cass">
 			<dataarea name="cass" size="0x0523">
 				<rom name="ulcbas.cas" size="0x0523" crc="d4225dfa" sha1="0c6e45bb23e1e4e85e46ffc56b64ec4b6f8398f9"/>
