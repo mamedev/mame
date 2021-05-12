@@ -10,10 +10,9 @@ appears to be in the exact middle between the gsword / josvolly HW and the ppkin
 driver by Angelo Salese
 
 TODO:
-- separate driver into 2 classes
-- reduce tagmap lookups
-- sound (controlled by three i8741);
-- coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
+- separate driver into 2 classes;
+- reduce tagmap lookups;
+- low-level emulation of inputs/soundlatch (controlled by several i8741, like Gladiator / Ougon no Shiro);
 - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
 
 BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
