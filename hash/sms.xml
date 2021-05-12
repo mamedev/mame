@@ -2667,7 +2667,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pigarus110">
+	<software name="pigarus110" cloneof="pigarus">
 		<description>Flight of Pigarus (v1.10)</description>
 		<year>2018</year>
 		<publisher>&lt;homebrew&gt;</publisher>
@@ -2683,7 +2683,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pigarus100">
+	<software name="pigarus100" cloneof="pigarus">
 		<description>Flight of Pigarus (v1.00)</description>
 		<year>2018</year>
 		<publisher>&lt;homebrew&gt;</publisher>
