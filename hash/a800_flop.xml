@@ -421,6 +421,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="croschck" supported="no"> <!-- randomly freezes up on player's turn screen -->
+		<description>Crosscheck</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="crosscheck (1986)(datasoft)(us).atr" size="92176" crc="b4cef936" sha1="1bb9efe6ce4829388f933ae85dd0836749ca9e55"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ccchomp">
 		<description>Crush, Crumble and Chomp!</description>
 		<year>1981</year>
@@ -430,17 +441,6 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="croschck" supported="no"> <!-- randomly locks on player's turn screen -->
-		<description>Crosscheck</description>
-		<year>1986</year>
-		<publisher>Datasoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="crosscheck (1986)(datasoft)(us).atr" size="92176" crc="b4cef936" sha1="1bb9efe6ce4829388f933ae85dd0836749ca9e55"/>  <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
