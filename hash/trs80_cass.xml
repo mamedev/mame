@@ -739,5 +739,18 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 			</dataarea>
 		</part>
 	</software>
+	<software name="dddd">
+		<description>Doubled Dancing Demon Demo</description>
+		<year>2009</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="George Phillips" />
+		<info name="usage" value="Enter, Enter, SYSTEM then DANDEM then /" />
+		<sharedfeat name="compatibility" value="3,4" />
+		<part name="cass" interface="trs80_cass">
+			<dataarea name="cass" size="0x4fa9">
+				<rom name="zchess.cas" size="0x4fa9" crc="1c4253a6" sha1="2f2eef2524333bcc5609621602c7687cca3b49de"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
