@@ -722,6 +722,11 @@ floatx80 m68000_base_device::READ_EA_FPE(int ea)
 					}
 					break;
 
+				case 4:     // #<data>
+					fpr = load_extended_float80(m_pc);
+					m_pc += 12;
+					break;
+
 				default:
 					fatalerror("M68kFPU: READ_EA_FPE: unhandled mode %d, reg %d, at %08X\n", mode, reg, m_pc);
 					break;
