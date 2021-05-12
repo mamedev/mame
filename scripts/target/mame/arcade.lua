@@ -3676,6 +3676,8 @@ files {
 	MAME_DIR .. "src/mame/machine/315_5338a.h",
 	MAME_DIR .. "src/mame/machine/315_5649.cpp",
 	MAME_DIR .. "src/mame/machine/315_5649.h",
+	MAME_DIR .. "src/mame/machine/bingoct.cpp",
+	MAME_DIR .. "src/mame/machine/bingoct.h",
 	MAME_DIR .. "src/mame/machine/model1io.cpp",
 	MAME_DIR .. "src/mame/machine/model1io.h",
 	MAME_DIR .. "src/mame/machine/model1io2.cpp",
