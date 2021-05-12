@@ -458,7 +458,6 @@ void cop01_state::cop01(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
 
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
