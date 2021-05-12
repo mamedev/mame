@@ -9,7 +9,7 @@ driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
 - Fix priority kludge (see video/cop01.c)
-- Inaccurate of the 1412M2 protection chip in mightguy, used by the sound CPU.
+- Inaccurate 1412M2 protection chip emulation in mightguy, used by the sound CPU.
   This is probably an extra CPU (program rom is the ic2 one), presumably
   with data / address line scrambling
 - Some sound problems remaining, not just 1412M2, but see also MT7949
