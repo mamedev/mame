@@ -1184,7 +1184,7 @@ void hd6301x_cpu_device::write_port2()
 }
 
 /*
-    if change_pc() directed these areas ,Call hd63701_trap_pc().
+    if change_pc() directed these areas, call hd63701_trap_pc().
     'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
     mode 0,1,2,4,6 : $0000-$001f
     mode 5         : $0000-$001f,$0200-$efff
