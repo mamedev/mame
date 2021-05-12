@@ -2651,16 +2651,50 @@ license:CC0
 
 	<!-- Notes: rom freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
 	<software name="pigarus">
-		<description>Flight of Pigarus</description>
+		<description>Flight of Pigarus (v1.11)</description>
 		<year>2018</year> <!-- 2Minds cart published 2020 -->
 		<publisher>2Minds</publisher>
 		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
 		<info name="alt_title" value="ピガロスの飛行" />
 		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
 			<dataarea name="rom" size="262144">
 				<rom name="flightofpigarus-sms-1.11.bin" size="262144" crc="60b86f18" sha1="46941b6ca4c38b07fa55987d3f30c249d5674e2a" offset="000000" /> <!-- this digital release not verified against physical cart -->
 			</dataarea>
-			<dataarea name="ram" size="32768"> <!-- same amount on physical cart? -->
+			<!-- 32K is what game can actually use? According to maker the pcb part is a 256K Lapis MR48V256 -->
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigarus110">
+		<description>Flight of Pigarus (v1.10)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<info name="alt_title" value="ピガロスの飛行" />
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="262144">
+				<rom name="flightofpigarus-sms-1.10.bin" size="262144" crc="1950005d" sha1="3bd03c3be402b90e61e6be5b67216c0c6d8056e6" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigarus100">
+		<description>Flight of Pigarus (v1.00)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<info name="alt_title" value="ピガロスの飛行" />
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="262144">
+				<rom name="flightofpigarus-sms-1.00.bin" size="262144" crc="838574d1" sha1="e53a16f5bf4a2d804b26c359cf3a727c06379e6d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
 			</dataarea>
 		</part>
 	</software>
