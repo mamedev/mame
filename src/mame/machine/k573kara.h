@@ -26,7 +26,7 @@ private:
 	uint16_t uart_r(offs_t offset);
 	void uart_w(offs_t offset, uint16_t data);
 
-	uint16_t unk_r();
+	uint16_t io_r();
 	void lamp1_w(uint16_t data);
 	void lamp2_w(uint16_t data);
 	void lamp3_w(uint16_t data);
