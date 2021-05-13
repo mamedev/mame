@@ -3978,6 +3978,8 @@ if (BUSES["VSMILE"]~=null) then
 		MAME_DIR .. "src/devices/bus/vsmile/pad.h",
 		MAME_DIR .. "src/devices/bus/vsmile/mat.cpp",
 		MAME_DIR .. "src/devices/bus/vsmile/mat.h",
+		MAME_DIR .. "src/devices/bus/vsmile/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/vsmile/keyboard.h",
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.cpp",
 		MAME_DIR .. "src/devices/bus/vsmile/vsmile_slot.h",
 		MAME_DIR .. "src/devices/bus/vsmile/rom.cpp",

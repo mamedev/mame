@@ -4672,11 +4672,12 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a keyboard controller -->
-	<software name="smartkb" supported="no">
+	<software name="smartkb">
 		<description>V.Smile Smart Keyboard (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
+		<sharedfeat name="ctrl1_default" value="smartkb_us" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
@@ -4688,11 +4689,12 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a keyboard controller -->
-	<software name="smartkbge" cloneof="smartkb" supported="no">
+	<software name="smartkbge" cloneof="smartkb">
 		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091444(GE)" />
+		<sharedfeat name="ctrl1_default" value="smartkb_ge" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="pcb" value="707180" />
@@ -4706,11 +4708,12 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<!-- No inputs, uses a keyboard controller -->
-	<software name="smartkbfr" cloneof="smartkb" supported="no">
+	<software name="smartkbfr" cloneof="smartkb">
 		<description>V.Smile Clavier Tip Tap (France)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-091445(FR)" />
+		<sharedfeat name="ctrl1_default" value="smartkb_fr" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="yellow" />
