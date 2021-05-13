@@ -380,11 +380,10 @@ protected:
 	void p6_csr_w(uint8_t data);
 
 	virtual void m6800_check_irq2() override;
-	void clear_pending_isi();
+	void clear_pending_isf();
 
 	uint8_t m_p6_csr;
-	bool m_pending_isi;
-	bool m_pending_isi_clear;
+	bool m_pending_isf_clear;
 };
 
 

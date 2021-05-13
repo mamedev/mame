@@ -426,7 +426,7 @@ nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char
 
 device_memory_interface::space_config_vector m6800_cpu_device::memory_space_config() const
 {
-	if(has_configured_map(AS_OPCODES))
+	if (has_configured_map(AS_OPCODES))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config)
@@ -440,13 +440,13 @@ device_memory_interface::space_config_vector m6800_cpu_device::memory_space_conf
 uint32_t m6800_cpu_device::RM16(uint32_t Addr )
 {
 	uint32_t result = RM(Addr) << 8;
-	return result | RM((Addr+1)&0xffff);
+	return result | RM((Addr+1) & 0xffff);
 }
 
 void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 {
-	WM( Addr, p->b.h );
-	WM( (Addr+1)&0xffff, p->b.l );
+	WM(Addr, p->b.h);
+	WM((Addr+1) & 0xffff, p->b.l);
 }
 
 /* IRQ enter */
@@ -455,11 +455,11 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 	int cycles_to_eat = 0;
 
 	LOG((message));
-	if( m_wai_state & (M6800_WAI|M6800_SLP) )
+	if (m_wai_state & (M6800_WAI | M6800_SLP))
 	{
-		if( m_wai_state & M6800_WAI )
+		if (m_wai_state & M6800_WAI)
 			cycles_to_eat = 4;
-		m_wai_state &= ~(M6800_WAI|M6800_SLP);
+		m_wai_state &= ~(M6800_WAI | M6800_SLP);
 	}
 	else
 	{
@@ -471,7 +471,7 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 		cycles_to_eat = 12;
 	}
 	SEI;
-	PCD = RM16( irq_vector );
+	PCD = RM16(irq_vector);
 
 	if (cycles_to_eat > 0)
 		increment_counter(cycles_to_eat);
@@ -484,7 +484,7 @@ void m6800_cpu_device::check_irq_lines()
 
 	if (m_nmi_pending)
 	{
-		if(m_wai_state & M6800_SLP)
+		if (m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
 
 		m_nmi_pending = false;
@@ -492,20 +492,20 @@ void m6800_cpu_device::check_irq_lines()
 	}
 	else
 	{
-		if( m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
+		if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
 		{
 			/* standard IRQ */
-			if(m_wai_state & M6800_SLP)
+			if (m_wai_state & M6800_SLP)
 				m_wai_state &= ~M6800_SLP;
 
-			if( !(CC & 0x10) )
+			if (!(CC & 0x10))
 			{
 				enter_interrupt("take IRQ1\n", 0xfff8);
 				standard_irq_callback(M6800_IRQ_LINE);
 			}
 		}
 		else
-			if( !(CC & 0x10) )
+			if (!(CC & 0x10))
 				m6800_check_irq2();
 	}
 }
@@ -584,7 +584,7 @@ void m6800_cpu_device::device_reset()
 {
 	m_cc = 0xc0;
 	SEI; /* IRQ disabled */
-	PCD = RM16( 0xfffe );
+	PCD = RM16(0xfffe);
 
 	m_wai_state = 0;
 	m_nmi_state = 0;
@@ -621,7 +621,7 @@ void m6800_cpu_device::execute_run()
 
 	do
 	{
-		if( m_wai_state & (M6800_WAI|M6800_SLP) )
+		if (m_wai_state & (M6800_WAI | M6800_SLP))
 		{
 			eat_cycles();
 		}
@@ -634,7 +634,7 @@ void m6800_cpu_device::execute_run()
 			(this->*m_insn[ireg])();
 			increment_counter(m_cycles[ireg]);
 		}
-	} while( m_icount>0 );
+	} while (m_icount > 0);
 }
 
 std::unique_ptr<util::disasm_interface> m6800_cpu_device::create_disassembler()
