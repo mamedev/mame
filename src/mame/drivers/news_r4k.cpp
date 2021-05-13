@@ -437,11 +437,10 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
 
-    // SONIC network controller
-    // Right now, this doesn't work because nothing is mapping the SONIC's address lines to 0x1e620000 space so it just causes a bunch of unmapped reads
-    map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
-    map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
-    map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
+    // SONIC network controller (not working yet)
+    //map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
+    //map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
+    //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
 
     // DMAC3 DMA Controller
     //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
