@@ -61,9 +61,9 @@
     with the trailing edge of writes to PIA0 CB1).  DEMO does not attempt
     to synchronize on horizontal sync; it relies on CPU timing.
 
-    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets TMR interrupts
-    and IRQ gets VBORD interrupts.  Since it does not use the PIA field
-    sync, it can be used to demonstrate how the GIME's VBORD interrupt
+    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets fast interrupts
+    and IRQ gets slow interrupts.  Since it does not use the PIA field
+    sync, it can be used to demonstrate how the GIME's slow interrupt
     is distinct.
 
     BOINK: SockMaster demo.  Like DEMO, it SYNCs on the trailing edge
@@ -385,6 +385,24 @@ ioport_constructor gime_device::device_input_ports() const
 
 
 
+//**************************************************************************
+//  TIMER
+//
+//  The CoCo 3 had a timer that was always running, it
+//  would decrement over and over again until zero was reached, and at that
+//  point, would flag an interrupt.  At this point, the timer starts back up
+//  again.
+//
+//  I am deducing that the timer interrupt line was asserted if the timer was
+//  zero and unasserted if the timer was non-zero.
+//
+//  Most CoCo 3 docs, including the specs that Tandy released, say that the
+//  high speed timer is 70ns (half of the speed of the main clock crystal).
+//  However, it seems that this is in error, and the GIME timer is really a
+//  279ns timer (one eighth the speed of the main clock crystal.  Gault's
+//  FAQ agrees with this
+//
+//**************************************************************************
 
 //-------------------------------------------------
 //  timer_type
@@ -763,13 +781,9 @@ void gime_device::write(offs_t offset, uint8_t data)
 
 inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 {
-	// this is needed for writes to FF95
-// 	bool timer_was_off = (m_gime_registers[0x04] == 0x00) && (m_gime_registers[0x05] == 0x00);
-
 	// sanity check input
 	offset &= 0x0F;
 
-	// perform logging
 	LOGGIME("%s: CoCo3 GIME: $%04x <== $%02x\n", describe_context(), offset + 0xff90, data);
 
 	// make the change, and track the difference
@@ -820,14 +834,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-				LOGINTMASKING("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
+			LOGINTMASKING("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -854,14 +868,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-				LOGINTMASKING("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
+			LOGINTMASKING("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -889,20 +903,6 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 		case 0x05:
 			//  $FF95 Timer register LSB
 			//        Bits 0-7 Low order eight bits of the timer
-// 			if (timer_was_off && (m_gime_registers[0x05] != 0x00))
-// 			{
-// 				// Writes to $FF95 do not cause the timer to reset, but MESS
-// 				// will invoke coco3_timer_reset() if $FF94/5 was previously
-// 				// $0000.  The reason for this is because the timer is not
-// 				// actually off when $FF94/5 are loaded with $0000; rather it
-// 				// is continuously reloading the GIME's internal countdown
-// 				// register, even if it isn't causing interrupts to be raised.
-// 				//
-// 				// Failure to do this was the cause of bug #1065.  Special
-// 				// thanks to John Kowalski for pointing me in the right
-// 				// direction
-// 				reset_timer();
-// 			}
 			break;
 
 		case 0x08:
