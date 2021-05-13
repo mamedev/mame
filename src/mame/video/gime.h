@@ -122,8 +122,8 @@ protected:
 
 	enum timer_type_t
 	{
-		GIME_TIMER_HBORD,
-		GIME_TIMER_CLOCK
+		GIME_TIMER_63USEC,
+		GIME_TIMER_279NSEC
 	};
 
 	// timer constants
