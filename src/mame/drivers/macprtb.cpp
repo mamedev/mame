@@ -98,9 +98,10 @@
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
-#include "machine/ncr5380.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/macscsi.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_bus.h"
+#include "bus/nscsi/devices.h"
 #include "sound/asc.h"
 #include "formats/ap_dsk35.h"
 
@@ -109,9 +110,9 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define C7M (7833600)
-#define C15M (C7M*2)
-#define C32M (C15M*2)
+#define C32M (31.3344_MHz_XTAL)
+#define C15M (C32M/2)
+#define C7M (C32M/4)
 
 class macportable_state : public driver_device
 {
@@ -122,7 +123,8 @@ public:
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
 		m_macadb(*this, "macadb"),
-		m_ncr5380(*this, "ncr5380"),
+		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -145,7 +147,8 @@ private:
 	required_device<m50753_device> m_pmu;
 	required_device<via6522_device> m_via1;
 	required_device<macadb_device> m_macadb;
-	required_device<ncr5380_device> m_ncr5380;
+	required_device<ncr53c80_device> m_ncr5380;
+	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -177,7 +180,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	int m_via_cycles, m_via_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_ca1_data;
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
@@ -187,6 +190,7 @@ private:
 
 	uint16_t scsi_r(offs_t offset, uint16_t mem_mask);
 	void scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void scsi_berr_w(uint8_t data);
 
 	uint16_t mac_scc_r(offs_t offset)
 	{
@@ -220,9 +224,9 @@ private:
 		field_interrupts();
 	}
 
-	u8 m_pmu_via_bus, m_pmu_ack, m_pmu_req;
-	u8 pmu_data_r() { return m_pmu_via_bus; }
-	void pmu_data_w(u8 data) { m_pmu_via_bus = data; }
+	u8 m_pmu_to_via, m_pmu_from_via, m_pmu_ack, m_pmu_req;
+	u8 pmu_data_r() { return m_pmu_from_via; }
+	void pmu_data_w(u8 data) { m_pmu_to_via = data; }
 	u8 pmu_comms_r() { return (m_pmu_req<<7); }
 	void pmu_comms_w(u8 data)
 	{
@@ -231,6 +235,7 @@ private:
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		}
 
+		m_via1->write_ca2(BIT(data, 4));
 		m_via1->write_cb1(BIT(data, 5));
 
 			m_pmu_ack = BIT(data, 6);
@@ -280,8 +285,9 @@ void macportable_state::machine_start()
 	m_via_cycles = -50;
 	m_via_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
-	m_pmu_via_bus = 0;
+	m_ca1_data = 0;
+	m_pmu_to_via = 0;
+	m_pmu_from_via = 0;
 	m_pmu_ack = m_pmu_req = 0;
 	m_adb_line = 1;
 
@@ -294,9 +300,8 @@ void macportable_state::machine_reset()
 	m_overlay = true;
 	m_via_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
-	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_ca1_data = 0;
 
-	m_pmu_via_bus = 0;
 	m_pmu_ack = 1;
 
 	// start 60.15 Hz timer
@@ -391,15 +396,6 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 	m_macadb->adb_vblank();
-
-	if (++m_irq_count == 60)
-	{
-		m_irq_count = 0;
-
-		m_ca2_data ^= 1;
-		/* signal 1 Hz irq on CA2 input on the VIA */
-		m_via1->write_ca2(m_ca2_data);
-	}
 }
 
 uint16_t macportable_state::scsi_r(offs_t offset, uint16_t mem_mask)
@@ -408,12 +404,9 @@ uint16_t macportable_state::scsi_r(offs_t offset, uint16_t mem_mask)
 
 	//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
-	if ((reg == 6) && (offset == 0x130))
-	{
-		reg = R5380_CURDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 6) && (offset == 0x130);
 
-	return m_ncr5380->ncr5380_read_reg(reg) << 8;
+	return m_scsihelp->read_wrapper(pseudo_dma, reg) << 8;
 }
 
 void macportable_state::scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -422,13 +415,16 @@ void macportable_state::scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
-	m_ncr5380->ncr5380_write_reg(reg, data);
+	m_scsihelp->write_wrapper(pseudo_dma, reg, data);
 }
+
+void macportable_state::scsi_berr_w(uint8_t data)
+{
+	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -449,7 +445,7 @@ void macportable_state::macprtb_map(address_map &map)
 
 uint8_t macportable_state::mac_via_in_a()
 {
-	return m_pmu_via_bus;
+	return m_pmu_to_via;
 }
 
 uint8_t macportable_state::mac_via_in_b()
@@ -459,7 +455,7 @@ uint8_t macportable_state::mac_via_in_b()
 
 void macportable_state::mac_via_out_a(uint8_t data)
 {
-	m_pmu_via_bus = data;
+	m_pmu_from_via = data;
 }
 
 void macportable_state::mac_via_out_b(uint8_t data)
@@ -515,10 +511,12 @@ void macportable_state::macprtb(machine_config &config)
 	M50753(config, m_pmu, 3.93216_MHz_XTAL);
 	m_pmu->read_p<2>().set(FUNC(macportable_state::pmu_data_r));
 	m_pmu->write_p<2>().set(FUNC(macportable_state::pmu_data_w));
+	m_pmu->set_pullups<2>(0xff); // internal pullup option?
 	m_pmu->read_p<3>().set(FUNC(macportable_state::pmu_comms_r));
 	m_pmu->write_p<3>().set(FUNC(macportable_state::pmu_comms_w));
 	m_pmu->read_p<4>().set(FUNC(macportable_state::pmu_adb_r));
 	m_pmu->write_p<4>().set(FUNC(macportable_state::pmu_adb_w));
+	m_pmu->set_pullups<4>(0x0f); // external pullups
 	m_pmu->read_in_p().set(FUNC(macportable_state::pmu_in_r));
 	m_pmu->ad_in<0>().set(FUNC(macportable_state::ad_in_r));
 	m_pmu->ad_in<1>().set(FUNC(macportable_state::ad_in_r));
@@ -546,12 +544,27 @@ void macportable_state::macprtb(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
+		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
+		adapter.irq_handler().set(m_via1, FUNC(r65c22_device::write_cb2));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(macportable_state::scsi_berr_w));
 
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macportable_state::set_scc_interrupt));
@@ -576,6 +589,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_ram->set_extra_options("1M,3M,5M,7M,9M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 
 ROM_START(macprtb)

@@ -145,7 +145,6 @@ trs80l2:   works
 
 sys80:     works
            investigate expansion-box
-           add 32 / 64 cpl switch
 
 ht1080z    works
            verify clock for AY-3-8910
@@ -155,6 +154,7 @@ ht1080z    works
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 
 
@@ -279,13 +279,12 @@ static INPUT_PORTS_START( trs80 )
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)          PORT_CHAR('Z') PORT_CHAR('z')
 	// These keys produce output on all systems, the shift key having no effect. They display arrow symbols and underscore.
 	// On original TRS80, shift cancels all keys except F3 which becomes backspace.
-	// On the radionic, Shift works, and the symbols display correctly.
-	// PORT_CHAR('_') is correct for all systems, however the others are only for radionic.
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_F1)  PORT_CHAR('[') PORT_CHAR('{')  // radionic: F1
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_F2) PORT_CHAR('\\') PORT_CHAR('}') // radionic: F2 ; sys80 mkII: F2 ; lnw80: F1
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_F3)  PORT_CHAR(']') PORT_CHAR('|')  // radionic: F3 ; sys80 mkII: F3
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_F4)  PORT_CHAR('^')                 // radionic: F4 ; sys80 mkII: F4 ; lnw80: F2
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_F5)  PORT_CHAR('_')                 // radionic: LF ; sys80 mkII: F1 ; lnw80: _
+	// PORT_CHAR('_') is correct for all systems.
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_F2)   // sys80 mkII: F2
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_F3)   // sys80 mkII: F3
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_F4)  // sys80 mkII: F4
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_F5)         PORT_CHAR('_')  // sys80 mkII: F1
 
 	PORT_START("LINE4") // Number pad: System 80 Mk II only
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)          PORT_CHAR('0')
@@ -321,6 +320,9 @@ static INPUT_PORTS_START( trs80 )
 	PORT_START("LINE7")
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
+
+	PORT_START("RESET") // special button
+	PORT_BIT(0x01, 0x00, IPT_OTHER) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)
@@ -349,6 +351,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(sys80)
 	PORT_INCLUDE (trs80l2)
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(    0x08, 0x00,   "Video Cut")  // Toggle switch on the back
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x08, DEF_STR( On ) )
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Page") PORT_CODE(KEYCODE_F6) PORT_TOGGLE  // extra keys above the main keyboard
+	//PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F7) PORT_TOGGLE  // this turns on the tape motor
 	PORT_START("BAUD")
 	PORT_DIPNAME( 0xff, 0x06, "Baud Rate")
 	PORT_DIPSETTING(    0x00, "110")
@@ -416,12 +424,16 @@ static void trs80_floppies(device_slot_interface &device)
 }
 
 
-void trs80_state::trs80(machine_config &config)       // the original model I, level I, with no extras
+void trs80_state::level1(machine_config &config)      // the original model I, level I, with no extras
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 10.6445_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::trs80_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::trs80_io);
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -447,9 +459,9 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("0");
 }
 
-void trs80_state::model1(machine_config &config)      // model I, level II
+void trs80_state::level2(machine_config &config)      // model I, level II
 {
-	trs80(config);
+	level1(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::m1_mem);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::m1_io);
@@ -499,8 +511,11 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 void trs80_state::sys80(machine_config &config)
 {
-	model1(config);
+	level2(config);
 	m_maincpu->set_addrmap(AS_IO, &trs80_state::sys80_io);
+	m_maincpu->halt_cb().set_nop(); // TODO: asserts HLTA on expansion bus instead
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_sys80));
 
 	config.device_remove("brg");
 	CLOCK(config, m_uart_clock, 19200 * 16);
@@ -646,13 +661,13 @@ ROM_END
 
 void trs80_state::init_trs80l2()
 {
-	m_mode = 2;
+	m_7bit = true;
 }
 
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1977, trs80,       0,        0,       level1,   trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1978, trs80l2,     0,        0,       level2,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

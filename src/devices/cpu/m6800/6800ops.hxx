@@ -41,7 +41,7 @@ OP_HANDLER( illegl3 )
 OP_HANDLER( trap )
 {
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC-1,(int) M_RDOP_ARG(PC-1)&0xFF);
-	TAKE_TRAP();
+	take_trap();
 }
 
 /* $00 ILLEGAL */
@@ -80,7 +80,7 @@ OP_HANDLER( tap )
 {
 	CC=A;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(); /* HJB 990417 */
+	check_irq_lines();
 }
 
 /* $07 TPA inherent ----- */
@@ -132,7 +132,7 @@ OP_HANDLER( cli )
 {
 	CLI;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(); /* HJB 990417 */
+	check_irq_lines();
 }
 
 /* $0f SEI */
@@ -140,7 +140,7 @@ OP_HANDLER( sei )
 {
 	SEI;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(); /* HJB 990417 */
+	check_irq_lines();
 }
 
 /* $10 SBA inherent -**** */
@@ -221,7 +221,7 @@ OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
 	m_wai_state |= M6800_SLP;
-	EAT_CYCLES();
+	eat_cycles();
 }
 
 /* $1b ABA inherent ***** */
@@ -427,7 +427,7 @@ OP_HANDLER( rti )
 	PULLBYTE(A);
 	PULLWORD(pX);
 	PULLWORD(pPC);
-	CHECK_IRQ_LINES(); /* HJB 990417 */
+	check_irq_lines();
 }
 
 /* $3c PSHX inherent ----- */
@@ -459,8 +459,8 @@ OP_HANDLER( wai )
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
-	CHECK_IRQ_LINES();
-	if (m_wai_state & M6800_WAI) EAT_CYCLES();
+	check_irq_lines();
+	if (m_wai_state & M6800_WAI) eat_cycles();
 }
 
 /* $3f SWI absolute indirect ----- */

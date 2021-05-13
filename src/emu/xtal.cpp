@@ -247,6 +247,7 @@ const double XTAL::known_xtals[] = {
 	 15'582'000, /* 15.582_MHz_XTAL        Zentec Zephyr */
 	 15'667'200, /* 15.6672_MHz_XTAL       Apple Macintosh */
 	 15'700'000, /* 15.7_MHz_XTAL          Motogonki */
+	 15'741'000, /* 15.741_MHz_XTAL        DECmate II 80-column display clock */
 	 15'897'600, /* 15.8976_MHz_XTAL       IAI Swyft */
 	 15'920'000, /* 15.92_MHz_XTAL         HP Integral PC */
 	 15'930'000, /* 15.93_MHz_XTAL         ADM 12 */

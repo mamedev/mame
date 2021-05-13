@@ -41,7 +41,7 @@ private:
 
 	u8 p2_r();
 	WRITE_LINE_MEMBER(midi_rx_r) { m_rx_data = state; }
-	WRITE_LINE_MEMBER(midiclock_w) { if (state == ASSERT_LINE) m_maincpu->m6801_clock_serial();}
+	WRITE_LINE_MEMBER(midiclock_w) { if (state) m_maincpu->m6801_clock_serial(); }
 
 	required_device<hd6303x_cpu_device> m_maincpu;
 	required_ioport m_port2;
@@ -130,7 +130,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-15/-20 + CR2032 battery
 
-	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL / 2)); // divider not verified
+	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL));
 	midiclock.signal_handler().set(FUNC(ymtx81z_state::midiclock_w));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(ymtx81z_state::midi_rx_r));

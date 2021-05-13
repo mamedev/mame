@@ -79,6 +79,7 @@ public:
 	}
 
 	void sbrain(machine_config &config);
+	void sagafox(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -752,6 +753,13 @@ void sbrain_state::sbrain(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("sbrain");
 }
 
+void sbrain_state::sagafox(machine_config& config)
+{
+	sbrain(config);
+
+	subdevice<software_list_device>("flop_list")->set_original("sagafox");
+}
+
 ROM_START( sbrain )
 	ROM_REGION( 0x0800, "subcpu", ROMREGION_ERASEFF ) // only the second CPU has its own ROM
 	ROM_SYSTEM_BIOS( 0, "4_2", "4.2")
@@ -769,4 +777,32 @@ ROM_START( sbrain )
 	ROM_LOAD("c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
 
-COMP( 1981, sbrain, 0, 0, sbrain, sbrain, sbrain_state, empty_init, "Intertec Data Systems", "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+ROM_START( sagafox )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("1b02.bin", 0x0000, 0x0800, CRC(1cd6e4d2) SHA1(585d2a52840804a3771077bcc77e249b28ea1602))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD("1cg0.bin", 0x0000, 0x0800, CRC(508c56ef) SHA1(9ba2cceeb3b9f72503693372ae76f54d5919f024))
+
+	ROM_REGION( 0x0400, "keyboard", 0 ) // use with KR3600-PRO
+	ROM_LOAD("1kb1.bin", 0x0000, 0x0400, CRC(92b00014) SHA1(0669ecfc24bf010735a9c14791409e80390a01f7))
+ROM_END
+
+ROM_START( sagafoxf80 )
+	ROM_REGION( 0x0800, "subcpu", 0 )
+	ROM_LOAD("f80_6ms.bin", 0x0000, 0x0800, CRC(81ed0c24) SHA1(411fd7bbb85dfd8c793f0871041f64febf5571e0))
+
+	ROM_REGION( 0x0800, "chargen", 0 ) // minor differences to sagafox, most notable on '6', suffering from bitrot?
+	ROM_LOAD("1cg0.bin", 0x0000, 0x0800, CRC(fba860fc) SHA1(7cd467fe2c11861daf1ed5f9f002874eabe2a47a))
+
+	ROM_REGION( 0x0400, "keyboard", 0 ) // use with KR3600-PRO
+	ROM_LOAD("1kb1.bin", 0x0000, 0x0400, CRC(92b00014) SHA1(0669ecfc24bf010735a9c14791409e80390a01f7))
+
+	ROM_REGION( 0x0800, "oam", 0 ) // software protection module?
+	ROM_LOAD("oam120.bin", 0x0000, 0x0800, CRC(880a8e36) SHA1(c6bee88a294090f039161fe20ce36a4ada3b10d3))
+ROM_END
+
+//    YEAR  NAME        PARENT  COMPAT MACHINE   INPUT   CLASS         INIT        COMPANY                                FULLNAME                            FLAGS
+COMP( 1981, sbrain,     0,      0,     sbrain,   sbrain, sbrain_state, empty_init, "Intertec Data Systems",               "SuperBrain Video Computer System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sagafox,    sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sagafoxf80, sbrain, 0,     sagafox,  sbrain, sbrain_state, empty_init, "Sistemi Avanzati Gestione Aziendale", "Saga Fox/F80",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

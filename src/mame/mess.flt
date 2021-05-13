@@ -225,6 +225,7 @@ dccons.cpp
 dcebridge.cpp
 dct11em.cpp
 debut.cpp
+decmate2.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
@@ -1019,6 +1020,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp

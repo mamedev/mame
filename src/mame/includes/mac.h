@@ -14,6 +14,8 @@
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/egret.h"
@@ -22,8 +24,8 @@
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
 #include "machine/applefdintf.h"
-#include "machine/ncr5380.h"
 #include "machine/macrtc.h"
+#include "machine/macscsi.h"
 #include "sound/asc.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
@@ -59,7 +61,8 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
-		m_ncr5380(*this, "ncr5380"),
+		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_scsihelp(*this, "scsihelp"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this, "rtc"),
@@ -196,7 +199,8 @@ private:
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;
-	optional_device<ncr5380_device> m_ncr5380;
+	required_device<ncr53c80_device> m_ncr5380;
+	required_device<mac_scsi_helper_device> m_scsihelp;
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<rtc3430042_device> m_rtc;
@@ -286,6 +290,7 @@ private:
 	void macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t macii_scsi_drq_r(offs_t offset, uint32_t mem_mask = ~0);
 	void macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void scsi_berr_w(uint8_t data);
 
 	uint32_t rbv_ramdac_r();
 	void rbv_ramdac_w(offs_t offset, uint32_t data);

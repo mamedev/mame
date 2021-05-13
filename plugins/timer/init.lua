@@ -1,6 +1,6 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Carl
-local util = require('util')
+require('lfs')
 local sqlite3 = require('lsqlite3')
 local exports = {}
 exports.name = "timer"
@@ -44,7 +44,7 @@ function timer.startplugin()
 			save()
 		end
 		timer_started = true
-		util.mkdir_recursive(dir .. '/timer')
+		lfs.mkdir(dir .. '/timer')
 		local db = assert(sqlite3.open(timer_db))
 		local found=false
 		db:exec([[select * from sqlite_master where name='timer';]], function(...) found=true return 0 end)

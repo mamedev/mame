@@ -41,7 +41,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "flop%u", 0U)
+		, m_floppy(*this, "floppy%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_baud(*this, "BAUD")
@@ -51,8 +51,8 @@ public:
 
 	void sys80(machine_config &config);
 	void sys80p(machine_config &config);
-	void trs80(machine_config &config);
-	void model1(machine_config &config);
+	void level1(machine_config &config);
+	void level2(machine_config &config);
 	void ht1080z(machine_config &config);
 
 	void init_trs80l2();
@@ -61,21 +61,21 @@ protected:
 	void machine_start() override;
 	void machine_reset() override;
 
-	void port_ff_w(uint8_t data);
-	void sys80_fe_w(uint8_t data);
-	void sys80_f8_w(uint8_t data);
-	void port_ea_w(uint8_t data);
-	void port_e8_w(uint8_t data);
-	uint8_t port_ff_r();
-	uint8_t sys80_f9_r();
-	uint8_t port_ea_r();
-	uint8_t port_e8_r();
-	uint8_t irq_status_r();
-	uint8_t printer_r();
-	void printer_w(uint8_t data);
-	void cassunit_w(uint8_t data);
-	void motor_w(uint8_t data);
-	uint8_t keyboard_r(offs_t offset);
+	void port_ff_w(u8 data);
+	void sys80_fe_w(u8 data);
+	void sys80_f8_w(u8 data);
+	void port_ea_w(u8 data);
+	void port_e8_w(u8 data);
+	u8 port_ff_r();
+	u8 sys80_f9_r();
+	u8 port_ea_r();
+	u8 port_e8_r();
+	u8 irq_status_r();
+	u8 printer_r();
+	void printer_w(u8 data);
+	void cassunit_w(u8 data);
+	void motor_w(u8 data);
+	u8 keyboard_r(offs_t offset);
 	u8 fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, u8 data);
 
@@ -85,19 +85,20 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	uint8_t m_mode = 0;
-	uint8_t m_irq = 0;
-	uint8_t m_mask = 0;
-	uint8_t m_tape_unit = 1;
+	u8 m_irq = 0;
+	u8 m_mask = 0;
+	u8 m_tape_unit = 1;
 	bool m_reg_load = true;
 	bool m_cassette_data = false;
 	emu_timer *m_cassette_data_timer;
 	double m_old_cassette_val = 0;
-	uint8_t m_size_store = 0xFF;
-	uint16_t m_timeout = 600;
+	bool m_cpl = 0;
+	u8 m_cols = 0xff;
+	bool m_7bit = false;
+	u16 m_timeout = 600;
 	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_shared_ptr<u8> m_p_videoram;
@@ -121,8 +122,9 @@ private:
 	void trs80_mem(address_map &map);
 	void ht1080z_io(address_map &map);
 
-	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_sys80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static void floppy_formats(format_registration &fr);
 };
 

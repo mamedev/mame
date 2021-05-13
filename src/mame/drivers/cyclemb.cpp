@@ -10,10 +10,9 @@ appears to be in the exact middle between the gsword / josvolly HW and the ppkin
 driver by Angelo Salese
 
 TODO:
-- separate driver into 2 classes
-- reduce tagmap lookups
-- sound (controlled by three i8741);
-- coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
+- separate driver into 2 classes;
+- reduce tagmap lookups;
+- low-level emulation of inputs/soundlatch (controlled by several i8741, like Gladiator / Ougon no Shiro);
 - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
 
 BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
@@ -1160,5 +1159,5 @@ void cyclemb_state::init_skydest()
 
 
 //    year  name      parent  machine   input    class          init          rot   company              fullname                 flags
-GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_SUPPORTS_SAVE )

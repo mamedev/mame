@@ -46,7 +46,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// address spaces
-	const address_space_config m_program_config;
+	address_space_config m_program_config;
 
 	enum state
 	{
@@ -105,7 +105,5 @@ enum
 	PDP8_IR,
 	PDP8_HALT
 };
-
-CPU_DISASSEMBLE( pdp8 );
 
 #endif /* __PDP8_H__ */

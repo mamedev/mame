@@ -1030,7 +1030,7 @@ bool i82586_device::cu_transmit(u32 command)
 		LOG("cu_transmit sending frame length %d\n", length);
 		dump_bytes(buf, length);
 
-		return send(buf, length) == length;
+		return send(buf, length, 4) == length;
 	}
 }
 

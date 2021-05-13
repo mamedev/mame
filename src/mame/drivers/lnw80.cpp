@@ -77,6 +77,7 @@ To Do / Status:
 #include "emu.h"
 #include "includes/trs80.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
 
 class lnw80_state : public trs80_state
@@ -242,6 +243,9 @@ static INPUT_PORTS_START( lnw80 )
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0xee, 0x00, IPT_UNUSED)
 
+	PORT_START("RESET")
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
+
 	PORT_START("CONFIG")
 	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
@@ -312,17 +316,16 @@ void lnw80_state::lnw80_fe_w(u8 data)
 
 void lnw80_state::machine_start()
 {
-	save_item(NAME(m_mode));
+	save_item(NAME(m_cpl));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_reg_load));
 	save_item(NAME(m_lnw_mode));
 	save_item(NAME(m_cassette_data));
 	save_item(NAME(m_old_cassette_val));
-	save_item(NAME(m_size_store));
+	save_item(NAME(m_cols));
 	save_item(NAME(m_timeout));
 
-	m_size_store = 0xff;
 	m_reg_load=1;
 
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lnw80_state::cassette_data_callback),this));
@@ -331,7 +334,8 @@ void lnw80_state::machine_start()
 
 void lnw80_state::machine_reset()
 {
-	m_mode = 0;
+	m_cpl = 0;
+	m_cols = 0xff;
 	m_cassette_data = false;
 	const u16 s_bauds[8]={ 110, 300, 600, 1200, 2400, 4800, 9600, 19200 };
 	u16 s_clock = s_bauds[m_io_baud->read()] << 4;
@@ -353,14 +357,14 @@ u32 lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	u8 skip = 1;
 	if (mode == 0)
 	{
-		skip = BIT(m_mode, 0) ? 2 : 1;
+		skip = m_cpl ? 2 : 1;
 		if (skip == 2)
 			cols >>= 1;
 	}
 
-	if (cols != m_size_store)
+	if (cols != m_cols)
 	{
-		m_size_store = cols;
+		m_cols = cols;
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
@@ -582,6 +586,10 @@ void lnw80_state::lnw80(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lnw80_state::lnw80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lnw80_state::lnw80_io);
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

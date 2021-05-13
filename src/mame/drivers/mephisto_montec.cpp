@@ -51,7 +51,6 @@ public:
 		, m_lcd_latch(*this, "lcd_latch")
 		, m_led_pwm(*this, "led_pwm")
 		, m_lcd(*this, "lcd%u", 0)
-		, m_dac(*this, "dac")
 		, m_keys(*this, "KEY.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
 	{ }
@@ -68,7 +67,6 @@ private:
 	required_device<hc259_device> m_lcd_latch;
 	required_device<pwm_display_device> m_led_pwm;
 	required_device_array<pcf2112_device, 2> m_lcd;
-	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<2> m_keys;
 	output_finder<8> m_digits;
 
@@ -191,7 +189,7 @@ void montec_state::montec(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HC259(config, m_lcd_latch);
-	m_lcd_latch->q_out_cb<2>().set(m_dac, FUNC(dac_bit_interface::write)).invert();
+	m_lcd_latch->q_out_cb<2>().set("dac", FUNC(dac_1bit_device::write)).invert();
 	m_lcd_latch->q_out_cb<4>().set(m_lcd[0], FUNC(pcf2112_device::data_w));
 	m_lcd_latch->q_out_cb<4>().append(m_lcd[1], FUNC(pcf2112_device::data_w));
 	m_lcd_latch->q_out_cb<5>().set(m_lcd[1], FUNC(pcf2112_device::dlen_w));
@@ -213,7 +211,7 @@ void montec_state::montec(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 void montec_state::montec4le(machine_config &config)

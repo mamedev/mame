@@ -26,8 +26,7 @@
 #include "sound/asc.h"
 #include "formats/ap_dsk35.h"
 
-#include "bus/nscsi/cd.h"
-#include "bus/nscsi/hd.h"
+#include "bus/nscsi/devices.h"
 
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/nubus_48gc.h"
@@ -628,10 +627,12 @@ uint32_t macquadra_state::screen_update_dafb(screen_device &screen, bitmap_rgb32
 
 WRITE_LINE_MEMBER(macquadra_state::drq_539x_1_w)
 {
+	m_dafb_scsi1_drq = state;
 }
 
 WRITE_LINE_MEMBER(macquadra_state::drq_539x_2_w)
 {
+	m_dafb_scsi2_drq = state;
 }
 
 WRITE_LINE_MEMBER(macquadra_state::irq_539x_1_w)
@@ -779,7 +780,7 @@ uint8_t macquadra_state::mac_5396_r(offs_t offset)
 	}
 	else    // pseudo-DMA: read from the FIFO
 	{
-//      return m_539x_1->read(2);
+		return m_ncr1->dma_r();
 	}
 
 	// never executed
@@ -794,7 +795,7 @@ void macquadra_state::mac_5396_w(offs_t offset, uint8_t data)
 	}
 	else    // pseudo-DMA: write to the FIFO
 	{
-//      m_539x_1->write(2, data);
+		m_ncr1->dma_w(data);
 	}
 }
 
@@ -810,7 +811,7 @@ void macquadra_state::quadra700_map(address_map &map)
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	map(0x5000f000, 0x5000f3ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f000, 0x5000f401).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::swim_r), FUNC(macquadra_state::swim_w)).mirror(0x00fc0000);
@@ -934,12 +935,6 @@ static void mac_nubus_cards(device_slot_interface &device)
 	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
 	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
 	device.option_add("laserview", NUBUS_LASERVIEW);  /* Sigma Designs LaserView monochrome video card */
-}
-
-static void mac_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
 }
 
 void macquadra_state::macqd700(machine_config &config)

@@ -61,7 +61,7 @@ Silver Bullet hardware notes:
 - buzzer, 16 leds, 8*8 chessboard buttons, module slot
 
 To summarize, known MCU chip ROM serials+year:
-- 100-1020B01 (1989), The Gambit
+- 100-1020B01 (1989), The Gambit, Designer 1500, Peri Beta
 - 100-1020B02 (1986), Silver Bullet
 - 100-1020B02 (1987), The Classic
 - 100-1020C01 (1987), Gambit Voice

@@ -9257,7 +9257,6 @@ michkit1                        //
 michkitb                        //
 michnew                         //
 michstake                       //
-missamer                        //
 montana                         //
 newdixie                        //
 penalty                         //
@@ -9268,7 +9267,6 @@ tripjok                         //
 
 @source:bingoc.cpp
 bingoc                          // (c) 1989 Sega
-bingoct                         // (c) 1989 Sega
 
 @source:bingoman.cpp
 bingoman                        //
@@ -9875,6 +9873,7 @@ can09                           //
 
 @source:canon_s80.cpp
 canons80                        //
+canonts3                        //
 
 @source:canyon.cpp
 canyon                          // 009493-009504    1977/10 [6502]
@@ -12047,6 +12046,10 @@ shackled                        // (c) 1986 Data East USA (US)
 srdarwin                        // (c) 1987 Data East Corporation (World)
 srdarwinj                       // (c) 1987 Data East Corporation (Japan)
 
+@source:decmate2.cpp
+decmate2                        //
+decmate3                        //
+
 @source:deco_ld.cpp
 begas                           // (c) 1983
 begas1                          // (c) 1983
@@ -12167,6 +12170,7 @@ decocass                        //
 decomult                        //
 
 @source:decstation.cpp
+ds2100                          // 1989 Digital Equipment Corporation (DECstation 2100)
 ds3100                          // 1989 Digital Equipment Corporation (DECstation 3100)
 ds5k133                         // 1993 Digital Equipment Corporation (DECstation 5000/133)
 
@@ -17445,6 +17449,7 @@ olympic                         //
 
 @source:joctronic.cpp
 bldyrolr                        //
+jpinball                        // (c) 1986 Joctronic
 punkywil                        //
 slalom03                        //
 walkyria                        //
@@ -22870,6 +22875,7 @@ misdraw                         // (c) 1986 Merit / Big Apple Games
 mosdraw                         // (c) 1990 Merit
 mdchoice                        // (c) 1983 Merit
 mpchoice                        // (c) 1983 Merit
+mpchoicea                       // (c) 1983 Merit
 mroundup                        // (c) 1984 Merit
 phrcraze                        // (c) 1986 Merit
 phrcrazea                       // (c) 1986 Merit
@@ -22880,6 +22886,7 @@ pitboss                         // (c) 1983 Merit
 pitboss04                       // (c) 1983 Merit
 pitboss03                       // (c) 1983 Merit
 pitboss03a                      // (c) 1983 Merit
+pitboss03b                      // (c) 1983 Merit
 pitbossm4                       // (c) 1983 Merit
 pitbossps                       // (c) 1983 Merit
 riviera                         // (c) 1987 Merit
@@ -23391,6 +23398,9 @@ mirage                          // (c) 1994 Mitchell
 @source:mirax.cpp
 mirax                           // (c) 1985 Current Technologies
 miraxa                          // (c) 1985 Current Technologies
+
+@source:missamer.cpp
+missamer                        // (c) 1984 Sirmo
 
 @source:missb2.cpp
 bublpong                        // bootleg on enhanced hardware
@@ -31606,6 +31616,7 @@ adillor                         // (c) 1997
 airco22b                        // (c) 1995
 alpinerc                        // (c) 1994
 alpinerd                        // (c) 1994
+alpinerjc                       // (c) 1994
 alpinesa                        // (c) 1996
 alpinr2a                        // (c) 1995
 alpinr2b                        // (c) 1995
@@ -36727,6 +36738,8 @@ sbowling                        // KB  (c) 1982 Taito Corporation
 
 @source:sbrain.cpp
 sbrain                          //
+sagafox                         //
+sagafoxf80                      //
 
 @source:sbrkout.cpp
 sbrkout                         // 033453-033455    1978/09 [6502]
@@ -40398,6 +40411,9 @@ tek4109a                        //
 @source:tek440x.cpp
 tek4404                         // (c) 1984 Tektronix
 
+@source:tekigw.cpp
+tek6130                         // Tektronix 6130
+
 @source:tekxp33x.cpp
 tekxp330                        //
 
@@ -42941,6 +42957,7 @@ wrally                          // (c) 1993 - Ref 930705
 wrallya                         // (c) 1993 - Ref 930705
 wrallyat                        // (c) 1993 - Ref 930217
 wrallyb                         // (c) 1993 - Ref 930217
+wrallyc                         // (c) 1993
 
 @source:wrinkles.cpp
 wrinkles
@@ -43494,6 +43511,7 @@ strider2a                       // Strider 2 (ASIA 991213)
 strider2u                       // Strider 2 (USA 991213)
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
+techromna                       // Tech Romancer (ASIA 980914)
 techromnu                       // Tech Romancer (USA 980914)
 twcupmil                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)
