@@ -3,7 +3,7 @@
 // thanks-to:Patrick Mackinlay
 
 /*
- * Sony NEWS R4000/4400-based workstations.
+ * Sony NEWS R4000/4400 APbus workstations.
  *
  * Sources and more information:
  *   - http://ozuma.o.oo7.jp/nws5000x.htm
@@ -443,15 +443,14 @@ void news_r4k_state::cpu_map(address_map &map)
     //map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
 
     // DMAC3 DMA Controller
-    //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
-    //map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
-    //map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
+    map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
+    map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
+    map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // SPIFI SCSI controllers
-    // This mapping should probably go through the DMAC3 to match the platform setup.
-    // The DMAC has to swap modes when talking to the SPIFI.
-    //map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
-    //map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    // The DMAC has to swap modes when talking to the SPIFI, so the physical route for this might be through the DMAC3.
+    map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
 
@@ -698,8 +697,22 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
  */
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 {
-    // Hack to get the monitor ROM to boot.
+    // This function spoofs the APbus being fully initialized
     // Needless to say, that might be causing problems, but this is enough for it to boot to the monitor shell
+    // and the NetBSD installer.
+    //
+    // In general, the APbus seems to be pretty transparent at the software level, DMA excluded.
+    // Devices attached to the APbus are still mapped into the CPU's address space.
+    // However, more advanced APbus DMA functionality is still unimplemented. Neither the monitor ROM nor the
+    // NetBSD floppy miniroot attempts to use any of it as far as I can tell. That might change when SCSI
+    // is implemented, but many of the Sony devices that the APbus connects to have their own DMA controllers
+    // like the FIFO chip used for floppy, sound, etc, the DMAC3, etc.
+    // The 5000 series seems to have a lot of DMA controllers...
+    //
+    // NetBSD has some code that can use the APbus DMA, see the following for more information.
+    // https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
+    // Given that NetBSD doesn't fully implement everything NEWS-OS does, there might be even more that the APbus can do.
+
     uint8_t value = 0x0;
     if (offset == 7)
     {
@@ -718,7 +731,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    // LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+    LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
     return value;
 }
 
@@ -767,6 +780,9 @@ void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
  * timer0_w
  *
  * Clears the TIMER0 interrupt - why this exists instead of just using INTCLR, I have no idea (yet).
+ * Maybe different values being written to this address control it somehow? NetBSD only uses 1.
+ * Maybe this will be more clear after SCSI is implemented and a NEWS-OS boot can be attempted.
+ * If NEWS-OS 4, 6, and NetBSD all only write a 1, then this level of emulation is probably sufficient anyways.
  * See https://github.com/NetBSD/src/blob/05082e19134c05f2f4b6eca73223cdc6b5ab09bf/sys/arch/newsmips/newsmips/news5000.c#L114
  */
 void news_r4k_state::timer0_w(offs_t offset, uint32_t data)
@@ -885,7 +901,7 @@ uint32_t news_r4k_state::bus_error()
  *
  * 1. Console - switch between serial and bitmap console. Bitmap is not implemented yet.
  * 2. Bitmap Disable - Enable or disable the internal video card
- * 3. Abort/Resume Enable - Unknown, NEWS-OS refers to this but doesn't elaborate
+ * 3. Abort/Resume Enable - Unknown, NEWS-OS refers to this but doesn't elaborate as to what it does
  * 4. Clear NVRAM - Upon boot, clear NVRAM contents and restore default values if set
  * 5. Auto Boot - Upon boot, automatically attempt to boot from the disk specified by the bootdev NVRAM variable
  * 6. Run Diagnostic Test - Attempt to run diagnostic test after ROM monitor has booted
@@ -929,11 +945,13 @@ ROM_REGION64_BE(0x40000, "mrom", 0)
 ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
+// idrom and macrom dumps include unmapped space that would ideally be umasked.
+// Additionally, there is machine-specific information contained within, so there is no "golden" full-chip hash.
 ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP) // dump includes unmapped space that would ideally be umasked
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 
 ROM_REGION64_BE(0x400, "macrom", 0)
-ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP) // dump includes unmapped space that would ideally be umasked
+ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP)
 ROM_END
 
 // Machine definitions

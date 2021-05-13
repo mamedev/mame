@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "spifi3.h"
 
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI 1 Protocol Controller")
@@ -36,7 +37,7 @@ void spifi3_device::map(address_map &map)
 	map(0x18, 0x1b).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_hi = 0x%x\n", spifi_reg.svptr_hi); return spifi_reg.svptr_hi; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_hi = 0x%x\n", data); spifi_reg.svptr_hi = data; }));
 	map(0x1c, 0x1f).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_mid = 0x%x\n", spifi_reg.svptr_mid); return spifi_reg.svptr_mid; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_mid = 0x%x\n", data); spifi_reg.svptr_mid = data; }));
 	map(0x20, 0x23).lrw32(NAME([this]() { LOG("read spifi_reg.svptr_low = 0x%x\n", spifi_reg.svptr_low); return spifi_reg.svptr_low; }), NAME([this](uint32_t data) { LOG("write spifi_reg.svptr_low = 0x%x\n", data); spifi_reg.svptr_low = data; }));
-	map(0x24, 0x27).lrw32(NAME([this]() { LOG("read spifi_reg.intr = 0x%x\n", spifi_reg.intr); return spifi_reg.intr; }), NAME([this](uint32_t data) { LOG("write spifi_reg.intr = 0x%x\n", data); spifi_reg.intr = data; }));
+	map(0x24, 0x27).lrw32(NAME([this]() { LOG("read spifi_reg.intr = 0x%x (%s)\n", spifi_reg.intr, machine().describe_context()); return spifi_reg.intr; }), NAME([this](uint32_t data) { LOG("write spifi_reg.intr = 0x%x\n", data); spifi_reg.intr = data; }));
 	map(0x28, 0x2b).lrw32(NAME([this]() { LOG("read spifi_reg.imask = 0x%x\n", spifi_reg.imask); return spifi_reg.imask; }), NAME([this](uint32_t data) { LOG("write spifi_reg.imask = 0x%x\n", data); spifi_reg.imask = data; }));
 	map(0x2c, 0x2f).lrw32(NAME([this]() { LOG("read spifi_reg.prctrl = 0x%x\n", spifi_reg.prctrl); return spifi_reg.prctrl; }), NAME([this](uint32_t data) { LOG("write spifi_reg.prctrl = 0x%x\n", data); spifi_reg.prctrl = data; }));
 	map(0x30, 0x33).lrw32(NAME([this]() { LOG("read spifi_reg.prstat = 0x%x\n", spifi_reg.prstat); return spifi_reg.prstat; }), NAME([this](uint32_t data) { LOG("write spifi_reg.prstat = 0x%x\n", data); spifi_reg.prstat = data; }));
@@ -67,8 +68,78 @@ void spifi3_device::map(address_map &map)
 	map(0x94, 0x97).lrw32(NAME([this]() { LOG("read spifi_reg.quecode = 0x%x\n", spifi_reg.quecode); return spifi_reg.quecode; }), NAME([this](uint32_t data) { LOG("write spifi_reg.quecode = 0x%x\n", data); spifi_reg.quecode = data; }));
 	map(0x98, 0x9b).lrw32(NAME([this]() { LOG("read spifi_reg.quetag = 0x%x\n", spifi_reg.quetag); return spifi_reg.quetag; }), NAME([this](uint32_t data) { LOG("write spifi_reg.quetag = 0x%x\n", data); spifi_reg.quetag = data; }));
 	map(0x9c, 0x9f).lrw32(NAME([this]() { LOG("read spifi_reg.quepage = 0x%x\n", spifi_reg.quepage); return spifi_reg.quepage; }), NAME([this](uint32_t data) { LOG("write spifi_reg.quepage = 0x%x\n", data); spifi_reg.quepage = data; }));
+	// mirror of above values goes here
+	map(0x200, 0x3ff).rw(FUNC(spifi3_device::cmd_buf_r), FUNC(spifi3_device::cmd_buf_w)).umask32(0xff);
+}
 
-	// TODO: command buffer
+uint8_t spifi3_device::cmd_buf_r(offs_t offset)
+{
+	// find which cmd entry
+	// 8 slots in the buffer, 16 bytes each
+	// so, divide the offset by 16 (truncated) to get the cmd entry
+	int cmd_entry = offset / 16;
+
+	// now, return the right item
+	// this is ugly, I need to improve this
+	uint8_t result = 0;
+	int register_offset = offset % 16;
+	if (register_offset < 12)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].cdb[register_offset];
+	} 
+	else if (register_offset == 12)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].quecode;
+	}
+	else if (register_offset == 13)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].quetag;
+	}
+	else if (register_offset == 14)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].idmsg;
+	}
+	else if (register_offset == 15)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].status;
+	}
+
+	LOG("SPIFI3: cmd_buf_r(0x%x) -> 0x%x\n", offset, result);
+
+	return result;
+}
+
+void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
+{
+	LOG("SPIFI3: cmd_buf_w(0x%x, 0x%x)\n", offset, data);
+	// find which cmd entry
+	// 8 slots in the buffer, 16 bytes each
+	// so, divide the offset by 16 (truncated) to get the cmd entry
+	int cmd_entry = offset / 16;
+
+	// now, return the right item
+	// this is ugly, I need to improve this
+	int register_offset = offset % 16;
+	if (register_offset < 12)
+	{
+		spifi_reg.cmbuf[cmd_entry].cdb[register_offset] = data;
+	}
+	else if (register_offset == 12)
+	{
+		spifi_reg.cmbuf[cmd_entry].quecode = data;
+	}
+	else if (register_offset == 13)
+	{
+		spifi_reg.cmbuf[cmd_entry].quetag = data;
+	}
+	else if (register_offset == 14)
+	{
+		spifi_reg.cmbuf[cmd_entry].idmsg = data;
+	}
+	else if (register_offset == 15)
+	{
+		spifi_reg.cmbuf[cmd_entry].status = data;
+	}
 }
 
 uint32_t spifi3_device::auxctrl_r()

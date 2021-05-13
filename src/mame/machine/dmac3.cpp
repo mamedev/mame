@@ -18,6 +18,7 @@
 #include "emu.h"
 #include "dmac3.h"
 
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMA Controller")

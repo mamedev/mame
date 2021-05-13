@@ -52,13 +52,21 @@ private:
 	uint32_t fifoctrl_r();
 	void fifoctrl_w(uint32_t data);
 
+	// Command buffer constants and functions
+	uint8_t cmd_buf_r(offs_t offset);
+	void cmd_buf_w(offs_t offset, uint8_t data);
+
 	struct spifi_cmd_entry
 	{
-		uint32_t cdb[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-		uint32_t quecode = 0;
-		uint32_t quetag = 0;
-		uint32_t idmsg = 0;
-		uint32_t status = 0;
+		// NetBSD has these mapped as uint32_t to align the accesses and such
+		// in reality, these are all 8-bit values that are mapped, in typical NWS-5000 series
+		// fashion, to be 32-bit word aligned.
+		// the same probably applies to the register file.
+		uint8_t cdb[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		uint8_t quecode = 0;
+		uint8_t quetag = 0;
+		uint8_t idmsg = 0;
+		uint8_t status = 0;
 	};
 
 	struct register_file
@@ -113,7 +121,7 @@ private:
 		uint32_t quetag = 0;
 		uint32_t quepage = 0;
 
-		uint32_t image[88]; // mirror of the previous values
+		// uint32_t image[88]; // mirror of the previous values
 		spifi_cmd_entry cmbuf[8];
 	} spifi_reg;
 };
