@@ -228,21 +228,17 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 			if (m_oddscanline)
 			{
 				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
 				hsync_time = screen().time_until_pos(scan, (m_htotal + m_hend) / 2);
 				m_scanline_timer->adjust(hsync_time);
-				if (scan != 0)
+				if ((scan != 0) && (scan < m_vend))
 					screen().update_partial(scan);
 			}
 			else
 			{
 				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
 				hsync_time = screen().time_until_pos(scan, m_hend / 2);
 				m_scanline_timer->adjust(hsync_time);
-				if (scan != 0)
+				if ((scan != 0) && (scan < m_vend))
 					screen().update_partial(scan);
 			}
 		}
@@ -250,11 +246,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 		{
 			if (m_oddscanline)
 			{
-				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
-				else
-					scan++;
+				int scan = screen().vpos() + 1;
 				hsync_time = screen().time_until_pos(scan, m_hbegin / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = false;
@@ -272,11 +264,9 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 		if (hstate == 1)
 		{
 			int scan = screen().vpos();
-			if (scan > m_vend)
-				scan = 0;
 			hsync_time = screen().time_until_pos(scan, m_hend);
 			m_scanline_timer->adjust(hsync_time);
-			if (scan != 0)
+			if ((scan != 0) && (scan < m_vend))
 				screen().update_partial(scan);
 		}
 		if (hstate == 0)
