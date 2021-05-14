@@ -56,6 +56,9 @@ public:
 	// read/write to the SSG registers
 	virtual uint8_t ssg_read(uint32_t regnum) = 0;
 	virtual void ssg_write(uint32_t regnum, uint8_t data) = 0;
+
+	// notification when the prescale has changed
+	virtual void ssg_prescale_changed() = 0;
 };
 
 
@@ -178,6 +181,12 @@ public:
 
 	// return a reference to our registers
 	ssg_registers &regs() { return m_regs; }
+
+	// true if we are overridden
+	bool overridden() const { return (m_override != nullptr); }
+
+	// indicate the prescale has changed
+	void prescale_changed() { if (m_override != nullptr) m_override->ssg_prescale_changed(); }
 
 private:
 	// internal state

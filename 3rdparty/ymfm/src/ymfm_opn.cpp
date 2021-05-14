@@ -429,6 +429,243 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 
 
 //*********************************************************
+//  SSG RESAMPLER
+//*********************************************************
+
+//-------------------------------------------------
+//  add_last - helper to add the last computed
+//  value to the sums, applying the given scale
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::add_last(int32_t &sum0, int32_t &sum1, int32_t &sum2, int32_t scale)
+{
+	sum0 += m_last.data[0] * scale;
+	sum1 += m_last.data[1] * scale;
+	sum2 += m_last.data[2] * scale;
+}
+
+
+//-------------------------------------------------
+//  clock_and_add - helper to clock a new value
+//  and then add it to the sums, applying the
+//  given scale
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::clock_and_add(int32_t &sum0, int32_t &sum1, int32_t &sum2, int32_t scale)
+{
+	m_ssg.clock();
+	m_ssg.output(m_last);
+	add_last(sum0, sum1, sum2, scale);
+}
+
+
+//-------------------------------------------------
+//  write_to_output - helper to write the sums to
+//  the appropriate outputs, applying the given
+//  divisor to the final result
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::write_to_output(OutputType *output, int32_t sum0, int32_t sum1, int32_t sum2, int32_t divisor)
+{
+	if (MixTo1)
+	{
+		// mixing to one, apply a 2/3 factor to prevent overflow
+		output->data[FirstOutput] = (sum0 + sum1 + sum2) * 2 / (3 * divisor);
+	}
+	else
+	{
+		// write three outputs in a row
+		output->data[FirstOutput + 0] = sum0 / divisor;
+		output->data[FirstOutput + 1] = sum1 / divisor;
+		output->data[FirstOutput + 2] = sum2 / divisor;
+	}
+
+	// track the sample index here
+	m_sampindex++;
+}
+
+
+//-------------------------------------------------
+//  ssg_resampler - constructor
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+ssg_resampler<OutputType, FirstOutput, MixTo1>::ssg_resampler(ssg_engine &ssg) :
+	m_ssg(ssg),
+	m_sampindex(0),
+	m_resampler(&ssg_resampler::resample_nop)
+{
+	m_last.clear();
+}
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::save_restore(ymfm_saved_state &state)
+{
+	state.save_restore(m_sampindex);
+	state.save_restore(m_last.data);
+}
+
+
+//-------------------------------------------------
+//  configure - configure a new ratio
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::configure(uint8_t outsamples, uint8_t srcsamples)
+{
+	switch (outsamples * 10 + srcsamples)
+	{
+		case 4*10 + 1:	/* 4:1 */	m_resampler = &ssg_resampler::resample_n_1<4>;	break;
+		case 2*10 + 1:	/* 2:1 */	m_resampler = &ssg_resampler::resample_n_1<2>;	break;
+		case 4*10 + 3:	/* 4:3 */	m_resampler = &ssg_resampler::resample_4_3;		break;
+		case 1*10 + 1:	/* 1:1 */	m_resampler = &ssg_resampler::resample_n_1<1>;	break;
+		case 2*10 + 3:	/* 2:3 */	m_resampler = &ssg_resampler::resample_2_3;		break;
+		case 1*10 + 3:	/* 1:3 */	m_resampler = &ssg_resampler::resample_1_n<3>;	break;
+		case 2*10 + 9:	/* 2:9 */	m_resampler = &ssg_resampler::resample_2_9;		break;
+		case 1*10 + 6:	/* 1:6 */	m_resampler = &ssg_resampler::resample_1_n<6>;	break;
+		case 0*10 + 0:	/* 0:0 */	m_resampler = &ssg_resampler::resample_nop;		break;
+		default: assert(false); break;
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_n_1 - resample SSG output to the
+//  target at a rate of 1 SSG sample to every
+//  n output sample
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+template<int Multiplier>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_n_1(OutputType *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		if (m_sampindex % Multiplier == 0)
+		{
+			m_ssg.clock();
+			m_ssg.output(m_last);
+		}
+		write_to_output(output, m_last.data[0], m_last.data[1], m_last.data[2]);
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_1_n - resample SSG output to the
+//  target at a rate of n SSG samples to every
+//  1 output sample
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+template<int Divisor>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_1_n(OutputType *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		int32_t sum0 = 0, sum1 = 0, sum2 = 0;
+		for (int rep = 0; rep < Divisor; rep++)
+			clock_and_add(sum0, sum1, sum2);
+		write_to_output(output, sum0, sum1, sum2, 6);
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_1_45 - resample SSG output to the
+//  target at a rate of 9 SSG samples to every
+//  2 output samples
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_2_9(OutputType *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		int32_t sum0 = 0, sum1 = 0, sum2 = 0;
+		if (bitfield(m_sampindex, 0) != 0)
+			add_last(sum0, sum1, sum2, 1);
+		clock_and_add(sum0, sum1, sum2, 2);
+		clock_and_add(sum0, sum1, sum2, 2);
+		clock_and_add(sum0, sum1, sum2, 2);
+		clock_and_add(sum0, sum1, sum2, 2);
+		if (bitfield(m_sampindex, 0) == 0)
+			clock_and_add(sum0, sum1, sum2, 1);
+		write_to_output(output, sum0, sum1, sum2, 9);
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_2_3 - resample SSG output to the
+//  target at a rate of 3 SSG samples to every
+//  2 output samples
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_2_3(OutputType *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		int32_t sum0 = 0, sum1 = 0, sum2 = 0;
+		if (bitfield(m_sampindex, 0) == 0)
+		{
+			clock_and_add(sum0, sum1, sum2, 2);
+			clock_and_add(sum0, sum1, sum2, 1);
+		}
+		else
+		{
+			add_last(sum0, sum1, sum2, 1);
+			clock_and_add(sum0, sum1, sum2, 2);
+		}
+		write_to_output(output, sum0, sum1, sum2, 3);
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_4_3 - resample SSG output to the
+//  target at a rate of 3 SSG samples to every
+//  4 output samples
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_4_3(OutputType *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		int32_t sum0 = 0, sum1 = 0, sum2 = 0;
+		int32_t step = bitfield(m_sampindex, 0, 2);
+		add_last(sum0, sum1, sum2, step);
+		if (step != 3)
+			clock_and_add(sum0, sum1, sum2, 3 - step);
+		write_to_output(output, sum0, sum1, sum2, 3);
+	}
+}
+
+
+//-------------------------------------------------
+//  resample_nop - no-op resampler
+//-------------------------------------------------
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_nop(OutputType *output, uint32_t numsamples)
+{
+	// nothing to do except increment the sample index
+	m_sampindex += numsamples;
+}
+
+
+
+//*********************************************************
 //  YM2149
 //*********************************************************
 
@@ -591,10 +828,14 @@ void ym2149::generate_ssg(output_data_ssg *output, uint32_t numsamples)
 //-------------------------------------------------
 
 ym2203::ym2203(ymfm_interface &intf) :
+	m_fidelity(OPN_FIDELITY_MAX),
 	m_address(0),
 	m_fm(intf),
-	m_ssg(intf)
+	m_ssg(intf),
+	m_ssg_resampler(m_ssg)
 {
+	m_last_fm.clear();
+	update_prescale(m_fm.clock_prescale());
 }
 
 
@@ -617,8 +858,13 @@ void ym2203::reset()
 void ym2203::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
+	state.save_restore(m_last_fm.data);
+
 	m_fm.save_restore(state);
 	m_ssg.save_restore(state);
+	m_ssg_resampler.save_restore(state);
+
+	update_prescale(m_fm.clock_prescale());
 }
 
 
@@ -745,47 +991,109 @@ void ym2203::write(uint32_t offset, uint8_t data)
 
 void ym2203::generate(output_data *output, uint32_t numsamples)
 {
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	// FM output is just repeated the prescale number of times; note that
+	// 0 is a special 1.5 case
+	if (m_fm_samples_per_output != 0)
 	{
-		// clock the system
-		m_fm.clock(fm_engine::ALL_CHANNELS);
-
-		// update the FM content; OPN is full 14-bit with no intermediate clipping
-		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
-
-		// convert to 10.3 floating point value for the DAC and back
-		output->roundtrip_fp();
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			if ((m_ssg_resampler.sampindex() + samp) % m_fm_samples_per_output == 0)
+				clock_fm();
+			output->data[0] = m_last_fm.data[0];
+		}
 	}
+	else
+	{
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			uint32_t step = (m_ssg_resampler.sampindex() + samp) % 3;
+			if (step == 0)
+				clock_fm();
+			output->data[0] = m_last_fm.data[0];
+			if (step == 1)
+			{
+				clock_fm();
+				output->data[0] = (output->data[0] + m_last_fm.data[0]) / 2;
+			}
+		}
+	}
+
+	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	m_ssg_resampler.resample(output - numsamples, numsamples);
 }
 
 
 //-------------------------------------------------
-//  generate_ssg - generate one sample of SSG
-//  sound
+//  update_prescale - update the prescale value,
+//  recomputing derived values
 //-------------------------------------------------
 
-void ym2203::generate_ssg(output_data_ssg *output, uint32_t numsamples)
+void ym2203::update_prescale(uint8_t prescale)
 {
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-	{
-		// clock the SSG
-		m_ssg.clock();
+	// tell the FM engine
+	m_fm.set_clock_prescale(prescale);
+	m_ssg.prescale_changed();
 
-		// YM2203 keeps the three SSG outputs independent
-		m_ssg.output(*output);
+	// Fidelity:   ---- minimum ----    ---- medium -----    ---- maximum-----
+	//              rate = clock/24      rate = clock/12      rate = clock/4
+	// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+	//     6          3:1     2:3          6:1     4:3         18:1     4:1
+	//     3        1.5:1     1:3          3:1     2:3          9:1     2:1
+	//     2          1:1     1:6          2:1     1:3          6:1     1:1
+
+	// compute the number of FM samples per output sample, and select the
+	// resampler function
+	if (m_fidelity == OPN_FIDELITY_MIN)
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 3;	m_ssg_resampler.configure(2, 3);	break;
+			case 3: m_fm_samples_per_output = 0;	m_ssg_resampler.configure(1, 3);	break;
+			case 2: m_fm_samples_per_output = 1;	m_ssg_resampler.configure(1, 6);	break;
+		}
 	}
+	else if (m_fidelity == OPN_FIDELITY_MED)
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 6;	m_ssg_resampler.configure(4, 3);	break;
+			case 3: m_fm_samples_per_output = 3;	m_ssg_resampler.configure(2, 3);	break;
+			case 2: m_fm_samples_per_output = 2;	m_ssg_resampler.configure(1, 3);	break;
+		}
+	}
+	else
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 18;	m_ssg_resampler.configure(4, 1);	break;
+			case 3: m_fm_samples_per_output = 9;	m_ssg_resampler.configure(2, 1);	break;
+			case 2: m_fm_samples_per_output = 6;	m_ssg_resampler.configure(1, 1);	break;
+		}
+	}
+
+	// if overriding, just set up the nop resampler
+	if (m_ssg.overridden())
+		m_ssg_resampler.configure(0, 0);
 }
 
 
 //-------------------------------------------------
-//  update_prescale - set a new prescale value and
-//  update clocks as needed
+//  clock_fm - clock FM state
 //-------------------------------------------------
 
-void ym2203::update_prescale(uint8_t newval)
+void ym2203::clock_fm()
 {
-	// inform the FM engine and refresh our clock rate
-	m_fm.set_clock_prescale(newval);
+	// clock the system
+	m_fm.clock(fm_engine::ALL_CHANNELS);
+
+	// update the FM content; OPN is full 14-bit with no intermediate clipping
+	m_fm.output(m_last_fm.clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+
+	// convert to 10.3 floating point value for the DAC and back
+	m_last_fm.roundtrip_fp();
 }
 
 
@@ -799,14 +1107,18 @@ void ym2203::update_prescale(uint8_t newval)
 //-------------------------------------------------
 
 ym2608::ym2608(ymfm_interface &intf) :
+	m_fidelity(OPN_FIDELITY_MAX),
 	m_address(0),
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c),
 	m_fm(intf),
 	m_ssg(intf),
+	m_ssg_resampler(m_ssg),
 	m_adpcm_a(intf, 0),
 	m_adpcm_b(intf)
 {
+	m_last_fm.clear();
+	update_prescale(m_fm.clock_prescale());
 }
 
 
@@ -847,9 +1159,11 @@ void ym2608::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_address);
 	state.save_restore(m_irq_enable);
 	state.save_restore(m_flag_control);
+	state.save_restore(m_last_fm.data);
 
 	m_fm.save_restore(state);
 	m_ssg.save_restore(state);
+	m_ssg_resampler.save_restore(state);
 	m_adpcm_a.save_restore(state);
 	m_adpcm_b.save_restore(state);
 }
@@ -1111,63 +1425,124 @@ void ym2608::write(uint32_t offset, uint8_t data)
 
 void ym2608::generate(output_data *output, uint32_t numsamples)
 {
+	// FM output is just repeated the prescale number of times; note that
+	// 0 is a special 1.5 case
+	if (m_fm_samples_per_output != 0)
+	{
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			if ((m_ssg_resampler.sampindex() + samp) % m_fm_samples_per_output == 0)
+				clock_fm_and_adpcm();
+			output->data[0] = m_last_fm.data[0];
+			output->data[1] = m_last_fm.data[1];
+		}
+	}
+	else
+	{
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			uint32_t step = (m_ssg_resampler.sampindex() + samp) % 3;
+			if (step == 0)
+				clock_fm_and_adpcm();
+			output->data[0] = m_last_fm.data[0];
+			output->data[1] = m_last_fm.data[1];
+			if (step == 1)
+			{
+				clock_fm_and_adpcm();
+				output->data[0] = (output->data[0] + m_last_fm.data[0]) / 2;
+				output->data[1] = (output->data[1] + m_last_fm.data[1]) / 2;
+			}
+		}
+	}
+
+	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	m_ssg_resampler.resample(output - numsamples, numsamples);
+}
+
+
+//-------------------------------------------------
+//  update_prescale - update the prescale value,
+//  recomputing derived values
+//-------------------------------------------------
+
+void ym2608::update_prescale(uint8_t prescale)
+{
+	// tell the FM engine
+	m_fm.set_clock_prescale(prescale);
+	m_ssg.prescale_changed();
+
+	// Fidelity:   ---- minimum ----    ---- medium -----    ---- maximum-----
+	//              rate = clock/48      rate = clock/24      rate = clock/8
+	// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+	//     6          3:1     2:3          6:1     4:3         18:1     4:1
+	//     3        1.5:1     1:3          3:1     2:3          9:1     2:1
+	//     2          1:1     1:6          2:1     1:3          6:1     1:1
+
+	// compute the number of FM samples per output sample, and select the
+	// resampler function
+	if (m_fidelity == OPN_FIDELITY_MIN)
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 3;	m_ssg_resampler.configure(2, 3);	break;
+			case 3: m_fm_samples_per_output = 0;	m_ssg_resampler.configure(1, 3);	break;
+			case 2: m_fm_samples_per_output = 1;	m_ssg_resampler.configure(1, 6);	break;
+		}
+	}
+	else if (m_fidelity == OPN_FIDELITY_MED)
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 6;	m_ssg_resampler.configure(4, 3);	break;
+			case 3: m_fm_samples_per_output = 3;	m_ssg_resampler.configure(2, 3);	break;
+			case 2: m_fm_samples_per_output = 2;	m_ssg_resampler.configure(1, 3);	break;
+		}
+	}
+	else
+	{
+		switch (prescale)
+		{
+			default:
+			case 6:	m_fm_samples_per_output = 18;	m_ssg_resampler.configure(4, 1);	break;
+			case 3: m_fm_samples_per_output = 9;	m_ssg_resampler.configure(2, 1);	break;
+			case 2: m_fm_samples_per_output = 6;	m_ssg_resampler.configure(1, 1);	break;
+		}
+	}
+
+	// if overriding, just set up the nop resampler
+	if (m_ssg.overridden())
+		m_ssg_resampler.configure(0, 0);
+}
+
+
+//-------------------------------------------------
+//  clock_fm_and_adpcm - clock FM and ADPCM state
+//-------------------------------------------------
+
+void ym2608::clock_fm_and_adpcm()
+{
 	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
 	uint32_t fmmask = bitfield(m_irq_enable, 7) ? 0x3f : 0x07;
 
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-	{
-		// clock the system
-		uint32_t env_counter = m_fm.clock(fm_engine::ALL_CHANNELS);
+	// clock the system
+	uint32_t env_counter = m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// clock the ADPCM-A engine on every envelope cycle
-		// (channels 4 and 5 clock every 2 envelope clocks)
-		if (bitfield(env_counter, 0, 2) == 0)
-			m_adpcm_a.clock(bitfield(env_counter, 2) ? 0x0f : 0x3f);
+	// clock the ADPCM-A engine on every envelope cycle
+	// (channels 4 and 5 clock every 2 envelope clocks)
+	if (bitfield(env_counter, 0, 2) == 0)
+		m_adpcm_a.clock(bitfield(env_counter, 2) ? 0x0f : 0x3f);
 
-		// clock the ADPCM-B engine every cycle
-		m_adpcm_b.clock();
+	// clock the ADPCM-B engine every cycle
+	m_adpcm_b.clock();
 
-		// update the FM content; OPNA is 13-bit with no intermediate clipping
-		m_fm.output(output->clear(), 1, 32767, fmmask);
+	// update the FM content; OPNA is 13-bit with no intermediate clipping
+	m_fm.output(m_last_fm.clear(), 1, 32767, fmmask);
 
-		// mix in the ADPCM
-		m_adpcm_a.output(*output, 0x3f);
-		m_adpcm_b.output(*output, 2);
-	}
-}
-
-
-//-------------------------------------------------
-//  generate_ssg - generate one sample of SSG
-//  sound
-//-------------------------------------------------
-
-void ym2608::generate_ssg(output_data_ssg *output, uint32_t numsamples)
-{
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-	{
-		// clock the SSG
-		m_ssg.clock();
-
-		// YM2608 combines the three SSG outputs internally
-		ssg_engine::output_data temp_output;
-		m_ssg.output(temp_output);
-
-		// just average for now; who knows what the real chip does
-		output->data[0] = temp_output.data[0] + temp_output.data[1] + temp_output.data[2];
-	}
-}
-
-
-//-------------------------------------------------
-//  update_prescale - set a new prescale value and
-//  update clocks as needed
-//-------------------------------------------------
-
-void ym2608::update_prescale(uint8_t newval)
-{
-	// inform the FM engine and refresh our clock rate
-	m_fm.set_clock_prescale(newval);
+	// mix in the ADPCM
+	m_adpcm_a.output(m_last_fm, 0x3f);
+	m_adpcm_b.output(m_last_fm, 2);
 }
 
 
@@ -1181,15 +1556,18 @@ void ym2608::update_prescale(uint8_t newval)
 //-------------------------------------------------
 
 ym2610::ym2610(ymfm_interface &intf, uint8_t channel_mask) :
+	m_fidelity(OPN_FIDELITY_MAX),
 	m_address(0),
 	m_fm_mask(channel_mask),
 	m_eos_status(0x00),
 	m_flag_mask(0xbf),
 	m_fm(intf),
 	m_ssg(intf),
+	m_ssg_resampler(m_ssg),
 	m_adpcm_a(intf, 8),
 	m_adpcm_b(intf, 8)
 {
+	update_prescale();
 }
 
 
@@ -1223,6 +1601,7 @@ void ym2610::save_restore(ymfm_saved_state &state)
 
 	m_fm.save_restore(state);
 	m_ssg.save_restore(state);
+	m_ssg_resampler.save_restore(state);
 	m_adpcm_a.save_restore(state);
 	m_adpcm_b.save_restore(state);
 }
@@ -1438,50 +1817,76 @@ void ym2610::write(uint32_t offset, uint8_t data)
 
 void ym2610::generate(output_data *output, uint32_t numsamples)
 {
+	// FM output is just repeated the prescale number of times
 	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
-		// clock the system
-		uint32_t env_counter = m_fm.clock(m_fm_mask);
-
-		// clock the ADPCM-A engine on every envelope cycle
-		if (bitfield(env_counter, 0, 2) == 0)
-			m_eos_status |= m_adpcm_a.clock(0x3f);
-
-		// clock the ADPCM-B engine every cycle
-		m_adpcm_b.clock();
-		if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
-			m_eos_status |= 0x80;
-
-		// update the FM content; OPNB is 13-bit with no intermediate clipping
-		m_fm.output(output->clear(), 1, 32767, m_fm_mask);
-
-		// mix in the ADPCM and clamp
-		m_adpcm_a.output(*output, 0x3f);
-		m_adpcm_b.output(*output, 2);
-		output->clamp16();
+		if ((m_ssg_resampler.sampindex() + samp) % m_fm_samples_per_output == 0)
+			clock_fm_and_adpcm();
+		output->data[0] = m_last_fm.data[0];
+		output->data[1] = m_last_fm.data[1];
 	}
+
+	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	m_ssg_resampler.resample(output - numsamples, numsamples);
 }
 
 
 //-------------------------------------------------
-//  generate_ssg - generate one sample of SSG
-//  sound
+//  update_prescale - update the prescale value,
+//  recomputing derived values
 //-------------------------------------------------
 
-void ym2610::generate_ssg(output_data_ssg *output, uint32_t numsamples)
+void ym2610::update_prescale()
 {
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	// Fidelity:   ---- minimum ----    ---- medium -----    ---- maximum-----
+	//              rate = clock/144     rate = clock/144     rate = clock/16
+	// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+	//     6          1:1     2:9          1:1     2:9         9:1     2:1
+
+	// compute the number of FM samples per output sample, and select the
+	// resampler function
+	if (m_fidelity == OPN_FIDELITY_MIN || m_fidelity == OPN_FIDELITY_MED)
 	{
-		// clock the SSG
-		m_ssg.clock();
-
-		// YM2610 combines the three SSG outputs internally
-		ssg_engine::output_data temp_output;
-		m_ssg.output(temp_output);
-
-		// just average for now; who knows what the real chip does
-		output->data[0] = temp_output.data[0] + temp_output.data[1] + temp_output.data[2];
+		m_fm_samples_per_output = 1;
+		m_ssg_resampler.configure(2, 9);
 	}
+	else
+	{
+		m_fm_samples_per_output = 9;
+		m_ssg_resampler.configure(2, 1);
+	}
+
+	// if overriding, just set up the nop resampler
+	if (m_ssg.overridden())
+		m_ssg_resampler.configure(0, 0);
+}
+
+
+//-------------------------------------------------
+//  clock_fm_and_adpcm - clock FM and ADPCM state
+//-------------------------------------------------
+
+void ym2610::clock_fm_and_adpcm()
+{
+	// clock the system
+	uint32_t env_counter = m_fm.clock(m_fm_mask);
+
+	// clock the ADPCM-A engine on every envelope cycle
+	if (bitfield(env_counter, 0, 2) == 0)
+		m_eos_status |= m_adpcm_a.clock(0x3f);
+
+	// clock the ADPCM-B engine every cycle
+	m_adpcm_b.clock();
+	if ((m_adpcm_b.status() & adpcm_b_channel::STATUS_EOS) != 0)
+		m_eos_status |= 0x80;
+
+	// update the FM content; OPNB is 13-bit with no intermediate clipping
+	m_fm.output(m_last_fm.clear(), 1, 32767, m_fm_mask);
+
+	// mix in the ADPCM and clamp
+	m_adpcm_a.output(m_last_fm, 0x3f);
+	m_adpcm_b.output(m_last_fm, 2);
+	m_last_fm.clamp16();
 }
 
 

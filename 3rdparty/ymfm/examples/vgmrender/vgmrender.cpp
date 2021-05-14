@@ -247,17 +247,36 @@ public:
 		}
 
 		// add the final result to the buffer
-		*buffer++ += m_output.data[0];
-		*buffer++ += m_output.data[ChipType::OUTPUTS > 1 ? 1 : 0];
+		if (m_type == CHIP_YM2203)
+		{
+			int32_t out0 = m_output.data[0];
+			int32_t out1 = m_output.data[1 % ChipType::OUTPUTS];
+			int32_t out2 = m_output.data[2 % ChipType::OUTPUTS];
+			int32_t out3 = m_output.data[3 % ChipType::OUTPUTS];
+			*buffer++ += out0 + out1 + out2 + out3;
+			*buffer++ += out0 + out1 + out2 + out3;
+		}
+		else if (m_type == CHIP_YM2608 || m_type == CHIP_YM2610)
+		{
+			int32_t out0 = m_output.data[0];
+			int32_t out1 = m_output.data[1 % ChipType::OUTPUTS];
+			int32_t out2 = m_output.data[2 % ChipType::OUTPUTS];
+			*buffer++ += out0 + out2;
+			*buffer++ += out1 + out2;
+		}
+		else if (ChipType::OUTPUTS == 1)
+		{
+			*buffer++ += m_output.data[0];
+			*buffer++ += m_output.data[0];
+		}
+		else
+		{
+			*buffer++ += m_output.data[0];
+			*buffer++ += m_output.data[1 % ChipType::OUTPUTS];
+		}
 	}
 
 protected:
-	// handle a prescale change event by updating our sample rate step
-	virtual void ymfm_prescale_changed() override
-	{
-		m_step = 0x100000000ull / m_chip.sample_rate(m_clock);
-	}
-
 	// handle a read from the ADPCM-A buffer
 	virtual uint8_t ymfm_adpcm_a_read(uint32_t offset) override
 	{
@@ -277,56 +296,6 @@ protected:
 	emulated_time m_step;
 	emulated_time m_pos;
 	std::vector<std::pair<uint32_t, uint8_t>> m_queue;
-};
-
-
-// ======================> vgm_chip
-
-template<typename ChipType>
-class vgm_chip_ssg : public vgm_chip<ChipType>
-{
-	using parent = vgm_chip<ChipType>;
-	using parent::m_chip;
-	using parent::m_clock;
-
-public:
-	// construction
-	vgm_chip_ssg(uint32_t clock, chip_type type) :
-		vgm_chip<ChipType>(clock, type),
-		m_step_ssg(0x100000000ull / m_chip.sample_rate_ssg(clock)),
-		m_pos_ssg(0)
-	{
-	}
-
-	// generate one output sample of output
-	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) override
-	{
-		// generate the FM
-		vgm_chip<ChipType>::generate(output_start, output_step, buffer);
-
-		// generate the SSG
-		for ( ; m_pos_ssg <= output_start; m_pos_ssg += m_step_ssg)
-			m_chip.generate_ssg(&m_output_ssg);
-		int32_t sum = m_output_ssg.data[0];
-		if (ChipType::SSG_OUTPUTS == 3)
-			sum += m_output_ssg.data[1] + m_output_ssg.data[2];
-		*buffer++ += sum;
-		*buffer++ += sum;
-	}
-
-protected:
-	// handle a prescale change event by updating our sample rate step
-	virtual void ymfm_prescale_changed() override
-	{
-		parent::ymfm_prescale_changed();
-		m_step_ssg = 0x100000000ull / m_chip.sample_rate_ssg(m_clock);
-	}
-
-private:
-	// internal state
-	typename ChipType::output_data_ssg m_output_ssg;
-	emulated_time m_step_ssg;
-	emulated_time m_pos_ssg;
 };
 
 
@@ -366,23 +335,6 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 	printf("Adding %s%s @ %dHz\n", (numchips == 2) ? "2 x " : "", chipname, clockval);
 	for (int index = 0; index < numchips; index++)
 		active_chips.push_back(new vgm_chip<ChipType>(clockval, type));
-}
-
-
-//-------------------------------------------------
-//  add_chips_ssg - add 1 or 2 instances of the
-//  given supported chip type, which has an SSG
-//  component
-//-------------------------------------------------
-
-template<typename ChipType>
-void add_chips_ssg(uint32_t clock, chip_type type, char const *chipname)
-{
-	uint32_t clockval = clock & 0x3fffffff;
-	int numchips = (clock & 0x40000000) ? 2 : 1;
-	printf("Adding %s%s @ %dHz\n", (numchips == 2) ? "2 x " : "", chipname, clockval);
-	for (int index = 0; index < numchips; index++)
-		active_chips.push_back(new vgm_chip_ssg<ChipType>(clockval, type));
 
 	if (type == CHIP_YM2608)
 	{
@@ -494,14 +446,14 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 		return data_start;
 	clock = parse_uint32(buffer, offset);
 	if (version >= 0x151 && clock != 0)
-		add_chips_ssg<ymfm::ym2203>(clock, CHIP_YM2203, "YM2203");
+		add_chips<ymfm::ym2203>(clock, CHIP_YM2203, "YM2203");
 
 	// +48: YM2608 clock
 	if (offset + 4 > data_start)
 		return data_start;
 	clock = parse_uint32(buffer, offset);
 	if (version >= 0x151 && clock != 0)
-		add_chips_ssg<ymfm::ym2608>(clock, CHIP_YM2608, "YM2608");
+		add_chips<ymfm::ym2608>(clock, CHIP_YM2608, "YM2608");
 
 	// +4C: YM2610/2610B clock
 	if (offset + 4 > data_start)
@@ -510,9 +462,9 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 	if (version >= 0x151 && clock != 0)
 	{
 		if (clock & 0x80000000)
-			add_chips_ssg<ymfm::ym2610b>(clock, CHIP_YM2610, "YM2610B");
+			add_chips<ymfm::ym2610b>(clock, CHIP_YM2610, "YM2610B");
 		else
-			add_chips_ssg<ymfm::ym2610>(clock, CHIP_YM2610, "YM2610");
+			add_chips<ymfm::ym2610>(clock, CHIP_YM2610, "YM2610");
 	}
 
 	// +50: YM3812 clock
@@ -585,7 +537,7 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 	if (version >= 0x151 && clock != 0)
 	{
 		fprintf(stderr, "Warning: clock for AY8910 specified, substituting YM2149\n");
-		add_chips_ssg<ymfm::ym2149>(clock, CHIP_YM2149, "YM2149");
+		add_chips<ymfm::ym2149>(clock, CHIP_YM2149, "YM2149");
 	}
 
 	// +78: AY8910 flags

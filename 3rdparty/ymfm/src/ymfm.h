@@ -88,6 +88,144 @@ inline uint32_t bitfield(uint32_t value, int start, int length = 1)
 }
 
 
+//-------------------------------------------------
+//  count_leading_zeros - return the number of
+//  leading zeros in a 32-bit value; CPU-optimized
+//  versions for various architectures are included
+//  below
+//-------------------------------------------------
+
+#if defined(__GNUC__)
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	if (value == 0)
+		return 32;
+	return __builtin_clz(value);
+}
+
+#elif defined(_MSC_VER)
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	unsigned long index;
+	return _BitScanReverse(&index, value) ? (31U - index) : 32U;
+}
+
+#else
+
+inline uint8_t count_leading_zeros(uint32_t value)
+{
+	if (value == 0)
+		return 32;
+	uint8_t count;
+	for (count = 0; int32_t(value) >= 0; count++)
+		value <<= 1;
+	return count;
+}
+
+#endif
+
+
+// Many of the Yamaha FM chips emit a floating-point value, which is sent to
+// a DAC for processing. The exact format of this floating-point value is
+// documented below. This description only makes sense if the "internal"
+// format treats sign as 1=positive and 0=negative, so the helpers below
+// presume that.
+//
+// Internal OPx data      16-bit signed data     Exp Sign Mantissa
+// =================      =================      === ==== ========
+// 1 1xxxxxxxx------  ->  0 1xxxxxxxx------  ->  111   1  1xxxxxxx
+// 1 01xxxxxxxx-----  ->  0 01xxxxxxxx-----  ->  110   1  1xxxxxxx
+// 1 001xxxxxxxx----  ->  0 001xxxxxxxx----  ->  101   1  1xxxxxxx
+// 1 0001xxxxxxxx---  ->  0 0001xxxxxxxx---  ->  100   1  1xxxxxxx
+// 1 00001xxxxxxxx--  ->  0 00001xxxxxxxx--  ->  011   1  1xxxxxxx
+// 1 000001xxxxxxxx-  ->  0 000001xxxxxxxx-  ->  010   1  1xxxxxxx
+// 1 000000xxxxxxxxx  ->  0 000000xxxxxxxxx  ->  001   1  xxxxxxxx
+// 0 111111xxxxxxxxx  ->  1 111111xxxxxxxxx  ->  001   0  xxxxxxxx
+// 0 111110xxxxxxxx-  ->  1 111110xxxxxxxx-  ->  010   0  0xxxxxxx
+// 0 11110xxxxxxxx--  ->  1 11110xxxxxxxx--  ->  011   0  0xxxxxxx
+// 0 1110xxxxxxxx---  ->  1 1110xxxxxxxx---  ->  100   0  0xxxxxxx
+// 0 110xxxxxxxx----  ->  1 110xxxxxxxx----  ->  101   0  0xxxxxxx
+// 0 10xxxxxxxx-----  ->  1 10xxxxxxxx-----  ->  110   0  0xxxxxxx
+// 0 0xxxxxxxx------  ->  1 0xxxxxxxx------  ->  111   0  0xxxxxxx
+
+//-------------------------------------------------
+//  encode_fp - given a 32-bit signed input value
+//  convert it to a signed 3.10 floating-point
+//  value
+//-------------------------------------------------
+
+inline int16_t encode_fp(int32_t value)
+{
+	// handle overflows first
+	if (value < -32768)
+		return (7 << 10) | 0x000;
+	if (value > 32767)
+		return (7 << 10) | 0x3ff;
+
+	// we need to count the number of leading sign bits after the sign
+	// we can use count_leading_zeros if we invert negative values
+	int32_t scanvalue = value ^ (int32_t(value) >> 31);
+
+	// exponent is related to the number of leading bits starting from bit 14
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
+
+	// smallest exponent value allowed is 1
+	exponent = std::max(exponent, 1);
+
+	// mantissa
+	int32_t mantissa = value >> (exponent - 1);
+
+	// assemble into final form, inverting the sign
+	return ((exponent << 10) | (mantissa & 0x3ff)) ^ 0x200;
+}
+
+
+//-------------------------------------------------
+//  decode_fp - given a 3.10 floating-point value,
+//  convert it to a signed 16-bit value
+//-------------------------------------------------
+
+inline int16_t decode_fp(int16_t value)
+{
+	// invert the sign and the exponent
+	value ^= 0x1e00;
+
+	// shift mantissa up to 16 bits then apply inverted exponent
+	return int16_t(value << 6) >> bitfield(value, 10, 3);
+}
+
+
+//-------------------------------------------------
+//  roundtrip_fp - compute the result of a round
+//  trip through the encode/decode process above
+//-------------------------------------------------
+
+inline int16_t roundtrip_fp(int32_t value)
+{
+	// handle overflows first
+	if (value < -32768)
+		return -32768;
+	if (value > 32767)
+		return 32767;
+
+	// we need to count the number of leading sign bits after the sign
+	// we can use count_leading_zeros if we invert negative values
+	int32_t scanvalue = value ^ (int32_t(value) >> 31);
+
+	// exponent is related to the number of leading bits starting from bit 14
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
+
+	// smallest exponent value allowed is 1
+	exponent = std::max(exponent, 1);
+
+	// apply the shift back and forth to zero out bits that are lost
+	exponent -= 1;
+	return (value >> exponent) << exponent;
+}
+
+
 
 //*********************************************************
 //  HELPER CLASSES
@@ -95,18 +233,21 @@ inline uint32_t bitfield(uint32_t value, int start, int length = 1)
 
 // forward declarations
 enum envelope_state : uint32_t;
-int16_t roundtrip_fp(int32_t value);
 
 
 // ======================> ymfm_output
 
-// struct containing output values
+// struct containing an array of output values
 template<int NumOutputs>
 struct ymfm_output
 {
-	ymfm_output &clear() { return init(0); }
-	ymfm_output &init(int32_t value) { for (int index = 0; index < NumOutputs; index++) data[index] = value; return *this; }
+	// clear all outputs to 0
+	ymfm_output &clear() { for (int index = 0; index < NumOutputs; index++) data[index] = 0; return *this; }
+
+	// clamp all outputs to a 16-bit signed value
 	ymfm_output &clamp16() { for (int index = 0; index < NumOutputs; index++) data[index] = std::clamp(data[index], -32768, 32767); return *this; }
+
+	// run each output value through the floating-point processor
 	ymfm_output &roundtrip_fp() { for (int index = 0; index < NumOutputs; index++) data[index] = ymfm::roundtrip_fp(data[index]); return *this; }
 	int32_t data[NumOutputs];
 };
@@ -248,11 +389,6 @@ public:
 	// our responsibility is to compare the current time against the previously
 	// noted busy end time and return true if we haven't yet passed it
 	virtual bool ymfm_is_busy() { return false; }
-
-	// the chip implementation calls this whenever the internal clock prescaler
-	// changes; our responsibility is to adjust our clocking of the chip in
-	// response to produce the correct output rate
-	virtual void ymfm_prescale_changed() { }
 
 	//
 	// I/O functions

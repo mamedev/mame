@@ -312,22 +312,176 @@ protected:
 //  OPN IMPLEMENTATION CLASSES
 //*********************************************************
 
+// A note about prescaling and sample rates.
+//
+// YM2203, YM2608, and YM2610 contain an onboard SSG (basically, a YM2149).
+// In order to properly generate sound at fully fidelity, the output sample
+// rate of the YM2149 must be input_clock / 8. This is much higher than the
+// FM needs, but in the interest of keeping things simple, the OPN generate
+// functions will output at the higher rate and just replicate the last FM
+// sample as many times as needed.
+//
+// To make things even more complicated, the YM2203 and YM2608 allow for
+// software-controlled prescaling, which affects the FM and SSG clocks in
+// different ways. There are three settings: divide by 6/4 (FM/SSG); divide
+// by 3/2; and divide by 2/1.
+//
+// Thus, the minimum output sample rate needed by each part of the chip
+// varies with the prescale as follows:
+//
+//             ---- YM2203 -----    ---- YM2608 -----    ---- YM2610 -----
+// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+//     6         /72      /16         /144     /32          /144    /32
+//     3         /36      /8          /72      /16
+//     2         /24      /4          /48      /8
+//
+// If we standardized on the fastest SSG rate, we'd end up with the following
+// (ratios are output_samples:source_samples):
+//
+//             ---- YM2203 -----    ---- YM2608 -----    ---- YM2610 -----
+//              rate = clock/4       rate = clock/8       rate = clock/16
+// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+//     6         18:1     4:1         18:1     4:1          9:1    2:1
+//     3          9:1     2:1          9:1     2:1
+//     2          6:1     1:1          6:1     1:1
+//
+// However, that's a pretty big performance hit for minimal gain. Going to
+// the other extreme, we could standardize on the fastest FM rate, but then
+// at least one prescale case (3) requires the FM to be smeared across two
+// output samples:
+//
+//             ---- YM2203 -----    ---- YM2608 -----    ---- YM2610 -----
+//              rate = clock/24      rate = clock/48      rate = clock/144
+// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+//     6          3:1     2:3          3:1     2:3          1:1    2:9
+//     3        1.5:1     1:3        1.5:1     1:3
+//     2          1:1     1:6          1:1     1:6
+//
+// Stepping back one factor of 2 addresses that issue:
+//
+//             ---- YM2203 -----    ---- YM2608 -----    ---- YM2610 -----
+//              rate = clock/12      rate = clock/24      rate = clock/144
+// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+//     6          6:1     4:3          6:1     4:3          1:1    2:9
+//     3          3:1     2:3          3:1     2:3
+//     2          2:1     1:3          2:1     1:3
+//
+// This gives us three levels of output fidelity:
+//    OPN_FIDELITY_MAX -- highest sample rate, using fastest SSG rate
+//    OPN_FIDELITY_MIN -- lowest sample rate, using fastest FM rate
+//    OPN_FIDELITY_MED -- medium sample rate such that FM is never smeared
+//
+// At the maximum clocks for YM2203/YM2608 (4Mhz/8MHz), these rates will
+// end up as:
+//    OPN_FIDELITY_MAX = 1000kHz
+//    OPN_FIDELITY_MIN =  166kHz
+//    OPN_FIEDLITY_MED =  333kHz
+
+
+// ======================> opn_fidelity
+
+enum opn_fidelity : uint8_t
+{
+	OPN_FIDELITY_MAX,
+	OPN_FIDELITY_MIN,
+	OPN_FIDELITY_MED,
+
+	OPN_FIDELITY_DEFAULT = OPN_FIDELITY_MAX
+};
+
+
+// ======================> ssg_resampler
+
+template<typename OutputType, int FirstOutput, bool MixTo1>
+class ssg_resampler
+{
+private:
+	// helper to add the last computed value to the sums, applying the given scale
+	void add_last(int32_t &sum0, int32_t &sum1, int32_t &sum2, int32_t scale = 1);
+
+	// helper to clock a new value and then add it to the sums, applying the given scale
+	void clock_and_add(int32_t &sum0, int32_t &sum1, int32_t &sum2, int32_t scale = 1);
+
+	// helper to write the sums to the appropriate outputs, applying the given
+	// divisor to the final result
+	void write_to_output(OutputType *output, int32_t sum0, int32_t sum1, int32_t sum2, int32_t divisor = 1);
+
+public:
+	// constructor
+	ssg_resampler(ssg_engine &ssg);
+
+	// save/restore
+	void save_restore(ymfm_saved_state &state);
+
+	// get the current sample index
+	uint32_t sampindex() const { return m_sampindex; }
+
+	// configure the ratio
+	void configure(uint8_t outsamples, uint8_t srcsamples);
+
+	// resample
+	void resample(OutputType *output, uint32_t numsamples)
+	{
+		(this->*m_resampler)(output, numsamples);
+	}
+
+private:
+	// resample SSG output to the target at a rate of 1 SSG sample
+	// to every n output samples
+	template<int Multiplier>
+	void resample_n_1(OutputType *output, uint32_t numsamples);
+
+	// resample SSG output to the target at a rate of n SSG samples
+	// to every 1 output sample
+	template<int Divisor>
+	void resample_1_n(OutputType *output, uint32_t numsamples);
+
+	// resample SSG output to the target at a rate of 9 SSG samples
+	// to every 2 output samples
+	void resample_2_9(OutputType *output, uint32_t numsamples);
+
+	// resample SSG output to the target at a rate of 3 SSG samples
+	// to every 1 output sample
+	void resample_1_3(OutputType *output, uint32_t numsamples);
+
+	// resample SSG output to the target at a rate of 3 SSG samples
+	// to every 2 output samples
+	void resample_2_3(OutputType *output, uint32_t numsamples);
+
+	// resample SSG output to the target at a rate of 3 SSG samples
+	// to every 4 output samples
+	void resample_4_3(OutputType *output, uint32_t numsamples);
+
+	// no-op resampler
+	void resample_nop(OutputType *output, uint32_t numsamples);
+
+	// define a pointer type
+	using resample_func = void (ssg_resampler::*)(OutputType *output, uint32_t numsamples);
+
+	// internal state
+	ssg_engine &m_ssg;
+	uint32_t m_sampindex;
+	resample_func m_resampler;
+	ssg_engine::output_data m_last;
+};
+
+
 // ======================> ym2203
 
 class ym2203
 {
 public:
 	using fm_engine = fm_engine_base<opn_registers>;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
-	using output_data = fm_engine::output_data;
-	using output_data_ssg = ymfm_output<SSG_OUTPUTS>;
+	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + ssg_engine::OUTPUTS;
+	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
 	ym2203(ymfm_interface &intf);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
+	void set_fidelity(opn_fidelity fidelity) { m_fidelity = fidelity; update_prescale(m_fm.clock_prescale()); }
 
 	// reset
 	void reset();
@@ -336,8 +490,17 @@ public:
 	void save_restore(ymfm_saved_state &state);
 
 	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale / ssg_engine::CLOCK_DIVIDER; }
+	uint32_t sample_rate(uint32_t input_clock) const
+	{
+		switch (m_fidelity)
+		{
+			case OPN_FIDELITY_MIN:	return input_clock / 24;
+			case OPN_FIDELITY_MED:	return input_clock / 12;
+			default:
+			case OPN_FIDELITY_MAX:	return input_clock / 4;
+		}
+	}
+	uint32_t ssg_effective_clock(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -352,16 +515,20 @@ public:
 
 	// generate one sample of sound
 	void generate(output_data *output, uint32_t numsamples = 1);
-	void generate_ssg(output_data_ssg *output, uint32_t numsamples = 1);
 
 protected:
-	// internal updates
+	// internal helpers
 	void update_prescale(uint8_t prescale);
+	void clock_fm();
 
 	// internal state
-	uint8_t m_address;               // address register
-	fm_engine m_fm;                  // core FM engine
-	ssg_engine m_ssg;                // SSG engine
+	opn_fidelity m_fidelity;            // configured fidelity
+	uint8_t m_address;                  // address register
+	uint8_t m_fm_samples_per_output;    // how many samples to repeat
+	fm_engine::output_data m_last_fm;   // last FM output
+	fm_engine m_fm;                     // core FM engine
+	ssg_engine m_ssg;                   // SSG engine
+	ssg_resampler<output_data, 1, false> m_ssg_resampler; // SSG resampler helper
 };
 
 
@@ -381,16 +548,16 @@ class ym2608
 
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = 1;
-	using output_data = fm_engine::output_data;
-	using output_data_ssg = ymfm_output<SSG_OUTPUTS>;
+	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + 1;
+	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
 	ym2608(ymfm_interface &intf);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
+	void set_fidelity(opn_fidelity fidelity) { m_fidelity = fidelity; update_prescale(m_fm.clock_prescale()); }
 
 	// reset
 	void reset();
@@ -399,8 +566,17 @@ public:
 	void save_restore(ymfm_saved_state &state);
 
 	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock / scale / ssg_engine::CLOCK_DIVIDER; }
+	uint32_t sample_rate(uint32_t input_clock) const
+	{
+		switch (m_fidelity)
+		{
+			case OPN_FIDELITY_MIN:	return input_clock / 48;
+			case OPN_FIDELITY_MED:	return input_clock / 24;
+			default:
+			case OPN_FIDELITY_MAX:	return input_clock / 8;
+		}
+	}
+	uint32_t ssg_effective_clock(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock / scale; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -419,20 +595,24 @@ public:
 
 	// generate one sample of sound
 	void generate(output_data *output, uint32_t numsamples = 1);
-	void generate_ssg(output_data_ssg *output, uint32_t numsamples = 1);
 
 protected:
-	// internal updates
+	// internal helpers
 	void update_prescale(uint8_t prescale);
+	void clock_fm_and_adpcm();
 
 	// internal state
-	uint16_t m_address;            // address register
-	uint8_t m_irq_enable;          // IRQ enable register
-	uint8_t m_flag_control;        // flag control register
-	fm_engine m_fm;                // core FM engine
-	ssg_engine m_ssg;              // SSG engine
-	adpcm_a_engine m_adpcm_a;      // ADPCM-A engine
-	adpcm_b_engine m_adpcm_b;      // ADPCM-B engine
+	opn_fidelity m_fidelity;            // configured fidelity
+	uint16_t m_address;                 // address register
+	uint8_t m_fm_samples_per_output;    // how many samples to repeat
+	uint8_t m_irq_enable;               // IRQ enable register
+	uint8_t m_flag_control;             // flag control register
+	fm_engine::output_data m_last_fm;   // last FM output
+	fm_engine m_fm;                     // core FM engine
+	ssg_engine m_ssg;                   // SSG engine
+	ssg_resampler<output_data, 2, true> m_ssg_resampler; // SSG resampler helper
+	adpcm_a_engine m_adpcm_a;           // ADPCM-A engine
+	adpcm_b_engine m_adpcm_b;           // ADPCM-B engine
 };
 
 
@@ -442,16 +622,16 @@ class ym2610
 {
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = 1;
-	using output_data = fm_engine::output_data;
-	using output_data_ssg = ymfm_output<SSG_OUTPUTS>;
+	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + 1;
+	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
 	ym2610(ymfm_interface &intf, uint8_t channel_mask = 0x36);
 
 	// configuration
 	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
+	void set_fidelity(opn_fidelity fidelity) { m_fidelity = fidelity; update_prescale(); }
 
 	// reset
 	void reset();
@@ -460,8 +640,17 @@ public:
 	void save_restore(ymfm_saved_state &state);
 
 	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / 4 / ssg_engine::CLOCK_DIVIDER; }
+	uint32_t sample_rate(uint32_t input_clock) const
+	{
+		switch (m_fidelity)
+		{
+			case OPN_FIDELITY_MIN:	return input_clock / 144;
+			case OPN_FIDELITY_MED:	return input_clock / 144;
+			default:
+			case OPN_FIDELITY_MAX:	return input_clock / 16;
+		}
+	}
+	uint32_t ssg_effective_clock(uint32_t input_clock) const { return input_clock / 4; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
@@ -480,18 +669,25 @@ public:
 
 	// generate one sample of sound
 	void generate(output_data *output, uint32_t numsamples = 1);
-	void generate_ssg(output_data_ssg *output, uint32_t numsamples = 1);
 
 protected:
+	// internal helpers
+	void update_prescale();
+	void clock_fm_and_adpcm();
+
 	// internal state
-	uint16_t m_address;            // address register
-	uint8_t const m_fm_mask;       // FM channel mask
-	uint8_t m_eos_status;          // end-of-sample signals
-	uint8_t m_flag_mask;           // flag mask control
-	fm_engine m_fm;                // core FM engine
-	ssg_engine m_ssg;              // core FM engine
-	adpcm_a_engine m_adpcm_a;      // ADPCM-A engine
-	adpcm_b_engine m_adpcm_b;      // ADPCM-B engine
+	opn_fidelity m_fidelity;            // configured fidelity
+	uint16_t m_address;                 // address register
+	uint8_t const m_fm_mask;            // FM channel mask
+	uint8_t m_fm_samples_per_output;    // how many samples to repeat
+	uint8_t m_eos_status;               // end-of-sample signals
+	uint8_t m_flag_mask;                // flag mask control
+	fm_engine::output_data m_last_fm;   // last FM output
+	fm_engine m_fm;                     // core FM engine
+	ssg_engine m_ssg;                   // core FM engine
+	ssg_resampler<output_data, 2, true> m_ssg_resampler; // SSG resampler helper
+	adpcm_a_engine m_adpcm_a;           // ADPCM-A engine
+	adpcm_b_engine m_adpcm_b;           // ADPCM-B engine
 };
 
 class ym2610b : public ym2610

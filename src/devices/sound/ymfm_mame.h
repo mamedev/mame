@@ -15,6 +15,10 @@
 // set it to 0 to use MAME's ay8910 as the SSG implementation
 #define USE_BUILTIN_SSG (0)
 
+// set this to control the output sample rate for SSG-based chips
+#define SSG_FIDELITY (ymfm::OPN_FIDELITY_MED)
+
+
 
 //*********************************************************
 //  MAME INTERFACES
@@ -119,14 +123,6 @@ protected:
 		return (machine().time() < m_busy_end);
 	}
 
-	// the chip implementation calls this whenever the internal clock prescaler
-	// changes; our responsibility is to adjust our clocking of the chip in
-	// response to produce the correct output rate
-	virtual void ymfm_prescale_changed() override
-	{
-		device_clock_changed();
-	}
-
 	// the chip implementation calls this whenever a new value is written to
 	// one of the chip's output ports (only applies to some chip types); our
 	// responsibility is to pass the written data on to any consumers
@@ -181,9 +177,15 @@ protected:
 // class is not intended to be used directly -- rather, devices should inherit
 // from either ymfm_device_base or ymfm_ssg_device_base, depending on whether
 // they include an SSG or not
-template<typename ChipClass>
+template<typename ChipClass, bool FMOnly = false>
 class ymfm_device_base : public ym_generic_device
 {
+protected:
+	// for SSG chips, we only create a subset of outputs here:
+	// YM2203 is 4 outputs: 1 mono FM + 3 SSG
+	// YM2608/2610 is 3 outputs: 2 stereo FM + 1 SSG
+	static constexpr int OUTPUTS = FMOnly ? ((ChipClass::OUTPUTS == 4) ? 1 : 2) : ChipClass::OUTPUTS;
+
 public:
 	// constructor
 	ymfm_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
@@ -210,7 +212,7 @@ protected:
 		ym_generic_device::device_start();
 
 		// allocate our stream
-		m_stream = device_sound_interface::stream_alloc(0, ChipClass::OUTPUTS, m_chip.sample_rate(device_t::clock()));
+		m_stream = device_sound_interface::stream_alloc(0, OUTPUTS, m_chip.sample_rate(device_t::clock()));
 
 		// compute the size of the save buffer by doing an initial save
 		ymfm::ymfm_saved_state state(m_save_blob, true);
@@ -229,7 +231,8 @@ protected:
 	// handle clock changed
 	virtual void device_clock_changed() override
 	{
-		m_stream->set_sample_rate(m_chip.sample_rate(device_t::clock()));
+		if (m_stream != nullptr)
+			m_stream->set_sample_rate(m_chip.sample_rate(device_t::clock()));
 	}
 
 	// handle pre-saving by filling the blob
@@ -258,6 +261,19 @@ protected:
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
+		update_internal(outputs);
+	}
+
+	// update streams
+	virtual ChipClass &update_streams()
+	{
+		m_stream->update();
+		return m_chip;
+	}
+
+	// internal update helper
+	void update_internal(std::vector<write_stream_view> &outputs, int output_shift = 0)
+	{
 		// local buffer to hold samples
 		constexpr int MAX_SAMPLES = 256;
 		typename ChipClass::output_data output[MAX_SAMPLES];
@@ -272,16 +288,12 @@ protected:
 			int cursamples = std::min(numsamples - sampindex, MAX_SAMPLES);
 			m_chip.generate(output, cursamples);
 			for (int outnum = 0; outnum < outcount; outnum++)
+			{
+				int eff_outnum = (outnum + output_shift) % OUTPUTS;
 				for (int index = 0; index < cursamples; index++)
-					outputs[outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
+					outputs[eff_outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
+			}
 		}
-	}
-
-	// update streams
-	virtual ChipClass &update_streams()
-	{
-		m_stream->update();
-		return m_chip;
 	}
 
 	// internal state
@@ -299,13 +311,11 @@ template<typename ChipClass>
 class ymfm_ssg_internal_device_base : public ymfm_device_base<ChipClass>
 {
 	using parent = ymfm_device_base<ChipClass>;
-	using parent::m_chip;
 
 public:
 	// constructor
 	ymfm_ssg_internal_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type),
-		m_ssg_stream(nullptr)
+		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type)
 	{
 	}
 
@@ -313,59 +323,14 @@ public:
 	void set_flags(int flags) { /* not supported when using internal SSG */ }
 
 protected:
-	// handle device start
-	virtual void device_start() override
-	{
-		// SSG streams are expected to be first, so allocate our stream then
-		// call the parent afterwards
-		m_ssg_stream = device_sound_interface::stream_alloc(0, ChipClass::SSG_OUTPUTS, m_chip.sample_rate_ssg(device_t::clock()));
-		parent::device_start();
-	}
-
-	// handle clock changed
-	virtual void device_clock_changed() override
-	{
-		parent::device_clock_changed();
-
-		// update our sample rate
-		m_ssg_stream->set_sample_rate(m_chip.sample_rate_ssg(device_t::clock()));
-	}
-
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		// if not the SSG stream, pass it along to our parent
-		if (&stream != m_ssg_stream)
-			return parent::sound_stream_update(stream, inputs, outputs);
-
-		// local buffer to hold samples
-		constexpr int MAX_SAMPLES = 256;
-		typename ChipClass::output_data_ssg output[MAX_SAMPLES];
-
-		// parameters
-		int const outcount = std::min(outputs.size(), std::size(output[0].data));
-		int const numsamples = outputs[0].samples();
-
-		// generate the SSG stream
-		for (int sampindex = 0; sampindex < numsamples; sampindex += MAX_SAMPLES)
-		{
-			int cursamples = std::min(numsamples - sampindex, MAX_SAMPLES);
-			m_chip.generate_ssg(output, cursamples);
-			for (int outnum = 0; outnum < outcount; outnum++)
-				for (int index = 0; index < cursamples; index++)
-					outputs[outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
-		}
+		// shift the output streams so that the SSGs are first:
+		//  YM2203 has 4 outputs: 1 FM + 3 SSG, so add 3
+		//  YM2608/10 has 3 outputs: 2 FM + 1 SSG, so add 1
+		parent::update_internal(outputs, (ChipClass::OUTPUTS == 4) ? 3 : 1);
 	}
-
-	// internal helper to update all our streams
-	virtual ChipClass &update_streams() override
-	{
-		m_ssg_stream->update();
-		return parent::update_streams();
-	}
-
-	// internal state
-	sound_stream *m_ssg_stream;      // SSG sound stream
 };
 
 
@@ -375,20 +340,22 @@ protected:
 // implementation in ay8910.cpp; this is the "classic" way to do it in MAME
 // and is more flexible in terms of output handling
 template<typename ChipClass>
-class ymfm_ssg_external_device_base : public ymfm_device_base<ChipClass>, public ymfm::ssg_override
+class ymfm_ssg_external_device_base : public ymfm_device_base<ChipClass, true>, public ymfm::ssg_override
 {
-	using parent = ymfm_device_base<ChipClass>;
-	using parent::m_chip;
-	using parent::m_io_read;
-	using parent::m_io_write;
+	using parent = ymfm_device_base<ChipClass, true>;
+
+	// deduce the number of SSG outputs from the total outputs:
+	// YM2203 = mono FM + 3 SSG outputs = 4 total
+	// YM2608/10 = stereo FM + 1 SSG output = 3 total
+	static constexpr int SSG_OUTPUTS = ChipClass::OUTPUTS - parent::OUTPUTS;
 
 public:
 	// constructor
 	ymfm_ssg_external_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		ymfm_device_base<ChipClass>(mconfig, tag, owner, clock, type),
+		ymfm_device_base<ChipClass, true>(mconfig, tag, owner, clock, type),
 		m_ssg_stream(nullptr),
 		m_ssg(*this, "ssg"),
-		m_ssg_flags(((ChipClass::SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
+		m_ssg_flags(((SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
 	{
 	}
 
@@ -405,6 +372,10 @@ public:
 	}
 
 protected:
+	using parent::m_chip;
+	using parent::m_io_read;
+	using parent::m_io_write;
+
 	// SSG overrides
 	virtual void ssg_reset() override
 	{
@@ -423,6 +394,11 @@ protected:
 		m_ssg->data_w(data);
 	}
 
+	virtual void ssg_prescale_changed() override
+	{
+		device_clock_changed();
+	}
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override
 	{
@@ -437,7 +413,7 @@ protected:
 
 		// route outputs through us
 		m_ssg->add_route(0, *this, 1.0, 0);
-		if (ChipClass::SSG_OUTPUTS > 1)
+		if (SSG_OUTPUTS > 1)
 		{
 			m_ssg->add_route(1, *this, 1.0, 1);
 			m_ssg->add_route(2, *this, 1.0, 2);
@@ -451,7 +427,7 @@ protected:
 		// and outputs; in our update handler we'll just forward each output from the
 		// embedded YM2149 device through our stream to make it look like it used to when
 		// we were inheriting from ay8910_device
-		m_ssg_stream = device_sound_interface::stream_alloc(ChipClass::SSG_OUTPUTS, ChipClass::SSG_OUTPUTS, SAMPLE_RATE_INPUT_ADAPTIVE);
+		m_ssg_stream = device_sound_interface::stream_alloc(SSG_OUTPUTS, SSG_OUTPUTS, SAMPLE_RATE_INPUT_ADAPTIVE);
 
 		// also tell the chip we want to override reads & writes
 		m_chip.ssg_override(*this);
@@ -466,7 +442,7 @@ protected:
 		parent::device_clock_changed();
 
 		// derive the effective clock from the computed sample rate
-		m_ssg->set_unscaled_clock(ymfm::ssg_engine::CLOCK_DIVIDER * m_chip.sample_rate_ssg(device_t::clock()));
+		m_ssg->set_unscaled_clock(m_chip.ssg_effective_clock(device_t::clock()));
 	}
 
 	// sound overrides
@@ -477,7 +453,7 @@ protected:
 			return parent::sound_stream_update(stream, inputs, outputs);
 
 		// just copy the streams from the SSG
-		for (int index = 0; index < ChipClass::SSG_OUTPUTS; index++)
+		for (int index = 0; index < SSG_OUTPUTS; index++)
 			outputs[index] = inputs[index];
 	}
 

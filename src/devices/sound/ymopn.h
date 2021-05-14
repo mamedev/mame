@@ -17,6 +17,8 @@ DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
 
 class ym2203_device : public ymfm_ssg_device_base<ymfm::ym2203>
 {
+	using parent = ymfm_ssg_device_base<ymfm::ym2203>;
+
 public:
 	// constructor
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -29,6 +31,10 @@ public:
 
 	// data register read
 	u8 data_r() { return update_streams().read_data(); }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -38,6 +44,8 @@ DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 
 class ym2608_device : public ymfm_ssg_device_base<ymfm::ym2608>, public device_rom_interface<21>
 {
+	using parent = ymfm_ssg_device_base<ymfm::ym2608>;
+
 public:
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -59,6 +67,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// ROM device overrides
@@ -81,7 +90,6 @@ template<typename ChipClass>
 class ym2610_device_base : public ymfm_ssg_device_base<ChipClass>, public device_memory_interface
 {
 	using parent = ymfm_ssg_device_base<ChipClass>;
-	using parent::update_streams;
 
 public:
 	// constructor
@@ -97,6 +105,8 @@ public:
 	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
 
 protected:
+	using parent::update_streams;
+
 	// device-level overrides
 	virtual void device_start() override;
 

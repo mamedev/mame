@@ -21,6 +21,20 @@ ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
+//-------------------------------------------------
+//  device_start - start of emulation
+//-------------------------------------------------
+
+void ym2203_device::device_start()
+{
+	// set our target output fidelity
+	m_chip.set_fidelity(SSG_FIDELITY);
+
+	// call our parent
+	parent::device_start();
+}
+
+
 
 //*********************************************************
 //  YM2608 DEVICE
@@ -37,6 +51,20 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal")
 {
+}
+
+
+//-------------------------------------------------
+//  ym2608_device - start of emulation
+//-------------------------------------------------
+
+void ym2608_device::device_start()
+{
+	// set our target output fidelity
+	m_chip.set_fidelity(SSG_FIDELITY);
+
+	// call our parent
+	parent::device_start();
 }
 
 
@@ -159,6 +187,9 @@ device_memory_interface::space_config_vector ym2610_device_base<ChipClass>::memo
 template<typename ChipClass>
 void ym2610_device_base<ChipClass>::device_start()
 {
+	// set our target output fidelity
+	parent::m_chip.set_fidelity(SSG_FIDELITY);
+
 	// call our parent
 	parent::device_start();
 
