@@ -5,6 +5,7 @@
     PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
 
 	TODO:
+	- pc98lt: remove timer hack;
 	- identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
 	- merge from base pc98 class (WIP);
 	- power handling;
@@ -17,7 +18,6 @@
 **************************************************************************************************/
 
 #include "emu.h"
-//#include "cpu/z80/z80.h"
 #include "includes/pc9801.h"
 
 void pc98lt_state::lt_palette(palette_device &palette) const
@@ -66,7 +66,7 @@ void pc98lt_state::lt_map(address_map &map)
 	// no TVRAM
 	map(0xa8000, 0xaffff).ram().share("gvram");
 //  0xb0000-0xbffff unmapped GVRAM or mirror, check me
-//	map(0xd0000, 0xd3fff) // learn (?)
+//	map(0xd0000, 0xd3fff) // nvram window
 //	map(0xd4000, 0xd7fff) // dictionary rom bank
 	map(0xd8000, 0xdbfff).bankr("kanji_bank");
 //	map(0xe0000, 0xeffff) // ROM drive
@@ -90,19 +90,19 @@ void pc98lt_state::lt_io(address_map &map)
 //	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
 //	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 //	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-//	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+//	map(0x0070, 0x007f) // PIT, V50 internal
 
 	// floppy actually requires a docking station on PC98HA, density should be 2dd given the mapping
 //	map(0x00be, 0x00be) // floppy mode control (?)
 //	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
 //	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
 
-//  map(0x00e0, 0x00ef) // uPD71071, internal to the V50 even?
+//  map(0x00e0, 0x00ef) // uPD71071, V50 internal
 
 //	map(0x0810, 0x0810) // <unknown device data>, LCDC?
 //	map(0x0812, 0x0812) // <unknown device address> & 0xf
 
-//	map(0x0c10, 0x0c10) // learn bank reg (odd)
+//	map(0x0c10, 0x0c10) // nvram bank reg (odd)
 //	map(0x0f8e, 0x0f8e) // card slot status 1
 //	map(0x4810, 0x4810) // ?
 //	map(0x4c10, 0x4c10) // dictionary bank reg
@@ -153,12 +153,21 @@ void pc98lt_state::machine_start()
 
 void pc98lt_state::lt_config(machine_config &config)
 {
-	V50(config, m_maincpu, XTAL(8'000'000));
+	const XTAL xtal = XTAL(8'000'000); 
+	V50(config, m_maincpu, xtal); // µPD70216
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc98lt_state::lt_map);
 	m_maincpu->set_addrmap(AS_IO, &pc98lt_state::lt_io);
+	// TODO: jumps off the weeds if divided by / 4 after timer check, DMA issue?
+//	m_maincpu->set_tclk(xtal / 4);
+	m_maincpu->set_tclk(xtal / 100);
+//	m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 //	UPD1990A
+//	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
+//	m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
+//	m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	// TODO: copied verbatim from base PC98, verify clock et al.
@@ -177,12 +186,15 @@ void pc98lt_state::lt_config(machine_config &config)
 void pc98ha_state::ha_config(machine_config &config)
 {
 	lt_config(config);
-	V50(config.replace(), m_maincpu, XTAL(10'000'000));
+	const XTAL xtal = XTAL(10'000'000);
+	V50(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc98ha_state::ha_map);
 	m_maincpu->set_addrmap(AS_IO, &pc98ha_state::ha_io);
+	m_maincpu->set_tclk(xtal / 4);
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 //	UPD4991A
+//	pit_clock_config(config, xtal/4);
 }
 
 ROM_START( pc98lt )

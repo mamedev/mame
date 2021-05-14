@@ -609,7 +609,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0060, 0x0063).rw(m_hgdc1, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 //  map(0x006c, 0x006f) border color / <undefined>
-	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::txt_scrl_r), FUNC(pc9801_state::txt_scrl_w)).umask16(0x00ff); //display registers / i8253 pit
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
@@ -1030,7 +1030,7 @@ void pc9801_state::pc9801ux_io(address_map &map)
 	map(0x0438, 0x043b).rw(FUNC(pc9801_state::access_ctrl_r), FUNC(pc9801_state::access_ctrl_w));
 	map(0x043c, 0x043f).w(FUNC(pc9801_state::pc9801rs_bank_w)); //ROM/RAM bank
 	map(0x04a0, 0x04af).w(FUNC(pc9801_state::egc_w));
-	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
+	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
 void pc9801_state::pc9801rs_map(address_map &map)
@@ -1375,7 +1375,7 @@ void pc9801_state::pc9821_io(address_map &map)
 	map(0x0060, 0x0063).r(FUNC(pc9801_state::unk_r)).umask32(0xff00ff00); // mouse related (unmapped checking for AT keyb controller\PS/2 mouse?)
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
 	map(0x0068, 0x006b).w(FUNC(pc9801_state::pc9821_video_ff_w)).umask32(0x00ff00ff); //mode FF / <undefined>
-	map(0x0070, 0x007f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
+	map(0x0070, 0x007f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00);
 	map(0x0070, 0x007f).rw(FUNC(pc9801_state::grcg_r), FUNC(pc9801_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
@@ -1412,7 +1412,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
-	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
+	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));
 	map(0x851c, 0x851f).rw(FUNC(pc9801_state::sdip_1_r), FUNC(pc9801_state::sdip_1_w));
@@ -2227,11 +2227,11 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
 }
 
-void pc9801_state::pc9801_pit_clock(machine_config &config, const XTAL clock)
+void pc9801_state::pit_clock_config(machine_config &config, const XTAL clock)
 {
-	m_pit8253->set_clk<0>(clock);
-	m_pit8253->set_clk<1>(clock);
-	m_pit8253->set_clk<2>(clock);
+	m_pit->set_clk<0>(clock);
+	m_pit->set_clk<1>(clock);
+	m_pit->set_clk<2>(clock);
 }
 
 void pc9801_state::pc9801_mouse(machine_config &config)
@@ -2325,13 +2325,13 @@ void pc9801_state::pc9801_ide(machine_config &config)
 
 void pc9801_state::pc9801_common(machine_config &config)
 {
-	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
-	m_pit8253->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
-	m_pit8253->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
-	m_pit8253->set_clk<2>(MAIN_CLOCK_X1); // RS-232C
-	m_pit8253->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
-	m_pit8253->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(MAIN_CLOCK_X1); // heartbeat IRQ
+	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(MAIN_CLOCK_X1); // Memory Refresh
+	m_pit->set_clk<2>(MAIN_CLOCK_X1); // RS-232C
+	m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
+	m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
 
 	AM9517A(config, m_dmac, 5000000); // unknown clock, TODO: check channels 0 - 1
 	m_dmac->out_hreq_callback().set(FUNC(pc9801_state::dma_hrq_changed));
@@ -2448,7 +2448,7 @@ void pc9801_state::pc9801rs(machine_config &config)
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_dac_portc_w));
 	// TODO: verify if it needs invert();
-	m_pit8253->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
+	m_pit->out_handler<1>().set( m_dac, FUNC(speaker_sound_device::level_w));
 
 	ADDRESS_MAP_BANK(config, "ipl_bank").set_map(&pc9801_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
@@ -2515,9 +2515,9 @@ void pc9801_state::pc9821(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_pit8253->set_clk<0>(MAIN_CLOCK_X2);
-	m_pit8253->set_clk<1>(MAIN_CLOCK_X2);
-	m_pit8253->set_clk<2>(MAIN_CLOCK_X2);
+	m_pit->set_clk<0>(MAIN_CLOCK_X2);
+	m_pit->set_clk<1>(MAIN_CLOCK_X2);
+	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9821)
@@ -2616,7 +2616,7 @@ void pc9801_state::pc486se(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
+	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// RAM: 1.6 MB (!) + 17.6 max
 	// "dedicated internal memory slot x 1"
@@ -2632,7 +2632,7 @@ void pc9801_state::pc486mu(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
+	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// CL-GD5428
 	// RAM: 5.6 + 61.6MB max

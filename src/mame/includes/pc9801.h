@@ -83,48 +83,50 @@ class pc98_base_state : public driver_device
 public:
 	pc98_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
 	{
 	}
 
 protected:
-	// ...
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 class pc9801_state : public pc98_base_state
 {
 public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc98_base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dmac(*this, "i8237"),
-		m_pit8253(*this, "pit8253"),
-		m_pic1(*this, "pic8259_master"),
-		m_pic2(*this, "pic8259_slave"),
-		m_ppi_sys(*this, "ppi8255_sys"),
-		m_ppi_prn(*this, "ppi8255_prn"),
-		m_fdc_2hd(*this, "upd765_2hd"),
-		m_fdc_2dd(*this, "upd765_2dd"),
-		m_rtc(*this, UPD1990A_TAG),
-		m_memsw(*this, "memsw"),
-		m_keyb(*this, "keyb"),
-		m_sio(*this, UPD8251_TAG),
-		m_hgdc1(*this, "upd7220_chr"),
-		m_hgdc2(*this, "upd7220_btm"),
-		m_sasibus(*this, SASIBUS_TAG),
-		m_sasi_data_out(*this, "sasi_data_out"),
-		m_sasi_data_in(*this, "sasi_data_in"),
-		m_sasi_ctrl_in(*this, "sasi_ctrl_in"),
-		m_ide(*this, "ide%u", 1U),
-		m_video_ram_1(*this, "video_ram_1"),
-		m_video_ram_2(*this, "video_ram_2"),
-		m_ext_gvram(*this, "ext_gvram"),
-		m_beeper(*this, "beeper"),
-		m_dac(*this, "dac"),
-		m_ram(*this, RAM_TAG),
-		m_ipl(*this, "ipl_bank"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+		pc98_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dmac(*this, "i8237")
+		, m_pit(*this, "pit")
+		, m_pic1(*this, "pic8259_master")
+		, m_pic2(*this, "pic8259_slave")
+		, m_ppi_sys(*this, "ppi8255_sys")
+		, m_ppi_prn(*this, "ppi8255_prn")
+		, m_fdc_2hd(*this, "upd765_2hd")
+		, m_fdc_2dd(*this, "upd765_2dd")
+		, m_rtc(*this, UPD1990A_TAG)
+		, m_memsw(*this, "memsw")
+		, m_keyb(*this, "keyb")
+		, m_sio(*this, UPD8251_TAG)
+		, m_hgdc1(*this, "upd7220_chr")
+		, m_hgdc2(*this, "upd7220_btm")
+		, m_sasibus(*this, SASIBUS_TAG)
+		, m_sasi_data_out(*this, "sasi_data_out")
+		, m_sasi_data_in(*this, "sasi_data_in")
+		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
+		, m_ide(*this, "ide%u", 1U)
+		, m_video_ram_1(*this, "video_ram_1")
+		, m_video_ram_2(*this, "video_ram_2")
+		, m_ext_gvram(*this, "ext_gvram")
+		, m_beeper(*this, "beeper")
+		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
+		, m_ipl(*this, "ipl_bank")
 	{
 	}
 
@@ -162,14 +164,15 @@ protected:
 	void pc9801_sasi(machine_config &config);
 	void pc9801_ide(machine_config &config);
 	void pc9801_common(machine_config &config);
-	void pc9801_pit_clock(machine_config &config, const XTAL clock);
+
+	void pit_clock_config(machine_config &config, const XTAL clock);
 
 private:
 	static void cdrom_headphones(device_t *device);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
-	required_device<pit8253_device> m_pit8253;
+	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<i8255_device> m_ppi_sys;
@@ -195,9 +198,6 @@ private:
 	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 
 	void rtc_w(uint8_t data);
 	void dmapg4_w(offs_t offset, uint8_t data);
@@ -467,9 +467,6 @@ public:
 	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_gfxdecode(*this, "gfxdecode")
-		, m_palette(*this, "palette")
-		, m_screen(*this, "screen")
 		, m_gvram(*this, "gvram")
 		, m_kanji_bank(*this, "kanji_bank")
 	{
@@ -486,9 +483,6 @@ protected:
 	virtual void machine_start() override;
 //	virtual void machine_reset() override;
 private:
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_memory_bank m_kanji_bank;
 
