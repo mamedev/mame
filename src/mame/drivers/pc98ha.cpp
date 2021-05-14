@@ -8,12 +8,14 @@
 	- pc98lt: remove timer hack;
 	- identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
 	- merge from base pc98 class (WIP);
+	- add NVRAM saving:
+		- hookup doesn't seem quite right, it initializes every time after soft reset;
 	- power handling;
 	- PC98HA specifics:
-        - optional docking station (for floppy device only or anything else?);
+		- RAM drive (current hang point);
 		- EMS;
-		- RAM drive (?);
 		- JEIDA memory card interface);
+        - optional docking station (for floppy device only or anything else?);
 
 **************************************************************************************************/
 
@@ -66,10 +68,10 @@ void pc98lt_state::lt_map(address_map &map)
 	// no TVRAM
 	map(0xa8000, 0xaffff).ram().share("gvram");
 //  0xb0000-0xbffff unmapped GVRAM or mirror, check me
-//	map(0xd0000, 0xd3fff) // nvram window
+	map(0xd0000, 0xd3fff).bankrw("nvram_bank");
 //	map(0xd4000, 0xd7fff) // dictionary rom bank
 	map(0xd8000, 0xdbfff).bankr("kanji_bank");
-//	map(0xe0000, 0xeffff) // ROM drive
+	map(0xe0000, 0xeffff).bankr("romdrv_bank");
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -102,7 +104,10 @@ void pc98lt_state::lt_io(address_map &map)
 //	map(0x0810, 0x0810) // <unknown device data>, LCDC?
 //	map(0x0812, 0x0812) // <unknown device address> & 0xf
 
-//	map(0x0c10, 0x0c10) // nvram bank reg (odd)
+	map(0x0c10, 0x0c10).lrw8(
+		NAME([this] () { return (m_nvram_bank_reg & (m_nvram_bank_size() - 1)) | 0x40; }),
+		NAME([this] (u8 data) { m_nvram_bank_reg = data & (m_nvram_bank_size() - 1); m_nvram_bank->set_entry(m_nvram_bank_reg); })
+	);
 //	map(0x0f8e, 0x0f8e) // card slot status 1
 //	map(0x4810, 0x4810) // ?
 //	map(0x4c10, 0x4c10) // dictionary bank reg
@@ -112,14 +117,17 @@ void pc98lt_state::lt_io(address_map &map)
 	map(0x8810, 0x8810).r(FUNC(pc98lt_state::power_status_r));
 	map(0x8c10, 0x8c10).lw8(NAME([this] (u8 data) { m_kanji_bank->set_entry(data & 0x0f); }));
 //	map(0xc810, 0xc810) // ?
-//	map(0xcc10, 0xcc10) // ROM drive bank reg
+	map(0xcc10, 0xcc10).lrw8(
+		NAME([this] () { return (m_romdrv_bank_reg & 0xf) | 0x40; }),
+		NAME([this] (u8 data) { m_romdrv_bank_reg = data & 0xf; m_romdrv_bank->set_entry(m_romdrv_bank_reg); })
+	);
 }
 
 void pc98ha_state::ha_io(address_map &map)
 {
 	lt_io(map);
 //	map(0x08e0, 0x08e7) // EMS bank regs (odd regs only)
-//	map(0x0e8e, 0x0e8e) // RAM drive bank reg 
+//	map(0x0e8e, 0x0e8e) // RAM drive bank reg
 //	map(0x1e8e, 0x1e8e) // RAM drive view select
 }
 
@@ -148,7 +156,16 @@ GFXDECODE_END
 
 void pc98lt_state::machine_start()
 {
-	m_kanji_bank->configure_entries(0, 0x10, memregion("kanji")->base(), 0x4000);
+    const u32 nvram_size = (m_nvram_bank_size()*0x4000) / 2;
+	m_nvram_ptr = make_unique_clear<uint16_t[]>(nvram_size);
+
+	m_kanji_bank->configure_entries(0, 0x10,                 memregion("kanji")->base(),  0x4000);
+	m_nvram_bank->configure_entries(0, m_nvram_bank_size(),  m_nvram_ptr.get(),           0x4000);
+	m_romdrv_bank->configure_entries(0, 0x10,                memregion("romdrv")->base(), 0x10000);
+
+	save_item(NAME(m_nvram_bank_reg));
+	save_item(NAME(m_romdrv_bank_reg));
+	save_pointer(NAME(m_nvram_ptr), nvram_size);
 }
 
 void pc98lt_state::lt_config(machine_config &config)
@@ -210,7 +227,7 @@ ROM_START( pc98lt )
 	ROM_REGION( 0x80000, "dict", ROMREGION_ERASEFF )
 	ROM_LOAD( "dict.rom",     0x000000, 0x080000, CRC(421278ee) SHA1(f6066fc5085de521395ce1a8bb040536c1454c7e) )
 
-	ROM_REGION( 0x80000, "romdrv", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
 	ROM_LOAD( "romdrv.rom",   0x000000, 0x080000, CRC(282ff6eb) SHA1(f4833e49dd9089ec40f5e86a713e08cd8c598578) )
 ROM_END
 

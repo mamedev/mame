@@ -468,7 +468,9 @@ public:
 		pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gvram(*this, "gvram")
+		, m_nvram_bank(*this, "nvram_bank")
 		, m_kanji_bank(*this, "kanji_bank")
+		, m_romdrv_bank(*this, "romdrv_bank")
 	{
 	}
 	
@@ -480,16 +482,22 @@ protected:
 
 	required_device <v50_device> m_maincpu;
 
+	virtual u8 m_nvram_bank_size() const { return 4; }
 	virtual void machine_start() override;
 //	virtual void machine_reset() override;
 private:
 	required_shared_ptr<uint16_t> m_gvram;
+	std::unique_ptr<uint16_t[]> m_nvram_ptr;
+	required_memory_bank m_nvram_bank;
 	required_memory_bank m_kanji_bank;
+	required_memory_bank m_romdrv_bank;
 
 	void lt_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	
 	u8 power_status_r();
+	u8 m_nvram_bank_reg;
+	u8 m_romdrv_bank_reg;
 };
 
 class pc98ha_state : public pc98lt_state
@@ -505,6 +513,8 @@ public:
 protected:
 	void ha_map(address_map &map);
 	void ha_io(address_map &map);
+	
+	virtual u8 m_nvram_bank_size() const override { return 16; }
 private:
 
 // ...
