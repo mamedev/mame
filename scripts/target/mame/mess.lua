@@ -1299,6 +1299,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"mchester",
 		"memotech",
 		"mera",
+		"mg1",
 		"mgu",
 		"microkey",
 		"microsoft",
@@ -2917,6 +2918,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/m79152pc.cpp",
 	MAME_DIR .. "src/mame/drivers/meritum.cpp",
 	MAME_DIR .. "src/mame/drivers/vdm7932x.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "mg1")
+files {
+	MAME_DIR .. "src/mame/drivers/mg1.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mgu")

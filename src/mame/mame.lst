@@ -23072,6 +23072,9 @@ gldarrow                        // (c) 1984 Meyco Games
 mfabfz                          //
 mfabfz85                        //
 
+@source:mg1.cpp
+mg1                             // Whitechapel Computer Works MG-1
+
 @source:mgames.cpp
 mgames                          // (c) 1981 Merit
 
