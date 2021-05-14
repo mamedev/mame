@@ -4,7 +4,7 @@
 
 ## Supported environments
 
-This code should compile cleanly in any environment that has C++17 support.
+This code should compile cleanly in any environment that has C++14 support.
 It has been tested on gcc, clang, and Microsoft Visual C++ 2019.
 
 ## Supported chip families
@@ -38,10 +38,42 @@ Currently, support is present for the following chips (organized by header file)
 * ymfm_opz.h:
 	* YM2414 (OPZ) -- preliminary
 
+## History
+
+These cores were originally written during the summer and fall of 2020 as part of the [MAME](https://mamedev.org/) project.
+As such, their design started off heavily based on how MAME works.
+
+The OPM/OPN cores first appeared in MAME 0.230.
+The OPL cores were added in MAME 0.231.
+A further rewrite to abstract MAME dependencies is planned for MAME 0.232.
+
+The goal was threefold:
+1. provide BSD-licensed emulation cores that are more compatible with MAME's core licensing
+1. modernize and unify the code around a common implementation of shared features
+1. improve accuracy where possible based on discoveries made by others
+
+## Accuracy
+
+The goal of these cores is not 100% digital accuracy.
+To achieve that would require full emulation of the pipelines, which would make the code extremely difficult to comprehend.
+It would also make it much harder to share common implementations of features, or to add support for less well-known chip types.
+If you want that level of accuracy, there are [several](https://github.com/nukeykt/Nuked-OPN2) [decap-based](https://github.com/nukeykt/Nuked-OPM) [emulation cores](https://github.com/nukeykt/Nuked-OPLL) out there.
+
+Instead, the main goals are:
+1. Extremely high (audibly indistinguishable) accuracy
+1. Reasonable performance
+1. Clean design with readable code
+1. Clear documentation of the various chips
+
 ## General approach
 
 Check out the [examples directory](https://github.com/aaronsgiles/ymfm/tree/main/examples) for some example usage patterns.
 I'm not a big fan of makefiles for simple things, so instructions on how to compile each example are provided at the top.
+
+# IMPORTANT
+
+As of May 2021, the interface to these is still a bit in flux.
+Be prepared when syncing with upstream to make some adjustments.
 
 ### Clocking
 

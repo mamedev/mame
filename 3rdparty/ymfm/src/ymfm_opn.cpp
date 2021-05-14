@@ -574,13 +574,13 @@ void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_1_n(OutputType *ou
 		int32_t sum0 = 0, sum1 = 0, sum2 = 0;
 		for (int rep = 0; rep < Divisor; rep++)
 			clock_and_add(sum0, sum1, sum2);
-		write_to_output(output, sum0, sum1, sum2, 6);
+		write_to_output(output, sum0, sum1, sum2, Divisor);
 	}
 }
 
 
 //-------------------------------------------------
-//  resample_1_45 - resample SSG output to the
+//  resample_2_9 - resample SSG output to the
 //  target at a rate of 9 SSG samples to every
 //  2 output samples
 //-------------------------------------------------
@@ -1018,7 +1018,7 @@ void ym2203::generate(output_data *output, uint32_t numsamples)
 		}
 	}
 
-	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	// resample the SSG as configured
 	m_ssg_resampler.resample(output - numsamples, numsamples);
 }
 
@@ -1074,7 +1074,8 @@ void ym2203::update_prescale(uint8_t prescale)
 		}
 	}
 
-	// if overriding, just set up the nop resampler
+	// if overriding the SSG, override the configuration with the nop
+	// resampler to at least keep the sample index moving forward
 	if (m_ssg.overridden())
 		m_ssg_resampler.configure(0, 0);
 }
@@ -1455,7 +1456,7 @@ void ym2608::generate(output_data *output, uint32_t numsamples)
 		}
 	}
 
-	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	// resample the SSG as configured
 	m_ssg_resampler.resample(output - numsamples, numsamples);
 }
 
@@ -1511,7 +1512,8 @@ void ym2608::update_prescale(uint8_t prescale)
 		}
 	}
 
-	// if overriding, just set up the nop resampler
+	// if overriding the SSG, override the configuration with the nop
+	// resampler to at least keep the sample index moving forward
 	if (m_ssg.overridden())
 		m_ssg_resampler.configure(0, 0);
 }
@@ -1826,7 +1828,7 @@ void ym2610::generate(output_data *output, uint32_t numsamples)
 		output->data[1] = m_last_fm.data[1];
 	}
 
-	// SSG output smears 3 samples over 4, 2, or 1 output sample
+	// resample the SSG as configured
 	m_ssg_resampler.resample(output - numsamples, numsamples);
 }
 
@@ -1856,7 +1858,8 @@ void ym2610::update_prescale()
 		m_ssg_resampler.configure(2, 1);
 	}
 
-	// if overriding, just set up the nop resampler
+	// if overriding the SSG, override the configuration with the nop
+	// resampler to at least keep the sample index moving forward
 	if (m_ssg.overridden())
 		m_ssg_resampler.configure(0, 0);
 }
