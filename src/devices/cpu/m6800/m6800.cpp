@@ -29,6 +29,8 @@ TODO:
   * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
   * finish 6301Y port 6 handshake, share implementation with p3csr?
   * 6301Y sci_trcsr2_r/w
+  * add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
+    to work fine without)
 
 *****************************************************************************/
 
