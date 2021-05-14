@@ -2049,7 +2049,6 @@ uint32_t pc9801_state::a20_286(bool state)
 *
 ****************************************/
 
-//
 void pc9801_state::pc9801_palette(palette_device &palette) const
 {
 	for(int i = 0; i < 8; i++)

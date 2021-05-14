@@ -3086,6 +3086,7 @@ files {
 	MAME_DIR .. "src/mame/machine/pc9801_cd.h",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.cpp",
 	MAME_DIR .. "src/mame/machine/pc9801_memsw.h",
+	MAME_DIR .. "src/mame/drivers/pc98ha.cpp",
 	MAME_DIR .. "src/mame/drivers/tk80bs.cpp",
 }
 

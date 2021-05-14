@@ -33654,6 +33654,10 @@ pc8801mk2sr                     //
 pc88va                          //
 pc88va2                         //
 
+@source:pc98ha.cpp
+pc98lt                          // 1989
+pc98ha                          // 1990
+
 @source:pc9801.cpp
 pc386m                          //
 pc486mu                         //

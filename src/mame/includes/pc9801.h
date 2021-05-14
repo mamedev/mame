@@ -9,6 +9,7 @@
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
+#include "cpu/nec/v5x.h"
 
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
@@ -77,11 +78,23 @@
 #define ANALOG_256_MODE (0x20 >> 1)
 #define GDC_IS_5MHz (0x84 >> 1)
 
-class pc9801_state : public driver_device
+class pc98_base_state : public driver_device
+{
+public:
+	pc98_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag)
+	{
+	}
+
+protected:
+	// ...
+};
+
+class pc9801_state : public pc98_base_state
 {
 public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
+		pc98_base_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "i8237"),
 		m_pit8253(*this, "pit8253"),
@@ -446,6 +459,61 @@ private:
 	void m_sdip_write(uint16_t port, uint8_t sdip_offset,uint8_t data);
 	uint16_t egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const;
 	uint16_t egc_shift(int plane, uint16_t val);
+};
+
+class pc98lt_state : public pc98_base_state
+{
+public:
+	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc98_base_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_screen(*this, "screen")
+		, m_gvram(*this, "gvram")
+		, m_kanji_bank(*this, "kanji_bank")
+	{
+	}
+	
+	void lt_config(machine_config &config);
+
+protected:
+	void lt_map(address_map &map);
+	void lt_io(address_map &map);
+
+	required_device <v50_device> m_maincpu;
+
+	virtual void machine_start() override;
+//	virtual void machine_reset() override;
+private:
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_gvram;
+	required_memory_bank m_kanji_bank;
+
+	void lt_palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	u8 power_status_r();
+};
+
+class pc98ha_state : public pc98lt_state
+{
+public:
+	pc98ha_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pc98lt_state(mconfig, type, tag)
+	{
+	}
+
+	void ha_config(machine_config &config);
+	
+protected:
+	void ha_map(address_map &map);
+	void ha_io(address_map &map);
+private:
+
+// ...
 };
 
 #endif // MAME_INCLUDES_PC9801_H
