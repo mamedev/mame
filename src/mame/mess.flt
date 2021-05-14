@@ -225,6 +225,7 @@ dccons.cpp
 dcebridge.cpp
 dct11em.cpp
 debut.cpp
+decmate2.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp

@@ -228,7 +228,7 @@ void star_state::tstar432(machine_config &config)
 	config.set_default_layout(layout_saitek_tstar432);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_kso");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_kso");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_kso");
 }
 

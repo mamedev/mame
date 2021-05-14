@@ -205,9 +205,9 @@ OP_HANDLER( daa )
 	uint8_t msn, lsn;
 	uint16_t t, cf = 0;
 	msn=A & 0xf0; lsn=A & 0x0f;
-	if( lsn>0x09 || CC&0x20 ) cf |= 0x06;
-	if( msn>0x80 && lsn>0x09 ) cf |= 0x60;
-	if( msn>0x90 || CC&0x01 ) cf |= 0x60;
+	if (lsn>0x09 || CC&0x20) cf |= 0x06;
+	if (msn>0x80 && lsn>0x09) cf |= 0x60;
+	if (msn>0x90 || CC&0x01) cf |= 0x60;
 	t = cf + A;
 	CLR_NZV; /* keep carry from previous operation */
 	SET_NZ8((uint8_t)t); SET_C8(t);
@@ -442,7 +442,7 @@ OP_HANDLER( mul )
 	uint16_t t;
 	t=A*B;
 	CLR_C;
-	if(t&0x80) SEC;
+	if (t & 0x80) SEC;
 	D=t;
 }
 

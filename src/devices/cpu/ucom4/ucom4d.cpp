@@ -94,27 +94,6 @@ const u8 ucom4_disassembler::ucom4_mnemonic[0x100] =
 };
 
 
-u32 ucom4_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-u32 ucom4_disassembler::interface_flags() const
-{
-	return PAGED2LEVEL;
-}
-
-u32 ucom4_disassembler::page_address_bits() const
-{
-	return 6;
-}
-
-u32 ucom4_disassembler::page2_address_bits() const
-{
-	return 2;
-}
-
-
 offs_t ucom4_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t pos = pc;

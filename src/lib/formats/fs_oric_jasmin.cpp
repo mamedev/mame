@@ -67,6 +67,11 @@ bool fs_oric_jasmin::can_write() const
 	return false;
 }
 
+bool fs_oric_jasmin::has_rsrc() const
+{
+	return false;
+}
+
 std::vector<fs_meta_description> fs_oric_jasmin::volume_meta_description() const
 {
 	std::vector<fs_meta_description> res;
@@ -290,9 +295,9 @@ fs_meta_data fs_oric_jasmin::impl::file::metadata()
 	res[fs_meta_name::name] = read_file_name(m_entry + 3);
 	res[fs_meta_name::locked] = m_entry[2] == 'L';
 	res[fs_meta_name::sequential] = m_entry[0xf] == 'S';
-	res[fs_meta_name::size_in_blocks] = uint64_t(m_entry[0x10] | (m_entry[0x11] << 8));
+	res[fs_meta_name::size_in_blocks] = r16l(m_entry + 0x10);
 
-	u16 ref = (m_entry[0] << 8) | m_entry[1];
+	u16 ref = r16b(m_entry);
 	auto dblk = m_fs.m_blockdev.get(cs_to_block(ref));
 	res[fs_meta_name::loading_address] = uint64_t(dblk.r16l(2));
 	res[fs_meta_name::length] = uint64_t(dblk.r16l(4));
@@ -351,7 +356,7 @@ std::vector<u8> fs_oric_jasmin::impl::file::read(u64 start, u64 length)
 std::pair<std::vector<u16>, u32> fs_oric_jasmin::impl::file::build_data_sector_table()
 {
 	std::pair<std::vector<u16>, u32> res;
-	u16 ref = (m_entry[0] << 8) | m_entry[1];
+	u16 ref = r16b(m_entry);
 	auto iblk = m_fs.m_blockdev.get(cs_to_block(ref));
 	u32 length = iblk.r16l(4);
 	while(m_fs.ref_valid(ref)) {
@@ -389,8 +394,8 @@ fs_meta_data fs_oric_jasmin::impl::system_file::metadata()
 	res[fs_meta_name::name] = read_file_name(m_entry + 3);
 	res[fs_meta_name::locked] = m_entry[2] == 'L';
 	res[fs_meta_name::sequential] = m_entry[0xf] == 'S';
-	res[fs_meta_name::size_in_blocks] = uint64_t(m_entry[0x10] | (m_entry[0x11] << 8));
-	res[fs_meta_name::length] = uint64_t(0x3e00);
+	res[fs_meta_name::size_in_blocks] = r16l(m_entry + 0x10);
+	res[fs_meta_name::length] = 0x3e00;
 
 	return res;
 }

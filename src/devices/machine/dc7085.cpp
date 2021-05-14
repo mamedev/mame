@@ -31,419 +31,340 @@
 DEFINE_DEVICE_TYPE(DC7085, dc7085_device, "dc7085", "Digital Equipment Corporation DC7085 Quad UART")
 DEFINE_DEVICE_TYPE(DC7085_CHANNEL, dc7085_channel, "dc7085_channel", "DC7085 UART channel")
 
-dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DC7085, tag, owner, clock),
-	m_chan0(*this, "ch0"),
-	m_chan1(*this, "ch1"),
-	m_chan2(*this, "ch2"),
-	m_chan3(*this, "ch3"),
-	m_int_cb(*this),
-	write_0_tx(*this),
-	write_1_tx(*this),
-	write_2_tx(*this),
-	write_3_tx(*this)
+enum csr_mask : u16
 {
-	std::fill_n(&rx_fifo[0], DC7085_RX_FIFO_SIZE, 0);
-	rx_fifo_num = 0;
+	CSR_TRDY  = 0x8000, // transmitter ready
+	CSR_TIE   = 0x4000, // transmitter interrupt enable
+	CSR_TLINE = 0x0300, // transmitter line number
+	CSR_RDONE = 0x0080, // receiver done
+	CSR_RIE   = 0x0040, // receiver interrupt enable
+	CSR_MSE   = 0x0020, // master scan enable
+	CSR_CLR   = 0x0010, // master clear
+	CSR_MAINT = 0x0008, // maintenance (loopback)
+};
+
+enum rbuf_mask : u16
+{
+	RBUF_DVAL   = 0x8000, // data valid
+	RBUF_OERR   = 0x4000, // overrun error
+	RBUF_FERR   = 0x2000, // framing error
+	RBUF_PERR   = 0x1000, // parity error
+	RBUF_RLINE  = 0x0300, // received line number
+	RBUF_RLINE3 = 0x0300,
+	RBUF_RLINE2 = 0x0200,
+	RBUF_RLINE1 = 0x0100,
+	RBUF_RLINE0 = 0x0000,
+	RBUF_DATA   = 0x00ff, // received character
+};
+
+enum lpr_mask : u16
+{
+	LPR_RXENAB = 0x1000, // receiver enable
+	LPR_SC     = 0x0f00, // speed code
+	LPR_ODDPAR = 0x0080, // odd parity
+	LPR_PARENB = 0x0040, // parity enable
+	LPR_STOP   = 0x0020, // stop code
+	LPR_CHAR   = 0x0018, // character length
+	LPR_LINE   = 0x0003, // parameter line number
+};
+
+enum tcr_mask : u16
+{
+	TCR_DTR3   = 0x0800, // modem control
+	TCR_DTR2   = 0x0400,
+	TCR_DTR1   = 0x0200,
+	TCR_DTR0   = 0x0100,
+	TCR_LNENB3 = 0x0008, // transmitter line enable
+	TCR_LNENB2 = 0x0004,
+	TCR_LNENB1 = 0x0002,
+	TCR_LNENB0 = 0x0001,
+};
+
+enum tdr_mask : u16
+{
+	TDR_BRK3 = 0x0800, // break control
+	TDR_BRK2 = 0x0400,
+	TDR_BRK1 = 0x0200,
+	TDR_BRK0 = 0x0100,
+	TDR_TBUF = 0x00ff, // transmitter buffer
+};
+
+dc7085_device::dc7085_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, DC7085, tag, owner, clock)
+	, m_chan(*this, "ch%u", 0U)
+	, m_int_cb(*this)
+	, m_tx_cb(*this)
+	, m_dtr_cb(*this)
+	, m_int_state(false)
+{
 }
 
 void dc7085_device::device_add_mconfig(machine_config &config)
 {
-	DC7085_CHANNEL(config, m_chan0, 0);
-	DC7085_CHANNEL(config, m_chan1, 0);
-	DC7085_CHANNEL(config, m_chan2, 0);
-	DC7085_CHANNEL(config, m_chan3, 0);
+	/*
+	 * Configure all four channels such that:
+	 *  - line numbers are inesrted into received data words
+	 *  - transmitter output is looped back to receiver when enabled
+	 *  - transmitter completion is signalled
+	 */
+	for (unsigned i = 0; i < std::size(m_chan); i++)
+	{
+		DC7085_CHANNEL(config, m_chan[i], 0);
+
+		m_chan[i]->rx_done().set([this, i](u16 data) { rx_done((i << 8) | data); });
+		m_chan[i]->tx_cb().set([this, i](int state) { m_tx_cb[i](state); if (m_csr & CSR_MAINT) m_chan[i]->rx_w(state); });
+		m_chan[i]->tx_done().set(*this, FUNC(dc7085_device::tx_done));
+	}
 }
 
 void dc7085_device::map(address_map &map)
 {
-	map(0x00, 0x01).rw(FUNC(dc7085_device::status_r), FUNC(dc7085_device::control_w));
-	map(0x04, 0x05).rw(FUNC(dc7085_device::rxbuffer_r), FUNC(dc7085_device::lineparams_w));
-	map(0x08, 0x09).rw(FUNC(dc7085_device::txparams_r), FUNC(dc7085_device::txparams_w));
-	map(0x0c, 0x0d).rw(FUNC(dc7085_device::modem_status_r), FUNC(dc7085_device::txdata_w));
+	map(0x00, 0x01).rw(FUNC(dc7085_device::csr_r), FUNC(dc7085_device::csr_w));
+	map(0x04, 0x05).rw(FUNC(dc7085_device::rbuf_r), FUNC(dc7085_device::lpr_w));
+	map(0x08, 0x09).rw(FUNC(dc7085_device::tcr_r), FUNC(dc7085_device::tcr_w));
+	map(0x0c, 0x0d).rw(FUNC(dc7085_device::msr_r), FUNC(dc7085_device::tdr_w));
 }
 
 void dc7085_device::device_start()
 {
 	m_int_cb.resolve_safe();
-	write_0_tx.resolve_safe();
-	write_1_tx.resolve_safe();
-	write_2_tx.resolve_safe();
-	write_3_tx.resolve_safe();
+	m_tx_cb.resolve_all_safe();
+	m_dtr_cb.resolve_all_safe();
 
-	save_item(NAME(m_status));
-	save_item(NAME(rx_fifo));
-	save_item(NAME(rx_fifo_read_ptr));
-	save_item(NAME(rx_fifo_write_ptr));
-	save_item(NAME(rx_fifo_num));
+	save_item(NAME(m_csr));
+	save_item(NAME(m_tcr));
+	save_item(NAME(m_msr));
+	//save_item(NAME(m_fifo));
+	save_item(NAME(m_rx_buf));
+	save_item(NAME(m_int_state));
 }
 
 void dc7085_device::device_reset()
 {
-	m_chan0->clear();
-	m_chan1->clear();
-	m_chan2->clear();
-	m_chan3->clear();
-	m_status = 0;
-	std::fill_n(&rx_fifo[0], DC7085_RX_FIFO_SIZE, 0);
-	rx_fifo_write_ptr = rx_fifo_read_ptr = 0;
-	rx_fifo_num = 0;
+	m_csr = 0;
+	m_tcr = 0;
+	m_msr = 0;
+
+	m_fifo.clear();
+	m_rx_buf = 0;
+
+	set_int(false);
 }
 
-u16 dc7085_device::status_r()
+u16 dc7085_device::rbuf_r()
 {
-	return m_status;
-}
-
-u16 dc7085_device::rxbuffer_r()
-{
-	u16 rv;
-
-	LOGMASKED(LOG_RX, "rxbuffer_r: rx_fifo_num %d\n", rx_fifo_num);
-
-	if (rx_fifo_num == 0)
-	{
-		LOGMASKED(LOG_RX, "rx fifo underflow\n");
-		m_status &= ~CTRL_RX_DONE;
-		recalc_irqs();
+	if (m_fifo.empty())
 		return 0;
-	}
 
-	rv = rx_fifo[rx_fifo_read_ptr++];
-	if (rx_fifo_read_ptr == DC7085_RX_FIFO_SIZE)
-	{
-		rx_fifo_read_ptr = 0;
-	}
+	u16 const data = m_fifo.dequeue();
 
-	rx_fifo_num--;
-	if (rx_fifo_num == 0)
+	LOGMASKED(LOG_RX, "rbuf_r 0x%04x fifo_length %d\n", data, m_fifo.queue_length());
+
+	if (m_fifo.empty())
+		m_csr &= ~CSR_RDONE;
+
+	// FIXME: insert pending data into fifo
+	if (m_rx_buf & RBUF_DVAL)
 	{
-		m_status &= ~CTRL_RX_DONE;
+		rx_fifo_push(m_rx_buf);
+		m_rx_buf = 0;
 	}
 
 	recalc_irqs();
 
-	//printf("Rx read %02x\n", rv);
-
-	return rv;
+	return data;
 }
 
-u16 dc7085_device::txparams_r()
+void dc7085_device::csr_w(u16 data)
 {
-	return 0;
-}
+	LOGMASKED(LOG_REG, "csr_w %04x tie %d rie %d scan %d clear %d loopback %d\n", data,
+		bool(data & CSR_TIE), bool(data & CSR_RIE), bool(data & CSR_MSE), bool(data & CSR_CLR), bool(data & CSR_MAINT));
 
-u16 dc7085_device::modem_status_r()
-{
-	return 0;
-}
-
-void dc7085_device::control_w(u16 data)
-{
-	LOGMASKED(LOG_REG, "control_w %04x\n", data);
-	LOGMASKED(LOG_REG, "\tTx IRQ %d  Rx IRQ %d\n", (data & CTRL_TX_IRQ_ENABLE) ? "1" : "0", (data & CTRL_RX_IRQ_ENABLE) ? "1" : "0");
-	LOGMASKED(LOG_REG, "\tScan enable %d  Master clear %d\n", (data & CTRL_MASTER_SCAN) ? "1" : "0", (data & CTRL_MASTER_CLEAR) ? "1" : "0");
-	LOGMASKED(LOG_REG, "\tLocal loopback %d\n", (data & CTRL_LOOPBACK) ? "1" : "0");
-
-	if (data & CTRL_MASTER_CLEAR)
+	if (!(data & CSR_CLR))
 	{
-		m_chan0->clear();
-		m_chan1->clear();
-		m_chan2->clear();
-		m_chan3->clear();
-		m_status = 0;
-		rx_fifo_write_ptr = rx_fifo_read_ptr = 0;
-		rx_fifo_num = 0;
-		return;
+		data &= (CSR_TIE | CSR_RIE | CSR_MSE | CSR_MAINT);
+		m_csr &= ~(CSR_TIE | CSR_RIE | CSR_MSE | CSR_MAINT);
+		m_csr |= data;
 	}
-
-	data &= (CTRL_TX_IRQ_ENABLE|CTRL_RX_IRQ_ENABLE|CTRL_MASTER_SCAN|CTRL_LOOPBACK);
-	m_status &= ~(CTRL_TX_IRQ_ENABLE|CTRL_RX_IRQ_ENABLE|CTRL_MASTER_SCAN|CTRL_LOOPBACK);
-	m_status |= data;
+	else
+		reset();
 }
 
-void dc7085_device::lineparams_w(u16 data)
+void dc7085_device::lpr_w(u16 data)
 {
 	static const int bauds[] = { 50, 75, 110, 134, 150, 300, 600, 1200, 1800, 2000, 2400, 3600, 4800, 7200, 9600, 19800 };
 
-	LOGMASKED(LOG_REG, "lineparams_w %04x\n", data);
-	LOGMASKED(LOG_REG, "\tline %d baud %d rx enabled %d\n", data & 3, bauds[(data>>8) & 0x0f], (data & 0x1000) ? 1 : 0);
-	LOGMASKED(LOG_REG, "\tline %d %d data bits, %d stop bits\n", data & 3, ((data>>3) & 3) + 5, ((data>>5) & 1));
-	LOGMASKED(LOG_REG, "\tline %d parity %s %s\n", data & 3, (data & LPARAM_ODD_PARITY) ? "odd" : "even", (data & LPARAM_PARITY_ENB) ? "enabled" : "disabled");
+	unsigned const baud = (data & LPR_SC) >> 8;
+	unsigned const data_bits = ((data & LPR_CHAR) >> 3) + 5;
+	unsigned const parity = (data & LPR_PARENB) ? ((data & LPR_ODDPAR) ? 1 : 2) : 0;
+	unsigned const stop_bits = (data & LPR_STOP) ? 2 : 1;
 
-	int parity = -1;
-	if (data & LPARAM_PARITY_ENB)
-	{
-		parity = (data & LPARAM_ODD_PARITY) ? 1 : 0;
-	}
-
-	switch (data & 3)
-	{
-		case 0:
-			m_chan0->set_format(((data>>3) & 3) + 5, parity, ((data>>5) & 1));
-			m_chan0->set_baud_rate(bauds[(data>>8) & 0x0f]);
-			m_chan0->set_rx_enable(data & LPARAM_RX_ENABLE);
-			break;
-		case 1:
-			m_chan1->set_format(((data>>3) & 3) + 5, parity, ((data>>5) & 1));
-			m_chan1->set_baud_rate(bauds[(data>>8) & 0x0f]);
-			m_chan1->set_rx_enable(data & LPARAM_RX_ENABLE);
-			break;
-		case 2:
-			m_chan2->set_format(((data>>3) & 3) + 5, parity, ((data>>5) & 1));
-			m_chan2->set_baud_rate(bauds[(data>>8) & 0x0f]);
-			m_chan2->set_rx_enable(data & LPARAM_RX_ENABLE);
-			break;
-		case 3:
-			m_chan3->set_format(((data>>3) & 3) + 5, parity, ((data>>5) & 1));
-			m_chan3->set_baud_rate(bauds[(data>>8) & 0x0f]);
-			m_chan3->set_rx_enable(data & LPARAM_RX_ENABLE);
-			break;
-	}
+	m_chan[data & LPR_LINE]->set_format(bauds[baud], data_bits, parity, stop_bits);
+	m_chan[data & LPR_LINE]->set_enable(data & LPR_RXENAB);
 }
 
-void dc7085_device::txparams_w(u16 data)
+void dc7085_device::tcr_w(u16 data)
 {
-	LOGMASKED(LOG_REG, "txparams_w %04x\n", data);
+	LOGMASKED(LOG_REG, "tcr_w %04x\n", data);
 
-	m_chan0->set_tx_enable(data & TXCTRL_LINE0_ENB);
-	m_chan1->set_tx_enable(data & TXCTRL_LINE1_ENB);
-	m_chan2->set_tx_enable(data & TXCTRL_LINE2_ENB);
-	m_chan3->set_tx_enable(data & TXCTRL_LINE3_ENB);
+	if ((data ^ m_tcr) & TCR_DTR0)
+		m_dtr_cb[0](bool(data & TCR_DTR0));
+	if ((data ^ m_tcr) & TCR_DTR1)
+		m_dtr_cb[1](bool(data & TCR_DTR1));
+	if ((data ^ m_tcr) & TCR_DTR2)
+		m_dtr_cb[2](bool(data & TCR_DTR2));
+	if ((data ^ m_tcr) & TCR_DTR3)
+		m_dtr_cb[3](bool(data & TCR_DTR3));
+
+	m_tcr = data;
+
 	recalc_irqs();
 }
 
-void dc7085_device::txdata_w(u16 data)
+void dc7085_device::tdr_w(u16 data)
 {
-	LOGMASKED(LOG_REG, "txdata_w %04x\n", data);
-	switch ((m_status >> 8) & 3)
-	{
-		case 0:
-			m_chan0->write_TX(data&0xff);
-			break;
-		case 1:
-			m_chan1->write_TX(data&0xff);
-			break;
-		case 2:
-			m_chan2->write_TX(data&0xff);
-			break;
-		case 3:
-			m_chan3->write_TX(data&0xff);
-			break;
-	}
+	LOGMASKED(LOG_REG, "tdr_w %04x (%s)\n", data, machine().describe_context());
+
+	unsigned const ch = (m_csr & CSR_TLINE) >> 8;
+
+	if (BIT(m_tcr, ch))
+		m_chan[ch]->tx_w(data & TDR_TBUF);
+
+	m_csr &= ~CSR_TRDY;
+	recalc_irqs();
 }
 
 void dc7085_device::recalc_irqs()
 {
-	bool bIRQ = false;
-
 	LOGMASKED(LOG_IRQ, "recalc_irqs enter\n");
-	if (m_chan0->is_tx_ready())
+	m_csr &= ~(CSR_TRDY | CSR_TLINE);
+	for (unsigned i = 0; i < 4; i++)
 	{
-		m_status |= CTRL_TRDY;
-		m_status &= ~CTRL_LINE_MASK;
-		LOGMASKED(LOG_IRQ, "ch 0: set TRDY\n");
-	}
-	else if (m_chan1->is_tx_ready())
-	{
-		m_status |= CTRL_TRDY;
-		m_status &= ~CTRL_LINE_MASK;
-		m_status |= (1 << 8);
-		LOGMASKED(LOG_IRQ, "ch 1: set TRDY\n");
-	}
-	else if (m_chan2->is_tx_ready())
-	{
-		m_status |= CTRL_TRDY;
-		m_status &= ~CTRL_LINE_MASK;
-		m_status |= (2 << 8);
-		LOGMASKED(LOG_IRQ, "ch 2: set TRDY\n");
-	}
-	else if (m_chan3->is_tx_ready())
-	{
-		m_status |= CTRL_TRDY;
-		m_status &= ~CTRL_LINE_MASK;
-		m_status |= (3 << 8);
-		LOGMASKED(LOG_IRQ, "ch 3: set TRDY\n");
+		if (BIT(m_tcr, i) && m_chan[i]->tx_ready())
+		{
+			m_csr |= CSR_TRDY;
+			m_csr |= (i << 8);
+			LOGMASKED(LOG_IRQ, "ch %u: set TRDY\n", i);
+
+			break;
+		}
 	}
 
-	if ((m_status & CTRL_TRDY) && (m_status & CTRL_TX_IRQ_ENABLE))
-	{
-		bIRQ = true;
-	}
-	else if ((m_status & CTRL_RX_DONE) && (m_status & CTRL_RX_IRQ_ENABLE))
-	{
-		bIRQ = true;
-	}
-
-	if (bIRQ)
-	{
-		m_int_cb(ASSERT_LINE);
-	}
-	else
-	{
-		m_int_cb(CLEAR_LINE);
-	}
+	set_int(((m_csr & CSR_TIE) && (m_csr & CSR_TRDY)) || ((m_csr & CSR_RIE) && (m_csr & CSR_RDONE)));
 }
 
-void dc7085_device::rx_fifo_push(uint16_t data, uint16_t errors)
+void dc7085_device::rx_fifo_push(u16 data)
 {
-	if (rx_fifo_num >= DC7085_RX_FIFO_SIZE)
+	if (!m_fifo.full())
 	{
-		LOGMASKED(LOG_RX, "DC7085: FIFO overflow\n");
-		data |= dc7085_device::RXMASK_OVERRUN_ERR;
-		return;
+		LOGMASKED(LOG_RX, "rx_fifo_push 0x%04x fifo_length %d\n", data, m_fifo.queue_length());
+
+		m_fifo.enqueue(data);
+
+		m_csr |= CSR_RDONE;
+	}
+	else
+		throw emu_fatalerror("fifo overflow\n");
+}
+
+void dc7085_device::rx_done(u16 data)
+{
+	// check if receive buffer is full
+	if (m_rx_buf & RBUF_DVAL)
+	{
+		// push buffer into fifo if not full
+		if (!m_fifo.full())
+		{
+			rx_fifo_push(m_rx_buf);
+			m_rx_buf = 0;
+		}
+		else
+			// flag buffer overrun
+			data |= RBUF_OERR;
 	}
 
-	rx_fifo[rx_fifo_write_ptr++] = data | errors;
-	if (rx_fifo_write_ptr == DC7085_RX_FIFO_SIZE)
-		rx_fifo_write_ptr = 0;
+	// store received data in fifo or buffer
+	if (!m_fifo.full())
+		rx_fifo_push(data);
+	else
+		m_rx_buf = data;
 
-	rx_fifo_num++;
-
-	LOGMASKED(LOG_RX, "ch %d, got %02x, fifo_num %d\n", (data>>8) & 3, data&0xff, rx_fifo_num);
-
-	m_status |= dc7085_device::CTRL_RX_DONE;
 	recalc_irqs();
 }
 
-// UART channel class stuff
+void dc7085_device::tx_done(int state)
+{
+	recalc_irqs();
+}
 
-dc7085_channel::dc7085_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+dc7085_channel::dc7085_channel(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, DC7085_CHANNEL, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
-	, rx_enabled(0)
-	, tx_enabled(0)
+	, m_tx_cb(*this)
+	, m_tx_done(*this)
+	, m_rx_done(*this)
+	, m_rx_enabled(false)
 {
 }
 
 void dc7085_channel::device_start()
 {
-	m_base = downcast<dc7085_device *>(owner());
-	m_ch = m_base->get_ch(this);    // get our channel number
+	m_tx_cb.resolve_safe();
+	m_rx_done.resolve_safe();
+	m_tx_done.resolve_safe();
 
-	save_item(NAME(baud_rate));
-	save_item(NAME(rx_enabled));
-	save_item(NAME(tx_enabled));
-	save_item(NAME(tx_data));
-	save_item(NAME(tx_ready));
+	save_item(NAME(m_rx_enabled));
 }
 
 void dc7085_channel::device_reset()
 {
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	transmit_register_reset();
 
-	baud_rate = 0;
-	rx_enabled = 0;
-	tx_enabled = 0;
-	tx_ready = 1;
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_tra_rate(0);
+	set_rcv_rate(0);
+
+	m_rx_enabled = false;
 }
 
-// serial device virtual overrides
 void dc7085_channel::rcv_complete()
 {
 	receive_register_extract();
 
-	//printf("%s ch %d rcv complete\n", tag(), m_ch);
-
-	if (rx_enabled)
+	if (m_rx_enabled)
 	{
-		uint16_t errors = 0;
-		if (is_receive_framing_error())
-			errors |= dc7085_device::RXMASK_FRAMING_ERR;
-		if (is_receive_parity_error())
-			errors |= dc7085_device::RXMASK_PARITY_ERR;
+		u16 data = RBUF_DVAL | get_received_char();
 
-		m_base->rx_fifo_push(get_received_char() | (m_ch << 8) | dc7085_device::RXMASK_DATA_VALID, errors);
+		if (is_receive_framing_error())
+			data |= RBUF_FERR;
+		if (is_receive_parity_error())
+			data |= RBUF_PERR;
+
+		m_rx_done(data);
 	}
 }
 
 void dc7085_channel::tra_complete()
 {
-	LOGMASKED(LOG_TX, "ch %d Tx complete\n", m_ch);
-	tx_ready = 1;
-
-	// if local loopback is on, write the transmitted data as if a byte had been received
-	if (m_base->m_status & dc7085_device::CTRL_LOOPBACK)
-		m_base->rx_fifo_push(tx_data | (m_ch << 8) | dc7085_device::RXMASK_DATA_VALID, 0);
-
-	m_base->recalc_irqs();
+	m_tx_done(1);
 }
 
 void dc7085_channel::tra_callback()
 {
-	int bit = transmit_register_get_data_bit();
-
-	LOGMASKED(LOG_TX, "transmit %d\n", bit);
-	switch (m_ch)
-	{
-		case 0: m_base->write_0_tx(bit); break;
-		case 1: m_base->write_1_tx(bit); break;
-		case 2: m_base->write_2_tx(bit); break;
-		case 3: m_base->write_3_tx(bit); break;
-	}
+	m_tx_cb(transmit_register_get_data_bit());
 }
 
-void dc7085_channel::set_baud_rate(int baud)
+void dc7085_channel::set_format(unsigned baud, unsigned data_bits, unsigned parity, unsigned stop_bits)
 {
+	set_data_frame(1, data_bits, parity ? (parity == 1 ? PARITY_ODD : PARITY_EVEN) : PARITY_NONE,
+		stop_bits == 1 ? STOP_BITS_1 : (data_bits == 5 ? STOP_BITS_1_5 : STOP_BITS_2));
+
 	set_tra_rate(baud);
 	set_rcv_rate(baud);
-	baud_rate = baud;
 }
 
-void dc7085_channel::set_format(int data_bits, int parity, int stop_bits)
+void dc7085_channel::tx_w(u8 data)
 {
-	switch (parity)
-	{
-		case -1:
-			set_data_frame(1, data_bits, PARITY_NONE, stop_bits ? STOP_BITS_1 : STOP_BITS_0);
-			break;
-
-		case 0:
-			set_data_frame(1, data_bits, PARITY_EVEN, stop_bits ? STOP_BITS_1 : STOP_BITS_0);
-			break;
-
-		case 1:
-			set_data_frame(1, data_bits, PARITY_ODD, stop_bits ? STOP_BITS_1 : STOP_BITS_0);
-			break;
-	}
-}
-
-// called on a master clear
-void dc7085_channel::clear()
-{
-	transmit_register_reset();
-	set_baud_rate(0);
-	rx_enabled = 0;
-	tx_enabled = 0;
-	tx_ready = 1;
-}
-
-void dc7085_channel::set_tx_enable(bool bEnabled)
-{
-	LOGMASKED(LOG_TX, "ch %d set_tx_enable %s\n", m_ch, bEnabled ? "true" : "false");
-	tx_enabled = bEnabled ? 1 : 0;
-}
-
-void dc7085_channel::set_rx_enable(bool bEnabled)
-{
-	rx_enabled = bEnabled ? 1 : 0;
-}
-
-void dc7085_channel::write_TX(uint8_t data)
-{
-	tx_data = data;
-
-	if (!tx_ready)
-	{
-		LOGMASKED(LOG_TX, "Write %02x to TX when TX not ready!\n", data);
-	}
-
-	LOGMASKED(LOG_TX, "ch %d Tx [%02x] (%d baud)\n", m_ch, data, baud_rate);
-
-	tx_ready = 0;
-
-	// send tx_data
-	transmit_register_setup(tx_data);
-
-	m_base->recalc_irqs();
+	if (is_transmit_register_empty())
+		transmit_register_setup(data);
 }
