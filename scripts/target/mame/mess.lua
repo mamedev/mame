@@ -1286,6 +1286,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"kontron",
 		"korg",
 		"kurzweil",
+		"kyber",
 		"kyocera",
 		"leapfrog",
 		"learsiegler",
@@ -2814,6 +2815,11 @@ files {
 createMESSProjects(_target, _subtarget, "kurzweil")
 files {
 	MAME_DIR .. "src/mame/drivers/krz2000.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "kyber")
+files {
+	MAME_DIR .. "src/mame/drivers/kminus.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "kyocera")
