@@ -31,9 +31,10 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -52,6 +53,7 @@ public:
 	ren_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_expansion(*this, "exp"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_lcd_pwm(*this, "lcd_pwm"),
@@ -70,11 +72,12 @@ protected:
 private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
+	required_device<saitekosa_expansion_device> m_expansion;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -156,7 +159,7 @@ void ren_state::leds_w(u8 data)
 void ren_state::control_w(u8 data)
 {
 	// d1: speaker out
-	m_dac->write(BIT(data, 1));
+	m_dac->level_w(BIT(data, 1));
 
 	// d2,d3: comm/module leds?
 	m_led_data[1] = (m_led_data[1] & ~0xc) | (~data & 0xc);
@@ -301,7 +304,7 @@ INPUT_PORTS_END
 
 void ren_state::ren(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6303Y(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ren_state::main_map);
 	m_maincpu->in_p2_cb().set(FUNC(ren_state::p2_r));
@@ -315,7 +318,7 @@ void ren_state::ren(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(ren_state::lcd_output_w));
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 34);
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
@@ -329,9 +332,12 @@ void ren_state::ren(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9+1, 9);
 	config.set_default_layout(layout_saitek_renaissance);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// expansion module
+	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 }
 
 

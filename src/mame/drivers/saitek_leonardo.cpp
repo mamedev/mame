@@ -42,7 +42,6 @@ Expansion modules released:
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
-- OSA module support (softwarelist, devices/bus)
 - OSA PC link (probably uses MCU serial interface)
 - add nvram
 - finish internal artwork
@@ -51,9 +50,10 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -70,6 +70,7 @@ public:
 	leo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_expansion(*this, "exp"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -85,9 +86,10 @@ protected:
 private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
+	required_device<saitekosa_expansion_device> m_expansion;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	required_ioport_array<9> m_inputs;
 
 	void main_map(address_map &map);
@@ -97,6 +99,7 @@ private:
 	void leds_w(u8 data);
 	u8 unk_r();
 	void unk_w(u8 data);
+	void exp_stb_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -107,12 +110,14 @@ private:
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { 0, 0 };
+	bool m_stb_enable = false;
 };
 
 void leo_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+	save_item(NAME(m_stb_enable));
 }
 
 
@@ -138,7 +143,7 @@ void leo_state::mux_w(u8 data)
 	update_display();
 
 	// d4: speaker out
-	m_dac->write(BIT(data, 4));
+	m_dac->level_w(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)
@@ -157,6 +162,12 @@ u8 leo_state::unk_r()
 void leo_state::unk_w(u8 data)
 {
 	// ?
+}
+
+void leo_state::exp_stb_w(int state)
+{
+	// STB-P to P5 IS
+	m_maincpu->set_input_line(M6801_IS_LINE, (state && m_stb_enable) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -186,29 +197,38 @@ void leo_state::p2_w(u8 data)
 
 u8 leo_state::p5_r()
 {
-	// ?
+	// d1: N/C, d4: IS strobe (handled with inputline)
 	return 0xff ^ 0x10;
 }
 
 void leo_state::p5_w(u8 data)
 {
+	// d2: expansion NMI-P
+	m_expansion->nmi_w(BIT(data, 2));
+
+	// d3: enable expansion STB signal
+	m_stb_enable = bool(BIT(data, 3));
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
+
 	// d6,d7: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
 	update_display();
 
 	// d0: power-off
-	// other: ?
 }
 
 u8 leo_state::p6_r()
 {
-	// read chessboard sensors
-	return ~m_board->read_file(m_inp_mux & 0xf);
+	// read chessboard sensors and module data
+	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void leo_state::p6_w(u8 data)
 {
 	// module data
+	m_expansion->data_w(data);
 }
 
 
@@ -291,7 +311,7 @@ INPUT_PORTS_END
 
 void leo_state::leo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leo_state::main_map);
 	m_maincpu->in_p2_cb().set(FUNC(leo_state::p2_r));
@@ -305,13 +325,17 @@ void leo_state::leo(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8+2);
 	config.set_default_layout(layout_saitek_leonardo);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// expansion module
+	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
+	m_expansion->stb_handler().set(FUNC(leo_state::exp_stb_w));
 }
 
 void leo_state::leoa(machine_config &config)

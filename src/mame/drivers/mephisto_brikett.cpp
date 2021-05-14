@@ -66,6 +66,10 @@ There are no other known external port peripherals.
 The Brikett was also used in the 1983 Mephisto Excalibur, but the hardware
 is completely different, based on a 68000.
 
+BTANB:
+- bad bug in mephistoj opening library: e4 e6 / d4 d5 / Nd2 c5 / exd5 Qd1xd5,
+  in other words: computer makes an illegal move with the WHITE queen
+
 ******************************************************************************/
 
 #include "emu.h"

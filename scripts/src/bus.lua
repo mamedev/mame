@@ -4444,6 +4444,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/saitek_osa/expansion.h,BUSES["SAITEK_OSA"] = true
+---------------------------------------------------
+
+if (BUSES["SAITEK_OSA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/modules.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/modules.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/samcoupe/drive/drive.h,BUSES["SAMCOUPE_DRIVE_PORT"] = true
 ---------------------------------------------------
 
