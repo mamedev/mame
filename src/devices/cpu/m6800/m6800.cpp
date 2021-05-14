@@ -21,8 +21,14 @@ System dependencies:    uint16_t must be 16 bit unsigned int
                         machine must be twos complement
 
 TODO:
-- Verify invalid opcodes for the different CPU types.
-- A lot more work and cleanups, especially for the 6801 derivatives.
+- verify invalid opcodes for the different CPU types
+- cleanups (difficult to do maintenance work right now)
+- improve 6801 and derivatives:
+  * make internal I/O map really internal
+  * RAM control register (eg. nvram)
+  * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
+  * finish 6301Y port 6 handshake, share implementation with p3csr?
+  * 6301Y sci_trcsr2_r/w
 
 *****************************************************************************/
 
