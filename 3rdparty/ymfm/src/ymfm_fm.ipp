@@ -837,12 +837,12 @@ void fm_channel<RegisterType>::save_restore(ymfm_saved_state &state)
 template<class RegisterType>
 void fm_channel<RegisterType>::keyonoff(uint32_t states, keyon_type type, uint32_t chnum)
 {
-	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+	for (int opnum = 0; opnum < array_size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(bitfield(states, opnum), type);
 
 	if (debug::LOG_KEYON_EVENTS && ((debug::GLOBAL_FM_CHANNEL_MASK >> chnum) & 1) != 0)
-		for (int opnum = 0; opnum < std::size(m_op); opnum++)
+		for (int opnum = 0; opnum < array_size(m_op); opnum++)
 			if (m_op[opnum] != nullptr)
 				debug::log_keyon("%c%s\n", bitfield(states, opnum) ? '+' : '-', m_regs.log_keyon(m_choffs, m_op[opnum]->opoffs()).c_str());
 }
@@ -858,7 +858,7 @@ bool fm_channel<RegisterType>::prepare()
 	uint32_t active_mask = 0;
 
 	// prepare all operators and determine if they are active
-	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+	for (int opnum = 0; opnum < array_size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			if (m_op[opnum]->prepare())
 				active_mask |= 1 << opnum;
@@ -878,7 +878,7 @@ void fm_channel<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 	m_feedback[0] = m_feedback[1];
 	m_feedback[1] = m_feedback_in;
 
-	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+	for (int opnum = 0; opnum < array_size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->clock(env_counter, lfo_raw_pm);
 }
@@ -930,7 +930,7 @@ void fm_channel<RegisterType>::output_2op(output_data &output, uint32_t rshift, 
 	{
 		result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
 		int32_t clipmin = -clipmax - 1;
-		result = std::clamp(result, clipmin, clipmax);
+		result = clamp(result, clipmin, clipmax);
 	}
 
 	// add to the output
@@ -1044,11 +1044,11 @@ void fm_channel<RegisterType>::output_4op(output_data &output, uint32_t rshift, 
 	// optionally add OP1, OP2, OP3
 	int32_t clipmin = -clipmax - 1;
 	if (bitfield(algorithm_ops, 7) != 0)
-		result = std::clamp(result + (opout[1] >> rshift), clipmin, clipmax);
+		result = clamp(result + (opout[1] >> rshift), clipmin, clipmax);
 	if (bitfield(algorithm_ops, 8) != 0)
-		result = std::clamp(result + (opout[2] >> rshift), clipmin, clipmax);
+		result = clamp(result + (opout[2] >> rshift), clipmin, clipmax);
 	if (bitfield(algorithm_ops, 9) != 0)
-		result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
+		result = clamp(result + (opout[3] >> rshift), clipmin, clipmax);
 
 	// add to the output
 	add_to_output(m_choffs, output, result);
@@ -1114,7 +1114,7 @@ void fm_channel<RegisterType>::output_rhythm_ch7(uint32_t phase_select, output_d
 	uint32_t op13phase = m_op[0]->phase();
 	phase = (0x100 << bitfield(op13phase, 8)) ^ (noise_state << 8);
 	result += m_op[1]->compute_volume(phase, am_offset) >> rshift;
-	result = std::clamp<int32_t>(result, -clipmax - 1, clipmax);
+	result = clamp(result, -clipmax - 1, clipmax);
 
 	// add to the output
 	add_to_output(m_choffs, output, result * 2);
@@ -1140,7 +1140,7 @@ void fm_channel<RegisterType>::output_rhythm_ch8(uint32_t phase_select, output_d
 	// and the operator 13/17 phase select to compute the phase
 	uint32_t phase = 0x100 | (phase_select << 9);
 	result += m_op[1]->compute_volume(phase, am_offset) >> rshift;
-	result = std::clamp<int32_t>(result, -clipmax - 1, clipmax);
+	result = clamp(result, -clipmax - 1, clipmax);
 
 	// add to the output
 	add_to_output(m_choffs, output, result * 2);

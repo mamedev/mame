@@ -203,7 +203,7 @@ bool adpcm_a_channel::clock()
 
 	// adjust ADPCM step
 	static int8_t const s_step_inc[8] = { -1, -1, -1, -1, 2, 5, 7, 9 };
-	m_step_index = std::clamp(m_step_index + s_step_inc[bitfield(data, 0, 3)], 0, 48);
+	m_step_index = clamp(m_step_index + s_step_inc[bitfield(data, 0, 3)], 0, 48);
 
 	return false;
 }
@@ -284,7 +284,7 @@ void adpcm_a_engine::save_restore(ymfm_saved_state &state)
 	m_regs.save_restore(state);
 
 	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		m_channel[chnum]->save_restore(state);
 }
 
@@ -297,7 +297,7 @@ uint32_t adpcm_a_engine::clock(uint32_t chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
 	uint32_t result = 0;
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		if (bitfield(chanmask, chnum))
 			if (m_channel[chnum]->clock())
 				result |= 1 << chnum;
@@ -318,7 +318,7 @@ void adpcm_a_engine::output(ymfm_output<NumOutputs> &output, uint32_t chanmask)
 	chanmask &= debug::GLOBAL_ADPCM_A_CHANNEL_MASK;
 
 	// compute the output of each channel
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		if (bitfield(chanmask, chnum))
 			m_channel[chnum]->output(output);
 }
@@ -339,7 +339,7 @@ void adpcm_a_engine::write(uint32_t regnum, uint8_t data)
 
 	// actively handle writes to the control register
 	if (regnum == 0x00)
-		for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
 			if (bitfield(data, chnum))
 				m_channel[chnum]->keyonoff(bitfield(~data, 7));
 }
@@ -507,11 +507,11 @@ void adpcm_b_channel::clock()
 		delta = -delta;
 
 	// add and clamp to 16 bits
-	m_accumulator = std::clamp(m_accumulator + delta, -32768, 32767);
+	m_accumulator = clamp(m_accumulator + delta, -32768, 32767);
 
 	// scale the ADPCM step: 0.9, 0.9, 0.9, 0.9, 1.2, 1.6, 2.0, 2.4
 	static uint8_t const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
-	m_adpcm_step = std::clamp((m_adpcm_step * s_step_scale[bitfield(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
+	m_adpcm_step = clamp((m_adpcm_step * s_step_scale[bitfield(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
 }
 
 

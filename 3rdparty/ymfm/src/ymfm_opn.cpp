@@ -2180,8 +2180,8 @@ void ymf276::generate(output_data *output, uint32_t numsamples)
 		}
 
 		// YMF276 is properly mixed; it shifts down 1 bit before clamping
-		output->data[0] = std::clamp(output->data[0] >> 1, -32768, 32767);
-		output->data[1] = std::clamp(output->data[1] >> 1, -32768, 32767);
+		output->data[0] = clamp(output->data[0] >> 1, -32768, 32767);
+		output->data[1] = clamp(output->data[1] >> 1, -32768, 32767);
 	}
 }
 

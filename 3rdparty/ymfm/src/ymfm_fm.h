@@ -276,7 +276,7 @@ public:
 	// assign operators
 	void assign(int index, fm_operator<RegisterType> *op)
 	{
-		assert(index < std::size(m_op));
+		assert(index < array_size(m_op));
 		m_op[index] = op;
 		if (op != nullptr)
 			op->set_choffs(m_choffs);

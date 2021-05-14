@@ -104,8 +104,7 @@ void opm_registers::save_restore(ymfm_saved_state &state)
 	state.save_restore(m_noise_counter);
 	state.save_restore(m_noise_state);
 	state.save_restore(m_noise_lfo);
-	for (int index = 0; index < std::size(m_regdata); index++)
-		state.save_restore(m_regdata[index]);
+	state.save_restore(m_regdata);
 }
 
 

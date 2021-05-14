@@ -89,6 +89,32 @@ inline uint32_t bitfield(uint32_t value, int start, int length = 1)
 
 
 //-------------------------------------------------
+//  clamp - clamp between the minimum and maximum
+//  values provided
+//-------------------------------------------------
+
+inline int32_t clamp(int32_t value, int32_t minval, int32_t maxval)
+{
+	if (value < minval)
+		return minval;
+	if (value > maxval)
+		return maxval;
+	return value;
+}
+
+
+//-------------------------------------------------
+//  array_size - return the size of an array
+//-------------------------------------------------
+
+template<typename ArrayType, int ArraySize>
+constexpr int32_t array_size(ArrayType (&array)[ArraySize])
+{
+	return ArraySize;
+}
+
+
+//-------------------------------------------------
 //  count_leading_zeros - return the number of
 //  leading zeros in a 32-bit value; CPU-optimized
 //  versions for various architectures are included
@@ -242,13 +268,30 @@ template<int NumOutputs>
 struct ymfm_output
 {
 	// clear all outputs to 0
-	ymfm_output &clear() { for (int index = 0; index < NumOutputs; index++) data[index] = 0; return *this; }
+	ymfm_output &clear()
+	{
+		for (int index = 0; index < NumOutputs; index++)
+			data[index] = 0;
+		return *this;
+	}
 
 	// clamp all outputs to a 16-bit signed value
-	ymfm_output &clamp16() { for (int index = 0; index < NumOutputs; index++) data[index] = std::clamp(data[index], -32768, 32767); return *this; }
+	ymfm_output &clamp16()
+	{
+		for (int index = 0; index < NumOutputs; index++)
+			data[index] = clamp(data[index], -32768, 32767);
+		return *this;
+	}
 
 	// run each output value through the floating-point processor
-	ymfm_output &roundtrip_fp() { for (int index = 0; index < NumOutputs; index++) data[index] = ymfm::roundtrip_fp(data[index]); return *this; }
+	ymfm_output &roundtrip_fp()
+	{
+		for (int index = 0; index < NumOutputs; index++)
+			data[index] = ymfm::roundtrip_fp(data[index]);
+		return *this;
+	}
+
+	// internal state
 	int32_t data[NumOutputs];
 };
 
