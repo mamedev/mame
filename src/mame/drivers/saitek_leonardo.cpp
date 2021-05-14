@@ -207,7 +207,7 @@ void leo_state::p5_w(u8 data)
 	m_expansion->nmi_w(BIT(data, 2));
 
 	// d3: enable expansion STB signal
-	m_stb_enable = bool(BIT(data, 3));
+	m_stb_enable = bool(data & 8);
 
 	// d5: expansion ACK-P
 	m_expansion->ack_w(BIT(data, 5));
@@ -320,6 +320,8 @@ void leo_state::leo(machine_config &config)
 	m_maincpu->out_p5_cb().set(FUNC(leo_state::p5_w));
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
+
+	config.set_perfect_quantum(m_maincpu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

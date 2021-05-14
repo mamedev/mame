@@ -23,6 +23,7 @@ so a chessboard display + 7seg info.
 
 TODO:
 - not sure about comm/module leds
+- fart noise at boot if osa module is inserted
 - finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
@@ -91,6 +92,7 @@ private:
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 control_r();
+	void exp_stb_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -177,6 +179,12 @@ u8 ren_state::control_r()
 	return 0;
 }
 
+void ren_state::exp_stb_w(int state)
+{
+	// STB-P to P5 IS
+	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 
 // MCU ports
 
@@ -189,7 +197,6 @@ u8 ren_state::p2_r()
 		data = m_inputs[m_inp_mux & 7]->read();
 
 	// d3: ?
-
 	return ~data;
 }
 
@@ -205,24 +212,32 @@ u8 ren_state::p5_r()
 	// d6: battery status
 	u8 b = m_inputs[8]->read() & 0x40;
 
+	// d4: IS strobe (handled with inputline)
 	// other: ?
-	return b | 0xbf;
+	return b | (0xff ^ 0x50);
 }
 
 void ren_state::p5_w(u8 data)
 {
-	// ?
+	// d1: expansion NMI-P
+	m_expansion->nmi_w(BIT(data, 1));
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
+
+	// other: ?
 }
 
 u8 ren_state::p6_r()
 {
-	// read chessboard sensors
-	return ~m_board->read_file(m_inp_mux & 0xf);
+	// read chessboard sensors and module data
+	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void ren_state::p6_w(u8 data)
 {
 	// module data
+	m_expansion->data_w(data);
 }
 
 
@@ -314,6 +329,8 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
+	config.set_perfect_quantum(m_maincpu);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -338,6 +355,7 @@ void ren_state::ren(machine_config &config)
 
 	// expansion module
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
+	m_expansion->stb_handler().set(FUNC(ren_state::exp_stb_w));
 }
 
 
