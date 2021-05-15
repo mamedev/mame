@@ -197,7 +197,7 @@ template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 	map(0x309400, 0x3095ff).mirror(0xcf6000).umask16(0x00ff).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write));
 
 	map(0x309600, 0x3097ff).mirror(0xcf6000).lr8(  // hdc
-		[this](offs_t offset)
+		[](offs_t offset)
 		{
 			return 0xff;
 		}, "hdc_r");
