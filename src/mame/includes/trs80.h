@@ -41,7 +41,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_fdc(*this, "fdc")
-		, m_floppy(*this, "flop%u", 0U)
+		, m_floppy(*this, "floppy%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_baud(*this, "BAUD")
@@ -51,8 +51,8 @@ public:
 
 	void sys80(machine_config &config);
 	void sys80p(machine_config &config);
-	void trs80(machine_config &config);
-	void model1(machine_config &config);
+	void level1(machine_config &config);
+	void level2(machine_config &config);
 	void ht1080z(machine_config &config);
 
 	void init_trs80l2();
@@ -98,7 +98,7 @@ protected:
 	u16 m_timeout = 600;
 	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	optional_shared_ptr<u8> m_p_videoram;
@@ -122,8 +122,9 @@ private:
 	void trs80_mem(address_map &map);
 	void ht1080z_io(address_map &map);
 
-	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_sys80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static void floppy_formats(format_registration &fr);
 };
 

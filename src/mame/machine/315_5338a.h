@@ -73,6 +73,7 @@ private:
 	uint8_t m_port_config;
 	uint8_t m_serial_output;
 	uint16_t m_address;
+	uint8_t m_cmd;
 };
 
 // device type definition

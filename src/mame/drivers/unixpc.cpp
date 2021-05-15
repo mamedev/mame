@@ -260,7 +260,8 @@ void unixpc_state::disk_control_w(uint8_t data)
 {
 	logerror("disk_control_w: %02x\n", data);
 
-	// TODO: bits 0-2 = head select
+	// bits 0-2 = head select
+	m_hdc->head_w(BIT(data, 0, 2));
 
 	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
 

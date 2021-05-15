@@ -18,7 +18,7 @@ BTANB:
 
 Elite A/S Challenger (EAS)
 ---------------------------------
-This came out in 1982. 2 program updates were released in 1983 and 1984,
+This came out in 1983. 2 program updates were released in 1983 and 1984,
 named Budapest and Glasgow, places where Fidelity competed in chess computer
 matches (they won it in 1983). A/S stands for auto sensory, it's the 1st
 Fidelity board with magnet sensors. The magnetic chessboard was licensed from

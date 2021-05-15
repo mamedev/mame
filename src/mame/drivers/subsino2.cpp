@@ -50,7 +50,7 @@ To do:
 #include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"

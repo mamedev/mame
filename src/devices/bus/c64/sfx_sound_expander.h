@@ -12,7 +12,7 @@
 #pragma once
 
 #include "exp.h"
-#include "sound/ym3526.h"
+#include "sound/ymopl.h"
 
 
 

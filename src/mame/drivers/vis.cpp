@@ -7,7 +7,7 @@
 #include "machine/8042kbdc.h"
 #include "machine/at.h"
 #include "sound/dac.h"
-#include "sound/ymf262.h"
+#include "sound/ymopl.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 

@@ -77,6 +77,7 @@ To Do / Status:
 #include "emu.h"
 #include "includes/trs80.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
 
 class lnw80_state : public trs80_state
@@ -241,6 +242,9 @@ static INPUT_PORTS_START( lnw80 )
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0xee, 0x00, IPT_UNUSED)
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(PAUSE)) PORT_WRITE_LINE_DEVICE_MEMBER("nmigate", input_merger_device, in_w<0>)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
@@ -582,6 +586,10 @@ void lnw80_state::lnw80(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lnw80_state::lnw80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lnw80_state::lnw80_io);
+	m_maincpu->halt_cb().set("nmigate", FUNC(input_merger_device::in_w<1>));
+
+	input_merger_device &nmigate(INPUT_MERGER_ANY_HIGH(config, "nmigate"));
+	nmigate.output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI); // TODO: also causes SYSRES on expansion bus
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

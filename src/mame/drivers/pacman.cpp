@@ -31,8 +31,10 @@
         * Pacman Club / Club Lambada
         * Eeekk!
 
-    Known issues:
+    TODO:
         * Mystery items in Ali Baba don't work correctly because of protection.
+        * mspactwin shows a green "0" in the corner on the PCB at tilescreen, but "18" on MAME.
+        * mspactwin_map supposed ROM 0x2000 mirroring implementation doesn't make much sense, there's a bus conflict now
 
     Known to exist but dumps needed
         * Ms Pac Plus
@@ -1137,12 +1139,12 @@ void mspactwin_state::mspactwin_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).mirror(0x4000).rom();
-	map(0x4000, 0x43ff).mirror(0xa000).mirror(0x8000).ram().w(FUNC(mspactwin_state::mspactwin_videoram_w)).share("videoram");
-	map(0x4400, 0x47ff).mirror(0xa000).mirror(0x8000).ram().w(FUNC(mspactwin_state::pacman_colorram_w)).share("colorram");
+	map(0x4000, 0x43ff).mirror(0x8000).ram().w(FUNC(mspactwin_state::mspactwin_videoram_w)).share("videoram");
+	map(0x4400, 0x47ff).mirror(0x8000).ram().w(FUNC(mspactwin_state::pacman_colorram_w)).share("colorram");
 	map(0x4800, 0x4bff).mirror(0xa000).r(FUNC(mspactwin_state::pacman_read_nop)).nopw();
 	map(0x4c00, 0x4fef).mirror(0xa000).ram();
 	map(0x4ff0, 0x4fff).mirror(0xa000).ram().share("spriteram");
-	map(0x5000, 0x5007).mirror(0xaf38).mirror(0x0030).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0x5000, 0x5007).mirror(0x0030).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x5040, 0x505f).mirror(0xaf00).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
 	map(0x5060, 0x506f).mirror(0xaf00).writeonly().share("spriteram2");
 	map(0x5070, 0x507f).mirror(0xaf00).nopw();
@@ -1157,8 +1159,8 @@ void mspactwin_state::mspactwin_map(address_map &map)
 
 void mspactwin_state::mspactwin_decrypted_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().share("decrypted_opcodes");
-	map(0x6000, 0x7fff).rom().share("decrypted_opcodes_mirror");
+	map(0x0000, 0x3fff).mirror(0x4000).rom().share("decrypted_opcodes");
+	map(0x4000, 0x5fff).unmapr(); // mirror only 6000-7fff
 	map(0x8000, 0xbfff).rom().share("decrypted_opcodes_high");
 }
 
@@ -1663,7 +1665,6 @@ static INPUT_PORTS_START( pacmanpe )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pacuman )
@@ -1881,16 +1882,16 @@ static INPUT_PORTS_START( mspactwin )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_DIPNAME( 0x10, 0x10, "Jama" )
+	PORT_DIPNAME( 0x10, 0x10, "Jama" ) // Speed
 	PORT_DIPSETTING(    0x10, "Slow" )
 	PORT_DIPSETTING(    0x00, "Fast" )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x80, 0x80, "Skip Screen" )       // Used to skip level
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_DIPNAME( 0x80, 0x80, "Skip Screen" ) // Used to skip level
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1901,7 +1902,7 @@ static INPUT_PORTS_START( mspactwin )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x0C, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW:3,4")
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
@@ -1911,7 +1912,6 @@ static INPUT_PORTS_START( mspactwin )
 	PORT_DIPSETTING(    0x10, "15000" )
 	PORT_DIPSETTING(    0x20, "20000" )
 	PORT_DIPSETTING(    0x30, "None"  )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superabc )
@@ -4783,10 +4783,10 @@ ROM_END
 
 /*****************************************************************************
 
-  Ms PacMan Twin (SUSILU)
-  -----------------------
+  Ms Pac Man Twin (SUSILU)
+  ------------------------
 
-  Argentine official hack of Ms. PacMan that allows 2 players simultaneously.
+  Argentine official hack of Ms. Pac-Man that allows 2 players simultaneously.
   Very rare PCB. Was avoiding us for more of 22 years...
   The mainboard is a PacMan bootleg PCB, with a mini daughterboard
   (normal in mspacman boards) plugged in the Z80 socket.
@@ -7876,19 +7876,10 @@ void pacman_state::init_eyes()
 		eyes_decode(&RAM[i]);
 }
 
-
-#define BITSWAP12(val,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	bitswap<16>(val,15,14,13,12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
-
-#define BITSWAP11(val,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	bitswap<16>(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
-
 void pacman_state::mspacman_install_patches(uint8_t *ROM)
 {
-	int i;
-
 	/* copy forty 8-byte patches into Pac-Man code */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		ROM[0x0410+i] = ROM[0x8008+i];
 		ROM[0x08E0+i] = ROM[0x81D8+i];
@@ -7951,13 +7942,13 @@ void pacman_state::init_mspacman()
 		DROM[0x0000+i] = ROM[0x0000+i]; /* pacman.6e */
 		DROM[0x1000+i] = ROM[0x1000+i]; /* pacman.6f */
 		DROM[0x2000+i] = ROM[0x2000+i]; /* pacman.6h */
-		DROM[0x3000+i] = bitswap<8>(ROM[0xb000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u7 */
+		DROM[0x3000+i] = bitswap<8>(ROM[0xb000+bitswap<12>(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u7 */
 	}
 	for (int i = 0; i < 0x800; i++)
 	{
-		DROM[0x8000+i] = bitswap<8>(ROM[0x8000+BITSWAP11(i,   8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u5 */
-		DROM[0x8800+i] = bitswap<8>(ROM[0x9800+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
-		DROM[0x9000+i] = bitswap<8>(ROM[0x9000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
+		DROM[0x8000+i] = bitswap<8>(ROM[0x8000+bitswap<11>(i,8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u5 */
+		DROM[0x8800+i] = bitswap<8>(ROM[0x9800+bitswap<11>(i,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
+		DROM[0x9000+i] = bitswap<8>(ROM[0x9000+bitswap<11>(i,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
 		DROM[0x9800+i] = ROM[0x1800+i];     /* mirror of pacman.6f high */
 	}
 	for (int i = 0; i < 0x1000; i++)
@@ -8070,15 +8061,15 @@ socket and run through the 74298.  Clock is tied to system clock.  */
 void pacman_state::init_mspacmbe()
 {
 	/* Address lines A1 and A0 swapped if A2=0 */
-	uint8_t *RAM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	for (int i = 0x1000; i < 0x2000; i += 4)
 	{
 		if (!(i & 8))
 		{
-			uint8_t temp = RAM[i+1];
-			RAM[i+1] = RAM[i+2];
-			RAM[i+2] = temp;
-		};
+			uint8_t temp = ROM[i+1];
+			ROM[i+1] = ROM[i+2];
+			ROM[i+2] = temp;
+		}
 	}
 }
 
@@ -8183,8 +8174,8 @@ void mspactwin_state::init_mspactwin()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000; A < 0x4000; A+=2) {
-
+	for (int A = 0x0000; A < 0x4000; A+=2)
+	{
 		// decode opcode
 		m_decrypted_opcodes     [A  ] = bitswap<8>(rom[       A  ]       , 4, 5, 6, 7, 0, 1, 2, 3);
 		m_decrypted_opcodes     [A+1] = bitswap<8>(rom[       A+1] ^ 0x9A, 6, 4, 5, 7, 2, 0, 3, 1);
@@ -8196,13 +8187,7 @@ void mspactwin_state::init_mspactwin()
 		rom[       A+1] = bitswap<8>(rom[       A+1] ^ 0xA3, 2, 4, 6, 3, 7, 0, 5, 1);
 		rom[0x8000+A  ] = bitswap<8>(rom[0x8000+A  ]       , 0, 1, 2, 3, 4, 5, 6, 7);
 		rom[0x8000+A+1] = bitswap<8>(rom[0x8000+A+1] ^ 0xA3, 2, 4, 6, 3, 7, 0, 5, 1);
-
 	}
-
-	for (int A = 0x0000; A < 0x2000; A++) {
-		m_decrypted_opcodes_mirror[A] = m_decrypted_opcodes[A+0x2000];
-	}
-
 }
 
 
@@ -8230,9 +8215,9 @@ GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   pacman_state,  empty_init,  
 GAME( 1980, newpuckx, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacheart, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Pac-Man (Hearts)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 198?, bucaner,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Buccaneer",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 1)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly2,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 2)",                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, hangly3,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Hangly-Man (set 3)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 1)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly2,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 2)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hangly3,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Igleck)",                     "Hangly-Man (set 3)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, baracuda, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Coinex)",                     "Barracuda",                                                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Popeye-Man",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacuman,  puckman,  pacman,   pacuman,  pacman_state,  empty_init,    ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)",                   MACHINE_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
@@ -8283,11 +8268,10 @@ GAME( 1992, mspacmanbco,  mspacman, woodpek, mspacman, pacman_state,  empty_init
 GAME( 1993, mspacmanbi,   mspacman, woodpek, mspacman, pacman_state,  empty_init,   ROT90,  "bootleg (Impeuropex)",    "Ms. Pac-Man (Impeuropex bootleg)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 198?, pacmansp,     puckman,  pacman,  pacmansp, pacman_state,  empty_init,   ROT90,  "bootleg (Video Game SA)", "Puck Man (Spanish, 'Made in Greece' bootleg)",                       MACHINE_SUPPORTS_SAVE ) // probably a further conversion of the mspacmanbg bootleg, still has some MS Pacman code + extra features
 
+GAME( 1992, mspactwin,    0,        mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "hack (Susilu)",   "Ms Pac Man Twin (Argentina)",            MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mspactwin,    0,        mspactwin, mspactwin, mspactwin_state, init_mspactwin, ROT90,  "SUSILU",   "Ms PacMan Twin (Argentina)",             MACHINE_SUPPORTS_SAVE )
-
-GAME( 1989, clubpacm,     0,        clubpacm,  clubpacm,  clubpacm_state,  empty_init,     ROT90,  "Miky SRL", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, clubpacma,    clubpacm, clubpacm,  clubpacma, clubpacm_state,  init_clubpacma, ROT90,  "Miky SRL", "Pacman Club (Argentina)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, clubpacm,     0,        clubpacm,  clubpacm,  clubpacm_state,  empty_init,     ROT90,  "hack (Miky SRL)", "Pacman Club / Club Lambada (Argentina)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, clubpacma,    clubpacm, clubpacm,  clubpacma, clubpacm_state,  init_clubpacma, ROT90,  "hack (Miky SRL)", "Pacman Club (Argentina)",                MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, jumpshot, 0,        pacman,   jumpshot, pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1985, jumpshotp,jumpshot, pacman,   jumpshotp,pacman_state,  init_jumpshot, ROT90,  "Bally Midway", "Jump Shot Engineering Sample", MACHINE_SUPPORTS_SAVE )

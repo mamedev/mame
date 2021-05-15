@@ -21,7 +21,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 
 #include "emupal.h"
 #include "screen.h"

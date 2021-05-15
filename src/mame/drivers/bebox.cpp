@@ -15,7 +15,7 @@
 /* Components */
 #include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "machine/mc146818.h"
 #include "machine/pckeybrd.h"
 #include "bus/lpci/mpc105.h"

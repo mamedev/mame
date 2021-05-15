@@ -8,7 +8,7 @@
 #include "a78_slot.h"
 #include "rom.h"
 #include "sound/pokey.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 // ======================> a78_xboard_device

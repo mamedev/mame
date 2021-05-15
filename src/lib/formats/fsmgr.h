@@ -23,6 +23,7 @@ enum class fs_meta_name {
 	name,
 	os_minimum_version,
 	os_version,
+	rsrc_length,
 	sequential,
 	size_in_blocks,
 };
@@ -45,8 +46,10 @@ public:
 	fs_meta() { value = false; }
 	fs_meta(std::string str) { value = str; }
 	fs_meta(bool b) { value = b; }
-	fs_meta(uint64_t num) { value = num; }
+	fs_meta(int32_t num) { value = uint64_t(num); }
+	fs_meta(uint32_t num) { value = uint64_t(num); }
 	fs_meta(int64_t num) { value = uint64_t(num); }
+	fs_meta(uint64_t num) { value = num; }
 	fs_meta(util::arbitrary_datetime dt) { value = dt; }
 
 	util::arbitrary_datetime as_date() const { return *std::get_if<util::arbitrary_datetime>(&value); }
@@ -66,8 +69,8 @@ fs_meta fs_meta_from_string(fs_meta_type type, std::string value);
 
 template<typename T> class fs_refcounted_outer {
 public:
-	fs_refcounted_outer(bool weak = false) :  m_object(nullptr), m_is_weak_ref(weak) {}
-	fs_refcounted_outer(T *object, bool weak = false) : m_object(object), m_is_weak_ref(weak) {
+	fs_refcounted_outer(bool weak) :  m_object(nullptr), m_is_weak_ref(weak) {}
+	fs_refcounted_outer(T *object, bool weak) : m_object(object), m_is_weak_ref(weak) {
 		ref();
 	}
 
@@ -88,23 +91,33 @@ public:
 	}
 
 	fs_refcounted_outer<T> &operator =(T *dir) {
-		unref();
-		m_object = dir;
-		ref();
+		if(m_object != dir) {
+			unref();
+			m_object = dir;
+			ref();
+		}
 		return *this;
 	}
 
 	fs_refcounted_outer<T> &operator =(const fs_refcounted_outer<T> &cref) {
-		unref();
-		m_object = cref.m_object;
-		m_is_weak_ref = cref.m_is_weak_ref;
-		ref();
+		if(m_object != cref.m_object) {
+			unref();
+			m_object = cref.m_object;
+			ref();
+		}
 		return *this;
 	}
 
 	fs_refcounted_outer<T> &operator =(fs_refcounted_outer<T> &&cref) {
-		m_object = cref.m_object;
-		m_is_weak_ref = cref.m_is_weak_ref;
+		if(m_object != cref.m_object) {
+			unref();
+			m_object = cref.m_object;
+			ref();
+		} else if(m_is_weak_ref != cref.m_is_weak_ref) {
+			ref();
+			cref.unref();
+			m_object = cref.m_object; // In case the object got deleted	(when going from strong ref to weak on the last strong)		
+		}
 		cref.m_object = nullptr;
 		return *this;
 	}
@@ -127,10 +140,9 @@ private:
 	
 	void unref() {
 		if(m_object) {
-			if(m_is_weak_ref)
-				m_object->unref_weak();
-			else
-				m_object->unref();
+			bool del = m_is_weak_ref ? m_object->unref_weak() : m_object->unref();
+			if(del)
+				m_object = nullptr;
 		}
 	}
 };
@@ -160,12 +172,12 @@ public:
 
 	void ref();
 	void ref_weak();
-	void unref();
-	void unref_weak();
+	bool unref();
+	bool unref_weak();
 
 	virtual void drop_weak_references() = 0;
 
-private:
+public:
 	uint32_t m_ref, m_weak_ref;
 };
 
@@ -200,7 +212,7 @@ public:
 	class block_t : public fs_refcounted_outer<iblock_t> {
 	public:
 		block_t(bool weak = false) :  fs_refcounted_outer<iblock_t>(weak) {}
-		block_t(iblock_t *block, bool weak = false) : fs_refcounted_outer(block, weak) {}
+		block_t(iblock_t *block, bool weak = true) : fs_refcounted_outer(block, weak) {}
 		virtual ~block_t() = default;
 
 		block_t strong() { return block_t(m_object, false); }
@@ -269,13 +281,15 @@ protected:
 		virtual fs_meta_data metadata() = 0;
 		virtual std::vector<u8> read_all() = 0;
 		virtual std::vector<u8> read(u64 start, u64 length) = 0;
+		virtual std::vector<u8> rsrc_read_all();
+		virtual std::vector<u8> rsrc_read(u64 start, u64 length);
 	};
 
 public:
 	class dir_t : public fs_refcounted_outer<idir_t> {
 	public:
 		dir_t(bool weak = false) :  fs_refcounted_outer<idir_t>(weak) {}
-		dir_t(idir_t *dir, bool weak = false) : fs_refcounted_outer(dir, weak) {}
+		dir_t(idir_t *dir, bool weak = true) : fs_refcounted_outer(dir, weak) {}
 		virtual ~dir_t() = default;
 
 		dir_t strong() { return dir_t(m_object, false); }
@@ -290,7 +304,7 @@ public:
 	class file_t : public fs_refcounted_outer<ifile_t> {
 	public:
 		file_t(bool weak = false) : fs_refcounted_outer<ifile_t>(weak) {}
-		file_t(ifile_t *file, bool weak = false) : fs_refcounted_outer(file, weak) {}
+		file_t(ifile_t *file, bool weak = true) : fs_refcounted_outer(file, weak) {}
 		virtual ~file_t() = default;
 
 		file_t strong() { return file_t(m_object, false); }
@@ -300,6 +314,8 @@ public:
 
 		std::vector<u8> read_all() { return m_object->read_all(); }
 		std::vector<u8> read(u32 start, u32 length) { return m_object->read(start, length); }
+		std::vector<u8> rsrc_read_all() { return m_object->rsrc_read_all(); }
+		std::vector<u8> rsrc_read(u32 start, u32 length) { return m_object->rsrc_read(start, length); }
 	};
 
 	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
@@ -311,6 +327,26 @@ public:
 	virtual void format(const fs_meta_data &meta);
 	virtual fs_meta_data metadata();
 	virtual dir_t root();
+
+	static void copy(uint8_t *p, const uint8_t *src, uint32_t size);
+	static void fill(uint8_t *p, uint8_t data, uint32_t size);
+	static void wstr(uint8_t *p, const std::string &str);
+	static void w8(  uint8_t *p, uint8_t data);
+	static void w16b(uint8_t *p, uint16_t data);
+	static void w24b(uint8_t *p, uint32_t data);
+	static void w32b(uint8_t *p, uint32_t data);
+	static void w16l(uint8_t *p, uint16_t data);
+	static void w24l(uint8_t *p, uint32_t data);
+	static void w32l(uint8_t *p, uint32_t data);
+
+	static std::string rstr(const uint8_t *p, uint32_t size);
+	static uint8_t  r8(  const uint8_t *p);
+	static uint16_t r16b(const uint8_t *p);
+	static uint32_t r24b(const uint8_t *p);
+	static uint32_t r32b(const uint8_t *p);
+	static uint16_t r16l(const uint8_t *p);
+	static uint32_t r24l(const uint8_t *p);
+	static uint32_t r32l(const uint8_t *p);
 
 protected:
 	fsblk_t &m_blockdev;
@@ -349,6 +385,7 @@ public:
 	virtual bool can_format() const = 0;
 	virtual bool can_read() const = 0;
 	virtual bool can_write() const = 0;
+	virtual bool has_rsrc() const = 0;
 	virtual char directory_separator() const;
 
 	bool has_subdirectories() const { return directory_separator() != 0; }

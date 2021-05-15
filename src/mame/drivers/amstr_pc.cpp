@@ -856,7 +856,7 @@ ROM_START( pc5086 ) // dies with error message 010
 	ROM_LOAD( "40178.ic801", 0x000, 0x800, CRC(f72f1c2e) SHA1(34897e78b3d10f96b36d81778e97c4a9a1b8618b) )
 ROM_END
 
-}
+} // Anonymous namespace
 
 
 /***************************************************************************

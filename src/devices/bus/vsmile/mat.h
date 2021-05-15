@@ -51,7 +51,8 @@ protected:
 
 	// vsmile_pad_device implementation
 	virtual void tx_complete() override;
-	virtual uint16_t stale_all() override { return STALE_ALL; }
+
+	uint16_t stale_all() { return STALE_ALL; }
 
 private:
 	required_ioport m_io_joy;

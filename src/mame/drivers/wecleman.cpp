@@ -279,7 +279,7 @@ TODO:
 #include "machine/adc0804.h"
 #include "machine/gen_latch.h"
 #include "machine/k007452.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "wecleman.lh"

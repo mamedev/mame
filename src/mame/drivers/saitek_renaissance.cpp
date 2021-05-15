@@ -22,7 +22,8 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- not sure about comm/module leds
+- not sure about comm/module leds, where is the module led?
+- fart noise at boot if osa module is inserted
 - finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
@@ -31,9 +32,10 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
@@ -52,6 +54,7 @@ public:
 	ren_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_expansion(*this, "exp"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_lcd_pwm(*this, "lcd_pwm"),
@@ -70,11 +73,12 @@ protected:
 private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
+	required_device<saitekosa_expansion_device> m_expansion;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
 	required_device<sed1502_device> m_lcd;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
@@ -88,6 +92,7 @@ private:
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 control_r();
+	void exp_stb_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -156,7 +161,7 @@ void ren_state::leds_w(u8 data)
 void ren_state::control_w(u8 data)
 {
 	// d1: speaker out
-	m_dac->write(BIT(data, 1));
+	m_dac->level_w(BIT(data, 1));
 
 	// d2,d3: comm/module leds?
 	m_led_data[1] = (m_led_data[1] & ~0xc) | (~data & 0xc);
@@ -174,6 +179,12 @@ u8 ren_state::control_r()
 	return 0;
 }
 
+void ren_state::exp_stb_w(int state)
+{
+	// STB-P to P5 IS
+	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 
 // MCU ports
 
@@ -186,7 +197,6 @@ u8 ren_state::p2_r()
 		data = m_inputs[m_inp_mux & 7]->read();
 
 	// d3: ?
-
 	return ~data;
 }
 
@@ -202,24 +212,32 @@ u8 ren_state::p5_r()
 	// d6: battery status
 	u8 b = m_inputs[8]->read() & 0x40;
 
+	// d4: IS strobe (handled with inputline)
 	// other: ?
-	return b | 0xbf;
+	return b | (0xff ^ 0x50);
 }
 
 void ren_state::p5_w(u8 data)
 {
-	// ?
+	// d1: expansion NMI-P
+	m_expansion->nmi_w(BIT(data, 1));
+
+	// d3,d5: expansion ACK-P?
+	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
+
+	// other: ?
 }
 
 u8 ren_state::p6_r()
 {
-	// read chessboard sensors
-	return ~m_board->read_file(m_inp_mux & 0xf);
+	// read chessboard sensors and module data
+	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void ren_state::p6_w(u8 data)
 {
 	// module data
+	m_expansion->data_w(data);
 }
 
 
@@ -301,7 +319,7 @@ INPUT_PORTS_END
 
 void ren_state::ren(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6303Y(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ren_state::main_map);
 	m_maincpu->in_p2_cb().set(FUNC(ren_state::p2_r));
@@ -311,11 +329,13 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
+	config.set_perfect_quantum(m_maincpu);
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	SED1502(config, m_lcd, 32768).write_segs().set(FUNC(ren_state::lcd_output_w));
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 34);
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
@@ -329,9 +349,13 @@ void ren_state::ren(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9+1, 9);
 	config.set_default_layout(layout_saitek_renaissance);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// expansion module
+	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
+	m_expansion->stb_handler().set(FUNC(ren_state::exp_stb_w));
 }
 
 

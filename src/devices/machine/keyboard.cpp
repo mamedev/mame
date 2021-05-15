@@ -22,6 +22,10 @@ void xxx_state::kbd_put(u8 data)
     (if your machine uses function keys, add your conversion code here)
 }
 
+In a device, at the top of the device's .cpp file in the appropriate spot:
+
+#include "machine/keyboard.ipp"
+
 ***************************************************************************/
 
 #include "emu.h"

@@ -420,6 +420,21 @@ void nscsi_cdrom_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00; // Reserved
 				break;
 
+			case 0x30: // magic Apple page
+				{
+					static const u8 apple_magic[0x24] =
+					{
+						0x23, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x30, 0x16, 0x41, 0x50,
+						0x50, 0x4C, 0x45, 0x20, 0x43, 0x4F, 0x4D, 0x50, 0x55, 0x54, 0x45, 0x52, 0x2C, 0x20, 0x49, 0x4E,
+						0x43, 0x20, 0x20, 0x20
+					};
+
+					LOG("Apple special MODE SENSE page\n");
+					memcpy(scsi_cmdbuf, apple_magic, 0x24);
+					pos += 0x24;
+				}
+				break;
+
 			default:
 				if (page != 0x3f) {
 					LOG("mode sense page %02x unhandled\n", p);
@@ -441,6 +456,41 @@ void nscsi_cdrom_device::scsi_command()
 		}
 		break;
 	}
+
+	case SC_READ_DISC_INFORMATION:
+		LOG("command READ DISC INFORMATION\n");
+		std::fill_n(scsi_cmdbuf, 34, 0);
+		scsi_cmdbuf[1] = 32;
+		scsi_cmdbuf[2] = 2; // disc is complete
+		scsi_cmdbuf[3] = 1; // first track
+		scsi_cmdbuf[4] = 1; // number of sessions (TODO: session support for CHDv6)
+		scsi_cmdbuf[5] = 1; // first track in last session
+		scsi_cmdbuf[6] = cdrom_get_last_track(cdrom);   // last track in last session
+		scsi_cmdbuf[8] = 0; // CD-ROM, not XA
+
+		// lead in start time in MSF
+		{
+			u32 tstart = cdrom_get_track_start(cdrom, 0);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[16] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[17] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[18] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[19] = (tstart & 0xff);
+
+			// lead-out start time in MSF
+			tstart = cdrom_get_track_start(cdrom, 0xaa);
+			tstart = to_msf(tstart + 150);
+
+			scsi_cmdbuf[20] = (tstart >> 24) & 0xff;
+			scsi_cmdbuf[21] = (tstart >> 16) & 0xff;
+			scsi_cmdbuf[22] = (tstart >> 8) & 0xff;
+			scsi_cmdbuf[23] = (tstart & 0xff);
+		}
+
+		scsi_data_in(0, 34);
+		scsi_status_complete(SS_GOOD);
+		break;
 
 	case SC_PREVENT_ALLOW_MEDIUM_REMOVAL:
 		// TODO: support eject prevention
