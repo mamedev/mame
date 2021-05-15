@@ -13,7 +13,7 @@
 
 // set this to 1 to use ymfm's built-in SSG implementation
 // set it to 0 to use MAME's ay8910 as the SSG implementation
-#define USE_BUILTIN_SSG (0)
+#define USE_BUILTIN_SSG (1)
 
 // set this to control the output sample rate for SSG-based chips
 #define SSG_FIDELITY (ymfm::OPN_FIDELITY_MED)
@@ -326,10 +326,15 @@ protected:
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		// shift the output streams so that the SSGs are first:
-		//  YM2203 has 4 outputs: 1 FM + 3 SSG, so add 3
-		//  YM2608/10 has 3 outputs: 2 FM + 1 SSG, so add 1
-		parent::update_internal(outputs, (ChipClass::OUTPUTS == 4) ? 3 : 1);
+		// ymfm outputs FM first, then SSG, while MAME traditionally
+		// wants SSG streams first; to do this, we rotate the outputs
+		// by the number of SSG output channels
+		parent::update_internal(outputs, ChipClass::SSG_OUTPUTS);
+
+		// for the single-output case, also apply boost the gain to better match
+		// previous version, which summed instead of averaged the outputs
+		if (ChipClass::SSG_OUTPUTS == 1)
+			outputs[0].apply_gain(3.0);
 	}
 };
 
@@ -344,18 +349,13 @@ class ymfm_ssg_external_device_base : public ymfm_device_base<ChipClass, true>, 
 {
 	using parent = ymfm_device_base<ChipClass, true>;
 
-	// deduce the number of SSG outputs from the total outputs:
-	// YM2203 = mono FM + 3 SSG outputs = 4 total
-	// YM2608/10 = stereo FM + 1 SSG output = 3 total
-	static constexpr int SSG_OUTPUTS = ChipClass::OUTPUTS - parent::OUTPUTS;
-
 public:
 	// constructor
 	ymfm_ssg_external_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 		ymfm_device_base<ChipClass, true>(mconfig, tag, owner, clock, type),
 		m_ssg_stream(nullptr),
 		m_ssg(*this, "ssg"),
-		m_ssg_flags(((SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
+		m_ssg_flags(((ChipClass::SSG_OUTPUTS == 1) ? AY8910_SINGLE_OUTPUT : 0) | AY8910_LEGACY_OUTPUT)
 	{
 	}
 
@@ -413,7 +413,7 @@ protected:
 
 		// route outputs through us
 		m_ssg->add_route(0, *this, 1.0, 0);
-		if (SSG_OUTPUTS > 1)
+		if (ChipClass::SSG_OUTPUTS > 1)
 		{
 			m_ssg->add_route(1, *this, 1.0, 1);
 			m_ssg->add_route(2, *this, 1.0, 2);
@@ -427,7 +427,7 @@ protected:
 		// and outputs; in our update handler we'll just forward each output from the
 		// embedded YM2149 device through our stream to make it look like it used to when
 		// we were inheriting from ay8910_device
-		m_ssg_stream = device_sound_interface::stream_alloc(SSG_OUTPUTS, SSG_OUTPUTS, SAMPLE_RATE_INPUT_ADAPTIVE);
+		m_ssg_stream = device_sound_interface::stream_alloc(ChipClass::SSG_OUTPUTS, ChipClass::SSG_OUTPUTS, SAMPLE_RATE_INPUT_ADAPTIVE);
 
 		// also tell the chip we want to override reads & writes
 		m_chip.ssg_override(*this);
@@ -453,7 +453,7 @@ protected:
 			return parent::sound_stream_update(stream, inputs, outputs);
 
 		// just copy the streams from the SSG
-		for (int index = 0; index < SSG_OUTPUTS; index++)
+		for (int index = 0; index < ChipClass::SSG_OUTPUTS; index++)
 			outputs[index] = inputs[index];
 	}
 

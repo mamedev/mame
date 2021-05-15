@@ -473,7 +473,8 @@ class ym2203
 public:
 	using fm_engine = fm_engine_base<opn_registers>;
 	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + ssg_engine::OUTPUTS;
+	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + SSG_OUTPUTS;
 	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
@@ -549,7 +550,8 @@ class ym2608
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + 1;
+	static constexpr uint32_t SSG_OUTPUTS = 1;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + SSG_OUTPUTS;
 	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
@@ -623,7 +625,8 @@ class ym2610
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + 1;
+	static constexpr uint32_t SSG_OUTPUTS = 1;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + SSG_OUTPUTS;
 	using output_data = ymfm_output<OUTPUTS>;
 
 	// constructor
