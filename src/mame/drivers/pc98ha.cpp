@@ -9,8 +9,12 @@
    	    - definitely incorrect given the erratic cursor blinking in N88BASIC;
     - identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
     - merge from base pc98 class (WIP);
+	- when idle for some time buzzer farts until a key is pressed (?);
     - add NVRAM saving:
-        - hookup doesn't seem quite right, it initializes every time after soft reset;
+	- pinpoint NVRAM init switch source:
+		- first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7, 
+		  which initializes battery backup if on, but port C is in output mode there.
+		  Somehow obf irq is on at boot if battery failed?
     - power handling;
     - pc98ha specifics:
         - RAM drive (current hang point);
@@ -65,11 +69,12 @@ u8 pc98lt_state::power_status_r()
 void pc98lt_state::lt_map(address_map &map)
 {
 	map(0x00000, 0x5ffff).ram(); // 384 KB
+	map(0x60000, 0x9ffff).noprw();
 
 	// no TVRAM
 	map(0xa8000, 0xaffff).ram().share("gvram");
 //  0xb0000-0xbffff unmapped GVRAM or mirror, check me
-	map(0xd0000, 0xd3fff).bankrw("nvram_bank");
+	map(0xd0000, 0xd3fff).bankrw("bram_bank");
 //	map(0xd4000, 0xd7fff) // dictionary rom bank
 	map(0xd8000, 0xdbfff).bankr("kanji_bank");
 	map(0xe0000, 0xeffff).bankr("romdrv_bank");
@@ -88,9 +93,9 @@ void pc98ha_state::ha_map(address_map &map)
 void pc98lt_state::lt_io(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / <undefined>
-//	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
-//	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
+//	map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
+	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
+	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
 //	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //	map(0x0070, 0x007f) // PIT, V50 internal
@@ -106,8 +111,8 @@ void pc98lt_state::lt_io(address_map &map)
 //	map(0x0812, 0x0812) // <unknown device address> & 0xf
 
 	map(0x0c10, 0x0c10).lrw8(
-		NAME([this] () { return (m_nvram_bank_reg & (m_nvram_bank_size() - 1)) | 0x40; }),
-		NAME([this] (u8 data) { m_nvram_bank_reg = data & (m_nvram_bank_size() - 1); m_nvram_bank->set_entry(m_nvram_bank_reg); })
+		NAME([this] () { return (m_bram_bank_reg & (m_bram_banks - 1)) | 0x40; }),
+		NAME([this] (u8 data) { m_bram_bank_reg = data & (m_bram_banks - 1); m_bram_bank->set_entry(m_bram_bank_reg); })
 	);
 //	map(0x0f8e, 0x0f8e) // card slot status 1
 //	map(0x4810, 0x4810) // ?
@@ -133,6 +138,81 @@ void pc98ha_state::ha_io(address_map &map)
 }
 
 static INPUT_PORTS_START( pc98lt )
+	PORT_START("SYSA")
+	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("SYSB")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
+	PORT_DIPNAME( 0x02, 0x00, "SYSB" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("SYSC")
+	PORT_DIPNAME( 0x01, 0x00, "SYSC" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 //static INPUT_PORTS_START( pc98ha )
@@ -157,16 +237,27 @@ GFXDECODE_END
 
 void pc98lt_state::machine_start()
 {
-    const u32 nvram_size = (m_nvram_bank_size()*0x4000) / 2;
-	m_nvram_ptr = make_unique_clear<uint16_t[]>(nvram_size);
+	// TODO: make this and NVRAM saving to co-exist
+	// we have a 16-bit host bus with a banked NVRAM window that also has different sizes depending on the model,
+	// may consider to encapsulate instead.
+    const u32 bram_size = memregion("backup")->bytes() / 2;
+	uint16_t *bram = (uint16_t *)memregion("backup")->base();
+	m_bram_banks = (bram_size * 2) / 0x4000;
+	m_bram_ptr = make_unique_clear<uint16_t[]>(bram_size);
+
+	for (int i = 0; i < bram_size; i++)
+		m_bram_ptr[i] = bram[i];
 
 	m_kanji_bank->configure_entries( 0, 0x10,                 memregion("kanji")->base(),  0x4000);
-	m_nvram_bank->configure_entries( 0, m_nvram_bank_size(),  m_nvram_ptr.get(),           0x4000);
+	m_bram_bank->configure_entries(  0, m_bram_banks,         m_bram_ptr.get(),            0x4000);
 	m_romdrv_bank->configure_entries(0, 0x10,                 memregion("romdrv")->base(), 0x10000);
 
-	save_item(NAME(m_nvram_bank_reg));
+	m_rtc->cs_w(1);
+	m_rtc->oe_w(1);
+
+	save_item(NAME(m_bram_bank_reg));
 	save_item(NAME(m_romdrv_bank_reg));
-	save_pointer(NAME(m_nvram_ptr), nvram_size);
+	save_pointer(NAME(m_bram_ptr), bram_size);
 }
 
 void pc98lt_state::lt_config(machine_config &config)
@@ -188,7 +279,13 @@ void pc98lt_state::lt_config(machine_config &config)
 	PC9801_KBD(config, m_keyb, 53);
 	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
-//	UPD1990A
+	I8255(config, m_ppi_sys, 0);
+	m_ppi_sys->in_pa_callback().set_ioport("SYSA");
+	m_ppi_sys->in_pb_callback().set_ioport("SYSB");
+//	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
+	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
+
+	UPD1990A(config, m_rtc);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	// TODO: copied verbatim from base PC98, verify clock et al.
@@ -201,7 +298,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pc98lt);
 
 	SPEAKER(config, "mono").front_center();
-//	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
+	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
 void pc98ha_state::ha_config(machine_config &config)
@@ -214,8 +311,7 @@ void pc98ha_state::ha_config(machine_config &config)
 	m_maincpu->set_tclk(xtal / 4);
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-//	UPD4991A
-//	pit_clock_config(config, xtal/4);
+	UPD4990A(config.replace(), m_rtc);
 }
 
 // all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.
@@ -229,7 +325,7 @@ ROM_START( pc98lt )
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, BAD_DUMP CRC(26a81aa2) SHA1(bf12e40c608ef6ef1ac38f6b0b3ca79260a50cef) )
 
-	ROM_REGION( 0x10000, "backup", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "backup", ROMREGION_ERASEFF )
 	ROM_LOAD( "backup.bin",   0x000000, 0x010000, BAD_DUMP CRC(56d7ca00) SHA1(d17942e166f98af1d484e497e97d31da515973f7) )
 	
 	ROM_REGION( 0x80000, "dict", ROMREGION_ERASEFF )
@@ -246,7 +342,7 @@ ROM_START( pc98ha )
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, BAD_DUMP CRC(4be5ff2f) SHA1(261d28419a2ddebe3177a282952806d7bb036b40) )
 
-	ROM_REGION( 0x40000, "backup", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x40000, "backup", ROMREGION_ERASEFF )
 	ROM_LOAD( "backup.bin",   0x000000, 0x040000, BAD_DUMP CRC(3c5b2a99) SHA1(f8e2f5a4c7601d4e81d5e9c83621107ed3f5a29a) )
 	
 	ROM_REGION( 0x100000, "dict", ROMREGION_ERASEFF )

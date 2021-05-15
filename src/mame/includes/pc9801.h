@@ -62,8 +62,7 @@
 #include "formats/dip_dsk.h"
 #include "formats/nfd_dsk.h"
 
-
-#define UPD1990A_TAG "upd1990a"
+#define RTC_TAG      "rtc"
 #define UPD8251_TAG  "upd8251"
 #define SASIBUS_TAG  "sasi"
 
@@ -87,6 +86,9 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
     	, m_keyb(*this, "keyb")
+		, m_rtc(*this, RTC_TAG)
+		, m_ppi_sys(*this, "ppi_sys")
+		, m_beeper(*this, "beeper")
 	{
 	}
 
@@ -95,6 +97,12 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<pc9801_kbd_device> m_keyb;
+	required_device<upd1990a_device> m_rtc;
+	required_device<i8255_device> m_ppi_sys;
+	optional_device<beep_device> m_beeper;
+
+	void rtc_w(uint8_t data);
+	void ppi_sys_beep_portc_w(uint8_t data);
 };
 
 class pc9801_state : public pc98_base_state
@@ -107,11 +115,9 @@ public:
 		, m_pit(*this, "pit")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
-		, m_ppi_sys(*this, "ppi8255_sys")
-		, m_ppi_prn(*this, "ppi8255_prn")
+		, m_ppi_prn(*this, "ppi_prn")
 		, m_fdc_2hd(*this, "upd765_2hd")
 		, m_fdc_2dd(*this, "upd765_2dd")
-		, m_rtc(*this, UPD1990A_TAG)
 		, m_memsw(*this, "memsw")
 		, m_sio(*this, UPD8251_TAG)
 		, m_hgdc1(*this, "upd7220_chr")
@@ -124,7 +130,6 @@ public:
 		, m_video_ram_1(*this, "video_ram_1")
 		, m_video_ram_2(*this, "video_ram_2")
 		, m_ext_gvram(*this, "ext_gvram")
-		, m_beeper(*this, "beeper")
 		, m_dac(*this, "dac")
 		, m_ram(*this, RAM_TAG)
 		, m_ipl(*this, "ipl_bank")
@@ -176,11 +181,9 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
-	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
-	required_device<upd1990a_device> m_rtc;
 	required_device<pc9801_memsw_device> m_memsw;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
@@ -193,13 +196,11 @@ private:
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
-	optional_device<beep_device> m_beeper;
 //	optional_device<dac_1bit_device> m_dac;
 	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
 
-	void rtc_w(uint8_t data);
 	void dmapg4_w(offs_t offset, uint8_t data);
 	void dmapg8_w(offs_t offset, uint8_t data);
 	void nmi_ctrl_w(offs_t offset, uint8_t data);
@@ -334,7 +335,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	void ppi_sys_beep_portc_w(uint8_t data);
 	void ppi_sys_dac_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
@@ -468,7 +468,7 @@ public:
 		pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_gvram(*this, "gvram")
-		, m_nvram_bank(*this, "nvram_bank")
+		, m_bram_bank(*this, "bram_bank")
 		, m_kanji_bank(*this, "kanji_bank")
 		, m_romdrv_bank(*this, "romdrv_bank")
 	{
@@ -480,15 +480,14 @@ protected:
 	void lt_map(address_map &map);
 	void lt_io(address_map &map);
 
-	required_device <v50_device> m_maincpu;
+	required_device<v50_device> m_maincpu;
 
-	virtual u8 m_nvram_bank_size() const { return 4; }
 	virtual void machine_start() override;
 //	virtual void machine_reset() override;
 private:
 	required_shared_ptr<uint16_t> m_gvram;
-	std::unique_ptr<uint16_t[]> m_nvram_ptr;
-	required_memory_bank m_nvram_bank;
+	std::unique_ptr<uint16_t[]> m_bram_ptr;
+	required_memory_bank m_bram_bank;
 	required_memory_bank m_kanji_bank;
 	required_memory_bank m_romdrv_bank;
 
@@ -496,8 +495,9 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	
 	u8 power_status_r();
-	u8 m_nvram_bank_reg;
 	u8 m_romdrv_bank_reg;
+	u8 m_bram_banks;
+	u8 m_bram_bank_reg;
 };
 
 class pc98ha_state : public pc98lt_state
@@ -514,7 +514,6 @@ protected:
 	void ha_map(address_map &map);
 	void ha_io(address_map &map);
 	
-	virtual u8 m_nvram_bank_size() const override { return 16; }
 private:
 
 // ...

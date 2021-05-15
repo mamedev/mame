@@ -334,7 +334,7 @@ Keyboard TX commands:
 
 
 
-void pc9801_state::rtc_w(uint8_t data)
+void pc98_base_state::rtc_w(uint8_t data)
 {
 	m_rtc->c0_w((data & 0x01) >> 0);
 	m_rtc->c1_w((data & 0x02) >> 1);
@@ -1499,7 +1499,7 @@ CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
 
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("DSW1")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("upd1990a", upd1990a_device, data_out_r)
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH,IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER(RTC_TAG, upd1990a_device, data_out_r)
 	PORT_DIPNAME( 0x0002, 0x0000, "DSW1" ) // error beep if OFF
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1876,7 +1876,7 @@ ch3 SCSI
 *
 ****************************************/
 
-void pc9801_state::ppi_sys_beep_portc_w(uint8_t data)
+void pc98_base_state::ppi_sys_beep_portc_w(uint8_t data)
 {
 	m_beeper->set_state(!(data & 0x08));
 }
