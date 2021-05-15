@@ -885,7 +885,7 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			change_gime_firq(m_firq & data);
 
 			// Special case timer reset value of zero
-			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR ))
+			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR))
 			{
 				set_interrupt_value(INTERRUPT_TMR, true);
 				set_interrupt_value(INTERRUPT_TMR, false);
@@ -1104,7 +1104,7 @@ void gime_device::change_gime_firq(uint8_t data)
 	{
 		m_firq = data;
 		if (m_gime_registers[0x00] & 0x10)
-		m_write_firq(firq_r());
+			m_write_firq(firq_r());
 	}
 }
 
