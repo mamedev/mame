@@ -92,14 +92,15 @@ from Brett Selwood and Andrew Davies.
 
     TODO/not working:
 
-    Keyboard:
-    - All others: Paste drops most characters.
+    Old CRTC-based keyboard:
+    - Paste drops many characters.
+    - Typing can drop the occasional character.
 
     FDC:   (TODO: see if these bugs still exist)
     - B drive doesn't work with most disks.
     - some disks cause MESS to freeze.
 
-    - Simply Write has keyboard problems (in 128k, no keys work).
+    - 128k: Simply Write has no keyboard.
 
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
