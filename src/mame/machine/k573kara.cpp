@@ -3,12 +3,6 @@
 #include "emu.h"
 #include "k573kara.h"
 
-#define LOG_GENERAL    (1 << 0)
-// #define VERBOSE        (LOG_GENERAL)
-// #define LOG_OUTPUT_STREAM std::cout
-
-#include "logmacro.h"
-
 #include "bus/rs232/rs232.h"
 
 /*
