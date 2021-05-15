@@ -278,9 +278,13 @@ TIMER_CALLBACK_MEMBER(vsmile_ctrl_device_base::rts_timer_expired)
 
 #include "pad.h"
 #include "mat.h"
+#include "keyboard.h"
 
 void vsmile_controllers(device_slot_interface &device)
 {
 	device.option_add("joy", VSMILE_PAD);
 	device.option_add("mat", VSMILE_MAT);
+	device.option_add("smartkb_us", VSMILE_KEYBOARD_US);
+	device.option_add("smartkb_fr", VSMILE_KEYBOARD_FR);
+	device.option_add("smartkb_ge", VSMILE_KEYBOARD_GE);
 }
