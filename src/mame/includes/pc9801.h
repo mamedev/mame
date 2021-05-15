@@ -86,6 +86,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+    	, m_keyb(*this, "keyb")
 	{
 	}
 
@@ -93,6 +94,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	required_device<pc9801_kbd_device> m_keyb;
 };
 
 class pc9801_state : public pc98_base_state
@@ -111,7 +113,6 @@ public:
 		, m_fdc_2dd(*this, "upd765_2dd")
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_memsw(*this, "memsw")
-		, m_keyb(*this, "keyb")
 		, m_sio(*this, UPD8251_TAG)
 		, m_hgdc1(*this, "upd7220_chr")
 		, m_hgdc2(*this, "upd7220_btm")
@@ -181,7 +182,6 @@ private:
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
 	required_device<pc9801_memsw_device> m_memsw;
-	required_device<pc9801_kbd_device> m_keyb;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;

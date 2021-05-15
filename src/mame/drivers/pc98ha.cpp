@@ -5,16 +5,17 @@
     PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
 
 	TODO:
-	- pc98lt: remove timer hack;
-	- identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
-	- merge from base pc98 class (WIP);
-	- add NVRAM saving:
-		- hookup doesn't seem quite right, it initializes every time after soft reset;
-	- power handling;
-	- PC98HA specifics:
-		- RAM drive (current hang point);
-		- EMS;
-		- JEIDA memory card interface);
+    - pc98lt: remove timer hack:
+   	    - definitely incorrect given the erratic cursor blinking in N88BASIC;
+    - identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
+    - merge from base pc98 class (WIP);
+    - add NVRAM saving:
+        - hookup doesn't seem quite right, it initializes every time after soft reset;
+    - power handling;
+    - pc98ha specifics:
+        - RAM drive (current hang point);
+        - EMS;
+        - JEIDA memory card interface;
         - optional docking station (for floppy device only or anything else?);
 
 **************************************************************************************************/
@@ -91,7 +92,7 @@ void pc98lt_state::lt_io(address_map &map)
 //	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
 //	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
 //	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-//	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
+	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //	map(0x0070, 0x007f) // PIT, V50 internal
 
 	// floppy actually requires a docking station on PC98HA, density should be 2dd given the mapping
@@ -159,9 +160,9 @@ void pc98lt_state::machine_start()
     const u32 nvram_size = (m_nvram_bank_size()*0x4000) / 2;
 	m_nvram_ptr = make_unique_clear<uint16_t[]>(nvram_size);
 
-	m_kanji_bank->configure_entries(0, 0x10,                 memregion("kanji")->base(),  0x4000);
-	m_nvram_bank->configure_entries(0, m_nvram_bank_size(),  m_nvram_ptr.get(),           0x4000);
-	m_romdrv_bank->configure_entries(0, 0x10,                memregion("romdrv")->base(), 0x10000);
+	m_kanji_bank->configure_entries( 0, 0x10,                 memregion("kanji")->base(),  0x4000);
+	m_nvram_bank->configure_entries( 0, m_nvram_bank_size(),  m_nvram_ptr.get(),           0x4000);
+	m_romdrv_bank->configure_entries(0, 0x10,                 memregion("romdrv")->base(), 0x10000);
 
 	save_item(NAME(m_nvram_bank_reg));
 	save_item(NAME(m_romdrv_bank_reg));
@@ -178,13 +179,16 @@ void pc98lt_state::lt_config(machine_config &config)
 //	m_maincpu->set_tclk(xtal / 4);
 	m_maincpu->set_tclk(xtal / 100);
 //	m_maincpu->tout2_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
-
-//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-//	UPD1990A
 //	m_pit->out_handler<0>().set(m_pic1, FUNC(pic8259_device::ir0_w));
 //	m_pit->out_handler<2>().set(m_sio, FUNC(i8251_device::write_txc));
 //	m_pit->out_handler<2>().append(m_sio, FUNC(i8251_device::write_rxc));
+
+//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	PC9801_KBD(config, m_keyb, 53);
+	m_keyb->irq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+
+//	UPD1990A
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	// TODO: copied verbatim from base PC98, verify clock et al.
@@ -214,38 +218,42 @@ void pc98ha_state::ha_config(machine_config &config)
 //	pit_clock_config(config, xtal/4);
 }
 
+// all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.
+// dict.rom and ramdrv.bin definitely won't fit an even ROM size regardless,
+// also backup.bin may not be factory default.
+
 ROM_START( pc98lt )
 	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom",      0x000000, 0x010000, CRC(b6a6a382) SHA1(3f1767cccc1ae02b3e48f6ee327d3ef4fad05750) )
+	ROM_LOAD( "ipl.rom",      0x000000, 0x010000, BAD_DUMP CRC(b6a6a382) SHA1(3f1767cccc1ae02b3e48f6ee327d3ef4fad05750) )
 
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, CRC(26a81aa2) SHA1(bf12e40c608ef6ef1ac38f6b0b3ca79260a50cef) )
+	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, BAD_DUMP CRC(26a81aa2) SHA1(bf12e40c608ef6ef1ac38f6b0b3ca79260a50cef) )
 
 	ROM_REGION( 0x10000, "backup", ROMREGION_ERASEFF )
-	ROM_LOAD( "backup.bin",   0x000000, 0x010000, CRC(56d7ca00) SHA1(d17942e166f98af1d484e497e97d31da515973f7) )
+	ROM_LOAD( "backup.bin",   0x000000, 0x010000, BAD_DUMP CRC(56d7ca00) SHA1(d17942e166f98af1d484e497e97d31da515973f7) )
 	
 	ROM_REGION( 0x80000, "dict", ROMREGION_ERASEFF )
-	ROM_LOAD( "dict.rom",     0x000000, 0x080000, CRC(421278ee) SHA1(f6066fc5085de521395ce1a8bb040536c1454c7e) )
+	ROM_LOAD( "dict.rom",     0x000000, 0x080000, BAD_DUMP CRC(421278ee) SHA1(f6066fc5085de521395ce1a8bb040536c1454c7e) )
 
 	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
-	ROM_LOAD( "romdrv.rom",   0x000000, 0x080000, CRC(282ff6eb) SHA1(f4833e49dd9089ec40f5e86a713e08cd8c598578) )
+	ROM_LOAD( "romdrv.rom",   0x000000, 0x080000, BAD_DUMP CRC(282ff6eb) SHA1(f4833e49dd9089ec40f5e86a713e08cd8c598578) )
 ROM_END
 
 ROM_START( pc98ha )
 	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom",      0x000000, 0x010000, CRC(2f552bb9) SHA1(7f53bf95181d65b2f9942285da669d92c61247a3) )
+	ROM_LOAD( "ipl.rom",      0x000000, 0x010000, BAD_DUMP CRC(2f552bb9) SHA1(7f53bf95181d65b2f9942285da669d92c61247a3) )
 
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, CRC(4be5ff2f) SHA1(261d28419a2ddebe3177a282952806d7bb036b40) )
+	ROM_LOAD( "kanji.rom",    0x000000, 0x040000, BAD_DUMP CRC(4be5ff2f) SHA1(261d28419a2ddebe3177a282952806d7bb036b40) )
 
 	ROM_REGION( 0x40000, "backup", ROMREGION_ERASEFF )
-	ROM_LOAD( "backup.bin",   0x000000, 0x040000, CRC(3c5b2a99) SHA1(f8e2f5a4c7601d4e81d5e9c83621107ed3f5a29a) )
+	ROM_LOAD( "backup.bin",   0x000000, 0x040000, BAD_DUMP CRC(3c5b2a99) SHA1(f8e2f5a4c7601d4e81d5e9c83621107ed3f5a29a) )
 	
 	ROM_REGION( 0x100000, "dict", ROMREGION_ERASEFF )
 	ROM_LOAD( "dict.rom",     0x000000, 0x0c0000, BAD_DUMP CRC(6dc8493c) SHA1(3e04cdc3403a814969b6590cd78e239e72677fe5) )
 
 	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
-	ROM_LOAD( "romdrv.rom",   0x000000, 0x100000, CRC(2f59127f) SHA1(932cb970c2b22408f7895dbf9df6dbc47f8e055b) )
+	ROM_LOAD( "romdrv.rom",   0x000000, 0x100000, BAD_DUMP CRC(2f59127f) SHA1(932cb970c2b22408f7895dbf9df6dbc47f8e055b) )
 
 	ROM_REGION( 0x200000, "ramdrv", ROMREGION_ERASEFF )
 	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
