@@ -505,6 +505,9 @@ class pc98ha_state : public pc98lt_state
 public:
 	pc98ha_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pc98lt_state(mconfig, type, tag)
+		, m_ems_banks(*this, "ems_bank%u", 1U)
+		, m_ext_view(*this, "ext_io")
+		, m_ramdrv_bank(*this, "ramdrv_bank")
 	{
 	}
 
@@ -513,10 +516,19 @@ public:
 protected:
 	void ha_map(address_map &map);
 	void ha_io(address_map &map);
-	
-private:
 
-// ...
+	virtual void machine_start() override;
+private:
+	required_memory_bank_array<4> m_ems_banks;
+	memory_view m_ext_view;
+	required_memory_bank m_ramdrv_bank;
+
+	std::unique_ptr<uint16_t[]> m_ems_ram;
+
+	void ext_view_bank_w(offs_t offset, u8 data);
+	void ext_view_sel_w(offs_t offset, u8 data);
+	void ems_bank_w(offs_t offset, u8 data);
+	u8 m_ext_view_sel;
 };
 
 #endif // MAME_INCLUDES_PC9801_H

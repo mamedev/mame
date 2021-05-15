@@ -17,8 +17,7 @@
 		  Somehow obf irq is on at boot if battery failed?
     - power handling;
     - pc98ha specifics:
-        - RAM drive (current hang point);
-        - EMS;
+        - MSDOS cannot detect EMS properly, is there a flag somewhere?
         - JEIDA memory card interface;
         - optional docking station (for floppy device only or anything else?);
 
@@ -74,20 +73,12 @@ void pc98lt_state::lt_map(address_map &map)
 	// no TVRAM
 	map(0xa8000, 0xaffff).ram().share("gvram");
 //  0xb0000-0xbffff unmapped GVRAM or mirror, check me
+	map(0xc0000, 0xcffff).unmaprw(); // EMS area, not present here but checked
 	map(0xd0000, 0xd3fff).bankrw("bram_bank");
 //	map(0xd4000, 0xd7fff) // dictionary rom bank
 	map(0xd8000, 0xdbfff).bankr("kanji_bank");
 	map(0xe0000, 0xeffff).bankr("romdrv_bank");
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
-}
-
-void pc98ha_state::ha_map(address_map &map)
-{
-	lt_map(map);
-	map(0x00000, 0x9ffff).ram(); // 640 KB
-
-//	map(0xc0000, 0xcffff) // EMS
-//	map(0xdc000, 0xdffff) // RAM drive / Memory card window area
 }
 
 void pc98lt_state::lt_io(address_map &map)
@@ -129,12 +120,55 @@ void pc98lt_state::lt_io(address_map &map)
 	);
 }
 
+/*
+ * 98HA specifics
+ */
+
+void pc98ha_state::ext_view_bank_w(offs_t offset, u8 data)
+{
+	if (m_ext_view_sel == 0x81)
+		m_ramdrv_bank->set_entry(data & 0x7f);
+	else
+		logerror("External view SEL bank set %02x (view=%02x)\n", data, m_ext_view_sel);
+}
+
+void pc98ha_state::ext_view_sel_w(offs_t offset, u8 data)
+{
+	m_ext_view_sel = data;
+	// either bit 7 ON or writing 0x80 to this port disables the external view.
+	if (data & 0x80)
+		m_ext_view.select(data & 0x3);
+	if (data != 0x81)
+		logerror("External view SEL line set %02x\n", data);
+}
+
+void pc98ha_state::ems_bank_w(offs_t offset, u8 data)
+{
+	m_ems_banks[offset]->set_entry(data & 0x7f);
+}
+
+void pc98ha_state::ha_map(address_map &map)
+{
+	lt_map(map);
+	map(0x00000, 0x9ffff).ram(); // 640 KB
+
+	map(0xc0000, 0xc3fff).bankrw("ems_bank1");
+	map(0xc4000, 0xc7fff).bankrw("ems_bank2");
+	map(0xc8000, 0xcbfff).bankrw("ems_bank3");
+	map(0xcc000, 0xcffff).bankrw("ems_bank4");
+	map(0xdc000, 0xdffff).view(m_ext_view);
+	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, checked
+	m_ext_view[1](0xdc000, 0xdffff).bankrw("ramdrv_bank");
+	m_ext_view[2](0xdc000, 0xdffff).unmaprw(); // JEIDA memory card
+	m_ext_view[3](0xdc000, 0xdffff).unmaprw();
+}
+
 void pc98ha_state::ha_io(address_map &map)
 {
 	lt_io(map);
-//	map(0x08e0, 0x08e7) // EMS bank regs (odd regs only)
-//	map(0x0e8e, 0x0e8e) // RAM drive bank reg
-//	map(0x1e8e, 0x1e8e) // RAM drive view select
+	map(0x08e0, 0x08e7).w(FUNC(pc98ha_state::ems_bank_w)).umask16(0xff00);
+	map(0x0e8e, 0x0e8e).w(FUNC(pc98ha_state::ext_view_bank_w)).umask16(0x00ff); // RAM drive bank reg
+	map(0x1e8e, 0x1e8e).w(FUNC(pc98ha_state::ext_view_sel_w)).umask16(0x00ff); // RAM drive view select
 }
 
 static INPUT_PORTS_START( pc98lt )
@@ -258,6 +292,22 @@ void pc98lt_state::machine_start()
 	save_item(NAME(m_bram_bank_reg));
 	save_item(NAME(m_romdrv_bank_reg));
 	save_pointer(NAME(m_bram_ptr), bram_size);
+}
+
+void pc98ha_state::machine_start()
+{
+	pc98lt_state::machine_start();
+	const u32 ems_banks = 0x80;
+	const u32 ems_size = (ems_banks * 0x4000) / 2;
+	
+	m_ramdrv_bank->configure_entries(0, 0x80,                 memregion("ramdrv")->base(), 0x4000);
+	
+	m_ems_ram = make_unique_clear<uint16_t[]>(ems_size);
+	for (int i = 0; i < 4; i++)
+		m_ems_banks[i]->configure_entries(0, 0x80,            m_ems_ram.get(), 0x4000);
+
+	save_item(NAME(m_ext_view_sel));
+	save_pointer(NAME(m_ems_ram), ems_size);
 }
 
 void pc98lt_state::lt_config(machine_config &config)
