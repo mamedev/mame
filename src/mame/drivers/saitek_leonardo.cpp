@@ -42,8 +42,10 @@ Expansion modules released:
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
+- OSA module comms is not completely understood
 - OSA PC link (probably uses MCU serial interface)
-- add nvram
+- add power-off
+- add nvram (MCU port $14?)
 - finish internal artwork
 
 ******************************************************************************/
@@ -110,14 +112,12 @@ private:
 
 	u8 m_inp_mux = 0;
 	u8 m_led_data[2] = { 0, 0 };
-	bool m_stb_enable = false;
 };
 
 void leo_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
-	save_item(NAME(m_stb_enable));
 }
 
 
@@ -167,7 +167,7 @@ void leo_state::unk_w(u8 data)
 void leo_state::exp_stb_w(int state)
 {
 	// STB-P to P5 IS
-	m_maincpu->set_input_line(M6801_IS_LINE, (state && m_stb_enable) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -206,11 +206,8 @@ void leo_state::p5_w(u8 data)
 	// d2: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 2));
 
-	// d3: enable expansion STB signal
-	m_stb_enable = bool(data & 8);
-
-	// d5: expansion ACK-P
-	m_expansion->ack_w(BIT(data, 5));
+	// d3,d5: expansion ACK-P?
+	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
 
 	// d6,d7: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);

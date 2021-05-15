@@ -22,7 +22,7 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- not sure about comm/module leds
+- not sure about comm/module leds, where is the module led?
 - fart noise at boot if osa module is inserted
 - finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
@@ -222,8 +222,8 @@ void ren_state::p5_w(u8 data)
 	// d1: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d5: expansion ACK-P
-	m_expansion->ack_w(BIT(data, 5));
+	// d3,d5: expansion ACK-P?
+	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
 
 	// other: ?
 }

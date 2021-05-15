@@ -3,7 +3,18 @@
 // thanks-to:Berger
 /***************************************************************************
 
-Saitek OSA Module: Maestro A
+Saitek OSA Module: Kasparov Maestro A (SciSys, 1986)
+
+The chess engine revision is in-between Kaplan's Stratos and Turbostar.
+
+Hardware notes:
+- PCB label: M6L-PE-012 REV.2
+- R65C02P4 @ 4MHz / 5.67MHz / 6MHz
+- 32KB ROM (D27C256)
+- 8KB RAM (HM6264LP-15)
+- 3 more sockets, one for KSO expansion ROM, 2 unused
+
+The PCB is not compatible for upgrading to newer Maestro versions.
 
 TODO:
 - does not work if cpu speed is 4MHz
