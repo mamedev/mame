@@ -4,6 +4,9 @@
 license:CC0
 -->
 <softwarelist name="pce" description="NEC PC-Engine cartridges">
+
+<!-- Clones marked as bad dumps are mostly legacy dumps from GoodPCE. Many are potential hacks that differ only in a few bytes from parents. Needs further investigation. -->
+
 	<software name="1943kai">
 		<description>1943 Kai</description>
 		<year>1991</year>
@@ -276,7 +279,7 @@ license:CC0
 		<info name="alt_title" value="弁慶 外伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="benkei gaiden (japan).pce" size="393216" crc="e1a73797" sha1="4bc46592f3707a7c3e514abc23e640e3194879ad" offset="000000" />
+				<rom name="benkei gaiden (japan).pce" size="393216" crc="c9626a43" sha1="0be41c774e7ee75b84efdc2b05a7a45ec0201503" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -290,7 +293,7 @@ license:CC0
 		<info name="alt_title" value="弁慶 外伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="benkei gaiden (japan) [a].pce" size="393216" crc="c9626a43" sha1="0be41c774e7ee75b84efdc2b05a7a45ec0201503" offset="000000" />
+				<rom name="benkei gaiden (japan) [b].pce" size="393216" crc="e1a73797" sha1="4bc46592f3707a7c3e514abc23e640e3194879ad" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +321,7 @@ license:CC0
 		<info name="alt_title" value="ビックリマンワールド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="bikkuriman world (japan) [a].pce" size="262144" crc="34893891" sha1="b063dc0057ab7cd00a6a46f080ea5af776948043" offset="000000" />
+				<rom name="bikkuriman world (japan) [b].pce" size="262144" crc="34893891" sha1="b063dc0057ab7cd00a6a46f080ea5af776948043" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +564,7 @@ license:CC0
 		<info name="alt_title" value="逐電屋 藤兵衛 BIT2の首斬り館より"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chikudenya toubei - kubikiri yakata yori (japan) [a].pce" size="524288" crc="84098884" sha1="d35065ea90324765742cfbd1b72aa56acc585f98" offset="000000" />
+				<rom name="chikudenya toubei - kubikiri yakata yori (japan) [b].pce" size="524288" crc="84098884" sha1="d35065ea90324765742cfbd1b72aa56acc585f98" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +648,7 @@ license:CC0
 		<info name="alt_title" value="コリューン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="coryoon - child of dragon (japan) [a].pce" size="524288" crc="d5389889" sha1="9c840b7452b6ec87db24cc75180ebb1c970bd3e8" offset="000000" />
+				<rom name="coryoon - child of dragon (japan) [b].pce" size="524288" crc="d5389889" sha1="9c840b7452b6ec87db24cc75180ebb1c970bd3e8" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -921,7 +924,7 @@ license:CC0
 		<info name="alt_title" value="ダウンロード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="download (japan) [a].pce" size="524288" crc="4e0de488" sha1="ee4a7f7dda0b22aaf043eaa4820759ddc20dff37" offset="000000" />
+				<rom name="download (japan) [b].pce" size="524288" crc="4e0de488" sha1="ee4a7f7dda0b22aaf043eaa4820759ddc20dff37" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -963,7 +966,7 @@ license:CC0
 		<info name="alt_title" value="ドラゴンセイバー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dragon saber - after story of dragon spirit (japan) [a].pce" size="524288" crc="c89ce75a" sha1="a2f17e33a36d6e67052ad4a1c3343e2e6624eb85" offset="000000" />
+				<rom name="dragon saber - after story of dragon spirit (japan) [b].pce" size="524288" crc="c89ce75a" sha1="a2f17e33a36d6e67052ad4a1c3343e2e6624eb85" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -996,6 +999,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Same as parent except for byte at 0x32386. parent: 0xBF, clone: 0xFF -->
 	<software name="droprock1" cloneof="droprock">
 		<description>Drop Rock Hora Hora (alt)</description>
 		<year>1990</year>
@@ -1005,7 +1009,7 @@ license:CC0
 		<info name="alt_title" value="ドロップロック ほらホラ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="drop rock hora hora (japan) [a].pce" size="262144" crc="8e81fcac" sha1="0ccbc76f4861b7ff4d5615a3a8149d0055c38a00" offset="000000" />
+				<rom name="drop rock hora hora (japan) [a].pce" size="262144" crc="8e81fcac" sha1="0ccbc76f4861b7ff4d5615a3a8149d0055c38a00" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1117,7 +1121,7 @@ license:CC0
 		<info name="alt_title" value="エフワン サーカス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f1 circus (japan) [a].pce" size="524288" crc="79705779" sha1="6eeb1a6db725c9e96d1a4b24a8d3a944b12813e1" offset="000000" />
+				<rom name="f1 circus (japan) [b].pce" size="524288" crc="79705779" sha1="6eeb1a6db725c9e96d1a4b24a8d3a944b12813e1" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1710,7 +1714,7 @@ license:CC0
 		<info name="alt_title" value="神武伝承"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="jinmu denshou (japan) [a].pce" size="524288" crc="84240ef9" sha1="735ba5d77f49288e360b2908d989efbdc8b7adf4" offset="000000" />
+				<rom name="jinmu denshou (japan) [b].pce" size="524288" crc="84240ef9" sha1="735ba5d77f49288e360b2908d989efbdc8b7adf4" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1738,7 +1742,7 @@ license:CC0
 		<info name="alt_title" value="獣王記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="juuouki (japan) [a].pce" size="524288" crc="6a628982" sha1="20a413b8c5ae86502fc21f55096b89b2d7350dc2" offset="000000" />
+				<rom name="juuouki (japan) [b].pce" size="524288" crc="6a628982" sha1="20a413b8c5ae86502fc21f55096b89b2d7350dc2" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1964,7 +1968,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="lady sword (japan) [a].pce" size="1048576" crc="eb833d15" sha1="1badb6f4f4d23ebf7caf11cc8c93403111ad9f82" offset="000000" />
+				<rom name="lady sword (japan) [b].pce" size="1048576" crc="eb833d15" sha1="1badb6f4f4d23ebf7caf11cc8c93403111ad9f82" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2062,7 +2066,7 @@ license:CC0
 		<info name="alt_title" value="麻雀学園 MILD 東間宗四郎登場"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong gakuen mild - touma soushirou toujou (japan) [a].pce" size="524288" crc="3e4d432a" sha1="0c613a18559f7c11ff50b181ee2e68a8fe0bb587" offset="000000" />
+				<rom name="mahjong gakuen mild - touma soushirou toujou (japan) [b].pce" size="524288" crc="3e4d432a" sha1="0c613a18559f7c11ff50b181ee2e68a8fe0bb587" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2356,7 +2360,7 @@ license:CC0
 		<info name="alt_title" value="モトローダーII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="moto roader ii (japan) [a].pce" size="393216" crc="4ba525ba" sha1="e1288b2ba9875be14cd16ad7e590fc002a42290e" offset="000000" />
+				<rom name="moto roader ii (japan) [b].pce" size="393216" crc="4ba525ba" sha1="e1288b2ba9875be14cd16ad7e590fc002a42290e" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2375,6 +2379,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Same as parent except two bytes at 0x47B09, 0x4905D. For both locations parent: 0xF7, clone: 0xFF -->
 	<software name="mrheli1" cloneof="mrheli">
 		<description>Mr. Heli no Daibouken (alt)</description>
 		<year>1989</year>
@@ -2384,7 +2389,7 @@ license:CC0
 		<info name="alt_title" value="ミスターヘリの大冒険"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mr. heli no daibouken (japan) [a].pce" size="524288" crc="ac0cd796" sha1="fbbda31dc3a240b348d2f9ef34eff70f2adcc191" offset="000000" />
+				<rom name="mr. heli no daibouken (japan) [a].pce" size="524288" crc="ac0cd796" sha1="fbbda31dc3a240b348d2f9ef34eff70f2adcc191" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2814,7 +2819,7 @@ license:CC0
 		<info name="alt_title" value="PC電人 PUNKIC CYBORGS"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pc denjin - punkic cyborgs (japan) [a].pce" size="524288" crc="8fb4f228" sha1="f3fb61cf86a87c0f99ef05926cd835c2fe305c45" offset="000000" />
+				<rom name="pc denjin - punkic cyborgs (japan) [b].pce" size="524288" crc="8fb4f228" sha1="f3fb61cf86a87c0f99ef05926cd835c2fe305c45" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2842,7 +2847,7 @@ license:CC0
 		<info name="alt_title" value="PC原人"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="pc genjin - pithecanthropus computerurus (japan) [a].pce" size="393216" crc="67b35e6e" sha1="2c36256e77e74d5528366d35f0a55c45bc37d5a5" offset="000000" />
+				<rom name="pc genjin - pithecanthropus computerurus (japan) [b].pce" size="393216" crc="67b35e6e" sha1="2c36256e77e74d5528366d35f0a55c45bc37d5a5" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2923,7 +2928,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="populous" />
 			<dataarea name="rom" size="524288">
-				<rom name="populous (japan) [a].pce" size="524288" crc="0a9ade99" sha1="8e021703241c20ebd2a40ee55788c3a5fc4b8592" offset="000000" />
+				<rom name="populous (japan) [b].pce" size="524288" crc="0a9ade99" sha1="8e021703241c20ebd2a40ee55788c3a5fc4b8592" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -2951,7 +2956,7 @@ license:CC0
 		<info name="alt_title" value="パワードリフト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power drift (japan) [a].pce" size="524288" crc="99e6d988" sha1="d5277a014b98d93abd29b35eafdf1a8ee28a1ff8" offset="000000" />
+				<rom name="power drift (japan) [b].pce" size="524288" crc="99e6d988" sha1="d5277a014b98d93abd29b35eafdf1a8ee28a1ff8" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3230,7 +3235,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rtypep2">
+	<software name="rtypep2a" cloneof="rtypep2">
 		<description>R-Type Part-2</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
@@ -3244,9 +3249,9 @@ license:CC0
 		</part>
 	</software>
 
-  <!-- later revision, password parser bugfix for passwords with 8 lives -->
-	<software name="rtypep21" cloneof="rtypep2">
-		<description>R-Type Part-2 (alt)</description>
+	<!-- later revision, password parser bugfix for passwords with 8 lives -->
+	<software name="rtypep2">
+		<description>R-Type Part-2 (v1.1)</description>
 		<year>1988</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="HC63009"/>
@@ -3254,7 +3259,7 @@ license:CC0
 		<info name="alt_title" value="アールタイプ II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="r-type part-2 (japan) [a].pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" offset="000000" />
+				<rom name="r-type part-2 (japan) (v1.1).pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3850,7 +3855,7 @@ license:CC0
 		<info name="alt_title" value="武田信玄"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="takeda shingen (japan) [a].pce" size="262144" crc="df7af71c" sha1="1d662df0936971e21b702633a8c75844753911c9" offset="000000" />
+				<rom name="takeda shingen (japan) [b].pce" size="262144" crc="df7af71c" sha1="1d662df0936971e21b702633a8c75844753911c9" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
