@@ -21,7 +21,7 @@
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

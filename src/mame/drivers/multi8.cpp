@@ -26,7 +26,7 @@
 #include "machine/upd765.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"

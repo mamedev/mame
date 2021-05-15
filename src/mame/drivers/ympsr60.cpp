@@ -7,7 +7,7 @@
     Documentation: https://github.com/JKN0/PSR70-reverse
     More documentation: https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-hardware.html
                         https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-firmware.html
-                        https://retroandreverse.blogspot.com/2021/01/digging-into-ym3806.html
+                        https://retroandreverse.blogspot.com/2021/01/digging-into-ymopq.html
 
     Service manual: https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
 

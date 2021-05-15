@@ -48,7 +48,7 @@
 #include "machine/315_5338a.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 // the layouts are very similar to eachother

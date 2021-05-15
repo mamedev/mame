@@ -31,8 +31,8 @@ Year + Game                 By      Board      Hardware
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
-#include "sound/ym3526.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

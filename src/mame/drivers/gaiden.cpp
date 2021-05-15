@@ -145,8 +145,8 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #include <algorithm>

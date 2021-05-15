@@ -332,7 +332,7 @@ u8 max80_state::keyboard_r(offs_t offset)
 
 u8 max80_state::fdc_status_r(offs_t offset)
 {
-	u8 data = 0xfc | m_fdc_drq | (m_fdc_int << 1);
+	u8 data = 0xfc | int(m_fdc_drq) | (m_fdc_int << 1);
 	return data;
 }
 

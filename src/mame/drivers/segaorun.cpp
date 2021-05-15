@@ -282,7 +282,7 @@ Notes:
 
 #include "machine/fd1089.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "outrun.lh"

@@ -10,8 +10,8 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2203.h"
-#include "sound/ym3526.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 

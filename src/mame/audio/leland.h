@@ -14,7 +14,7 @@
 #include "machine/gen_latch.h"
 #include "machine/pit8253.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 class leland_80186_sound_device : public device_t

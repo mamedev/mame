@@ -39,7 +39,7 @@ DAC               -26.6860Mhz
 
 #include "cpu/m68000/m68000.h"
 #include "machine/taitoio.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

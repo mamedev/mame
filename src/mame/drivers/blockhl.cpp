@@ -25,7 +25,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
 

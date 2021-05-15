@@ -10,7 +10,7 @@
 #include "nmk004.h"
 
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 
 void nmk004_device::write(uint8_t data)

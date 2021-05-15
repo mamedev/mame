@@ -17,7 +17,7 @@
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "tceptor2.lh"
