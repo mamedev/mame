@@ -421,6 +421,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="croschck" supported="no"> <!-- randomly freezes up on player's turn screen -->
+		<description>Crosscheck</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="crosscheck (1986)(datasoft)(us).atr" size="92176" crc="b4cef936" sha1="1bb9efe6ce4829388f933ae85dd0836749ca9e55"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccchomp">
+		<description>Crush, Crumble and Chomp!</description>
+		<year>1981</year>
+		<publisher>Epyx</publisher>
+		<sharedfeat name="compatibility" value="OSb"/>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cutthroa">
 		<description>Cutthroats</description>
 		<year>1984</year>
@@ -444,19 +468,6 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="caverns of mars (1982)(atari)(us).atr" size="92176" crc="b5b08100" sha1="e4cfd18a24734ae2b038810f10765fd440522adc"/> <!-- Verified -->
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ccchomp">
-		<description>Crush, Crumble and Chomp!</description>
-		<year>1981</year>
-		<publisher>Epyx</publisher>
-		<sharedfeat name="compatibility" value="OSb"/>
-		<sharedfeat name="requirement" value="a800:basicb"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -515,6 +526,17 @@ license:CC0
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="essex (1985)(synapse software)(us)(disk 2 of 2 side b)(disk 2, side 2).atr" size="92176" crc="70b697d2" sha1="a26e4765740e9e4986cd55b3209de4bd77503d90"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fforest">
+		<description>Forbidden Forest</description>
+		<year>1983</year>
+		<publisher>Cosmi</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="forbidden forest (1983)(cosmi)(us).atr" size="92176" crc="3faaa34c" sha1="3e122297fe9f891785e59eb9b607403aae21719f"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -621,6 +643,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="saracen">
+		<description>Saracen</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="saracen (1987)(datasoft)(us)(side a).atr" size="92176" crc="512b4ab7" sha1="3b91a79a49c699ea458a85fe81612a55e494c1ec"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="saracen (1987)(datasoft)(us)(side b).atr" size="92176" crc="40217012" sha1="13675d252b391f1e177bf7b5d97b4d813ac0cdbe"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shatalli">
 		<description>Chronicles of Osgorth: The Shattered Alliance</description>
 		<year>1981</year>
@@ -657,6 +695,35 @@ license:CC0
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="spellbreaker rel 63 (1985-09-16)(infocom)(us)(side b).atr" size="92176" crc="27595ca6" sha1="ca66381b5b28da9838b3416985c06b3530efbe34"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spitfr40" supported="no"> <!-- joystick/keyboard inputs mostly not responsive -->
+		<description>Spitfire 40</description>
+		<year>1986</year>
+		<publisher>Avalon Hill</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="spitfire 40 (1986)(avalon hill)(us).atr" size="92176" crc="875a404f" sha1="49e6c560d38137944c1cd9bc6c5f37a012045a84"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Atari Translator allows disks that only work on earlier 400/800 systems to load on later XL/XE machines -->
+	<software name="transltr"> <!-- runs but needs testing -->
+		<description>Atari Translator (USA)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="atari translator (1983)(atari)(us)(side a)[req 64k].atr" size="92176" crc="003cb47c" sha1="ad74be8f96742892c4c33373ca96372b58d88a68"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="atari translator (1983)(atari)(us)(side b)[req 64k].atr" size="92176" crc="861ac5d7" sha1="70ec2f2cb8cfb83dd528a9eabcf028a3b154e8cd"/>  <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
