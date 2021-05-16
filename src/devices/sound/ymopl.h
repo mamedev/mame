@@ -29,6 +29,8 @@ DECLARE_DEVICE_TYPE(Y8950, y8950_device);
 
 class y8950_device : public ymfm_device_base<ymfm::y8950>, public device_rom_interface<21>
 {
+	using parent = ymfm_device_base<ymfm::y8950>;
+
 public:
 	// constructor
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -48,8 +50,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	uint8_t ymfm_adpcm_b_read(offs_t address) override;
-	void ymfm_adpcm_b_write(offs_t address, uint8_t data) override;
+	uint8_t ymfm_external_read(ymfm::ymfm_interface::external_type type, uint32_t address) override;
+	void ymfm_external_write(ymfm::ymfm_interface::external_type type, uint32_t address, uint8_t data) override;
 };
 
 

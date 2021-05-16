@@ -40,18 +40,6 @@ namespace ymfm
 //  GLOBAL ENUMERATORS
 //*********************************************************
 
-enum envelope_state : uint32_t
-{
-	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
-	EG_ATTACK = 1,
-	EG_DECAY = 2,
-	EG_SUSTAIN = 3,
-	EG_RELEASE = 4,
-	EG_REVERB = 5,		// OPZ only; set EG_HAS_REVERB to enable
-	EG_STATES = 6
-};
-
-
 // three different keyon sources; actual keyon is an OR over all of these
 enum keyon_type : uint32_t
 {

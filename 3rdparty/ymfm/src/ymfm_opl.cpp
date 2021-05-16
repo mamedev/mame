@@ -933,7 +933,7 @@ uint8_t y8950::read_data()
 	switch (m_address)
 	{
 		case 0x05:  // keyboard in
-			result = m_fm.intf().ymfm_io_read(1);
+			result = m_fm.intf().ymfm_external_read(ymfm_interface::EXTERNAL_IO, 1);
 			break;
 
 		case 0x09:  // ADPCM data
@@ -942,7 +942,7 @@ uint8_t y8950::read_data()
 			break;
 
 		case 0x19:  // I/O data
-			result = m_fm.intf().ymfm_io_read(0);
+			result = m_fm.intf().ymfm_external_read(ymfm_interface::EXTERNAL_IO, 0);
 			break;
 
 		default:
@@ -1011,7 +1011,7 @@ void y8950::write_data(uint8_t data)
 			break;
 
 		case 0x06:  // keyboard out
-			m_fm.intf().ymfm_io_write(1, data);
+			m_fm.intf().ymfm_external_write(ymfm_interface::EXTERNAL_IO, 1, data);
 			break;
 
 		case 0x08:  // split FM/ADPCM-B
@@ -1041,7 +1041,7 @@ void y8950::write_data(uint8_t data)
 			break;
 
 		case 0x19:  // I/O data
-			m_fm.intf().ymfm_io_write(0, data & m_io_ddr);
+			m_fm.intf().ymfm_external_write(ymfm_interface::EXTERNAL_IO, 0, data & m_io_ddr);
 			break;
 
 		default:    // everything else to FM

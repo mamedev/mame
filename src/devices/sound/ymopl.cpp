@@ -56,9 +56,11 @@ void y8950_device::rom_bank_updated()
 //  default address space
 //-------------------------------------------------
 
-uint8_t y8950_device::ymfm_adpcm_b_read(uint32_t offset)
+uint8_t y8950_device::ymfm_external_read(external_type type, uint32_t offset)
 {
-	return read_byte(offset);
+	if (type == EXTERNAL_ADPCM_B)
+		return read_byte(offset);
+	return parent::ymfm_external_read(type, offset);
 }
 
 
@@ -68,9 +70,11 @@ uint8_t y8950_device::ymfm_adpcm_b_read(uint32_t offset)
 //  default address space
 //-------------------------------------------------
 
-void y8950_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
+void y8950_device::ymfm_external_write(external_type type, uint32_t offset, uint8_t data)
 {
-	space().write_byte(offset, data);
+	if (type == EXTERNAL_ADPCM_B)
+		return space().write_byte(offset, data);
+	parent::ymfm_external_write(type, offset, data);
 }
 
 

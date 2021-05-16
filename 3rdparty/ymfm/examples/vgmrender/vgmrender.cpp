@@ -95,42 +95,22 @@ public:
 	virtual void generate(emulated_time output_start, emulated_time output_step, int32_t *buffer) = 0;
 
 	// write data to the ADPCM-A buffer
-	void write_adpcm_a(uint32_t base, uint32_t length, uint8_t const *src)
+	void write_data(ymfm::ymfm_interface::external_type type, uint32_t base, uint32_t length, uint8_t const *src)
 	{
 		uint32_t end = base + length;
-		if (end > m_adpcm_a_data.size())
-			m_adpcm_a_data.resize(end);
-		memcpy(&m_adpcm_a_data[base], src, length);
-	}
-
-	// write data to the ADPCM-B buffer
-	void write_adpcm_b(uint32_t base, uint32_t length, uint8_t const *src)
-	{
-		uint32_t end = base + length;
-		if (end > m_adpcm_b_data.size())
-			m_adpcm_b_data.resize(end);
-		memcpy(&m_adpcm_b_data[base], src, length);
-	}
-
-	// write data to the PCM buffer
-	void write_pcm(uint32_t base, uint32_t length, uint8_t const *src)
-	{
-		uint32_t end = base + length;
-		if (end > m_pcm_data.size())
-			m_pcm_data.resize(end);
-		memcpy(&m_pcm_data[base], src, length);
+		if (end > m_data[type].size())
+			m_data[type].resize(end);
+		memcpy(&m_data[type][base], src, length);
 	}
 
 	// seek within the PCM stream
 	void seek_pcm(uint32_t pos) { m_pcm_offset = pos; }
-	uint8_t read_pcm() { return (m_pcm_offset < m_pcm_data.size()) ? m_pcm_data[m_pcm_offset++] : 0; }
+	uint8_t read_pcm() { auto &pcm = m_data[ymfm::ymfm_interface::EXTERNAL_PCM]; return (m_pcm_offset < pcm.size()) ? pcm[m_pcm_offset++] : 0; }
 
 protected:
 	// internal state
 	chip_type m_type;
-	std::vector<uint8_t> m_adpcm_a_data;
-	std::vector<uint8_t> m_adpcm_b_data;
-	std::vector<uint8_t> m_pcm_data;
+	std::vector<uint8_t> m_data[ymfm::ymfm_interface::EXTERNAL_TYPES];
 	uint32_t m_pcm_offset;
 #if (CAPTURE_NATIVE)
 public:
@@ -277,16 +257,11 @@ public:
 	}
 
 protected:
-	// handle a read from the ADPCM-A buffer
-	virtual uint8_t ymfm_adpcm_a_read(uint32_t offset) override
+	// handle a read from the buffer
+	virtual uint8_t ymfm_external_read(external_type type, uint32_t offset) override
 	{
-		return (offset < m_adpcm_a_data.size()) ? m_adpcm_a_data[offset] : 0;
-	}
-
-	// handle a read from the ADPCM-B buffer
-	virtual uint8_t ymfm_adpcm_b_read(uint32_t offset) override
-	{
-		return (offset < m_adpcm_b_data.size()) ? m_adpcm_b_data[offset] : 0;
+		auto &data = m_data[type];
+		return (offset < data.size()) ? data[offset] : 0;
 	}
 
 	// internal state
@@ -351,7 +326,7 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 			fclose(rom);
 			for (auto chip : active_chips)
 				if (chip->type() == type)
-					chip->write_adpcm_a(0, size, &temp[0]);
+					chip->write_data(ymfm::ymfm_interface::EXTERNAL_ADPCM_A, 0, size, &temp[0]);
 		}
 	}
 }
@@ -927,7 +902,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 					{
 						vgm_chip_base *chip = find_chip(CHIP_YM2612, 0);
 						if (chip != nullptr)
-							chip->write_pcm(0, size - 8, &buffer[localoffset]);
+							chip->write_data(ymfm::ymfm_interface::EXTERNAL_PCM, 0, size - 8, &buffer[localoffset]);
 						break;
 					}
 
@@ -938,7 +913,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						{
 							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
 							if (chip != nullptr)
-								chip->write_adpcm_a(start, size - 8, &buffer[localoffset]);
+								chip->write_data(ymfm::ymfm_interface::EXTERNAL_ADPCM_A, start, size - 8, &buffer[localoffset]);
 						}
 						break;
 
@@ -949,7 +924,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						{
 							vgm_chip_base *chip = find_chip(CHIP_YM2608, index);
 							if (chip != nullptr)
-								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
+								chip->write_data(ymfm::ymfm_interface::EXTERNAL_ADPCM_B, start, size - 8, &buffer[localoffset]);
 						}
 						break;
 
@@ -960,7 +935,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						{
 							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
 							if (chip != nullptr)
-								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
+								chip->write_data(ymfm::ymfm_interface::EXTERNAL_ADPCM_B, start, size - 8, &buffer[localoffset]);
 						}
 						break;
 
@@ -971,7 +946,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 						{
 							vgm_chip_base *chip = find_chip(CHIP_Y8950, index);
 							if (chip != nullptr)
-								chip->write_adpcm_b(start, size - 8, &buffer[localoffset]);
+								chip->write_data(ymfm::ymfm_interface::EXTERNAL_ADPCM_B, start, size - 8, &buffer[localoffset]);
 						}
 						break;
 

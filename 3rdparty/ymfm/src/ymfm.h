@@ -257,8 +257,16 @@ inline int16_t roundtrip_fp(int32_t value)
 //  HELPER CLASSES
 //*********************************************************
 
-// forward declarations
-enum envelope_state : uint32_t;
+enum envelope_state : uint32_t
+{
+	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
+	EG_ATTACK = 1,
+	EG_DECAY = 2,
+	EG_SUSTAIN = 3,
+	EG_RELEASE = 4,
+	EG_REVERB = 5,		// OPZ only; set EG_HAS_REVERB to enable
+	EG_STATES = 6
+};
 
 
 // ======================> ymfm_output
@@ -437,36 +445,27 @@ public:
 	// I/O functions
 	//
 
+	enum external_type : uint32_t
+	{
+		EXTERNAL_IO = 0,
+		EXTERNAL_ADPCM_A,
+		EXTERNAL_ADPCM_B,
+		EXTERNAL_PCM,
+		EXTERNAL_TYPES
+	};
+
 	// the chip implementation calls this when the state of the IRQ signal has
 	// changed due to a status change; our responsibility is to respond as
 	// needed to the change in IRQ state, signaling any consumers
 	virtual void ymfm_update_irq(bool asserted) { }
 
-	// the chip implementation calls this whenever a new value is written to
-	// one of the chip's output ports (only applies to some chip types); our
-	// responsibility is to pass the written data on to any consumers
-	virtual void ymfm_io_write(uint8_t port, uint8_t data) { }
+	// the chip implementation calls this whenever data is read from outside
+	// of the chip; our responsibility is to provide the data requested
+	virtual uint8_t ymfm_external_read(external_type type, uint32_t address) { return 0; }
 
-	// the chip implementation calls this whenever an on-chip register is read
-	// which returns data from one of the chip's input ports; our responsibility
-	// is to produce the current input value so that it can be reflected by the
-	// read operation
-	virtual uint8_t ymfm_io_read(uint8_t port) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-A engine needs to
-	// fetch data for sound generation; our responsibility is to read the data
-	// from the appropriate ROM/RAM at the given offset and return it
-	virtual uint8_t ymfm_adpcm_a_read(uint32_t offset) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-B engine needs to
-	// fetch data for sound generation; our responsibility is to read the data
-	// from the appropriate ROM/RAM at the given offset and return it
-	virtual uint8_t ymfm_adpcm_b_read(uint32_t offset) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-B engine requests
-	// a write to the sound data; our responsibility is to write the data to
-	// the appropriate RAM at the given offset
-	virtual void ymfm_adpcm_b_write(uint32_t offset, uint8_t data) { }
+	// the chip implementation calls this whenever data is written outside
+	// of the chip; our responsibility is to pass the written data on to any consumers
+	virtual void ymfm_external_write(external_type type, uint32_t address, uint8_t data) { }
 
 protected:
 	// pointer to engine callbacks -- this is set directly by the engine at
