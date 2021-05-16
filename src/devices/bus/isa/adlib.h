@@ -6,7 +6,7 @@
 #pragma once
 
 #include "isa.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

@@ -19,6 +19,7 @@
 #include "formats/cqm_dsk.h"
 #include "formats/dsk_dsk.h"
 #include "formats/pc_dsk.h"
+#include "formats/ipf_dsk.h"
 
 #include "formats/fs_unformatted.h"
 #include "formats/fsblk_vec.h"
@@ -168,6 +169,7 @@ void format_registration::add_pc_formats()
 	add_mfm_containers();
 
 	add(FLOPPY_PC_FORMAT);
+	add(FLOPPY_IPF_FORMAT);
 }
 
 void format_registration::add(floppy_format_type format)

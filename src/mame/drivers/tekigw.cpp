@@ -262,7 +262,7 @@ void tek6100_state::scr_w(u8 data)
 					{
 						m_ssr |= SSR_PERR;
 						m_per &= ~PER_PARADR;
-						m_per |= PER_LOERR | (offset >> 9) & PER_PARADR;
+						m_per |= PER_LOERR | ((offset >> 9) & PER_PARADR);
 
 						error = true;
 					}
@@ -272,7 +272,7 @@ void tek6100_state::scr_w(u8 data)
 					{
 						m_ssr |= SSR_PERR;
 						m_per &= ~PER_PARADR;
-						m_per |= PER_HIERR | (offset >> 9) & PER_PARADR;
+						m_per |= PER_HIERR | ((offset >> 9) & PER_PARADR);
 
 						error = true;
 					}

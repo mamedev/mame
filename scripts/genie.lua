@@ -1437,6 +1437,7 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
 			"-Wno-unused-variable",
+			"-Wno-xor-used-as-pow",
 			"-Wno-microsoft-cast",
 		}
 end

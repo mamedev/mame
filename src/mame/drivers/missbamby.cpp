@@ -234,7 +234,7 @@ ROM_START( gwinner )
 	ROM_LOAD( "reben_sa_gw-b_chk_f884_crc_7822.bin", 0x2000, 0x1000, CRC(0146a4ff) SHA1(d23048ba0f23daf5caba07affc57e88ab09ca91e) )
 
 	ROM_REGION(0x20, "prom", 0)
-	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, NO_DUMP )
+	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, CRC(27ed5f29) SHA1(2d5f190fac6be15d3c5b344647333bbf47a04fc3) )
 ROM_END
 
 ROM_START( unkslot )

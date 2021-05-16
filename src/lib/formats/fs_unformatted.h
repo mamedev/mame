@@ -46,6 +46,7 @@ public:
 	virtual bool can_format() const override;
 	virtual bool can_read() const override;
 	virtual bool can_write() const override;
+	virtual bool has_rsrc() const override;
 };
 
 extern const filesystem_manager_type FS_UNFORMATTED;

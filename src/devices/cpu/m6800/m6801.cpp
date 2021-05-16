@@ -78,6 +78,7 @@ enum
 };
 
 /* take interrupt */
+#define TAKE_ISI enter_interrupt("take ISI\n",0xfff8)
 #define TAKE_ICI enter_interrupt("take ICI\n",0xfff6)
 #define TAKE_OCI enter_interrupt("take OCI\n",0xfff4)
 #define TAKE_TOI enter_interrupt("take TOI\n",0xfff2)
@@ -291,7 +292,7 @@ void hd6301y_cpu_device::hd6301y_io(address_map &map)
 	map(0x0015, 0x0015).w(FUNC(hd6301y_cpu_device::p5_data_w));
 	//map(0x001e, 0x001e).rw(FUNC(hd6301y_cpu_device::sci_trcsr2_r), FUNC(hd6301y_cpu_device::sci_trcsr2_w));
 	map(0x0020, 0x0020).rw(FUNC(hd6301y_cpu_device::ff_r), FUNC(hd6301y_cpu_device::p5_ddr_w));
-	//map(0x0021, 0x0021).rw(FUNC(hd6301y_cpu_device::p6_csr_r), FUNC(hd6301y_cpu_device::p6_csr_w));
+	map(0x0021, 0x0021).rw(FUNC(hd6301y_cpu_device::p6_csr_r), FUNC(hd6301y_cpu_device::p6_csr_w));
 }
 
 
@@ -415,7 +416,6 @@ void m6801_cpu_device::m6800_check_irq2()
 				((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
 				((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
 	{
-		LOG("SCI interrupt\n");
 		TAKE_SCI;
 	}
 }
@@ -444,9 +444,19 @@ void hd6301x_cpu_device::m6800_check_irq2()
 				((m_trcsr & (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) == (M6801_TRCSR_RIE|M6801_TRCSR_ORFE)) ||
 				((m_trcsr & (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)) == (M6801_TRCSR_TIE|M6801_TRCSR_TDRE)))
 	{
-		LOG("SCI interrupt\n");
 		TAKE_SCI;
 	}
+}
+
+void hd6301y_cpu_device::m6800_check_irq2()
+{
+	if ((m_p6csr & 0xc0) == 0xc0)
+	{
+		TAKE_ISI;
+		standard_irq_callback(M6801_IS_LINE);
+	}
+	else
+		hd6301x_cpu_device::m6800_check_irq2();
 }
 
 void m6801_cpu_device::modified_tcsr()
@@ -512,7 +522,7 @@ void m6801_cpu_device::check_timer_event()
 	{
 		TOH++;  // next IRQ point
 #if 0
-		CLEANUP_COUNTERS();
+		cleanup_counters();
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
@@ -572,7 +582,7 @@ void hd6301x_cpu_device::check_timer_event()
 	{
 		TOH++;  // next IRQ point
 #if 0
-		CLEANUP_COUNTERS();
+		cleanup_counters();
 #endif
 		m_tcsr |= TCSR_TOF;
 		m_pending_tcsr |= TCSR_TOF;
@@ -632,7 +642,7 @@ void hd6301x_cpu_device::increment_counter(int amount)
 		check_timer_event();
 }
 
-void m6801_cpu_device::EAT_CYCLES()
+void m6801_cpu_device::eat_cycles()
 {
 	int cycles_to_eat = std::min(int(m_timer_next - CTD), m_icount);
 	if (cycles_to_eat > 0)
@@ -640,7 +650,7 @@ void m6801_cpu_device::EAT_CYCLES()
 }
 
 /* cleanup high-word of counters */
-void m6801_cpu_device::CLEANUP_COUNTERS()
+void m6801_cpu_device::cleanup_counters()
 {
 	OCH -= CTH;
 	TOH -= CTH;
@@ -650,10 +660,10 @@ void m6801_cpu_device::CLEANUP_COUNTERS()
 		check_timer_event();
 }
 
-void hd6301x_cpu_device::CLEANUP_COUNTERS()
+void hd6301x_cpu_device::cleanup_counters()
 {
 	OC2H -= CTH;
-	m6801_cpu_device::CLEANUP_COUNTERS();
+	m6801_cpu_device::cleanup_counters();
 }
 
 void m6801_cpu_device::set_rmcr(uint8_t data)
@@ -788,7 +798,7 @@ void m6801_cpu_device::serial_transmit()
 				// send stop bit '1'
 				m_tx = 1;
 
-				CHECK_IRQ_LINES();
+				check_irq_lines();
 
 				m_txbits = M6801_SERIAL_START;
 
@@ -876,7 +886,7 @@ void m6801_cpu_device::serial_receive()
 
 						LOGRX("SCI Receive Overrun Error\n");
 
-						CHECK_IRQ_LINES();
+						check_irq_lines();
 					}
 					else
 					{
@@ -890,7 +900,7 @@ void m6801_cpu_device::serial_receive()
 							// set RDRF flag
 							m_trcsr |= M6801_TRCSR_RDRF;
 
-							CHECK_IRQ_LINES();
+							check_irq_lines();
 						}
 					}
 				}
@@ -908,7 +918,7 @@ void m6801_cpu_device::serial_receive()
 
 					LOGRX("SCI Receive Framing Error\n");
 
-					CHECK_IRQ_LINES();
+					check_irq_lines();
 				}
 
 				m_rxbits = M6801_SERIAL_START;
@@ -969,7 +979,7 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 		{
 			m_irq_state[M6801_TIN_LINE] = state;
 			//edge = (state == CLEAR_LINE ) ? 2 : 0;
-			if( ((m_tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
+			if (((m_tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0)) == 0)
 				return;
 			/* active edge in */
 			m_tcsr |= TCSR_ICF;
@@ -984,6 +994,28 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 		break;
 	}
 }
+
+void hd6301y_cpu_device::execute_set_input(int irqline, int state)
+{
+	switch (irqline)
+	{
+	case M6801_IS_LINE:
+		// interrupt at falling edge
+		if (!state && m_irq_state[M6801_IS_LINE])
+		{
+			m_p6csr |= 0x80; // IS flag
+			m_pending_isf_clear = false;
+		}
+
+		m_irq_state[M6801_IS_LINE] = state;
+		break;
+
+	default:
+		m6801_cpu_device::execute_set_input(irqline, state);
+		break;
+	}
+}
+
 
 
 void m6801_cpu_device::device_resolve_objects()
@@ -1011,6 +1043,7 @@ void m6801_cpu_device::device_start()
 
 	m_sci_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m6801_cpu_device::sci_tick),this));
 
+	m_irq_state[M6801_IS_LINE] = 0;
 	m_port_ddr[3] = 0;
 	m_port_data[3] = 0;
 	m_input_capture = 0;
@@ -1030,7 +1063,7 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_counter.d));
 	save_item(NAME(m_output_compare.d));
 	save_item(NAME(m_input_capture));
-	save_item(NAME(m_p3csr_is3_flag_read));
+	save_item(NAME(m_pending_isf_clear));
 	save_item(NAME(m_port3_latched));
 	save_item(NAME(m_port2_written));
 
@@ -1051,11 +1084,8 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_use_ext_serclock));
 
 	save_item(NAME(m_latch09));
-
 	save_item(NAME(m_timer_over.d));
-
 	save_item(NAME(m_timer_next));
-
 	save_item(NAME(m_sc1_state));
 }
 
@@ -1078,6 +1108,13 @@ void hd6301x_cpu_device::device_start()
 	save_item(NAME(m_t2cnt_written));
 }
 
+void hd6301y_cpu_device::device_start()
+{
+	hd6301x_cpu_device::device_start();
+
+	save_item(NAME(m_p6csr));
+}
+
 void m6801_cpu_device::device_reset()
 {
 	m6800_cpu_device::device_reset();
@@ -1090,7 +1127,7 @@ void m6801_cpu_device::device_reset()
 	m_port_ddr[2] = 0x00;
 	m_port_data[0] = 0;
 	m_p3csr = 0x00;
-	m_p3csr_is3_flag_read = 0;
+	m_pending_isf_clear = false;
 	m_port2_written = false;
 	m_port3_latched = 0;
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
@@ -1134,6 +1171,15 @@ void hd6301x_cpu_device::device_reset()
 	m_tcsr3 = 0x00;
 	m_tout3 = false;
 	m_t2cnt_written = false;
+
+	m_p3csr = 0; // does not have this reg
+}
+
+void hd6301y_cpu_device::device_reset()
+{
+	hd6301x_cpu_device::device_reset();
+
+	m_p6csr = 7;
 }
 
 
@@ -1187,7 +1233,7 @@ void hd6301x_cpu_device::write_port2()
 }
 
 /*
-    if change_pc() direccted these areas ,Call hd63701_trap_pc().
+    if change_pc() directed these areas, call hd63701_trap_pc().
     'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
     mode 0,1,2,4,6 : $0000-$001f
     mode 5         : $0000-$001f,$0200-$efff
@@ -1215,7 +1261,7 @@ void m6801_cpu_device::p1_ddr_w(uint8_t data)
 
 uint8_t m6801_cpu_device::p1_data_r()
 {
-	if(m_port_ddr[0] == 0xff)
+	if (m_port_ddr[0] == 0xff)
 		return m_port_data[0];
 	else
 		return (m_in_port_func[0]() & (m_port_ddr[0] ^ 0xff)) | (m_port_data[0] & m_port_ddr[0]);
@@ -1255,7 +1301,7 @@ void hd6301x_cpu_device::p2_ddr_2bit_w(uint8_t data)
 
 uint8_t m6801_cpu_device::p2_data_r()
 {
-	if(m_port_ddr[1] == 0xff)
+	if (m_port_ddr[1] == 0xff)
 		return m_port_data[1];
 	else
 		return (m_in_port_func[1]() & (m_port_ddr[1] ^ 0xff)) | (m_port_data[1] & m_port_ddr[1]);
@@ -1287,11 +1333,11 @@ uint8_t m6801_cpu_device::p3_data_r()
 
 	if (!machine().side_effects_disabled())
 	{
-		if (m_p3csr_is3_flag_read)
+		if (m_pending_isf_clear)
 		{
 			LOGPORT("Cleared IS3\n");
 			m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
-			m_p3csr_is3_flag_read = 0;
+			m_pending_isf_clear = false;
 		}
 
 		if (!(m_p3csr & M6801_P3CSR_OSS))
@@ -1303,8 +1349,7 @@ uint8_t m6801_cpu_device::p3_data_r()
 	if ((m_p3csr & M6801_P3CSR_LE) || (m_port_ddr[2] == 0xff))
 		data = m_port_data[2];
 	else
-		data = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff))
-			| (m_port_data[2] & m_port_ddr[2]);
+		data = (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
 
 	if (!machine().side_effects_disabled())
 	{
@@ -1322,11 +1367,11 @@ void m6801_cpu_device::p3_data_w(uint8_t data)
 {
 	LOGPORT("Port 3 Data Register: %02x\n", data);
 
-	if (m_p3csr_is3_flag_read)
+	if (m_pending_isf_clear)
 	{
 		LOGPORT("Cleared IS3\n");
 		m_p3csr &= ~M6801_P3CSR_IS3_FLAG;
-		m_p3csr_is3_flag_read = 0;
+		m_pending_isf_clear = false;
 	}
 
 	if (m_p3csr & M6801_P3CSR_OSS)
@@ -1343,11 +1388,29 @@ void m6801_cpu_device::p3_data_w(uint8_t data)
 	}
 }
 
+uint8_t hd6301x_cpu_device::p3_data_r()
+{
+	// no handshaking protocol
+	if (m_port_ddr[2] == 0xff)
+		return m_port_data[2];
+	else
+		return (m_in_port_func[2]() & (m_port_ddr[2] ^ 0xff)) | (m_port_data[2] & m_port_ddr[2]);
+}
+
+void hd6301x_cpu_device::p3_data_w(uint8_t data)
+{
+	// no handshaking protocol
+	LOGPORT("Port 3 Data Register: %02x\n", data);
+
+	m_port_data[2] = data;
+	m_out_port_func[2](0, (m_port_data[2] & m_port_ddr[2]) | (m_port_ddr[2] ^ 0xff), m_port_ddr[2]);
+}
+
 uint8_t m6801_cpu_device::p3_csr_r()
 {
 	if ((m_p3csr & M6801_P3CSR_IS3_FLAG) && !machine().side_effects_disabled())
 	{
-		m_p3csr_is3_flag_read = 1;
+		m_pending_isf_clear = true;
 	}
 
 	return m_p3csr;
@@ -1373,7 +1436,7 @@ void m6801_cpu_device::p4_ddr_w(uint8_t data)
 
 uint8_t m6801_cpu_device::p4_data_r()
 {
-	if(m_port_ddr[3] == 0xff)
+	if (m_port_ddr[3] == 0xff)
 		return m_port_data[3];
 	else
 		return (m_in_port_func[3]() & (m_port_ddr[3] ^ 0xff)) | (m_port_data[3] & m_port_ddr[3]);
@@ -1400,10 +1463,16 @@ void hd6301y_cpu_device::p5_ddr_w(uint8_t data)
 
 uint8_t hd6301x_cpu_device::p5_data_r()
 {
-	if(m_portx_ddr[0] == 0xff)
+	// read-only
+	return m_in_portx_func[0]();
+}
+
+uint8_t hd6301y_cpu_device::p5_data_r()
+{
+	if (m_portx_ddr[0] == 0xff)
 		return m_portx_data[0];
 	else
-		return (m_in_portx_func[0]() & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
+		return ((m_in_portx_func[0]() | ((m_irq_state[M6801_IS_LINE]) ? 0x10 : 0)) & (m_portx_ddr[0] ^ 0xff)) | (m_portx_data[0] & m_portx_ddr[0]);
 }
 
 void hd6301y_cpu_device::p5_data_w(uint8_t data)
@@ -1427,7 +1496,7 @@ void hd6301x_cpu_device::p6_ddr_w(uint8_t data)
 
 uint8_t hd6301x_cpu_device::p6_data_r()
 {
-	if(m_portx_ddr[1] == 0xff)
+	if (m_portx_ddr[1] == 0xff)
 		return m_portx_data[1];
 	else
 		return (m_in_portx_func[1]() & (m_portx_ddr[1] ^ 0xff)) | (m_portx_data[1] & m_portx_ddr[1]);
@@ -1439,6 +1508,48 @@ void hd6301x_cpu_device::p6_data_w(uint8_t data)
 
 	m_portx_data[1] = data;
 	m_out_portx_func[1](0, (m_portx_data[1] & m_portx_ddr[1]) | (m_portx_ddr[1] ^ 0xff), m_portx_ddr[1]);
+}
+
+uint8_t hd6301y_cpu_device::p6_data_r()
+{
+	if (!machine().side_effects_disabled())
+		clear_pending_isf();
+
+	return hd6301x_cpu_device::p6_data_r();
+}
+
+void hd6301y_cpu_device::p6_data_w(uint8_t data)
+{
+	clear_pending_isf();
+
+	hd6301x_cpu_device::p6_data_w(data);
+}
+
+void hd6301y_cpu_device::clear_pending_isf()
+{
+	// IS flag is cleared when reading/writing P6 after reading P6 CSR
+	if (m_pending_isf_clear)
+	{
+		m_p6csr &= 0x7f;
+		m_pending_isf_clear = false;
+	}
+}
+
+uint8_t hd6301y_cpu_device::p6_csr_r()
+{
+	if (!machine().side_effects_disabled())
+		m_pending_isf_clear = true;
+
+	return m_p6csr | 7;
+}
+
+void hd6301y_cpu_device::p6_csr_w(uint8_t data)
+{
+	LOGPORT("Port 6 Control/Status Register: %02x\n", data);
+
+	m_p6csr = (m_p6csr & 0x80) | (data & 0x7f);
+	if (!(m_cc & 0x10) && data & 0x40)
+		m6800_check_irq2();
 }
 
 uint8_t hd6301x_cpu_device::p7_data_r()
@@ -1472,13 +1583,13 @@ void m6801_cpu_device::tcsr_w(uint8_t data)
 	m_tcsr = data | (m_tcsr & 0xe0);
 	m_pending_tcsr &= m_tcsr;
 	modified_tcsr();
-	if( !(m_cc & 0x10) )
+	if (!(m_cc & 0x10))
 		m6800_check_irq2();
 }
 
 uint8_t m6801_cpu_device::ch_r()
 {
-	if(!(m_pending_tcsr&TCSR_TOF) && !machine().side_effects_disabled())
+	if (!(m_pending_tcsr & TCSR_TOF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_TOF;
 		modified_tcsr();
@@ -1524,13 +1635,13 @@ void m6801_cpu_device::ocrh_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register: %02x\n", data);
 
-	if(!(m_pending_tcsr&TCSR_OCF))
+	if (!(m_pending_tcsr & TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
 		modified_tcsr();
 	}
 
-	if( m_output_compare.b.h != data)
+	if (m_output_compare.b.h != data)
 	{
 		m_output_compare.b.h = data;
 		modified_counters();
@@ -1541,13 +1652,13 @@ void m6801_cpu_device::ocrl_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register: %02x\n", data);
 
-	if(!(m_pending_tcsr&TCSR_OCF))
+	if (!(m_pending_tcsr & TCSR_OCF))
 	{
 		m_tcsr &= ~TCSR_OCF;
 		modified_tcsr();
 	}
 
-	if( m_output_compare.b.l != data)
+	if (m_output_compare.b.l != data)
 	{
 		m_output_compare.b.l = data;
 		modified_counters();
@@ -1556,7 +1667,7 @@ void m6801_cpu_device::ocrl_w(uint8_t data)
 
 uint8_t m6801_cpu_device::icrh_r()
 {
-	if(!(m_pending_tcsr&TCSR_ICF) && !machine().side_effects_disabled())
+	if (!(m_pending_tcsr & TCSR_ICF) && !machine().side_effects_disabled())
 	{
 		m_tcsr &= ~TCSR_ICF;
 		modified_tcsr();
@@ -1587,7 +1698,7 @@ void hd6301x_cpu_device::tcsr2_w(uint8_t data)
 	m_tcsr2 = data | (m_tcsr2 & TCSR2_OCF2);
 	m_pending_tcsr2 &= m_tcsr2;
 	modified_tcsr();
-	if( !(m_cc & 0x10) )
+	if (!(m_cc & 0x10))
 		m6800_check_irq2();
 }
 
@@ -1605,13 +1716,13 @@ void hd6301x_cpu_device::ocr2h_w(uint8_t data)
 {
 	LOGTIMER("Output Compare High Register 2: %02x\n", data);
 
-	if(!(m_pending_tcsr2&TCSR2_OCF2))
+	if (!(m_pending_tcsr2 & TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
 		modified_tcsr();
 	}
 
-	if( m_output_compare2.b.h != data)
+	if (m_output_compare2.b.h != data)
 	{
 		m_output_compare2.b.h = data;
 		modified_counters();
@@ -1622,13 +1733,13 @@ void hd6301x_cpu_device::ocr2l_w(uint8_t data)
 {
 	LOGTIMER("Output Compare Low Register 2: %02x\n", data);
 
-	if(!(m_pending_tcsr2&TCSR2_OCF2))
+	if (!(m_pending_tcsr2 & TCSR2_OCF2))
 	{
 		m_tcsr2 &= ~TCSR2_OCF2;
 		modified_tcsr();
 	}
 
-	if( m_output_compare2.b.l != data)
+	if (m_output_compare2.b.l != data)
 	{
 		m_output_compare2.b.l = data;
 		modified_counters();
@@ -1714,7 +1825,7 @@ void hd6301x_cpu_device::tcsr3_w(uint8_t data)
 	{
 		m_tout3 = false;
 		write_port2();
-	}	
+	}
 	else if (tout3_last_enable ? (data & 0x0c) == 0 : (data & 0x0c) != 0)
 	{
 		m_port2_written = true;
@@ -1826,8 +1937,6 @@ void m6801_cpu_device::rcr_w(uint8_t data)
 
 uint8_t m6801_cpu_device::ff_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("PC %04x: warning - read from write-only internal register\n", pc());
 	return 0xff;
 }
 
@@ -1867,7 +1976,7 @@ std::unique_ptr<util::disasm_interface> hd6301_cpu_device::create_disassembler()
 	return std::make_unique<m680x_disassembler>(6301);
 }
 
-void hd6301_cpu_device::TAKE_TRAP()
+void hd6301_cpu_device::take_trap()
 {
 	enter_interrupt("take TRAP\n",0xffee);
 }

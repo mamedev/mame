@@ -134,7 +134,7 @@ out:
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/bankdev.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 namespace {

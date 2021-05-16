@@ -2888,10 +2888,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 
 	if (pedal != 0)
 	{
-		// the pedal has a simple 1-bit "light interrupted" sensor. the faster you pedal,
-		// the faster it pulses.  this is connected to the clock input for timer A3,
+		// The pedal has a simple 1-bit "light interrupted" sensor. The faster you pedal,
+		// the faster it pulses. This is connected to the clock input for timer A3,
 		// and timer A3 is configured by the MCU program to cause an interrupt each time
-		// it's clocked. by counting the number of interrupts in a frame, we can determine
+		// it's clocked. By counting the number of interrupts in a frame, it can determine
 		// how fast the user is pedaling.
 
 		// these values(in usec) may need tweaking:

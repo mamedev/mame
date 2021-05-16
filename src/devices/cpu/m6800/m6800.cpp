@@ -1,55 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/*** m6800: Portable 6800 class  emulator *************************************
+/*** m6800: Portable 6800 class emulator *************************************
 
-    m68xx.c
+m68xx.cpp
 
-    References:
+References:
 
-        6809 Simulator V09, By L.C. Benschop, Eindhoven The Netherlands.
+    6809 Simulator V09, By L.C. Benschop, Eindhoven The Netherlands.
 
-        m6809: Portable 6809 emulator, DS (6809 code in MAME, derived from
-            the 6809 Simulator V09)
+    m6809: Portable 6809 emulator, DS (6809 code in MAME, derived from
+        the 6809 Simulator V09)
 
-        6809 Microcomputer Programming & Interfacing with Experiments"
-            by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
+    6809 Microcomputer Programming & Interfacing with Experiments"
+        by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    uint16_t must be 16 bit unsigned int
-                            uint8_t must be 8 bit unsigned int
-                            uint32_t must be more than 16 bits
-                            arrays up to 65536 bytes must be supported
-                            machine must be twos complement
+System dependencies:    uint16_t must be 16 bit unsigned int
+                        uint8_t must be 8 bit unsigned int
+                        uint32_t must be more than 16 bits
+                        arrays up to 65536 bytes must be supported
+                        machine must be twos complement
 
-History
-991031  ZV
-    Added NSC-8105 support
-
-990319  HJB
-    Fixed wrong LSB/MSB order for push/pull word.
-    Subtract .extra_cycles at the beginning/end of the exectution loops.
-
-990316  HJB
-    Renamed to 6800, since that's the basic CPU.
-    Added different cycle count tables for M6800/2/8, M6801/3 and m68xx.
-
-990314  HJB
-    Also added the M6800 subtype.
-
-990311  HJB
-    Added _info functions. Now uses static m6808_Regs struct instead
-    of single statics. Changed the 16 bit registers to use the generic
-    PAIR union. Registers defined using macros. Split the core into
-    four execution loops for M6802, M6803, M6808 and HD63701.
-    TST, TSTA and TSTB opcodes reset carry flag.
 TODO:
-    Verify invalid opcodes for the different CPU types.
-    Add proper credits to _info functions.
-    Integrate m6808_Flags into the registers (multiple m6808 type CPUs?)
-
-990301  HJB
-    Modified the interrupt handling. No more pending interrupt checks.
-    WAI opcode saves state, when an interrupt is taken (IRQ or OCI),
-    the state is only saved if not already done by WAI.
+- verify invalid opcodes for the different CPU types
+- cleanups (difficult to do maintenance work right now)
+- improve 6801 and derivatives:
+  * make internal I/O map really internal
+  * RAM control register (eg. nvram)
+  * IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
+  * finish 6301Y port 6 handshake, share implementation with p3csr?
+  * 6301Y sci_trcsr2_r/w
+  * add 6801U4 extra timer registers (bublbobl, kikikai, though they seem
+    to work fine without)
 
 *****************************************************************************/
 
@@ -453,7 +434,7 @@ nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char
 
 device_memory_interface::space_config_vector m6800_cpu_device::memory_space_config() const
 {
-	if(has_configured_map(AS_OPCODES))
+	if (has_configured_map(AS_OPCODES))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_OPCODES, &m_decrypted_opcodes_config)
@@ -467,24 +448,26 @@ device_memory_interface::space_config_vector m6800_cpu_device::memory_space_conf
 uint32_t m6800_cpu_device::RM16(uint32_t Addr )
 {
 	uint32_t result = RM(Addr) << 8;
-	return result | RM((Addr+1)&0xffff);
+	return result | RM((Addr+1) & 0xffff);
 }
 
 void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 {
-	WM( Addr, p->b.h );
-	WM( (Addr+1)&0xffff, p->b.l );
+	WM(Addr, p->b.h);
+	WM((Addr+1) & 0xffff, p->b.l);
 }
 
 /* IRQ enter */
 void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 {
+	int cycles_to_eat = 0;
+
 	LOG((message));
-	if( m_wai_state & (M6800_WAI|M6800_SLP) )
+	if (m_wai_state & (M6800_WAI | M6800_SLP))
 	{
-		if( m_wai_state & M6800_WAI )
-			m_icount -= 4;
-		m_wai_state &= ~(M6800_WAI|M6800_SLP);
+		if (m_wai_state & M6800_WAI)
+			cycles_to_eat = 4;
+		m_wai_state &= ~(M6800_WAI | M6800_SLP);
 	}
 	else
 	{
@@ -493,22 +476,23 @@ void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 		PUSHBYTE(A);
 		PUSHBYTE(B);
 		PUSHBYTE(CC);
-		m_icount -= 12;
+		cycles_to_eat = 12;
 	}
 	SEI;
-	PCD = RM16( irq_vector );
+	PCD = RM16(irq_vector);
+
+	if (cycles_to_eat > 0)
+		increment_counter(cycles_to_eat);
 }
 
-
-
 /* check the IRQ lines for pending interrupts */
-void m6800_cpu_device::CHECK_IRQ_LINES()
+void m6800_cpu_device::check_irq_lines()
 {
 	// TODO: IS3 interrupt
 
 	if (m_nmi_pending)
 	{
-		if(m_wai_state & M6800_SLP)
+		if (m_wai_state & M6800_SLP)
 			m_wai_state &= ~M6800_SLP;
 
 		m_nmi_pending = false;
@@ -516,19 +500,20 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 	}
 	else
 	{
-		if( m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
-		{   /* standard IRQ */
-			if(m_wai_state & M6800_SLP)
+		if (m_irq_state[M6800_IRQ_LINE] != CLEAR_LINE)
+		{
+			/* standard IRQ */
+			if (m_wai_state & M6800_SLP)
 				m_wai_state &= ~M6800_SLP;
 
-			if( !(CC & 0x10) )
+			if (!(CC & 0x10))
 			{
 				enter_interrupt("take IRQ1\n", 0xfff8);
 				standard_irq_callback(M6800_IRQ_LINE);
 			}
 		}
 		else
-			if( !(CC & 0x10) )
+			if (!(CC & 0x10))
 				m6800_check_irq2();
 	}
 }
@@ -538,9 +523,10 @@ void m6800_cpu_device::increment_counter(int amount)
 	m_icount -= amount;
 }
 
-void m6800_cpu_device::EAT_CYCLES()
+void m6800_cpu_device::eat_cycles()
 {
-	increment_counter(m_icount);
+	if (m_icount > 0)
+		increment_counter(m_icount);
 }
 
 
@@ -605,8 +591,8 @@ void m6800_cpu_device::state_string_export(const device_state_entry &entry, std:
 void m6800_cpu_device::device_reset()
 {
 	m_cc = 0xc0;
-	SEI;                /* IRQ disabled */
-	PCD = RM16( 0xfffe );
+	SEI; /* IRQ disabled */
+	PCD = RM16(0xfffe);
 
 	m_wai_state = 0;
 	m_nmi_state = 0;
@@ -637,28 +623,26 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
  ****************************************************************************/
 void m6800_cpu_device::execute_run()
 {
-	uint8_t ireg;
+	check_irq_lines();
 
-	CHECK_IRQ_LINES(); /* HJB 990417 */
-
-	CLEANUP_COUNTERS();
+	cleanup_counters();
 
 	do
 	{
-		if( m_wai_state & (M6800_WAI|M6800_SLP) )
+		if (m_wai_state & (M6800_WAI | M6800_SLP))
 		{
-			EAT_CYCLES();
+			eat_cycles();
 		}
 		else
 		{
 			pPPC = pPC;
 			debugger_instruction_hook(PCD);
-			ireg=M_RDOP(PCD);
+			uint8_t ireg=M_RDOP(PCD);
 			PC++;
 			(this->*m_insn[ireg])();
 			increment_counter(m_cycles[ireg]);
 		}
-	} while( m_icount>0 );
+	} while (m_icount > 0);
 }
 
 std::unique_ptr<util::disasm_interface> m6800_cpu_device::create_disassembler()

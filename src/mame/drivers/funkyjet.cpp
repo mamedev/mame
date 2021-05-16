@@ -98,7 +98,7 @@ Notes:
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 

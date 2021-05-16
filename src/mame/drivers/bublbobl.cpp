@@ -270,11 +270,10 @@ TODO:
 #include "emu.h"
 #include "includes/bublbobl.h"
 
-#include "cpu/m6800/m6801.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2203.h"
-#include "sound/ym3526.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -355,15 +354,8 @@ void bublbobl_state::sound_map(address_map &map)
 
 void bublbobl_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x0000).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr1_r), FUNC(bublbobl_state::bublbobl_mcu_ddr1_w));
-	map(0x0001, 0x0001).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr2_r), FUNC(bublbobl_state::bublbobl_mcu_ddr2_w));
-	map(0x0002, 0x0002).rw(FUNC(bublbobl_state::bublbobl_mcu_port1_r), FUNC(bublbobl_state::bublbobl_mcu_port1_w));
-	map(0x0003, 0x0003).rw(FUNC(bublbobl_state::bublbobl_mcu_port2_r), FUNC(bublbobl_state::bublbobl_mcu_port2_w));
-	map(0x0004, 0x0004).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr3_r), FUNC(bublbobl_state::bublbobl_mcu_ddr3_w));
-	map(0x0005, 0x0005).rw(FUNC(bublbobl_state::bublbobl_mcu_ddr4_r), FUNC(bublbobl_state::bublbobl_mcu_ddr4_w));
-	map(0x0006, 0x0006).rw(FUNC(bublbobl_state::bublbobl_mcu_port3_r), FUNC(bublbobl_state::bublbobl_mcu_port3_w));
-	map(0x0007, 0x0007).rw(FUNC(bublbobl_state::bublbobl_mcu_port4_r), FUNC(bublbobl_state::bublbobl_mcu_port4_w));
-	map(0x0040, 0x00ff).ram();
+	map(0x0000, 0x0007).m(m_mcu, FUNC(m6801_cpu_device::m6801_io));
+	map(0x0040, 0x00ff).ram(); // internal
 	map(0xf000, 0xffff).rom();
 }
 
@@ -921,14 +913,7 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 {
 	MACHINE_START_CALL_MEMBER(common);
 
-	save_item(NAME(m_ddr1));
-	save_item(NAME(m_ddr2));
-	save_item(NAME(m_ddr3));
-	save_item(NAME(m_ddr4));
-	save_item(NAME(m_port1_in));
-	save_item(NAME(m_port2_in));
 	save_item(NAME(m_port3_in));
-	save_item(NAME(m_port4_in));
 	save_item(NAME(m_port1_out));
 	save_item(NAME(m_port2_out));
 	save_item(NAME(m_port3_out));
@@ -940,14 +925,7 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	MACHINE_RESET_CALL_MEMBER(common);
 	bublbobl_bankswitch_w(0x00); // force a bankswitch write of all zeroes, as /RESET clears the latch
 
-	m_ddr1 = 0;
-	m_ddr2 = 0;
-	m_ddr3 = 0;
-	m_ddr4 = 0;
-	m_port1_in = 0;
-	m_port2_in = 0;
 	m_port3_in = 0;
-	m_port4_in = 0;
 	m_port1_out = 0;
 	m_port2_out = 0;
 	m_port3_out = 0;
@@ -1006,8 +984,14 @@ void bublbobl_state::bublbobl(machine_config &config)
 	bublbobl_nomcu(config);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(bublbobl_state::mcram_vect_r));
 
-	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	m_mcu->set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
+	auto &mcu(M6801(config, "mcu", XTAL(4'000'000))); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	mcu.set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
+	mcu.in_p1_cb().set_ioport("IN0");
+	mcu.out_p1_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port1_w));
+	mcu.out_p2_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port2_w));
+	mcu.out_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_w));
+	mcu.in_p3_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port3_r));
+	mcu.out_p4_cb().set(FUNC(bublbobl_state::bublbobl_mcu_port4_w));
 
 	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
 }

@@ -13,7 +13,8 @@ enum
 {
 	M6801_IRQ_LINE = M6800_IRQ_LINE,
 	M6801_TIN_LINE, // P20/Tin Input Capture line (edge sense). Active edge is selectable by internal reg.
-	M6801_SC1_LINE
+	M6801_SC1_LINE,
+	M6801_IS_LINE // IS3(6801) or ISF(6301Y)
 };
 
 enum
@@ -71,6 +72,7 @@ protected:
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
+	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_disasm_interface overrides
@@ -83,8 +85,8 @@ protected:
 	uint8_t p2_data_r();
 	void p2_data_w(uint8_t data);
 	void p3_ddr_w(uint8_t data);
-	uint8_t p3_data_r();
-	void p3_data_w(uint8_t data);
+	virtual uint8_t p3_data_r();
+	virtual void p3_data_w(uint8_t data);
 	uint8_t p3_csr_r();
 	void p3_csr_w(uint8_t data);
 	void p4_ddr_w(uint8_t data);
@@ -137,7 +139,7 @@ protected:
 	PAIR    m_counter;        /* free running counter */
 	PAIR    m_output_compare; /* output compare       */
 	uint16_t  m_input_capture;  /* input capture        */
-	int     m_p3csr_is3_flag_read;
+	bool m_pending_isf_clear;
 	int     m_port3_latched;
 
 	uint8_t   m_trcsr, m_rmcr, m_rdr, m_tdr, m_rsr, m_tsr;
@@ -162,8 +164,8 @@ protected:
 
 	virtual void m6800_check_irq2() override;
 	virtual void increment_counter(int amount) override;
-	virtual void EAT_CYCLES() override;
-	virtual void CLEANUP_COUNTERS() override;
+	virtual void eat_cycles() override;
+	virtual void cleanup_counters() override;
 
 	virtual void modified_tcsr();
 	virtual void set_timer_event();
@@ -209,7 +211,7 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual void TAKE_TRAP() override;
+	virtual void take_trap() override;
 };
 
 
@@ -269,10 +271,12 @@ protected:
 	virtual void write_port2() override;
 
 	void p2_ddr_2bit_w(uint8_t data);
-	uint8_t p5_data_r();
+	virtual uint8_t p3_data_r() override;
+	virtual void p3_data_w(uint8_t data) override;
+	virtual uint8_t p5_data_r();
 	void p6_ddr_w(uint8_t data);
-	uint8_t p6_data_r();
-	void p6_data_w(uint8_t data);
+	virtual uint8_t p6_data_r();
+	virtual void p6_data_w(uint8_t data);
 	uint8_t p7_data_r();
 	void p7_data_w(uint8_t data);
 
@@ -296,7 +300,7 @@ protected:
 	virtual void modified_counters() override;
 	virtual void increment_counter(int amount) override;
 	virtual void check_timer_event() override;
-	virtual void CLEANUP_COUNTERS() override;
+	virtual void cleanup_counters() override;
 	virtual void set_rmcr(uint8_t data) override;
 
 	devcb_read8::array<2> m_in_portx_func;
@@ -357,8 +361,26 @@ public:
 protected:
 	hd6301y_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_execute_interface overrides
+	virtual void execute_set_input(int inputnum, int state) override;
+
 	void p5_ddr_w(uint8_t data);
+	virtual uint8_t p5_data_r() override;
 	void p5_data_w(uint8_t data);
+	virtual uint8_t p6_data_r() override;
+	virtual void p6_data_w(uint8_t data) override;
+	uint8_t p6_csr_r();
+	void p6_csr_w(uint8_t data);
+
+	virtual void m6800_check_irq2() override;
+	void clear_pending_isf();
+
+	uint8_t m_p6csr;
+	bool m_pending_isf_clear;
 };
 
 

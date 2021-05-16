@@ -5,7 +5,7 @@
 #include "video/x68k_crtc.h"
 #include "screen.h"
 
-//#define VERBOSE 0
+//#define VERBOSE 1
 #include "logmacro.h"
 
 // device type definitions
@@ -228,21 +228,17 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 			if (m_oddscanline)
 			{
 				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
 				hsync_time = screen().time_until_pos(scan, (m_htotal + m_hend) / 2);
 				m_scanline_timer->adjust(hsync_time);
-				if (scan != 0)
+				if ((scan != 0) && (scan < m_vend))
 					screen().update_partial(scan);
 			}
 			else
 			{
 				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
 				hsync_time = screen().time_until_pos(scan, m_hend / 2);
 				m_scanline_timer->adjust(hsync_time);
-				if (scan != 0)
+				if ((scan != 0) && (scan < m_vend))
 					screen().update_partial(scan);
 			}
 		}
@@ -250,11 +246,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 		{
 			if (m_oddscanline)
 			{
-				int scan = screen().vpos();
-				if (scan > m_vend)
-					scan = m_vbegin;
-				else
-					scan++;
+				int scan = screen().vpos() + 1;
 				hsync_time = screen().time_until_pos(scan, m_hbegin / 2);
 				m_scanline_timer->adjust(hsync_time, 1);
 				m_oddscanline = false;
@@ -272,11 +264,9 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 		if (hstate == 1)
 		{
 			int scan = screen().vpos();
-			if (scan > m_vend)
-				scan = 0;
 			hsync_time = screen().time_until_pos(scan, m_hend);
 			m_scanline_timer->adjust(hsync_time);
-			if (scan != 0)
+			if ((scan != 0) && (scan < m_vend))
 				screen().update_partial(scan);
 		}
 		if (hstate == 0)
@@ -407,14 +397,15 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 	case 9:  // CRTC raster IRQ (GPIP6)
 		{
 			data = m_reg[9];
-			attotime irq_time = screen().time_until_pos((data) / m_vmultiple,2);
-
-			if (data != screen().vpos())
+			attotime irq_time = attotime::zero;
+			if ((data / m_vmultiple) != screen().vpos())
+			{
+				irq_time = screen().time_until_pos((data) / m_vmultiple,2);
 				m_rint_callback(1);
-			if (irq_time.as_double() > 0)
-				m_raster_irq_timer->adjust(irq_time, (data) / m_vmultiple);
+			}
+			m_raster_irq_timer->adjust(irq_time, (data) / m_vmultiple);
+			LOG("CRTC: Write to raster IRQ register - %i %i %f\n",data, screen().vpos(), irq_time.as_double());
 		}
-		LOG("CRTC: Write to raster IRQ register - %i\n",data);
 		break;
 	case 20:
 		if (ACCESSING_BITS_0_7)

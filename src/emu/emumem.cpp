@@ -1043,7 +1043,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
-		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
+		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride;
 }
 
 

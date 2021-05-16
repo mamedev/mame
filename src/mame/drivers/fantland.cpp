@@ -48,8 +48,8 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/ym2151.h"
-#include "sound/ym3526.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

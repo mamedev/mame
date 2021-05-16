@@ -200,7 +200,7 @@ RoadBlasters (aka Future Vette):005*
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/atarimo.h"
 #include "speaker.h"
 

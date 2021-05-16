@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Patrick Mackinlay
+
+Whitechapel Computer Works MG-1.
+-->
+<mamelayout version="2">
+	<element name="led_round" defstate="1">
+		<disk state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="led_rect" defstate="1">
+		<rect state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<view name="Graphics">
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="800" />
+		</screen>
+		<element name="led_err" ref="led_round">
+			<bounds x="1000" y="800" width="10" height="10" />
+		</element>
+		<element name="led_fdd" ref="led_rect">
+			<bounds x="970" y="803" width="15" height="5" />
+		</element>
+	</view>
+</mamelayout>

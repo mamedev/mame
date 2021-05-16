@@ -19,6 +19,8 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/i8255.h"
+#include "machine/mc68681.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"
@@ -29,6 +31,7 @@ class tek4107a_state : public driver_device
 public:
 	tek4107a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_vpac(*this, "vpac")
 	{ }
 
 	void tek4109a(machine_config &config);
@@ -39,22 +42,37 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	u8 vpac_r(offs_t offset);
+
 	void tek4107a_io(address_map &map);
 	void tek4107a_mem(address_map &map);
+
+	required_device<crt9007_device> m_vpac;
 };
+
+u8 tek4107a_state::vpac_r(offs_t offset)
+{
+	return m_vpac->read(offset + 0x20);
+}
 
 /* Memory Maps */
 
 void tek4107a_state::tek4107a_mem(address_map &map)
 {
-	map(0x00000, 0xbffff).ram();
-	map(0xc0000, 0xfffff).rom().region("firmware", 0);
+	map(0x00000, 0x7ffff).ram();
+	map(0x80000, 0xbffff).rom().region("firmware", 0);
+	map(0xf0000, 0xfffff).rom().region("firmware", 0x30000);
 }
 
 void tek4107a_state::tek4107a_io(address_map &map)
 {
-	map(0x0080, 0x00bf).w("vpac", FUNC(crt9007_device::write)).umask16(0x00ff);
+	map(0x0000, 0x001f).rw("duart0", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
+	map(0x0000, 0x001f).rw("duart1", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
+	map(0x0080, 0x00bf).r(FUNC(tek4107a_state::vpac_r)).w(m_vpac, FUNC(crt9007_device::write)).umask16(0x00ff);
+	map(0x00ce, 0x00cf).ram();
+	map(0x0100, 0x0107).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 }
 
 /* Input Ports */
@@ -68,7 +86,7 @@ void tek4107a_state::video_start()
 {
 }
 
-uint32_t tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -108,9 +126,19 @@ void tek4107a_state::tek4107a(machine_config &config)
 	screen.set_raw(25200000, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
 
-	crt9007_device &vpac(CRT9007(config, "vpac", 25200000 / 8));
-	vpac.set_screen("screen");
-	vpac.set_character_width(8);
+	scn2681_device &duart0(SCN2681(config, "duart0", 3686400));
+	duart0.irq_cb().set("maincpu", FUNC(i80186_cpu_device::int0_w));
+	duart0.outport_cb().set_inputline("maincpu", INPUT_LINE_NMI).bit(5).invert(); // RxRDYB
+
+	scn2681_device &duart1(SCN2681(config, "duart1", 3686400));
+	duart1.irq_cb().set("maincpu", FUNC(i80186_cpu_device::int2_w));
+
+	I8255(config, "ppi").in_pb_callback().set_constant(0x30);
+
+	CRT9007(config, m_vpac, 25200000 / 8);
+	m_vpac->set_screen("screen");
+	m_vpac->set_character_width(8);
+	m_vpac->int_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 
 	PALETTE(config, "palette").set_entries(64);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_tek4107a);

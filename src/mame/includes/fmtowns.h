@@ -21,7 +21,7 @@
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -412,19 +412,19 @@ private:
 	u8 m_vram_mask_addr;
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
-	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
+	TIMER_CALLBACK_MEMBER(draw_sprites);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
 	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_sprite_start();
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();
 	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
 	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
-	void draw_sprites(const rectangle* rect);
 	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
 	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline);
 	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);

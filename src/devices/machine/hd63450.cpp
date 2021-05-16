@@ -461,6 +461,14 @@ void hd63450_device::single_transfer(int x)
 			m_reg[x].mtc = space.read_word(m_reg[x].bar+4);
 			return;
 		}
+		else if (m_reg[x].ccr & 0x40)
+		{
+			m_reg[x].mar = m_reg[x].bar;
+			m_reg[x].mtc = m_reg[x].btc;
+			m_reg[x].csr |= 0x40;
+			set_irq(x);
+			return;
+		}
 		m_timer[x]->adjust(attotime::never);
 		m_reg[x].csr |= 0xe0;  // channel operation complete, block transfer complete
 		m_reg[x].csr &= ~0x08;  // channel no longer active

@@ -28,7 +28,7 @@
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/es8712.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
