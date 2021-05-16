@@ -5868,10 +5868,10 @@ GAME(  1984, comg204,  0,        sys905,   comg204,  calomega_state, empty_init,
 GAME(  1984, comg208,  0,        sys905,   comg208 , calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_SUPPORTS_SAVE )
 GAME(  1984, comg227,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
 GAME(  1984, comg230,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
-GAME(  1984, comg236,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg236,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )
 GAME(  1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",        MACHINE_SUPPORTS_SAVE )
 GAME(  1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",  MACHINE_SUPPORTS_SAVE )
-GAME(  1985, comg246,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  1985, comg246,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )
 GAMEL( 1985, comg272a, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",          MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
 GAMEL( 1985, comg272b, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
 
