@@ -1421,6 +1421,9 @@ void ymf262::generate(output_data *output, uint32_t numsamples)
 
 ymf278b::ymf278b(ymfm_interface &intf) :
 	m_address(0),
+	m_fm_pos(0),
+	m_load_remaining(0),
+	m_next_status_id(false),
 	m_fm(intf),
 	m_pcm(intf)
 {
@@ -1436,6 +1439,9 @@ void ymf278b::reset()
 	// reset the engines
 	m_fm.reset();
 	m_pcm.reset();
+
+	// next status read will return ID
+	m_next_status_id = true;
 }
 
 
@@ -1446,6 +1452,9 @@ void ymf278b::reset()
 void ymf278b::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
+	state.save_restore(m_fm_pos);
+	state.save_restore(m_load_remaining);
+	state.save_restore(m_next_status_id);
 	m_fm.save_restore(state);
 	m_pcm.save_restore(state);
 }
@@ -1457,7 +1466,33 @@ void ymf278b::save_restore(ymfm_saved_state &state)
 
 uint8_t ymf278b::read_status()
 {
-	return m_fm.status();
+	uint8_t result;
+
+	// first status read after initialization returns a chip ID, which
+	// varies based on the "new" flags, indicating the mode
+	if (m_next_status_id)
+	{
+		if (m_fm.regs().new2flag())
+			result = 0x02;
+		else if (m_fm.regs().newflag())
+			result = 0x00;
+		else
+			result = 0x06;
+		m_next_status_id = false;
+	}
+	else
+	{
+		result = m_fm.status();
+		if (m_fm.intf().ymfm_is_busy())
+			result |= STATUS_BUSY;
+		if (m_load_remaining != 0)
+			result |= STATUS_LD;
+
+		// if new2 flag is not set, we're in OPL2 or OPL3 mode
+		if (!m_fm.regs().new2flag())
+			result &= ~(STATUS_BUSY | STATUS_LD);
+	}
+	return result;
 }
 
 
@@ -1521,7 +1556,18 @@ void ymf278b::write_data(uint8_t data)
 {
 	// write to FM
 	if (bitfield(m_address, 9) == 0)
+	{
+		uint8_t old = m_fm.regs().new2flag();
 		m_fm.write(m_address, data);
+
+		// changing NEW2 from 0->1 causes the next status read to
+		// return the chip ID
+		if (old == 0 && m_fm.regs().new2flag() != 0)
+			m_next_status_id = true;
+	}
+
+	// BUSY goes for 56 clocks on FM writes
+	m_fm.intf().ymfm_set_busy_end(56);
 }
 
 
@@ -1569,6 +1615,14 @@ void ymf278b::write_data_pcm(uint8_t data)
 	// write to FM
 	if (bitfield(m_address, 9) != 0)
 		m_pcm.write(m_address & 0xff, data);
+
+	// writes to the waveform number cause loads to happen for "about 300usec"
+	// which is ~13 samples at the nominal output frequency of 44.1kHz
+	if (m_address >= 0x08 && m_address <= 0x1f)
+		m_load_remaining = 13;
+
+	// BUSY goes for 88 clocks on PCM writes
+	m_fm.intf().ymfm_set_busy_end(88);
 }
 
 
@@ -1658,6 +1712,10 @@ void ymf278b::generate(output_data *output, uint32_t numsamples)
 		// YMF278B output is 16-bit 2s complement serial
 		output->clamp16();
 	}
+
+	// decrement the load waiting count
+	if (m_load_remaining > 0)
+		m_load_remaining -= std::min(m_load_remaining, numsamples);
 }
 
 

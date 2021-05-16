@@ -57,7 +57,9 @@ struct pcm_cache
 	uint32_t pan_right;               // right panning attenuation
 	uint32_t eg_sustain;              // sustain level, shifted up to envelope values
 	uint8_t eg_rate[EG_STATES];       // envelope rate, including KSR
-	uint8_t am_scale;                 // shift value for AM LFO
+	uint8_t lfo_step;                 // stepping value for LFO
+	uint8_t am_depth;                 // scale value for AM LFO
+	uint8_t pm_depth;                 // scale value for PM LFO
 };
 
 

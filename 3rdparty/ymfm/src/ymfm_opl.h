@@ -699,6 +699,9 @@ public:
 	static constexpr uint32_t OUTPUTS = 6;
 	using output_data = ymfm_output<OUTPUTS>;
 
+	static constexpr uint8_t STATUS_BUSY = 0x01;
+	static constexpr uint8_t STATUS_LD = 0x02;
+
 	// constructor
 	ymf278b(ymfm_interface &intf);
 
@@ -732,6 +735,8 @@ protected:
 	// internal state
 	uint16_t m_address;              // address register
 	uint32_t m_fm_pos;               // FM resampling position
+	uint32_t m_load_remaining;       // how many more samples until LD flag clears
+	bool m_next_status_id;           // flag to track which status ID to return
 	fm_engine m_fm;                  // core FM engine
 	pcm_engine m_pcm;                // core PCM engine
 };

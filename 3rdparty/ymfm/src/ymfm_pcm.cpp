@@ -92,9 +92,22 @@ void pcm_registers::cache_channel_data(uint32_t choffs, pcm_cache &cache)
 	else
 		cache.pan_left = cache.pan_right = 96;
 
-	// AM LFO is a right shift, set to maximum if 0
+	// determine the LFO stepping value; this how much to add to a running
+	// x.18 value for the LFO; steps were derived from frequencies in the
+	// manual and come out very close with these values
+	static const uint8_t s_lfo_steps[8] = { 1, 12, 19, 25, 31, 35, 37, 42 };
+	cache.lfo_step = s_lfo_steps[ch_lfo_speed(choffs)];
+
+	// AM LFO depth values, derived from the manual; note each has at most
+	// 2 bits to make the "multiply" easy in hardware
 	static const uint8_t s_am_depth[8] = { 0, 0x14, 0x20, 0x28, 0x30, 0x40, 0x50, 0x80 };
-	cache.am_scale = s_am_depth[ch_am_depth(choffs)];
+	cache.am_depth = s_am_depth[ch_am_depth(choffs)];
+
+	// PM LFO depth values; these are converted from the manual's cents values
+	// into f-numbers; the computations come out quite cleanly so pretty sure
+	// these are correct
+	static const uint8_t s_pm_depth[8] = { 0, 2, 3, 4, 6, 12, 24, 48 };
+	cache.pm_depth = s_pm_depth[ch_vibrato(choffs)];
 
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = ch_sustain_level(choffs);
@@ -141,7 +154,7 @@ uint32_t pcm_registers::effective_rate(uint32_t raw, uint32_t correction)
 		return 63;
 
 	// otherwise add the correction and clamp to range
-	return clamp(raw + correction, 0, 63);
+	return clamp(raw * 4 + correction, 0, 63);
 }
 
 
@@ -248,17 +261,28 @@ bool pcm_channel::prepare()
 void pcm_channel::clock(uint32_t env_counter)
 {
 	// clock the LFO, which is an x.18 value incremented based on the
-	// LFO frequency value
-	static const uint8_t s_lfo_steps[8] = { 1, 12, 19, 25, 31, 35, 37, 42 };
-	m_lfo_counter += s_lfo_steps[m_regs.ch_lfo_speed(m_choffs)];
+	// LFO speed value
+	m_lfo_counter += m_cache.lfo_step;
 
 	// clock the envelope
 	clock_envelope(env_counter);
 
+	// determine the step after applying vibrato
+	uint32_t step = m_cache.step;
+	if (m_cache.pm_depth != 0)
+	{
+		// shift the LFO by 1/4 cycle for PM so that it starts at 0
+		uint32_t lfo_shifted = m_lfo_counter + (1 << 16);
+		int32_t lfo_value = bitfield(lfo_shifted, 10, 7);
+		if (bitfield(lfo_shifted, 17) != 0)
+			lfo_value ^= 0x7f;
+		lfo_value -= 0x40;
+		step += (lfo_value * int32_t(m_cache.pm_depth)) >> 7;
+	}
+
 	// advance the sample step and loop as needed
-	// TODO: apply vibrato
 	m_curpos = m_nextpos;
-	m_nextpos = m_curpos + m_cache.step;
+	m_nextpos = m_curpos + step;
 	if (m_nextpos >= m_endpos)
 		m_nextpos += m_looppos - m_endpos;
 
@@ -288,10 +312,13 @@ void pcm_channel::output(output_data &output) const
 		return;
 
 	// add in LFO AM modulation
-	if (bitfield(m_lfo_counter, 17) == 0)
-		envelope += (bitfield(m_lfo_counter, 10, 7) * m_cache.am_scale) >> 7;
-	else
-		envelope += (bitfield(~m_lfo_counter, 10, 7) * m_cache.am_scale) >> 7;
+	if (m_cache.am_depth != 0)
+	{
+		uint32_t lfo_value = bitfield(m_lfo_counter, 10, 7);
+		if (bitfield(m_lfo_counter, 17) != 0)
+			lfo_value ^= 0x7f;
+		envelope += (lfo_value * m_cache.am_depth) >> 7;
+	}
 
 	// add in the current interpolated total level value, which is a .10
 	// value shifted left by 2
@@ -308,8 +335,8 @@ void pcm_channel::output(output_data &output) const
 	// fetch current sample and add
 	int16_t sample = fetch_sample();
 	uint32_t outnum = m_regs.ch_output_channel(m_choffs) * 2;
-	output.data[outnum + 0] += (lvol * sample) >> 16;
-	output.data[outnum + 1] += (rvol * sample) >> 16;
+	output.data[outnum + 0] += (lvol * sample) >> 15;
+	output.data[outnum + 1] += (rvol * sample) >> 15;
 }
 
 
@@ -503,7 +530,7 @@ void pcm_channel::clock_envelope(uint32_t env_counter)
 			m_env_attenuation = 0x3ff;
 
 		// transition to reverb at -18dB if enabled
-		if (m_env_attenuation >= 0xc0 && m_regs.ch_pseudo_reverb(m_choffs))
+		if (m_env_attenuation >= 0xc0 && m_eg_state < EG_REVERB && m_regs.ch_pseudo_reverb(m_choffs))
 			m_eg_state = EG_REVERB;
 	}
 }
