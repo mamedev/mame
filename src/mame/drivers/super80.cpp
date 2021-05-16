@@ -722,7 +722,9 @@ void super80_state::super80(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(super80_state::quickload_cb));
+	quickload.set_interface("super80_quik");
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -736,6 +738,7 @@ void super80_state::super80(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("DEF");
+	SOFTWARE_LIST(config, "quik_list").set_original("super80_quik").set_filter("DEF");
 }
 
 void super80_state::super80d(machine_config &config)
@@ -745,8 +748,8 @@ void super80_state::super80d(machine_config &config)
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80d));
 
 	// software list
-	config.device_remove("cass_list");
-	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("D");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("super80_cass").set_filter("D");
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("super80_quik").set_filter("D");
 }
 
 void super80_state::super80e(machine_config &config)
@@ -757,8 +760,8 @@ void super80_state::super80e(machine_config &config)
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80e));
 
 	// software list
-	config.device_remove("cass_list");
-	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("E");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("super80_cass").set_filter("E");
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("super80_quik").set_filter("E");
 }
 
 void super80_state::super80m(machine_config &config)
@@ -772,8 +775,8 @@ void super80_state::super80m(machine_config &config)
 	m_screen->screen_vblank().set([this](bool state) { super80_state::screen_vblank_super80m(state); });
 
 	// software list
-	config.device_remove("cass_list");
-	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("M");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("super80_cass").set_filter("M");
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("super80_quik").set_filter("M");
 }
 
 void super80v_state::super80v(machine_config &config)
@@ -825,7 +828,9 @@ void super80v_state::super80v(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80v_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(super80v_state::quickload_cb));
+	quickload.set_interface("super80_quik");
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -854,6 +859,7 @@ void super80v_state::super80v(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("V");
+	SOFTWARE_LIST(config, "quik_list").set_original("super80_quik").set_filter("V");
 	SOFTWARE_LIST(config, "flop_list").set_original("super80_flop");
 }
 
@@ -863,8 +869,8 @@ void super80r_state::super80r(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &super80r_state::super80r_map);
 
 	// software list
-	config.device_remove("cass_list");
-	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("R");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("super80_cass").set_filter("R");
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("super80_quik").set_filter("R");
 }
 
 /**************************** ROMS *****************************************************************/

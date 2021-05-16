@@ -277,6 +277,7 @@ void mbee_state::mbeett_io(address_map &map)
 	map(0x0109, 0x0109).mirror(0xfe00).r(FUNC(mbee_state::speed_high_r));
 	map(0x000a, 0x000a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
 	map(0x010a, 0x010a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
+	map(0x0068, 0x006f).mirror(0xff00).noprw();    // swallow i/o to SCC which was never fitted to production machines
 }
 
 void mbee_state::mbee56_io(address_map &map)
