@@ -277,7 +277,6 @@ void mbee_state::mbeett_io(address_map &map)
 	map(0x0109, 0x0109).mirror(0xfe00).r(FUNC(mbee_state::speed_high_r));
 	map(0x000a, 0x000a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
 	map(0x010a, 0x010a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
-	map(0x0068, 0x006f).mirror(0xff00).rw("scc", FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w));
 }
 
 void mbee_state::mbee56_io(address_map &map)
@@ -849,7 +848,6 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
-	SCC8530(config, "scc", 4000000); // clock unknown
 	config.device_remove("cass_list"); // mbeett is incompatible with the others
 }
 
