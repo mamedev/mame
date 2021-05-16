@@ -605,10 +605,11 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			return image_init_result::FAIL;
 		}
 
-		u8 header[28];
-
 		/* get the header */
+		u8 header[28];
 		image.fread( &header, sizeof(header));
+
+		logerror("SNP PC register = 0x%04x\n", header[26] | (header[27] << 8));
 
 		// write it to ram, and skip roms
 		unsigned char s_byte;
@@ -658,6 +659,8 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			m_maincpu->set_state_int(Z80_IM, header[25]);
 			m_maincpu->set_pc(header[26] | (header[27] << 8));
 		}
+		else
+			m_maincpu->set_pc(0xe000);  // SNP destroys workspace, so do cold start.
 	}
 
 	return image_init_result::PASS;
