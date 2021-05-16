@@ -51,7 +51,7 @@ void y8950_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_b_read - callback to read data for
+//  ymfm_external_read - callback to read data for
 //  the ADPCM-B engine; in this case, from our
 //  default address space
 //-------------------------------------------------
@@ -65,7 +65,7 @@ uint8_t y8950_device::ymfm_external_read(external_type type, uint32_t offset)
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_b_write - callback to write data to
+//  ymfm_external_write - callback to write data to
 //  the ADPCM-B engine; in this case, to our
 //  default address space
 //-------------------------------------------------
@@ -109,6 +109,62 @@ DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ymfm_device_base<ymfm::ymf262>(mconfig, tag, owner, clock, YMF262)
 {
+}
+
+
+
+//*********************************************************
+//  YMF278B DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "YMF278B OPL4")
+
+//-------------------------------------------------
+//  ymf278b_device - constructor
+//-------------------------------------------------
+
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ymf278b>(mconfig, tag, owner, clock, YMF278B),
+	device_rom_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  rom_bank_updated - refresh the stream if the
+//  ROM banking changes
+//-------------------------------------------------
+
+void ymf278b_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
+//  ymfm_external_read - callback to read data for
+//  the ADPCM-B engine; in this case, from our
+//  default address space
+//-------------------------------------------------
+
+uint8_t ymf278b_device::ymfm_external_read(external_type type, uint32_t offset)
+{
+	if (type == EXTERNAL_PCM)
+		return read_byte(offset);
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  ymfm_external_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
+//-------------------------------------------------
+
+void ymf278b_device::ymfm_external_write(external_type type, uint32_t offset, uint8_t data)
+{
+	if (type == EXTERNAL_PCM)
+		return space().write_byte(offset, data);
 }
 
 

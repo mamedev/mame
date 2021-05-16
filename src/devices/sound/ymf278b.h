@@ -1,3 +1,7 @@
+#if 1
+#include "ymopl.h"
+#else
+
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Olivier Galibert, hap
 #ifndef MAME_SOUND_YMF278B_H
@@ -190,3 +194,5 @@ private:
 DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device)
 
 #endif // MAME_SOUND_YMF278B_H
+
+#endif

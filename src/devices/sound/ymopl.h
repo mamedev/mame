@@ -83,6 +83,36 @@ public:
 };
 
 
+// ======================> ymf278b_device
+
+DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device);
+
+class ymf278b_device : public ymfm_device_base<ymfm::ymf278b>, public device_rom_interface<22>
+{
+public:
+	// constructor
+	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// additional register reads
+	uint8_t data_pcm_r() { return update_streams().read_data_pcm(); }
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data(data); }
+	void address_pcm_w(u8 data) { update_streams().write_address_pcm(data); }
+	void data_pcm_w(u8 data) { update_streams().write_data_pcm(data); }
+
+protected:
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
+private:
+	// ADPCM read/write callbacks
+	uint8_t ymfm_external_read(ymfm::ymfm_interface::external_type type, uint32_t address) override;
+	void ymfm_external_write(ymfm::ymfm_interface::external_type type, uint32_t address, uint8_t data) override;
+};
+
+
 // ======================> ym2413_device
 
 DECLARE_DEVICE_TYPE(YM2413, ym2413_device);

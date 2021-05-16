@@ -1421,7 +1421,8 @@ void ymf262::generate(output_data *output, uint32_t numsamples)
 
 ymf278b::ymf278b(ymfm_interface &intf) :
 	m_address(0),
-	m_fm(intf)
+	m_fm(intf),
+	m_pcm(intf)
 {
 }
 
@@ -1434,6 +1435,7 @@ void ymf278b::reset()
 {
 	// reset the engines
 	m_fm.reset();
+	m_pcm.reset();
 }
 
 
@@ -1445,6 +1447,7 @@ void ymf278b::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
 	m_fm.save_restore(state);
+	m_pcm.save_restore(state);
 }
 
 
@@ -1455,6 +1458,20 @@ void ymf278b::save_restore(ymfm_saved_state &state)
 uint8_t ymf278b::read_status()
 {
 	return m_fm.status();
+}
+
+
+//-------------------------------------------------
+//  write_data_pcm - handle a write to the PCM data
+//  register
+//-------------------------------------------------
+
+uint8_t ymf278b::read_data_pcm()
+{
+	// write to FM
+	if (bitfield(m_address, 9) != 0)
+		return m_pcm.read(m_address & 0xff);
+	return 0;
 }
 
 
@@ -1471,8 +1488,8 @@ uint8_t ymf278b::read(uint32_t offset)
 			result = read_status();
 			break;
 
-		case 5: // PCM data port (not supported for now)
-			//result = read_data_pcm();
+		case 5: // PCM data port
+			result = read_data_pcm();
 			break;
 
 		default:
@@ -1503,7 +1520,8 @@ void ymf278b::write_address(uint8_t data)
 void ymf278b::write_data(uint8_t data)
 {
 	// write to FM
-	m_fm.write(m_address, data);
+	if (bitfield(m_address, 9) == 0)
+		m_fm.write(m_address, data);
 }
 
 
@@ -1521,6 +1539,36 @@ void ymf278b::write_address_hi(uint8_t data)
 	// except for register 0x105; assuming YMF278B works the same way?
 	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
 		m_address &= 0xff;
+}
+
+
+//-------------------------------------------------
+//  write_address_pcm - handle a write to the upper
+//  address register
+//-------------------------------------------------
+
+void ymf278b::write_address_pcm(uint8_t data)
+{
+	// just set the address
+	m_address = data | 0x200;
+
+	// YMF262, in compatibility mode, treats the upper bit as masked
+	// except for register 0x105; assuming YMF278B works the same way?
+	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
+		m_address &= 0xff;
+}
+
+
+//-------------------------------------------------
+//  write_data_pcm - handle a write to the PCM data
+//  register
+//-------------------------------------------------
+
+void ymf278b::write_data_pcm(uint8_t data)
+{
+	// write to FM
+	if (bitfield(m_address, 9) != 0)
+		m_pcm.write(m_address & 0xff, data);
 }
 
 
@@ -1549,12 +1597,12 @@ void ymf278b::write(uint32_t offset, uint8_t data)
 			write_data(data);
 			break;
 
-		case 4: // PCM address port (not supported for now)
-			//write_address_pcm(data);
+		case 4: // PCM address port
+			write_address_pcm(data);
 			break;
 
-		case 5: // PCM address port (not supported for now)
-			//write_data_pcm(data);
+		case 5: // PCM address port
+			write_data_pcm(data);
 			break;
 
 		default:
@@ -1570,13 +1618,42 @@ void ymf278b::write(uint32_t offset, uint8_t data)
 
 void ymf278b::generate(output_data *output, uint32_t numsamples)
 {
-	for (uint32_t samp = 0; samp < numsamples; samp++)
+	static const int16_t s_mix_scale[8] = { 0x7fa, 0x5a4, 0x3fd, 0x2d2, 0x1fe, 0x169, 0xff, 0 };
+	int32_t const pcm_l = s_mix_scale[m_pcm.regs().mix_pcm_l()];
+	int32_t const pcm_r = s_mix_scale[m_pcm.regs().mix_pcm_r()];
+	int32_t const fm_l = s_mix_scale[m_pcm.regs().mix_fm_l()];
+	int32_t const fm_r = s_mix_scale[m_pcm.regs().mix_fm_r()];
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
 		// clock the system
+		m_fm_pos += FM_STEP;
+		if (bitfield(m_fm_pos, 24))
+		{
+			m_fm.clock(fm_engine::ALL_CHANNELS);
+			m_fm_pos &= 0xffffff;
+		}
 		m_fm.clock(fm_engine::ALL_CHANNELS);
+		m_pcm.clock(pcm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YMF278B need verification
-		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+		fm_engine::output_data fmout;
+		m_fm.output(fmout.clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+
+		// update the PCM content
+		pcm_engine::output_data pcmout;
+		m_pcm.output(pcmout.clear(), pcm_engine::ALL_CHANNELS);
+
+		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
+		output->data[0] = (fmout.data[0] * fm_l + pcmout.data[0] * pcm_l) >> 11;
+		output->data[1] = (fmout.data[1] * fm_r + pcmout.data[1] * pcm_r) >> 11;
+
+		// DO0 output: FM channels 2+3 only
+		output->data[2] = fmout.data[2];
+		output->data[3] = fmout.data[3];
+
+		// DO1 output: wavetable channels 2+3 only
+		output->data[4] = pcmout.data[2];
+		output->data[5] = pcmout.data[3];
 
 		// YMF278B output is 16-bit 2s complement serial
 		output->clamp16();

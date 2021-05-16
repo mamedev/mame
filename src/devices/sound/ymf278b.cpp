@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "ymf278b.h"
 
+#if 0
 #include <algorithm>
 
 #define VERBOSE 0
@@ -981,3 +982,5 @@ void ymf278b_device::device_post_load()
 	ymfm::ymfm_saved_state state(m_save_blob, false);
 	m_fm.save_restore(state);
 }
+#endif
+

@@ -55,10 +55,11 @@ public:
 	static constexpr uint32_t GLOBAL_FM_CHANNEL_MASK = 0xffffffff;
 	static constexpr uint32_t GLOBAL_ADPCM_A_CHANNEL_MASK = 0xffffffff;
 	static constexpr uint32_t GLOBAL_ADPCM_B_CHANNEL_MASK = 0xffffffff;
+	static constexpr uint32_t GLOBAL_PCM_CHANNEL_MASK = 0xffffffff;
 
 	// types of logging
 	static constexpr bool LOG_FM_WRITES = false;
-	static constexpr bool LOG_KEYON_EVENTS = false;
+	static constexpr bool LOG_KEYON_EVENTS = true;
 	static constexpr bool LOG_UNEXPECTED_READ_WRITES = false;
 
 	// helpers to write based on the log type
