@@ -7921,7 +7921,7 @@ has been replaced with an all-zero block. -->
 		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Asterix Operation Getafix (UK) [Cocktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c946effa" sha1="4498732a6b5077b791ad7f4cdb998a938fda3e67" status="baddump"/>
+				<rom name="Asterix Operation Getafix (UK) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c946effa" sha1="4498732a6b5077b791ad7f4cdb998a938fda3e67" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7935,7 +7935,7 @@ has been replaced with an all-zero block. -->
 		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Asterix El Golpe del Menhir (Spain) [Cocktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9ababc1e" sha1="e202017f9ad9bd6e38e1c2c312fd926dcd94ae2c" status="baddump"/>
+				<rom name="Asterix El Golpe del Menhir (Spain) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9ababc1e" sha1="e202017f9ad9bd6e38e1c2c312fd926dcd94ae2c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
