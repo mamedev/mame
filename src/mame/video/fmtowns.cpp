@@ -981,9 +981,6 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 	const rectangle *rect = &m_video.towns_crtc_layerscr[1];
 	int linesize = m_video.towns_crtc_reg[24] * 4;
 
-	if(!(m_video.towns_sprite_reg[1] & 0x80))
-		return;
-
 	// TODO: I'm not confident about this but based on the behavior of aburner and rbisland, it's probably in the ballpark
 	// aburner writes the backgound color from 0 to 0x400 in both pages while rbisland from 0 to 0x800 (What's the difference?)
 	// it's only written when the color changes so the sprite engine has to be prevented from writing there
@@ -1472,6 +1469,9 @@ void towns_state::draw_text_layer()
 
 void towns_state::towns_sprite_start()
 {
+	if(!(m_video.towns_sprite_reg[1] & 0x80))
+		return;
+
 	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	m_video.towns_sprite_flag = 1;  // we are now drawing
 	m_video.sprite_timer->adjust(m_maincpu->cycles_to_attotime(128 * (1025-sprite_limit)));
