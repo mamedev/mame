@@ -2609,6 +2609,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/samdac.h",
 		MAME_DIR .. "src/devices/bus/centronics/smartboard.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/smartboard.h",
+		MAME_DIR .. "src/devices/bus/centronics/etibuffer.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/etibuffer.h",
 	}
 
 	dependency {

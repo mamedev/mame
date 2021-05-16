@@ -136,6 +136,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "samdac.h"
 #include "chessmec.h"
 #include "smartboard.h"
+#include "etibuffer.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -151,4 +152,5 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("samdac", CENTRONICS_SAMDAC);
 	device.option_add("chessmec", CENTRONICS_CHESSMEC);
 	device.option_add("smartboard", CENTRONICS_SMARTBOARD);
+	device.option_add("etibuffer", ETIPRINTBUFFER);
 }
