@@ -11637,6 +11637,9 @@ dambustr                        // (c) 1981 South West Research
 dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
 
+@source:dangbar.cpp
+dangbar                         //
+
 @source:darius.cpp
 darius                          // A96 (c) 1986 Taito Corporation Japan (World)
 dariuse                         // A96 (c) 1986 Taito Corporation (Japan)
