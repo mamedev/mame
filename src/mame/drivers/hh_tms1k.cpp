@@ -129,7 +129,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part  
+ *M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:
 

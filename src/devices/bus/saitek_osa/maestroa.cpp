@@ -15,6 +15,7 @@ Hardware notes:
 - 3 more sockets, one for KSO expansion ROM, 2 unused
 
 The PCB is not compatible for upgrading to newer Maestro versions.
+CPU is a 4MHz part. The higher speed Maestro versions overclock it.
 
 TODO:
 - does not work if cpu speed is 4MHz

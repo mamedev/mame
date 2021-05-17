@@ -4,8 +4,7 @@
 
 Saitek OSA Expansion Slot
 
-TODO:
-- not sure what RTS does
+Used by Saitek(SciSys) chess computers Leonardo, Galileo, Renaissance.
 
 ***************************************************************************/
 
