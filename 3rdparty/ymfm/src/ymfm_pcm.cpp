@@ -180,7 +180,6 @@ pcm_channel::pcm_channel(pcm_engine &owner, uint32_t choffs) :
 	m_total_level(0x7f << 10),
 	m_format(0),
 	m_key_state(0),
-	m_reload_wavetable(false),
 	m_regs(owner.regs()),
 	m_owner(owner)
 {
@@ -193,10 +192,17 @@ pcm_channel::pcm_channel(pcm_engine &owner, uint32_t choffs) :
 
 void pcm_channel::reset()
 {
-	m_env_attenuation = 0x3ff;
+	m_baseaddr = 0;
+	m_endpos = 0;
+	m_looppos = 0;
+	m_curpos = 0;
+	m_nextpos = 0;
+	m_lfo_counter = 0;
 	m_eg_state = EG_RELEASE;
+	m_env_attenuation = 0x3ff;
+	m_total_level = 0x7f << 10;
+	m_format = 0;
 	m_key_state = 0;
-	m_reload_wavetable = true;
 }
 
 
@@ -206,14 +212,17 @@ void pcm_channel::reset()
 
 void pcm_channel::save_restore(ymfm_saved_state &state)
 {
+	state.save_restore(m_baseaddr);
+	state.save_restore(m_endpos);
+	state.save_restore(m_looppos);
 	state.save_restore(m_curpos);
 	state.save_restore(m_nextpos);
 	state.save_restore(m_lfo_counter);
 	state.save_restore(m_eg_state);
 	state.save_restore(m_env_attenuation);
 	state.save_restore(m_total_level);
+	state.save_restore(m_format);
 	state.save_restore(m_key_state);
-	m_reload_wavetable = true;
 }
 
 
@@ -223,11 +232,6 @@ void pcm_channel::save_restore(ymfm_saved_state &state)
 
 bool pcm_channel::prepare()
 {
-	// reload the wavetable
-	if (m_reload_wavetable)
-		load_wavetable();
-	m_reload_wavetable = false;
-
 	// cache the data
 	m_regs.cache_channel_data(m_choffs, m_cache);
 
@@ -358,7 +362,7 @@ void pcm_channel::keyonoff(bool on)
 			int8_t(m_regs.ch_octave(m_choffs) << 4) >> 4,
 			m_regs.ch_fnumber(m_choffs),
 			m_regs.ch_total_level(m_choffs),
-			m_regs.ch_level_direct(m_choffs) ? 'T' : 'V',
+			m_regs.ch_level_direct(m_choffs) ? '!' : '/',
 			m_regs.ch_attack_rate(m_choffs),
 			m_regs.ch_decay_rate(m_choffs),
 			m_regs.ch_sustain_rate(m_choffs),
@@ -424,15 +428,11 @@ void pcm_channel::load_wavetable()
 	m_endpos = -m_endpos << 16;
 
 	// remaining data values set registers
-	m_regs.write(0x80 + m_choffs, read_pcm(wavheader + 7));
-	m_regs.write(0x98 + m_choffs, read_pcm(wavheader + 8));
-	m_regs.write(0xb0 + m_choffs, read_pcm(wavheader + 9));
-	m_regs.write(0xc8 + m_choffs, read_pcm(wavheader + 10));
-	m_regs.write(0xe0 + m_choffs, read_pcm(wavheader + 11));
-
-	// if the key was on, retrigger the sample
-	if ((m_key_state & KEY_ON) != 0)
-		m_key_state = KEY_PENDING | KEY_PENDING_ON;
+	m_owner.write(0x80 + m_choffs, read_pcm(wavheader + 7));
+	m_owner.write(0x98 + m_choffs, read_pcm(wavheader + 8));
+	m_owner.write(0xb0 + m_choffs, read_pcm(wavheader + 9));
+	m_owner.write(0xc8 + m_choffs, read_pcm(wavheader + 10));
+	m_owner.write(0xe0 + m_choffs, read_pcm(wavheader + 11));
 }
 
 

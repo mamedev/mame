@@ -248,7 +248,6 @@ private:
 	uint32_t m_total_level;               // total level with as 7.10 for interp
 	uint8_t m_format;                     // sample format
 	uint8_t m_key_state;                  // current key state
-	uint8_t m_reload_wavetable;           // wavetable reload pending
 	pcm_cache m_cache;                    // cached data
 	pcm_registers &m_regs;                // reference to registers
 	pcm_engine &m_owner;                  // reference to our owner
