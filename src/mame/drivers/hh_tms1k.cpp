@@ -113,6 +113,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
+ *M34137   TMS1100?  1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -129,7 +130,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
- *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part  
+ *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
  *M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:

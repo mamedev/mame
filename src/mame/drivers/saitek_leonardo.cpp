@@ -102,6 +102,7 @@ private:
 	u8 unk_r();
 	void unk_w(u8 data);
 	void exp_stb_w(int state);
+	void exp_rts_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -168,6 +169,12 @@ void leo_state::exp_stb_w(int state)
 {
 	// STB-P to P5 IS
 	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void leo_state::exp_rts_w(int state)
+{
+	// ?
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -318,8 +325,6 @@ void leo_state::leo(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
-	config.set_perfect_quantum(m_maincpu);
-
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
@@ -335,6 +340,7 @@ void leo_state::leo(machine_config &config)
 	// expansion module
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(FUNC(leo_state::exp_stb_w));
+	m_expansion->rts_handler().set(FUNC(leo_state::exp_rts_w));
 }
 
 void leo_state::leoa(machine_config &config)
