@@ -113,11 +113,11 @@ void ym2608_device::rom_bank_updated()
 //  the ADPCM-A/B engines
 //-------------------------------------------------
 
-uint8_t ym2608_device::ymfm_external_read(external_type type, uint32_t offset)
+uint8_t ym2608_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	if (type == EXTERNAL_ADPCM_A)
+	if (type == ymfm::ACCESS_ADPCM_A)
 		return m_internal->as_u8(offset % m_internal->bytes());
-	else if (type == EXTERNAL_ADPCM_B)
+	else if (type == ymfm::ACCESS_ADPCM_B)
 		return space(0).read_byte(offset);
 	return 0;
 }
@@ -129,9 +129,9 @@ uint8_t ym2608_device::ymfm_external_read(external_type type, uint32_t offset)
 //  default address space
 //-------------------------------------------------
 
-void ym2608_device::ymfm_external_write(external_type type, uint32_t offset, uint8_t data)
+void ym2608_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
 {
-	if (type == EXTERNAL_ADPCM_B)
+	if (type == ymfm::ACCESS_ADPCM_B)
 		return space(0).write_byte(offset, data);
 }
 
@@ -205,11 +205,11 @@ void ym2610_device_base<ChipClass>::device_start()
 //-------------------------------------------------
 
 template<typename ChipClass>
-uint8_t ym2610_device_base<ChipClass>::ymfm_external_read(ymfm::ymfm_interface::external_type type, uint32_t offset)
+uint8_t ym2610_device_base<ChipClass>::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	if (type == ymfm::ymfm_interface::EXTERNAL_ADPCM_A)
+	if (type == ymfm::ACCESS_ADPCM_A)
 		return space(0).read_byte(offset);
-	else if (type == ymfm::ymfm_interface::EXTERNAL_ADPCM_B)
+	else if (type == ymfm::ACCESS_ADPCM_B)
 		return space(1).read_byte(offset);
 	return 0;
 }

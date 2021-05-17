@@ -50,8 +50,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	uint8_t ymfm_external_read(ymfm::ymfm_interface::external_type type, uint32_t address) override;
-	void ymfm_external_write(ymfm::ymfm_interface::external_type type, uint32_t address, uint8_t data) override;
+	uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
+	void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override;
 };
 
 
@@ -108,8 +108,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	uint8_t ymfm_external_read(ymfm::ymfm_interface::external_type type, uint32_t address) override;
-	void ymfm_external_write(ymfm::ymfm_interface::external_type type, uint32_t address, uint8_t data) override;
+	uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
+	void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override;
 };
 
 

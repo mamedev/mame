@@ -56,9 +56,9 @@ void y8950_device::rom_bank_updated()
 //  default address space
 //-------------------------------------------------
 
-uint8_t y8950_device::ymfm_external_read(external_type type, uint32_t offset)
+uint8_t y8950_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	if (type == EXTERNAL_ADPCM_B)
+	if (type == ymfm::ACCESS_ADPCM_B)
 		return read_byte(offset);
 	return parent::ymfm_external_read(type, offset);
 }
@@ -70,9 +70,9 @@ uint8_t y8950_device::ymfm_external_read(external_type type, uint32_t offset)
 //  default address space
 //-------------------------------------------------
 
-void y8950_device::ymfm_external_write(external_type type, uint32_t offset, uint8_t data)
+void y8950_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
 {
-	if (type == EXTERNAL_ADPCM_B)
+	if (type == ymfm::ACCESS_ADPCM_B)
 		return space().write_byte(offset, data);
 	parent::ymfm_external_write(type, offset, data);
 }
@@ -147,9 +147,9 @@ void ymf278b_device::rom_bank_updated()
 //  default address space
 //-------------------------------------------------
 
-uint8_t ymf278b_device::ymfm_external_read(external_type type, uint32_t offset)
+uint8_t ymf278b_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	if (type == EXTERNAL_PCM)
+	if (type == ymfm::ACCESS_PCM)
 		return read_byte(offset);
 	return 0;
 }
@@ -161,9 +161,9 @@ uint8_t ymf278b_device::ymfm_external_read(external_type type, uint32_t offset)
 //  default address space
 //-------------------------------------------------
 
-void ymf278b_device::ymfm_external_write(external_type type, uint32_t offset, uint8_t data)
+void ymf278b_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
 {
-	if (type == EXTERNAL_PCM)
+	if (type == ymfm::ACCESS_PCM)
 		return space().write_byte(offset, data);
 }
 

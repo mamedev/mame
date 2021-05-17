@@ -484,7 +484,7 @@ void ym2151::write_data(uint8_t data)
 	if (m_address == 0x1b)
 	{
 		// writes to register 0x1B send the upper 2 bits to the output lines
-		m_fm.intf().ymfm_external_write(ymfm_interface::EXTERNAL_IO, 0, data >> 6);
+		m_fm.intf().ymfm_external_write(ACCESS_IO, 0, data >> 6);
 	}
 
 	// mark busy for a bit

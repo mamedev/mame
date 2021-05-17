@@ -258,6 +258,7 @@ inline int16_t roundtrip_fp(int32_t value)
 //  HELPER CLASSES
 //*********************************************************
 
+// various envelope states
 enum envelope_state : uint32_t
 {
 	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
@@ -269,6 +270,21 @@ enum envelope_state : uint32_t
 	EG_STATES = 6
 };
 
+// external I/O access classes
+enum access_class : uint32_t
+{
+	ACCESS_IO = 0,
+	ACCESS_ADPCM_A,
+	ACCESS_ADPCM_B,
+	ACCESS_PCM,
+	ACCESS_CLASSES
+};
+
+
+
+//*********************************************************
+//  HELPER CLASSES
+//*********************************************************
 
 // ======================> ymfm_output
 
@@ -446,15 +462,6 @@ public:
 	// I/O functions
 	//
 
-	enum external_type : uint32_t
-	{
-		EXTERNAL_IO = 0,
-		EXTERNAL_ADPCM_A,
-		EXTERNAL_ADPCM_B,
-		EXTERNAL_PCM,
-		EXTERNAL_TYPES
-	};
-
 	// the chip implementation calls this when the state of the IRQ signal has
 	// changed due to a status change; our responsibility is to respond as
 	// needed to the change in IRQ state, signaling any consumers
@@ -462,11 +469,11 @@ public:
 
 	// the chip implementation calls this whenever data is read from outside
 	// of the chip; our responsibility is to provide the data requested
-	virtual uint8_t ymfm_external_read(external_type type, uint32_t address) { return 0; }
+	virtual uint8_t ymfm_external_read(access_class type, uint32_t address) { return 0; }
 
 	// the chip implementation calls this whenever data is written outside
 	// of the chip; our responsibility is to pass the written data on to any consumers
-	virtual void ymfm_external_write(external_type type, uint32_t address, uint8_t data) { }
+	virtual void ymfm_external_write(access_class type, uint32_t address, uint8_t data) { }
 
 protected:
 	// pointer to engine callbacks -- this is set directly by the engine at

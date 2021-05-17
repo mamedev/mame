@@ -125,16 +125,16 @@ protected:
 
 	// the chip implementation calls this whenever data is read from outside
 	// of the chip; our responsibility is to provide the data requested
-	virtual uint8_t ymfm_external_read(ymfm_interface::external_type type, uint32_t address) override
+	virtual uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override
 	{
-		return (type != EXTERNAL_IO || m_io_read[address & 1].isnull()) ? 0 : m_io_read[address & 1]();
+		return (type != ymfm::ACCESS_IO || m_io_read[address & 1].isnull()) ? 0 : m_io_read[address & 1]();
 	}
 
 	// the chip implementation calls this whenever data is written outside
 	// of the chip; our responsibility is to pass the written data on to any consumers
-	virtual void ymfm_external_write(ymfm_interface::external_type type, uint32_t address, uint8_t data) override
+	virtual void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override
 	{
-		if (type == EXTERNAL_IO && !m_io_write[address & 1].isnull())
+		if (type == ymfm::ACCESS_IO && !m_io_write[address & 1].isnull())
 			m_io_write[address & 1](data);
 	}
 

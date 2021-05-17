@@ -369,9 +369,9 @@ void pcm_channel::keyonoff(bool on)
 			debug::log_keyon(" RC=%X", m_regs.ch_rate_correction(m_choffs));
 
 		if (m_regs.ch_pseudo_reverb(m_choffs) != 0)
-			debug::log_keyon(" REV");
+			debug::log_keyon(" %s", "REV");
 		if (m_regs.ch_damp(m_choffs) != 0)
-			debug::log_keyon(" DAMP");
+			debug::log_keyon(" %s", "DAMP");
 
 		if (m_regs.ch_vibrato(m_choffs) != 0 || m_regs.ch_am_depth(m_choffs) != 0)
 		{
@@ -381,7 +381,7 @@ void pcm_channel::keyonoff(bool on)
 				debug::log_keyon(" AM=%d", m_regs.ch_am_depth(m_choffs));
 			debug::log_keyon(" LFO=%d", m_regs.ch_lfo_speed(m_choffs));
 		}
-		debug::log_keyon("\n");
+		debug::log_keyon("%s", "\n");
 	}
 }
 
@@ -443,7 +443,7 @@ void pcm_channel::load_wavetable()
 
 uint8_t pcm_channel::read_pcm(uint32_t address) const
 {
-	return m_owner.intf().ymfm_external_read(ymfm_interface::EXTERNAL_PCM, address);
+	return m_owner.intf().ymfm_external_read(ACCESS_PCM, address);
 }
 
 
@@ -675,7 +675,7 @@ uint8_t pcm_engine::read(uint32_t regnum)
 {
 	// handle reads from the data register
 	if (regnum == 0x06 && m_regs.memory_access_mode() != 0)
-		return m_intf.ymfm_external_read(ymfm_interface::EXTERNAL_PCM, m_regs.memory_address_autoinc());
+		return m_intf.ymfm_external_read(ACCESS_PCM, m_regs.memory_address_autoinc());
 
 	return m_regs.read(regnum);
 }
@@ -690,7 +690,7 @@ void pcm_engine::write(uint32_t regnum, uint8_t data)
 	// handle reads to the data register
 	if (regnum == 0x06 && m_regs.memory_access_mode() != 0)
 	{
-		m_intf.ymfm_external_write(ymfm_interface::EXTERNAL_PCM, m_regs.memory_address_autoinc(), data);
+		m_intf.ymfm_external_write(ACCESS_PCM, m_regs.memory_address_autoinc(), data);
 		return;
 	}
 
