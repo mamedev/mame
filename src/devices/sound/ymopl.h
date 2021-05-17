@@ -89,6 +89,8 @@ DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device);
 
 class ymf278b_device : public ymfm_device_base<ymfm::ymf278b>, public device_rom_interface<22>
 {
+	using parent = ymfm_device_base<ymfm::ymf278b>;
+
 public:
 	// constructor
 	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -105,6 +107,9 @@ public:
 protected:
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
+
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
 	// ADPCM read/write callbacks
