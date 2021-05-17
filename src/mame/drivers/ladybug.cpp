@@ -146,12 +146,9 @@ void dorodon_state::decrypted_opcodes_map(address_map &map)
 void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 {
 	// LS138 @ J4
-	map(0x0000, 0x1fff).rom();	// 2764 at R4
-	map(0x2000, 0x3fff).rom();	// 2764 at N4
-	map(0x4000, 0x5fff).rom();	// 2764 at M4
+	map(0x0000, 0x5fff).rom();	// 2764s at R4, N4, and M4
 	// LS138 @ J4 and LS139 @ H4
-	map(0x6000, 0x67ff).ram();  // 6116 @ K3, also clk on PAL K2 (16R6, U001)
-	map(0x6800, 0x6fff).ram();  // 6116 @ M3
+	map(0x6000, 0x6fff).ram();  // 6116s @ K3 & M3, also connected to clk on PAL K2 (16R6, U001)
 	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w)); // pin 29 on ribbon 
 	//map(0x77ff, 0x7fff);	// LS139 @ H4 pin7 is NC
 
@@ -176,9 +173,7 @@ void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 void mrsdyna_state::mrsdyna_cpu2_map(address_map &map)
 {
 	// LS138 @ P7
-	map(0x0000, 0x1fff).rom(); // 2764 at H6
-	map(0x2000, 0x3fff).rom(); // 2764 at J6
-	map(0x4000, 0x5fff).rom(); // 2764 at L6
+	map(0x0000, 0x5fff).rom(); // 2764s at H6,J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
 	map(0x8000, 0x8000).mirror(0x1fff).readonly().share("sound_low"); // LS374 @ P6
 	map(0xa000, 0xa000).mirror(0x1fff).readonly().share("sound_high"); // LS374 @ R6
@@ -193,9 +188,7 @@ void mrsdyna_state::mrsdyna_cpu2_map(address_map &map)
 void sraider_state::sraider_cpu2_map(address_map &map)
 {
 	// LS138 @ P7
-	map(0x0000, 0x1fff).rom(); // 2764 at H6
-	map(0x2000, 0x3fff).rom(); // 2764 at J6
-	map(0x4000, 0x5fff).rom(); // 2764 at L6
+	map(0x0000, 0x5fff).rom(); // 2764s at H6, J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
 	map(0x8000, 0x8000).mirror(0x1fff).readonly().share("sound_low"); // LS374 @ P6
 	map(0xa000, 0xa000).mirror(0x1fff).readonly().share("sound_high"); // LS374 @ R6
@@ -925,8 +918,8 @@ void sraider_state::sraider(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sraider);
 	PALETTE(config, m_palette, FUNC(sraider_state::sraider_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
 
-	ZEROHOUR_STARS(config, m_stars, 0);
 	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
+	ZEROHOUR_STARS(config, m_stars, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -937,6 +930,7 @@ void sraider_state::sraider(machine_config &config)
 	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
+
 
 /***************************************************************************
 
@@ -1168,6 +1162,7 @@ ROM_START( sraider )
 	ROM_LOAD( "srpr10-2.l3",  0x0020, 0x0020, CRC(88b67e70) SHA1(e21ee2939e96dffee101bd92c62ed975b6b64001) )
 	ROM_LOAD( "srpr10-3.c1",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
+
 
 void dorodon_state::init_dorodon()
 {
