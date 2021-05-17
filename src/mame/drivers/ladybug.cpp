@@ -156,8 +156,8 @@ void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 	// LS138 @ N3 (bottom 3 bits)
 	// (all of these are read/write)
 	map(0x8005, 0x8005).mirror(0x1ff8).r(FUNC(mrsdyna_state::mrsdyna_protection_r));  // OE on PAL @ K2 (16R6, U001) (100x xxxx xxxx x101)
-	map(0x8006, 0x8006).mirror(0x1ff8).writeonly().share("sound_low");  // LS374 @ P6
-	map(0x8007, 0x8007).mirror(0x1ff8).writeonly().share("sound_high"); // LS374 @ R6
+	map(0x8006, 0x8006).mirror(0x1ff8).w("soundlatch_low", FUNC(latch8_device::write)); // LS374 @ P6
+	map(0x8007, 0x8007).mirror(0x1ff8).w("soundlatch_high", FUNC(latch8_device::write)); // LS374 @ R6
 	map(0x8000, 0x8000).mirror(0x1ff8).portr("IN0");
 	map(0x8001, 0x8001).mirror(0x1ff8).portr("IN1");
 	map(0x8002, 0x8002).mirror(0x1ff8).portr("DSW0");
@@ -175,8 +175,8 @@ void mrsdyna_state::mrsdyna_cpu2_map(address_map &map)
 	// LS138 @ P7
 	map(0x0000, 0x5fff).rom(); // 2764s at H6,J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
-	map(0x8000, 0x8000).mirror(0x1fff).readonly().share("sound_low"); // LS374 @ P6
-	map(0xa000, 0xa000).mirror(0x1fff).readonly().share("sound_high"); // LS374 @ R6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
 	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(mrsdyna_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
 	// LS138 @ P7 (nY7) and LS139 @ H4
 	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
@@ -190,8 +190,8 @@ void sraider_state::sraider_cpu2_map(address_map &map)
 	// LS138 @ P7
 	map(0x0000, 0x5fff).rom(); // 2764s at H6, J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
-	map(0x8000, 0x8000).mirror(0x1fff).readonly().share("sound_low"); // LS374 @ P6
-	map(0xa000, 0xa000).mirror(0x1fff).readonly().share("sound_high"); // LS374 @ R6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
 	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(sraider_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
 	// LS138 @ P7 (nY7) and LS139 @ H4
 	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
@@ -869,6 +869,9 @@ void mrsdyna_state::mrsdyna(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu1_map);
 	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
 
+	LATCH8(config, "soundlatch_low");
+	LATCH8(config, "soundlatch_high");
+
 	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
 	sub.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu2_map);
 	sub.set_addrmap(AS_IO, &mrsdyna_state::mrsdyna_cpu2_io_map);
@@ -902,6 +905,9 @@ void sraider_state::sraider(machine_config &config)
 	z80_device &maincpu(Z80(config, "maincpu", 4000000));   /* 4 MHz */
 	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::mrsdyna_cpu1_map);
 	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
+
+	LATCH8(config, "soundlatch_low");
+	LATCH8(config, "soundlatch_high");
 
 	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
 	sub.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu2_map);
