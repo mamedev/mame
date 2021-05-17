@@ -57,6 +57,7 @@ public:
 
 	void init_comg079();
 	void init_comg080();
+	void init_comg145();
 	void init_comg176();
 	void init_any();
 
