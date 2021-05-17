@@ -1146,7 +1146,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	LOGCOMP("Initiating command %02x\n", val);
 
-	if (intrq) {
+	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
