@@ -146,11 +146,6 @@ static INPUT_PORTS_START( coco3_keyboard )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, coco3_state, coco_state::keyboard_changed, 0) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-
-	PORT_START("screen_config")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
-	PORT_CONFSETTING(    0x00, "Composite" )
-	PORT_CONFSETTING(    0x01, "RGB" )
 INPUT_PORTS_END
 
 
@@ -223,6 +218,13 @@ INPUT_PORTS_END
 //  INPUT_PORTS( coco3 )
 //-------------------------------------------------
 
+static INPUT_PORTS_START( screen_config )
+	PORT_START("screen_config")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Composite" )
+	PORT_CONFSETTING(    0x01, "RGB" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco3_keyboard )
 	PORT_INCLUDE( coco3_joystick )
@@ -231,6 +233,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
+	PORT_INCLUDE( screen_config )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco3dw )
@@ -241,6 +244,7 @@ static INPUT_PORTS_START( coco3dw )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport_dw )
+	PORT_INCLUDE( screen_config )
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( rs_printer )
