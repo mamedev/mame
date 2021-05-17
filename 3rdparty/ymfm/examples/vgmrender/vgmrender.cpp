@@ -64,6 +64,7 @@ enum chip_type
 	CHIP_Y8950,
 	CHIP_YM3812,
 	CHIP_YMF262,
+	CHIP_YMF278B,
 	CHIP_TYPES
 };
 
@@ -172,9 +173,9 @@ public:
 		if (!m_queue.empty())
 		{
 			auto front = m_queue.front();
-			addr1 = 0 + 2 * ((front.first >> 8) & 1);
+			addr1 = 0 + 2 * ((front.first >> 8) & 3);
 			data1 = front.first & 0xff;
-			addr2 = (m_type == CHIP_YM2149) ? 2 : (1 + 2 * ((front.first >> 8) & 1));
+			addr2 = addr1 + ((m_type == CHIP_YM2149) ? 2 : 1);
 			data2 = front.second;
 			m_queue.erase(m_queue.begin());
 		}
@@ -243,6 +244,11 @@ public:
 			int32_t out2 = m_output.data[2 % ChipType::OUTPUTS];
 			*buffer++ += out0 + out2;
 			*buffer++ += out1 + out2;
+		}
+		else if (m_type == CHIP_YMF278B)
+		{
+			*buffer++ += m_output.data[4];
+			*buffer++ += m_output.data[5];
 		}
 		else if (ChipType::OUTPUTS == 1)
 		{
@@ -475,7 +481,7 @@ uint32_t parse_header(std::vector<uint8_t> &buffer)
 		return data_start;
 	clock = parse_uint32(buffer, offset);
 	if (version >= 0x151 && clock != 0)
-		fprintf(stderr, "Warning: clock for YMF278B specified, but not supported\n");
+		add_chips<ymfm::ymf278b>(clock, CHIP_YMF278B, "YMF278B");
 
 	// +64: YMF271 clock
 	if (offset + 4 > data_start)
@@ -727,15 +733,20 @@ void write_chip(chip_type type, uint8_t index, uint32_t reg, uint8_t data)
 
 
 //-------------------------------------------------
-//  write_chip_hi - handle an upper-address write
-//  to the given chip and index
+//  add_rom_data - add data to the given chip
+//  type in the given access class
 //-------------------------------------------------
 
-void write_chip_hi(chip_type type, uint8_t index, uint32_t reg, uint8_t data)
+void add_rom_data(chip_type type, ymfm::access_class access, std::vector<uint8_t> &buffer, uint32_t &localoffset, uint32_t size)
 {
-	vgm_chip_base *chip = find_chip(type, index);
-	if (chip != nullptr)
-		chip->write(reg | 0x100, data);
+	uint32_t length = parse_uint32(buffer, localoffset);
+	uint32_t start = parse_uint32(buffer, localoffset);
+	for (int index = 0; index < 2; index++)
+	{
+		vgm_chip_base *chip = find_chip(type, index);
+		if (chip != nullptr)
+			chip->write_data(access, start, size, &buffer[localoffset]);
+	}
 }
 
 
@@ -774,7 +785,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			// YM2612 port 1, write value dd to register aa
 			case 0x53:
 			case 0xa3:
-				write_chip_hi(CHIP_YM2612, cmd >> 7, buffer[offset], buffer[offset + 1]);
+				write_chip(CHIP_YM2612, cmd >> 7, buffer[offset] | 0x100, buffer[offset + 1]);
 				offset += 2;
 				break;
 
@@ -802,7 +813,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			// YM2608 port 1, write value dd to register aa
 			case 0x57:
 			case 0xa7:
-				write_chip_hi(CHIP_YM2608, cmd >> 7, buffer[offset], buffer[offset + 1]);
+				write_chip(CHIP_YM2608, cmd >> 7, buffer[offset] | 0x100, buffer[offset + 1]);
 				offset += 2;
 				break;
 
@@ -816,7 +827,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			// YM2610 port 1, write value dd to register aa
 			case 0x59:
 			case 0xa9:
-				write_chip_hi(CHIP_YM2610, cmd >> 7, buffer[offset], buffer[offset + 1]);
+				write_chip(CHIP_YM2610, cmd >> 7, buffer[offset] | 0x100, buffer[offset + 1]);
 				offset += 2;
 				break;
 
@@ -851,7 +862,7 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			// YMF262 port 1, write value dd to register aa
 			case 0x5f:
 			case 0xaf:
-				write_chip_hi(CHIP_YMF262, cmd >> 7, buffer[offset], buffer[offset + 1]);
+				write_chip(CHIP_YMF262, cmd >> 7, buffer[offset] | 0x100, buffer[offset + 1]);
 				offset += 2;
 				break;
 
@@ -907,54 +918,29 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 					}
 
 					case 0x82: // YM2610 ADPCM ROM data
-						length = parse_uint32(buffer, localoffset);
-						start = parse_uint32(buffer, localoffset);
-						for (int index = 0; index < 2; index++)
-						{
-							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
-							if (chip != nullptr)
-								chip->write_data(ymfm::ACCESS_ADPCM_A, start, size - 8, &buffer[localoffset]);
-						}
+						add_rom_data(CHIP_YM2610, ymfm::ACCESS_ADPCM_A, buffer, localoffset, size - 8);
 						break;
 
 					case 0x81: // YM2608 DELTA-T ROM data
-						length = parse_uint32(buffer, localoffset);
-						start = parse_uint32(buffer, localoffset);
-						for (int index = 0; index < 2; index++)
-						{
-							vgm_chip_base *chip = find_chip(CHIP_YM2608, index);
-							if (chip != nullptr)
-								chip->write_data(ymfm::ACCESS_ADPCM_B, start, size - 8, &buffer[localoffset]);
-						}
+						add_rom_data(CHIP_YM2608, ymfm::ACCESS_ADPCM_B, buffer, localoffset, size - 8);
 						break;
 
 					case 0x83: // YM2610 DELTA-T ROM data
-						length = parse_uint32(buffer, localoffset);
-						start = parse_uint32(buffer, localoffset);
-						for (int index = 0; index < 2; index++)
-						{
-							vgm_chip_base *chip = find_chip(CHIP_YM2610, index);
-							if (chip != nullptr)
-								chip->write_data(ymfm::ACCESS_ADPCM_B, start, size - 8, &buffer[localoffset]);
-						}
+						add_rom_data(CHIP_YM2610, ymfm::ACCESS_ADPCM_B, buffer, localoffset, size - 8);
+						break;
+
+					case 0x84: // YMF278B ROM data
+					case 0x87: // YMF278B RAM data
+						add_rom_data(CHIP_YMF278B, ymfm::ACCESS_PCM, buffer, localoffset, size - 8);
 						break;
 
 					case 0x88: // Y8950 DELTA-T ROM data
-						length = parse_uint32(buffer, localoffset);
-						start = parse_uint32(buffer, localoffset);
-						for (int index = 0; index < 2; index++)
-						{
-							vgm_chip_base *chip = find_chip(CHIP_Y8950, index);
-							if (chip != nullptr)
-								chip->write_data(ymfm::ACCESS_ADPCM_B, start, size - 8, &buffer[localoffset]);
-						}
+						add_rom_data(CHIP_Y8950, ymfm::ACCESS_ADPCM_B, buffer, localoffset, size - 8);
 						break;
 
 					case 0x80: // Sega PCM ROM data
-					case 0x84: // YMF278B ROM data
 					case 0x85: // YMF271 ROM data
 					case 0x86: // YMZ280B ROM data
-					case 0x87: // YMF278B RAM data
 					case 0x89: // MultiPCM ROM data
 					case 0x8A: // uPD7759 ROM data
 					case 0x8B: // OKIM6295 ROM data
@@ -995,6 +981,12 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			case 0xa0:
 				write_chip(CHIP_YM2149, buffer[offset] >> 7, buffer[offset] & 0x7f, buffer[offset + 1]);
 				offset += 2;
+				break;
+
+			// pp aa dd: YMF278B, port pp, write value dd to register aa
+			case 0xd0:
+				write_chip(CHIP_YMF278B, buffer[offset] >> 7, ((buffer[offset] & 0x7f) << 8) | buffer[offset + 1], buffer[offset + 2]);
+				offset += 3;
 				break;
 
 			case 0x70:	case 0x71:	case 0x72:	case 0x73:	case 0x74:	case 0x75:	case 0x76:	case 0x77:
@@ -1055,7 +1047,6 @@ void generate_all(std::vector<uint8_t> &buffer, uint32_t data_start, uint32_t ou
 			case 0xc6:	// mmll dd: WonderSwan, write value dd to memory offset mmll (mm - offset MSB, ll - offset LSB)
 			case 0xc7:	// mmll dd: VSU, write value dd to memory offset mmll (mm - offset MSB, ll - offset LSB)
 			case 0xc8:	// mmll dd: X1-010, write value dd to memory offset mmll (mm - offset MSB, ll - offset LSB)
-			case 0xd0:	// pp aa dd: YMF278B, port pp, write value dd to register aa
 			case 0xd1:	// pp aa dd: YMF271, port pp, write value dd to register aa
 			case 0xd2:	// pp aa dd: SCC1, port pp, write value dd to register aa
 			case 0xd3:	// pp aa dd: K054539, write value dd to register ppaa
