@@ -638,11 +638,11 @@ void pcm_engine::clock(uint32_t chanmask)
 		m_modified_channels = m_prepare_count = 0;
 	}
 
-	// increment the envelope counter by 8/15; this seems odd but makes
-	// the numbers line up quite accurately
+	// increment the envelope counter; the envelope generator
+	// only clocks every other sample in order to make the PCM
+	// envelopes line up with the FM envelopes (after taking into
+	// account the different FM sampling rate)
 	m_env_counter++;
-	if (bitfield(m_env_counter, 0, 4) == 14)
-		m_env_counter++;
 
 	// now update the state of all the channels and operators
 	for (int chnum = 0; chnum < CHANNELS; chnum++)

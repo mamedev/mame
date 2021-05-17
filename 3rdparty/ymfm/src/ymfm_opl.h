@@ -683,16 +683,16 @@ protected:
 
 class ymf278b
 {
-	// Using the nominal datasheet frequency of 33.868MHz, the output of
-	// the chip will be clock/768 = 44.1kHz. However, the FM engine is
-	// clocked internally at clock/(19*36), or 49.515kHz, so the FM output
-	// needs to be downsampled. The calculations below produce the fractional
-	// number of extra FM samples we need to consume for each output sample,
-	// as a 0.24 fixed point fraction.
-	static constexpr double NOMINAL_CLOCK = 33868800;
-	static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(opl4_registers::DEFAULT_PRESCALE * opl4_registers::OPERATORS);
-	static constexpr double NOMINAL_OUTPUT_RATE = NOMINAL_CLOCK / 768.0;
-	static constexpr uint32_t FM_STEP = uint32_t((NOMINAL_FM_RATE / NOMINAL_OUTPUT_RATE - 1.0) * double(1 << 24));
+	// Using the nominal datasheet frequency of 33.868MHz, the output of the
+	// chip will be clock/768 = 44.1kHz. However, the FM engine is clocked
+	// internally at clock/(19*36), or 49.515kHz, so the FM output needs to
+	// be downsampled. We treat this as needing to clock the FM engine an
+	// extra tick every few samples. The exact ratio is 768/(19*36) or
+	// 768/684 = 192/171. So if we always clock the FM once, we'll have
+	// 192/171 - 1 = 21/171 left. Thus we count 21 for each sample and when
+	// it gets above 171, we tick an extra time.
+	static constexpr uint32_t FM_EXTRA_SAMPLE_THRESH = 171;
+	static constexpr uint32_t FM_EXTRA_SAMPLE_STEP = 192 - FM_EXTRA_SAMPLE_THRESH;
 
 public:
 	using fm_engine = fm_engine_base<opl4_registers>;

@@ -1680,11 +1680,11 @@ void ymf278b::generate(output_data *output, uint32_t numsamples)
 	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
 		// clock the system
-		m_fm_pos += FM_STEP;
-		if (bitfield(m_fm_pos, 24))
+		m_fm_pos += FM_EXTRA_SAMPLE_STEP;
+		if (m_fm_pos >= FM_EXTRA_SAMPLE_THRESH)
 		{
 			m_fm.clock(fm_engine::ALL_CHANNELS);
-			m_fm_pos &= 0xffffff;
+			m_fm_pos -= FM_EXTRA_SAMPLE_THRESH;
 		}
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 		m_pcm.clock(pcm_engine::ALL_CHANNELS);
