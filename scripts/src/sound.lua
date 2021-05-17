@@ -1180,8 +1180,8 @@ end
 --@src/devices/sound/ymopl.h,SOUNDS["YM3526"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YM3812"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YMF262"] = true
+--@src/devices/sound/ymopl.h,SOUNDS["YMF278B"] = true
 --@src/devices/sound/ymf271.h,SOUNDS["YMF271"] = true
---@src/devices/sound/ymf278b.h,SOUNDS["YMF278B"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["Y8950"] = true
 ---------------------------------------------------
 
