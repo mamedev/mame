@@ -195,7 +195,7 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	{
 		case TIMER_DIECOM_LIGHTGUN:
 			m_dclg_output_h |= 0x02;
-			/* fall though */
+			[[fallthrough]];
 		case TIMER_HIRES_JOYSTICK_X:
 		case TIMER_HIRES_JOYSTICK_Y:
 			poll_keyboard();
