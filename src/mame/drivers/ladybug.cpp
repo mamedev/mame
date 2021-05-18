@@ -74,6 +74,7 @@ unknown dips
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/latch8.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"

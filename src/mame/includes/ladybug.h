@@ -13,7 +13,6 @@
 #include "video/ladybug.h"
 #include "emupal.h"
 #include "tilemap.h"
-#include "machine/latch8.h"
 
 
 class ladybug_base_state : public driver_device
@@ -94,8 +93,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_video(*this, "video")
-		, m_soundlatch_low(*this, "soundlatch_low")
-		, m_soundlatch_high(*this, "soundlatch_high")
 	{ }
 
 	void mrsdyna(machine_config &config);
@@ -122,8 +119,6 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ladybug_video_device> m_video;
-	required_device<latch8_device> m_soundlatch_low;
-	required_device<latch8_device> m_soundlatch_high;
 
 	tilemap_t   *m_grid_tilemap;
 
