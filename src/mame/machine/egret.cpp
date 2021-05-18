@@ -87,6 +87,10 @@ void egret_device::device_add_mconfig(machine_config &config)
 {
 	M68HC05EG(config, m_maincpu, XTAL(32'768)*128);  // Intended to run 4.1 MHz, the ADB timings in uS are twice as long as spec at 2.1
 	m_maincpu->set_addrmap(AS_PROGRAM, &egret_device::egret_map);
+
+	#if USE_BUS_ADB
+	ADB_CONNECTOR(config, "adb1", adb_device::default_devices, "a9m0331", false);
+	#endif
 }
 
 const tiny_rom_entry *egret_device::device_rom_region() const

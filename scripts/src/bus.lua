@@ -201,6 +201,8 @@ if (BUSES["ADB"]~=null) then
 		MAME_DIR .. "src/devices/bus/adb/adb.h",
 		MAME_DIR .. "src/devices/bus/adb/adbhle.cpp",
 		MAME_DIR .. "src/devices/bus/adb/adbhle.h",
+		MAME_DIR .. "src/devices/bus/adb/a9m0331.cpp",
+		MAME_DIR .. "src/devices/bus/adb/a9m0331.h",
 	}
 end
 
