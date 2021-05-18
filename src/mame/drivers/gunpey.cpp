@@ -248,7 +248,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_oki(*this, "oki")
 		, m_wram(*this, "wram")
-		, m_blit_ram(*this, "blit_ram", 0x10, ENDIANNESS_LITTLE)
 		, m_blit_rom(*this, "blit_rom")
 	{ }
 
@@ -286,6 +285,7 @@ private:
 	u16 m_vreg_addr = 0;
 
 	// blitter related
+	u8 m_blit_ram[0x10] = {0};
 	int m_srcx = 0;
 	int m_srcxbase = 0;
 	int m_srcxcount = 0;
@@ -321,7 +321,6 @@ private:
 
 	// shared pointers
 	required_shared_ptr<u16> m_wram;
-	memory_share_creator<u8> m_blit_ram;
 
 	// memory regions
 	required_region_ptr<u8> m_blit_rom;
@@ -355,6 +354,7 @@ void gunpey_state::video_start()
 
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vreg_addr));
+	save_item(NAME(m_blit_ram));
 	save_item(NAME(m_srcx));
 	save_item(NAME(m_srcxbase));
 	save_item(NAME(m_srcxcount));
@@ -936,7 +936,7 @@ bool gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow,
 
 void gunpey_state::blitter_w(offs_t offset, u8 data)
 {
-	//logerror("gunpey_blitter_w offset %01x data %02x\n", offset, data);
+	//logerror("blitter_w offset %01x data %02x\n", offset, data);
 
 	m_blit_ram[offset] = data;
 
@@ -994,12 +994,12 @@ void gunpey_state::blitter_w(offs_t offset, u8 data)
 
 void gunpey_state::blitter_upper_w(offs_t offset, u8 data)
 {
-	//logerror("gunpey_blitter_upper_w %02x %02x\n", offset, data);
+	//logerror("blitter_upper_w %02x %02x\n", offset, data);
 }
 
 void gunpey_state::blitter_upper2_w(offs_t offset, u8 data)
 {
-	//logerror("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
+	//logerror("blitter_upper2_w %02x %02x\n", offset, data);
 }
 
 
