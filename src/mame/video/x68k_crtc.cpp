@@ -231,7 +231,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 				hsync_time = screen().time_until_pos(scan, (m_htotal + m_hend) / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if ((scan != 0) && (scan < m_vend))
-					screen().update_partial(scan);
+					screen().update_partial(scan - 1);
 			}
 			else
 			{
@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 				hsync_time = screen().time_until_pos(scan, m_hend / 2);
 				m_scanline_timer->adjust(hsync_time);
 				if ((scan != 0) && (scan < m_vend))
-					screen().update_partial(scan);
+					screen().update_partial(scan - 1);
 			}
 		}
 		if (hstate == 0)
@@ -267,7 +267,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 			hsync_time = screen().time_until_pos(scan, m_hend);
 			m_scanline_timer->adjust(hsync_time);
 			if ((scan != 0) && (scan < m_vend))
-				screen().update_partial(scan);
+				screen().update_partial(scan - 1);
 		}
 		if (hstate == 0)
 		{
@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::raster_irq)
 	if (scan <= m_vtotal)
 	{
 		m_rint_callback(0);
-		screen().update_partial(scan);
+		screen().update_partial(scan - 1);
 		irq_time = screen().time_until_pos(scan, m_hbegin);
 		// end of HBlank period clears GPIP6 also?
 		end_time = screen().time_until_pos(scan, m_hend);
