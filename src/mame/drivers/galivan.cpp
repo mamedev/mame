@@ -31,7 +31,7 @@ TODO
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-#include "sound/ym3526.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

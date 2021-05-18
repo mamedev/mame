@@ -173,19 +173,11 @@ Exidy Sorcerer Video/Disk Unit:
 void sorcerer_state::sorcerer_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xbfff).ram();
+	map(0x0000, 0xffff).ram();
 	//map(0xc000, 0xdfff).rom();      // mapped by the cartslot
 	map(0xe000, 0xefff).rom().region("maincpu", 0).nopw();    // bios
-	map(0xf000, 0xf7ff).ram();                                // screen ram
 	map(0xf800, 0xfbff).rom().region("chargen", 0).nopw();    // inbuilt characters
-	map(0xfc00, 0xffff).ram().share("pcg");                   // PCG
-}
-
-void sorcerer_state::sorcererb_mem(address_map &map)
-{
-	map.unmap_value_high();
-	sorcerer_mem(map);
-	map(0xc000, 0xdfff).ram();
+	map(0xfc00, 0xffff).share("pcg");                   // PCG
 }
 
 void sorcererd_state::sorcererd_mem(address_map &map)
@@ -477,8 +469,9 @@ void sorcerer_state::sorcerer(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,snp", attotime::from_seconds(4)));
+	quickload.set_load_callback(FUNC(sorcerer_state::quickload_cb));
+	quickload.set_interface("sorcerer_quik");
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
@@ -498,6 +491,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sorcerer_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("sorcerer_cass");
+	SOFTWARE_LIST(config, "quik_list").set_original("sorcerer_quik");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
@@ -559,7 +553,6 @@ void sorcerer_state::sorcerera(machine_config &config)
 void sorcerer_state::sorcererb(machine_config &config)
 {
 	sorcerer(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sorcerer_state::sorcererb_mem);
 	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcererb_io);
 
 	Z80DMA(config, m_dma, ES_CPU_CLOCK);

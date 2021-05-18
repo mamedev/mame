@@ -64,7 +64,7 @@
 // number of extra FM samples we need to consume for each output sample,
 // as a 0.24 fixed point fraction.
 static constexpr double NOMINAL_CLOCK = 33868800;
-static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymopl4_registers::DEFAULT_PRESCALE * ymopl4_registers::OPERATORS);
+static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymfm::opl4_registers::DEFAULT_PRESCALE * ymfm::opl4_registers::OPERATORS);
 static constexpr double NOMINAL_OUTPUT_RATE = NOMINAL_CLOCK / 768.0;
 static constexpr uint32_t FM_STEP = uint32_t((NOMINAL_FM_RATE / NOMINAL_OUTPUT_RATE - 1.0) * double(1 << 24));
 
@@ -335,16 +335,16 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; clipping is unknown
-		s32 sums[fm_engine::OUTPUTS] = { 0 };
-		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
+		fm_engine::output_data sums;
+		m_fm.output(sums.clear(), 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
-		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
-		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1]) * fmr);
+		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums.data[0]) * fml);
+		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums.data[1]) * fmr);
 
 		// DO0 output: FM channels 2+3 only
-		outputs[2].put_int(i, sums[2], 32768);
-		outputs[3].put_int(i, sums[3], 32768);
+		outputs[2].put_int(i, sums.data[2], 32768);
+		outputs[3].put_int(i, sums.data[3], 32768);
 
 		// DO1 output: wavetable channels 2+3 only
 		outputs[4].put_int(i, *mixp++, 32768);
@@ -929,8 +929,22 @@ void ymf278b_device::device_start()
 	// Register state for saving
 	register_save_state();
 
-	// YMF262 related
-	m_fm.save(*this);
+	// YMF262 related -- cribbed from ymfm_device_base_common
+	{
+		// allocate our timers
+		for (int tnum = 0; tnum < 2; tnum++)
+			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymf278b_device::fm_timer_handler), this));
+
+		// resolve the handlers
+		m_update_irq.resolve();
+
+		// compute the size of the save buffer by doing an initial save
+		ymfm::ymfm_saved_state state(m_save_blob, true);
+		m_fm.save_restore(state);
+
+		// now register the blob for save, on the assumption the size won't change
+		save_item(NAME(m_save_blob));
+	}
 }
 
 
@@ -941,5 +955,29 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_fm(*this)
+	, m_update_irq(*this)
 {
+}
+
+// handle pre-saving by filling the blob
+void ymf278b_device::device_pre_save()
+{
+	// remember the original blob size
+	auto orig_size = m_save_blob.size();
+
+	// save the state
+	ymfm::ymfm_saved_state state(m_save_blob, true);
+	m_fm.save_restore(state);
+
+	// ensure that the size didn't change since we first allocated
+	if (m_save_blob.size() != orig_size)
+		throw emu_fatalerror("State size changed for ymfm chip");
+}
+
+// handle post-loading by restoring from the blob
+void ymf278b_device::device_post_load()
+{
+	// populate the state from the blob
+	ymfm::ymfm_saved_state state(m_save_blob, false);
+	m_fm.save_restore(state);
 }

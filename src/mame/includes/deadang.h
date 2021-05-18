@@ -7,7 +7,7 @@
 
 #include "audio/seibu.h"
 #include "machine/timer.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

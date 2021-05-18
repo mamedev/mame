@@ -119,7 +119,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "machine/decocrpt.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 #include <algorithm>

@@ -48,11 +48,12 @@ HD44780_PIXEL_UPDATE(canons80_state::pixel_update)
 
 void canons80_state::canons80_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("maincpu", FUNC(hd6301x0_cpu_device::m6801_io));
+	map(0x0000, 0x001f).m("maincpu", FUNC(hd6301x0_cpu_device::hd6301x_io));
 	map(0x0040, 0x00ff).ram();
 	map(0x0100, 0x07ff).ram();
 	map(0x2000, 0x2001).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x4000, 0x7fff).rom().region("external", 0x4000);
+	map(0x8000, 0xbfff).rom().region("external", 0);
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -80,8 +81,14 @@ void canons80_state::canons80(machine_config &config)
 ROM_START( canons80 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "hd63a1x0p.bin", 0x0000, 0x1000, NO_DUMP )
-	ROM_FILL( 0xffe, 1, 0x40 )
-	ROM_FILL( 0xfff, 1, 0x00 )
+	ROM_FILL( 0xfec, 1, 0xbf )
+	ROM_FILL( 0xfed, 1, 0xf2 )
+	ROM_FILL( 0xff4, 1, 0xbf )
+	ROM_FILL( 0xff5, 1, 0xf5 )
+	ROM_FILL( 0xffa, 1, 0xbf )
+	ROM_FILL( 0xffb, 1, 0xf8 )
+	ROM_FILL( 0xffe, 1, 0xbf )
+	ROM_FILL( 0xfff, 1, 0xfb )
 
 	ROM_REGION( 0x8000, "external", 0 )
 	ROM_LOAD( "canon_8735kx_nh4-0029_064.ic6", 0x0000, 0x8000, CRC(b6cd2ff7) SHA1(e47a136300c826e480fac1be7fc090523078a2a6) )
@@ -90,8 +97,14 @@ ROM_END
 ROM_START( canonts3 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "hd63a1x0p.bin", 0x0000, 0x1000, NO_DUMP )
-	ROM_FILL( 0xffe, 1, 0x40 )
-	ROM_FILL( 0xfff, 1, 0x00 )
+	ROM_FILL( 0xfec, 1, 0xbf )
+	ROM_FILL( 0xfed, 1, 0xf2 )
+	ROM_FILL( 0xff4, 1, 0xbf )
+	ROM_FILL( 0xff5, 1, 0xf5 )
+	ROM_FILL( 0xffa, 1, 0xbf )
+	ROM_FILL( 0xffb, 1, 0xf8 )
+	ROM_FILL( 0xffe, 1, 0xbf )
+	ROM_FILL( 0xfff, 1, 0xfb )
 
 	ROM_REGION( 0x8000, "external", 0 )
 	ROM_LOAD( "nh4-0268.ic6", 0x0000, 0x8000, CRC(bbdd9f74) SHA1(347fa0d37f4df0c175ff1d7feb634f681739804f) )

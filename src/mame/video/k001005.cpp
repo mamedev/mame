@@ -237,7 +237,7 @@ void k001005_renderer::render_polygons()
 				if (v[vert_num].p[POLY_FOG] > 65536.0f) v[vert_num].p[POLY_FOG] = 65536.0f;
 				vert_num++;
 			}
-			while (!last_vertex);
+			while (!last_vertex && vert_num < 4);
 
 			tex_y = ((header & 0x400) >> 5) |
 					((header & 0x100) >> 4) |
@@ -392,7 +392,7 @@ void k001005_renderer::render_polygons()
 					vert_num++;
 					new_verts++;
 				}
-				while (!last_vertex);
+				while (!last_vertex && vert_num < 4);
 
 				extra.texture_x = tex_x * 8;
 				extra.texture_y = tex_y * 8;
@@ -474,7 +474,7 @@ void k001005_renderer::render_polygons()
 				if (v[vert_num].p[POLY_FOG] > 65536.0f) v[vert_num].p[POLY_FOG] = 65536.0f;
 				vert_num++;
 			}
-			while (!last_vertex);
+			while (!last_vertex && vert_num < 4);
 
 			r = (fifo[index] >>  0) & 0xff;
 			g = (fifo[index] >>  8) & 0xff;
@@ -600,7 +600,7 @@ void k001005_renderer::render_polygons()
 					vert_num++;
 					new_verts++;
 				}
-				while (!last_vertex);
+				while (!last_vertex && vert_num < 4);
 
 				r = (fifo[index] >>  0) & 0xff;
 				g = (fifo[index] >>  8) & 0xff;
@@ -668,7 +668,7 @@ void k001005_renderer::render_polygons()
 				v[vert_num].y = ((float)(-y) / 16.0f) + 192.0f + 8;
 				vert_num++;
 			}
-			while (!last_vertex);
+			while (!last_vertex && vert_num < 4);
 
 			// unknown word
 			index++;
@@ -738,7 +738,7 @@ void k001005_renderer::render_polygons()
 				v[vert_num].p[POLY_V] = tv;
 				vert_num++;
 			}
-			while (!last_vertex);
+			while (!last_vertex && vert_num < 4);
 
 			r = (color >>  0) & 0xff;
 			g = (color >>  8) & 0xff;
@@ -820,7 +820,7 @@ void k001005_renderer::render_polygons()
 				v[vert_num].p[POLY_A] = (color >> 24) & 0xff;
 				vert_num++;
 			}
-			while (!last_vertex);
+			while (!last_vertex && vert_num < 4);
 
 			extra.color = color;
 			extra.flags = cmd;

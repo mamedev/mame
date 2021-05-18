@@ -163,7 +163,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 					// put it in the queue
 					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
 					m_newkb_q[m_newkb_q_pos] = code;
-					if (m_newkb_q_pos < 19) m_newkb_q_pos++;
+					if (m_newkb_q_pos < (std::size(m_newkb_q)-1))
+						m_newkb_q_pos++;
 				}
 			}
 			m_newkb_was_pressed[i] = pressed;
@@ -184,11 +185,13 @@ uint8_t mbee_state::port18_r()
 
 	if (m_newkb_q_pos)
 	{
-		m_newkb_q_pos--;
 		for (i = 0; i < m_newkb_q_pos; i++) m_newkb_q[i] = m_newkb_q[i+1]; // ripple queue
+		m_newkb_q[m_newkb_q_pos] = 0;
+		m_newkb_q_pos--;
 	}
 
 	m_b2 = 0; // clear irq
+	m_pio->port_b_write(pio_port_b_r());
 	return data;
 }
 

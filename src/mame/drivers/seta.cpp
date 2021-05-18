@@ -1422,10 +1422,9 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/pit8253.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
-#include "sound/ym2612.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "diserial.h"
 #include "screen.h"

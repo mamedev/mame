@@ -262,7 +262,155 @@ uint32_t fsblk_t::block_t::r32l(u32 offset)
 	return blk[0] | (blk[1] << 8) | (blk[2] << 16) | (blk[3] << 24);
 }
 
-const char *fs_meta_get_name(fs_meta_name name)
+
+
+void filesystem_t::copy(uint8_t *p, const uint8_t *src, u32 size)
+{
+	memcpy(p, src, size);
+}
+
+void filesystem_t::fill(uint8_t *p, uint8_t data, u32 size)
+{
+	memset(p, data, size);
+}
+
+void filesystem_t::wstr(uint8_t *p, const std::string &str)
+{
+	memcpy(p, str.data(), str.size());
+}
+
+void filesystem_t::w8(uint8_t *p, uint8_t data)
+{
+	p[0] = data;
+}
+
+void filesystem_t::w16b(uint8_t *p, u16 data)
+{
+	p[0] = data >> 8;
+	p[1] = data;
+}
+
+void filesystem_t::w24b(uint8_t *p, u32 data)
+{
+	p[0] = data >> 16;
+	p[1] = data >> 8;
+	p[2] = data;
+}
+
+void filesystem_t::w32b(uint8_t *p, u32 data)
+{
+	p[0] = data >> 24;
+	p[1] = data >> 16;
+	p[2] = data >> 8;
+	p[3] = data;
+}
+
+void filesystem_t::w16l(uint8_t *p, u16 data)
+{
+	p[0] = data;
+	p[1] = data >> 8;
+}
+
+void filesystem_t::w24l(uint8_t *p, u32 data)
+{
+	p[0] = data;
+	p[1] = data >> 8;
+	p[2] = data >> 16;
+}
+
+void filesystem_t::w32l(uint8_t *p, u32 data)
+{
+	p[0] = data;
+	p[1] = data >> 8;
+	p[2] = data >> 16;
+	p[3] = data >> 24;
+}
+
+std::string filesystem_t::rstr(const uint8_t *p, u32 size)
+{
+	std::string res;
+	for(u32 i=0; i != size; i++)
+		res += char(*p++);
+	return res;
+}
+
+uint8_t filesystem_t::r8(const uint8_t *p)
+{
+	return p[0];
+}
+
+uint16_t filesystem_t::r16b(const uint8_t *p)
+{
+	return (p[0] << 8) | p[1];
+}
+
+uint32_t filesystem_t::r24b(const uint8_t *p)
+{
+	return (p[0] << 16) | (p[1] << 8) | p[2];
+}
+
+uint32_t filesystem_t::r32b(const uint8_t *p)
+{
+	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
+}
+
+uint16_t filesystem_t::r16l(const uint8_t *p)
+{
+	return p[0] | (p[1] << 8);
+}
+
+uint32_t filesystem_t::r24l(const uint8_t *p)
+{
+	return p[0] | (p[1] << 8) | (p[2] << 16);
+}
+
+uint32_t filesystem_t::r32l(const uint8_t *p)
+{
+	return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+filesystem_t::file_t filesystem_t::idir_t::file_create(const fs_meta_data &info)
+{
+	fatalerror("file_create called on a filesystem not supporting write\n");
+}
+
+void filesystem_t::idir_t::file_delete(uint64_t key)
+{
+	fatalerror("file_delete called on a filesystem not supporting write\n");
+}
+
+
+void filesystem_t::ifile_t::replace(const std::vector<u8> &data)
+{
+	fatalerror("replace called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::ifile_t::rsrc_replace(const std::vector<u8> &data)
+{
+	fatalerror("rsrc_replace called on a filesystem not supporting write or resource forks \n");
+}
+
+void filesystem_t::ifile_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::idir_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
+void filesystem_t::metadata_change(const fs_meta_data &info)
+{
+	fatalerror("metadata_change called on a filesystem not supporting write \n");
+}
+
+std::vector<u8> filesystem_t::ifile_t::rsrc_read_all()
+{
+	fatalerror("rsrc_read_all called on a filesystem without resource forks\n");
+}
+
+const char *fs_meta_data::entry_name(fs_meta_name name)
 {
 	switch(name) {
 	case fs_meta_name::creation_date: return "creation_date";
@@ -280,7 +428,7 @@ const char *fs_meta_get_name(fs_meta_name name)
 	return "";
 }
 
-std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
+std::string fs_meta::to_string(fs_meta_type type, const fs_meta &m)
 {
 	switch(type) {
 	case fs_meta_type::string: return m.as_string();

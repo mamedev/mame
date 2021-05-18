@@ -17,7 +17,7 @@
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/timer.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/atarimo.h"
 
 #include "speaker.h"

@@ -51,10 +51,10 @@ void msx_cart_sfg_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	YM2151(config, m_ym2151, XTAL(3'579'545));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
-	m_ym2151->irq_handler().set(FUNC(msx_cart_sfg_device::ym2151_irq_w));
-	m_ym2151->add_route(0, "lspeaker", 0.80);
-	m_ym2151->add_route(1, "rspeaker", 0.80);
+	ym2151_device &ym2151(YM2151(config, m_ym2151, XTAL(3'579'545)));  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	ym2151.irq_handler().set(FUNC(msx_cart_sfg_device::ym2151_irq_w));
+	ym2151.add_route(0, "lspeaker", 0.80);
+	ym2151.add_route(1, "rspeaker", 0.80);
 
 	YM2148(config, m_ym2148, XTAL(4'000'000));
 	m_ym2148->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
@@ -72,10 +72,10 @@ void msx_cart_sfg05_device::device_add_mconfig(machine_config &config)
 {
 	msx_cart_sfg_device::device_add_mconfig(config);
 
-	YM2164(config.replace(), m_ym2151, XTAL(3'579'545));
-	m_ym2151->irq_handler().set(FUNC(msx_cart_sfg05_device::ym2151_irq_w));
-	m_ym2151->add_route(0, "lspeaker", 0.80);
-	m_ym2151->add_route(1, "rspeaker", 0.80);
+	ym2164_device &ym2164(YM2164(config.replace(), m_ym2151, XTAL(3'579'545)));
+	ym2164.irq_handler().set(FUNC(msx_cart_sfg05_device::ym2151_irq_w));
+	ym2164.add_route(0, "lspeaker", 0.80);
+	ym2164.add_route(1, "rspeaker", 0.80);
 }
 
 
@@ -156,7 +156,7 @@ uint8_t msx_cart_sfg_device::read_cart(offs_t offset)
 	{
 		case 0x3ff0:     // YM-2151 status read
 		case 0x3ff1:     // YM-2151 status read mirror?
-			return m_ym2151->status_r();
+			return m_ym2151->read(offset & 1);
 
 		case 0x3ff2:     // YM-2148 keyboard column read
 		case 0x3ff3:     // YM-2148 --
@@ -182,11 +182,8 @@ void msx_cart_sfg_device::write_cart(offs_t offset, uint8_t data)
 	switch (offset & 0x3fff)
 	{
 		case 0x3ff0:     // YM-2151 register
-			m_ym2151->register_w(data);
-			break;
-
 		case 0x3ff1:    // YM-2151 data
-			m_ym2151->data_w(data);
+			m_ym2151->write(offset & 1, data);
 			break;
 
 		case 0x3ff2:   // YM-2148 write keyboard row

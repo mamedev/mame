@@ -127,20 +127,5 @@ void coco3_state::update_cart_base(uint8_t *cart_base)
 
 uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bool result;
-	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))
-	{
-		/* composite screen */
-		result = m_gime->update_composite(bitmap, cliprect);
-	}
-	else if (!strcmp(screen.tag(), ":" RGB_SCREEN_TAG))
-	{
-		/* rgb screen */
-		result = m_gime->update_rgb(bitmap, cliprect);
-	}
-	else
-	{
-		fatalerror("Called screen_update() with invalid tag '%s'\n", screen.tag());
-	}
-	return result;
+	return (m_screen_config->read() & 1) ? m_gime->update_rgb(bitmap, cliprect) : m_gime->update_composite(bitmap, cliprect);
 }

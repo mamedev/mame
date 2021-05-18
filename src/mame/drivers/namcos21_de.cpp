@@ -45,7 +45,7 @@ Driver's Eyes works,
 #include "video/namco_c355spr.h"
 #include "video/namcos21_3d.h"
 #include "sound/c140.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 
 

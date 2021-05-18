@@ -609,9 +609,11 @@ void memory_view::memory_view_entry::prepare_device_map(address_map &map)
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
 {
-	// no map specified, use the space-specific one
-	if (map == nullptr)
+	// no map specified, use the space-specific one and import the submaps
+	if (map == nullptr) {
 		map = m_map.get();
+		map->import_submaps(m_manager.machine(), m_view.m_device, data_width(), endianness(), addr_shift());
+	}
 
 	prepare_map_generic(*map, true);
 

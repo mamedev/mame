@@ -224,7 +224,7 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

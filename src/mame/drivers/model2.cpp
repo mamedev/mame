@@ -101,7 +101,7 @@
 #include "machine/315_5649.h"
 #include "machine/model1io.h"
 #include "machine/model1io2.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "video/segaic24.h"
 #include "speaker.h"
 

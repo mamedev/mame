@@ -41,7 +41,7 @@ help with figuring out the encryption on the coin-op parts of the program.
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/sn76496.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "includes/megadriv.h"
 #include "includes/megadriv_acbl.h"
 

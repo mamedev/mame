@@ -156,20 +156,17 @@ void tek6100_state::machine_start()
 
 	save_item(NAME(m_hdc_ptr));
 	save_pointer(NAME(m_hdc_buf), 4096);
+
+	m_per = 0;
+	m_ssr = 0;
 }
 
 void tek6100_state::machine_reset()
 {
-	m_hcr = 0;
-	m_nmr = 0;
-	m_per = 0;
-	m_scr = 0;
-	m_ssr = 0;
-
-	m_hdc_ptr = 0;
-
-	// FIXME:
-	m_fdc->mr_w(1);
+	hcr_w(0);
+	nov_w(0);
+	scr_w(0);
+	fcr_w(0);
 }
 
 void tek6100_state::init_common()
@@ -189,14 +186,15 @@ enum fcr_mask : u8
 
 void tek6100_state::fcr_w(u8 data)
 {
-	floppy_image_device *fdd = m_fdd[data & FCR_DRIVE];
+	floppy_image_device *fdd = nullptr;
+	if (data & FCR_FDEN)
+		fdd = m_fdd[data & FCR_DRIVE];
 
 	m_fdc->set_floppy(fdd);
 	if (fdd)
 		fdd->ss_w(bool(data & FCR_SIDE));
 
 	m_fdc->dden_w(bool(data & FCR_DDEN));
-	m_fdc->mr_w(bool(data & FCR_FDEN));
 }
 
 enum gcr_mask : u8
@@ -232,7 +230,7 @@ enum ssr_mask : u8
 enum per_mask : u16
 {
 	PER_PARADR = 0x3fff, // parity address
-	PER_HIERR  = 0x4000, // TODO: documentation has these reversed?
+	PER_HIERR  = 0x4000,
 	PER_LOERR  = 0x8000,
 };
 
@@ -469,7 +467,7 @@ void tek6100_state::tek6130(machine_config &config)
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
 	m_cpu->set_fpu(m_fpu);
 
-	NS32202(config, m_icu, 200); // 20'000? 5_MHz_XTAL?
+	NS32202(config, m_icu, 20_MHz_XTAL / 1000);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
 	/*
 	 *  0   mmu configuration link
@@ -527,18 +525,18 @@ void tek6100_state::tek6130(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", "525dd", FLOPPY_525_DD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	WD1010(config, m_hdc, 20_MHz_XTAL / 4);
-	m_hdc->out_intrq_callback().set(m_icu, FUNC(ns32202_device::ir_w<2>)).invert();
+	m_hdc->out_intrq_callback().set(m_icu, FUNC(ns32202_device::ir_w<2>));
 	m_hdc->in_data_callback().set(FUNC(tek6100_state::buf_r<u8>));
 	m_hdc->out_data_callback().set(FUNC(tek6100_state::buf_w<u8>));
 	m_hdc->out_bcr_callback().set([this](int state) { if (state) m_hdc_ptr = 0; });
 
 	HARDDISK(config, "hdc:0", 0);
 
-	I82586(config, m_lan, 10'000'000);
+	I82586(config, m_lan, 16_MHz_XTAL / 2);
 	m_lan->set_addrmap(0, &tek6100_state::lan_map);
 	m_lan->out_irq_cb().set(m_icu, FUNC(ns32202_device::ir_w<11>)).invert();
 
-	TMS9914(config, m_gpib, 4'000'000);
+	TMS9914(config, m_gpib, 20_MHz_XTAL / 4);
 	m_gpib->int_write_cb().set(m_icu, FUNC(ns32202_device::ir_w<10>));
 	m_gpib->dio_read_cb().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_gpib->dio_write_cb().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));

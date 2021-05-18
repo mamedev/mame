@@ -54,12 +54,6 @@ void menu_control_floppy_image::do_load_create()
 			err = fd.finish_load();
 			if (err == image_init_result::PASS) {
 				fs_meta_data meta;
-				if(create_fs->m_manager) {
-					auto metav = create_fs->m_manager->volume_meta_description();
-					for(const auto &e : metav)
-						if(!e.m_ro)
-							meta[e.m_name] = e.m_default;
-				}
 				fd.init_fs(create_fs, meta);
 			}
 		}
