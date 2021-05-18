@@ -11,7 +11,7 @@ Quester                            (c) 1987 Namco
 Pac-Mania                          (c) 1987 Namco
 Galaga '88                         (c) 1987 Namco
 Pro Yakyuu World Stadium           (c) 1988 Namco
-Chou-Zetsurin-Jin Beraboh Man      (c) 1988 Namco
+Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
 Pro Tennis World Court             (c) 1988 Namco
@@ -312,8 +312,8 @@ Date  Name                                  Key  Screen
 12/87 Galaga '88                            153  V-FLIP
 12/87 Galaga '88 (Japanese version)         153  V
  3/88 Pro Yakyuu World Stadium              154  H
- 5/88 Chou-Zetsurin-Jin Beraboh Man         B    H
-??/88 Chou-Zetsurin-Jin Beraboh Man         NONE H
+ 5/88 Chou Zetsurinjin Berabowman           B    H
+??/88 Chou Zetsurinjin Berabowman           NONE H
                    (standard NS1 hardware)
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
@@ -1782,7 +1782,7 @@ ROM_START( ws )
 	ROM_LOAD_HS( "ws1_obj3.bin",    0x60000, 0x10000, CRC(f2ed5309) SHA1(b7d9c0a617660ecceaf7db3fd53bc0377ed1b6c1) )
 ROM_END
 
-/* Chou-Zetsurin-Jin Beraboh Man (revision C) */
+/* Chou Zetsurinjin Berabowman (revision C) */
 ROM_START( berabohm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -1827,7 +1827,7 @@ ROM_START( berabohm )
 	ROM_LOAD( "bm_obj-7.bin",       0xe0000, 0x20000, CRC(377c81ed) SHA1(85f4682c6079863793f5575d261a33309c221ba7) )
 ROM_END
 
-/* Chou-Zetsurin-Jin Beraboh Man (revision B) */
+/* Chou Zetsurinjin Berabowman (revision B) */
 ROM_START( berabohmb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -2902,8 +2902,8 @@ GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, init_galaga88
 GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, init_ws,       ROT180, "Namco", "Pro Yakyuu World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou-Zetsurin-Jin Beraboh Man (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou-Zetsurin-Jin Beraboh Man (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou Zetsurinjin Berabowman (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou Zetsurinjin Berabowman (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
