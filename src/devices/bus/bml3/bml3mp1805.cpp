@@ -6,6 +6,7 @@
 
     Hitachi MP-1805 floppy disk controller card for the MB-6890
     Floppy drive is attached
+    TODO: fix crash when a floppy is mounted
 
 *********************************************************************/
 
@@ -55,6 +56,7 @@ void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("bml3_flop").set_filter("3");
 }
 
 //-------------------------------------------------
