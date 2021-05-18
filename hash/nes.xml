@@ -3043,7 +3043,7 @@ license:CC0
 	</software>
 
 	<software name="baseballj1" cloneof="baseball">
-		<description>Baseball (Jpn, STROM pcb)</description>
+		<description>Baseball (Jpn, STROM PCB)</description>
 		<year>1983</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-BA"/>
@@ -11268,7 +11268,7 @@ license:CC0
 	</software>
 
 	<software name="excitbikj1" cloneof="excitbik">
-		<description>Excitebike (Jpn, RTROM pcb)</description>
+		<description>Excitebike (Jpn, RTROM PCB)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-EB"/>
@@ -20587,7 +20587,7 @@ license:CC0
 
 <!-- this was found on a proto cart, but the program is the same as the final Rev. 0 -->
 	<software name="kirbyu2" cloneof="kirby">
-		<description>Kirby's Adventure (USA, TKEPROM pcb)</description>
+		<description>Kirby's Adventure (USA, TKEPROM PCB)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -28826,7 +28826,7 @@ license:CC0
 	</software>
 
 	<software name="pinballj" cloneof="pinball">
-		<description>Pinball (Jpn, STROM pcb)</description>
+		<description>Pinball (Jpn, STROM PCB)</description>
 		<year>1984</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-PN"/>
@@ -42049,7 +42049,7 @@ license:CC0
 
 <!-- this was found on a proto cart, but the program is the same as the final -->
 	<software name="wariowdu1" cloneof="wariowd">
-		<description>Wario's Woods (USA, TKEPROM pcb)</description>
+		<description>Wario's Woods (USA, TKEPROM PCB)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -42316,7 +42316,7 @@ license:CC0
 
 <!-- this was found on a proto cart, but the program is the same as the final -->
 	<software name="carmntim1" cloneof="carmntim">
-		<description>Where in Time is Carmen Sandiego? (USA, TKEPROM pcb)</description>
+		<description>Where in Time is Carmen Sandiego? (USA, TKEPROM PCB)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
