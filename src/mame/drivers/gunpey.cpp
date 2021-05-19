@@ -235,7 +235,7 @@ struct huffman_node_s
 };
 
 
-constexpr u32 get_vmem_addr(u16 x, u16 y)
+constexpr u32 get_video_addr(u16 x, u16 y)
 {
 	return (x & 0x7ff) | (u32(y & 0x7ff) << 11);
 }
@@ -377,7 +377,7 @@ void gunpey_state::draw_pixel_clut(bitmap_ind16 &bitmap, const rectangle &clipre
 	color += u32(pix);
 
 	// get palette
-	const u32 col_offs = get_vmem_addr((color & 0xff) << 1, (color >> 8));
+	const u32 col_offs = get_video_addr((color & 0xff) << 1, (color >> 8));
 	const u16 color_data = (m_vram[col_offs]) | (m_vram[col_offs + 1] << 8);
 
 	draw_pixel(bitmap, cliprect, x, xi, y, yi, color_data, alpha, scene_gradient);
@@ -492,7 +492,7 @@ bool gunpey_state::draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 				{
 					const int xi2 = xsourceoff >> ZOOM_SHIFT;
 
-					const u8 data = m_vram[get_vmem_addr(xsource + (xi2 >> 1), ysource + yi2)];
+					const u8 data = m_vram[get_video_addr(xsource + (xi2 >> 1), ysource + yi2)];
 
 					draw_pixel_clut(bitmap, cliprect, x, xi, y, yi, BIT(data, BIT(xi2, 0) << 2, 4), color, alpha, scene_gradient);
 					xsourceoff += widthstep;
@@ -518,7 +518,7 @@ bool gunpey_state::draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int
 				{
 					const int xi2 = xsourceoff >> ZOOM_SHIFT;
 
-					const u8 data = m_vram[get_vmem_addr(xsource + xi2, ysource + yi2)];
+					const u8 data = m_vram[get_video_addr(xsource + xi2, ysource + yi2)];
 
 					draw_pixel_clut(bitmap, cliprect, x, xi, y, yi, data, color, alpha, scene_gradient);
 					xsourceoff += widthstep;
@@ -631,7 +631,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 bool gunpey_state::write_dest_byte(u8 usedata)
 {
 	// write the byte we and to destination and increase our counters
-	m_vram[get_vmem_addr(m_dstx, m_dsty)] = usedata;
+	m_vram[get_video_addr(m_dstx, m_dsty)] = usedata;
 
 	// increase destination counter and check if we've filled our destination rectangle
 	m_dstx++; m_dstxcount++;
@@ -650,7 +650,7 @@ bool gunpey_state::write_dest_byte(u8 usedata)
 
 inline u8 gunpey_state::get_vrom_byte(int x, int y)
 {
-	return m_blit_rom[get_vmem_addr(x, y) & (m_blit_rom.length() - 1)];
+	return m_blit_rom[get_video_addr(x, y) & (m_blit_rom.length() - 1)];
 }
 
 inline int gunpey_state::get_next_bit(state_s *s)
@@ -695,7 +695,7 @@ void state_s::set_o(unsigned char v)
 			break;
 	}
 
-	buf[get_vmem_addr(dx + (ox++), dy + oy)] = v;
+	buf[get_video_addr(dx + (ox++), dy + oy)] = v;
 }
 
 
@@ -708,7 +708,7 @@ unsigned char state_s::get_o(int x, int y) const
 	assert(y < oh);
 	assert(y < 256);
 
-	return buf[get_vmem_addr(dx + x, dy + y)];
+	return buf[get_video_addr(dx + x, dy + y)];
 }
 
 
@@ -976,7 +976,7 @@ void gunpey_state::blitter_w(offs_t offset, u8 data)
 
 			for (;;)
 			{
-				u8 usedata = m_blit_rom[get_vmem_addr(m_srcx, m_srcy)];
+				u8 usedata = m_blit_rom[get_video_addr(m_srcx, m_srcy)];
 				m_srcx++; m_srcxcount++;
 				if (m_srcxcount == m_xsize)
 				{
