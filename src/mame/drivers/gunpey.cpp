@@ -237,7 +237,7 @@ struct huffman_node_s
 
 constexpr u32 get_vmem_addr(u16 x, u16 y)
 {
-	return (x & 0x7ff) | ((y & 0x7ff) << 11);
+	return (x & 0x7ff) | (u32(y & 0x7ff) << 11);
 }
 
 	
