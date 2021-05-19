@@ -463,19 +463,23 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	}
 }
 
+inline u8 c140_device::keyon_status_read(u16 offset)
+{
+	m_stream->update();
+	C140_VOICE *v = &m_voi[offset >> 4];
+	// suzuka 8 hours and final lap games reads from here,
+	// expecting bit 6 to be an inprogress sample flag.
+	// four trax expects bits 6 and 4 high to signal keyon, is latter actually half flag?
+	// (sounds kinda bogus when player crashes in an object and jump spin)
+	return (v->key) ? 0x50 : 0x00;
+}
+
 
 u8 c140_device::c140_r(offs_t offset)
 {
-	m_stream->update();
-
 	offset &= 0x1ff;
 	if ((offset & 0xf) == 0x5)
-	{
-		C140_VOICE *v = &m_voi[offset >> 4];
-		// suzuka 8 hours 1 & 2 reads from here,
-		// expecting bit 6 to be an inprogress sample flag.
-		return (v->key) ? 0x40 : 0x00;
-	}
+		return keyon_status_read(offset);
 	return m_REG[offset];
 }
 
@@ -549,12 +553,11 @@ void c140_device::c140_w(offs_t offset, u8 data)
 u8 c219_device::c219_r(offs_t offset)
 {
 	offset &= 0x1ff;
+	// assume same as c140
+	// TODO: what happens here on reading unmapped voice regs?
 	if ((offset & 0xf) == 0x5)
-	{
-		// assume same as c140
-		C140_VOICE *v = &m_voi[offset >> 4];
-		return (v->key) ? 0x40 : 0x00;
-	}
+		return keyon_status_read(offset);
+
 	return m_REG[offset];
 }
 
