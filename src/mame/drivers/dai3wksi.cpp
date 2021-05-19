@@ -679,5 +679,5 @@ ROM_END
 GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Warp-1 (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, warp1t,   warp1, dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Sun Electronics", "Warp-1 (Japan, Taito license)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, warp1t,   warp1, dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Sun Electronics (Taito license)", "Warp-1 (Japan, Taito license)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1979, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg (Igleck)", "Warp-1 (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_warp1bl )
