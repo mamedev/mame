@@ -43818,7 +43818,7 @@ license:CC0
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-A2"/>
 		<info name="release" value="19890721"/>
-		<info name="alt_title" value="全米プロバスケット"/>
+		<info name="alt_title" value="全米!!プロバスケット"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
