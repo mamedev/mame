@@ -357,6 +357,7 @@ struct options
 	const dasm_table_entry *dasm;
 	uint32_t                skip;
 	uint32_t                count;
+	bool                    octal;
 };
 
 static const dasm_table_entry dasm_table[] =
@@ -426,6 +427,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "h16",             be,  0, []() -> util::disasm_interface * { return new h16_disassembler; } },
 	{ "hc11",            be,  0, []() -> util::disasm_interface * { return new hc11_disassembler; } },
 	{ "hcd62121",        le,  0, []() -> util::disasm_interface * { return new hcd62121_disassembler; } },
+	{ "hd6120",          be, -1, []() -> util::disasm_interface * { return new hd6120_disassembler; } },
 	{ "hd61700",         le, -1, []() -> util::disasm_interface * { return new hd61700_disassembler; } },
 	{ "hd6301",          be,  0, []() -> util::disasm_interface * { return new m680x_disassembler(6301); } },
 	{ "hd6309",          be,  0, []() -> util::disasm_interface * { return new hd6309_disassembler; } },
@@ -1110,6 +1112,8 @@ static int parse_options(int argc, char *argv[], options *opts)
 				opts->upper = true;
 			else if(tolower((uint8_t)curarg[1]) == 'x')
 				opts->xchbytes = true;
+			else if(tolower((uint8_t)curarg[1]) == 'o')
+				opts->octal = true;
 			else
 				goto usage;
 
@@ -1183,7 +1187,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 usage:
 	printf("Usage: %s <filename> -arch <architecture> [-basepc <pc>] \n", argv[0]);
 	printf("   [-mode <n>] [-norawbytes] [-xchbytes] [-flipped] [-upper] [-lower]\n");
-	printf("   [-skip <n>] [-count <n>]\n");
+	printf("   [-skip <n>] [-count <n>] [-octal]\n");
 	printf("\n");
 	printf("Supported architectures:");
 	const int colwidth = 1 + std::strlen(std::max_element(std::begin(dasm_table), std::end(dasm_table), [](const dasm_table_entry &a, const dasm_table_entry &b) { return std::strlen(a.name) < std::strlen(b.name); })->name);
@@ -1350,7 +1354,7 @@ int main(int argc, char *argv[])
 	// pc to string conversion
 	std::function<std::string (offs_t pc)> pc_to_string;
 	int aw = 32 - count_leading_zeros(pc_mask);
-	bool is_octal = false; // Parameter?  Per-cpu config?
+	bool is_octal = opts.octal; // Parameter?  Per-cpu config?
 	if((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = disasm->page_address_bits();
 		int bits2 = disasm->page2_address_bits();
@@ -1471,62 +1475,122 @@ int main(int argc, char *argv[])
 	max_len >>= granularity_shift;
 	std::function<std::string (offs_t pc, offs_t size)> dump_raw_bytes;
 
-	switch(granularity) {
-	case 1:
-		dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
-			std::string result = "";
-			for(offs_t i=0; i != size; i++) {
-				if(i)
-					result += ' ';
-				result += util::string_format("%02x", base_buffer.r8(pc));
-				pc = next_pc(pc, step);
-			}
-			return result;
-		};
-		max_len = (max_len * 3) - 1;
-		break;
+	if(is_octal) {
+		switch(granularity) {
+		case 1:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%03o", base_buffer.r8(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 4) - 1;
+			break;
 
-	case 2:
-		dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
-			std::string result = "";
-			for(offs_t i=0; i != size; i++) {
-				if(i)
-					result += ' ';
-				result += util::string_format("%04x", base_buffer.r16(pc));
-				pc = next_pc(pc, step);
-			}
-			return result;
-		};
-		max_len = (max_len * 5) - 1;
-		break;
+		case 2:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%06o", base_buffer.r16(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 7) - 1;
+			break;
 
-	case 4:
-		dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
-			std::string result = "";
-			for(offs_t i=0; i != size; i++) {
-				if(i)
-					result += ' ';
-				result += util::string_format("%08x", base_buffer.r32(pc));
-				pc = next_pc(pc, step);
-			}
-			return result;
-		};
-		max_len = (max_len * 9) - 1;
-		break;
+		case 4:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%011o", base_buffer.r32(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 12) - 1;
+			break;
 
-	case 8:
-		dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
-			std::string result = "";
-			for(offs_t i=0; i != size; i++) {
-				if(i)
-					result += ' ';
-				result += util::string_format("%016x", base_buffer.r64(pc));
-				pc = next_pc(pc, step);
-			}
-			return result;
-		};
-		max_len = (max_len * 17) - 1;
-		break;
+		case 8:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%022o", base_buffer.r64(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 23) - 1;
+			break;
+		}
+	} else {
+		switch(granularity) {
+		case 1:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%02x", base_buffer.r8(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 3) - 1;
+			break;
+
+		case 2:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%04x", base_buffer.r16(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 5) - 1;
+			break;
+
+		case 4:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%08x", base_buffer.r32(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 9) - 1;
+			break;
+
+		case 8:
+			dump_raw_bytes = [step = disasm->opcode_alignment(), next_pc, base_buffer](offs_t pc, offs_t size) -> std::string {
+				std::string result = "";
+				for(offs_t i=0; i != size; i++) {
+					if(i)
+						result += ' ';
+					result += util::string_format("%016x", base_buffer.r64(pc));
+					pc = next_pc(pc, step);
+				}
+				return result;
+			};
+			max_len = (max_len * 17) - 1;
+			break;
+		}
 	}
 
 	if(opts.flipped) {
