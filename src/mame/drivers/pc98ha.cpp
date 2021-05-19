@@ -15,6 +15,7 @@
 		- first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7, 
 		  which initializes battery backup if on, but port C is in output mode there.
 		  Somehow obf irq is on at boot if battery failed?
+	- RTC throws 2065 as year, it reads back I/O 0x22/0x23 (not on base PC98?)
     - power handling;
     - pc98ha specifics:
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
@@ -157,7 +158,7 @@ void pc98ha_state::ha_map(address_map &map)
 	map(0xc8000, 0xcbfff).bankrw("ems_bank3");
 	map(0xcc000, 0xcffff).bankrw("ems_bank4");
 	map(0xdc000, 0xdffff).view(m_ext_view);
-	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, checked
+	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, never really accessed?
 	m_ext_view[1](0xdc000, 0xdffff).bankrw("ramdrv_bank");
 	m_ext_view[2](0xdc000, 0xdffff).unmaprw(); // JEIDA memory card
 	m_ext_view[3](0xdc000, 0xdffff).unmaprw();
@@ -304,7 +305,7 @@ void pc98ha_state::machine_start()
 	
 	m_ems_ram = make_unique_clear<uint16_t[]>(ems_size);
 	for (int i = 0; i < 4; i++)
-		m_ems_banks[i]->configure_entries(0, 0x80,            m_ems_ram.get(), 0x4000);
+		m_ems_banks[i]->configure_entries(0, ems_banks, m_ems_ram.get(), 0x4000);
 
 	save_item(NAME(m_ext_view_sel));
 	save_pointer(NAME(m_ems_ram), ems_size);
