@@ -10,8 +10,7 @@
     - implement sound as a bml3bus slot device
     - account for hardware differences between MB-6890, MB-6891 and MB-6892
       (e.g. custom font support on the MB-6892)
-    - both floppy disk controllers exhibit instability and can cause random
-      problems.
+    - MP1805 fdc crashes if a disk is inserted.
 
 **************************************************************************************/
 
@@ -933,11 +932,12 @@ void bml3_state::bml3_common(machine_config &config)
 	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
-	   User may want to switch this to MP-1802 (5.25" DS/DD).
+	/* Default to nothing, to stop machine hanging at start.
+	   Can use MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
+	   Or use MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, "bml3rtc");
 	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
 	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);

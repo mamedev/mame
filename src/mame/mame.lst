@@ -2462,6 +2462,7 @@ bonzeadvu                       // B41 (c) 1988 Taito America Corporation (US)
 cadash                          // C21 (c) 1989 Taito Corporation Japan
 cadashf                         // C21 (c) 1989 Taito Corporation Japan
 cadashg                         // C21 (c) 1989 Taito Corporation Japan
+cadashgo                        // C21 (c) 1989 Taito Corporation Japan
 cadashi                         // C21 (c) 1989 Taito Corporation Japan
 cadashj                         // C21 (c) 1989 Taito Corporation
 cadashj1                        // C21 (c) 1989 Taito Corporation
@@ -11630,6 +11631,7 @@ dai                             // DAI
 @source:dai3wksi.cpp
 dai3wksi                        // 1979.09 Dai San Wakusei (The Third Planet)
 warp1                           // 1979.12 Warp-1
+warp1t                          // 1979.12 Warp-1 (Taito license)
 warp1bl                         // bootleg
 
 @source:dambustr.cpp

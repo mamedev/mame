@@ -22,7 +22,6 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- not sure about comm/module leds, where is the module led?
 - fart noise at boot if osa module is inserted
 - finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
@@ -138,18 +137,17 @@ void ren_state::lcd_output_w(offs_t offset, u64 data)
 void ren_state::update_display()
 {
 	m_display->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0]);
-	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1]);
+	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x38) | m_led_data[1]);
 }
 
 void ren_state::mux_w(u8 data)
 {
 	// d0-d3 input/chessboard led mux
 	// d4: chessboard led data
+	// d5: module led
 	// d6,d7: mode led
-	m_inp_mux = data;
+	m_inp_mux = data ^ 0x20;
 	update_display();
-
-	// d5: ?
 }
 
 void ren_state::leds_w(u8 data)
@@ -164,11 +162,9 @@ void ren_state::control_w(u8 data)
 	// d1: speaker out
 	m_dac->level_w(BIT(data, 1));
 
-	// d2,d3: comm/module leds?
-	m_led_data[1] = (m_led_data[1] & ~0xc) | (~data & 0xc);
+	// d2: comm led
+	m_led_data[1] = (m_led_data[1] & ~0x4) | (~data & 0x4);
 	update_display();
-
-	// d6: power off?
 
 	// other: ?
 }

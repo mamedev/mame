@@ -21,6 +21,8 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
 	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 
+	void force_32x32_sprites(bool force) { m_force_32x32 = force; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -33,6 +35,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<u16> m_spriteram;
+	bool m_force_32x32;
 };
 
 // device type definition

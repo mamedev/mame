@@ -69,6 +69,7 @@ public:
 		, m_fdd(*this, "fdc:%u:525dd", 0U)
 		//, m_dma(*this, "dma")
 		, m_hdc(*this, "hdc")
+		, m_hdd(*this, "hdc:0")
 		, m_lan(*this, "lan")
 		, m_led(*this, "led")
 	{
@@ -123,6 +124,7 @@ protected:
 	optional_device_array<floppy_image_device, 2> m_fdd;
 	//required_device<am9516a_device> m_dma;
 	required_device<wd1010_device> m_hdc;
+	required_device<harddisk_image_device> m_hdd;
 	required_device<i82586_device> m_lan;
 
 	output_finder<> m_led;
@@ -395,7 +397,7 @@ enum hcr_mask : u8
 
 void tek6100_state::hcr_w(u8 data)
 {
-	m_hdc->drdy_w(bool(data & HCR_DRSEL));
+	m_hdc->drdy_w(m_hdd->exists() && bool(data & HCR_DRSEL));
 	m_hdc->brdy_w(bool(data & HCR_BFRDY));
 
 	if (!(data & HCR_BCCLR))
@@ -530,7 +532,7 @@ void tek6100_state::tek6130(machine_config &config)
 	m_hdc->out_data_callback().set(FUNC(tek6100_state::buf_w<u8>));
 	m_hdc->out_bcr_callback().set([this](int state) { if (state) m_hdc_ptr = 0; });
 
-	HARDDISK(config, "hdc:0", 0);
+	HARDDISK(config, m_hdd, 0);
 
 	I82586(config, m_lan, 16_MHz_XTAL / 2);
 	m_lan->set_addrmap(0, &tek6100_state::lan_map);
