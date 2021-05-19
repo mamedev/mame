@@ -234,11 +234,13 @@ struct huffman_node_s
 	int arg1_val;
 };
 
-static inline u32 get_vmem_addr(int x, int y)
+
+constexpr u32 get_vmem_addr(u16 x, u16 y)
 {
 	return (x & 0x7ff) | ((y & 0x7ff) << 11);
 }
 
+	
 class gunpey_state : public driver_device
 {
 public:
