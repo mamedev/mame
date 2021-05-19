@@ -466,7 +466,16 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 u8 c140_device::c140_r(offs_t offset)
 {
+	m_stream->update();
+
 	offset &= 0x1ff;
+	if ((offset & 0xf) == 0x5)
+	{
+		C140_VOICE *v = &m_voi[offset >> 4];
+		// suzuka 8 hours 1 & 2 reads from here,
+		// expecting bit 6 to be an inprogress sample flag.
+		return (v->key) ? 0x40 : 0x00;
+	}
 	return m_REG[offset];
 }
 
@@ -540,6 +549,12 @@ void c140_device::c140_w(offs_t offset, u8 data)
 u8 c219_device::c219_r(offs_t offset)
 {
 	offset &= 0x1ff;
+	if ((offset & 0xf) == 0x5)
+	{
+		// assume same as c140
+		C140_VOICE *v = &m_voi[offset >> 4];
+		return (v->key) ? 0x40 : 0x00;
+	}
 	return m_REG[offset];
 }
 
