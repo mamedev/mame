@@ -684,7 +684,11 @@ int sdl_window_info::complete_create()
 
 	// create or attach to an existing window
 	SDL_Window *sdlwindow;
+#ifdef SDLMAME_X11
 	const char *attach_window = downcast<sdl_options &>(machine().options()).attach_window();
+#else
+	const char *attach_window = nullptr;
+#endif
 	if (attach_window && *attach_window)
 	{
 		// we're attaching to an existing window; parse the argument
@@ -714,6 +718,7 @@ int sdl_window_info::complete_create()
 		{
 			switch (swmi.subsystem)
 			{
+#ifdef SDLMAME_X11
 			case SDL_SYSWM_X11:
 				// by default, SDL_CreateWindowFrom() doesn't ensure that we're getting the events that we
 				// expect
@@ -723,6 +728,7 @@ int sdl_window_info::complete_create()
 					PropertyChangeMask | StructureNotifyMask |
 					ExposureMask | KeymapStateMask);
 				break;
+#endif // SDLMAME_X11
 
 			default:
 				break;
