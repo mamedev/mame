@@ -13,6 +13,7 @@
 
 #include <variant>
 #include <unordered_map>
+#include <functional>
 
 enum class fs_meta_name {
 	creation_date,
