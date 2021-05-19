@@ -50,11 +50,17 @@ public:
 	void coco3_mem(address_map &map);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 	virtual void update_cart_base(uint8_t *cart_base) override;
 
 	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value) override;
 	virtual void cart_w(bool line) override;
+
+	uint8_t m_pia1b_control_register;
 
 private:
 	required_device<gime_device> m_gime;
