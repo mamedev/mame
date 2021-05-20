@@ -27,9 +27,6 @@ known issues:
     Finest Hour:
     - roz plane colors are bad in-game
 
-    Final Lap:
-    - sprite size bit is bogus during splash screen
-
     Final Lap 3:
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
@@ -1929,6 +1926,8 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
+	m_ns2sprite->force_32x32_sprites(true);
+
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1954,6 +1953,8 @@ void namcos2_state::finalap2(machine_config &config)
 	finallap(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+
+	m_ns2sprite->force_32x32_sprites(false);
 }
 
 void namcos2_state::finalap3(machine_config &config)
@@ -1961,6 +1962,8 @@ void namcos2_state::finalap3(machine_config &config)
 	finallap_c68(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+
+	m_ns2sprite->force_32x32_sprites(false);
 }
 
 

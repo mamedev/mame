@@ -555,6 +555,8 @@ end
 
 if CPUS["PDP8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.cpp",
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.h",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.cpp",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.h",
 	}

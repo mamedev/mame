@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include "screen.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -76,10 +78,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	devcb_write_line m_stb_handler;
 	devcb_write_line m_rts_handler;
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// input pins state
 	u8 m_data = 0;
@@ -101,6 +106,8 @@ public:
 	virtual void data_w(u8 data) { }
 	virtual void nmi_w(int state) { }
 	virtual void ack_w(int state) { }
+
+	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return UPDATE_HAS_NOT_CHANGED; }
 
 protected:
 	device_saitekosa_expansion_interface(const machine_config &mconfig, device_t &device);

@@ -184,7 +184,7 @@ void ren_state::exp_stb_w(int state)
 
 void ren_state::exp_rts_w(int state)
 {
-	// ?
+	// NAND with ACK-P? (not used by module)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -342,7 +342,7 @@ void ren_state::ren(machine_config &config)
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(ren_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(873/2, 1080/2);
 	screen.set_visarea_full();

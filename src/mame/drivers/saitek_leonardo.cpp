@@ -173,7 +173,7 @@ void leo_state::exp_stb_w(int state)
 
 void leo_state::exp_rts_w(int state)
 {
-	// ?
+	// NAND with ACK-P? (not used by module)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
