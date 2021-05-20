@@ -77,6 +77,48 @@ building MAME on a 64-bit system.  Instructions may need to be adjusted for
   the portable Qt debugger, add **USE_QTDEBUG=1** to the make options.  You
   will need to install the MSYS2 packages for Qt 5.
 
+Using Windows Subsystem for Linux on Windows 10
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(done with Ubuntu as it's the most popular distro)
+
+Step 1: install Windows Subsystem for Linux
+
+* right-click Start menu
+* click Apps and Features
+* click Programs and Features
+* click Turn Windows features on or off
+* check Windows Subsystem for Linux
+* click OK
+* reboot when asked
+
+Step 2: install Ubuntu on Windows Subsystem for Linux
+
+* browse to https://ubuntu.com/wsl to open page on Microsoft Store
+* click Get
+* click Install
+
+Step 3: build MAME
+
+* open Ubuntu in Start menu
+* upgrade the installation, get MAME dependencies, clone repository and build MAME
+
+    sudo apt update
+
+    sudo apt upgrade
+
+    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default
+
+    git clone https://github.com/mamedev/mame.git
+
+    cd mame
+
+    make vs2019
+
+* in Explorer, browse to network path \\\\wsl$\\Ubuntu, right-click it and choose Map network drive
+* from that newly mapped network drive, copy the project somewhere on your system as it's a read-only share
+* open the solution in Visual Studio
+
 Using a standard MSYS2 installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
