@@ -1023,7 +1023,7 @@ license:CC0
 	</software>
 
 	<software name="aburnerj1" cloneof="aburner">
-		<description>After Burner II (Jpn, Alt PCB)</description>
+		<description>After Burner II (Jpn, alt PCB)</description>
 		<year>1989</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-AFB-6200 (SS13)"/>
@@ -1031,7 +1031,7 @@ license:CC0
 		<info name="alt_title" value="アフターバーナー ~ After Burner (Box)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sunsoft4" />
-			<feature name="pcb" value="SUNSOFT-4" />
+			<feature name="pcb" value="SUNSOFT-6A" />
 			<dataarea name="prg" size="131072">
 				<rom name="mpr-12363" size="131072" crc="88f202f0" sha1="709e2744cf4f7ce43c41ed57ec858128e008f305" offset="00000" />
 			</dataarea>
@@ -3432,7 +3432,7 @@ license:CC0
 
 <!-- This is on a Famicom PCB, but it already contains the US code... -->
 	<software name="batmanrjup" cloneof="batmanrj">
-		<description>Batman - Return of the Joker (USA, Prototype)</description>
+		<description>Batman - Return of the Joker (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -17635,8 +17635,13 @@ license:CC0
 		<description>Ice Climber (Euro, USA, Kor)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-IC-USA, NES-IC-(EEC/ESP), NES-IC-KOR"/>
-		<info name="release" value="198510xx (USA), 19860901 (Euro), 1989 (Kor)"/>
+		<info name="serial" value="NES-IC-USA"/>
+		<info name="serial" value="NES-IC-EEC"/>
+		<info name="serial" value="NES-IC-ESP"/>
+		<info name="serial" value="NES-IC-KOR"/>
+		<info name="release" value="198510xx (USA)"/>
+		<info name="release" value="19860901 (Euro)"/>
+		<info name="release" value="1989 (Kor)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="NES-NROM-128" />
@@ -37119,7 +37124,8 @@ license:CC0
 		<description>Super Spike V'Ball (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-VJ-(USA/CAN)"/>
+		<info name="serial" value="NES-VJ-USA"/>
+		<info name="serial" value="NES-VJ-CAN"/>
 		<info name="release" value="199002xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -40531,7 +40537,9 @@ license:CC0
 		<description>Trog! (Euro)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="NES-4A-(AUS/NOE/ESP)"/>
+		<info name="serial" value="NES-4A-AUS"/>
+		<info name="serial" value="NES-4A-NOE"/>
+		<info name="serial" value="NES-4A-ESP"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="NES-UNROM" />
@@ -43818,7 +43826,7 @@ license:CC0
 		<publisher>Vic Tokai</publisher>
 		<info name="serial" value="VIC-A2"/>
 		<info name="release" value="19890721"/>
-		<info name="alt_title" value="全米!!プロバスケット"/>
+		<info name="alt_title" value="全米‼︎プロバスケット"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
