@@ -46278,7 +46278,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="f-1 sensation (japan).chr" size="131072" crc="67853884" sha1="94f27858c002745b9666d36485526a6404b9db84" offset="00000" status="baddump" />
+				<rom name="f-1 sensation (japan).chr" size="131072" crc="67853884" sha1="4a170b3dcf365badd2bea6984d0be84651459348" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="f-1 sensation (japan).prg" size="131072" crc="cb106f49" sha1="f4c359b97b0df2aa2942b141ee9d0a9dd7d28e3d" offset="00000" status="baddump" />
