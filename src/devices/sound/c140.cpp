@@ -466,12 +466,12 @@ void c219_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 inline u8 c140_device::keyon_status_read(u16 offset)
 {
 	m_stream->update();
-	C140_VOICE *v = &m_voi[offset >> 4];
+	C140_VOICE const &v = m_voi[offset >> 4];
 	// suzuka 8 hours and final lap games reads from here,
 	// expecting bit 6 to be an inprogress sample flag.
 	// four trax also expects bit 4 high for some specific channels to make engine noises to work properly
 	// (sounds kinda bogus when player crashes in an object and jump spin, needs real HW verification)
-	return (v->key ? 0x40 : 0x00) | (v->mode & 0x3f);
+	return (v.key ? 0x40 : 0x00) | (v.mode & 0x3f);
 }
 
 

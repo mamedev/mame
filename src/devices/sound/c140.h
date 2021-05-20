@@ -98,7 +98,7 @@ protected:
 
 	emu_timer *m_int1_timer;
 	
-	inline u8 keyon_status_read(u16 offset);
+	u8 keyon_status_read(u16 offset);
 };
 
 class c219_device : public c140_device
