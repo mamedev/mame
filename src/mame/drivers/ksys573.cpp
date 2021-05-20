@@ -48,7 +48,7 @@
 P Anime Champ                                   2000.12    GCA07 JA          (no CD)
 P Bass Angler                                   1998.03    GE765 JA          765 JA A02
 P Bass Angler 2                                 1998.07    GC865 JA          865 JA A02
-P *DAM-DDR Dance Dance Revolution for DAM       1999.11
+P DAM-DDR Dance Dance Revolution for DAM        1999.11    GQ921 JB          921 JB B02
 P *DAM-DDR Dance Dance Revolution for DAM 2nd   2000.07
 A Dance Dance Revolution                        1998.09    GC845 JA          845 JA(missing)/UA A01 / 845 JA A02
 A Dance Dance Revolution Internet Ranking ver.  1998.11    GC845 JB          845 JB A01 / 845 JA/UA A02
@@ -359,6 +359,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/k573mcr.h"
 #include "machine/k573msu.h"
 #include "machine/k573npu.h"
+#include "machine/k573kara.h"
 #include "machine/mb89371.h"
 #include "machine/ram.h"
 #include "machine/timekpr.h"
@@ -509,6 +510,7 @@ public:
 	void gtfrk11m(machine_config &config);
 	void gtfrk10mb(machine_config &config);
 	void ddr(machine_config &config);
+	void ddrk(machine_config &config);
 	void pnchmn(machine_config &config);
 	void gtrfrk7m(machine_config &config);
 	void ddr3m(machine_config &config);
@@ -551,6 +553,7 @@ public:
 	void dmx(machine_config &config);
 	void drmn(machine_config &config);
 	void k573d(machine_config &config);
+	void k573k(machine_config &config);
 	void k573a(machine_config &config);
 	void pccard1_16mb(machine_config &config);
 	void pccard1_32mb(machine_config &config);
@@ -666,6 +669,7 @@ private:
 	void konami573_map(address_map &map);
 	void konami573a_map(address_map &map);
 	void konami573d_map(address_map &map);
+	void konami573k_map(address_map &map);
 
 	required_ioport m_analog0;
 	required_ioport m_analog1;
@@ -787,6 +791,12 @@ void ksys573_state::konami573d_map(address_map &map)
 {
 	konami573_map(map);
 	map(0x1f640000, 0x1f6400ff).m("k573dio", FUNC(k573dio_device::amap));
+}
+
+void ksys573_state::konami573k_map(address_map &map)
+{
+	konami573_map(map);
+	map(0x1f640000, 0x1f6400ff).m("k573kara", FUNC(k573kara_device::amap));
 }
 
 void ksys573_state::konami573a_map(address_map &map)
@@ -2429,6 +2439,14 @@ void ksys573_state::k573d(machine_config &config)
 	KONAMI_573_DIGITAL_IO_BOARD(config, "k573dio", XTAL(19'660'800));
 }
 
+// Variants with additional karaoke I/O board
+void ksys573_state::k573k(machine_config &config)
+{
+	konami573(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::konami573k_map);
+	KONAMI_573_KARAOKE_IO_BOARD(config, "k573kara", XTAL(36'864'000));
+}
+
 // Variants with additional analogue i/o board
 void ksys573_state::k573a(machine_config &config)
 {
@@ -2521,6 +2539,12 @@ void ksys573_state::ddr(machine_config &config)
 {
 	k573a(config);
 	cassx(config);
+}
+
+void ksys573_state::ddrk(machine_config &config)
+{
+	k573k(config);
+	cassxi(config);
 }
 
 void ksys573_state::ddr2mc2(machine_config &config)
@@ -3094,6 +3118,33 @@ static INPUT_PORTS_START( ddrsolo )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ddrkara )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x10000000, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Service/Select")
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xffff6000, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x00000f0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(ksys573_state, gn845pwbb_read)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_16WAY PORT_PLAYER(1) PORT_NAME("P1 Down 2")
+	PORT_BIT(0x00000020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_16WAY PORT_PLAYER(1) PORT_NAME("P1 Left 2")
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Telop")
+	PORT_BIT(0x00000080, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mode")
+	PORT_BIT(0x00001000, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Level")
+	PORT_BIT(0x00008000, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Start")
+
+	PORT_MODIFY("IN3")
+	PORT_BIT(0xfffffbff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_SERVICE_NO_TOGGLE(0x00000400, IP_ACTIVE_LOW) PORT_NAME("Test")
+
+	PORT_START("STAGE")
+	PORT_BIT(0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY PORT_PLAYER(1)
+	PORT_BIT(0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_16WAY PORT_PLAYER(1) /* multiplexor */
+	PORT_BIT(0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_16WAY PORT_PLAYER(1) /* multiplexor */
+	PORT_BIT(0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_16WAY PORT_PLAYER(1)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gtrfrks )
 	PORT_INCLUDE( konami573 )
 
@@ -3645,6 +3696,19 @@ ROM_START( ddra )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845aaa02", 0, SHA1(9b786de9b1085009c088de0d40425976c1f8df7b) )
+ROM_END
+
+ROM_START( ddrkara )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, "cassette:game:eeprom", 0 )
+	ROM_LOAD( "gq921jbb.u1", 0x000000, 0x000224, BAD_DUMP CRC(4c91aecf) SHA1(4b8318523d6691b2124afceafba78e6bac8ba75f) )
+
+	ROM_REGION( 0x000008, "cassette:game:id", 0 )
+	ROM_LOAD( "gq921jbb.u6", 0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "921jbb02", 0, SHA1(32849007fe5527245a6cc2de38e73d60ae74eff0) )
 ROM_END
 
 ROM_START( ddr2m )
@@ -5766,6 +5830,7 @@ GAME( 1998, ddrj,      dstage,   ddr,        ddr,       ksys573_state, init_ddr,
 GAME( 1998, ddrja,     dstage,   ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, ddrjb,     dstage,   ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GC845 VER. JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, ddra,      dstage,   ddr,        ddr,       ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution (GN845 VER. AAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, ddrkara,   dstage,   ddrk,       ddrkara,   ksys573_state, init_ddr,      ROT0,  "Konami", "Dance Dance Revolution Karaoke Mix", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1998, fbait2bc,  sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait 2 - A Bass Challenge (GE865 VER. UAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassang2,  fbait2bc, fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler 2 (GE865 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbc,  sys573,   hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", MACHINE_IMPERFECT_SOUND )
