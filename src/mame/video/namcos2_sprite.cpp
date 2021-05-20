@@ -227,18 +227,16 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const u16 word0   = m_spriteram[offset + (loop * 4) + 0];
 			const u16 word1   = m_spriteram[offset + (loop * 4) + 1];
 			const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
+			const int sizey   = ((word0 >> 10) & 0x003f) + 1;
 
-			const int sizey = ((word0 >> 10) & 0x003f) + 1;
-			int sizex       =  (word3 >> 10) & 0x003f;
-			int is_32       =  (word0 >> 9)  & 0x0001;
-
-			// The finallap title screen needs 32x32 sprites, but doesn't set the expected bit
-			// other games (eg. mirninja) do correctly set it.
+			// It appears that Final Lap does not support 16x16 sprites, otherwise the titlescreen and
+			// rear-view mirror have glitches. Other games (eg. mirninja) do correctly set it.
 			//
-			// can the 16x16 support be disabled globally with a register, or via a pin on the chip?
-			if (m_force_32x32)
-				is_32 = 1;
+			// It's not expected that there's a missing emulation feature for disabling 16x16 sprite mode,
+			// but simply the early Namco System 2 hardware that Final Lap runs on does not support it.
+			bool is_32 = bool(word0 & 0x200) || m_force_32x32;
 
+			int sizex = (word3 >> 10) & 0x003f;
 			if (!is_32) sizex >>= 1;
 
 			if ((sizey - 1) && sizex)

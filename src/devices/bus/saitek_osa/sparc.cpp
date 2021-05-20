@@ -8,9 +8,12 @@ Saitek OSA Module: Kasparov Sparc (1993)
 The chess engine is by the Spracklen's. Their last, and also their strongest.
 
 Hardware notes:
-- Fujitsu MB86930 SPARClite @ 20MHz (fan cooled)
+- Fujitsu MB86930 SPARClite @ 20MHz
 - 256KB ROM (4*AMD AM27C512)
 - 1MB DRAM (8*NEC 424256-60), expandable to 4MB
+
+The module doesn't have its own LCD screen. It has a grill+fan underneath
+at the front part, and a heatsink on the CPU.
 
 TODO:
 - skeleton device, missing SPARClite emulation, maybe only needs the MMU?
