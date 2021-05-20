@@ -1258,7 +1258,7 @@ void hd6120_device::execute_run()
 			break;
 
 		case minor_state::EXTIOT_5:
-			if (m_intgnt)
+			if (m_intgnt && m_if < 010)
 			{
 				m_intgnt = false;
 				m_intgnt_callback(1);
