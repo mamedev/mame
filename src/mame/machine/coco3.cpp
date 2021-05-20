@@ -47,34 +47,6 @@
 #include "includes/coco3.h"
 
 //-------------------------------------------------
-//  device_start
-//-------------------------------------------------
-
-void coco3_state::device_start()
-{
-	// call parent device_start
-	coco_state::device_start();
-
-	// save state support
-	save_item(NAME(m_pia1b_control_register));
-
-}
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void coco3_state::device_reset()
-{
-	/* call parent device_start */
-	coco_state::device_reset();
-
-	/* reset state */
-	m_pia1b_control_register = 0;
-
-}
-
-//-------------------------------------------------
 //  ff20_write
 //-------------------------------------------------
 
@@ -82,12 +54,8 @@ void coco3_state::ff20_write(offs_t offset, uint8_t data)
 {
 	coco_state::ff20_write(offset, data);
 
-	if (offset == 0x03)
-		m_pia1b_control_register = data;
-
-	/* only pass ff22 to gime if the data register is addressed */
-	if (offset == 0x02 && ((m_pia1b_control_register & 0x04) == 0x04))
-		m_gime->ff22_write(data);
+	/* The GIME monitors writes to the PIA to simulate a VDG */
+	m_gime->pia_write(offset, data);
 }
 
 
