@@ -157,6 +157,7 @@ void pce_joypad2_turbo_device::device_start()
 {
 	pce_joypad2_device::device_start();
 	save_item(NAME(m_counter));
+	save_item(NAME(m_prev_clr));
 }
 
 
@@ -167,6 +168,7 @@ void pce_joypad2_turbo_device::device_start()
 void pce_joypad2_turbo_device::device_reset()
 {
 	m_counter = 0;
+	m_prev_clr = false;
 }
 
 
@@ -203,7 +205,10 @@ void pce_joypad2_device::clr_w(int state)
 void pce_joypad2_turbo_device::clr_w(int state)
 {
 	pce_joypad2_device::clr_w(state);
-	m_counter = (m_counter + 1) & 7; // QA, QD pin not connected
+	if ((!m_prev_clr) && state) // rising edge, connected to 74xx163 clock pin
+		m_counter = (m_counter + 1) & 7; // QA, QD pin not connected
+
+	m_prev_clr = state;
 }
 
 

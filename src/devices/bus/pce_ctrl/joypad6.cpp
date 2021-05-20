@@ -246,7 +246,7 @@ void pce_joypad6_base_device::clr_w(int state)
 {
 	m_muxer[0]->strobe_w(state);
 	m_muxer[1]->strobe_w(state);
-	if ((!m_prev_clr) && state)
+	if ((!m_prev_clr) && state) // rising edge, connected to 74xx163 clock pin
 		m_counter = (m_counter + 1) & 0x3; // Toggle buttons/autofire, connected to 74xx163; QC, QD pin not used
 
 	m_prev_clr = state;

@@ -75,6 +75,7 @@ private:
 
 	// internal states
 	u8 m_counter = 0; // Turbo rate counter, connected on 74xx163 QB and QC.
+	bool m_prev_clr = false; // previous CLR pin state
 
 	// IO ports
 	required_ioport m_buttons_io;
