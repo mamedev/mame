@@ -76,7 +76,7 @@ Compaibility flags:
 		</part>
 	</software>
 
-	<software name="insecth" supported="partial"><!-- keyboard sometimes not working -->
+	<software name="insecth">
 		<description>Insect Hunter</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
