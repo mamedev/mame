@@ -245,7 +245,9 @@ void pc98ha_state::ha_map(address_map &map)
 void pc98ha_state::ha_io(address_map &map)
 {
 	lt_io(map);
-	map(0x0020, 0x002f).nopr(); // upd4991a routes to 0x22 and 0x23, suppress log spam for now
+	map(0x0020, 0x002f).unmaprw();
+	map(0x0022, 0x0022).w(m_rtc_pio, FUNC(upd4991a_device::address_w));
+	map(0x0023, 0x0023).rw(m_rtc_pio, FUNC(upd4991a_device::data_r), FUNC(upd4991a_device::data_w));
 	map(0x08e0, 0x08e7).w(FUNC(pc98ha_state::ems_bank_w)).umask16(0xff00);
 	map(0x0e8e, 0x0e8e).w(FUNC(pc98ha_state::ext_view_bank_w));
 	map(0x0f8e, 0x0f8e).r(FUNC(pc98ha_state::memcard_status_1_r));
@@ -352,8 +354,14 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pc98lt_state, system_type_r)
 INPUT_PORTS_END
 
-//static INPUT_PORTS_START( pc98ha )
-//INPUT_PORTS_END
+static INPUT_PORTS_START( pc98ha )
+	PORT_INCLUDE( pc98lt )
+	
+	PORT_MODIFY("SYSB")
+	PORT_DIPNAME( 0x01, 0x00, "<rtc empty signal>" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
 
 // debug
 static const gfx_layout gfx_16x16x1 =
@@ -390,8 +398,11 @@ void pc98lt_state::machine_start()
 	m_romdrv_bank->configure_entries( 0, 0x10,                 memregion("romdrv")->base(), 0x10000);
 	m_dict_bank->configure_entries(   0, 0x40,                 memregion("dict")->base(),    0x4000);
 
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
+	if (m_rtc != nullptr)
+	{
+		m_rtc->cs_w(1);
+		m_rtc->oe_w(1);
+	}
 	m_sys_type = 0xc0 >> 6;
 
 	save_item(NAME(m_bram_bank_reg));
@@ -484,7 +495,8 @@ void pc98ha_state::ha_config(machine_config &config)
 	m_maincpu->set_tclk(xtal / 4);
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	UPD4990A(config.replace(), m_rtc); // !!! upd4991a !!!
+	config.device_remove("rtc");
+	UPD4991A(config, m_rtc_pio, 32'768);
 }
 
 // all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.
@@ -530,4 +542,4 @@ ROM_START( pc98ha )
 ROM_END
 
 COMP( 1989, pc98lt,      0,        0, lt_config,    pc98lt,   pc98lt_state, empty_init,   "NEC",   "PC-98LT",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, pc98ha,      0,        0, ha_config,    pc98lt,   pc98ha_state, empty_init,   "NEC",   "PC-98HA (Handy98)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1990, pc98ha,      0,        0, ha_config,    pc98ha,   pc98ha_state, empty_init,   "NEC",   "PC-98HA (Handy98)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

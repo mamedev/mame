@@ -18,12 +18,13 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/output_latch.h"
+#include "machine/pc9801_memsw.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "machine/pc9801_memsw.h"
+#include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
 #include "bus/scsi/pc9801_sasi.h"
@@ -100,7 +101,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<pc9801_kbd_device> m_keyb;
-	required_device<upd1990a_device> m_rtc;
+	optional_device<upd1990a_device> m_rtc;
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
 	optional_device<beep_device> m_beeper;
@@ -525,6 +526,7 @@ public:
 		, m_ems_banks(*this, "ems_bank%u", 1U)
 		, m_ext_view(*this, "ext_io")
 		, m_ramdrv_bank(*this, "ramdrv_bank")
+		, m_rtc_pio(*this, "prtc")
 	{
 	}
 
@@ -539,6 +541,7 @@ private:
 	required_memory_bank_array<4> m_ems_banks;
 	memory_view m_ext_view;
 	required_memory_bank m_ramdrv_bank;
+	required_device<upd4991a_device> m_rtc_pio;
 
 	std::unique_ptr<uint16_t[]> m_ems_ram;
 
