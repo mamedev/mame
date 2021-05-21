@@ -7,9 +7,10 @@ CREI680 trainer.
 This has 2 boards, the CPU board with the buttons, LEDs etc,
 and the video board.
 
-Like many machines of this era, the cassette circuit is grossly
-overcomplicated, using at least 12 chips. We assume that it uses 300 baud
-Kansas City format.
+Like many machines of this era, the cassette circuit is grossly overcomplicated,
+using a 3301 op-amp, a 75140 line receiver and a bunch of CMOS logic ICs. Since
+the first of these (a 14040B) divides the E clock down to 300 * 16 to generate
+the ACIA's TXC input, the format can be assumed to be Kansas City.
 
 The schematic is missing some information, so we've guessed a few things.
 We don't have any instructions, user manual or anything - just the schematic.
@@ -313,9 +314,9 @@ void crei680_state::crei680(machine_config &config)
 	//m_uart->rts_handler().set(FUNC(crei680_state::acia_rts_w));
 	m_uart->irq_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
-	clock_device &acia_clock(CLOCK(config, "acia_clock", 4800));
-	acia_clock.signal_handler().set("uart", FUNC(acia6850_device::write_txc));
-	acia_clock.signal_handler().append("uart", FUNC(acia6850_device::write_rxc));
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 2.4576_MHz_XTAL / 4 / 128));
+	acia_clock.signal_handler().set("uart", FUNC(acia6850_device::write_txc)); // connected directly
+	acia_clock.signal_handler().append("uart", FUNC(acia6850_device::write_rxc)); // FIXME: modulated by RXD
 
 	TIMER(config, "kansas_w").configure_periodic(FUNC(crei680_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(crei680_state::kansas_r), attotime::from_hz(40000));
