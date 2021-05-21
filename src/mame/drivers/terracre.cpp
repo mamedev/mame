@@ -85,9 +85,9 @@ AT-2
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -513,7 +513,7 @@ void amazon_state::amazon_1412m2(machine_config &config)
 	amazon_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amazon_state::amazon_1412m2_map);
 
-	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
+	NB1412M2(config, m_prot, XTAL(16'000'000)/4); // divided by 4 maybe
 }
 
 

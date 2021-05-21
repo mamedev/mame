@@ -1224,11 +1224,14 @@ void sound_manager::samples(s16 *buffer)
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+	bool old_muted = m_muted;
 	if (mute)
 		m_muted |= reason;
 	else
 		m_muted &= ~reason;
-	set_attenuation(m_attenuation);
+
+	if(old_muted != (m_muted != 0))
+		set_attenuation(m_attenuation);
 }
 
 

@@ -49,8 +49,14 @@ void menu_control_floppy_image::do_load_create()
 			machine().popmessage("Error: %s", fd.error());
 			return;
 		}
-		if (create_fs)
-			fd.init_fs(create_fs);
+		if (create_fs) {
+			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
+			err = fd.finish_load();
+			if (err == image_init_result::PASS) {
+				fs_meta_data meta;
+				fd.init_fs(create_fs, meta);
+			}
+		}
 	} else {
 		image_init_result err = fd.load(input_filename);
 		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
@@ -125,7 +131,7 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
-			const auto &fs = fd.get_fs();
+			const auto &fs = fd.get_create_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
 			output_format = format_array[m_submenu_result.i];
 			if(fs.size() == 1) {
@@ -145,7 +151,7 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
-			create_fs = &fd.get_fs()[m_submenu_result.i];
+			create_fs = &fd.get_create_fs()[m_submenu_result.i];
 			do_load_create();
 			stack_pop();
 		}

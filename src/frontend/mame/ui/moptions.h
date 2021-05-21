@@ -50,6 +50,7 @@
 #define OPTION_LAST_USED_MACHINE      "last_used_machine"
 #define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
 #define OPTION_HIDE_ROMLESS           "hide_romless"
+#define OPTION_UNTHROTTLE_MUTE        "unthrottle_mute"
 
 
 // core UI options
@@ -115,6 +116,7 @@ public:
 	int last_right_panel() const { return int_value(OPTION_LAST_RIGHT_PANEL); }
 	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
 	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
+	bool unthrottle_mute() const { return bool_value(OPTION_UNTHROTTLE_MUTE); }
 
 	// UI options
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }

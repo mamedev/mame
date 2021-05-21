@@ -474,6 +474,5 @@ uint32_t gaelco3d_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_video_changed = false;
 	}
 
-	logerror("---update---\n");
 	return (!ret);
 }

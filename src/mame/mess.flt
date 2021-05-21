@@ -108,6 +108,7 @@ b2m.cpp
 babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
+basf7100.cpp
 basic52.cpp
 basssta.cpp
 bbc.cpp
@@ -169,6 +170,7 @@ channelf.cpp
 chaos.cpp
 chessmate.cpp
 chessmst.cpp
+chessmstdm.cpp
 cit101.cpp
 cit101xl.cpp
 cit1500.cpp
@@ -200,6 +202,7 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
+crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -223,6 +226,7 @@ dccons.cpp
 dcebridge.cpp
 dct11em.cpp
 debut.cpp
+decmate2.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
@@ -267,6 +271,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+elzet80.cpp
 emax.cpp
 emma2.cpp
 emu2.cpp
@@ -447,6 +452,7 @@ innotv_innotabmax.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
+intellec8.cpp
 intellect02.cpp
 interpro.cpp
 intv.cpp
@@ -478,6 +484,7 @@ jtc.cpp
 juicebox.cpp
 juku.cpp
 junior.cpp
+junior80.cpp
 juno106.cpp
 juno6.cpp
 jupace.cpp
@@ -495,6 +502,7 @@ kaypro.cpp
 kc.cpp
 kdt6.cpp
 kim1.cpp
+kminus.cpp
 konin.cpp
 korgds8.cpp
 korgdss1.cpp
@@ -530,6 +538,7 @@ lisa.cpp
 llc1.cpp
 llc2.cpp
 lms46.cpp
+lnw80.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
@@ -544,12 +553,14 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+macpdm.cpp
 macprtb.cpp
 macpwrbk030.cpp
 macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+max80.cpp
 mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
@@ -573,21 +584,27 @@ mekd3.cpp
 mekd4.cpp
 mekd5.cpp
 mephisto_academy.cpp
+mephisto_amsterdam.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
+mephisto_milano.cpp
 mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
 mephisto_mondial.cpp
+mephisto_mondial2.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
+mephisto_risc.cpp
+mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
+mg1.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -824,6 +841,7 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
+radionic.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -845,6 +863,7 @@ roland_jx3p.cpp
 roland_jx8p.cpp
 roland_mc50.cpp
 roland_mt32.cpp
+roland_pr100.cpp
 roland_r8.cpp
 roland_ra30.cpp
 roland_s10.cpp
@@ -915,7 +934,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -1005,6 +1023,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp
@@ -1160,6 +1179,7 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr60.cpp
 ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp

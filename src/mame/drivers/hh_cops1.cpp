@@ -3,12 +3,12 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  National Semiconductor COPS(MM57 MCU series) handhelds
+National Semiconductor COPS(MM57 MCU series) handhelds
 
-  MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
+MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
-  TODO:
-  - qkracerm link cable
+TODO:
+- qkracerm link cable
 
 ***************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "machine/ds8874.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -132,6 +133,10 @@ namespace {
   Judging from videos online, there are two versions of Basketball. One where
   the display shows "12" at power-on(as on MAME), and one that shows "15".
 
+  There's also an other version of Hockey, presumably for the foreign market.
+  It plays more like Basketball/Soccer: no penalty boxes and you can't go
+  behind the goal.
+
 ***************************************************************************/
 
 class mbaskb_state : public hh_cops1_state
@@ -201,6 +206,7 @@ void mbaskb_state::write_f(u8 data)
 u8 mbaskb_state::read_f()
 {
 	// F1: difficulty switch
+	// F2: N/C
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
@@ -214,7 +220,7 @@ static INPUT_PORTS_START( mbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 
 	PORT_START("IN.1") // INB
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // both buttons
 
 	PORT_START("IN.2") // F1
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
@@ -252,6 +258,8 @@ void mbaskb_state::msoccer(machine_config &config)
 {
 	mbaskb(config);
 	config.set_default_layout(layout_msoccer);
+
+	m_display->set_bri_levels(0.005, 0.05, 0.2); // goalie is darker
 }
 
 void mbaskb_state::mhockey(machine_config &config)
@@ -320,7 +328,9 @@ public:
 	void update_display();
 	void write_do(u8 data);
 	void write_s(u8 data);
+	u8 read_f();
 	u8 read_k();
+	int read_si();
 	void qkracerm(machine_config &config);
 };
 
@@ -349,15 +359,30 @@ void qkracerm_state::write_do(u8 data)
 
 void qkracerm_state::write_s(u8 data)
 {
-	// S: digit segment data
+	// Sa-Sg: digit segment data
+	// Sp: link data out
 	m_s = data;
 	update_display();
+}
+
+u8 qkracerm_state::read_f()
+{
+	// F1: N/C
+	// F2: link cable detected
+	// F3: link data in
+	return m_maincpu->f_output_r() & 1;
 }
 
 u8 qkracerm_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
+}
+
+int qkracerm_state::read_si()
+{
+	// SI: link master(1)/slave(0)
+	return 0;
 }
 
 // config
@@ -402,7 +427,9 @@ void qkracerm_state::qkracerm(machine_config &config)
 	m_maincpu->set_option_lb_10(5);
 	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkracerm_state::write_s));
+	m_maincpu->read_f().set(FUNC(qkracerm_state::read_f));
 	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
+	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
 
 	/* video hardware */
 	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
@@ -619,4 +646,7 @@ CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_
 CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
-CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

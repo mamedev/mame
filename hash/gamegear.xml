@@ -18,6 +18,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
   - "Outrunners",
   - "Sports Illustrated Golf",
   - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
+
+Hung Tao Hsin games are possibly pirate bootlegs though they may be officially licensed as with the Taiwanese Aaronix SMS games. All are slightly modified versions of existing SMS carts.
 -->
 
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
@@ -185,6 +187,20 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="aerialastw">
+		<description>Aerial Assault (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-11"/>
+		<info name="alt_title" value="空中出擊 (Kōng zhòng chūjí)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="aerial assault [hth] [sms-gg] (tw).bin" size="262144" crc="6630e5fd" sha1="c3305d745792a931ea92da6e6457c43d7cc45cf2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aerialas">
 		<description>Aerial Assault (World, v0)</description>
 		<year>1992</year>
@@ -276,12 +292,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	    </part>
 	</software-->
 
-	<!--  Alt. Title: Alex Kido (on the boxart) -->
 	<software name="alexkidd">
 		<description>Alex Kidd in Miracle World (Tw, SMS mode)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
 		<info name="serial" value="HG 101-10"/>
+		<info name="alt_title" value="天空魔城 (Tiānkōng mó chéng) Alex Kido"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="131072">
@@ -398,6 +414,20 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="arena (usa, europe).bin" size="524288" crc="7cb3facf" sha1="91e411d979789f2e31dcfe94fb7f757815f60680"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argosnj">
+		<description>Argos no Juujiken (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-02"/>
+		<info name="alt_title" value="十字剣 (Shízì jiàn) Alocos" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="argos no juujiken [hth] [sms-gg] (tw).bin" size="131072" crc="5e4b454e" sha1="5c1fef3b564fe1373101e5e331b38949dd2e583b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1022,6 +1052,20 @@ a certain item) -->
 			<feature name="ic1" value="MPR-17715" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17715.ic1" size="524288" crc="fe7374d2" sha1="824e463d0be5c0e81205a475b5ad7e55c366e486"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackblt">
+		<description>Black Belt (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-19"/>
+		<info name="alt_title" value="サ！熱血高手 (Sa! Rèxuè gāoshǒu)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="black belt [hth] [sms-gg] (tw).bin" size="131072" crc="98f64975" sha1="54a8cf79fac1f4c1dd1b2350b6934e42fc766020"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1974,6 +2018,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="cybers">
+		<description>The Cyber Shinobi (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-33"/>
+		<info name="alt_title" value="スーペースの忍者" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="cyber shinobi, the [hth] [sms-gg] (tw).bin" size="262144" crc="ad9ff469" sha1="3b411c14c38ecc4cfbddd69362bbb70bed10eb9f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="daffy">
 		<description>Daffy Duck in Hollywood (Euro)</description>
 		<year>1994</year>
@@ -2154,6 +2212,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="dokidoki">
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-03"/>
+		<info name="alt_title" value="Astro Adventure 宇宙大冒險 (Yǔzhòu dà màoxiǎn)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="doki doki penguin land - uchuu-daibouken [hth] [sms-gg] (tw).bin" size="131072" crc="fb163003" sha1="e3da56644c098d07947b1ffd9465002616a69d30"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developers: Aspect -->
 	<software name="donald42" cloneof="deepduck">
 		<description>Donald Duck no 4-Tsu no Hihou (Jpn)</description>
@@ -2220,6 +2292,8 @@ a certain item) -->
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (usa, europe) (beta).bin" size="262144" crc="331904c0" sha1="b24aa3e31efbf09e8d0d9ae9d07b4d219b648f96"/>
 			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
 		</part>
 	</software>
 
@@ -2231,6 +2305,22 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="double dragon (usa, europe).bin" size="262144" crc="1307a290" sha1="baebe28fc7549cbb06c94fcb36a3c40231933c01"/>
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragontw">
+		<description>Double Dragon (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-02"/>
+		<info name="alt_title" value="双截龍 (Shuāng jiélóng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="double dragon [hth] [sms-gg] (tw).bin" size="262144" crc="f4f848c2" sha1="ad438b8ed5aafab4ea615a4aaa75d2ddf7ba81c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2738,6 +2828,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="finalbb">
+		<description>Final Bubble Bobble (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-01"/>
+		<info name="alt_title" value="Bubble Dragon 超級泡泡龍 (Chāojí pào pào lóng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="final bubble bobble [hth] [sms-gg] (tw).bin" size="262144" crc="b948752e" sha1="3f4b02b6545a3ce0c8b69c4e6791da01a7d7f285"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="foreman">
 		<description>Foreman for Real (World)</description>
 		<year>1995</year>
@@ -2751,6 +2855,20 @@ a certain item) -->
 			<feature name="ic1" value="MPR-18216" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18216.ic1" size="524288" crc="d46d5685" sha1="d7109dc1db52bb4828a01b433a4b2993ac2e59e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forgottn">
+		<description>Forgotten Worlds (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-46"/>
+		<info name="alt_title" value="世界の末日 (Shìjièno mòrì)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="forgotten worlds [hth] [sms-gg] (tw).bin" size="262144" crc="44136a72" sha1="d5c8fc8d931b7fb3c4ff88bcf206a606bac3f98a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3166,6 +3284,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="greatbsk">
+		<description>Great Basketball (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-17"/>
+		<info name="alt_title" value="’９４年スパーバスケットボール" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="great basketball [hth] [sms-gg] (tw).bin" size="131072" crc="6fe448a5" sha1="3424fea350cde85a3840938a615906bb37769811"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="greendog">
 		<description>Greendog (Euro, USA)</description>
 		<year>1993</year>
@@ -3258,6 +3390,20 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="heavy weight champ (japan).bin" size="131072" crc="beed9150" sha1="7cfd703ebdab4b2665f402adeac0060740615b6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hokuto" cloneof="blackblt">
+		<description>Hokuto no Ken (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-04"/>
+		<info name="alt_title" value="北斗の拳 (Běidǒuno quán) Northern Ken" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="hokuto no ken [hth] [sms-gg] (tw).bin" size="131072" crc="b6207f0d" sha1="5f7ddc93de74c9713bba2a6ff117efc851483a8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3875,6 +4021,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="kungfuk">
+		<description>Kung Fu Kid (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 401-21"/>
+		<info name="alt_title" value="魔界列傳 (Mójiè lièzhuàn)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="kung fu kid [hth] [sms-gg] (tw).bin" size="131072" crc="4762e022" sha1="e3bb68ce42be58fca1158568012570e5366cd647"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kunichan">
 		<description>Kuni-chan no Game Tengoku (Jpn)</description>
 		<year>1991</year>
@@ -4196,6 +4356,20 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="523862">
 				<rom name="lion king, the (prototype - aug 20,  1994).bin" size="523862" crc="3d0b31a2" sha1="79f221ca2654d5df64392e4e06c498557eaebf19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordswrd">
+		<description>Lord of Sword (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-05"/>
+		<info name="alt_title" value="月風魔傳 (Yuè fēngmó chuán)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="lord of sword [hth] [sms-gg] (tw).bin" size="262144" crc="7eaed675" sha1="cb36be9b9f67966ffcc6c322a37b3936297e1461"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5992,6 +6166,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="paperboytw">
+		<description>Paperboy (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-23"/>
+		<info name="alt_title" value="銀色先鋒 (Yínsè xiānfēng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="paperboy [v1] [hth] [sms-gg] (tw).bin" size="131072" crc="354bee78" sha1="14b19ee7f6ef398474fe56beac2327ee14ce6157"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paperbo2">
 		<description>Paperboy II (Euro, USA)</description>
 		<year>1992</year>
@@ -6336,6 +6524,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="ppersiatw" cloneof="ppersia">
+		<description>Prince of Persia (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-15"/>
+		<info name="alt_title" value="アリパパ伝説" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="prince of persia [hth] [sms-gg] (tw).bin" size="262144" crc="cafd2d83" sha1="80a5bdc835ed63a0cb19d46aae99dfb78719e091"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppersiau" cloneof="ppersia">
 		<description>Prince of Persia (USA, SMS mode)</description>
 		<year>1992</year>
@@ -6510,6 +6712,20 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="puzzle bobble (japan).bin" size="262144" crc="8e54ee04" sha1="15568554cf6474e1ad64401217b702a048113a2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quartet">
+		<description>Quartet (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-28"/>
+		<info name="alt_title" value="䧳雄雙俠 (Cí xióng shuāng xiá)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="quartet [hth] [sms-gg] (tw).bin" size="131072" crc="cacdf759" sha1="7c32614ef0fb330fff0934ef16a6eca8369743da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6777,6 +6993,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="rtype">
+		<description>R-Type (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 401-01"/>
+		<info name="alt_title" value="異形 (Yìxíng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="r-type [hth] [sms-gg] (tw).bin" size="524288" crc="e532716f" sha1="908b532564c67014bf881a524ac9ad186f9013c9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ryukyu" cloneof="solitarp">
 		<description>Ryuukyuu (Jpn)</description>
 		<year>1991</year>
@@ -6833,6 +7063,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="sspirits">
+		<description>Scramble Spirits (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-09"/>
+		<info name="alt_title" value="虎胆妙算 (Hǔ dǎn miào suàn)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="scramble spirits [hth] [sms-gg] (tw).bin" size="262144" crc="7d59283b" sha1="b21b5ce444e483cbca79c709eea6a902d53af1d7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scratchg">
 		<description>Scratch Golf (USA)</description>
 		<year>1994</year>
@@ -6878,6 +7122,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="secret">
+		<description>Secret Command (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 101-07"/>
+		<info name="alt_title" value="上尉命令 (Shàngwèi mìnglìng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="secret command [hth] [sms-gg] (tw).bin" size="131072" crc="89efcc22" sha1="3b699b84b7ebaa3a2cc7443b34909771e6518c55"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sega4in1">
 		<description>Sega Game Pack 4 in 1 (Euro)</description>
 		<year>1991</year>
@@ -6907,6 +7165,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="seishun">
+		<description>Seishun Scandal (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 256-06"/>
+		<info name="alt_title" value="快打小子 (Kuài dǎ xiǎozi) Action Boy" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="32768">
+				<rom name="seishun scandal [hth] [sms-gg] (tw).bin" size="32768" crc="d0263024" sha1="11cb726c497482895f4f6f6b424615fe52f18a18"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sensible">
 		<description>Sensible Soccer (Euro)</description>
 		<year>1994</year>
@@ -6932,6 +7204,34 @@ a certain item) -->
 				<rom name="shadam crusader - harukanaru oukoku (japan).bin" size="524288" crc="09f9ed60" sha1="de4b546f61dd32106247d38643849f6aaeeedb07"/>
 			</dataarea>
 			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shdancer">
+		<description>Shadow Dancer (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 401-06"/>
+		<info name="alt_title" value="影舞者 (Yǐng wǔ zhě)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="shadow dancer - the secret of shinobi [hth] [sms-gg] (tw).bin" size="524288" crc="ab67c6bd" sha1="b5fabb4a9a43f7496f2ca40979348b59fde5d14f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beast">
+		<description>Shadow of the Beast (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-47"/>
+		<info name="alt_title" value="鬼影獸の王 (Guǐ yǐng shòuno wáng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="shadow of the beast [hth] [sms-gg] (tw).bin" size="262144" crc="ac2ea669" sha1="a63bdab47d3f648537cad25e4161ac55a23c8137"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8477,6 +8777,20 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="strider">
+		<description>Strider (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 401-02"/>
+		<info name="alt_title" value="突撃飛龍 (Tūjī fēilóng)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="524288">
+				<rom name="strider [hth] [sms-gg] (tw).bin" size="524288" crc="63a7f906" sha1="43b822bbccdc666e5bfb7f86f690516ac251b0b3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="striker">
 		<description>Striker (Euro)</description>
 		<year>1995</year>
@@ -8485,6 +8799,20 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="striker (europe) (en,fr,de,es,it).bin" size="524288" crc="b421c057" sha1="dc51ed36b12d1a943bcf79d9ab246505a190f795"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submarin">
+		<description>Submarine Attack (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-31"/>
+		<info name="alt_title" value="紅色十月大反擊 (Hóngsè shí yuè dà fǎnjí)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="submarine attack [hth] [sms-gg] (tw).bin" size="262144" crc="d282ef71" sha1="e4e3464aa4b9378761663ae69037308a5e3411f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9347,6 +9675,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="tengenwcp" cloneof="tengenwc">
+		<description>Tengen World Cup Soccer (prototype)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="tengen world cup soccer [proto].bin" size="262144" crc="8e6818ae" sha1="69bb04a218d207a9a907a37970b6ac992a64b8cd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="term2">
 		<description>Terminator 2 - Judgment Day (Euro, USA)</description>
 		<year>1993</year>
@@ -9378,6 +9717,20 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="tesserae (usa, europe).bin" size="131072" crc="ca0e11cc" sha1="2b2652c7e03218b212e4d6a6246bd70e925e7ee1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tblade">
+		<description>Thunder Blade (Tw, SMS mode)</description>
+		<year>199?</year>
+		<publisher>Hung Tao Hsin</publisher>
+		<info name="serial" value="HG 201-03"/>
+		<info name="alt_title" value="藍色霹靂號 (Lán sè pīlì hào)" />
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="262144">
+				<rom name="thunder blade [hth] [sms-gg] (tw).bin" size="262144" crc="98cf1254" sha1="93d93e3f79b7e206c0c58187e3ed047222999af6"/>
 			</dataarea>
 		</part>
 	</software>

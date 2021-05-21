@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cassette tapes for the Microbee non-disk models. These extensions are supported: TAP, WAV.
+
+Compatibility flags:
+1 = mbee
+2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s
+
+If no flag is specified, it's assumed it works on all of them.
+
+They do not work on disk-based microbees, or on premium models.
+
+-->
+<softwarelist name="mbee_cass" description="Microbee cassettes">
+
+	<software name="bee3">
+		<description>Bee III Basic</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="LOAD then start the tape" />
+		<part name="cass" interface="mbee_cass">
+			<dataarea name="cass" size="0x3088">
+				<rom name="bee3.tap" size="0x3088" crc="4b250be5" sha1="97683a7b7a8bdebfb3bfc19bd07443b97a229079"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starblock">
+		<description>Star Block</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="LOAD then start the tape. When finished, RUN" />
+		<part name="cass" interface="mbee_cass">
+			<dataarea name="cass" size="0x33dc29">
+				<rom name="starblock.wav" size="0x33dc29" crc="0dca01c6" sha1="a38e3c8ce559f2795da485726c665ff38c3e6f97"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

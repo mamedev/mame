@@ -37,6 +37,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/sensorboard.h"
@@ -124,20 +125,14 @@ protected:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 	void lcd_palette(palette_device &palette) const;
 
-	u8 m_inp_mux;
-	u8 m_led_data;
-	u8 m_lcd_control;
-	u8 m_lcd_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
+	u8 m_lcd_control = 0;
+	u8 m_lcd_data = 0;
 };
 
 void sexpert_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-	m_lcd_control = 0;
-	m_lcd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
@@ -336,7 +331,8 @@ void sforte_state::lcd_data_w(u8 data)
 
 void sexpert_state::sexpert_map(address_map &map)
 {
-	map(0x0000, 0x1fef).ram().share("nvram"); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x1ff0, 0x1fff).unmaprw(); // 8KB RAM, but RAM CE pin is deactivated on $1ff0-$1fff
 	map(0x1ff0, 0x1ff0).r(FUNC(sexpert_state::input1_r));
 	map(0x1ff1, 0x1ff1).r(FUNC(sexpert_state::input2_r));
 	map(0x1ff2, 0x1ff2).nopw(); // printer

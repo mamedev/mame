@@ -7,7 +7,7 @@
 
 #include "cpu/m6502/m65c02.h"
 #include "sound/namco.h"
-#include "video/c45.h"
+#include "video/namco_c45road.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

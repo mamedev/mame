@@ -1,23 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
 Mephisto Berlin 68000 / Berlin Professional 68020
 Berlin Professional has the same engine as Mephisto Genius.
 
-TODO:
-- does it have ROM waitstates like mephisto_modular?
-
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot clears battery backed RAM
+
+TODO:
+- does it have ROM waitstates like mephisto_modular?
 
 ******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "video/mmdisplay2.h"
@@ -32,7 +31,9 @@ public:
 	berlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 		, m_board(*this, "board")
+		, m_display(*this, "display")
 		, m_keys(*this, "KEY")
 	{ }
 
@@ -40,15 +41,19 @@ public:
 	void berlinp(machine_config &config);
 
 private:
-	u8 input_r();
+	required_device<cpu_device> m_maincpu;
+	memory_share_creator<u8> m_nvram;
+	required_device<mephisto_board_device> m_board;
+	required_device<mephisto_display2_device> m_display;
+	required_ioport m_keys;
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
-	void nvram_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mephisto_board_device> m_board;
-	required_ioport m_keys;
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
+
+	u8 input_r();
 };
 
 
@@ -59,10 +64,9 @@ private:
 
 u8 berlin_state::input_r()
 {
-	if (m_board->mux_r() == 0xff)
-		return m_keys->read();
-	else
-		return m_board->input_r() ^ 0xff;
+	// display i/o d7 selects keypad
+	u8 data = (m_display->io_r() & 0x80) ? 0 : m_keys->read();
+	return ~m_board->input_r() | data;
 }
 
 
@@ -71,22 +75,17 @@ u8 berlin_state::input_r()
     Address Maps
 ******************************************************************************/
 
-void berlin_state::nvram_map(address_map &map)
-{
-	// nvram is 8-bit (8KB)
-	map(0x0000, 0x1fff).ram().share("nvram");
-}
-
 void berlin_state::berlin_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x800000, 0x87ffff).ram();
-	map(0x900000, 0x903fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
+	map(0x900000, 0x903fff).rw(FUNC(berlin_state::nvram_r), FUNC(berlin_state::nvram_w)).umask16(0xff00);
 	map(0xa00000, 0xa00000).r(FUNC(berlin_state::input_r));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_module2_device::latch_w));
-	map(0xd00008, 0xd00008).w("display", FUNC(mephisto_display_module2_device::io_w));
+	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
+	map(0xd00008, 0xd00008).w(m_display, FUNC(mephisto_display2_device::io_w));
 	map(0xe00000, 0xe00000).w(m_board, FUNC(mephisto_board_device::led_w));
+	map(0xe00000, 0xe00001).nopr(); // clr.b
 }
 
 void berlin_state::berlinp_mem(address_map &map)
@@ -96,9 +95,9 @@ void berlin_state::berlinp_mem(address_map &map)
 	map(0x800000, 0x800000).r(FUNC(berlin_state::input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
-	map(0xb00000, 0xb00000).w("display", FUNC(mephisto_display_module2_device::io_w));
-	map(0xc00000, 0xc00000).w("display", FUNC(mephisto_display_module2_device::latch_w));
-	map(0xd00000, 0xd07fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
+	map(0xb00000, 0xb00000).w(m_display, FUNC(mephisto_display2_device::io_w));
+	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
+	map(0xd00000, 0xd07fff).rw(FUNC(berlin_state::nvram_r), FUNC(berlin_state::nvram_w)).umask32(0xff000000);
 }
 
 
@@ -109,14 +108,14 @@ void berlin_state::berlinp_mem(address_map &map)
 
 static INPUT_PORTS_START( berlin )
 	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("UP")    PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DOWN")  PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LEFT")  PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("NEW GAME (1/2)") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("NEW GAME (2/2)") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Enter")           PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Clear")           PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Up")              PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Down")            PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Left")            PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Right")           PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (1/2)")  PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("New Game (2/2)")  PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_F1) // "
 INPUT_PORTS_END
 
 
@@ -135,12 +134,11 @@ void berlin_state::berlin(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
-	MEPHISTO_BUTTONS_BOARD(config, m_board);
+	MEPHISTO_BUTTONS_BOARD(config, m_board); // internal
 	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);
 
-	MEPHISTO_DISPLAY_MODULE2(config, "display");
+	MEPHISTO_DISPLAY_MODULE2(config, m_display); // internal
 	config.set_default_layout(layout_mephisto_berlin);
 }
 

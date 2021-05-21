@@ -62,6 +62,9 @@ public:
 	auto &set_option_k_active_high(bool b) { m_option_k_active_high = b; return *this; }
 	auto &set_option_inb_active_high(bool b) { m_option_inb_active_high = b; return *this; }
 
+	// I/O access
+	u8 f_output_r() { return m_f; }
+
 protected:
 	// construction/destruction
 	cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);

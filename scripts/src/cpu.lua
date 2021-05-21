@@ -555,6 +555,8 @@ end
 
 if CPUS["PDP8"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.cpp",
+		MAME_DIR .. "src/devices/cpu/pdp8/hd6120.h",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.cpp",
 		MAME_DIR .. "src/devices/cpu/pdp8/pdp8.h",
 	}
@@ -666,6 +668,10 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h83006.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83032.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83032.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83042.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83042.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2245.cpp",
@@ -2881,6 +2887,7 @@ end
 --@src/devices/cpu/pps41/mm75.h,CPUS["PPS41"] = true
 --@src/devices/cpu/pps41/mm76.h,CPUS["PPS41"] = true
 --@src/devices/cpu/pps41/mm78.h,CPUS["PPS41"] = true
+--@src/devices/cpu/pps41/mm78la.h,CPUS["PPS41"] = true
 --------------------------------------------------
 
 if CPUS["PPS41"] then
@@ -2896,6 +2903,9 @@ if CPUS["PPS41"] then
 		MAME_DIR .. "src/devices/cpu/pps41/mm78.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/mm78.h",
 		MAME_DIR .. "src/devices/cpu/pps41/mm78op.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78la.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78la.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78laop.cpp",
 	}
 end
 
@@ -3512,4 +3522,14 @@ end
 if opt_tool(CPUS, "MK1") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.h")
+end
+
+--------------------------------------------------
+-- Motorola M68HC16 (CPU16) - Disassembler only
+--@src/devices/cpu/m68hc16/m68hc16.h,CPUS["M68HC16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "M68HC16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.h")
 end

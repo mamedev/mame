@@ -2121,32 +2121,32 @@ ROM_START( shollow2 )
 ROM_END
 
 /*
-  TRON (Set 1 - 8/9)
+  TRON (Set 1 - 8/9), program ROMs stamped as "AUG 9"
 */
 
 ROM_START( tron )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "pro0.d2",     0x0000, 0x2000, CRC(0de0471a) SHA1(378847604a6a9c079d887348010ab9539d5f6195) )
-	ROM_LOAD( "scpu_pgb.d3", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) )
-	ROM_LOAD( "scpu_pgc.d4", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) )
-	ROM_LOAD( "scpu_pgd.d5", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) )
-	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
-	ROM_LOAD( "scpu_pgf.d7", 0xA000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
+	ROM_LOAD( "scpu-pga_lctn-c2_tron_aug_9.c2", 0x0000, 0x2000, CRC(0de0471a) SHA1(378847604a6a9c079d887348010ab9539d5f6195) ) // labeled: SCPU-PGA   LCTN-C2   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgb_lctn-c3_tron_aug_9.c3", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) ) // labeled: SCPU-PGB   LCTN-C3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgc_lctn-c4_tron_aug_9.c4", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) ) // labeled: SCPU-PGC   LCTN-C4   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgd_lctn-c5_tron_aug_9.c5", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) ) // labeled: SCPU-PGD   LCTN-C5   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pge_lctn-c6_tron_aug_9.c6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) ) // labeled: SCPU-PGE   LCTN-C6   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgf_lctn-c7_tron_aug_9.c7", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) ) // labeled: SCPU-PGF   LCTN-C7   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
-	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
-	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
+	ROM_LOAD( "ssi-0a_lctn-a7_tron.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) ) // labeled: SSI/0A   LCTN-A7   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0b_lctn-a8_tron.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) ) // labeled: SSI/0B   LCTN-A8   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0c_lctn-a9_tron.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) ) // labeled: SSI/0C   LCTN-A9   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",     0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",     0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2157,32 +2157,32 @@ ROM_START( tron )
 ROM_END
 
 /*
-  TRON (Set 2 - 6/25)
+  TRON (Set 2 - 6/25), program ROMs stamped as "JUN 25" - also known to be stamped 6 25 or handwritten 6-25
 */
 
 ROM_START( tron2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_pga.d2", 0x0000, 0x2000, CRC(5151770b) SHA1(26f4d830de7be228528e462dd628f439629a2641) )
-	ROM_LOAD( "scpu_pgb.d3", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) )
-	ROM_LOAD( "scpu_pgc.d4", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) )
-	ROM_LOAD( "scpu_pgd.d5", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) )
-	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) )
-	ROM_LOAD( "scpu_pgf.d7", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) )
+	ROM_LOAD( "scpu-pga_lctn-c2_tron_jun_25.c2", 0x0000, 0x2000, CRC(5151770b) SHA1(26f4d830de7be228528e462dd628f439629a2641) ) // labeled: SCPU-PGA   LCTN-C2   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgb_lctn-c3_tron_jun_25.c3", 0x2000, 0x2000, CRC(8ddf8717) SHA1(e0c294afa8ba0b0ba89e3e0fb3ff6d8fc4398e32) ) // labeled: SCPU-PGB   LCTN-C3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgc_lctn-c4_tron_jun_25.c4", 0x4000, 0x2000, CRC(4241e3a0) SHA1(24c1bd2f31e194542571c391c5dccf21354115c2) ) // labeled: SCPU-PGC   LCTN-C4   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgd_lctn-c5_tron_jun_25.c5", 0x6000, 0x2000, CRC(035d2fe7) SHA1(1b827ca30a439d2f4cc94fcc0e90ee0cf87e018c) ) // labeled: SCPU-PGD   LCTN-C5   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pge_lctn-c6_tron_jun_25.c6", 0x8000, 0x2000, CRC(24c185d8) SHA1(45ac7c53f6f4eba5c7bf3fc6559cddd3821eddad) ) // labeled: SCPU-PGE   LCTN-C6   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgf_lctn-c7_tron_jun_25.c7", 0xa000, 0x2000, CRC(38c4bbaf) SHA1(a7cd496ce75199b8279ea963520cf70d5f562bb2) ) // labeled: SCPU-PGF   LCTN-C7   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
-	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
-	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
+	ROM_LOAD( "ssi-0a_lctn-a7_tron.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) ) // labeled: SSI/0A   LCTN-A7   TRON   (c)1982 BALLY   MIDWAY - also stamped JUN 25
+	ROM_LOAD( "ssi-0b_lctn-a8_tron.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) ) // labeled: SSI/0B   LCTN-A8   TRON   (c)1982 BALLY   MIDWAY - also stamped JUN 25
+	ROM_LOAD( "ssi-0c_lctn-a9_tron.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) ) // labeled: SSI/0C   LCTN-A9   TRON   (c)1982 BALLY   MIDWAY - also stamped JUN 25
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",     0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",     0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2193,32 +2193,32 @@ ROM_START( tron2 )
 ROM_END
 
 /*
-  TRON (Set 3 - 6/17)
+  TRON (Set 3 - 6/17), program ROMs stamped as "JUN 17" - also known to be stamped 6 17 or handwritten 6-17
 */
 
 ROM_START( tron3 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_pga.d2", 0x0000, 0x2000, CRC(fc33afd7) SHA1(99a2ed972c3db477f35a7162079563367864f207) ) // sldh
-	ROM_LOAD( "scpu_pgb.d3", 0x2000, 0x2000, CRC(7d9e22ac) SHA1(16a6e9651d5f764e8762fd8d6e53d13fda7473de) ) // sldh
-	ROM_LOAD( "scpu_pgc.d4", 0x4000, 0x2000, CRC(902011c6) SHA1(17ac768a0fd1278ae83414f0d67d6ac8337f4773) ) // sldh
-	ROM_LOAD( "scpu_pgd.d5", 0x6000, 0x2000, CRC(86477e89) SHA1(196f0d3930d10bfe4ddee82ce8b28bb99324069e) ) // sldh
-	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) ) // sldh
-	ROM_LOAD( "scpu_pgf.d7", 0xa000, 0x2000, CRC(4325fb08) SHA1(70727aa37354425315d8a8b3ca07bbe91f7e8f08) ) // sldh
+	ROM_LOAD( "scpu-pga_lctn-c2_tron_jun_17.c2", 0x0000, 0x2000, CRC(fc33afd7) SHA1(99a2ed972c3db477f35a7162079563367864f207) ) // labeled: SCPU-PGA   LCTN-C2   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgb_lctn-c3_tron_jun_17.c3", 0x2000, 0x2000, CRC(7d9e22ac) SHA1(16a6e9651d5f764e8762fd8d6e53d13fda7473de) ) // labeled: SCPU-PGB   LCTN-C3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgc_lctn-c4_tron_jun_17.c4", 0x4000, 0x2000, CRC(902011c6) SHA1(17ac768a0fd1278ae83414f0d67d6ac8337f4773) ) // labeled: SCPU-PGC   LCTN-C4   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgd_lctn-c5_tron_jun_17.c5", 0x6000, 0x2000, CRC(86477e89) SHA1(196f0d3930d10bfe4ddee82ce8b28bb99324069e) ) // labeled: SCPU-PGD   LCTN-C5   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pge_lctn-c6_tron_jun_17.c6", 0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) ) // labeled: SCPU-PGE   LCTN-C6   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgf_lctn-c7_tron_jun_17.c7", 0xa000, 0x2000, CRC(4325fb08) SHA1(70727aa37354425315d8a8b3ca07bbe91f7e8f08) ) // labeled: SCPU-PGF   LCTN-C7   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
-	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
-	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
+	ROM_LOAD( "ssi-0a_lctn-a7_tron.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) ) // labeled: SSI/0A   LCTN-A7   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0b_lctn-a8_tron.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) ) // labeled: SSI/0B   LCTN-A8   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0c_lctn-a9_tron.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) ) // labeled: SSI/0C   LCTN-A9   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",     0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",     0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2229,32 +2229,32 @@ ROM_START( tron3 )
 ROM_END
 
 /*
-  TRON (Set 4 - 6/16)
+  TRON (Set 4 - 6/15), program ROMs stamped as "JUN 15" - also known to be stamped 6 15 or handwritten 6-15
 */
 
 ROM_START( tron4 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "pga-615.d2",   0x0000, 0x2000, CRC(09d7a95a) SHA1(630f4c43204df0510926c5fc07e0c1b3783cf5e4) )
-	ROM_LOAD( "pgb-615.d3",   0x2000, 0x2000, CRC(b454337d) SHA1(c2306ad5401a3f60e231be59198610a36b527f1f) )
-	ROM_LOAD( "pgc-615.d4",   0x4000, 0x2000, CRC(ac1836ff) SHA1(a8d20facf91b4c93082f8e71a663e5da8b036ecb) )
-	ROM_LOAD( "pgd-615.d5",   0x6000, 0x2000, CRC(1a7bec6d) SHA1(4d47020494e0963db22473a459e97c1c06c4b5ee) )
-	ROM_LOAD( "pge-615.d6",   0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) )
-	ROM_LOAD( "pgf-615.d7",   0xa000, 0x2000, CRC(790ee743) SHA1(14dc84b2bbaab22772e0579f11fe0bf136a0ddab) )
+	ROM_LOAD( "scpu-pga_lctn-c2_tron_jun_15.c2", 0x0000, 0x2000, CRC(09d7a95a) SHA1(630f4c43204df0510926c5fc07e0c1b3783cf5e4) ) // labeled: SCPU-PGA   LCTN-C2   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgb_lctn-c3_tron_jun_15.c3", 0x2000, 0x2000, CRC(b454337d) SHA1(c2306ad5401a3f60e231be59198610a36b527f1f) ) // labeled: SCPU-PGB   LCTN-C3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgc_lctn-c4_tron_jun_15.c4", 0x4000, 0x2000, CRC(ac1836ff) SHA1(a8d20facf91b4c93082f8e71a663e5da8b036ecb) ) // labeled: SCPU-PGC   LCTN-C4   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgd_lctn-c5_tron_jun_15.c5", 0x6000, 0x2000, CRC(1a7bec6d) SHA1(4d47020494e0963db22473a459e97c1c06c4b5ee) ) // labeled: SCPU-PGD   LCTN-C5   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pge_lctn-c6_tron_jun_15.c6", 0x8000, 0x2000, CRC(ea198fa8) SHA1(d8c97ea87d504e77edc38c87c2953c8c4f1a405b) ) // labeled: SCPU-PGE   LCTN-C6   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-pgf_lctn-c7_tron_jun_15.c7", 0xa000, 0x2000, CRC(790ee743) SHA1(14dc84b2bbaab22772e0579f11fe0bf136a0ddab) ) // labeled: SCPU-PGF   LCTN-C7   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_oa.a7",    0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) )
-	ROM_LOAD( "ssi_ob.a8",    0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) )
-	ROM_LOAD( "ssi_oc.a9",    0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) )
+	ROM_LOAD( "tron_snd-0_may_10_82.a7",  0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) ) // hand written TRON SND-0, stamped MAY 10 '82
+	ROM_LOAD( "tron_snd-1_may_10_82.a8",  0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) ) // hand written TRON SND-1, stamped MAY 10 '82
+	ROM_LOAD( "tron_snd-2_may_10_82.a9",  0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) ) // hand written TRON SND-2, stamped MAY 10 '82
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3",  0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4",  0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",       0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",      0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",      0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",       0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2265,32 +2265,32 @@ ROM_START( tron4 )
 ROM_END
 
 /*
-  TRON (Set 5 - 5/12)
+  TRON (Set 5 - 5/12), handwritten labels for program & sound ROMs (though the sound ROMs were stamped MAY 10 '82)
 */
 
 ROM_START( tron5 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "tron_pro-0_5-12.d2",   0x0000, 0x2000, CRC(ccc4119f) SHA1(a07677ed4dae4062849867d91be96ddf342826a3) ) /* all labels were hand written */
-	ROM_LOAD( "tron_pro-1_5-12.d3",   0x2000, 0x2000, CRC(153f148c) SHA1(3d0065a9a92d4a1ad85cc907da18c03c94328e5d) )
-	ROM_LOAD( "tron_pro-2_5-12.d4",   0x4000, 0x2000, CRC(e62bb8a1) SHA1(817987251e015c3290507ebc88ee7acc07c5accd) )
-	ROM_LOAD( "tron_pro-3_5-12.d5",   0x6000, 0x2000, CRC(dbc06c91) SHA1(4d75c84844ade35c577e91787639dfdc48f9cb28) )
-	ROM_LOAD( "tron_pro-4_5-12.d6",   0x8000, 0x2000, CRC(30adb624) SHA1(5baf0294dfb01be5bdf34cfc63d764d7f34657e1) )
-	ROM_LOAD( "tron_pro-5_5-12.d7",   0xa000, 0x2000, CRC(191c72bb) SHA1(bbf406ebfb80e46f1f20bedd0d20d0154f009317) )
+	ROM_LOAD( "tron_pro-0_5-12.c2", 0x0000, 0x2000, CRC(ccc4119f) SHA1(a07677ed4dae4062849867d91be96ddf342826a3) ) // all labels were hand written
+	ROM_LOAD( "tron_pro-1_5-12.c3", 0x2000, 0x2000, CRC(153f148c) SHA1(3d0065a9a92d4a1ad85cc907da18c03c94328e5d) )
+	ROM_LOAD( "tron_pro-2_5-12.c4", 0x4000, 0x2000, CRC(e62bb8a1) SHA1(817987251e015c3290507ebc88ee7acc07c5accd) )
+	ROM_LOAD( "tron_pro-3_5-12.c5", 0x6000, 0x2000, CRC(dbc06c91) SHA1(4d75c84844ade35c577e91787639dfdc48f9cb28) )
+	ROM_LOAD( "tron_pro-4_5-12.c6", 0x8000, 0x2000, CRC(30adb624) SHA1(5baf0294dfb01be5bdf34cfc63d764d7f34657e1) )
+	ROM_LOAD( "tron_pro-5_5-12.c7", 0xa000, 0x2000, CRC(191c72bb) SHA1(bbf406ebfb80e46f1f20bedd0d20d0154f009317) )
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_oa.a7",    0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) )
-	ROM_LOAD( "ssi_ob.a8",    0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) )
-	ROM_LOAD( "ssi_oc.a9",    0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) )
+	ROM_LOAD( "tron_snd-0_may_10_82.a7",  0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) ) // hand written TRON SND-0, stamped MAY 10 '82
+	ROM_LOAD( "tron_snd-1_may_10_82.a8",  0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) ) // hand written TRON SND-1, stamped MAY 10 '82
+	ROM_LOAD( "tron_snd-2_may_10_82.a9",  0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) ) // hand written TRON SND-2, stamped MAY 10 '82
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3",  0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4",  0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",       0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",      0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",      0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",       0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2302,27 +2302,27 @@ ROM_END
 
 ROM_START( tronger )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "pro0.d2", 0x0000, 0x2000, CRC(ba14603d) SHA1(1cc30c4ea659926314343f00ccbcfe9021f4de26) )
-	ROM_LOAD( "scpu_pgb.d3", 0x2000, 0x2000, CRC(063a748f) SHA1(aefe647e9b562d6a9da1ec32a9d403fce7e62012) )// sldh
-	ROM_LOAD( "scpu_pgc.d4", 0x4000, 0x2000, CRC(6ca50365) SHA1(76e17284da7c3ddf752d67b5e80d3c145f64068e) )// sldh
-	ROM_LOAD( "scpu_pgd.d5", 0x6000, 0x2000, CRC(b5b241c9) SHA1(4a9bde02387365912b3e9878428c8aa1f87a365a) )// sldh
-	ROM_LOAD( "scpu_pge.d6", 0x8000, 0x2000, CRC(04597abe) SHA1(7a896b9415a2479da8519329568e5fb8a429d03e) )// sldh
-	ROM_LOAD( "scpu_pgf.d7", 0xa000, 0x2000, CRC(3908e404) SHA1(d61b73c87ba4b0ab8751d9c653b663b1342d5d73) )// sldh
+	ROM_LOAD( "scpu_pga.c2", 0x0000, 0x2000, CRC(ba14603d) SHA1(1cc30c4ea659926314343f00ccbcfe9021f4de26) )
+	ROM_LOAD( "scpu_pgb.c3", 0x2000, 0x2000, CRC(063a748f) SHA1(aefe647e9b562d6a9da1ec32a9d403fce7e62012) )
+	ROM_LOAD( "scpu_pgc.c4", 0x4000, 0x2000, CRC(6ca50365) SHA1(76e17284da7c3ddf752d67b5e80d3c145f64068e) )
+	ROM_LOAD( "scpu_pgd.c5", 0x6000, 0x2000, CRC(b5b241c9) SHA1(4a9bde02387365912b3e9878428c8aa1f87a365a) )
+	ROM_LOAD( "scpu_pge.c6", 0x8000, 0x2000, CRC(04597abe) SHA1(7a896b9415a2479da8519329568e5fb8a429d03e) )
+	ROM_LOAD( "scpu_pgf.c7", 0xa000, 0x2000, CRC(3908e404) SHA1(d61b73c87ba4b0ab8751d9c653b663b1342d5d73) )
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
-	ROM_LOAD( "ssi_0a.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) )
-	ROM_LOAD( "ssi_0b.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) )
-	ROM_LOAD( "ssi_0c.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) )
+	ROM_LOAD( "ssi-0a_lctn-a7_tron.a7",   0x0000, 0x1000, CRC(765e6eba) SHA1(42efeefc8571dfc237c0be3368248f1e56add92e) ) // labeled: SSI/0A   LCTN-A7   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0b_lctn-a8_tron.a8",   0x1000, 0x1000, CRC(1b90ccdd) SHA1(0876e5eeaa63bb8cc97f3634a6ddd8a29a9b012f) ) // labeled: SSI/0B   LCTN-A8   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "ssi-0c_lctn-a9_tron.a9",   0x2000, 0x1000, CRC(3a4bc629) SHA1(ce8452a99a313ae7429de471bbea39de08c9fd4b) ) // labeled: SSI/0C   LCTN-A9   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
-	ROM_LOAD( "scpu_bgg.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
-	ROM_LOAD( "scpu_bgh.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+	ROM_LOAD( "scpu-bgg_lctn-g3_tron.g3", 0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) ) // labeled: SCPU-BGG   LCTN-G3   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "scpu-bgh_lctn-g4_tron.g4", 0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) ) // labeled: SCPU-BGH   LCTN-G4   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
-	ROM_LOAD( "vga.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
-	ROM_LOAD( "vgb.dc1",     0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
-	ROM_LOAD( "vgc.cb1",     0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
-	ROM_LOAD( "vga.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+	ROM_LOAD( "vga_lctn-e1_tron.e1",      0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) ) // labeled: VGA   LCTN-E1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgb_lctn-dc1_tron.dc1",    0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) ) // labeled: VGB   LCTN-DC1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgc_lctn-cb1_tron.cb1",    0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) ) // labeled: VGC   LCTN-CB1   TRON   (c)1982 BALLY   MIDWAY
+	ROM_LOAD( "vgd_lctn-a1_tron.a1",      0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) ) // labeled: VGD   LCTN-A1   TRON   (c)1982 BALLY   MIDWAY
 
 	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
 	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
@@ -2679,26 +2679,33 @@ ROM_START( timber )
 	ROM_LOAD( "timfg6.bin",   0x1c000, 0x4000, CRC(244778e8) SHA1(494bc1e627997cd4f1d5267c5fafd0779ccf9255) )
 ROM_END
 
+/*
+Disc of TRON 10/4/83
 
+referred to as version 2, known differences:
+  shows "DEREZZ A RING    2000" in score table
+  Sound Test menu shows sounds 1 through 16 (though the other sounds are still in the game)
+  Player Input screen shows "UPRIGHT   ACTIVATE ALL DEVICES   TILT TO EXIT"
+*/
 ROM_START( dotron )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "loc-pg0.1c",   0x00000, 0x4000, CRC(ba0da15f) SHA1(c0dfac2e5d6549620525b9e3d64b7c5494164dbd) )
-	ROM_LOAD( "loc-pg1.2c",   0x04000, 0x4000, CRC(dc300191) SHA1(417e964f38bfbdd84cae79939c23a7de41cd7bae) )
-	ROM_LOAD( "loc-pg2.3c",   0x08000, 0x4000, CRC(ab0b3800) SHA1(457a18bd98a3c4a9f893a3704dbc7d0fde4ef8ba) )
-	ROM_LOAD( "loc-pg1.4c",   0x0c000, 0x2000, CRC(f98c9f8e) SHA1(a215f0fd6cd9e8cacbe06cb7bfe4e2cced150c86) )
+	ROM_LOAD( "disc_tron_uprt_pg0_10-4-83.1c",  0x00000, 0x4000, CRC(40d00195) SHA1(e06a8097f02b9f445df0dd5c0ec13f9a0a1dcd8a) ) // labeled: DISC/TRON   UPRT PG0   10/4/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg1_10-4-83.2c",  0x04000, 0x4000, CRC(5a7d1300) SHA1(8a1f088de9289cd902e72b55d3e72c3f07246778) ) // labeled: DISC/TRON   UPRT PG1   10/4/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg2_10-4-83.3c",  0x08000, 0x4000, CRC(cb89c9be) SHA1(c773a68891fbf94808a2ee0036928c0c48d6673d) ) // labeled: DISC/TRON   UPRT PG2   10/4/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg3_10-4-83.4c",  0x0c000, 0x2000, CRC(5098faf4) SHA1(9f861f99cb170513b68aee48bbfd60ee439d7fa9) ) // labeled: DISC/TRON   UPRT PG3   10/4/83   BALLY/MIDWY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "sound0.a7",    0x00000, 0x1000, CRC(6d39bf19) SHA1(3d27466fcb6d41133f16119cddb815833c8b4eda) )
-	ROM_LOAD( "sound1.a8",    0x01000, 0x1000, CRC(ac872e1d) SHA1(c2833b20e124c505be3d5be2c885b9cf9927ca4c) )
-	ROM_LOAD( "sound2.a9",    0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) )
-	ROM_LOAD( "sound3.a10",   0x03000, 0x1000, CRC(6b5aeb02) SHA1(039d8d664f067bc0d085ad7730ef63dbd6dc387e) )
+	ROM_LOAD( "disc_tron_uprt_snd0_10-4-83.a7",  0x00000, 0x1000, CRC(7fb54293) SHA1(6d538a3e48f98e269623850f1f6774848a89fd59) ) // labeled: DISC/TRON   UPRT SND0   10/4/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd1_10-4-83.a8",  0x01000, 0x1000, CRC(edef7326) SHA1(5c9a64604252eea0628bf9d6221e8add82f66abe) ) // labeled: DISC/TRON   UPRT SND1   10/4/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd2_9-22-83.a9",  0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) ) // labeled: DISC/TRON   UPRT SND2   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd3_9-22-83.a10", 0x03000, 0x1000, CRC(6b5aeb02) SHA1(039d8d664f067bc0d085ad7730ef63dbd6dc387e) ) // labeled: DISC/TRON   UPRT SND3   9/22/83   BALLY/MIDWY
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) )
+	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) ) // need to verify actual labels
 	ROM_LOAD( "loc-bg1.5f",   0x02000, 0x2000, CRC(bb2d7a5d) SHA1(8044be9ffca9520fd77e0da492147e553f9f7da3) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) )
+	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) ) // these ROMs dated 8/15/83 - need to verify actual labels
 	ROM_LOAD( "loc-h.cp3",    0x02000, 0x2000, CRC(3bb4d475) SHA1(3795ba1640790041da51ebeac8517cc7d32e243e) )
 	ROM_LOAD( "loc-e.cp6",    0x04000, 0x2000, CRC(ce957f1a) SHA1(24177a8dd6dcb377cf8aee7c7b47b26f29e77e20) )
 	ROM_LOAD( "loc-f.cp5",    0x06000, 0x2000, CRC(d26053ce) SHA1(b7fb3d1df9b80c056cf131574565addb529645e1) )
@@ -2708,25 +2715,33 @@ ROM_START( dotron )
 	ROM_LOAD( "loc-b.cp9",    0x0e000, 0x2000, CRC(565a5c48) SHA1(9dfafd58bd552bfda4e1799a175735ecc1369ba3) )
 ROM_END
 
+/*
+Disc of TRON 9/22/83
+
+referred to as version 1, known differences:
+  Missing "DEREZZ A RING    2000" in score table
+  Sound Test menu shows sounds 1 through 19
+  Player Input screen shows "UPRIGHT   ACTIVATE ALL PLAYER INPUT   SWITCHES AND DEVICES   HIT TILT TO EXIT"
+*/
 ROM_START( dotrona )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "aloc-pg0.1c",  0x00000, 0x4000, CRC(40d00195) SHA1(e06a8097f02b9f445df0dd5c0ec13f9a0a1dcd8a) )
-	ROM_LOAD( "aloc-pg1.2c",  0x04000, 0x4000, CRC(5a7d1300) SHA1(8a1f088de9289cd902e72b55d3e72c3f07246778) )
-	ROM_LOAD( "aloc-pg2.3c",  0x08000, 0x4000, CRC(cb89c9be) SHA1(c773a68891fbf94808a2ee0036928c0c48d6673d) )
-	ROM_LOAD( "aloc-pg1.4c",  0x0c000, 0x2000, CRC(5098faf4) SHA1(9f861f99cb170513b68aee48bbfd60ee439d7fa9) )
+	ROM_LOAD( "disc_tron_uprt_pg0_9-22-83.1c",   0x00000, 0x4000, CRC(ba0da15f) SHA1(c0dfac2e5d6549620525b9e3d64b7c5494164dbd) ) // labeled: DISC/TRON   UPRT PG0   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg1_9-22-83.2c",   0x04000, 0x4000, CRC(dc300191) SHA1(417e964f38bfbdd84cae79939c23a7de41cd7bae) ) // labeled: DISC/TRON   UPRT PG1   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg2_9-22-83.3c",   0x08000, 0x4000, CRC(ab0b3800) SHA1(457a18bd98a3c4a9f893a3704dbc7d0fde4ef8ba) ) // labeled: DISC/TRON   UPRT PG2   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_pg3_9-22-83.4c",   0x0c000, 0x2000, CRC(f98c9f8e) SHA1(a215f0fd6cd9e8cacbe06cb7bfe4e2cced150c86) ) // labeled: DISC/TRON   UPRT PG3   9/22/83   BALLY/MIDWY
 
 	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "asound0.a7",   0x00000, 0x1000, CRC(7fb54293) SHA1(6d538a3e48f98e269623850f1f6774848a89fd59) )
-	ROM_LOAD( "asound1.a8",   0x01000, 0x1000, CRC(edef7326) SHA1(5c9a64604252eea0628bf9d6221e8add82f66abe) )
-	ROM_LOAD( "sound2.a9",    0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) )
-	ROM_LOAD( "sound3.a10",   0x03000, 0x1000, CRC(6b5aeb02) SHA1(039d8d664f067bc0d085ad7730ef63dbd6dc387e) )
+	ROM_LOAD( "disc_tron_uprt_snd0_9-22-83.a7",  0x00000, 0x1000, CRC(6d39bf19) SHA1(3d27466fcb6d41133f16119cddb815833c8b4eda) ) // labeled: DISC/TRON   UPRT SND0   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd1_9-22-83.a8",  0x01000, 0x1000, CRC(ac872e1d) SHA1(c2833b20e124c505be3d5be2c885b9cf9927ca4c) ) // labeled: DISC/TRON   UPRT SND1   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd2_9-22-83.a9",  0x02000, 0x1000, CRC(e8ef6519) SHA1(261b0463a73b403bc46df3e04f3d12173787d6e7) ) // labeled: DISC/TRON   UPRT SND2   9/22/83   BALLY/MIDWY
+	ROM_LOAD( "disc_tron_uprt_snd3_9-22-83.a10", 0x03000, 0x1000, CRC(6b5aeb02) SHA1(039d8d664f067bc0d085ad7730ef63dbd6dc387e) ) // labeled: DISC/TRON   UPRT SND3   9/22/83   BALLY/MIDWY
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) )
+	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) ) // need to verify actual labels
 	ROM_LOAD( "loc-bg1.5f",   0x02000, 0x2000, CRC(bb2d7a5d) SHA1(8044be9ffca9520fd77e0da492147e553f9f7da3) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) )
+	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) ) // these ROMs dated 8/15/83 - need to verify actual labels
 	ROM_LOAD( "loc-h.cp3",    0x02000, 0x2000, CRC(3bb4d475) SHA1(3795ba1640790041da51ebeac8517cc7d32e243e) )
 	ROM_LOAD( "loc-e.cp6",    0x04000, 0x2000, CRC(ce957f1a) SHA1(24177a8dd6dcb377cf8aee7c7b47b26f29e77e20) )
 	ROM_LOAD( "loc-f.cp5",    0x06000, 0x2000, CRC(d26053ce) SHA1(b7fb3d1df9b80c056cf131574565addb529645e1) )
@@ -2738,28 +2753,28 @@ ROM_END
 
 ROM_START( dotrone )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "loc-cpu1",     0x00000, 0x4000, CRC(eee31b8c) SHA1(c05ad1d10588a6c1050c608f1a473685ebe4daad) )
+	ROM_LOAD( "loc-cpu1",     0x00000, 0x4000, CRC(eee31b8c) SHA1(c05ad1d10588a6c1050c608f1a473685ebe4daad) ) // need to verify actual labels
 	ROM_LOAD( "loc-cpu2",     0x04000, 0x4000, CRC(75ba6ad3) SHA1(d02c3d731073fb6083bd8f771f76338939384a07) )
 	ROM_LOAD( "loc-cpu3",     0x08000, 0x4000, CRC(94bb1a0e) SHA1(af4769fac39e67eff840675bf93cc4304f2875fd) )
 	ROM_LOAD( "loc-cpu4",     0x0c000, 0x2000, CRC(c137383c) SHA1(ccf7cf9c7c0528aa819cfca34c1c0e89ab2d586a) )
 
-	ROM_REGION( 0x10000, "ssio:cpu", 0 )
-	ROM_LOAD( "loc-a",        0x00000, 0x1000, CRC(2de6a8a8) SHA1(6bba00daed8836297f3189db4e4fe8e158adc465) )
-	ROM_LOAD( "loc-b",        0x01000, 0x1000, CRC(4097663e) SHA1(afb5224529550cec378415a5cd81b47f6c6c101b) )
-	ROM_LOAD( "loc-c",        0x02000, 0x1000, CRC(f576b9e7) SHA1(4ff39c46c390aa93d900f5f7a0b35fa71f066863) )
-	ROM_LOAD( "loc-d",        0x03000, 0x1000, CRC(74b0059e) SHA1(1fe393721446538036fb6110fdc3920959ebd596) )
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) // These 4 ROMs stamped "AUG 19"
+	ROM_LOAD( "ssi_o_loc-a_disc_of_tron_aug_19", 0x00000, 0x1000, CRC(2de6a8a8) SHA1(6bba00daed8836297f3189db4e4fe8e158adc465) ) // labeled: SSI/O   LOC-A   DISC OF TRON   (c)1983 BALLY/MIDAY
+	ROM_LOAD( "ssi_o_loc-b_disc_of_tron_aug_19", 0x01000, 0x1000, CRC(4097663e) SHA1(afb5224529550cec378415a5cd81b47f6c6c101b) ) // labeled: SSI/O   LOC-B   DISC OF TRON   (c)1983 BALLY/MIDAY
+	ROM_LOAD( "ssi_o_loc-c_disc_of_tron_aug_19", 0x02000, 0x1000, CRC(f576b9e7) SHA1(4ff39c46c390aa93d900f5f7a0b35fa71f066863) ) // labeled: SSI/O   LOC-C   DISC OF TRON   (c)1983 BALLY/MIDAY
+	ROM_LOAD( "ssi_o_loc-d_disc_of_tron_aug_19", 0x03000, 0x1000, CRC(74b0059e) SHA1(1fe393721446538036fb6110fdc3920959ebd596) ) // labeled: SSI/O   LOC-D   DISC OF TRON   (c)1983 BALLY/MIDAY
 
 	ROM_REGION( 0x10000, "snt:cpu", 0 )
-	ROM_LOAD( "pre.u3",       0x09000, 0x1000, CRC(c3d0f762) SHA1(a1857641c35b5bcb33f29fe79a1a581c4cbf129b) )
+	ROM_LOAD( "pre.u3",       0x09000, 0x1000, CRC(c3d0f762) SHA1(a1857641c35b5bcb33f29fe79a1a581c4cbf129b) ) // need to verify actual labels
 	ROM_LOAD( "pre.u4",       0x0a000, 0x1000, CRC(7ca79b43) SHA1(c995e1e67d70706a090eb777e9fec0f1ba03f82d) )
 	ROM_LOAD( "pre.u5",       0x0b000, 0x1000, CRC(24e9618e) SHA1(eb245ff381a76b314a0ed3519e140444afae341c) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) )
+	ROM_LOAD( "loc-bg2.6f",   0x00000, 0x2000, CRC(40167124) SHA1(782c8192dd58a3f23ff2338452dd03206d79030a) ) // need to verify actual labels
 	ROM_LOAD( "loc-bg1.5f",   0x02000, 0x2000, CRC(bb2d7a5d) SHA1(8044be9ffca9520fd77e0da492147e553f9f7da3) )
 
 	ROM_REGION( 0x10000, "gfx2", 0 )
-	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) )
+	ROM_LOAD( "loc-g.cp4",    0x00000, 0x2000, CRC(57a2b1ff) SHA1(b97539ffd2f5fc8b86fc2f8f233cc26ba16f82ee) ) // need to verify actual labels
 	ROM_LOAD( "loc-h.cp3",    0x02000, 0x2000, CRC(3bb4d475) SHA1(3795ba1640790041da51ebeac8517cc7d32e243e) )
 	ROM_LOAD( "loc-e.cp6",    0x04000, 0x2000, CRC(ce957f1a) SHA1(24177a8dd6dcb377cf8aee7c7b47b26f29e77e20) )
 	ROM_LOAD( "loc-f.cp5",    0x06000, 0x2000, CRC(d26053ce) SHA1(b7fb3d1df9b80c056cf131574565addb529645e1) )
@@ -2769,7 +2784,7 @@ ROM_START( dotrone )
 	ROM_LOAD( "loc-b.cp9",    0x0e000, 0x2000, CRC(565a5c48) SHA1(9dfafd58bd552bfda4e1799a175735ecc1369ba3) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "edotlamp.u2",  0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )    /* lamp sequencer PROM */
+	ROM_LOAD( "edotlamp.u2",  0x0020, 0x0020, CRC(fb58b867) SHA1(45beb55f2c2e9197f091fc06e9a2f595e57e5c93) )    // lamp sequencer PROM
 ROM_END
 
 
@@ -2809,7 +2824,7 @@ ROM_START( nflfoot )
 	ROM_LOAD( "nflvidfg.cp9", 0x0e000, 0x2000, CRC(46558146) SHA1(4bedfae8cf0fcb9d837706ee13fbe3944ab47216) )
 
 	DISK_REGION( "ced_videodisc" )
-		DISK_IMAGE_READONLY( "nflfoot", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "nflfoot", 0, NO_DUMP )
 ROM_END
 
 
@@ -3067,8 +3082,8 @@ GAME(  1983, tapperb,   tapper,   mcr_91490,     tapper,    mcr_state,         i
 GAME(  1983, sutapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Suntory)", MACHINE_SUPPORTS_SAVE )
 GAME(  1984, rbtapper,  tapper,   mcr_91490,     tapper,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Tapper (Root Beer)", MACHINE_SUPPORTS_SAVE )
 GAME(  1984, timber,    0,        mcr_91490,     timber,    mcr_state,         init_mcr_91490, ROT0,  "Bally Midway", "Timber", MACHINE_SUPPORTS_SAVE )
-GAME(  1983, dotron,    0,        mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright)", MACHINE_SUPPORTS_SAVE )
-GAME(  1983, dotrona,   dotron,   mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright alternate)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotron,    0,        mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright, 10/4/83)", MACHINE_SUPPORTS_SAVE )
+GAME(  1983, dotrona,   dotron,   mcr_91490,     dotron,    mcr_state,         init_mcr_91490, ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Upright, 9/22/83)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk */
 GAME(  1983, dotrone,   dotron,   mcr_91490_snt, dotrone,   mcr_state,         init_dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )

@@ -309,8 +309,6 @@ void memory_manager::initialize()
 		allocate(memory);
 	}
 
-	allocate(m_machine.m_dummy_space);
-
 	// construct and preprocess the address_map for each space
 	for (auto const memory : memories)
 		memory->prepare_maps();
@@ -595,7 +593,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		// 1. Adjusting
 		nstart &= ~default_lowbits_mask;
 		nend |= default_lowbits_mask;
-		
+
 		// 2. Clearing
 		u64 smask, emask;
 		if(m_config.endianness() == ENDIANNESS_BIG) {
@@ -1045,7 +1043,7 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
-		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
+		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride;
 }
 
 

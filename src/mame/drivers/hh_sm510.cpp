@@ -5093,9 +5093,9 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   known releases (Gauntlet):
-  - World: Gauntlet
-  - Japan: Gauntlet (published by Sega)
-  - UK: Gauntlet (published by Grandstand)
+  - World: Gauntlet, published by Tiger
+  - Japan: Gauntlet, published by Sega
+  - UK: Gauntlet, published by Grandstand
 
   Robin Hood is the same MCU/ROM, different LCD.
 
@@ -5619,8 +5619,8 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   known releases:
-  - World: Space Harrier II
-  - Japan: Space Harrier (published by Sega)
+  - World: Space Harrier II, published by Tiger
+  - Japan: Space Harrier, published by Sega
 
 ***************************************************************************/
 
@@ -5972,8 +5972,8 @@ ROM_END
   * lcd screen with custom segments, 1-bit sound
 
   known releases:
-  - World: Altered Beast
-  - Japan: Juuouki (published by Sega)
+  - World: Altered Beast, published by Tiger
+  - Japan: Juuouki, published by Sega
 
 ***************************************************************************/
 

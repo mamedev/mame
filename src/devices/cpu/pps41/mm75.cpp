@@ -23,6 +23,5 @@ mm75_device::mm75_device(const machine_config &mconfig, const char *tag, device_
 void mm75_device::device_start()
 {
 	mm76_device::device_start();
-	m_d_pins--;
-	m_d_mask >>= 1;
+	set_d_pins(9);
 }

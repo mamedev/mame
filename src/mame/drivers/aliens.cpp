@@ -15,7 +15,7 @@ Preliminary driver by:
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 

@@ -47,6 +47,34 @@
 #include "includes/coco3.h"
 
 //-------------------------------------------------
+//  device_start
+//-------------------------------------------------
+
+void coco3_state::device_start()
+{
+	// call parent device_start
+	coco_state::device_start();
+
+	// save state support
+	save_item(NAME(m_pia1b_control_register));
+
+}
+
+//-------------------------------------------------
+//  device_reset
+//-------------------------------------------------
+
+void coco3_state::device_reset()
+{
+	/* call parent device_start */
+	coco_state::device_reset();
+
+	/* reset state */
+	m_pia1b_control_register = 0;
+
+}
+
+//-------------------------------------------------
 //  ff20_write
 //-------------------------------------------------
 
@@ -54,7 +82,11 @@ void coco3_state::ff20_write(offs_t offset, uint8_t data)
 {
 	coco_state::ff20_write(offset, data);
 
-	if (offset == 0x02)
+	if (offset == 0x03)
+		m_pia1b_control_register = data;
+
+	/* only pass ff22 to gime if the data register is addressed */
+	if (offset == 0x02 && ((m_pia1b_control_register & 0x04) == 0x04))
 		m_gime->ff22_write(data);
 }
 
@@ -127,20 +159,5 @@ void coco3_state::update_cart_base(uint8_t *cart_base)
 
 uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bool result;
-	if (!strcmp(screen.tag(), ":" COMPOSITE_SCREEN_TAG))
-	{
-		/* composite screen */
-		result = m_gime->update_composite(bitmap, cliprect);
-	}
-	else if (!strcmp(screen.tag(), ":" RGB_SCREEN_TAG))
-	{
-		/* rgb screen */
-		result = m_gime->update_rgb(bitmap, cliprect);
-	}
-	else
-	{
-		fatalerror("Called screen_update() with invalid tag '%s'\n", screen.tag());
-	}
-	return result;
+	return (m_screen_config->read() & 1) ? m_gime->update_rgb(bitmap, cliprect) : m_gime->update_composite(bitmap, cliprect);
 }

@@ -414,8 +414,8 @@ void mm76_device::op_oa()
 
 void mm76_device::op_ios()
 {
-	// IOS: start serial I/O
-	m_sclock_count = 8;
+	// IOS: start serial I/O (2 cycles per shift, 1st shift at IOS+3)
+	m_sclock_count = 9;
 }
 
 void mm76_device::op_i1()

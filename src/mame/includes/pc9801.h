@@ -30,8 +30,9 @@
 #include "bus/scsi/scsihd.h"
 
 #include "sound/beep.h"
+//#include "sound/dac.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 
 #include "video/upd7220.h"
 
@@ -105,6 +106,7 @@ public:
 		m_video_ram_2(*this, "video_ram_2"),
 		m_ext_gvram(*this, "ext_gvram"),
 		m_beeper(*this, "beeper"),
+		m_dac(*this, "dac"),
 		m_ram(*this, RAM_TAG),
 		m_ipl(*this, "ipl_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -113,21 +115,41 @@ public:
 	{
 	}
 
-	void pc9821v20(machine_config &config);
-	void pc9801ux(machine_config &config);
-	void pc9801vm(machine_config &config);
 	void pc9801(machine_config &config);
-	void pc9801bx2(machine_config &config);
+
+	void pc9801vm(machine_config &config);
+
+	void pc9801ux(machine_config &config);
 	void pc9801rs(machine_config &config);
+
+	void pc9801bx2(machine_config &config);
+
 	void pc9821(machine_config &config);
 	void pc9821as(machine_config &config);
 	void pc9821ap2(machine_config &config);
+	void pc9821xa16(machine_config &config);
+	void pc9821ra20(machine_config &config);
+	void pc9821ra333(machine_config &config);
+	void pc9821v20(machine_config &config);
+
+	void pc386m(machine_config &config);
+	void pc486mu(machine_config &config);
+	void pc486se(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
+
+	void pc9801_keyboard(machine_config &config);
+	void pc9801_mouse(machine_config &config);
+	void pc9801_cbus(machine_config &config);
+	void pc9801_sasi(machine_config &config);
+	void pc9801_ide(machine_config &config);
+	void pc9801_common(machine_config &config);
+	void pc9801_pit_clock(machine_config &config, const XTAL clock);
 
 private:
 	static void cdrom_headphones(device_t *device);
@@ -155,7 +177,9 @@ private:
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
-	required_device<beep_device> m_beeper;
+	optional_device<beep_device> m_beeper;
+//	optional_device<dac_1bit_device> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -297,7 +321,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	void ppi_sys_portc_w(uint8_t data);
+	void ppi_sys_beep_portc_w(uint8_t data);
+	void ppi_sys_dac_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
@@ -310,16 +335,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	uint8_t unk_r();
 
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
 
-	void pc9801_keyboard(machine_config &config);
-	void pc9801_mouse(machine_config &config);
-	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
-	void pc9801_ide(machine_config &config);
-	void pc9801_common(machine_config &config);
 	void ipl_bank(address_map &map);
 	void pc9801_common_io(address_map &map);
 	void pc9801_io(address_map &map);
@@ -370,13 +388,17 @@ private:
 
 	struct{
 		uint8_t control;
-		uint8_t lx;
-		uint8_t ly;
+		uint8_t lx, ly;
+		uint8_t dx, dy;
+		uint8_t prev_dx, prev_dy;
 		uint8_t freq_reg;
 		uint8_t freq_index;
 	}m_mouse;
 
 	uint8_t m_ide_sel;
+
+	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
+	bool m_dac_disable;
 
 	/* PC9801RS specific, move to specific state */
 	uint8_t m_gate_a20; //A20 line

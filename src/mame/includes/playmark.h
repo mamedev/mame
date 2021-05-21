@@ -8,6 +8,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
@@ -63,6 +64,7 @@ public:
 		m_rowscroll(*this, "rowscroll"),
 		m_audio_pic(*this, "audiopic"),
 		m_audio_mcs(*this, "audiomcs"),
+		m_soundlatch(*this, "soundlatch"),
 		m_eeprom(*this, "eeprom"),
 		m_ticket(*this, "ticket"),
 		m_token(*this, "token")
@@ -119,6 +121,7 @@ private:
 	// devices
 	optional_device<pic16c57_device> m_audio_pic; // all but wbeachvla;
 	optional_device<i87c51_device> m_audio_mcs; // wbeachvla
+	optional_device<generic_latch_8_device> m_soundlatch; // wbeachvla
 	optional_device<eeprom_serial_93cxx_device> m_eeprom; // wbeachvl hotmind
 	optional_device<ticket_dispenser_device> m_ticket; // hotmind luckboomh
 	optional_device<ticket_dispenser_device> m_token; // hotmind luckboomh
@@ -144,6 +147,8 @@ private:
 	void excelsr_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0); // excelsr
 	void hrdtimes_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0); // bigtwinb, hrdtimes, hotmind, luckboomh
 	void playmark_oki_banking_w(u8 data);
+	uint8_t wbeachvla_snd_command_r(); // wbeachvla
+	void wbeachvla_snd_control_w(uint8_t data); // wbeachvla
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info); // bigtwin, excelsr
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info); // bigtwin, excelsr
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info); // wbeachvk
@@ -180,6 +185,7 @@ private:
 	void luckboomh_main_map(address_map &map);
 	void oki_map(address_map &map);
 	void wbeachvl_main_map(address_map &map);
+	void wbeachvla_main_map(address_map &map);
 
 	void wbeachvl_base(machine_config &config);
 };

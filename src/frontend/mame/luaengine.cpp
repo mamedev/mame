@@ -932,7 +932,7 @@ void lua_engine::initialize()
 	auto thread_type = emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
 	thread_type.set("start", [](context &ctx, const char *scr) {
 			std::string script(scr);
-			if(ctx.busy)
+			if (ctx.busy)
 				return false;
 			std::thread th([&ctx, script]() {
 					sol::state thstate;
@@ -954,13 +954,24 @@ void lua_engine::initialize()
 								thstate["status"] = ctx.result;
 							};
 						auto ret = func();
-						if (ret.valid()) {
+						if (ret.valid())
+						{
 							const char *tmp = ret.get<const char *>();
 							if (tmp != nullptr)
 								ctx.result = tmp;
 							else
-								exit(0);
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
 						}
+						else
+						{
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
+					}
+					else
+					{
+						sol::error err = res;
+						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
 					}
 					ctx.busy = false;
 				});
@@ -970,13 +981,13 @@ void lua_engine::initialize()
 			return true;
 		});
 	thread_type.set("continue", [](context &ctx, const char *val) {
-			if(!ctx.yield)
+			if (!ctx.yield)
 				return;
 			ctx.result = val;
 			ctx.sync.notify_all();
 		});
 	thread_type.set("result", sol::property([](context &ctx) -> std::string {
-			if(ctx.busy && !ctx.yield)
+			if (ctx.busy && !ctx.yield)
 				return "";
 			return ctx.result;
 		}));

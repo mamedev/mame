@@ -406,7 +406,7 @@ void nes_cart_slot_device::call_load_ines()
 	{
 		mapper |= (header[8] & 0x0f) << 8;
 		// read submappers (based on 20140116 specs)
-		submapper = (header[8] & 0xf0 >> 8);
+		submapper = (header[8] & 0xf0) >> 4;
 		prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
 		vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
 	}
@@ -862,7 +862,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 	{
 		mapper |= (ROM[8] & 0x0f) << 8;
 		// read submappers (based on 20140116 specs)
-		submapper = (ROM[8] & 0xf0 >> 8);
+		submapper = (ROM[8] & 0xf0) >> 4;
 	}
 
 	ines_mapr_setup(mapper, &pcb_id);

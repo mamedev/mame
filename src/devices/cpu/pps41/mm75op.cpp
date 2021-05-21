@@ -7,8 +7,6 @@
 #include "mm75.h"
 
 
-// opcodes (differences with mm76_device)
-
 // unsupported opcodes
 
 void mm75_device::op_ios()
@@ -19,7 +17,7 @@ void mm75_device::op_ios()
 
 void mm75_device::op_i2c()
 {
-	// I2C: does not PI5-8 pins
+	// I2C: does not have PI5-8 pins
 	m_a = 0;
 	op_illegal();
 }

@@ -55,8 +55,8 @@ void bbc_ams3_device::device_add_mconfig(machine_config &config)
 	m_fdc->hdl_wr_callback().set(FUNC(bbc_ams3_device::motor_w));
 	m_fdc->opt_wr_callback().set(FUNC(bbc_ams3_device::side_w));
 	// Hitachi HFD 305S
-	FLOPPY_CONNECTOR(config, m_floppy0, "3dsdd", FLOPPY_3_DSDD, true, bbc_ams3_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, "3dsdd", FLOPPY_3_DSDD, false, bbc_ams3_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], "3dsdd", FLOPPY_3_DSDD, true, bbc_ams3_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], "3dsdd", FLOPPY_3_DSDD, false, bbc_ams3_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -77,8 +77,7 @@ bbc_ams3_device::bbc_ams3_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, BBC_AMS3, tag, owner, clock)
 	, device_bbc_fdc_interface(mconfig, *this)
 	, m_fdc(*this, "i8271")
-	, m_floppy0(*this, "i8271:0")
-	, m_floppy1(*this, "i8271:1")
+	, m_floppy(*this, "i8271:%u", 0)
 {
 }
 
@@ -125,13 +124,13 @@ void bbc_ams3_device::write(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(bbc_ams3_device::motor_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->mon_w(!state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->mon_w(!state);
 	m_fdc->ready_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_ams3_device::side_w)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(state);
+	if (m_floppy[0]->get_device()) m_floppy[0]->get_device()->ss_w(state);
+	if (m_floppy[1]->get_device()) m_floppy[1]->get_device()->ss_w(state);
 }

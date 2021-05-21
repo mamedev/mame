@@ -203,6 +203,11 @@ newoption {
 }
 
 newoption {
+	trigger = "AR",
+	description = "AR replacement",
+}
+
+newoption {
 	trigger = "TOOLCHAIN",
 	description = "Toolchain prefix"
 }
@@ -485,14 +490,12 @@ language "C++"
 
 flags {
 	"StaticRuntime",
+	"Cpp17",
 }
 
 configuration { "vs20*" }
 	buildoptions {
 		"/bigobj",
-	}
-	buildoptions_cpp {
-		"/std:c++17",
 	}
 	flags {
 		"ExtraWarnings",
@@ -1086,6 +1089,12 @@ end
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
 			}
+			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
+				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
+					"-Wno-error=ignored-attributes",
+					"-Wno-error=unused-const-variable",
+				}
+			end
 			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
 				buildoptions {
 					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
@@ -1121,6 +1130,14 @@ end
 			if (version >= 100000) then
 				buildoptions {
 					"-Wno-return-local-addr", -- sqlite3.c in GCC 10
+				}
+			end
+			if (version >= 110000) then
+				buildoptions {
+					"-Wno-nonnull",			-- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
+					"-Wno-stringop-overread",	-- machine/bbc.cpp in GCC 11.1
+					"-Wno-misleading-indentation",	-- sqlite3.c in GCC 11.1
+					"-Wno-maybe-uninitialized"	-- expat in GCC 11.1
 				}
 			end
 		end
@@ -1428,6 +1445,8 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
 			"-Wno-unused-variable",
+			"-Wno-xor-used-as-pow",
+			"-Wno-microsoft-cast",
 		}
 end
 

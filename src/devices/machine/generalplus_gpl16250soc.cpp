@@ -253,6 +253,10 @@ void sunplus_gcm394_base_device::trigger_systemm_dma(int channel)
 	if (mem.read_word(0x4abe7) == 0x4840)
 		mem.write_word(0x4abe7, 0x4841);    // camp rock IRQ? wait hack
 
+	//if (mem.read_word(0x37244) == 0x4845)
+	//  mem.write_word(0x37244, 0x4840);    // hannah montana guitar force service mode
+
+
 
 
 	// clear params after operation

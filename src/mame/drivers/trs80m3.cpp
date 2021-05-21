@@ -57,12 +57,17 @@ Model 4P - is the same as Model 4 except:
 To Do / Status:
 --------------
 
-trs80m3:   works
+JV3: Cannot write, due to an emulation bug causing the machine to hang.
+JV1: If you try to create a disk in the File Manager, MAME will crash.
+DMK: Cannot write (no option).
+IMD: Does not work with a quad drive. Cannot write.
 
-trs80m4:   works
-           will boot model 3 floppies, but not model 4 ones
+trs80m3:   Works
 
-trs80m4p:  floppy not working, so machine is useless
+trs80m4:   Works
+
+trs80m4p:  Floppy not working, so machine is useless.
+           In debugger g 402a, then pc=0;g and it will boot.
 
 ***************************************************************************/
 
@@ -72,6 +77,7 @@ trs80m4p:  floppy not working, so machine is useless
 #include "screen.h"
 #include "speaker.h"
 
+#include "formats/imd_dsk.h"
 #include "formats/trs80_dsk.h"
 #include "formats/dmk_dsk.h"
 
@@ -324,14 +330,23 @@ GFXDECODE_END
 
 void trs80m3_state::floppy_formats(format_registration &fr)
 {
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_IMD_FORMAT);
+	fr.add(FLOPPY_JV3_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 }
 
+// If you choose a disk that has more tracks than the drive,
+// MAME will probably crash. The default is DD, which allows
+// IMD boot disks to work, and any other disk with up to 40
+// tracks. You need QD to support up to 80 tracks, but it
+// breaks the IMD disks.
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD);
+	device.option_add("35t_sd", FLOPPY_525_SSSD_35T);
+	device.option_add("40t_sd", FLOPPY_525_SSSD);
+	device.option_add("40t_dd", FLOPPY_525_DD);
+	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
 
@@ -361,16 +376,19 @@ void trs80m3_state::model3(machine_config &config)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80m3_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(trs80m3_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
@@ -393,6 +411,10 @@ void trs80m3_state::model3(machine_config &config)
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("3");
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("3");
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("3");
 }
 
 void trs80m3_state::model4(machine_config &config)
@@ -411,6 +433,11 @@ void trs80m3_state::model4(machine_config &config)
 	m_m4_bank->set_data_width(8);
 	m_m4_bank->set_addr_width(18);
 	m_m4_bank->set_stride(0x10000);
+
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("trs80_cass").set_filter("4");
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("trs80_flop").set_filter("4");
+	config.device_remove("quickload");  // removed because it crashes..
+	config.device_remove("quik_list");
 }
 
 void trs80m3_state::model4p(machine_config &config)
@@ -430,7 +457,11 @@ void trs80m3_state::model4p(machine_config &config)
 	m_m4p_bank->set_addr_width(19);
 	m_m4p_bank->set_stride(0x10000);
 
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("trs80_flop").set_filter("4");
 	config.device_remove("quickload");
+	config.device_remove("cassette");
+	config.device_remove("cass_list");
+	config.device_remove("quik_list");
 }
 
 void trs80m3_state::cp500(machine_config &config)
@@ -532,7 +563,7 @@ void trs80m3_state::init_trs80m4p()
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT             COMPANY               FULLNAME                FLAGS
-COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        MACHINE_SUPPORTS_SAVE )
+COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, trs80m4,     trs80m3,  0,        model4,   trs80m3,  trs80m3_state, init_trs80m4,  "Tandy Radio Shack", "TRS-80 Model 4",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

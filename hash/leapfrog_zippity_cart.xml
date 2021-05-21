@@ -5,13 +5,13 @@ license:CC0
 -->
 
 <!--
-	Not dumped:
-	
-	The Princess and the Frog
-	Toy Story 3
+    Not dumped:
 
-	(it also needs confirming if US / UK cartridges are different, dumps are all from UK cartridges)
-	
+    The Princess and the Frog
+    Toy Story 3
+
+    (it also needs confirming if US / UK cartridges are different, dumps are all from UK cartridges)
+
 -->
 <softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity Cartridges">
 
@@ -36,5 +36,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

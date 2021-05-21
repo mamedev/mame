@@ -26,8 +26,8 @@ Notes:
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

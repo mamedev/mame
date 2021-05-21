@@ -230,7 +230,7 @@ void mk1_cpu_device::alu_update()
 			m_alu_result = m_alu_a + (m_alu_a & m_alu_b) + (carry ? 1 : 0);
 		carry = u16(m_alu_a) + u16(m_alu_a & m_alu_b) + (carry ? 1 : 0) >= 0x100;
 		break;
- 
+
 	case 0b1001:
 		if (BIT(m_alu_function, 4))
 			m_alu_result = ~(m_alu_a ^ m_alu_b);

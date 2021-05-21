@@ -109,7 +109,7 @@ u8 apple2_joystick_device::pdl2_r()
 
 u8 apple2_joystick_device::pdl3_r()
 {
-	return m_joy_x[1]->read();
+	return m_joy_y[1]->read();
 }
 
 READ_LINE_MEMBER(apple2_joystick_device::sw0_r)

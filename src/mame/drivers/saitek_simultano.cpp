@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
-// thanks-to:Achim, bataais
+// thanks-to:Achim, bataais, Berger
 /***************************************************************************
 
 Saitek Simultano, it is related to Saitek Stratos, see saitek_stratos.cpp
@@ -16,19 +16,21 @@ Hardware notes:
 - Epson SED1502F, LCD screen
 - piezo, 16+3 leds, button sensors chessboard
 
-It also appeared in Tandy's Chess Champion 2150, not as a simple rebrand, but
-with hardware differences: 3MHz R65C02, 1 64KB ROM and no EGR socket.
+It also appeared in Tandy's Chess Champion 2150, still manufactured and
+programmed by Saitek. Not as a simple rebrand, but with hardware differences:
+3MHz R65C02, 1 64KB ROM and no EGR socket.
 
 TODO:
-- where does the IRQ come from? same problem as with stratos
+- IRQ is from HELIOS pin 2, how is the timing determined? same problem as with stratos
 - verify that egr(1) does not work on real chesscomputer
+- is cc2150 the same rom contents as the first simultano?
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m6502/m65c02.h"
-#include "machine/bankdev.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -67,6 +69,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(go_button);
 
 	void simultano(machine_config &config);
+	void cc2150(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -75,7 +78,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_rombank;
+	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -84,8 +87,8 @@ private:
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
-	void main_map(address_map &map);
-	void rombank_map(address_map &map);
+	void simultano_map(address_map &map);
+	void cc2150_map(address_map &map);
 
 	void power_off();
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -115,7 +118,8 @@ void simultano_state::machine_start()
 void simultano_state::machine_reset()
 {
 	m_power = true;
-	m_rombank->set_bank(0);
+	m_control = 0;
+	m_rombank.select(0);
 }
 
 
@@ -177,8 +181,8 @@ void simultano_state::select_w(u8 data)
 	// d0-d3: input/chessboard mux
 	// d6,d7: side panel led mux
 	// d4,d5: led data
-	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf), false);
-	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3, true);
+	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
+	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
 	m_select = data;
 }
 
@@ -206,7 +210,7 @@ void simultano_state::control_w(u8 data)
 	m_control = data;
 
 	// d0,d1: rombank
-	m_rombank->set_bank(bitswap<2>(data,0,1));
+	m_rombank.select(bitswap<2>(data,0,1));
 
 	// d6 falling edge: power-off request
 	if (~data & prev & 0x40)
@@ -219,7 +223,7 @@ void simultano_state::control_w(u8 data)
     Address Maps
 ******************************************************************************/
 
-void simultano_state::main_map(address_map &map)
+void simultano_state::cc2150_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w(FUNC(simultano_state::select_w));
@@ -228,14 +232,18 @@ void simultano_state::main_map(address_map &map)
 	map(0x2600, 0x2600).rw(FUNC(simultano_state::control_r), FUNC(simultano_state::control_w));
 	//map(0x4000, 0x5fff).noprw(); // tries to access RAM, unpopulated on PCB
 	map(0x6000, 0x607f).rw("lcd", FUNC(sed1502_device::read), FUNC(sed1502_device::write));
-	map(0x8000, 0xffff).m(m_rombank, FUNC(address_map_bank_device::amap8));
+
+	map(0x8000, 0xffff).view(m_rombank);
+	m_rombank[0](0x8000, 0xffff).rom().region("maincpu", 0x0000);
+	m_rombank[1](0x8000, 0xffff).rom().region("maincpu", 0x8000);
+	m_rombank[2](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
+	m_rombank[3](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
 }
 
-void simultano_state::rombank_map(address_map &map)
+void simultano_state::simultano_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
-	map(0x10000, 0x17fff).r("extrom", FUNC(generic_slot_device::read_rom));
+	cc2150_map(map);
+	m_rombank[2](0x8000, 0xffff).r("extrom", FUNC(generic_slot_device::read_rom));
 }
 
 
@@ -295,20 +303,25 @@ static INPUT_PORTS_START( simultano )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, simultano_state, acl_button, 0) PORT_NAME("ACL")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cc2150 )
+	PORT_INCLUDE( simultano )
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+INPUT_PORTS_END
+
 
 
 /******************************************************************************
     Machine Configs
 ******************************************************************************/
 
-void simultano_state::simultano(machine_config &config)
+void simultano_state::cc2150(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 5_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::main_map);
-	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
-
-	ADDRESS_MAP_BANK(config, "rombank").set_map(&simultano_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
+	R65C02(config, m_maincpu, 3_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::cc2150_map);
+	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(91.6)); // measured
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -334,9 +347,19 @@ void simultano_state::simultano(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void simultano_state::simultano(machine_config &config)
+{
+	cc2150(config);
+
+	/* basic machine hardware */
+	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::simultano_map);
+	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 
@@ -364,6 +387,15 @@ ROM_START( simultanoa )
 	ROM_LOAD("simultano.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
 ROM_END
 
+ROM_START( cc2150 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("y01g_418_u3.u3",  0x8000, 0x8000, CRC(612dac24) SHA1(ba318f2ba34f9eb3df76a30c455bded76617bb11) ) // AMI 27512
+	ROM_CONTINUE(               0x0000, 0x8000 )
+
+	ROM_REGION( 795951, "screen", 0 )
+	ROM_LOAD("simultano.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -375,3 +407,4 @@ ROM_END
 /*    YEAR  NAME        PARENT    CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
 CONS( 1989, simultano,  0,         0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. C)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, simultanoa, simultano, 0, simultano, simultano, simultano_state, empty_init, "Saitek", "Kasparov Simultano (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, cc2150,     simultano, 0, cc2150,    cc2150,    simultano_state, empty_init, "Saitek / Tandy Corporation", "Chess Champion 2150", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

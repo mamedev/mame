@@ -10,6 +10,8 @@
 
     GQ972 PWB(A2) 0000070609 Main board
     -----------------------------------
+        25.175 MHz clock (near GCUs and VGA connectors)
+        16.6666 MHz clock (near GCUs and VGA connectors)
         OSC 66.0000MHz
         IBM PowerPC 403GCX at 66MHz
         (2x) Konami 0000057714 (2D object processor)
@@ -74,8 +76,8 @@
         GQ972 Main Board
         2x CD-ROM drive in Slot 1
 
-	Pop'n Music
-	------------
+    Pop'n Music
+    ------------
         GQ986 Backplane
         GQ971 SPU
         GQ972 Main Board
@@ -151,6 +153,7 @@
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
+#include "sound/xt446.h"
 #include "sound/rf5c400.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
@@ -396,6 +399,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu"),
+		m_gcu_sub(*this, "gcu_sub"),
 		m_duart_com(*this, "duart_com"),
 		m_status_leds(*this, "status_led_%u", 0U),
 		m_io_inputs(*this, "IN%u", 0U)
@@ -405,6 +409,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_resolve_objects() override;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -433,6 +438,7 @@ protected:
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ata_interface_device> m_ata;
 	required_device<k057714_device> m_gcu;
+	optional_device<k057714_device> m_gcu_sub;
 
 private:
 	uint32_t cabinet_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -445,6 +451,8 @@ private:
 	void extend_board_irq_w(offs_t offset, uint8_t data);
 
 	uint8_t input_r(offs_t offset);
+
+	void control_w(offs_t offset, uint8_t data);
 
 	uint16_t ata_command_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -465,6 +473,8 @@ private:
 	output_finder<8> m_status_leds;
 
 	required_ioport_array<4> m_io_inputs;
+
+	uint8_t m_control;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -574,7 +584,6 @@ public:
 		firebeat_state(mconfig, type, tag),
 		m_duart_midi(*this, "duart_midi"),
 		m_kbd(*this, "kbd%u", 0),
-		m_gcu_sub(*this, "gcu_sub"),
 		m_lamps(*this, "lamp_%u", 1U),
 		m_cab_led_door_lamp(*this, "door_lamp"),
 		m_cab_led_start1p(*this, "start1p"),
@@ -613,7 +622,6 @@ private:
 
 	required_device<pc16552_device> m_duart_midi;
 	required_device_array<midi_keyboard_device, 2> m_kbd;
-	required_device<k057714_device> m_gcu_sub;
 
 	output_finder<3> m_lamps;
 	output_finder<> m_cab_led_door_lamp;
@@ -691,6 +699,13 @@ void firebeat_state::machine_start()
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
+void firebeat_state::machine_reset()
+{
+	m_extend_board_irq_enable = 0x3f;
+	m_extend_board_irq_active = 0x00;
+	m_control = 0;
+}
+
 void firebeat_state::device_resolve_objects()
 {
 	m_status_leds.resolve();
@@ -699,11 +714,9 @@ void firebeat_state::device_resolve_objects()
 void firebeat_state::init_firebeat()
 {
 	uint8_t *rom = memregion("user2")->base();
+	set_ibutton(rom);
 
 //  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
-
-	m_extend_board_irq_enable = 0x3f;
-	m_extend_board_irq_active = 0x00;
 
 	// Set to defaults here, but overridden for most specific games. It represents various bits of
 	// data, such as the firebeat's ability to play certain games at all, whether the firebeat is
@@ -714,8 +727,6 @@ void firebeat_state::init_firebeat()
 	m_cabinet_info = 0;
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
-
-	set_ibutton(rom);
 
 	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
@@ -740,16 +751,13 @@ void firebeat_state::firebeat(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 384);
-	screen.set_visarea(0, 511, 0, 383);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
+
+	K057714(config, m_gcu, 0).set_screen("screen");
+	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -774,6 +782,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x7d000500, 0x7d000501).w(FUNC(firebeat_state::control_w));
 	map(0x7d000800, 0x7d000803).r(FUNC(firebeat_state::input_r));
 	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
@@ -817,31 +826,31 @@ uint32_t firebeat_state::cabinet_r(offs_t offset, uint32_t mem_mask)
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
 /*
-	Each DS1991 dongle has 3 secure enclaves. The first enclave is always the game
-	serial number. This is a 9 digit alphanumeric ID. The first three characters are
-	always the game's code, and the rest of the characters are all digits. The fourth
-	character seems to be a region specifier and causes many games to check against
-	values in the m_cabinet_info register to verify that the hardware matches. This was
-	used to region lock JP and overseas data as well as specify that certain firebeats
-	only accept e-Amusement dongles (Konami's rental service before it was an online network).
+    Each DS1991 dongle has 3 secure enclaves. The first enclave is always the game
+    serial number. This is a 9 digit alphanumeric ID. The first three characters are
+    always the game's code, and the rest of the characters are all digits. The fourth
+    character seems to be a region specifier and causes many games to check against
+    values in the m_cabinet_info register to verify that the hardware matches. This was
+    used to region lock JP and overseas data as well as specify that certain firebeats
+    only accept e-Amusement dongles (Konami's rental service before it was an online network).
 
-	Odd numbers in the 4th position correspond to JP data, with 1 and 3 being observed
-	values in the wild. Some games also accept a 7 and a few games also accept a 5.
-	Even numbers in the 4th position correspond to overseas data, with 4 being the only
-	observed value. A 0 or 9 in the 4th position is game-specific (much like the handling of
-	m_cabinet_info) but generally correspond to rental data.
+    Odd numbers in the 4th position correspond to JP data, with 1 and 3 being observed
+    values in the wild. Some games also accept a 7 and a few games also accept a 5.
+    Even numbers in the 4th position correspond to overseas data, with 4 being the only
+    observed value. A 0 or 9 in the 4th position is game-specific (much like the handling of
+    m_cabinet_info) but generally correspond to rental data.
 
-	The second enclave is license data for some Pop'n Music games and specifies the length
-	of time a dongle is valid for. The RTCRAM is used for this check which is why there is
-	no operator menu to change the RTC. Instead, the time is set using the license check
-	screen that appears on some series such as Pop'n Music and Firebeat. It is encoded in
-	the password that is given to the operator to pass the check. For games which do not use
-	extended license information, this enclave is left blank.
+    The second enclave is license data for some Pop'n Music games and specifies the length
+    of time a dongle is valid for. The RTCRAM is used for this check which is why there is
+    no operator menu to change the RTC. Instead, the time is set using the license check
+    screen that appears on some series such as Pop'n Music and Firebeat. It is encoded in
+    the password that is given to the operator to pass the check. For games which do not use
+    extended license information, this enclave is left blank.
 
-	The third enclave is a mode switch. Every game looks for some unique set of data here
-	and will turn on manufacture/service mode if the right value is set. Some games also
-	look for overseas and rental strings here and a few also have no hardware check dongles
-	and debug dongles. In the case of normal retail dongles, this enclave is left blank.
+    The third enclave is a mode switch. Every game looks for some unique set of data here
+    and will turn on manufacture/service mode if the right value is set. Some games also
+    look for overseas and rental strings here and a few also have no hardware check dongles
+    and debug dongles. In the case of normal retail dongles, this enclave is left blank.
 */
 
 enum
@@ -1019,6 +1028,36 @@ uint8_t firebeat_state::input_r(offs_t offset)
 }
 
 /*****************************************************************************/
+
+void firebeat_state::control_w(offs_t offset, uint8_t data)
+{
+	// 0x01 - 31kHz (25.175 MHz)/24kHz (16.6666 MHz) clock switch
+	// 0x02 - Unused?
+	// 0x04 - Set to 1 by all games except beatmania III, usage unknown. Screen related?
+	// 0x08 - Toggles screen mirroring when only one GCU is in use? Default 0
+	// 0x80 - Used by ParaParaParadise and Keyboardmania. Set to 1 when doing YMZ flash initialization?
+
+	if (BIT(data, 0) == 0 && BIT(m_control, 0) == 1)
+	{
+		// Set screen to 31kHz from 24kHz
+		m_gcu->set_pixclock(25.175_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(25.175_MHz_XTAL);
+	}
+	else if (BIT(data, 0) == 1 && BIT(m_control, 0) == 0)
+	{
+		// Set screen to 24kHz from 31kHz
+		m_gcu->set_pixclock(16.6666_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(16.6666_MHz_XTAL);
+	}
+
+	m_control = data;
+}
+
+/*****************************************************************************/
 /* ATA Interface */
 
 uint16_t firebeat_state::ata_command_r(offs_t offset, uint16_t mem_mask)
@@ -1176,11 +1215,13 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 
 void firebeat_spu_state::machine_start()
 {
+	firebeat_state::machine_start();
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
 }
 
 void firebeat_spu_state::machine_reset()
 {
+	firebeat_state::machine_reset();
 	m_spu_ata_dma = 0;
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
@@ -1429,11 +1470,6 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	firebeat_spu_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_bm3_state::firebeat_bm3_map);
-
-	// beatmania III is the only game on the Firebeat platform to use 640x480
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(640, 480);
-	screen->set_visarea(0, 639, 0, 479);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
@@ -1803,27 +1839,21 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
-	K057714(config, m_gcu_sub, 0);
-	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
 
+	K057714(config, m_gcu, 0).set_screen("lscreen");
+	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
+
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
+
+	K057714(config, m_gcu_sub, 0).set_screen("rscreen");
+	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1849,6 +1879,12 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	auto &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
 	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
 	midi_chan0.out_int_callback().set(FUNC(firebeat_kbm_state::midi_keyboard_right_irq_callback));
+
+	// Synth card
+	auto &xt446(XT446(config, "xt446"));
+	midi_chan1.out_tx_callback().set(xt446, FUNC(xt446_device::midi_w));
+	xt446.add_route(0, "lspeaker", 1.0);
+	xt446.add_route(1, "rspeaker", 1.0);
 }
 
 void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
@@ -2312,10 +2348,10 @@ ROM_START( kbm )
 	ROM_LOAD("gq974", 0x00, 0xc8, CRC(65e4886a) SHA1(afba0315f2532599c51e232f734c538c4d108d73))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "gq974-ja c01", 0, SHA1(46b766b5ed75de4139df369b414692919de244c7) )
+	DISK_IMAGE_READONLY( "gq974-ja c01", 0, SHA1(975a4a59f842b8a7edad79b307e489cc88bef24d) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "gq974-ja a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) )
+	DISK_IMAGE_READONLY( "gq974-ja a02", 1, SHA1(80086676c00c9ca06ec14e305ea4523b6576e47f) )
 ROM_END
 
 ROM_START( kbh )
@@ -2326,10 +2362,10 @@ ROM_START( kbh )
 	ROM_LOAD("gu974", 0x00, 0xc8, CRC(748b8476) SHA1(5d507fd46235c4315ad32599ce87aa4e06642eb5))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(af4e8182f6a984895d9a9a00bbfb6c65fb7b4738) )
+	DISK_IMAGE_READONLY( "gu974-ka a01", 0, SHA1(07d3d6abcb13b2c2a556f2eed7e89e3d11febf1b) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(e66930f965b1aa1a681ab696302a04958dc8a334) ) // identical to jaa02 image
+	DISK_IMAGE_READONLY( "gu974-ka a02", 1, SHA1(9e358b0551b650a432e685ec82d3df2433e2aac3) )
 ROM_END
 
 ROM_START( kbm2nd )
@@ -2340,10 +2376,10 @@ ROM_START( kbm2nd )
 	ROM_LOAD("gca01ja_gca01aa", 0x00, 0xc8, CRC(27f977cf) SHA1(14739cb4edfc3c4453673d59f2bd0442eab71d6a))
 
 	DISK_REGION( "ata:0:cdrom" ) // program CD-ROM
-	DISK_IMAGE_READONLY( "a01 ja a01", 0, SHA1(0aabc0c03f7ae7e7633bf6056de833ace68f9163) )
+	DISK_IMAGE_READONLY( "a01 ja a01", 0, SHA1(6a661dd737c83130febe771402a159859afeffba) )
 
 	DISK_REGION( "ata:1:cdrom" ) // audio CD-ROM
-	DISK_IMAGE_READONLY( "a01 ja a02", 1, SHA1(4d62f6ecfbf5ab0b014feb7b01014cba440c87f8) )
+	DISK_IMAGE_READONLY( "a01 ja a02", 1, SHA1(e1ffc0bd4ea169951ed9ceaf090dbb1511a46601) )
 ROM_END
 
 ROM_START( kbm3rd )
@@ -2545,7 +2581,7 @@ ROM_START( bm3core )
 	DISK_IMAGE_READONLY( "a05jca01", 0, SHA1(b89eced8a1325b087e3f875d1a643bebe9bad5c0) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
-	DISK_IMAGE_READONLY( "a05jca02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a05jca02", 0, SHA1(1de7db35d20bbf728732f6a24c19315f9f4ad469) )
 ROM_END
 
 ROM_START( bm36th )
@@ -2562,7 +2598,7 @@ ROM_START( bm36th )
 	DISK_IMAGE_READONLY( "a21jca01", 0, SHA1(d1b888379cc0b2c2ab58fa2c5be49258043c3ea1) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
-	DISK_IMAGE_READONLY( "a21jca02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a21jca02", 0, SHA1(8fa11848af40966e42b6304e37de92be5c1fe3dc) )
 ROM_END
 
 ROM_START( bm37th )
@@ -2629,7 +2665,7 @@ GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_pop
 // Requires ST-224 emulation for optional toggleable external effects, but otherwise is fully playable
 // Core Remix and 6th Mix are marked as MACHINE_NOT_WORKING because of missing HDD dumps
 GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, bm37th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 7th Mix", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_IMPERFECT_SOUND )

@@ -767,6 +767,32 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 					params--;
 					break;
 
+				case 'O':
+				case 'o':
+					if (params == 0)
+					{
+						m_console.printf("Not enough parameters for format!\n");
+						return 0;
+					}
+					if (u32(*param >> 60) != 0)
+					{
+						p += sprintf(p, zerofill ? "%0*o" : "%*o", (width <= 20) ? 1 : width - 20, u32(*param >> 60));
+						p += sprintf(p, "%0*o", 10, u32(BIT(*param, 30, 30)));
+					}
+					else
+					{
+						if (width > 20)
+							p += sprintf(p, zerofill ? "%0*o" : "%*o", width - 20, 0);
+						if (u32(BIT(*param, 30, 30)) != 0)
+							p += sprintf(p, zerofill ? "%0*o" : "%*o", (width <= 10) ? 1 : width - 10, u32(BIT(*param, 30, 30)));
+						else if (width > 10)
+							p += sprintf(p, zerofill ? "%0*o" : "%*o", width - 10, 0);
+					}
+					p += sprintf(p, zerofill ? "%0*o" : "%*o", (width < 10) ? width : 10, u32(BIT(*param, 0, 30)));
+					param++;
+					params--;
+					break;
+
 				case 'D':
 				case 'd':
 					if (params == 0)

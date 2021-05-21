@@ -698,7 +698,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add_internal("pak", COCO_PAK);
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("gmc", COCO_PAK_GMC);
 	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ram", COCO_PAK_RAM);

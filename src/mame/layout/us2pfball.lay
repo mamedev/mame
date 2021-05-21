@@ -100,8 +100,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-8.99" right="348.99" top="-124.99" bottom="162.99" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_blue"><bounds left="-9" right="349" top="-125" bottom="-80" /></element>
 		<element ref="text_down"><bounds x="-8" y="-124" width="120" height="19" /></element>
 		<element ref="text_field"><bounds x="110" y="-124" width="120" height="19" /></element>
@@ -135,8 +134,7 @@ license:CC0
 		<element ref="static_white"><bounds left="-9" right="349" top="-55" bottom="-51" /></element>
 		<element ref="static_white"><bounds left="-9" right="349" top="110" bottom="114" /></element>
 
-	<!-- 7segs -->
-
+		<!-- 7segs -->
 		<element name="digit0" ref="digit"><bounds x="-5"  y="0" width="42" height="59" /></element>
 		<element name="digit1" ref="digit"><bounds x="39"  y="0" width="42" height="59" /></element>
 		<element name="digit2" ref="digit"><bounds x="83"  y="0" width="42" height="59" /></element>
@@ -146,8 +144,7 @@ license:CC0
 		<element name="digit6" ref="digit"><bounds x="259" y="0" width="42" height="59" /></element>
 		<element name="digit7" ref="digit"><bounds x="303" y="0" width="42" height="59" /></element>
 
-	<!-- separators -->
-
+		<!-- separators -->
 		<element ref="static_white"><bounds x="-9" y="-52" width="4" height="163" /></element>
 		<element ref="static_white"><bounds x="37" y="-52" width="2" height="163" /></element>
 		<element ref="static_white"><bounds x="81" y="-52" width="2" height="163" /></element>

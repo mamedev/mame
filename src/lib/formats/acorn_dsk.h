@@ -20,7 +20,7 @@ class acorn_ssd_format : public wd177x_format
 public:
 	acorn_ssd_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
@@ -36,7 +36,7 @@ class acorn_dsd_format : public wd177x_format
 public:
 	acorn_dsd_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
@@ -52,7 +52,7 @@ class opus_ddos_format : public wd177x_format
 public:
 	opus_ddos_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
@@ -68,7 +68,7 @@ class acorn_adfs_old_format : public wd177x_format
 public:
 	acorn_adfs_old_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
@@ -84,7 +84,7 @@ class acorn_adfs_new_format : public wd177x_format
 public:
 	acorn_adfs_new_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;
@@ -100,7 +100,7 @@ class acorn_dos_format : public wd177x_format
 public:
 	acorn_dos_format();
 
-	virtual int find_size(io_generic *io, uint32_t form_factor) override;
+	virtual int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) override;
 	virtual int get_image_offset(const format &f, int head, int track) override;
 	virtual const char *name() const override;

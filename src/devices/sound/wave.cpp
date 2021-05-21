@@ -2,16 +2,14 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    wave.c
+    Cassette wave samples sound driver
 
-    Code that interfaces
-    Functions to handle loading, creation, recording and playback
-    of wave samples for IO_CASSETTE
+    Code that interfaces functions to handle loading, creation,
+    recording and playback of wave samples for IO_CASSETTE
 
     2010-06-19 - Found that since 0.132, the right channel is badly out of
     sync on a mono system, causing bad sound. Added code to disable
     the second channel on a mono system.
-
 
 ****************************************************************************/
 

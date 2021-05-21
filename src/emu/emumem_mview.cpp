@@ -609,9 +609,11 @@ void memory_view::memory_view_entry::prepare_device_map(address_map &map)
 
 template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
 {
-	// no map specified, use the space-specific one
-	if (map == nullptr)
+	// no map specified, use the space-specific one and import the submaps
+	if (map == nullptr) {
 		map = m_map.get();
+		map->import_submaps(m_manager.machine(), m_view.m_device, data_width(), endianness(), addr_shift());
+	}
 
 	prepare_map_generic(*map, true);
 
@@ -662,6 +664,9 @@ void memory_view::disable()
 	m_cur_id = -1;
 	m_handler_read->select_a(-1);
 	m_handler_write->select_a(-1);
+
+	if(m_space)
+		m_space->invalidate_caches(read_or_write::READWRITE);
 }
 
 void memory_view::select(int slot)
@@ -674,6 +679,9 @@ void memory_view::select(int slot)
 	m_cur_id = i->second;
 	m_handler_read->select_a(m_cur_id);
 	m_handler_write->select_a(m_cur_id);
+
+	if(m_space)
+		m_space->invalidate_caches(read_or_write::READWRITE);
 }
 
 int memory_view::id_to_slot(int id) const

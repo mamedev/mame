@@ -205,7 +205,7 @@ license:CC0
 		<!-- leds -->
 		<repeat count="8">
 			<param name="y" start="8.3" increment="10" />
-			<param name="i1" start="11" increment="-1" />
+			<param name="i1" start="7" increment="-1" />
 
 			<repeat count="8">
 				<param name="x" start="8.3" increment="10" />
@@ -423,13 +423,14 @@ license:CC0
 <!-- display -->
 
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+	<element name="ldot_hide"><disk><color red="0.54" green="0.57" blue="0.58" /></disk></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
-	<element name="ldot" defstate="0">
-		<rect state="1"><color red="0.2" green="0.16" blue="0.16" /></rect>
-		<rect state="0"><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+	<element name="ldot">
+		<rect><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+		<rect statemask="0x80"><color red="0.2" green="0.16" blue="0.16" /></rect>
 	</element>
 
 	<group name="display">
@@ -437,17 +438,23 @@ license:CC0
 
 		<element ref="lcd_bg"><bounds x="31" y="90.3" width="22.5" height="7.4" /></element>
 
-		<element name="digit3" ref="digit"><bounds x="32" y="91" width="4" height="6" /></element>
-		<element name="digit2" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
-		<element name="digit1" ref="digit"><bounds x="43" y="91" width="4" height="6" /></element>
-		<element name="digit0" ref="digit"><bounds x="48.5" y="91" width="4" height="6" /></element>
+		<element name="digit3" ref="digit"><bounds x="32.6" y="91" width="4" height="6" /></element>
+		<element name="digit2" ref="digit"><bounds x="37.7" y="91" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="42.8" y="91" width="4" height="6" /></element>
+		<element name="digit0" ref="digit"><bounds x="47.9" y="91" width="4" height="6" /></element>
 
-		<element name="3.7" ref="ldot"><bounds x="36.25" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="2.7" ref="ldot"><bounds x="41.75" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="1.7" ref="ldot"><bounds x="47.25" y="96.42" width="0.6" height="0.6" /></element>
+		<!-- digits DP are different from normal 7seg -->
+		<element ref="ldot_hide"><bounds x="35.9" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="41.0" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.1" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.2" y="96.3" width="0.85" height="0.85" /></element>
 
-		<element name="0.7" ref="ldot"><bounds x="42.16" y="92.75" width="0.6" height="0.6" /></element>
-		<element name="0.7" ref="ldot"><bounds x="41.94" y="94.55" width="0.6" height="0.6" /></element>
+		<element name="digit3" ref="ldot"><bounds x="36.59" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.69" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="46.79" y="96.42" width="0.6" height="0.6" /></element>
+
+		<element name="digit0" ref="ldot"><bounds x="42.06" y="92.30" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.80" y="95.12" width="0.6" height="0.6" /></element>
 	</group>
 
 

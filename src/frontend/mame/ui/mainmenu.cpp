@@ -122,7 +122,7 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (machine().options().cheat())
 		item_append(_("Cheat"), 0, (void *)CHEAT);
 
-	if (machine().options().plugins())
+	if (machine().options().plugins() && !mame_machine_manager::instance()->lua()->get_menu().empty())
 		item_append(_("Plugin Options"), 0, (void *)PLUGINS);
 
 	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))

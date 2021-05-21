@@ -126,7 +126,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -292,21 +292,6 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 }
 
 
-/* the protection is a simple multiply */
-void combatsc_state::protection_w(offs_t offset, uint8_t data)
-{
-	m_prot[offset] = data;
-}
-uint8_t combatsc_state::protection_r(offs_t offset)
-{
-	return ((m_prot[0] * m_prot[1]) >> (offset * 8)) & 0xff;
-}
-void combatsc_state::protection_clock_w(uint8_t data)
-{
-	/* 0x3f is written here every time before accessing the other registers */
-}
-
-
 /****************************************************************************/
 
 void combatsc_state::combatsc_sh_irqtrigger_w(uint8_t data)
@@ -353,8 +338,7 @@ void combatsc_state::combatsc_map(address_map &map)
 	map(0x0020, 0x005f).rw(FUNC(combatsc_state::combatsc_scrollram_r), FUNC(combatsc_state::combatsc_scrollram_w));
 //  map(0x0060, 0x00ff).writeonly();                 /* RAM */
 
-	map(0x0200, 0x0201).rw(FUNC(combatsc_state::protection_r), FUNC(combatsc_state::protection_w));
-	map(0x0206, 0x0206).w(FUNC(combatsc_state::protection_clock_w));
+	map(0x0200, 0x0207).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 
 	map(0x0400, 0x0400).portr("IN0");
 	map(0x0401, 0x0401).portr("DSW3");           /* DSW #3 */
@@ -660,7 +644,6 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_bank_select));
 	save_item(NAME(m_video_circuit));
 	save_item(NAME(m_boost));
-	save_item(NAME(m_prot));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_sign));
 	save_pointer(NAME(m_page[0]),0x2000);
@@ -684,8 +667,6 @@ void combatsc_state::machine_reset()
 	m_vreg = -1;
 	m_boost = 1;
 	m_bank_select = -1;
-	m_prot[0] = 0;
-	m_prot[1] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -712,6 +693,8 @@ void combatsc_state::combatsc(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(combatsc_state,combatsc)
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -1,0 +1,1361 @@
+<?xml version="1.0"?>
+
+<!--
+license: CC0
+copyright-holders: Dirk Best
+
+Miss Americana (Sirmo)
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="red_led" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="white_lamp" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.7" green="0.7" blue="0.7" />
+		</disk>
+	</element>
+
+	<element name="hole" defstate="0">
+		<disk state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</disk>
+	</element>
+
+	<element name="red_rect">
+		<rect state="0">
+			<color red="0.76" green="0.20" blue="0.09" />
+		</rect>
+		<rect state="1">
+			<color red="0.96" green="0.40" blue="0.29" />
+		</rect>
+	</element>
+
+	<element name="yellow_rect">
+		<rect state="0">
+			<color red="0.72" green="0.73" blue="0.00" />
+		</rect>
+		<rect state="1">
+			<color red="0.92" green="0.83" blue="0.19" />
+		</rect>
+	</element>
+
+	<element name="blue_rect">
+		<rect state="0">
+			<color red="0.01" green="0.13" blue="0.63" />
+		</rect>
+		<rect state="1">
+			<color red="0.21" green="0.33" blue="0.83" />
+		</rect>
+	</element>
+
+	<element name="green_rect">
+		<rect state="0">
+			<color red="0.16" green="0.61" blue="0.21" />
+		</rect>
+		<rect state="1">
+			<color red="0.36" green="0.81" blue="0.39" />
+		</rect>
+	</element>
+
+	<element name="white_rect">
+		<rect state="0">
+			<color red="0.81" green="0.86" blue="0.90" />
+		</rect>
+		<rect state="1">
+			<color red="1.00" green="1.00" blue="1.00" />
+		</rect>
+	</element>
+
+	<element name="black_rect">
+		<rect state="0">
+			<color red="0.00" green="0.00" blue="0.00" />
+		</rect>
+		<rect state="1">
+			<color red="0.20" green="0.20" blue="0.20" />
+		</rect>
+	</element>
+
+	<element name="txt_tilt"><text string="TILT" /></element>
+	<element name="txt_missamericana"><text string="MISS AMERICANA" /></element>
+
+	<element name="txt_sound1"><text string="SOUND 1" /></element>
+	<element name="txt_sound2"><text string="SOUND 2" /></element>
+	<element name="txt_sound3"><text string="SOUND 3" /></element>
+	<element name="txt_sound4"><text string="SOUND 4" /></element>
+	<element name="txt_sound5"><text string="SOUND 5" /></element>
+	<element name="txt_sound6"><text string="SOUND 6" /></element>
+
+	<element name="txt_maincard"><text string="MAIN CARD" /></element>
+	<element name="txt_extracard"><text string="EXTRA CARD" /></element>
+
+	<element name="txt_striped"><text string="STRIPED" /></element>
+	<element name="txt_diagonal"><text string="DIAGONAL" /></element>
+	<element name="txt_score"><text string="SCORE" /></element>
+	<element name="txt_whenlit"><text string="WHEN LIT" /></element>
+	<element name="txt_cornersscore"><text string="CORNERS SCORE" /></element>
+	<element name="txt_as"><text string="AS" /></element>
+	<element name="txt_red"><text string="RED" /></element>
+	<element name="txt_5online"><text string="5 ON LINE" /></element>
+	<element name="txt_scores"><text string="SCORES" /></element>
+	<element name="txt_pressbuttons"><text string="PRESS BUTTONS" /></element>
+	<element name="txt_beforeshooting"><text string="BEFORE SHOOTING" /></element>
+	<element name="txt_4thball"><text string="4TH BALL" /></element>
+	<element name="txt_5thball"><text string="5TH BALL" /></element>
+	<element name="txt_4stars"><text string="4 STARS" /></element>
+	<element name="txt_green"><text string="GREEN" /></element>
+	<element name="txt_any2"><text string="ANY 2" /></element>
+	<element name="txt_any3"><text string="ANY 3" /></element>
+	<element name="txt_stars"><text string="STARS" /></element>
+	<element name="txt_give"><text string="GIVE" /></element>
+	<element name="txt_ok"><text string="OK" /></element>
+
+	<element name="txt_selectnow"><text string="SELECT NOW" /></element>
+	<element name="txt_pressabcdebuttonstomovemagiclines"><text string="PRESS ABCDE BUTTONS TO MOVE MAGIC LINES" /></element>
+
+	<element name="txt_rightarrow">
+		<text string="▶" state="0">
+			<color red="0.76" green="0.20" blue="0.09" />
+		</text>
+		<text string="▶" state="1">
+			<color red="0.96" green="0.40" blue="0.29" />
+		</text>
+	</element>
+
+	<element name="txt_a"><text string="A" /></element>
+	<element name="txt_b"><text string="B" /></element>
+	<element name="txt_c"><text string="C" /></element>
+	<element name="txt_d"><text string="D" /></element>
+	<element name="txt_e"><text string="E" /></element>
+
+	<element name="txt_if16ishit"><text string="IF 16 IS HIT" /></element>
+	<element name="txt_bonusarrows"><text string="BONUS ARROWS" /></element>
+	<element name="txt_advance"><text string="ADVANCE" /></element>
+	<element name="txt_one"><text string="ONE" /></element>
+	<element name="txt_step"><text string="STEP" /></element>
+	<element name="txt_bonus"><text string="BONUS" /></element>
+	<element name="txt_pressxbuttonto"><text string="PRESS X BUTTON TO" /></element>
+	<element name="txt_collectdouble"><text string="COLLECT DOUBLE" /></element>
+	<element name="txt_greenscoreor"><text string="GREEN SCORE OR" /></element>
+	<element name="txt_savebonus"><text string="SAVE BONUS" /></element>
+	<element name="txt_fornextgame"><text string="FOR NEXT GAME" /></element>
+	<element name="txt_roll"><text string="ROLL" /></element>
+	<element name="txt_overs"><text string="OVERS" /></element>
+
+	<element name="txt_extraballs"><text string="EXTRA BALLS" /></element>
+	<element name="txt_1st"><text string="1ST" /></element>
+	<element name="txt_extra"><text string="EXTRA" /></element>
+	<element name="txt_ball"><text string="BALL" /></element>
+	<element name="txt_2nd"><text string="2ND" /></element>
+	<element name="txt_3rd"><text string="3RD" /></element>
+
+	<repeat count="25">
+		<param name="i" start="1" increment="1" />
+		<element name="txt_~i~"><text string="~i~" /></element>
+	</repeat>
+
+	<element name="txt_trg0"><text string="TRG0" /></element>
+	<element name="txt_trg1"><text string="TRG1" /></element>
+	<element name="txt_trg2"><text string="TRG2" /></element>
+	<element name="txt_trg3"><text string="TRG3" /></element>
+	<element name="txt_trg4"><text string="TRG4" /></element>
+	<element name="txt_trg5"><text string="TRG5" /></element>
+
+	<element name="txt_shutter"><text string="SHUTTER" /></element>
+	<element name="txt_gate"><text string="GATE" /></element>
+	<element name="txt_alley"><text string="ALLEY" /></element>
+	<element name="txt_door"><text string="DOOR" /></element>
+
+	<element name="txt_redrollover"><text string="RED ROLLOVER" /></element>
+	<element name="txt_yellowrollover"><text string="YELLOW ROLLOVER" /></element>
+	<element name="txt_reddoorbutton"><text string="RED DOORBUTTON" /></element>
+	<element name="txt_yellowdoorbutton"><text string="YELLOW DOORBUTTON" /></element>
+	<element name="txt_carryovershutter"><text string="CARRY OVER SHUTTER" /></element>
+
+	<element name="txt_carryoverballlifter"><text string="CARRY OVER BALLLIFTER" /></element>
+	<element name="txt_restcontactballlifter"><text string="REST CONTACT BALLIFTER" /></element>
+	<element name="txt_manualballlift"><text string="MANUAL BALLLIFT" /></element>
+
+	<element name="txt_coinleft"><text string="COIN LEFT" /></element>
+	<element name="txt_coinright"><text string="COIN RIGHT" /></element>
+
+	<element name="txt_r"><text string="R" /></element>
+	<element name="txt_x"><text string="X" /></element>
+
+	<element name="txt_sv1"><text string="SV1" /></element>
+	<element name="txt_sv2"><text string="SV2" /></element>
+	<element name="txt_sv3"><text string="SV3" /></element>
+	<element name="txt_sv4"><text string="SV4" /></element>
+	<element name="txt_sv5"><text string="SV5" /></element>
+	<element name="txt_sv6"><text string="SV6" /></element>
+
+	<!-- point table top -->
+	<element name="txt_table_0.0"><text string="75" /></element>
+	<element name="txt_table_0.1"><text string="16" /></element>
+	<element name="txt_table_0.2"><text string="4" /></element>
+	<element name="txt_table_1.0"><text string="96" /></element>
+	<element name="txt_table_1.1"><text string="24" /></element>
+	<element name="txt_table_1.2"><text string="8" /></element>
+	<element name="txt_table_2.0"><text string="96" /></element>
+	<element name="txt_table_2.1"><text string="50" /></element>
+	<element name="txt_table_2.2"><text string="16" /></element>
+	<element name="txt_table_3.0"><text string="200" /></element>
+	<element name="txt_table_3.1"><text string="96" /></element>
+	<element name="txt_table_3.2"><text string="32" /></element>
+	<element name="txt_table_4.0"><text string="300" /></element>
+	<element name="txt_table_4.1"><text string="144" /></element>
+	<element name="txt_table_4.2"><text string="64" /></element>
+	<element name="txt_table_5.0"><text string="400" /></element>
+	<element name="txt_table_5.1"><text string="192" /></element>
+	<element name="txt_table_5.2"><text string="128" /></element>
+	<element name="txt_table_6.0"><text string="600" /></element>
+	<element name="txt_table_6.1"><text string="400" /></element>
+	<element name="txt_table_6.2"><text string="192" /></element>
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="1000" height="2020"/>
+
+		<element name="lamp7.6" ref="red_led">
+			<bounds x="50" y="20" width="20" height="20" />
+		</element>
+		<element ref="txt_tilt">
+			<bounds x="70" y="20" width="50" height="20" />
+		</element>
+
+		<element ref="txt_missamericana">
+			<bounds x="0" y="10" width="1000" height="40" />
+		</element>
+
+		<!-- striped diagonal score when lit -->
+		<element ref="red_rect">
+			<bounds x="860" y="10" width="140" height="120" />
+		</element>
+		<element name="lamp4.10" ref="yellow_rect">
+			<bounds x="870" y="20" width="120" height="100" />
+		</element>
+		<element ref="txt_striped">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="30" width="120" height="20" />
+		</element>
+		<element ref="txt_diagonal">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="50" width="120" height="20" />
+		</element>
+		<element ref="txt_score">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="70" width="120" height="20" />
+		</element>
+		<element ref="txt_whenlit">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="90" width="120" height="20" />
+		</element>
+
+		<!-- SOUND 1-6 right side -->
+		<element name="lamp5.10" ref="red_led">
+			<bounds x="870" y="170" width="20" height="20" />
+		</element>
+		<element ref="txt_sound1">
+			<bounds x="890" y="170" width="90" height="20" />
+		</element>
+		<element name="lamp5.11" ref="red_led">
+			<bounds x="870" y="200" width="20" height="20" />
+		</element>
+		<element ref="txt_sound2">
+			<bounds x="890" y="200" width="90" height="20" />
+		</element>
+		<element name="lamp5.12" ref="red_led">
+			<bounds x="870" y="230" width="20" height="20" />
+		</element>
+		<element ref="txt_sound3">
+			<bounds x="890" y="230" width="90" height="20" />
+		</element>
+		<element name="lamp5.13" ref="red_led">
+			<bounds x="870" y="260" width="20" height="20" />
+		</element>
+		<element ref="txt_sound4">
+			<bounds x="890" y="260" width="90" height="20" />
+		</element>
+		<element name="lamp5.14" ref="red_led">
+			<bounds x="870" y="290" width="20" height="20" />
+		</element>
+		<element ref="txt_sound5">
+			<bounds x="890" y="290" width="90" height="20" />
+		</element>
+		<element name="lamp5.15" ref="red_led">
+			<bounds x="870" y="320" width="20" height="20" />
+		</element>
+		<element ref="txt_sound6">
+			<bounds x="890" y="320" width="90" height="20" />
+		</element>
+
+		<!-- magic lines background rect -->
+		<element ref="red_rect">
+			<bounds x="150" y="610" width="700" height="330" />
+		</element>
+
+		<!-- point table -->
+		<element ref="blue_rect">
+			<bounds x="180" y="70" width="630" height="550" />
+		</element>
+
+		<element ref="red_rect">
+			<bounds x="160" y="90" width="670" height="80" />
+		</element>
+		<repeat count="7">
+			<param name="i" start="10" increment="1" />
+			<param name="x" start="190" increment="90" />
+			<param name="txt_ix" start="0" increment="1" />
+			<param name="txt_x" start="190" increment="90" />
+			<element name="lamp0.~i~" ref="red_rect">
+				<bounds x="~x~" y="90" width="70" height="80" />
+			</element>
+			<repeat count="3">
+				<param name="txt_iy" start="0" increment="1" />
+				<param name="txt_y" start="100" increment="20" />
+				<element ref="txt_table_~txt_ix~.~txt_iy~">
+					<color red="0.0" green="0.0" blue="0.0" />
+					<bounds x="~txt_x~" y="~txt_y~" width="70" height="20" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="yellow_rect">
+			<bounds x="160" y="210" width="670" height="80" />
+		</element>
+		<repeat count="7">
+			<param name="i" start="10" increment="1" />
+			<param name="x" start="190" increment="90" />
+			<param name="txt_ix" start="0" increment="1" />
+			<param name="txt_x" start="190" increment="90" />
+			<element name="lamp1.~i~" ref="yellow_rect">
+				<bounds x="~x~" y="210" width="70" height="80" />
+			</element>
+			<repeat count="3">
+				<param name="txt_iy" start="0" increment="1" />
+				<param name="txt_y" start="220" increment="20" />
+				<element ref="txt_table_~txt_ix~.~txt_iy~">
+					<color red="0.0" green="0.0" blue="0.0" />
+					<bounds x="~txt_x~" y="~txt_y~" width="70" height="20" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="green_rect">
+			<bounds x="160" y="330" width="670" height="80" />
+		</element>
+		<repeat count="7">
+			<param name="i" start="10" increment="1" />
+			<param name="x" start="190" increment="90" />
+			<param name="txt_ix" start="0" increment="1" />
+			<param name="txt_x" start="190" increment="90" />
+			<element name="lamp2.~i~" ref="green_rect">
+				<bounds x="~x~" y="330" width="70" height="80" />
+			</element>
+			<repeat count="3">
+				<param name="txt_iy" start="0" increment="1" />
+				<param name="txt_y" start="340" increment="20" />
+				<element ref="txt_table_~txt_ix~.~txt_iy~">
+					<color red="0.0" green="0.0" blue="0.0" />
+					<bounds x="~txt_x~" y="~txt_y~" width="70" height="20" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="white_rect">
+			<bounds x="160" y="450" width="670" height="80" />
+		</element>
+		<repeat count="7">
+			<param name="i" start="10" increment="1" />
+			<param name="x" start="190" increment="90" />
+			<param name="txt_ix" start="0" increment="1" />
+			<param name="txt_x" start="190" increment="90" />
+			<element name="lamp3.~i~" ref="white_rect">
+				<bounds x="~x~" y="450" width="70" height="80" />
+			</element>
+			<repeat count="3">
+				<param name="txt_iy" start="0" increment="1" />
+				<param name="txt_y" start="460" increment="20" />
+				<element ref="txt_table_~txt_ix~.~txt_iy~">
+					<color red="0.0" green="0.0" blue="0.0" />
+					<bounds x="~txt_x~" y="~txt_y~" width="70" height="20" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<element ref="txt_maincard">
+			<color red="0.16" green="0.61" blue="0.21" />
+			<bounds x="210" y="550" width="190" height="50" />
+		</element>
+		<element ref="txt_extracard">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="600" y="550" width="190" height="50" />
+		</element>
+
+		<!-- main card corners score as red 5 on line -->
+		<element ref="red_rect">
+			<bounds x="0" y="660" width="140" height="140" />
+		</element>
+		<element name="lamp7.0" ref="yellow_rect">
+			<bounds x="10" y="670" width="120" height="120" />
+		</element>
+		<element ref="txt_maincard">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="680" width="120" height="20" />
+		</element>
+		<element ref="txt_cornersscore">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="700" width="120" height="20" />
+		</element>
+		<element ref="txt_as">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="720" width="120" height="20" />
+		</element>
+		<element ref="txt_red">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="740" width="120" height="20" />
+		</element>
+		<element ref="txt_5online">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="760" width="120" height="20" />
+		</element>
+
+		<!-- extra card scores when lit -->
+		<element ref="red_rect">
+			<bounds x="860" y="660" width="140" height="120" />
+		</element>
+		<element name="lamp7.2" ref="yellow_rect">
+			<bounds x="870" y="670" width="120" height="100" />
+		</element>
+		<element ref="txt_extracard">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="680" width="120" height="20" />
+		</element>
+		<element ref="txt_scores">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="700" width="120" height="20" />
+		</element>
+		<element ref="txt_whenlit">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="720" width="120" height="20" />
+		</element>
+
+		<!-- magic lines area -->
+		<element ref="white_rect">
+			<bounds x="160" y="630" width="680" height="300" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="470" y="630" width="60" height="300" />
+		</element>
+		<element ref="txt_a">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="630" width="60" height="60" />
+		</element>
+		<element ref="txt_b">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="690" width="60" height="60" />
+		</element>
+		<element ref="txt_c">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="750" width="60" height="60" />
+		</element>
+		<element ref="txt_d">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="810" width="60" height="60" />
+		</element>
+		<element ref="txt_e">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="870" width="60" height="60" />
+		</element>
+
+		<!-- main card -->
+		<repeat count="5">
+			<param name="i1" start="0" increment="1" />
+			<param name="y" start="640" increment="60" />
+			<repeat count="5">
+				<param name="i2" start="0" increment="1" />
+				<param name="x" start="175" increment="60" />
+				<element name="lamp~i1~.~i2~" ref="white_lamp">
+					<bounds x="~x~" y="~y~" width="40" height="40" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- extra card -->
+		<repeat count="5">
+			<param name="i1" start="0" increment="1" />
+			<param name="y" start="640" increment="60" />
+			<repeat count="5">
+				<param name="i2" start="5" increment="1" />
+				<param name="x" start="545" increment="60" />
+				<element name="lamp~i1~.~i2~" ref="white_lamp">
+					<bounds x="~x~" y="~y~" width="40" height="40" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- select now -->
+		<element name="lamp7.10" ref="red_rect">
+			<bounds x="360" y="940" width="280" height="60" />
+		</element>
+		<element ref="txt_selectnow">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="400" y="950" width="200" height="20" />
+		</element>
+		<element ref="txt_pressabcdebuttonstomovemagiclines">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="360" y="970" width="280" height="20" />
+		</element>
+
+		<!-- 4 stars as green 5 on line -->
+		<element ref="red_rect">
+			<bounds x="0" y="970" width="140" height="120" />
+		</element>
+		<element name="lamp7.1" ref="yellow_rect">
+			<bounds x="10" y="980" width="120" height="100" />
+		</element>
+		<element ref="txt_4stars">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="990" width="120" height="20" />
+		</element>
+		<element ref="txt_as">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1010" width="120" height="20" />
+		</element>
+		<element ref="txt_green">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1030" width="120" height="20" />
+		</element>
+		<element ref="txt_5online">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1050" width="120" height="20" />
+		</element>
+
+		<!-- select now arrows -->
+		<element ref="blue_rect">
+			<bounds x="200" y="1000" width="600" height="60" />
+		</element>
+		<element name="lamp6.9" ref="txt_rightarrow">
+			<bounds x="220" y="1000" width="60" height="60" />
+		</element>
+		<element name="lamp6.10" ref="txt_rightarrow">
+			<bounds x="280" y="1000" width="60" height="60" />
+		</element>
+		<element name="lamp6.11" ref="txt_rightarrow">
+			<bounds x="340" y="1000" width="60" height="60" />
+		</element>
+		<element name="lamp6.12" ref="txt_rightarrow">
+			<bounds x="400" y="1000" width="60" height="60" />
+		</element>
+		<element name="lamp6.13" ref="white_lamp">
+			<bounds x="490" y="1005" width="50" height="50" />
+		</element>
+		<element ref="txt_a">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="495" y="1010" width="40" height="40" />
+		</element>
+		<element name="lamp6.13" ref="white_lamp">
+			<bounds x="550" y="1005" width="50" height="50" />
+		</element>
+		<element ref="txt_b">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="555" y="1010" width="40" height="40" />
+		</element>
+		<element name="lamp6.14" ref="white_lamp">
+			<bounds x="610" y="1005" width="50" height="50" />
+		</element>
+		<element ref="txt_c">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="615" y="1010" width="40" height="40" />
+		</element>
+		<element name="lamp6.15" ref="white_lamp">
+			<bounds x="670" y="1005" width="50" height="50" />
+		</element>
+		<element ref="txt_d">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="675" y="1010" width="40" height="40" />
+		</element>
+		<element name="lamp6.16" ref="white_lamp">
+			<bounds x="730" y="1005" width="50" height="50" />
+		</element>
+		<element ref="txt_e">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="735" y="1010" width="40" height="40" />
+		</element>
+
+		<!-- press buttons before shooting 4th/5th ball -->
+		<element ref="red_rect">
+			<bounds x="860" y="970" width="140" height="190" />
+		</element>
+		<element name="lamp7.8" ref="yellow_rect">
+			<bounds x="870" y="980" width="120" height="80" />
+		</element>
+		<element ref="txt_pressbuttons">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="990" width="120" height="20" />
+		</element>
+		<element ref="txt_beforeshooting">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="1010" width="120" height="20" />
+		</element>
+		<element ref="txt_4thball">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="1030" width="120" height="20" />
+		</element>
+		<element name="lamp7.9" ref="yellow_rect">
+			<bounds x="870" y="1070" width="120" height="80" />
+		</element>
+		<element ref="txt_pressbuttons">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="1080" width="120" height="20" />
+		</element>
+		<element ref="txt_beforeshooting">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="1100" width="120" height="20" />
+		</element>
+		<element ref="txt_5thball">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="870" y="1120" width="120" height="20" />
+		</element>
+
+		<!-- any 2/3 stars give, ok -->
+		<element ref="red_rect">
+			<bounds x="0" y="1110" width="140" height="220" />
+		</element>
+		<element name="lamp6.7" ref="yellow_rect">
+			<bounds x="10" y="1120" width="120" height="60" />
+		</element>
+		<element ref="txt_any2">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1120" width="70" height="60" />
+		</element>
+		<element ref="txt_stars">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="80" y="1120" width="50" height="30" />
+		</element>
+		<element ref="txt_give">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="80" y="1150" width="50" height="30" />
+		</element>
+		<element name="lamp6.8" ref="yellow_rect">
+			<bounds x="10" y="1190" width="120" height="60" />
+		</element>
+		<element ref="txt_any3">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1190" width="70" height="60" />
+		</element>
+		<element ref="txt_stars">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="80" y="1190" width="50" height="30" />
+		</element>
+		<element ref="txt_give">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="80" y="1220" width="50" height="30" />
+		</element>
+		<element name="lamp7.7" ref="yellow_rect">
+			<bounds x="10" y="1260" width="120" height="60" />
+		</element>
+		<element ref="txt_ok">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="10" y="1260" width="120" height="60" />
+		</element>
+
+		<!-- roll overs -->
+		<element ref="green_rect">
+			<bounds x="200" y="1100" width="600" height="220" />
+		</element>
+		<element ref="txt_if16ishit">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="200" y="1130" width="160" height="20" />
+		</element>
+		<element ref="txt_bonusarrows">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="200" y="1160" width="160" height="20" />
+		</element>
+		<element ref="txt_advance">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="200" y="1190" width="160" height="20" />
+		</element>
+		<element ref="txt_one">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="200" y="1220" width="160" height="20" />
+		</element>
+		<element ref="txt_step">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="200" y="1220" width="160" height="20" />
+		</element>
+		<element ref="txt_bonus">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1110" width="180" height="40" />
+		</element>
+		<element ref="txt_pressxbuttonto">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1160" width="180" height="20" />
+		</element>
+		<element ref="txt_collectdouble">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1190" width="180" height="20" />
+		</element>
+		<element ref="txt_greenscoreor">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1220" width="180" height="20" />
+		</element>
+		<element ref="txt_savebonus">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1250" width="180" height="20" />
+		</element>
+		<element ref="txt_fornextgame">
+			<color red="0.76" green="0.20" blue="0.09" />
+			<bounds x="620" y="1280" width="180" height="20" />
+		</element>
+		<element name="lamp6.1" ref="txt_rightarrow">
+			<bounds x="360" y="1130" width="40" height="40" />
+		</element>
+		<element name="lamp6.2" ref="txt_rightarrow">
+			<bounds x="410" y="1130" width="40" height="40" />
+		</element>
+		<element name="lamp6.3" ref="txt_rightarrow">
+			<bounds x="460" y="1130" width="40" height="40" />
+		</element>
+		<element name="lamp6.4" ref="txt_rightarrow">
+			<bounds x="510" y="1130" width="40" height="40" />
+		</element>
+		<element name="lamp6.5" ref="txt_rightarrow">
+			<bounds x="560" y="1130" width="40" height="40" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="360" y="1210" width="240" height="110" />
+		</element>
+		<element name="lamp6.0" ref="white_rect">
+			<bounds x="370" y="1220" width="60" height="90" />
+		</element>
+		<element name="lamp6.0" ref="yellow_rect">
+			<bounds x="380" y="1230" width="40" height="70" />
+		</element>
+		<element name="lamp7.11" ref="green_rect">
+			<bounds x="440" y="1220" width="80" height="90" />
+		</element>
+		<element ref="txt_roll">
+			<color red="0.72" green="0.73" blue="0.00" />
+			<bounds x="450" y="1220" width="60" height="40" />
+		</element>
+		<element ref="txt_overs">
+			<color red="0.72" green="0.73" blue="0.00" />
+			<bounds x="450" y="1260" width="60" height="40" />
+		</element>
+		<element name="lamp6.6" ref="white_rect">
+			<bounds x="530" y="1220" width="60" height="90" />
+		</element>
+		<element name="lamp6.6" ref="red_rect">
+			<bounds x="540" y="1230" width="40" height="70" />
+		</element>
+
+		<!-- led digits -->
+		<element ref="yellow_rect">
+			<bounds x="810" y="1180" width="180" height="80" />
+		</element>
+		<element ref="black_rect">
+			<bounds x="820" y="1190" width="160" height="60" />
+		</element>
+		<repeat count="4">
+			<param name="n" start="3" increment="-1" />
+			<param name="x" start="830" increment="35" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="1195" width="35" height="50" />
+			</element>
+		</repeat>
+
+		<!-- extra balls -->
+		<element name="lamp5.0" ref="red_rect">
+			<bounds x="140" y="1340" width="120" height="40" />
+		</element>
+		<element ref="txt_extraballs">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="140" y="1340" width="120" height="40" />
+		</element>
+		<element name="lamp5.1" ref="red_rect">
+			<bounds x="270" y="1340" width="40" height="40" />
+		</element>
+		<element ref="txt_1st">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="270" y="1340" width="40" height="40" />
+		</element>
+		<element name="lamp5.2" ref="red_rect">
+			<bounds x="320" y="1340" width="70" height="40" />
+		</element>
+		<element ref="txt_extra">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="320" y="1340" width="70" height="40" />
+		</element>
+		<element name="lamp5.3" ref="red_rect">
+			<bounds x="400" y="1340" width="60" height="40" />
+		</element>
+		<element ref="txt_ball">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="400" y="1340" width="60" height="40" />
+		</element>
+		<element name="lamp5.4" ref="red_rect">
+			<bounds x="470" y="1340" width="40" height="40" />
+		</element>
+		<element ref="txt_2nd">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="1340" width="40" height="40" />
+		</element>
+		<element name="lamp5.5" ref="red_rect">
+			<bounds x="520" y="1340" width="70" height="40" />
+		</element>
+		<element ref="txt_extra">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="520" y="1340" width="70" height="40" />
+		</element>
+		<element name="lamp5.6" ref="red_rect">
+			<bounds x="600" y="1340" width="60" height="40" />
+		</element>
+		<element ref="txt_ball">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="600" y="1340" width="60" height="40" />
+		</element>
+		<element name="lamp5.7" ref="red_rect">
+			<bounds x="670" y="1340" width="40" height="40" />
+		</element>
+		<element ref="txt_3rd">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="670" y="1340" width="40" height="40" />
+		</element>
+		<element name="lamp5.8" ref="red_rect">
+			<bounds x="720" y="1340" width="70" height="40" />
+		</element>
+		<element ref="txt_extra">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="720" y="1340" width="70" height="40" />
+		</element>
+		<element name="lamp5.9" ref="red_rect">
+			<bounds x="800" y="1340" width="60" height="40" />
+		</element>
+		<element ref="txt_ball">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="800" y="1340" width="60" height="40" />
+		</element>
+
+		<!-- bottom area - inputs -->
+
+		<!-- triggers -->
+		<element ref="white_rect" inputtag="row5" inputmask="0x10">
+			<bounds x="40" y="1410" width="60" height="40" />
+		</element>
+		<element ref="txt_trg0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1410" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x01">
+			<bounds x="110" y="1410" width="60" height="40" />
+		</element>
+		<element ref="txt_trg1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="110" y="1410" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x02">
+			<bounds x="40" y="1460" width="60" height="40" />
+		</element>
+		<element ref="txt_trg2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1460" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x04">
+			<bounds x="110" y="1460" width="60" height="40" />
+		</element>
+		<element ref="txt_trg3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="110" y="1460" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x08">
+			<bounds x="40" y="1510" width="60" height="40" />
+		</element>
+		<element ref="txt_trg4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1510" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x10">
+			<bounds x="110" y="1510" width="60" height="40" />
+		</element>
+		<element ref="txt_trg5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="110" y="1510" width="60" height="40" />
+		</element>
+
+		<!-- rollover, doorbutton, carry over shutter -->
+		<element ref="white_rect" inputtag="row3" inputmask="0x10">
+			<bounds x="40" y="1650" width="200" height="40" />
+		</element>
+		<element ref="txt_redrollover">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1650" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row3" inputmask="0x20">
+			<bounds x="40" y="1700" width="200" height="40" />
+		</element>
+		<element ref="txt_yellowrollover">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1700" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x02">
+			<bounds x="40" y="1750" width="200" height="40" />
+		</element>
+		<element ref="txt_reddoorbutton">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1750" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x04">
+			<bounds x="40" y="1800" width="200" height="40" />
+		</element>
+		<element ref="txt_yellowdoorbutton">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1800" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row1" inputmask="0x80">
+			<bounds x="40" y="1850" width="200" height="40" />
+		</element>
+		<element ref="txt_carryovershutter">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="40" y="1850" width="200" height="40" />
+		</element>
+
+		<!-- holes -->
+		<element ref="red_rect">
+			<bounds x="220" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x01">
+			<bounds x="230" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="230" y="1470" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="300" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x02">
+			<bounds x="310" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="310" y="1470" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="380" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x04">
+			<bounds x="390" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="390" y="1470" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="460" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x08">
+			<bounds x="470" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="1470" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="540" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x10">
+			<bounds x="550" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="550" y="1470" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="620" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x20">
+			<bounds x="630" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="630" y="1470" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="700" y="1400" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row0" inputmask="0x40">
+			<bounds x="710" y="1410" width="50" height="50" />
+		</element>
+		<element ref="txt_7">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="710" y="1470" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="260" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x01">
+			<bounds x="270" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_8">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="270" y="1580" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="340" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x02">
+			<bounds x="350" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_9">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="350" y="1580" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="420" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x04">
+			<bounds x="430" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_10">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="430" y="1580" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="500" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x08">
+			<bounds x="510" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_11">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="510" y="1580" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="580" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x10">
+			<bounds x="590" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_12">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="590" y="1580" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="660" y="1510" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row1" inputmask="0x20">
+			<bounds x="670" y="1520" width="50" height="50" />
+		</element>
+		<element ref="txt_13">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="670" y="1580" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="300" y="1620" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x01">
+			<bounds x="310" y="1630" width="50" height="50" />
+		</element>
+		<element ref="txt_14">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="310" y="1690" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="380" y="1620" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x02">
+			<bounds x="390" y="1630" width="50" height="50" />
+		</element>
+		<element ref="txt_15">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="390" y="1690" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="460" y="1620" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x04">
+			<bounds x="470" y="1630" width="50" height="50" />
+		</element>
+		<element ref="txt_16">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="1690" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="540" y="1620" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x08">
+			<bounds x="550" y="1630" width="50" height="50" />
+		</element>
+		<element ref="txt_17">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="550" y="1690" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="620" y="1620" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x10">
+			<bounds x="630" y="1630" width="50" height="50" />
+		</element>
+		<element ref="txt_18">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="630" y="1690" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="340" y="1730" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x20">
+			<bounds x="350" y="1740" width="50" height="50" />
+		</element>
+		<element ref="txt_19">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="350" y="1800" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="420" y="1730" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x40">
+			<bounds x="430" y="1740" width="50" height="50" />
+		</element>
+		<element ref="txt_20">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="430" y="1800" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="500" y="1730" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row2" inputmask="0x80">
+			<bounds x="510" y="1740" width="50" height="50" />
+		</element>
+		<element ref="txt_21">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="510" y="1800" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="580" y="1730" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row3" inputmask="0x01">
+			<bounds x="590" y="1740" width="50" height="50" />
+		</element>
+		<element ref="txt_22">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="590" y="1800" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="380" y="1840" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row3" inputmask="0x02">
+			<bounds x="390" y="1850" width="50" height="50" />
+		</element>
+		<element ref="txt_23">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="390" y="1910" width="50" height="20" />
+		</element>
+		<element ref="white_rect">
+			<bounds x="460" y="1840" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row3" inputmask="0x04">
+			<bounds x="470" y="1850" width="50" height="50" />
+		</element>
+		<element ref="txt_24">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="470" y="1910" width="50" height="20" />
+		</element>
+		<element ref="red_rect">
+			<bounds x="540" y="1840" width="70" height="100" />
+		</element>
+		<element ref="hole" inputtag="row3" inputmask="0x08">
+			<bounds x="550" y="1850" width="50" height="50" />
+		</element>
+		<element ref="txt_25">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="550" y="1910" width="50" height="20" />
+		</element>
+
+		<!-- shutter, gate, alley, door -->
+		<element ref="white_rect" inputtag="row0" inputmask="0x80">
+			<bounds x="840" y="1410" width="120" height="40" />
+		</element>
+		<element ref="txt_shutter">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="840" y="1410" width="120" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row1" inputmask="0x40">
+			<bounds x="840" y="1460" width="120" height="40" />
+		</element>
+		<element ref="txt_gate">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="840" y="1460" width="120" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row3" inputmask="0x40">
+			<bounds x="840" y="1510" width="120" height="40" />
+		</element>
+		<element ref="txt_alley">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="840" y="1510" width="120" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row5" inputmask="0x08">
+			<bounds x="840" y="1560" width="120" height="40" />
+		</element>
+		<element ref="txt_door">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="840" y="1560" width="120" height="40" />
+		</element>
+
+		<!-- carry over balllift, rest contact balllift, manual balllift -->
+		<element ref="white_rect" inputtag="row4" inputmask="0x20">
+			<bounds x="760" y="1650" width="200" height="40" />
+		</element>
+		<element ref="txt_carryoverballlifter">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="760" y="1650" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x40">
+			<bounds x="760" y="1700" width="200" height="40" />
+		</element>
+		<element ref="txt_restcontactballlifter">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="760" y="1700" width="200" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row4" inputmask="0x80">
+			<bounds x="760" y="1750" width="200" height="40" />
+		</element>
+		<element ref="txt_manualballlift">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="760" y="1750" width="200" height="40" />
+		</element>
+
+		<!-- magic line buttons a, b, c, d, e -->
+		<element ref="white_rect" inputtag="row6" inputmask="0x08">
+			<bounds x="80" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_a">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="80" y="1970" width="40" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x10">
+			<bounds x="130" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_b">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="130" y="1970" width="40" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x20">
+			<bounds x="180" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_c">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="180" y="1970" width="40" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x40">
+			<bounds x="230" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_d">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="230" y="1970" width="40" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row6" inputmask="0x80">
+			<bounds x="280" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_e">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="280" y="1970" width="40" height="40" />
+		</element>
+
+		<!-- coin slots -->
+		<element ref="white_rect" inputtag="row7" inputmask="0x02">
+			<bounds x="380" y="1970" width="110" height="40" />
+		</element>
+		<element ref="txt_coinleft">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="380" y="1970" width="110" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x01">
+			<bounds x="500" y="1970" width="110" height="40" />
+		</element>
+		<element ref="txt_coinright">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="500" y="1970" width="110" height="40" />
+		</element>
+
+		<!-- r and x buttons -->
+		<element ref="white_rect" inputtag="row5" inputmask="0x01">
+			<bounds x="670" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_r">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="670" y="1970" width="40" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row5" inputmask="0x02">
+			<bounds x="720" y="1970" width="40" height="40" />
+		</element>
+		<element ref="txt_x">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="720" y="1970" width="40" height="40" />
+		</element>
+
+		<!-- service box buttons -->
+		<element ref="white_rect" inputtag="row7" inputmask="0x04">
+			<bounds x="830" y="1870" width="60" height="40" />
+		</element>
+		<element ref="txt_sv1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="830" y="1870" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x08">
+			<bounds x="900" y="1870" width="60" height="40" />
+		</element>
+		<element ref="txt_sv2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="900" y="1870" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x10">
+			<bounds x="830" y="1920" width="60" height="40" />
+		</element>
+		<element ref="txt_sv3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="830" y="1920" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x20">
+			<bounds x="900" y="1920" width="60" height="40" />
+		</element>
+		<element ref="txt_sv4">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="900" y="1920" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x40">
+			<bounds x="830" y="1970" width="60" height="40" />
+		</element>
+		<element ref="txt_sv5">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="830" y="1970" width="60" height="40" />
+		</element>
+		<element ref="white_rect" inputtag="row7" inputmask="0x80">
+			<bounds x="900" y="1970" width="60" height="40" />
+		</element>
+		<element ref="txt_sv6">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="900" y="1970" width="60" height="40" />
+		</element>
+
+	</view>
+</mamelayout>

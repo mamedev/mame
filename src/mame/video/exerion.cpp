@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-void exerion_state::exerion_palette(palette_device &palette) const
+void exerion_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
@@ -102,10 +102,7 @@ void exerion_state::exerion_palette(palette_device &palette) const
 
 void exerion_state::video_start()
 {
-	/* get pointers to the mixing and lookup PROMs */
-	m_background_mixer = memregion("proms")->base() + 0x320;
-
-	/* allocate memory for the decoded background graphics */
+	// allocate memory for the decoded background graphics
 	m_background_gfx[0] = std::make_unique<uint16_t[]>(256 * 256);
 	m_background_gfx[1] = std::make_unique<uint16_t[]>(256 * 256);
 	m_background_gfx[2] = std::make_unique<uint16_t[]>(256 * 256);
@@ -133,7 +130,7 @@ void exerion_state::video_start()
 	 * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
 	 * of these two bits together.
 	 */
-	uint8_t *gfx = memregion("gfx3")->base();
+	uint8_t *gfx = memregion("bgdata")->base();
 	for (int i = 0; i < 4; i++)
 	{
 		uint8_t *src = gfx + i * 0x2000;
@@ -179,25 +176,25 @@ void exerion_state::video_start()
  *
  *************************************/
 
-void exerion_state::exerion_videoreg_w(uint8_t data)
+void exerion_state::videoreg_w(uint8_t data)
 {
-	/* bit 0 = flip screen and joystick input multiplexer */
+	// bit 0 = flip screen and joystick input multiplexer
 	m_cocktail_flip = data & 1;
 
-	/* bits 1-2 char lookup table bank */
+	// bits 1-2 char lookup table bank
 	m_char_palette = (data & 0x06) >> 1;
 
-	/* bits 3 char bank */
+	// bits 3 char bank
 	m_char_bank = (data & 0x08) >> 3;
 
-	/* bits 4-5 unused */
+	// bits 4-5 unused
 
-	/* bits 6-7 sprite lookup table bank */
+	// bits 6-7 sprite lookup table bank
 	m_sprite_palette = (data & 0xc0) >> 6;
 }
 
 
-void exerion_state::exerion_video_latch_w(offs_t offset, uint8_t data)
+void exerion_state::video_latch_w(offs_t offset, uint8_t data)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -206,10 +203,10 @@ void exerion_state::exerion_video_latch_w(offs_t offset, uint8_t data)
 }
 
 
-uint8_t exerion_state::exerion_video_timing_r()
+uint8_t exerion_state::video_timing_r()
 {
-	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
-	/* bit 1 is VBLANK */
+	// bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1
+	// bit 1 is VBLANK
 
 	uint16_t hcounter = m_screen->hpos() + EXERION_HCOUNT_START;
 	uint8_t snmi = 1;
@@ -229,10 +226,8 @@ uint8_t exerion_state::exerion_video_timing_r()
 
 void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y;
-
-	/* loop over all visible scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	// loop over all visible scanlines
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint16_t *src0 = &m_background_gfx[0][m_background_latches[1] * 256];
 		uint16_t *src1 = &m_background_gfx[1][m_background_latches[3] * 256];
@@ -254,11 +249,11 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 		uint16_t scanline[VISIBLE_X_MAX];
 		pen_t pen_base = 0x200 + ((m_background_latches[12] >> 4) << 4);
 
-		/* the cocktail flip flag controls whether we count up or down in X */
+		// the cocktail flip flag controls whether we count up or down in X
 		if (!m_cocktail_flip)
 		{
-			/* skip processing anything that's not visible */
-			for (x = BACKGROUND_X_START; x < cliprect.min_x; x++)
+			// skip processing anything that's not visible
+			for (int x = BACKGROUND_X_START; x < cliprect.min_x; x++)
 			{
 				if (!(++xoffs0 & 0x1f)) start0++, stop0++;
 				if (!(++xoffs1 & 0x1f)) start1++, stop1++;
@@ -266,26 +261,26 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 				if (!(++xoffs3 & 0x1f)) start3++, stop3++;
 			}
 
-			/* draw the rest of the scanline fully */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			// draw the rest of the scanline fully
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint16_t combined = 0;
 				uint8_t lookupval;
 
-				/* the output enable is controlled by the carries on the start/stop counters */
-				/* they are only active when the start has carried but the stop hasn't */
+				// the output enable is controlled by the carries on the start/stop counters
+				// they are only active when the start has carried but the stop hasn't
 				if ((start0 ^ stop0) & 0x10) combined |= src0[xoffs0 & 0xff];
 				if ((start1 ^ stop1) & 0x10) combined |= src1[xoffs1 & 0xff];
 				if ((start2 ^ stop2) & 0x10) combined |= src2[xoffs2 & 0xff];
 				if ((start3 ^ stop3) & 0x10) combined |= src3[xoffs3 & 0xff];
 
-				/* bits 8-11 of the combined value contains the lookup for the mixer PROM */
+				// bits 8-11 of the combined value contains the lookup for the mixer PROM
 				lookupval = mixer[combined >> 8] & 3;
 
-				/* the color index comes from the looked up value combined with the pixel data */
+				// the color index comes from the looked up value combined with the pixel data
 				scanline[x] = pen_base | (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
 
-				/* the start/stop counters are clocked when the low 5 bits of the X counter overflow */
+				// the start/stop counters are clocked when the low 5 bits of the X counter overflow
 				if (!(++xoffs0 & 0x1f)) start0++, stop0++;
 				if (!(++xoffs1 & 0x1f)) start1++, stop1++;
 				if (!(++xoffs2 & 0x1f)) start2++, stop2++;
@@ -294,8 +289,8 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 		}
 		else
 		{
-			/* skip processing anything that's not visible */
-			for (x = BACKGROUND_X_START; x < cliprect.min_x; x++)
+			// skip processing anything that's not visible
+			for (int x = BACKGROUND_X_START; x < cliprect.min_x; x++)
 			{
 				if (!(xoffs0-- & 0x1f)) start0++, stop0++;
 				if (!(xoffs1-- & 0x1f)) start1++, stop1++;
@@ -303,26 +298,26 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 				if (!(xoffs3-- & 0x1f)) start3++, stop3++;
 			}
 
-			/* draw the rest of the scanline fully */
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			// draw the rest of the scanline fully
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint16_t combined = 0;
 				uint8_t lookupval;
 
-				/* the output enable is controlled by the carries on the start/stop counters */
-				/* they are only active when the start has carried but the stop hasn't */
+				// the output enable is controlled by the carries on the start/stop counters
+				// they are only active when the start has carried but the stop hasn't
 				if ((start0 ^ stop0) & 0x10) combined |= src0[xoffs0 & 0xff];
 				if ((start1 ^ stop1) & 0x10) combined |= src1[xoffs1 & 0xff];
 				if ((start2 ^ stop2) & 0x10) combined |= src2[xoffs2 & 0xff];
 				if ((start3 ^ stop3) & 0x10) combined |= src3[xoffs3 & 0xff];
 
-				/* bits 8-11 of the combined value contains the lookup for the mixer PROM */
+				// bits 8-11 of the combined value contains the lookup for the mixer PROM
 				lookupval = mixer[combined >> 8] & 3;
 
-				/* the color index comes from the looked up value combined with the pixel data */
+				// the color index comes from the looked up value combined with the pixel data
 				scanline[x] = pen_base | (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
 
-				/* the start/stop counters are clocked when the low 5 bits of the X counter overflow */
+				// the start/stop counters are clocked when the low 5 bits of the X counter overflow
 				if (!(xoffs0-- & 0x1f)) start0++, stop0++;
 				if (!(xoffs1-- & 0x1f)) start1++, stop1++;
 				if (!(xoffs2-- & 0x1f)) start2++, stop2++;
@@ -330,7 +325,7 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
 			}
 		}
 
-		/* draw the scanline */
+		// draw the scanline
 		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
 	}
 }
@@ -342,15 +337,13 @@ void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
  *
  *************************************/
 
-uint32_t exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int sx, sy, offs, i;
-
-	/* draw background */
+	// draw background
 	draw_background(bitmap, cliprect);
 
-	/* draw sprites */
-	for (i = 0; i < m_spriteram.bytes(); i += 4)
+	// draw sprites
+	for (int i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		int flags = m_spriteram[i + 0];
 		int y = m_spriteram[i + 1] ^ 255;
@@ -392,14 +385,14 @@ uint32_t exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind1
 		if (doubled) i += 4;
 	}
 
-	/* draw the visible text layer */
-	for (sy = cliprect.min_y/8; sy <= cliprect.max_y/8; sy++)
-		for (sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
+	// draw the visible text layer
+	for (int sy = cliprect.min_y/8; sy <= cliprect.max_y/8; sy++)
+		for (int sx = VISIBLE_X_MIN/8; sx < VISIBLE_X_MAX/8; sx++)
 		{
 			int x = m_cocktail_flip ? (63*8 - 8*sx) : 8*sx;
 			int y = m_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
-			offs = sx + sy * 64;
+			int offs = sx + sy * 64;
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 				m_videoram[offs] + 256 * m_char_bank,
 				((m_videoram[offs] & 0xf0) >> 4) + m_char_palette * 16,

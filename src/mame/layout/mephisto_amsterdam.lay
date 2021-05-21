@@ -4,18 +4,14 @@ license:CC0
 -->
 <mamelayout version="2">
 
-	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
-
-	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
-	</element>
+<!-- define elements -->
 
 	<element name="led" defstate="0">
 		<disk state="0">
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 	<element name="hlb" defstate="0">
@@ -169,7 +165,7 @@ license:CC0
 
 		<!-- chessboard leds -->
 		<repeat count="8">
-			<param name="x" start="8.2" increment="10" />
+			<param name="x" start="8.3" increment="10" />
 			<param name="la" start="0" increment="1" />
 			<param name="lb" start="8" increment="1" />
 			<param name="lc" start="16" increment="1" />
@@ -348,14 +344,41 @@ license:CC0
 	</group>
 
 
-<!-- 7seg panel -->
+<!-- display -->
 
-	<group name="panel">
-		<element ref="lcd_bg"><bounds x="0" y="0" width="35" height="15" /></element>
-		<element name="digit0" ref="digit"><bounds x="4"  y="2.5" width="6" height="10" /></element>
-		<element name="digit1" ref="digit"><bounds x="11" y="2.5" width="6" height="10" /></element>
-		<element name="digit2" ref="digit"><bounds x="18" y="2.5" width="6" height="10" /></element>
-		<element name="digit3" ref="digit"><bounds x="25" y="2.5" width="6" height="10" /></element>
+	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+	<element name="ldot_hide"><disk><color red="0.54" green="0.57" blue="0.58" /></disk></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
+	</element>
+	<element name="ldot">
+		<rect><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+		<rect statemask="0x80"><color red="0.2" green="0.16" blue="0.16" /></rect>
+	</element>
+
+	<group name="display">
+		<bounds x="31" y="90.3" width="22.5" height="7.4" />
+
+		<element ref="lcd_bg"><bounds x="31" y="90.3" width="22.5" height="7.4" /></element>
+
+		<element name="digit3" ref="digit"><bounds x="32.6" y="91" width="4" height="6" /></element>
+		<element name="digit2" ref="digit"><bounds x="37.7" y="91" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="42.8" y="91" width="4" height="6" /></element>
+		<element name="digit0" ref="digit"><bounds x="47.9" y="91" width="4" height="6" /></element>
+
+		<!-- digits DP are different from normal 7seg -->
+		<element ref="ldot_hide"><bounds x="35.9" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="41.0" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.1" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.2" y="96.3" width="0.85" height="0.85" /></element>
+
+		<element name="digit3" ref="ldot"><bounds x="36.59" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.69" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="46.79" y="96.42" width="0.6" height="0.6" /></element>
+
+		<element name="digit0" ref="ldot"><bounds x="42.06" y="92.30" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.80" y="95.12" width="0.6" height="0.6" /></element>
 	</group>
 
 
@@ -470,55 +493,60 @@ license:CC0
 		<element ref="gray"><bounds x="89.7" y="105.3" width="0.9" height="0.9" /></element>
 		<element ref="white"><bounds x="94.5" y="105.1" width="1.3" height="1.3" /></element>
 
-		<!-- Buttons (new_keyboard)-->
-		<element ref="keys" inputtag="LINE1" inputmask="0x01">    <!-- INFO -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x01">    <!-- INFO -->
 			<bounds x="69"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x02">    <!-- POS -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x02">    <!-- POS -->
 			<bounds x="74"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x04">    <!-- LEV -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x04">    <!-- LEV -->
 			<bounds x="79"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x08">    <!-- MEM -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x08">    <!-- MEM -->
 			<bounds x="84"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x10">    <!-- CL -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x10">    <!-- CL -->
 			<bounds x="89"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x20">    <!-- ENT -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x20">    <!-- ENT -->
 			<bounds x="94"  y="93" width="4" height="4" /><color alpha="0.25" />
 		</element>
 
-		<element ref="keys" inputtag="LINE0" inputmask="0x01">    <!-- A1 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x01">    <!-- A1 -->
 			<bounds x="69"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x02">    <!-- B2 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x02">    <!-- B2 -->
 			<bounds x="74"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x04">    <!-- C3 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x04">    <!-- C3 -->
 			<bounds x="79"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x08">    <!-- D4 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x08">    <!-- D4 -->
 			<bounds x="84"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x10">    <!-- E5 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x10">    <!-- E5 -->
 			<bounds x="89"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x20">    <!-- F6 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x20">    <!-- F6 -->
 			<bounds x="94"  y="98" width="4" height="4" /><color alpha="0.25" />
 		</element>
 
-		<element ref="keys" inputtag="LINE1" inputmask="0x40">    <!-- G7 -->
+		<element ref="keys" inputtag="RESET" inputmask="0x01">    <!-- RES -->
+			<bounds x="69"  y="103" width="4" height="4" /><color alpha="0.25" />
+		</element>
+		<element ref="keys" inputtag="RESET" inputmask="0x02">    <!-- RES -->
+			<bounds x="74"  y="103" width="4" height="4" /><color alpha="0.25" />
+		</element>
+		<element ref="keys" inputtag="KEY.1" inputmask="0x40">    <!-- G7 -->
 			<bounds x="79"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE1" inputmask="0x80">    <!-- H8 -->
+		<element ref="keys" inputtag="KEY.1" inputmask="0x80">    <!-- H8 -->
 			<bounds x="84"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x40">    <!-- 9 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x40">    <!-- 9 -->
 			<bounds x="89"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
-		<element ref="keys" inputtag="LINE0" inputmask="0x80">    <!-- 0 -->
+		<element ref="keys" inputtag="KEY.0" inputmask="0x80">    <!-- 0 -->
 			<bounds x="94"  y="103" width="4" height="4" /><color alpha="0.25" />
 		</element>
 	</group>
@@ -531,15 +559,10 @@ license:CC0
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
-		<group ref="panel"><bounds x="37.5" y="91" width="20" height="8" /></group>
-
-		<group ref="buttons"><bounds x="67.5" y="88.5" width="29" height="14" /></group>
-
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="6.5" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="14.2" y="16.5" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="14.2" y="26.5" width="2" height="2" /></element>
@@ -557,6 +580,11 @@ license:CC0
 		<element ref="text_f"><bounds x="71.5" y="84" width="2" height="2" /></element>
 		<element ref="text_g"><bounds x="81.5" y="84" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="91.5" y="84" width="2" height="2" /></element>
+
+		<!-- bottom side -->
+		<element ref="lcd_bg"><bounds x="37.5" y="91.5" width="20" height="8" /></element>
+		<group ref="display"><bounds x="38" y="92.3" width="19" height="6.4" /></group>
+		<group ref="buttons"><bounds x="67.5" y="88.5" width="29" height="14" /></group>
 	</view>
 
 </mamelayout>

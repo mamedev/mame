@@ -178,6 +178,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_show(false)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
+	, m_unthrottle_mute(false)
 	, m_machine_info()
 	, m_unemulated_features()
 	, m_imperfect_features()
@@ -353,6 +354,13 @@ void mame_ui_manager::initialize(running_machine &machine)
 				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
 					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
+
+	// handle throttle-related options and initial muting state now that the sound manager has been brought up
+	const bool starting_throttle = machine.options().throttle();
+	machine.video().set_throttled(starting_throttle);
+	m_unthrottle_mute = options().unthrottle_mute();
+	if (!starting_throttle && m_unthrottle_mute)
+		machine.sound().ui_mute(true);
 }
 
 
@@ -416,8 +424,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	switch_code_poller poller(machine().input());
 	std::string warning_text;
 	rgb_t warning_color;
+	bool config_menu = false;
 	auto handler_messagebox_anykey =
-		[this, &poller, &warning_text, &warning_color] (render_container &container) -> uint32_t
+		[this, &poller, &warning_text, &warning_color, &config_menu] (render_container &container) -> uint32_t
 		{
 			// draw a standard message window
 			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
@@ -426,6 +435,11 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
+				return UI_HANDLER_CANCEL;
+			}
+			else if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+			{
+				config_menu = true;
 				return UI_HANDLER_CANCEL;
 			}
 			else if (poller.poll() != INPUT_CODE_INVALID)
@@ -553,9 +567,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		poller.reset();
 		while (poller.poll() != INPUT_CODE_INVALID) { }
 
-		// loop while we have a handler
-		while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
-			machine().video().frame_update();
+		if (m_handler_callback_type == ui_callback_type::MODAL)
+		{
+			config_menu = false;
+
+			// loop while we have a handler
+			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+				machine().video().frame_update();
+		}
 
 		// clear the handler and force an update
 		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
@@ -569,6 +588,14 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(machine()))
 		show_menu();
+	else if (config_menu)
+	{
+		show_menu();
+
+		// loop while we have a handler
+		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
+			machine().video().frame_update();
+	}
 }
 
 
@@ -1362,7 +1389,12 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-		machine().video().set_throttled(!machine().video().throttled());
+	{
+		const bool new_throttle_state = !machine().video().throttled();
+		machine().video().set_throttled(new_throttle_state);
+		if (m_unthrottle_mute)
+			machine().sound().ui_mute(!new_throttle_state);
+	}
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))

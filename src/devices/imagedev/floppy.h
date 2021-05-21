@@ -55,18 +55,18 @@ public:
 		const char *m_name;
 		u32 m_key;
 		const char *m_description;
-		
-		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+
+		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
 			m_manager(manager),
 			m_type(type),
 			m_image_size(image_size),
 			m_name(name),
-			m_key(key),
+			m_key(0),
 			m_description(description)
 		{}
-		
-		fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
-			m_manager(manager),
+
+		fs_info(const char *name, u32 key, const char *description) :
+			m_manager(nullptr),
 			m_type(nullptr),
 			m_image_size(0),
 			m_name(name),
@@ -80,12 +80,13 @@ public:
 
 	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_format_t *get_formats() const;
-	const std::vector<fs_info> &get_fs() const { return m_fs; }
+	const std::vector<fs_info> &get_create_fs() const { return m_create_fs; }
+	const std::vector<fs_info> &get_io_fs() const { return m_io_fs; }
 	floppy_image_format_t *get_load_format() const;
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
-	void init_fs(const fs_info *fs);
+	void init_fs(const fs_info *fs, const fs_meta_data &meta);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -117,6 +118,7 @@ public:
 	bool ready_r();
 	void set_ready(bool state);
 	double get_pos();
+	virtual void tfsel_w(int state) { };    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
@@ -156,9 +158,9 @@ protected:
 	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
 		floppy_image_device *m_fid;
 		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
-		
-		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
-		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+
+		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) override;
+		virtual void add_raw(const char *name, u32 key, const char *description) override;
 	};
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -185,7 +187,7 @@ protected:
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
-	std::vector<fs_info>  m_fs;
+	std::vector<fs_info>  m_create_fs, m_io_fs;
 	std::vector<std::unique_ptr<filesystem_manager_t>> m_fs_managers;
 	emu_timer             *index_timer;
 
@@ -315,6 +317,7 @@ public:
 
 	virtual bool wpt_r() override;
 	virtual void mon_w(int) override;
+	virtual void tfsel_w(int state) override;
 	virtual void seek_phase_w(int phases) override;
 	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
 	virtual bool writing_disabled() const override;

@@ -10,7 +10,7 @@
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/tms34061.h"
 #include "machine/nvram.h"
 #include "video/awpvid.h"

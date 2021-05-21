@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="singingstarkaraoke_cart" description="Taikee Singing Star Karaoke cartridges">
+
+	<software name="karaokd1" supported="no">
+		<description>Karao Kids Songs 1 (Spain)</description>
+		<year>200?</year>
+		<publisher>Taikee / Imaginarium / ItsMagical</publisher>
+		<part name="cart" interface="singingstarkaraoke_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="karaokidssongs1.bin" size="0x200000" crc="7fe29b9f" sha1="6cba45ff2f57c92f978d4bba51ab0f7e59d4c450" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="karaokd2" supported="no">
+		<description>Karao Kids Songs 2 (Spain)</description>
+		<year>200?</year>
+		<publisher>Taikee / Imaginarium / ItsMagical</publisher>
+		<part name="cart" interface="singingstarkaraoke_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="karaokidssongs2.bin" size="0x200000" crc="7a1f455c" sha1="13bb5949629df64f5940923b224d930a4adf23ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="origkara" supported="no">
+		<description>Original Karaoke</description>
+		<year>200?</year>
+		<publisher>Taikee</publisher>
+		<part name="cart" interface="singingstarkaraoke_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="originalkaraokeredo.bin" size="0x200000" crc="59129a14" sha1="e45f212e0f6a2e6e8b573b4e62752c9173def056" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

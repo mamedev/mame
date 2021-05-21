@@ -160,8 +160,39 @@ PL2 Button | 7A | 7B | PL1 Button
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/sn76477.h"
 
 #include "speaker.h"
+
+class speakres_state : public route16_state
+{
+public:
+	speakres_state(const machine_config &mconfig, device_type type, const char *tag)
+		: route16_state(mconfig, type, tag)
+		, m_sn(*this, "snsnd")
+		, m_dac(*this, "dac")
+	{}
+
+	void speakres(machine_config &config);
+	void stratvox(machine_config &config);
+	void spacecho(machine_config &config);
+
+private:
+	uint8_t speakres_in3_r();
+	void speakres_out2_w(uint8_t data);
+	void stratvox_sn76477_w(uint8_t data);
+	void stratvox_dac_w(uint8_t data);
+	DECLARE_MACHINE_START(speakres);
+
+	void speakres_cpu1_map(address_map &map);
+	void stratvox_cpu1_map(address_map &map);
+	void stratvox_cpu2_map(address_map &map);
+
+	required_device<sn76477_device> m_sn;
+	required_device<dac_byte_interface> m_dac;
+
+	int m_speakres_vrx;
+};
 
 
 /*************************************
@@ -170,7 +201,7 @@ PL2 Button | 7A | 7B | PL1 Button
  *
  *************************************/
 
-MACHINE_START_MEMBER(route16_state, speakres)
+MACHINE_START_MEMBER(speakres_state, speakres)
 {
 	save_item(NAME(m_speakres_vrx));
 }
@@ -324,7 +355,7 @@ uint8_t route16_state::route16_prot_read()
  *
  *************************************/
 
-void route16_state::stratvox_sn76477_w(uint8_t data)
+void speakres_state::stratvox_sn76477_w(uint8_t data)
 {
 	/***************************************************************
 	 * AY8910 output bits are connected to...
@@ -344,6 +375,13 @@ void route16_state::stratvox_sn76477_w(uint8_t data)
 	m_sn->mixer_a_w((data >> 4) & 1);
 	m_sn->mixer_b_w((data >> 5) & 1);
 	m_sn->mixer_c_w((data >> 6) & 1);
+}
+
+void speakres_state::stratvox_dac_w(uint8_t data)
+{
+	// Data is written into a pair of MC14175B quad D flip-flops with complementary outputs.
+	// Schematics indicate an inverting output is tapped for the most significant bit (F7 pin 3).
+	m_dac->data_w(data ^ 0x80);
 }
 
 
@@ -402,7 +440,7 @@ uint8_t route16_state::jongpute_p2_matrix_r()
   this would then be checking that the sounds are mixed correctly.
 ***************************************************************************/
 
-uint8_t route16_state::speakres_in3_r()
+uint8_t speakres_state::speakres_in3_r()
 {
 	int bit2=4, bit1=2, bit0=1;
 
@@ -417,7 +455,7 @@ uint8_t route16_state::speakres_in3_r()
 	return 0xf8|bit2|bit1|bit0;
 }
 
-void route16_state::speakres_out2_w(uint8_t data)
+void speakres_state::speakres_out2_w(uint8_t data)
 {
 	m_speakres_vrx=0;
 }
@@ -454,25 +492,25 @@ void route16_state::routex_cpu1_map(address_map &map)
 }
 
 
-void route16_state::stratvox_cpu1_map(address_map &map)
+void speakres_state::stratvox_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(speakres_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
 	map(0x5800, 0x5800).portr("P2");
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
 
-void route16_state::speakres_cpu1_map(address_map &map)
+void speakres_state::speakres_cpu1_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram().share("sharedram");
-	map(0x4800, 0x4800).portr("DSW").w(FUNC(route16_state::out0_w));
-	map(0x5000, 0x5000).portr("P1").w(FUNC(route16_state::out1_w));
-	map(0x5800, 0x5800).portr("P2").w(FUNC(route16_state::speakres_out2_w));
-	map(0x6000, 0x6000).r(FUNC(route16_state::speakres_in3_r));
+	map(0x4800, 0x4800).portr("DSW").w(FUNC(speakres_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(FUNC(speakres_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(FUNC(speakres_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(FUNC(speakres_state::speakres_in3_r));
 	map(0x8000, 0xbfff).ram().share("videoram1");
 }
 
@@ -511,10 +549,10 @@ void route16_state::route16_cpu2_map(address_map &map)
 }
 
 
-void route16_state::stratvox_cpu2_map(address_map &map)
+void speakres_state::stratvox_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2800, 0x2800).w(FUNC(speakres_state::stratvox_dac_w));
 	map(0x4000, 0x43ff).ram().share("sharedram");
 	map(0x8000, 0xbfff).ram().share("videoram2");
 }
@@ -879,19 +917,19 @@ void route16_state::routex(machine_config &config)
 }
 
 
-void route16_state::stratvox(machine_config &config)
+void speakres_state::stratvox(machine_config &config)
 {
 	route16(config);
 
 	/* basic machine hardware */
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu1_map);
-	m_cpu2->set_addrmap(AS_PROGRAM, &route16_state::stratvox_cpu2_map);
+	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu1_map);
+	m_cpu2->set_addrmap(AS_PROGRAM, &speakres_state::stratvox_cpu2_map);
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(route16_state::screen_update_jongpute));
+	m_screen->set_screen_update(FUNC(speakres_state::screen_update_jongpute));
 
 	/* sound hardware */
-	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(route16_state::stratvox_sn76477_w));  // SN76477 commands (SN76477 not populated on Route 16 PCB)
+	subdevice<ay8910_device>("ay8910")->port_a_write_callback().set(FUNC(speakres_state::stratvox_sn76477_w));  // SN76477 commands (SN76477 not populated on Route 16 PCB)
 
 	SN76477(config, m_sn);
 	m_sn->set_noise_params(RES_K(47), RES_K(150), CAP_U(0.001));
@@ -909,20 +947,20 @@ void route16_state::stratvox(machine_config &config)
 	m_sn->set_enable(1);
 	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25); // R = 15K, 2R = 30K (TODO: output filtering)
 }
 
-void route16_state::speakres(machine_config &config)
+void speakres_state::speakres(machine_config &config)
 {
 	stratvox(config);
 
 	/* basic machine hardware */
-	m_cpu1->set_addrmap(AS_PROGRAM, &route16_state::speakres_cpu1_map);
+	m_cpu1->set_addrmap(AS_PROGRAM, &speakres_state::speakres_cpu1_map);
 
-	MCFG_MACHINE_START_OVERRIDE(route16_state, speakres)
+	MCFG_MACHINE_START_OVERRIDE(speakres_state, speakres)
 }
 
-void route16_state::spacecho(machine_config &config)
+void speakres_state::spacecho(machine_config &config)
 {
 	speakres(config);
 
@@ -1385,14 +1423,14 @@ GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, empty_init,  
 GAME( 1981, routex,   route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, routexa,  route16,  routex,   route16,  route16_state, empty_init,    ROT270, "bootleg",                                    "Route X (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, route16_state, empty_init,    ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, empty_init,    ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, empty_init,    ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, speakres, 0,        speakres, speakres, speakres_state, empty_init,   ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, speakres_state, empty_init,   ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, speakres_state, empty_init,   ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, speakres_state, empty_init,   ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1981, jongpute, 0,        jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co.",                 "Jongputer",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )  // sampling voice is not emulated, bug with colors makes tile recognition difficult
 GAME( 1981, ttmahjng, jongpute, jongpute, jongpute, route16_state, empty_init,    ROT0,   "Alpha Denshi Co. (Taito license)", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

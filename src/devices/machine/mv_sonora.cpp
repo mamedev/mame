@@ -3,7 +3,7 @@
 /*********************************************************************
 
     Mac video support, "Sonora" edition
-	Supports 5 different modelines at up to 16bpp
+    Supports 5 different modelines at up to 16bpp
 
 *********************************************************************/
 
@@ -24,12 +24,14 @@ mac_video_sonora_device::mac_video_sonora_device(const machine_config &mconfig, 
 	device_t(mconfig, MAC_VIDEO_SONORA, tag, owner, clock),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
-	m_monitor_config(*this, "monitor")
+	m_monitor_config(*this, "monitor"),
+	m_screen_vblank(*this)
 {
 }
 
 void mac_video_sonora_device::device_start()
 {
+	m_screen_vblank.resolve_safe();
 	m_vram = nullptr;
 
 	save_item(NAME(m_vram_offset));
@@ -56,6 +58,7 @@ void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(mac_video_sonora_device::screen_update));
+	m_screen->screen_vblank().set([this](int state) { m_screen_vblank(state && (m_modeline_id != -1)); });
 
 	PALETTE(config, m_palette).set_entries(256);
 }
@@ -69,7 +72,7 @@ void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 
 // The system starts by leaving everything undriven and reading the
 // result.  If it's not 7, it's the monitor type.  If it's 7, then it
-// needs the extended monitor sense.  It tend drives a 0 on each of
+// needs the extended monitor sense.  It then drives a 0 on each of
 // the 3 pins in sequence and records the result on the other two, and
 // that gives the signature.
 
@@ -113,7 +116,7 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			uint32_t *scanline = &bitmap.pix(y);
 			for(uint32_t x = 0; x != hres; x += 64) {
 				uint64_t pixels = *vram ++;
-				for(uint32_t bit = 0; bit != 64; bit ++)
+				for(int32_t bit = 63; bit >= 0; bit --)
 					*scanline ++ = pens[(((pixels >> bit) & 1) << 7) | 0x7f];
 			}
 		}
@@ -124,7 +127,7 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			uint32_t *scanline = &bitmap.pix(y);
 			for(uint32_t x = 0; x != hres; x += 8) {
 				uint64_t pixels = *vram ++;
-				for(uint32_t bit = 0; bit != 64; bit += 8)
+				for(int32_t bit = 56; bit >= 0; bit -= 8)
 					*scanline ++ = pens[((pixels >> bit) & 0xff)];
 			}
 		}
@@ -160,7 +163,7 @@ uint8_t mac_video_sonora_device::vctrl_r(offs_t offset)
 			res = mon;
 			if(!(m_monitor_id & 8))
 				res &= m_monitor_id & 7;
-		}			
+		}
 
 		return m_monitor_id | (res << 4);
 	}
@@ -219,6 +222,18 @@ void mac_video_sonora_device::vctrl_w(offs_t offset, uint8_t data)
 	}
 }
 
+uint8_t mac_video_sonora_device::dac_r(offs_t offset)
+{
+	switch(offset) {
+	case 2:
+		return m_pal_control;
+
+	default:
+		logerror("dac_r %x\n", offset);
+		return 0;
+	}
+}
+
 void mac_video_sonora_device::dac_w(offs_t offset, uint8_t data)
 {
 	switch(offset) {
@@ -241,6 +256,7 @@ void mac_video_sonora_device::dac_w(offs_t offset, uint8_t data)
 		break;
 
 	case 2:
+		logerror("control = %02x\n", data);
 		m_pal_control = data;
 		break;
 

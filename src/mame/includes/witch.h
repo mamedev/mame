@@ -17,7 +17,7 @@ Witch / Pinball Champ '95 / Keirin Ou
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/es8712.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
