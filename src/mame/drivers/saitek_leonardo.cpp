@@ -174,7 +174,6 @@ void leo_state::exp_stb_w(int state)
 void leo_state::exp_rts_w(int state)
 {
 	// NAND with ACK-P? (not used by module)
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -213,8 +212,10 @@ void leo_state::p5_w(u8 data)
 	// d2: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 2));
 
-	// d3,d5: expansion ACK-P?
-	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
+	// d3: NAND with STB-P?
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
 
 	// d6,d7: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
@@ -324,6 +325,8 @@ void leo_state::leo(machine_config &config)
 	m_maincpu->out_p5_cb().set(FUNC(leo_state::p5_w));
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

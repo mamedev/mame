@@ -4457,6 +4457,8 @@ if (BUSES["SAITEK_OSA"]~=null) then
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/modules.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/modules.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/sparc.cpp",

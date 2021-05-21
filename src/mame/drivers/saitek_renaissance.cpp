@@ -22,7 +22,7 @@ The LCD screen is fairly large, it's the same one as in Saitek Simultano,
 so a chessboard display + 7seg info.
 
 TODO:
-- fart noise at boot if osa module is inserted
+- fart noise at boot if maestroa module is inserted
 - finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
@@ -185,7 +185,6 @@ void ren_state::exp_stb_w(int state)
 void ren_state::exp_rts_w(int state)
 {
 	// NAND with ACK-P? (not used by module)
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 
@@ -225,8 +224,10 @@ void ren_state::p5_w(u8 data)
 	// d1: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d3,d5: expansion ACK-P?
-	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
+	// d3: NAND with STB-P?
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
 
 	// other: ?
 }
@@ -331,6 +332,8 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->out_p5_cb().set(FUNC(ren_state::p5_w));
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
