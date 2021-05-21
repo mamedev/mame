@@ -11378,6 +11378,9 @@ crazybal                        // EGS
 crbaloon                        // CL  (c) 1980 Taito Corporation
 crbaloon2                       // CL  (c) 1980 Taito Corporation
 
+@source:crei680.cpp
+crei680
+
 @source:crgolf.cpp
 crgolf                          // (c) 1984 Nasco Japan
 crgolfa                         // (c) 1984 Nasco Japan

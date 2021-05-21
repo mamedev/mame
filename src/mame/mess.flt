@@ -202,6 +202,7 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
+crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
