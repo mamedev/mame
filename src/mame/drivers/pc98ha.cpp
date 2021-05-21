@@ -15,9 +15,11 @@
 		- first port C read (pc98lt: i/o 0x35, PC=0xf841f) tests for bit 7, 
 		  which initializes battery backup if on, but port C is in output mode there.
 		  Somehow obf irq is on at boot if battery failed?
-	- RTC throws 2065 as year, it reads back I/O 0x22/0x23 (not on base PC98?)
     - power handling;
     - pc98ha specifics:
+		- RTC is upd4991a (unemulated), current hookup throws 2065 as year, 
+		  it's parallel instead of serial and incompatible with everything else ugh;
+		- EMS fails at boot, it's never ever really checked;
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
         - JEIDA memory card interface;
         - optional docking station (for floppy device only or anything else?);
@@ -63,11 +65,66 @@ uint32_t pc98lt_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
  */
 u8 pc98lt_state::power_status_r()
 {
-	return 0x00;
+	return 0x80;
+}
+
+void pc98lt_state::power_control_w(offs_t offset, u8 data)
+{
+	// TODO: happens pretty often, supposed to halt the system and wake up on arbitrary event?
+	if (BIT(data, 2))
+		logerror("%s: power_control_w standby signal ON\n", machine().describe_context());
+
+	// pc98lt: go to prompt (type "command" in main menu) and execute "poweroff.com"
+	if (BIT(data, 0))
+		logerror("%s: power_control_w power off signal ON\n", machine().describe_context());
+	// pc98ha bit 1: flips between 0->1 on system boot failure, in tandem with standby mode held
+	if (data & ~0x05)
+		logerror("%s: power_control_w unknown signal sent %02x\n", machine().describe_context(), data);
+}
+
+// TODO: intentionally repeated from base pc98
+u8 pc98lt_state::floppy_mode_r(offs_t offset)
+{
+	return (m_floppy_mode & 3) | 0x08;
+}
+
+void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
+{
+	// bit 1: selects between 2hd and 2dd, not unlike base PC98
+	m_floppy_mode = data & 3;
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+
+	m_fdc->set_rate(data & 0x02 ? 500000 : 250000);
+}
+
+u8 pc98lt_state::fdc_ctrl_r(offs_t offset)
+{
+	int ret = (m_fdc->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
+	ret |= (m_fdc->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
+	return ret | 0x64;
+}
+
+void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
+{
+	m_fdc->reset_w(BIT(data, 7));
+
+	m_fdc_ctrl = data;
+	if(data & 0x40)
+	{
+		m_fdc->set_ready_line_connected(0);
+		m_fdc->ready_w(0);
+	}
+	else
+		m_fdc->set_ready_line_connected(1);
+
+	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void pc98lt_state::lt_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00000, 0x5ffff).ram(); // 384 KB
 	map(0x60000, 0x9ffff).noprw();
 
@@ -76,7 +133,7 @@ void pc98lt_state::lt_map(address_map &map)
 //  0xb0000-0xbffff unmapped GVRAM or mirror, check me
 	map(0xc0000, 0xcffff).unmaprw(); // EMS area, not present here but checked
 	map(0xd0000, 0xd3fff).bankrw("bram_bank");
-//	map(0xd4000, 0xd7fff) // dictionary rom bank
+	map(0xd4000, 0xd7fff).bankr("dict_bank");
 	map(0xd8000, 0xdbfff).bankr("kanji_bank");
 	map(0xe0000, 0xeffff).bankr("romdrv_bank");
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
@@ -88,14 +145,14 @@ void pc98lt_state::lt_io(address_map &map)
 //	map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
 	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00); //i8251 RS232c / i8255 system port
-//	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_keyb, FUNC(pc9801_kbd_device::rx_r), FUNC(pc9801_kbd_device::tx_w)).umask16(0xff00); //i8255 printer port / i8251 keyboard
 //	map(0x0070, 0x007f) // PIT, V50 internal
 
 	// floppy actually requires a docking station on PC98HA, density should be 2dd given the mapping
-//	map(0x00be, 0x00be) // floppy mode control (?)
-//	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
-//	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
+	map(0x00be, 0x00be).rw(FUNC(pc98lt_state::floppy_mode_r), FUNC(pc98lt_state::floppy_mode_w));
+	map(0x00c8, 0x00cb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x00cc, 0x00cc).rw(FUNC(pc98lt_state::fdc_ctrl_r), FUNC(pc98lt_state::fdc_ctrl_w));
 
 //  map(0x00e0, 0x00ef) // uPD71071, V50 internal
 
@@ -106,13 +163,16 @@ void pc98lt_state::lt_io(address_map &map)
 		NAME([this] () { return (m_bram_bank_reg & (m_bram_banks - 1)) | 0x40; }),
 		NAME([this] (u8 data) { m_bram_bank_reg = data & (m_bram_banks - 1); m_bram_bank->set_entry(m_bram_bank_reg); })
 	);
-//	map(0x0f8e, 0x0f8e) // card slot status 1
+//	map(0x0f8e, 0x0f8e) // card slot status 1 (undefined on pc98lt?)
 //	map(0x4810, 0x4810) // ?
-//	map(0x4c10, 0x4c10) // dictionary bank reg
+	map(0x4c10, 0x4c10).lrw8(
+		NAME([this] () { return (m_dict_bank_reg & 0x3f) | 0x40; }),
+		NAME([this] (u8 data) { m_dict_bank_reg = data & 0x3f; m_dict_bank->set_entry(m_dict_bank_reg); })
+	);
 //	map(0x5e8e, 0x5e8e) // card slot status 2
 //	map(0x6e8e, 0x6e8e) // modem control 1
 //	map(0x7e8e, 0x7e8e) // modem control 2
-	map(0x8810, 0x8810).r(FUNC(pc98lt_state::power_status_r));
+	map(0x8810, 0x8810).rw(FUNC(pc98lt_state::power_status_r), FUNC(pc98lt_state::power_control_w));
 	map(0x8c10, 0x8c10).lw8(NAME([this] (u8 data) { m_kanji_bank->set_entry(data & 0x0f); }));
 //	map(0xc810, 0xc810) // ?
 	map(0xcc10, 0xcc10).lrw8(
@@ -121,9 +181,11 @@ void pc98lt_state::lt_io(address_map &map)
 	);
 }
 
-/*
+/************************************
+ *
  * 98HA specifics
- */
+ *
+ ***********************************/
 
 void pc98ha_state::ext_view_bank_w(offs_t offset, u8 data)
 {
@@ -148,6 +210,22 @@ void pc98ha_state::ems_bank_w(offs_t offset, u8 data)
 	m_ems_banks[offset]->set_entry(data & 0x7f);
 }
 
+u8 pc98ha_state::memcard_status_1_r(offs_t offset)
+{
+	// TODO: identify exact type
+	// 0x0e: memory card present
+	// bit 3 is checked at boot, PC=f82a5
+	// mask 0xf0 is checked at PC=f8956 then periodically polled at PC=0xfd110
+	// NeoGeo uses v3
+	return 0x04;
+}
+
+u8 pc98ha_state::memcard_status_2_r(offs_t offset)
+{
+	// 0x46: memory card present
+	return 0x40;
+}
+
 void pc98ha_state::ha_map(address_map &map)
 {
 	lt_map(map);
@@ -158,7 +236,7 @@ void pc98ha_state::ha_map(address_map &map)
 	map(0xc8000, 0xcbfff).bankrw("ems_bank3");
 	map(0xcc000, 0xcffff).bankrw("ems_bank4");
 	map(0xdc000, 0xdffff).view(m_ext_view);
-	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, never really accessed?
+	m_ext_view[0](0xdc000, 0xdffff).unmaprw(); // unknown, accessed on MSDOS boot
 	m_ext_view[1](0xdc000, 0xdffff).bankrw("ramdrv_bank");
 	m_ext_view[2](0xdc000, 0xdffff).unmaprw(); // JEIDA memory card
 	m_ext_view[3](0xdc000, 0xdffff).unmaprw();
@@ -167,9 +245,12 @@ void pc98ha_state::ha_map(address_map &map)
 void pc98ha_state::ha_io(address_map &map)
 {
 	lt_io(map);
+	map(0x0020, 0x002f).nopr(); // upd4991a routes to 0x22 and 0x23, suppress log spam for now
 	map(0x08e0, 0x08e7).w(FUNC(pc98ha_state::ems_bank_w)).umask16(0xff00);
-	map(0x0e8e, 0x0e8e).w(FUNC(pc98ha_state::ext_view_bank_w)).umask16(0x00ff); // RAM drive bank reg
-	map(0x1e8e, 0x1e8e).w(FUNC(pc98ha_state::ext_view_sel_w)).umask16(0x00ff); // RAM drive view select
+	map(0x0e8e, 0x0e8e).w(FUNC(pc98ha_state::ext_view_bank_w));
+	map(0x0f8e, 0x0f8e).r(FUNC(pc98ha_state::memcard_status_1_r));
+	map(0x1e8e, 0x1e8e).w(FUNC(pc98ha_state::ext_view_sel_w));
+	map(0x5f8e, 0x5f8e).r(FUNC(pc98ha_state::memcard_status_2_r));
 }
 
 static INPUT_PORTS_START( pc98lt )
@@ -248,6 +329,27 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("PRNB")
+	PORT_DIPNAME( 0x01, 0x00, "PRNB" ) // checked on boot
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) // checked on boot
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(pc98lt_state, system_type_r)
 INPUT_PORTS_END
 
 //static INPUT_PORTS_START( pc98ha )
@@ -283,15 +385,18 @@ void pc98lt_state::machine_start()
 	for (int i = 0; i < bram_size; i++)
 		m_bram_ptr[i] = bram[i];
 
-	m_kanji_bank->configure_entries( 0, 0x10,                 memregion("kanji")->base(),  0x4000);
-	m_bram_bank->configure_entries(  0, m_bram_banks,         m_bram_ptr.get(),            0x4000);
-	m_romdrv_bank->configure_entries(0, 0x10,                 memregion("romdrv")->base(), 0x10000);
+	m_kanji_bank->configure_entries(  0, 0x10,                 memregion("kanji")->base(),   0x4000);
+	m_bram_bank->configure_entries(   0, m_bram_banks,         m_bram_ptr.get(),             0x4000);
+	m_romdrv_bank->configure_entries( 0, 0x10,                 memregion("romdrv")->base(), 0x10000);
+	m_dict_bank->configure_entries(   0, 0x40,                 memregion("dict")->base(),    0x4000);
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+	m_sys_type = 0xc0 >> 6;
 
 	save_item(NAME(m_bram_bank_reg));
 	save_item(NAME(m_romdrv_bank_reg));
+	save_item(NAME(m_dict_bank_reg));
 	save_pointer(NAME(m_bram_ptr), bram_size);
 }
 
@@ -302,13 +407,20 @@ void pc98ha_state::machine_start()
 	const u32 ems_size = (ems_banks * 0x4000) / 2;
 	
 	m_ramdrv_bank->configure_entries(0, 0x80,                 memregion("ramdrv")->base(), 0x4000);
-	
+
 	m_ems_ram = make_unique_clear<uint16_t[]>(ems_size);
 	for (int i = 0; i < 4; i++)
 		m_ems_banks[i]->configure_entries(0, ems_banks, m_ems_ram.get(), 0x4000);
 
 	save_item(NAME(m_ext_view_sel));
 	save_pointer(NAME(m_ems_ram), ems_size);
+}
+
+static void pc9801_floppies(device_slot_interface &device)
+{
+//	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525hd", FLOPPY_525_HD);
+//	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 void pc98lt_state::lt_config(machine_config &config)
@@ -336,7 +448,17 @@ void pc98lt_state::lt_config(machine_config &config)
 //	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
 	m_ppi_sys->out_pc_callback().set(FUNC(pc98lt_state::ppi_sys_beep_portc_w));
 
+	I8255(config, m_ppi_prn, 0);
+	m_ppi_prn->in_pb_callback().set_ioport("PRNB");
+
 	UPD1990A(config, m_rtc);
+
+	UPD765A(config, m_fdc, 8'000'000, false, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
+//	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
+	FLOPPY_CONNECTOR(config, "upd765:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	// TODO: copied verbatim from base PC98, verify clock et al.
@@ -362,7 +484,7 @@ void pc98ha_state::ha_config(machine_config &config)
 	m_maincpu->set_tclk(xtal / 4);
 //	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	UPD4990A(config.replace(), m_rtc);
+	UPD4990A(config.replace(), m_rtc); // !!! upd4991a !!!
 }
 
 // all ROMs in both sets needs at least chip renaming, and I haven't seen a single PCB pic from the net.
@@ -379,7 +501,7 @@ ROM_START( pc98lt )
 	ROM_REGION16_LE( 0x10000, "backup", ROMREGION_ERASEFF )
 	ROM_LOAD( "backup.bin",   0x000000, 0x010000, BAD_DUMP CRC(56d7ca00) SHA1(d17942e166f98af1d484e497e97d31da515973f7) )
 	
-	ROM_REGION( 0x80000, "dict", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "dict", ROMREGION_ERASEFF )
 	ROM_LOAD( "dict.rom",     0x000000, 0x080000, BAD_DUMP CRC(421278ee) SHA1(f6066fc5085de521395ce1a8bb040536c1454c7e) )
 
 	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
@@ -402,6 +524,7 @@ ROM_START( pc98ha )
 	ROM_REGION( 0x100000, "romdrv", ROMREGION_ERASEFF )
 	ROM_LOAD( "romdrv.rom",   0x000000, 0x100000, BAD_DUMP CRC(2f59127f) SHA1(932cb970c2b22408f7895dbf9df6dbc47f8e055b) )
 
+	// $00 filled with odd size
 	ROM_REGION( 0x200000, "ramdrv", ROMREGION_ERASEFF )
 	ROM_LOAD( "ramdrv.bin",   0x000000, 0x160000, BAD_DUMP CRC(f2cec994) SHA1(c986ad6d8f810ac0a9657c1af26b6fec712d56ed) )
 ROM_END

@@ -88,9 +88,12 @@ public:
     	, m_keyb(*this, "keyb")
 		, m_rtc(*this, RTC_TAG)
 		, m_ppi_sys(*this, "ppi_sys")
+		, m_ppi_prn(*this, "ppi_prn")
 		, m_beeper(*this, "beeper")
 	{
 	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -99,10 +102,15 @@ protected:
 	required_device<pc9801_kbd_device> m_keyb;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8255_device> m_ppi_sys;
+	required_device<i8255_device> m_ppi_prn;
 	optional_device<beep_device> m_beeper;
 
 	void rtc_w(uint8_t data);
 	void ppi_sys_beep_portc_w(uint8_t data);
+	
+	static void floppy_formats(format_registration &fr);
+
+	u8 m_sys_type;
 };
 
 class pc9801_state : public pc98_base_state
@@ -115,7 +123,6 @@ public:
 		, m_pit(*this, "pit")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
-		, m_ppi_prn(*this, "ppi_prn")
 		, m_fdc_2hd(*this, "upd765_2hd")
 		, m_fdc_2dd(*this, "upd765_2dd")
 		, m_memsw(*this, "memsw")
@@ -157,7 +164,6 @@ public:
 	void pc486mu(machine_config &config);
 	void pc486se(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
 
@@ -181,7 +187,6 @@ private:
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
-	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<pc9801_memsw_device> m_memsw;
@@ -309,7 +314,6 @@ private:
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
 
-	static void floppy_formats(format_registration &fr);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -441,7 +445,6 @@ private:
 	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
-	uint8_t m_sys_type;
 
 	struct {
 		uint16_t regs[8];
@@ -467,8 +470,10 @@ public:
 	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_fdc(*this, "upd765")
 		, m_gvram(*this, "gvram")
 		, m_bram_bank(*this, "bram_bank")
+		, m_dict_bank(*this, "dict_bank")
 		, m_kanji_bank(*this, "kanji_bank")
 		, m_romdrv_bank(*this, "romdrv_bank")
 	{
@@ -485,19 +490,31 @@ protected:
 	virtual void machine_start() override;
 //	virtual void machine_reset() override;
 private:
+	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<uint16_t> m_gvram;
 	std::unique_ptr<uint16_t[]> m_bram_ptr;
 	required_memory_bank m_bram_bank;
+	required_memory_bank m_dict_bank;
 	required_memory_bank m_kanji_bank;
 	required_memory_bank m_romdrv_bank;
 
 	void lt_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	u8 power_status_r();
+	void power_control_w(offs_t offset, u8 data);
+	u8 floppy_mode_r(offs_t offset);
+	void floppy_mode_w(offs_t offset, u8 data);
+	u8 fdc_ctrl_r(offs_t offset);
+	void fdc_ctrl_w(offs_t offset, u8 data);
+
 	u8 m_romdrv_bank_reg;
 	u8 m_bram_banks;
 	u8 m_bram_bank_reg;
+	u8 m_dict_bank_reg;
+	
+	u8 m_floppy_mode;
+	u8 m_fdc_ctrl;
 };
 
 class pc98ha_state : public pc98lt_state
@@ -528,6 +545,8 @@ private:
 	void ext_view_bank_w(offs_t offset, u8 data);
 	void ext_view_sel_w(offs_t offset, u8 data);
 	void ems_bank_w(offs_t offset, u8 data);
+	u8 memcard_status_1_r(offs_t offset);
+	u8 memcard_status_2_r(offs_t offset);
 	u8 m_ext_view_sel;
 };
 
