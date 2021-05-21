@@ -942,7 +942,7 @@ const cpu16_disassembler::opcode_info cpu16_disassembler::s_opinfo[4][256] =
 		{ "ediv", cpu16_disassembler::mode::INH, 0 },
 		{ "edivs", cpu16_disassembler::mode::INH, 0 },
 		{ "idiv", cpu16_disassembler::mode::INH, 0 },
-		{ "fdiv", cpu16_/disassembler::mode::INH, 0 },
+		{ "fdiv", cpu16_disassembler::mode::INH, 0 },
 		{ "tpd", cpu16_disassembler::mode::INH, 0 },
 		{ "tdp", cpu16_disassembler::mode::INH, 0 },
 		{ "", cpu16_disassembler::mode::UND, 0 },
