@@ -178,9 +178,7 @@ MC6845_UPDATE_ROW( crei680_state::crtc_update_row )
 			chr |= 0x40;
 		u8 gfx = (ra < 8) ? m_cgen[(chr<<3) | ra] : 0;
 
-		/* Display a scanline of a character (8 pixels) */
-		*p++ = palette[BIT(gfx, 7)];
-		*p++ = palette[BIT(gfx, 6)];
+		/* Display a scanline of a character (6 pixels) */
 		*p++ = palette[BIT(gfx, 5)];
 		*p++ = palette[BIT(gfx, 4)];
 		*p++ = palette[BIT(gfx, 3)];
