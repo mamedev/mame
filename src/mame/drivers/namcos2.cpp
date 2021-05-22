@@ -1788,6 +1788,7 @@ void namcos2_state::configure_c45road_standard(machine_config &config)
 {
 	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_c116);
+	m_c45_road->set_xoffset(-72);
 }
 
 void namcos2_state::configure_namcos2_sprite_standard(machine_config &config)
