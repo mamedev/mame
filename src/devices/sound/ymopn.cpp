@@ -119,7 +119,7 @@ uint8_t ym2608_device::ymfm_external_read(ymfm::access_class type, uint32_t offs
 		return m_internal->as_u8(offset % m_internal->bytes());
 	else if (type == ymfm::ACCESS_ADPCM_B)
 		return space(0).read_byte(offset);
-	return 0;
+	return parent::ymfm_external_read(type, offset);
 }
 
 
@@ -133,6 +133,7 @@ void ym2608_device::ymfm_external_write(ymfm::access_class type, uint32_t offset
 {
 	if (type == ymfm::ACCESS_ADPCM_B)
 		return space(0).write_byte(offset, data);
+	parent::ymfm_external_write(type, offset, data);
 }
 
 
