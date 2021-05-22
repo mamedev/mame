@@ -2820,7 +2820,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	{
 		int itemline = r + m_topline_datsview;
 		std::string_view const tempbuf(std::string_view(m_info_buffer).substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-		if (tempbuf[0] == '#')
+		if (!tempbuf.empty() && (tempbuf[0] == '#'))
 			continue;
 
 		if (r == 0 && m_topline_datsview != 0) // up arrow
