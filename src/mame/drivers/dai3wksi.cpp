@@ -26,7 +26,6 @@ TVG_24.7     [6cca323d]
 TVG_25.8     [5aa6eb1e]
 TVG_26.9     [840c1a75]
 --------------------------
-
 Warp 1
 PCB: SIV-01-C, Taito logo
 
@@ -36,11 +35,12 @@ Z80 @ 2.5MHz
 5*SN76477, dai3wksi has 6
 --------------------------
 
-
 TODO:
 - Get rid of those big lookup tables, I see no proms on the PCB so it's hardcoded
-  logic somehow? it's 3bpp colors, not b&w + color overlay
-  Note: warp1 colors match the ones of dai3wksi according to flyer and game photos
+  logic somehow? it's 3bpp colors, not b&w + color overlay.
+  Note: warp1 colors match the ones of dai3wksi according to flyer and game photos.
+  DIP switch for changing cyan to white does not make sense.
+  PCB video of warp1 does not red-blink the 'fuel low' message.
 - Two player games are automatically displayed in cocktail mode.
   Is this by design (a cocktail only romset)?
 - Discrete audio needs adding to replace hardcoded samples
