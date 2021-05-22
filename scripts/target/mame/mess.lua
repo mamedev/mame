@@ -4695,6 +4695,7 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
+	MAME_DIR .. "src/mame/drivers/philipsbo.cpp",
 	MAME_DIR .. "src/mame/drivers/mindset.cpp",
 	MAME_DIR .. "src/mame/drivers/gs6502.cpp",
 	MAME_DIR .. "src/mame/drivers/gs6809.cpp",
