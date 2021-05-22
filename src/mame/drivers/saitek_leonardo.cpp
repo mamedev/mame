@@ -46,7 +46,6 @@ TODO:
 - OSA PC link (probably uses MCU serial interface)
 - add power-off
 - add nvram (MCU port $14?)
-- finish internal artwork
 
 ******************************************************************************/
 
@@ -427,7 +426,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
