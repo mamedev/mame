@@ -50,10 +50,6 @@ public:
 	void coco3_mem(address_map &map);
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
 	virtual void update_cart_base(uint8_t *cart_base) override;
 
 	// miscellaneous
