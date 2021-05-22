@@ -34618,6 +34618,9 @@ kov3hd101
 phc25                           //
 phc25j                          //
 
+@source:philipsbo.cpp
+pbo                             // (c) 1987 Philips
+
 @source:phoenix.cpp
 avefenix                        // bootleg (Video Game)
 avefenixl                       // bootleg (Laguna)
