@@ -55,6 +55,7 @@ public:
 	static constexpr uint32_t GLOBAL_FM_CHANNEL_MASK = 0xffffffff;
 	static constexpr uint32_t GLOBAL_ADPCM_A_CHANNEL_MASK = 0xffffffff;
 	static constexpr uint32_t GLOBAL_ADPCM_B_CHANNEL_MASK = 0xffffffff;
+	static constexpr uint32_t GLOBAL_PCM_CHANNEL_MASK = 0xffffffff;
 
 	// types of logging
 	static constexpr bool LOG_FM_WRITES = false;
@@ -108,7 +109,7 @@ inline int32_t clamp(int32_t value, int32_t minval, int32_t maxval)
 //-------------------------------------------------
 
 template<typename ArrayType, int ArraySize>
-constexpr int32_t array_size(ArrayType (&array)[ArraySize])
+constexpr uint32_t array_size(ArrayType (&array)[ArraySize])
 {
 	return ArraySize;
 }
@@ -257,9 +258,33 @@ inline int16_t roundtrip_fp(int32_t value)
 //  HELPER CLASSES
 //*********************************************************
 
-// forward declarations
-enum envelope_state : uint32_t;
+// various envelope states
+enum envelope_state : uint32_t
+{
+	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
+	EG_ATTACK = 1,
+	EG_DECAY = 2,
+	EG_SUSTAIN = 3,
+	EG_RELEASE = 4,
+	EG_REVERB = 5,		// OPZ only; set EG_HAS_REVERB to enable
+	EG_STATES = 6
+};
 
+// external I/O access classes
+enum access_class : uint32_t
+{
+	ACCESS_IO = 0,
+	ACCESS_ADPCM_A,
+	ACCESS_ADPCM_B,
+	ACCESS_PCM,
+	ACCESS_CLASSES
+};
+
+
+
+//*********************************************************
+//  HELPER CLASSES
+//*********************************************************
 
 // ======================> ymfm_output
 
@@ -270,7 +295,7 @@ struct ymfm_output
 	// clear all outputs to 0
 	ymfm_output &clear()
 	{
-		for (int index = 0; index < NumOutputs; index++)
+		for (uint32_t index = 0; index < NumOutputs; index++)
 			data[index] = 0;
 		return *this;
 	}
@@ -278,7 +303,7 @@ struct ymfm_output
 	// clamp all outputs to a 16-bit signed value
 	ymfm_output &clamp16()
 	{
-		for (int index = 0; index < NumOutputs; index++)
+		for (uint32_t index = 0; index < NumOutputs; index++)
 			data[index] = clamp(data[index], -32768, 32767);
 		return *this;
 	}
@@ -286,7 +311,7 @@ struct ymfm_output
 	// run each output value through the floating-point processor
 	ymfm_output &roundtrip_fp()
 	{
-		for (int index = 0; index < NumOutputs; index++)
+		for (uint32_t index = 0; index < NumOutputs; index++)
 			data[index] = ymfm::roundtrip_fp(data[index]);
 		return *this;
 	}
@@ -336,7 +361,7 @@ public:
 	void save(uint32_t &data) { write(data).write(data >> 8).write(data >> 16).write(data >> 24); }
 	void save(envelope_state &data) { write(uint8_t(data)); }
 	template<typename DataType, int Count>
-	void save(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) save(data[index]); }
+	void save(DataType (&data)[Count]) { for (uint32_t index = 0; index < Count; index++) save(data[index]); }
 
 	// restore data from the buffer
 	void restore(bool &data) { data = read() ? true : false; }
@@ -348,11 +373,11 @@ public:
 	void restore(uint32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
 	void restore(envelope_state &data) { data = envelope_state(read()); }
 	template<typename DataType, int Count>
-	void restore(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) restore(data[index]); }
+	void restore(DataType (&data)[Count]) { for (uint32_t index = 0; index < Count; index++) restore(data[index]); }
 
 	// internal helper
 	ymfm_saved_state &write(uint8_t data) { m_buffer.push_back(data); return *this; }
-	uint8_t read() { return (m_offset < m_buffer.size()) ? m_buffer[m_offset++] : 0; }
+	uint8_t read() { return (m_offset < int32_t(m_buffer.size())) ? m_buffer[m_offset++] : 0; }
 
 	// internal state
 	std::vector<uint8_t> &m_buffer;
@@ -442,31 +467,13 @@ public:
 	// needed to the change in IRQ state, signaling any consumers
 	virtual void ymfm_update_irq(bool asserted) { }
 
-	// the chip implementation calls this whenever a new value is written to
-	// one of the chip's output ports (only applies to some chip types); our
-	// responsibility is to pass the written data on to any consumers
-	virtual void ymfm_io_write(uint8_t port, uint8_t data) { }
+	// the chip implementation calls this whenever data is read from outside
+	// of the chip; our responsibility is to provide the data requested
+	virtual uint8_t ymfm_external_read(access_class type, uint32_t address) { return 0; }
 
-	// the chip implementation calls this whenever an on-chip register is read
-	// which returns data from one of the chip's input ports; our responsibility
-	// is to produce the current input value so that it can be reflected by the
-	// read operation
-	virtual uint8_t ymfm_io_read(uint8_t port) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-A engine needs to
-	// fetch data for sound generation; our responsibility is to read the data
-	// from the appropriate ROM/RAM at the given offset and return it
-	virtual uint8_t ymfm_adpcm_a_read(uint32_t offset) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-B engine needs to
-	// fetch data for sound generation; our responsibility is to read the data
-	// from the appropriate ROM/RAM at the given offset and return it
-	virtual uint8_t ymfm_adpcm_b_read(uint32_t offset) { return 0; }
-
-	// the chip implementation calls this whenever the ADPCM-B engine requests
-	// a write to the sound data; our responsibility is to write the data to
-	// the appropriate RAM at the given offset
-	virtual void ymfm_adpcm_b_write(uint32_t offset, uint8_t data) { }
+	// the chip implementation calls this whenever data is written outside
+	// of the chip; our responsibility is to pass the written data on to any consumers
+	virtual void ymfm_external_write(access_class type, uint32_t address, uint8_t data) { }
 
 protected:
 	// pointer to engine callbacks -- this is set directly by the engine at

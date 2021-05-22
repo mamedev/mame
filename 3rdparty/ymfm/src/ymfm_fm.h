@@ -40,18 +40,6 @@ namespace ymfm
 //  GLOBAL ENUMERATORS
 //*********************************************************
 
-enum envelope_state : uint32_t
-{
-	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
-	EG_ATTACK = 1,
-	EG_DECAY = 2,
-	EG_SUSTAIN = 3,
-	EG_RELEASE = 4,
-	EG_REVERB = 5,		// OPZ only; set EG_HAS_REVERB to enable
-	EG_STATES = 6
-};
-
-
 // three different keyon sources; actual keyon is an OR over all of these
 enum keyon_type : uint32_t
 {
@@ -213,7 +201,7 @@ public:
 	void keyonoff(uint32_t on, keyon_type type);
 
 	// return a reference to our registers
-	RegisterType &regs() { return m_regs; }
+	RegisterType &regs() const { return m_regs; }
 
 	// simple getters for debugging
 	envelope_state debug_eg_state() const { return m_env_state; }
@@ -274,7 +262,7 @@ public:
 	uint32_t choffs() const { return m_choffs; }
 
 	// assign operators
-	void assign(int index, fm_operator<RegisterType> *op)
+	void assign(uint32_t index, fm_operator<RegisterType> *op)
 	{
 		assert(index < array_size(m_op));
 		m_op[index] = op;
@@ -309,10 +297,10 @@ public:
 	}
 
 	// return a reference to our registers
-	RegisterType &regs() { return m_regs; }
+	RegisterType &regs() const { return m_regs; }
 
 	// simple getters for debugging
-	fm_operator<RegisterType> *debug_operator(int index) const { return m_op[index]; }
+	fm_operator<RegisterType> *debug_operator(uint32_t index) const { return m_op[index]; }
 
 private:
 	// helper to add values to the outputs based on channel enables
@@ -420,8 +408,8 @@ public:
 	void invalidate_caches() { m_modified_channels = RegisterType::ALL_CHANNELS; }
 
 	// simple getters for debugging
-	fm_channel<RegisterType> *debug_channel(int index) const { return m_channel[index].get(); }
-	fm_operator<RegisterType> *debug_operator(int index) const { return m_operator[index].get(); }
+	fm_channel<RegisterType> *debug_channel(uint32_t index) const { return m_channel[index].get(); }
+	fm_operator<RegisterType> *debug_operator(uint32_t index) const { return m_operator[index].get(); }
 
 public:
 	// timer callback; called by the interface when a timer fires

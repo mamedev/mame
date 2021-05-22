@@ -144,9 +144,11 @@ void ssg_engine::clock()
 	}
 
 	// clock noise; noise period units are clock/16 but since we run at clock/8,
-	// our counter needs a right shift prior to compare
+	// our counter needs a right shift prior to compare; note that a period of 0
+	// should produce an indentical result to a period of 1, so add a special
+	// check against that case
 	m_noise_count++;
-	if ((m_noise_count >> 1) >= m_regs.noise_period())
+	if ((m_noise_count >> 1) >= m_regs.noise_period() && m_noise_count != 1)
 	{
 		m_noise_state ^= (bitfield(m_noise_state, 0) ^ bitfield(m_noise_state, 3)) << 17;
 		m_noise_state >>= 1;
@@ -240,9 +242,9 @@ uint8_t ssg_engine::read(uint32_t regnum)
 
 	// read from the I/O ports call the handlers if they are configured for input
 	if (regnum == 0x0e && !m_regs.io_a_out())
-		return m_intf.ymfm_io_read(0);
+		return m_intf.ymfm_external_read(ACCESS_IO, 0);
 	else if (regnum == 0x0f && !m_regs.io_b_out())
-		return m_intf.ymfm_io_read(1);
+		return m_intf.ymfm_external_read(ACCESS_IO, 1);
 
 	// otherwise just return the register value
 	return m_regs.read(regnum);
@@ -269,9 +271,9 @@ void ssg_engine::write(uint32_t regnum, uint8_t data)
 
 	// writes to the I/O ports call the handlers if they are configured for output
 	else if (regnum == 0x0e && m_regs.io_a_out())
-		m_intf.ymfm_io_write(0, data);
+		m_intf.ymfm_external_write(ACCESS_IO, 0, data);
 	else if (regnum == 0x0f && m_regs.io_b_out())
-		m_intf.ymfm_io_write(1, data);
+		m_intf.ymfm_external_write(ACCESS_IO, 1, data);
 }
 
 }

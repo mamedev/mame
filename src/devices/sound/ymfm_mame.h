@@ -123,22 +123,19 @@ protected:
 		return (machine().time() < m_busy_end);
 	}
 
-	// the chip implementation calls this whenever a new value is written to
-	// one of the chip's output ports (only applies to some chip types); our
-	// responsibility is to pass the written data on to any consumers
-	virtual void ymfm_io_write(uint8_t port, uint8_t data) override
+	// the chip implementation calls this whenever data is read from outside
+	// of the chip; our responsibility is to provide the data requested
+	virtual uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override
 	{
-		if (!m_io_write[port & 1].isnull())
-			m_io_write[port & 1](data);
+		return (type != ymfm::ACCESS_IO || m_io_read[address & 1].isnull()) ? 0 : m_io_read[address & 1]();
 	}
 
-	// the chip implementation calls this whenever an on-chip register is read
-	// which returns data from one of the chip's input ports; our responsibility
-	// is to produce the current input value so that it can be reflected by the
-	// read operation
-	virtual uint8_t ymfm_io_read(uint8_t port) override
+	// the chip implementation calls this whenever data is written outside
+	// of the chip; our responsibility is to pass the written data on to any consumers
+	virtual void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override
 	{
-		return m_io_read[port & 1].isnull() ? 0 : m_io_read[port & 1]();
+		if (type == ymfm::ACCESS_IO && !m_io_write[address & 1].isnull())
+			m_io_write[address & 1](data);
 	}
 
 	// handle device start

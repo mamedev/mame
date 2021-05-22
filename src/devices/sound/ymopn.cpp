@@ -109,38 +109,31 @@ void ym2608_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_a_read - callback to read data for
-//  the ADPCM-A engine; in this case, from the
-//  internal ROM containing drum samples
+//  ymfm_external_read - callback to read data for
+//  the ADPCM-A/B engines
 //-------------------------------------------------
 
-uint8_t ym2608_device::ymfm_adpcm_a_read(uint32_t offset)
+uint8_t ym2608_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	return m_internal->as_u8(offset % m_internal->bytes());
+	if (type == ymfm::ACCESS_ADPCM_A)
+		return m_internal->as_u8(offset % m_internal->bytes());
+	else if (type == ymfm::ACCESS_ADPCM_B)
+		return space(0).read_byte(offset);
+	return parent::ymfm_external_read(type, offset);
 }
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_b_read - callback to read data for
-//  the ADPCM-B engine; in this case, from our
-//  default address space
-//-------------------------------------------------
-
-uint8_t ym2608_device::ymfm_adpcm_b_read(uint32_t offset)
-{
-	return space(0).read_byte(offset);
-}
-
-
-//-------------------------------------------------
-//  ymfm_adpcm_b_write - callback to write data to
+//  ymfm_external_write - callback to write data to
 //  the ADPCM-B engine; in this case, to our
 //  default address space
 //-------------------------------------------------
 
-void ym2608_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
+void ym2608_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
 {
-	space(0).write_byte(offset, data);
+	if (type == ymfm::ACCESS_ADPCM_B)
+		return space(0).write_byte(offset, data);
+	parent::ymfm_external_write(type, offset, data);
 }
 
 
@@ -208,28 +201,18 @@ void ym2610_device_base<ChipClass>::device_start()
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_a_read - callback to read data for
-//  the ADPCM-A engine; in this case, from address
-//  space 0
+//  ymfm_external_read - callback to read data for
+//  the ADPCM-A/B engines
 //-------------------------------------------------
 
 template<typename ChipClass>
-uint8_t ym2610_device_base<ChipClass>::ymfm_adpcm_a_read(uint32_t offset)
+uint8_t ym2610_device_base<ChipClass>::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	return space(0).read_byte(offset);
-}
-
-
-//-------------------------------------------------
-//  ymfm_adpcm_b_read - callback to read data for
-//  the ADPCM-B engine; in this case, from address
-//  space 1
-//-------------------------------------------------
-
-template<typename ChipClass>
-uint8_t ym2610_device_base<ChipClass>::ymfm_adpcm_b_read(uint32_t offset)
-{
-	return space(1).read_byte(offset);
+	if (type == ymfm::ACCESS_ADPCM_A)
+		return space(0).read_byte(offset);
+	else if (type == ymfm::ACCESS_ADPCM_B)
+		return space(1).read_byte(offset);
+	return 0;
 }
 
 

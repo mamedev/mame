@@ -51,12 +51,12 @@ opm_registers::opm_registers() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
 	// create the LFO waveforms; AM in the low 8 bits, PM in the upper 8
 	// waveforms are adjusted to match the pictures in the application manual
-	for (int index = 0; index < LFO_WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < LFO_WAVEFORM_LENGTH; index++)
 	{
 		// waveform 0 is a sawtooth
 		uint8_t am = index ^ 0xff;
@@ -484,7 +484,7 @@ void ym2151::write_data(uint8_t data)
 	if (m_address == 0x1b)
 	{
 		// writes to register 0x1B send the upper 2 bits to the output lines
-		m_fm.intf().ymfm_io_write(0, data >> 6);
+		m_fm.intf().ymfm_external_write(ACCESS_IO, 0, data >> 6);
 	}
 
 	// mark busy for a bit

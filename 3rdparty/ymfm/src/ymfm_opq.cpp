@@ -58,11 +58,11 @@ opq_registers::opq_registers() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
 	uint16_t zeroval = m_waveform[0][0];
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[1][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
 }
 

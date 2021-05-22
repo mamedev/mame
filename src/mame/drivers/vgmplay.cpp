@@ -39,7 +39,6 @@
 #include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
 #include "sound/ymf271.h"
-#include "sound/ymf278b.h"
 #include "sound/ymopl.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
