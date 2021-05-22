@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Golden Child
+-->
+<mamelayout version="2">
+	<element name="devicetag_str" defstate="0">
+		<text string="~devicetag~">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="40" height="4" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<color red="0.7" green="0.7" blue="0.7" />
+		</rect>
+	</element>
+	<element name="red_led" defstate="0">
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</disk>
+		<disk state="0">
+			<bounds x="0.1" y="0.1" width=".80" height="0.80" />
+			<color red="0.2" green="0" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0.2" green="0.2" blue=".20" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.1" y="0.1" width=".80" height="0.80" />
+			<color red="0.8" green="0" blue="0" />
+		</disk>
+	</element>
+	<element name="pushbutton" defstate="0">
+		<disk state="0">
+			<color red="0.0" green="0" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.1" y="0.1" width=".80" height="0.80" />
+			<color red="0.0" green="0" blue="0" />
+		</disk>
+	</element>
+
+	<element name="printerready_str" defstate="0">
+		<text string="Printer Ready">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="25" height="4" />
+		</text>
+	</element>
+	<element name="ready_str" defstate="0">
+		<text string="READY">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="25" height="4" />
+		</text>
+	</element>
+	<element name="clear_str" defstate="0">
+		<text string="CLEAR">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="35" height="4" />
+		</text>
+	</element>
+	<element name="test_str" defstate="0">
+		<text string="TEST">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="35" height="4" />
+		</text>
+	</element>
+	<element name="bufferready_str" defstate="0">
+		<text string="Buffer Ready">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="35" height="4" />
+		</text>
+	</element>
+
+	<view name="Control panel">
+		<element ref="background">
+			<bounds x="0" y="0" width="40" height="13" />
+		</element>
+		<element name="devicetag_str" ref="devicetag_str">
+			<bounds xc="20" y="1" width="40" height="2" />
+		</element>
+		<element name="printerready_led" ref="red_led">
+			<bounds xc="5" yc="9" width="4" height="4" />
+		</element>
+		<element name="printerready_str" ref="printerready_str">
+			<bounds xc="5" yc="5" width="8" height="2" />
+		</element>
+		<element inputtag="CLEAR" inputmask="0x01" ref="pushbutton">
+			<bounds xc="15" yc="9" width="4" height="4" />
+		</element>
+		<element name="clear_str" ref="clear_str">
+			<bounds xc="15" yc="5" width="5" height="2" />
+		</element>
+		<element inputtag="TEST" inputmask="0x01" ref="pushbutton">
+			<bounds xc="25" yc="9" width="4" height="4" />
+		</element>
+		<element name="test_str" ref="test_str">
+			<bounds xc="25" yc="5" width="5" height="2" />
+		</element>
+		<element name="bufferready_led" ref="red_led">
+			<bounds xc="35" yc="9" width="4" height="4" />
+		</element>
+		<element name="bufferready_str" ref="bufferready_str">
+			<bounds xc="35" yc="5" width="8" height="2" />
+		</element>
+	</view>
+</mamelayout>

@@ -14,7 +14,7 @@
 // Some interesting notes about the rom code:
 //    * Design goal is simplicity, all state is held in the registers so entire 48k ram can be used for buffer.
 //    * Uses no subroutine calls and avoids use of the stack which makes for lots of repeated code.
-//    * For refresh, executes continuous opcodes located between XX80 and XXF0 in the memory map at least once every 4ms
+//    * For refresh, executes continuous opcodes located between XX80 and XXF0 in the memory map at least once every 4ms.
 //    * Most routines begin on nxx boundaries, with n80-nFF filled with nops.
 //
 // Rom code is entered from the scanned magazine, and some minor bugs fixed.
@@ -61,9 +61,12 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<z80_device> m_maincpu;
-	required_device<screen_device> m_screen;
+	optional_device<screen_device> m_screen;
 	required_device<centronics_device> m_ctx;
 	required_device<output_latch_device> m_ctx_data_out;
+
+	output_finder<> m_printerready_led;
+	output_finder<> m_bufferready_led;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -74,6 +77,8 @@ protected:
 	void etiprintbuffer_device_iomap(address_map &map);
 
 	uint32_t screen_update_etibuffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color);
+	void draw7seg(u8 digit, int x0, int y0, int w, int h, int t, bitmap_rgb32 &bitmap, u32 color);
 
 	uint8_t eti_status_r(offs_t offset);
 	uint8_t eti_read_1000(offs_t offset);
@@ -95,7 +100,7 @@ protected:
 	u16 m_bufferhead = 0;
 	u16 m_buffertail = 0;
 
-	void drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color);
+	u8 m_ram[48 * 1024];  // 48k ram
 };
 
 // device type definition
