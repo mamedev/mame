@@ -61,6 +61,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "saitek_galileo.lh" // clickable
 #include "saitek_leonardo.lh" // clickable
 
 
@@ -79,8 +80,9 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void leo(machine_config &config);
-	void leoa(machine_config &config);
+	void leonardo(machine_config &config);
+	void leonardoa(machine_config &config);
+	void galileo(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -351,7 +353,7 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void leo_state::leo(machine_config &config)
+void leo_state::leonardo(machine_config &config)
 {
 	// basic machine hardware
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
@@ -383,12 +385,16 @@ void leo_state::leo(machine_config &config)
 	m_expansion->rts_handler().set(FUNC(leo_state::exp_rts_w));
 }
 
-void leo_state::leoa(machine_config &config)
+void leo_state::leonardoa(machine_config &config)
 {
-	leo(config);
+	leonardo(config);
+	m_board->set_delay(attotime::from_msec(250)); // slower chessboard response?
+}
 
-	// slower chessboard response?
-	m_board->set_delay(attotime::from_msec(250));
+void leo_state::galileo(machine_config &config)
+{
+	leonardo(config);
+	config.set_default_layout(layout_saitek_galileo);
 }
 
 
@@ -420,8 +426,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP  MACHINE  INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,        0,   leo,     leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1986, leonardoa, leonardo, 0,   leoa,    leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    CMP  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
-CONS( 1988, galileo,   leonardo, 0,   leo,     galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )

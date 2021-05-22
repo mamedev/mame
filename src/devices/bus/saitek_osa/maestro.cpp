@@ -330,14 +330,7 @@ void saitekosa_maestro_device::ack_w(int state)
 
 u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static const rgb_t colors[3] =
-	{
-		rgb_t(135, 143, 145), // lcd pixel off
-		rgb_t(51, 42, 43), // lcd pixel on
-		rgb_t(147, 155, 158) // background
-	};
-
-	bitmap.fill(colors[2], cliprect);
+	bitmap.fill(0xffffff, cliprect);
 	const u8 *render = m_lcd->render();
 
 	// draw lcd characters
@@ -346,7 +339,7 @@ u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 
 		const u8 *src = render + 16 * ((i & 7) + BIT(i, 3) * 40);
 		for (int y = 0; y < 8; y++)
 			for (int x = 0; x < 5; x++)
-				bitmap.pix(y + 4, i * 6 + x + 2) = colors[BIT(src[y], 4 - x)];
+				bitmap.pix(y + 4, i * 6 + x + 2) = BIT(src[y], 4 - x) ? 0x282828 : 0xe8e8e8;
 	}
 
 	return 0;
