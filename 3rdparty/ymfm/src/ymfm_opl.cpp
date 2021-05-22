@@ -96,7 +96,7 @@ opl_registers_base<Revision>::opl_registers_base() :
 				wf4[index] = bitfield(index, 9) ? zeroval : wf0[index * 2];
 				wf5[index] = bitfield(index, 9) ? zeroval : wf0[(index * 2) & 0x1ff];
 				wf6[index] = bitfield(index, 9) << 15;
-				wf7[index] = (zeroval - wf0[(index / 2)]) | (bitfield(index, 9) << 15);
+				wf7[index] = (bitfield(index, 9) ? (index ^ 0x13ff) : index) << 3;
 			}
 		}
 	}
