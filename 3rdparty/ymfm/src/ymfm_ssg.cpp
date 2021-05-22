@@ -144,9 +144,11 @@ void ssg_engine::clock()
 	}
 
 	// clock noise; noise period units are clock/16 but since we run at clock/8,
-	// our counter needs a right shift prior to compare
+	// our counter needs a right shift prior to compare; note that a period of 0
+	// should produce an indentical result to a period of 1, so add a special
+	// check against that case
 	m_noise_count++;
-	if ((m_noise_count >> 1) >= m_regs.noise_period())
+	if ((m_noise_count >> 1) >= m_regs.noise_period() && m_noise_count != 1)
 	{
 		m_noise_state ^= (bitfield(m_noise_state, 0) ^ bitfield(m_noise_state, 3)) << 17;
 		m_noise_state >>= 1;

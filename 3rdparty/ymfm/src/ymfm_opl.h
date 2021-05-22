@@ -171,7 +171,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// OPL4 apparently can read back FM registers?
-	uint8_t read(uint16_t index) { return m_regdata[index]; }
+	uint8_t read(uint16_t index) const { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
@@ -375,6 +375,9 @@ public:
 	// return an array of operator indices for each channel
 	struct operator_mapping { uint32_t chan[CHANNELS]; };
 	void operator_map(operator_mapping &dest) const;
+
+	// read a register value
+	uint8_t read(uint16_t index) const { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
@@ -668,6 +671,54 @@ public:
 	void generate(output_data *output, uint32_t numsamples = 1);
 
 protected:
+	// internal state
+	uint16_t m_address;              // address register
+	fm_engine m_fm;                  // core FM engine
+};
+
+
+// ======================> ymf289b
+
+class ymf289b
+{
+	static constexpr uint8_t STATUS_BUSY_FLAGS = 0x05;
+
+public:
+	using fm_engine = fm_engine_base<opl3_registers>;
+	using output_data = fm_engine::output_data;
+	static constexpr uint32_t OUTPUTS = 2;
+
+	// constructor
+	ymf289b(ymfm_interface &intf);
+
+	// reset
+	void reset();
+
+	// save/restore
+	void save_restore(ymfm_saved_state &state);
+
+	// pass-through helpers
+	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
+	void invalidate_caches() { m_fm.invalidate_caches(); }
+
+	// read access
+	uint8_t read_status();
+	uint8_t read_data();
+	uint8_t read(uint32_t offset);
+
+	// write access
+	void write_address(uint8_t data);
+	void write_data(uint8_t data);
+	void write_address_hi(uint8_t data);
+	void write(uint32_t offset, uint8_t data);
+
+	// generate samples of sound
+	void generate(output_data *output, uint32_t numsamples = 1);
+
+protected:
+	// internal helpers
+	bool ymf289b_mode() { return ((m_fm.regs().read(0x105) & 0x04) != 0); }
+
 	// internal state
 	uint16_t m_address;              // address register
 	fm_engine m_fm;                  // core FM engine

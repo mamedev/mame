@@ -23,11 +23,14 @@
 #include <cstdint>
 #include <cstring>
 #include <list>
+#include <string>
 
 #include "em_inflate.h"
 #include "ymfm_opl.h"
 #include "ymfm_opm.h"
 #include "ymfm_opn.h"
+
+#define LOG_WRITES (0)
 
 // enable this to run the nuked OPN2 core in parallel; output is not captured,
 // but logging can be added to observe behaviors
@@ -82,8 +85,9 @@ class vgm_chip_base
 {
 public:
 	// construction
-	vgm_chip_base(uint32_t clock, chip_type type) :
-		m_type(type)
+	vgm_chip_base(uint32_t clock, chip_type type, char const *name) :
+		m_type(type),
+		m_name(name)
 	{
 	}
 
@@ -111,6 +115,7 @@ public:
 protected:
 	// internal state
 	chip_type m_type;
+	std::string m_name;
 	std::vector<uint8_t> m_data[ymfm::ACCESS_CLASSES];
 	uint32_t m_pcm_offset;
 #if (CAPTURE_NATIVE)
@@ -134,10 +139,11 @@ class vgm_chip : public vgm_chip_base, public ymfm::ymfm_interface
 {
 public:
 	// construction
-	vgm_chip(uint32_t clock, chip_type type) :
-		vgm_chip_base(clock, type),
+	vgm_chip(uint32_t clock, chip_type type, char const *name) :
+		vgm_chip_base(clock, type, name),
 		m_chip(*this),
 		m_clock(clock),
+		m_clocks(0),
 		m_step(0x100000000ull / m_chip.sample_rate(clock)),
 		m_pos(0)
 	{
@@ -183,6 +189,8 @@ public:
 		// write to the chip
 		if (addr1 != 0xffff)
 		{
+			if (LOG_WRITES)
+				printf("%10.5f: %s %03X=%02X\n", double(m_clocks) / double(m_chip.sample_rate(m_clock)), m_name.c_str(), data1, data2);
 			m_chip.write(addr1, data1);
 			m_chip.write(addr2, data2);
 		}
@@ -260,6 +268,7 @@ public:
 			*buffer++ += m_output.data[0];
 			*buffer++ += m_output.data[1 % ChipType::OUTPUTS];
 		}
+		m_clocks++;
 	}
 
 protected:
@@ -273,6 +282,7 @@ protected:
 	// internal state
 	ChipType m_chip;
 	uint32_t m_clock;
+	uint64_t m_clocks;
 	typename ChipType::output_data m_output;
 	emulated_time m_step;
 	emulated_time m_pos;
@@ -315,7 +325,11 @@ void add_chips(uint32_t clock, chip_type type, char const *chipname)
 	int numchips = (clock & 0x40000000) ? 2 : 1;
 	printf("Adding %s%s @ %dHz\n", (numchips == 2) ? "2 x " : "", chipname, clockval);
 	for (int index = 0; index < numchips; index++)
-		active_chips.push_back(new vgm_chip<ChipType>(clockval, type));
+	{
+		char name[100];
+		sprintf(name, "%s #%d", chipname, index);
+		active_chips.push_back(new vgm_chip<ChipType>(clockval, type, chipname));
+	}
 
 	if (type == CHIP_YM2608)
 	{
