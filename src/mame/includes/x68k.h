@@ -25,7 +25,7 @@
 #include "machine/upd765.h"
 #include "sound/flt_vol.h"
 #include "sound/okim6258.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/x68k_crtc.h"
 #include "bus/x68k/x68kexp.h"
 

@@ -11,7 +11,7 @@
 #include "machine/gen_latch.h"
 #include "sound/lc7535.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "video/deco_zoomspr.h"

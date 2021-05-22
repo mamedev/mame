@@ -42,8 +42,8 @@ Notes:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2203.h"
-#include "sound/ym3812.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

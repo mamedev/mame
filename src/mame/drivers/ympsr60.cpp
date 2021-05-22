@@ -7,7 +7,7 @@
     Documentation: https://github.com/JKN0/PSR70-reverse
     More documentation: https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-hardware.html
                         https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-firmware.html
-                        https://retroandreverse.blogspot.com/2021/01/digging-into-ym3806.html
+                        https://retroandreverse.blogspot.com/2021/01/digging-into-ymopq.html
 
     Service manual: https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
 
@@ -46,6 +46,7 @@
 #include "machine/i8255.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "sound/ymopq.h"
 #include "bus/midi/midi.h"
 
 #include "emupal.h"
@@ -58,6 +59,7 @@ public:
 	psr60_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ym3806(*this, "ym3806"),
 		m_ppi(*this, "ppi"),
 		m_acia(*this, "acia"),
 		m_rom2bank(*this, "rom2bank")
@@ -71,6 +73,7 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
+	required_device<ym3806_device> m_ym3806;
 	required_device<i8255_device> m_ppi;
 	required_device<acia6850_device> m_acia;
 	required_memory_bank m_rom2bank;
@@ -81,17 +84,20 @@ private:
 	void ppi_pc_w(u8 data);
 	void recalc_irqs();
 
-	int m_acia_irq;
+	int m_acia_irq, m_ym_irq;
 
 	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }
+
+	WRITE_LINE_MEMBER(ym_irq_w) { m_ym_irq = state; recalc_irqs(); printf("YM IRQ %d\n", state); }
+
 };
 
 void psr60_state::psr60_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("rom1", 0);
 	map(0x8000, 0xbfff).bankr("rom2bank");
-	// c000-c0ff: YM3806 "OPQ" FM chip
+	map(0xc000, 0xc0ff).rw(m_ym3806, FUNC(ym3806_device::read), FUNC(ym3806_device::write));
 	map(0xe000, 0xffff).ram();  // work RAM
 }
 
@@ -111,7 +117,7 @@ void psr60_state::ppi_pc_w(u8 data)
 
 void psr60_state::recalc_irqs()
 {
-	int irq_state = m_acia_irq; // (| OPQ, RYP4, and DRVIF interrupts eventually)
+	int irq_state = m_acia_irq | m_ym_irq; // (|| RYP4 and DRVIF interrupts eventually)
 	m_maincpu->set_input_line(0, irq_state);
 }
 
@@ -152,6 +158,11 @@ void psr60_state::psr60(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	YM3806(config, m_ym3806, 3.579545_MHz_XTAL);
+	m_ym3806->irq_handler().set(FUNC(psr60_state::ym_irq_w));
+	m_ym3806->add_route(0, "lspeaker", 1.0);
+	m_ym3806->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( psr60 )

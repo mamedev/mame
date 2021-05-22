@@ -7912,6 +7912,34 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="asterog">
+		<description>Astérix: Operation Getafix (UK)</description>
+		<year>1990</year>
+		<publisher>Coktel Vision</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="distributor" value="System 4" />
+		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Asterix Operation Getafix (UK) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c946effa" sha1="4498732a6b5077b791ad7f4cdb998a938fda3e67" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroges" cloneof="asterog">
+		<description>Astérix: El Golpe del Menhir (Astérix y Operacion Menhir) (Spain, System 4 release)</description>
+		<year>1990</year>
+		<publisher>Coktel Vision</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<info name="distributor" value="System 4" />
+		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Asterix El Golpe del Menhir (Spain) [Coktel Vision] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9ababc1e" sha1="e202017f9ad9bd6e38e1c2c312fd926dcd94ae2c" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bat">
 		<description>B.A.T. (VGA Version)</description>
 		<year>1990</year>
@@ -8209,6 +8237,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Battle Chess (EGA version - 2nd release) [Interplay] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="040ff059" sha1="b21954c1c0ae2e44e78f8d4d5cb955ba6f4967a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchesses" cloneof="btlchess">
+		<description>Battle Chess (3.5", EGA version, Spain, Dro Soft release)</description>
+		<year>1988</year>
+		<publisher>Electronic Arts / Interplay</publisher>
+		<info name="distributor" value="Dro Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (EGA version) (Spain) [Electronic Arts] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="b3602eff" sha1="7c689014dd939a0b2666cc0b8963cd56befbb819"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10393,6 +10433,33 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ishar">
+		<description>Ishar: Legend of the Fortress</description>
+		<year>1992</year>
+		<publisher>Silmarils</publisher>
+		<info name="developer" value="Silmarils" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 1 of 4] [Disk A].img" size="368640" crc="c3d9dd94" sha1="6cbd07973e1b63597a8571858ed3835de651ffe3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 2 of 4] [Disk B].img" size="368640" crc="b104a509" sha1="37094cd30b41da66e4f7de4b5daae88cb66d1c64"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 3 of 4] [Disk C].img" size="368640" crc="6b756b72" sha1="ec4993e83247148f7b33ae9b5a92f42d1e939c16"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 4 of 4] [Disk D].img" size="368640" crc="e5b4da48" sha1="d53fd8662d25cef392a2650732de8ab25c11d7c9"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="italy90">
 		<description>Italy '90 Soccer</description>

@@ -92,18 +92,15 @@ from Brett Selwood and Andrew Davies.
 
     TODO/not working:
 
-    Keyboard:
-    - 256tc: Paste ignores shift key
-    - All others: Paste drops most characters.
-    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
-                however it actually uses the new keyboard with interrupts.
-                The keyboard has issues in the Offsider Macro Key Editor.
+    Old CRTC-based keyboard:
+    - Paste drops many characters.
+    - Typing can drop the occasional character.
 
     FDC:   (TODO: see if these bugs still exist)
     - B drive doesn't work with most disks.
     - some disks cause MESS to freeze.
 
-    - Simply Write has keyboard problems (in 128k, no keys work).
+    - 128k: Simply Write has no keyboard.
 
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
@@ -280,7 +277,7 @@ void mbee_state::mbeett_io(address_map &map)
 	map(0x0109, 0x0109).mirror(0xfe00).r(FUNC(mbee_state::speed_high_r));
 	map(0x000a, 0x000a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
 	map(0x010a, 0x010a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
-	map(0x0068, 0x006f).mirror(0xff00).rw("scc", FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w));
+	map(0x0068, 0x006f).mirror(0xff00).noprw();    // swallow i/o to SCC which was never fitted to production machines
 }
 
 void mbee_state::mbee56_io(address_map &map)
@@ -852,7 +849,6 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
-	SCC8530(config, "scc", 4000000); // clock unknown
 	config.device_remove("cass_list"); // mbeett is incompatible with the others
 }
 
@@ -1149,7 +1145,7 @@ COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeei
 COMP( 1985, mbeepc85b, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mbeepc85s, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

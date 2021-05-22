@@ -202,6 +202,7 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
+crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -501,6 +502,7 @@ kaypro.cpp
 kc.cpp
 kdt6.cpp
 kim1.cpp
+kminus.cpp
 konin.cpp
 korgds8.cpp
 korgdss1.cpp
@@ -602,6 +604,7 @@ mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
+mg1.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -778,6 +781,7 @@ pes.cpp
 pet.cpp
 pg685.cpp
 phc25.cpp
+philipsbo.cpp
 phunsy.cpp
 picno.cpp
 pimps.cpp

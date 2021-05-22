@@ -32,7 +32,7 @@
 #include "sound/beep.h"
 //#include "sound/dac.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 
 #include "video/upd7220.h"
 

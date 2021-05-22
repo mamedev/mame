@@ -41,31 +41,58 @@ void aquarius_state::aquarius_palette(palette_device &palette) const
 		palette.set_pen_indirect(i, aquarius_pens[i]);
 }
 
-void aquarius_state::aquarius_videoram_w(offs_t offset, uint8_t data)
+void aquarius_state::videoram_w(offs_t offset, uint8_t data)
 {
+	int row = offset / 40;
+	int col = offset % 40;
+	int tile_index = (row + 2) * 44 + (col + 2);
+
 	m_videoram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(tile_index);
+	if (offset == 0) m_tilemap->mark_all_dirty();
 }
 
-void aquarius_state::aquarius_colorram_w(offs_t offset, uint8_t data)
+void aquarius_state::colorram_w(offs_t offset, uint8_t data)
 {
+	int row = offset / 40;
+	int col = offset % 40;
+	int tile_index = (row + 2) * 44 + (col + 2);
+
 	m_colorram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset);
+	m_tilemap->mark_tile_dirty(tile_index);
+	if (offset == 0) m_tilemap->mark_all_dirty();
 }
 
-TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
+TILE_GET_INFO_MEMBER(aquarius_state::get_tile_info)
 {
-	int bank = 0;
-	int code = m_videoram[tile_index];
-	int color = m_colorram[tile_index];
-	int flags = 0;
+	int row = tile_index / 44;
+	int col = tile_index % 44;
 
-	tileinfo.set(bank, code, color, flags);
+	switch (row)
+	{
+	case 0: case 1: case 27: case 28:
+		// border top/bottom
+		tileinfo.set(0, m_videoram[0], m_colorram[0], 0);
+		break;
+	default:
+		switch (col)
+		{
+		case 0: case 1: case 42: case 43:
+			// border left/right
+			tileinfo.set(0, m_videoram[0], m_colorram[0], 0);
+			break;
+		default:
+			// display area
+			tileinfo.set(0, m_videoram[(row - 2) * 40 + (col - 2)], m_colorram[(row - 2) * 40 + (col - 2)], 0);
+			break;
+		}
+		break;
+	}
 }
 
 void aquarius_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarius_state::aquarius_gettileinfo)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarius_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 44, 29);
 }
 
 uint32_t aquarius_state::screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

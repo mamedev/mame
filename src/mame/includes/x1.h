@@ -25,7 +25,7 @@
 #include "machine/z80dma.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/mc6845.h"
 
 #include "formats/x1_tap.h"

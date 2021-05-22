@@ -29,7 +29,7 @@ The daughter board is connected to the main board via 40 pin socket
 #include "speaker.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 
 
 namespace {

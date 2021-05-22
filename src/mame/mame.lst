@@ -2462,6 +2462,7 @@ bonzeadvu                       // B41 (c) 1988 Taito America Corporation (US)
 cadash                          // C21 (c) 1989 Taito Corporation Japan
 cadashf                         // C21 (c) 1989 Taito Corporation Japan
 cadashg                         // C21 (c) 1989 Taito Corporation Japan
+cadashgo                        // C21 (c) 1989 Taito Corporation Japan
 cadashi                         // C21 (c) 1989 Taito Corporation Japan
 cadashj                         // C21 (c) 1989 Taito Corporation
 cadashj1                        // C21 (c) 1989 Taito Corporation
@@ -2472,6 +2473,7 @@ cadashu                         // C21 (c) 1989 Taito America Corporation
 cadashu1                        // C21 (c) 1989 Taito America Corporation
 earthjkr                        // (c) 1993 Visco (Japan)
 earthjkra                       //
+earthjkrb                       //
 earthjkrp                       //
 eto                             // (c) 1994 Visco (Japan)
 galmedes                        // (c) 1992 Visco (Japan)
@@ -9267,7 +9269,6 @@ tripjok                         //
 
 @source:bingoc.cpp
 bingoc                          // (c) 1989 Sega
-bingoct                         // (c) 1989 Sega
 
 @source:bingoman.cpp
 bingoman                        //
@@ -9833,6 +9834,7 @@ comg175                         // (c) 1984 Cal Omega / Casino Electronics Inc.
 comg176                         // (c) 1982 Cal Omega Inc.
 comg181                         // (c) 1983 Cal Omega Inc.
 comg183                         // (c) 1983 Cal Omega Inc.
+comg184                         // (c) 1983 Cal Omega Inc.
 comg185                         // (c) 1983 Cal Omega Inc.
 comg186                         // (c) 1983 Cal Omega Inc.
 comg187                         // (c) 1983 Cal Omega Inc.
@@ -11376,6 +11378,9 @@ crazybal                        // EGS
 crbaloon                        // CL  (c) 1980 Taito Corporation
 crbaloon2                       // CL  (c) 1980 Taito Corporation
 
+@source:crei680.cpp
+crei680
+
 @source:crgolf.cpp
 crgolf                          // (c) 1984 Nasco Japan
 crgolfa                         // (c) 1984 Nasco Japan
@@ -11629,12 +11634,16 @@ dai                             // DAI
 @source:dai3wksi.cpp
 dai3wksi                        // 1979.09 Dai San Wakusei (The Third Planet)
 warp1                           // 1979.12 Warp-1
+warp1t                          // 1979.12 Warp-1 (Taito license)
 warp1bl                         // bootleg
 
 @source:dambustr.cpp
 dambustr                        // (c) 1981 South West Research
 dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
+
+@source:dangbar.cpp
+dangbar                         //
 
 @source:darius.cpp
 darius                          // A96 (c) 1986 Taito Corporation Japan (World)
@@ -19147,6 +19156,9 @@ klaxd2                          // 136075           (c) 1989 (Germany)
 klaxj3                          // 136075           (c) 1989 (Japan)
 klaxj4                          // 136075           (c) 1989 (Japan)
 
+@source:kminus.cpp
+kminus                          // 1982 Kyber Minus
+
 @source:kncljoe.cpp
 bcrusher                        // bootleg
 kncljoe                         // (c) 1985 Taito Corporation
@@ -19365,6 +19377,7 @@ bassangl                        // 1998 - Bass Angler (GE765 VER. JAA)
 cr589fw                         // 1999 - CR-589 Firmware (700B04)
 cr589fwa                        // 1999 - CR-589 Firmware (700A04)
 darkhleg                        // 1998 - Dark Horse Legend (GX706 VER. JAA)
+ddrkara                         // 1999 - Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)
 ddr2m                           // 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA)
 ddr2mc                          // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)
 ddr2mc2                         // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)
@@ -19473,11 +19486,19 @@ pcnfrk                          // 1999 - Percussion Freaks (GQ881 VER. EAB)
 pcnfrka                         // 1999 - Percussion Freaks (GQ881 VER. AAB)
 pcnfrkk                         // 1999 - Percussion Freaks (GQ881 VER. KAB)
 pcnfrku                         // 1999 - Percussion Freaks (GQ881 VER. UAB)
-pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. KAA)
-pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
+pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. AAA)
+pcnfrk2mk                       // 2000 - Percussion Freaks 2nd Mix (GE912 VER. KAA)
+pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. AAA)
+pcnfrk3mk                       // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
 pcnfrk4m                        // 2001 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
 pcnfrk4mk                       // 2001 - Percussion Freaks 4rd Mix (G*A25 VER. KAA)
-pcnfrk5m                        // 2001 - Percussion Freaks 5th Mix (G*B05 VER. KAA)
+pcnfrk5m                        // 2001 - Percussion Freaks 5th Mix (G*B05 VER. AAA)
+pcnfrk5mk                       // 2001 - Percussion Freaks 5th Mix (G*B05 VER. KAA)
+pcnfrk6m                        // 2001 - Percussion Freaks 6th Mix (G*B16 VER. AAA)
+pcnfrk7m                        // 2002 - Percussion Freaks 7th Mix (G*C07 VER. AAA)
+pcnfrk8m                        // 2003 - Percussion Freaks 8th Mix (G*C38 VER. AAA)
+pcnfrk9m                        // 2003 - Percussion Freaks 9th Mix eAmusement (G*D09 VER. ABA)
+pcnfrk10m                       // 2004 - Percussion Freaks 10th Mix eAmusement (G*D40 VER. ACA)
 pnchmn                          // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB)
 pnchmn2                         // 2000 - Punch Mania 2: Hokuto no Ken (GQA09 JAA)
 pnchmna                         // 2000 - Punch Mania: Hokuto no Ken (GQ918 VER. JAB, ALT CD)
@@ -19541,8 +19562,9 @@ dorodon2                        // Falcon
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 ladybugb2                       // bootleg
+mrsdyna                         // 8203 (c) 1982 Universal
 snapjack                        // ???? (c)
-sraider                         // ???? (c) 1982 Universal
+sraider                         // 8203 (c) 1982 Universal
 
 @source:ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games
@@ -22465,6 +22487,7 @@ turbotag                        // (c) 1985
 archrivl                        // (c) 1989
 archrivla                       // (c) 1989
 archrivlb                       // bootleg
+basketbal                       // bootleg
 blasted                         // (c) 1988
 intlaser                        // (c) 1987
 pigskin                         // (c) 1990
@@ -22876,6 +22899,7 @@ misdraw                         // (c) 1986 Merit / Big Apple Games
 mosdraw                         // (c) 1990 Merit
 mdchoice                        // (c) 1983 Merit
 mpchoice                        // (c) 1983 Merit
+mpchoicea                       // (c) 1983 Merit
 mroundup                        // (c) 1984 Merit
 phrcraze                        // (c) 1986 Merit
 phrcrazea                       // (c) 1986 Merit
@@ -22886,6 +22910,7 @@ pitboss                         // (c) 1983 Merit
 pitboss04                       // (c) 1983 Merit
 pitboss03                       // (c) 1983 Merit
 pitboss03a                      // (c) 1983 Merit
+pitboss03b                      // (c) 1983 Merit
 pitbossm4                       // (c) 1983 Merit
 pitbossps                       // (c) 1983 Merit
 riviera                         // (c) 1987 Merit
@@ -23062,6 +23087,9 @@ gldarrow                        // (c) 1984 Meyco Games
 @source:mfabfz.cpp
 mfabfz                          //
 mfabfz85                        //
+
+@source:mg1.cpp
+mg1                             // Whitechapel Computer Works MG-1
 
 @source:mgames.cpp
 mgames                          // (c) 1981 Merit
@@ -23436,6 +23464,7 @@ blockr1                         // 06/11/1991 (c) 1991 Capcom (World) (Joystick 
 blockr2                         // 10/09/1991 (c) 1991 Capcom (World)
 cworld                          // 11/1989 (QUIZ 1) (c) 1989 Capcom
 dokaben                         // 3/1989 (c) 1989 Capcom (Japan)
+dokaben2                        // ?/1989 (c) 1989 Capcom (Japan)
 hatena                          // 28/02/1990 (QUIZ 2) (c) 1990 Capcom (Japan)
 marukin                         // 17/10/1990 (c) 1990 Yuga (Japan)
 mgakuen                         // (c) 1988 Yuga
@@ -34596,6 +34625,9 @@ kov3hd101
 phc25                           //
 phc25j                          //
 
+@source:philipsbo.cpp
+pbo                             // (c) 1987 Philips
+
 @source:phoenix.cpp
 avefenix                        // bootleg (Video Game)
 avefenixl                       // bootleg (Laguna)
@@ -43507,6 +43539,7 @@ strider2a                       // Strider 2 (ASIA 991213)
 strider2u                       // Strider 2 (USA 991213)
 tblkkuzu                        // The Block Kuzushi (JAPAN)
 techromn                        // Tech Romancer (EURO 980914)
+techromna                       // Tech Romancer (ASIA 980914)
 techromnu                       // Tech Romancer (USA 980914)
 twcupmil                        // Tecmo World Cup Millennium (JAPAN)
 tgmj                            // Tetris The Grand Master (JAPAN 980710)

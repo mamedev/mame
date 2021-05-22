@@ -381,7 +381,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: fan made release, which runs in original system and was also released and distributed as physical copy. More info: https://youtu.be/6ntwR94J6iM https://goo.gl/9efrGv-->
+	<!-- Notes: fan made release, which runs in original system and was also released and distributed as physical copy. More info: https://youtu.be/6ntwR94J6iM https://goo.gl/9efrGv -->
 	<software name="alexkidd2">
 		<description>Alex Kidd in Miracle World 2 (World, hack)</description>
 		<year>2017</year>
@@ -863,6 +863,19 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Notes: rom freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
+	<software name="baraburu">
+		<description>Bara Buru</description>
+		<year>2016</year> <!-- 2Minds cart published 2020 -->
+		<publisher>2Minds</publisher>
+		<info name="alt_title" value="バラブルー" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="baraburuu-sms-1.00.bin" size="131072" crc="43e39aa4" sha1="5a56ce4ae9ec21b158f5c6bfead15a9f0057e2cd" offset="000000" /> <!-- this digital release not verified against physical cart -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bartvssm">
 		<description>The Simpsons - Bart vs. The Space Mutants (Euro, Bra)</description>
 		<year>1992</year>
@@ -1231,6 +1244,18 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="bram stoker's dracula (europe).bin" size="262144" crc="1b10a951" sha1="6c9f52cdae96541020eaaa543ca6f729763f3ada" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: rom freely available at https://www.smspower.org, physical cartridge produced by Ichigo of 2Minds but not available commercially -->
+	<software name="brucelee">
+		<description>Bruce Lee</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="brucelee-sms-1.00.bin" size="131072" crc="37e27a38" sha1="48c41270493302d51da773ba938ffae5264ceb28" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2624,6 +2649,56 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Notes: rom freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
+	<software name="pigarus">
+		<description>Flight of Pigarus (v1.11)</description>
+		<year>2018</year> <!-- 2Minds cart published 2020 -->
+		<publisher>2Minds</publisher>
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<info name="alt_title" value="ピガロスの飛行" />
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="262144">
+				<rom name="flightofpigarus-sms-1.11.bin" size="262144" crc="60b86f18" sha1="46941b6ca4c38b07fa55987d3f30c249d5674e2a" offset="000000" /> <!-- this digital release not verified against physical cart -->
+			</dataarea>
+			<!-- 32K is what game can actually use? According to maker the pcb part is a 256K Lapis MR48V256 -->
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigarus110" cloneof="pigarus">
+		<description>Flight of Pigarus (v1.10)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<info name="alt_title" value="ピガロスの飛行" />
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="262144">
+				<rom name="flightofpigarus-sms-1.10.bin" size="262144" crc="1950005d" sha1="3bd03c3be402b90e61e6be5b67216c0c6d8056e6" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pigarus100" cloneof="pigarus">
+		<description>Flight of Pigarus (v1.00)</description>
+		<year>2018</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Replay mode fully supported only on PAL/50Hz drivers, e.g. smspal" />
+		<info name="alt_title" value="ピガロスの飛行" />
+		<part name="cart" interface="sms_cart">
+			<feature name="battery" value="yes" />
+			<dataarea name="rom" size="262144">
+				<rom name="flightofpigarus-sms-1.00.bin" size="262144" crc="838574d1" sha1="e53a16f5bf4a2d804b26c359cf3a727c06379e6d" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flint">
 		<description>The Flintstones (Euro, Bra)</description>
 		<year>1991</year>
@@ -3208,7 +3283,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: FM support, in Japan only 1000 copies were manufactured as a prize for a contest-->
+	<!-- Notes: FM support, in Japan only 1000 copies were manufactured as a prize for a contest -->
 	<software name="greatice">
 		<description>Great Ice Hockey (Jpn, USA)</description>
 		<year>1987</year>
@@ -3382,6 +3457,19 @@ license:CC0
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="heavyweight champ (europe).bin" size="262144" crc="fdab876a" sha1="7e2523061df0c08b7df7b446b5504c4eb0fea163" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: rom freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
+	<software name="heroesad">
+		<description>Heroes Against Demons</description>
+		<year>2020</year>
+		<publisher>2Minds</publisher>
+		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="heroesagainstdemons_v1.04b [retail rom].bin" size="262144" crc="8c77f8bf" sha1="95bec2ea672024162653fa8657e6f3344b7260cc" offset="000000" /> <!-- this digital release not verified against physical cart -->
 			</dataarea>
 		</part>
 	</software>
@@ -6148,7 +6236,7 @@ license:CC0
 		<info name="alt_title" value="ソロモンの鍵 -王女リヒタの涙-" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<!-- cartridge contains 2 eproms, labels on the chips: 6301 CHR and 6302 P-->
+				<!-- cartridge contains 2 eproms, labels on the chips: 6301 CHR and 6302 P -->
 				<rom name="solomon no kagi - oujo rihita no namida (prototype).bin" size="131072" crc="92dc4cd6" sha1="4587743e156bddf59e268f89bc08a9450eabe5ea" offset="000000" />
 			</dataarea>
 		</part>
@@ -7282,6 +7370,19 @@ license:CC0
 			<feature name="ic1" value="MPR-12138F" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-12138f.ic1" size="262144" crc="dfb0b161" sha1="0dc37f1104508c2c0e2593b10dffc3f268ae8ff9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Hack of alexkidd v1.1. IPS patch freely available at https://www.smspower.org and physical cartridges sold at https://www.2minds.fr -->
+	<software name="voyagesv">
+		<description>Voyage - A Sorceress' Vacation</description>
+		<year>2020</year> <!-- 2Minds cart published 2021 -->
+		<publisher>2Minds</publisher>
+		<info name="usage" value="Only runs with certain drivers, e.g. smsj - others show SOFTWARE ERROR" />
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="voyage - a sorceress vacation v1.04 (build 704).bin" size="524288" crc="f56940f8" sha1="e7f3477aec7292d10d5956b14c2881ac5bf7e87b" offset="000000" /> <!-- this digital release not verified against physical cart -->
 			</dataarea>
 		</part>
 	</software>

@@ -7,7 +7,7 @@
 *************************************************************************/
 
 #include "cpu/sh/sh2.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
 #include "machine/eepromser.h"
 #include "emupal.h"
 #include "screen.h"

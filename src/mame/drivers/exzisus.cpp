@@ -41,7 +41,7 @@ TODO:
 #include "audio/taitosnd.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

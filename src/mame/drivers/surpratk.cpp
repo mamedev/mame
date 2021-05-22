@@ -15,7 +15,7 @@
 #include "includes/konamipt.h"
 
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 

@@ -450,7 +450,7 @@ ROM_START(jpinball)
 	ROM_LOAD("joctronic_pb.ic6", 0x0000, 0x4000, CRC(5a1415a7) SHA1(cdf036bd1816907b7bb905189482c56bde38c228))
 
 	ROM_REGION(0x4000, "soundcpu", 0)
-	ROM_LOAD("joctronic_pb.ic8s", 0x0000, 0x4000, BAD_DUMP CRC(22ca95fe) SHA1(71fe4e522ca478b57f081f096f5e6b79a9cdff00)) // has stuck bits
+	ROM_LOAD("joctronic_pb.ic8s", 0x0000, 0x4000, CRC(34a08640) SHA1(0b01eaea262d4d3bb168264e58ebde804452060e))
 ROM_END
 
 /*-------------------------------------------------------------------

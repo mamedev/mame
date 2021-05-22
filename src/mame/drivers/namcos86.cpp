@@ -178,7 +178,7 @@ TODO:
 #include "includes/namcos86.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

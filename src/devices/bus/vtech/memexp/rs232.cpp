@@ -22,7 +22,11 @@ DEFINE_DEVICE_TYPE(VTECH_RS232_INTERFACE, vtech_rs232_interface_device, "vtech_r
 
 ROM_START( rs232 )
 	ROM_REGION(0x800, "software", 0)
-	ROM_LOAD("rs232_v15.ic2", 0x000, 0x800, CRC(6545260d) SHA1(4042f6f1e09e383f3c92f628c6187dc5f072fdb2))
+	ROM_DEFAULT_BIOS("16")
+	ROM_SYSTEM_BIOS(0, "15", "Version 1.5") // 1985
+	ROMX_LOAD("rs232_v15.ic2", 0x000, 0x800, CRC(6545260d) SHA1(4042f6f1e09e383f3c92f628c6187dc5f072fdb2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "16", "Version 1.6") // 1987
+	ROMX_LOAD("rs232_v16.ic2", 0x000, 0x800, CRC(d761fc79) SHA1(28e00c7ff33143a948308330859bee54b474e114), ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const

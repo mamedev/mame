@@ -197,6 +197,7 @@ void gime_device::device_start(void)
 	save_item(NAME(m_mmu));
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_ff22_value));
+	save_item(NAME(m_ff23_value));
 	save_item(NAME(m_interrupt_value));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_firq));
@@ -315,6 +316,7 @@ void gime_device::device_reset(void)
 	m_displayed_rgb = false;
 
 	m_ff22_value = 0;
+	m_ff23_value = 0;
 
 	update_memory();
 	reset_timer();
@@ -618,6 +620,22 @@ void gime_device::update_memory(int bank)
 uint8_t *gime_device::memory_pointer(uint32_t address)
 {
 	return &m_ram->pointer()[address % m_ram->size()];
+}
+
+
+
+//-------------------------------------------------
+//  pia_write - observe writes to pia 1
+//-------------------------------------------------
+
+void gime_device::pia_write(offs_t offset, uint8_t data)
+{
+	if (offset == 0x03)
+		m_ff23_value = data;
+
+	/* only cache writes to $FF22 if the data register is addressed */
+	if (offset == 0x02 && ((m_ff23_value & 0x04) == 0x04))
+		m_ff22_value = data;
 }
 
 
