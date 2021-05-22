@@ -23,7 +23,7 @@ static INPUT_PORTS_START ( etiprintbuffer_device )
 	PORT_START("CLEAR")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear Buffer") PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, clear_sw, 0)
 
-	PORT_START("ETI Configuration")
+	PORT_START("CONFIG")
 #ifdef DEBUG_BUFFER_DISPLAY
 	PORT_CONFNAME(0x03, 0x01, "ETI Buffer Debug Display")
 	PORT_CONFSETTING(0x00, "Off")
@@ -133,7 +133,7 @@ void etiprintbuffer_device::device_start()
 void etiprintbuffer_device::device_reset()
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	u16 ram16kblocks = ioport("ETI Configuration")->read() >> 2;
+	u16 ram16kblocks = ioport("CONFIG")->read() >> 2;
 	if (ram16kblocks) mem.install_ram(0x4000,0x4000+ram16kblocks*0x4000-1,m_ram);
 
 	output_busy(0);
@@ -294,7 +294,7 @@ uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, b
 	u32 fullcolor  = 0xbbbbdd;
 	u32 barcolor;
 
-	u8 display = ioport("ETI Configuration")->read();
+	u8 display = ioport("CONFIG")->read();
 	bitmap.plot_box(0,0,SCREEN_WIDTH,SCREEN_HEIGHT,0x000000);  // clear screen
 
 	if (display & 0x2) // display bars
