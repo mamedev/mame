@@ -444,13 +444,13 @@ static int create(int argc, char *argv[])
 
 	auto dest_format = find_format_by_name(argv[2]);
 	if(!dest_format) {
-		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[2]);
 		return 1;
 	}
 
 	auto source_fs = find_fs_by_name(argv[3]);
 	if(!source_fs) {
-		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
 		return 1;
 	}
 
@@ -607,13 +607,13 @@ static int flopdir(int argc, char *argv[])
 
 	auto format = find_format_by_name(argv[2]);
 	if(!format) {
-		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[2]);
 		return 1;
 	}
 
 	auto fs = find_fs_by_name(argv[3]);
 	if(!fs) {
-		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
 		return 1;
 	}
 
