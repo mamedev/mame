@@ -50,6 +50,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/cqm_dsk.h",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.h",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.h",
 		MAME_DIR .. "src/lib/formats/td0_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/td0_dsk.h",
 		MAME_DIR .. "src/lib/formats/hxchfe_dsk.cpp",
@@ -1492,18 +1494,6 @@ if opt_tool(FORMATS, "PC98_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/pc98_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/pc98_dsk.h",
-	}
-end
-
---------------------------------------------------
---
---@src/lib/formats/ipf_dsk.h,FORMATS["IPF_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "IPF_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/ipf_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/ipf_dsk.h",
 	}
 end
 

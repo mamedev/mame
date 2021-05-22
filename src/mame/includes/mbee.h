@@ -19,7 +19,6 @@
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
-#include "machine/8530scc.h"
 #include "machine/buffer.h"
 #include "machine/mc146818.h"
 #include "machine/wd_fdc.h"

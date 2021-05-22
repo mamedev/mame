@@ -1187,7 +1187,6 @@ void gime_device::horizontal_sync_changed(bool line)
 		if (--m_timer_value == 0)
 			timer_elapsed();
 	}
-
 }
 
 

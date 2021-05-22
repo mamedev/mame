@@ -486,5 +486,8 @@ license:CC0
 		<element name="9.2" ref="ledr"><bounds x="12" y="90" width="2" height="1" /></element>
 		<element name="9.3" ref="ledr"><bounds x="16" y="90" width="2" height="1" /></element>
 
+		<!-- analyst's screen -->
+		<screen index="1"><bounds x="63.5" y="90" width="20" height="3.8" /></screen>
+
 	</view>
 </mamelayout>

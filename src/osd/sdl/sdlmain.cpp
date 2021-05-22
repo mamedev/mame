@@ -93,7 +93,8 @@ const options_entry sdl_options::s_option_entries[] =
 	#ifdef SDLMAME_X11
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL FULL SCREEN OPTIONS" },
 	{ SDLOPTION_USEALLHEADS,                 "0",     OPTION_BOOLEAN,    "split full screen image across monitors" },
-	#endif
+	{ SDLOPTION_ATTACH_WINDOW,               "",      OPTION_STRING,     "attach to arbitrary window" },
+	#endif // SDLMAME_X11
 
 	// keyboard mapping
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },

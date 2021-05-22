@@ -64,7 +64,7 @@ bool fs_oric_jasmin::can_read() const
 
 bool fs_oric_jasmin::can_write() const
 {
-	return false;
+	return true;
 }
 
 bool fs_oric_jasmin::has_rsrc() const
@@ -88,7 +88,7 @@ fs_meta_data fs_oric_jasmin::impl::metadata()
 	while(len > 0 && bdir.rodata()[0xf8 + len - 1] == ' ')
 		len--;
 
-	res[fs_meta_name::name] = bdir.rstr(0xf8, len);
+	res.set(fs_meta_name::name, bdir.rstr(0xf8, len));
 	return res;	
 }
 
@@ -116,7 +116,7 @@ std::vector<fs_meta_description> fs_oric_jasmin::file_meta_description() const
 
 void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 {
-	std::string volume_name = meta.find(fs_meta_name::name)->second.as_string();
+	std::string volume_name = meta.get_string(fs_meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
 
 	m_blockdev.fill(0x6c);
@@ -139,7 +139,7 @@ void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 
 	fmap.w8(0xf6, 0x80);
 	fmap.w8(0xf7, 0x80);
-	fmap.fill(0xf8, 0x20, 8);
+	volume_name.resize(8, ' ');
 	fmap.wstr(0xf8, volume_name);
 
 	auto bdir = m_blockdev.get(20*17+1);
@@ -266,11 +266,18 @@ filesystem_t::file_t fs_oric_jasmin::impl::root_dir::file_get(uint64_t key)
 	u16 ref = bdir.r16b(off);
 	bool system = ref == 0 && key == 0 && bdir.r32b(off+0xb) == 0x2e535953;
 	if(system)
-		return file_t(new system_file(m_fs, bdir.rodata() + off));
+		return file_t(new system_file(m_fs, this, bdir.rodata() + off, key));
 
 	if(!m_fs.ref_valid(ref))
 		fatalerror("Key to deleted/non-existent file\n");
-	return file_t(new file(m_fs, bdir.rodata() + off, key));
+	return file_t(new file(m_fs, this, bdir.rodata() + off, key));
+}
+
+void fs_oric_jasmin::impl::root_dir::update_file(u16 key, const u8 *entry)
+{
+	uint64_t rkey = key;
+	auto [bdir, off] = get_dir_block(rkey);
+	bdir.copy(off, entry, 18);
 }
 
 filesystem_t::dir_t fs_oric_jasmin::impl::root_dir::dir_get(uint64_t key)
@@ -278,10 +285,29 @@ filesystem_t::dir_t fs_oric_jasmin::impl::root_dir::dir_get(uint64_t key)
 	fatalerror("Directories not supported\n");
 }
 
-fs_oric_jasmin::impl::file::file(impl &fs, const u8 *entry, u16 key) : m_fs(fs), m_key(key)
+std::string fs_oric_jasmin::impl::file_name_prepare(std::string fname)
+{
+	std::string nname;
+	size_t i;
+	for(i = 0; i != 8 && i != fname.size() && fname[i] != '.'; i++)
+		nname += fname[i];
+	if(nname.size() != 8)
+		nname.insert(nname.end(), 8 - nname.size(), ' ');
+	nname += '.';
+	while(i != fname.size() && fname[i] != '.')
+		i++;
+	if(i != fname.size())
+		i++;
+	while(i != fname.size() && nname.size() != 12)
+		nname += fname[i++];
+	if(nname.size() != 12)
+		nname.insert(nname.end(), 12 - nname.size(), ' ');
+	return nname;
+}
+
+fs_oric_jasmin::impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
-	(void)m_key;
 }
 
 void fs_oric_jasmin::impl::file::drop_weak_references()
@@ -292,79 +318,36 @@ fs_meta_data fs_oric_jasmin::impl::file::metadata()
 {
 	fs_meta_data res;
 
-	res[fs_meta_name::name] = read_file_name(m_entry + 3);
-	res[fs_meta_name::locked] = m_entry[2] == 'L';
-	res[fs_meta_name::sequential] = m_entry[0xf] == 'S';
-	res[fs_meta_name::size_in_blocks] = r16l(m_entry + 0x10);
+	res.set(fs_meta_name::name, read_file_name(m_entry + 3));
+	res.set(fs_meta_name::locked, m_entry[2] == 'L');
+	res.set(fs_meta_name::sequential, m_entry[0xf] == 'S');
+	res.set(fs_meta_name::size_in_blocks, r16l(m_entry + 0x10));
 
 	u16 ref = r16b(m_entry);
 	auto dblk = m_fs.m_blockdev.get(cs_to_block(ref));
-	res[fs_meta_name::loading_address] = uint64_t(dblk.r16l(2));
-	res[fs_meta_name::length] = uint64_t(dblk.r16l(4));
+	res.set(fs_meta_name::loading_address, dblk.r16l(2));
+	res.set(fs_meta_name::length, dblk.r16l(4));
 
 	return res;
 }
 
 std::vector<u8> fs_oric_jasmin::impl::file::read_all()
 {
-	auto [sect, length] = build_data_sector_table();
-	std::vector<u8> data(length);
-	u32 pos = 0;
-	for(u16 ref : sect) {
-		u32 npos = pos + 256;
-		if(npos > length)
-			npos = length;
-		if(npos > pos) {
-			auto dblk = m_fs.m_blockdev.get(cs_to_block(ref));
-			memcpy(data.data() + pos, dblk.rodata(), npos - pos);
-		} else
-			break;
-		pos = npos;
-	}
-	return data;
-}
-
-std::vector<u8> fs_oric_jasmin::impl::file::read(u64 start, u64 length)
-{
-	auto [sect, rlength] = build_data_sector_table();
-	length += start;
-	if(length > rlength)
-		length = rlength;
-
-	if(rlength < start)
-		return std::vector<u8>();
-
-	std::vector<u8> data(length - start);
-	u32 pos = 0;
-	for(u16 ref : sect) {
-		u32 npos = pos + 256;
-		if(npos > length)
-			npos = length;
-		if(npos > pos) {
-			if(npos > start) {
-				u32 off = pos < start ? start & 0xff : 0;
-				auto dblk = m_fs.m_blockdev.get(cs_to_block(ref));
-				memcpy(data.data() + pos + off - start, dblk.rodata() + off, npos - pos - off);
-			}
-		} else
-			break;
-		pos = npos;
-	}
-	return data;
-}
-
-std::pair<std::vector<u16>, u32> fs_oric_jasmin::impl::file::build_data_sector_table()
-{
-	std::pair<std::vector<u16>, u32> res;
+	std::vector<u8> data;
 	u16 ref = r16b(m_entry);
 	auto iblk = m_fs.m_blockdev.get(cs_to_block(ref));
 	u32 length = iblk.r16l(4);
 	while(m_fs.ref_valid(ref)) {
-		for(u32 pos = 6; pos != 256; pos += 2) {
+		for(u32 pos = 6; pos != 256 && data.size() < length; pos += 2) {
 			u16 dref = iblk.r16b(pos);
 			if(!m_fs.ref_valid(dref))
 			   goto done;
-			res.first.push_back(dref);
+			auto dblk = m_fs.m_blockdev.get(cs_to_block(dref));
+			u32 dpos = data.size();
+			data.resize(dpos + 256);
+			memcpy(data.data() + dpos, dblk.rodata(), 256);
+			if(data.size() >= length)
+				goto done;
 		}
 		ref = iblk.r16b(2);
 		if(!m_fs.ref_valid(ref))
@@ -372,13 +355,11 @@ std::pair<std::vector<u16>, u32> fs_oric_jasmin::impl::file::build_data_sector_t
 		iblk = m_fs.m_blockdev.get(cs_to_block(ref));
 	}
  done:
-	if(length > 256 * res.first.size())
-		length = 256 * res.first.size();
-	res.second = length;
-	return res;	
+	data.resize(length);
+	return data;
 }
 
-fs_oric_jasmin::impl::system_file::system_file(impl &fs, const u8 *entry) : m_fs(fs)
+fs_oric_jasmin::impl::system_file::system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
 }
@@ -391,11 +372,11 @@ fs_meta_data fs_oric_jasmin::impl::system_file::metadata()
 {
 	fs_meta_data res;
 
-	res[fs_meta_name::name] = read_file_name(m_entry + 3);
-	res[fs_meta_name::locked] = m_entry[2] == 'L';
-	res[fs_meta_name::sequential] = m_entry[0xf] == 'S';
-	res[fs_meta_name::size_in_blocks] = r16l(m_entry + 0x10);
-	res[fs_meta_name::length] = 0x3e00;
+	res.set(fs_meta_name::name, read_file_name(m_entry + 3));
+	res.set(fs_meta_name::locked, m_entry[2] == 'L');
+	res.set(fs_meta_name::sequential, m_entry[0xf] == 'S');
+	res.set(fs_meta_name::size_in_blocks, r16l(m_entry + 0x10));
+	res.set(fs_meta_name::length, 0x3e00);
 
 	return res;
 }
@@ -410,25 +391,225 @@ std::vector<u8> fs_oric_jasmin::impl::system_file::read_all()
 	return data;
 }
 
-std::vector<u8> fs_oric_jasmin::impl::system_file::read(u64 start, u64 length)
+fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const fs_meta_data &info)
 {
-	if(start >= 0x3e00)
-		return std::vector<u8>();
-	length += start;
-	if(length > 0x3e00)
-		length = 0x3e00;
-	std::vector<u8> data(length - start);
-	
-	for(u32 i = start / 256; i <= (length - 1) / 256; i++) {
-		u32 pos = i * 256;
-		u32 off = i * 256 < start ? start & 0xff : 0;
-		u32 len = i * 256 > length ? length & 0xff : 0x100;
-		auto dblk = m_fs.m_blockdev.get(i);
-		memcpy(data.data() + pos + off - start, dblk.rodata() + off, len);
+	// One block of sector list, one block of data
+	u32 nb = 2;
+
+	// Find the key for the next entry, increase nb if needed
+	auto bdir = m_fs.m_blockdev.get(20*17+1);
+	uint64_t id = 0;
+	for(;;) {
+		for(u32 i = 0; i != 14; i ++) {
+			u32 off = 4 + i*18;
+			u16 ref = bdir.r16b(off);
+			if(!m_fs.ref_valid(ref))
+				goto found;
+			id++;
+		}
+		u16 ref = bdir.r16b(2);
+		if(!ref || !m_fs.ref_valid(ref)) {
+			nb ++;
+			break;
+		}
+		bdir = m_fs.m_blockdev.get(cs_to_block(ref));
+	}
+ found:
+	auto block = m_fs.allocate_blocks(nb);
+	if(block.empty())
+		return nullptr;
+
+	auto sblk = m_fs.m_blockdev.get(cs_to_block(block[0]));
+	sblk.w16b(0, 0xff00);   // Next sector
+	sblk.w16l(2, info.get_number(fs_meta_name::loading_address, 0x500));
+	sblk.w16l(4, 0);        // Length
+	sblk.w16b(6, block[1]); // Data block
+
+	if(nb == 3) {
+		bdir.w16l(0, block[2]);    // Link to the next directory sector
+		bdir = m_fs.m_blockdev.get(cs_to_block(block[2]));
+		bdir.fill(0xff);
+		bdir.w16l(0, block[2]); // Reference to itself
+		bdir.w16l(2, 0xff00);   // No next directory sector
 	}
 
-	return data;
+	u32 off = 4 + (id % 14) * 18;
+	bdir.w16b(off+0x00, block[0]); // First (and only) sector in the sector list
+	bdir.w8  (off+0x02, info.get_flag(fs_meta_name::locked, false) ? 'L' : 'U');
+	bdir.wstr(off+0x03, file_name_prepare(info.get_string(fs_meta_name::name, "")));
+	bdir.w8  (off+0x0f, info.get_flag(fs_meta_name::sequential, true) ? 'S' : 'D');
+	bdir.w16l(off+0x10, 2); // 2 sectors for an empty file
+
+	return file_t(new file(m_fs, this, bdir.rodata() + off, id));	
 }
+
+
+
+void fs_oric_jasmin::impl::root_dir::file_delete(uint64_t key)
+{
+}
+
+void fs_oric_jasmin::impl::file::replace(const std::vector<u8> &data)
+{
+	u32 cur_ns = r16l(m_entry + 0x10);
+	// Data sectors first
+	u32 need_ns = (data.size() + 255) / 256;
+	if(need_ns == 0)
+		need_ns = 1;
+	// Add the sector list sectors, 125 entries/sector
+	need_ns += (need_ns + 124)/125;
+
+	// Enough space?
+	if(cur_ns < need_ns && m_fs.free_block_count() < need_ns - cur_ns)
+		return;
+
+	u16 load_address = 0;
+	std::vector<u16> tofree;
+	u16 iref = r16b(m_entry);
+	for(u32 i=0; i < cur_ns; i += 125+1) {
+		auto iblk = m_fs.m_blockdev.get(cs_to_block(iref));
+		if(!i)
+			load_address = iblk.r16l(2);
+		tofree.push_back(iref);
+		for(u32 j=0; j != 125 && i+j+1 != cur_ns; j++)
+			tofree.push_back(iblk.r16b(6+2*j));
+		iref = iblk.r16b(2);
+	}
+	m_fs.free_blocks(tofree);
+
+	std::vector<u16> blocks = m_fs.allocate_blocks(need_ns);
+	for(u32 i=0; i < need_ns; i += 125+1) {
+		auto iblk = m_fs.m_blockdev.get(cs_to_block(blocks[i]));
+		iblk.fill(0xff);
+		if(!i) {
+			iblk.w16l(2, load_address);
+			iblk.w16l(4, data.size());
+		}
+		if(i + 126 < need_ns)
+			iblk.w16b(0, blocks[i+126]);
+		else
+			iblk.w16b(0, 0xff00);
+
+		for(u32 j=0; j != 125 && i+j+1 != need_ns; j++) {
+			u32 dpos = 256 * (j + i/126*125);
+			u32 size = data.size() - dpos;
+			iblk.w16b(6+j*2, blocks[i+j+1]);
+			auto dblk = m_fs.m_blockdev.get(cs_to_block(blocks[i+j+1]));
+			if(size >= 256)
+				dblk.copy(0, data.data() + dpos, 256);
+			else {
+				dblk.copy(0, data.data() + dpos, size);
+				dblk.fill(size, 0x55, 256-size);
+			}
+		}
+	}
+	w16l(m_entry + 0x10, need_ns);
+	w16b(m_entry + 0x00, blocks[0]);
+	m_dir->update_file(m_key, m_entry);
+}
+
+void fs_oric_jasmin::impl::root_dir::metadata_change(const fs_meta_data &info)
+{
+}
+
+void fs_oric_jasmin::impl::metadata_change(const fs_meta_data &info)
+{
+	if(info.has(fs_meta_name::name)) {
+		std::string volume_name = info.get_string(fs_meta_name::name);
+		volume_name.resize(8, ' ');
+		m_blockdev.get(20*17).wstr(0xf8, volume_name);
+	}
+}
+
+void fs_oric_jasmin::impl::file::metadata_change(const fs_meta_data &info)
+{
+	if(info.has(fs_meta_name::locked))
+		w8  (m_entry+0x02, info.get_flag(fs_meta_name::locked) ? 'L' : 'U');
+	if(info.has(fs_meta_name::name))
+		wstr(m_entry+0x03, file_name_prepare(info.get_string(fs_meta_name::name)));
+	if(info.has(fs_meta_name::sequential))
+		w8  (m_entry+0x0f, info.get_flag(fs_meta_name::sequential) ? 'D' : 'S');
+	if(info.has(fs_meta_name::loading_address))
+		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(fs_meta_name::loading_address));
+	m_dir->update_file(m_key, m_entry);
+}
+
+void fs_oric_jasmin::impl::system_file::replace(const std::vector<u8> &data)
+{
+	if(data.size() != 0x3e00)
+		return;
+
+	for(u32 i=0; i != 0x3e; i++)
+		m_fs.m_blockdev.get(i).copy(0, data.data() + i * 256, 256);
+}
+
+void fs_oric_jasmin::impl::system_file::metadata_change(const fs_meta_data &info)
+{
+	if(info.has(fs_meta_name::locked))
+		w8  (m_entry+0x02, info.get_flag(fs_meta_name::locked) ? 'L' : 'U');
+	if(info.has(fs_meta_name::name))
+		wstr(m_entry+0x03, file_name_prepare(info.get_string(fs_meta_name::name)));
+	if(info.has(fs_meta_name::sequential))
+		w8  (m_entry+0x0f, info.get_flag(fs_meta_name::sequential) ? 'S' : 'D');
+	if(info.has(fs_meta_name::loading_address))
+		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(fs_meta_name::loading_address));
+	m_dir->update_file(m_key, m_entry);
+}
+
+std::vector<u16> fs_oric_jasmin::impl::allocate_blocks(u32 count)
+{
+	std::vector<u16> blocks;
+	if(free_block_count() < count)
+		return blocks;
+
+	auto fmap = m_blockdev.get(20*17);
+	u32 nf = 0;
+	for(u32 track = 0; track != 2*41 && nf != count; track++) {
+		u32 map = fmap.r24l(track*3);
+		if(map != 0x800000) {
+			for(u32 sect = 1; sect <= 17 && nf != count; sect++)
+				if(map & (0x20000 >> sect)) {
+					blocks.push_back((track << 8) | sect);
+					map &= ~(0x20000 >> sect);
+					nf++;
+				}
+			if(!map)
+				map = 0x800000;
+			fmap.w24l(track*3, map);
+		}
+	}
+	return blocks;
+}
+
+void fs_oric_jasmin::impl::free_blocks(const std::vector<u16> &blocks)
+{
+	auto fmap = m_blockdev.get(20*17);
+	for(u16 ref : blocks) {
+		u32 track = ref >> 8;
+		u32 sect = ref & 0xff;
+		u32 map = fmap.r24l(track*3);
+		if(map == 0x800000)
+			map = 0;
+		map |= 0x20000 >> sect;
+		fmap.w24l(track*3, map);
+	}
+}
+
+u32 fs_oric_jasmin::impl::free_block_count()
+{
+	auto fmap = m_blockdev.get(20*17);
+	u32 nf = 0;
+	for(u32 track = 0; track != 2*41; track++) {
+		u32 map = fmap.r24l(track*3);
+		if(map != 0x800000) {
+			for(u32 sect = 1; sect <= 17; sect++)
+				if(map & (0x20000 >> sect))
+					nf++;
+		}
+	}
+	return nf;
+}
+
 
 
 const filesystem_manager_type FS_ORIC_JASMIN = &filesystem_manager_creator<fs_oric_jasmin>;;
