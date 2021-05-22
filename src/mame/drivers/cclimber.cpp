@@ -2157,8 +2157,8 @@ ROM_START( rpatrol )
 	ROM_CONTINUE(             0x003000, 0x000800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "9.2t",    0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-	ROM_LOAD( "8.2s",    0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "8.2s",    0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "9.2t",    0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "mb7051.1b",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
@@ -2181,8 +2181,8 @@ ROM_START( rpatroln )
 	ROM_CONTINUE(          0x003000, 0x000800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 ) /* located on an original ORCA OVG-50B PCB */
-	ROM_LOAD( "9.2t", 0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-	ROM_LOAD( "8.2s", 0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "8.2s", 0x000000, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "9.2t", 0x000800, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 
 	ROM_REGION( 0x0060, "proms", 0 ) /* located on an original ORCA OVG-50B PCB */
 	ROM_LOAD( "mb7051.1b", 0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
@@ -2209,7 +2209,7 @@ ROM_START( rpatrolb )
 	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
 	/* 0x3800-0x3fff - empty */
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_REGION( 0x1000, "gfx2", 0 ) // roms swapped around
 	ROM_LOAD( "rp11.6c",      0x0000, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 	ROM_LOAD( "rp10.6a",      0x0800, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
@@ -2770,7 +2770,7 @@ GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_i
 
 GAME( 1981, rpatrol,     0,        rpatrol,   rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
 GAME( 1981, rpatroln,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  rpatrol,   rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
