@@ -1542,9 +1542,10 @@ void ym2608::clock_fm_and_adpcm()
 	// update the FM content; OPNA is 13-bit with no intermediate clipping
 	m_fm.output(m_last_fm.clear(), 1, 32767, fmmask);
 
-	// mix in the ADPCM
+	// mix in the ADPCM and clamp
 	m_adpcm_a.output(m_last_fm, 0x3f);
 	m_adpcm_b.output(m_last_fm, 1);
+	m_last_fm.clamp16();
 }
 
 
