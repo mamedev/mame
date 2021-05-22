@@ -12,6 +12,7 @@
 #include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/hd63450.h"
+#include "machine/mc68681.h"
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd_fdc.h"
@@ -69,7 +70,9 @@ protected:
 	void fdc_irq_w(int state);
 	void scc_irq_w(int state);
 	void net_irq_w(int state);
+	void floppy_select_w(uint8_t data);
 	uint8_t fa0101_read();
+	uint8_t net_fe00e1_read();
 };
 
 void pbo_state::main_map(address_map &map)
@@ -77,11 +80,9 @@ void pbo_state::main_map(address_map &map)
 	map(0x000000, 0x07ffff).ram().share(m_main_ram_share);
 	map(0x080000, 0xbfffff).rw(FUNC(pbo_state::berr_r), FUNC(pbo_state::berr_w));
 	map(0xf80000, 0xf8ffff).rom().region("maincpu", 0);
-	map(0xfa0000, 0xfa0001).rw(m_fdc, FUNC(mb8877_device::status_r), FUNC(mb8877_device::cmd_w)).umask16(0x00ff);
-	map(0xfa0030, 0xfa0031).rw(m_scc, FUNC(scc85c30_device::cb_r), FUNC(scc85c30_device::cb_w)).umask16(0x00ff);
-	map(0xfa0032, 0xfa0033).rw(m_scc, FUNC(scc85c30_device::db_r), FUNC(scc85c30_device::db_w)).umask16(0x00ff);
-	map(0xfa0034, 0xfa0035).rw(m_scc, FUNC(scc85c30_device::ca_r), FUNC(scc85c30_device::ca_w)).umask16(0x00ff);
-	map(0xfa0036, 0xfa0037).rw(m_scc, FUNC(scc85c30_device::da_r), FUNC(scc85c30_device::da_w)).umask16(0x00ff);
+	map(0xfa0000, 0xfa0007).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)).umask16(0x00ff);
+	map(0xfa0011, 0xfa0011).w(FUNC(pbo_state::floppy_select_w));
+	map(0xfa0030, 0xfa0037).rw(m_scc, FUNC(scc85c30_device::ab_dc_r), FUNC(scc85c30_device::ab_dc_w)).umask16(0x00ff);
 	map(0xfa8400, 0xfa840f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0xfa0100, 0xfa0101).r(FUNC(pbo_state::fa0101_read)).umask16(0x00ff);
 }
@@ -91,6 +92,8 @@ void pbo_state::net_map(address_map &map)
 	map(0x000000, 0x000fff).ram().share(m_net_ram_share); // Unknown RAM size
 	map(0xf00000, 0xf1ffff).ram();
 	map(0xf80000, 0xf83fff).rom().region("netcpu", 0);
+	map(0xfe00e1, 0xfe00e1).r(FUNC(pbo_state::net_fe00e1_read));
+	map(0xfe0100, 0xfe011f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 }
 
 uint16_t pbo_state::berr_r(offs_t offset)
@@ -140,6 +143,11 @@ void pbo_state::net_irq_w(int state)
 	LOG("LANCE IRQ: %d\n", state);
 }
 
+void pbo_state::floppy_select_w(uint8_t data)
+{
+	LOG("Floppy select: %02X\n", data);
+}
+
 // It's unclear what hardware this location corresponds to on the actual board.
 // If it's unmapped, which returns 0 by default, the system hangs with very little
 //   meaningful external access.
@@ -148,6 +156,11 @@ uint8_t pbo_state::fa0101_read()
 {
 	LOG("Read from FA0101: 80\n");
 	return 0x80;
+}
+
+uint8_t pbo_state::net_fe00e1_read()
+{
+	return 0;
 }
 
 static INPUT_PORTS_START( pbo )
@@ -239,6 +252,8 @@ void pbo_state::pbo(machine_config &config)
 
 	AM7990(config, m_lance);
 	m_lance->intr_out().set(FUNC(pbo_state::net_irq_w));
+
+	MC68681(config, "duart", 3'686'400);
 }
 
 ROM_START( pbo )
