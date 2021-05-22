@@ -27,9 +27,11 @@ DEFINE_DEVICE_TYPE(ADB_A9M0330, a9m0330_device, "a9m0330", "Apple IIgs ADB Keybo
 
 ROM_START(a9m0330)
 	ROM_REGION(0x400, "mcu", 0)
-	// early 1986 version
+	// from early-production ROM 00 Woz Limited Edition IIgs.  keyboard "Part Number 658-4081  825-1301-A"
+	// ROM is marked "NEC Japan  8626XD 341-0232A  543" so 26th week of 1986
 	ROM_LOAD("341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76))
-	// later 1987 version
+	// from later non-Woz ROM 01.  keyboard "Model A9M0330"
+	// ROM is marked "NEC Japan 8806HD  8048HC610  341-0124-A  (c) APPLE 87" so 6th week of 1988
 	ROM_LOAD("341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013))
 ROM_END
 
