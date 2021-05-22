@@ -4,8 +4,7 @@
 
 Saitek OSA Expansion Slot
 
-TODO:
-- not sure what RTS does
+Used by Saitek(SciSys) chess computers Leonardo, Galileo, Renaissance.
 
 ***************************************************************************/
 
@@ -64,6 +63,20 @@ void saitekosa_expansion_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void saitekosa_expansion_device::device_add_mconfig(machine_config &config)
+{
+	// optional embedded screen
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(99, 16);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(saitekosa_expansion_device::screen_update));
+}
+
+//-------------------------------------------------
 //  host to module interface
 //-------------------------------------------------
 
@@ -101,6 +114,11 @@ void saitekosa_expansion_device::ack_w(int state)
 		m_module->ack_w(state);
 
 	m_ack = state;
+}
+
+u32 saitekosa_expansion_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : UPDATE_HAS_NOT_CHANGED;
 }
 
 

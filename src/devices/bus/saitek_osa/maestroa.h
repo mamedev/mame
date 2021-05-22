@@ -20,12 +20,16 @@ public:
 	// construction/destruction
 	saitekosa_maestroa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	DECLARE_INPUT_CHANGED_MEMBER(switch_cpu_freq) { set_cpu_freq(); }
+
 	// from host
 	virtual u8 data_r() override;
 	virtual void nmi_w(int state) override;
+	virtual void ack_w(int state) override;
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -35,11 +39,13 @@ private:
 
 	void main_map(address_map &map);
 
-	u8 p2200_r();
-	u8 p2400_r();
-	void p2400_w(u8 data);
-	u8 p2600_r();
-	void p2600_w(u8 data);
+	u8 rts_r();
+	u8 xdata_r();
+	void xdata_w(u8 data);
+	u8 ack_r();
+	void control_w(u8 data);
+
+	void set_cpu_freq();
 
 	u8 m_latch = 0xff;
 	bool m_latch_enable = false;

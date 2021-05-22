@@ -249,7 +249,7 @@ void slapshot_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("z80bank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */

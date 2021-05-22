@@ -19,12 +19,11 @@ The 6301Y0 seen on one of them, was a SX8A 6301Y0G84P, this is in fact the
 MCU(+internal maskrom, disabled here) used in Saitek Conquistador.
 
 The LCD screen is fairly large, it's the same one as in Saitek Simultano,
-so a chessboard display + 7seg info.
+so a chessboard display + 7seg info. It's on a small drawer that can be
+pushed in to hide the chessboard display.
 
 TODO:
-- not sure about comm/module leds, where is the module led?
-- fart noise at boot if osa module is inserted
-- finish internal artwork
+- fart noise at boot if maestroa module is inserted
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 
@@ -93,6 +92,7 @@ private:
 	void control_w(u8 data);
 	u8 control_r();
 	void exp_stb_w(int state);
+	void exp_rts_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -137,18 +137,17 @@ void ren_state::lcd_output_w(offs_t offset, u64 data)
 void ren_state::update_display()
 {
 	m_display->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0]);
-	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1]);
+	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x38) | m_led_data[1]);
 }
 
 void ren_state::mux_w(u8 data)
 {
 	// d0-d3 input/chessboard led mux
 	// d4: chessboard led data
+	// d5: module led
 	// d6,d7: mode led
-	m_inp_mux = data;
+	m_inp_mux = data ^ 0x20;
 	update_display();
-
-	// d5: ?
 }
 
 void ren_state::leds_w(u8 data)
@@ -163,11 +162,9 @@ void ren_state::control_w(u8 data)
 	// d1: speaker out
 	m_dac->level_w(BIT(data, 1));
 
-	// d2,d3: comm/module leds?
-	m_led_data[1] = (m_led_data[1] & ~0xc) | (~data & 0xc);
+	// d2: comm led
+	m_led_data[1] = (m_led_data[1] & ~0x4) | (~data & 0x4);
 	update_display();
-
-	// d6: power off?
 
 	// other: ?
 }
@@ -183,6 +180,11 @@ void ren_state::exp_stb_w(int state)
 {
 	// STB-P to P5 IS
 	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void ren_state::exp_rts_w(int state)
+{
+	// NAND with ACK-P? (not used by module)
 }
 
 
@@ -222,8 +224,10 @@ void ren_state::p5_w(u8 data)
 	// d1: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d3,d5: expansion ACK-P?
-	m_expansion->ack_w(BIT(data, 3) & BIT(data, 5));
+	// d3: NAND with STB-P?
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
 
 	// other: ?
 }
@@ -266,49 +270,53 @@ void ren_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( ren )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // king
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // rook
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // knight
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // queen
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // bishop
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // pawn
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // scroll?
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // tab
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // +
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Scroll")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) // n
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // function?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // sound
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Function")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // n
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // stop?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // library
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Stop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Library")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // info
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // play?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) // level
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Info")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // -
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // normal?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // analysis
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Normal")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Analysis")
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) // n
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // new game
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) // setup
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Set Up")
 
 	PORT_START("IN.8")
 	PORT_CONFNAME( 0x40, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x40, "Low" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 
@@ -329,7 +337,7 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
-	config.set_perfect_quantum(m_maincpu);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -341,7 +349,7 @@ void ren_state::ren(machine_config &config)
 	m_lcd_pwm->set_refresh(attotime::from_hz(30));
 	m_lcd_pwm->output_x().set(FUNC(ren_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
 	screen.set_size(873/2, 1080/2);
 	screen.set_visarea_full();
@@ -356,6 +364,7 @@ void ren_state::ren(machine_config &config)
 	// expansion module
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
 	m_expansion->stb_handler().set(FUNC(ren_state::exp_stb_w));
+	m_expansion->rts_handler().set(FUNC(ren_state::exp_rts_w));
 }
 
 

@@ -68,8 +68,8 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			int vlr = (0xf - rmal) + (0xf - al) + (0xf - ral);
 			if (vlr > 0xf) vlr = 0xf;
 
-			vll = m_volume_table[(vll << 1) | (chan->control & 1)];
-			vlr = m_volume_table[(vlr << 1) | (chan->control & 1)];
+			vll = m_volume_table[(vll << 1) | (~chan->control & 1)];
+			vlr = m_volume_table[(vlr << 1) | (~chan->control & 1)];
 
 			/* Check channel mode */
 			if ((ch >= 4) && (chan->noise_control & 0x80))

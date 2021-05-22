@@ -27,9 +27,6 @@ known issues:
     Finest Hour:
     - roz plane colors are bad in-game
 
-    Final Lap:
-    - sprite size bit is bogus during splash screen
-
     Final Lap 3:
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.cpp yet
 
@@ -1791,6 +1788,7 @@ void namcos2_state::configure_c45road_standard(machine_config &config)
 {
 	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_c116);
+	m_c45_road->set_xoffset(-72);
 }
 
 void namcos2_state::configure_namcos2_sprite_standard(machine_config &config)
@@ -1929,6 +1927,8 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
+	m_ns2sprite->force_32x32_sprites(true);
+
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1954,6 +1954,8 @@ void namcos2_state::finalap2(machine_config &config)
 	finallap(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+
+	m_ns2sprite->force_32x32_sprites(false);
 }
 
 void namcos2_state::finalap3(machine_config &config)
@@ -1961,6 +1963,8 @@ void namcos2_state::finalap3(machine_config &config)
 	finallap_c68(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+
+	m_ns2sprite->force_32x32_sprites(false);
 }
 
 
@@ -5683,12 +5687,12 @@ void namcos2_state::init_luckywld()
 /* from sys2c65b to sys2c65c sometime between 1988 and 1990 as mirai ninja    */
 /* and metal hawk have the B version and dragon saber has the C version       */
 
-/*    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
-GAMEL( 1987, finallap,   0,        finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapd,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapc,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjc, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+/*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
+GAMEL( 1987, finallap,   0,        finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapd,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapc,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjc, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,  ROT90,  "Namco", "Assault (Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj, ROT90,  "Namco", "Assault (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -5708,9 +5712,9 @@ GAME(  1988, pheliosj,   phelios,  base2,    base,     namcos2_state, init_pheli
 
 GAME(  1989, dirtfoxj,   0,        base2,    dirtfox,  namcos2_state, init_dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1989, fourtrax,   0,        finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1989, fourtraxj,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1989, fourtraxa,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco (Atari license?)", "Four Trax (US?, censored banners)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap ) // boards using the ROM code FX4 were produced for Atari? there's no US region warning or Atari copyright tho, modded version of the World code
+GAMEL( 1989, fourtrax,   0,        finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1989, fourtraxj,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1989, fourtraxa,  fourtrax, finallap, fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco (Atari license?)", "Four Trax (US?, censored banners)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap ) // boards using the ROM code FX4 were produced for Atari? there's no US region warning or Atari copyright tho, modded version of the World code
 
 GAME(  1989, valkyrie,   0,        base3,    base,     namcos2_state, init_valkyrie, ROT90,  "Namco", "Valkyrie no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
@@ -5729,8 +5733,8 @@ GAME(  1990, dsaber,     0,        base3,    base,     namcos2_state, init_dsabe
 GAME(  1990, dsabera,    dsaber,   base3,    base,     namcos2_state, init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", MACHINE_SUPPORTS_SAVE )
 GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state, init_dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1990, finalap2,   0,        finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1990, finalap2,   0,        finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1990, gollygho,   0,        gollygho, gollygho, namcos2_state, init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
@@ -5751,24 +5755,24 @@ GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, init_cosmo
 GAME(  1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly Ghost 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(  1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly Ghost 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1992, luckywld,   0,        luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1992, sws,        0,        base_c68, base,     namcos2_state, init_sws,      ROT0,   "Namco", "Super World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME(  1992, sws92,      0,        base_c68, base,     namcos2_state, init_sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, sws92g,     sws92,    base_c68, base,     namcos2_state, init_sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", MACHINE_SUPPORTS_SAVE ) // this appears to have a subtitle, what is it?

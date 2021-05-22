@@ -6,6 +6,7 @@
 
     Hitachi MP-1805 floppy disk controller card for the MB-6890
     Floppy drive is attached
+    TODO: make sure disk can be read
 
 *********************************************************************/
 
@@ -31,9 +32,11 @@ ROM_START( mp1805 )
 	ROM_LOAD( "mp1805.rom", 0xf800, 0x0800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
 ROM_END
 
+// Although the drive is single-sided, D88 images are double-sided,
+//  so we need to allocate enough space or MAME will crash.
 void bml3bus_mp1805_device::floppy_drives(device_slot_interface &device)
 {
-	device.option_add("mb_6890", FLOPPY_3_SSDD);
+	device.option_add("mb_6890", FLOPPY_3_DSDD);
 }
 
 
@@ -55,6 +58,7 @@ void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[2], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	SOFTWARE_LIST(config, "flop_list").set_original("bml3_flop").set_filter("3");
 }
 
 //-------------------------------------------------
@@ -81,26 +85,42 @@ void bml3bus_mp1805_device::bml3_mp1805_w(uint8_t data)
 	// Dn: 1=select drive <n>
 
 	logerror("control_w %02x\n", data);
-	int prev, next;
-	for(prev = 0; prev != 4; prev++)
-		if(m_control & (1 << prev))
-			break;
-	m_control = data;
-	for(next = 0; next != 4; next++)
-		if(m_control & (1 << next))
-			break;
+	u8 prev, next;
+	bool mon = BIT(data, 7);
+	floppy_image_device *fprev = nullptr, *fnext = nullptr;
 
-	auto fprev = m_floppy[prev]->get_device();
-	auto fnext = m_floppy[next]->get_device();
+	if (!mon)
+	{
+		for(prev = 0; prev < 4; prev++)
+			if(BIT(m_control, prev))
+				break;
 
-	if(fprev && fprev != fnext)
-		m_floppy[prev]->get_device()->mon_w(1);
+		if (prev < 4)
+		{
+			fprev = m_floppy[prev]->get_device();
+			if (fprev)
+			{
+				logerror("Drive %d motor off\n",prev);
+				fprev->mon_w(1);
+			}
+		}
+	}
+	else
+	if (data & 15)
+	{
+		for(next = 0; next < 4; next++)
+			if(BIT(data, next))
+				break;
 
-	if((m_control & 0x80) && fnext) {
-		logerror("motor on\n");
-		fnext->mon_w(0);
+		fnext = m_floppy[next]->get_device();
+		if (fnext)
+		{
+			logerror("Drive %d motor on\n",next);
+			fnext->mon_w(0);
+		}
 	}
 
+	m_control = data;
 	m_mc6843->set_floppy(fnext);
 }
 

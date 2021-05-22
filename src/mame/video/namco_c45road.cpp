@@ -25,9 +25,9 @@
  *      0x1fa00..0x1fbdf    xxx- ---- ---- ----     priority
  *                          ---- xxxx xxxx xxxx     xscroll
  *
- *      0x1fbfe             horizontal adjust?
- *                          0x0017
- *                          0x0018 (Final Lap3)
+ *      0x1fbfe             horizontal adjust? (Thunder Ceptor suggests maybe not although isn't on Namco System 2)
+ *                          0x0017 (Suzuka 8 Hours / Four Trax / Lucky & Wild)
+ *                          0x0018 (Final Lap / Thunder Ceptor)
  *
  *      0x1fc00..0x1fddf    selects line in source bitmap
  *      0x1fdfe             yscroll
@@ -86,7 +86,8 @@ namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, cons
 	m_tileram(*this, "tileram"),
 	m_lineram(*this, "lineram"),
 	m_clut(*this, "clut"),
-	m_transparent_color(~0)
+	m_transparent_color(~0),
+	m_xoffset(0)
 {
 }
 
@@ -174,7 +175,7 @@ void namco_c45_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			screenx |= ~0x7ff;
 
 		// adjust the horizontal placement
-		screenx -= 64; // needs adjustment to left
+		screenx += m_xoffset; // needs adjustment to left
 
 		int numpixels = (44 * ROAD_TILE_SIZE << 16) / dsourcex;
 		unsigned sourcex = 0;

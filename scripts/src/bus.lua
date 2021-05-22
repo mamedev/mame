@@ -201,6 +201,10 @@ if (BUSES["ADB"]~=null) then
 		MAME_DIR .. "src/devices/bus/adb/adb.h",
 		MAME_DIR .. "src/devices/bus/adb/adbhle.cpp",
 		MAME_DIR .. "src/devices/bus/adb/adbhle.h",
+		MAME_DIR .. "src/devices/bus/adb/a9m0330.cpp",
+		MAME_DIR .. "src/devices/bus/adb/a9m0330.h",
+		MAME_DIR .. "src/devices/bus/adb/a9m0331.cpp",
+		MAME_DIR .. "src/devices/bus/adb/a9m0331.h",
 	}
 end
 
@@ -618,6 +622,8 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_a500.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm7.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_arm7.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_casper.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_cms6809.cpp",
@@ -4455,6 +4461,8 @@ if (BUSES["SAITEK_OSA"]~=null) then
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/modules.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/modules.h",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
+		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/sparc.cpp",

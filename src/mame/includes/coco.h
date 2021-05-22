@@ -259,8 +259,8 @@ protected:
 	bool m_dclg_previous_bit;
 	uint8_t m_dclg_output_h;
 	uint8_t m_dclg_output_v;
-	uint8_t m_dclg_state;
-	uint16_t m_dclg_timer;
+	uint32_t m_dclg_state;
+	uint32_t m_dclg_timer;
 
 	// VHD selection
 	uint8_t m_vhd_select;

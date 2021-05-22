@@ -2462,6 +2462,7 @@ bonzeadvu                       // B41 (c) 1988 Taito America Corporation (US)
 cadash                          // C21 (c) 1989 Taito Corporation Japan
 cadashf                         // C21 (c) 1989 Taito Corporation Japan
 cadashg                         // C21 (c) 1989 Taito Corporation Japan
+cadashgo                        // C21 (c) 1989 Taito Corporation Japan
 cadashi                         // C21 (c) 1989 Taito Corporation Japan
 cadashj                         // C21 (c) 1989 Taito Corporation
 cadashj1                        // C21 (c) 1989 Taito Corporation
@@ -9833,6 +9834,7 @@ comg175                         // (c) 1984 Cal Omega / Casino Electronics Inc.
 comg176                         // (c) 1982 Cal Omega Inc.
 comg181                         // (c) 1983 Cal Omega Inc.
 comg183                         // (c) 1983 Cal Omega Inc.
+comg184                         // (c) 1983 Cal Omega Inc.
 comg185                         // (c) 1983 Cal Omega Inc.
 comg186                         // (c) 1983 Cal Omega Inc.
 comg187                         // (c) 1983 Cal Omega Inc.
@@ -11376,6 +11378,9 @@ crazybal                        // EGS
 crbaloon                        // CL  (c) 1980 Taito Corporation
 crbaloon2                       // CL  (c) 1980 Taito Corporation
 
+@source:crei680.cpp
+crei680
+
 @source:crgolf.cpp
 crgolf                          // (c) 1984 Nasco Japan
 crgolfa                         // (c) 1984 Nasco Japan
@@ -11629,12 +11634,16 @@ dai                             // DAI
 @source:dai3wksi.cpp
 dai3wksi                        // 1979.09 Dai San Wakusei (The Third Planet)
 warp1                           // 1979.12 Warp-1
+warp1t                          // 1979.12 Warp-1 (Taito license)
 warp1bl                         // bootleg
 
 @source:dambustr.cpp
 dambustr                        // (c) 1981 South West Research
 dambustra                       // (c) 1981 South West Research
 dambustruk                      // (c) 1981 South West Research
+
+@source:dangbar.cpp
+dangbar                         //
 
 @source:darius.cpp
 darius                          // A96 (c) 1986 Taito Corporation Japan (World)
@@ -19368,6 +19377,7 @@ bassangl                        // 1998 - Bass Angler (GE765 VER. JAA)
 cr589fw                         // 1999 - CR-589 Firmware (700B04)
 cr589fwa                        // 1999 - CR-589 Firmware (700A04)
 darkhleg                        // 1998 - Dark Horse Legend (GX706 VER. JAA)
+ddrkara                         // 1999 - Dance Dance Revolution Karaoke Mix (GQ921 VER. JBB)
 ddr2m                           // 1999 - Dance Dance Revolution 2nd Mix (GN895 VER. JAA)
 ddr2mc                          // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)
 ddr2mc2                         // 1999 - Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)
@@ -19552,8 +19562,9 @@ dorodon2                        // Falcon
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
 ladybugb2                       // bootleg
+mrsdyna                         // 8203 (c) 1982 Universal
 snapjack                        // ???? (c)
-sraider                         // ???? (c) 1982 Universal
+sraider                         // 8203 (c) 1982 Universal
 
 @source:ladyfrog.cpp
 ladyfrog                        // (c) 1990 Mondial Games

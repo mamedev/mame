@@ -29,6 +29,8 @@ public:
 
 	// C45 Land (Road) Emulation
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
+	void set_xoffset(int xoffset) { m_xoffset = xoffset; }
+
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
 protected:
@@ -60,6 +62,7 @@ private:
 	optional_region_ptr<uint8_t>  m_clut;
 	tilemap_t *                 m_tilemap;
 	pen_t                       m_transparent_color;
+	int                         m_xoffset;
 };
 
 

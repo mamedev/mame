@@ -123,7 +123,7 @@ std::vector<fs_meta_description> fs_prodos::directory_meta_description() const
 
 void fs_prodos::impl::format(const fs_meta_data &meta)
 {
-	std::string volume_name = meta.find(fs_meta_name::name)->second.as_string();
+	std::string volume_name = meta.get_string(fs_meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
 
 	// Maximum usable partition size = 32M - 512 bytes (65535 blocks)
@@ -211,11 +211,11 @@ fs_meta_data fs_prodos::impl::metadata()
 	fs_meta_data res;
 	auto bdir = m_blockdev.get(2);
 	int len = bdir.r8(0x04) & 0xf;
-	res[fs_meta_name::name] = bdir.rstr(0x05, len);
-	res[fs_meta_name::os_version] = uint64_t(bdir.r8(0x20));
-	res[fs_meta_name::os_minimum_version] = uint64_t(bdir.r8(0x21));
-	res[fs_meta_name::creation_date] = prodos_to_dt(bdir.r32l(0x1c));
-	res[fs_meta_name::modification_date] = prodos_to_dt(bdir.r32l(0x16));
+	res.set(fs_meta_name::name, bdir.rstr(0x05, len));
+	res.set(fs_meta_name::os_version, bdir.r8(0x20));
+	res.set(fs_meta_name::os_minimum_version, bdir.r8(0x21));
+	res.set(fs_meta_name::creation_date, prodos_to_dt(bdir.r32l(0x1c)));
+	res.set(fs_meta_name::modification_date, prodos_to_dt(bdir.r32l(0x16)));
 	return res;	
 }
 
@@ -246,11 +246,11 @@ fs_meta_data fs_prodos::impl::dir::metadata()
 
 	auto bdir = m_fs.m_blockdev.get(m_base_block);
 	int len = bdir.r8(0x04) & 0xf;
-	res[fs_meta_name::name] = bdir.rstr(0x05, len);
-	res[fs_meta_name::os_version] = uint64_t(bdir.r8(0x20));
-	res[fs_meta_name::os_minimum_version] = uint64_t(bdir.r8(0x21));
-	res[fs_meta_name::creation_date] = prodos_to_dt(bdir.r32l(0x1c));
-	res[fs_meta_name::modification_date] = prodos_to_dt(bdir.r32l(0x16));
+	res.set(fs_meta_name::name, bdir.rstr(0x05, len));
+	res.set(fs_meta_name::os_version, bdir.r8(0x20));
+	res.set(fs_meta_name::os_minimum_version, bdir.r8(0x21));
+	res.set(fs_meta_name::creation_date, prodos_to_dt(bdir.r32l(0x1c)));
+	res.set(fs_meta_name::modification_date, prodos_to_dt(bdir.r32l(0x16)));
 	return res;	
 }
 
@@ -357,14 +357,14 @@ fs_meta_data fs_prodos::impl::file::metadata()
 	u8 type = r8(m_entry);
 	std::string name = rstr(m_entry+1, type & 0xf);
 	type >>= 4;
-	res[fs_meta_name::name] = name;
+	res.set(fs_meta_name::name, name);
 	if(type == 5) {
 		auto rootblk = m_fs.m_blockdev.get(r16l(m_entry+0x11));
-		res[fs_meta_name::length] = rootblk.r24l(0x005);
-		res[fs_meta_name::rsrc_length] = rootblk.r24l(0x105);
+		res.set(fs_meta_name::length, rootblk.r24l(0x005));
+		res.set(fs_meta_name::rsrc_length, rootblk.r24l(0x105));
 		
 	} else if(type >= 1 && type <= 3)
-		res[fs_meta_name::length] = r24l(m_entry + 0x15);
+		res.set(fs_meta_name::length, r24l(m_entry + 0x15));
 
 	else
 		fatalerror("fs_prodos::impl::file::metadata: Unhandled file type %d\n", type);
@@ -467,35 +467,6 @@ std::vector<u8> fs_prodos::impl::file::read_all()
 	return data;
 }
 
-std::vector<u8> fs_prodos::impl::file::read(u64 start, u64 length)
-{
-	auto [blocks, rlength] = data_blocks();
-	length += start;
-	if(length > rlength)
-		length = rlength;
-
-	if(rlength < start)
-		return std::vector<u8>();
-
-	std::vector<u8> data(length - start);
-	u32 pos = 0;
-	for(u16 block : blocks) {
-		u32 npos = pos + 512;
-		if(npos > length)
-			npos = length;
-		if(npos > pos) {
-			if(npos > start) {
-				u32 off = pos < start ? start & 0xff : 0;
-				auto dblk = m_fs.m_blockdev.get(block);
-				memcpy(data.data() + pos + off - start, dblk.rodata() + off, npos - pos - off);
-			}
-		} else
-			break;
-		pos = npos;
-	}
-	return data;
-}
-
 std::vector<u8> fs_prodos::impl::file::rsrc_read_all()
 {
 	auto [blocks, length] = rsrc_blocks();
@@ -509,35 +480,6 @@ std::vector<u8> fs_prodos::impl::file::rsrc_read_all()
 		if(npos > pos) {
 			auto dblk = m_fs.m_blockdev.get(block);
 			memcpy(data.data() + pos, dblk.rodata(), npos - pos);
-		} else
-			break;
-		pos = npos;
-	}
-	return data;
-}
-
-std::vector<u8> fs_prodos::impl::file::rsrc_read(u64 start, u64 length)
-{
-	auto [blocks, rlength] = rsrc_blocks();
-	length += start;
-	if(length > rlength)
-		length = rlength;
-
-	if(rlength < start)
-		return std::vector<u8>();
-
-	std::vector<u8> data(length - start);
-	u32 pos = 0;
-	for(u16 block : blocks) {
-		u32 npos = pos + 512;
-		if(npos > length)
-			npos = length;
-		if(npos > pos) {
-			if(npos > start) {
-				u32 off = pos < start ? start & 0xff : 0;
-				auto dblk = m_fs.m_blockdev.get(block);
-				memcpy(data.data() + pos + off - start, dblk.rodata() + off, npos - pos - off);
-			}
 		} else
 			break;
 		pos = npos;

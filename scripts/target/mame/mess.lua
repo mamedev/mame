@@ -4041,6 +4041,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/amico2k.cpp",
 	MAME_DIR .. "src/mame/drivers/babbage.cpp",
 	MAME_DIR .. "src/mame/drivers/bob85.cpp",
+	MAME_DIR .. "src/mame/drivers/crei680.cpp",
 	MAME_DIR .. "src/mame/drivers/cvicny.cpp",
 	MAME_DIR .. "src/mame/drivers/datum.cpp",
 	MAME_DIR .. "src/mame/drivers/dolphunk.cpp",

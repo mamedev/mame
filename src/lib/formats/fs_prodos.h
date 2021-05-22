@@ -44,9 +44,7 @@ public:
 
 			virtual fs_meta_data metadata() override;
 			virtual std::vector<u8> read_all() override;
-			virtual std::vector<u8> read(u64 start, u64 length) override;
 			virtual std::vector<u8> rsrc_read_all() override;
-			virtual std::vector<u8> rsrc_read(u64 start, u64 length) override;
 
 		private:
 			impl &m_fs;

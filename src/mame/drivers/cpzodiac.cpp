@@ -96,7 +96,7 @@ void cpzodiac_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).w("syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xea00, 0xea00).nopr();
