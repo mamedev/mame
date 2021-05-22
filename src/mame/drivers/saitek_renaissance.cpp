@@ -19,11 +19,11 @@ The 6301Y0 seen on one of them, was a SX8A 6301Y0G84P, this is in fact the
 MCU(+internal maskrom, disabled here) used in Saitek Conquistador.
 
 The LCD screen is fairly large, it's the same one as in Saitek Simultano,
-so a chessboard display + 7seg info.
+so a chessboard display + 7seg info. It's on a small drawer that can be
+pushed in to hide the chessboard display.
 
 TODO:
 - fart noise at boot if maestroa module is inserted
-- finish internal artwork
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 

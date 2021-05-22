@@ -332,9 +332,9 @@ u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 
 {
 	static const rgb_t colors[3] =
 	{
-		rgb_t(131, 136, 139), // lcd pixel off
+		rgb_t(135, 143, 145), // lcd pixel off
 		rgb_t(51, 42, 43), // lcd pixel on
-		rgb_t(138, 146, 148) // background
+		rgb_t(147, 155, 158) // background
 	};
 
 	bitmap.fill(colors[2], cliprect);

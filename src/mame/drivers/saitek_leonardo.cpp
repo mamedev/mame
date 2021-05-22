@@ -424,4 +424,4 @@ ROM_END
 CONS( 1986, leonardo,  0,        0,   leo,     leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 CONS( 1986, leonardoa, leonardo, 0,   leoa,    leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
 
-CONS( 1988, galileo,   0,        0,   leo,     galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1988, galileo,   leonardo, 0,   leo,     galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
