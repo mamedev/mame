@@ -1927,7 +1927,7 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
-	m_ns2sprite->force_32x32_sprites(true);
+	m_ns2sprite->set_older_sprite_type(true);
 
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
@@ -1955,7 +1955,7 @@ void namcos2_state::finalap2(machine_config &config)
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
 
-	m_ns2sprite->force_32x32_sprites(false);
+	m_ns2sprite->set_older_sprite_type(false);
 }
 
 void namcos2_state::finalap3(machine_config &config)
@@ -1964,7 +1964,7 @@ void namcos2_state::finalap3(machine_config &config)
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
 
-	m_ns2sprite->force_32x32_sprites(false);
+	m_ns2sprite->set_older_sprite_type(false);
 }
 
 
@@ -2703,11 +2703,14 @@ ROM_START( finallap )
 	/* no external MCU ROM? previously loaded type C, but the game predates it */
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	ROM_FILL( 0, 0x200000, 0xff )
-	ROM_LOAD32_BYTE( "obj-0b",  0x200003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_LOAD32_BYTE( "obj-1b",  0x200002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_LOAD32_BYTE( "obj-2b",  0x200001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_LOAD32_BYTE( "obj-3b",  0x200000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
+	ROM_RELOAD(0x200003, 0x80000)
+	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
+	ROM_RELOAD(0x200002, 0x80000)
+	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
+	ROM_RELOAD(0x200001, 0x80000)
+	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_RELOAD(0x200000, 0x80000)
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2749,11 +2752,14 @@ ROM_START( finallapd )
 	/* no external MCU ROM? previously loaded type C, but the game predates it */
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	ROM_FILL( 0, 0x200000, 0xff )
-	ROM_LOAD32_BYTE( "obj-0b",  0x200003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_LOAD32_BYTE( "obj-1b",  0x200002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_LOAD32_BYTE( "obj-2b",  0x200001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_LOAD32_BYTE( "obj-3b",  0x200000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
+	ROM_RELOAD(0x200003, 0x80000)
+	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
+	ROM_RELOAD(0x200002, 0x80000)
+	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
+	ROM_RELOAD(0x200001, 0x80000)
+	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_RELOAD(0x200000, 0x80000)
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2795,11 +2801,14 @@ ROM_START( finallapc )
 	/* no external MCU ROM? previously loaded type C, but the game predates it */
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	ROM_FILL( 0, 0x200000, 0xff )
-	ROM_LOAD32_BYTE( "obj-0b",  0x200003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_LOAD32_BYTE( "obj-1b",  0x200002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_LOAD32_BYTE( "obj-2b",  0x200001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_LOAD32_BYTE( "obj-3b",  0x200000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
+	ROM_RELOAD(0x200003, 0x80000)
+	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
+	ROM_RELOAD(0x200002, 0x80000)
+	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
+	ROM_RELOAD(0x200001, 0x80000)
+	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_RELOAD(0x200000, 0x80000)
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2841,11 +2850,14 @@ ROM_START( finallapjc )
 	/* no external MCU ROM? previously loaded type C, but the game predates it */
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	ROM_FILL( 0, 0x200000, 0xff )
-	ROM_LOAD32_BYTE( "obj-0b",  0x200003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_LOAD32_BYTE( "obj-1b",  0x200002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_LOAD32_BYTE( "obj-2b",  0x200001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_LOAD32_BYTE( "obj-3b",  0x200000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
+	ROM_RELOAD(0x200003, 0x80000)
+	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
+	ROM_RELOAD(0x200002, 0x80000)
+	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
+	ROM_RELOAD(0x200001, 0x80000)
+	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_RELOAD(0x200000, 0x80000)
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2887,11 +2899,14 @@ ROM_START( finallapjb )
 	/* no external MCU ROM? previously loaded type C, but the game predates it */
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	ROM_FILL( 0, 0x200000, 0xff )
-	ROM_LOAD32_BYTE( "obj-0b",  0x200003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_LOAD32_BYTE( "obj-1b",  0x200002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_LOAD32_BYTE( "obj-2b",  0x200001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_LOAD32_BYTE( "obj-3b",  0x200000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
+	ROM_RELOAD(0x200003, 0x80000)
+	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
+	ROM_RELOAD(0x200002, 0x80000)
+	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
+	ROM_RELOAD(0x200001, 0x80000)
+	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
+	ROM_RELOAD(0x200000, 0x80000)
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )

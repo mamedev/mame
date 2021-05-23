@@ -27,7 +27,7 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, cons
 	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG),
-	m_force_32x32(false)
+	m_older_sprite_type(false)
 {
 }
 
@@ -233,8 +233,18 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			// rear-view mirror have glitches. Other games (eg. mirninja) do correctly set it.
 			//
 			// It's not expected that there's a missing emulation feature for disabling 16x16 sprite mode,
-			// but simply the early Namco System 2 hardware that Final Lap runs on does not support it.
-			bool is_32 = bool(word0 & 0x200) || m_force_32x32;
+			// but simply the early Namco System 2 hardware that Final Lap runs on does not support it
+			// fully.
+			//
+			// Final Lap further complicates things however, as the radar/map sprite is a 16x16 sprite.
+			// and maybe significantly, is using tiles numbers in the 0x000-0x7ff range whereas every
+			// other sprite in Final Lap is uses mirror addresses (tile numbers 0x800-0xfff)
+			//
+			// Could it be a PCB design issue prevents the flag from working on tiles 0x800-0xfff forcing
+			// 32x32 mode for that range?
+
+			const u32 sprn   = (word1 >> 2) & 0x0fff;
+			bool is_32 = bool(word0 & 0x200) || (m_older_sprite_type && (sprn & 0x800));
 
 			int sizex = (word3 >> 10) & 0x003f;
 			if (!is_32) sizex >>= 1;
@@ -242,7 +252,6 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			if ((sizey - 1) && sizex)
 			{
 				const u32 color  = (word3 >> 4) & 0x000f;
-				const u32 sprn   = (word1 >> 2) & 0x0fff;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
 				const int xpos   = (offset4 & 0x03ff) - 0x50 + 0x07;
 				const bool flipy = word1 & 0x8000;
