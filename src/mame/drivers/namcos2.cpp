@@ -1927,8 +1927,6 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
-	m_ns2sprite->set_older_sprite_type(true);
-
 	m_c140->add_route(0, "lspeaker", 0.75);
 	m_c140->add_route(1, "rspeaker", 0.75);
 
@@ -1940,6 +1938,13 @@ void namcos2_state::finallap(machine_config &config)
 	finallap_noio(config);
 	configure_c65_standard(config);
 }
+
+void namcos2_state::finallap_altsprite(machine_config &config)
+{
+	finallap(config);
+	m_ns2sprite->set_older_sprite_type(true);
+}
+
 
 void namcos2_state::finallap_c68(machine_config &config)
 {
@@ -1954,8 +1959,6 @@ void namcos2_state::finalap2(machine_config &config)
 	finallap(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
-
-	m_ns2sprite->set_older_sprite_type(false);
 }
 
 void namcos2_state::finalap3(machine_config &config)
@@ -1963,8 +1966,6 @@ void namcos2_state::finalap3(machine_config &config)
 	finallap_c68(config);
 
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
-
-	m_ns2sprite->set_older_sprite_type(false);
 }
 
 
@@ -2704,13 +2705,10 @@ ROM_START( finallap )
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_RELOAD(0x200003, 0x80000)
 	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_RELOAD(0x200002, 0x80000)
 	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_RELOAD(0x200001, 0x80000)
 	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
-	ROM_RELOAD(0x200000, 0x80000)
+	ROM_COPY( "sprite", 0x000000, 0x200000, 0x200000 )
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2753,13 +2751,10 @@ ROM_START( finallapd )
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_RELOAD(0x200003, 0x80000)
 	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_RELOAD(0x200002, 0x80000)
 	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_RELOAD(0x200001, 0x80000)
 	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
-	ROM_RELOAD(0x200000, 0x80000)
+	ROM_COPY( "sprite", 0x000000, 0x200000, 0x200000 )
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2802,13 +2797,10 @@ ROM_START( finallapc )
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_RELOAD(0x200003, 0x80000)
 	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_RELOAD(0x200002, 0x80000)
 	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_RELOAD(0x200001, 0x80000)
 	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
-	ROM_RELOAD(0x200000, 0x80000)
+	ROM_COPY( "sprite", 0x000000, 0x200000, 0x200000 )
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -2851,13 +2843,10 @@ ROM_START( finallapjc )
 
 	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
 	ROM_LOAD32_BYTE( "obj-0b",  0x000003, 0x80000, CRC(c6986523) SHA1(1a4b0e95ade6314850b6e44f2debda0ab6e91397) )
-	ROM_RELOAD(0x200003, 0x80000)
 	ROM_LOAD32_BYTE( "obj-1b",  0x000002, 0x80000, CRC(6af7d284) SHA1(c74f975c301ff15040be1b38359624ec9c83ac76) )
-	ROM_RELOAD(0x200002, 0x80000)
 	ROM_LOAD32_BYTE( "obj-2b",  0x000001, 0x80000, CRC(de45ca8d) SHA1(f476ff1719f60d721d55fd1e40e465f48e7ed019) )
-	ROM_RELOAD(0x200001, 0x80000)
 	ROM_LOAD32_BYTE( "obj-3b",  0x000000, 0x80000, CRC(dba830a2) SHA1(5bd899b39458978dd419bf01082782a02b2d9c20) )
-	ROM_RELOAD(0x200000, 0x80000)
+	ROM_COPY( "sprite", 0x000000, 0x200000, 0x200000 )
 
 	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
 	NAMCOS2_GFXROM_LOAD_128K( "fl1-c0",  0x000000, CRC(cd9d2966) SHA1(39671f846542ba6ae47764674509127cf73e3d71) )
@@ -5703,11 +5692,11 @@ void namcos2_state::init_luckywld()
 /* and metal hawk have the B version and dragon saber has the C version       */
 
 /*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
-GAMEL( 1987, finallap,   0,        finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapd,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapc,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjc, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallap,   0,        finallap_altsprite, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapd,  finallap, finallap_altsprite, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapc,  finallap, finallap_altsprite, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjc, finallap, finallap_altsprite, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjb, finallap, finallap_altsprite, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,  ROT90,  "Namco", "Assault (Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj, ROT90,  "Namco", "Assault (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -239,12 +239,24 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			// Final Lap further complicates things however, as the radar/map sprite is a 16x16 sprite.
 			// and maybe significantly, is using tiles numbers in the 0x000-0x7ff range whereas every
 			// other sprite in Final Lap is uses mirror addresses (tile numbers 0x800-0xfff)
+			// 
+			// There are further sprites in Final Lap, for example sparks, and some frames of the car
+			// rotation which are also meant to be 16x16 sprites, and get pulled from 0x000-0x7ff too
+			// which strongly suggests that the sprite size control is being influenced by the tile
+			// address.
 			//
-			// Could it be a PCB design issue prevents the flag from working on tiles 0x800-0xfff forcing
-			// 32x32 mode for that range?
+			// This could also simply suggest that the Final Lap video board doesn't support the higher
+			// number of tiles, and bits have simply been shifted around as a result, but Four Trax is
+			// said to use the same video board, but uses twice as much ROM and doesn't expect this
+			// behavior
 
-			const u32 sprn   = (word1 >> 2) & 0x0fff;
-			bool is_32 = bool(word0 & 0x200) || (m_older_sprite_type && (sprn & 0x800));
+			const u32 sprn = (word1 >> 2) & 0x0fff;
+			bool is_32;
+
+			if (m_older_sprite_type)
+				is_32 = bool(sprn & 0x800);
+			else
+				is_32 = bool(word0 & 0x200);
 
 			int sizex = (word3 >> 10) & 0x003f;
 			if (!is_32) sizex >>= 1;

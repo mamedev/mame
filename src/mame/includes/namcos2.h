@@ -81,6 +81,7 @@ public:
 	void base2(machine_config &config);
 	void finallap_noio(machine_config &config);
 	void finallap(machine_config &config);
+	void finallap_altsprite(machine_config &config);
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);
 	void finalap3(machine_config &config);
