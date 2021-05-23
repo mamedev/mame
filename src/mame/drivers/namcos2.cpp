@@ -1942,7 +1942,10 @@ void namcos2_state::finallap(machine_config &config)
 void namcos2_state::finallap_altsprite(machine_config &config)
 {
 	finallap(config);
-	m_ns2sprite->set_older_sprite_type(true);
+
+	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0);
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
 }
 
 
@@ -2089,7 +2092,10 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_c116, gfx_metlhawk);
 
-	configure_namcos2_sprite_standard(config);
+	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0);
+	m_ns2sprite->set_gfxdecode_tag("gfxdecode");
+	m_ns2sprite->set_spriteram_tag("spriteram");
+
 	configure_c123tmap_standard(config);
 	configure_c169roz_standard(config);
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));

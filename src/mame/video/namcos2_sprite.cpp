@@ -22,12 +22,30 @@
 #include "namcos2_sprite.h"
 
 DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco System 2 Sprites (C106,C134,C135,C146)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_FINALLAP, namcos2_sprite_finallap_device, "namcos2_sprite_finallap", "Namco System 2 Sprites (C106,C134,C135,C146) (Final Lap)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_METALHAWK, namcos2_sprite_metalhawk_device, "namcos2_sprite_metalhawk", "Namco System 2 Sprites (C106,C134,C135,C146) (Metal Hawk)")
 
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE, tag, owner, clock)
+{
+}
+
+namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG),
 	m_older_sprite_type(false)
+{
+}
+
+
+namcos2_sprite_metalhawk_device::namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_METALHAWK, tag, owner, clock)
+{
+}
+
+namcos2_sprite_finallap_device::namcos2_sprite_finallap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_FINALLAP, tag, owner, clock)
 {
 }
 
@@ -192,6 +210,22 @@ void namcos2_sprite_device::zdrawgfxzoom(
 	/* nop */
 }
 
+void namcos2_sprite_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	sprn = (word1 >> 2) & 0x0fff;
+	is_32 = bool(word0 & 0x200);
+}
+
+void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	// Final Lap schematics show an older sprite board with lower capacity
+	// and the 32/16 pixel mode select on a different bit
+	// this is needed for the title screen to look correct, in addition to various in game sparks effects etc.
+
+	sprn = (word1 >> 2) & 0x07ff;
+	is_32 = bool((word1 >> 2) & 0x800);
+}
+
 void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
 	int offset = (control & 0x000f) * (128 * 4);
@@ -229,37 +263,10 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
 			const int sizey   = ((word0 >> 10) & 0x003f) + 1;
 
-			// It appears that Final Lap does not support 16x16 sprites, otherwise the titlescreen and
-			// rear-view mirror have glitches. Other games (eg. mirninja) do correctly set it.
-			//
-			// It's not expected that there's a missing emulation feature for disabling 16x16 sprite mode,
-			// but simply the early Namco System 2 hardware that Final Lap runs on does not support it
-			// fully.
-			//
-			// Final Lap further complicates things however, as the radar/map sprite is a 16x16 sprite.
-			// and maybe significantly, is using tiles numbers in the 0x000-0x7ff range whereas every
-			// other sprite in Final Lap is uses mirror addresses (tile numbers 0x800-0xfff)
-			// 
-			// There are further sprites in Final Lap, for example sparks, and some frames of the car
-			// rotation which are also meant to be 16x16 sprites, and get pulled from 0x000-0x7ff too
-			// which strongly suggests that the sprite size control is being influenced by the tile
-			// address.
-			//
-			// This could also simply suggest that the Final Lap video board doesn't support the higher
-			// number of tiles, and bits have simply been shifted around as a result, but Four Trax is
-			// said to use the same video board, but uses twice as much ROM and doesn't expect this
-			// behavior
-
-			u32 sprn = (word1 >> 2) & 0x0fff;
+			u32 sprn;
 			bool is_32;
 
-			if (m_older_sprite_type)
-			{
-				is_32 = bool(sprn & 0x800);
-				sprn &= 0x7ff;
-			}
-			else
-				is_32 = bool(word0 & 0x200);
+			get_tilenum_and_size(word0, word1, sprn, is_32);
 
 			int sizex = (word3 >> 10) & 0x003f;
 			if (!is_32) sizex >>= 1;
@@ -299,7 +306,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 } /* draw_sprites */
 
-void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
 	/**
 	 * word#0
