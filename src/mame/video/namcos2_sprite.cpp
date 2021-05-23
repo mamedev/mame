@@ -33,8 +33,7 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, cons
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_spriteram(*this, finder_base::DUMMY_TAG),
-	m_older_sprite_type(false)
+	m_spriteram(*this, finder_base::DUMMY_TAG)
 {
 }
 

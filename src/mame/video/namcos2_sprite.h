@@ -35,7 +35,6 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<u16> m_spriteram;
-	bool m_older_sprite_type;
 };
 
 class namcos2_sprite_finallap_device : public namcos2_sprite_device
