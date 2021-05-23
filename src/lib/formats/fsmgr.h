@@ -391,7 +391,7 @@ public:
 	struct floppy_enumerator {
 		virtual ~floppy_enumerator() = default;
 
-		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, uint32_t image_size, const char *name, const char *description) = 0;
+		virtual void add(floppy_format_type type, uint32_t image_size, const char *name, const char *description) = 0;
 		virtual void add_raw(const char *name, uint32_t key, const char *description) = 0;
 	};
 
@@ -409,6 +409,9 @@ public:
 
 
 	virtual ~filesystem_manager_t() = default;
+
+	virtual const char *name() const = 0;
+	virtual const char *description() const = 0;
 
 	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 	virtual void enumerate_h(hd_enumerator &he) const;
@@ -435,15 +438,5 @@ protected:
 	static bool has(uint32_t form_factor, const std::vector<uint32_t> &variants, uint32_t ff, uint32_t variant);
 	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 };
-
-
-typedef filesystem_manager_t *(*filesystem_manager_type)();
-
-// this template function creates a stub which constructs a filesystem manager
-template<class _FormatClass>
-filesystem_manager_t *filesystem_manager_creator()
-{
-	return new _FormatClass();
-}
 
 #endif

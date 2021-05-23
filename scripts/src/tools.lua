@@ -609,6 +609,8 @@ includedirs {
 }
 
 files {
+	MAME_DIR .. "src/tools/image_handler.cpp",
+	MAME_DIR .. "src/tools/image_handler.h",
 	MAME_DIR .. "src/tools/floptool.cpp",
 }
 

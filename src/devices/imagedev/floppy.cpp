@@ -177,9 +177,9 @@ void format_registration::add(floppy_format_type format)
 	m_formats.push_back(format);
 }
 
-void format_registration::add(filesystem_manager_type fs)
+void format_registration::add(const filesystem_manager_t &fs)
 {
-	m_fs.push_back(fs);
+	m_fs.push_back(&fs);
 }
 
 void floppy_image_device::default_fm_floppy_formats(format_registration &fr)
@@ -311,12 +311,12 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description)
+void floppy_image_device::fs_enum::add(floppy_format_type type, u32 image_size, const char *name, const char *description)
 {
-	if(manager->can_format())
-		m_fid->m_create_fs.emplace_back(fs_info(manager, type, image_size, name, description));
-	if(manager->can_read())
-		m_fid->m_io_fs.emplace_back(fs_info(manager, type, image_size, name, description));
+	if(m_manager->can_format())
+		m_fid->m_create_fs.emplace_back(fs_info(m_manager, type, image_size, name, description));
+	if(m_manager->can_read())
+		m_fid->m_io_fs.emplace_back(fs_info(m_manager, type, image_size, name, description));
 }
 
 void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
@@ -347,11 +347,11 @@ void floppy_image_device::register_formats()
 	}
 
 	fs_enum fse(this);
-	for(filesystem_manager_type fmt : fr.m_fs)
+	for(const filesystem_manager_t *fmt : fr.m_fs)
 	{
-		auto ff = fmt();
-		ff->enumerate_f(fse, form_factor, variants);
-		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
+		fse.m_manager = fmt;
+		fmt->enumerate_f(fse, form_factor, variants);
+		m_fs_managers.push_back(fmt);
 	}
 }
 

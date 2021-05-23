@@ -27,14 +27,14 @@ public:
 	format_registration();
 
 	void add(floppy_format_type format);
-	void add(filesystem_manager_type fs);
+	void add(const filesystem_manager_t &fs);
 
 	void add_fm_containers();
 	void add_mfm_containers();
 	void add_pc_formats();
 
 	std::vector<floppy_format_type> m_formats;
-	std::vector<filesystem_manager_type> m_fs;
+	std::vector<const filesystem_manager_t *> m_fs;
 };
 
 class floppy_image_device : public device_t,
@@ -157,9 +157,11 @@ public:
 protected:
 	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
 		floppy_image_device *m_fid;
+		const filesystem_manager_t *m_manager;
+
 		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
 
-		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) override;
+		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;
 	};
 
@@ -188,7 +190,7 @@ protected:
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
 	std::vector<fs_info>  m_create_fs, m_io_fs;
-	std::vector<std::unique_ptr<filesystem_manager_t>> m_fs_managers;
+	std::vector<const filesystem_manager_t *> m_fs_managers;
 	emu_timer             *index_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */

@@ -7,6 +7,8 @@
 #include "fs_oric_jasmin.h"
 #include "oric_dsk.h"
 
+const fs_oric_jasmin FS_ORIC_JASMIN;
+
 // Floppy only, format is 41 tracks, 1/2 heads, 17 sectors.
 // Filesystem has no subdirectories.
 //
@@ -39,12 +41,22 @@
 //     offset 04-05: length of the file in bytes on the first sector, ffff otherwise
 //     offset 06+  : reference to data sectors, (ff, ff) when done
 
+const char *fs_oric_jasmin::name() const
+{
+	return "oric_jasmin";
+}
+
+const char *fs_oric_jasmin::description() const
+{
+	return "Oric Jasmin";
+}
+
 void fs_oric_jasmin::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
-		fe.add(this, FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
+		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
 	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::SSDD))
-		fe.add(this, FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
+		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
 }
 
 std::unique_ptr<filesystem_t> fs_oric_jasmin::mount(fsblk_t &blockdev) const
@@ -609,7 +621,3 @@ u32 fs_oric_jasmin::impl::free_block_count()
 	}
 	return nf;
 }
-
-
-
-const filesystem_manager_type FS_ORIC_JASMIN = &filesystem_manager_creator<fs_oric_jasmin>;;
