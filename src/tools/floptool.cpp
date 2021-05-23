@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-	(Floppy) image command-line manager
+    (Floppy) image command-line manager
 
 ***************************************************************************/
 
@@ -568,7 +568,7 @@ static int generic_dir(const filesystem_manager_t *fm, fsblk_t &blockdev)
 	std::unordered_map<fs_meta_name, size_t> nmap;
 	for(size_t i = 0; i != names.size(); i++)
 		nmap[names[i]] = i;
-	
+
 	auto root = load_fs->root();
 	std::vector<std::vector<std::string>> entries;
 
@@ -593,7 +593,7 @@ static int generic_dir(const filesystem_manager_t *fm, fsblk_t &blockdev)
 		}
 		printf("%s\n", l.c_str());
 	}
-	
+
 	return 0;
 }
 

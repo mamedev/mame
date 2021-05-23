@@ -140,7 +140,7 @@ public:
 		} else if(m_is_weak_ref != cref.m_is_weak_ref) {
 			ref();
 			cref.unref();
-			m_object = cref.m_object; // In case the object got deleted	(when going from strong ref to weak on the last strong)		
+			m_object = cref.m_object; // In case the object got deleted (when going from strong ref to weak on the last strong)
 		}
 		cref.m_object = nullptr;
 		return *this;
@@ -161,7 +161,7 @@ private:
 				m_object->ref();
 		}
 	}
-	
+
 	void unref() {
 		if(m_object) {
 			bool del = m_is_weak_ref ? m_object->unref_weak() : m_object->unref();
@@ -269,7 +269,7 @@ public:
 
 	fsblk_t() : m_block_size(0) {}
 	virtual ~fsblk_t() = default;
-	
+
 	virtual void set_block_size(uint32_t block_size);
 	virtual uint32_t block_count() const = 0;
 	virtual block_t get(uint32_t id) = 0;
@@ -385,7 +385,7 @@ protected:
 };
 
 class unformatted_floppy_creator;
-	
+
 class filesystem_manager_t {
 public:
 	struct floppy_enumerator {

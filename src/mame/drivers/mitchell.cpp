@@ -1781,7 +1781,7 @@ ROM_START( dokaben2 )
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	ROM_LOAD( "d2_02.1e",     0x000000, 0x20000, CRC(5dd7b941) SHA1(b0e93e733b9bbabe68896c92af34b90daf8dcd7c) ) /* chars */
 	ROM_LOAD( "d2_03.2e",     0x020000, 0x20000, CRC(b615e696) SHA1(f1ec11202fce23af4af15682b158795f7ff4234f) )
-	/* 40000-7ffff empty */                                         
+	/* 40000-7ffff empty */
 	ROM_LOAD( "d2_04.1g",     0x080000, 0x20000, CRC(56b35605) SHA1(c065b03b5cb00ac75b8b439a4f35d9b04a886626) )
 	ROM_LOAD( "d2_05.2g",     0x0a0000, 0x20000, CRC(ce98ff74) SHA1(ddae2e035369886ab03074e947405ef916cc425a) )
 	/* c0000-fffff empty */

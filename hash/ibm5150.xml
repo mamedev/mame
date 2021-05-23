@@ -10459,7 +10459,7 @@ has been replaced with an all-zero block. -->
 				<rom name="Ishar [Silmarils] [1992] [5.25DD] [Disk 4 of 4] [Disk D].img" size="368640" crc="e5b4da48" sha1="d53fd8662d25cef392a2650732de8ab25c11d7c9"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="italy90">
 		<description>Italy '90 Soccer</description>

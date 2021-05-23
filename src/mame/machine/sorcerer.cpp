@@ -559,9 +559,9 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 			1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
 			2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
 			Important addresses:
-				01D5 = start (load) address of a conventional basic program
-				C858 = an autorun basic program will have this exec address on the tape
-				C3DD = part of basic that displays READY and lets user enter input */
+			    01D5 = start (load) address of a conventional basic program
+			    C858 = an autorun basic program will have this exec address on the tape
+			    C3DD = part of basic that displays READY and lets user enter input */
 
 			if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 			{

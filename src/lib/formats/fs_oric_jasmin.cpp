@@ -89,7 +89,7 @@ fs_meta_data fs_oric_jasmin::impl::metadata()
 		len--;
 
 	res.set(fs_meta_name::name, bdir.rstr(0xf8, len));
-	return res;	
+	return res;
 }
 
 bool fs_oric_jasmin::validate_filename(std::string name)
@@ -149,7 +149,7 @@ void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 }
 
 fs_oric_jasmin::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 256), m_root(true)
-{	
+{
 }
 
 bool fs_oric_jasmin::impl::ref_valid(u16 ref)
@@ -440,7 +440,7 @@ fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const f
 	bdir.w8  (off+0x0f, info.get_flag(fs_meta_name::sequential, true) ? 'S' : 'D');
 	bdir.w16l(off+0x10, 2); // 2 sectors for an empty file
 
-	return file_t(new file(m_fs, this, bdir.rodata() + off, id));	
+	return file_t(new file(m_fs, this, bdir.rodata() + off, id));
 }
 
 

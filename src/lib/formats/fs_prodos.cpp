@@ -188,7 +188,7 @@ void fs_prodos::impl::format(const fs_meta_data &meta)
 }
 
 fs_prodos::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512), m_root(true)
-{	
+{
 }
 
 util::arbitrary_datetime fs_prodos::impl::prodos_to_dt(u32 date)
@@ -216,7 +216,7 @@ fs_meta_data fs_prodos::impl::metadata()
 	res.set(fs_meta_name::os_minimum_version, bdir.r8(0x21));
 	res.set(fs_meta_name::creation_date, prodos_to_dt(bdir.r32l(0x1c)));
 	res.set(fs_meta_name::modification_date, prodos_to_dt(bdir.r32l(0x16)));
-	return res;	
+	return res;
 }
 
 filesystem_t::dir_t fs_prodos::impl::root()
@@ -251,7 +251,7 @@ fs_meta_data fs_prodos::impl::dir::metadata()
 	res.set(fs_meta_name::os_minimum_version, bdir.r8(0x21));
 	res.set(fs_meta_name::creation_date, prodos_to_dt(bdir.r32l(0x1c)));
 	res.set(fs_meta_name::modification_date, prodos_to_dt(bdir.r32l(0x16)));
-	return res;	
+	return res;
 }
 
 std::vector<fs_dir_entry> fs_prodos::impl::dir::contents()
@@ -362,7 +362,7 @@ fs_meta_data fs_prodos::impl::file::metadata()
 		auto rootblk = m_fs.m_blockdev.get(r16l(m_entry+0x11));
 		res.set(fs_meta_name::length, rootblk.r24l(0x005));
 		res.set(fs_meta_name::rsrc_length, rootblk.r24l(0x105));
-		
+
 	} else if(type >= 1 && type <= 3)
 		res.set(fs_meta_name::length, r24l(m_entry + 0x15));
 

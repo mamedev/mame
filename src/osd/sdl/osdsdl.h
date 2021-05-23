@@ -16,7 +16,7 @@
 #define SDLOPTION_INIPATH               "inipath"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
 #define SDLOPTION_USEALLHEADS           "useallheads"
-#define SDLOPTION_ATTACH_WINDOW			"attach_window"
+#define SDLOPTION_ATTACH_WINDOW         "attach_window"
 #define SDLOPTION_CENTERH               "centerh"
 #define SDLOPTION_CENTERV               "centerv"
 

@@ -240,7 +240,7 @@ constexpr u32 get_video_addr(u16 x, u16 y)
 	return (x & 0x7ff) | (u32(y & 0x7ff) << 11);
 }
 
-	
+
 class gunpey_state : public driver_device
 {
 public:

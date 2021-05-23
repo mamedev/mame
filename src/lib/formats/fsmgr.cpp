@@ -24,7 +24,7 @@ bool fs_refcounted_inner::unref()
 	if(m_ref == 0) {
 		if(m_weak_ref)
 			drop_weak_references();
-		else 
+		else
 			delete this;
 		return true;
 	}

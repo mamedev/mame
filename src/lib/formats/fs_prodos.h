@@ -58,7 +58,7 @@ public:
 
 		impl(fsblk_t &blockdev);
 		virtual ~impl() = default;
-		
+
 		virtual void format(const fs_meta_data &meta) override;
 
 		virtual fs_meta_data metadata() override;

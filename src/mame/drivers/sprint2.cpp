@@ -193,14 +193,14 @@ uint8_t sprint2_state::sync_r()
 }
 
 
-template <uint8_t Which> 
+template <uint8_t Which>
 uint8_t sprint2_state::steering_r()
 {
 	return m_steering[Which];
 }
 
 
-template <uint8_t Which> 
+template <uint8_t Which>
 void sprint2_state::steering_reset_w(uint8_t data)
 {
 	m_steering[Which] |= 0x80;
