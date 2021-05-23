@@ -42212,4 +42212,95 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lechocdm">
+		<description>Le Choc des Multinationales (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Sogiciel</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"Le Choc des Multinationales" is a 1982 French simulation game developed and distributed by Sogiciel.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="le choc des multinationales (4am crack).dsk" size="143360" crc="883a6653" sha1="69aeda4f7e221f42392a7c6cc35ff08bb1267c18"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lalmonop">
+		<description>L. A. Land Monopoly (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Continental Software</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"L. A. Land Monopoly" is a 1980 board game developed by Jeff Stanton and distributed by Continental Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="l. a. land monopoly (4am and san inc crack).dsk" size="143360" crc="1343945f" sha1="12cc537abbe9da06fa6d9802d47096aa9523c0c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anltut87">
+		<description>Analogies Tutorial (Version 12.15.87) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-05-17"/>
+		<!--"Analogies Tutorial" is a 1983 educational program developed and distributed by Hartley Courseware. This updated version, dated December 15, 1987, is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v12.15.87 (4am crack) side a.dsk" size="143360" crc="fa2036cd" sha1="f1927b777d150dbc1343e78023cf7148fb314547"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="analogies tutorial v12.15.87 (4am crack) side b.dsk" size="143360" crc="283b3b33" sha1="3cebf89919243d5f4ff4cd64f7f935e504f8ede3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decpcdpp">
+		<description>Decimals and Percent: Decimals Practice Problems (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Decimals and Percent: Decimals Practice Problems" is a 1981 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="decimals and percent 2nd edition (4am and san inc crack).dsk" size="143360" crc="3d16ad56" sha1="ff765a012546b808c12aec30f5334777d86214e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhbasic">
+		<description>Hand Holding BASIC (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Hand Holding BASIC" is a 1980 educational program developed by Neil Bennett and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hand holding basic (4am and san inc crack).dsk" size="143360" crc="b320ae13" sha1="3fe03672338a15b84784db9fd8af04cdd736762c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgngame">
+		<description>Dragon Games (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>American Educational Computer</publisher>
+		<info name="release" value="2021-05-18"/>
+		<!--"Dragon Games" is a 1982 educational program developed and distributed by American Educational Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dragon games (4am crack).dsk" size="143360" crc="8ad2ff45" sha1="18732199591bc2ddeec617f2cd20413ae07e42c0"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
