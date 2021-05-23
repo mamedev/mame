@@ -423,10 +423,12 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	// detune adjustment
 	cache.detune = detune_adjustment(op_detune(opoffs), keycode);
 
-	// multiple value, as an x.1 value (0 means 0.5)
-	cache.multiple = op_multiple(opoffs) * 2;
+	// multiple value, as an x.4 value (0 means 0.5)
+	// the "fine" control provides the fractional bits
+	cache.multiple = op_multiple(opoffs) << 4;
 	if (cache.multiple == 0)
-		cache.multiple = 1;
+		cache.multiple = 0x08;
+	cache.multiple |= op_fine(opoffs);
 
 	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
 	// block_freq, detune, and multiple, so compute it after we've done those;
@@ -490,6 +492,10 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		substep += 75 * freq;
 		phase_step = substep >> 12;
 		m_phase_substep[opoffs] = substep & 0xfff;
+
+		// detune/multiple occupy the same space as fix_range/fix_frequency so
+		// don't apply them in addition
+		return phase_step;
 	}
 	else
 	{
@@ -497,9 +503,6 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		// manual, converted into 1/64ths
 		static const int16_t s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
 		int32_t delta = s_detune2_delta[op_detune2(opoffs)];
-
-		// the fine parameter seems to add 1/16th of an octave per unit
-		delta += op_fine(opoffs) * (12*64)/16;
 
 		// add in the PM deltas
 		uint32_t pm_sensitivity = ch_lfo_pm_sens(choffs);
@@ -532,13 +535,13 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		// apply delta and convert to a frequency number; this translation is
 		// the same as OPM so just re-use that helper
 		phase_step = opm_key_code_to_phase_step(cache.block_freq, delta);
+
+		// apply detune based on the keycode
+		phase_step += cache.detune;
+
+		// apply frequency multiplier (which is cached as an x.4 value)
+		return (phase_step * cache.multiple) >> 4;
 	}
-
-	// apply detune based on the keycode
-	phase_step += cache.detune;
-
-	// apply frequency multiplier (which is cached as an x.1 value)
-	return (phase_step * cache.multiple) >> 1;
 }
 
 
