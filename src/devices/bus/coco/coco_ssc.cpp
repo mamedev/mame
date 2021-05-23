@@ -421,8 +421,6 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 		m_tms7000_busy = false;
 	}
 
-	m_tms7000_portc = data;
-
 	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
 			machine().describe_context(),
 			data & 0x80 ? '.' : 'B',
@@ -434,6 +432,8 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 			data & 0x02 ? '1' : '0',
 			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
 			data );
+
+	m_tms7000_portc = data;
 }
 
 u8 coco_ssc_device::ssc_port_d_r()
