@@ -900,19 +900,19 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	if(xflip)
 	{
 		if (xhalfsize)
-			xstart = x+8;
+			xstart = x+7;
 		else
-			xstart = x+16;
-		xend = x;
+			xstart = x+15;
+		xend = x-1;
 		xdir = -1;
 	}
 	else
 	{
-		xstart = x+1;
+		xstart = x;
 		if (xhalfsize)
-			xend = x+9;
+			xend = x+8;
 		else
-			xend = x+17;
+			xend = x+16;
 		xdir = 1;
 	}
 	if(yflip)
@@ -1018,7 +1018,7 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
+			logerror("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
@@ -1028,7 +1028,7 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 		{
 			poffset = (attr & 0x3ff) << 7;
 #ifdef SPR_DEBUG
-			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x",
+			logerror("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x\n",
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
