@@ -42,9 +42,9 @@
 
 #define LOG_INTERFACE   (1U <<  1)
 #define LOG_INTERNAL    (1U <<  2)
-//#define VERBOSE (0)
-#define VERBOSE (LOG_INTERFACE)
-//#define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
+#define VERBOSE (0)
+// #define VERBOSE (LOG_INTERFACE)
+// #define VERBOSE (LOG_INTERFACE|LOG_INTERNAL)
 
 #include "logmacro.h"
 
@@ -314,9 +314,6 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 					data & 0x02 ? '1' : '0',
 					data & 0x01 ? '1' : '0',
 					data );
-
-//   			machine().scheduler().abort_timeslice();
-//  			machine().scheduler().synchronize();
 			break;
 	}
 
@@ -335,15 +332,13 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 		case 0x00:
 			LOGINTERFACE( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
 
-			if( ((data & 1) == 1) )
+			if( (data & 1) == 1 )
 			{
-				LOGINTERNAL( "Resetting SPO\n" );
 				m_spo->reset();
 			}
 
 			if( ((m_reset_line & 1) == 1) && ((data & 1) == 0) )
 			{
-				LOGINTERNAL( "Resetting PIC, AY, reset busy\n" );
 				m_tms7040->reset();
 				m_ay->reset();
 				m_tms7000_busy = false;
@@ -357,8 +352,6 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 			m_tms7000_porta = data;
 			m_tms7000_busy = true;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
-//   			machine().scheduler().abort_timeslice();
-//  			machine().scheduler().synchronize();
 			break;
 	}
 }
@@ -372,7 +365,7 @@ u8 coco_ssc_device::ssc_port_a_r()
 {
 	LOGINTERNAL( "[%s] port a read: %02x\n", machine().describe_context(), m_tms7000_porta );
 
-	if (!machine().side_effects_disabled())
+	if( !machine().side_effects_disabled() )
 	{
 		m_tms7040->set_input_line(TMS7000_INT3_LINE, CLEAR_LINE);
 	}
@@ -396,21 +389,8 @@ u8 coco_ssc_device::ssc_port_c_r()
 
 void coco_ssc_device::ssc_port_c_w(u8 data)
 {
-	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x) - ",
-			machine().describe_context(),
-			data & 0x80 ? '.' : 'B',
-			data & 0x40 ? '.' : 'P',
-			data & 0x20 ? '.' : 'V',
-			data & 0x10 ? '.' : 'R',
-			data & 0x40 ? (data & 0x08 ? 'R' : 'W') : (data & 0x08 ? 'D' : '.'),
-			data & 0x04 ? '1' : '0',
-			data & 0x02 ? '1' : '0',
-			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
-			data );
-
-	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
+	if( (data & C_RCS) == 0 && (data & C_RRW) == 0 ) /* static RAM write */
 	{
-		LOGINTERNAL( "static ram write, " );
 		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
@@ -422,37 +402,43 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 	{
 		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
 		{
-			LOGINTERNAL( "ay latch address, " );
 			m_ay->address_w(m_tms7000_portd);
 		}
 
 		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
 		{
-			LOGINTERNAL( "ay latch data, " );
 			m_ay->data_w(m_tms7000_portd);
 		}
 	}
 
-	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) )
+	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) && (m_tms7000_portd < 64) )
 	{
-		LOGINTERNAL( "speech load address, " );
-		m_spo->ald_w(m_tms7000_portd);
+		m_spo->ald_w(m_tms7000_portd); /* load allophone */
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
-		LOGINTERNAL( "clear tms busy" );
 		m_tms7000_busy = false;
 	}
 
-	LOGINTERNAL( "\n" );
-
 	m_tms7000_portc = data;
+
+	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
+			machine().describe_context(),
+			data & 0x80 ? '.' : 'B',
+			data & 0x40 ? '.' : 'P',
+			data & 0x20 ? '.' : 'V',
+			data & 0x10 ? '.' : 'R',
+			data & 0x40 ? (data & 0x08 ? 'R' : 'W') : (data & 0x08 ? 'D' : '.'),
+			data & 0x04 ? '1' : '0',
+			data & 0x02 ? '1' : '0',
+			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
+			data );
 }
 
 u8 coco_ssc_device::ssc_port_d_r()
 {
-	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0))
+	if( ((m_tms7000_portc & C_RCS) == 0) && ((m_tms7000_portc & C_ACS) == 0) )
 		logerror( "[%s] Warning: Reading RAM and PSG at the same time!\n", machine().describe_context() );
 
 	if( ((m_tms7000_portc & C_RCS) == 0)  && ((m_tms7000_portc & C_RRW) == C_RRW)) /* static ram chip select (low) and static ram chip read (high) */
@@ -523,7 +509,7 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 	if( count > 0 )
 	{
-		for (int sampindex = 0; sampindex < count; sampindex++)
+		for( int sampindex = 0; sampindex < count; sampindex++ )
 		{
 			auto source_sample = src.get(sampindex);
 			m_rms[m_index] += source_sample * source_sample;
@@ -547,8 +533,6 @@ bool cocossc_sac_device::sound_activity_circuit_output()
 {
 	float sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0f);
 	float average = (sum / BUFFER_SIZE);
-
-// 	fprintf( stderr, "average: %f\n", average );
 
 	return average < 0.317f;
 }
