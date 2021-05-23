@@ -31,7 +31,7 @@ static INPUT_PORTS_START ( etiprintbuffer_device )
 	PORT_CONFSETTING(0x02, "Buffer Head/Tail")
 #endif
 	PORT_CONFNAME(0x0c, 0x0c, "Ram Size")
-	PORT_CONFSETTING(0x00, "0K")  // setting a ram size of 0k will cause it to print garbage, only use for testing ram test routines
+	PORT_CONFSETTING(0x00, "0K (will not work, passes FF to printer)")  // setting a ram size of 0k will cause it to pass only 00 on to printer, only use for testing ram test failure routines
 	PORT_CONFSETTING(0x04, "16K")
 	PORT_CONFSETTING(0x08, "32K")
 	PORT_CONFSETTING(0x0c, "48K")
@@ -128,6 +128,13 @@ void etiprintbuffer_device::device_start()
 	m_bufferready_led.resolve();
 	m_ack_timer = timer_alloc(TIMER_ACK);
 	m_strobeout_timer = timer_alloc(TIMER_STROBEOUT);
+
+	save_item(NAME(m_ram));
+	save_item(NAME(m_data));
+	save_item(NAME(m_datalatch));
+	save_item(NAME(m_strobereceived));
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_busy));
 }
 
 void etiprintbuffer_device::device_reset()
@@ -294,7 +301,7 @@ uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, b
 	u32 fullcolor  = 0xbbbbdd;
 	u32 barcolor;
 
-	u8 display = ioport("CONFIG")->read();
+	u8 display = ioport("CONFIG")->read() & 0x3;
 	bitmap.plot_box(0,0,SCREEN_WIDTH,SCREEN_HEIGHT,0x000000);  // clear screen
 
 	if (display & 0x2) // display bars
