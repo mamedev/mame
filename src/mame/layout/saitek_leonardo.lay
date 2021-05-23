@@ -612,6 +612,7 @@ license:CC0
 		<element ref="text_l014"><bounds x="66.75" y="4.1" width="5.5" height="1.3" /></element>
 
 		<element ref="text_l11"><bounds x="22.5" y="8.6" width="6" height="1.3" /></element>
+		<element ref="text_l11a"><bounds x="22.5" y="7.4" width="6" height="1.3" /></element>
 		<element ref="text_l12"><bounds x="28.0" y="8.5" width="6" height="1.5" /></element>
 		<element ref="text_l13"><bounds x="33.5" y="8.5" width="6" height="1.5" /></element>
 		<element ref="text_l14"><bounds x="39.75" y="8.6" width="4.5" height="1.3" /></element>
