@@ -42,9 +42,9 @@
 
 #define LOG_INTERFACE   (1U <<  1)
 #define LOG_INTERNAL    (1U <<  2)
-#define VERBOSE (0)
-// #define VERBOSE (LOG_INTERFACE)
-// #define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
+//#define VERBOSE (0)
+#define VERBOSE (LOG_INTERFACE)
+//#define VERBOSE (LOG_INTERFACE | LOG_INTERNAL)
 
 #include "logmacro.h"
 
@@ -141,7 +141,7 @@ namespace
 		static constexpr int BUFFER_SIZE = 4;
 	private:
 		sound_stream*  m_stream;
-		double m_rms[BUFFER_SIZE];
+		float m_rms[BUFFER_SIZE];
 		int m_index;
 	};
 };
@@ -237,7 +237,7 @@ void coco_ssc_device::device_start()
 
 void coco_ssc_device::device_reset()
 {
-	m_reset_line = 0;
+	m_reset_line = 1;
 	m_tms7000_busy = false;
 }
 
@@ -315,6 +315,8 @@ u8 coco_ssc_device::ff7d_read(offs_t offset)
 					data & 0x01 ? '1' : '0',
 					data );
 
+//   			machine().scheduler().abort_timeslice();
+//  			machine().scheduler().synchronize();
 			break;
 	}
 
@@ -333,19 +335,18 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 		case 0x00:
 			LOGINTERFACE( "[%s] ff7d write: %02x\n", machine().describe_context(), data );
 
-			if( (data & 1) == 1 )
+			if( ((data & 1) == 1) )
 			{
+				LOGINTERNAL( "Resetting SPO\n" );
 				m_spo->reset();
 			}
 
-			if( (m_reset_line & 1) == 1 )
+			if( ((m_reset_line & 1) == 1) && ((data & 1) == 0) )
 			{
-				if( (data & 1) == 0 )
-				{
-					m_tms7040->reset();
-					m_ay->reset();
-					m_tms7000_busy = false;
-				}
+				LOGINTERNAL( "Resetting PIC, AY, reset busy\n" );
+				m_tms7040->reset();
+				m_ay->reset();
+				m_tms7000_busy = false;
 			}
 
 			m_reset_line = data;
@@ -356,6 +357,8 @@ void coco_ssc_device::ff7d_write(offs_t offset, u8 data)
 			m_tms7000_porta = data;
 			m_tms7000_busy = true;
 			m_tms7040->set_input_line(TMS7000_INT3_LINE, ASSERT_LINE);
+//   			machine().scheduler().abort_timeslice();
+//  			machine().scheduler().synchronize();
 			break;
 	}
 }
@@ -393,8 +396,21 @@ u8 coco_ssc_device::ssc_port_c_r()
 
 void coco_ssc_device::ssc_port_c_w(u8 data)
 {
+	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x) - ",
+			machine().describe_context(),
+			data & 0x80 ? '.' : 'B',
+			data & 0x40 ? '.' : 'P',
+			data & 0x20 ? '.' : 'V',
+			data & 0x10 ? '.' : 'R',
+			data & 0x40 ? (data & 0x08 ? 'R' : 'W') : (data & 0x08 ? 'D' : '.'),
+			data & 0x04 ? '1' : '0',
+			data & 0x02 ? '1' : '0',
+			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
+			data );
+
 	if( (data & C_RCS) == 0 && (data & C_RRW) == 0) /* static RAM write */
 	{
+		LOGINTERNAL( "static ram write, " );
 		u16 address = u16(data) << 8;
 		address += m_tms7000_portb;
 		address &= 0x7ff;
@@ -406,36 +422,30 @@ void coco_ssc_device::ssc_port_c_w(u8 data)
 	{
 		if( (data & (C_BDR|C_BC1)) == (C_BDR|C_BC1) ) /* BDIR = 1, BC1 = 1: latch address */
 		{
+			LOGINTERNAL( "ay latch address, " );
 			m_ay->address_w(m_tms7000_portd);
 		}
 
 		if( ((data & C_BDR) == C_BDR) && ((data & C_BC1) == 0) ) /* BDIR = 1, BC1 = 0: write data */
 		{
+			LOGINTERNAL( "ay latch data, " );
 			m_ay->data_w(m_tms7000_portd);
 		}
 	}
 
-	if( (data & C_ALD) == 0 )
+	if( ((m_tms7000_portc & C_ALD) == C_ALD) && ((data & C_ALD) == 0) )
 	{
+		LOGINTERNAL( "speech load address, " );
 		m_spo->ald_w(m_tms7000_portd);
 	}
 
 	if( ((m_tms7000_portc & C_BSY) == 0) && ((data & C_BSY) == C_BSY) )
 	{
+		LOGINTERNAL( "clear tms busy" );
 		m_tms7000_busy = false;
 	}
 
-	LOGINTERNAL( "[%s] port c write: %c%c%c%c %c%c%c%c (%02x)\n",
-			machine().describe_context(),
-			data & 0x80 ? '.' : 'B',
-			data & 0x40 ? '.' : 'P',
-			data & 0x20 ? '.' : 'V',
-			data & 0x10 ? '.' : 'R',
-			data & 0x40 ? (data & 0x08 ? 'R' : 'W') : (data & 0x08 ? 'D' : '.'),
-			data & 0x04 ? '1' : '0',
-			data & 0x02 ? '1' : '0',
-			data & 0x40 ? (data & 0x01 ? '1' : '0') : (data & 0x01 ? 'C' : '.'),
-			data );
+	LOGINTERNAL( "\n" );
 
 	m_tms7000_portc = data;
 }
@@ -485,7 +495,7 @@ cocossc_sac_device::cocossc_sac_device(const machine_config &mconfig, const char
 		m_stream(nullptr),
 		m_index(0)
 {
-	std::fill(std::begin(m_rms), std::end(m_rms), 0);
+	std::fill(std::begin(m_rms), std::end(m_rms), 0.0f);
 }
 
 
@@ -515,10 +525,9 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 	{
 		for (int sampindex = 0; sampindex < count; sampindex++)
 		{
-			// sum the squares
-			m_rms[m_index] += src.get(sampindex) * src.get(sampindex);
-			// copy from source to destination
-			dst.put(sampindex, src.get(sampindex));
+			auto source_sample = src.get(sampindex);
+			m_rms[m_index] += source_sample * source_sample;
+			dst.put(sampindex, source_sample);
 		}
 
 		m_rms[m_index] = m_rms[m_index] / count;
@@ -526,7 +535,7 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 	}
 
 	m_index++;
-	m_index &= BUFFER_SIZE;
+	m_index &= (BUFFER_SIZE-1);
 }
 
 
@@ -536,8 +545,10 @@ void cocossc_sac_device::sound_stream_update(sound_stream &stream, std::vector<r
 
 bool cocossc_sac_device::sound_activity_circuit_output()
 {
-	double sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0);
-	double average = (sum / BUFFER_SIZE);
+	float sum = std::accumulate(std::begin(m_rms), std::end(m_rms), 0.0f);
+	float average = (sum / BUFFER_SIZE);
 
-	return average < 0.08;
+// 	fprintf( stderr, "average: %f\n", average );
+
+	return average < 0.317f;
 }
