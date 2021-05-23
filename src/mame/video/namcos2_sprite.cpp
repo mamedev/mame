@@ -250,11 +250,14 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			// said to use the same video board, but uses twice as much ROM and doesn't expect this
 			// behavior
 
-			const u32 sprn = (word1 >> 2) & 0x0fff;
+			u32 sprn = (word1 >> 2) & 0x0fff;
 			bool is_32;
 
 			if (m_older_sprite_type)
+			{
 				is_32 = bool(sprn & 0x800);
+				sprn &= 0x7ff;
+			}
 			else
 				is_32 = bool(word0 & 0x200);
 
