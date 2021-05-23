@@ -1,23 +1,35 @@
-/*
- * Electronics Today International 48K Print Buffer emulation
- */
+// license:BSD-3-Clause
+// copyright-holders:Golden Child
+/***********************************************************************
 
-// Designed by Nick Sawyer and published in the July and August 1985 issues of Electronics Today International (UK Edition)
-// (markings on PCB are "PB 300-A")
-//
-//   Electronics-Today-1985-07.pdf (pages 33-37 part 1 : schematic, parts list, description) (pages 54-55 pcb foil pattern)
-//   Electronics-Today-1985-08.pdf (pages 48-50 part 2 : rom listing, memory map)
-//   Electronics-Today-1985-09.pdf (page 52) (follow up notes)
-//   Electronics-Today-1985-10.pdf (page 58) (follow up notes)
-//   Electronics-Today-1985-11.pdf (page 13) (follow up notes)
-//
-// Some interesting notes about the rom code:
-//    * Design goal is simplicity, all state is held in the registers so entire 48k ram can be used for buffer.
-//    * Uses no subroutine calls and avoids use of the stack which makes for lots of repeated code.
-//    * For refresh, executes continuous opcodes located between XX80 and XXF0 in the memory map at least once every 4ms.
-//    * Most routines begin on nxx boundaries, with n80-nFF filled with nops.
-//
-// Rom code is entered from the scanned magazine, and some minor bugs fixed.
+    Electronics Today International Print Buffer
+
+    Designed by Nick Sawyer and published in the July and August 1985
+       issues of Electronics Today International (UK Edition)
+
+    Electronics-Today-1985-07.pdf
+        (pages 33-37 part 1 : schematic, parts list, description)
+        (pages 54-55 pcb foil pattern)
+
+    Electronics-Today-1985-08.pdf
+        (pages 48-50 part 2 : rom listing, memory map)
+
+    Electronics-Today-1985-09.pdf (page 52) (follow up notes)
+    Electronics-Today-1985-10.pdf (page 58) (follow up notes)
+    Electronics-Today-1985-11.pdf (page 13) (follow up notes)
+
+     Some interesting notes about the rom code:
+
+    * All state is held in the registers so entire 48k ram can be used.
+    * Uses no subroutine calls and avoids use of the stack.
+    * For refresh, executes continuous opcodes located between XX80 and XXF0
+        in the memory map at least once every 4ms.
+
+    * Rom code is entered from the scanned magazine,
+       with a bug fixed by inserting an 0x00 nop at 0x382,
+       shifting bytes 0x382-0x3ee to 0x383-0x3ef.
+
+***********************************************************************/
 
 #ifndef MAME_BUS_CENTRONICS_ETIBUFFERDEV_H
 #define MAME_BUS_CENTRONICS_ETIBUFFERDEV_H

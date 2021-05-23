@@ -43,15 +43,8 @@ copyright-holders:Golden Child
 			<color red="0.0" green="0" blue="0" />
 		</disk>
 	</element>
-
 	<element name="printerready_str" defstate="0">
 		<text string="Printer Ready">
-			<color red="0" green="0" blue="0" />
-			<bounds x="0" y="0" width="25" height="4" />
-		</text>
-	</element>
-	<element name="ready_str" defstate="0">
-		<text string="READY">
 			<color red="0" green="0" blue="0" />
 			<bounds x="0" y="0" width="25" height="4" />
 		</text>

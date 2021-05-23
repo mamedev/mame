@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Golden Child
 #include "emu.h"
 #include "etibuffer.h"
 #include "etibuffer.lh"
@@ -31,7 +33,7 @@ static INPUT_PORTS_START ( etiprintbuffer_device )
 	PORT_CONFSETTING(0x02, "Buffer Head/Tail")
 #endif
 	PORT_CONFNAME(0x0c, 0x0c, "Ram Size")
-	PORT_CONFSETTING(0x00, "0K (will not work, passes FF to printer)")  // setting a ram size of 0k will cause it to pass only 00 on to printer, only use for testing ram test failure routines
+	PORT_CONFSETTING(0x00, "0K (will not work, passes FF to printer)")  // ram size of 0k will pass only 00 on to printer, use for ram test failure
 	PORT_CONFSETTING(0x04, "16K")
 	PORT_CONFSETTING(0x08, "32K")
 	PORT_CONFSETTING(0x0c, "48K")
