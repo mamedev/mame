@@ -797,13 +797,13 @@ void coco_state::poll_keyboard(void)
 
 	/* poll the joystick (*/
 	bool joyin;
-	uint8_t buttons;
 	joyin = poll_joystick();
 
 	/* PA7 comes from JOYIN */
 	pia0_pa |= joyin ? 0x80 : 0x00;
 
 	/* mask out the buttons */
+	uint8_t buttons;
 	buttons = poll_joystick_buttons();
 	pia0_pa &= ~buttons;
 
