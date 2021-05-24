@@ -673,6 +673,11 @@ ROM_START( jak_dwmn )
 	ROM_LOAD16_WORD_SWAP( "dreamworks.bin", 0x000000, 0x400000, CRC(3ae9f786) SHA1(46451be3af459fbdb75d1155b3817543afe183d5) )
 ROM_END
 
+ROM_START( jak_dwmno )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dw_spg300_test.bin", 0x000000, 0x400000, CRC(1ca2817b) SHA1(39ae519457c102c4420fae3699b2db0557ef1cf5) )
+ROM_END
+
 ROM_START( jak_xmenp )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "xmen.bin", 0x000000, 0x400000, CRC(1fa271e0) SHA1(c32652e9eddf82ab496e3609f8fa444e447fb509) )
@@ -741,5 +746,6 @@ CONS( 2005, jak_xmenp, 0,        0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_st
 
 // Dreamworks Movie Night was never manufactured 
 CONS( 2006, jak_dwmn, 0,        0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Oct 18 2006, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_dwmno,jak_dwmn, 0, jakks_gkr_2m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Apr 24 2006, test program)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Some versions of the Shrek - Over the Hedge unit show the GameKey logo on startup (others don't) there is no evidence to suggest it was ever released with a GameKey port tho, and the internal PCB has no place for one on the versions we've seen (which show the logo)
