@@ -1243,6 +1243,9 @@ void z80scc_channel::tra_callback()
 		LOGTX("%s: transmit data bit %d m_wr5:%02x\n", FUNCNAME, db, m_wr5);
 		// transmit data
 		out_txd_cb(db);
+
+		if (m_wr14 & WR14_LOCAL_LOOPBACK)
+			write_rx(db);
 	}
 	else
 	{
@@ -2298,6 +2301,10 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 		m_brg_counter = 0;
 #endif
 	}
+
+	if (!(m_wr14 & WR14_LOCAL_LOOPBACK) && (data & WR14_LOCAL_LOOPBACK))
+		receive_register_reset();
+
 	// TODO: Add info on the other bits of this register
 	m_wr14 = data;
 	update_serial();
