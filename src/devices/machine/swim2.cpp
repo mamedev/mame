@@ -297,7 +297,7 @@ void swim2_device::write(offs_t offset, u8 data)
 	if(m_mode & 0x01)
 		fifo_clear();
 
-	if((m_mode ^ prev_mode) & 0x06)
+	if((m_mode ^ prev_mode) & 0x86)
 		m_devsel_cb(m_mode & 0x80 ? (m_mode >> 1) & 3 : 0);
 	if((m_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_mode >> 5) & 1);
