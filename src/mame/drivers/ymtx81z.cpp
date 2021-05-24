@@ -19,6 +19,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "tx81z.lh"
+
 class ymtx81z_state : public driver_device
 {
 public:
@@ -148,6 +150,8 @@ void ymtx81z_state::tx81z(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 3);
+
+	config.set_default_layout(layout_tx81z);
 
 	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 16);
