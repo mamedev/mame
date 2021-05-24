@@ -199,7 +199,6 @@ protected:
 	void update_sound(void);
 	bool poll_joystick(void);
 	uint8_t poll_joystick_buttons(void);
-
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);
