@@ -198,8 +198,8 @@ public:
 	uint32_t ch_echo(uint32_t choffs) const          { return byte(0x18, 7, 1, choffs); }
 	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return byte(0x18, 4, 3, choffs); }
 	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return byte(0x18, 0, 2, choffs); }
-	uint32_t ch_block_freq_24(uint32_t choffs) const { return word(0x20, 0, 6, 0x30, 0, 8, choffs); }
-	uint32_t ch_block_freq_13(uint32_t choffs) const { return word(0x28, 0, 6, 0x30, 0, 8, choffs); }
+	uint32_t ch_block_freq_24(uint32_t choffs) const { return word(0x20, 0, 7, 0x30, 0, 8, choffs); }
+	uint32_t ch_block_freq_13(uint32_t choffs) const { return word(0x28, 0, 7, 0x38, 0, 8, choffs); }
 
 	// per-operator registers
 	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 0, 6, opoffs); }
