@@ -176,15 +176,15 @@ public:
 
 	// system-wide registers
 	uint32_t timer_a_value() const              { return 0; }
-	uint32_t timer_b_value() const              { return byte(0x03, 0, 8); }
+	uint32_t timer_b_value() const              { return byte(0x03, 2, 6) | 0xc0; } // ???
 	uint32_t csm() const                        { return 0; }
-	uint32_t reset_timer_b() const              { return byte(0x14, 5, 1); }
+	uint32_t reset_timer_b() const              { return byte(0x03, 0, 1); } // ???
 	uint32_t reset_timer_a() const              { return 0; }
-	uint32_t enable_timer_b() const             { return byte(0x14, 3, 1); }
+	uint32_t enable_timer_b() const             { return byte(0x03, 0, 1); } // ???
 	uint32_t enable_timer_a() const             { return 0; }
-	uint32_t load_timer_b() const               { return byte(0x14, 1, 1); }
+	uint32_t load_timer_b() const               { return byte(0x03, 0, 1); } // ???
 	uint32_t load_timer_a() const               { return 0; }
-	uint32_t lfo_enable() const                 { return byte(0x04, 4, 1) ^ 1; }
+	uint32_t lfo_enable() const                 { return byte(0x04, 3, 1) ^ 1; }
 	uint32_t lfo_rate() const                   { return byte(0x04, 0, 3); }
 
 	// per-channel registers
@@ -277,6 +277,17 @@ public:
 protected:
 	// internal state
 	fm_engine m_fm;                  // core FM engine
+};
+
+
+// ======================> ym3533
+
+class ym3533 : public ym3806
+{
+public:
+	// constructor
+	ym3533(ymfm_interface &intf) :
+		ym3806(intf) { }
 };
 
 }

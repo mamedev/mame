@@ -12,7 +12,7 @@
     Service manual: https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
 
     CPU: Z80 @ 6 MHz
-    Sound: YM3806 "OPQ" FM @ 3.58 MHz + YM2154 "RYP" sample playback chip for drums
+    Sound: YM3533 "OPQ" FM @ 3.58 MHz + YM2154 "RYP" sample playback chip for drums
     Panel and keyboard I/O: 82C55A PPI and Yamaha IG14330 "DRVIF"
     MIDI I/O: HD6350 ACIA, baud rate clock is 500 kHz
 
@@ -59,7 +59,7 @@ public:
 	psr60_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ym3806(*this, "ym3806"),
+		m_ym3533(*this, "ym3533"),
 		m_ppi(*this, "ppi"),
 		m_acia(*this, "acia"),
 		m_rom2bank(*this, "rom2bank")
@@ -73,7 +73,7 @@ protected:
 
 private:
 	required_device<z80_device> m_maincpu;
-	required_device<ym3806_device> m_ym3806;
+	required_device<ym3533_device> m_ym3533;
 	required_device<i8255_device> m_ppi;
 	required_device<acia6850_device> m_acia;
 	required_memory_bank m_rom2bank;
@@ -89,7 +89,7 @@ private:
 	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }
 
-	WRITE_LINE_MEMBER(ym_irq_w) { m_ym_irq = state; recalc_irqs(); printf("YM IRQ %d\n", state); }
+	WRITE_LINE_MEMBER(ym_irq_w) { m_ym_irq = state; recalc_irqs(); }
 
 };
 
@@ -97,7 +97,7 @@ void psr60_state::psr60_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("rom1", 0);
 	map(0x8000, 0xbfff).bankr("rom2bank");
-	map(0xc000, 0xc0ff).rw(m_ym3806, FUNC(ym3806_device::read), FUNC(ym3806_device::write));
+	map(0xc000, 0xc0ff).rw(m_ym3533, FUNC(ym3533_device::read), FUNC(ym3533_device::write));
 	map(0xe000, 0xffff).ram();  // work RAM
 }
 
@@ -159,10 +159,10 @@ void psr60_state::psr60(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM3806(config, m_ym3806, 3.579545_MHz_XTAL);
-	m_ym3806->irq_handler().set(FUNC(psr60_state::ym_irq_w));
-	m_ym3806->add_route(0, "lspeaker", 1.0);
-	m_ym3806->add_route(1, "rspeaker", 1.0);
+	YM3533(config, m_ym3533, 3.579545_MHz_XTAL);
+	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
+	m_ym3533->add_route(0, "lspeaker", 1.0);
+	m_ym3533->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( psr60 )
