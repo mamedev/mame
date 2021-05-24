@@ -87,6 +87,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
@@ -122,6 +123,11 @@ void leo_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+}
+
+void leo_state::machine_reset()
+{
+	m_stb->in_clear<0>();
 }
 
 
@@ -361,7 +367,7 @@ void leo_state::leonardo(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
-	INPUT_MERGER_ANY_LOW(config, m_stb);
+	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(u32(~3));
 	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
