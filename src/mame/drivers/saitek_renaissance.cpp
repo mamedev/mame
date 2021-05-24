@@ -357,7 +357,7 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
 
-	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(u32(~3));
+	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(~u32(3));
 	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
