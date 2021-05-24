@@ -1170,8 +1170,8 @@ end
 ---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM2414"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM3806"] = true
+--@src/devices/sound/ymopz.h,SOUNDS["YM2414"] = true
+--@src/devices/sound/ymopq.h,SOUNDS["YM3806"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2203"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YM2413"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2608"] = true
