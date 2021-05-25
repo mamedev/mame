@@ -235,7 +235,7 @@ protected:
 	u32 cache_entry;
 	bool cache_weak;
 
-	bool image_dirty;
+	bool image_dirty, track_dirty;
 	int ready_counter;
 
 	load_cb cur_load_cb;

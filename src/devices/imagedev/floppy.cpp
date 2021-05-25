@@ -262,6 +262,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		cyl(0),
 		subcyl(0),
 		image_dirty(false),
+		track_dirty(false),
 		ready_counter(0),
 		m_make_sound(false),
 		m_sound_out(nullptr),
@@ -393,6 +394,11 @@ void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
 
 void floppy_image_device::commit_image()
 {
+	if(track_dirty) {
+		flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
+		track_dirty = false;
+	}
+
 	image_dirty = false;
 	if(!output_format || !output_format->supports_save())
 		return;
@@ -1044,6 +1050,11 @@ void floppy_image_device::stp_w(int state)
 		cache_clear();
 		stp = state;
 		if ( stp == 0 ) {
+			if(track_dirty) {
+				flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
+				track_dirty = false;
+			}
+
 			int ocyl = cyl;
 			if ( dir ) {
 				if ( cyl ) cyl--;
@@ -1099,6 +1110,12 @@ void floppy_image_device::seek_phase_w(int _phases)
 		next_pos = 0;
 	else if(next_pos > (tracks-1)*4)
 		next_pos = (tracks-1)*4;
+
+	if(track_dirty) {
+		flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
+		track_dirty = false;
+	}
+
 	cyl = next_pos >> 2;
 	subcyl = next_pos & 3;
 
@@ -1308,6 +1325,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 		return;
 
 	image_dirty = true;
+	track_dirty = true;
 	cache_clear();
 
 	attotime base;
@@ -1368,8 +1386,6 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 	}
 
 	buf.resize(cells);
-
-	flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
 }
 
 void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg)
