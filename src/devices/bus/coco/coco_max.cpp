@@ -13,11 +13,11 @@
 
 #include "machine/ram.h"
 
-#define MOUSE_DELTA          10
-#define MOUSE_SENSITIVITY    100
-#define COCOMAX_X_TAG	"cocomax_x"
-#define COCOMAX_Y_TAG	"cocomax_y"
-#define COCOMAX_BUTTONS	"cocomax_buttons"
+#define MOUSE_DELTA			10
+#define MOUSE_SENSITIVITY	100
+#define COCOMAX_X_TAG		"cocomax_x"
+#define COCOMAX_Y_TAG		"cocomax_y"
+#define COCOMAX_BUTTONS		"cocomax_buttons"
 
 // #define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
@@ -75,7 +75,7 @@ namespace
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_MAX, device_cococart_interface, coco_pak_max_device, "cocopakmax", "CoCo Max A/D Cartridge")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_MAX, device_cococart_interface, coco_pak_max_device, "cocopakmax", "CoCo Max HI-RES input module")
 
 
 
@@ -114,7 +114,7 @@ void coco_pak_max_device::device_start()
 	// save state
  	save_item(NAME(m_a2d_result));
 
-	// install $ff7d-e handler
+	// install $ff60-$ff63 handler
 	install_read_handler(0xff60, 0xff63, read8sm_delegate(*this, FUNC(coco_pak_max_device::ff60_read)));
 }
 
@@ -141,19 +141,18 @@ u8 coco_pak_max_device::ff60_read(offs_t offset)
 
 	switch (offset)
 	{
-		case 1:
+		case 0:
 			m_a2d_result = m_mouse_x->read();
 			break;
-		case 2:
+		case 1:
 			m_a2d_result = m_mouse_y->read();
 			break;
+		case 2:
+			m_a2d_result = BIT(m_buttons->read(), 0) ? 0xff : 0;
+			break;
 		case 3:
-			m_a2d_result = BIT(m_buttons->read(), 1);
+			m_a2d_result = BIT(m_buttons->read(), 1) ? 0xff : 0;
 			break;
-		case 4:
-			m_a2d_result = BIT(m_buttons->read(), 2);
-			break;
-		case 0:
 		default:
 			break;
 	}
