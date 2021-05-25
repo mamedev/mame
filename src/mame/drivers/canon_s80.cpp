@@ -241,4 +241,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT        COMPANY  FULLNAME                                  FLAGS
 COMP( 1988, canons80, 0,      0,      canons80, 0,     canons80_state, empty_init, "Canon", "Canon S-80 electronic typewriter",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, canonts3, 0,      0,      canons80, 0,     canons80_state, empty_init, "Canon", "Canon Typestar 3",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, canonts3, 0,      0,      canons80, 0,     canons80_state, empty_init, "Canon", "Typestar 3",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

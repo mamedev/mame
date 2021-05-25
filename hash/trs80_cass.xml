@@ -523,7 +523,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		</part>
 	</software>
 	<software name="galaxy1">
-		<description>Galaxy Invasion (1)</description>
+		<description>Galaxy Invasion (set 1)</description>
 		<year>1980</year>
 		<publisher>Big Five Software</publisher>
 		<info name="author" value="Bill Hogue and Jeff Konyu" />
@@ -536,7 +536,7 @@ Note that trs80m4p doesn't physically have a cassette interface, so no tapes can
 		</part>
 	</software>
 	<software name="galaxy2">
-		<description>Galaxy Invasion (2)</description>
+		<description>Galaxy Invasion (set 2)</description>
 		<year>1980</year>
 		<publisher>Big Five Software</publisher>
 		<info name="author" value="Bill Hogue and Jeff Konyu" />

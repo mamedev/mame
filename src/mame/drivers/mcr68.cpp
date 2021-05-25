@@ -1670,8 +1670,8 @@ GAME( 1987, intlaser,  blasted,  intlaser, intlaser,  mcr68_state, init_intlaser
 
 GAME( 1989, archrivl,  0,        archrivl, archrivl,  mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1989, archrivla, archrivl, archrivl, archrivl,  mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivlb, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, basketbal, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Basket Ball (8-way Joystick bootleg of Arch Rivals)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivlb, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, basketbal, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Basket Ball (8-way joystick bootleg of Arch Rivals)",   MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, trisport,  0,        trisport, trisport,  mcr68_state, init_trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
 
