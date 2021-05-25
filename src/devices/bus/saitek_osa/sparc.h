@@ -22,6 +22,8 @@ public:
 	// construction/destruction
 	saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
+
 	// from host
 	virtual u8 data_r() override;
 
