@@ -116,6 +116,16 @@ void saitekosa_expansion_device::ack_w(int state)
 	m_ack = state;
 }
 
+void saitekosa_expansion_device::pw_w(int state)
+{
+	state = (state) ? 1 : 0;
+
+	if (m_module)
+		m_module->pw_w(state);
+
+	m_pw = state;
+}
+
 u32 saitekosa_expansion_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : UPDATE_HAS_NOT_CHANGED;

@@ -339,7 +339,7 @@ u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 
 		const u8 *src = render + 16 * ((i & 7) + BIT(i, 3) * 40);
 		for (int y = 0; y < 8; y++)
 			for (int x = 0; x < 5; x++)
-				bitmap.pix(y + 4, i * 6 + x + 2) = BIT(src[y], 4 - x) ? 0x282828 : 0xe8e8e8;
+				bitmap.pix(y + 4, i * 6 + x + 2) = (BIT(src[y], 4 - x) && m_expansion->pw_state()) ? 0x282828 : 0xe8e8e8;
 	}
 
 	return 0;
