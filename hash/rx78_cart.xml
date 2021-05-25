@@ -146,9 +146,11 @@ The monitor will expect you to load a program from cassette.
 	</software>
 
 	<software name="gundam">
-		<description>Mobile Suit Gundam</description>
+		<description>Mobile Suit Gundam: Lunar 2 no Tatakai</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="alt_title" value="Mobile Suit ガンダム ルナ・ツーの戦い" /><!-- used on box art -->
+		<info name="alt_title" value="Mobil Suit ガンダム ルナ・ツーのタタカイ" /><!-- title screen really spells it "MOBIL SUIT" -->
 		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">

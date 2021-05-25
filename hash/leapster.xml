@@ -591,7 +591,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="dorawr">
+	<software name="dorawr" supported="no">
 		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -603,7 +603,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="dorawra" cloneof="dorawr">
+	<software name="dorawra" cloneof="dorawr" supported="no">
 		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA, alt)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -1432,7 +1432,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 	</software>
 
 	<software name="penguins" supported="no">
-		<description>Nickelodeon The Penguins of Madagascar - Race for the 1sr Place! (USA)</description>
+		<description>Nickelodeon The Penguins of Madagascar - Race for 1st Place! (USA)</description>
 		<year>2010</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-14007-B" />
@@ -1626,7 +1626,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 
 	<!-- L-MAX carts, ordered by title -->
 
-	<software name="dorawrlmx">
+	<software name="dorawrlmx" supported="no">
 		<description>Nick Jr. Dora the Explorer - Wildlife Rescue (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1638,7 +1638,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="lettontllmx">
+	<software name="lettontllmx" supported="no">
 		<description>Letters on the Loose (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1650,7 +1650,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="madagasclmx">
+	<software name="madagasclmx" supported="no">
 		<description>Madagascar (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1662,7 +1662,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="nascarlmx">
+	<software name="nascarlmx" supported="no">
 		<description>NASCAR (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1674,7 +1674,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="numbrunlmx">
+	<software name="numbrunlmx" supported="no">
 		<description>Numbers on the Run - Counting on Zero (USA, L-MAX)</description>
 		<year>2005?</year>
 		<publisher>LeapFrog</publisher>
@@ -1686,7 +1686,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spongeblmx" cloneof="spongeb">
+	<software name="spongeblmx" cloneof="spongeb" supported="no">
 		<description>Spongebob Squarepants - Saves the Day (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1698,7 +1698,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spidermnlmx" cloneof="spidermn">
+	<software name="spidermnlmx" cloneof="spidermn" supported="no">
 		<description>Spider-Man - The Case of the Sinister Speller (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
