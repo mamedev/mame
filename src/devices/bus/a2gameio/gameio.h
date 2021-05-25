@@ -67,6 +67,9 @@ public:
 	// utility strobe (active low)
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
+	// check if a device is connected
+	bool is_device_connected() { return (m_intf != nullptr); }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
