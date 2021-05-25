@@ -394,7 +394,7 @@ void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
 
 void floppy_image_device::commit_image()
 {
-	if(track_dirty) {
+	if(FLUX_SCREEN && track_dirty) {
 		flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
 		track_dirty = false;
 	}
@@ -486,24 +486,26 @@ void floppy_image_device::device_start()
 	save_item(NAME(ready_counter));
 	save_item(NAME(phases));
 
-	m_flux_per_pixel_infos.resize(flux_screen_sx*flux_screen_sy);
-	flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data();
-	for(int y = 0; y != flux_screen_sy; y++) {
-		int head = y >= flux_screen_sy / 2 ? 1 : 0;
-		int yc = (flux_screen_sy/2-1)/2 + (flux_screen_sy/2)*head;
-		int dy = y - yc;
-		for(int x = 0; x != flux_screen_sx; x++) {
-			const int xc = (flux_screen_sx - 1)/2;
-			int dx = x - xc;
-			int r = int(sqrt(dx*dx + dy*dy) + 0.5);
-			ppi->m_r = r;
-			if(r > flux_max_r || r < flux_min_r)
-				ppi->m_position = 0xffffffff;
-			else
-				ppi->m_position = int((200e6 / 2 / M_PI) * atan2(dy, dx) + 100000000.5) % 200000000;
-			ppi->m_combined_track = 0;
-			ppi->m_color = 0;
-			ppi ++;
+	if(FLUX_SCREEN) {
+		m_flux_per_pixel_infos.resize(flux_screen_sx*flux_screen_sy);
+		flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data();
+		for(int y = 0; y != flux_screen_sy; y++) {
+			int head = y >= flux_screen_sy / 2 ? 1 : 0;
+			int yc = (flux_screen_sy/2-1)/2 + (flux_screen_sy/2)*head;
+			int dy = y - yc;
+			for(int x = 0; x != flux_screen_sx; x++) {
+				const int xc = (flux_screen_sx - 1)/2;
+				int dx = x - xc;
+				int r = int(sqrt(dx*dx + dy*dy) + 0.5);
+				ppi->m_r = r;
+				if(r > flux_max_r || r < flux_min_r)
+					ppi->m_position = 0xffffffff;
+				else
+					ppi->m_position = int((200e6 / 2 / M_PI) * atan2(dy, dx) + 100000000.5) % 200000000;
+				ppi->m_combined_track = 0;
+				ppi->m_color = 0;
+				ppi ++;
+			}
 		}
 	}
 }
@@ -624,11 +626,15 @@ image_init_result floppy_image_device::call_load()
 		return cur_load_cb(this);
 
 	flux_image_prepare();
+
 	return image_init_result::PASS;
 }
 
 void floppy_image_device::flux_image_prepare()
 {
+	if(!FLUX_SCREEN)
+		return;
+
 	int tracks = 0, heads = 0, rez = 0;
 	image->get_maximal_geometry(tracks, heads);
 	rez = image->get_resolution();
@@ -1050,7 +1056,7 @@ void floppy_image_device::stp_w(int state)
 		cache_clear();
 		stp = state;
 		if ( stp == 0 ) {
-			if(track_dirty) {
+			if(FLUX_SCREEN && track_dirty) {
 				flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
 				track_dirty = false;
 			}
@@ -1111,7 +1117,7 @@ void floppy_image_device::seek_phase_w(int _phases)
 	else if(next_pos > (tracks-1)*4)
 		next_pos = (tracks-1)*4;
 
-	if(track_dirty) {
+	if(FLUX_SCREEN && track_dirty) {
 		flux_image_compute_for_track(((cyl << 2) | subcyl) >> (2 - image->get_resolution()), ss);
 		track_dirty = false;
 	}
@@ -1886,12 +1892,13 @@ void floppy_image_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, FLOPSPK).front_center();
 	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
 
-#if FLUX_SCREEN
-	SCREEN(config, m_flux_screen, SCREEN_TYPE_RASTER);
-	m_flux_screen->set_screen_update(FUNC(floppy_image_device::flux_screen_update));
-	m_flux_screen->set_raw(30*(flux_screen_sx+1)*(flux_screen_sy+1), flux_screen_sx+1, 0, flux_screen_sx, flux_screen_sy+1, 0, flux_screen_sy);
-	m_flux_screen->set_physical_aspect(1, 2);
-#endif
+	if (FLUX_SCREEN)
+	{
+		SCREEN(config, m_flux_screen, SCREEN_TYPE_RASTER);
+		m_flux_screen->set_screen_update(FUNC(floppy_image_device::flux_screen_update));
+		m_flux_screen->set_raw(30*(flux_screen_sx+1)*(flux_screen_sy+1), flux_screen_sx+1, 0, flux_screen_sx, flux_screen_sy+1, 0, flux_screen_sy);
+		m_flux_screen->set_physical_aspect(1, 2);
+	}
 }
 
 
