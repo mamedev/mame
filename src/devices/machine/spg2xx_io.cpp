@@ -1102,7 +1102,15 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		const uint16_t channel = (m_io_regs[REG_ADC_CTRL] >> 4) & 3;
 		if (BIT(m_io_regs[REG_ADC_CTRL], 0))
 		{
-			if (!BIT(old_ctrl, 0))
+			// Does anything require the 0->1 check below?
+			// jak_sith (and all the other Star Wars units / GameKeys) break on the high score table if you leave the demo
+			// running or finish a game with a high score, as they write '0x0001' and then don't read any further directional
+			// inputs until 0x2000 is set, but that never happens because the value at the time is already 0x0001.
+			//
+			// If the state of the lowest bit is important to other software, maybe it's more of a status flag than a true
+			// read/write register?
+		
+			//if (!BIT(old_ctrl, 0))
 			{
 				m_io_regs[REG_ADC_CTRL] |= 0x2000;
 				if (BIT(m_io_regs[REG_ADC_CTRL], 9))
