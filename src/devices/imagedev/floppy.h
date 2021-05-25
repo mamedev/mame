@@ -231,6 +231,7 @@ protected:
 
 	/* Current floppy zone cache */
 	attotime cache_start_time, cache_end_time, cache_weak_start;
+	attotime amplifier_freakout_time;
 	int cache_index;
 	u32 cache_entry;
 	bool cache_weak;
@@ -316,6 +317,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_ED,        floppy_35_ed,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_25")

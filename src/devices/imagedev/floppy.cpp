@@ -59,6 +59,7 @@ DEFINE_DEVICE_TYPE(FLOPPY_35_ED,   floppy_35_ed,   "floppy_35_ed",   "3.5\" exte
 // generic 5.25" drives
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_525_sssd_35t", "5.25\" single-sided single density 35-track floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_525_sd_35t",   "5.25\" double-sided single density 35-track floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_525_vtech",    "5.25\" single-sided single density VTECH floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_525_sssd",     "5.25\" single-sided single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_525_sd",       "5.25\" single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd",     "5.25\" single-sided double density floppy drive")
@@ -261,6 +262,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		revolution_count(0),
 		cyl(0),
 		subcyl(0),
+		amplifier_freakout_time(attotime::from_usec(16)),
 		image_dirty(false),
 		track_dirty(false),
 		ready_counter(0),
@@ -1280,7 +1282,7 @@ void floppy_image_device::cache_weakness_setup()
 		return;
 	}
 
-	cache_weak = cache_end_time.is_never() || (cache_end_time - cache_start_time >= attotime::from_usec(16));
+	cache_weak = cache_end_time.is_never() || (cache_end_time - cache_start_time >= amplifier_freakout_time);
 	if(!cache_weak) {
 		cache_weak_start = attotime::never;
 		return;
@@ -2100,6 +2102,31 @@ void floppy_525_sd_35t::setup_characteristics()
 	tracks = 35;
 	sides = 2;
 	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::DSSD);
+}
+
+//-------------------------------------------------
+//  5.25" single-sided single density, VTECH edition
+//-------------------------------------------------
+
+floppy_525_vtech::floppy_525_vtech(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_VTECH, tag, owner, clock)
+{
+	amplifier_freakout_time = attotime::from_usec(64);
+}
+
+floppy_525_vtech::~floppy_525_vtech()
+{
+}
+
+void floppy_525_vtech::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 40;
+	sides = 1;
+	set_rpm(85);
 
 	variants.push_back(floppy_image::SSSD);
 }

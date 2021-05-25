@@ -47,7 +47,7 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 
 static void laser_floppies(device_slot_interface &device)
 {
-	device.option_add("525", FLOPPY_525_SSSD);
+	device.option_add("525", FLOPPY_525_VTECH);
 }
 
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
@@ -152,7 +152,6 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 			m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		}
 		if(newflop) {
-			newflop->set_rpm(85);
 			newflop->mon_w(0);
 			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&vtech_floppy_controller_device::index_callback, this));
 			m_current_cyl = newflop->get_cyl() << 1;
