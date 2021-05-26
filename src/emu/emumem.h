@@ -1851,6 +1851,8 @@ public:
 	void select(int entry);
 	void disable();
 
+	std::optional<int> entry() const { return m_cur_id == -1 ? std::optional<int>() : m_cur_slot; }
+
 	const std::string &name() const { return m_name; }
 
 private:
