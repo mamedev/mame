@@ -16,6 +16,7 @@
 #include <functional>
 
 enum class fs_meta_name {
+	basic,
 	creation_date,
 	length,
 	loading_address,
@@ -379,6 +380,8 @@ public:
 	static uint16_t r16l(const uint8_t *p);
 	static uint32_t r24l(const uint8_t *p);
 	static uint32_t r32l(const uint8_t *p);
+
+	static std::string trim_end_spaces(const std::string &str);
 
 protected:
 	fsblk_t &m_blockdev;
