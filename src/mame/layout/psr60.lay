@@ -3,6 +3,8 @@
 license:CC0
 -->
 <mamelayout version="2">
+
+	<!-- general grey backdrop -->
 	<element name="greyback">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
@@ -10,6 +12,7 @@ license:CC0
 		</rect>
 	</element>
 
+	<!-- container boxes for top sections -->
 	<element name="box-196">
 		<rect>
 			<bounds left="0" top="0" right="196" bottom="250" />
@@ -20,7 +23,6 @@ license:CC0
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-
 	<element name="box-216">
 		<rect>
 			<bounds left="0" top="0" right="216" bottom="250" />
@@ -31,7 +33,6 @@ license:CC0
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-
 	<element name="box-303">
 		<rect>
 			<bounds left="0" top="0" right="303" bottom="250" />
@@ -42,7 +43,6 @@ license:CC0
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-
 	<element name="box-350">
 		<rect>
 			<bounds left="0" top="0" right="350" bottom="250" />
@@ -53,7 +53,6 @@ license:CC0
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
 	</element>
-
 	<element name="box-669">
 		<rect>
 			<bounds left="0" top="0" right="669" bottom="250" />
@@ -65,23 +64,27 @@ license:CC0
 		</rect>
 	</element>
 
+	<!-- logo substitutes -->
+	<element name="yamaha"><text string="YAMAHA" align="0" /></element>
+	<element name="psr60"><text string="PSR-60" align="0" /></element>
 
+	<!-- slider labels -->
 	<element name="slidermin"><text string="MIN" align="1" /></element>
 	<element name="slidermax"><text string="MAX" align="2" /></element>
 	<element name="sliderslow"><text string="SLOW" align="1" /></element>
 	<element name="sliderfast"><text string="FAST" align="2" /></element>
 
-	<element name="yamaha"><text string="YAMAHA" align="0" /></element>
-	<element name="psr60"><text string="PSR-60" align="0" /></element>
-
+	<!-- power section text -->
 	<element name="power"><text string="POWER" align="0" /></element>
 	<element name="mastervolume"><text string="MASTER VOLUME" align="0" /></element>
 
+	<!-- pitch section text -->
 	<element name="pitch"><text string="PITCH" align="1" /></element>
 	<element name="transposer"><text string="TRANSPOSER" align="1" /></element>
 	<element name="uparrow"><text string="▲" align="1" /></element>
 	<element name="downarrow"><text string="▼" align="1" /></element>
 
+	<!-- auto bass chord section text -->
 	<element name="autobasschord"><text string="AUTO BASS CHORD" align="1" /></element>
 	<element name="off"><text string="OFF" align="1" /></element>
 	<element name="single"><text string="SINGLE" align="1" /></element>
@@ -91,6 +94,7 @@ license:CC0
 	<element name="chordvolume"><text string="CHORD VOLUME" align="0" /></element>
 	<element name="bassvolume"><text string="BASS VOLUME" align="0" /></element>
 
+	<!-- rhythm section text -->
 	<element name="rhythm"><text string="RHYTHM" align="1" /></element>
 	<element name="handclap"><text string="HAND CLAP" align="1" /></element>
 	<element name="one"><text string="1" align="1" /></element>
@@ -121,6 +125,7 @@ license:CC0
 	<element name="volume"><text string="VOLUME" align="0" /></element>
 	<element name="tempo"><text string="TEMPO" align="0" /></element>
 
+	<!-- orchestra section text -->
 	<element name="orchestra"><text string="ORCHESTRA" align="1" /></element>
 	<element name="tolower"><text string="TO LOWER" align="1" /></element>
 	<element name="duet"><text string="DUET" align="1" /></element>
@@ -151,6 +156,7 @@ license:CC0
 	<element name="cosmic"><text string="COSMIC" align="1" /></element>
 	<element name="on"><text string="ON" align="1" /></element>
 
+	<!-- solo section text -->
 	<element name="solo"><text string="SOLO" align="1" /></element>
 	<element name="sustain"><text string="SUSTAIN" align="1" /></element>
 	<element name="flute"><text string="FLUTE" align="1" /></element>
@@ -170,16 +176,19 @@ license:CC0
 	<element name="oboe"><text string="OBOE" align="1" /></element>
 	<element name="bass"><text string="BASS" align="1" /></element>
 
+	<!-- music programmer section text -->
 	<element name="musicprogrammer"><text string="MUSIC PROGRAMMER" align="1" /></element>
 	<element name="record"><text string="RECORD" align="1" /></element>
 	<element name="playback"><text string="PLAY BACK" align="1" /></element>
 	<element name="pause"><text string="PAUSE" align="1" /></element>
 	<element name="chordbass"><text string="CHORD/BASS" align="1" /></element>
 
+	<!-- tape section text -->
 	<element name="tape"><text string="TAPE" align="1" /></element>
 	<element name="save"><text string="SAVE" align="1" /></element>
 	<element name="load"><text string="LOAD" align="1" /></element>
 
+	<!-- above keys text -->
 	<element name="midimode"><text string="MIDI MODE" align="0" /></element>
 	<element name="keyboardpercussion"><text string="KEYBOARD PERCUSSION" align="1" /></element>
 	<element name="fillin1"><text string="FILL IN 1" align="0" /></element>
@@ -190,6 +199,7 @@ license:CC0
 	<element name="stop"><text string="STOP" align="0" /></element>
 	<element name="introending"><text string="INTRO/ENDING" align="0" /></element>
 
+	<!-- button primitives -->
 	<element name="button" defstate="0">
 		<disk><bounds x="0" y="0" width="21" height="21" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk><bounds x="44" y="0" width="21" height="21" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -201,7 +211,6 @@ license:CC0
 		<disk state="1"><bounds x="46" y="2" width="17" height="17" /><color red="0.5" green="0.5" blue="0.5" /></disk>
 		<rect state="1"><bounds x="11" y="2" width="43" height="17" /><color red="0.5" green="0.5" blue="0.5" /></rect>
 	</element>
-
 	<element name="button-wide" defstate="0">
 		<disk><bounds x="0" y="0" width="21" height="21" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk><bounds x="91" y="0" width="21" height="21" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -214,6 +223,7 @@ license:CC0
 		<rect state="1"><bounds x="11" y="2" width="90" height="17" /><color red="0.5" green="0.5" blue="0.5" /></rect>
 	</element>
 
+	<!-- color bars to lay on top of buttons -->
 	<element name="button-grey-color">
 		<rect><bounds x="0" y="0" width="64" height="21" /><color alpha="0" /></rect>
 		<rect><bounds x="8" y="8" width="48" height="5" /><color red="0.6" green="0.6" blue="0.6" /></rect>
@@ -243,15 +253,7 @@ license:CC0
 		<rect><bounds x="8" y="8" width="48" height="5" /><color red="1.0" green="0.2" blue="0.2" /></rect>
 	</element>
 
-	<element name="slider-power">
-		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
-		<disk><bounds x="59" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
-		<rect><bounds x="11" y="0" width="58" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
-		<disk><bounds x="61" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
-		<rect><bounds x="11" y="2" width="58" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
-	</element>
-
+	<!-- slider primitives -->
 	<element name="slider">
 		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk><bounds x="118" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -260,7 +262,14 @@ license:CC0
 		<disk><bounds x="120" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
 		<rect><bounds x="11" y="2" width="117" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
 	</element>
-
+	<element name="slider-power">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="59" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="58" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="61" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="58" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+	</element>
 	<element name="slider-tempo">
 		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk><bounds x="151" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -270,11 +279,13 @@ license:CC0
 		<rect><bounds x="11" y="2" width="150" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
 	</element>
 
+	<!-- LED primitive -->
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
 		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
 	</element>
 
+	<!-- keyboard primitives -->
 	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 	<element name="whitekey" defstate="0">
 		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
@@ -317,6 +328,7 @@ license:CC0
 		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 	</element>
 
+	<!-- speaker grill -->
 	<element name="speaker">
 		<rect><bounds x="0" y="0" width="500" height="462" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<disk><bounds x="29" y="10" width="442" height="442" /><color red="0.0" green="0.0" blue="0.0" /></disk>
@@ -350,6 +362,7 @@ license:CC0
 		<rect><bounds x="10" y="442" width="480" height="11" /><color red="0.2" green="0.2" blue="0.2" /></rect>
 	</element>
 
+	<!-- top grill -->
 	<element name="topgrill">
 		<rect><bounds x="567" y="60" width="2410" height="92" /><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<rect><bounds x="567" y="74" width="2410" height="3" /><color red="0.2" green="0.2" blue="0.2" /></rect>
@@ -548,6 +561,7 @@ license:CC0
 		<element ref="tempo"><bounds x="1081" y="378" width="174" height="14" /></element>
 	</group>
 
+	<!-- orchestra group -->
 	<group name="group-orchestra">
 		<element ref="box-669"><bounds x="1571" y="156" width="669" height="250" /></element>
 		<element ref="orchestra"><bounds x="1601" y="165" width="138" height="17" /></element>
@@ -666,13 +680,13 @@ license:CC0
 		<element ref="box-669"><bounds x="2245" y="156" width="669" height="250" /></element>
 		<element ref="solo"><bounds x="2275" y="165" width="138" height="17" /></element>
 
-		<!-- solo top row -->
+		<!-- top row -->
 		<element ref="button" inputtag="DRVIF_14" inputmask="0x80"><bounds x="2821" y="208" width="65" height="21" /></element>
 		<element ref="button-white-color"><bounds x="2821" y="208" width="65" height="21" /></element>
 		<element ref="led" name="DRVIF_14_DP1"><bounds x="2821" y="235" width="12" height="12" /></element>
 		<element ref="sustain"><bounds x="2839" y="233" width="65" height="14" /></element>
 
-		<!-- solo 2nd row -->
+		<!-- 2nd row -->
 		<element ref="led" name="DRVIF_15_DP4"><bounds x="2271" y="267" width="12" height="12" /></element>
 		<element ref="jazz"><bounds x="2289" y="257" width="60" height="14" /></element>
 		<element ref="flute"><bounds x="2289" y="267" width="60" height="14" /></element>
@@ -732,7 +746,7 @@ license:CC0
 		<element ref="led" name="DRVIF_18_DP1"><bounds x="2821" y="309" width="12" height="12" /></element>
 		<element ref="bass"><bounds x="2839" y="307" width="60" height="14" /></element>
 
-		<!-- solo 3rd row -->
+		<!-- 3rd row -->
 		<element ref="slidermin"><bounds x="2271" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="2271" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="2271" y="352" width="139" height="23" /></element>
@@ -749,7 +763,7 @@ license:CC0
 		<element ref="box-350"><bounds x="2919" y="156" width="350" height="250" /></element>
 		<element ref="musicprogrammer"><bounds x="2949" y="165" width="138" height="17" /></element>
 
-		<!-- music programmer top row -->
+		<!-- top row -->
 		<element ref="solo"><bounds x="2945" y="193" width="60" height="14" /></element>
 		<element ref="button" inputtag="DRVIF_19" inputmask="0x40"><bounds x="2945" y="208" width="65" height="21" /></element>
 		<element ref="button-red-color"><bounds x="2945" y="208" width="65" height="21" /></element>
@@ -761,7 +775,7 @@ license:CC0
 		<element ref="led" name="DRVIF_20_DP2"><bounds x="3024" y="235" width="12" height="12" /></element>
 		<element ref="playback"><bounds x="3042" y="233" width="65" height="14" /></element>
 
-		<!-- music programmer 2nd row -->
+		<!-- 2nd row -->
 		<element ref="orchestra"><bounds x="2945" y="267" width="100" height="14" /></element>
 		<element ref="button" inputtag="DRVIF_19" inputmask="0x20"><bounds x="2945" y="282" width="65" height="21" /></element>
 		<element ref="button-red-color"><bounds x="2945" y="282" width="65" height="21" /></element>
@@ -782,7 +796,7 @@ license:CC0
 		<element ref="led" name="DRVIF_0_DP1"><bounds x="3182" y="309" width="12" height="12" /></element>
 		<element ref="pause"><bounds x="3200" y="307" width="65" height="14" /></element>
 
-		<!-- music programmer 3rd row -->
+		<!-- 3rd row -->
 		<element ref="chordbass"><bounds x="2945" y="338" width="100" height="14" /></element>
 		<element ref="button" inputtag="DRVIF_19" inputmask="0x10"><bounds x="2945" y="353" width="65" height="21" /></element>
 		<element ref="button-red-color"><bounds x="2945" y="353" width="65" height="21" /></element>
@@ -795,18 +809,18 @@ license:CC0
 		<element ref="playback"><bounds x="3042" y="378" width="65" height="14" /></element>
 	</group>
 
+	<!-- tape group -->
 	<group name="group-tape">
-		<!-- tape group -->
 		<element ref="box-216"><bounds x="3274" y="156" width="216" height="250" /></element>
 		<element ref="tape"><bounds x="3304" y="165" width="138" height="17" /></element>
 
-		<!-- tape top row -->
+		<!-- top row -->
 		<element ref="button" inputtag="DRVIF_19" inputmask="0x80"><bounds x="3300" y="208" width="65" height="21" /></element>
 		<element ref="button-pink-color"><bounds x="3300" y="208" width="65" height="21" /></element>
 		<element ref="led"><bounds x="3300" y="235" width="12" height="12" /></element>
 		<element ref="save"><bounds x="3318" y="233" width="65" height="14" /></element>
 
-		<!-- tape top row -->
+		<!-- top row -->
 		<element ref="button" inputtag="DRVIF_20" inputmask="0x80"><bounds x="3300" y="282" width="65" height="21" /></element>
 		<element ref="button-pink-color"><bounds x="3300" y="282" width="65" height="21" /></element>
 		<element ref="led"><bounds x="3300" y="309" width="12" height="12" /></element>
@@ -853,6 +867,7 @@ license:CC0
 		<element ref="introending"><bounds x="1929" y="448" width="112" height="14" /></element>
 	</group>
 
+	<!-- keyboard group -->
 	<group name="keyboard">
 		<element ref="keyfill"><bounds x="564" y="494" width="2395" height="524" /></element>
 

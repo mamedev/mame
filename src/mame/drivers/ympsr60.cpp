@@ -54,6 +54,7 @@
 #include "speaker.h"
 
 #include "psr60.lh"
+#include "psr70.lh"
 
 class psr60_state : public driver_device
 {
@@ -72,7 +73,9 @@ public:
 		m_drvif_out(*this, "DRVIF_%u_DP%u", 0U, 1U)
 	{ }
 
+	void psr_common(machine_config &config);
 	void psr60(machine_config &config);
+	void psr70(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -450,7 +453,7 @@ static INPUT_PORTS_START(psr70)
 	DRVIF_PORT(22, "Unused23.1", "Play Back Solo", "Play Back Orchestra", "Play Back Chord/Bass")
 INPUT_PORTS_END
 
-void psr60_state::psr60(machine_config &config)
+void psr60_state::psr_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 6_MHz_XTAL);
@@ -473,8 +476,6 @@ void psr60_state::psr60(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 500_kHz_XTAL));    // 31250 * 16 = 500,000
 	acia_clock.signal_handler().set(FUNC(psr60_state::write_acia_clock));
 
-	config.set_default_layout(layout_psr60);
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -482,6 +483,18 @@ void psr60_state::psr60(machine_config &config)
 	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
 	m_ym3533->add_route(0, "lspeaker", 1.0);
 	m_ym3533->add_route(1, "rspeaker", 1.0);
+}
+
+void psr60_state::psr60(machine_config &config)
+{
+	psr_common(config);
+	config.set_default_layout(layout_psr60);
+}
+
+void psr60_state::psr70(machine_config &config)
+{
+	psr_common(config);
+	config.set_default_layout(layout_psr70);
 }
 
 ROM_START( psr60 )
@@ -501,4 +514,4 @@ ROM_START(psr70)
 ROM_END
 
 CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING)
-CONS(1985, psr70, psr60, 0, psr60, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING)
