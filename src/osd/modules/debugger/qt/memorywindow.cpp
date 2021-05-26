@@ -132,6 +132,12 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	reverseAct->setShortcut(QKeySequence("Ctrl+R"));
 	connect(reverseAct, &QAction::toggled, this, &MemoryWindow::reverseChanged);
 
+	// Create a decimal addressing radio
+	QAction *decimalAct = new QAction("Decimal Addresses", this);
+	decimalAct->setObjectName("decimal");
+	decimalAct->setCheckable(true);
+	connect(decimalAct, &QAction::toggled, this, &MemoryWindow::decimalChanged);
+
 	// Create increase and decrease bytes-per-line actions
 	QAction *increaseBplAct = new QAction("Increase Bytes Per Line", this);
 	QAction *decreaseBplAct = new QAction("Decrease Bytes Per Line", this);
@@ -147,6 +153,7 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	optionsMenu->addActions(addressGroup->actions());
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(reverseAct);
+	optionsMenu->addAction(decimalAct);
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(increaseBplAct);
 	optionsMenu->addAction(decreaseBplAct);
@@ -249,6 +256,14 @@ void MemoryWindow::reverseChanged(bool changedTo)
 {
 	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
 	memView->set_reverse(changedTo);
+	m_memTable->viewport()->update();
+}
+
+
+void MemoryWindow::decimalChanged(bool changedTo)
+{
+	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
+	memView->set_decimal_addr(changedTo);
 	m_memTable->viewport()->update();
 }
 
@@ -394,6 +409,9 @@ void MemoryWindowQtConfig::buildFromQWidget(QWidget *widget)
 	QAction *reverse = window->findChild<QAction *>("reverse");
 	m_reverse = reverse->isChecked();
 
+	QAction *decimal = window->findChild<QAction *>("decimal");
+	m_decimalAddr = decimal->isChecked();
+
 	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
 	if (addressGroup->checkedAction()->text() == "Logical Addresses")
 		m_addressMode = 0;
@@ -429,6 +447,10 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
 	if (m_reverse)
 		reverse->trigger();
 
+	QAction *decimal = window->findChild<QAction *>("decimal");
+	if (m_decimalAddr)
+		decimal->trigger();
+
 	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
 	addressGroup->actions()[m_addressMode]->trigger();
 
@@ -442,6 +464,7 @@ void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 	WindowQtConfig::addToXmlDataNode(node);
 	node.set_attribute_int("memoryregion", m_memoryRegion);
 	node.set_attribute_int("reverse", m_reverse);
+	node.set_attribute_int("decimaladdr", m_decimalAddr);
 	node.set_attribute_int("addressmode", m_addressMode);
 	node.set_attribute_int("dataformat", m_dataFormat);
 }
@@ -452,6 +475,7 @@ void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 	WindowQtConfig::recoverFromXmlNode(node);
 	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
 	m_reverse = node.get_attribute_int("reverse", m_reverse);
+	m_decimalAddr = node.get_attribute_int("decimaladdr", m_decimalAddr);
 	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
 	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
 }
