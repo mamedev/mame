@@ -2,16 +2,16 @@
 // copyright-holders:Juergen Buchmueller
 /*********************************************************************
 
-    formats/vt_dsk.c
+    formats/vt_dsk_legacy.cpp
 
-    VTech Laser/VZ disk images
+    VTech Laser/VZ disk images (legacy support)
 
 *********************************************************************/
 
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include "formats/vt_dsk.h"
+#include "formats/vt_dsk_legacy.h"
 #include "formats/basicdsk.h"
 
 static FLOPPY_IDENTIFY(vz_identify)
@@ -47,7 +47,7 @@ static FLOPPY_CONSTRUCT(vz_construct)
 }
 
 
-extern LEGACY_FLOPPY_OPTIONS_START(vz)
+LEGACY_FLOPPY_OPTIONS_START(vz)
 	LEGACY_FLOPPY_OPTION(vtech1, "dsk", "Laser/VZ disk image", vz_identify, vz_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
