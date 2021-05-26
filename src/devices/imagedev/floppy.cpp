@@ -39,7 +39,7 @@
 
 #define PITCH_SEEK_SAMPLES 1
 
-#define FLUX_SCREEN 1
+#define FLUX_SCREEN 0
 
 #define FLOPSND_TAG "floppysound"
 
