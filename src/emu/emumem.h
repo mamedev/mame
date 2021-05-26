@@ -17,6 +17,7 @@
 #ifndef MAME_EMU_EMUMEM_H
 #define MAME_EMU_EMUMEM_H
 
+#include <optional>
 #include <type_traits>
 
 using s8 = std::int8_t;
