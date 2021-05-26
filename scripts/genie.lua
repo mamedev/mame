@@ -1088,6 +1088,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
+				"-Wno-unused-const-variable",
 			}
 			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
 				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
