@@ -47,7 +47,7 @@ static FLOPPY_CONSTRUCT(vz_construct)
 }
 
 
-LEGACY_FLOPPY_OPTIONS_START(vz)
+extern LEGACY_FLOPPY_OPTIONS_START(vz)
 	LEGACY_FLOPPY_OPTION(vtech1, "dsk", "Laser/VZ disk image", vz_identify, vz_construct, NULL,
 		HEADS([1])
 		TRACKS([40])
