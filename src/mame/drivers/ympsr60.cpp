@@ -57,6 +57,8 @@
 
 class psr60_state : public driver_device
 {
+	static constexpr int DRVIF_MAX_TARGETS = 23;
+
 public:
 	psr60_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
@@ -66,7 +68,8 @@ public:
 		m_acia(*this, "acia"),
 		m_rom2bank(*this, "rom2bank"),
 		m_keyboard(*this, "P1_%u", 0),
-		m_drvif(*this, "DRVIF_%u", 0)
+		m_drvif(*this, "DRVIF_%u", 0),
+		m_drvif_out(*this, "DRVIF_%u_DP%u", 0U, 1U)
 	{ }
 
 	void psr60(machine_config &config);
@@ -82,7 +85,8 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_memory_bank m_rom2bank;
 	required_ioport_array<10> m_keyboard;
-	required_ioport_array<21> m_drvif;
+	required_ioport_array<DRVIF_MAX_TARGETS> m_drvif;
+	output_finder<DRVIF_MAX_TARGETS,4> m_drvif_out;
 
 	void psr60_map(address_map &map);
 	void psr60_io_map(address_map &map);
@@ -129,17 +133,11 @@ void psr60_state::psr60_io_map(address_map &map)
 
 u8 psr60_state::ppi_pa_r()
 {
-	if (BIT(m_keyboard_select, 0)) return m_keyboard[0]->read();
-	if (BIT(m_keyboard_select, 1)) return m_keyboard[1]->read();
-	if (BIT(m_keyboard_select, 2)) return m_keyboard[2]->read();
-	if (BIT(m_keyboard_select, 3)) return m_keyboard[3]->read();
-	if (BIT(m_keyboard_select, 4)) return m_keyboard[4]->read();
-	if (BIT(m_keyboard_select, 5)) return m_keyboard[5]->read();
-	if (BIT(m_keyboard_select, 6)) return m_keyboard[6]->read();
-	if (BIT(m_keyboard_select, 7)) return m_keyboard[7]->read();
-	if (BIT(m_keyboard_select, 8)) return m_keyboard[8]->read();
-	if (BIT(m_keyboard_select, 9)) return m_keyboard[9]->read();
-	return 0;
+	u8 result = 0;
+	for (int bit = 0; bit < 10; bit++)
+		if (BIT(m_keyboard_select, bit))
+			result |= m_keyboard[bit]->read();
+	return result;
 }
 
 void psr60_state::ppi_pb_w(u8 data)
@@ -170,14 +168,10 @@ void psr60_state::drvif_w(offs_t offset, u8 data)
 {
 	if (offset == 1)
 		m_drvif_select = data & 0x1f;
-	else if (offset == 2)
+	else if (offset == 2 && m_drvif_select < DRVIF_MAX_TARGETS)
 	{
 		for (int bit = 0; bit < 4; bit++)
-		{
-			char name[20];
-			sprintf(name, "DRVIF_%d_DP%d", m_drvif_select, bit + 1);
-			output().set_value(name, BIT(data, 3 - bit));
-		}
+			m_drvif_out[m_drvif_select][bit] = BIT(data, 3 - bit);
 	}
 	else
 		printf("DRVIF: %02X = %02X\n", offset, data);
@@ -199,6 +193,7 @@ void psr60_state::recalc_irqs()
 
 void psr60_state::machine_start()
 {
+	m_drvif_out.resolve();
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
 	m_acia_irq = CLEAR_LINE;
@@ -207,6 +202,13 @@ void psr60_state::machine_start()
 void psr60_state::machine_reset()
 {
 }
+
+#define DRVIF_PORT(num, sw1, sw2, sw3, sw4) \
+	PORT_START("DRVIF_" #num) \
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num)
 
 static INPUT_PORTS_START(psr60)
 	PORT_START("P1_9")
@@ -297,35 +299,155 @@ static INPUT_PORTS_START(psr60)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-#define DRVIF_PORT(num, sw1, sw2, sw3, sw4) \
-	PORT_START("DRVIF_" #num) \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num)
-
 	DRVIF_PORT( 0, "Pause", "Unused1.2", "Unused1.3", "Unused1.4")
 	DRVIF_PORT( 1, "Pitch Up", "Pitch Down", "Transposer Up", "Transposer Down")
 	DRVIF_PORT( 2, "Memory", "Fingered", "Single Finger", "Off")
 	DRVIF_PORT( 3, "Fill In 3", "Fill In 2", "Fill In 1", "Keyboard Percussion")
-	DRVIF_PORT( 4, "On", "Variation", "Hand Clap 2", "Hand Clap 1")
+	DRVIF_PORT( 4, "Orchestra On", "Variation", "Hand Clap 2", "Hand Clap 1")
 	DRVIF_PORT( 5, "Pops", "Disco", "Reggae", "Big Band")
 	DRVIF_PORT( 6, "March/Polka", "Samba", "Salsa", "Rock'N'Roll")
-	DRVIF_PORT( 7, "Intro/Ending", "Start", "Unused8.3", "Stop")
+	DRVIF_PORT( 7, "Intro/Ending", "Start", "Synchro", "Stop")
 	DRVIF_PORT( 8, "MIDI Mode", "Unused9.2", "Unused9.3", "Unused9.4")
 	DRVIF_PORT( 9, "Brass 1", "Strings", "Pipe Organ", "Jazz Organ")
 	DRVIF_PORT(10, "Calliope", "Clarinet", "Brass & Chimes", "Brass 2")
 	DRVIF_PORT(11, "Unused12.1", "Unused12.2", "Unused12.3", "Unused12.4")
 	DRVIF_PORT(12, "Unused13.1", "Unused13.2", "Unused13.3", "Unused13.4")
-	DRVIF_PORT(13, "On", "To Lower", "Trio", "Duet")
+	DRVIF_PORT(13, "Solo On", "To Lower", "Trio", "Duet")
 	DRVIF_PORT(14, "Sustain", "Stereo Symphonic", "Sustain 2", "Sustain 1")
 	DRVIF_PORT(15, "Trumpet", "Violin", "Piccolo", "Jazz Flute")
 	DRVIF_PORT(16, "Oboe", "Saxophone", "Horn", "Trombone")
 	DRVIF_PORT(17, "Pop Synth", "Percussion 2", "Percussion 1", "Electric Guitar")
-	DRVIF_PORT(18, "Bass", "SlapSynth", "Funk Synth/Blues Synth", "Off")
-	DRVIF_PORT(19, "Save", "Solo Record", "Orchestra Record", "Chord/Bass Record")
-	DRVIF_PORT(20, "Load", "Solo Play Back", "Orchestra Play Back", "Chord/Bass Play Back")
-	DRVIF_PORT(21, "Unused21.1", "Unused21.2", "Unused21.3", "Unused21.4")
+	DRVIF_PORT(18, "Bass", "SlapSynth", "Funk Synth/Blues Synth", "Programmer Off")
+	DRVIF_PORT(19, "Save", "Record Solo", "Record Orchestra", "Record Chord/Bass")
+	DRVIF_PORT(20, "Load", "Play Back Solo", "Play Back Orchestra", "Play Back Chord/Bass")
+	DRVIF_PORT(21, "Unused22.1", "Unused22.2", "Unused22.3", "Unused22.4")
+	DRVIF_PORT(22, "Unused23.1", "Unused23.2", "Unused23.3", "Unused23.4")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(psr70)
+	PORT_START("P1_9")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT)    PORT_NAME("Octave 0 C")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)         PORT_NAME("Octave 0 C#")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_NAME("Octave 0 D")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_NAME("Octave 0 D#")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)         PORT_NAME("Octave 0 E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)         PORT_NAME("Octave 0 F")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)         PORT_NAME("Octave 0 F#")
+
+	PORT_START("P1_8")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_NAME("Octave 0 G")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)         PORT_NAME("Octave 0 G#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)         PORT_NAME("Octave 0 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)         PORT_NAME("Octave 0 A#")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)         PORT_NAME("Octave 0 B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_NAME("Octave 1 C")
+
+	PORT_START("P1_7")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_NAME("Octave 1 C#")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_NAME("Octave 1 D")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_NAME("Octave 1 D#")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_NAME("Octave 1 E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_NAME("Octave 1 F")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_NAME("Octave 1 F#")
+
+	PORT_START("P1_6")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("Octave 1 G")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_NAME("Octave 1 G#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_NAME("Octave 1 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_NAME("Octave 1 A#")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 1 B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 2 C")
+
+	PORT_START("P1_5")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_NAME("Octave 2 C#")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_NAME("Octave 2 D")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_NAME("Octave 2 D#")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_NAME("Octave 2 E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_NAME("Octave 2 F")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_NAME("Octave 2 F#")
+
+	PORT_START("P1_4")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("Octave 2 G")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_NAME("Octave 2 G#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_NAME("Octave 2 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_NAME("Octave 2 A#")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 2 B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 3 C")
+
+	PORT_START("P1_3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_NAME("Octave 3 C#")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_NAME("Octave 3 D")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_NAME("Octave 3 D#")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_NAME("Octave 3 E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_NAME("Octave 3 F")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_NAME("Octave 3 F#")
+
+	PORT_START("P1_2")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("Octave 3 G")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_NAME("Octave 3 G#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_NAME("Octave 3 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_NAME("Octave 3 A#")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 3 B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 4 C")
+
+	PORT_START("P1_1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_NAME("Octave 4 C#")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_NAME("Octave 4 D")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_NAME("Octave 4 D#")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_NAME("Octave 4 E")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_NAME("Octave 4 F")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)         PORT_NAME("Octave 4 F#")
+
+	PORT_START("P1_0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // cassette input
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_NAME("Octave 4 G")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_NAME("Octave 4 G#")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_NAME("Octave 4 A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_NAME("Octave 4 A#")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 4 B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_NAME("Octave 5 C")
+
+	DRVIF_PORT( 0, "Unused1.1", "Unused1.2", "Unused1.3", "Split")
+	DRVIF_PORT( 1, "Pitch Up", "Pitch Down", "Transposer Up", "Transposer Down")
+	DRVIF_PORT( 2, "Memory", "Fingered", "Single Finger", "Off")
+	DRVIF_PORT( 3, "Fill In 3", "Fill In 2", "Fill In 1", "Keyboard Percussion")
+	DRVIF_PORT( 4, "Pops", "Disco", "Reggae", "Big Band")
+	DRVIF_PORT( 5, "March/Polka", "Samba", "Salsa", "Rock'N'Roll")
+	DRVIF_PORT( 6, "Intro/Ending", "Start", "Synchro", "Stop")
+	DRVIF_PORT( 7, "MIDI Mode", "Unused9.2", "Unused9.3", "Custom Clear")
+	DRVIF_PORT( 8, "Orchestra On", "Variation", "Hand Clap 2", "Hand Clap 1")
+	DRVIF_PORT( 9, "Pause", "Custom 3", "Custom 2", "Custom 1")
+	DRVIF_PORT(10, "Program", "Rhythm", "Bass", "Chord")
+	DRVIF_PORT(11, "Solo On", "To Lower", "Trio", "Duet")
+	DRVIF_PORT(12, "Brass 1", "Strings", "Pipe Organ", "Jazz Organ")
+	DRVIF_PORT(13, "Calliope", "Clarinet", "Brass & Chimes", "Brass 2")
+	DRVIF_PORT(14, "Unused15.1", "Unused15.2", "Unused15.3", "Unused15.4")
+	DRVIF_PORT(15, "Unused16.1", "Unused16.2", "Unused16.3", "Unused16.4")
+	DRVIF_PORT(16, "Solo Sustain", "Stereo Symphonic", "Sustain 2", "Sustain 1")
+	DRVIF_PORT(17, "Trumpet", "Violin", "Piccolo", "Jazz Flute")
+	DRVIF_PORT(18, "Oboe", "Saxophone", "Horn", "Trombone")
+	DRVIF_PORT(19, "Pop Synth", "Percussion 2", "Percussion 1", "Programmer Off")
+	DRVIF_PORT(20, "Registration Memory", "Program 3", "Program 2", "Program 1")
+	DRVIF_PORT(21, "Unused22.1", "Record Solo", "Record Orchestra", "Record Chord/Bass")
+	DRVIF_PORT(22, "Unused23.1", "Play Back Solo", "Play Back Orchestra", "Play Back Chord/Bass")
 INPUT_PORTS_END
 
 void psr60_state::psr60(machine_config &config)
@@ -378,5 +500,5 @@ ROM_START(psr70)
 	ROM_LOAD("yamaha_psr60_pgm_ic110.bin", 0x000000, 0x008000, CRC(39db8c74) SHA1(7750104d1e5df3357aa553ac58768dbc34051cd8))
 ROM_END
 
-CONS(1985, psr60, 0, 0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING)
-CONS(1985, psr70, psr60, 0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING)
+CONS(1985, psr70, psr60, 0, psr60, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING)
