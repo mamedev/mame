@@ -79,7 +79,7 @@ public:
 	virtual ~floppy_image_device();
 
 	void set_formats(std::function<void (format_registration &fr)> formats);
-	floppy_image_format_t *get_formats() const;
+	const std::vector<floppy_image_format_t *> &get_formats() const;
 	const std::vector<fs_info> &get_create_fs() const { return m_create_fs; }
 	const std::vector<fs_info> &get_io_fs() const { return m_io_fs; }
 	floppy_image_format_t *get_load_format() const;
@@ -188,7 +188,7 @@ protected:
 	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
-	floppy_image_format_t *fif_list;
+	std::vector<floppy_image_format_t *> fif_list;
 	std::vector<fs_info>  m_create_fs, m_io_fs;
 	std::vector<const filesystem_manager_t *> m_fs_managers;
 	emu_timer             *index_timer;

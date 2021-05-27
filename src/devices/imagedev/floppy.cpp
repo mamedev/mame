@@ -247,7 +247,6 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		input_format(nullptr),
 		output_format(nullptr),
 		image(),
-		fif_list(nullptr),
 		index_timer(nullptr),
 		tracks(0),
 		sides(0),
@@ -280,12 +279,8 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 
 floppy_image_device::~floppy_image_device()
 {
-	for(floppy_image_format_t *format = fif_list; format; ) {
-		floppy_image_format_t* tmp_format = format;
-		format = format->next;
-		delete tmp_format;
-	}
-	fif_list = nullptr;
+	for(floppy_image_format_t *format : fif_list)
+		delete format;
 }
 
 void floppy_image_device::setup_load_cb(load_cb cb)
@@ -338,16 +333,12 @@ void floppy_image_device::register_formats()
 		format_registration_cb(fr);
 
 	extension_list[0] = '\0';
-	fif_list = nullptr;
+	fif_list.clear();
 	for(floppy_format_type fft : fr.m_formats)
 	{
 		// allocate a new format
 		floppy_image_format_t *fif = fft();
-		if(!fif_list)
-			fif_list = fif;
-		else
-			fif_list->append(fif);
-
+		fif_list.push_back(fif);
 		add_format(fif->name(), fif->description(), fif->extensions(), "");
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
@@ -367,7 +358,7 @@ void floppy_image_device::set_formats(std::function<void (format_registration &f
 	format_registration_cb = formats;
 }
 
-floppy_image_format_t *floppy_image_device::get_formats() const
+const std::vector<floppy_image_format_t *> &floppy_image_device::get_formats() const
 {
 	return fif_list;
 }
@@ -551,7 +542,7 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for (floppy_image_format_t *format = fif_list; format; format = format->next)
+	for (floppy_image_format_t *format : fif_list)
 	{
 		int score = format->identify(&io, form_factor, variants);
 		if(score > best) {
@@ -599,7 +590,7 @@ image_init_result floppy_image_device::call_load()
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = nullptr;
-	for (floppy_image_format_t *format = fif_list; format; format = format->next) {
+	for (floppy_image_format_t *format : fif_list) {
 		int score = format->identify(&io, form_factor, variants);
 		if(score > best) {
 			best = score;
@@ -804,7 +795,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 	output_format = nullptr;
 
 	// search for a suitable format based on the extension
-	for(floppy_image_format_t *i = fif_list; i; i = i->next)
+	for(floppy_image_format_t *i : fif_list)
 	{
 		// only consider formats that actually support saving
 		if(!i->supports_save())

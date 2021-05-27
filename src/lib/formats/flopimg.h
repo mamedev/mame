@@ -224,8 +224,7 @@ class floppy_image;
 class floppy_image_format_t
 {
 public:
-	floppy_image_format_t();
-	virtual ~floppy_image_format_t();
+	virtual ~floppy_image_format_t() = default;
 
 	/*! @brief Identify an image.
 	  The identify function tests if the image is valid
@@ -270,10 +269,6 @@ public:
 	//! @returns true if format supports saving.
 	virtual bool supports_save() const = 0;
 
-	//! Used if a linked list of formats is needed
-	floppy_image_format_t *next;
-	//! This appends a format to the linked list of formats, needed for floppy_image_device().
-	void append(floppy_image_format_t *_next);
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
 	//! @returns true if file matches the extension.

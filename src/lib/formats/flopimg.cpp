@@ -995,23 +995,6 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 	return false;
 }
 
-floppy_image_format_t::floppy_image_format_t()
-{
-	next = nullptr;
-}
-
-floppy_image_format_t::~floppy_image_format_t()
-{
-}
-
-void floppy_image_format_t::append(floppy_image_format_t *_next)
-{
-	if(next)
-		next->append(_next);
-	else
-		next = _next;
-}
-
 bool floppy_image_format_t::save(io_generic *, const std::vector<uint32_t> &, floppy_image *)
 {
 	return false;
