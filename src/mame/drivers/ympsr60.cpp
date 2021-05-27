@@ -122,6 +122,7 @@ private:
 
 	u8 ym2154_r(offs_t offset);
 	void ym2154_w(offs_t offset, u8 data);
+	attotime ym2154_period(u32 tempo) const { return attotime::from_hz(2250000 / 12 / 8) * (2048 - tempo); }
 
 public:
 	INPUT_CHANGED_MEMBER(drvif_changed);
@@ -140,9 +141,18 @@ void psr60_state::psr60_map(address_map &map)
 //
 // YM2154 - ROMpler with I/O ports
 //
+// Chip is clocked at 2.25MHz
+//
 // Some of this looks suspiciously like 2x the ADPCM-A attached to the
-// YM2608: 6 channels (x2), total level and instrument levels behave
+// YM2608: 6 channels (2 banks), total level and instrument levels behave
 // the same.
+//
+// Start/end addresses are 9 bits to address 32k ROMs (15 bits) so
+// presume a left shift of 6 (actually 7 if 4-bit ADPCM data).
+//
+// Two serial ROMs are connected, containing 32k of sample data each.
+// It appears that the channel bank (0-5 vs 6-11) implies which of the
+// two ROMs is read.
 //
 //      System-wide registers:
 //           01 -------- Unknown ($00 written at init)
@@ -151,22 +161,24 @@ void psr60_state::psr60_map(address_map &map)
 //           03 -x------ Unknown (IRQ enable?)
 //              -----x-- Timer enable
 //           04 --xxxxxx Master volume (0=min, 3F=max)
-//           05 --xxxxxx Channels 6-11 key on/off
-//           06 --xxxxxx Channels 0-5 key on/off
+//           05 --xxxxxx Bank 2 key on/off
+//           06 --xxxxxx Bank 1 key on/off
 //           07 -------x Unknown ($01 written at init)
 //
 //     Per-channel registers (channel in address bits 0-2)
-//        08-0D -------- Unknown (written after others; ch 0-5 overlaps 6-11 here)
-//        10-15 ---xxxxx Ch 0-5 Instrument volume (0=min, 1F=max)
-//        18-1D ---xxxxx Ch 6-11 Instrument volume (0=min, 1F=max)
-//        20-25 ---xxxxx Ch 0-5 Start address?
-//        28-2D xx------ Ch 0-5 ???
-//              -------x Ch 0-5 ???
-//        30-35  xxxxxxx Ch 0-5 ???
-//        38-3D ---xxxxx Ch 6-11 Start address?
-//        40-45 xx------ Ch 6-11 ???
-//              -------x Ch 6-11 ???
-//        48-4D  xxxxxxx Ch 6-11 ???
+//        08-0D -------- Unknown; written as two nibbles so shared between banks
+//        10-15 -xx----- Bank 1 Write 11 here to disable?
+//              ---xxxxx Bank 1 Instrument volume (0=min, 1F=max)
+//        18-1D -xx----- Bank 2 Write 11 here to disable?
+//              ---xxxxx Bank 2 Instrument volume (0=min, 1F=max)
+//        20-25 ---xxxxx Bank 1 Start address upper bits
+//        28-2D xxxx---- Bank 1 Start address lower bits
+//              -------x Bank 1 End address upper bits
+//        30-35 xxxxxxxx Bank 1 End address lower bits
+//        38-3D ---xxxxx Bank 2 Start address upper bits
+//        40-45 xxxx---- Bank 2 Start address lower bits
+//              -------x Bank 2 End address upper bits
+//        48-4D xxxxxxxx Bank 2 End address lower bits
 //
 //     Reads:
 //        01-0A xxxxxxxx AN1-10 digital values
@@ -217,7 +229,7 @@ void psr60_state::ym2154_w(offs_t offset, u8 data)
 		if (BIT(old ^ data, 2) != 0)
 		{
 			if (BIT(data, 2) != 0)
-				m_ym2154_timer->adjust(attotime::from_msec(512 * 1024) / m_ym2154_tempo);
+				m_ym2154_timer->adjust(ym2154_period(m_ym2154_tempo));
 			else
 				m_ym2154_timer->enable(false);
 		}
@@ -233,13 +245,13 @@ void psr60_state::ym2154_w(offs_t offset, u8 data)
 	{
 		for (int bit = 0; bit < 6; bit++)
 			if (BIT(data, bit) != 0)
-				printf("YM2154: Ch%2d on: %02X %02X %02X vol=%02X low=%02X\n", 6 + bit, m_ym2154_regs[0x38+bit], m_ym2154_regs[0x40+bit], m_ym2154_regs[0x48+bit], m_ym2154_regs[0x18+bit], m_ym2154_regs[0x08+bit]);
+				printf("YM2154: Bank 2 Ch %d on: %03X-%03X vol=%02X low=%X\n", bit, (m_ym2154_regs[0x38+bit] << 4) | (m_ym2154_regs[0x40+bit] >> 4), ((m_ym2154_regs[0x40+bit] & 0x0f) << 8) | m_ym2154_regs[0x48+bit], m_ym2154_regs[0x18+bit], m_ym2154_regs[0x08+bit] >> 4);
 	}
 	else if (offset == 6)
 	{
 		for (int bit = 0; bit < 6; bit++)
 			if (BIT(data, bit) != 0)
-				printf("YM2154: Ch%2d on: %02X %02X %02X vol=%02X low=%02X\n", bit, m_ym2154_regs[0x20+bit], m_ym2154_regs[0x28+bit], m_ym2154_regs[0x30+bit], m_ym2154_regs[0x10+bit], m_ym2154_regs[0x08+bit]);
+				printf("YM2154: Bank 1 Ch %d on: %03X-%03X vol=%02X low=%X\n", bit, (m_ym2154_regs[0x20+bit] << 4) | (m_ym2154_regs[0x28+bit] >> 4), ((m_ym2154_regs[0x28+bit] & 0x0f) << 8) | m_ym2154_regs[0x30+bit], m_ym2154_regs[0x10+bit], m_ym2154_regs[0x08+bit] & 0xf);
 	}
 	else if (offset < 8 || offset >= 0x50)
 		printf("YM2154: Write %02X = %02X\n", offset, data);
@@ -250,7 +262,7 @@ TIMER_CALLBACK_MEMBER(psr60_state::ym2154_timer)
 	m_ym2154_irq = 1;
 	recalc_irqs();
 	if (BIT(m_ym2154_regs[3], 2) != 0)
-		m_ym2154_timer->adjust(attotime::from_msec(512 * 1024 / 16) / m_ym2154_tempo);
+		m_ym2154_timer->adjust(ym2154_period(m_ym2154_tempo));
 }
 
 INPUT_CHANGED_MEMBER(psr60_state::ryp4_changed)
