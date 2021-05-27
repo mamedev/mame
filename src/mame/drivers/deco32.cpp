@@ -33,6 +33,10 @@
 
     Tattoo Assassins uses DE Pinball soundboard 520-5077-00 R
 
+    How to calibrate guns in Locked 'n Loaded and Gun Hard:
+    - keep SERVICE1 pressed (default 9) and press the test mode switch (default F2)
+    - complete guns' calibration
+    - exit test mode
 
     TODO:
 
