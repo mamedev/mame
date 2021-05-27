@@ -1086,6 +1086,9 @@ atari_slapstic_device::alt_select_101_110::alt_select_101_110(atari_slapstic_dev
 
 void atari_slapstic_device::alt_select_101_110::test(offs_t addr) const
 {
+	m_sl->logerror("Select %04x\n", addr);
+	if(addr == 0x32ae)
+		abort();
 	if(m_reset(addr)) {
 		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_active.get();
@@ -1130,7 +1133,7 @@ void atari_slapstic_device::alt_select_111_118::test(offs_t addr) const
 atari_slapstic_device::alt_commit::alt_commit(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
 {
 	m_reset  = check.test_reset();
-	m_commit = check.test_any(data->alt4);
+	m_commit = check.test_in(data->alt4);
 }
 
 void atari_slapstic_device::alt_commit::test(offs_t addr) const
