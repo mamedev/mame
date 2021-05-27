@@ -3,7 +3,8 @@
 /*
  * canon_s80.cpp
  *
- *    CANON S-80 electronic typewriter
+ *    CANON S-80 (electronic typewriter, not the S80 digital camera)
+ *    CANON Typestar 3
  *
  * skeleton driver by:
  *    Felipe Correa da Silva Sanches <juca@members.fsf.org>
@@ -145,8 +146,7 @@ Notes:
       CODE +   |    D      Prints a demo on the paper
       ---------|---------------------------------------------------
 
-*************************************************************************************
- */
+*************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6800/m6801.h"
@@ -359,5 +359,5 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                                  FLAGS
-COMP( 1988, canons80, 0,      0,      canons80, canons80, canons80_state, empty_init, "Canon", "Canon S-80 electronic typewriter",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, canons80, 0,      0,      canons80, canons80, canons80_state, empty_init, "Canon", "S-80 (Canon) (electronic typewriter)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1988, canonts3, 0,      0,      canons80, canons80, canons80_state, empty_init, "Canon", "Typestar 3",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
