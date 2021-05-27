@@ -48,6 +48,8 @@ private:
 	void update_latching_inverter();
 	void flush_writes(bool keep_margin = false);
 
+	static void floppy_formats(format_registration &fr);
+
 	required_device<vtech_memexp_slot_device> m_memexp;
 	required_device<floppy_connector> m_floppy0, m_floppy1;
 	floppy_image_device *m_floppy;

@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "floppy.h"
+#include "formats/vt_dsk.h"
+#include "formats/fs_vtech.h"
 
 
 //**************************************************************************
@@ -47,14 +49,21 @@ const tiny_rom_entry *vtech_floppy_controller_device::device_rom_region() const
 
 static void laser_floppies(device_slot_interface &device)
 {
-	device.option_add("525", FLOPPY_525_SSSD);
+	device.option_add("525", FLOPPY_525_VTECH);
+}
+
+void vtech_floppy_controller_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_VTECH_BIN_FORMAT);
+	fr.add(FLOPPY_VTECH_DSK_FORMAT);
+	fr.add(FS_VTECH);
 }
 
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 {
 	VTECH_MEMEXP_SLOT(config, m_memexp);
-	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_formats);
 }
 
 
@@ -152,7 +161,6 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 			m_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		}
 		if(newflop) {
-			newflop->set_rpm(85);
 			newflop->mon_w(0);
 			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&vtech_floppy_controller_device::index_callback, this));
 			m_current_cyl = newflop->get_cyl() << 1;

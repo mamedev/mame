@@ -43,9 +43,9 @@ Expansion modules released:
 
 TODO:
 - OSA module comms is not completely understood
-- OSA PC link (probably uses MCU serial interface)
-- add power-off
+- OSA PC link, uses MCU serial interface
 - add nvram (MCU port $14?)
+- add power-off, not useful with missing nvram support
 
 ******************************************************************************/
 
@@ -225,7 +225,8 @@ void leo_state::p5_w(u8 data)
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
 	update_display();
 
-	// d0: power-off
+	// d0: power-off on falling edge
+	m_expansion->pw_w(data & 1);
 }
 
 u8 leo_state::p6_r()

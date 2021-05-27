@@ -101,7 +101,7 @@ text editor (e.g. Notepad, Emacs or TextEdit) and configure every option you
 need. However, no particular tweaks are needed to start, so you can leave most
 of the options unaltered.
 
-If you execute **mame64 -createconfig** when you already have an existing
+If you execute **mame -createconfig** when you already have an existing
 mame.ini from a previous MAME version, MAME automatically updates the
 pre-existing mame.ini by copying changed options into it.
 

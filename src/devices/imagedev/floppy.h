@@ -231,11 +231,12 @@ protected:
 
 	/* Current floppy zone cache */
 	attotime cache_start_time, cache_end_time, cache_weak_start;
+	attotime amplifier_freakout_time;
 	int cache_index;
 	u32 cache_entry;
 	bool cache_weak;
 
-	bool image_dirty;
+	bool image_dirty, track_dirty;
 	int ready_counter;
 
 	load_cb cur_load_cb;
@@ -266,6 +267,35 @@ protected:
 	// Sound
 	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
+
+	// Flux visualization
+	struct flux_per_pixel_info {
+		uint32_t m_position;      // 0-199999999 Angular position in the track, 0xffffffff if not in the floppy image
+		uint16_t m_r;             // Distance from the center
+		uint8_t m_combined_track; // No need to store head, it's y >= flux_screen_sy/2
+		uint8_t m_color;          // Computed gray level from the flux counts
+	};
+
+	struct flux_per_combined_track_info {
+		std::vector<flux_per_pixel_info *> m_pixels[2];
+		uint32_t m_span;
+		uint8_t m_track;
+		uint8_t m_subtrack;
+	};
+
+	std::vector<flux_per_pixel_info> m_flux_per_pixel_infos;
+	std::vector<flux_per_combined_track_info> m_flux_per_combined_track_infos;
+
+	optional_device<screen_device> m_flux_screen;
+
+	static constexpr int flux_screen_sx = 501;
+	static constexpr int flux_screen_sy = 1002;
+	static constexpr int flux_min_r     = 100;
+	static constexpr int flux_max_r     = 245;
+
+	void flux_image_prepare();
+	void flux_image_compute_for_track(int track, int head);
+	uint32_t flux_screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -287,6 +317,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_ED,        floppy_35_ed,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_25")

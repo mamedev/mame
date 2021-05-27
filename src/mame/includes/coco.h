@@ -197,7 +197,8 @@ protected:
 
 	soundmux_status_t soundmux_status(void);
 	void update_sound(void);
-	void poll_joystick(bool *joyin, uint8_t *buttons);
+	bool poll_joystick(void);
+	uint8_t poll_joystick_buttons(void);
 	void poll_keyboard(void);
 	void poll_hires_joystick(void);
 	void update_cassout(int cassout);

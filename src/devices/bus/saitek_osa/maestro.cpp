@@ -8,6 +8,10 @@ This is for the newer versions. For Maestro A, see maestroa.*
 
 The hardware and chess engine is similar to the Stratos/Turbo King series.
 
+Version B is compatible with the 1st EGR expansion ROM, version C/D uses
+EGR II. Versions D+ and D++ are post-production improvements, they were not
+sold officially.
+
 Hardware notes:
 - CPU: see notes below
 - 64KB ROM (2*27C256)
@@ -95,7 +99,7 @@ void saitekosa_maestro_device::set_cpu_freq()
 ROM_START( maestro )
 	ROM_REGION(0x10000, "maincpu", 0)
 
-	ROM_DEFAULT_BIOS("dpp")
+	ROM_DEFAULT_BIOS("d1")
 
 	// B (Maestro only)
 	ROM_SYSTEM_BIOS(0, "b1", "Maestro B (set 1)")
@@ -114,11 +118,11 @@ ROM_START( maestro )
 	// D
 	ROM_SYSTEM_BIOS(3, "d1", "Maestro D (set 1)")
 	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(3))
-	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(3))
+	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(4, "d2", "Maestro D (set 2)")
 	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(4))
-	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(4))
+	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(4))
 
 	// D+
 	ROM_SYSTEM_BIOS(5, "dp", "Maestro D+")
@@ -134,7 +138,7 @@ ROM_END
 ROM_START( analyst )
 	ROM_REGION(0x10000, "maincpu", 0)
 
-	ROM_DEFAULT_BIOS("dpp")
+	ROM_DEFAULT_BIOS("d1")
 
 	// B (Analyst only)
 	ROM_SYSTEM_BIOS(0, "b", "Analyst B")
@@ -149,11 +153,11 @@ ROM_START( analyst )
 	// D
 	ROM_SYSTEM_BIOS(2, "d1", "Analyst D (set 1)")
 	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(2))
-	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(2))
+	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(2))
 
 	ROM_SYSTEM_BIOS(3, "d2", "Analyst D (set 2)")
 	ROMX_LOAD("ma3_714a_u2.u2", 0x0000, 0x8000, CRC(435e1e30) SHA1(0d82df7c40443cb341dacebdf65f33c3e03bce70), ROM_BIOS(3))
-	ROMX_LOAD("b6m_b15_u3.u3",  0x8000, 0x8000, CRC(6155de90) SHA1(bb5cdf061dde2d1dc7925d455891c3ade1d274e3), ROM_BIOS(3))
+	ROMX_LOAD("b6m_629_u3.u3",  0x8000, 0x8000, CRC(15e7b1f1) SHA1(d2a757114f13c6141d74a15671aa06b675304b4a), ROM_BIOS(3))
 
 	// D+
 	ROM_SYSTEM_BIOS(4, "dp", "Analyst D+")
@@ -339,7 +343,7 @@ u32 saitekosa_analyst_device::screen_update(screen_device &screen, bitmap_rgb32 
 		const u8 *src = render + 16 * ((i & 7) + BIT(i, 3) * 40);
 		for (int y = 0; y < 8; y++)
 			for (int x = 0; x < 5; x++)
-				bitmap.pix(y + 4, i * 6 + x + 2) = BIT(src[y], 4 - x) ? 0x282828 : 0xe8e8e8;
+				bitmap.pix(y + 4, i * 6 + x + 2) = (BIT(src[y], 4 - x) && m_expansion->pw_state()) ? 0x282828 : 0xe8e8e8;
 	}
 
 	return 0;

@@ -245,6 +245,9 @@ void ren_state::p5_w(u8 data)
 	// d5: expansion ACK-P
 	m_expansion->ack_w(BIT(data, 5));
 
+	// d0: power-off on falling edge
+	m_expansion->pw_w(data & 1);
+
 	// other: ?
 }
 

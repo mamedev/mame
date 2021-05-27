@@ -175,19 +175,9 @@ void x68k_crtc_device::refresh_mode()
 		scr.max_x = m_hend + 2;
 	rectangle visiblescr(m_hbegin, m_hend, m_vbegin, m_vend);
 
-	// expand visible area to the size indicated by CRTC reg 20
-	int length = m_hend - m_hbegin;
-	if (length < m_width)
-	{
-		visiblescr.min_x = m_hbegin - ((m_width - length)/2);
-		visiblescr.max_x = m_hend + ((m_width - length)/2);
-	}
-	length = m_vend - m_vbegin;
-	if (length < m_height)
-	{
-		visiblescr.min_y = m_vbegin - ((m_height - length)/2);
-		visiblescr.max_y = m_vend + ((m_height - length)/2);
-	}
+	if ((visiblescr.max_y > m_height) || (visiblescr.max_x > m_width))
+		logerror("visarea larger then reg[20]: %dx%d, %dx%d", visiblescr.max_x, visiblescr.max_y, m_width, m_height);
+
 	// bounds check
 	if (visiblescr.min_x < 0)
 		visiblescr.min_x = 0;

@@ -146,8 +146,10 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			trackbuf.resize(cell_count);
 
 			uLongf size = ent->uncompressed_size;
-			if(uncompress((Bytef *)&trackbuf[0], &size, &compressed[0], ent->compressed_size) != Z_OK)
+			if(uncompress((Bytef *)&trackbuf[0], &size, &compressed[0], ent->compressed_size) != Z_OK) {
+				fprintf(stderr, "fail1\n");
 				return false;
+			}
 
 			uint32_t cur_time = 0;
 			for(unsigned int i=0; i != cell_count; i++) {
@@ -155,12 +157,15 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				trackbuf[i] = (trackbuf[i] & MG_MASK) | cur_time;
 				cur_time = next_cur_time;
 			}
-			if(cur_time != 200000000)
+			if(cur_time != 200000000) {
+				fprintf(stderr, "fail2 %d\n", cur_time);
 				return false;
+			}
 
 			ent++;
 		}
 
+	fprintf(stderr, "tick\n");
 	return true;
 }
 

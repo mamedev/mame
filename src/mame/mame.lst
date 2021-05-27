@@ -1094,15 +1094,15 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
-marvice                         // (c) 1994 Web Picmatic
-marvice100hz                    // (c) 1994 Web Picmatic
+marvice                         // (c) 1994 Picmatic
+marvice100hz                    // (c) 1994 Picmatic
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
-tierras100hz                    // (c) 1995 Web Picmatic
+tierras100hz                    // (c) 1995 Picmatic
 wsjr                            // (c) 1991
 wsjr_15                         // (c) 1991
-zortonbr                        // (c) 1994 Web Picmatic
-zortonbr_100                    // (c) 1993 Web Picmatic
+zortonbr                        // (c) 1994 Picmatic
+zortonbr_100                    // (c) 1993 Picmatic
 
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
