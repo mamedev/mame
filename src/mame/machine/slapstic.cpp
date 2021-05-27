@@ -1086,9 +1086,6 @@ atari_slapstic_device::alt_select_101_110::alt_select_101_110(atari_slapstic_dev
 
 void atari_slapstic_device::alt_select_101_110::test(offs_t addr) const
 {
-	m_sl->logerror("Select %04x\n", addr);
-	if(addr == 0x32ae)
-		abort();
 	if(m_reset(addr)) {
 		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
 		m_sl->m_state = m_sl->m_s_active.get();
