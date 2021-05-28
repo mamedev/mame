@@ -221,7 +221,7 @@ void x68k_state::draw_text(bitmap_rgb32 &bitmap, int xscr, int yscr, rectangle r
 				+ (((m_tvram[loc+0x20000] >> bit) & 0x01) ? 4 : 0)
 				+ (((m_tvram[loc+0x30000] >> bit) & 0x01) ? 8 : 0);
 			// Colour 0 is displayable if the text layer is at the priority level 2
-			if((m_pcgpalette->pen(colour) & 0xffffff) || ((m_video.reg[1] & 0x0c00) == 0x0800))
+			if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || ((m_video.reg[1] & 0x0c00) == 0x0800))
 				bitmap.pix(line, pixel) = m_pcgpalette->pen(colour);
 			bit--;
 			if(bit < 0)
@@ -747,7 +747,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 	else
-		bitmap.fill(0, rect); // possibly fill with m_pcgpalette->pen(0)
+		bitmap.fill(m_pcgpalette->pen(0), rect);
 
 	for(priority=2;priority>=0;priority--)
 	{
