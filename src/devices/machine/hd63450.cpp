@@ -62,6 +62,7 @@ void hd63450_device::device_start()
 	save_item(STRUCT_MEMBER(m_reg, mar));
 	save_item(STRUCT_MEMBER(m_reg, dar));
 	save_item(STRUCT_MEMBER(m_reg, btc));
+	save_item(STRUCT_MEMBER(m_reg, bar));
 	save_item(STRUCT_MEMBER(m_reg, niv));
 	save_item(STRUCT_MEMBER(m_reg, eiv));
 	save_item(STRUCT_MEMBER(m_reg, mfc));
@@ -452,13 +453,23 @@ void hd63450_device::single_transfer(int x)
 	{
 		// End of transfer
 		LOG("DMA#%i: End of transfer\n",x);
-		if ((m_reg[x].ocr & 0x0c) != 0 && m_reg[x].btc > 0)
+		if ((m_reg[x].ocr & 0x0c) == 0x08 && m_reg[x].btc > 0)
 		{
 			m_reg[x].btc--;
 			m_reg[x].bar+=6;
 			m_reg[x].mar = space.read_word(m_reg[x].bar) << 16;
 			m_reg[x].mar |= space.read_word(m_reg[x].bar+2);
 			m_reg[x].mtc = space.read_word(m_reg[x].bar+4);
+			return;
+		}
+		else if ((m_reg[x].ocr & 0x0c) == 0x0c && m_reg[x].bar)
+		{
+			u32 bar = m_reg[x].bar;
+			m_reg[x].mar = space.read_word(bar) << 16;
+			m_reg[x].mar |= space.read_word(bar+2);
+			m_reg[x].mtc = space.read_word(bar+4);
+			m_reg[x].bar = space.read_word(bar+6) << 16;
+			m_reg[x].bar |= space.read_word(bar+10);
 			return;
 		}
 		else if (m_reg[x].ccr & 0x40)

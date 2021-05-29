@@ -172,7 +172,7 @@ void x68k_crtc_device::refresh_mode()
 	rectangle visiblescr(m_hbegin, m_hend, m_vbegin, m_vend);
 
 	if ((visiblescr.max_y > m_height) || (visiblescr.max_x > m_width))
-		logerror("visarea larger then reg[20]: %dx%d, %dx%d", visiblescr.max_x, visiblescr.max_y, m_width, m_height);
+		logerror("visarea larger then reg[20]: %dx%d, %dx%d\n", visiblescr.max_x, visiblescr.max_y, m_width, m_height);
 
 	// bounds check
 	if (visiblescr.min_x < 0)
