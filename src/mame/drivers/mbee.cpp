@@ -1125,10 +1125,10 @@ ROM_START( mbeepp ) // Premium Plus
 	ROM_LOAD( "pp.bin", 0x0000, 0x4000, CRC(33292300) SHA1(8ba32123ef1b3beffa797855a1de0ea2078d652a) ) // ver 1.0
 
 	ROM_REGION( 0x4000, "pals", 0 )
-	ROM_LOAD( "silver.u39", 0x0000, 0x4000, CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
+	ROM_LOAD( "silver.u39", 0x0000, 0x4000, BAD_DUMP CRC(c34aab64) SHA1(781fe648488dec90185760f8e081e488b73b68bf) )
 
 	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD("char256.u53", 0x0000, 0x2000, CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
+	ROM_LOAD("char256.u53", 0x0000, 0x2000, BAD_DUMP CRC(9372af3c) SHA1(a63591822c0504de2fed52e88d64e1dbd6124b74) )
 ROM_END
 
 /***************************************************************************

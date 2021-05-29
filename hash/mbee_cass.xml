@@ -13,6 +13,13 @@ If no flag is specified, it's assumed it works on all of them.
 
 They do not work on disk-based microbees, or on premium models.
 
+Cassette File Types:
+- This is a single letter that displays after the 6-character filename, while loading.
+- B = Basic, loaded by Basic. If it doesn't self-start type RUN.
+- M = Machine-code, loaded by Basic. If it doesn't self-start type EXEC.
+- W = Wordbee, loaded by Wordbee only.
+- T = Teleterm, loaded by Teleterm machine (mbeett) only.
+
 -->
 <softwarelist name="mbee_cass" description="Microbee cassettes">
 
