@@ -460,7 +460,7 @@ WRITE_LINE_MEMBER( acia6850_device::write_rxc )
 						m_rx_counter = 0;
 
 						LOG("MC6850 '%s': RX STOP BIT\n", tag());
-
+						LOG("MC6850 '%s': RX DATA: %2X\n", tag(), m_rdr );
 						if (!m_rxd)
 						{
 							m_status |= SR_FE;

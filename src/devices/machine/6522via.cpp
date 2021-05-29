@@ -563,7 +563,11 @@ uint8_t via6522_device::input_pa()
 
 	/// TODO: REMOVE THIS
 	if (m_ddr_a != 0xff && !m_in_a_handler.isnull())
-		pa &= m_in_a_handler();
+	{
+		uint8_t handler_value = m_in_a_handler();
+		pa |= handler_value & ~m_ddr_a; // or in hi hits
+		pa &= handler_value & ~m_ddr_a; // mask out lo bits
+	}
 
 	pa |= m_out_a & m_ddr_a;
 
@@ -588,7 +592,9 @@ uint8_t via6522_device::input_pb()
 	/// TODO: REMOVE THIS
 	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
 	{
-		pb &= m_in_b_handler();
+		uint8_t handler_value = m_in_b_handler();
+		pb |= handler_value & ~m_ddr_b; // or in hi hits
+		pb &= handler_value & ~m_ddr_b; // mask out lo bits
 	}
 
 	pb |= m_out_b & m_ddr_b;
