@@ -38553,7 +38553,6 @@ supreme
 arcade10
 
 @source:storio.cpp
-innotab2                        // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
 storiode                        // (c) 2011 V.Tech
 storioes                        // (c) 2011 V.Tech
@@ -42127,6 +42126,9 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
+
+@source:vtech_innotab.cpp
+innotab2                        // (c) 2011 V.Tech
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)
