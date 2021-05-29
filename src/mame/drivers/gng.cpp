@@ -408,7 +408,7 @@ void gng_state::gng(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2, 384, 128, 0, 262, 22, 246);	// hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(12'000'000)/2, 384, 128, 0, 262, 22, 246);  // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gng_state::screen_update_gng));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

@@ -75,9 +75,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	virtual uint8_t ymfm_adpcm_a_read(uint32_t address) override;
-	virtual uint8_t ymfm_adpcm_b_read(uint32_t address) override;
-	virtual void ymfm_adpcm_b_write(uint32_t address, u8 data) override;
+	virtual uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
+	virtual void ymfm_external_write(ymfm::access_class type, uint32_t address, u8 data) override;
 
 	// internal state
 	required_memory_region m_internal; // internal memory region
@@ -115,8 +114,7 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	virtual uint8_t ymfm_adpcm_a_read(offs_t address) override;
-	virtual uint8_t ymfm_adpcm_b_read(offs_t address) override;
+	virtual uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
 
 	// internal state
 	address_space_config const m_adpcm_a_config; // address space 0 config (ADPCM-A)

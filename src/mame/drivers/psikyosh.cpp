@@ -279,7 +279,7 @@ Notes:
 #include "cpu/sh/sh2.h"
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

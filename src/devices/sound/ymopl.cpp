@@ -51,26 +51,30 @@ void y8950_device::rom_bank_updated()
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_b_read - callback to read data for
+//  ymfm_external_read - callback to read data for
 //  the ADPCM-B engine; in this case, from our
 //  default address space
 //-------------------------------------------------
 
-uint8_t y8950_device::ymfm_adpcm_b_read(uint32_t offset)
+uint8_t y8950_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
 {
-	return read_byte(offset);
+	if (type == ymfm::ACCESS_ADPCM_B)
+		return read_byte(offset);
+	return parent::ymfm_external_read(type, offset);
 }
 
 
 //-------------------------------------------------
-//  ymfm_adpcm_b_write - callback to write data to
+//  ymfm_external_write - callback to write data to
 //  the ADPCM-B engine; in this case, to our
 //  default address space
 //-------------------------------------------------
 
-void y8950_device::ymfm_adpcm_b_write(uint32_t offset, uint8_t data)
+void y8950_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
 {
-	space().write_byte(offset, data);
+	if (type == ymfm::ACCESS_ADPCM_B)
+		return space().write_byte(offset, data);
+	parent::ymfm_external_write(type, offset, data);
 }
 
 
@@ -105,6 +109,75 @@ DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ymfm_device_base<ymfm::ymf262>(mconfig, tag, owner, clock, YMF262)
 {
+}
+
+
+
+//*********************************************************
+//  YMF278B DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YMF278B, ymf278b_device, "ymf278b", "YMF278B OPL4")
+
+//-------------------------------------------------
+//  ymf278b_device - constructor
+//-------------------------------------------------
+
+ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ymf278b>(mconfig, tag, owner, clock, YMF278B),
+	device_rom_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  rom_bank_updated - refresh the stream if the
+//  ROM banking changes
+//-------------------------------------------------
+
+void ymf278b_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+//-------------------------------------------------
+//  ymfm_external_read - callback to read data for
+//  the ADPCM-B engine; in this case, from our
+//  default address space
+//-------------------------------------------------
+
+uint8_t ymf278b_device::ymfm_external_read(ymfm::access_class type, uint32_t offset)
+{
+	if (type == ymfm::ACCESS_PCM)
+		return read_byte(offset);
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  ymfm_external_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
+//-------------------------------------------------
+
+void ymf278b_device::ymfm_external_write(ymfm::access_class type, uint32_t offset, uint8_t data)
+{
+	if (type == ymfm::ACCESS_PCM)
+		return space().write_byte(offset, data);
+}
+
+
+//-------------------------------------------------
+//  ymfm_external_write - callback to write data to
+//  the ADPCM-B engine; in this case, to our
+//  default address space
+//-------------------------------------------------
+
+void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	// rotate the outputs so that the DO2 outputs are first
+	parent::update_internal(outputs, 2);
 }
 
 

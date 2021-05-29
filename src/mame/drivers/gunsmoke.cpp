@@ -320,7 +320,7 @@ void gunsmoke_state::gunsmoke(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246);	// hsync is 50..77, vsync is 257..259
+	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gunsmoke_state::screen_update_gunsmoke));
 	screen.set_palette(m_palette);
 

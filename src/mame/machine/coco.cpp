@@ -661,7 +661,7 @@ bool coco_state::is_joystick_hires(int joystick_index)
 //  poll_joystick
 //-------------------------------------------------
 
-void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
+bool coco_state::poll_joystick(void)
 {
 	static const analog_input_t s_empty = {};
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -712,10 +712,64 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			break;
 	}
 
-	*joyin = joyin_value;
-	*buttons = analog->buttons();
+	return joyin_value;
 }
 
+
+//-------------------------------------------------
+//  poll_joystick_buttons
+//-------------------------------------------------
+
+uint8_t coco_state::poll_joystick_buttons(void)
+{
+	static const analog_input_t s_empty = {};
+	const analog_input_t *analog;
+	uint8_t joy0, joy1;
+
+	switch(joystick_type(0))
+	{
+		case JOYSTICK_NORMAL:
+			analog = &m_joystick;
+			break;
+
+		case JOYSTICK_RAT_MOUSE:
+			analog = &m_rat_mouse;
+			break;
+
+		case JOYSTICK_DIECOM_LIGHT_GUN:
+			analog = &m_diecom_lightgun;
+			break;
+
+		default: /* None */
+			analog = &s_empty;
+			break;
+	}
+
+	joy0 = analog->buttons();
+
+	switch(joystick_type(1))
+	{
+		case JOYSTICK_NORMAL:
+			analog = &m_joystick;
+			break;
+
+		case JOYSTICK_RAT_MOUSE:
+			analog = &m_rat_mouse;
+			break;
+
+		case JOYSTICK_DIECOM_LIGHT_GUN:
+			analog = &m_diecom_lightgun;
+			break;
+
+		default: /* None */
+			analog = &s_empty;
+			break;
+	}
+
+	joy1 = analog->buttons();
+
+	return joy0 | joy1;
+}
 
 
 //-------------------------------------------------
@@ -743,13 +797,14 @@ void coco_state::poll_keyboard(void)
 
 	/* poll the joystick (*/
 	bool joyin;
-	uint8_t buttons;
-	poll_joystick(&joyin, &buttons);
+	joyin = poll_joystick();
 
 	/* PA7 comes from JOYIN */
 	pia0_pa |= joyin ? 0x80 : 0x00;
 
 	/* mask out the buttons */
+	uint8_t buttons;
+	buttons = poll_joystick_buttons();
 	pia0_pa &= ~buttons;
 
 	/* and write the result to PIA0 */

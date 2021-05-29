@@ -1543,6 +1543,12 @@ int apple_2mg_format::identify(io_generic *io, uint32_t form_factor, const std::
 		return 100;
 	}
 
+	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
+	if (!strncmp(reinterpret_cast<char *>(signature), "GMI2", 4))
+	{
+		return 100;
+	}
+
 	return 0;
 }
 

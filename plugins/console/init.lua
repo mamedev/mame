@@ -296,11 +296,11 @@ function console.startplugin()
 end
 
 setmetatable(console, {
-		     __gc = function ()
-			     if history_fullpath then
-				     local ln = require("linenoise")
-				     ln.savehistory(history_fullpath)
-			     end
+			 __gc = function ()
+				 if history_fullpath then
+					 local ln = require("linenoise")
+					 ln.savehistory(history_fullpath)
+				 end
 end})
 
 return exports

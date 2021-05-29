@@ -1154,6 +1154,8 @@ FORMATS["VECTOR06_DSK"] = true
 FORMATS["VG5K_CAS"] = true
 FORMATS["VICTOR9K_DSK"] = true
 FORMATS["VT_CAS"] = true
+FORMATS["VT_DSK"] = true
+FORMATS["FS_VTECH"] = true
 FORMATS["WD177X_DSK"] = true
 FORMATS["X07_CAS"] = true
 FORMATS["X1_TAP"] = true
@@ -4695,6 +4697,7 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_tp1985.cpp",
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",
+	MAME_DIR .. "src/mame/drivers/philipsbo.cpp",
 	MAME_DIR .. "src/mame/drivers/mindset.cpp",
 	MAME_DIR .. "src/mame/drivers/gs6502.cpp",
 	MAME_DIR .. "src/mame/drivers/gs6809.cpp",

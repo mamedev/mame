@@ -46,7 +46,6 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/ymopl.h"
-#include "sound/ymf278b.h"
 #include "speaker.h"
 
 

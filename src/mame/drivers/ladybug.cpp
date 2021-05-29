@@ -58,7 +58,7 @@ Mrs. Dynamite
 Space Raider
 
 Space Raider also uses the Starfield generator board from Zero Hour,
-	Connected via flywires to these boards
+    Connected via flywires to these boards
 
 TODO:
 
@@ -147,11 +147,11 @@ void dorodon_state::decrypted_opcodes_map(address_map &map)
 void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 {
 	// LS138 @ J4
-	map(0x0000, 0x5fff).rom();	// 2764s at R4, N4, and M4
+	map(0x0000, 0x5fff).rom();  // 2764s at R4, N4, and M4
 	// LS138 @ J4 and LS139 @ H4
 	map(0x6000, 0x6fff).ram();  // 6116s @ K3 & M3, also connected to clk on PAL K2 (16R6, U001)
-	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w)); // pin 29 on ribbon 
-	//map(0x77ff, 0x7fff);	// LS139 @ H4 pin7 is NC
+	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w)); // pin 29 on ribbon
+	//map(0x77ff, 0x7fff);  // LS139 @ H4 pin7 is NC
 
 	// LS138 @ J4, Pin11 (0x8000-0x9fff) and
 	// LS138 @ N3 (bottom 3 bits)

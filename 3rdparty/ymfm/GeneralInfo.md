@@ -19,7 +19,7 @@ The Yamaha FM chips can be broadly categoried into families:
 * OPL (YM3526)
 	* OPL2 (YM3812)
 	* OPLL (YM2413, YM2423, YMF281, DS1001, and others)
-	* OPL3 (YMF262)
+	* OPL3 (YMF262, YMF289B)
 	* OPL4 (YMF278)
 
 Additionally, several lesser-documented variants exist exclusively in the employ of Yamaha synthesizers:
@@ -242,9 +242,9 @@ some details on the OPN family:
 
 chip ID:  | YM2203 | YM2608 | YMF288 | YM2610 | YM2610B | YM2612 | YM3438 | YMF276 |
 ---------:|:------:|:------:|:------:|:------:|:-------:|:------:|:------:|:------:|
-aka:      |   OPN  |  OPNA  |  OPN3  |  OPNB  |  OPNB2  |  OPN2  |  OPN2C |  OPN2L |
+aka:      |   OPN  |  OPNA  |  OPN3L |  OPNB  |  OPNB2  |  OPN2  |  OPN2C |  OPN2L |
 FM:       |    3   |    6   |    6   |    4   |    6    |    6   |    6   |    6   |
-AY-8910:  |    3   |    3   |    3   |    3   |    3    |    -   |    -   |    -   |
+AY-8910:  |    3   |    1   |    1   |    1   |    1    |    -   |    -   |    -   |
 ADPCM-A:  |    -   |  6 int |  6 int |  6 ext |  6 ext  |    -   |    -   |    -   |
 ADPCM-B:  |    -   |  1 ext |    -   |  1 ext |  1 ext  |    -   |    -   |    -   |
 DAC:      |   no   |   no   |   no   |   no   |   no    |   yes  |   yes  |   yes  |
@@ -252,7 +252,7 @@ output:   | 10.3fp | 16-bit | 16-bit | 16-bit |  16-bit |  9-bit |  9-bit | 16-b
 summing:  |  adder |  adder |  adder |  adder |  adder  |  muxer |  muxer |  adder |
 
 * FM represents the number of FM channels available.
-* AY-8910 represents the number of AY-8910-compatible channels that are built in.
+* AY-8910 represents the number of AY-8910-compatible outputs.
 * ADPCM-A represents the number of internal/external ADPCM-A channels present.
 * ADPCM-B represents the number of internal/external ADPCM-B channels present.
 * DAC indicates if a directly-accessible DAC output exists, replacing one channel.
@@ -261,15 +261,15 @@ summing:  |  adder |  adder |  adder |  adder |  adder  |  muxer |  muxer |  add
 
 OPL has a similar trove of chip variants:
 
-chip ID:     | YM3526 |  Y8950  | YM3812 | YM2413 | YMF262 | YMF278B |
-------------:|:------:|:-------:|:------:|:------:|:------:|:-------:|
-aka:         |   OPL  |MSX-AUDIO|  OPL2  |  OPLL  |  OPL3  |   OPL4  |
-FM:          |    9   |    9    |    9   |    9   |   18   |    18   |
-ADPCM-B:     |    -   |  1 ext  |    -   |    -   |    -   |    -    |
-wavetable:   |    -   |    -    |    -   |    -   |    -   |    24   |
-instruments: |   no   |    no   |   no   |   yes  |   no   |    no   |
-output:      | 10.3fp |  10.3fp | 10.3fp |  9-bit | 16-bit | 16-bit  |
-summing:     |  adder |  adder  |  adder |  muxer |  adder |  adder  |
+chip ID:     | YM3526 |  Y8950  | YM3812 | YM2413 | YMF262 | YMF289B | YMF278B |
+------------:|:------:|:-------:|:------:|:------:|:------:|:-------:|:-------:|
+aka:         |   OPL  |MSX-AUDIO|  OPL2  |  OPLL  |  OPL3  |  OPL3L  |   OPL4  |
+FM:          |    9   |    9    |    9   |    9   |   18   |   18    |    18   |
+ADPCM-B:     |    -   |  1 ext  |    -   |    -   |    -   |    -    |    -    |
+wavetable:   |    -   |    -    |    -   |    -   |    -   |    -    |    24   |
+instruments: |   no   |    no   |   no   |   yes  |   no   |   no    |    no   |
+output:      | 10.3fp |  10.3fp | 10.3fp |  9-bit | 16-bit | 16-bit  | 16-bit  |
+summing:     |  adder |  adder  |  adder |  muxer |  adder |  adder  |  adder  |
 
 * FM represents the number of FM channels available.
 * ADPCM-B represents the number of external ADPCM-B channels present.

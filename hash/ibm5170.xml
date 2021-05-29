@@ -12801,7 +12801,7 @@ license:CC0
 				<rom name="Ishar 2 (Spain) [Silmarils] [1995] [3.5HD] [Disk 2 of 2] [Disk B].img" size="1474560" crc="3ea14189" sha1="be8895194524656fbf5956e417cd54630bd83d83"/>
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="jazz">
 		<description>Jazz Jackrabbit</description>

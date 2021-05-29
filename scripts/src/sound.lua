@@ -1170,8 +1170,8 @@ end
 ---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM2414"] = true
---@src/devices/sound/ymopm.h,SOUNDS["YM3806"] = true
+--@src/devices/sound/ymopz.h,SOUNDS["YM2414"] = true
+--@src/devices/sound/ymopq.h,SOUNDS["YM3806"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2203"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YM2413"] = true
 --@src/devices/sound/ymopn.h,SOUNDS["YM2608"] = true
@@ -1180,8 +1180,8 @@ end
 --@src/devices/sound/ymopl.h,SOUNDS["YM3526"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YM3812"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["YMF262"] = true
+--@src/devices/sound/ymopl.h,SOUNDS["YMF278B"] = true
 --@src/devices/sound/ymf271.h,SOUNDS["YMF271"] = true
---@src/devices/sound/ymf278b.h,SOUNDS["YMF278B"] = true
 --@src/devices/sound/ymopl.h,SOUNDS["Y8950"] = true
 ---------------------------------------------------
 
@@ -1215,7 +1215,7 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	}
 end
 
-if (SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null or SOUNDS["YM3812"]~=null or SOUNDS["YMF262"]~=null or SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
+if (SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null or SOUNDS["YM3812"]~=null or SOUNDS["YMF262"]~=null or SOUNDS["YMF278B"]~=null or SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ymopl.cpp",
 		MAME_DIR .. "src/devices/sound/ymopl.h",
@@ -1226,13 +1226,6 @@ if (SOUNDS["YMF271"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ymf271.cpp",
 		MAME_DIR .. "src/devices/sound/ymf271.h",
-	}
-end
-
-if (SOUNDS["YMF278B"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ymf278b.cpp",
-		MAME_DIR .. "src/devices/sound/ymf278b.h",
 	}
 end
 

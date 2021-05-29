@@ -29,6 +29,8 @@ DECLARE_DEVICE_TYPE(Y8950, y8950_device);
 
 class y8950_device : public ymfm_device_base<ymfm::y8950>, public device_rom_interface<21>
 {
+	using parent = ymfm_device_base<ymfm::y8950>;
+
 public:
 	// constructor
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -48,8 +50,8 @@ protected:
 
 private:
 	// ADPCM read/write callbacks
-	uint8_t ymfm_adpcm_b_read(offs_t address) override;
-	void ymfm_adpcm_b_write(offs_t address, uint8_t data) override;
+	uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
+	void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override;
 };
 
 
@@ -78,6 +80,41 @@ public:
 	// additional register writes
 	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
 	void data_hi_w(u8 data) { update_streams().write_data(data); }
+};
+
+
+// ======================> ymf278b_device
+
+DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device);
+
+class ymf278b_device : public ymfm_device_base<ymfm::ymf278b>, public device_rom_interface<22>
+{
+	using parent = ymfm_device_base<ymfm::ymf278b>;
+
+public:
+	// constructor
+	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// additional register reads
+	uint8_t data_pcm_r() { return update_streams().read_data_pcm(); }
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data(data); }
+	void address_pcm_w(u8 data) { update_streams().write_address_pcm(data); }
+	void data_pcm_w(u8 data) { update_streams().write_data_pcm(data); }
+
+protected:
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	// ADPCM read/write callbacks
+	uint8_t ymfm_external_read(ymfm::access_class type, uint32_t address) override;
+	void ymfm_external_write(ymfm::access_class type, uint32_t address, uint8_t data) override;
 };
 
 

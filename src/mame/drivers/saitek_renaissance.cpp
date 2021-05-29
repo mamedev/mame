@@ -33,11 +33,13 @@ TODO:
 
 #include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/input_merger.h"
 #include "machine/sensorboard.h"
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
 #include "video/sed1500.h"
 
+#include "render.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -54,6 +56,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_expansion(*this, "exp"),
+		m_stb(*this, "stb"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_lcd_pwm(*this, "lcd_pwm"),
@@ -63,16 +66,20 @@ public:
 		m_out_lcd(*this, "s%u.%u", 0U, 0U)
 	{ }
 
+	template <int N> DECLARE_INPUT_CHANGED_MEMBER(change_view);
+
 	// machine configs
 	void ren(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
 	required_device<saitekosa_expansion_device> m_expansion;
+	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -91,7 +98,6 @@ private:
 	void leds_w(u8 data);
 	void control_w(u8 data);
 	u8 control_r();
-	void exp_stb_w(int state);
 	void exp_rts_w(int state);
 
 	u8 p2_r();
@@ -111,6 +117,21 @@ void ren_state::machine_start()
 
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+}
+
+void ren_state::machine_reset()
+{
+	m_stb->in_clear<0>();
+}
+
+template <int N> INPUT_CHANGED_MEMBER(ren_state::change_view)
+{
+	if (oldval && !newval)
+	{
+		// meant for changing lcd drawer view
+		render_target *target = machine().render().first_target();
+		target->set_view(target->view() + N);
+	}
 }
 
 
@@ -176,15 +197,9 @@ u8 ren_state::control_r()
 	return 0;
 }
 
-void ren_state::exp_stb_w(int state)
-{
-	// STB-P to P5 IS
-	m_maincpu->set_input_line(M6801_IS_LINE, state ? CLEAR_LINE : ASSERT_LINE);
-}
-
 void ren_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P? (not used by module)
+	// NAND with ACK-P (not used by module)
 }
 
 
@@ -224,10 +239,14 @@ void ren_state::p5_w(u8 data)
 	// d1: expansion NMI-P
 	m_expansion->nmi_w(BIT(data, 1));
 
-	// d3: NAND with STB-P?
+	// d3: NAND with STB-P
+	m_stb->in_w<1>(BIT(data, 3));
 
 	// d5: expansion ACK-P
 	m_expansion->ack_w(BIT(data, 5));
+
+	// d0: power-off on falling edge
+	m_expansion->pw_w(data & 1);
 
 	// other: ?
 }
@@ -317,6 +336,10 @@ static INPUT_PORTS_START( ren )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+
+	PORT_START("VIEW")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, change_view<+1>, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CHANGED_MEMBER(DEVICE_SELF, ren_state, change_view<-1>, 0)
 INPUT_PORTS_END
 
 
@@ -336,6 +359,9 @@ void ren_state::ren(machine_config &config)
 	m_maincpu->out_p5_cb().set(FUNC(ren_state::p5_w));
 	m_maincpu->in_p6_cb().set(FUNC(ren_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(ren_state::p6_w));
+
+	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(~u32(3));
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -363,7 +389,7 @@ void ren_state::ren(machine_config &config)
 
 	// expansion module
 	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
-	m_expansion->stb_handler().set(FUNC(ren_state::exp_stb_w));
+	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
 	m_expansion->rts_handler().set(FUNC(ren_state::exp_rts_w));
 }
 
@@ -398,5 +424,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    CMP  MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1989, renaissa,  0,        0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1989, renaissaa, renaissa, 0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, renaissa,  0,        0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, renaissaa, renaissa, 0,   ren,    ren,  ren_state, empty_init, "Saitek", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

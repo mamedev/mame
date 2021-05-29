@@ -214,11 +214,11 @@ void rmnimbus_state::nimbus(machine_config &config)
 
 /*
 Known unavailable BIOS set:
-	Another version of v1.31a labelled: SYS1 16128 31/10/86, SYS2 16129 28/10/86
-	Another version of v1.32c labelled: SYS1 17130 10.03.87, SYS 2. 17131 09.03.87
-	Another version of v1.32c labelled: SYS 1 21323 2/12/88, SYS 2 21324 5/1/89
-	v1.33c labelled "RESEARCH MACHINE P.N. 32857(32858) PC186 SYS1(SYS2) V1.33C", no date labelled
-	Another version of v1.40d labelled: 24693 IC30 02/7/91(AA), 24694 IC27 28/6/91(AA)
+    Another version of v1.31a labelled: SYS1 16128 31/10/86, SYS2 16129 28/10/86
+    Another version of v1.32c labelled: SYS1 17130 10.03.87, SYS 2. 17131 09.03.87
+    Another version of v1.32c labelled: SYS 1 21323 2/12/88, SYS 2 21324 5/1/89
+    v1.33c labelled "RESEARCH MACHINE P.N. 32857(32858) PC186 SYS1(SYS2) V1.33C", no date labelled
+    Another version of v1.40d labelled: 24693 IC30 02/7/91(AA), 24694 IC27 28/6/91(AA)
 */
 ROM_START( nimbus )
 	ROM_REGION( 0x100000, MAINCPU_TAG, 0 )
@@ -226,7 +226,7 @@ ROM_START( nimbus )
 	ROM_SYSTEM_BIOS(0, "v125a", "Nimbus BIOS v1.25a (1985-12-02)")
 	ROMX_LOAD("sys1-1.25a_13484_6-11-85_m5m27256p.rom", 0xf0001, 0x8000, CRC(5870df28) SHA1(12e1a7d22439d512b221c355d641d113f0e6568e), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("sys2-1.25a_13485_2-12-85_m5m27256p.rom", 0xf0000, 0x8000, CRC(15888320) SHA1(32cc2485468c6a9944e505162e319a283eef8a84), ROM_SKIP(1) | ROM_BIOS(0))
-	
+
 	ROM_SYSTEM_BIOS(1, "v131a", "Nimbus BIOS v1.31a (1986-06-18)")
 	ROMX_LOAD("sys1-1.31a-16128-1986-06-18.rom", 0xf0001, 0x8000, CRC(6416eb05) SHA1(1b640163a7efbc24381c7b24976a8609c066959b), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("sys2-1.31a-16129-1986-06-18.rom", 0xf0000, 0x8000, CRC(b224359d) SHA1(456bbe37afcd4429cca76ba2d6bd534dfda3fc9c), ROM_SKIP(1) | ROM_BIOS(1))
@@ -238,7 +238,7 @@ ROM_START( nimbus )
 	ROM_SYSTEM_BIOS(3, "v132d", "Nimbus BIOS v1.32d (1989-01-20)")
 	ROMX_LOAD("sys1-1.32d_21323_17-1-89_m5m27256p_63210c.rom", 0xf0001, 0x8000, CRC(e0ecbc02) SHA1(b5cb16df23bd30af5556660364e4733790f99164), ROM_SKIP(1) | ROM_BIOS(3))
 	ROMX_LOAD("sys2-1.32d_21324_20-1-89_m5m27256p_63210c.rom", 0xf0000, 0x8000, CRC(8ef4a357) SHA1(29309cb8bfe9256d4684f3e6575e3720b0dcacd4), ROM_SKIP(1) | ROM_BIOS(3))
-	
+
 	ROM_SYSTEM_BIOS(4, "v132f", "Nimbus BIOS v1.32f (1989-11-29)")
 	ROMX_LOAD("sys-1-1.32f-22779-1989-11-29.rom", 0xf0001, 0x8000, CRC(786c31e8) SHA1(da7f828f7f96087518bea1a3d89fee59b283b4ba), ROM_SKIP(1) | ROM_BIOS(4))
 	ROMX_LOAD("sys-2-1.32f-22778-1989-11-29.rom", 0xf0000, 0x8000, CRC(0be3db64) SHA1(af806405ec6fbc20385705f90d5059a47de17b08), ROM_SKIP(1) | ROM_BIOS(4))

@@ -1039,8 +1039,7 @@ void debug_imgui::refresh_typelist()
 	if(fd == nullptr)
 		return;
 
-	floppy_image_format_t* format_list = fd->get_formats();
-	for(floppy_image_format_t* flist = format_list; flist; flist = flist->next)
+	for(floppy_image_format_t* flist : fd->get_formats())
 	{
 		if(flist->supports_save())
 		{
