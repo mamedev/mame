@@ -13,7 +13,7 @@ SEGA 315-5124 custom
 SEGA 315-5297 custom
 27C512 ROM
 3x NEC D4168C-15-SG RAM (1 near the CPU, 2 near the 315-5124)
-XTAL (value not readable)
+10.7386 MHz XTAL
 
 2)
 one '837-6900 FORTUNE WHEEL' sticker, one '880324 0508 H' sticker
@@ -156,7 +156,7 @@ INPUT_PORTS_END
 void fwheel_state::fwheel(machine_config &config)
 {
 	// on 837-6899 PCB
-	Z80(config, m_maincpu, 4'000'000); // not verified
+	Z80(config, m_maincpu, XTAL(10'738'000) / 3); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &fwheel_state::main_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &fwheel_state::main_io_map);
 
@@ -165,13 +165,13 @@ void fwheel_state::fwheel(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
-	m_main_scr->set_raw(XTAL(10'738'635)/2, \
+	m_main_scr->set_raw(XTAL(10'738'000) / 2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
-	m_main_scr->set_refresh_hz(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
+	m_main_scr->set_refresh_hz(XTAL(10'738'000) / 2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC));
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
-	SEGA315_5124(config, m_vdp, 10'738'635); // not verified
+	SEGA315_5124(config, m_vdp, XTAL(10'738'000)); // not verified
 	m_vdp->set_screen(m_main_scr);
 	m_vdp->set_is_pal(false);
 	m_vdp->n_int().set_inputline(m_maincpu, 0);
