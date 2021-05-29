@@ -110,7 +110,7 @@ public:
 	// the following constants are uncommon:
 	//          bool DYNAMIC_OPS: True if ops/channel can be changed at runtime (OPL3+)
 	//       bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage (OPLL)
-	//        bool EG_HAS_REVERB: True if the chip has a faux reverb envelope stage (OPZ)
+	//        bool EG_HAS_REVERB: True if the chip has a faux reverb envelope stage (OPQ/OPZ)
 	//           bool EG_HAS_SSG: True if the chip has SSG envelope support (OPN)
 	//      bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
 	//

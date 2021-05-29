@@ -138,6 +138,7 @@ public:
 	static constexpr uint32_t REGISTERS = 0x190;
 	static constexpr uint32_t DEFAULT_PRESCALE = 2;
 	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
+	static constexpr bool EG_HAS_REVERB = true;
 	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr uint32_t REG_MODE = 0x14;
 	static constexpr uint8_t STATUS_TIMERA = 0x01;

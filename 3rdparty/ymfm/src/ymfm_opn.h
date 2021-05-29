@@ -116,13 +116,11 @@ public:
 	static constexpr uint32_t CHANNELS = IsOpnA ? 6 : 3;
 	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr uint32_t WAVEFORMS = 1;
 	static constexpr uint32_t REGISTERS = IsOpnA ? 0x200 : 0x100;
 	static constexpr uint32_t REG_MODE = 0x27;
 	static constexpr uint32_t DEFAULT_PRESCALE = 6;
 	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = true;
 	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr uint32_t CSM_TRIGGER_MASK = 1 << 2;

@@ -207,7 +207,12 @@ int32_t opn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	// when we cross the divider count, add enough to zero it and cause an
 	// increment at bit 8; the 7-bit value lives from bits 8-14
 	if (subcount >= lfo_max_count[lfo_rate()])
-		m_lfo_counter += subcount ^ 0xff;
+	{
+		// note: to match the published values this should be 0x100 - subcount;
+		// however, tests on the hardware and nuked bear out an off-by-one
+		// error exists that causes the max LFO rate to be faster than published
+		m_lfo_counter += 0x101 - subcount;
+	}
 
 	// AM value is 7 bits, staring at bit 8; grab the low 6 directly
 	m_lfo_am = bitfield(m_lfo_counter, 8, 6);
