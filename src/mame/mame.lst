@@ -14161,6 +14161,9 @@ asurabld                        // (c) 1998 (Japan)
 asurabus                        // (c) 2000 (Japan)
 asurabusa                       // review build
 
+@source:fwheel.cpp
+fwheel                          //
+
 @source:g627.cpp
 rota_101                        //
 rota_115                        //
