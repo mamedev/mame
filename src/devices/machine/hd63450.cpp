@@ -298,7 +298,8 @@ void hd63450_device::dma_transfer_start(int channel)
 	}
 
 	// Burst transfers will halt the CPU until the transfer is complete
-	if ((m_reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
+	// max rate transfer hold the bus
+	if (((m_reg[channel].dcr & 0xc0) == 0x00) || ((m_reg[channel].ocr & 3) == 1))  // Burst transfer
 	{
 		m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
@@ -494,8 +495,8 @@ void hd63450_device::single_transfer(int x)
 		m_reg[x].csr &= ~0x08;  // channel no longer active
 		m_reg[x].ccr &= ~0xc0;
 
-		// Burst transfer
-		if ((m_reg[x].dcr & 0xc0) == 0x00)
+		// Burst transfer or max rate transfer
+		if (((m_reg[x].dcr & 0xc0) == 0x00) || ((m_reg[x].ocr & 3) == 1))
 		{
 			m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		}
