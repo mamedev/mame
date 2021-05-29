@@ -809,7 +809,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 			for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 			{
 				colour = m_special.pix(scanline / divisor, pixel) & 0xff;
-				if(colour)
+				// XXX: this might check the pen color not the palette index
+				if(colour & ~1)
 					bitmap.pix(scanline, pixel) = m_gfxpalette->pen(colour & ~1);
 			}
 		}
