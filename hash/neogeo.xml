@@ -7710,8 +7710,9 @@ license:CC0
 		<description>Bang Bang Busters</description>
 		<year>2001</year>
 		<publisher>Visco</publisher>
-		<sharedfeat name="release" value="MVS, AES" />
-		<sharedfeat name="compatibility" value="MVS, AES" />
+		<info name="alt_title" value="バンバン バスターズ"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="071.p1" offset="0x000000" size="0x080000" crc="7687197d" sha1="4bb9cb7819807f7a7e1f85f1c4faac4a2f8761e8" />
