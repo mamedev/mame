@@ -120,6 +120,7 @@ public:
 	void naomi2m2(machine_config &config);
 	void naomi2gd(machine_config &config);
 	void naomi2m1(machine_config &config);
+	void naomi2m4(machine_config &config);
 
 	void init_naomi2();
 
