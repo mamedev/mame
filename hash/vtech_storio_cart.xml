@@ -188,7 +188,7 @@ license:CC0
 		<description>Cars 2 (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-281900(US)"/>	
+		<info name="serial" value="80-281900(US)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x8400000">
 				<rom name="v.reader_cars_2_n231gt_c279.bin" size="0x8400000" crc="c59126cc" sha1="8bd36e0dc2633ebf8ec6ac4d05edc6a60ca94e45" />

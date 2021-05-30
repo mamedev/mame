@@ -4,11 +4,11 @@
 
     LeapFrog Leapster Explorer
 
-	 - runs Linux
-	 - unknown ARM9 based SoC
+     - runs Linux
+     - unknown ARM9 based SoC
 
-	 Internal ROM not currently dumped, this file exists to reference the
-	 Software List
+     Internal ROM not currently dumped, this file exists to reference the
+     Software List
 
 *******************************************************************************/
 

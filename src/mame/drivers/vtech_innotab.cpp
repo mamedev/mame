@@ -3,12 +3,12 @@
 /******************************************************************************
 
     VTech InnoTab 1/2/3
-	NOT InnoTab MAX
+    NOT InnoTab MAX
 
-	InnoTab 1/2/3 appear to be compatible with each other (updated internal
-	software etc.)
+    InnoTab 1/2/3 appear to be compatible with each other (updated internal
+    software etc.)
 
-	where do the InnoTab 3S and InnoTab 2 Baby fit in?
+    where do the InnoTab 3S and InnoTab 2 Baby fit in?
 
 *******************************************************************************/
 
@@ -102,7 +102,7 @@ void vtech_innotab_state::vtech_innotab(machine_config& config)
 /*
 **************************************************************
 APP Version : 10.90
-     Device : THGBM4G4D1HBAIR(ISP)_4Bit  
+     Device : THGBM4G4D1HBAIR(ISP)_4Bit
 **************************************************************
 
 
@@ -122,7 +122,7 @@ ECSD_CSD.BIN
 
       Device life time Type A : Not defined
       Device life time Type B : Not defined
-      Device life time (PRE_EOL_INFO) : Not Defined 
+      Device life time (PRE_EOL_INFO) : Not Defined
 
   <2> -- Partition Size Info.--
 
@@ -179,12 +179,12 @@ ECSD_CSD.BIN
 
 **************************************************************
 APP Version : 10.90
-     Device : THGBM4G4D1HBAIR(ISP)_4Bit  
+     Device : THGBM4G4D1HBAIR(ISP)_4Bit
 **************************************************************
 
 Init EMMC... OK!    ( OCR register: 80FF8080 )
-Verifing CSD Succeeded 
-Verifing ECSD Succeeded 
+Verifing CSD Succeeded
+Verifing ECSD Succeeded
 Verifing BOOT1 : Succeeded. Time : 0. 47 S -- Partition Size :1024 KB Processing Size from the File : 1024 KB )
 Verifing BOOT2 : Succeeded. Time : 0. 47 S -- Partition Size :1024 KB Processing Size from the File : 1024 KB )
 Analysis file is complete, Space usage: 20.26% time: 13S
