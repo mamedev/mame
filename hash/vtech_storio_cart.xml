@@ -171,11 +171,26 @@ license:CC0
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="v.reader_mickey_mouse_clubhouse_n231gt_c276.bin" size="0x4200000" crc="67dea606" sha1="cdee41449bd5ba15fd8b9e5e6ca4ad2836397eae" />
-				<!-- The dump below was from an identical cartridge, but doesn't appear to be V.Reader data at all, it contains no filesystem -->
-				<!-- <rom name="v.reader_mickey_mouse_clubhouse_h27u518s2ctr_ad76.BIN" size="0x4200000" crc="8b7eb4b5" sha1="f68d4e826b786710d0bea6669ab62648b0a09ff1" /> -->
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
+	     the data structure is very different, and doesn't start with the FAT16 filesystem?
+		 does the system BIOS detect different cartridge types and handle them in different ways? -->
+	<software name="mmcluba" cloneof="mmclub" supported="no">
+		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-281000(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_mickey_mouse_clubhouse_h27u518s2ctr_ad76.bin" size="0x4200000" crc="8b7eb4b5" sha1="f68d4e826b786710d0bea6669ab62648b0a09ff1" />
+			</dataarea>
+		</part>
+	</software>
+
+	
 
 	<software name="mickeychgr" cloneof="mmclub" supported="no">
 		<description>Micky Maus Wunderhaus (Germany)</description>
