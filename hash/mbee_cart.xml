@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+PAK and NET roms for the Microbee non-disk models. These extensions are supported: MBP, MBN, ROM.
+
+Compatibility flags:
+1 = mbee
+2 = mbeeic, mbeepc, mbeepc85
+
+If no flag is specified, it's assumed it works on all of them.
+
+Most roms can be mounted in any slot, although there's sometimes one is recommended.
+The usage will state any recommended slot, although we don't enforce it.
+
+If you choose -rom1, use pak0 to run it. This follows up to -rom8, which is run by pak7.
+
+If you are using the 'mbee' machine, there's only one slot (-rom), use edasm to run it.
+
+-->
+<softwarelist name="mbee_cart" description="Microbee PAK roms">
+
+	<software name="edasm">
+		<description>EDASM</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="edasm.mbp" size="0x2000" crc="1af1b3a9" sha1="d035a997c2dbbb3918b3395a3a5a1076aa203ee5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth10">
+		<description>FORTH v1.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="forth.mbp" size="0x2000" crc="c0795c2b" sha1="8faa0a46fbbdb8a1019d706a40cd4431a5063f8c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="forth11">
+		<description>FORTH v1.1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="forth11.mbp" size="0x2000" crc="f0fc2358" sha1="b7303b94abe647d5a6ffb2fba5d205412f970c16" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ozlogo">
+		<description>OZLOGO</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="ozlogo.mbp" size="0x2000" crc="47c3ef69" sha1="8274d27c323ca4a6cc9e7d24946ae9c0531c3112" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess">
+		<description>CHESS</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="chess.mbp" size="0x2000" crc="fe9ee9d0" sha1="a316559414e68c0101af5f00755db551e7c5788e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help1">
+		<description>HELP (set 1)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom2 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="help1.mbp" size="0x2000" crc="d34fae54" sha1="5ed30636f48e9d208ce2da367ba4425782a5bce3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help2">
+		<description>HELP (set 2)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom2 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="help2.mbp" size="0x2000" crc="a4f1fa90" sha1="1456abc6ed0501a3b15a99b4302750843293ae5f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdisas">
+		<description>Mydas Dissassembler</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mdisas.mbp" size="0x2000" crc="a14c1747" sha1="0ef2e27ecac659c4050b1e43dd183a0809263014" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdisas">
+		<description>Super Disassembler 3.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="sdisas.mbp" size="0x2000" crc="613f2212" sha1="967f7516354911a1278a8d5e09ac2d2c74c76594" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwordp">
+		<description>Mytek Word Processor</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="mwordp.mbp" size="0x2000" crc="1bbec49f" sha1="12e0f78ec5550076c5f63bc8aaf28930c6c3ad09" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msinv">
+		<description>Microspace Invaders</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="invaders.mbp" size="0x2000" crc="ad84132d" sha1="d4eeecc548ed61f29a9ab157b003b9a8ce0713eb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="survivor">
+		<description>Survivor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="survivor.mbp" size="0x2000" crc="75d6d01e" sha1="81f8163774eccd5e000a206f08cb842c6b0d8c88" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typtut">
+		<description>Typing Tutor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="typtut.mbp" size="0x2000" crc="3e1c790c" sha1="9b4b1822fb64d9cd12a7347af23916bc36be5314" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee10">
+		<description>Wordbee 1.0</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee10.mbp" size="0x2000" crc="2ed7e739" sha1="fec174caa6f9534c3ef93feb491b31a5642f9d2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee12">
+		<description>Wordbee 1.2</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee12.mbp" size="0x2000" crc="0fc21cb5" sha1="33b3995988fc51ddef1568e160dfe699867adbd5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee12s">
+		<description>Wordbee 1.2 (Swedish)</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee12s.mbp" size="0x2000" crc="2ae22525" sha1="893f2fc1511f4b2c55741365faaf00a478491383" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee13">
+		<description>Wordbee 1.3</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee13.mbp" size="0x2000" crc="85f0e581" sha1="fea7bf261ce268097c6db662300dce091887b807" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee13r3">
+		<description>Wordbee 1.3 Rel 3</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee13r3.mbp" size="0x2000" crc="d7c58b7b" sha1="5af1b8d21a0f21534ed1833ae919dbbc6ca973e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbee20s">
+		<description>Wordbee 2.0 (Swedish)</description>
+		<year>1982</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1) [-rom1 recommended]"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="rom" size="0x2000">
+				<rom name="wbee20s.mbp" size="0x2000" crc="6a0fe57f" sha1="a101b588b1872e19382b9e9ea50fabb0fd060aa6" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+	<software name="chip8">
+		<description>CHIP8 V1.0</description>
+		<year>198?</year>
+		<publisher>Dreamcards</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="net" size="0x1000">
+				<rom name="chip8_1.mbn" size="0x1000" crc="1c4a4cd2" sha1="dcac3ef89889b9e03aca4f64f258ffdb026bf800" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chip8a">
+		<description>CHIP8 V2.2</description>
+		<year>198?</year>
+		<publisher>Dreamcards</publisher>
+		<info name="usage" value="edasm (mbee) or pak(slot-1)"/>
+		<part name="cart" interface="mbee_cart">
+			<dataarea name="net" size="0x1000">
+				<rom name="chip8_2.mbn" size="0x1000" crc="11fbb547" sha1="7bd9dc4b67b33b8e1be99beb6a0ddff25bdbd3f7" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+
+</softwarelist>

@@ -393,6 +393,7 @@ ROM_START( segasp )
 ROM_END
 
 // probably satellite screen-less player I/O and hoppers controller units, while actual game running on main Lindbergh unit
+// actual size is 16Mbyte, the rest is garbage leftover from some other game
 ROM_START( aminosan )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )

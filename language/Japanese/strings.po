@@ -2414,7 +2414,7 @@ msgstr "アナログ操作"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "DIPスイッチ"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -3268,9 +3268,6 @@ msgstr "MAMEinfoファイル"
 
 #~ msgid "Full"
 #~ msgstr "全体"
-
-#~ msgid "Dip Switches"
-#~ msgstr "DIPスイッチ"
 
 #~ msgid "Select position to load from"
 #~ msgstr "セーブ元を選択"
