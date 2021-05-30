@@ -164,17 +164,21 @@ uint8_t enmirage_state::mirage_adc_read()
     switch( m_mux_value & 0x03 )
     {
         case 0:
-            value = m_cassette->input(); /* microphone */
-            break;
+            value = m_cassette->input(); /* compressed input */
+ 			logerror( "%s, 5503 sample: channel: compressed input, data: $%02x\n", machine().describe_context(), value);
+           break;
         case 1:
-//            value = m_sample->sample(); /* internal audio */
-            value = 0x7f; /* internal audio */
+//            value = m_sample->sample(); /* line input */
+            value = 0x7f; /* line input */
+ 			logerror( "%s, 5503 sample: channel: line input, data: $%02x\n", machine().describe_context(), value);
             break;
         case 2:
             value = m_wheel[0]->read(); /* pitch wheel */
+ 			logerror( "%s, 5503 sample: channel: pitch wheel, data: $%02x\n", machine().describe_context(), value);
             break;
         case 3:
             value = m_wheel[1]->read(); /* mod wheel */
+ 			logerror( "%s, 5503 sample: channel: mod wheel, data: $%02x\n", machine().describe_context(), value);
             break;
     }
 
@@ -191,6 +195,7 @@ void enmirage_state::machine_reset()
 {
     last_sndram_bank = 0;
     membank("sndbank")->set_base(memregion("es5503")->base() );
+    m_mux_value = 0;
 }
 
 void enmirage_state::mirage_map(address_map &map)
@@ -199,11 +204,8 @@ void enmirage_state::mirage_map(address_map &map)
     map(0x8000, 0xbfff).ram(); // main RAM
     map(0xc000, 0xdfff).ram(); // expansion RAM
     map(0xe100, 0xe101).rw("acia6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-//     map(0xe302, 0xe199).noprw(); // filters
     map(0xe200, 0xe2ff).m(m_via, FUNC(via6522_device::map));
-//     map(0xe300, 0xe407).noprw(); // filters
 	map(0xe400, 0xe41f).w(FUNC(enmirage_state::coefficients_w));
-//     map(0xe418, 0xe4ff).noprw(); // filters
     map(0xe800, 0xe803).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
     map(0xec00, 0xecef).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
     map(0xf000, 0xffff).rom().region("osrom", 0);
@@ -212,14 +214,15 @@ void enmirage_state::mirage_map(address_map &map)
 void enmirage_state::coefficients_w( offs_t offset, uint8_t data )
 {
 	uint8_t channel = offset & 0x07;
-	uint8_t osciliator = offset >> 3;
+	uint8_t osciliator = (offset >> 3) & 0x03;
 
-	logerror( "%s, filter update: channel: %d, data: $%02x (%s %s)\n",
+	logerror( "%s, filter update: channel: %d, data: $%02x (%s%s%s)\n",
 				machine().describe_context(),
 				channel,
 				data,
-				(osciliator & 0x01) == 0 ? "VF" : "",
-				(osciliator & 0x02) == 0 ? "VQ" : "" );
+				(osciliator & 0x01) == 0 ? "VF" : "",   /* cut-off frequency */
+				(osciliator & 0x03) == 0 ? " and " : "",
+				(osciliator & 0x02) == 0 ? "VQ" : "" ); /* filter resonance */
 }
 
 // port A:
@@ -327,6 +330,7 @@ void enmirage_state::mirage(machine_config &config)
     // <0> via6522
     // <1> wd1772
     // <2> es5502
+    // <3> cartridge connector (not implemented)
 
     SPEAKER(config, "speaker").front_center();
 
@@ -404,9 +408,9 @@ static INPUT_PORTS_START( mirage )
     PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")   PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, enmirage_state, input_changed, 0)
 
     PORT_START(PITCH_TAG)
-    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD)
+    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD) PORT_PLAYER(1)
     PORT_START(MOD_TAG)
-    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Mod Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_5_PAD) PORT_CODE_DEC(KEYCODE_6_PAD)
+    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Mod Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(KEYCODE_5_PAD) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 ROM_START( enmirage )
