@@ -14,6 +14,7 @@
     c000-dfff: optional expansion RAM
     e100-e101: 6850 UART (for MIDI)
     e200-e2ff: 6522 VIA
+    e400-e407: write to both filters
     e408-e40f: filter cut-off frequency
     e410-e417: filter resonance
     e418-e41f: multiplexer address pre-set
@@ -112,9 +113,7 @@ public:
 
 protected:
     virtual void device_start() override;
-    void cutoff_freq_w(offs_t offset, uint8_t data);
-	void filter_resonance_w(offs_t offset, uint8_t data);
-	void multiplexer_address_preset_w(offs_t offset, uint8_t data);
+	void coefficients_w(offs_t offset, uint8_t data);
 
 private:
 	void update_keypad_matrix();
@@ -203,28 +202,24 @@ void enmirage_state::mirage_map(address_map &map)
 //     map(0xe302, 0xe199).noprw(); // filters
     map(0xe200, 0xe2ff).m(m_via, FUNC(via6522_device::map));
 //     map(0xe300, 0xe407).noprw(); // filters
-    map(0xe408, 0xe40f).w(FUNC(enmirage_state::cutoff_freq_w));
-    map(0xe410, 0xe417).w(FUNC(enmirage_state::filter_resonance_w));
-    map(0xe418, 0xe41f).w(FUNC(enmirage_state::multiplexer_address_preset_w));
+	map(0xe400, 0xe41f).w(FUNC(enmirage_state::coefficients_w));
 //     map(0xe418, 0xe4ff).noprw(); // filters
     map(0xe800, 0xe803).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
     map(0xec00, 0xecef).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
     map(0xf000, 0xffff).rom().region("osrom", 0);
 }
 
-void enmirage_state::multiplexer_address_preset_w(offs_t offset, uint8_t data)
+void enmirage_state::coefficients_w( offs_t offset, uint8_t data )
 {
-// 	logerror( "multiplexer address preset: offset: %u, data: %u\n", offset, data );
-}
+	uint8_t channel = offset & 0x07;
+	uint8_t osciliator = offset >> 3;
 
-void enmirage_state::filter_resonance_w(offs_t offset, uint8_t data)
-{
-// 	logerror( "filter resonance: offset: %u, data: %u\n", offset, data );
-}
-
-void enmirage_state::cutoff_freq_w(offs_t offset, uint8_t data)
-{
-// 	logerror( "cutoff freq: offset: %u, data: %u\n", offset, data );
+	logerror( "%s, filter update: channel: %d, data: $%02x (%s %s)\n",
+				machine().describe_context(),
+				channel,
+				data,
+				(osciliator & 0x01) == 0 ? "VF" : "",
+				(osciliator & 0x02) == 0 ? "VQ" : "" );
 }
 
 // port A:
@@ -248,6 +243,7 @@ void enmirage_state::update_keypad_matrix()
 // port B:
 //  bit 6: IN disk load
 //  bit 5: IN Q Chip sync
+
 // uint8_t enmirage_state::mirage_via_read_portb()
 // {
 // 	uint8_t value = 0;
@@ -282,7 +278,7 @@ void enmirage_state::mirage_via_write_porta(uint8_t data)
 
 // port B:
 //  bit 7: OUT UART clock
-//  bit 4: OUT disk enable (motor on?)
+//  bit 4: OUT DSEL disk select, motor on, and (6500/11 reset ?)
 //  bit 3: OUT sample/play
 //  bit 2: OUT mic line/in
 //  bit 1: OUT upper/lower bank (64k halves)
@@ -301,15 +297,20 @@ void enmirage_state::mirage_via_write_portb(uint8_t data)
         membank("sndbank")->set_base(memregion("es5503")->base() + bank);
     }
 
+	// handle floppy motor on
     floppy_image_device *flop = m_floppy_connector->get_device();
     flop->mon_w(data & 0x10 ? 1 : 0 );
 
+	// handle 6500/11 reset (not handled yet)
+
+	// record audio input mixer position
     m_mux_value = (data >> 2) & 0x03;
 
+	// handle acia clock
+	// this bit is set by the internal via timer
     int clock = (data >> 7) & 0x01;
     m_acia->write_txc(clock);
     m_acia->write_rxc(clock);
-//     logerror("pb7: %d: %s\n", clock, machine().time().to_string() );
 }
 
 void enmirage_state::enmirage_es5503_map(address_map &map)
@@ -364,6 +365,7 @@ void enmirage_state::mirage(machine_config &config)
 
     FLOPPY_CONNECTOR(config, "wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats).enable_sound(true);
 
+	// This clock allows the CPU to keep in sync with the sound chip
 	clock_device &es5503_ca3_clock(CLOCK(config, "ca3_clock", XTAL(8'000'000) / 16));
 	es5503_ca3_clock.signal_handler().set(m_via, FUNC(via6522_device::write_pb5));
 
