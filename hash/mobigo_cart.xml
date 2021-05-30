@@ -124,18 +124,6 @@ license:CC0
 		<info name="serial" value="80-251100(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_251100.bin" size="0x1000000" crc="5d9d8f5f" sha1="359ba58fe4266b31aefa8397121069ce2ec33318"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dprincesalt" cloneof="dprinces" supported="no">
-		<description>Disney Princess (USA, alt)</description>
-		<year>2010</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-251100(US)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251100 - Disney Princess (US).bin" size="0x1000000" crc="fd9d04fc" sha1="af9ae160faf3087eb4d3a375c484e569465d4fc4"/>
 			</dataarea>
 		</part>
