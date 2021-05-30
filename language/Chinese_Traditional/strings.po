@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-29 22:30+1000\n"
-"PO-Revision-Date: 2019-03-18 06:50+0800\n"
+"PO-Revision-Date: 2021-05-30 17:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -37,6 +37,8 @@ msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"啟用 UI 控制\n"
+"以 %1$s 切換"
 
 #: src/frontend/mame/ui/ui.cpp:1249
 #, c-format
@@ -44,6 +46,8 @@ msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"停用 UI 控制\n"
+"以 %1$s 切換"
 
 #: src/frontend/mame/ui/ui.cpp:1442
 #, c-format
@@ -151,7 +155,7 @@ msgstr "最大光束寬度"
 
 #: src/frontend/mame/ui/ui.cpp:1606
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "光束點大小"
 
 #: src/frontend/mame/ui/ui.cpp:1607
 msgid "Beam Intensity Weight"
@@ -363,11 +367,11 @@ msgstr "其他選項"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "略過未完整模擬的警示訊息"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Re-select last machine launched"
-msgstr ""
+msgstr "重新選擇上次執行的機台"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Enlarge images in the right panel"
@@ -435,7 +439,7 @@ msgstr "限制速度"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "當未限制速度時靜音"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Sleep"
@@ -447,11 +451,11 @@ msgstr "速度"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "調整速度以符合更新率"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Low latency"
-msgstr ""
+msgstr "低延遲"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Rotation Options"
@@ -491,7 +495,7 @@ msgstr "裝飾圖選項"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "縮放至畫面區域"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "State/Playback Options"
@@ -503,15 +507,15 @@ msgstr "自動儲存/還原"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Allow rewind"
-msgstr ""
+msgstr "允許倒帶"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Rewind capacity"
-msgstr "倒轉容量"
+msgstr "倒帶容量"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "供截圖使用的雙線過濾"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Burn-in"
@@ -684,7 +688,7 @@ msgstr "自動"
 
 #: src/frontend/mame/ui/menu.cpp:1178
 msgid "Start Machine"
-msgstr ""
+msgstr "啟動機台"
 
 #: src/frontend/mame/ui/menu.cpp:1180
 msgid "Return to Machine"
@@ -705,31 +709,31 @@ msgstr "畫面 #%d"
 
 #: src/frontend/mame/ui/videoopt.cpp:184
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "縮放至畫面區域"
 
 #: src/frontend/mame/ui/videoopt.cpp:196
 msgid "X Only"
-msgstr ""
+msgstr "僅 X 軸"
 
 #: src/frontend/mame/ui/videoopt.cpp:200
 msgid "Y Only"
-msgstr ""
+msgstr "僅 Y 軸"
 
 #: src/frontend/mame/ui/videoopt.cpp:204
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "X 軸或 Y 週（自動）"
 
 #: src/frontend/mame/ui/videoopt.cpp:211
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "非整數縮放"
 
 #: src/frontend/mame/ui/videoopt.cpp:214
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "維持長寬比例"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "正在錄製時無法變更選項！"
 
 #: src/frontend/mame/ui/info.cpp:31
 msgid "protection"
@@ -891,6 +895,9 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。"
+"故無法達成此機台的完成體驗。\n"
 
 #: src/frontend/mame/ui/info.cpp:315
 #, c-format
@@ -921,7 +928,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
 msgid "GHz"
-msgstr ""
+msgstr "GHz"
 
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
@@ -936,7 +943,7 @@ msgstr "kHz"
 #: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
 #: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
 msgid "Hz"
-msgstr ""
+msgstr "Hz"
 
 #: src/frontend/mame/ui/info.cpp:395
 msgid ""
@@ -1052,7 +1059,7 @@ msgstr "選擇映像檔格式"
 
 #: src/frontend/mame/ui/filecreate.cpp:325
 msgid "Select initial contents"
-msgstr ""
+msgstr "選擇初始化內容"
 
 #: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:113
 msgid "Keyboard Mode"
@@ -1069,11 +1076,11 @@ msgstr "模擬"
 #: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:478
 #, c-format
 msgid "%1$s [root%2$s]"
-msgstr ""
+msgstr "%1$s [root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:53
 msgid "[root%2$s]"
-msgstr ""
+msgstr "[root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:56
 msgid "Enabled"
@@ -1308,12 +1315,12 @@ msgstr " （已鎖定）"
 #: src/frontend/mame/ui/miscmenu.cpp:455
 #, c-format
 msgid "P%d Visibility"
-msgstr ""
+msgstr "P$d 可見度"
 
 #: src/frontend/mame/ui/miscmenu.cpp:509
 #, c-format
 msgid "P%d Crosshair"
-msgstr ""
+msgstr "P%d 十字準星"
 
 #: src/frontend/mame/ui/miscmenu.cpp:526
 msgid "Visible Delay"
@@ -1363,11 +1370,11 @@ msgstr "從最愛移除"
 
 #: src/frontend/mame/ui/miscmenu.cpp:827
 msgid "Save Machine Configuration"
-msgstr ""
+msgstr "儲存機台設定"
 
 #: src/frontend/mame/ui/miscmenu.cpp:838
 msgid "Configure Machine:"
-msgstr ""
+msgstr "設定機台："
 
 #: src/frontend/mame/ui/miscmenu.cpp:872 src/frontend/mame/ui/selmenu.cpp:2595
 msgid " (default)"
@@ -1387,7 +1394,7 @@ msgstr "[ 錯誤 ]"
 
 #: src/frontend/mame/ui/state.cpp:213
 msgid "No save states found"
-msgstr ""
+msgstr "未找到已儲存的狀態"
 
 #: src/frontend/mame/ui/state.cpp:404
 msgid "Load State"
@@ -1395,7 +1402,7 @@ msgstr "載入狀態"
 
 #: src/frontend/mame/ui/state.cpp:404
 msgid "Select state to load"
-msgstr ""
+msgstr "選擇要載入的狀態"
 
 #: src/frontend/mame/ui/state.cpp:428
 msgid "Save State"
@@ -1403,7 +1410,7 @@ msgstr "儲存狀態"
 
 #: src/frontend/mame/ui/state.cpp:428
 msgid "Press a key or joystick button, or select state to overwrite"
-msgstr ""
+msgstr "按下鍵盤按鍵、搖桿按鈕或選擇狀態以覆寫"
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
@@ -1417,7 +1424,7 @@ msgstr "使用者介面"
 #: src/frontend/mame/ui/inputmap.cpp:41
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "玩家 %1$d 控制"
 
 #: src/frontend/mame/ui/inputmap.cpp:44
 msgid "Other Controls"
@@ -1425,41 +1432,41 @@ msgstr "其他控制"
 
 #: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no input map."
-msgstr ""
+msgstr "此機台沒有輸入對應表"
 
 #: src/frontend/mame/ui/inputmap.cpp:310
 msgid "Pressed"
-msgstr ""
+msgstr "按住"
 
 #: src/frontend/mame/ui/inputmap.cpp:379 plugins/autofire/autofire_menu.lua:123
 #: plugins/cheat/init.lua:626
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "輸入了無效序列"
 
 #: src/frontend/mame/ui/inputmap.cpp:480
 #, c-format
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/inputmap.cpp:507
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr ""
+msgstr "按下 %1$s 設定\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:508
 #, c-format
 msgid "Press %1$s to append\n"
-msgstr ""
+msgstr "按下 %1$s 加入\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:509
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr ""
+msgstr "按下 %1$s 清除\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:510
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr ""
+msgstr "按下 %1$s 還原預設值\n"
 
 #: src/frontend/mame/ui/tapectrl.cpp:85
 msgid "stopped"
@@ -1475,11 +1482,11 @@ msgstr "（正在執行）"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "recording"
-msgstr "正在記錄"
+msgstr "正在錄製"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(recording)"
-msgstr "（正在記錄）"
+msgstr "（正在錄製）"
 
 #: src/frontend/mame/ui/tapectrl.cpp:95
 msgid "Pause/Stop"
@@ -1509,7 +1516,8 @@ msgstr "無法跨目錄儲存"
 msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
-msgstr ""
+msgstr "選定的軟體缺少一個或多個必要的 ROM 或 CHD 映像檔\n"
+"請取得正確的檔案或選擇不同的檔案。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:150
 msgid ""
@@ -1531,8 +1539,8 @@ msgid ""
 msgstr ""
 "找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
 "\n"
-"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
-"訊。"
+"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關"
+"資訊。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selgame.cpp:603
@@ -2401,7 +2409,7 @@ msgstr "類比控制"
 
 #: src/frontend/mame/ui/mainmenu.cpp:71
 msgid "DIP Switches"
-msgstr ""
+msgstr "機台設定開關"
 
 #: src/frontend/mame/ui/mainmenu.cpp:73
 msgid "Machine Configuration"
@@ -2417,7 +2425,7 @@ msgstr "機台資訊"
 
 #: src/frontend/mame/ui/mainmenu.cpp:80
 msgid "Warning Information"
-msgstr ""
+msgstr "警示訊息"
 
 #: src/frontend/mame/ui/mainmenu.cpp:86
 msgid "Image Information"
@@ -2470,7 +2478,7 @@ msgstr "查閱外部文件"
 #: src/frontend/mame/ui/mainmenu.cpp:140
 #, c-format
 msgid "About %s"
-msgstr ""
+msgstr "關於 %s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:146
 msgid "Select New Machine"
@@ -2557,6 +2565,9 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。"
+"請取得正確的檔案或選擇不同的系統。\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2524
 msgid ""
@@ -2564,28 +2575,31 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。"
+"請取得正確的檔案或選擇不同的軟體項目。\n"
+"\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2540
 msgid "incorrect checksum"
-msgstr ""
+msgstr "不正確的檢查碼"
 
 #: src/frontend/mame/ui/selmenu.cpp:2543
 msgid "incorrect length"
-msgstr ""
+msgstr "不正確的長度"
 
 #: src/frontend/mame/ui/selmenu.cpp:2546
 msgid "not found"
-msgstr ""
+msgstr "未找到"
 
 #: src/frontend/mame/ui/selmenu.cpp:2557
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
-msgstr ""
+msgstr "%1$s (%2$s) - %3$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2559
 #, c-format
 msgid "%1$s - %2$s\n"
-msgstr ""
+msgstr "%1$s - %2$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2563
 msgid "Press any key to continue."
@@ -2661,12 +2675,12 @@ msgstr "  畫面 '%1$s'： 向量\n"
 #: src/frontend/mame/ui/devopt.cpp:116
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgstr "  畫面 '%1$s'： %2$d × %3$d (V) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:117
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgstr "  畫面 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:130
 msgid "* Sound:\n"
@@ -2763,7 +2777,7 @@ msgstr "[無]\n"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "其他： "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
@@ -2796,11 +2810,11 @@ msgstr "類型"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "（空）"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "可輸入任意類型名稱"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
@@ -2808,7 +2822,7 @@ msgstr "儲存"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "類型名稱為空"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
@@ -2841,11 +2855,11 @@ msgstr "此變更僅當選定 \"開始新搜尋\" 時生效"
 
 #: plugins/cheatfind/init.lua:510
 msgid "Automatic"
-msgstr ""
+msgstr "自動"
 
 #: plugins/cheatfind/init.lua:510
 msgid "Manual"
-msgstr ""
+msgstr "手動"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Pause Mode"
@@ -2853,11 +2867,11 @@ msgstr "暫停模式"
 
 #: plugins/cheatfind/init.lua:518
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "當需要時手動切換暫停"
 
 #: plugins/cheatfind/init.lua:521
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "螢幕選單出現時自動切換暫停"
 
 #: plugins/cheatfind/init.lua:542
 msgid "All slots cleared and current state saved to Slot 1"
@@ -2870,12 +2884,12 @@ msgstr "開始新搜尋"
 #: plugins/cheatfind/init.lua:565
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "記憶體狀態已儲存至插槽 %d"
 
 #: plugins/cheatfind/init.lua:581
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "儲存現有的記憶體狀態至插槽 %d"
 
 #: plugins/cheatfind/init.lua:612
 #, lua-format
@@ -2885,27 +2899,27 @@ msgstr "總計發現 %d 符合"
 #: plugins/cheatfind/init.lua:620
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "執行比較：插槽 $d %s 插槽 %d"
 
 #: plugins/cheatfind/init.lua:621
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "執行比較  ：  插槽 %d %s 插槽 %d %s %d"
 
 #: plugins/cheatfind/init.lua:622
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "執行比較  ：  插槽 %d BITWISE%s 插槽 %d"
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "執行比較  :  插槽 %d %s %d"
 
 #: plugins/cheatfind/init.lua:664 plugins/cheatfind/init.lua:706
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "插槽 %d"
 
 #: plugins/cheatfind/init.lua:675
 msgid "Left less than right"
@@ -2965,11 +2979,11 @@ msgstr "資料格式"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "插槽 1 的值"
 
 #: plugins/cheatfind/init.lua:734
 msgid "Last Slot Value"
-msgstr ""
+msgstr "最後插槽的值"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Test/Write Poke Value"
@@ -2979,22 +2993,24 @@ msgstr "測試/寫入塞入值"
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
-msgstr "如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
+msgstr ""
+"如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
 
 #: plugins/cheatfind/init.lua:746
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
-msgstr "如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
+msgstr ""
+"如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
 
 #: plugins/cheatfind/init.lua:748
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "如果你想塞入 %s，用這個"
 
 #: plugins/cheatfind/init.lua:771
 msgid "Aligned only"
-msgstr ""
+msgstr "僅對齊"
 
 #: plugins/cheatfind/init.lua:787
 msgid "Undo last search -- #"
@@ -3011,7 +3027,7 @@ msgstr "所有"
 #: plugins/cheatfind/init.lua:903
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "測試作弊碼 %08X_%02X"
 
 #: plugins/cheatfind/init.lua:943
 msgid "Cheat engine not available"
@@ -3061,37 +3077,37 @@ msgstr "輸入埠"
 
 #: plugins/autofire/init.lua:103
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "載入連射選單時失敗"
 
 #: plugins/autofire/init.lua:110
 msgid "Autofire"
-msgstr ""
+msgstr "連射"
 
 #: plugins/autofire/autofire_menu.lua:58
 msgid "Autofire buttons"
-msgstr ""
+msgstr "連射按鈕"
 
 #: plugins/autofire/autofire_menu.lua:59
 #, lua-format
 msgid "Press %s to delete"
-msgstr ""
+msgstr "按下 $s 刪除"
 
 #: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:208
 msgid "Add autofire button"
-msgstr ""
+msgstr "新增連射按鈕"
 
 #: plugins/autofire/autofire_menu.lua:103
 #: plugins/autofire/autofire_menu.lua:104
 msgid "NOT SET"
-msgstr ""
+msgstr "未設定"
 
 #: plugins/autofire/autofire_menu.lua:105
 msgid "Input"
-msgstr ""
+msgstr "輸入"
 
 #: plugins/autofire/autofire_menu.lua:106
 msgid "Hotkey"
-msgstr ""
+msgstr "熱鍵"
 
 #: plugins/autofire/autofire_menu.lua:107
 msgid "On frames"
@@ -3115,7 +3131,7 @@ msgstr ""
 
 #: plugins/autofire/autofire_menu.lua:181
 msgid "Edit autofire button"
-msgstr ""
+msgstr "編輯連射按鈕"
 
 #: plugins/autofire/autofire_menu.lua:189 plugins/cheat/init.lua:650
 msgid "Done"
@@ -3148,7 +3164,7 @@ msgstr "選擇要設定熱鍵的作弊碼"
 #: plugins/cheat/init.lua:607
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "按下 %s 清除熱鍵"
 
 #: plugins/cheat/init.lua:645
 msgid "None"
@@ -3234,289 +3250,3 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
-
-#~ msgid "Backdrops"
-#~ msgstr "背景圖"
-
-#~ msgid "Overlays"
-#~ msgstr "覆疊圖"
-
-#~ msgid "Bezels"
-#~ msgstr "外框圖"
-
-#~ msgid "CPanels"
-#~ msgstr "操作檯"
-
-#~ msgid "View"
-#~ msgstr "檢視"
-
-#~ msgid "Cropped"
-#~ msgstr "裁切"
-
-#~ msgid "Full"
-#~ msgstr "全部"
-
-#~ msgid "Dip Switches"
-#~ msgstr "機台設定開關"
-
-#~ msgid "Select position to load from"
-#~ msgstr "選擇載入位置"
-
-#~ msgid "Select position to save to"
-#~ msgstr "選擇儲存位置"
-
-#~ msgid "Keyboard Emulation Status"
-#~ msgstr "鍵盤模擬狀態"
-
-#~ msgid "Mode: PARTIAL Emulation"
-#~ msgstr "模式： 部分模擬"
-
-#~ msgid "UI:   Enabled"
-#~ msgstr "UI：   已啟用"
-
-#~ msgid "**Use ScrLock to toggle**"
-#~ msgstr "**使用 ScrLock 鍵切換**"
-
-#~ msgid "Mode: FULL Emulation"
-#~ msgstr "模式： 完整模擬"
-
-#~ msgid "UI:   Disabled"
-#~ msgstr "UI：   已停用"
-
-#~ msgid "Autofire can't be enabled"
-#~ msgstr "無法啟用連射"
-
-#, c-format
-#~ msgid "%1$.3ffps"
-#~ msgstr "%1$.3ffps"
-
-#~ msgid "Autofire Settings"
-#~ msgstr "連射設定"
-
-#~ msgid "Autofire Status"
-#~ msgstr "連射狀態"
-
-#~ msgid "No buttons found on this machine!"
-#~ msgstr "此機台上無可用按鍵！"
-
-#~ msgid "Autofire Delay"
-#~ msgstr "連射延遲"
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "選定的軟體缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他軟體。\n"
-#~ "\n"
-
-#~ msgid "Keyboard Mode:"
-#~ msgstr "鍵盤模式:"
-
-#~ msgid "Save machine configuration"
-#~ msgstr "儲存機台設定"
-
-#~ msgid "Configure machine:"
-#~ msgstr "設定機台："
-
-#~ msgid "Support Cocktail\tYes\n"
-#~ msgstr "支援檯面型筐體\t是\n"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "選定的機台缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他機台。\n"
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "重新選擇上次執行的機台"
-
-#~ msgid "Refresh speed"
-#~ msgstr "更新速度"
-
-#~ msgid "Artwork Crop"
-#~ msgstr "裝飾圖裁切"
-
-#~ msgid "Use Backdrops"
-#~ msgstr "使用背景圖"
-
-#~ msgid "Use Overlays"
-#~ msgstr "使用覆疊圖"
-
-#~ msgid "Use Bezels"
-#~ msgstr "使用外框圖"
-
-#~ msgid "Use Control Panels"
-#~ msgstr "使用控制面版圖"
-
-#~ msgid "Use Marquees"
-#~ msgstr "使用機檯標題圖"
-
-#~ msgid "Bilinear snapshot"
-#~ msgstr "雙線過濾擷圖"
-
-#, c-format
-#~ msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
-
-#~ msgid "  %2$s %3$d.%4$06d MHz\n"
-#~ msgstr "  %2$s %3$d.%4$06d MHz\n"
-
-#~ msgid "  %2$s %5$d.%6$03d kHz\n"
-#~ msgstr "  %2$s %5$d.%6$03d kHz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
-#~ msgstr "  畫面 '%1$s'： %2$d × %3$d (V) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-#~ msgstr "  畫面 '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-
-#, c-format
-#~ msgid "  %1$d×%2$s\n"
-#~ msgstr "  %1$d×%2$s\n"
-
-#~ msgid "  %2$s\n"
-#~ msgstr "  %2$s\n"
-
-#~ msgid ""
-#~ "The software selected is missing one or more required ROM or CHD images. "
-#~ "Please select a different one."
-#~ msgstr "選定的軟體缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他軟體。"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this machine cannot be emulated as they requires physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this machine.\n"
-#~ msgstr ""
-#~ "此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。故無法完"
-#~ "成此機台的體驗。\n"
-
-#~ msgid "Press button for hotkey or wait to clear"
-#~ msgstr "按下熱鍵按鈕或等候清除"
-
-#~ msgid "Manually pause & unpause the game when needed with the pause hotkey"
-#~ msgstr "當需要暫停熱鍵時手動暫停及取消暫停遊戲"
-
-#, lua-format
-#~ msgid "Memory State saved to Slot %d"
-#~ msgstr "記憶體狀態已儲存至插槽 %d"
-
-#~ msgid "Save Current Memory State to Slot "
-#~ msgstr "儲存現有的記憶體狀態至插槽"
-
-#~ msgid "Perform Compare  :  "
-#~ msgstr "進行比較 ："
-
-#~ msgid "Use this if you want to poke 0x00"
-#~ msgstr "如果你想塞入 0x00 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x01"
-#~ msgstr "如果你想塞入 0x01 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x02"
-#~ msgstr "如果你想塞入 0x02 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x03"
-#~ msgstr "如果你想塞入 0x03 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x04"
-#~ msgstr "如果你想塞入 0x04 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x05"
-#~ msgstr "如果你想塞入 0x05 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x06"
-#~ msgstr "如果你想塞入 0x06 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x07"
-#~ msgstr "如果你想塞入 0x07 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x08"
-#~ msgstr "如果你想塞入 0x08 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x09"
-#~ msgstr "如果你想塞入 0x09 ，用這個"
-
-#~ msgid "Use this if you want to poke 0x63 (Decimal 99)"
-#~ msgstr "如果你想塞入 0x63 （十進位的 99），用這個"
-
-#~ msgid "Use this if you want to poke 0x99 (BCD 99)"
-#~ msgstr "如果你想塞入 0x99 （二進位的 99），用這個"
-
-#~ msgid "Use this if you want to poke 0xFF (Decimal 255)"
-#~ msgstr "如果你想塞入 0xFF （十進位的 255），用這個"
-
-#~ msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-#~ msgstr "如果你想塞入 0x3E7 （十進位的 999），用這個"
-
-#~ msgid "Use this if you want to poke 0x999 (BCD 999)"
-#~ msgstr "如果你想塞入 0x999 （二進位的 999），用這個"
-
-#~ msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-#~ msgstr "如果你想塞入 0x270F （十進位的 9999），用這個"
-
-#~ msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-#~ msgstr "如果你想塞入 0x9999 （二進位的 9999），用這個"
-
-#~ msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-#~ msgstr "如果你想塞入 0xFFFF （十進位的 65535），用這個"
-
-#, lua-format
-#~ msgid "Test Cheat %08X:%02X"
-#~ msgstr "測試作弊碼 %08X:%02X"
-
-#~ msgid "Data cleared and current state saved"
-#~ msgstr "清除資料及儲存目前狀態"
-
-#~ msgid "Current state saved"
-#~ msgstr "儲存目前狀態"
-
-#~ msgid "Save current -- #"
-#~ msgstr "儲存目前 -- #"
-
-#~ msgid "Compare"
-#~ msgstr "比較"
-
-#~ msgid "Left operand"
-#~ msgstr "左運算元"
-
-#~ msgid "Current"
-#~ msgstr "目前"
-
-#~ msgid "Operator"
-#~ msgstr "運算子"
-
-#~ msgid "Left less than right, value is difference"
-#~ msgstr "左值小於右值，值改變"
-
-#~ msgid "Left greater than right, value is difference"
-#~ msgstr "左值大於右值，值改變"
-
-#~ msgid "Left not equal to right, value is difference"
-#~ msgstr "左值不等於右值，值改變"
-
-#~ msgid "Right operand"
-#~ msgstr "右運算元"
-
-#~ msgid "Test cheat at addr %08X"
-#~ msgstr "在位址 %08X 測試作弊碼"
-
-#~ msgid ""
-#~ "ROM Audit Disabled\t\n"
-#~ "Samples Audit Disabled\t\n"
-#~ msgstr ""
-#~ "ROM 驗證已停用\t\n"
-#~ "樣本檔驗證已停用\t\n"
-
-#~ msgid "Activated"
-#~ msgstr "啟動"
-
-#~ msgid " added"
-#~ msgstr " 已加入"
