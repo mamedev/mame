@@ -241,11 +241,10 @@ void mbee_state::mbeepc_io(address_map &map)
 	map(0x0000, 0x0003).mirror(0xff10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0008, 0x0008).mirror(0xff10).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
 	map(0x0009, 0x0009).mirror(0xff00).nopw();
+	map(0x000a, 0x000a).select(0xff10).rw(FUNC(mbee_state::telcom_r), FUNC(mbee_state::port0a_w));
 	map(0x000b, 0x000b).mirror(0xff10).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
 	map(0x000d, 0x000d).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
-	map(0x000a, 0x000a).mirror(0xfe10).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
-	map(0x010a, 0x010a).mirror(0xfe10).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
 }
 
 void mbee_state::mbeeppc_io(address_map &map)
@@ -254,12 +253,11 @@ void mbee_state::mbeeppc_io(address_map &map)
 	map(0x0000, 0x0003).mirror(0xff10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0x0008, 0x0008).mirror(0xff10).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
 	map(0x0009, 0x0009).mirror(0xff00).nopw();
+	map(0x000a, 0x000a).select(0xff10).rw(FUNC(mbee_state::telcom_r), FUNC(mbee_state::port0a_w));
 	map(0x000b, 0x000b).mirror(0xff10).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
 	map(0x000d, 0x000d).mirror(0xff10).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
 	map(0x001c, 0x001c).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
-	map(0x000a, 0x000a).mirror(0xfe10).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
-	map(0x010a, 0x010a).mirror(0xfe10).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
 }
 
 void mbee_state::mbeett_io(address_map &map)
@@ -270,15 +268,13 @@ void mbee_state::mbeett_io(address_map &map)
 	map(0x0006, 0x0006).mirror(0xff00).w(FUNC(mbee_state::port06_w));
 	map(0x0007, 0x0007).mirror(0xff00).r(FUNC(mbee_state::port07_r));
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
+	map(0x000a, 0x000a).select(0xff10).rw(FUNC(mbee_state::telcom_r), FUNC(mbee_state::port0a_w));
 	map(0x000b, 0x000b).mirror(0xff00).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
 	map(0x000d, 0x000d).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
 	map(0x0018, 0x001b).mirror(0xff00).r(FUNC(mbee_state::port18_r));
 	map(0x001c, 0x001f).mirror(0xff00).rw(FUNC(mbee_state::port1c_r), FUNC(mbee_state::port1c_w));
-	map(0x0009, 0x0009).mirror(0xfe00).r(FUNC(mbee_state::speed_low_r));
-	map(0x0109, 0x0109).mirror(0xfe00).r(FUNC(mbee_state::speed_high_r));
-	map(0x000a, 0x000a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
-	map(0x010a, 0x010a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
+	map(0x0009, 0x0009).select(0xff00).r(FUNC(mbee_state::speed_r));
 	map(0x0068, 0x006f).mirror(0xff00).noprw();    // swallow i/o to SCC which was never fitted to production machines
 }
 
@@ -323,8 +319,7 @@ void mbee_state::mbee256_io(address_map &map)
 	map(0x0006, 0x0006).mirror(0xff00).w(FUNC(mbee_state::port06_w));
 	map(0x0007, 0x0007).mirror(0xff00).r(FUNC(mbee_state::port07_r));
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
-	map(0x0009, 0x0009).mirror(0xfd00).r(FUNC(mbee_state::speed_low_r));
-	map(0x0209, 0x0209).mirror(0xfd00).r(FUNC(mbee_state::speed_high_r));
+	map(0x0009, 0x0009).select(0xff00).r(FUNC(mbee_state::speed_r));
 	map(0x0009, 0x0009).mirror(0xff00).nopw();
 	map(0x000b, 0x000b).mirror(0xff00).w(FUNC(mbee_state::port0b_w));
 	map(0x000c, 0x000c).mirror(0xff00).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));

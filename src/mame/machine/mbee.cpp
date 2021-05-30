@@ -202,18 +202,11 @@ u8 mbee_state::port18_r()
 
 ************************************************************/
 
-u8 mbee_state::speed_low_r()
+u8 mbee_state::speed_r(offs_t offset)
 {
-	m_maincpu->set_unscaled_clock(3375000);
+	m_maincpu->set_unscaled_clock(BIT(offset, 8, 2) ? 6750000 : 3375000);
 	return 0xff;
 }
-
-u8 mbee_state::speed_high_r()
-{
-	m_maincpu->set_unscaled_clock(6750000);
-	return 0xff;
-}
-
 
 
 /***********************************************************
@@ -388,20 +381,12 @@ void mbee_state::port0a_w(u8 data)
 	m_0a = data & 15;
 }
 
-u8 mbee_state::telcom_low_r()
+// Banking of Telcom rom
+// Todo: implement 4 banks, however no roms use it.
+u8 mbee_state::telcom_r(offs_t offset)
 {
-/* Read of port 0A - set Telcom rom to first half */
 	if (m_telcom)
-		m_telcom->set_entry(0);
-
-	return m_0a;
-}
-
-u8 mbee_state::telcom_high_r()
-{
-/* Read of port 10A - set Telcom rom to 2nd half */
-	if (m_telcom)
-		m_telcom->set_entry(1);
+		m_telcom->set_entry(BIT(offset, 8));
 
 	return m_0a;
 }

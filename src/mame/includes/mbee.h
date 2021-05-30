@@ -100,10 +100,8 @@ private:
 	u8 port1c_r();
 	void port1c_w(u8 data);
 	void port50_w(u8 data);
-	u8 telcom_low_r();
-	u8 telcom_high_r();
-	u8 speed_low_r();
-	u8 speed_high_r();
+	u8 telcom_r(offs_t);
+	u8 speed_r(offs_t);
 	void m6545_index_w(u8 data);
 	void m6545_data_w(u8 data);
 	u8 video_low_r(offs_t offset);
