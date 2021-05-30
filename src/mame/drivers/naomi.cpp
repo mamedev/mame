@@ -730,8 +730,8 @@ Mushiking The King Of Beetles 2006 First (Japan)    840-0167C    not present  2 
 Mushiking The King Of Beetles 2006 Second (Japan)   840-0171C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
 Pokasuka Ghost!                                     840-0170C    not present  5 (512Mb)   present  317-0461-COM  present  requires 837-14672 sensor board (SH4 based)
 Radirgy Noa                                         841-0062C    not present  4 (512Mb)   present  317-5138-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Rhythm Tengoku                                      841-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
-Driving Simulator                                   841-0178C    not present  8 (512Mb)   present  317-0502-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A", require 3 comm.bd. linked Naomi 2
+Rhythm Tengoku                                      840-0177C    not present  4 (512Mb)   present  317-0503-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A"
+Driving Simulator                                   840-0178C    not present  8 (512Mb)   present  317-0502-JPN  present  IC2# is labeled "VER.2" - IC4# is marked "8A", require 3 comm.bd. linked Naomi 2
 Star Horse Progress Returns (main screen left)      840-0183C    24480        4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (main screen right)     840-0184C    not present  2 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
 Star Horse Progress Returns (live and voice)        840-0185C    not present  4 (512Mb)   present  not present   present  IC2# is labeled "VER.2", requires 837-13785 ARCNET&IO BD
