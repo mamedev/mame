@@ -19665,6 +19665,9 @@ leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprise
 mfleappad                       // (c) 2002 LeapFrog
 ltleappad                       // (c) 2005 LeapFrog
 
+@source:leapfrog_leapster_explorer.cpp
+leapexpr
+
 @source:leapster.cpp
 leapster                        //
 leapster2                       //
