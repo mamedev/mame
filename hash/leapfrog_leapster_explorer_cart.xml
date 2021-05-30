@@ -11,7 +11,7 @@
 		<info name="serial" value="500-14226-A"/>
 		<part name="cart" interface="leapfrog_leapster_explorer_cart">
 			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
-				<rom loadflag="load16_word_swap" name="leapster_explorer_tinker_bell_lost_treasure_mxic_c276.BIN" size="0x4200000" crc="1d88cffa" sha1="50941cf44bcbec559f0110f9151ee98b82d755ca" />
+				<rom loadflag="load16_word_swap" name="leapster_explorer_tinker_bell_lost_treasure_mxic_c276.bin" size="0x4200000" crc="1d88cffa" sha1="50941cf44bcbec559f0110f9151ee98b82d755ca" />
 			</dataarea>
 		</part>
 	</software>
