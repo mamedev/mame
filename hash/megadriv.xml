@@ -24991,7 +24991,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sspinp2" cloneof="sspin">
-		<description>Sonic Spinball (prototype 19930917)</description>
+		<description>Sonic Spinball (Euro, prototype 19930917)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26123,7 +26123,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sf2p2" cloneof="sf2">
-		<description>Street Fighter II' - Champion Edition (prototype 19930325)</description>
+		<description>Street Fighter II' - Champion Edition (Euro, USA, prototype 19930325)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -26141,7 +26141,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sf2p1" cloneof="sf2">
-		<description>Street Fighter II' - Champion Edition (prototype 19930730)</description>
+		<description>Street Fighter II' - Champion Edition (Euro, USA, prototype 19930730)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
