@@ -36793,6 +36793,9 @@ sc2a                            //
 @source:schick.cpp
 schick                          // Microhard
 
+@source:schexx4gen.cpp
+schexx                          // (c) 1996 ICE
+
 @source:scm_500.cpp
 scm_500                         //
 
