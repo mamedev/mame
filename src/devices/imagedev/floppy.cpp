@@ -114,6 +114,9 @@ DEFINE_DEVICE_TYPE(EPSON_SD_621L, epson_sd_621l, "epson_sd_621l", "EPSON SD-621L
 DEFINE_DEVICE_TYPE(EPSON_SD_680L, epson_sd_680l, "epson_sd_680l", "EPSON SD-680L Mini-Floppy Disk Drive")
 #endif
 
+// Panasonic 3.5" drive
+DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
+
 // Sony 3.5" drives
 DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Micro Floppydisk Drive")
 DEFINE_DEVICE_TYPE(SONY_OA_D32W, sony_oa_d32w, "sony_oa_d32w", "Sony OA-D32W Micro Floppydisk Drive")
@@ -141,9 +144,6 @@ DEFINE_DEVICE_TYPE(IBM_6360, ibm_6360, "ibm_6360", "IBM 6360 8\" single-sided si
 DEFINE_DEVICE_TYPE(OAD34V, oa_d34v_device, "oa_d34v", "Apple/Sony 3.5 SD (400K GCR)")
 DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/800K GCR)")
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
-
-// Panasonic 3.5" drives
-DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
 
 format_registration::format_registration()
 {
@@ -2511,6 +2511,33 @@ void epson_sd_321::setup_characteristics()
 	variants.push_back(floppy_image::DSDD);
 }
 
+
+//-------------------------------------------------
+//  3.5" Panasonic Flexible Disk Drive JU-363
+//-------------------------------------------------
+
+pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_DD, tag, owner, clock)
+{
+}
+
+pana_ju_363::~pana_ju_363()
+{
+}
+
+void pana_ju_363::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 84;
+	sides = 2;
+	dskchg_writable = true;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
+}
+
 //-------------------------------------------------
 //  Sony OA-D31V
 //
@@ -3087,30 +3114,3 @@ bool mfd75w_device::is_2m() const
 
 	return false;
 }
-
-//-------------------------------------------------
-//  3.5" Panasonic Flexible Disk Drive JU-363
-//-------------------------------------------------
-
-pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_35_DD, tag, owner, clock)
-{
-}
-
-pana_ju_363::~pana_ju_363()
-{
-}
-
-void pana_ju_363::setup_characteristics()
-{
-	form_factor = floppy_image::FF_35;
-	tracks = 84;
-	sides = 2;
-	dskchg_writable = true;
-	set_rpm(300);
-
-	variants.push_back(floppy_image::SSSD);
-	variants.push_back(floppy_image::SSDD);
-	variants.push_back(floppy_image::DSDD);
-}
-
