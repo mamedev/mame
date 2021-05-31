@@ -654,8 +654,8 @@ ROM_END
   - Vol. 3: Physics & Engineering
   - Vol. 4: Electronics
 
-  Paste example: SS200SR -332/31.8=0.200 CSS200C
-  Now enter a value, followed by RUN, to convert Fahrenheit to Celcius.
+  Paste example: CCSS200SR 2-32+.12131*.5=.5.201=50.200 CSS200C
+  Now enter a value under 70, followed by RUN, to calculate its factorial.
 
   known releases:
   - World: Cambridge Programmable, published by Sinclair Radionics
