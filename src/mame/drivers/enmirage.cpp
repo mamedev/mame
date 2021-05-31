@@ -65,26 +65,6 @@
 #define PITCH_TAG "pitch"
 #define MOD_TAG "mod"
 
-// class en_sample_device : public device_t,
-//     public device_sound_interface
-// {
-// public:
-//     en_sample_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-//     ~en_sample_device() { }
-//     uint8_t sample() {return m_sample;}
-//
-// protected:
-//     // device-level overrides
-//     virtual void device_start() override;
-//
-//     // sound stream update overrides
-//     virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-//
-// private:
-//     sound_stream*  m_stream;
-//     uint8_t m_sample;
-// };
-
 class enmirage_state : public driver_device
 {
 public:
@@ -96,7 +76,6 @@ public:
         , m_floppy_connector(*this, "wd1772:0")
         , m_via(*this, "via6522")
         , m_irq_merge(*this, "irqmerge")
-//         , m_sample(*this, "en_sample_tag")
         , m_cassette(*this, "cassette")
         , m_acia(*this, "acia6850")
         , m_wheel(*this, {PITCH_TAG, MOD_TAG})
@@ -118,7 +97,7 @@ protected:
 private:
 	void update_keypad_matrix();
 
-//     uint8_t mirage_via_read_portb();
+    uint8_t mirage_via_read_portb();
     void mirage_via_write_porta(uint8_t data);
     void mirage_via_write_portb(uint8_t data);
     uint8_t mirage_adc_read();
@@ -133,19 +112,16 @@ private:
     required_device<floppy_connector> m_floppy_connector;
     required_device<via6522_device> m_via;
     required_device<input_merger_device> m_irq_merge;
-//     required_device<en_sample_device> m_sample;
     required_device<cassette_image_device> m_cassette;
     required_device<acia6850_device> m_acia;
 
     required_ioport_array<2> m_wheel;
     required_ioport_array<3> m_key;
 
-    int last_sndram_bank;
+    int m_last_sndram_bank;
     int m_mux_value;
     int m_key_col_select;
 };
-
-// DEFINE_DEVICE_TYPE(EN_SAMPLE, en_sample_device, "en_sample", "Ensonic Mirage Sampler Circuit");
 
 void enmirage_state::floppy_formats(format_registration &fr)
 {
@@ -155,7 +131,7 @@ void enmirage_state::floppy_formats(format_registration &fr)
 
 static void ensoniq_floppies(device_slot_interface &device)
 {
-    device.option_add("35dd", FLOPPY_35_DD);
+    device.option_add("35dd", PANA_JU_363);
 }
 
 uint8_t enmirage_state::mirage_adc_read()
@@ -164,12 +140,13 @@ uint8_t enmirage_state::mirage_adc_read()
     switch( m_mux_value & 0x03 )
     {
         case 0:
+        	/* mixed input: audio jack and ES5503 - todo */
             value = m_cassette->input(); /* compressed input */
  			logerror( "%s, 5503 sample: channel: compressed input, data: $%02x\n", machine().describe_context(), value);
            break;
         case 1:
-//            value = m_sample->sample(); /* line input */
-            value = 0x7f; /* line input */
+        	/* mixed input: audio jack and ES5503 - todo */
+            value = m_cassette->input(); /* line input */
  			logerror( "%s, 5503 sample: channel: line input, data: $%02x\n", machine().describe_context(), value);
             break;
         case 2:
@@ -189,11 +166,15 @@ void enmirage_state::device_start()
 {
     // call base device_start
     driver_device::device_start();
+
+	save_item(NAME(m_last_sndram_bank));
+	save_item(NAME(m_mux_value));
+	save_item(NAME(m_key_col_select));
 }
 
 void enmirage_state::machine_reset()
 {
-    last_sndram_bank = 0;
+    m_last_sndram_bank = 0;
     membank("sndbank")->set_base(memregion("es5503")->base() );
     m_mux_value = 0;
 }
@@ -214,15 +195,16 @@ void enmirage_state::mirage_map(address_map &map)
 void enmirage_state::coefficients_w( offs_t offset, uint8_t data )
 {
 	uint8_t channel = offset & 0x07;
-	uint8_t osciliator = (offset >> 3) & 0x03;
+	uint8_t filter_input = (offset >> 3) & 0x03;
 
-	logerror( "%s, filter update: channel: %d, data: $%02x (%s%s%s)\n",
+	logerror( "%s, filter update: channel: %d, data: $%02x (%s%s%s%s)\n",
 				machine().describe_context(),
 				channel,
 				data,
-				(osciliator & 0x01) == 0 ? "VF" : "",   /* cut-off frequency */
-				(osciliator & 0x03) == 0 ? " and " : "",
-				(osciliator & 0x02) == 0 ? "VQ" : "" ); /* filter resonance */
+				(filter_input & 0x01) == 0 ? "VF" : "",   /* cut-off frequency */
+				(filter_input & 0x03) == 0 ? " and " : "",
+				(filter_input & 0x02) == 0 ? "VQ" : "", /* filter resonance */
+				(filter_input & 0x03) == 0x03 ? "preload dac" : "" );
 }
 
 // port A:
@@ -247,18 +229,25 @@ void enmirage_state::update_keypad_matrix()
 //  bit 6: IN disk load
 //  bit 5: IN Q Chip sync
 
-// uint8_t enmirage_state::mirage_via_read_portb()
-// {
-// 	uint8_t value = 0;
-//
-//     floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
-//     if (floppy)
-//     {
-//         value = ((!floppy->ready_r()) & 0x01) << 6;
-//     }
-//
-//     return value;
-// }
+uint8_t enmirage_state::mirage_via_read_portb()
+{
+	uint8_t value = m_via->read_pb();
+
+    floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
+    if (floppy)
+    {
+		if( floppy->dskchg_r() )
+		{
+			value |= 0x40;
+		}
+		else
+		{
+			value &= ~0x40;
+		}
+    }
+
+    return value;
+}
 
 // port A: front panel
 // bits 0/1/2: dual purpose (0 to 7 lines, though a 74LS145 decoder):
@@ -281,7 +270,7 @@ void enmirage_state::mirage_via_write_porta(uint8_t data)
 
 // port B:
 //  bit 7: OUT UART clock
-//  bit 4: OUT DSEL disk select, motor on, and (6500/11 reset ?)
+//  bit 4: OUT disk select, motor on, and 6500/11 reset
 //  bit 3: OUT sample/play
 //  bit 2: OUT mic line/in
 //  bit 1: OUT upper/lower bank (64k halves)
@@ -294,9 +283,9 @@ void enmirage_state::mirage_via_write_portb(uint8_t data)
     // handle sound RAM bank switching
     bank = (data & 2) ? (64*1024) : 0;
     bank += (data & 1) ? (32*1024) : 0;
-    if (bank != last_sndram_bank)
+    if (bank != m_last_sndram_bank)
     {
-        last_sndram_bank = bank;
+        m_last_sndram_bank = bank;
         membank("sndbank")->set_base(memregion("es5503")->base() + bank);
     }
 
@@ -338,9 +327,6 @@ void enmirage_state::mirage(machine_config &config)
     m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
     m_cassette->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-//     EN_SAMPLE(config, m_sample, 8000000);
-//     m_sample->add_route(ALL_OUTPUTS, "speaker", 1.0);
-
     es5503_device &es5503(ES5503(config, "es5503", 8000000));
     es5503.set_channels(8);
     es5503.set_addrmap(0, &enmirage_state::enmirage_es5503_map);
@@ -350,7 +336,7 @@ void enmirage_state::mirage(machine_config &config)
 
     MOS6522(config, m_via, 3000000);
     m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
-//     m_via->readpb_handler().set(FUNC(enmirage_state::mirage_via_read_portb));
+    m_via->readpb_handler().set(FUNC(enmirage_state::mirage_via_read_portb));
     m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
     m_via->irq_handler().set(m_irq_merge, FUNC(input_merger_device::in_w<0>));
 
@@ -369,7 +355,7 @@ void enmirage_state::mirage(machine_config &config)
 
     FLOPPY_CONNECTOR(config, "wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats).enable_sound(true);
 
-	// This clock allows the CPU to keep in sync with the sound chip
+	// This clock allows the CPU to keep in sync with the sound chip - may be unused int he firmware
 	clock_device &es5503_ca3_clock(CLOCK(config, "ca3_clock", XTAL(8'000'000) / 16));
 	es5503_ca3_clock.signal_handler().set(m_via, FUNC(via6522_device::write_pb5));
 
@@ -410,7 +396,7 @@ static INPUT_PORTS_START( mirage )
     PORT_START(PITCH_TAG)
     PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD) PORT_PLAYER(1)
     PORT_START(MOD_TAG)
-    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Mod Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(KEYCODE_5_PAD) PORT_PLAYER(1)
+    PORT_BIT( 0xff, 0x7f, IPT_PADDLE) PORT_NAME("Mod Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(KEYCODE_3_PAD) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 ROM_START( enmirage )
@@ -426,58 +412,7 @@ void enmirage_state::init_mirage()
     if (floppy)
     {
         m_fdc->set_floppy(floppy);
-
-        floppy->ss_w(0);
     }
-
-    m_via->write_pa6(1);
 }
-
-//-------------------------------------------------
-//  en_sample_device - constructor
-//-------------------------------------------------
-
-// en_sample_device::en_sample_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-//     : device_t(mconfig, EN_SAMPLE, tag, owner, clock),
-//         device_sound_interface(mconfig, *this),
-//         m_stream(nullptr),
-//         m_sample(0)
-// {
-// }
-//
-// //-------------------------------------------------
-// //  device_start - device-specific startup
-// //-------------------------------------------------
-//
-// void en_sample_device::device_start()
-// {
-//     m_stream = stream_alloc(1, 1, machine().sample_rate());
-// }
-//
-// //-------------------------------------------------
-// //  sound_stream_update - handle a stream update
-// //-------------------------------------------------
-//
-// void en_sample_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-// {
-//     auto &src = inputs[0];
-//     auto &dst = outputs[0];
-//
-//     int count = dst.samples();
-//     double m_rms = 0;
-//
-//     if( count > 0 )
-//     {
-//         for (int sampindex = 0; sampindex < count; sampindex++)
-//         {
-//             m_rms += src.get(sampindex);
-//             dst.put(sampindex, src.get(sampindex));
-//         }
-//
-//         m_rms /= count;
-//     }
-//
-//     m_sample = 0x7f;
-// }
 
 CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage", MACHINE_NOT_WORKING )

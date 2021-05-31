@@ -142,6 +142,8 @@ DEFINE_DEVICE_TYPE(OAD34V, oa_d34v_device, "oa_d34v", "Apple/Sony 3.5 SD (400K G
 DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/800K GCR)")
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
 
+// Panasonic 3.5" drives
+DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
 
 format_registration::format_registration()
 {
@@ -741,7 +743,7 @@ uint32_t floppy_image_device::flux_screen_update(screen_device &device, bitmap_r
 				}
 				ppi++;
 			}
-		}		
+		}
 	} else {
 		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
 			flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data() + y * flux_screen_sx + cliprect.min_x;
@@ -3085,3 +3087,30 @@ bool mfd75w_device::is_2m() const
 
 	return false;
 }
+
+//-------------------------------------------------
+//  3.5" Panasonic Flexible Disk Drive JU-363
+//-------------------------------------------------
+
+pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_35_DD, tag, owner, clock)
+{
+}
+
+pana_ju_363::~pana_ju_363()
+{
+}
+
+void pana_ju_363::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 84;
+	sides = 2;
+	dskchg_writable = true;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
+}
+
