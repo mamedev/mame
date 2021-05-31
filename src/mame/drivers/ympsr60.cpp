@@ -46,6 +46,9 @@
 #include "machine/i8255.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "sound/bbd.h"
+#include "sound/mixer.h"
+#include "sound/ym2154.h"
 #include "sound/ymopq.h"
 #include "bus/midi/midi.h"
 
@@ -68,12 +71,17 @@ public:
 		m_ym3533(*this, "ym3533"),
 		m_ppi(*this, "ppi"),
 		m_acia(*this, "acia"),
+		m_lmixer(*this, "lmixer"),
+		m_rmixer(*this, "rmixer"),
+		m_bbd(*this, "bbd"),
+		m_ryp4(*this, "ryp4"),
 		m_rom2bank(*this, "rom2bank"),
 		m_keyboard(*this, "P1_%u", 0),
 		m_drvif(*this, "DRVIF_%u", 0),
 		m_drvif_out(*this, "DRVIF_%u_DP%u", 0U, 1U),
 		m_ryp4_in(*this, "RYP4_%u", 1U),
-		m_ryp4_out(*this, "RYP4_%u", 1U)
+		m_ryp4_out(*this, "RYP4_%u", 1U),
+		m_mastervol(*this, "MASTERVOL")
 	{ }
 
 	void psr_common(machine_config &config);
@@ -83,21 +91,24 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<z80_device> m_maincpu;
 	required_device<ym3533_device> m_ym3533;
 	required_device<i8255_device> m_ppi;
 	required_device<acia6850_device> m_acia;
+	required_device<mixer_device> m_lmixer;
+	required_device<mixer_device> m_rmixer;
+	required_device<mn3204p_device> m_bbd;
+	required_device<ym2154_device> m_ryp4;
 	required_memory_bank m_rom2bank;
 	required_ioport_array<10> m_keyboard;
 	required_ioport_array<DRVIF_MAX_TARGETS> m_drvif;
 	output_finder<DRVIF_MAX_TARGETS, 4> m_drvif_out;
 	required_ioport_array<RYP4_MAX_TARGETS> m_ryp4_in;
 	output_finder<RYP4_MAX_TARGETS> m_ryp4_out;
-	u8 m_ym2154_regs[0x80];
-	u16 m_ym2154_tempo;
-	emu_timer *m_ym2154_timer;
+	required_ioport m_mastervol;
 
 	void psr60_map(address_map &map);
 	void psr60_io_map(address_map &map);
@@ -109,25 +120,24 @@ private:
 
 	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
 	u16 m_keyboard_select;
+	u8 m_bbd_config;
 	u8 m_drvif_data[2];
 	u8 m_drvif_select;
 
 	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }
-
 	WRITE_LINE_MEMBER(ym_irq_w) { m_ym_irq = state; recalc_irqs(); }
+	WRITE_LINE_MEMBER(ryp4_irq_w) { m_ym2154_irq = state; recalc_irqs(); }
+
+	u8 ryp4_an_r(offs_t offset);
+	void ryp4_out_w(u8 data);
 
 	u8 drvif_r(offs_t offset);
 	void drvif_w(offs_t offset, u8 data);
 
-	u8 ym2154_r(offs_t offset);
-	void ym2154_w(offs_t offset, u8 data);
-	attotime ym2154_period(u32 tempo) const { return attotime::from_hz(2250000 / 12 / 8) * (2048 - tempo); }
-
 public:
 	INPUT_CHANGED_MEMBER(drvif_changed);
-	INPUT_CHANGED_MEMBER(ryp4_changed);
-	TIMER_CALLBACK_MEMBER(ym2154_timer);
+	INPUT_CHANGED_MEMBER(mastervol_changed);
 };
 
 void psr60_state::psr60_map(address_map &map)
@@ -138,148 +148,13 @@ void psr60_state::psr60_map(address_map &map)
 	map(0xe000, 0xffff).ram();  // work RAM
 }
 
-//
-// YM2154 - ROMpler with I/O ports
-//
-// Chip is clocked at 2.25MHz
-//
-// Some of this looks suspiciously like 2x the ADPCM-A attached to the
-// YM2608: 6 channels (2 banks), total level and instrument levels behave
-// the same.
-//
-// Start/end addresses are 9 bits to address 32k ROMs (15 bits) so
-// presume a left shift of 6 (actually 7 if 4-bit ADPCM data).
-//
-// Two serial ROMs are connected, containing 32k of sample data each.
-// It appears that the channel bank (0-5 vs 6-11) implies which of the
-// two ROMs is read.
-//
-//      System-wide registers:
-//           01 -------- Unknown ($00 written at init)
-//           02 1xxxxxxx Timer upper bits latch
-//              0---xxxx Timer lower bits
-//           03 -x------ Unknown (IRQ enable?)
-//              -----x-- Timer enable
-//           04 --xxxxxx Master volume (0=min, 3F=max)
-//           05 --xxxxxx Bank 2 key on/off
-//           06 --xxxxxx Bank 1 key on/off
-//           07 -------x Unknown ($01 written at init)
-//
-//     Per-channel registers (channel in address bits 0-2)
-//        08-0D -------- Unknown; written as two nibbles so shared between banks
-//        10-15 -xx----- Bank 1 Write 11 here to disable?
-//              ---xxxxx Bank 1 Instrument volume (0=min, 1F=max)
-//        18-1D -xx----- Bank 2 Write 11 here to disable?
-//              ---xxxxx Bank 2 Instrument volume (0=min, 1F=max)
-//        20-25 ---xxxxx Bank 1 Start address upper bits
-//        28-2D xxxx---- Bank 1 Start address lower bits
-//              -------x Bank 1 End address upper bits
-//        30-35 xxxxxxxx Bank 1 End address lower bits
-//        38-3D ---xxxxx Bank 2 Start address upper bits
-//        40-45 xxxx---- Bank 2 Start address lower bits
-//              -------x Bank 2 End address upper bits
-//        48-4D xxxxxxxx Bank 2 End address lower bits
-//
-//     Reads:
-//        01-0A xxxxxxxx AN1-10 digital values
-//           0E -------- IRQ clear?
-//
-
-u8 psr60_state::ym2154_r(offs_t offset)
-{
-	u8 result = 0;
-
-	// read analog inputs
-	if (offset >= 1 && offset <= 10)
-	{
-		if (offset - 1 < RYP4_MAX_TARGETS)
-			result = m_ryp4_in[offset - 1]->read();
-	}
-	else if (offset == 14)
-	{
-		m_ym2154_irq = 0;
-		recalc_irqs();
-	}
-	else
-		printf("YM2154: Read %02X\n", offset);
-
-	return result;
-}
-
-void psr60_state::ym2154_w(offs_t offset, u8 data)
-{
-//	printf("YM2154: Write %02X=%02X\n", offset, data);
-	u8 old = m_ym2154_regs[offset];
-	m_ym2154_regs[offset] = data;
-
-	// tempo
-	if (offset == 2)
-	{
-		// two writes in succession
-		if (BIT(data, 7) == 0 && BIT(old, 7) != 0)
-		{
-			m_ym2154_tempo = (BIT(old, 0, 7) << 4) | (data & 0xf);
-			printf("YM2154: tempo = %03X\n", m_ym2154_tempo);
-		}
-	}
-
-	// control
-	else if (offset == 3)
-	{
-		if (BIT(old ^ data, 2) != 0)
-		{
-			if (BIT(data, 2) != 0)
-				m_ym2154_timer->adjust(ym2154_period(m_ym2154_tempo));
-			else
-				m_ym2154_timer->enable(false);
-		}
-	}
-
-	// total overall level
-	else if (offset == 4)
-	{
-	}
-
-	// key on
-	else if (offset == 5)
-	{
-		for (int bit = 0; bit < 6; bit++)
-			if (BIT(data, bit) != 0)
-				printf("YM2154: Bank 2 Ch %d on: %03X-%03X vol=%02X low=%X\n", bit, (m_ym2154_regs[0x38+bit] << 4) | (m_ym2154_regs[0x40+bit] >> 4), ((m_ym2154_regs[0x40+bit] & 0x0f) << 8) | m_ym2154_regs[0x48+bit], m_ym2154_regs[0x18+bit], m_ym2154_regs[0x08+bit] >> 4);
-	}
-	else if (offset == 6)
-	{
-		for (int bit = 0; bit < 6; bit++)
-			if (BIT(data, bit) != 0)
-				printf("YM2154: Bank 1 Ch %d on: %03X-%03X vol=%02X low=%X\n", bit, (m_ym2154_regs[0x20+bit] << 4) | (m_ym2154_regs[0x28+bit] >> 4), ((m_ym2154_regs[0x28+bit] & 0x0f) << 8) | m_ym2154_regs[0x30+bit], m_ym2154_regs[0x10+bit], m_ym2154_regs[0x08+bit] & 0xf);
-	}
-	else if (offset < 8 || offset >= 0x50)
-		printf("YM2154: Write %02X = %02X\n", offset, data);
-}
-
-TIMER_CALLBACK_MEMBER(psr60_state::ym2154_timer)
-{
-	m_ym2154_irq = 1;
-	recalc_irqs();
-	if (BIT(m_ym2154_regs[3], 2) != 0)
-		m_ym2154_timer->adjust(ym2154_period(m_ym2154_tempo));
-}
-
-INPUT_CHANGED_MEMBER(psr60_state::ryp4_changed)
-{
-	// why does this crash? need to feed the values to an output to reflect
-	// the sliders in the layout
-//	m_ryp4_out[param] = m_ryp4_in[param]->read();
-}
-
-
 void psr60_state::psr60_io_map(address_map &map)
 {
 	map.global_mask(0xff);  // top 8 bits of the address are ignored by this hardware for I/O access
 	map(0x10, 0x11).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x20, 0x23).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x3f).rw(FUNC(psr60_state::drvif_r), FUNC(psr60_state::drvif_w));
-	map(0x80, 0xff).rw(FUNC(psr60_state::ym2154_r), FUNC(psr60_state::ym2154_w));
+	map(0x80, 0xff).rw(m_ryp4, FUNC(ym2154_device::read), FUNC(ym2154_device::write));
 }
 
 u8 psr60_state::ppi_pa_r()
@@ -300,6 +175,49 @@ void psr60_state::ppi_pc_w(u8 data)
 {
 	m_rom2bank->set_entry(BIT(data, 4));
 	m_keyboard_select = (m_keyboard_select & ~0x300) | ((data & 3) << 8);
+}
+
+u8 psr60_state::ryp4_an_r(offs_t offset)
+{
+	return (offset < RYP4_MAX_TARGETS) ? (m_ryp4_in[offset]->read() * 255 / 100) : 0;
+}
+
+void psr60_state::ryp4_out_w(u8 data)
+{
+	m_bbd_config = data;
+
+	// bit 0 (CT0) enables/disables the effect
+	m_bbd->set_output_gain(0, BIT(data, 0) ? 1.0 : 0.0);
+
+	// bits 1 + 2 go to the 'T' and 'C' pins and control the frequency
+	// modulation, which we simulate in a periodic timer
+}
+
+void psr60_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	// only two states have been observed to be measured: CT1=1/CT2=0 and CT1=0/CT2=1
+	attotime curtime = machine().time();
+	double bbd_freq;
+	if (BIT(m_bbd_config, 1) && !BIT(m_bbd_config, 2))
+	{
+		// Stereo symphonic off: min freq 35 kHz, max freq 107 kHz, varies at 0,3 Hz
+		curtime.m_seconds %= 3;
+		double pos = curtime.as_double() / 3;
+		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
+		bbd_freq = 35 + (107 - 35) * pos;
+	}
+	else
+	{
+		// Stereo symphonic on: min freq 48 kHz, max freq 61 kHz, varies at 6 Hz
+		curtime.m_seconds = 0;
+		double pos = curtime.as_double() * 6;
+		pos -= floor(pos);
+		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
+		bbd_freq = 48 + (61 - 48) * pos;
+	}
+
+	// two out-of-phase clocks run the BBD so it's effectively 2x frequency
+	m_bbd->set_unscaled_clock(bbd_freq * 2);
 }
 
 //
@@ -345,6 +263,13 @@ INPUT_CHANGED_MEMBER(psr60_state::drvif_changed)
 	recalc_irqs();
 }
 
+INPUT_CHANGED_MEMBER(psr60_state::mastervol_changed)
+{
+	float mastervol = m_mastervol->read() / 75.0;
+	m_lmixer->set_output_gain(0, mastervol);
+	m_rmixer->set_output_gain(0, mastervol);
+}
+
 void psr60_state::recalc_irqs()
 {
 	int irq_state = m_acia_irq | m_ym_irq | m_drvif_irq | m_ym2154_irq;
@@ -357,8 +282,7 @@ void psr60_state::machine_start()
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
 	m_acia_irq = CLEAR_LINE;
-
-	m_ym2154_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psr60_state::ym2154_timer), this));
+	timer_alloc()->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 void psr60_state::machine_reset()
@@ -374,7 +298,7 @@ void psr60_state::machine_reset()
 
 #define RYP4_PORT(num, name) \
 	PORT_START("RYP4_" #num) \
-	PORT_ADJUSTER(0xc0, name) PORT_MINMAX(0x00, 0xff) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, ryp4_changed, num - 1)
+	PORT_ADJUSTER(75, name)
 
 static INPUT_PORTS_START(psr60)
 	PORT_START("P1_9")
@@ -497,6 +421,9 @@ static INPUT_PORTS_START(psr60)
 	RYP4_PORT(6, "Bass Volume")
 	RYP4_PORT(7, "Unused7")
 	RYP4_PORT(8, "Unused8")
+
+	PORT_START("MASTERVOL")
+	PORT_ADJUSTER(75, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(psr70)
@@ -632,6 +559,9 @@ static INPUT_PORTS_START(psr70)
 	RYP4_PORT(6, "Bass Volume")
 	RYP4_PORT(7, "Unused7")
 	RYP4_PORT(8, "Unused8")
+
+	PORT_START("MASTERVOL")
+	PORT_ADJUSTER(75, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 void psr60_state::psr_common(machine_config &config)
@@ -660,10 +590,30 @@ void psr60_state::psr_common(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	MIXER(config, m_lmixer);
+	m_lmixer->add_route(0, "lspeaker", 1.0);
+
+	MIXER(config, m_rmixer);
+	m_rmixer->add_route(0, "rspeaker", 1.0);
+
+	YM2154(config, m_ryp4, 2250000);
+	m_ryp4->irq_handler().set(FUNC(psr60_state::ryp4_irq_w));
+	m_ryp4->io_read_handler().set(FUNC(psr60_state::ryp4_an_r));
+	m_ryp4->io_write_handler().set(FUNC(psr60_state::ryp4_out_w));
+	m_ryp4->add_route(0, m_lmixer, 0.50);		// rhythm channels are mixed in separately
+	m_ryp4->add_route(1, m_rmixer, 0.50);
+
+	MN3204P(config, m_bbd, 12700); // 6.7kHz feeds the iG10090 driver, range is 10-200kHz
+	m_bbd->add_route(0, m_lmixer, 0.11);		// BBD is mixed in
+	m_bbd->add_route(0, m_rmixer, 0.11);
+
 	YM3533(config, m_ym3533, 3.579545_MHz_XTAL);
 	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
-	m_ym3533->add_route(0, "lspeaker", 1.0);
-	m_ym3533->add_route(1, "rspeaker", 1.0);
+	m_ym3533->add_route(0, m_lmixer, 0.16);		// channel 1 = ORC
+	m_ym3533->add_route(0, m_rmixer, 0.16);
+	m_ym3533->add_route(0, m_bbd, 1.0);
+	m_ym3533->add_route(1, m_lmixer, 0.22);		// channel 2 = SABC
+	m_ym3533->add_route(1, m_rmixer, 0.22);
 }
 
 void psr60_state::psr60(machine_config &config)
@@ -684,6 +634,12 @@ ROM_START( psr60 )
 
 	ROM_REGION(0x8000, "rom2", 0)
 	ROM_LOAD("yamaha_psr60_pgm_ic110.bin", 0x000000, 0x008000, CRC(39db8c74) SHA1(7750104d1e5df3357aa553ac58768dbc34051cd8))
+
+	ROM_REGION(0x8000, "ryp4:group0", 0)
+	ROM_LOAD("ym21908.bin", 0x0000, 0x8000, CRC(4ed0d9dc) SHA1(aed7ab6f1c9e28fdf259cb932136b12845040d79) BAD_DUMP)
+
+	ROM_REGION(0x8000, "ryp4:group1", 0)
+	ROM_LOAD("ym21909.bin", 0x0000, 0x8000, CRC(bb9bb698) SHA1(76563d1f25152cd54041019ef7bc264ede0d8b2b) BAD_DUMP)
 ROM_END
 
 ROM_START(psr70)
@@ -692,6 +648,12 @@ ROM_START(psr70)
 
 	ROM_REGION(0x8000, "rom2", 0)
 	ROM_LOAD("yamaha_psr60_pgm_ic110.bin", 0x000000, 0x008000, CRC(39db8c74) SHA1(7750104d1e5df3357aa553ac58768dbc34051cd8))
+
+	ROM_REGION(0x8000, "ryp4:group0", 0)
+	ROM_LOAD("ym21908.bin", 0x0000, 0x8000, CRC(4ed0d9dc) SHA1(aed7ab6f1c9e28fdf259cb932136b12845040d79) BAD_DUMP)
+
+	ROM_REGION(0x8000, "ryp4:group1", 0)
+	ROM_LOAD("ym21909.bin", 0x0000, 0x8000, CRC(bb9bb698) SHA1(76563d1f25152cd54041019ef7bc264ede0d8b2b) BAD_DUMP)
 ROM_END
 
 CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK)

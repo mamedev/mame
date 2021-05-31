@@ -279,6 +279,61 @@ license:CC0
 		<rect><bounds x="11" y="2" width="150" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
 	</element>
 
+	<element name="slider-bar-white">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-green">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="0.5" green="1.0" blue="0.5" /></rect>
+	</element>
+	<element name="slider-bar-yellow">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="1.0" green="1.0" blue="0.5" /></rect>
+	</element>
+	<element name="slider-bar-blue">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="0.5" green="0.5" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-red">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="1.0" green="0.2" blue="0.2" /></rect>
+	</element>
+	<element name="slider-bar-grey">
+		<disk><bounds x="0" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<disk><bounds x="41" y="0" width="23" height="23" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="11" y="0" width="40" height="23" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<disk><bounds x="2" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<disk><bounds x="43" y="2" width="19" height="19" /><color red="0.3" green="0.3" blue="0.3" /></disk>
+		<rect><bounds x="11" y="2" width="40" height="19" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect><bounds x="30" y="2" width="5" height="19" /><color red="0.6" green="0.6" blue="0.6" /></rect>
+	</element>
+
 	<!-- LED primitive -->
 	<element name="led" defstate="0">
 		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
@@ -388,11 +443,17 @@ license:CC0
 		<element ref="power"><bounds x="177" y="165" width="82" height="17" /></element>
 		<element ref="led" name="DRVIF_0_DP4"><bounds x="213" y="188" width="12" height="12" /></element>
 		<element ref="slider-power"><bounds x="177" y="209" width="82" height="23" /></element>
+		<element ref="slider-bar-red"><bounds x="193" y="209" width="64" height="23" /></element>
 
 		<element ref="mastervolume"><bounds x="177" y="307" width="139" height="17" /></element>
 		<element ref="slidermin"><bounds x="177" y="336" width="139" height="13" /></element>
 		<element ref="slidermax"><bounds x="177" y="336" width="139" height="13" /></element>
 		<element ref="slider"><bounds x="177" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-grey">
+			<animate inputtag="MASTERVOL" mask="0xff" />
+			<bounds state="0" x="177" y="352" width="64" height="23" />
+			<bounds state="100" x="252" y="352" width="64" height="23" />
+		</element>
 	</group>
 
 	<!-- pitch group -->
@@ -451,11 +512,21 @@ license:CC0
 		<element ref="slidermin"><bounds x="567" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="567" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="567" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-blue">
+			<animate inputtag="RYP4_6" mask="0xff" />
+			<bounds state="0" x="567" y="352" width="64" height="23" />
+			<bounds state="100" x="642" y="352" width="64" height="23" />
+		</element>
 		<element ref="bassvolume"><bounds x="567" y="378" width="139" height="14" /></element>
 
 		<element ref="slidermin"><bounds x="727" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="727" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="727" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-blue">
+			<animate inputtag="RYP4_5" mask="0xff" />
+			<bounds state="0" x="727" y="352" width="64" height="23" />
+			<bounds state="100" x="802" y="352" width="64" height="23" />
+		</element>
 		<element ref="chordvolume"><bounds x="727" y="378" width="139" height="14" /></element>
 	</group>
 
@@ -553,11 +624,21 @@ license:CC0
 		<element ref="slidermin"><bounds x="923" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="923" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="923" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-yellow">
+			<animate inputtag="RYP4_3" mask="0xff" />
+			<bounds state="0" x="923" y="352" width="64" height="23" />
+			<bounds state="100" x="998" y="352" width="64" height="23" />
+		</element>
 		<element ref="volume"><bounds x="923" y="378" width="139" height="14" /></element>
 
 		<element ref="sliderslow"><bounds x="1081" y="338" width="174" height="12" /></element>
 		<element ref="sliderfast"><bounds x="1081" y="338" width="174" height="12" /></element>
 		<element ref="slider-tempo"><bounds x="1081" y="352" width="174" height="23" /></element>
+		<element ref="slider-bar-yellow">
+			<animate inputtag="RYP4_4" mask="0xff" />
+			<bounds state="0" x="1081" y="352" width="64" height="23" />
+			<bounds state="100" x="1191" y="352" width="64" height="23" />
+		</element>
 		<element ref="tempo"><bounds x="1081" y="378" width="174" height="14" /></element>
 	</group>
 
@@ -667,6 +748,11 @@ license:CC0
 		<element ref="slidermin"><bounds x="1597" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="1597" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="1597" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-green">
+			<animate inputtag="RYP4_2" mask="0xff" />
+			<bounds state="0" x="1597" y="352" width="64" height="23" />
+			<bounds state="100" x="1672" y="352" width="64" height="23" />
+		</element>
 		<element ref="volume"><bounds x="1597" y="378" width="139" height="14" /></element>
 
 		<element ref="button" inputtag="DRVIF_4" inputmask="0x80"><bounds x="1755" y="353" width="65" height="21" /></element>
@@ -750,6 +836,11 @@ license:CC0
 		<element ref="slidermin"><bounds x="2271" y="338" width="139" height="12" /></element>
 		<element ref="slidermax"><bounds x="2271" y="338" width="139" height="12" /></element>
 		<element ref="slider"><bounds x="2271" y="352" width="139" height="23" /></element>
+		<element ref="slider-bar-white">
+			<animate inputtag="RYP4_1" mask="0xff" />
+			<bounds state="0" x="2271" y="352" width="64" height="23" />
+			<bounds state="100" x="2346" y="352" width="64" height="23" />
+		</element>
 		<element ref="volume"><bounds x="2271" y="378" width="139" height="14" /></element>
 
 		<element ref="button" inputtag="DRVIF_13" inputmask="0x80"><bounds x="2429" y="353" width="65" height="21" /></element>
