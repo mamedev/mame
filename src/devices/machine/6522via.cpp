@@ -587,7 +587,9 @@ uint8_t via6522_device::input_pb()
 
 	/// TODO: REMOVE THIS
 	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
+	{
 		pb &= m_in_b_handler();
+	}
 
 	pb |= m_out_b & m_ddr_b;
 
