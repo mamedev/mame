@@ -272,6 +272,8 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 
 void coco_fdc_device_base::device_start()
 {
+	coco_family_fdc_device_base::device_start();
+
 	install_readwrite_handler(0xFF74, 0xFF76,
 			read8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
 			write8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));

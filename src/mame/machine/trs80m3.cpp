@@ -292,6 +292,7 @@ void trs80m3_state::port_e4_w(uint8_t data)
     d7 1=enable disk INTRQ to generate NMI
     d6 1=enable disk Motor Timeout to generate NMI */
 
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmi_mask = data;
 }
 
@@ -355,7 +356,8 @@ void trs80m3_state::port_ec_w(uint8_t data)
 
 	m_mode = (m_mode & 0xde) | (BIT(data, 2) ? 1 : 0) | (BIT(data, 3) ? 0x20 : 0);
 
-	m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+		m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	m_port_ec = data & 0x7e;
 }
@@ -387,17 +389,17 @@ void trs80m3_state::port_f4_w(uint8_t data)
 		m_wait = false;
 	}
 
-	m_floppy = nullptr;
+	m_fdd = nullptr;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	if (BIT(data, 0)) m_fdd = m_floppy[0]->get_device();
+	if (BIT(data, 1)) m_fdd = m_floppy[1]->get_device();
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_fdd);
 
-	if (m_floppy)
+	if (m_fdd)
 	{
-		m_floppy->mon_w(0);
-		m_floppy->ss_w(BIT(data, 4));
+		m_fdd->mon_w(0);
+		m_fdd->ss_w(BIT(data, 4));
 		m_timeout = 1600;
 	}
 
@@ -409,9 +411,13 @@ void trs80m3_state::port_ff_w(uint8_t data)
 /* Cassette port
     d1, d0 Cassette output */
 
-	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	m_cassette->output(levels[data & 3]);
-	m_cassette_data &= ~0x80;
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+	{
+		static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+		m_cassette->output(levels[data & 3]);
+		m_cassette_data &= ~0x80;
+	}
+	m_speaker->level_w(!(BIT(data, 0)));
 }
 
 
@@ -437,8 +443,8 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 	{
 		m_timeout--;
 		if (m_timeout == 0)
-			if (m_floppy)
-				m_floppy->mon_w(1);  // motor off
+			if (m_fdd)
+				m_fdd->mon_w(1);  // motor off
 	}
 	// Also, if cpu is in wait, unlock it and trigger NMI
 	// Don't, it breaks disk loading
@@ -558,8 +564,12 @@ void trs80m3_state::machine_start()
 	m_start_address = 0;
 	m_old_cassette_val = 0;
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
-	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+	{
+		m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
+		m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	}
+
 	if (!(m_model4 & 6))   // Model 3 leave now
 		return;
 
@@ -615,7 +625,7 @@ void trs80m3_state::machine_reset()
 	if (m_model4 & 6)
 		port_84_w(0);    // 4 & 4P - switch in devices
 
-	m_floppy = nullptr;
+	m_fdd = nullptr;
 }
 
 
@@ -665,13 +675,12 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 				image.fread( &addr, 2);
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-				// Todo: the below only applies for non-ram
-				if (address < 0x3c00)
+				ptr = program.get_write_ptr(address);
+				if (!ptr)
 				{
 					image.message("Attempting to write outside of RAM");
 					return image_init_result::FAIL;
 				}
-				ptr = program.get_write_ptr(address);
 				image.fread( ptr, block_length);
 			}
 			break;

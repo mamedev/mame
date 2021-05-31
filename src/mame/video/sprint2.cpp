@@ -10,7 +10,7 @@
 #include "includes/sprint2.h"
 
 
-void sprint2_state::sprint2_palette(palette_device &palette) const
+void sprint2_state::palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
@@ -49,27 +49,7 @@ void sprint2_state::video_start()
 }
 
 
-uint8_t sprint2_state::sprint2_collision1_r()
-{
-	return m_collision[0];
-}
-uint8_t sprint2_state::sprint2_collision2_r()
-{
-	return m_collision[1];
-}
-
-
-void sprint2_state::sprint2_collision_reset1_w(uint8_t data)
-{
-	m_collision[0] = 0;
-}
-void sprint2_state::sprint2_collision_reset2_w(uint8_t data)
-{
-	m_collision[1] = 0;
-}
-
-
-void sprint2_state::sprint2_video_ram_w(offs_t offset, uint8_t data)
+void sprint2_state::video_ram_w(offs_t offset, uint8_t data)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -96,50 +76,44 @@ uint8_t sprint2_state::collision_check(rectangle& rect)
 }
 
 
-inline int sprint2_state::get_sprite_code(uint8_t *video_ram, int n)
+inline int sprint2_state::get_sprite_code(int n)
 {
-	return video_ram[0x398 + 2 * n + 1] >> 3;
+	return m_video_ram[0x398 + 2 * n + 1] >> 3;
 }
-inline int sprint2_state::get_sprite_x(uint8_t *video_ram, int n)
+inline int sprint2_state::get_sprite_x(int n)
 {
-	return 2 * (248 - video_ram[0x390 + 1 * n]);
+	return 2 * (248 - m_video_ram[0x390 + 1 * n]);
 }
-inline int sprint2_state::get_sprite_y(uint8_t *video_ram, int n)
+inline int sprint2_state::get_sprite_y(int n)
 {
-	return 1 * (248 - video_ram[0x398 + 2 * n]);
+	return 1 * (248 - m_video_ram[0x398 + 2 * n]);
 }
 
 
-uint32_t sprint2_state::screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sprint2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *video_ram = m_video_ram;
-	int i;
-
 	m_bg_tilemap->draw(*m_screen, bitmap, cliprect, 0, 0);
 
-	/* draw the sprites */
+	// draw the sprites
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			get_sprite_code(video_ram, i),
+			get_sprite_code(i),
 			i,
 			0, 0,
-			get_sprite_x(video_ram, i),
-			get_sprite_y(video_ram, i), 0);
+			get_sprite_x(i),
+			get_sprite_y(i), 0);
 	}
 	return 0;
 }
 
 
-WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
+WRITE_LINE_MEMBER(sprint2_state::screen_vblank)
 {
 	// rising edge
 	if (state)
 	{
-		uint8_t *video_ram = m_video_ram;
-		int i;
-		int j;
 		const rectangle &visarea = m_screen->visible_area();
 
 		/*
@@ -150,47 +124,47 @@ WRITE_LINE_MEMBER(sprint2_state::screen_vblank_sprint2)
 		 *
 		 */
 
-		for (i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			rectangle rect(
-					get_sprite_x(video_ram, i),
-					get_sprite_x(video_ram, i) + m_gfxdecode->gfx(1)->width() - 1,
-					get_sprite_y(video_ram, i),
-					get_sprite_y(video_ram, i) + m_gfxdecode->gfx(1)->height() - 1);
+					get_sprite_x(i),
+					get_sprite_x(i) + m_gfxdecode->gfx(1)->width() - 1,
+					get_sprite_y(i),
+					get_sprite_y(i) + m_gfxdecode->gfx(1)->height() - 1);
 			rect &= visarea;
 
-			/* check for sprite-tilemap collisions */
+			// check for sprite-tilemap collisions
 
 			m_bg_tilemap->draw(*m_screen, m_helper, rect, 0, 0);
 
 			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
-				get_sprite_code(video_ram, i),
+				get_sprite_code(i),
 				0,
 				0, 0,
-				get_sprite_x(video_ram, i),
-				get_sprite_y(video_ram, i), 1);
+				get_sprite_x(i),
+				get_sprite_y(i), 1);
 
 			m_collision[i] |= collision_check(rect);
 
-			/* check for sprite-sprite collisions */
+			// check for sprite-sprite collisions
 
-			for (j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++)
 				if (j != i)
 				{
 					m_gfxdecode->gfx(1)->transpen(m_helper,rect,
-						get_sprite_code(video_ram, j),
+						get_sprite_code(j),
 						1,
 						0, 0,
-						get_sprite_x(video_ram, j),
-						get_sprite_y(video_ram, j), 0);
+						get_sprite_x(j),
+						get_sprite_y(j), 0);
 				}
 
 			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
-				get_sprite_code(video_ram, i),
+				get_sprite_code(i),
 				0,
 				0, 0,
-				get_sprite_x(video_ram, i),
-				get_sprite_y(video_ram, i), 1);
+				get_sprite_x(i),
+				get_sprite_y(i), 1);
 
 			m_collision[i] |= collision_check(rect);
 		}

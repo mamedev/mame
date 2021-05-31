@@ -90,14 +90,14 @@ void samcoupe_expansion_device::iorq_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER( samcoupe_expansion_device::xmem_w )
 {
-		if (m_module)
-			m_module->xmem_w(state);
+	if (m_module)
+		m_module->xmem_w(state);
 }
 
 WRITE_LINE_MEMBER( samcoupe_expansion_device::print_w )
 {
-		if (m_module)
-			m_module->print_w(state);
+	if (m_module)
+		m_module->print_w(state);
 }
 
 

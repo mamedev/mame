@@ -196,7 +196,7 @@ other supported games as well.
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
 #include "machine/rstbuf.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -1820,9 +1820,9 @@ void m72_state::m72_audio_chips(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK));
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 void m72_state::m72_base(machine_config &config)

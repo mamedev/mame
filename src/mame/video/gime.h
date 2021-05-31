@@ -40,7 +40,7 @@ public:
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }
 
 	// the GIME seems to intercept writes to $FF22 (not precisely sure how)
-	void ff22_write(uint8_t data) { m_ff22_value = data; }
+	void pia_write(offs_t offset, uint8_t data);
 
 	// updates the cart ROM
 	void update_cart_rom(void);
@@ -122,8 +122,8 @@ protected:
 
 	enum timer_type_t
 	{
-		GIME_TIMER_HBORD,
-		GIME_TIMER_CLOCK
+		GIME_TIMER_63USEC,
+		GIME_TIMER_279NSEC
 	};
 
 	// timer constants
@@ -141,6 +141,7 @@ protected:
 	uint8_t                     m_gime_registers[16];
 	uint8_t                     m_mmu[16];
 	uint8_t                     m_ff22_value;
+	uint8_t                     m_ff23_value;
 	uint8_t                     m_interrupt_value;
 	uint8_t                     m_irq;
 	uint8_t                     m_firq;

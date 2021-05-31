@@ -9414,5 +9414,29 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 		</part>
 	</software>
 
+	<software name="raypoker">
+		<description>RAY Pokeri 100 mk (Fin)</description>
+		<year>1991</year>
+		<publisher>Las Vegas Games</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="901120">
+				<rom name="ray_pokeri_100.adf" size="901120" crc="24f959f5" sha1="1aa5e0e7196139e1910dece1037bc68b568515cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raypoker2" cloneof="raypoker">
+		<description>RAY Pokeri 200 mk (Fin)</description>
+		<year>1992</year>
+		<publisher>Las Vegas Games</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="901120">
+				<rom name="ray_pokeri_200.adf" size="901120" crc="f275c39b" sha1="ed8ad9875fbb1ddbaca1b0d71e4a7ad429b15ceb"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
 

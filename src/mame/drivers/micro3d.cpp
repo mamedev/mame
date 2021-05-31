@@ -34,7 +34,7 @@
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
 #include "machine/z80scc.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 #include "screen.h"
 #include "speaker.h"

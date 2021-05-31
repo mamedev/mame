@@ -81,7 +81,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -316,14 +316,11 @@ void gunsmoke_state::gunsmoke(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));  // 3 MHz
 	audiocpu.set_addrmap(AS_PROGRAM, &gunsmoke_state::sound_map);
-	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_hz(4*59.63));
+	audiocpu.set_periodic_int(FUNC(gunsmoke_state::irq0_line_hold), attotime::from_ticks(384*262/4, 6000000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.63);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(gunsmoke_state::screen_update_gunsmoke));
 	screen.set_palette(m_palette);
 

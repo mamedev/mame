@@ -1023,7 +1023,7 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f08000 = ethernet ID PROM
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);
-	map(0x50f10100, 0x50f10101).r(m_ncr53c94, FUNC(ncr53c94_device::dma16_r));
+	map(0x50f10100, 0x50f10101).rw(m_ncr53c94, FUNC(ncr53c94_device::dma16_r), FUNC(ncr53c94_device::dma16_w));
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -1094,7 +1094,7 @@ void macpdm_state::macpdm(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk");

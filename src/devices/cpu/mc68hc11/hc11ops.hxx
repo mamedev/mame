@@ -1952,7 +1952,7 @@ void HC11OP(dec_indy)()
 /* DES              0x34 */
 void HC11OP(des)()
 {
-	m_ix--;
+	m_sp--;
 	CYCLES(3);
 }
 

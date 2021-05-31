@@ -100,7 +100,7 @@ TODO:
 #include "machine/msm6242.h"
 #include "machine/tmp68301.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

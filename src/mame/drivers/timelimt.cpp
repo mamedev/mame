@@ -240,9 +240,9 @@ void timelimt_state::timelimt(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC15
 	mainlatch.q_out_cb<0>().set(FUNC(timelimt_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set(FUNC(timelimt_state::coin_lockout_w));
-	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert();
-	mainlatch.q_out_cb<6>().set_nop(); // probably flip screen
-	mainlatch.q_out_cb<7>().set_nop(); // probably flip screen
+	mainlatch.q_out_cb<3>().set_nop(); // PSG mute control on thepit not used properly in timelimt (only set at startup, reset at game over)
+	mainlatch.q_out_cb<6>().set_nop(); // probably horizontal flip, as on thepit
+	mainlatch.q_out_cb<7>().set_nop(); // probably vertical flip, as on thepit
 
 	WATCHDOG_TIMER(config, "watchdog");
 

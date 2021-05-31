@@ -10,18 +10,18 @@ Blazer                             (c) 1987 Namco
 Quester                            (c) 1987 Namco
 Pac-Mania                          (c) 1987 Namco
 Galaga '88                         (c) 1987 Namco
-World Stadium                      (c) 1988 Namco
-Beraboh Man                        (c) 1988 Namco
+Pro Yakyuu World Stadium           (c) 1988 Namco
+Chou Zetsurinjin Berabowman        (c) 1988 Namco
 Alice In Wonderland / Marchen Maze (c) 1988 Namco
 Bakutotsu Kijuutei                 (c) 1988 Namco
-World Court                        (c) 1988 Namco
+Pro Tennis World Court             (c) 1988 Namco
 Splatter House                     (c) 1988 Namco
 Face Off                           (c) 1988 Namco
 Rompers                            (c) 1989 Namco
 Blast Off                          (c) 1989 Namco
-World Stadium '89                  (c) 1989 Namco
+Pro Yakyuu World Stadium '89       (c) 1989 Namco
 Dangerous Seed                     (c) 1989 Namco
-World Stadium '90                  (c) 1990 Namco
+Pro Yakyuu World Stadium '90       (c) 1990 Namco
 Pistol Daimyo no Bouken            (c) 1990 Namco
 Boxy Boy / Souko Ban Deluxe        (c) 1990 Namco
 Puzzle Club                        (c) 1990 Namco (prototype)
@@ -311,19 +311,20 @@ Date  Name                                  Key  Screen
 11/87 Pac-Mania (Japanese version)          151  V
 12/87 Galaga '88                            153  V-FLIP
 12/87 Galaga '88 (Japanese version)         153  V
- 3/88 World Stadium                         154  H
- 5/88 Beraboh Man                           B    H
-??/88 Beraboh Man (standard NS1 hardware)   NONE H
+ 3/88 Pro Yakyuu World Stadium              154  H
+ 5/88 Chou Zetsurinjin Berabowman           B    H
+??/88 Chou Zetsurinjin Berabowman           NONE H
+                   (standard NS1 hardware)
  7/88 Marchen Maze / Alice In Wonderland    152  H
  8/88 Bakutotsu Kijuutei / Baraduke 2       155  H
-10/88 World Court                           143  H
+10/88 Pro Tennis World Court                143  H
 11/88 Splatter House                        181  H
 12/88 Face Off                              C    H
  2/89 Rompers                               182  V
  3/89 Blast Off                             183  V
- 7/89 World Stadium '89                     184  H
+ 7/89 Pro Yakyuu World Stadium '89          184  H
 12/89 Dangerous Seed                        308  V
- 7/90 World Stadium '90                     310  H
+ 7/90 Pro Yakyuu World Stadium '90          310  H
 10/90 Pistol Daimyo no Bouken               309  H-FLIP
 11/90 Souko Ban Deluxe                      311  H-FLIP
 ??/90 Puzzle Club (prototype)               ?    V
@@ -339,7 +340,7 @@ C - uses sub board with support for player 3 and 4 controls
 #include "includes/namcos1.h"
 
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -691,6 +692,9 @@ static INPUT_PORTS_START( berabohm )
 	PORT_DIPNAME( 0x04, 0x04, "Invulnerability" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1614,8 +1618,8 @@ ROM_START( galaga88 )
 	/* 180000-1fffff empty */
 	/* 200000-27ffff empty */
 	ROM_LOAD_512( "g81_p5.bin",      0x280000, CRC(4fbd3f6c) SHA1(40d8dadc0a36b4c1886778cfc8d380a34aea2505) )
-	ROM_LOAD_512( "g8x_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Unknown number for the "x" */
-	ROM_LOAD_512( "g8x_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Unknown number for the "x" */
+	ROM_LOAD_512( "g82_p6.bin",      0x300000, CRC(403d01c1) SHA1(86109087b10c4fbcc940df6a84f7546de56303d2) ) /* Confirmed "G82" on original US PCB */
+	ROM_LOAD_512( "g82_p7.bin",      0x380000, CRC(df75b7fc) SHA1(cb810e7ba05bd8e873559e529e25a99adbf6307d) ) /* Confirmed "G82" on original US PCB */
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* MCU internal ROM */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0000, 0x1000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
@@ -1737,7 +1741,7 @@ ROM_START( galaga88a )
 	ROM_LOAD( "g8_obj-5.bin",       0xa0000, 0x20000, CRC(b0645169) SHA1(e55dc9bd532b6bd821b7bf6994c35175600c317c) ) // 12-11-87
 ROM_END
 
-/* World Stadium */
+/* Pro Yakyuu World Stadium */
 ROM_START( ws )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "ws1_snd0.bin",       0x00000, 0x10000, CRC(45a87810) SHA1(b6537500cc6e862d97074f636248446d6fae5d07) )
@@ -1778,7 +1782,7 @@ ROM_START( ws )
 	ROM_LOAD_HS( "ws1_obj3.bin",    0x60000, 0x10000, CRC(f2ed5309) SHA1(b7d9c0a617660ecceaf7db3fd53bc0377ed1b6c1) )
 ROM_END
 
-/* Beraboh Man (revision C) */
+/* Chou Zetsurinjin Berabowman (revision C) */
 ROM_START( berabohm )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -1823,7 +1827,7 @@ ROM_START( berabohm )
 	ROM_LOAD( "bm_obj-7.bin",       0xe0000, 0x20000, CRC(377c81ed) SHA1(85f4682c6079863793f5575d261a33309c221ba7) )
 ROM_END
 
-/* Beraboh Man (revision B) */
+/* Chou Zetsurinjin Berabowman (revision B) */
 ROM_START( berabohmb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bm1_s0.bin",         0x00000, 0x10000, CRC(d5d53cb1) SHA1(af5db529550382dab61197eb46e02110efc4c21b) )
@@ -1999,7 +2003,7 @@ ROM_START( bakutotu )
 	ROM_LOAD( "bk_obj-7.bin",       0xe0000, 0x20000, CRC(809aa0e6) SHA1(d5dbc04037001a0808e79da742f7c4a8f5d3bc2f) )
 ROM_END
 
-/* World Court */
+/* Pro Tennis World Court */
 ROM_START( wldcourt )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "wc1_snd0.bin",       0x00000, 0x10000, CRC(17a6505d) SHA1(773636173947a656c3b5a21049c28eedc40e4654) )
@@ -2461,7 +2465,7 @@ ROM_START( blastoff )
 	ROM_LOAD( "bo1_obj4.bin",       0x80000, 0x20000, CRC(c2c1b9cb) SHA1(754bf6136f4b1b4958474072dca5c6dbf54517bd) )
 ROM_END
 
-/* World Stadium '89 */
+/* Pro Yakyuu World Stadium '89 */
 ROM_START( ws89 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "w91_snd0.bin",       0x00000, 0x10000, CRC(52b84d5a) SHA1(efe7921a565faa42793d581868aa3fa634d81103) )
@@ -2541,7 +2545,7 @@ ROM_START( dangseed )
 	ROM_LOAD( "dr_obj-2.bin",       0x40000, 0x20000, CRC(7e3a78c0) SHA1(d0026f70c05ef84dd9fc0588869ad7920949624a) )
 ROM_END
 
-/* World Stadium '90 */
+/* Pro Yakyuu World Stadium '90 */
 ROM_START( ws90 )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "w91_snd0.bin",       0x00000, 0x10000, CRC(52b84d5a) SHA1(efe7921a565faa42793d581868aa3fa634d81103) )
@@ -2897,13 +2901,13 @@ GAME( 1987, pacmaniaj, pacmania, ns1,     pacmania, namcos1_state, init_pacmania
 GAME( 1987, galaga88,  0,        ns1,     galaga88, namcos1_state, init_galaga88, ROT270, "Namco", "Galaga '88", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, galaga88a, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (02-03-88)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, galaga88j, galaga88, ns1,     galaga88, namcos1_state, init_galaga88, ROT90,  "Namco", "Galaga '88 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, init_ws,       ROT180, "Namco", "World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Beraboh Man (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ws,        0,        ns1,     ns1,      namcos1_state, init_ws,       ROT180, "Namco", "Pro Yakyuu World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohm,  0,        ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou Zetsurinjin Berabowman (Japan, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, berabohmb, berabohm, ns1,     berabohm, namcos1_state, init_berabohm, ROT180, "Namco", "Chou Zetsurinjin Berabowman (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmaze,     0,        ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmaze2,    mmaze,    ns1,     mmaze,    namcos1_state, init_alice,    ROT180, "Namco", "Marchen Maze (Japan, hack?)", MACHINE_SUPPORTS_SAVE ) // removed copyright screen, hacked for export? But still has and requires MCU
 GAME( 1988, bakutotu,  0,        ns1,     bakutotu, namcos1_state, init_bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "World Court (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, wldcourt,  0,        ns1,     wldcourt, namcos1_state, init_wldcourt, ROT180, "Namco", "Pro Tennis World Court (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatter,  0,        ns1,     splatter3,namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, new version (SH3))", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatter2, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (World, old version (SH2))", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, splatterj, splatter, ns1,     splatter, namcos1_state, init_splatter, ROT180, "Namco", "Splatter House (Japan, SH1)", MACHINE_SUPPORTS_SAVE )
@@ -2911,9 +2915,9 @@ GAME( 1988, faceoff,   0,        ns1,     faceoff,  namcos1_state, init_faceoff,
 GAME( 1989, rompers,   0,        ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, romperso,  rompers,  ns1,     ns1,      namcos1_state, init_rompers,  ROT90,  "Namco", "Rompers (Japan, old version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blastoff,  0,        ns1,     ns1,      namcos1_state, init_blastoff, ROT90,  "Namco", "Blast Off (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, init_ws89,     ROT180, "Namco", "World Stadium '89 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ws89,      ws,       ns1,     ws89,     namcos1_state, init_ws89,     ROT180, "Namco", "Pro Yakyuu World Stadium '89 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, dangseed,  0,        ns1,     dangseed, namcos1_state, init_dangseed, ROT90,  "Namco", "Dangerous Seed (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, init_ws90,     ROT180, "Namco", "World Stadium '90 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ws90,      ws,       ns1,     ws90,     namcos1_state, init_ws90,     ROT180, "Namco", "Pro Yakyuu World Stadium '90 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pistoldm,  0,        ns1,     ns1,      namcos1_state, init_pistoldm, ROT0,   "Namco", "Pistol Daimyo no Bouken (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, boxyboy,   0,        ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (World, SB2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, boxyboya,  boxyboy,  ns1,     boxyboy,  namcos1_state, init_soukobdx, ROT0,   "Namco", "Boxy Boy (SB?)", MACHINE_SUPPORTS_SAVE )

@@ -273,17 +273,20 @@ Thrill Drive 713A13  -       713A14  -
 #include "cpu/sharc/sharc.h"
 #include "machine/adc1213x.h"
 #include "machine/k033906.h"
+#include "machine/konami_gn676_lan.h"
 #include "machine/konppc.h"
 #include "machine/timekpr.h"
 //#include "machine/x76f041.h"
-#include "sound/rf5c400.h"
 #include "sound/k056800.h"
-#include "video/voodoo.h"
+#include "sound/rf5c400.h"
 #include "video/k001604.h"
+#include "video/voodoo.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class nwktr_state : public driver_device
 {
@@ -293,34 +296,31 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp"),
-		m_dsp2(*this, "dsp2"),
+		m_dsp(*this, {"dsp", "dsp2"}), // TODO: hardcoded tags in machine/konpc.cpp
 		m_k056800(*this, "k056800"),
-		m_k001604_1(*this, "k001604_1"),
-		m_k001604_2(*this, "k001604_2"),
+		m_k001604(*this, "k001604_%u", 1U),
 		m_konppc(*this, "konppc"),
 		m_adc12138(*this, "adc12138"),
 		m_voodoo(*this, "voodoo%u", 0U),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
-		m_in2(*this, "IN2"),
+		m_in(*this, "IN%u", 0U),
 		m_dsw(*this, "DSW"),
-		m_analog1(*this, "ANALOG1"),
-		m_analog2(*this, "ANALOG2"),
-		m_analog3(*this, "ANALOG3"),
-		m_analog4(*this, "ANALOG4"),
-		m_analog5(*this, "ANALOG5"),
+		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_sharc_dataram(*this, "sharc%u_dataram", 0U),
+		m_cg_view(*this, "cg_view")
 	{ }
 
 	void thrilld(machine_config &config);
 	void nwktr(machine_config &config);
 
-	void init_nwktr();
 	void init_racingj();
 	void init_thrilld();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -329,59 +329,34 @@ private:
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<adsp21062_device> m_dsp;
-	required_device<adsp21062_device> m_dsp2;
+	required_device_array<adsp21062_device, 2> m_dsp;
 	required_device<k056800_device> m_k056800;
-	required_device<k001604_device> m_k001604_1;
-	required_device<k001604_device> m_k001604_2;
+	required_device_array<k001604_device, 2> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
 	required_device_array<voodoo_device, 2> m_voodoo;
-	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
+	required_ioport_array<3> m_in;
+	required_ioport m_dsw;
+	required_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer;
-	int m_fpga_uploaded;
-	int m_lanc2_ram_r;
-	int m_lanc2_ram_w;
-	uint8_t m_lanc2_reg[3];
-	std::unique_ptr<uint8_t[]> m_lanc2_ram;
-	std::unique_ptr<uint32_t[]> m_sharc0_dataram;
-	std::unique_ptr<uint32_t[]> m_sharc1_dataram;
 	void paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t nwktr_k001604_tile_r(offs_t offset);
-	void nwktr_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t nwktr_k001604_char_r(offs_t offset);
-	void nwktr_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t nwktr_k001604_reg_r(offs_t offset);
-	void nwktr_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
-	uint32_t lanc1_r(offs_t offset);
-	void lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t lanc2_r(offs_t offset, uint32_t mem_mask = ~0);
-	void lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t dsp_dataram0_r(offs_t offset);
-	void dsp_dataram0_w(offs_t offset, uint32_t data);
-	uint32_t dsp_dataram1_r(offs_t offset);
-	void dsp_dataram1_w(offs_t offset, uint32_t data);
 	void soundtimer_en_w(uint16_t data);
 	void soundtimer_count_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	double adc12138_input_callback(uint8_t input);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void lanc2_init();
+	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void nwktr_map(address_map &map);
+	void ppc_map(address_map &map);
 	void sharc0_map(address_map &map);
 	void sharc1_map(address_map &map);
 	void sound_memmap(address_map &map);
@@ -394,71 +369,17 @@ void nwktr_state::paletteram32_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
-}
-
-WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_1)
-{
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
-}
-
-uint32_t nwktr_state::nwktr_k001604_tile_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->tile_r(offset);
-}
-
-void nwktr_state::nwktr_k001604_tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->tile_w(offset, data, mem_mask);
-}
-
-uint32_t nwktr_state::nwktr_k001604_char_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->char_r(offset);
-}
-
-void nwktr_state::nwktr_k001604_char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->char_w(offset, data, mem_mask);
-}
-
-uint32_t nwktr_state::nwktr_k001604_reg_r(offs_t offset)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	return k001604->reg_r(offset);
-}
-
-void nwktr_state::nwktr_k001604_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
-	k001604->reg_w(offset, data, mem_mask);
-}
-
-uint32_t nwktr_state::screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+template <uint8_t Which>
+uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_voodoo[0]->voodoo_update(bitmap, cliprect);
-	m_k001604_1->draw_front_layer(screen, bitmap, cliprect);
+	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
+	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 
 	return 0;
 }
 
-uint32_t nwktr_state::screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(m_palette->pen(0), cliprect);
-
-	m_voodoo[1]->voodoo_update(bitmap, cliprect);
-	m_k001604_2->draw_front_layer(screen, bitmap, cliprect);
-
-	return 0;
-}
 
 /*****************************************************************************/
 
@@ -469,13 +390,13 @@ uint8_t nwktr_state::sysreg_r(offs_t offset)
 	switch (offset)
 	{
 		case 0:
-			r = m_in0->read();
+			r = m_in[0]->read();
 			break;
 		case 1:
-			r = m_in1->read();
+			r = m_in[1]->read();
 			break;
 		case 2:
-			r = m_in2->read();
+			r = m_in[2]->read();
 			break;
 		case 3:
 			r = m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
@@ -496,7 +417,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 	{
 		case 0:
 		case 1:
-			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
+			m_pcb_digit[offset] = bitswap<7>(~data , 0, 1, 2, 3, 4, 5, 6);
 			break;
 
 		case 4:
@@ -520,6 +441,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			m_konppc->set_cgboard_id((data >> 4) & 3);
+			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
 
 		default:
@@ -527,148 +449,6 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 	}
 }
 
-
-void nwktr_state::lanc2_init()
-{
-	m_fpga_uploaded = 0;
-	m_lanc2_ram_r = 0;
-	m_lanc2_ram_w = 0;
-	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
-}
-
-uint32_t nwktr_state::lanc1_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0x40/4:
-		{
-			uint32_t r = 0;
-
-			r |= (m_fpga_uploaded) ? (1 << 6) : 0;
-			r |= 1 << 5;
-
-			return (r) << 24;
-		}
-
-		default:
-		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-			return 0xffffffff;
-		}
-	}
-}
-
-void nwktr_state::lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-}
-
-uint32_t nwktr_state::lanc2_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= m_lanc2_ram[m_lanc2_ram_r & 0x7fff];
-			m_lanc2_ram_r++;
-		}
-		else
-		{
-			r |= 0xffffff00;
-		}
-	}
-
-	if (offset == 4)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= 0x00000000;
-		}
-	}
-
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-
-	return r;
-}
-
-void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			uint8_t value = data >> 24;
-
-			value = ((value >> 7) & 0x01) |
-					((value >> 5) & 0x02) |
-					((value >> 3) & 0x04) |
-					((value >> 1) & 0x08) |
-					((value << 1) & 0x10) |
-					((value << 3) & 0x20) |
-					((value << 5) & 0x40) |
-					((value << 7) & 0x80);
-
-			m_fpga_uploaded = 1;
-			m_lanc2_reg[0] = (uint8_t)(data >> 24);
-
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, m_maincpu->pc());
-		}
-		else if (ACCESSING_BITS_8_15)
-		{
-			m_lanc2_ram_r = 0;
-			m_lanc2_ram_w = 0;
-			m_lanc2_reg[1] = (uint8_t)(data >> 8);
-		}
-		else if (ACCESSING_BITS_16_23)
-		{
-			if (m_lanc2_reg[0] != 0)
-			{
-				m_lanc2_ram[2] = (data >> 20) & 0xf;
-				m_lanc2_ram[3] = 0;
-			}
-			m_lanc2_reg[2] = (uint8_t)(data >> 16);
-		}
-		else if (ACCESSING_BITS_0_7)
-		{
-			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
-			m_lanc2_ram_w++;
-		}
-		else
-		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-		}
-	}
-	if (offset == 4)
-	{
-		// TODO: The data below would normally be present on the serialflash at 2G.
-
-		if (strcmp(machine().system().name, "thrilld") == 0 ||
-			strcmp(machine().system().name, "thrilldb") == 0 ||
-			strcmp(machine().system().name, "thrilldbe") == 0)
-		{
-			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;      // G*71
-			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;      // 3
-			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;      // --**
-			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;      // *
-
-			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;      // GC71
-			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;      // 3
-			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;      //   JA
-			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;      // A
-		}
-		else if (strcmp(machine().system().name, "racingj2") == 0)
-		{
-			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;      // GE88
-			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;      // 8 00
-			m_work_ram[(0x3ffc80/4) + 2] = 0x39374541;      // 97EA
-			m_work_ram[(0x3ffc80/4) + 3] = 0x410058da;      // A
-		}
-	}
-
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-}
 
 /*****************************************************************************/
 
@@ -714,24 +494,28 @@ void nwktr_state::machine_start()
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }
 
-void nwktr_state::nwktr_map(address_map &map)
+void nwktr_state::ppc_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram().share("work_ram"); // Work RAM
-	map(0x74000000, 0x740000ff).rw(FUNC(nwktr_state::nwktr_k001604_reg_r), FUNC(nwktr_state::nwktr_k001604_reg_w));
+	map(0x00000000, 0x003fffff).ram().share(m_work_ram);
+	map(0x74000000, 0x7407ffff).view(m_cg_view);
+	m_cg_view[0](0x74000000, 0x740000ff).rw(m_k001604[0], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
+	m_cg_view[1](0x74000000, 0x740000ff).rw(m_k001604[1], FUNC(k001604_device::reg_r), FUNC(k001604_device::reg_w));
 	map(0x74010000, 0x7401ffff).ram().w(FUNC(nwktr_state::paletteram32_w)).share("paletteram");
-	map(0x74020000, 0x7403ffff).rw(FUNC(nwktr_state::nwktr_k001604_tile_r), FUNC(nwktr_state::nwktr_k001604_tile_w));
-	map(0x74040000, 0x7407ffff).rw(FUNC(nwktr_state::nwktr_k001604_char_r), FUNC(nwktr_state::nwktr_k001604_char_w));
+	m_cg_view[0](0x74020000, 0x7403ffff).rw(m_k001604[0], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[0](0x74040000, 0x7407ffff).rw(m_k001604[0], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
+	m_cg_view[1](0x74020000, 0x7403ffff).rw(m_k001604[1], FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
+	m_cg_view[1](0x74040000, 0x7407ffff).rw(m_k001604[1], FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7d000000, 0x7d00ffff).r(FUNC(nwktr_state::sysreg_r));
 	map(0x7d010000, 0x7d01ffff).w(FUNC(nwktr_state::sysreg_w));
 	map(0x7d020000, 0x7d021fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)); // M48T58Y RTC/NVRAM
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
-	map(0x7d040000, 0x7d04ffff).rw(FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
-	map(0x7d050000, 0x7d05ffff).rw(FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
-	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
-	map(0x7f000000, 0x7f1fffff).rom().region("user1", 0);
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
+	map(0x7d040000, 0x7d04ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc1_r), FUNC(konami_gn676_lan_device::lanc1_w));
+	map(0x7d050000, 0x7d05ffff).rw("gn676_lan", FUNC(konami_gn676_lan_device::lanc2_r), FUNC(konami_gn676_lan_device::lanc2_w));
+	map(0x7e000000, 0x7e7fffff).rom().region("datarom", 0);
+	map(0x7f000000, 0x7f1fffff).rom().region("prgrom", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
 }
 
 /*****************************************************************************/
@@ -748,47 +532,26 @@ void nwktr_state::sound_memmap(address_map &map)
 
 /*****************************************************************************/
 
-
-uint32_t nwktr_state::dsp_dataram0_r(offs_t offset)
-{
-	return m_sharc0_dataram[offset] & 0xffff;
-}
-
-void nwktr_state::dsp_dataram0_w(offs_t offset, uint32_t data)
-{
-	m_sharc0_dataram[offset] = data;
-}
-
-uint32_t nwktr_state::dsp_dataram1_r(offs_t offset)
-{
-	return m_sharc1_dataram[offset] & 0xffff;
-}
-
-void nwktr_state::dsp_dataram1_w(offs_t offset, uint32_t data)
-{
-	m_sharc1_dataram[offset] = data;
-}
-
 void nwktr_state::sharc0_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(FUNC(nwktr_state::dsp_dataram0_r), FUNC(nwktr_state::dsp_dataram0_w));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
-	map(0x3600000, 0x37fffff).bankr("bank5");
+	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
 }
 
 void nwktr_state::sharc1_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).rw(FUNC(nwktr_state::dsp_dataram1_r), FUNC(nwktr_state::dsp_dataram1_w));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
 	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
-	map(0x3600000, 0x37fffff).bankr("bank6");
+	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
 }
 
 /*****************************************************************************/
@@ -862,11 +625,11 @@ double nwktr_state::adc12138_input_callback(uint8_t input)
 	int value = 0;
 	switch (input)
 	{
-		case 0: value = m_analog1->read(); break;
-		case 1: value = m_analog2->read(); break;
-		case 2: value = m_analog3->read(); break;
-		case 3: value = m_analog4->read(); break;
-		case 4: value = m_analog5->read(); break;
+		case 0: value = m_analog[0]->read(); break;
+		case 1: value = m_analog[1]->read(); break;
+		case 2: value = m_analog[2]->read(); break;
+		case 3: value = m_analog[3]->read(); break;
+		case 4: value = m_analog[4]->read(); break;
 	}
 
 	return (double)(value) / 4095.0;
@@ -874,26 +637,26 @@ double nwktr_state::adc12138_input_callback(uint8_t input)
 
 void nwktr_state::machine_reset()
 {
-	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void nwktr_state::nwktr(machine_config &config)
 {
 	// basic machine hardware
 	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2); // PowerPC 403GA 32MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::nwktr_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::ppc_map);
 
 	M68000(config, m_audiocpu, XTAL(64'000'000)/4); // 16MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nwktr_state::sound_memmap);
 
-	ADSP21062(config, m_dsp, XTAL(36'000'000));
-	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp->set_addrmap(AS_DATA, &nwktr_state::sharc0_map);
+	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
+	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp[0]->set_addrmap(AS_DATA, &nwktr_state::sharc0_map);
 
-	ADSP21062(config, m_dsp2, XTAL(36'000'000));
-	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp2->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
+	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
+	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp[1]->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
 
 	config.set_maximum_quantum(attotime::from_hz(9000));
 
@@ -902,49 +665,49 @@ void nwktr_state::nwktr(machine_config &config)
 	ADC12138(config, m_adc12138, 0);
 	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	K033906(config, "k033906_1", 0, "voodoo0");
-	K033906(config, "k033906_2", 0, "voodoo1");
+	K033906(config, "k033906_1", 0, m_voodoo[0]);
+	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp);
-	m_voodoo[0]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_0));
+	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp);
-	m_voodoo[1]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_1));
+	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	lscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
-	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
+	lscreen.set_screen_update(FUNC(nwktr_state::screen_update<0>));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for unused/debug screen from slave CG board
 	// resolution currently unknown, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	rscreen.set_raw(XTAL(64'000'000) / 4, 644, 44, 44 + 512, 450, 31, 31 + 400);
-	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
+	rscreen.set_screen_update(FUNC(nwktr_state::screen_update<1>));
 
 	PALETTE(config, m_palette).set_entries(65536);
 
-	K001604(config, m_k001604_1, 0);
-	m_k001604_1->set_layer_size(0);
-	m_k001604_1->set_roz_size(1);
-	m_k001604_1->set_txt_mem_offset(0);  // correct?
-	m_k001604_1->set_roz_mem_offset(0);  // correct?
-	m_k001604_1->set_palette(m_palette);
+	K001604(config, m_k001604[0], 0);
+	m_k001604[0]->set_layer_size(0);
+	m_k001604[0]->set_roz_size(1);
+	m_k001604[0]->set_txt_mem_offset(0);  // correct?
+	m_k001604[0]->set_roz_mem_offset(0);  // correct?
+	m_k001604[0]->set_palette(m_palette);
 
-	K001604(config, m_k001604_2, 0);
-	m_k001604_2->set_layer_size(0);
-	m_k001604_2->set_roz_size(1);
-	m_k001604_2->set_txt_mem_offset(0);  // correct?
-	m_k001604_2->set_roz_mem_offset(0);  // correct?
-	m_k001604_2->set_palette(m_palette);
+	K001604(config, m_k001604[1], 0);
+	m_k001604[1]->set_layer_size(0);
+	m_k001604[1]->set_roz_size(1);
+	m_k001604[1]->set_txt_mem_offset(0);  // correct?
+	m_k001604[1]->set_roz_mem_offset(0);  // correct?
+	m_k001604[1]->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -959,58 +722,48 @@ void nwktr_state::nwktr(machine_config &config)
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_num_boards(2);
 	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
+
+	KONAMI_GN676_LAN(config, "gn676_lan", 0, m_work_ram);
 }
 
 void nwktr_state::thrilld(machine_config &config)
 {
 	nwktr(config);
 
-	m_k001604_1->set_layer_size(1);
+	m_k001604[0]->set_layer_size(1);
 
-	m_k001604_2->set_layer_size(1);
+	m_k001604[1]->set_layer_size(1);
 }
 
 /*****************************************************************************/
 
-void nwktr_state::init_nwktr()
-{
-	m_sharc0_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
-	m_sharc1_dataram = std::make_unique<uint32_t[]>(0x100000 / 4);
-
-	lanc2_init();
-}
-
 void nwktr_state::init_racingj()
 {
-	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user6")->base()); // for some reason, additional CG roms are located on the slave CG board...
-
-	init_nwktr();
+	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
+	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("slave_cgboard")->base()); // for some reason, additional CG roms are located on the slave CG board...
 }
 
 void nwktr_state::init_thrilld()
 {
-	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
-	m_konppc->set_cgboard_texture_bank(0, "bank6", memregion("user5")->base()); // ...while this is not the case for thrilld
-
-	init_nwktr();
+	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
+	m_konppc->set_cgboard_texture_bank(0, "slave_cgboard_bank", memregion("master_cgboard")->base()); // ...while this is not the case for thrilld
 }
 
 /*****************************************************************************/
 
 ROM_START(racingj)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("676gnc01.27p", 0x000000, 0x200000, CRC(690346b5) SHA1(157ab6788382ef4f5a8772f08819f54d0856fcc8) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP("676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP("676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
-	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "676a13.8x",  0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
 	ROM_LOAD32_WORD_SWAP( "676a14.16x", 0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
@@ -1026,19 +779,19 @@ ROM_START(racingj)
 ROM_END
 
 ROM_START(racingj2)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP( "676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1057,19 +810,19 @@ ROM_START(racingj2)
 ROM_END
 
 ROM_START(racingj2j)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP( "676a04.16t", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f) )
 	ROM_LOAD32_WORD_SWAP( "676a05.14t", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5) )
 	ROM_LOAD32_WORD_SWAP( "888a06.12t", 0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // Master CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // Master CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
-	ROM_REGION32_BE(0x800000, "user6", 0) // Slave CG Board texture roms
+	ROM_REGION32_BE(0x800000, "slave_cgboard", 0) // Slave CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "888a13.8x",  0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
 	ROM_LOAD32_WORD_SWAP( "888a14.16x", 0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
@@ -1088,14 +841,14 @@ ROM_START(racingj2j)
 ROM_END
 
 ROM_START(thrilld)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1114,14 +867,14 @@ ROM_START(thrilld)
 ROM_END
 
 ROM_START(thrilldb)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",  0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1140,14 +893,14 @@ ROM_START(thrilldb)
 ROM_END
 
 ROM_START(thrilldbe)
-	ROM_REGION32_BE(0x200000, "user1", 0) // PowerPC program roms
+	ROM_REGION32_BE(0x200000, "prgrom", 0) // PowerPC program roms
 	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
 
-	ROM_REGION32_BE(0x800000, "user2", 0) // Data roms
+	ROM_REGION32_BE(0x800000, "datarom", 0) // Data roms
 	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a) )
 	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69) )
 
-	ROM_REGION32_BE(0x800000, "user5", 0) // CG Board texture roms
+	ROM_REGION32_BE(0x800000, "master_cgboard", 0) // CG Board texture roms
 	ROM_LOAD32_WORD_SWAP( "713a13.8x",  0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
 	ROM_LOAD32_WORD_SWAP( "713a14.16x", 0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
@@ -1164,6 +917,9 @@ ROM_START(thrilldbe)
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*****************************************************************************/
 

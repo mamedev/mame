@@ -23,10 +23,12 @@ Hardware notes:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -85,8 +87,6 @@ void scc_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
-
-// TTL
 
 void scc_state::control_w(offs_t offset, u8 data)
 {

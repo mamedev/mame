@@ -23,9 +23,13 @@
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+
 #include "cpu/unsp/unsp.h"
 #include "machine/spg110.h"
 #include "screen.h"
+#include "softlist.h"
 #include "speaker.h"
 
 class spg110_game_state : public driver_device
@@ -49,6 +53,28 @@ protected:
 	virtual void mem_map(address_map &map);
 };
 
+class spg110_sstarkar_game_state : public spg110_game_state
+{
+public:
+	spg110_sstarkar_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg110_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cartrom(*this, "cartrom")
+	{ }
+public:
+	void sstarkar(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<generic_slot_device> m_cart;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	optional_memory_bank m_cartrom;
+
+	void mem_map_cart(address_map &map);
+};
+
 /*************************
 *    Machine Hardware    *
 *************************/
@@ -57,6 +83,12 @@ void spg110_game_state::mem_map(address_map &map)
 {
 	map(0x004000, 0x3fffff).rom().region("maincpu", 0x8000);
 }
+
+void spg110_sstarkar_game_state::mem_map_cart(address_map &map)
+{
+	map(0x004000, 0x0fffff).bankr("cartrom");
+}
+
 
 static INPUT_PORTS_START( jak_capb )
 	PORT_START("PA")
@@ -515,6 +547,43 @@ void spg110_game_state::spg110_spdmo(machine_config& config)
 	m_maincpu->set_video_irq_spidman(true);
 }
 
+
+void spg110_sstarkar_game_state::machine_start()
+{
+	// if there's a cart, override the standard mapping
+	if (m_cart && m_cart->exists())
+	{
+		m_cartrom->configure_entries(0, 1, m_cart->get_rom_base()+0x8000, 0x200000-0x8000);
+		m_cartrom->set_entry(0);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(spg110_sstarkar_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
+void spg110_sstarkar_game_state::sstarkar(machine_config &config)
+{
+	spg110_game_state::spg110_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg110_sstarkar_game_state::mem_map_cart);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "singingstarkaraoke_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(spg110_sstarkar_game_state::cart_load));
+	m_cart->set_must_be_loaded(true);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("singingstarkaraoke_cart");
+}
+
+
 ROM_START( jak_capb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "classicarcadepinball.bin", 0x000000, 0x200000, CRC(b643dab0) SHA1(f57d546758ba442e28b5f0f48b3819b2fc2eb7f7) )
@@ -552,10 +621,9 @@ ROM_START( conyfght )
 	// MCU (I/O?) read protected TODO: add NO_DUMP
 ROM_END
 
-// TODO: move this to a Softlist once Vol 1 is dumped
-ROM_START( karaokd2 )
+ROM_START( sstarkar )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "karaokidssongs2.bin", 0x000000, 0x200000, CRC(7a1f455c) SHA1(13bb5949629df64f5940923b224d930a4adf23ff) )
+	// no internal BIOS
 ROM_END
 
 
@@ -575,4 +643,5 @@ CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?)
 CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / Big Ben",      "TV Virtual Fighter / Free Fight Kung Fu (Conny / Big Ben)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, karaokd2,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Imaginarium / ItsMagical",      "Karao Kids Songs 2 (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
+// The unit contains no BIOS ROM, was sold by Taikee as Singing Star Karaoke, but also by Imaginarium / ItsMagical in Spain as Karao Kids.  Cartridges are compatible.
+CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium

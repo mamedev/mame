@@ -42,6 +42,7 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 		item_append(s, 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
 	}
 	item_append(_("Other Controls"), 0, (void *)uintptr_t(IPG_OTHER + 1));
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_groups::handle()
@@ -113,6 +114,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 
 	// populate the menu in a standard fashion
 	populate_sorted(customtop, custombottom);
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_general::update_input(input_item_data &seqchangeditem)
@@ -219,7 +221,12 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 	}
 
 	// populate the menu in a standard fashion
-	populate_sorted(customtop, custombottom);
+	if (!data.empty())
+		populate_sorted(customtop, custombottom);
+	else
+		item_append(_("This machine has no input map."), FLAG_DISABLE, nullptr);
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_specific::update_input(input_item_data &seqchangeditem)

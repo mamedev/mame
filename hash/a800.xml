@@ -1281,7 +1281,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="bbsba">
+	<software name="bbsba" cloneof="bbsb">
 		<description>Bounty Bob Strikes Back! (Alt)</description>
 			<!-- Identical to the image contained in Bill Hogue's emulator. http://www.bigfivesoftware.com/Emulator/emulator.htm. -->
 		<year>1984</year>

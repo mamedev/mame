@@ -74,6 +74,12 @@ requested. The new Rockwell version (R65NC22) is only labeled with Apple
 part number 338-6523 (later Macs use a PLCC version which Apple numbered
 338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
+Raster timings from the BBU ERS:
+There are 512 visible pixels (32.68 microseconds) per scanline plus 192 pixels
+(12.25 microseconds) of hblank.  Sound/PWM are fetched at the end of hblank.
+Vertically there are 28 lines of vblank followed by 342 displayed lines.
+Scanline 0 is the start of vblank.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -82,24 +88,22 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_bus.h"
-#include "bus/nscsi/hd.h"
-#include "bus/nscsi/cd.h"
-#include "machine/ncr5380.h"
+#include "machine/rescap.h"
+#include "bus/nscsi/devices.h"
 #include "machine/ram.h"
 #include "machine/applefdintf.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
+#include "machine/macscsi.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -119,8 +123,8 @@ static constexpr int MAC_H_TOTAL = 704;       // (512+192)
 static constexpr int MAC_V_TOTAL = 370;       // (342+28)
 
 // sound buffer locations
-static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1);
-static constexpr int MAC_ALT_SND_BUF_OFFSET  = (0x5F00>>1);
+static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1); // (end of memory minus 0x0300; for the typical macplus case, this is 0x3ffd00-0x3fffe3 in 16 bit blocks)
+static constexpr int MAC_ALT_SND_BUF_OFFSET  = (0x5F00>>1); // (end of memory minus 0x5F00)
 
 class mac128_state : public driver_device
 {
@@ -131,8 +135,8 @@ public:
 		m_via(*this, "via6522_0"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
-		m_ncr5380(*this, "ncr5380"),
 		m_scsibus(*this, "scsibus"),
+		m_scsihelp(*this, "scsihelp"),
 		m_ncr5380n(*this, "scsibus:7:ncr5380n"),
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -140,6 +144,8 @@ public:
 		m_rtc(*this,"rtc"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "macdac"),
+		m_filter(*this, "dacfilter"),
+		m_volfilter(*this, "volfilter"),
 		m_scc(*this, "scc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
@@ -165,15 +171,17 @@ private:
 	required_device<via6522_device> m_via;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
-	optional_device<ncr5380_device> m_ncr5380;
 	optional_device<nscsi_bus_device> m_scsibus;
+	optional_device<mac_scsi_helper_device> m_scsihelp;
 	optional_device<ncr5380n_device> m_ncr5380n;
 	required_device<applefdintf_device> m_iwm;
 	required_device_array<floppy_connector, 2> m_floppy;
 	optional_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
-	required_device<dac_8bit_pwm_device> m_dac;
+	required_device<dac_12bit_r2r_device> m_dac; // actually 1-bit pwm w/8-bit counters
+	required_device<filter_biquad_device> m_filter;
+	required_device<filter_biquad_device> m_volfilter;
 	required_device<z80scc_device> m_scc;
 
 	optional_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -206,6 +214,7 @@ private:
 	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_berr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
@@ -237,6 +246,7 @@ private:
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
 	void devsel_se_w(uint8_t devsel);
+	void snd_push(uint8_t data);
 	void pwm_push(uint8_t data);
 
 	uint32_t m_overlay;
@@ -422,19 +432,31 @@ void mac128_state::vblank_irq()
 
 void mac128_state::update_volume()
 {
-	if (!m_snd_enable)
+	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
+	 * -> CD4016 gate A pulling a 5.1V zener-regulated signal to ground if input is high ->
+	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF
+	 *  FC of 4939.3903Hz, Q of 0.7293, Gain of 1.0) ->
+	 * ->\-> r13 (470k) ------------------------>|
+	 *   |-> r12 (470k) -> CD4016 D (pa0 != 0) ->|
+	 *   |-> r17 (150k) -> CD4016 C (pa1 != 0) ->|
+	 *   |-> r16 (68k)  -> CD4016 B (pa2 != 0) ->\-> DC blocking caps ->
+	 * -> Push-Pull +12v/-12vb amplifier w/feedback (technically a 1st order multifeedback lowpass filter?) ->
+	 * -> Audio Jack -> Speaker
+	 */
+	const double res_ohm_tbl[8] =
 	{
-		// ls161 clear input
-		m_dac->set_output_gain(ALL_OUTPUTS, 0);
-	}
-	else
-	{
-		// sound -> r13 (470k)
-		// sound -> r12 (470k) -> 4016 (pa0 != 0)
-		// sound -> r17 (150k) -> 4016 (pa1 != 0)
-		// sound -> r16 (68k)  -> 4016 (pa2 != 0)
-		m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
-	}
+		//       R13                  R16                 R17                  R12
+		(1.0 / ( (1.0 / RES_K(470))                                                               ) ),
+		(1.0 / ( (1.0 / RES_K(470))                                          + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                                           ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                      + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) )
+	};
+
+	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
 }
 
 WRITE_LINE_MEMBER(mac128_state::vblank_w)
@@ -444,25 +466,33 @@ WRITE_LINE_MEMBER(mac128_state::vblank_w)
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
-	int scanline = param;
-	uint16_t *mac_snd_buf_ptr;
+	const int scanline = param;
 
-	if (scanline == MAC_V_VIS)
+	if (scanline == 0)
 	{
 		vblank_irq();
 	}
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (scanline < MAC_V_VIS)
+	if (scanline >= 28)
 	{
 		m_via->write_pb6(1);
-		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
 	}
+
+	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
 
 	if ((!(scanline % 10)) && (!m_macadb))
 	{
 		mouse_callback();
 	}
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	const int scanline = m_screen->vpos();
+	uint16_t *mac_snd_buf_ptr;
 
 	if (m_main_buffer)
 	{
@@ -473,14 +503,38 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
 	}
 
-	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+	// The sound "DAC" is a 1-bit PWM output driven by two 4-bit LS161 counters
+	// chained together. These counters are reset at the end of HBLANK, and
+	// count up once every C7M clock (2 pixels per clock), with the TC (SND)
+	// output connected (through two inverters) to the speaker filter. The
+	// counters count a max of 256 C7M clocks before reaching terminal count
+	// and halting themselves, and there are 704 / 2 = 352 C7M clocks per
+	// scanline, so this means the TC (SND) output over time is an asymmetric
+	// PWM squarewave, low from between 0 (if the load value is 0xff) and
+	// 255 (if the load value is 0x00) of the 352 C7M clocks per scanline,
+	// and high the remainder of the time. This has a significant DC offset
+	// due to the remaining clocks where the TC signal remains high.
+	// The counters can be forced to reset and be held at a value of 0x00 if
+	// the VIA PB7(/SNDRES) pin is held active(low), and this conversely will
+	// cause the TC (SND) counter pin to output a constant low level for as
+	// long as /SNDRES is held active.
+	// Some games such as Lode Runner use the sound manager "swMode" function,
+	// which uses the /SNDRES pin to alternately force the sound output low
+	// vs running normally in a square wave. During this time, the software is
+	// leaving the actual sound buffer FIFO values at a constant 0x80.
+	// So unless we force the 1-bit PWM to have a value of "always low" while
+	// PB7 is low, we get almost no sound in Lode Runner, and probably other
+	// games/software as well.
+	snd_push(mac_snd_buf_ptr[scanline] >> 8);
 	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
-	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+
+	m_via->write_pb6(0);
 }
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+void mac128_state::snd_push(uint8_t data)
 {
-	m_via->write_pb6(0);
+	double frac = (m_snd_enable ? (((double)(~data)) / (MAC_H_TOTAL / 2.0)) : 1.0);
+	m_dac->write((uint16_t)(frac * 4095.0)); // using a fraction of a 12 bit value, so we can handle inputs ranging between 0/352 and 352/352 without losing resolution.
 }
 
 void mac128_state::pwm_push(uint8_t data)
@@ -562,6 +616,11 @@ WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
 	m_scsi_drq = state;
 }
 
+void mac128_state::scsi_berr_w(uint8_t data)
+{
+	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+}
+
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
@@ -607,12 +666,7 @@ uint16_t mac128_state::macse_scsi_r(offs_t offset, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
-	if ((reg == 6) && (offset == 0x130))
-	{
-		reg = R5380_CURDATA_DTACK;
-	}
-
-	return m_ncr5380->ncr5380_read_reg(reg)<<8;
+	return m_scsihelp->read_wrapper(BIT(offset, 8), reg)<<8;
 }
 
 void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -621,12 +675,7 @@ void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
-
-	m_ncr5380->ncr5380_write_reg(reg, data);
+	m_scsihelp->write_wrapper(BIT(offset, 8), reg, data>>8);
 }
 
 void mac128_state::scc_mouse_irq(int x, int y)
@@ -1068,12 +1117,6 @@ void mac128_state::macse_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void mac_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-}
-
 static void mac_pds_cards(device_slot_interface &device)
 {
 	device.option_add("hyperdrive", PDS_HYPERDRIVE);  // GCC HyperDrive ST-506 interface
@@ -1097,7 +1140,11 @@ void mac128_state::mac512ke(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
+	FILTER_BIQUAD(config, m_volfilter).opamp_mfb_lowpass_setup(RES_K(39.020), RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
+	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
+	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
+	DAC_12BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1172,7 +1219,7 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380n", NCR5380N).clock(24_MHz_XTAL).machine_config([this](device_t *device) {
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380n", NCR5380N).machine_config([this](device_t *device) {
 		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
@@ -1195,7 +1242,6 @@ void mac128_state::macse(machine_config &config)
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
-	config.device_remove("scsibus");
 
 	IWM(config.replace(), m_iwm, C7M*2);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
@@ -1204,13 +1250,19 @@ void mac128_state::macse(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380n, FUNC(ncr5380n_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380n, FUNC(ncr5380n_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380n, FUNC(ncr5380n_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380n, FUNC(ncr5380n_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
-	m_ncr5380->irq_callback().set(FUNC(mac128_state::scsi_irq_w));
+	subdevice<nscsi_connector>("scsibus:7")->set_option_machine_config("ncr5380n", [this](device_t *device) {
+		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
 	MACADB(config, m_macadb, C7M);
 	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
@@ -1251,6 +1303,12 @@ void mac128_state::macclasc(machine_config &config)
 
 	config.device_remove("pds");
 	config.device_remove("sepds");
+
+	NSCSI_CONNECTOR(config.replace(), "scsibus:7").option_set("ncr5380n", NCR53C80).machine_config([this](device_t *device) {
+		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 }
 
 static INPUT_PORTS_START( macplus )
@@ -1278,6 +1336,28 @@ ROM_START( mactw )
     ROM_REGION16_BE(0x100000, "bootrom", 0)
     ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
 ROM_END
+
+    // one twiggy mac (SN 1042) has the following sum16s on the 4x 16k eproms on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "H1 // A04A"
+    // U4 EPROM // 0 HI: "H0 // B6ED"
+    // U5 EPROM // 1 LOW: "Lo1 // 6C8C"
+    // U6 EPROM // 0 LOW: "Lo0 // F332"
+    // This version (Rom Version 4.4T?) was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
+    // The ROM has been marked as bad pending a redump or other verification of correctness.
+    ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
+    ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332
+    ROMX_LOAD("h1__a04a.u3",  0x08000, 0x04000, CRC(fa9ae0d1) SHA1(e89826325caf053aad2c09d134c8c7483d442821), ROM_SKIP(1) ) // SUM16: A04A
+    ROMX_LOAD("lo1__6c8c.u5", 0x08001, 0x04000, CRC(ca78a04e) SHA1(724d7d7b585c375cd5797e4334d6ab6267e798dc), ROM_SKIP(1) ) // SUM16: 6C8C
+
+
+    // one twiggy mac (SN 1072, upc MA1M830241240) has the following sum16s on the 4x 16k EPROMs on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "Rom 2.45 // H 1 // 1D79"
+    // U4 EPROM // 0 HI: "ROM 2.45 // High0 // D4DF"
+    // U5 EPROM // 1 LOW: "ROM 2.45 // LOW1 // 977F"
+    // U6 EPROM // 0 LOW: "ROM 2.45 // LOW0 // C813"
+    // This Twiggy mac has a prototype IWM labeled "<signetics> 8248 // XXX-X299 (C) // APPLE 82"
+    // The ROM of this twiggy mac has been tentatively dated between March and April 1983, possibly March 11, 1983.
+    // See https://macgui.com/news/article.php?t=517
 */
 
 ROM_START( mac128k )
@@ -1303,6 +1383,15 @@ ROM_START( mac128k )
 	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
 	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
+
 ROM_END
 
 ROM_START( mac512k )
@@ -1310,11 +1399,20 @@ ROM_START( mac512k )
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
 	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( unitron )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
+	// pals are different from mac 128/512/512ke
 ROM_END
 
 ROM_START( utrn1024 )
@@ -1322,6 +1420,7 @@ ROM_START( utrn1024 )
 	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM: 4d1eeee1
 	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) ) // not correct label
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) ) // not correct label
+	// unknown pals
 ROM_END
 
 ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
@@ -1372,6 +1471,14 @@ ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 ma
 	        GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
 	    'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( macplus ) // same notes as above apply here as well
@@ -1396,16 +1503,27 @@ ROM_START( macplus ) // same notes as above apply here as well
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
 	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(4) )
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U11E 342-0517-A  PAL16??  ASG
+	// @U2D  341-0514-A  PAL16L8  BMU1
+	// @U3D  342-0516-A  PAL16R6  TSG
+	// @U3E  342-0519-A  PAL20??  CAS
+	// @U2E  342-0520-A  PAL20R4A BMU2
+	// @U1E  342-0515-A  PAL16R8  LAG
+	// @U1D  342-0522-A  VP16RP8MPC (PAL16R4A on schem) TSM
 ROM_END
 
 ROM_START( macse )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macsefd )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macclasc )

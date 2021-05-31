@@ -18,6 +18,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="2ndserial072" cloneof="2ndserial">
+		<description>2nd Serial 0.72</description>
+		<year>2000</year>
+		<publisher>Sprow</publisher>
+		<info name="author" value="Robert Sprowson"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="2ndSerial-0.72.rom" size="8192" crc="dd6d9cac" sha1="adeee9523585cdf59fc13f8c1437b488c3d170ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2ndserial">
+		<description>2nd Serial 0.74</description>
+		<year>2000</year>
+		<publisher>Sprow</publisher>
+		<info name="author" value="Robert Sprowson"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="2ndSerial-0.74.rom" size="8192" crc="e58cdb76" sha1="9ebbe845734d77ebf1730ea622ce2db43f18b1c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="65c02asm">
 		<description>65C02 Assembler 1.60</description>
 		<year>1987</year>
@@ -26,6 +50,30 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="65C02Assembler-1.60.rom" size="16384" crc="2d0da038" sha1="faf4eefbbe6ae60ea00adb878a48de4d149beb41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="65c02dev">
+		<description>Mijas 65(C)02 Development System 4.1</description>
+		<year>1987</year>
+		<publisher>Mijas Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="part_id" value="RELASM v4.1" />
+			<dataarea name="rom" size="16384">
+				<rom name="RELASM_65C02_Development_System-4.1.rom" size="16384" crc="331a90f3" sha1="0315efb3ed5eab3843e9b825cca137fdd2fa975d"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<feature name="part_id" value="ROMBUG v3.32" />
+			<dataarea name="rom" size="16384">
+				<rom name="ROMBUG_65C02_Debug-3.32.rom" size="16384" crc="7997b673" sha1="7046ad652f1c4507d150812a6a8c04c554be30bb"/>
+			</dataarea>
+		</part>
+		<part name="rom3" interface="bbc_rom">
+			<feature name="part_id" value="CCLIB v2.0" />
+			<dataarea name="rom" size="16384">
+				<rom name="CClib-2.0.rom" size="16384" crc="79a733cc" sha1="5a2f00e681bdc5c85c95abba9a022e857e320fea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -514,6 +562,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="apb">
+		<description>Advanced Printer Buffer 1.01</description>
+		<year>1986</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="rom" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="AdvancedPrinterBuffer-1.01.rom" size="8192" crc="a323c1c4" sha1="a74efad7befba46b7f0b735964722cc7a04d876d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arm100" cloneof="arm">
 		<description>Advanced ROM Manager 1.00</description>
 		<year>1986</year>
@@ -669,7 +728,7 @@ license:CC0
 	</software>
 
 	<software name="adeplus">
-		<description>ADE+</description>
+		<description>ADE+ 1.0</description>
 		<year>1986</year>
 		<publisher>System Software</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -680,6 +739,27 @@ license:CC0
 		<part name="rom2" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ADE6500-1.0.rom" size="16384" crc="946f793d" sha1="d8653a9d5dedb6651514939941a82bd8927b03cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adeplus093" cloneof="adeplus">
+		<description>ADE+ 0.93 (pre-release)</description>
+		<year>1986</year>
+		<publisher>System Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ADEplus-0.93.rom" size="16384" crc="30e16ac1" sha1="eda8a21bdb7c588a531fda80dc376f3b3f6f07e8"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ADE6500-0.93.rom" size="16384" crc="4c3e6409" sha1="65e0e31e83211fb7721408b66d98222e5b2e4bf1"/>
+			</dataarea>
+		</part>
+		<part name="rom3" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ADEBUG-0.93.rom" size="16384" crc="ae95a2ad" sha1="db6dd7445f5570ecdb037e0cf24d8946c2b29f50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -795,8 +875,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="adfsutil107" cloneof="adfsutil">
+		<description>ADFS Utilities 1.07</description>
+		<year>1988</year>
+		<publisher>Pineapple Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ADFSUtilities-1.07.rom" size="16384" crc="653decdc" sha1="00be15c56d90035281651d7b9c922293c866ead6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adfsutil">
-		<description>ADFS Utilities</description>
+		<description>ADFS Utilities 1.10</description>
 		<year>1988</year>
 		<publisher>Pineapple Software</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -879,6 +970,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="AIDSII-2.16.rom" size="8192" crc="35b317ea" sha1="8adcfa96f32d74fc9991de836b122c88bab727bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alantool">
+		<description>Alan's Tools</description>
+		<year>1986</year>
+		<publisher>UserSoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AlansTools.rom" size="16384" crc="7c79c5a4" sha1="e33acde86d62c5889a52883749df3d6c884ab30f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1111,6 +1213,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="amt1">
+		<description>AMT-1 Terminal 1.04</description>
+		<year>1983</year>
+		<publisher>ICS Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="AMT1_Terminal-1.04.rom" size="16384" crc="d01faaee" sha1="ceaa27fa4a44a30332caf7cd818f246f0b9cc59e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amtor2">
 		<description>AMTOR MkII 3.05</description>
 		<year>1986</year>
@@ -1146,7 +1259,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="amwfsb">
+	<software name="amwfs634b" cloneof="amwfsb">
 		<description>Amcom WFS 6.34B</description>
 		<year>1986</year>
 		<publisher>Amcom</publisher>
@@ -1154,6 +1267,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Amcom-WFS-6.34B.rom" size="16384" crc="658fbc8a" sha1="83a8948db417a4d3c8a532941237f381208de72a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amwfsb">
+		<description>Amcom WFS 6.56B</description>
+		<year>1986</year>
+		<publisher>Amcom</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Amcom-WFS-6.56B.rom" size="16384" crc="e2c68e30" sha1="c59fd45ca1acba574a27d49294a58f7bc2b9972d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1379,9 +1504,9 @@ license:CC0
 	</software>
 
 	<software name="arabic">
-		<description>Arabic ROM</description>
-		<year>1984</year>
-		<publisher>Watford Electronics</publisher>
+		<description>Alnoor Arabic ROM</description>
+		<year>1985</year>
+		<publisher>A.L.K.</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Arabic-1.00.rom" size="16384" crc="94895cd3" sha1="21988704ea88e95404be046b6f6860c3186f020f"/>
@@ -1528,11 +1653,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="asrom">
+		<description>ASROM 3.10</description>
+		<year>1985</year>
+		<publisher>Astonsoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="ASROM-3.10.rom" size="8192" crc="a2dfb093" sha1="56a82bce6fbfda7d9cd282e830aa033c1797947e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ats238" cloneof="ats">
 		<description>BBC Teletext 2.38</description>
 		<year>198?</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Acorn Teletext Adaptor"/>
+		<info name="usage" value="Requires Acorn Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BBCTeletext-2.38.rom" size="16384" crc="b14e0ac5" sha1="10684233152b9e9cbd56e5f6fa5d1ed6e65006d7"/>
@@ -1544,7 +1680,7 @@ license:CC0
 		<description>BBC Teletext 2.50</description>
 		<year>1986</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Acorn Teletext Adaptor"/>
+		<info name="usage" value="Requires Acorn Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BBCTeletext-2.50.rom" size="16384" crc="6a8fcada" sha1="d8a51e4b9bd6bafa826d1d76622cc5811ce9a0ad"/>
@@ -1556,7 +1692,7 @@ license:CC0
 		<description>ATS 2.58</description>
 		<year>1987</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Acorn Teletext Adaptor"/>
+		<info name="usage" value="Requires Acorn Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-2.58.rom" size="16384" crc="2eb236ac" sha1="11ee629ff22d45cdfa4ad5dd7c70cafbbf11a971"/>
@@ -1568,7 +1704,7 @@ license:CC0
 		<description>ATS 2.59 Morley</description>
 		<year>1987</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Morley Teletext Adaptor"/>
+		<info name="usage" value="Requires Morley Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-2.59-Morley.rom" size="16384" crc="b6a1a3f2" sha1="45658bd369a07c5df3d41636a8f84bdf741ce159"/>
@@ -1580,7 +1716,7 @@ license:CC0
 		<description>ATS 2.60 STL</description>
 		<year>1988</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Solidisk Teletext Adaptor"/>
+		<info name="usage" value="Requires Solidisk Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-2.60-STL.rom" size="16384" crc="c00995a7" sha1="d7742f78e77a677e92b8401b7a00efd6e0dc6731"/>
@@ -1592,7 +1728,7 @@ license:CC0
 		<description>ATS 3.0</description>
 		<year>1988</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Acorn Teletext Adaptor"/>
+		<info name="usage" value="Requires Acorn Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-3.0.rom" size="16384" crc="c9c521e8" sha1="2703dd20bc96d867f74940d7aa1fe84c8f4c6ecc"/>
@@ -1604,7 +1740,7 @@ license:CC0
 		<description>ATS 3.1 Morley</description>
 		<year>1989</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Morley Teletext Adaptor"/>
+		<info name="usage" value="Requires Morley Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-3.1-Morley.rom" size="16384" crc="d8cc1386" sha1="41a25d5ab5972e6acfecf9318aab239c6e0ff1bc"/>
@@ -1616,7 +1752,7 @@ license:CC0
 		<description>ATS 3.1</description>
 		<year>1989</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires Acorn Teletext Adaptor"/>
+		<info name="usage" value="Requires Acorn Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS-3.1.rom" size="16384" crc="b16c4147" sha1="6e206e2232e83ebfc25647e029de2cb83876dd25"/>
@@ -1628,7 +1764,7 @@ license:CC0
 		<description>ATS+ 1.00</description>
 		<year>1987</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires GIS Teletext Adaptor"/>
+		<info name="usage" value="Requires GIS Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS+-1.00.rom" size="16384" crc="490382ee" sha1="d6ea5ade7a34947a48577a49d389da8698ca8370"/>
@@ -1640,10 +1776,21 @@ license:CC0
 		<description>ATS+ 2.00</description>
 		<year>1989</year>
 		<publisher>BBC Soft</publisher>
-		<info name="usage" value="Requires GIS Teletext Adaptor"/>
+		<info name="usage" value="Requires GIS Teletext Adapter"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ATS+-2.00.rom" size="16384" crc="0da04674" sha1="8713b63a5d4a63586f4220d28d6821947b6d0aac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autosave">
+		<description>Autosave BASIC file</description>
+		<year>1986</year>
+		<publisher>Gordon Horsington</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Autosave BASIC-1.0.rom" size="16384" crc="20fecd2d" sha1="8ddcf6cde24546d48e17bd1b1b880e225d345576"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1712,6 +1859,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BCPL-7.0.rom" size="16384" crc="81c373b2" sha1="09ff6358ff4c58046f4531abe739a888898cb8d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beast">
+		<description>BEAST 1.7</description>
+		<year>1984</year>
+		<publisher>University of Nottingham</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BEAST-1.7.rom" size="8192" crc="03a3fe7e" sha1="4e4fc3128c42fb1322bd6ac56c2920bab0ea231c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2035,6 +2193,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="booster">
+		<description>Basic Booster</description>
+		<year>1989</year>
+		<publisher>Beebugsoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BasicBooster.rom" size="8192" crc="faff1bfa" sha1="223642652cbaa021c81edda6f70b9e7de6b06c15"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brom106" cloneof="brom">
 		<description>BROM 1.06</description>
 		<year>1984</year>
@@ -2236,13 +2405,26 @@ license:CC0
 
 	<software name="chall">
 		<description>Opus Challenger 1.03</description>
-		<year>198?</year>
+		<year>1987</year>
 		<publisher>Slogger</publisher>
 		<info name="usage" value="Requires Opus Challenger"/>
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="OpusChallenger-1.03.rom" size="16384" crc="98367cf4" sha1="eca3631aa420691f96b72bfdf2e9c2b613e1bf33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chadfs">
+		<description>Opus Challenger ADFS 2.00</description>
+		<year>1987</year>
+		<publisher>Slogger</publisher>
+		<info name="usage" value="Requires Opus Challenger"/>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="OpusChallengerADFS-2.00.rom" size="32768" crc="e922c19a" sha1="b9f5c749412528e4f8e9cda9f13e10f8405bb195"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2259,6 +2441,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="charset122" cloneof="charset">
+		<description>Character Sets 1.22</description>
+		<year>1990</year>
+		<publisher>J.G.Harston</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CharacterSets-1.22.rom" size="16384" crc="0ede3988" sha1="94c2e01d4716ccf2c75bf51fcdb29bdc60691d75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="charset">
+		<description>Character Sets 1.23</description>
+		<year>1990</year>
+		<publisher>J.G.Harston</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CharacterSets-1.23.rom" size="16384" crc="b2071a44" sha1="78576b9b72d3ac30314c38044455fee9ec49c629"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chauffeur">
 		<description>Chauffeur</description>
 		<year>1987</year>
@@ -2270,8 +2474,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cmsflex">
+		<description>CMS Flex 3.01</description>
+		<year>1984</year>
+		<publisher>CMS Soft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CMSFlex-3.01.rom" size="16384" crc="87c7b09f" sha1="7f2f8666298276713f6035f1dd12d1237cb8a81b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cmslink">
-		<description>CMS Link 2.00</description>
+		<description>CMS Link BBC -> Micro Module</description>
 		<year>1986</year>
 		<publisher>CMS Soft</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -2375,24 +2590,46 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="commsofte" cloneof="commsoft">
-		<description>CommSoft 8.6e</description>
+	<software name="commsoft21" cloneof="commsoft">
+		<description>CommSoft 8.6e C21</description>
 		<year>1985</year>
 		<publisher>SoftMachinery</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="CommSoft-8.6e.rom" size="16384" crc="4d1bc757" sha1="3c0a1e64db16e5626ce8f7fdb4de76b13fb88559"/>
+				<rom name="CommSoft-8.6e-C21.rom" size="16384" crc="4d1bc757" sha1="3c0a1e64db16e5626ce8f7fdb4de76b13fb88559"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commsoft64" cloneof="commsoft">
+		<description>CommSoft 8.6h V64</description>
+		<year>1985</year>
+		<publisher>SoftMachinery</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CommSoft-8.6h-V64.rom" size="16384" crc="f2809b67" sha1="d4701308b2a44b1103de78070086c8c927555320"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commsoft172" cloneof="commsoft">
+		<description>CommSoft 8.6h V172</description>
+		<year>1985</year>
+		<publisher>SoftMachinery</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="CommSoft-8.6h-V172.rom" size="16384" crc="78a3cab4" sha1="5bfecbb8421e103cbc1a32e759e4b6cf1a04573d"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="commsoft">
-		<description>CommSoft 8.6h</description>
+		<description>CommSoft 8.6h C340</description>
 		<year>1985</year>
 		<publisher>SoftMachinery</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="CommSoft-8.6h.rom" size="16384" crc="09e56db5" sha1="6d50162871ca6c1ed0eebea9c2ba8528e0c718ba"/>
+				<rom name="CommSoft-8.6h-C340.rom" size="16384" crc="09e56db5" sha1="6d50162871ca6c1ed0eebea9c2ba8528e0c718ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2437,6 +2674,61 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Commstar-3033.rom" size="8192" crc="4ce2f1f3" sha1="c03ffa9c4ef06b5c6916a1f6206b51a3f68dbace"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar3045" cloneof="commstar">
+		<description>Commstar 3045</description>
+		<year>1984</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Commstar-3045.rom" size="8192" crc="748ae37b" sha1="b57c206c89a6a7697090e37970f14fa78c60c815"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar3184" cloneof="commstar">
+		<description>Commstar 3184</description>
+		<year>1984</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Commstar-3184.rom" size="8192" crc="e58a1da4" sha1="c94f82b2a805faa79bf6e55bbe66ba4b930e8d1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar3362" cloneof="commstar">
+		<description>Commstar 3362</description>
+		<year>1984</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Commstar-3362.rom" size="8192" crc="0befba86" sha1="a99a49df5c4de5a37f3f853c9c0cbefe12bc2f1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar3525" cloneof="commstar">
+		<description>Commstar 3525</description>
+		<year>1984</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Commstar-3525.rom" size="8192" crc="e4e858b1" sha1="b08ef0dbc7fc50d57c19af44265daa436286a587"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar4055" cloneof="commstar">
+		<description>Commstar 4055</description>
+		<year>1984</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Commstar-4055.rom" size="8192" crc="39e77f57" sha1="b74befb412054cb9c4f70a2f77b1fc4eba102200"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2541,23 +2833,34 @@ license:CC0
 	</software>
 
 	<software name="commstar231" cloneof="commstar2">
-		<description>Commstar II 2.31</description>
+		<description>Commstar II 2.31 S/N:2077</description>
 		<year>1986</year>
 		<publisher>PACE</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Commstar-2.31.rom" size="16384" crc="b5f5f042" sha1="485e3a5d5270aee07a2a3d755f0831ef25348554"/>
+				<rom name="Commstar-2.31-2077.rom" size="16384" crc="b5f5f042" sha1="485e3a5d5270aee07a2a3d755f0831ef25348554"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commstar231a" cloneof="commstar2">
+		<description>Commstar II 2.31 S/N:2187</description>
+		<year>1986</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Commstar-2.31-2187.rom" size="16384" crc="5ea2bb24" sha1="976d9813f64dadbec1841d45cbea677b9eed6456"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="commstar2">
-		<description>Commstar II 2.40</description>
+		<description>Commstar II 2.40 S/N:24650</description>
 		<year>1986</year>
 		<publisher>PACE</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Commstar-2.40.rom" size="16384" crc="80ce15c0" sha1="abdb9df1632aa45394ca3561bab7c7561cafac10"/>
+				<rom name="Commstar-2.40-24650.rom" size="16384" crc="80ce15c0" sha1="abdb9df1632aa45394ca3561bab7c7561cafac10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2606,6 +2909,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="compas2d">
+		<description>Compas 2D 1.0</description>
+		<year>1983</year>
+		<publisher>Autographics Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Compas2D-1.0.rom" size="8192" crc="1e922157" sha1="682fa3e6449be1330f001ba4e40b1a7d0a2da9ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compasadv">
+		<description>Compas Advanced 3.06</description>
+		<year>1984</year>
+		<publisher>Autographics Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="CompasAdvanced-3.06.rom" size="8192" crc="b097361c" sha1="92c611a81874787b638032b92fad9168e3af423b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="conquest">
 		<description>ConQuest</description>
 		<year>1987</year>
@@ -2622,6 +2947,7 @@ license:CC0
 		<description>SJ Control ROM 0.23</description>
 		<year>1983</year>
 		<publisher>SJ Research</publisher>
+		<info name="author" value="Peter Miller"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Control-0.23.rom" size="8192" crc="32f9f7a7" sha1="b814667bc4201a1895cc245db9dd4c419ca1bbcf"/>
@@ -2633,9 +2959,21 @@ license:CC0
 		<description>SJ Control ROM 0.30</description>
 		<year>1984</year>
 		<publisher>SJ Research</publisher>
+		<info name="author" value="Peter Miller"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Control-0.30.rom" size="8192" crc="c1e23523" sha1="3f6cb47d380b82115e5ed0fb911fb899ab96ba94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cookie">
+		<description>Cookie ROM</description>
+		<year>1984</year>
+		<publisher>Rhodri Davies</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Cookie-0.00.rom" size="16384" crc="f6a260ce" sha1="15a1744ab19511693e31639d3fadaf894ba81ffb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2647,6 +2985,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="CPFS-1.20.rom" size="16384" crc="a74c42c9" sha1="f0c42724dd58a85efc05955b27453fc32c9d3594"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpn067" cloneof="cpn071">
+		<description>CPN 0.67</description>
+		<year>1982</year>
+		<publisher>Torch Computers</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="CPN-0.67.rom" size="8192" crc="44be0a4a" sha1="e4b86a32e17e60929674c26c52c4757b8ee6a3dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2719,8 +3069,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="databeeb10" cloneof="databeeb">
+		<description>DataBeeb 1.0</description>
+		<year>1985</year>
+		<publisher>Miracle Technology</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DataBeeb-1.0.rom" size="8192" crc="cf849bab" sha1="d24f186f1357c39710a15e2a4113d32c3712881d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="databeeb">
-		<description>DataBeeb</description>
+		<description>DataBeeb 1.2</description>
 		<year>1985</year>
 		<publisher>Miracle Technology</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -3128,6 +3489,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="decce">
+		<description>DECCE Terminal 2.12</description>
+		<year>1984</year>
+		<publisher>Decce Universal</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DECCE-2.12.rom" size="8192" crc="34ebdb17" sha1="7b679db55805b7067e87232f8d17a45c9fbea8d9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demomc">
 		<description>Demo (Master Compact)</description>
 		<year>1985</year>
@@ -3145,13 +3517,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="demon">
+	<software name="demon101" cloneof="demon">
 		<description>Demon Zromm 1.01</description>
 		<year>1984</year>
 		<publisher>Argonaut Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="DemonZromm-1.01.rom" size="8192" crc="04ef9115" sha1="a9eefa61d17148945b3c61576b72b1f82c0411db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demon">
+		<description>Demon Zromm 1.03</description>
+		<year>1985</year>
+		<publisher>Argonaut Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DemonZromm-1.03.rom" size="8192" crc="0fe1bd33" sha1="1ef66d13c6dcd670c679ab809b31c7dc22728a4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3163,6 +3546,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DesROM-1.00.rom" size="16384" crc="7b99b6bf" sha1="b09a8bf5388c653c6570649019032e08d89f7233"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="detalker">
+		<description>Detalker 1.00</description>
+		<year>1984</year>
+		<publisher>Revelstone</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Detalker-1.00.rom" size="8192" crc="7b232141" sha1="8d2e9c856227870c6e02da278eed6ac653dbebf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3347,13 +3741,46 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="diagram">
-		<description>Diagram</description>
+	<software name="diagram3112" cloneof="diagram">
+		<description>Diagram S/N:3112</description>
 		<year>1985</year>
 		<publisher>Pineapple Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Diagram-3112.rom" size="16384" crc="2d26a493" sha1="56643a7a3eaca2321ff430365e7d48bc0607a92d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagram3291" cloneof="diagram">
+		<description>Diagram S/N:3291</description>
+		<year>1985</year>
+		<publisher>Pineapple Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Diagram-3291.rom" size="16384" crc="aaac8534" sha1="badebbcda61efae277640fff3bd7e4004667f548"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagram">
+		<description>Diagram S/N:8787</description>
+		<year>1985</year>
+		<publisher>Pineapple Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Diagram-8787.rom" size="16384" crc="c14cacdf" sha1="6d2a6eb744ebd180ad2bdf5debad9ea0086368f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagram1">
+		<description>Diagram 1.00</description>
+		<year>198?</year>
+		<publisher>Pineapple Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Diagram-1.00.rom" size="16384" crc="b7dceff1" sha1="f3cad313dc25711398321f52feee3c9e668c1fff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3380,13 +3807,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="digtldrw">
+	<software name="digtldrw834" cloneof="digtldrw">
 		<description>Digital Drawings DD/B834</description>
 		<year>1983</year>
 		<publisher>Ibbotsons Design Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DigitalDrawings-DD-B834.rom" size="16384" crc="7090b0ff" sha1="9093ef59aae8f9c479a17aa03d639c161cf04c0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digtldrw">
+		<description>Digital Drawings DD/B835</description>
+		<year>1983</year>
+		<publisher>Ibbotsons Design Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="DigitalDrawings-DD-B835.rom" size="16384" crc="2ef03aaf" sha1="42680b24cd62db4e2fe9b966fb0ac95921fd24d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3535,6 +3973,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="disczap">
+		<description>Disc Zap 1.3</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscZap-1.3.rom" size="8192" crc="cd10b050" sha1="e2a941bd445edda0544d0b2576ad44a3dd086d56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disczap2">
+		<description>Disc Zap V2 1.3</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DiscZapV2-1.3.rom" size="8192" crc="773a99f2" sha1="41b01c3c4594ca4b053c5991428fe72ab1260348"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dmaster">
 		<description>D-Master</description>
 		<year>1986</year>
@@ -3590,6 +4050,30 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dosfsb">
+		<description>DOS FS 1.13b</description>
+		<year>1990</year>
+		<publisher>Petrov Software</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DOSFS-1.13b.rom" size="8192" crc="e1470cd9" sha1="29711b190de57df2a544b107bf176b6133202df8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dosfsm">
+		<description>DOS FS 1.13m</description>
+		<year>1990</year>
+		<publisher>Petrov Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="DOSFS-1.13m.rom" size="8192" crc="2e0d1654" sha1="02034aee25570e6e024a07304d6f7778746761fb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dotprintp">
 		<description>DotPrint-Plus</description>
 		<year>1986</year>
@@ -3597,6 +4081,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="DotPrint-Plus-1.24.rom" size="16384" crc="11a09cdf" sha1="a6321e686c2a5465da6f5a935dfb79c1b32cdd3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drwhomin">
+		<description>Doctor Who and the Mines of Terror ROM</description>
+		<year>1985</year>
+		<publisher>Micro Power</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="DrWhoAndTheMinesOfTerror.rom" size="16384" crc="9ce48a7e" sha1="9287aa2c0ef535d008f7d0e7e34a96400098816a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3752,6 +4247,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dykasay">
+		<description>DykaSay Speech</description>
+		<year>198?</year>
+		<publisher>Dyka</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="DykaSay-3.07.rom" size="16384" crc="802c1e67" sha1="81a82950fe30716bd555b517992e33e5687db6ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="easytalk101" cloneof="easytalk">
 		<description>Easy Talk 1.01</description>
 		<year>1984</year>
@@ -3890,7 +4396,29 @@ license:CC0
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="EnvelopesROM-2.4.rom" size="8192" crc="adccec3d" sha1="d5a08e2f33aa423be043b199f5ec336824504ad6"/>
+				<rom name="EnvelopesROM-2.4.rom" size="8192" crc="de10fabe" sha1="8f0e85121e4ca1c4b550039489da0f23da4707d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epic23" cloneof="epic">
+		<description>Extended Programmable Interactive Communicator 2.3</description>
+		<year>1983</year>
+		<publisher>University of Bristol</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="EPIC-2.3.rom" size="8192" crc="59c47ebb" sha1="cecb0a98a0d5fd70100b12e229bfd81885474620"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epic">
+		<description>Extended Programmable Interactive Communicator 2.47</description>
+		<year>1983</year>
+		<publisher>University of Bristol</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="EPIC-2.47.rom" size="8192" crc="d5a0f73d" sha1="1273be89438778aa22ef60faa6d6845c0deb2eb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4029,6 +4557,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="epsonfx">
+		<description>Epson FX80 1.00</description>
+		<year>1983</year>
+		<publisher>Electronequip</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="v">
+				<rom name="EpsonFX80-1.00.rom" size="8192" crc="60ff9be7" sha1="b9cc33e67033c6b59f9113672ca4f84dea774769"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epsondmp">
 		<description>Epson Dump ROM</description>
 		<year>1984</year>
@@ -4146,6 +4685,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="ExmonII-2.02.rom" size="16384" crc="f0447739" sha1="ae3f737c778dc90240d025ffa1ec8064d22165e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expermnt">
+		<description>Experimenters 1.20P</description>
+		<year>1985</year>
+		<publisher>MEWsoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Expermenters-1.20P.rom" size="8192" crc="f35a4f40" sha1="1526bebc67e8f14646344b5fc2cc9aeac5c4b1ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4344,6 +4894,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="fmon">
+		<description>FMON</description>
+		<year>1986</year>
+		<publisher>FSoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="FMON-1.0.rom" size="16384" crc="55c3d5e3" sha1="7b41fc149f1f550dc628e319e46953224cdf41bf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fontaid101" cloneof="fontaid">
 		<description>FontAid 1.01</description>
 		<year>1986</year>
@@ -4433,6 +4994,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ft2000">
+		<description>FT-2000</description>
+		<year>1984</year>
+		<publisher>Acoustimed</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="FT2000-1.10.rom" size="16384" crc="a06f63ef" sha1="a56d7602b3f53bf1aa1695a73bc2461a117d1d15"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="futures" supported="no">
 		<description>Futures 2.0a</description>
 		<year>1987</year>
@@ -4440,6 +5012,39 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Futures-2.0a.rom" size="16384" crc="beb5afcb" sha1="f6a5741698bbe234bbc21a8df2649c56f5b51f24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gdump101" cloneof="gdump">
+		<description>GDump 1.01</description>
+		<year>1983</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GDump-1.01.rom" size="8192" crc="ff98209c" sha1="cf26e81c891ddb031640107dba544d80e30b29a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gdump201" cloneof="gdump">
+		<description>GDump 2.01</description>
+		<year>1983</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GDump-2.01.rom" size="8192" crc="2a962023" sha1="d993dd82bf11fd197388918e4cfa0368388d23d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gdump">
+		<description>GDump 3.00</description>
+		<year>1983</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GDump-3.00.rom" size="8192" crc="6c86f413" sha1="bb2cab2399b777aa523c9d5f61e70bc6fc555b03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4654,6 +5259,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="GraphicsExtension-2.09.rom" size="8192" crc="c4e34f78" sha1="3d76bd5889d82c34c9e096c30ac6cc566d533159"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphsys">
+		<description>Graphics System 0.20</description>
+		<year>1983</year>
+		<publisher>Level 9</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="GraphicsSystem-0.20.rom" size="8192" crc="15b11375" sha1="4dcae9ed747016bead59759b889939fcb9fc072c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4973,61 +5589,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="icebox">
-		<description>Ice-Box 1.00</description>
-		<year>1984</year>
-		<publisher>Event One</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="Ice-Box-1.00.rom" size="8192" crc="3c2833f7" sha1="d6706a0cd16470885ec43123d017072bc598d2dd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="iceboxa" cloneof="icebox">
-		<description>Ice-Box 1.00 [alt]</description>
-		<year>1984</year>
-		<publisher>Event One</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="Ice-Box-1.00[a].rom" size="8192" crc="6b1f2783" sha1="4eb464c0e1d4460800f2ff50753f59fa5262a36c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="iceboxa2" cloneof="icebox">
-		<description>Ice-Box 1.00 [alt2]</description>
-		<year>1984</year>
-		<publisher>Event One</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="Ice-Box-1.00[a2].rom" size="8192" crc="70504dd7" sha1="4aef36a14a16b0fae9a9a50772731f1b4f1839f8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="iceboxa3" cloneof="icebox">
-		<description>Ice-Box 1.00 [alt3]</description>
-		<year>1984</year>
-		<publisher>Event One</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="Ice-Box-1.00[a3].rom" size="8192" crc="c059c9a0" sha1="2c886cd9c7f96c1777b7de96793f0be39e124a6d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="icebox14" cloneof="icebox">
-		<description>Ice-Box 1.40</description>
-		<year>1985</year>
-		<publisher>Event One</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="Ice-Box-1.40.rom" size="8192" crc="31cbd6e4" sha1="3239ece31d642115d64aa4dbffd5b8eba12894d4"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="iconmstr">
 		<description>Icon Master 1.00</description>
 		<year>1985</year>
@@ -5039,6 +5600,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ieeefs001" cloneof="ieeefs">
+		<description>IEEE Filing System 0.01</description>
+		<year>1983</year>
+		<publisher>Intelligent Interfaces</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="IEEEFS-0.01.rom" size="8192" crc="69dfc98d" sha1="0d3fcb79e70cfa42eff8cc78bf29c2493898d6eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ieeefs002" cloneof="ieeefs">
+		<description>IEEE Filing System 0.02</description>
+		<year>1983</year>
+		<publisher>Intelligent Interfaces</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="IEEEFS-0.02.rom" size="8192" crc="8f5eb6e1" sha1="c063109bb2ac28bddc2798dfb043067ad0d97069"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ieeefs">
+		<description>IEEE Filing System 0.05</description>
+		<year>1983</year>
+		<publisher>Intelligent Interfaces</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="IEEEFS-0.05.rom" size="8192" crc="4c2e80ee" sha1="0bf33f0378657cf35a49f4f74be40c26ebcb9de5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="imagep">
 		<description>Image Processor 0.9A</description>
 		<year>1984</year>
@@ -5046,6 +5640,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="ImageProcessor-0.9A.rom" size="8192" crc="95bc21cc" sha1="834f38484025be4db49cf89bc853ec5bcd4ad16f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="index">
+		<description>Index</description>
+		<year>1984</year>
+		<publisher>Solidisk</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Index.rom" size="16384" crc="d3023582" sha1="ceb9b0698af47f97c0f310b7ddbde5a033f30b37"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5112,6 +5717,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Instat-B00741.rom" size="16384" crc="7a33ff83" sha1="eb42b966898121fa1934265719bb3693acac3f1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibase10a" cloneof="ibase">
+		<description>Inter-Base 1.0A</description>
+		<year>1987</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ccibase" />
+			<dataarea name="rom" size="65536">
+				<rom name="InterBase-1.0A.rom" size="65536" crc="1e619ebe" sha1="3b2509c22f5e57f020fac48547d04c22e39ce5db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5358,6 +5975,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kermit025" cloneof="kermit">
+		<description>Kermit 0.25</description>
+		<year>1985</year>
+		<publisher>CUCCA</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Kermit-0.25.rom" size="16384" crc="66c451ea" sha1="ef1ad37627e4b84996c00feb9812a656a32283ac"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kermit102" cloneof="kermit">
 		<description>Kermit 1.02</description>
 		<year>1985</year>
@@ -5413,6 +6041,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lanman032" cloneof="lanman" supported="no">
+		<description>LAN Manager 0.32</description>
+		<year>2008</year>
+		<publisher>Sprow</publisher>
+		<info name="author" value="Robert Sprowson"/>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="LANManager-0.32.rom" size="16384" crc="1df3b017" sha1="7dcde45c0c878f3ba66bf33f714360fbb93303f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lanman" supported="no">
+		<description>LAN Manager 0.37</description>
+		<year>2008</year>
+		<publisher>Sprow</publisher>
+		<info name="author" value="Robert Sprowson"/>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="LANManager-0.37.rom" size="16384" crc="9597054e" sha1="0d8b06d89a191589291057028011f078888ea799"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lemodem100" cloneof="lemodem">
 		<description>Le Modem 1.00</description>
 		<year>1985</year>
@@ -5431,6 +6085,39 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="LeModem-1.04.rom" size="16384" crc="3fcb1ee1" sha1="a97383a9276250fb235fc1fbc9a0ac27299654c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemon223" cloneof="lemon">
+		<description>Lemon 2.23</description>
+		<year>1983</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Lemon-2.23.rom" size="8192" crc="254c0d20" sha1="92bd8e7918af679f10b7ee4c5c34c479c7d3fa5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemon226" cloneof="lemon">
+		<description>Lemon 2.26</description>
+		<year>1983</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Lemon-2.26.rom" size="8192" crc="bcd55b62" sha1="22ff51c60acfc94152b5849ab82d0029645c1700"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemon">
+		<description>Lemon 4.0n</description>
+		<year>1985</year>
+		<publisher>D.A.Computers</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Lemon-4.0n.rom" size="16384" crc="fd4b8e53" sha1="0272c07899d29e6527d7829c6db986a5b31e3c8c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5566,6 +6253,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lucifer">
+		<description>Lucifer Logic Analyser 1.0</description>
+		<year>1984</year>
+		<publisher>Ferroglen Research</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="LuciferLogicAnalyser-1.0.rom" size="16384" crc="1efbdf39" sha1="05d1f3f51a9669c5de48d550f1af2522faa30248"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lvldos">
 		<description>LVL Dos 0.91</description>
 		<year>198?</year>
@@ -5576,6 +6274,31 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="LVL-Dos-0.91.rom" size="8192" crc="69d7653a" sha1="9cd39d011290b97d5ba05b6c745689a8553be5fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lvlsdos">
+		<description>LVL Super Dos 1.00</description>
+		<year>1984</year>
+		<publisher>LVL Group</publisher>
+		<info name="usage" value="Requires Computer Village 1797 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<sharedfeat name="fdc_default" value="cv1797"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="LVL-SuperDos-1.00.rom" size="16384" crc="0a51e354" sha1="84363f2f8e2fb4cca77ce27f48d88635b34fa3a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lxtools">
+		<description>LX-80 Toolkit</description>
+		<year>1986</year>
+		<publisher>Gordon Horsington</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="LX80-Toolkit-1.0.rom" size="8192" crc="06ac5298" sha1="c63e35daa7e9fb0d7a0534b921aba50e16c7d285"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5591,13 +6314,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mach1">
+	<software name="mach101" cloneof="mach1">
 		<description>MACH 1 1.01</description>
 		<year>1984</year>
 		<publisher>Gnomonica</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MACH1-1.01.rom" size="16384" crc="d3de7211" sha1="121e6e653b817802f37a3007858bb817ddd598a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mach1">
+		<description>MACH 1 1.03</description>
+		<year>1984</year>
+		<publisher>Gnomonica</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MACH1-1.03.rom" size="16384" crc="23170c4c" sha1="1857a0417d4404aadcee07aeed9f74c2c25b8cf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5625,14 +6359,26 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mstrcopy">
-		<description>MASTERcopy</description>
+	<software name="mbcopy100" cloneof="mbcopy">
+		<description>MASTERcopy 1.00</description>
 		<year>1987</year>
 		<publisher>M/B Software</publisher>
 		<sharedfeat name="compatibility" value="M"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="MASTERcopy-1.00.rom" size="8192" crc="54fdd35d" sha1="7b6db35f26b90a66452b907fde80a84d670645e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbcopy">
+		<description>MASTERcopy 1.01</description>
+		<year>1987</year>
+		<publisher>M/B Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="MASTERcopy-1.01.rom" size="8192" crc="56a4d5f8" sha1="615e2098831a4f74622ef384b0d815577e494320"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5649,6 +6395,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="masterem100d" cloneof="masterem">
+		<description>Master Emulation ROM 1.00 (Dabbs)</description>
+		<year>1987</year>
+		<publisher>Dabbs Press</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MasterEmulationROM-1.00-Dabbs.rom" size="16384" crc="faa338b1" sha1="93e481304fb3978b8f1608b5e1baff7cf90c5561"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="masterem201" cloneof="masterem">
 		<description>Master Emulation ROM 2.01</description>
 		<year>1987</year>
@@ -5657,6 +6415,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MasterEmulationROM-2.01.rom" size="16384" crc="a11d80c6" sha1="798e7f4ce7f9dc61cd89d035c571f8dbd86b322c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masterem201d" cloneof="masterem">
+		<description>Master Emulation ROM 2.01 (Dabbs)</description>
+		<year>1987</year>
+		<publisher>Dabbs Press</publisher>
+		<sharedfeat name="compatibility" value="B,B+"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MasterEmulationROM-2.01-Dabbs.rom" size="16384" crc="83ec7fc5" sha1="3f516097027def7c8d59bc8fad43951ac9a95bb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5734,8 +6504,8 @@ license:CC0
 
 	<software name="maxim">
 		<description>Maxim 1.0</description>
-		<year>198?</year>
-		<publisher>J.Price</publisher>
+		<year>1986</year>
+		<publisher>Maxim Computer Systems</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Maxim-1.0.rom" size="16384" crc="e8493587" sha1="c786d023e2c460ab095974ed7bad56c4ea815423"/>
@@ -5762,6 +6532,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MCP-0.41-CBL.rom" size="16384" crc="b36f07f4" sha1="bd53f09bf73357845a6f97df1ee9e5aea5cdca90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcp101ab">
+		<description>MCP v1.01 (AB)</description>
+		<year>1984</year>
+		<publisher>Torch Computers</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MCP-1.01-AB.rom" size="16384" crc="1892d3ca" sha1="35f718cdc6b980f86c78a4f6272b1bff4f1d51e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5883,6 +6665,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="memex256">
+		<description>Memex Chameleon 256K 2.00</description>
+		<year>1986</year>
+		<publisher>Memex</publisher>
+		<info name="usage" value="Requires Memex Chameleon board"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Chameleon256-2.00.rom" size="8192" crc="6a582d2f" sha1="1e1536941bd84e2e809da62850035c1584781cb3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="menurom100" cloneof="menurom">
 		<description>Menu ROM 1.00</description>
 		<year>1985</year>
@@ -5977,6 +6771,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="MicroC-1.0.rom" size="16384" crc="a8632713" sha1="e547967d419725cfa7069cb348968e8cb211bfae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromon">
+		<description>Micromon</description>
+		<year>1983</year>
+		<publisher>Molimerx</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Micromon-0.01.rom" size="8192" crc="9aa7c657" sha1="6beae75e638d66c3ebe5bc1c3c1fe865a80034f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6095,6 +6900,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="midos">
+		<description>MiDOS 0.16</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="MiDOS-0.16.rom" size="8192" crc="2a874535" sha1="3dbdaa481cb1f28283365dc3391b805468fd5162"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="midwdfs">
 		<description>Midwich MWFS</description>
 		<year>1985</year>
@@ -6117,6 +6934,17 @@ license:CC0
 				<rom name="MiniOfficeII-2.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x10000"/>
 				<rom name="MiniOfficeII-3.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x08000"/>
 				<rom name="MiniOfficeII-4.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modemc">
+		<description>Modem Controller 1.01</description>
+		<year>1985</year>
+		<publisher>Loco Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ModemController-1.01.rom" size="16384" crc="2353eace" sha1="f67f00150b558ad692685379ed32eed1b94151c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6271,6 +7099,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="multbas">
+		<description>Multi-Basic 1.00</description>
+		<year>1985</year>
+		<publisher>CMS Soft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="MultiBasic-1.00.rom" size="16384" crc="fb2200df" sha1="4d034c56d33b09177263f394412975b551506602"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="multfont">
 		<description>MultiFont</description>
 		<year>1984</year>
@@ -6322,6 +7161,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="PMSMultiFontNTQ-1.4.rom" size="16384" crc="96626c06" sha1="b07d05940cfd47949e988731bd406c1c553269a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n3270">
+		<description>Network 3270 Terminal 2.1</description>
+		<year>1985</year>
+		<publisher>J I Davies</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Network3270-2.1.rom" size="16384" crc="7b9ecf81" sha1="6db35423f281d0ebcc397d8ea9da75460d966dce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6451,7 +7301,7 @@ license:CC0
 
 	<software name="nfs334">
 		<description>Acorn NFS 3.34</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Acorn</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6462,7 +7312,7 @@ license:CC0
 
 	<software name="nfs334b" cloneof="nfs334">
 		<description>Acorn NFS 3.34B</description>
-		<year>198?</year>
+		<year>1982</year>
 		<publisher>Acorn</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6560,6 +7410,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="olsutil">
+		<description>OlsUtil 3.00</description>
+		<year>1985</year>
+		<publisher>Per H. Nielsen</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="OlsUtil-3.00.rom" size="8192" crc="40f3d8df" sha1="e47fbf815c4dc9e1b10cd9c4579cdcf037f15896"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oplogo">
 		<description>Open LOGO</description>
 		<year>1984</year>
@@ -6594,6 +7455,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="OverlayBASIC-1.1.rom" size="8192" crc="3c5fb883" sha1="fb78306831ad3c63ab349cc26dc48e0b4f94cabe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oxpascal10" cloneof="oxpascal">
+		<description>Oxford Pascal 1.0</description>
+		<year>1985</year>
+		<publisher>Oxford Computer Systems</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="OxfordPascal-1.0.rom" size="16384" crc="a298388e" sha1="447c2eb9381841d19faa377b5c44a1808a770611"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6671,6 +7543,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="PCB-1.03.rom" size="16384" crc="f2d3c295" sha1="4558ea56ba9f082ed4d0d68b2dc6d3e9e5fe4267"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcb105" cloneof="pcb">
+		<description>PCB 1.05</description>
+		<year>1986</year>
+		<publisher>Pineapple Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PCB-1.05.rom" size="16384" crc="b8824a69" sha1="29bc0af50bf8c3f7a92c7d1b59b5af3db564cced"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6785,6 +7668,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="phx023" cloneof="phx">
+		<description>PHX 0.23</description>
+		<year>198?</year>
+		<publisher>University of Cambridge</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PHX-0.23.rom" size="8192" crc="6a26bfeb" sha1="5d06308c1eaa84c4a7d481d913135b6fe8af22b7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="phx100" cloneof="phx">
 		<description>PHX 1.00</description>
 		<year>198?</year>
@@ -6890,8 +7784,8 @@ license:CC0
 		<year>1984</year>
 		<publisher>Acorn</publisher>
 		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="Prestel-1.1.rom" size="16384" crc="7266f0af" sha1="9badd7ace07d9c3683fa5ba60d869959dbd55103"/>
+			<dataarea name="rom" size="8192">
+				<rom name="Prestel-1.1.rom" size="8192" crc="21d1a780" sha1="72483b4a71d8e7452641cea25212d521c5854dcf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6899,7 +7793,7 @@ license:CC0
 	<software name="prestel47" cloneof="prestel" supported="no">
 		<description>Prestel 4.7n</description>
 		<year>1984</year>
-		<publisher>Acorn</publisher>
+		<publisher>SofMac</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Prestel-4.7n.rom" size="8192" crc="0a67a386" sha1="4e3f983e51e812a903dfce9bfbb41a040c4b9ff5"/>
@@ -6910,7 +7804,7 @@ license:CC0
 	<software name="prestelt471" cloneof="prestel" supported="no">
 		<description>Prestel Trial 4.71r</description>
 		<year>1984</year>
-		<publisher>Acorn</publisher>
+		<publisher>SofMac</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="PrestelTrial-4.71r.rom" size="8192" crc="c6067294" sha1="5702b0b895cfabb30ffdcf9fe2718de2276315ef"/>
@@ -6921,7 +7815,7 @@ license:CC0
 	<software name="prestel" supported="no">
 		<description>Prestel 4.8n</description>
 		<year>1984</year>
-		<publisher>Acorn</publisher>
+		<publisher>SofMac</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Prestel-4.8n.rom" size="8192" crc="7b021ee3" sha1="a5250165b10d317c1a593fbb5ec6b2504a42de44"/>
@@ -6957,7 +7851,7 @@ license:CC0
 		<publisher>Logotron</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="PrintBox-1.22.rom" size="16384" crc="045f7460" sha1="2c61c694a7c21658907ecf8be355032e5b7ac245"/>
+				<rom name="PrintBox-1.22.rom" size="16384" crc="53b331ea" sha1="626ecfffd14f0005af16c3352a06c216f1ede6be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7039,6 +7933,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="prntmeps106" cloneof="prntmeps">
+		<description>Printmaster (Epson) 1.06</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Printmaster-Epson-1.06.rom" size="8192" crc="efc45ee4" sha1="ca921caa7bcf580dc1a4924b14c676a64765689b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prntmeps108" cloneof="prntmeps">
 		<description>Printmaster (Epson) 1.08</description>
 		<year>1984</year>
@@ -7108,6 +8013,29 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="prntutil">
+		<description>Printer Utility</description>
+		<year>1984</year>
+		<publisher>&gt;unknown&lt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PrinterUtility.rom" size="8192" crc="e20b6c24" sha1="cc68804bc5ff819acd48ccfc20ffe1ca4a748f7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntware">
+		<description>Printware Support ROM 1.1</description>
+		<year>1988</year>
+		<publisher>Data Design</publisher>
+		<info name="usage" value="Use with Designer Castles"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="PrintwareSupport-1.1.rom" size="16384" crc="17f17eb1" sha1="05739191af2edc5817e6404b204b63e07eb54c58"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="prisma2">
 		<description>MasterPieCe 1.10</description>
 		<year>1987</year>
@@ -7154,24 +8082,35 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="probe402" cloneof="probe">
-		<description>Probe 4.02</description>
+	<software name="probe2402" cloneof="probe2">
+		<description>Probe 2 4.02</description>
 		<year>1984</year>
 		<publisher>Altra</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Probe-4.02.rom" size="16384" crc="6ad22fab" sha1="b42ae689156e2f92be27558b9b94b4966fc7ac94"/>
+				<rom name="Probe2-4.02.rom" size="16384" crc="6ad22fab" sha1="b42ae689156e2f92be27558b9b94b4966fc7ac94"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="probe">
-		<description>Probe 4.05</description>
+	<software name="probe2">
+		<description>Probe 2 4.05</description>
 		<year>1984</year>
 		<publisher>Altra</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Probe-4.05.rom" size="16384" crc="311d51ac" sha1="19d22c0a0845b8c5e78e9055df2ff796d554c20f"/>
+				<rom name="Probe2-4.05.rom" size="16384" crc="311d51ac" sha1="19d22c0a0845b8c5e78e9055df2ff796d554c20f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="procyon">
+		<description>Procyon 1.81</description>
+		<year>1985</year>
+		<publisher>JK Programs</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Procyon-1.81.rom" size="8192" crc="467e478d" sha1="1cebfbc9c942f4c8a2a82fa22ce1da96229af952"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7294,6 +8233,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="qmc1510">
+		<description>QMC1510 Terminal Emulator</description>
+		<year>198?</year>
+		<publisher>Queen Mary College</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="QMC1510.rom" size="8192" crc="31b066da" sha1="34710bdcc08e008c6b7537cd2d8c01b1c666a658"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qrom">
+		<description>QROM</description>
+		<year>1984</year>
+		<publisher>Redvers Developments</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="QROM.rom" size="8192" crc="70689753" sha1="1c70f9daca5099230e83d962407053ccf1956715"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="quest21a" cloneof="quest">
 		<description>Quest 2.1A</description>
 		<year>1984</year>
@@ -7343,7 +8304,7 @@ license:CC0
 	<software name="ramdisc">
 		<description>RAMDisc 1.01</description>
 		<year>198?</year>
-		<publisher>M/B Software</publisher>
+		<publisher>Morley Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="RAMDisc-1.01.rom" size="16384" crc="627568c2" sha1="17e727998756fe35ff451fd2ce1d4b5977be24fc"/>
@@ -7725,6 +8686,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rtty">
+		<description>RTTY Program 1.05</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="RTTY-1.05.rom" size="8192" crc="244fe01f" sha1="40a6f3ca9d867848ecd8a9652630e714d61c6d6c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="satpic3" supported="no">
 		<description>SatPic 3.0 (Timestep)</description>
 		<year>1986</year>
@@ -7769,35 +8741,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="scrndump101" cloneof="scrndump">
-		<description>Screen Dump ROM 1.01</description>
-		<year>1983</year>
-		<publisher>D.A.Computers</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="ScreenDump-1.01.rom" size="16384" crc="2cfaac28" sha1="c726ebc20ec99fdc2a7aefc1b1f27df2027a5d05"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scrndump">
-		<description>Screen Dump ROM 2.01</description>
-		<year>1983</year>
-		<publisher>D.A.Computers</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="8192">
-				<rom name="ScreenDump-2.01.rom" size="8192" crc="2a962023" sha1="d993dd82bf11fd197388918e4cfa0368388d23d6"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scrnprnt020" cloneof="scrnprnt">
 		<description>Screenprint 0.20</description>
-		<year>1988</year>
+		<year>1987</year>
 		<publisher>ESM</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Screenprint-0.20.rom" size="8192" crc="a3a57f0c" sha1="aea1b5c2101ac94ce6234a089ea03977be54328e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrnprnt024" cloneof="scrnprnt">
+		<description>Screenprint 0.24</description>
+		<year>1987</year>
+		<publisher>ESM</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Screenprint-0.24.rom" size="16384" crc="c88be535" sha1="f06867e6dac7bcca0364138b4860e3c11b771e9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7920,6 +8881,17 @@ license:CC0
 		<part name="rom2" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="SEHK_CC1-3.00.rom" size="16384" crc="5d5fafc3" sha1="ec1e93d5490f9f5e2eac5096f9f9e40aa48bffc8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="selcopy">
+		<description>Selective Copier</description>
+		<year>198?</year>
+		<publisher>A&amp;T-Soft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="SelCopy-1.00.rom" size="8192" crc="a1826068" sha1="152973739696c21c029061439d9bc7203b7c8795"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8080,8 +9052,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="slkeypad200" cloneof="slkeypad">
+		<description>Softlife Keypad Software 2.00</description>
+		<year>1985</year>
+		<publisher>Softlife</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Softlife-Keypad-2.00.rom" size="8192" crc="616e6b13" sha1="8ba1be8eac627552ba3aee75713fb87ce27fc8b6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="slkeypad">
-		<description>Softlife Keypad Software</description>
+		<description>Softlife Keypad Software 2.10</description>
 		<year>1985</year>
 		<publisher>Softlife</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -8271,13 +9254,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="starbasekt" cloneof="starbase">
+		<description>StarBASE 2.00 (Keyteam)</description>
+		<year>1984</year>
+		<publisher>Computer Users Club</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="StarBASE-2.00-KT.rom" size="16384" crc="78873bde" sha1="c0d2796451c4736d958f8dfe9e72cd905756e058"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starbasecuc" cloneof="starbase">
 		<description>StarBASE 2.00 (CUC)</description>
 		<year>1984</year>
 		<publisher>Computer Users Club</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="StarBASE-2.00-CUC.rom" size="16384" crc="78873bde" sha1="c0d2796451c4736d958f8dfe9e72cd905756e058"/>
+				<rom name="StarBASE-2.00-CUC.rom" size="16384" crc="df47e0ce" sha1="8b438c4a70231f39fe3f87dcd51ceb21be272cbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8370,6 +9364,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="starnlq">
+		<description>Star NLQ 1.0</description>
+		<year>1984</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="StarNLQ-1.0.rom" size="8192" crc="b968fd52" sha1="5ae1896aff3a061b31fc4a65393ca87aad57418b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="starstik141" cloneof="starstik">
 		<description>StarStick 1.41</description>
 		<year>1984</year>
@@ -8442,7 +9447,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stladfs21j" supported="no">
+	<software name="stladfs21j10" supported="no">
 		<description>Solidisk ADFS 2.1J (10MB)</description>
 		<year>1986</year>
 		<publisher>Solidisk</publisher>
@@ -8450,6 +9455,18 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Solidisk-ADFS-2.1J-10MB.rom" size="16384" crc="8a5abd63" sha1="24f9ec81f7864d7c83fcede4a49433687154de0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stladfs21j20m" supported="no">
+		<description>Solidisk ADFS 2.1J (20MB) Master</description>
+		<year>1986</year>
+		<publisher>Solidisk</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="Solidisk-ADFS-2.1J-20MB-Master.rom" size="32768" crc="2861f769" sha1="8d04d31716a3735abd3b2b6d2da91b7bdec975bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8513,6 +9530,19 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Solidisk-DDFS-1.5.rom" size="8192" crc="49826cb7" sha1="925ac251a10658117b3accfff8c27d6c4bd46298"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stlddfs18">
+		<description>Solidisk DDFS 1.8</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Requires Solidisk 1770 DDFS Issue 1 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Solidisk-DDFS-1.8.rom" size="8192" crc="aaeaf35e" sha1="8f62c4e19fc4335ce1c532963e43334f00af19e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8903,6 +9933,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="supastor14">
+		<description>SupaStore 1.4</description>
+		<year>1986</year>
+		<publisher>ESM</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="SupaStore-1.4.rom" size="16384" crc="9e5845ee" sha1="643a33ff38b09aaf9cda0bf01b5e9c9bde5bac5b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="supastor15">
 		<description>SupaStore 1.5</description>
 		<year>198?</year>
@@ -8949,7 +9990,7 @@ license:CC0
 
 	<software name="suprutil">
 		<description>Super Utility</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>GTM Computers</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -9102,6 +10143,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tek4010">
+		<description>Tektronix 4010 and VT100 Emulator</description>
+		<year>1983</year>
+		<publisher>Polytechnic of Central London</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Tektronix4010-0.10.rom" size="8192" crc="55580612" sha1="2d0056113f4438440a9e16169abffb8bf3f8afb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teledata">
+		<description>Teledata 1.0</description>
+		<year>1984</year>
+		<publisher>Kenneth B. Larsen</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Teledata-1.0.rom" size="16384" crc="e4facce4" sha1="32fb9d5fc406bb504f8fe89da6c22fb009bfe233"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="teletel100" cloneof="teletel">
 		<description>Teletel Emulator 1.00</description>
 		<year>1986</year>
@@ -9135,6 +10198,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="teletxted">
+		<description>Teletext Editor 1.00</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TeletextEditor-1.00.rom" size="16384" crc="ca7d8da0" sha1="ae04d2a953d17144354ad3f28139f6bbf53415f1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ttxtrtf" cloneof="ttxtsup">
 		<description>Teletext RTFROM</description>
 		<year>1986</year>
@@ -9157,6 +10231,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="televid">
+		<description>Televideo Emulator 1.1</description>
+		<year>198?</year>
+		<publisher>Protechnic Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="TelevideoEmulator-1.1.rom" size="8192" crc="3239abc0" sha1="dd7090832cda5fee22f10ca87e7201af288713be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi209a" cloneof="termi2">
+		<description>Termi II 0.9A</description>
+		<year>1984</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="TermiII-0.9A.rom" size="8192" crc="7f397001" sha1="38365ee07983675a5e53f5ee79555fb6ef31e991"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="termi2">
 		<description>Termi II A1.5</description>
 		<year>1984</year>
@@ -9164,6 +10260,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="TermiII-A1.5.rom" size="8192" crc="f10d4139" sha1="d08aaba8f12f8432ddf6aba93ec09a391388b174"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="termi202" cloneof="termi">
+		<description>Termi 2.02</description>
+		<year>1983</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Termi-2.02.rom" size="8192" crc="25cc9dee" sha1="d4ce6e024e30b30663b17df390c6ac920d0c0832"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9268,8 +10375,21 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tictoc100" cloneof="tictoc">
+		<description>Tic-Toc RTC 1.00</description>
+		<year>1988</year>
+		<publisher>Computer and Technical Services</publisher>
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="stlrtc" />
+			<dataarea name="rom" size="16384">
+				<rom name="TicTocRTC-1.00.rom" size="16384" crc="99de1358" sha1="eb81169a9b578376b543927439c030a13be0bf80"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tictoc">
-		<description>Tic-Toc RTC</description>
+		<description>Tic-Toc RTC 2.03</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
 		<sharedfeat name="compatibility" value="B"/>
@@ -9328,13 +10448,35 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tnc23">
+	<software name="pk87" cloneof="pk232">
+		<description>BBC/PK-232 1.00</description>
+		<year>1987</year>
+		<publisher>Ian Copestake Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="BBC_PK-232-1.00.rom" size="8192" crc="8050a06e" sha1="6d3669e2321cc2704cfd08c9d5e215a3fdcbf4a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pk232">
+		<description>BBC/PK-232 1.01</description>
+		<year>1987</year>
+		<publisher>Ian Copestake Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="BBC_PK-232-1.01.rom" size="16384" crc="dc445b0f" sha1="89d31ab2217e338f0f99ccab36253dc8ed7c091d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnc3">
 		<description>TNC2-3 Driver</description>
 		<year>1987</year>
 		<publisher>Amrac</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="TNC2-3.rom" size="16384" crc="4bad82be" sha1="be0d29c263517003517039fd02bdc521342069c2"/>
+				<rom name="TNC3.rom" size="16384" crc="4bad82be" sha1="be0d29c263517003517039fd02bdc521342069c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9467,6 +10609,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="Toolstar-1.77-1262.rom" size="8192" crc="4d9e0bbd" sha1="87b3f4f3fc066046da9a8500dd96bde132b1a01b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolstar1409" cloneof="toolstar">
+		<description>Toolstar 1.77 1409</description>
+		<year>1983</year>
+		<publisher>PACE</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Toolstar-1.77-1409.rom" size="8192" crc="6272a208" sha1="cdb1b9b652eaa237cf7cbde5100c1fd78e100ab2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9639,6 +10792,17 @@ license:CC0
 		<part name="rom2" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="UMI-2B-5.01_2.rom" size="16384" crc="10dc5dc9" sha1="26c35f321853813df074e815c5b9f691a8920777"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unicom">
+		<description>Unicom Zromm 0.99e</description>
+		<year>1984</year>
+		<publisher>Argonaut Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="UnicomZromm-0.99e.rom" size="8192" crc="66374702" sha1="bd21c41dd81adcf9cdfc8e34d9e1f15e4485d884"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9840,8 +11004,31 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="utools">
-		<description>U-Tools</description>
+	<software name="userutil">
+		<description>Users Utility 1.10</description>
+		<year>1984</year>
+		<publisher>S and A Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="UsersUtility-1.10.rom" size="8192" crc="eab21fca" sha1="6389180e6ad0d8e331ef67f7e743d7c9da183ca8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utilrom">
+		<description>The UtilRom 1.2</description>
+		<year>1990</year>
+		<publisher>B&amp;B Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TheUtilRom-1.2.rom" size="16384" crc="628e3ea4" sha1="50e139aec4be2ccf97e8d00c31542dde796ac6c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utools124" cloneof="utools">
+		<description>U-Tools 1.24</description>
 		<year>1984</year>
 		<publisher>Intersoft</publisher>
 		<part name="rom1" interface="bbc_rom">
@@ -9851,13 +11038,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="utoolsd" cloneof="utools">
-		<description>U-Tools Demonstration</description>
+	<software name="utools125d" cloneof="utools">
+		<description>U-Tools 1.25 Demonstration</description>
 		<year>1984</year>
 		<publisher>Intersoft</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="UTools-Demo-1.25.rom" size="8192" crc="8cd5737e" sha1="d31380043f45c6516e7f9097e59fb09b2fe3351d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="utools">
+		<description>U-Tools 1.26</description>
+		<year>1984</year>
+		<publisher>Intersoft</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="UTools-1.26.rom" size="16384" crc="0b2d6887" sha1="de35982762d289c078d7d3bbfdc053372b32172c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9939,6 +11137,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="vaxvt100">
+		<description>Vax VT100</description>
+		<year>1985</year>
+		<publisher>Liverpool University</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="VaxVT100-C085.rom" size="16384" crc="9ee42d63" sha1="8fd70834be58d4a2897ba4abab9b2c876d3ce140"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vaxvt100a" cloneof="vaxvt100">
+		<description>Vax VT100 (alt)</description>
+		<year>1985</year>
+		<publisher>Liverpool University</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="VaxVT100-C085a.rom" size="16384" crc="4bdea26f" sha1="a53b4fc24bab8a6194aff1d7b90d0e03a737259d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulcc">
+		<description>ULCC Enhanced Console Routines 0.32</description>
+		<year>1985</year>
+		<publisher>University of London Computer Centre</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="part_id" value="Utility" />
+			<dataarea name="rom" size="16384">
+				<rom name="ULCC-Utility-323_14.rom" size="16384" crc="5ce77eb9" sha1="bfecb2bbf5400186f0da094d2c2a711c3cca341e"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<feature name="part_id" value="Workstation" />
+			<dataarea name="rom" size="16384">
+				<rom name="ULCC-Workstation-1.4_4.rom" size="16384" crc="e6e5a752" sha1="69a4c50735e0accbc0afa6232cf0d5c429f9597d"/>
+			</dataarea>
+		</part>
+		<part name="rom3" interface="bbc_rom">
+			<feature name="part_id" value="CONFIG Program" />
+			<dataarea name="rom" size="16384">
+				<rom name="ULCC-EnhancedConsoleConfig-0.21_8.rom" size="16384" crc="b88a6297" sha1="2c4bac24c19f1f6a8c56ddf35a5f481b022af2be"/>
+			</dataarea>
+		</part>
+		<part name="rom4" interface="bbc_rom">
+			<feature name="part_id" value="CONSOLE Program" />
+			<dataarea name="rom" size="16384">
+				<rom name="ULCC-Console-V872_9.rom" size="16384" crc="d0f6a01a" sha1="da35145d821a16c73cb617146362d1cdc1f40747"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vdu">
 		<description>VDU 1.2</description>
 		<year>1986</year>
@@ -9946,6 +11196,17 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="VDU-1.2.rom" size="8192" crc="7c929c4a" sha1="0bc797ccee37252baf65c0c6bdc5ab91ccf5093e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdu4">
+		<description>VDU 4.10R</description>
+		<year>1984</year>
+		<publisher>University of Leeds</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VDU-4.10R.rom" size="8192" crc="8844acc7" sha1="849781159870154e61de955c94fc103eee6b00ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9969,6 +11230,28 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="VideoROM-X3.1.rom" size="16384" crc="e2089d1c" sha1="32c3aed1e8dc44997a7b567da012b85687062193"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidicode">
+		<description>Vidicode 1.0 (Dut)</description>
+		<year>1984</year>
+		<publisher>H.E.H.Eppens</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Vidicode-1.0.rom" size="16384" crc="30a9cd46" sha1="a014cb6a5311465b0d5d62b87e44a55bc06f0e8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidifix">
+		<description>Vidifix 1.5 (Dut)</description>
+		<year>1984</year>
+		<publisher>H.O.Wagenaar</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Vidifix-1.5.rom" size="8192" crc="adb706df" sha1="60b38227d88fa47bdb9921d5ddea5b2ddf1bb467"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10049,6 +11332,29 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="View-B3.0.rom" size="16384" crc="bdc9b5df" sha1="14820174e8ea802f1ae95186285a4592fd519699"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewpdmp">
+		<description>View Printer Driver 1.10</description>
+		<year>1984</year>
+		<publisher>Micro-Plus</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="ViewPrinterDriver-1.10.rom" size="8192" crc="e43f81bf" sha1="4ff7c51063d1a47197d25562a57524a9ffa76749"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewpdpr" supported="no">
+		<description>Pro Range View Printer Driver 1.00</description>
+		<year>1986</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palqst" />
+			<dataarea name="rom" size="32768">
+				<rom name="ProRangeViewPrinterDriver-1.00.rom" size="32768" crc="f5e0183a" sha1="f71030f9535667af41aa521d242438c32ebd4081"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10217,6 +11523,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="viewps">
+		<description>View to PostScript Converter 1.11</description>
+		<year>1986</year>
+		<publisher>W G Dixon</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="ViewPostScriptConverter-1.11.rom" size="16384" crc="d121898b" sha1="c67b7f9cf09be4014c41b9b20facc2f4b3636d21"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vnula102" cloneof="vnula" supported="partial">
 		<description>VideoNuLA 1.02</description>
 		<year>2017</year>
@@ -10235,6 +11552,28 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="VideoNuLA-1.03.rom" size="16384" crc="cd3324f8" sha1="e12b6d3671b52eb55476155358859b5a1937211a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vmp090" cloneof="vmp">
+		<description>VMP 0.90</description>
+		<year>1984</year>
+		<publisher>Solidisk</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VMP-0.90.rom" size="8192" crc="37d82981" sha1="28c63053419c2f2995d8f571269e521b82842e8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vmp">
+		<description>VMP 1.00</description>
+		<year>1984</year>
+		<publisher>Solidisk</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="VMP-1.00.rom" size="8192" crc="71ba9cd9" sha1="0fc9263800b38f78bbdaebf5c513229d6451a9c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10394,6 +11733,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wdfs140" cloneof="wdfs144">
+		<description>Watford Electronics DFS 1.40</description>
+		<year>1983</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Acorn 8271 FDC" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Watford-DFS-1.40.rom" size="16384" crc="fd495019" sha1="5ca8165bdf1ec396640925cb37ce826238e78378"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wdfs141" cloneof="wdfs144">
 		<description>Watford Electronics DFS 1.41</description>
 		<year>1983</year>
@@ -10485,6 +11837,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wildrom">
+		<description>WildROM 1.27</description>
+		<year>1990</year>
+		<publisher>JRS</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WildROM-1.27.rom" size="16384" crc="9478d5db" sha1="08cec09c3459ea87a93d57c7bd6f4ddb9a7bcc89"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="window25" cloneof="window">
 		<description>Window 1025</description>
 		<year>1985</year>
@@ -10548,7 +11911,7 @@ license:CC0
 	<software name="wordpwr">
 		<description>WordPower</description>
 		<year>1986</year>
-		<publisher>Ian Copestake</publisher>
+		<publisher>Ian Copestake Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="WordPower-4.00.rom" size="16384" crc="19952ec2" sha1="2c30cc1dceb127e22cf10b89a37d1cfc6f48fe73"/>
@@ -10777,6 +12140,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wslem">
+		<description>WSL Terminal Emulator 3.0</description>
+		<year>1986</year>
+		<publisher>WSL</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WSLTerminalEmulator-3.0.rom" size="16384" crc="f927baa3" sha1="d21b2d28aad6b62811b75519606ecdebc77af823"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wslemfx" cloneof="wslem">
+		<description>WSL Terminal Emulator (Epson FX80) 3.0</description>
+		<year>1986</year>
+		<publisher>WSL</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="WSLTerminalEmulator_FX80-3.0.rom" size="16384" crc="61214775" sha1="ca554f4471c601e233ac9cda802a82ab4a47202d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wysiwygp">
 		<description>WYSIWYG Plus 1.2</description>
 		<year>1986</year>
@@ -10795,6 +12180,28 @@ license:CC0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="WYSIWYGPlus-1.22.rom" size="16384" crc="d2c37f11" sha1="7da9b11c4e478ebc714b68485c4dd7059d175a2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbasic2" cloneof="xbasic">
+		<description>XBasic B.2</description>
+		<year>1988</year>
+		<publisher>DEB</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Xbasic-B.2.rom" size="16384" crc="77d01cb6" sha1="16daa1452c679b784212089aa80c2de64de30add"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbasic">
+		<description>XBasic B.9</description>
+		<year>1990</year>
+		<publisher>DEB</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Xbasic-B.9.rom" size="16384" crc="35570012" sha1="64b9baccff58d024af551a907d290aa328811684"/>
 			</dataarea>
 		</part>
 	</software>

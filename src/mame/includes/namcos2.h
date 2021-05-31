@@ -16,7 +16,7 @@
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
 #include "sound/c140.h"
-#include "video/c45.h"
+#include "video/namco_c45road.h"
 #include "video/namco_c116.h"
 #include "machine/namco65.h"
 #include "machine/namco68.h"
@@ -80,6 +80,7 @@ public:
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
 	void finallap_noio(machine_config &config);
+	void base_fl(machine_config &config);
 	void finallap(machine_config &config);
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);

@@ -50,7 +50,7 @@ protected:
 
 	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
 	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
-	int find_size(io_generic *io, uint32_t form_factor) const;
+	int find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 	int compute_track_size(const format &f) const;
 	virtual void build_sector_description(const format &d, uint8_t *sectdata, desc_s *sectors, int track, int head) const;
 	void check_compatibility(floppy_image *image, std::vector<int> &candidates);

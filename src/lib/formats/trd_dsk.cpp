@@ -31,7 +31,7 @@ const char *trd_format::extensions() const
 	return "trd";
 }
 
-int trd_format::find_size(io_generic *io, uint32_t form_factor)
+int trd_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int index = -1;
 	uint64_t size = io_generic_size(io);

@@ -18,11 +18,11 @@ BTANB:
 
 Elite A/S Challenger (EAS)
 ---------------------------------
-This came out in 1982. 2 program updates were released in 1983 and 1984,
-named Budapest and Glasgow, places where Fidelity won chess computer matches.
-A/S stands for auto sensory, it's the 1st Fidelity board with magnet sensors.
-The magnetic chessboard was licensed from AVE Micro Systems, in fact, the
-PC model board is the same one as in AVE's ARB (ave_arb.cpp driver).
+This came out in 1983. 2 program updates were released in 1983 and 1984,
+named Budapest and Glasgow, places where Fidelity competed in chess computer
+matches (they won it in 1983). A/S stands for auto sensory, it's the 1st
+Fidelity board with magnet sensors. The magnetic chessboard was licensed from
+AVE Micro Systems, in fact, the PC model board is the same one as in AVE's ARB.
 
 hardware overview:
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs

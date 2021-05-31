@@ -462,7 +462,7 @@ void x68k_state::draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 				}
 				else
 					blend = false;
-				if((colour && (m_gfxpalette->pen(colour) & 0xffffff)) || (m_video.gfx_pri == 2))
+				if((m_gfxpalette->pen(colour) & 0xffffff) || (m_video.gfx_pri == 2))
 				{
 					if(blend)
 						bitmap.pix(scanline, pixel) = ((bitmap.pix(scanline, pixel) >> 1) & 0xff7f7f7f) + ((m_gfxpalette->pen(colour) >> 1) & 0x7f7f7f);
@@ -535,6 +535,35 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle clip
 			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_crtc->hbegin()+sx,m_crtc->vbegin()+(sy*m_video.bg_double),0x10000,0x10000*m_video.bg_double,0x00);
 		}
 	}
+}
+
+void x68k_state::draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect)
+{
+	int sclx = layer ? m_spritereg[0x402] : m_spritereg[0x400];
+	int scly = layer ? m_spritereg[0x403] : m_spritereg[0x401];
+	tilemap_t* x68k_bg0;
+	tilemap_t* x68k_bg1;
+	tilemap_t* map;
+
+	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
+	{
+		x68k_bg0 = m_bg0_8;
+		x68k_bg1 = m_bg1_8;
+	}
+	else
+	{
+		x68k_bg0 = m_bg0_16;
+		x68k_bg1 = m_bg1_16;
+	}
+
+	if(layer)
+		map = (m_spritereg[0x404] & 0x0030) == 0x10 ? x68k_bg0 : x68k_bg1;
+	else
+		map = (m_spritereg[0x404] & 0x0006) == 0x02 ? x68k_bg0 : x68k_bg1;
+
+	map->set_scrollx(0,(sclx - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
+	map->set_scrolly(0,(scly - m_crtc->vbegin()) & 0x3ff);
+	map->draw(screen, bitmap, rect, opaque ? TILEMAP_DRAW_OPAQUE : 0, 0);
 }
 
 static const gfx_layout x68k_pcg_8 =
@@ -632,24 +661,8 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	int priority;
 	int xscr,yscr;
 	int x;
-	tilemap_t* x68k_bg0;
-	tilemap_t* x68k_bg1;
 	int pixel = 0, scanline = 0;
 	//uint8_t *rom;
-
-	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
-	{
-		x68k_bg0 = m_bg0_8;
-		x68k_bg1 = m_bg1_8;
-	}
-	else
-	{
-		x68k_bg0 = m_bg0_16;
-		x68k_bg1 = m_bg1_16;
-	}
-//  rect.max_x=m_crtc->width();
-//  rect.max_y=m_crtc->height();
-	bitmap.fill(0, cliprect);
 
 	if(m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
 		return 0;
@@ -682,6 +695,33 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		}
 	}
 
+	bool clear = false;
+	if(m_video.reg[2] & 0x0040)
+	{
+		if(m_spritereg[0x404] & 0x0008)
+		{
+			clear = true;
+			draw_bg(m_pcgbitmap, screen, 1, true, rect);
+		}
+		else if(m_spritereg[0x404] & 0x0001)
+		{
+			clear = true;
+			draw_bg(m_pcgbitmap, screen, 0, true, rect);
+		}
+	}
+	if(clear)
+	{
+		for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+		{
+			for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
+			{
+				uint8_t colour = m_pcgbitmap.pix(scanline, pixel) & 0xff;
+				bitmap.pix(scanline, pixel) = m_pcgpalette->pen(colour);
+			}
+		}
+	}
+	else
+		bitmap.fill(0, rect); // possibly fill with m_pcgpalette->pen(0)
 
 	for(priority=2;priority>=0;priority--)
 	{
@@ -694,37 +734,13 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			m_pcgbitmap.fill(0, rect);
 			draw_sprites(m_pcgbitmap,1,rect);
-			if((m_spritereg[0x404] & 0x0008))
-			{
-				if((m_spritereg[0x404] & 0x0030) == 0x10)  // BG1 TXSEL
-				{
-					x68k_bg0->set_scrollx(0,(m_spritereg[0x402] - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-					x68k_bg0->set_scrolly(0,(m_spritereg[0x403] - m_crtc->vbegin()) & 0x3ff);
-					x68k_bg0->draw(screen, m_pcgbitmap,rect,0,0);
-				}
-				else
-				{
-					x68k_bg1->set_scrollx(0,(m_spritereg[0x402] - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-					x68k_bg1->set_scrolly(0,(m_spritereg[0x403] - m_crtc->vbegin()) & 0x3ff);
-					x68k_bg1->draw(screen, m_pcgbitmap,rect,0,0);
-				}
-			}
+			if(m_spritereg[0x404] & 0x0008)
+				draw_bg(m_pcgbitmap, screen, 1, false, rect);
+
 			draw_sprites(m_pcgbitmap,2,rect);
-			if((m_spritereg[0x404] & 0x0001))
-			{
-				if((m_spritereg[0x404] & 0x0006) == 0x02)  // BG0 TXSEL
-				{
-					x68k_bg0->set_scrollx(0,(m_spritereg[0x400] - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-					x68k_bg0->set_scrolly(0,(m_spritereg[0x401] - m_crtc->vbegin()) & 0x3ff);
-					x68k_bg0->draw(screen, m_pcgbitmap,rect,0,0);
-				}
-				else
-				{
-					x68k_bg1->set_scrollx(0,(m_spritereg[0x400] - m_crtc->hbegin() - m_video.bg_hshift) & 0x3ff);
-					x68k_bg1->set_scrolly(0,(m_spritereg[0x401] - m_crtc->vbegin()) & 0x3ff);
-					x68k_bg1->draw(screen, m_pcgbitmap,rect,0,0);
-				}
-			}
+			if(m_spritereg[0x404] & 0x0001)
+				draw_bg(m_pcgbitmap, screen, 0, false, rect);
+
 			draw_sprites(m_pcgbitmap,3,rect);
 
 			for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
@@ -732,7 +748,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 				for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 				{
 					uint8_t colour = m_pcgbitmap.pix(scanline, pixel) & 0xff;
-					if((colour && (m_pcgpalette->pen(colour) & 0xffffff)) || ((m_video.reg[1] & 0x3000) == 0x2000))
+					if(colour && (m_pcgpalette->pen(colour) & 0xffffff))
 						bitmap.pix(scanline, pixel) = m_pcgpalette->pen(colour);
 				}
 			}

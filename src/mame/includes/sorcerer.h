@@ -97,7 +97,6 @@ protected:
 	void portff_w(u8 data);
 	TIMER_CALLBACK_MEMBER(cassette_tc);
 	TIMER_CALLBACK_MEMBER(serial_tc);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void machine_start_common(offs_t endmem);
 	void machine_reset_common();

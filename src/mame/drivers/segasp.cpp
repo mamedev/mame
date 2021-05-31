@@ -36,6 +36,7 @@ G1 bus PIO or DMA, or directly via banked  area 0x0100xxxx in SH4 address space.
 todo: make this actually readable, we don't support unicode source files
 
  Title                                       PCB ID     REV CFID    Dumped Region  PIC             MAIN BD Serial
+Aminosan (satellite)                        837-15041    F*           yes  JP     253-5508-0613J  AAFG-01A40195003, Medal
 Battle Police                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Beetle DASH!!                               ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Bingo Galaxy (main)                         834-14788    C            ROM  JP     253-5508-0513J  AAFE-01A37754716, AAFE-01E10924916, AAFE-01D67304905, Medal
@@ -389,6 +390,23 @@ ROM_START( segasp )
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_PARAMETER( ":rom_board:id", "5502" )
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
+ROM_END
+
+// probably satellite screen-less player I/O and hoppers controller units, while actual game running on main Lindbergh unit
+ROM_START( aminosan )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(3d15e610) SHA1(00b040365eaf23f4d6ffe9927e264836d0cdaba1) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(0db8a64a) SHA1(6b6144d1e9b90cb1beb4ac65801ee0b261339106) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0613-jpn.ic15", 0, 0x800, CRC(cf3071b9) SHA1(27044f8d51ce3d2662847ff3f58dd4302935b9c8) )
 ROM_END
 
 ROM_START( brickppl )
@@ -748,6 +766,7 @@ ROM_END
 
 GAME( 2004, segasp,  0,          segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Sega System SP (Spider) BIOS", GAME_FLAGS | MACHINE_IS_BIOS_ROOT )
 // These use ROMs
+GAME( 2010, aminosan,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Aminosan (satellite)", GAME_FLAGS )
 GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (main)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )

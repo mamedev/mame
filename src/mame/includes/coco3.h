@@ -4,7 +4,7 @@
 
     coco3.h
 
-    TRS-80 Radio Shack Color Computer 1/2 Family
+    TRS-80 Radio Shack Color Computer 3 Family
 
 ***************************************************************************/
 
@@ -23,9 +23,6 @@
 
 #define GIME_TAG                "gime"
 #define VDG_TAG                 "vdg"
-#define COMPOSITE_SCREEN_TAG    "composite"
-#define RGB_SCREEN_TAG          "rgb"
-
 
 
 //**************************************************************************
@@ -37,7 +34,8 @@ class coco3_state : public coco_state
 public:
 	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: coco_state(mconfig, type, tag)
-		, m_gime(*this, GIME_TAG) { }
+		, m_gime(*this, GIME_TAG)
+		, m_screen_config(*this, "screen_config") { }
 
 	virtual void ff20_write(offs_t offset, uint8_t data) override;
 	virtual uint8_t ff40_read(offs_t offset) override;
@@ -50,6 +48,7 @@ public:
 	void coco3dw1(machine_config &config);
 	void coco3(machine_config &config);
 	void coco3_mem(address_map &map);
+
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;
 
@@ -57,8 +56,11 @@ protected:
 	virtual void update_keyboard_input(uint8_t value) override;
 	virtual void cart_w(bool line) override;
 
+	uint8_t m_pia1b_control_register;
+
 private:
 	required_device<gime_device> m_gime;
+	required_ioport m_screen_config;
 };
 
 #endif // MAME_INCLUDES_COCO3_H

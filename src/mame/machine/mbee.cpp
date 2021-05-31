@@ -163,7 +163,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 					// put it in the queue
 					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
 					m_newkb_q[m_newkb_q_pos] = code;
-					if (m_newkb_q_pos < 19) m_newkb_q_pos++;
+					if (m_newkb_q_pos < (std::size(m_newkb_q)-1))
+						m_newkb_q_pos++;
 				}
 			}
 			m_newkb_was_pressed[i] = pressed;
@@ -184,11 +185,13 @@ uint8_t mbee_state::port18_r()
 
 	if (m_newkb_q_pos)
 	{
-		m_newkb_q_pos--;
 		for (i = 0; i < m_newkb_q_pos; i++) m_newkb_q[i] = m_newkb_q[i+1]; // ripple queue
+		m_newkb_q[m_newkb_q_pos] = 0;
+		m_newkb_q_pos--;
 	}
 
 	m_b2 = 0; // clear irq
+	m_pio->port_b_write(pio_port_b_r());
 	return data;
 }
 
@@ -574,16 +577,44 @@ bit 4,5 : (banking main ram) 0x10 = 128k; 0x20 = 256k
 
     Quickload
 
-    These load the standard BIN format, as well
+    This loads the standard BIN format, as well
     as BEE, COM and MWB files.
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	bool autorun = BIT(m_io_config->read(), 0);
+	if (image.is_filetype("bin"))
+	{
+		uint16_t execute_address, start_addr, end_addr;
+
+		/* load the binary into memory */
+		if (z80bin_load_file(image, space, execute_address, start_addr, end_addr) != image_init_result::PASS)
+			return image_init_result::FAIL;
+
+		/* is this file executable? */
+		if (execute_address != 0xffff)
+		{
+			space.write_word(0xa6, execute_address);            /* fix the EXEC command */
+
+			if (autorun)
+			{
+				space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
+				m_maincpu->set_pc(execute_address);
+			}
+			else
+			{
+				space.write_word(0xa2, 0x8517);
+			}
+		}
+
+		return image_init_result::PASS;
+	}
+
 	uint16_t i, j;
-	uint8_t data, sw = m_io_config->read() & 1;   /* reading the config switch: 1 = autorun */
+	uint8_t data;
 
 	size_t quickload_size = image.length();
 	if (image.is_filetype("mwb"))
@@ -608,7 +639,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw)
+		if (autorun)
 		{
 			space.write_word(0xa2,0x801e);  /* fix warm-start vector to get around some copy-protections */
 			m_maincpu->set_pc(0x801e);
@@ -616,7 +647,8 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 		else
 			space.write_word(0xa2,0x8517);
 	}
-	else if (image.is_filetype("com"))
+	else
+	if (image.is_filetype("com"))
 	{
 		/* com files - most com files are just machine-language games with a wrapper and don't need cp/m to be present */
 		for (i = 0; i < quickload_size; i++)
@@ -638,9 +670,11 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw) m_maincpu->set_pc(0x100);
+		if (autorun)
+			m_maincpu->set_pc(0x100);
 	}
-	else if (image.is_filetype("bee"))
+	else
+	if (image.is_filetype("bee"))
 	{
 		/* bee files - machine-language games that start at 0900 */
 		for (i = 0; i < quickload_size; i++)
@@ -662,45 +696,10 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 			}
 		}
 
-		if (sw) m_maincpu->set_pc(0x900);
-	}
-
-	return image_init_result::PASS;
-}
-
-
-/*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( mbee_state::quickload_bin )
--------------------------------------------------*/
-
-QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bin)
-{
-	uint16_t execute_address, start_addr, end_addr;
-	int autorun;
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* load the binary into memory */
-	if (z80bin_load_file(image, space, execute_address, start_addr, end_addr) != image_init_result::PASS)
-		return image_init_result::FAIL;
-
-	/* is this file executable? */
-	if (execute_address != 0xffff)
-	{
-		/* check to see if autorun is on */
-		autorun = m_io_config->read() & 1;
-
-		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
-
 		if (autorun)
-		{
-			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
-			m_maincpu->set_pc(execute_address);
-		}
-		else
-		{
-			space.write_word(0xa2, 0x8517);
-		}
+			m_maincpu->set_pc(0x900);
 	}
 
 	return image_init_result::PASS;
 }
+

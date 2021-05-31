@@ -1614,7 +1614,7 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	lba2 += m_towns_cd.parameter[3] << 8;
 	lba2 += m_towns_cd.parameter[2];
 	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
-	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current;
+	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current + 1;
 
 	m_cdda->set_cdrom(device->get_cdrom_file());
 	m_cdda->start_audio(m_towns_cd.cdda_current,m_towns_cd.cdda_length);
@@ -1837,7 +1837,6 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 									{
 										int track = (m_towns_cd.extra_status/2)-4;
 										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),track);
-										addr += cdrom_get_toc(m_cdrom->get_cdrom_file())->tracks[track].pregap;
 										addr = lba_to_msf(addr + 150);
 										towns_cd_set_status(0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
@@ -2763,6 +2762,11 @@ void towns_state::machine_start()
 	if (m_flop[1]->get_device())
 		m_flop[1]->get_device()->set_rpm(360);
 
+	// uninitialized PCM RAM filled with 0xff (fmtmarty chasehq relies on that)
+	address_space &space = subdevice<rf5c68_device>("pcm")->space(0);
+	for (int i = 0; i < 0x10000; i++)
+		space.write_byte(i, 0xff);
+
 	m_timer0 = 0;
 	m_timer1 = 0;
 	m_serial_irq_enable = 0;
@@ -2889,12 +2893,12 @@ void towns_state::towns_base(machine_config &config)
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
 	pcm.set_addrmap(0, &towns_state::pcm_mem);
-	pcm.add_route(0, "lspeaker", 3.00);
-	pcm.add_route(1, "rspeaker", 3.00);
+	pcm.add_route(0, "lspeaker", 1.00);
+	pcm.add_route(1, "rspeaker", 1.00);
 
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 1.00);
-	m_cdda->add_route(1, "rspeaker", 1.00);
+	m_cdda->add_route(0, "lspeaker", 0.30);
+	m_cdda->add_route(1, "rspeaker", 0.30);
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.50);

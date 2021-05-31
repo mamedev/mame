@@ -11,7 +11,7 @@ license:CC0
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 
@@ -155,7 +155,7 @@ license:CC0
 
 		<!-- chessboard leds -->
 		<repeat count="8">
-			<param name="x" start="8.2" increment="10" />
+			<param name="x" start="8.3" increment="10" />
 			<param name="la" start="0" increment="1" />
 			<param name="lb" start="8" increment="1" />
 			<param name="lc" start="16" increment="1" />

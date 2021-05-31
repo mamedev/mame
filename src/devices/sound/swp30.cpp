@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "swp30.h"
 
+static int scount = 0;
+
 /*
   The SWP30 is the combination of a rompler called AWM2 (Advanced Wave
   Memory 2) and an effects DSP called MEG (Multiple Effects
@@ -52,7 +54,7 @@
   25 bits address and 32 bits data wide.  It applies four filters to
   the sample data, two of fixed type (low pass then highpass) and two
   free 3-point FIR filters (used for yet another lowpass and
-  highpass).  Envelopes are handled automatically, and the final
+  highpass).  Envelopes are handled semi-automatically, and the final
   panned result is sent to the mixer.
 
 
@@ -163,9 +165,9 @@ void swp30_device::device_add_mconfig(machine_config &config)
 
 void swp30_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, 44100, STREAM_SYNCHRONOUS);
 
-	// Attenuantion for panning is 4.4 floating point.  That means 0
+	// Attenuation for panning is 4.4 floating point.  That means 0
 	// to -96.3dB.  Since it's a nice range, we assume it's the same
 	// for other attenuation values.  Computed value is 1.16
 	// format, to avoid overflow
@@ -226,6 +228,8 @@ void swp30_device::device_start()
 	save_item(NAME(m_eq_filter));
 	save_item(NAME(m_routing));
 
+	save_item(NAME(m_internal_adr));
+
 	save_item(NAME(m_program_address));
 }
 
@@ -263,7 +267,7 @@ void swp30_device::device_reset()
 
 void swp30_device::rom_bank_updated()
 {
-	m_stream->update();
+	// Nothing to do, stream is synchronous
 }
 
 void swp30_device::map(address_map &map)
@@ -306,7 +310,10 @@ void swp30_device::map(address_map &map)
 
 	// Control registers
 	// These appear as channel slots 0x0e and 0x0f
-	// 00-0b missing
+	// 00-01 missing
+	rctrl(map, 0x02).rw(FUNC(swp30_device::internal_adr_r), FUNC(swp30_device::internal_adr_w));
+	rctrl(map, 0x03).r (FUNC(swp30_device::internal_r));
+	// 04-0b missing
 	rctrl(map, 0x0c).rw(FUNC(swp30_device::keyon_mask_r<3>), FUNC(swp30_device::keyon_mask_w<3>));
 	rctrl(map, 0x0d).rw(FUNC(swp30_device::keyon_mask_r<2>), FUNC(swp30_device::keyon_mask_w<2>));
 	rctrl(map, 0x0e).rw(FUNC(swp30_device::keyon_mask_r<1>), FUNC(swp30_device::keyon_mask_w<1>));
@@ -428,7 +435,7 @@ void swp30_device::lpf_cutoff_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(0 && m_lpf_cutoff[chan] != data)
+	if(1 || m_lpf_cutoff[chan] != data)
 		logerror("chan %02x lpf cutoff %04x\n", chan, data);
 	m_lpf_cutoff[chan] = data;
 }
@@ -442,7 +449,7 @@ void swp30_device::lpf_cutoff_inc_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(0 && m_lpf_cutoff_inc[chan] != data)
+	if(1 || m_lpf_cutoff_inc[chan] != data)
 		logerror("chan %02x lpf cutoff increment %04x\n", chan, data);
 	m_lpf_cutoff_inc[chan] = data;
 }
@@ -456,7 +463,7 @@ void swp30_device::hpf_cutoff_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(0 && m_hpf_cutoff[chan] != data)
+	if(1 || m_hpf_cutoff[chan] != data)
 		logerror("chan %02x hpf cutoff %04x\n", chan, data);
 	m_hpf_cutoff[chan] = data;
 }
@@ -470,7 +477,7 @@ void swp30_device::lpf_reso_w(offs_t offset, u16 data)
 {
 	m_stream->update();
 	u8 chan = offset >> 6;
-	if(0 && m_lpf_reso[chan] != data)
+	if(1 || m_lpf_reso[chan] != data)
 		logerror("chan %02x lpf resonance %04x\n", chan, data);
 	m_lpf_reso[chan] = data;
 }
@@ -583,7 +590,7 @@ template<int sel> void swp30_device::envelope_w(offs_t offset, u16 data)
 	u8 chan = offset >> 6;
 	bool ch = m_envelope[chan][sel] != data;
 	m_envelope[chan][sel] = data;
-	if(0 && ch)
+	if(1 && ch)
 		logerror("snd chan %02x envelopes %04x %04x %04x\n", chan, m_envelope[chan][0], m_envelope[chan][1], m_envelope[chan][2]);
 }
 
@@ -658,6 +665,52 @@ void swp30_device::address_l_w(offs_t offset, u16 data)
 	m_address[chan] = (m_address[chan] & 0xffff0000) | data;
 	if(0)
 		logerror("snd chan %02x format %s flags %02x address %06x\n", chan, formats[m_address[chan] >> 30], (m_address[chan] >> 24) & 0x3f, m_address[chan] & 0xffffff);
+}
+
+u16 swp30_device::internal_adr_r()
+{
+	return m_internal_adr;
+}
+
+void swp30_device::internal_adr_w(u16 data)
+{
+	m_internal_adr = data;
+}
+
+u16 swp30_device::internal_r()
+{
+	u8 chan = m_internal_adr & 0x3f;
+	switch(m_internal_adr >> 8) {
+	case 0:
+		// used at d312
+		// r0 = [b15, b14, 0,0,0,0,0,0, !b13, !b12, !b11, !b10, !b9, !b8, 1, 1]
+		// voice[45] = (voice[4b] * r0l) >> 7 (unsigned)
+		// if(r0h == 0) voice[43] = 0xff
+		// else         voice[43] = voice[51] - r0l; // 51 = inverse velocity
+		// if(r0l >= 0x80) ???
+		logerror("read %02x.0\n", chan);
+
+		// 3f -> active stays 2 until release where 1
+		// 7f, bf, ff -> active = 0 immediatly
+		return 0x0000 | 0x0000;
+
+	case 4:
+		// used at 44c4
+		// tests & 0x4000 only
+		logerror("read %02x.4\n", chan);
+		return 0x0000;
+
+	case 6:
+		// used at 3e7c
+		// tests & 0x8000 only, keyoff?
+		logerror("read %02x.6\n", chan);
+		return 0x0000;
+	}
+
+	logerror("%s internal_r port %x channel %02x sample %d\n", machine().time().to_string(), m_internal_adr >> 8, m_internal_adr & 0x1f, scount);
+	machine().debug_break();
+
+	return 0;
 }
 
 
@@ -751,8 +804,8 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 		preg = util::string_format("lf%02x", (slot-0x3e) + 2*chan);
 	else
 		preg = util::string_format("%02x.%02x", chan, slot);
-	if((slot >= 0xa && slot <= 0xd) || (slot >= 0x2c && slot <= 0x2f))
-		machine().debug_break();
+	//  if((slot >= 0xa && slot <= 0xd) || (slot >= 0x2c && slot <= 0x2f))
+	//      machine().debug_break();
 
 	logerror("snd_w [%04x %04x] %-5s, %04x\n", offset, offset*2, preg, data);
 }
@@ -763,117 +816,117 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 
 void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// Loop first on the samples and not on the channels otherwise
-	// effects will be annoying to implement.
+	if(outputs[0].samples() != 1)
+		fatalerror("Sync stream not sync?\n");
 
-	for(int sample = 0; sample < outputs[0].samples(); sample++) {
-		// Accumulate on 64 bits, shift/clamp at the end
-		s64 acc_left = 0, acc_right = 0;
+	scount++;
 
-		// Loop on channels
-		for(int channel = 0; channel < 64; channel++)
-			if(m_active_mask & (u64(1) << channel)) {
-				// First, read the sample
+	// Accumulate on 64 bits, shift/clamp at the end
+	s64 acc_left = 0, acc_right = 0;
 
-				// - Find the base sample index and base address
-				s32 spos = m_sample_pos[channel] >> 8;
-				offs_t base_address = (m_address[channel] & 0x1ffffff) << 2;
-				// - Read/decompress the sample
-				s16 samp = 0;
-				switch(m_address[channel] >> 30) {
-				case 0: { // 16-bits linear
-					offs_t adr = base_address + (spos << 1);
-					samp = read_word(adr);
-					break;
-				}
+	// Loop on channels
+	for(int channel = 0; channel < 64; channel++)
+		if(m_active_mask & (u64(1) << channel)) {
+			// First, read the sample
 
-				case 1: { // 12-bits linear
-					offs_t adr = base_address + (spos >> 2)*6;
-					switch(spos & 3) {
-					case 0: { // .abc .... ....
-						u16 w0 = read_word(adr);
-						samp = (w0 & 0x0fff) << 4;
-						break;
-					}
-					case 1: { // C... ..AB ....
-						u16 w0 = read_word(adr);
-						u16 w1 = read_word(adr+2);
-						samp = ((w0 & 0xf000) >> 8) | ((w1 & 0x00ff) << 8);
-						break;
-					}
-					case 2: { // .... bc.. ...a
-						u16 w0 = read_word(adr+2);
-						u16 w1 = read_word(adr+4);
-						samp = ((w0 & 0xff00) >> 4) | ((w1 & 0x000f) << 12);
-						break;
-					}
-					case 3: { // .... .... ABC.
-						u16 w1 = read_word(adr+4);
-						samp = w1 & 0xfff0;
-						break;
-					}
-					}
-					break;
-				}
-
-				case 2:   // 8-bits linear
-					samp = read_byte(base_address + spos) << 8;
-					break;
-
-				case 3:   // 8-bits logarithmic
-					samp = m_sample_log8[read_byte(base_address + spos)];
-					break;
-				}
-
-				//logerror("sample %02x %06x [%d] %+5d %04x  %04x %04x\n", channel, base_address >> 2, m_address[channel] >> 30, spos, samp & 0xffff, m_volume[channel], m_pan[channel]);
-
-				// Second, step the sample pos, loop/deactivate as needed
-				m_sample_pos[channel] += m_sample_increment[m_freq[channel] & 0x3fff];
-				s32 loop_size = (m_post_size[channel] << 8) | ((m_address[channel] >> 22) & 0xf8);
-				if(m_sample_pos[channel] >= loop_size) {
-					// We reached the loop point, stop if loop size is zero,
-					// otherwise loop
-					if(!loop_size)
-						m_active_mask &= ~((u64(1) << channel));
-					else
-						do
-							m_sample_pos[channel] -= loop_size;
-						while(m_sample_pos[channel] >= loop_size);
-				}
-
-				// Third, filter the sample
-				// - missing lpf_cutoff, lpf_reso, hpf_cutoff
-
-				// - eq lowpass
-				s32 samp1 = (samp  * m_eq_filter[channel][2] + m_sample_history[channel][0][0] * m_eq_filter[channel][1] + m_sample_history[channel][0][1] * m_eq_filter[channel][0]) >> 13;
-				m_sample_history[channel][0][1] = m_sample_history[channel][0][0];
-				m_sample_history[channel][0][0] = samp;
-
-				// - eq highpass
-				s32 samp2 = (samp1 * m_eq_filter[channel][5] + m_sample_history[channel][1][0] * m_eq_filter[channel][4] + m_sample_history[channel][1][1] * m_eq_filter[channel][3]) >> 13;
-				m_sample_history[channel][1][1] = m_sample_history[channel][1][0];
-				m_sample_history[channel][1][0] = samp1;
-
-				// - anything else?
-
-				// Fourth, volume (disabled) and pan, clamp the attenuation at -96dB
-				s32 sampl = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] >> 8))];
-				s32 sampr = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] & 0xff))];
-
-				// Fifth, add to the accumulators
-				acc_left  += sampl;
-				acc_right += sampr;
-
-				// Missing: reverb, chorus, effects in general
+			// - Find the base sample index and base address
+			s32 spos = m_sample_pos[channel] >> 8;
+			offs_t base_address = (m_address[channel] & 0x1ffffff) << 2;
+			// - Read/decompress the sample
+			s16 samp = 0;
+			switch(m_address[channel] >> 30) {
+			case 0: { // 16-bits linear
+				offs_t adr = base_address + (spos << 1);
+				samp = read_word(adr);
+				break;
 			}
 
-		// Samples are 16 bits, there are up to 64 of them, and the accumulators are fixed-point signed 48.16
-		// Global EQ is missing (it's done in the MEG)
+			case 1: { // 12-bits linear
+				offs_t adr = base_address + (spos >> 2)*6;
+				switch(spos & 3) {
+				case 0: { // .abc .... ....
+					u16 w0 = read_word(adr);
+					samp = (w0 & 0x0fff) << 4;
+					break;
+				}
+				case 1: { // C... ..AB ....
+					u16 w0 = read_word(adr);
+					u16 w1 = read_word(adr+2);
+					samp = ((w0 & 0xf000) >> 8) | ((w1 & 0x00ff) << 8);
+					break;
+				}
+				case 2: { // .... bc.. ...a
+					u16 w0 = read_word(adr+2);
+					u16 w1 = read_word(adr+4);
+					samp = ((w0 & 0xff00) >> 4) | ((w1 & 0x000f) << 12);
+					break;
+				}
+				case 3: { // .... .... ABC.
+					u16 w1 = read_word(adr+4);
+					samp = w1 & 0xfff0;
+					break;
+				}
+				}
+				break;
+			}
 
-		acc_left >>= (16+6);
-		outputs[0].put_int_clamp(sample, acc_left, 32768);
+			case 2:   // 8-bits linear
+				samp = read_byte(base_address + spos) << 8;
+				break;
 
-		acc_right >>= (16+6);
-		outputs[1].put_int_clamp(sample, acc_right, 32768);
-	}
+			case 3:   // 8-bits logarithmic
+				samp = m_sample_log8[read_byte(base_address + spos)];
+				break;
+			}
+
+			//logerror("sample %02x %06x [%d] %+5d %04x  %04x %04x\n", channel, base_address >> 2, m_address[channel] >> 30, spos, samp & 0xffff, m_volume[channel], m_pan[channel]);
+
+			// Second, step the sample pos, loop/deactivate as needed
+			m_sample_pos[channel] += m_sample_increment[m_freq[channel] & 0x3fff];
+			s32 loop_size = (m_post_size[channel] << 8) | ((m_address[channel] >> 22) & 0xf8);
+			if(m_sample_pos[channel] >= loop_size) {
+				// We reached the loop point, stop if loop size is zero,
+				// otherwise loop
+				if(!loop_size)
+					m_active_mask &= ~((u64(1) << channel));
+				else
+					do
+						m_sample_pos[channel] -= loop_size;
+					while(m_sample_pos[channel] >= loop_size);
+			}
+
+			// Third, filter the sample
+			// - missing lpf_cutoff, lpf_reso, hpf_cutoff
+
+			// - eq lowpass
+			s32 samp1 = (samp  * m_eq_filter[channel][2] + m_sample_history[channel][0][0] * m_eq_filter[channel][1] + m_sample_history[channel][0][1] * m_eq_filter[channel][0]) >> 13;
+			m_sample_history[channel][0][1] = m_sample_history[channel][0][0];
+			m_sample_history[channel][0][0] = samp;
+
+			// - eq highpass
+			s32 samp2 = (samp1 * m_eq_filter[channel][5] + m_sample_history[channel][1][0] * m_eq_filter[channel][4] + m_sample_history[channel][1][1] * m_eq_filter[channel][3]) >> 13;
+			m_sample_history[channel][1][1] = m_sample_history[channel][1][0];
+			m_sample_history[channel][1][0] = samp1;
+
+			// - anything else?
+
+			// Fourth, volume (disabled) and pan, clamp the attenuation at -96dB
+			s32 sampl = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] >> 8))];
+			s32 sampr = samp2 * m_linear_attenuation[std::min(0xff, (m_volume[channel] & 0x00) + (m_pan[channel] & 0xff))];
+
+			// Fifth, add to the accumulators
+			acc_left  += sampl;
+			acc_right += sampr;
+
+			// Missing: reverb, chorus, effects in general
+		}
+
+	// Samples are 16 bits, there are up to 64 of them, and the accumulators are fixed-point signed 48.16
+	// Global EQ is missing (it's done in the MEG)
+
+	acc_left >>= (16+6);
+	outputs[0].put_int_clamp(0, acc_left, 32768);
+
+	acc_right >>= (16+6);
+	outputs[1].put_int_clamp(0, acc_right, 32768);
 }

@@ -603,7 +603,7 @@ void merit_state::couple_map(address_map &map)
 
 static INPUT_PORTS_START( meritpoker )
 
-	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Take / Lo" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -613,7 +613,7 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME( "Cash Out / Hi-Score" )
 
-	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_START("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -623,7 +623,7 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in descending order (usually P2 controls - Not used!) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* MUST be "LOW" or Riviera Hi-Score rev A will hang */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -678,10 +678,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( chkndraw )
 	PORT_INCLUDE( meritpoker )
 
-	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Take Half / Dbl Half" )
 
-	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_COCKTAIL PORT_CODE(KEYCODE_W) PORT_NAME( "P2 Deal")
@@ -691,7 +691,7 @@ static INPUT_PORTS_START( chkndraw )
 	PORT_DIPSETTING(    0x40, "90%" )
 	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate setting - Likely not used */
 
-	PORT_MODIFY("IN2") /* Pins #46 through #41 of J3 in decending order */
+	PORT_MODIFY("IN2") /* Pins #46 through #41 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME( "P2 Hold 1 / Take / Lo" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME( "P2 Hold 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME( "P2 Hold 3 / Take Half / Dbl Half" )
@@ -775,11 +775,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( iowapp )
 	PORT_INCLUDE( meritpoker )
 
-	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_MODIFY("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 
-//  PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+//  PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in descending order */
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* If HIGH triggers a "TOKEN LOW" error - Hopper releated */
 
 	PORT_MODIFY("DSW")
@@ -815,7 +815,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where are they mapped? */
 
-	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1/P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1/P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1/P2 Button 3")
@@ -825,7 +825,7 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1/P2 Cancel")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // pulling this LOW causes "unathorized conversion" msg.
 
-	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_START("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -838,7 +838,7 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where a
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "5" ) /* Duplicate setting - Likely not used */
 
-	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order */
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 3")
@@ -877,7 +877,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mapped, all "IPT_UNKNOWN" below checked and nothing seems to work
-	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
@@ -887,7 +887,7 @@ static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mappe
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("Cancel")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset Points") /* Counts down player point if pressed instead of "Play" */
 
-	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_START("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
@@ -901,7 +901,7 @@ static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mappe
 	PORT_DIPSETTING(    0x40, "90%" )
 
 
-	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order */
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 3")
@@ -988,7 +988,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mpchoice ) /* pitbossc games but dips like The Round Up */
 	PORT_INCLUDE( pitboss )
 
-	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )    PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
 	PORT_DIPSETTING(    0x80, "80%" )
 	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate */
@@ -1021,9 +1021,45 @@ static INPUT_PORTS_START( mpchoice ) /* pitbossc games but dips like The Round U
 	PORT_DIPSETTING(    0x00, "50" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mpchoicea ) /* pitbossc games but dips like The Round Up */
+	PORT_INCLUDE( pitboss )
+
+	PORT_MODIFY("IN1") /* Pins #57 through #51 of J3 in descending order */
+	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )    PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
+	PORT_DIPSETTING(    0x80, "80%" )
+	PORT_DIPSETTING(    0x00, "85%" ) /* Duplicate */
+	PORT_DIPSETTING(    0xc0, "85%" )
+	PORT_DIPSETTING(    0x40, "90%" )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )     PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Enable Acey Deucey" )    PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Enable Black Jack" )     PORT_DIPLOCATION("SW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW:4") /* 3 Games for this set, no dice game */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, "Counter Top" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )           PORT_DIPLOCATION("SW:7,8")
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0xc0, "10" )
+	PORT_DIPSETTING(    0x80, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( casino5 )
 
-	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
@@ -1033,7 +1069,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* pulling this LOW makes the horse racing game to not work */
 
-	PORT_START("IN1") /* Pins #57 through #51 of J3 in decending order */
+	PORT_START("IN1") /* Pins #57 through #51 of J3 in descending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) /* Runs basic Diagnostics on roms */
@@ -1046,7 +1082,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_DIPSETTING(    0xc0, "85%" )
 	PORT_DIPSETTING(    0x40, "90%" )
 
-	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in descending order (usually P2 controls - Not used!) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* pulling this LOW causes "Unathorized conversion" */
@@ -1577,7 +1613,7 @@ ROM_START( pitboss04 ) /* Program roms on a CTR-202 daughter card - Internal des
 	ROM_LOAD( "chr7_u40a.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
-ROM_START( pitboss03 ) /* Roms also found labeled simply as "PBHD" U5 through U7 */
+ROM_START( pitboss03 ) /* Roms also found labeled simply as "PBHD" U5 through U7 (PBHD means Poker, Blackjack, Horse & Dice) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2214-03_u5-0c.u5", 0x0000, 0x2000, CRC(97f870bd) SHA1(b1b01abff0385e3b0585e49f78b93bcf56e434ef) ) /* Internal designation: M4A4REV0 */
 	ROM_LOAD( "2214-03_u6-0.u6",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Games included in this set are: */
@@ -1595,6 +1631,21 @@ ROM_END
 ROM_START( pitboss03a ) /* Specific build for localized region with no Free Hand Bonus */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2214-03_u5-1c.u5", 0x0000, 0x2000, CRC(cf985f96) SHA1(d0e1c3887fe87b92c52410215b5eec600a793c50) ) /* Internal designation: M4A4REV0 */
+	ROM_LOAD( "2214-03_u6-0.u6",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Games included in this set are: */
+	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+ROM_END
+
+ROM_START( pitboss03b ) /* ROMs had no labels, Set has Free Hand Bonus so it might an earlier revision of pitboss03 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u5.bin",           0x0000, 0x2000, CRC(f6b22d25) SHA1(418a1c3e671b5bb4823ea45a5b382b1cbde74f8a) ) /* Internal designation: M4A4REV0 */
 	ROM_LOAD( "2214-03_u6-0.u6",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Games included in this set are: */
 	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
@@ -1667,6 +1718,21 @@ ROM_START( mpchoice ) /* Same games as pitbossc but different dips & can control
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+ROM_END
+
+ROM_START( mpchoicea ) /* Like the M4C1 set above, but only 3 games here */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "m3c1_u5b.u5",  0x0000, 0x2000, CRC(685eb48a) SHA1(31f41527f7a29379bf783f48ea50c3b74523d304) ) /* Internal designation: M3CG */
+	ROM_LOAD( "m3c1_u6b.u6",  0x2000, 0x2000, CRC(4cf91cca) SHA1(aaf685e66e153fa2c47b90c17af9f70751008e9a) ) /* Games included in this set are: */
+	ROM_LOAD( "m3c1_u7.u7",   0x4000, 0x2000, CRC(5a2aca08) SHA1(0fb4600f61ff1aef2d79ce7a63ee3fd9e79f7f3f) ) /* Draw Poker, Blackjack & Acey Deucey */
+
+	ROM_REGION( 0x6000, "gfx1", 0 ) /* NOTE: U37 & U38 were operator swaps and are not likely correct for this set */
+	ROM_LOAD( "hcg_u39.u39",   0x0000, 0x2000, CRC(6f82560d) SHA1(206acc5a0fcf391e03a5963bd344e3e15b7c691d) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1982 Merit industries   Philadelphia PA. */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                         */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hcg_u40.u40",  0x0000, 0x2000, CRC(6e20ba8f) SHA1(675cee5b8c38e3b9101c3c0788d2663ce397e40f) )
 ROM_END
 
 ROM_START( casino5 )
@@ -2553,12 +2619,14 @@ void merit_state::init_dtrvwz5()
 
 GAME( 1983, pitboss,    0,        pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-07, U5-0A)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* "7" hand written over a 5 */
 GAME( 1983, pitboss04,  pitboss,  casino5, pitboss,   merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss03,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Also M4A4 */
+GAME( 1983, pitboss03a, pitboss,  pitboss, pitbossa1, merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Also M4A4 */
+GAME( 1983, pitboss03b, pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A4)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* No labels, so use internal designation */
 GAME( 1983, pitbossm4,  pitboss,  pitboss, pitbossb,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (M4A1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossps,  pitboss,  pitboss, pitbossa,  merit_state, empty_init, ROT0,  "Merit", "The Pit Boss (PSB1)",             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, mdchoice,   pitboss,  pitboss, mdchoice,  merit_state, empty_init, ROT0,  "Merit", "Dealer's Choice (E4A1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
 GAME( 1983, mpchoice,   pitboss,  pitboss, mpchoice,  merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M4C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state, empty_init, ROT0,  "Merit", "Player's Choice (M3C1)",          MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1989, casino5,    0,        casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
