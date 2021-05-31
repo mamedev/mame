@@ -809,7 +809,7 @@ CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
 
-CONS( 1977, cambrp,    0,       0, cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, cambrp,    0,       0, cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.
