@@ -284,7 +284,7 @@ void opq_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[EG_REVERB] = (ch_reverb(choffs) != 0) ? 5 : cache.eg_rate[EG_RELEASE];
+	cache.eg_rate[EG_REVERB] = (ch_reverb(choffs) != 0) ? 5*4 : cache.eg_rate[EG_RELEASE];
 	cache.eg_shift = 0;
 }
 
