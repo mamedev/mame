@@ -34,7 +34,7 @@ Addons (w/ yellow Smartridges)
 |        | 80-091443(UK)     | V.Smile Smart Keyboard                                                     |
 |   XX   | 80-091444(GE)     | Schreibspaß (52-091444 on back label)                                      |
 |   XX   | 80-091445(FR)     | V.Smile Clavier Tip Tap                                                    |
-|        | 80-091447(SP)     | Teclado Interactivo V.Smile                                                |
+|   XX   | 80-091447(SP)     | Teclado Interactivo V.Smile (52-091447(SP) on back label)                  |
 +========+===================+============================================================================+
 |        | 80-03600(US)      | V.Smile PC Pal Island                                                      |
 +========+===================+============================================================================+
@@ -4671,7 +4671,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkb">
 		<description>V.Smile Smart Keyboard (USA)</description>
 		<year>200?</year>
@@ -4688,7 +4687,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkbge" cloneof="smartkb">
 		<description>V.Smile Schreibspaß (Germany)</description>
 		<year>200?</year>
@@ -4707,7 +4705,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- No inputs, uses a keyboard controller -->
 	<software name="smartkbfr" cloneof="smartkb">
 		<description>V.Smile Clavier Tip Tap (France)</description>
 		<year>200?</year>
@@ -4720,6 +4717,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="091445 - Vsmile Tip Tap (FR).bin" size="8388608" crc="93a8cc75" sha1="3fc1e93f18782b3f38ec7d97b3c70f8a9358230d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smartkbsp" cloneof="smartkb" supported="no">
+		<description>Teclado Interactivo V.Smile (Spain)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-091447(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="yellow" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="52-091447 - Teclado Interactivo V.Smile (Spain).bin" size="8388608" crc="a7ae2ba8" sha1="ba6b0ad2845090bfc6f50e3c995b25a571d07c87" />
 			</dataarea>
 		</part>
 	</software>
