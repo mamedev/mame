@@ -2,7 +2,8 @@
 // copyright-holders:
 /*******************************************************************************
 
-    Skeleton driver for Merit Scorpion darts machines
+    Skeleton driver for Merit Scorpion darts machines.
+    The same PCB is used also on other Merit darts machines, like Regent Darts. 
 
     Hardware overview:
     Main CPU: Dallas DS80C3202-UM or compatible (80C31 on older models)
