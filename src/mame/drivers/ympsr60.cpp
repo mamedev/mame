@@ -62,7 +62,7 @@
 class psr60_state : public driver_device
 {
 	static constexpr int DRVIF_MAX_TARGETS = 23;
-	static constexpr int RYP4_MAX_TARGETS = 8;
+	static constexpr int RYP4_MAX_TARGETS = 10;
 
 public:
 	psr60_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -124,6 +124,7 @@ private:
 	u8 m_bbd_config;
 	u8 m_drvif_data[2];
 	u8 m_drvif_select;
+	u8 m_sustain_fuzz;
 
 	WRITE_LINE_MEMBER(write_acia_clock) { m_acia->write_txc(state); m_acia->write_rxc(state); }
 	WRITE_LINE_MEMBER(acia_irq_w) { m_acia_irq = state; recalc_irqs(); }
@@ -139,6 +140,11 @@ private:
 public:
 	INPUT_CHANGED_MEMBER(drvif_changed);
 	INPUT_CHANGED_MEMBER(mastervol_changed);
+
+	// optional sustain pedal input; if this doesn't change, sustain will not work
+	// if no pedal present, it seems sustain should still work, so toggle the value
+	// here a bit to make the keyboard notice
+	CUSTOM_INPUT_MEMBER(sustain_fuzz) { return (m_sustain_fuzz = !m_sustain_fuzz) ? 8 : 12; }
 };
 
 void psr60_state::psr60_map(address_map &map)
@@ -267,7 +273,7 @@ INPUT_CHANGED_MEMBER(psr60_state::drvif_changed)
 
 INPUT_CHANGED_MEMBER(psr60_state::mastervol_changed)
 {
-	float mastervol = m_mastervol->read() / 75.0;
+	float mastervol = m_mastervol->read() / 50.0;
 	m_lmixer->set_output_gain(0, mastervol);
 	m_rmixer->set_output_gain(0, mastervol);
 }
@@ -298,9 +304,9 @@ void psr60_state::machine_reset()
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num) \
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, drvif_changed, num)
 
-#define RYP4_PORT(num, name) \
+#define RYP4_PORT(num, defval, name) \
 	PORT_START("RYP4_" #num) \
-	PORT_ADJUSTER(75, name)
+	PORT_ADJUSTER(defval, name)
 
 static INPUT_PORTS_START(psr60)
 	PORT_START("P1_9")
@@ -415,17 +421,19 @@ static INPUT_PORTS_START(psr60)
 	DRVIF_PORT(21, "Unused22.1", "Unused22.2", "Unused22.3", "Unused22.4")
 	DRVIF_PORT(22, "Unused23.1", "Unused23.2", "Unused23.3", "Unused23.4")
 
-	RYP4_PORT(1, "Solo Volume")
-	RYP4_PORT(2, "Orchestra Volume")
-	RYP4_PORT(3, "Rhythm Volume")
-	RYP4_PORT(4, "Rhythm Tempo")
-	RYP4_PORT(5, "Chord Volume")
-	RYP4_PORT(6, "Bass Volume")
-	RYP4_PORT(7, "Unused7")
-	RYP4_PORT(8, "Unused8")
+	RYP4_PORT( 1, 75, "Solo Volume")
+	RYP4_PORT( 2, 75, "Orchestra Volume")
+	RYP4_PORT( 3, 75, "Rhythm Volume")
+	RYP4_PORT( 4, 50, "Rhythm Tempo")
+	RYP4_PORT( 5, 75, "Chord Volume")
+	RYP4_PORT( 6, 75, "Bass Volume")
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 8,  0, "Unused8")
+	RYP4_PORT( 9,  0, "Unused9")
+	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(75, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(psr70)
@@ -553,17 +561,19 @@ static INPUT_PORTS_START(psr70)
 	DRVIF_PORT(21, "Unused22.1", "Record Solo", "Record Orchestra", "Record Chord/Bass")
 	DRVIF_PORT(22, "Unused23.1", "Play Back Solo", "Play Back Orchestra", "Play Back Chord/Bass")
 
-	RYP4_PORT(1, "Solo Volume")
-	RYP4_PORT(2, "Orchestra Volume")
-	RYP4_PORT(3, "Rhythm Volume")
-	RYP4_PORT(4, "Rhythm Tempo")
-	RYP4_PORT(5, "Chord Volume")
-	RYP4_PORT(6, "Bass Volume")
-	RYP4_PORT(7, "Unused7")
-	RYP4_PORT(8, "Unused8")
+	RYP4_PORT( 1, 75, "Solo Volume")
+	RYP4_PORT( 2, 75, "Orchestra Volume")
+	RYP4_PORT( 3, 75, "Rhythm Volume")
+	RYP4_PORT( 4, 50, "Rhythm Tempo")
+	RYP4_PORT( 5, 75, "Chord Volume")
+	RYP4_PORT( 6, 75, "Bass Volume")
+	RYP4_PORT( 7,  0, "Sustain") PORT_CUSTOM_MEMBER(psr60_state, sustain_fuzz)
+	RYP4_PORT( 8,  0, "Unused8")
+	RYP4_PORT( 9,  0, "Unused9")
+	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(75, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 void psr60_state::psr_common(machine_config &config)
