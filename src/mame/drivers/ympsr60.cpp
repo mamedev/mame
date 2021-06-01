@@ -91,7 +91,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	required_device<z80_device> m_maincpu;
@@ -117,6 +116,8 @@ private:
 	void ppi_pb_w(u8 data);
 	void ppi_pc_w(u8 data);
 	void recalc_irqs();
+
+	attoseconds_t cv_handler(attotime const &curtime);
 
 	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
 	u16 m_keyboard_select;
@@ -193,10 +194,11 @@ void psr60_state::ryp4_out_w(u8 data)
 	// modulation, which we simulate in a periodic timer
 }
 
-void psr60_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
 {
+	attotime curtime = cvtime;
+
 	// only two states have been observed to be measured: CT1=1/CT2=0 and CT1=0/CT2=1
-	attotime curtime = machine().time();
 	double bbd_freq;
 	if (BIT(m_bbd_config, 1) && !BIT(m_bbd_config, 2))
 	{
@@ -204,7 +206,7 @@ void psr60_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		curtime.m_seconds %= 3;
 		double pos = curtime.as_double() / 3;
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
-		bbd_freq = 35 + (107 - 35) * pos;
+		bbd_freq = 35000 + (107000 - 35000) * pos;
 	}
 	else
 	{
@@ -213,11 +215,11 @@ void psr60_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		double pos = curtime.as_double() * 6;
 		pos -= floor(pos);
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
-		bbd_freq = 48 + (61 - 48) * pos;
+		bbd_freq = 48000 + (61000 - 48000) * pos;
 	}
 
-	// two out-of-phase clocks run the BBD so it's effectively 2x frequency
-	m_bbd->set_unscaled_clock(bbd_freq * 2);
+	// BBD driver provides two out-of-phase clocks to basically run the BBD at 2x
+	return HZ_TO_ATTOSECONDS(bbd_freq * 2);
 }
 
 //
@@ -604,6 +606,7 @@ void psr60_state::psr_common(machine_config &config)
 	m_ryp4->add_route(1, m_rmixer, 0.50);
 
 	MN3204P(config, m_bbd, 12700); // 6.7kHz feeds the iG10090 driver, range is 10-200kHz
+	m_bbd->set_cv_handler(FUNC(psr60_state::cv_handler));
 	m_bbd->add_route(0, m_lmixer, 0.11);		// BBD is mixed in
 	m_bbd->add_route(0, m_rmixer, 0.11);
 
@@ -611,9 +614,9 @@ void psr60_state::psr_common(machine_config &config)
 	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
 	m_ym3533->add_route(0, m_lmixer, 0.16);		// channel 1 = ORC
 	m_ym3533->add_route(0, m_rmixer, 0.16);
-	m_ym3533->add_route(0, m_bbd, 1.0);
 	m_ym3533->add_route(1, m_lmixer, 0.22);		// channel 2 = SABC
 	m_ym3533->add_route(1, m_rmixer, 0.22);
+	m_ym3533->add_route(1, m_bbd, 1.0);
 }
 
 void psr60_state::psr60(machine_config &config)
