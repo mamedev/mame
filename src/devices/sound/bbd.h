@@ -36,7 +36,7 @@ protected:
 
 protected:
 	// override to convert clock to sample rate
-	stream_buffer::sample_t outputval(s32 index) const { return m_buffer[m_curpos + Entries + index]; }
+	stream_buffer::sample_t outputval(s32 index) const { return m_buffer[(m_curpos + Entries + index) % std::size(m_buffer)]; }
 	virtual u32 sample_rate() const { return clock(); }
 
 	sound_stream *          m_stream;
