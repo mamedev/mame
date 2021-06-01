@@ -52,9 +52,10 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_rtc(*this, "rtc")
-		, m_p_pak(*this, "pakrom")
-		, m_pak(*this, "pakrom")
-		, m_telcom(*this, "telcom")
+		, m_pakdef(*this, "pakdef")
+		, m_netdef(*this, "netdef")
+		, m_p_pakdef(*this, "pakdef")
+		, m_p_netdef(*this, "netdef")
 		, m_basic(*this, "basic")
 		, m_io_x7(*this, "X.7")
 		, m_io_oldkb(*this, "X.%u", 0)
@@ -63,7 +64,8 @@ public:
 		, m_screen(*this, "screen")
 		, m_bankr(*this, "bankr%d", 0)
 		, m_bankw(*this, "bankw%d", 0)
-		, m_pakrom(*this, "pak%u", 0U)
+		, m_pak(*this, "pak%u", 0U)
+		, m_net(*this, "net")
 		{ }
 
 	void mbee56(machine_config &config);
@@ -73,8 +75,6 @@ public:
 	void mbee(machine_config &config);
 	void mbeett(machine_config &config);
 	void mbeeic(machine_config &config);
-	void mbeepc(machine_config &config);
-	void mbeepc2(machine_config &config);
 	void mbee128p(machine_config &config);
 	void remove_carts(machine_config &config);
 
@@ -113,7 +113,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pio_ardy);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
 	u8 fdc_status_r();
-	u8 pakrom_r(offs_t);
+	u8 pak_r(offs_t);
+	u8 net_r(offs_t);
 	void fdc_motor_w(u8 data);
 	void standard_palette(palette_device &palette) const;
 	void premium_palette(palette_device &palette) const;
@@ -121,14 +122,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, u8);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak0_load) { return load_cart(image, m_pakrom[0], 0); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak1_load) { return load_cart(image, m_pakrom[1], 1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak2_load) { return load_cart(image, m_pakrom[2], 2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak3_load) { return load_cart(image, m_pakrom[3], 3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak4_load) { return load_cart(image, m_pakrom[4], 4); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak5_load) { return load_cart(image, m_pakrom[5], 5); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak6_load) { return load_cart(image, m_pakrom[6], 6); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak7_load) { return load_cart(image, m_pakrom[7], 7); }
+	template <u8 T> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak_load) { return load_cart(image, m_pak[T], T); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(net_load);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
@@ -147,8 +142,6 @@ private:
 	void mbee_mem(address_map &map);
 	void mbeeic_io(address_map &map);
 	void mbeeic_mem(address_map &map);
-	void mbeepc_io(address_map &map);
-	void mbeepc_mem(address_map &map);
 	void mbeeppc_io(address_map &map);
 	void mbeeppc_mem(address_map &map);
 	void mbeett_io(address_map &map);
@@ -162,6 +155,7 @@ private:
 	bool m_b2 = 0;
 	u8 m_framecnt = 0;
 	u8 m_08 = 0;
+	u8 m_09 = 0;
 	u8 m_0a = 0;
 	u8 m_0b = 0;
 	u8 m_1c = 0;
@@ -172,7 +166,8 @@ private:
 	u8 m_sy6545_ind = 0;
 	u8 m_fdc_rq = 0;
 	u8 m_bank_array[33] = { 0, };
-	bool m_pakrom_extended[8] = { 0, };
+	bool m_pak_extended[8] = { 0, };
+	bool m_net_extended = 0;
 	std::unique_ptr<u8[]> m_dummy; // black hole for writes to rom
 	std::unique_ptr<u8[]> m_ram;   // main banked-switch ram, 128/256/pp
 	std::unique_ptr<u8[]> m_vram;  // video ram, all models
@@ -193,9 +188,10 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<mc146818_device> m_rtc;
-	optional_region_ptr<u8> m_p_pak;
-	optional_memory_region m_pak;
-	optional_memory_bank m_telcom;
+	optional_memory_region m_pakdef;
+	optional_memory_region m_netdef;
+	optional_region_ptr<u8> m_p_pakdef;
+	optional_region_ptr<u8> m_p_netdef;
 	optional_memory_bank m_basic;
 	optional_ioport m_io_x7;
 	optional_ioport_array<8> m_io_oldkb;
@@ -204,7 +200,8 @@ private:
 	required_device<screen_device> m_screen;
 	optional_memory_bank_array<16> m_bankr;
 	optional_memory_bank_array<16> m_bankw;
-	optional_device_array<generic_slot_device, 8> m_pakrom;
+	optional_device_array<generic_slot_device, 8> m_pak;
+	optional_device<generic_slot_device> m_net;
 };
 
 #endif // MAME_INCLUDES_MBEE_H

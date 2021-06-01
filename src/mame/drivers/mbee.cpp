@@ -136,8 +136,8 @@ void mbee_state::mbee_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xbfff).rom().region("maincpu",0);
-	map(0xc000, 0xdfff).r(FUNC(mbee_state::pakrom_r));
-	map(0xe000, 0xefff).rom().region("telcomrom",0);
+	map(0xc000, 0xdfff).r(FUNC(mbee_state::pak_r));
+	map(0xe000, 0xefff).r(FUNC(mbee_state::net_r));
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -146,18 +146,8 @@ void mbee_state::mbeeic_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0xbfff).rom().region("maincpu",0);
-	map(0xc000, 0xdfff).r(FUNC(mbee_state::pakrom_r));
-	map(0xe000, 0xefff).rom().region("telcomrom",0);
-	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
-	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
-}
-
-void mbee_state::mbeepc_mem(address_map &map)
-{
-	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0xbfff).rom().region("maincpu",0);
-	map(0xc000, 0xdfff).r(FUNC(mbee_state::pakrom_r));
-	map(0xe000, 0xefff).bankr("telcom");
+	map(0xc000, 0xdfff).r(FUNC(mbee_state::pak_r));
+	map(0xe000, 0xefff).r(FUNC(mbee_state::net_r));
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -167,8 +157,19 @@ void mbee_state::mbeeppc_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0x9fff).bankr("basic");
 	map(0xa000, 0xbfff).rom().region("maincpu",0);
-	map(0xc000, 0xdfff).r(FUNC(mbee_state::pakrom_r));
-	map(0xe000, 0xefff).bankr("telcom");
+	map(0xc000, 0xdfff).r(FUNC(mbee_state::pak_r));
+	map(0xe000, 0xefff).r(FUNC(mbee_state::net_r));
+	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
+	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
+}
+
+void mbee_state::mbeett_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0x9fff).rom().region("maincpu",0);
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).r(FUNC(mbee_state::pak_r));
+	map(0xe000, 0xefff).r(FUNC(mbee_state::net_r));
 	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
 	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
 }
@@ -201,17 +202,6 @@ void mbee_state::mbee256_mem(address_map &map)
 	map(0xf000, 0xffff).bankr("bankr15").bankw("bankw15");
 }
 
-void mbee_state::mbeett_mem(address_map &map)
-{
-	map(0x0000, 0x7fff).ram();
-	map(0x8000, 0x9fff).rom().region("maincpu",0);
-	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).r(FUNC(mbee_state::pakrom_r));
-	map(0xe000, 0xefff).bankr("telcom");
-	map(0xf000, 0xf7ff).rw(FUNC(mbee_state::video_low_r), FUNC(mbee_state::video_low_w));
-	map(0xf800, 0xffff).rw(FUNC(mbee_state::video_high_r), FUNC(mbee_state::video_high_w));
-}
-
 void mbee_state::mbee_io(address_map &map)
 {
 	map.global_mask(0xff);
@@ -223,19 +213,6 @@ void mbee_state::mbee_io(address_map &map)
 }
 
 void mbee_state::mbeeic_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0x00, 0x03).mirror(0x10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x08, 0x08).mirror(0x10).rw(FUNC(mbee_state::port08_r), FUNC(mbee_state::port08_w));
-	map(0x09, 0x09).nopw(); /* Listed as "Colour Wait Off" or "USART 2651" but never used */
-	map(0x0a, 0x0a).mirror(0x10).w(FUNC(mbee_state::port0a_w));
-	map(0x0b, 0x0b).mirror(0x10).w(FUNC(mbee_state::port0b_w));
-	map(0x0c, 0x0c).mirror(0x10).r(m_crtc, FUNC(mc6845_device::status_r)).w(FUNC(mbee_state::m6545_index_w));
-	map(0x0d, 0x0d).mirror(0x10).r(m_crtc, FUNC(mc6845_device::register_r)).w(FUNC(mbee_state::m6545_data_w));
-}
-
-void mbee_state::mbeepc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0003).mirror(0xff10).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
@@ -646,8 +623,9 @@ void mbee_state::remove_carts(machine_config &config)
 	config.device_remove("pak3");
 	config.device_remove("pak4");
 	config.device_remove("pak5");
-	config.device_remove("pak6");
-	config.device_remove("pak7");
+	//config.device_remove("pak6");
+	//config.device_remove("pak7");
+	config.device_remove("net");
 }
 
 void mbee_state::mbee(machine_config &config)
@@ -705,7 +683,8 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak0_load));
+	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<0U>));
+	GENERIC_SOCKET(config, "net",  generic_plain_slot, "mbee_cart", "mbn,rom").set_device_load(FUNC(mbee_state::net_load));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
@@ -768,31 +747,19 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak0_load));
-	GENERIC_SOCKET(config, "pak1", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak1_load));
-	GENERIC_SOCKET(config, "pak2", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak2_load));
-	GENERIC_SOCKET(config, "pak3", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak3_load));
-	GENERIC_SOCKET(config, "pak4", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak4_load));
-	GENERIC_SOCKET(config, "pak5", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak5_load));
-	GENERIC_SOCKET(config, "pak6", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak6_load));
-	GENERIC_SOCKET(config, "pak7", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak7_load));
+	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<0U>));
+	GENERIC_SOCKET(config, "pak1", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<1U>));
+	GENERIC_SOCKET(config, "pak2", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<2U>));
+	GENERIC_SOCKET(config, "pak3", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<3U>));
+	GENERIC_SOCKET(config, "pak4", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<4U>));
+	GENERIC_SOCKET(config, "pak5", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<5U>));
+	//GENERIC_SOCKET(config, "pak6", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<6U>));
+	//GENERIC_SOCKET(config, "pak7", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<7U>));
+	GENERIC_SOCKET(config, "net",  generic_plain_slot, "mbee_cart", "mbn,rom").set_device_load(FUNC(mbee_state::net_load));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
 	SOFTWARE_LIST(config, "cart_list").set_original("mbee_cart").set_filter("2");
-}
-
-void mbee_state::mbeepc(machine_config &config)
-{
-	mbeeic(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeepc_mem);
-	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeepc_io);
-}
-
-void mbee_state::mbeepc2(machine_config &config)
-{
-	mbeepc(config);
-	remove_carts(config);
 }
 
 void mbee_state::mbeeppc(machine_config &config)
@@ -884,18 +851,6 @@ void mbee_state::mbeett(machine_config &config)
 	config.device_remove("cass_list"); // mbeett is incompatible with the others
 }
 
-/* Unused roms:
-    ROM_LOAD_OPTIONAL("net.rom", 0xe000,  0x1000, CRC(e14aac4c) SHA1(330902cf47f53c22c85003a620f7d7d3261ebb67) )
-    customised for a certain high school. Requires pulsing at bit 3 port 0 before it runs.
-
-    ROM_LOAD_OPTIONAL("chip8_22.rom", 0xe000,  0x1000, CRC(11fbb547) SHA1(7bd9dc4b67b33b8e1be99beb6a0ddff25bdbd3f7) )
-    Dreamcards Chip-8 V2.2 rom
-
-    ROM_LOAD_OPTIONAL("telcom11.rom", 0xe000,  0x1000, CRC(15516499) SHA1(2d4953f994b66c5d3b1d457b8c92d9a0a69eb8b8) )
-    Telcom 1.1 for the mbeeic (It could have 1.0, 1.1 or 1.2)
-
-*/
-
 
 ROM_START( mbee )
 	ROM_REGION( 0x6000, "maincpu", 0 )
@@ -904,16 +859,13 @@ ROM_START( mbee )
 	ROM_LOAD("bas510c.ic28",          0x2000,  0x1000, CRC(906ac00f) SHA1(9b46458e5755e2c16cdb191a6a70df6de9fe0271) )
 	ROM_LOAD("bas510d.ic30",          0x3000,  0x1000, CRC(61727323) SHA1(c0fea9fd0e25beb9faa7424db8efd07cf8d26c1b) )
 
-	ROM_REGION( 0x1000, "telcomrom", 0 )
-	ROM_LOAD_OPTIONAL("telcom10.rom", 0x0000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
-
 	// first 0x800 for normal chars, 2nd 0x800 for small chars. Some roms don't have small chars so normal ones loaded twice.
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("charrom.ic13",          0x0000,  0x0800, CRC(b149737b) SHA1(a3cd4f5d0d3c71137cd1f0f650db83333a2e3597) )
 	ROM_RELOAD( 0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0000,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeeic )
@@ -921,11 +873,11 @@ ROM_START( mbeeic )
 	ROM_LOAD("bas522a.ic5",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.ic10",          0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-	ROM_REGION( 0x1000, "telcomrom", 0 )
-	ROM_LOAD_OPTIONAL("telcom12.rom", 0x0000,  0x1000, CRC(0231bda3) SHA1(be7b32499034f985cc8f7865f2bc2b78c485585c) )
+	ROM_REGION( 0x1000, "netdef", 0 )
+	ROM_LOAD_OPTIONAL("telcom10.rom", 0x0000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
 
 	/* PAK option roms */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee12.mbp",            0x0000,  0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 1
 	ROM_LOAD("help1.mbp",             0x2000,  0x2000, CRC(d34fae54) SHA1(5ed30636f48e9d208ce2da367ba4425782a5bce3) ) // 2
 
@@ -934,7 +886,7 @@ ROM_START( mbeeic )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeepc )
@@ -942,11 +894,11 @@ ROM_START( mbeepc )
 	ROM_LOAD("bas522a.ic5",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.ic10",          0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
-	ROM_LOAD_OPTIONAL("telcom31.rom", 0x0000,  0x2000, CRC(5a904a29) SHA1(3120fb65ccefeb180ab80d8d35440c70dc8452c8) )
+	ROM_REGION( 0x1000, "netdef", 0 )
+	ROM_LOAD_OPTIONAL("telcom10.rom", 0x0000,  0x1000, CRC(cc9ac94d) SHA1(6804b5ff54d16f8e06180751d8681c44f351e0bb) )
 
 	/* PAK option roms */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee12.mbp",            0x0000,  0x2000, CRC(0fc21cb5) SHA1(33b3995988fc51ddef1568e160dfe699867adbd5) ) // 1
 	ROM_LOAD("help1.mbp",             0x2000,  0x2000, CRC(d34fae54) SHA1(5ed30636f48e9d208ce2da367ba4425782a5bce3) ) // 2
 
@@ -955,7 +907,7 @@ ROM_START( mbeepc )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeepc85 )
@@ -963,11 +915,11 @@ ROM_START( mbeepc85 )
 	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
 	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
+	ROM_REGION( 0x2000, "netdef", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13r3.mbp",          0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD("help2.mbp",             0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD("shell.rom",             0xa000,  0x2000, CRC(5a2c7cd6) SHA1(8edc086710cb558f2146d660eddc8a18ba6a141c) ) // 5
@@ -977,7 +929,7 @@ ROM_START( mbeepc85 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeepc85b )
@@ -985,11 +937,11 @@ ROM_START( mbeepc85b )
 	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
 	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
+	ROM_REGION( 0x2000, "netdef", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13r3.mbp",          0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD("help2.mbp",             0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD("busy.rom",              0x4000,  0x2000, CRC(56255f60) SHA1(fd2e37209fd49290be6875bc460cfc05392938ba) ) // 2
@@ -1004,7 +956,7 @@ ROM_START( mbeepc85b )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeepc85s )
@@ -1012,11 +964,11 @@ ROM_START( mbeepc85s )
 	ROM_LOAD("bas524a.rom",           0x0000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
 	ROM_LOAD("bas524b.rom",           0x2000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
+	ROM_REGION( 0x2000, "netdef", 0 )
 	ROM_LOAD_OPTIONAL("telco321s.rom", 0x0000, 0x2000, CRC(00f8fde1) SHA1(eb881bbab90c85fd6e29540decd25e884c67f738) )
 
 	/* PAK roms - These are not optional and will only work in the correct slots. */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee20s.mbp",           0x0000,  0x2000, CRC(6a0fe57f) SHA1(a101b588b1872e19382b9e9ea50fabb0fd060aa6) ) // 0
 	ROM_LOAD("db-s.rom",              0x2000,  0x2000, CRC(e2094771) SHA1(62d7fb66c91d2bd24523bc84e4f005cf2c4480bb) ) // 1
 	ROM_LOAD("kalk-s.rom",            0x4000,  0x2000, CRC(08dd71ee) SHA1(c9d506d8bb56f602c3481b253d4cac226f545d98) ) // 2
@@ -1029,17 +981,17 @@ ROM_START( mbeepc85s )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeett )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("kernel_106.rom",        0x0000,  0x2000, CRC(5ab9cb1d) SHA1(a1fb971622f85c4d866b91cb4bec6d75757e8c5f) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
+	ROM_REGION( 0x2000, "netdef", 0 )
 	ROM_LOAD("wm_106.rom",            0x0000,  0x2000, CRC(77e0b355) SHA1(1db6769cd6b12e1c335c83f17f8c139986c87758) )
 
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("tv_470311.rom",         0x2000,  0x2000, CRC(2c4c2dcb) SHA1(77cd75166a389cb2d1d8abf00b1ddd077ce98354) ) // 1
 	ROM_CONTINUE( 0x12000, 0x2000 )
 	ROM_LOAD("tw_103.rom",            0x4000,  0x2000, CRC(881edb4b) SHA1(f6e30a12b1537bd55b69d1319799b150e80a471b) ) // 2
@@ -1059,11 +1011,11 @@ ROM_START( mbeeppc )
 	ROM_REGION( 0x4000, "basicrom", 0 )
 	ROM_LOAD("bas529a.rom",           0x0000,  0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
-	ROM_REGION( 0x2000, "telcomrom", 0 )
+	ROM_REGION( 0x2000, "netdef", 0 )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
-	ROM_REGION( 0x20000, "pakrom", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wbee13r3.mbp",          0x0000,  0x2000, CRC(d7c58b7b) SHA1(5af1b8d21a0f21534ed1833ae919dbbc6ca973e2) ) // 0
 	ROM_LOAD("help2.mbp",             0x2000,  0x2000, CRC(a4f1fa90) SHA1(1456abc6ed0501a3b15a99b4302750843293ae5f) ) // 1
 	ROM_LOAD("busy-p.rom",            0x4000,  0x2000, CRC(f2897427) SHA1(b4c351bdac72d89589980be6d654f9b931bcba6b) ) // 2
@@ -1086,7 +1038,7 @@ ROM_START( mbee56 )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
@@ -1101,7 +1053,7 @@ ROM_START( mbee128 ) // Standard 128k (CIAB is the same thing with half the ram)
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   /* video switching prom, not needed for emulation purposes */
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbee128p ) // Premium 128K
@@ -1161,13 +1113,13 @@ ROM_END
 //    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT           COMPANY               FULLNAME
 COMP( 1982, mbee,      0,      0,      mbee,     mbee,    mbee_state, init_mbee,     "Applied Technology", "Microbee 16 Standard", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, mbeeic,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee 32 IC", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, mbeepc,    mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee Personal Communicator", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, mbeepc85b, mbee,   0,      mbeepc2,  mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, mbeepc85s, mbee,   0,      mbeepc2,  mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mbeepc,    mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee Personal Communicator", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85,  mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85b, mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mbeepc85s, mbee,   0,      mbeeic,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_SUPPORTS_SAVE )
-COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 64k",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Applied Technology", "Microbee 256TC",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
