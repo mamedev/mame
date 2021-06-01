@@ -3908,6 +3908,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/tek440x.cpp",
 	MAME_DIR .. "src/mame/drivers/tekigw.cpp",
 	MAME_DIR .. "src/mame/drivers/tekxp33x.cpp",
+	MAME_DIR .. "src/mame/machine/tek410x_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/tek410x_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "telenova")
