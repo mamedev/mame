@@ -19666,6 +19666,9 @@ leappad                         // (c) 2001 LeapFrog / Knowledge Kids Enterprise
 mfleappad                       // (c) 2002 LeapFrog
 ltleappad                       // (c) 2005 LeapFrog
 
+@source:leapfrog_leapster_explorer.cpp
+leapexpr
+
 @source:leapster.cpp
 leapster                        //
 leapster2                       //
@@ -32719,50 +32722,51 @@ fcpocket
 rminitv
 
 @source:nes_vt369_vtunknown.cpp
+240in1ar
 bittboy
-mc_pg150
-mc_hh210
-dvnimbus
-unkra200
+denv150
+dgun2561
 dgun2577
-lxcyber
+dgun2593
+dvnimbus
+egame150
+fapocket
+gcs2mgp
 gtct885
-rd5_240
 hkb502
 hkb502a
+lpgm240
 lxcap
-retro400
-myarccn
-fapocket
-sy889
-sy888b
-mc_cb280
-mog_m320
-dgun2561
-dgun2593
-lxcmcy
-lxcmc250
-lxcmcysw
-lxcmcyfz
-lxcmcydp
-lxcmcysp
-lxcmcycr
-lxcmcypj
-lxcmcypp
+lxccatv
 lxccminn
 lxccplan
+lxcmc250
+lxcmcy
+lxcmcycr
+lxcmcydp
+lxcmcyfz
+lxcmcypj
+lxcmcypp
+lxcmcysp
+lxcmcysw
+lxcyber
+mc_cb280
+mc_hh210
+mc_pg150
+mog_m320
+myarccn
+otrail
+rd5_240
+red5mam
+retro400
 rtvgc300
 rtvgc300fz
-red5mam
-240in1ar
-denv150
-egame150
-lpgm240
-tup240
-otrail
-zonefusn
 sealvt
-gcs2mgp
+sy888b
+sy889
+tup240
+unkra200
+zonefusn
 
 @source:newbrain.cpp
 newbrain                        //
@@ -38560,7 +38564,6 @@ supreme
 arcade10
 
 @source:storio.cpp
-innotab2                        // (c) 2011 V.Tech
 storio                          // (c) 2011 V.Tech
 storiode                        // (c) 2011 V.Tech
 storioes                        // (c) 2011 V.Tech
@@ -42134,6 +42137,9 @@ laser700                        // 1984? Laser 700
 
 @source:vtech_eu3a12.cpp
 vreadere
+
+@source:vtech_innotab.cpp
+innotab2                        // (c) 2011 V.Tech
 
 @source:vulgus.cpp
 mach9                           // bootleg (ITISA)

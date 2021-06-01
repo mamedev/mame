@@ -45,7 +45,20 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cars2g" supported="no">
+	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-251900(US) -->
+	<software name="cars2" supported="no">
+		<description>Disney/Pixar Cars 2 (USA, rev 2?)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-251900(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_251900_2.bin" size="0x1000000" crc="9d0da1ef" sha1="2fc4e5e4251508b391067541fcca0230b6cf5b16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2g" cloneof="cars2" supported="no">
 		<description>Disney/Pixar Cars 2 (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -124,18 +137,6 @@ license:CC0
 		<info name="serial" value="80-251100(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
-				<rom name="mobigo_251100.bin" size="0x1000000" crc="5d9d8f5f" sha1="359ba58fe4266b31aefa8397121069ce2ec33318"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dprincesalt" cloneof="dprinces" supported="no">
-		<description>Disney Princess (USA, alt)</description>
-		<year>2010</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-251100(US)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
 				<rom name="80-251100 - Disney Princess (US).bin" size="0x1000000" crc="fd9d04fc" sha1="af9ae160faf3087eb4d3a375c484e569465d4fc4"/>
 			</dataarea>
 		</part>
@@ -185,18 +186,6 @@ license:CC0
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="mobigo_252800.bin" size="0x1000000" crc="afb1288c" sha1="355358492787020668daf2cf7cf56fadf3da2710"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jakenevalt" cloneof="jakenev" supported="no">
-		<description>Disney Jake and the Neverland Pirates (USA, alt)</description>
-		<year>2012</year>
-		<publisher>VTech</publisher>
-		<info name="serial" value="80-252800(US)"/>
-		<part name="cart" interface="mobigo_cart">
-			<dataarea name="rom" size="0x1000000">
-				<rom name="80-252800 - Jake and the Neverland Pirates (US).bin" size="0x1000000" crc="eebe529e" sha1="7a8dc059e6713470937631b2b4d65cf87f9d3d20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -439,14 +428,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- offset 0x12 is '0x01' is this a version number? cartridge was still only marked as 80-252700(US) -->
 	<software name="thomas" supported="no">
-		<description>Thomas &amp; Friends - Really Useful Engines (USA)</description>
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 1?)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252700(US)"/>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="mobigo_252700.bin" size="0x1000000" crc="a5e6e828" sha1="cf33feca9ea8cf6716524546c6c10a6048eadda6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-252700(US) -->
+	<software name="thomasa" cloneof="thomas" supported="no">
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 2?)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-252700(US)"/>
+		<part name="cart" interface="mobigo_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="mobigo_252700_2.bin" size="0x1000000" crc="a5515438" sha1="3a9896c28479aff95d43692da2562e97f974c44d"/>
 			</dataarea>
 		</part>
 	</software>
