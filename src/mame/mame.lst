@@ -34907,6 +34907,9 @@ wbeachvl2                       // (c) 1995
 wbeachvl3                       // (c) 1995
 wbeachvla                       // (c) 1995
 
+@source:plsonic4.cpp
+plsonic4                        //
+
 @source:plus4.cpp
 c116                            //
 c16                             //
