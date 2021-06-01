@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, tim lindner
 /***************************************************************************
 
-    drivers/mirage.c
+    drivers/enmirage.c
 
     Ensoniq Mirage Sampler
     Preliminary driver by R. Belmont
@@ -39,8 +39,17 @@
     Port A bit 3 is right anode, bit 4 is left anode
     ROW 0 is read on VIA port A bit 5, ROW 1 in port A bit 6, and ROW 2 in port A bit 7.
 
-    Keyboard models talk to the R6500 through the VIA shifter: CA2 is handshake, CB1 is shift clock, CB2 is shift data.
+    Keyboard models talk to the R6500/11 through the VIA shifter: CA2 is handshake, CB1 is shift clock,
+    CB2 is shift data.
     This is unconnected on the rackmount version.
+
+    Unimplemented:
+    	* Four Pole Low-Pass Voltage Controlled Filter section
+    	* External sync signal
+    	* Foot pedal
+    	* ADC feedback
+    	* Piano keyboard controller
+    	* Expansion connector
 
 ***************************************************************************/
 
@@ -61,6 +70,17 @@
 #include "video/pwm.h"
 
 #include "enmirage.lh"
+
+#define LOG_ADC_READ		(1U <<  1)
+#define LOG_FILTER_WRITE	(1U <<  2)
+#define VERBOSE (0)
+//#define VERBOSE (LOG_ADC_READ)
+//#define VERBOSE (LOG_ADC_READ|LOG_FILTER_WRITE)
+
+#include "logmacro.h"
+
+#define LOGADCREAD(...)		LOGMASKED(LOG_ADC_READ, __VA_ARGS__)
+#define LOGFILTERWRITE(...) LOGMASKED(LOG_FILTER_WRITE, __VA_ARGS__)
 
 #define PITCH_TAG "pitch"
 #define MOD_TAG "mod"
@@ -136,26 +156,35 @@ static void ensoniq_floppies(device_slot_interface &device)
 
 uint8_t enmirage_state::mirage_adc_read()
 {
+	/* fake data to get past filter calibration */
+	/* should be removed when filters are implemented */
+	const uint8_t wave[] = {0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x69};
+	static int wave_index = 0;
+
     uint8_t value;
     switch( m_mux_value & 0x03 )
     {
         case 0:
         	/* mixed input: audio jack and ES5503 - todo */
             value = m_cassette->input(); /* compressed input */
- 			logerror( "%s, 5503 sample: channel: compressed input, data: $%02x\n", machine().describe_context(), value);
+
+            value = wave[wave_index];
+ 			LOGADCREAD( "%s, 5503 sample: channel: compressed input, data: $%02x (%d)\n", machine().describe_context(), value, wave_index);
+            if( ++wave_index == 34) wave_index = 0;
+
            break;
         case 1:
         	/* mixed input: audio jack and ES5503 - todo */
             value = m_cassette->input(); /* line input */
- 			logerror( "%s, 5503 sample: channel: line input, data: $%02x\n", machine().describe_context(), value);
+ 			LOGADCREAD( "%s, 5503 sample: channel: line input, data: $%02x\n", machine().describe_context(), value);
             break;
         case 2:
             value = m_wheel[0]->read(); /* pitch wheel */
- 			logerror( "%s, 5503 sample: channel: pitch wheel, data: $%02x\n", machine().describe_context(), value);
+ 			LOGADCREAD( "%s, 5503 sample: channel: pitch wheel, data: $%02x\n", machine().describe_context(), value);
             break;
         case 3:
             value = m_wheel[1]->read(); /* mod wheel */
- 			logerror( "%s, 5503 sample: channel: mod wheel, data: $%02x\n", machine().describe_context(), value);
+ 			LOGADCREAD( "%s, 5503 sample: channel: mod wheel, data: $%02x\n", machine().describe_context(), value);
             break;
     }
 
@@ -197,7 +226,7 @@ void enmirage_state::coefficients_w( offs_t offset, uint8_t data )
 	uint8_t channel = offset & 0x07;
 	uint8_t filter_input = (offset >> 3) & 0x03;
 
-	logerror( "%s, filter update: channel: %d, data: $%02x (%s%s%s%s)\n",
+	LOGFILTERWRITE( "%s, filter update: channel: %d, data: $%02x (%s%s%s%s)\n",
 				machine().describe_context(),
 				channel,
 				data,
@@ -236,14 +265,10 @@ uint8_t enmirage_state::mirage_via_read_portb()
     floppy_image_device *floppy = m_floppy_connector ? m_floppy_connector->get_device() : nullptr;
     if (floppy)
     {
-		if( floppy->dskchg_r() )
-		{
+		if (floppy->dskchg_r())
 			value |= 0x40;
-		}
 		else
-		{
 			value &= ~0x40;
-		}
     }
 
     return value;
@@ -261,7 +286,7 @@ void enmirage_state::mirage_via_write_porta(uint8_t data)
     m_display->matrix(((data >> 3) & 3) ^ 3, (1<<segdata));
 
 	uint8_t new_select = (data & 0x07);
-	if( m_key_col_select != new_select)
+	if (m_key_col_select != new_select)
 	{
 		m_key_col_select = new_select;
 		update_keypad_matrix();
@@ -293,7 +318,7 @@ void enmirage_state::mirage_via_write_portb(uint8_t data)
     floppy_image_device *flop = m_floppy_connector->get_device();
     flop->mon_w(data & 0x10 ? 1 : 0 );
 
-	// handle 6500/11 reset (not handled yet)
+	// handle 6500/11 reset (TODO)
 
 	// record audio input mixer position
     m_mux_value = (data >> 2) & 0x03;
@@ -319,7 +344,7 @@ void enmirage_state::mirage(machine_config &config)
     // <0> via6522
     // <1> wd1772
     // <2> es5502
-    // <3> cartridge connector (not implemented)
+    // <3> cartridge connector (TODO)
 
     SPEAKER(config, "speaker").front_center();
 
@@ -341,7 +366,6 @@ void enmirage_state::mirage(machine_config &config)
     m_via->irq_handler().set(m_irq_merge, FUNC(input_merger_device::in_w<0>));
 
     PWM_DISPLAY(config, m_display).set_size(2, 8);
-//     m_display->set_segmask(0x3, 0xff);
     config.set_default_layout(layout_enmirage);
 
     ACIA6850(config, m_acia).txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
@@ -355,13 +379,9 @@ void enmirage_state::mirage(machine_config &config)
 
     FLOPPY_CONNECTOR(config, "wd1772:0", ensoniq_floppies, "35dd", enmirage_state::floppy_formats).enable_sound(true);
 
-	// This clock allows the CPU to keep in sync with the sound chip - may be unused int he firmware
+	// This clock allows the CPU to keep in sync with the sound chip - may not be unused in the firmware
 	clock_device &es5503_ca3_clock(CLOCK(config, "ca3_clock", XTAL(8'000'000) / 16));
 	es5503_ca3_clock.signal_handler().set(m_via, FUNC(via6522_device::write_pb5));
-
-// 	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
-// 	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
-// 	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
 }
 
 static INPUT_PORTS_START( mirage )
@@ -415,4 +435,4 @@ void enmirage_state::init_mirage()
     }
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage", MACHINE_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage", MACHINE_IS_INCOMPLETE )
