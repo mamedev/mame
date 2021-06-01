@@ -141,7 +141,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
 - cmsport: Conic Basketball
@@ -10162,9 +10162,12 @@ ROM_END
 
 /***************************************************************************
 
-  TI-2550 III/TI-1265 (both have same chip)
+  TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
   * 9-digit cyan VFD display
+
+  Only the TI-2550 III has the top button row (RV, SQRT, etc).
+  TI-1600 doesn't have the memory buttons.
 
 ***************************************************************************/
 
