@@ -71,7 +71,10 @@ public:
 		m_prom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_vram(*this, "vram"),
+		m_map(*this, "map", 0x1000, ENDIANNESS_BIG),
+		m_map_view(*this, "map"),
 		m_boot(false),
+		m_map_control(0),
 		m_kb_rdata(true),
 		m_kb_tdata(true),
 		m_kb_rclamp(false),
@@ -87,6 +90,10 @@ private:
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
 	void memory_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 map_r(offs_t offset);
+	void map_w(offs_t offset, u16 data, u16 mem_mask);
+	u8 mapcntl_r();
+	void mapcntl_w(u8 data);
 	void sound_w(u8 data);
 	void diag_w(u8 data);
 
@@ -107,8 +114,11 @@ private:
 	required_region_ptr<u16> m_prom;
 	required_shared_ptr<u16> m_mainram;
 	required_shared_ptr<u16> m_vram;
+	memory_share_creator<u16> m_map;
+	memory_view m_map_view;
 
 	bool m_boot;
+	u8 m_map_control;
 	bool m_kb_rdata;
 	bool m_kb_tdata;
 	bool m_kb_rclamp;
@@ -124,6 +134,7 @@ private:
 void tek440x_state::machine_start()
 {
 	save_item(NAME(m_boot));
+	save_item(NAME(m_map_control));
 	save_item(NAME(m_kb_rdata));
 	save_item(NAME(m_kb_tdata));
 	save_item(NAME(m_kb_rclamp));
@@ -143,6 +154,7 @@ void tek440x_state::machine_reset()
 	m_boot = true;
 	diag_w(0);
 	m_keyboard->kdo_w(1);
+	mapcntl_w(0);
 }
 
 
@@ -186,14 +198,56 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if (m_boot)
 		return m_prom[offset & 0x3fff];
 
-	// TODO: banking
+	const offs_t offset0 = offset;
+	if (BIT(m_map_control, 4))
+		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
+	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m_maincpu->set_buserror_details(offset0 << 1, 1, m_maincpu->get_fc());
+	}
+
 	return m_vm->read16(offset, mem_mask);
 }
 
 void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// TODO: banking
+	const offs_t offset0 = offset;
+	if (BIT(m_map_control, 4))
+		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
+	if (offset < 0x300000 && offset >= 0x100000 && !machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m_maincpu->set_buserror_details(offset0 << 1, 0, m_maincpu->get_fc());
+	}
+
 	m_vm->write16(offset, data, mem_mask);
+}
+
+u16 tek440x_state::map_r(offs_t offset)
+{
+	return m_map[offset >> 11];
+}
+
+void tek440x_state::map_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_map[offset >> 11]);
+}
+
+u8 tek440x_state::mapcntl_r()
+{
+	return m_map_control;
+}
+
+void tek440x_state::mapcntl_w(u8 data)
+{
+	if (BIT(data, 5))
+		m_map_view.select(0);
+	else
+		m_map_view.disable();
+	m_map_control = data & 0x1f;
 }
 
 void tek440x_state::sound_w(u8 data)
@@ -245,6 +299,8 @@ WRITE_LINE_MEMBER(tek440x_state::kb_tdata_w)
 void tek440x_state::logical_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(tek440x_state::memory_r), FUNC(tek440x_state::memory_w));
+	map(0x800000, 0xffffff).view(m_map_view);
+	m_map_view[0](0x800000, 0xffffff).rw(FUNC(tek440x_state::map_r), FUNC(tek440x_state::map_w));
 }
 
 void tek440x_state::physical_map(address_map &map)
@@ -253,7 +309,7 @@ void tek440x_state::physical_map(address_map &map)
 	map(0x600000, 0x61ffff).ram().share("vram");
 	map(0x740000, 0x747fff).rom().mirror(0x8000).region("maincpu", 0);
 	map(0x760000, 0x760fff).ram().mirror(0xf000); // debug RAM
-	map(0x780000, 0x781fff).ram(); // map registers
+	map(0x780000, 0x780000).rw(FUNC(tek440x_state::mapcntl_r), FUNC(tek440x_state::mapcntl_w));
 	// 782000-783fff: video address registers
 	// 784000-785fff: video control registers
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
