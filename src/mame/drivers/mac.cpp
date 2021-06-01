@@ -627,6 +627,8 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 	{
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
+
+		SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	}
 
 	SCC8530(config, m_scc, C7M);
@@ -807,6 +809,8 @@ void mac_state::maciihd(machine_config &config)
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
+
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }
 
 void mac_state::maciifx(machine_config &config)
@@ -970,6 +974,8 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
+
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
