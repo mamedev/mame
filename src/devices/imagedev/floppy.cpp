@@ -2517,7 +2517,7 @@ void epson_sd_321::setup_characteristics()
 //-------------------------------------------------
 
 pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_35_DD, tag, owner, clock)
+	floppy_image_device(mconfig, PANA_JU_363, tag, owner, clock)
 {
 }
 
