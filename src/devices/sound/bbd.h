@@ -14,12 +14,18 @@
 template<int Entries, int Outputs>
 class bbd_device_base : public device_t, public device_sound_interface
 {
+public:
+	// configuration
+	template <typename... T> void set_cv_handler(T &&... args)
+	{
+		m_cv_handler.set(std::forward<T>(args)...);
+	}
+
 protected:
+	using cv_delegate = device_delegate<attoseconds_t (attotime const &)>;
+
 	// internal constructor
 	bbd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
-
-	// override to convert clock to sample rate
-	virtual u32 sample_rate() const { return clock(); }
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -29,9 +35,15 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 protected:
+	// override to convert clock to sample rate
+	stream_buffer::sample_t outputval(s32 index) const { return m_buffer[m_curpos + Entries + index]; }
+	virtual u32 sample_rate() const { return clock(); }
+
 	sound_stream *          m_stream;
 	u32                     m_curpos;
-	stream_buffer::sample_t m_buffer[Entries];
+	cv_delegate             m_cv_handler;
+	attotime                m_next_bbdtime;
+	stream_buffer::sample_t m_buffer[Entries + 1];
 };
 
 
