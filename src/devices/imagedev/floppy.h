@@ -15,6 +15,7 @@
 #include "formats/fsmgr.h"
 #include "sound/samples.h"
 #include "softlist_dev.h"
+#include "screen.h"
 
 class floppy_sound_device;
 
