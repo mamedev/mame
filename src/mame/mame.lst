@@ -38780,26 +38780,31 @@ jak_mk
 jak_mpacw
 
 @source:spg2xx_jakks_gkr.cpp
-jak_wwe                         //
-jak_fan4                        //
-jak_just                        //
+jak_capc                        //
+jak_care                        //
+jak_dbz                         //
+jak_disf                        //
+jak_disn                        //
 jak_dora                        //
 jak_dorr                        //
-jak_disn                        //
-jak_disf                        //
 jak_dpr                         //
 jak_dprs                        //
-jak_sith                        //
-jak_sdoo                        //
-jak_dbz                         //
+jak_dwmn                        //
+jak_dwmno                       //
+jak_fan4                        //
+jak_just                        //
 jak_mpac                        //
-jak_capc                        //
-jak_wof                         //
-jak_spdm                        //
-jak_pooh                        //
-jak_care                        //
 jak_nick                        //
+jak_pooh                        //
 jak_sbfc                        //
+jak_sdoo                        //
+jak_sith                        //
+jak_sithp                       //
+jak_spdm                        //
+jak_swot                        //
+jak_wof                         //
+jak_wwe                         //
+jak_xmenp                       //
 
 @source:spg2xx_jakks_sharp.cpp
 jsc_dora
