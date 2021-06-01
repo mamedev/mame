@@ -259,8 +259,8 @@ void psr60_state::drvif_w(offs_t offset, u8 data)
 		for (int bit = 0; bit < 4; bit++)
 			m_drvif_out[m_drvif_select][bit] = BIT(data, 3 - bit);
 	}
-	else
-		printf("DRVIF: %02X = %02X\n", offset, data);
+//	else
+//		printf("DRVIF: %02X = %02X\n", offset, data);
 }
 
 INPUT_CHANGED_MEMBER(psr60_state::drvif_changed)
@@ -669,5 +669,5 @@ ROM_START(psr70)
 	ROM_LOAD("ym21909.bin", 0x0000, 0x8000, CRC(bb9bb698) SHA1(76563d1f25152cd54041019ef7bc264ede0d8b2b) BAD_DUMP)
 ROM_END
 
-CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK)
-CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND | MACHINE_CLICKABLE_ARTWORK)
