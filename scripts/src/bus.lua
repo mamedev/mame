@@ -4014,6 +4014,8 @@ if (BUSES["VTECH_MEMEXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/vtech/memexp/rs232.h",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/rtty.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/rtty.h",
+		MAME_DIR .. "src/devices/bus/vtech/memexp/sdloader.cpp",
+		MAME_DIR .. "src/devices/bus/vtech/memexp/sdloader.h",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/wordpro.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/memexp/wordpro.h",
 	}
@@ -4030,6 +4032,8 @@ if (BUSES["VTECH_IOEXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/ioexp.h",
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/carts.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/carts.h",
+		MAME_DIR .. "src/devices/bus/vtech/ioexp/lpen.cpp",
+		MAME_DIR .. "src/devices/bus/vtech/ioexp/lpen.h",
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/joystick.cpp",
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/joystick.h",
 		MAME_DIR .. "src/devices/bus/vtech/ioexp/printer.cpp",
