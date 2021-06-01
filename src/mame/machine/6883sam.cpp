@@ -382,7 +382,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 	if (xorval & (SAM_STATE_R1|SAM_STATE_R0))
 		update_cpu_clock();
 
-	if( xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
+	if (xorval & (SAM_STATE_F6|SAM_STATE_F5|SAM_STATE_F4|SAM_STATE_F3|SAM_STATE_F2|SAM_STATE_F1|SAM_STATE_F0))
 	{
 		/* Video frame buffer address changed */
 		LOGFBITS("%s: SAM F Address: $%04x\n",
@@ -390,7 +390,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 			display_offset() );
 	}
 
-	if( xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
+	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
 	{
 		/* Video frame buffer address changed */
 		LOGVBITS("%s: SAM V Bits: $%02x\n",
@@ -398,7 +398,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)) );
 	}
 
-	if( xorval & (SAM_STATE_P1))
+	if (xorval & (SAM_STATE_P1))
 	{
 		/* Video frame buffer address changed */
 		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
@@ -406,7 +406,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 			(m_sam_state & (SAM_STATE_P1)) >> 10 );
 	}
 
-	if( xorval & (SAM_STATE_TY))
+	if (xorval & (SAM_STATE_TY))
 	{
 		/* Video frame buffer address changed */
 		LOGTBITS("%s: SAM TY Bits: $%02x\n",
@@ -414,7 +414,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 			(m_sam_state & (SAM_STATE_TY)) >> 15 );
 	}
 
-	if( xorval & (SAM_STATE_M0|SAM_STATE_M1))
+	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
 	{
 		/* Video frame buffer address changed */
 		LOGMBITS("%s: SAM M Bits: $%02x\n",
@@ -422,7 +422,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9 );
 	}
 
-	if( xorval & (SAM_STATE_R0|SAM_STATE_R1))
+	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
 	{
 		/* Video frame buffer address changed */
 		LOGRBITS("%s: SAM R Bits: $%02x\n",

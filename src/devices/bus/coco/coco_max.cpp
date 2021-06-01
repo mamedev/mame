@@ -11,8 +11,6 @@
 #include "emu.h"
 #include "coco_max.h"
 
-#include "machine/ram.h"
-
 #define MOUSE_SENSITIVITY	75
 #define COCOMAX_X_TAG		"cocomax_x"
 #define COCOMAX_Y_TAG		"cocomax_y"
@@ -27,9 +25,9 @@
 
 INPUT_PORTS_START( cocomax_mouse )
 	PORT_START(COCOMAX_X_TAG)
-	PORT_BIT( 0xff, 0x00,  IPT_AD_STICK_X) PORT_NAME("CoCo Max Mouse X") PORT_SENSITIVITY(MOUSE_SENSITIVITY) PORT_MINMAX(0x00,0xff) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_X) PORT_NAME("CoCo Max Mouse X") PORT_SENSITIVITY(MOUSE_SENSITIVITY) PORT_MINMAX(0x00,0xff) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_4_PAD) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_PLAYER(1)
 	PORT_START(COCOMAX_Y_TAG)
-	PORT_BIT( 0xff, 0x00,  IPT_AD_STICK_Y) PORT_NAME("CoCo Max Mouse Y") PORT_SENSITIVITY(MOUSE_SENSITIVITY) PORT_MINMAX(0x00,0xff) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80,  IPT_AD_STICK_Y) PORT_NAME("CoCo Max Mouse Y") PORT_SENSITIVITY(MOUSE_SENSITIVITY) PORT_MINMAX(0x00,0xff) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_8_PAD) PORT_CODE_INC(KEYCODE_2_PAD) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_PLAYER(1)
 	PORT_START(COCOMAX_BUTTONS)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("CoCo Max Left Button") PORT_CODE(KEYCODE_0_PAD) PORT_CODE(MOUSECODE_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("CoCo Max Right Button") PORT_CODE(KEYCODE_DEL_PAD) PORT_CODE(MOUSECODE_BUTTON2) PORT_PLAYER(1)
@@ -113,7 +111,7 @@ void coco_pak_max_device::device_start()
 	// save state
  	save_item(NAME(m_a2d_result));
 
-	// install $ff90-$ff93 handler
+	// install $ff90-$ff97 handler
 	install_read_handler(0xff90, 0xff97, read8sm_delegate(*this, FUNC(coco_pak_max_device::ff90_read)));
 }
 
@@ -138,7 +136,7 @@ u8 coco_pak_max_device::ff90_read(offs_t offset)
 {
 	uint8_t result = m_a2d_result;
 
-	switch (offset & 0x08)
+	switch (offset & 0x07)
 	{
 		case 0:
 			m_a2d_result = m_mouse_y->read();
