@@ -364,6 +364,8 @@ void hd63450_device::single_transfer(int x)
 	if (!dma_in_progress(x))  // DMA in progress in channel x
 		return;
 
+	m_bec = 0;
+
 	if (m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 	{
 		if (!m_dma_read[x].isnull())
@@ -443,6 +445,11 @@ void hd63450_device::single_transfer(int x)
 //              LOG("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 	}
 
+	if (m_bec == ERR_BUS)
+	{
+		set_error(x, 9);  //assume error in mar, TODO: other errors
+		return;
+	}
 
 	// decrease memory transfer counter
 	if (m_reg[x].mtc > 0)
