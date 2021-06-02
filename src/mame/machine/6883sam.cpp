@@ -387,7 +387,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGFBITS("%s: SAM F Address: $%04x\n",
 			machine().describe_context(),
-			display_offset() );
+			display_offset());
 	}
 
 	if (xorval & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2))
@@ -395,7 +395,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGVBITS("%s: SAM V Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)) );
+			(m_sam_state & (SAM_STATE_V0|SAM_STATE_V1|SAM_STATE_V2)));
 	}
 
 	if (xorval & (SAM_STATE_P1))
@@ -403,7 +403,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGPBITS("%s: SAM P1 Bit: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_P1)) >> 10 );
+			(m_sam_state & (SAM_STATE_P1)) >> 10);
 	}
 
 	if (xorval & (SAM_STATE_TY))
@@ -411,7 +411,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGTBITS("%s: SAM TY Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_TY)) >> 15 );
+			(m_sam_state & (SAM_STATE_TY)) >> 15);
 	}
 
 	if (xorval & (SAM_STATE_M0|SAM_STATE_M1))
@@ -419,7 +419,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGMBITS("%s: SAM M Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9 );
+			(m_sam_state & (SAM_STATE_M0|SAM_STATE_M1)) >> 9);
 	}
 
 	if (xorval & (SAM_STATE_R0|SAM_STATE_R1))
@@ -427,7 +427,7 @@ void sam6883_device::internal_write(offs_t offset, uint8_t data)
 		/* Video frame buffer address changed */
 		LOGRBITS("%s: SAM R Bits: $%02x\n",
 			machine().describe_context(),
-			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11 );
+			(m_sam_state & (SAM_STATE_R0|SAM_STATE_R1)) >> 11);
 	}
 }
 
