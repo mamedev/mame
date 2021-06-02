@@ -9,7 +9,7 @@
 
     TODO:
     - clean this up!
-    - Properly emulate the protection chips, used by several games (check stvprot.cpp for more info)
+    - Properly emulate the protection chips, used by several games
 
     (per-game issues)
     - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
@@ -43,7 +43,6 @@
 #include "cpu/sh/sh2.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
-#include "machine/stvprot.h"
 #include "sound/scsp.h"
 
 #include "softlist.h"
@@ -263,6 +262,93 @@ void stv_state::hop_ioga_w(offs_t offset, uint8_t data)
 		m_hopper->motor_w(data & 0x80);
 	stv_ioga_w(offset, data);
 }
+
+
+// ST-V hookup for 315-5881 encryption/compression chip
+
+/*
+ Known ST-V Games using this kind of protection
+
+ Astra Superstars (text layer gfx transfer)
+ Elandoree (gfx transfer of textures)
+ Final Fight Revenge (boot vectors etc.)
+ Radiant Silvergun (game start protection)
+ Steep Slope Sliders (gfx transfer of character portraits)
+ Tecmo World Cup '98 (Tecmo logo, player movement)
+
+*/
+
+/*************************************
+*
+* Common Handlers
+*
+*************************************/
+
+uint32_t stv_state::common_prot_r(offs_t offset)
+{
+	uint32_t *ROM = (uint32_t *)memregion("abus")->base();
+
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			uint8_t* base;
+			uint16_t res = m_cryptdevice->do_decrypt(base);
+			uint16_t res2 = m_cryptdevice->do_decrypt(base);
+			res = ((res & 0xff00) >> 8) | ((res & 0x00ff) << 8);
+			res2 = ((res2 & 0xff00) >> 8) | ((res2 & 0x00ff) << 8);
+
+			return res2 | (res << 16);
+		}
+		return m_a_bus[offset];
+	}
+	else
+	{
+		if(m_a_bus[offset] != 0) return m_a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
+
+
+uint16_t stv_state::crypt_read_callback(uint32_t addr)
+{
+	uint16_t dat= m_maincpu->space().read_word((0x02000000+2*addr));
+	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
+}
+
+void stv_state::common_prot_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_a_bus[offset]);
+
+	if (offset == 0)
+	{
+		COMBINE_DATA(&m_abus_protenable);
+	}
+	else if(offset == 2)
+	{
+		if (ACCESSING_BITS_16_31) m_cryptdevice->set_addr_low(data >> 16);
+		if (ACCESSING_BITS_0_15) m_cryptdevice->set_addr_high(data&0xffff);
+
+	}
+	else if(offset == 3)
+	{
+		COMBINE_DATA(&m_abus_protkey);
+
+		m_cryptdevice->set_subkey(m_abus_protkey>>16);
+	}
+}
+
+void stv_state::install_common_protection()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4fffff0, 0x4ffffff, read32sm_delegate(*this, FUNC(stv_state::common_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4fffff0, 0x4ffffff, write32s_delegate(*this, FUNC(stv_state::common_prot_w)));
+}
+
+void stv_state::stv_register_protection_savestates()
+{
+	save_item(NAME(m_a_bus));
+}
+
 
 /*
 
@@ -1265,7 +1351,7 @@ MACHINE_START_MEMBER(stv_state, stv)
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 
-	stv_register_protection_savestates(); // machine/stvprot.c
+	stv_register_protection_savestates();
 
 	m_audiocpu->set_reset_callback(*this, FUNC(stv_state::m68k_reset_callback));
 }
