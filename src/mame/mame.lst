@@ -2534,6 +2534,7 @@ comportiii                      // Compaq Portable III
 comslt286                       // Compaq SLT/286
 dsys200                         // Dell System 200
 pcd2                            // 1986 Siemens PCD-2
+pcd2m                           // Siemens PCD-2M
 pcd3nsl                         // Siemens-Nixdorf PCD-3Nsl
 pcd3nsx                         // Siemens-Nixdorf PCD-3Nsx
 pcd4x                           // Siemens-Nixdorf PCD-4H and other 486 desktops and towers
@@ -2668,6 +2669,7 @@ ataripc5                        // Atari PC5 (386)
 atariabc286                     // Atari ABC-286/30
 lion3500                        // 1993 Lion 3500C/T notebook
 o286foxii                       // Octek Fox II motherboard (286)
+ocfoxm                          // Octek Fox M 286
 ocjagii                         // Octek Jaguar II motherboard (386)
 ocjagv                          // Octek Jaguar V motherboard (386)
 ocpanii                         // Octek Panther II motherboard (386sx)
@@ -2797,6 +2799,12 @@ pg750eisa                       // Siemens PG 750 486 EISA
 samdm286                        // Samsung Deskmaster 286-12
 zdz248                          // Zenith Z-248
 ncr3433                         // NCR Class 3433
+cl28612s                        // Wearnes CL286-12/16S (CL286-12S and CL286-16S)
+asi100b0                        // ASI 100B0, identified as "HAM 12 TI 286 Motherboard ZERO WAIT"
+pwb7270e                        // Advanced Logic Research PWB 7270 REV E
+prolite286                      // CAF Prolite 286/16
+twinnet                         // Twinhead Netstation PC
+icldrsm40                       // ICL DRS M40 (286)
 
 
 @source:atari_s1.cpp
