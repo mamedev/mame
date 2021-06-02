@@ -12,7 +12,7 @@ Z8400AB1 main CPU
 3x 6116 RAMs
 8-dip bank
 4-dip bank
-8? MHz XTAL (near main CPU)
+8 MHz XTAL (near main CPU)
 20 MHz XTAL
 lots of TTL
 4x digital counters
