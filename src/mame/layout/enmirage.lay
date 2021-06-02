@@ -59,11 +59,11 @@ copyright-holders:tim lindner
 		<bounds left="0" top="0" right="1000" bottom="437" />
 
 		<!-- bezel -->
-		<element name="background" ref="background">
+		<element ref="background">
 			<bounds x="0" y="0" width="1000" height="437" />
 		</element>
 
-		<element name="lcd_background" ref="lcd_background">
+		<element ref="lcd_background">
 			<bounds x="54" y="64" width="127" height="87" />
 		</element>
 
@@ -115,43 +115,43 @@ copyright-holders:tim lindner
 		<element ref="button_white"><bounds x="123" y="175" width="75" height="3" /></element>
 
 		<!-- Labels, row 1 -->
-		<element name="label_1" ref="label_1"><bounds x="269" y="12" width="71" height="22" /></element>
-		<element name="label_2" ref="label_2"><bounds x="362" y="12" width="71" height="22" /></element>
-		<element name="label_2" ref="label_3"><bounds x="455" y="12" width="71" height="22" /></element>
-		<element name="label_Rec" ref="label_Rec"><bounds x="584" y="12" width="71" height="22" /></element>
-		<element name="label_Upper" ref="label_Upper"><bounds x="711" y="12" width="71" height="22" /></element>
-		<element name="label_Upper" ref="label_Upper"><bounds x="882" y="12" width="71" height="22" /></element>
+		<element ref="label_1"><bounds x="269" y="12" width="71" height="22" /></element>
+		<element ref="label_2"><bounds x="362" y="12" width="71" height="22" /></element>
+		<element ref="label_3"><bounds x="455" y="12" width="71" height="22" /></element>
+		<element ref="label_Rec"><bounds x="584" y="12" width="71" height="22" /></element>
+		<element ref="label_Upper"><bounds x="711" y="12" width="71" height="22" /></element>
+		<element ref="label_Upper"><bounds x="882" y="12" width="71" height="22" /></element>
 
 		<!-- Labels, row 2 -->
-		<element name="label_4" ref="label_4"><bounds x="269" y="105" width="71" height="22" /></element>
-		<element name="label_5" ref="label_5"><bounds x="362" y="105" width="71" height="22" /></element>
-		<element name="label_6" ref="label_6"><bounds x="455" y="105" width="71" height="22" /></element>
-		<element name="label_Play" ref="label_Play"><bounds x="584" y="105" width="71" height="22" /></element>
-		<element name="label_Lower" ref="label_Lower"><bounds x="711" y="105" width="71" height="22" /></element>
-		<element name="label_Lower" ref="label_Lower"><bounds x="882" y="105" width="71" height="22" /></element>
+		<element ref="label_4"><bounds x="269" y="105" width="71" height="22" /></element>
+		<element ref="label_5"><bounds x="362" y="105" width="71" height="22" /></element>
+		<element ref="label_6"><bounds x="455" y="105" width="71" height="22" /></element>
+		<element ref="label_Play"><bounds x="584" y="105" width="71" height="22" /></element>
+		<element ref="label_Lower"><bounds x="711" y="105" width="71" height="22" /></element>
+		<element ref="label_Lower"><bounds x="882" y="105" width="71" height="22" /></element>
 
 		<!-- Labels, row 3 -->
-		<element name="label_Param" ref="label_Param"><bounds x="24" y="198" width="71" height="22" /></element>
-		<element name="label_Value" ref="label_Value"><bounds x="136" y="198" width="71" height="22" /></element>
-		<element name="label_7" ref="label_7"><bounds x="269" y="198" width="71" height="22" /></element>
-		<element name="label_8" ref="label_8"><bounds x="362" y="198" width="71" height="22" /></element>
-		<element name="label_9" ref="label_9"><bounds x="455" y="198" width="71" height="22" /></element>
-		<element name="label_Load" ref="label_Load"><bounds x="584" y="198" width="71" height="22" /></element>
+		<element ref="label_Param"><bounds x="24" y="198" width="71" height="22" /></element>
+		<element ref="label_Value"><bounds x="136" y="198" width="71" height="22" /></element>
+		<element ref="label_7"><bounds x="269" y="198" width="71" height="22" /></element>
+		<element ref="label_8"><bounds x="362" y="198" width="71" height="22" /></element>
+		<element ref="label_9"><bounds x="455" y="198" width="71" height="22" /></element>
+		<element ref="label_Load"><bounds x="584" y="198" width="71" height="22" /></element>
 
 		<!-- Labels, row 4 -->
-		<element name="label_Off" ref="label_Off"><bounds x="24" y="291" width="71" height="22" /></element>
-		<element name="label_On" ref="label_On"><bounds x="136" y="291" width="71" height="22" /></element>
-		<element name="label_Cancel" ref="label_Cancel"><bounds x="269" y="291" width="71" height="22" /></element>
-		<element name="label_0" ref="label_0"><bounds x="362" y="291" width="71" height="22" /></element>
-		<element name="label_Enter" ref="label_Enter"><bounds x="455" y="291" width="71" height="22" /></element>
-		<element name="label_Save" ref="label_Save"><bounds x="584" y="291" width="71" height="22" /></element>
+		<element ref="label_Off"><bounds x="24" y="291" width="71" height="22" /></element>
+		<element ref="label_On"><bounds x="136" y="291" width="71" height="22" /></element>
+		<element ref="label_Cancel"><bounds x="269" y="291" width="71" height="22" /></element>
+		<element ref="label_0"><bounds x="362" y="291" width="71" height="22" /></element>
+		<element ref="label_Enter"><bounds x="455" y="291" width="71" height="22" /></element>
+		<element ref="label_Save"><bounds x="584" y="291" width="71" height="22" /></element>
 
 		<!-- Labels, row 5 -->
-		<element name="label_CONTROL" ref="label_CONTROL"><bounds x="58" y="374" width="111" height="22" /></element>
-		<element name="label_SELECT" ref="label_SELECT"><bounds x="362" y="374" width="71" height="22" /></element>
-		<element name="label_SEQ" ref="label_SEQ"><bounds x="584" y="374" width="71" height="22" /></element>
-		<element name="label_SAMPLE" ref="label_SAMPLE"><bounds x="711" y="374" width="71" height="22" /></element>
-		<element name="label_LOAD" ref="label_LOAD"><bounds x="882" y="374" width="71" height="22" /></element>
+		<element ref="label_CONTROL"><bounds x="58" y="374" width="111" height="22" /></element>
+		<element ref="label_SELECT"><bounds x="362" y="374" width="71" height="22" /></element>
+		<element ref="label_SEQ"><bounds x="584" y="374" width="71" height="22" /></element>
+		<element ref="label_SAMPLE"><bounds x="711" y="374" width="71" height="22" /></element>
+		<element ref="label_LOAD"><bounds x="882" y="374" width="71" height="22" /></element>
 
 		<!-- hand built LEDs, left side-->
 		<element name="0.0" ref="led_segement">
