@@ -593,7 +593,7 @@ ROM_START( zdrum )
 	ROM_LOAD( "um53.bin", 0x00000, 0x80000, CRC(372022da) SHA1(809d103bdb365c9ff9e32b6a3032040b6a91ce88) ) // MBM29F040A
 
 	ROM_REGION( 0x117, "plds", 0 )
-	ROM_LOAD( "u507.bin", 0x000, 0x117, CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) ) // PALCE16V8H, mostly 1, protected?
+	ROM_LOAD( "u507.bin", 0x000, 0x117, CRC(681ddf27) SHA1(0f9696918e512eb3840750c9386b4312a9e937ab) ) // PALCE16V8H
 
 	DISK_REGION( "ide:0:hdd:image" ) // should contain the songs
 	DISK_IMAGE( "zdrum", 0, NO_DUMP )
