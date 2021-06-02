@@ -224,7 +224,7 @@ void enmirage_state::mirage_map(address_map &map)
 	map(0xf000, 0xffff).rom().region("osrom", 0);
 }
 
-void enmirage_state::coefficients_w(offs_t offset, uint8_t data )
+void enmirage_state::coefficients_w(offs_t offset, uint8_t data)
 {
 	uint8_t channel = offset & 0x07;
 	uint8_t filter_input = (offset >> 3) & 0x03;
@@ -236,7 +236,7 @@ void enmirage_state::coefficients_w(offs_t offset, uint8_t data )
 				(filter_input & 0x01) == 0 ? "VF" : "", /* cut-off frequency */
 				(filter_input & 0x03) == 0 ? " and " : "",
 				(filter_input & 0x02) == 0 ? "VQ" : "", /* filter resonance */
-				(filter_input & 0x03) == 0x03 ? "preload dac" : "" );
+				(filter_input & 0x03) == 0x03 ? "preload dac" : "");
 }
 
 // port A:
@@ -313,8 +313,9 @@ void enmirage_state::mirage_via_write_portb(uint8_t data)
 	m_sample_bank->set_entry(bank);
 
 	// handle floppy motor on
-	floppy_image_device *flop = m_floppy_connector->get_device();
-	flop->mon_w(data & 0x10 ? 1 : 0 );
+	floppy_image_device *floppy = m_floppy_connector->get_device();
+	if (floppy)
+		floppy->mon_w(data & 0x10 ? 1 : 0);
 
 	// handle 6500/11 reset (TODO)
 
