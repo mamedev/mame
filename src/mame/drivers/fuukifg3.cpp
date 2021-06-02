@@ -8,7 +8,7 @@
                 based on fuukifg2 by Luca Elia
 
 Hardware is similar to FG-2 used for :
-"Go Go! Mile Smile", "Susume! Mile Smile (Japan)" & "Gyakuten!! Puzzle Bancho (Japan)"
+"Go Go! Mile Smile", "Susume! Mile Smile (Japan)" & "Gyakuten!! Puzzle Bancho (Japan, set 1)"
 See fuukifg2.cpp
 
 Main  CPU   :   M68020
@@ -153,6 +153,13 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 |                                |
 |  BG2022     BG1012       PGM0  |
 |--------------------------------|
+
+
+There is an Asura Buster known to exist on a FG3-SUB-EP containing all EPROMs
+ with the following checksum values for the program ROMS:
+
+  PGM0 - BB1D, PGM1 - 6D84, PGM2 - EE6B & PGM3 - 7977  (which match the current Japan, set 1)
+  other game EPROMs dated, 10/30, 11/1 or 11/2
 
 ***************************************************************************/
 
@@ -623,6 +630,41 @@ Fuuki, 2000   Consists of a FG-3J MAIN-J mainboard &  FG-3J ROM-J combo
 
 ROM_START( asurabus )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
+	ROM_LOAD32_BYTE( "uspgm3.u1", 0x000000, 0x80000, CRC(e152cec9) SHA1(af1d93bdabc6732c0ff53972826d67a3753ef785) ) // hand written labels
+	ROM_LOAD32_BYTE( "uspgm2.u2", 0x000001, 0x80000, CRC(b19787db) SHA1(3d6757f38f297c1ee89003173567319b5dae8000) )
+	ROM_LOAD32_BYTE( "uspgm1.u3", 0x000002, 0x80000, CRC(6588e51a) SHA1(9ab978c80d8ece447697557c8000be95760306f3) )
+	ROM_LOAD32_BYTE( "uspgm0.u4", 0x000003, 0x80000, CRC(981e6ff1) SHA1(088d26a3cbd2361ffc756c3da8a67b94ae7bbd65) )
+
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+
+	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD16_WORD_SWAP( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD16_WORD_SWAP( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD16_WORD_SWAP( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD16_WORD_SWAP( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD16_WORD_SWAP( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+
+	ROM_REGION( 0x0800000, "gfx2", 0 )
+	ROM_LOAD32_WORD_SWAP( "bg1012.u22", 0x0000002, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD32_WORD_SWAP( "bg1113.u23", 0x0000000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+
+	ROM_REGION( 0x0800000, "gfx3", 0 )
+	ROM_LOAD32_WORD_SWAP( "bg2022.u25", 0x0000002, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD32_WORD_SWAP( "bg2123.u24", 0x0000000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
+	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
+	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
+ROM_END
+
+ROM_START( asurabusj )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
 	ROM_LOAD32_BYTE( "pgm3.u1", 0x000000, 0x80000, CRC(2c6b5271) SHA1(188371f1f003823ac719e962e048719d76696b2f) )
 	ROM_LOAD32_BYTE( "pgm2.u2", 0x000001, 0x80000, CRC(8f8694ec) SHA1(3334df4aecc5ab2f8914ef6748c027a99b39ce26) )
 	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(0a040f0f) SHA1(d5e86d33efcbbde7ee62cfc8dfe867f250a33415) )
@@ -656,7 +698,42 @@ ROM_START( asurabus )
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
-ROM_START( asurabusa )
+ROM_START( asurabusja )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
+	ROM_LOAD32_BYTE( "pgm3_583a.u1", 0x000000, 0x80000, CRC(46ab3b0e) SHA1(2d6a57352891a484fe11cda9addbff5b3940c17c) ) // hand written labels with checksums
+	ROM_LOAD32_BYTE( "pgm2_0ff4.u2", 0x000001, 0x80000, CRC(fa7aa289) SHA1(6f82371274c45f889a19a4fdd859015fb6ea249a) )
+	ROM_LOAD32_BYTE( "pgm1_bac7.u3", 0x000002, 0x80000, CRC(67364e19) SHA1(959b896b201f103ef9189b537139c89bfc7144ea) )
+	ROM_LOAD32_BYTE( "pgm0_193a.u4", 0x000003, 0x80000, CRC(94d39c64) SHA1(95ca2aa3e19e64bed7add3170653fa3364530fde) )
+
+	ROM_REGION( 0x80000, "soundcpu", 0 ) /* Z80 */
+	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
+
+	ROM_REGION( 0x2000000, "fuukivid", 0 )
+	ROM_LOAD16_WORD_SWAP( "sp01.u13", 0x0000000, 0x400000, CRC(5edea463) SHA1(22a780912f060bae0c9a403a7bfd4d27f25b76e3) )
+	ROM_LOAD16_WORD_SWAP( "sp23.u14", 0x0400000, 0x400000, CRC(91b1b0de) SHA1(341367966559ef2027415b673eb0db704680c81f) )
+	ROM_LOAD16_WORD_SWAP( "sp45.u15", 0x0800000, 0x400000, CRC(96c69aac) SHA1(cf053523026651427f884b9dd7c095af362dd24e) )
+	ROM_LOAD16_WORD_SWAP( "sp67.u16", 0x0c00000, 0x400000, CRC(7c3d83bf) SHA1(7188dd923c6c7eb6aee3323e7ab54aa240c35ea3) )
+	ROM_LOAD16_WORD_SWAP( "sp89.u17", 0x1000000, 0x400000, CRC(cb1e14f8) SHA1(941cea1887d7ceb52222adcf1d6913969e6163aa) )
+	ROM_LOAD16_WORD_SWAP( "spab.u18", 0x1400000, 0x400000, CRC(e5a4608d) SHA1(b8e39f53e0b7ad1e16ae9c3726597776b404be1c) )
+	ROM_LOAD16_WORD_SWAP( "spcd.u19", 0x1800000, 0x400000, CRC(99bfbe32) SHA1(926a8afc4a175874f22f53300e76f59331d3b9ba) )
+	ROM_LOAD16_WORD_SWAP( "spef.u20", 0x1c00000, 0x400000, CRC(c9c799cc) SHA1(01373316700d8688deeea2e9e8f831d5f86c7f17) )
+
+	ROM_REGION( 0x0800000, "gfx2", 0 )
+	ROM_LOAD32_WORD_SWAP( "bg1012.u22", 0x0000002, 0x400000, CRC(e3fb9af0) SHA1(11900cc2873337692f66fb4f1eb9c574e5a967de) )
+	ROM_LOAD32_WORD_SWAP( "bg1113.u23", 0x0000000, 0x400000, CRC(5f8657e6) SHA1(7c2854dc5d2d4efe55bda01e329da051350e0031) )
+
+	ROM_REGION( 0x0800000, "gfx3", 0 )
+	ROM_LOAD32_WORD_SWAP( "bg2022.u25", 0x0000002, 0x400000, CRC(f46eda52) SHA1(46530016b32a164bd76c4f53e7b53b2beb28db06) )
+	ROM_LOAD32_WORD_SWAP( "bg2123.u24", 0x0000000, 0x400000, CRC(c4ebb86b) SHA1(a7093e6e02b64566d277cbbd5fa90cd430e7c8a0) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
+	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
+
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
+	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
+ROM_END
+
+ROM_START( asurabusjr ) // ARCADIA review build
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
 	ROM_LOAD32_BYTE( "24-31.pgm3", 0x000000, 0x80000, CRC(cfcb9c75) SHA1(51e325d5e60d5bb058429f04a5170dcc17986b7d) )
 	ROM_LOAD32_BYTE( "16-23.pgm2", 0x000001, 0x80000, CRC(e4d07738) SHA1(c6c949c5b0cbc129917bb8c93707539adabbd336) )
@@ -699,7 +776,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1998, asurabld,  0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, asurabld,   0,        fuuki32, asurabld, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, asurabus,  0,        fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, asurabusa, asurabus, fuuki32, asurabusa,fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4
+GAME( 2001, asurabus,   0,        fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (USA)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusj,  asurabus, fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan, set 1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusja, asurabus, fuuki32, asurabus, fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan, set 2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, asurabusjr, asurabus, fuuki32, asurabusa,fuuki32_state, empty_init, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan) (ARCADIA review build)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has pause function on P1 button 4

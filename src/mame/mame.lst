@@ -14159,8 +14159,10 @@ pbancho                         // (c) 1996 (Japan)
 
 @source:fuukifg3.cpp
 asurabld                        // (c) 1998 (Japan)
-asurabus                        // (c) 2000 (Japan)
-asurabusa                       // review build
+asurabus                        // (c) 2001 (USA)
+asurabusj                       // (c) 2000 (Japan)
+asurabusja                      // (c) 2000 (Japan)
+asurabusjr                      // review build
 
 @source:fwheel.cpp
 fwheel                          //
