@@ -2514,6 +2514,12 @@ void epson_sd_321::setup_characteristics()
 
 //-------------------------------------------------
 //  3.5" Panasonic Flexible Disk Drive JU-363
+//
+//  track to track: 3 ms
+//  settling time: 15 ms
+//  motor start time: 500 ms
+//  transfer rate: 250 Kbits/s
+//
 //-------------------------------------------------
 
 pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

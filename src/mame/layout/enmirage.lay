@@ -11,33 +11,33 @@ copyright-holders:tim lindner
 	<element name="lcd_background"><rect><color red="0.360" green="0.274" blue="0.180" /></rect></element>
 
 	<!-- Labels -->
-	<element name="label_1"> <text string="1"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_2"> <text string="2"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_3"> <text string="3"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Rec"> <text string="Rec"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Upper"> <text string="Upper"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_4"> <text string="4"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_5"> <text string="5"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_6"> <text string="6"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Play"> <text string="Play"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Lower"> <text string="Lower"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Param"> <text string="Param"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Value"> <text string="Value"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_7"> <text string="7"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_8"> <text string="8"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_9"> <text string="9"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Load"> <text string="Load"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Off"> <text string="Off/&#9662;"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_On"> <text string="On/&#9650;"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Cancel"> <text string="Cancel"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_0"> <text string="0/Prog"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Enter"> <text string="Enter"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_Save"> <text string="Save"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_CONTROL"> <text string="CONTROL"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_SELECT"> <text string="SELECT"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_SEQ"> <text string="SEQ"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_SAMPLE"> <text string="SAMPLE"> <color red="1" green="1" blue="1" /></text></element>
-	<element name="label_LOAD"> <text string="LOAD"> <color red="1" green="1" blue="1" /></text></element>
+	<element name="label_1"> <text string="1"></text></element>
+	<element name="label_2"> <text string="2"></text></element>
+	<element name="label_3"> <text string="3"></text></element>
+	<element name="label_Rec"> <text string="Rec"></text></element>
+	<element name="label_Upper"> <text string="Upper"></text></element>
+	<element name="label_4"> <text string="4"></text></element>
+	<element name="label_5"> <text string="5"></text></element>
+	<element name="label_6"> <text string="6"></text></element>
+	<element name="label_Play"> <text string="Play"></text></element>
+	<element name="label_Lower"> <text string="Lower"></text></element>
+	<element name="label_Param"> <text string="Param"></text></element>
+	<element name="label_Value"> <text string="Value"></text></element>
+	<element name="label_7"> <text string="7"></text></element>
+	<element name="label_8"> <text string="8"></text></element>
+	<element name="label_9"> <text string="9"></text></element>
+	<element name="label_Load"> <text string="Load"></text></element>
+	<element name="label_Off"> <text string="Off/&#9662;"></text></element>
+	<element name="label_On"> <text string="On/&#9650;"></text></element>
+	<element name="label_Cancel"> <text string="Cancel"></text></element>
+	<element name="label_0"> <text string="0/Prog"></text></element>
+	<element name="label_Enter"> <text string="Enter"></text></element>
+	<element name="label_Save"> <text string="Save"></text></element>
+	<element name="label_CONTROL"> <text string="CONTROL"></text></element>
+	<element name="label_SELECT"> <text string="SELECT"></text></element>
+	<element name="label_SEQ"> <text string="SEQ"></text></element>
+	<element name="label_SAMPLE"> <text string="SAMPLE"></text></element>
+	<element name="label_LOAD"> <text string="LOAD"></text></element>
 
 	<!-- Buttons -->
 	<element name="button_yellow"><rect><color red="0.996" green="0.874" blue="0.016" /></rect></element>
@@ -100,19 +100,19 @@ copyright-holders:tim lindner
 		<element name="button_Save" ref="button_grey" inputtag="pb5" inputmask="0x20"><bounds x="597" y="325" width="44" height="24" /></element>
 
 		<!-- Lines -->
-		<element name="line_1" ref="button_white"><bounds x="281" y="82" width="659" height="6" /></element>
-		<element name="line_2" ref="button_white"><bounds x="281" y="175" width="659" height="6" /></element>
-		<element name="line_3" ref="button_white"><bounds x="34" y="268" width="649" height="6" /></element>
-		<element name="line_4" ref="button_white"><bounds x="0" y="361" width="939" height="6" /></element>11
-		<element name="line_5" ref="button_white"><bounds x="38" y="367" width="155" height="6" /></element>
-		<element name="line_6" ref="button_white"><bounds x="282" y="367" width="230" height="6" /></element>
-		<element name="line_7" ref="button_white"><bounds x="597" y="367" width="44" height="6" /></element>
-		<element name="line_8" ref="button_white"><bounds x="711" y="367" width="71" height="6" /></element>
-		<element name="line_9" ref="button_white"><bounds x="895" y="367" width="44" height="6" /></element>
-		<element name="line_10" ref="button_white"><bounds x="60" y="149" width="3" height="29" /></element>
-		<element name="line_11" ref="button_white"><bounds x="123" y="149" width="3" height="29" /></element>
-		<element name="line_12" ref="button_white"><bounds x="38" y="175" width="44" height="3" /></element>
-		<element name="line_13" ref="button_white"><bounds x="123" y="175" width="75" height="3" /></element>
+		<element ref="button_white"><bounds x="281" y="82" width="659" height="6" /></element>
+		<element ref="button_white"><bounds x="281" y="175" width="659" height="6" /></element>
+		<element ref="button_white"><bounds x="34" y="268" width="649" height="6" /></element>
+		<element ref="button_white"><bounds x="0" y="361" width="939" height="6" /></element>11
+		<element ref="button_white"><bounds x="38" y="367" width="155" height="6" /></element>
+		<element ref="button_white"><bounds x="282" y="367" width="230" height="6" /></element>
+		<element ref="button_white"><bounds x="597" y="367" width="44" height="6" /></element>
+		<element ref="button_white"><bounds x="711" y="367" width="71" height="6" /></element>
+		<element ref="button_white"><bounds x="895" y="367" width="44" height="6" /></element>
+		<element ref="button_white"><bounds x="60" y="149" width="3" height="29" /></element>
+		<element ref="button_white"><bounds x="123" y="149" width="3" height="29" /></element>
+		<element ref="button_white"><bounds x="38" y="175" width="44" height="3" /></element>
+		<element ref="button_white"><bounds x="123" y="175" width="75" height="3" /></element>
 
 		<!-- Labels, row 1 -->
 		<element name="label_1" ref="label_1"><bounds x="269" y="12" width="71" height="22" /></element>
