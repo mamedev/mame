@@ -2018,6 +2018,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- These images are probably extracted from the installation CD -->
 	<software name="sys712lcq" supported="no">
 		<description>System Software 7.1.2 (LC 580/Quadra 630, US English)</description>
 		<year>1994</year>
@@ -2638,8 +2639,8 @@ license:CC0
 	</software>
 
 	<!-- S/N: Z93350-001A -->
-	<software name="clarisw">
-		<description>ClarisWorks (Swedish)</description>
+	<software name="clarisw20sv">
+		<description>ClarisWorks 2.0 (Swedish)</description>
 		<year>1993</year>
 		<publisher>Claris</publisher>
 		<info name="version" value="2.0" />
@@ -2881,24 +2882,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="macwp15v1">
-		<description>MacWrite Pro 1.5v1</description>
-		<year>1993</year>
-		<publisher>Claris</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1474560">
-				<rom name="disk01.img" size="1474560" crc="c7b3a7a3" sha1="3f822f72bf15e301c4590db6090753a698301b3d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1474560">
-				<rom name="disk02.img" size="1474560" crc="3faeb185" sha1="bc9bc42e1835cfbf7390e3dd5a95083e888c704e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="macwp15v3">
 		<description>MacWrite Pro 1.5v3</description>
 		<year>1994</year>
@@ -2919,6 +2902,24 @@ license:CC0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
 				<rom name="disk03.img" size="1474560" crc="9693ecfd" sha1="eaf35fe598f0319d7da035ded83c8d4b2eafd0c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macwp15v1" cloneof="macwp15v3">
+		<description>MacWrite Pro 1.5v1</description>
+		<year>1993</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="c7b3a7a3" sha1="3f822f72bf15e301c4590db6090753a698301b3d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="3faeb185" sha1="bc9bc42e1835cfbf7390e3dd5a95083e888c704e" />
 			</dataarea>
 		</part>
 	</software>
