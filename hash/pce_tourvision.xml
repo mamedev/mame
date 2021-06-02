@@ -66,7 +66,6 @@ Space Invader
 Strange Zone
 Taito Motor Bike
 Tales Of Monster Path
-Titan
 TV Sports Football
 World Beach Volley
 World Court Tennis
@@ -1413,6 +1412,19 @@ Parasol Stars
 			<feature name="id" value="0x2a"/>
 			<dataarea name="rom" size="524288">
 				<rom name="time cruise ii (japan).pce" size="524288" crc="cfec1d6a" sha1="84bf83124a77ff67aaa0ea3f34ad9edbb755454d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="titan">
+		<description>Titan (TourVision PCE bootleg)</description>
+		<year>1991</year>
+		<publisher>bootleg (TourVision) / Naxat</publisher>
+		<info name="alt_title" value="タイタン"/>
+		<part name="cart" interface="tourvision_cart">
+			<feature name="id" value="0x2b"/>
+			<dataarea name="rom" size="262144">
+				<rom name="titan (japan).pce" size="262144" crc="d20f382f" sha1="7d12a65453c8d3d539104904a9a1eb9e429f9ab4" />
 			</dataarea>
 		</part>
 	</software>
