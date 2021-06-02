@@ -1,15 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont,Aaron Giles
 /*
     Yamaha PSR-60/PSR-70 PortaSound keyboards
     Preliminary driver by R. Belmont, major thanks to reverse-engineering work by JKN0
+
+	Note: PSR-50 is likely the same hardware.
+
+	Special thanks to
 
     Documentation: https://github.com/JKN0/PSR70-reverse
     More documentation: https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-hardware.html
                         https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-firmware.html
                         https://retroandreverse.blogspot.com/2021/01/digging-into-ymopq.html
 
-    Service manual: https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
+    Service manuals: https://elektrotanya.com/yamaha_psr-60.pdf/download.html
+	                 https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
+
+	Thanks to Lord Nightmare for help with the BBD filter chain
 
     CPU: Z80 @ 6 MHz
     Sound: YM3533 "OPQ" FM @ 3.58 MHz + YM2154 "RYP" sample playback chip for drums
@@ -47,6 +54,8 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "sound/bbd.h"
+#include "sound/flt_biquad.h"
+#include "sound/flt_rc.h"
 #include "sound/mixer.h"
 #include "sound/ym2154.h"
 #include "sound/ymopq.h"
@@ -73,8 +82,16 @@ public:
 		m_acia(*this, "acia"),
 		m_lmixer(*this, "lmixer"),
 		m_rmixer(*this, "rmixer"),
+		m_bbd_mixer(*this, "bbdmixer"),
 		m_bbd(*this, "bbd"),
 		m_ryp4(*this, "ryp4"),
+		m_ic206b(*this, "ic206b"),
+		m_ic206a(*this, "ic206a"),
+		m_ic205(*this, "ic205"),
+		m_postbbd_rc(*this, "postbbd_rc"),
+		m_ic204b(*this, "ic204b"),
+		m_first_rc(*this, "first_rc"),
+		m_ic204a(*this, "ic204a"),
 		m_rom2bank(*this, "rom2bank"),
 		m_keyboard(*this, "P1_%u", 0),
 		m_drvif(*this, "DRVIF_%u", 0),
@@ -99,8 +116,16 @@ private:
 	required_device<acia6850_device> m_acia;
 	required_device<mixer_device> m_lmixer;
 	required_device<mixer_device> m_rmixer;
+	required_device<mixer_device> m_bbd_mixer;
 	required_device<mn3204p_device> m_bbd;
 	required_device<ym2154_device> m_ryp4;
+	required_device<filter_biquad_device> m_ic206b;
+	required_device<filter_biquad_device> m_ic206a;
+	required_device<filter_biquad_device> m_ic205;
+	required_device<filter_rc_device> m_postbbd_rc;
+	required_device<filter_biquad_device> m_ic204b;
+	required_device<filter_rc_device> m_first_rc;
+	required_device<filter_biquad_device> m_ic204a;
 	required_memory_bank m_rom2bank;
 	required_ioport_array<10> m_keyboard;
 	required_ioport_array<DRVIF_MAX_TARGETS> m_drvif;
@@ -194,7 +219,7 @@ void psr60_state::ryp4_out_w(u8 data)
 	m_bbd_config = data;
 
 	// bit 0 (CT0) enables/disables the effect
-	m_bbd->set_output_gain(0, BIT(data, 0) ? 1.0 : 0.0);
+	m_ic206a->set_output_gain(0, BIT(data, 0) ? 1.0 : 0.0);
 
 	// bits 1 + 2 go to the 'T' and 'C' pins and control the frequency
 	// modulation, which we simulate in a periodic timer
@@ -290,7 +315,6 @@ void psr60_state::machine_start()
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
 	m_acia_irq = CLEAR_LINE;
-	timer_alloc()->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 }
 
 void psr60_state::machine_reset()
@@ -433,7 +457,7 @@ static INPUT_PORTS_START(psr60)
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(psr70)
@@ -573,7 +597,7 @@ static INPUT_PORTS_START(psr70)
 	RYP4_PORT(10,  0, "Unused10")
 
 	PORT_START("MASTERVOL")
-	PORT_ADJUSTER(50, "Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
+	PORT_ADJUSTER(50, "PSR Master Volume") PORT_CHANGED_MEMBER(DEVICE_SELF, psr60_state, mastervol_changed, 0)
 INPUT_PORTS_END
 
 void psr60_state::psr_common(machine_config &config)
@@ -608,17 +632,48 @@ void psr60_state::psr_common(machine_config &config)
 	MIXER(config, m_rmixer);
 	m_rmixer->add_route(0, "rspeaker", 1.0);
 
-	YM2154(config, m_ryp4, 2250000);
-	m_ryp4->irq_handler().set(FUNC(psr60_state::ryp4_irq_w));
-	m_ryp4->io_read_handler().set(FUNC(psr60_state::ryp4_an_r));
-	m_ryp4->io_write_handler().set(FUNC(psr60_state::ryp4_out_w));
-	m_ryp4->add_route(0, m_lmixer, 0.50);		// rhythm channels are mixed in separately
-	m_ryp4->add_route(1, m_rmixer, 0.50);
+	// begin BBD filter chain....
+	// thanks to Lord Nightmare for figuring this out
+	FILTER_BIQUAD(config, m_ic206b);
+	m_ic206b->opamp_mfb_lowpass_setup(RES_K(100), 0, RES_K(100), 0, CAP_P(100));
+	m_ic206b->add_route(0, m_lmixer, 0.11);
+	m_ic206b->add_route(0, m_rmixer, 0.11);
 
-	MN3204P(config, m_bbd, 12700); // 6.7kHz feeds the iG10090 driver, range is 10-200kHz
+	// not accurate, not correctly modeling the 22k resistor in series with the cap
+	FILTER_BIQUAD(config, m_ic206a);
+	m_ic206a->opamp_mfb_lowpass_setup(RES_K(33), 0, RES_K(22), 0, CAP_P(0.0039));
+	m_ic206a->add_route(0, m_ic206b, 1.0);
+
+	FILTER_BIQUAD(config, m_ic205);
+	m_ic205->opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.9), RES_R(0.001), CAP_U(0.0068), CAP_P(82));
+	m_ic205->add_route(0, m_ic206a, 1.0);
+
+	FILTER_RC(config, m_postbbd_rc);
+	m_postbbd_rc->set_rc(filter_rc_device::LOWPASS_2C, RES_K(22), 0, 0, CAP_U(0.0015));
+	m_postbbd_rc->add_route(0, m_ic205, 1.0);
+
+	MIXER(config, m_bbd_mixer);
+	m_bbd_mixer->add_route(0, m_postbbd_rc, 1.0);
+
+	MN3204P(config, m_bbd, 50000);
 	m_bbd->set_cv_handler(FUNC(psr60_state::cv_handler));
-	m_bbd->add_route(0, m_lmixer, 0.11);		// BBD is mixed in
-	m_bbd->add_route(0, m_rmixer, 0.11);
+	m_bbd->add_route(0, m_bbd_mixer, 0.5);
+	m_bbd->add_route(1, m_bbd_mixer, 0.5);
+
+	FILTER_BIQUAD(config, m_ic204b);
+	m_ic204b->opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.9), RES_R(0.001), CAP_U(0.0068), CAP_P(82));
+	m_ic204b->add_route(0, m_bbd, 1.0);
+
+	FILTER_RC(config, m_first_rc);
+	m_first_rc->set_rc(filter_rc_device::LOWPASS_2C, RES_R(22), 0, 0, CAP_U(0.0015));
+	m_first_rc->add_route(0, m_ic204b, 1.0);
+
+	// not accurate, not correctly modeling the 22k resistor bypassing the 22k resistor in series
+	// with the cap, and just assuming two 22k resistors in parallel
+	FILTER_BIQUAD(config, m_ic204a);
+	m_ic204a->opamp_mfb_lowpass_setup(RES_K(11), 0, RES_K(47), 0, CAP_P(150));
+	m_ic204a->add_route(0, m_first_rc, 1.0);
+	// end BBD filter chain....
 
 	YM3533(config, m_ym3533, 3.579545_MHz_XTAL);
 	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
@@ -626,7 +681,14 @@ void psr60_state::psr_common(machine_config &config)
 	m_ym3533->add_route(0, m_rmixer, 0.16);
 	m_ym3533->add_route(1, m_lmixer, 0.22);		// channel 2 = SABC
 	m_ym3533->add_route(1, m_rmixer, 0.22);
-	m_ym3533->add_route(1, m_bbd, 1.0);
+	m_ym3533->add_route(1, m_ic204a, 1.0);		// routed to BBD via filters
+
+	YM2154(config, m_ryp4, 2250000);
+	m_ryp4->irq_handler().set(FUNC(psr60_state::ryp4_irq_w));
+	m_ryp4->io_read_handler().set(FUNC(psr60_state::ryp4_an_r));
+	m_ryp4->io_write_handler().set(FUNC(psr60_state::ryp4_out_w));
+	m_ryp4->add_route(0, m_lmixer, 0.50);
+	m_ryp4->add_route(1, m_rmixer, 0.50);
 }
 
 void psr60_state::psr60(machine_config &config)
