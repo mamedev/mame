@@ -24562,6 +24562,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="pcb" value="171-5694-01"/>
 			<feature name="ic5" value="PC74HC139P"/>
 			<dataarea name="rom" width="16" endianness="big" size="262144">
+			<!-- The known dump is a 512KB overdump. PCB clearly has two 128KB 27C100s. This cuts off the second half (all 0xFF). -->
 				<rom name="ship (visitor prototype).bin" size="262144" crc="852b5511" sha1="167c163e10135b6d0fcd63b1d1b6981d30db9af0"/>
 			</dataarea>
 		</part>
