@@ -275,7 +275,7 @@ void spg2xx_io_device::set_spi_irq(bool set)
 
 	const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 	if (changed)
-		check_irqs(changed);
+		check_data_irq();
 }
 
 void spg2xx_io_device::update_spi_irqs()
@@ -458,15 +458,7 @@ uint16_t spg2xx_io_device::io_r(offs_t offset)
 		break;
 
 	case REG_ADC_DATA:
-		if (!machine().side_effects_disabled())
-		{
-			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS &= ~0x2000;
-			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-			if (changed)
-				check_irqs(changed);
-			LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
-		}
+		LOGMASKED(LOG_IO_READS | LOG_ADC, "%s: io_r: ADC Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case REG_WAKEUP_SOURCE:
@@ -741,10 +733,7 @@ void spg2xx_io_device::increment_timer_a()
 		IO_IRQ_STATUS |= 0x0800;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
-		{
-			//printf("Timer A overflow\n");
-			check_irqs(0x0800);
-		}
+			check_timers_irq();
 	}
 }
 
@@ -758,10 +747,7 @@ void spg2xx_io_device::update_timer_c_src()
 		IO_IRQ_STATUS |= 0x0400;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
-		{
-			printf("Timer B overflow\n");
-			check_irqs(0x0400);
-		}
+			check_timers_irq();
 	}
 }
 
@@ -954,7 +940,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		IO_IRQ_STATUS &= ~0x0800;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
-			check_irqs(0x0800);
+			check_timers_irq();
 		break;
 	}
 
@@ -998,7 +984,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		IO_IRQ_STATUS &= ~0x0400;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
-			check_irqs(0x0400);
+			check_timers_irq();
 		break;
 	}
 
@@ -1030,7 +1016,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		m_io_regs[REG_INT_CTRL] = data;
 		const uint16_t changed = (IO_IRQ_STATUS & old) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 		if (changed)
-			check_irqs(changed);
+			check_all_irqs(changed);
 		break;
 	}
 
@@ -1046,7 +1032,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 			IO_IRQ_STATUS |= 0x0100;
 		}
 		if (changed)
-			check_irqs(changed);
+			check_all_irqs(changed);
 		break;
 	}
 
@@ -1099,41 +1085,24 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 		const uint16_t old_ctrl = m_io_regs[REG_ADC_CTRL];
 		m_io_regs[REG_ADC_CTRL] = data & ~0x2000;
 
-		const uint16_t channel = (m_io_regs[REG_ADC_CTRL] >> 4) & 3;
+		if (BIT(old_ctrl, 13) && BIT(data, 13))
+		{
+			m_io_regs[REG_ADC_CTRL] &= ~0x2000;
+			IO_IRQ_STATUS &= ~0x2000;
+			check_data_irq();
+		}
+
 		if (BIT(m_io_regs[REG_ADC_CTRL], 0))
 		{
-			// Does anything require the 0->1 check below?
-			// jak_sith (and all the other Star Wars units / GameKeys) break on the high score table if you leave the demo
-			// running or finish a game with a high score, as they write '0x0001' and then don't read any further directional
-			// inputs until 0x2000 is set, but that never happens because the value at the time is already 0x0001.
-			//
-			// If the state of the lowest bit is important to other software, maybe it's more of a status flag than a true
-			// read/write register?
-		
-			//if (!BIT(old_ctrl, 0))
-			{
-				m_io_regs[REG_ADC_CTRL] |= 0x2000;
-				if (BIT(m_io_regs[REG_ADC_CTRL], 9))
-				{
-					const uint16_t old = IO_IRQ_STATUS;
-					IO_IRQ_STATUS |= 0x2000;
-					const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-					if (changed)
-						check_irqs(changed);
-				}
-			}
+			// Assume ready unless stated otherwise (i.e., conversion request is issued).
+			m_io_regs[REG_ADC_CTRL] |= 0x2000;
 
-			if (BIT(data, 13))
-			{
-				m_io_regs[REG_ADC_CTRL] &= ~0x2000;
-				check_irqs(0x2000);
-			}
-
+			const uint16_t adc_channel = (m_io_regs[REG_ADC_CTRL] >> 4) & 3;
 			if (!BIT(old_ctrl, 12) && BIT(m_io_regs[REG_ADC_CTRL], 12))
 			{
 				m_io_regs[REG_ADC_CTRL] &= ~0x3000;
 				const uint32_t adc_clocks = 16 << ((m_io_regs[REG_ADC_CTRL] >> 2) & 3);
-				m_adc_timer[channel]->adjust(attotime::from_ticks(adc_clocks, 27000000));
+				m_adc_timer[adc_channel]->adjust(attotime::from_ticks(adc_clocks, 27000000));
 				m_io_regs[REG_ADC_DATA] &= ~0x8000;
 			}
 
@@ -1141,7 +1110,7 @@ void spg2xx_io_device::io_w(offs_t offset, uint16_t data)
 			if (BIT(data, 10))
 			{
 				m_io_regs[REG_ADC_DATA] &= ~0x8000;
-				m_adc_timer[channel]->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
+				m_adc_timer[adc_channel]->adjust(attotime::from_hz(8000), 0, attotime::from_hz(8000));
 			}
 		}
 		else
@@ -1288,7 +1257,7 @@ void spg2xx_io_device::io_extended_w(offs_t offset, uint16_t data)
 			IO_IRQ_STATUS &= ~0x0100;
 			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 			if (changed)
-				check_irqs(0x0100);
+				check_data_irq();
 		}
 		break;
 
@@ -1514,7 +1483,7 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			IO_IRQ_STATUS |= 1;
 			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 			if (changed)
-				check_irqs(0x0001);
+				check_tmb_lofreq_key_irq();
 			break;
 		}
 
@@ -1525,7 +1494,7 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			IO_IRQ_STATUS |= 2;
 			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
 			if (changed)
-				check_irqs(0x0002);
+				check_tmb_lofreq_key_irq();
 			break;
 		}
 
@@ -1574,37 +1543,35 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 void spg2xx_io_device::system_timer_tick()
 {
-	const uint16_t old = IO_IRQ_STATUS;
-	uint16_t check_mask = 0x0040;
 	IO_IRQ_STATUS |= 0x0040;
+
+	bool check_lofreq = false;
 
 	m_2khz_divider++;
 	if (m_2khz_divider == 2)
 	{
 		m_2khz_divider = 0;
 		IO_IRQ_STATUS |= 0x0020;
-		check_mask |= 0x0020;
 
 		m_1khz_divider++;
 		if (m_1khz_divider == 2)
 		{
 			m_1khz_divider = 0;
 			IO_IRQ_STATUS |= 0x0010;
-			check_mask |= 0x0010;
 
 			m_4hz_divider++;
 			if (m_4hz_divider == 256)
 			{
 				m_4hz_divider = 0;
 				IO_IRQ_STATUS |= 0x0008;
-				check_mask |= 0x0008;
+				check_lofreq = BIT(IO_IRQ_ENABLE, 3);
 			}
 		}
 	}
 
-	const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-	if (changed)
-		check_irqs(check_mask);
+	check_hifreq_periodic_irq();
+	if (check_lofreq)
+		check_tmb_lofreq_key_irq();
 }
 
 void spg2xx_io_device::uart_transmit_tick()
@@ -1619,10 +1586,10 @@ void spg2xx_io_device::uart_transmit_tick()
 		IO_IRQ_STATUS |= 0x0100;
 		m_uart_tx_irq = true;
 		LOGMASKED(LOG_UART, "uart_transmit_tick: Setting UART IRQ bit\n");
-		if (IO_IRQ_STATUS != old)
+		if (IO_IRQ_STATUS != old && BIT(IO_IRQ_ENABLE, 8))
 		{
 			LOGMASKED(LOG_UART, "uart_transmit_tick: Bit newly set, checking IRQs\n");
-			check_irqs(0x0100);
+			check_data_irq();
 		}
 	}
 }
@@ -1637,7 +1604,8 @@ void spg2xx_io_device::uart_receive_tick()
 		LOGMASKED(LOG_UART, "uart_receive_tick: RxIntEn is set, setting rx_irq to true and setting UART IRQ\n");
 		m_uart_rx_irq = true;
 		IO_IRQ_STATUS |= 0x0100;
-		check_irqs(0x0100);
+		if (BIT(IO_IRQ_ENABLE, 8))
+			check_data_irq();
 	}
 }
 
@@ -1661,59 +1629,72 @@ void spg2xx_io_device::check_extint_irq(int channel)
 	if (old_irq != IO_IRQ_STATUS)
 	{
 		LOGMASKED(LOG_EXTINT, "extint IRQ changed, so checking interrupts\n");
-		check_irqs(mask);
+		check_external_irq();
 	}
 }
 
-void spg2xx_io_device::check_irqs(const uint16_t changed)
+void spg2xx_io_device::check_timers_irq()
+{
+	LOGMASKED(LOG_TIMERS, "Checking IRQ2 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00);
+
+	if (m_timer_irq_cb)
+		m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		logerror("spg2xx_io_device::check_timers_irq, attempted to use m_timer_irq_cb without setting it\n");
+}
+
+void spg2xx_io_device::check_data_irq()
+{
+	LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C | LOG_ADC, "Checking IRQ3 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100);
+	if (m_uart_adc_irq_cb)
+		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		logerror("spg2xx_io_device::check_data_irq, attempted to use m_uart_adc_irq_cb without setting it\n");
+}
+
+void spg2xx_io_device::check_external_irq()
+{
+	LOGMASKED(LOG_EXTINT, "Checking IRQ5 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200);
+	if (m_external_irq_cb)
+		m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		logerror("spg2xx_io_device::check_external_irq, attempted to use m_external_irq_cb without setting it\n");
+}
+
+void spg2xx_io_device::check_hifreq_periodic_irq()
+{
+	LOGMASKED(LOG_TIMERS, "Checking IRQ6 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070);
+	if (m_ffreq_tmr1_irq_cb)
+		m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		logerror("spg2xx_io_device::check_hifreq_periodic_irq, attempted to use m_ffreq_tmr1_irq_cb without setting it\n");
+}
+
+void spg2xx_io_device::check_tmb_lofreq_key_irq()
+{
+	LOGMASKED(LOG_IRQS, "Checking IRQ7 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b);
+	if (m_ffreq_tmr2_irq_cb)
+		m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
+	else
+		logerror("spg2xx_io_device::check_tmb_lofreq_key_irq, attempted to use m_ffreq_tmr2_irq_cb without setting it\n");
+}
+
+void spg2xx_io_device::check_all_irqs(const uint16_t changed)
 {
 	if (changed & 0x0c00) // Timer A, Timer B IRQ
-	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ2 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00), changed);
-
-		if (m_timer_irq_cb)
-			m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
-		else
-			logerror("spg2xx_io_device::check_irqs, attempted to use m_timer_irq_cb without setting it\n");
-	}
+		check_timers_irq();
 
 	if (changed & 0x6100) // UART, SPI, SIO, I2C, ADC IRQ
-	{
-		LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C | LOG_ADC, "%ssserting IRQ3 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100), changed);
-		if (m_uart_adc_irq_cb)
-			m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
-		else
-			logerror("spg2xx_io_device::check_irqs, attempted to use m_uart_adc_irq_cb without setting it\n");
-	}
+		check_data_irq();
 
 	if (changed & 0x1200) // External IRQ
-	{
-		LOGMASKED(LOG_EXTINT, "%ssserting IRQ5 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200), changed);
-		if (m_external_irq_cb)
-			m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
-		else
-			logerror("spg2xx_io_device::check_irqs, attempted to use m_external_irq_cb without setting it\n");
-
-	}
+		check_external_irq();
 
 	if (changed & 0x0070) // 1024Hz, 2048Hz, 4096Hz IRQ
-	{
-		LOGMASKED(LOG_TIMERS, "%ssserting IRQ6 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070), changed);     //m_cpu->set_state_unsynced(UNSP_IRQ6_LINE, (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-		if (m_ffreq_tmr1_irq_cb)
-			m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-		else
-			logerror("spg2xx_io_device::check_irqs, attempted to use m_ffreq_tmr1_irq_cb without setting it\n");
-	}
+		check_hifreq_periodic_irq();
 
 	if (changed & 0x008b) // TMB1, TMB2, 4Hz, key change IRQ
-	{
-		LOGMASKED(LOG_IRQS, "%ssserting IRQ7 (%04x, %04x)\n", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? "A" : "Dea", (IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b), changed);
-		if (m_ffreq_tmr2_irq_cb)
-			m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
-		else
-			logerror("spg2xx_io_device::check_irqs, attempted to use m_ffreq_tmr2_irq_cb without setting it\n");
-
-	}
+		check_tmb_lofreq_key_irq();
 }
 
 uint16_t spg2xx_io_device::do_special_gpio(uint32_t index, uint16_t mask)
@@ -1787,19 +1768,13 @@ void spg2xx_io_device::do_gpio(uint32_t offset, bool write)
 void spg2xx_io_device::do_adc_capture(int channel)
 {
 	m_io_regs[REG_ADC_DATA] = (m_adc_in[channel]() & 0x0fff) | 0x8000;
-	if (BIT(m_io_regs[REG_ADC_DATA], 11))
-	{
-		//m_io_regs[REG_ADC_DATA] |= 0xf000;
-	}
 	m_io_regs[REG_ADC_CTRL] |= 0x2000;
-	const uint16_t old = IO_IRQ_STATUS;
 	if (BIT(m_io_regs[REG_ADC_CTRL], 9))
 	{
 		IO_IRQ_STATUS |= 0x2000;
-		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-		if (changed)
+		if (BIT(m_io_regs[REG_ADC_CTRL], 9) && BIT(IO_IRQ_ENABLE, 13))
 		{
-			check_irqs(changed);
+			check_data_irq();
 		}
 	}
 }

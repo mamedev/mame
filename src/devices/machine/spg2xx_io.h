@@ -149,7 +149,12 @@ protected:
 		REG_IO_DRIVE_CTRL
 	};
 	void check_extint_irq(int channel);
-	void check_irqs(const uint16_t changed);
+	void check_timers_irq();
+	void check_data_irq();
+	void check_external_irq();
+	void check_hifreq_periodic_irq();
+	void check_tmb_lofreq_key_irq();
+	void check_all_irqs(const uint16_t changed);
 
 	static const device_timer_id TIMER_TMB1 = 0;
 	static const device_timer_id TIMER_TMB2 = 1;
