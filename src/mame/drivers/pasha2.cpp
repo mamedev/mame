@@ -129,27 +129,29 @@ private:
 
 	// video-related
 	u8 m_vbuffer = 0;
-
-	// memory
 	bitmap_ind16 m_bg_bitmap[2];
 	bitmap_ind16 m_fg_bitmap[2];
-	void misc_w(offs_t offset, u16 data);
-	void vbuffer_set_w(u16 data);
-	void vbuffer_clear_w(u16 data);
-	void bg_bitmap_w(offs_t offset, u8 data);
-	void fg_bitmap_w(offs_t offset, u8 data);
-
-	void pasha2_lamps_w(u16 data);
-	u16 pasha2_speedup_r(offs_t offset);
-
-	template<int Chip> void oki_bank_w(offs_t offset, u16 data);
-
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
+
+	// video functions
+	void vbuffer_set_w(u16 data);
+	void vbuffer_clear_w(u16 data);
+	void bg_bitmap_w(offs_t offset, u8 data);
+	void fg_bitmap_w(offs_t offset, u8 data);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	// peripheral handlers
+	template<int Chip> void oki_bank_w(offs_t offset, u16 data);
+	void misc_w(offs_t offset, u16 data);
+	void pasha2_lamps_w(u16 data);
+
+	// speedup functions
+	u16 pasha2_speedup_r(offs_t offset);
 
 	// address maps
 	void pasha2_io(address_map &map);
