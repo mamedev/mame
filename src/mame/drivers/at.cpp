@@ -1831,6 +1831,15 @@ ROM_END
 //  80286 motherboard
 //**************************************************************************
 
+// ID: PC CHIPS M209 - Chipset: UMC UM82C206L, PC 4L50F2052 - BIOS: AMI 286 BIOS 162020 CDTEK - Keyboard BIOS: AMI KEY BOARD BIOS 162020 CDTEK
+// CPU:AMD N80L286-16/S - RAM: SIPP30x4, 1MB DIP - BIOS-ID: S286-6181-101590-K0 - ISA8: 1, ISA16: 6 - OSC: 33.333MHz, 14.31818
+ROM_START( pccm209 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "pcchips_m209_gq4x.bin", 0x10000, 0x08000, CRC(d1a68208) SHA1(58285d293f723507a5401e55c5e4e5d27681d824))
+	ROM_CONTINUE( 0x10001, 0x08000 )
+ROM_END
+
+
 // ID: unknown - ASI 100B0, identified as “HAM 12 TI 286 Motherboard ZERO WAIT” - Chipset: Texas Instruments TACT82301PB, TACT82302PB, TACT82303PB (cf. at386sx)
 // CPU: xxx, FPU: IIT 2C87-12 - RAM: 1MB in DIP, 4xSIPP30 - OSC: 24.000MHz, 14.31818 - ISA8: 3, ISA16: 5
 ROM_START( asi100b0 ) // BIOS-String: D286-1112-040990-K0
@@ -1962,6 +1971,7 @@ ROM_END
 
 
 // ***** 286 mainboards using the Chips & Technologies CS8221 NEAT chipset: P82C211 + P82C212 + P82C215 + P82C206
+
 ROM_START( neat )
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	// 0: BIOS-String: ENET-1131-030389-K0
@@ -2032,6 +2042,7 @@ ROM_START( pwb7270e )
 	ROMX_LOAD( "alreven.bin", 0x10000, 0x08000, CRC(b6428bae) SHA1(4e6e6eec67ff62cf8b4a3ce500bd15a54ee3d5fe), ROM_SKIP(1) )
 	ROMX_LOAD( "alrodd.bin", 0x10001, 0x08000, CRC(6eedbcf0) SHA1(58173b6f749d40aa294747823d4b442c8938710e), ROM_SKIP(1) )
 ROM_END
+
 
 // ***** 286 motherboards using the Acer (ALi) M1207 chipset
 
@@ -2172,6 +2183,11 @@ ROM_START( ht12a )
 	ROM_SYSTEM_BIOS(6, "ami123", "AMI HT 12.3") /*(Motherboard Manufacturer: Aquarius Systems USA Inc.) (BIOS release date:: 13-06-1990)*/
 	ROMX_LOAD( "ht12h.bin", 0x10001, 0x8000, CRC(db8b471e) SHA1(7b5fa1c131061fa7719247db3e282f6d30226778),ROM_SKIP(1) | ROM_BIOS(6) )
 	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(6) )
+	// 7: ID: H286-C3 158 - Chipset: Headland HT12/A3A0050 - BIOS: AMI 286 BIOS SETUP 649963 - Keyboard BIOS: JET ELECTRONICS CO LTD SN 9 0922133
+	// BIOS-String: DH12-1164-083090-K - CPU: AMD N80L286-12/S, FPU socket provided - RAM: SIMM30: 4, 1MB DIP - OSC: 8.000MHZ - ISA8: 1, ISA16: 5
+	ROM_SYSTEM_BIOS(7, "h286c3", "H286-C3") 
+	ROMX_LOAD( "h286-c3-158-hi.bin", 0x10001, 0x8000, CRC(ec0cbbba) SHA1(97d7f32cb9c622cfbd08909ac67d09a8aa734430),ROM_SKIP(1) | ROM_BIOS(7) )
+	ROMX_LOAD( "h286-c3-158-lo.bin", 0x10000, 0x8000, CRC(dedcf41a) SHA1(ede2c852b3e947ce4efa54640b2e37db83355a6c),ROM_SKIP(1) | ROM_BIOS(7) )
 ROM_END
 
 
@@ -2256,6 +2272,46 @@ ROM_START( suntac6 )
 	ROM_SYSTEM_BIOS(3, "tci", "TCI")
 	ROMX_LOAD( "suntac_80286_lo.bin", 0x18000, 0x4000, CRC(f7bf6c49) SHA1(d8e813c264008f096006f46b90769c0927e44da9), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "suntac_80286_hi.bin", 0x18001, 0x4000, CRC(5f382e78) SHA1(8ba222df9d7028513e37978598d8139906e8834c), ROM_SKIP(1) | ROM_BIOS(3) )
+	// 4: BIOS-String: D286-5017-011388
+	ROM_SYSTEM_BIOS(4, "st62m02", "ST62M-02-B")
+	ROMX_LOAD( "7_st62m02-b_l.bin", 0x10000, 0x8000, CRC(fd24911f) SHA1(71ab1177d0b6b9482353e3b405f4b332cbeecfc3), ROM_SKIP(1) | ROM_BIOS(4) )
+	ROMX_LOAD( "7_st62m02-b_h.bin", 0x10001, 0x8000, CRC(fca78c7b) SHA1(35e892bf52fb1cbc9bfaed7866c2ef7a31d4b762), ROM_SKIP(1) | ROM_BIOS(4) )
+	// 5: BIOS-String: Phoenix ROM BIOS PLUS Version 3.10 00 - LYI-CHENG ENTERPRISE CO., LTD.
+	ROM_SYSTEM_BIOS(5, "bay1000", "Bay 1000")
+	ROMX_LOAD( "286-suntac-bay-1000c-ic22.bin", 0x18000, 0x4000, CRC(7f3ef79e) SHA1(d4f7086e2902d3b264b1fff76d1bea811aa58fc5), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "286-suntac-bay-1000c-ic23.bin", 0x18001, 0x4000, CRC(cca972a4) SHA1(22bd712700bfacd34070e704e901623ecc37a390), ROM_SKIP(1) | ROM_BIOS(5) )
+	// 6: BIOS-String: Phoenix 80286 ROM BIOS PLUS Version 3.10.22 - Personal computer 286
+	ROM_SYSTEM_BIOS(6, "st2806036", "Suntac ST2806036")
+	ROMX_LOAD( "286-suntac-2806036-lo.bin", 0x10000, 0x8000, CRC(907dcbf7) SHA1(8782e49926366d7a640c60b875e6c091091a2f54), ROM_SKIP(1) | ROM_BIOS(6) )
+	ROMX_LOAD( "286-suntac-2806036-hi.bin", 0x10001, 0x8000, CRC(ba24e88f) SHA1(07983752c8128ae62391737f428d6db42fefdbb8), ROM_SKIP(1) | ROM_BIOS(6) )
+	// 7: BIOS-String: 286 Modular BIOS Version 3.03YK2 Copyright Award Software Inc. - YOUTH KEEP ENTERPRISE CO., LTD.
+	ROM_SYSTEM_BIOS(7, "youth", "Suntac Youth")
+	ROMX_LOAD( "286-suntac-youth-rom1-128.bin", 0x18000, 0x4000, CRC(f232c31b) SHA1(49b9990c951a61bde10478cbb5db4b913baae1e2), ROM_SKIP(1) | ROM_BIOS(7) )
+	ROMX_LOAD( "286-suntac-youth-rom3-128.bin", 0x18001, 0x4000, CRC(0735b127) SHA1(0c79cbd7d40b75dcba5fe33bf8e3a96050e12af5), ROM_SKIP(1) | ROM_BIOS(7) )
+	// 8: BIOS-String: 286 Modular BIOS Version 3.01, Copyright Award Software Inc. - ECS
+	// complains about Refresh Timing Error
+	ROM_SYSTEM_BIOS(8, "ecs", "Suntac ECS")
+	ROMX_LOAD( "st62_award_3.01_ecs_suntac_rom1.bin", 0x18000, 0x4000, CRC(17296492) SHA1(3a3bf7c20946ef56b767f54c8de45cd46d5c1167), ROM_SKIP(1) | ROM_BIOS(8) )
+	ROMX_LOAD( "st62_award_3.01_ecs_suntac_rom3.bin", 0x18001, 0x4000, CRC(5f0aa2d9) SHA1(5ed5897adb4507c399f200dad9337c1c8b246a48), ROM_SKIP(1) | ROM_BIOS(8) )
+	// 9: AMI 286 BIOS for MORSE Personal Computer - BIOS-String: DSUN-1216-091589-K0
+	ROM_SYSTEM_BIOS(9, "stmorse", "ST-Morse")
+	ROMX_LOAD( "st-morse.bio", 0x10000, 0x10000, CRC(7136e89f) SHA1(50d15f96dba855e58bb39c937ad9358fc0084b10), ROM_BIOS(9) )
+	// 10:  286-BIOS (C)1987 AMI, for CDTEK - BIOS-String: DSUN-1202-043089-K0
+	ROM_SYSTEM_BIOS(10, "sunami", "Suntac AMI")
+	ROMX_LOAD( "suntac_ami_286_even_bios.bin", 0x10001, 0x8000, CRC(acdffb05) SHA1(180fd693bf86a6fdecc713d5873f3c0950b56c98), ROM_SKIP(1) | ROM_BIOS(10) )
+	ROMX_LOAD( "suntac_ami_286_odd_bios.bin", 0x10000, 0x8000, CRC(9003d5ad) SHA1(6a2de572d11625ecdacc4ad7b5c324b160540541), ROM_SKIP(1) | ROM_BIOS(10) )
+	// 11: BIOS-String: Phoenix 286 ROM BIOS PLUS Version 3.10 10 - VIP
+	ROM_SYSTEM_BIOS(11, "sunphovip", "Suntac Phoenix VIP")
+	ROMX_LOAD( "st-ph-l.rom", 0x10001, 0x8000, CRC(ebb6446f) SHA1(086a8f016c2c0cc56d3bd7ea4e152ae215d4e5ce), ROM_SKIP(1) | ROM_BIOS(11) )
+	ROMX_LOAD( "st-ph-h.rom", 0x10000, 0x8000, CRC(1c77bd34) SHA1(0dea2dd8ba69fdfb829d152840817bcbdcc3e394), ROM_SKIP(1) | ROM_BIOS(11) )
+	// 12: BIOS-String: 286-BIOS (C) AMI, for SUPERCOM - SSUN-1120-042589-K0
+	ROM_SYSTEM_BIOS(12, "supercom", "Suntac Supercom")
+	ROMX_LOAD( "supercom_lo.bin", 0x18000, 0x4000, CRC(6c8ce417) SHA1(fc2cdc9d23e9d75bb48d26b102873a9964871f52), ROM_SKIP(1) | ROM_BIOS(12) )
+	ROMX_LOAD( "supercom_hi.bin", 0x18001, 0x4000, CRC(6c1b645d) SHA1(0def25267428338804c5858e3f536720a2b7d349), ROM_SKIP(1) | ROM_BIOS(12) )
+	// 13:
+	ROM_SYSTEM_BIOS(13, "suntacmr", "Suntac MR BIOS")
+	ROMX_LOAD( "v000v200-1.bin", 0x10000, 0x8000, CRC(1a34d56e) SHA1(ae950de20641c6394485d891e50136b1dc5261e3), ROM_SKIP(1) | ROM_BIOS(13) )
+	ROMX_LOAD( "v000b200-2.bin", 0x10001, 0x8000, CRC(2aeea8bd) SHA1(e6c306cc56dd614d704262a087dcc07b75fd9ac6), ROM_SKIP(1) | ROM_BIOS(13) )
 ROM_END
 
 // ***** 286 motherboards using the 5 chip VLSI chipset
@@ -5484,6 +5540,7 @@ COMP( 1990, ocfoxm,    ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 199?, octekg2,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek", "286 motherboard with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, olim203,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti", "M203 motherboard", MACHINE_NOT_WORKING )
 COMP( 198?, pccm205,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "PC-Chips", "M205", MACHINE_NOT_WORKING )
+COMP( 198?, pccm209,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "PC-Chips", "M209", MACHINE_NOT_WORKING )
 COMP( 198?, pccm216,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "PC-Chips", "M216", MACHINE_NOT_WORKING )
 COMP( 198?, snomi286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Snobol", "Mini 286", MACHINE_NOT_WORKING )
 COMP( 198?, u3911v3,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Uniron", "U3911-V3", MACHINE_NOT_WORKING )
