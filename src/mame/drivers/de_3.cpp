@@ -20,6 +20,9 @@
 // Data East CPU board is similar to Williams System 11, but without the generic audio board.
 // For now, we'll presume the timings are the same.
 
+
+namespace {
+
 extern const char layout_pinball[];
 
 class de_3_state : public genpin_class
@@ -37,11 +40,12 @@ public:
 	void de_3_dmd1(machine_config &config);
 	void de_3_dmd2(machine_config &config);
 
-private:
+protected:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void pia34_pa_w(uint8_t data);
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
@@ -58,10 +62,10 @@ private:
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
 	void sol2_w(uint8_t data) { } // solenoids 8-15
-	void sol3_w(uint8_t data);
+	[[maybe_unused]] void sol3_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void dac_w(uint8_t data) { }
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	uint8_t dmd_status_r();
 
 //  uint8_t sound_latch_r();
@@ -742,12 +746,25 @@ ROM_START(jupk_501g)
 	ROM_LOAD("jpu21.dat", 0x080000, 0x40000, CRC(6ac1554c) SHA1(9a91ce836c089f96ad9c809bb66fcddda1f3e456))
 ROM_END
 
+ROM_START(jupk_307)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("jpcpua.307", 0x0000, 0x10000, CRC(b60c3bca) SHA1(0f5619319d2affefa993f396f7a4b1875eea81ab))
+	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "gfx3", 0)
+	ROM_LOAD("jpdspa.400", 0x00000, 0x80000, CRC(4c044f05) SHA1(573a188a255ad3b6aa18427fd6b45aeca6f83e04))
+	ROM_REGION(0x010000, "soundcpu", 0)
+	ROM_LOAD("jpu7.dat", 0x0000, 0x10000, CRC(f3afcf13) SHA1(64e12f9d42c00ae08a4584b2ebea475566b90c13))
+	ROM_REGION(0x1000000, "bsmt", 0)
+	ROM_LOAD("jpu17.dat", 0x000000, 0x80000, CRC(38135a23) SHA1(7c284c17783269824a3d3e83c4cd8ead27133309))
+	ROM_LOAD("jpu21.dat", 0x080000, 0x40000, CRC(6ac1554c) SHA1(9a91ce836c089f96ad9c809bb66fcddda1f3e456))
+ROM_END
+
 ROM_START(jupk_305)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("jpcpua3.05.bin", 0x0000, 0x10000, CRC(0a9bd439) SHA1(486df3e268c81518ff4d0638517e93b57a8d9d2e))
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "gfx3", 0)
-	ROM_LOAD("jpdspa.510", 0x00000, 0x80000, BAD_DUMP CRC(9ca61e3c) SHA1(38ae472f38e6fc33671e9a276313208e5ccd8640)) // Not dumped on this set
+	ROM_LOAD("jpdspa.400", 0x00000, 0x80000, CRC(4c044f05) SHA1(573a188a255ad3b6aa18427fd6b45aeca6f83e04)) // Not dumped on this set, using 4.00 from the 3.07 revision
 	ROM_REGION(0x010000, "soundcpu", 0)
 	ROM_LOAD("jpu7.dat", 0x0000, 0x10000, CRC(f3afcf13) SHA1(64e12f9d42c00ae08a4584b2ebea475566b90c13))
 	ROM_REGION(0x1000000, "bsmt", 0)
@@ -1414,6 +1431,9 @@ ROM_START(wwfr_103f)
 	ROM_LOAD("wfsndu36.400", 0x100000, 0x80000, CRC(39db8d85) SHA1(a55dd88fd4d9154b523dca9160bf96119af1f94d))
 ROM_END
 
+} // Anonymous namespace
+
+
 GAME(1993,  rab_320,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
 GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
 GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)", MACHINE_IS_SKELETON_MECHANICAL) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
@@ -1435,7 +1455,8 @@ GAME(1992,  hook_401_p,    hook_408, de_3_dmd1, de_3, de_3_state, empty_init, RO
 GAME(1993,  jupk_513,      0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.13, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK SEP. 28, 1993 USA CPU 5.13. DISPLAY VERSION- JURASSIC A5.10 8/24/1993
 GAME(1993,  jupk_501,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01, display A5.01)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC A5.01 6/24/1993
 GAME(1993,  jupk_501g,     jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 5.01 Germany, display G5.01)",                          MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK JUNE 28, 1993 USA CPU 5.01. DISPLAY VERSION- JURASSIC G5.01 6/24/1993
-GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A5.10)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  jupk_307,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.07, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
+GAME(1993,  jupk_305,      jupk_513, de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Jurassic Park (USA 3.05, display A4.00)",                                  MACHINE_IS_SKELETON_MECHANICAL) // JURASSIC PARK. MAY 25, 1993. USA CPU 3.05
 GAME(1993,  lah_112,       0,        de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.12, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO NOV. 10, 1993 USA CPU 1.12. DISPLAY VERSION- ACTION HERO A1.06 11/11/1993
 GAME(1993,  lah_110,       lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (USA 1.10, display A1.06)",                               MACHINE_IS_SKELETON_MECHANICAL) // LAST ACTION HERO OCT. 18, 1993 USA CPU 1.10
 GAME(1993,  lah_xxx_s105,  lah_112,  de_3_dmd2, de_3, de_3_state, empty_init, ROT0, "Data East", "Last Action Hero (unknown CPU, display L1.05)",                            MACHINE_IS_SKELETON_MECHANICAL) // DISPLAY VERSION- ACTION HERO L1.05 11/11/1993
