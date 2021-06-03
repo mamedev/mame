@@ -75,6 +75,7 @@ public:
 	void mbee(machine_config &config);
 	void mbeett(machine_config &config);
 	void mbeeic(machine_config &config);
+	void mbeepc85(machine_config &config);
 	void mbee128p(machine_config &config);
 	void remove_carts(machine_config &config);
 
