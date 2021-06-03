@@ -91,48 +91,32 @@ void spg2xx_io_device::device_start()
 	m_chip_sel.resolve_safe();
 	m_pal_read_cb.resolve_safe(0);
 
-	m_timer_irq_cb.resolve();
-	m_uart_adc_irq_cb.resolve();
-	m_external_irq_cb.resolve();
-	m_ffreq_tmr1_irq_cb.resolve();
-	m_ffreq_tmr2_irq_cb.resolve();
+	m_timer_irq_cb.resolve_safe();
+	m_uart_adc_irq_cb.resolve_safe();
+	m_external_irq_cb.resolve_safe();
+	m_ffreq_tmr1_irq_cb.resolve_safe();
+	m_ffreq_tmr2_irq_cb.resolve_safe();
 
-	m_fiq_vector_w.resolve();
+	m_fiq_vector_w.resolve_safe();
 
-	m_tmb1 = timer_alloc(TIMER_TMB1);
-	m_tmb2 = timer_alloc(TIMER_TMB2);
-	m_tmb1->adjust(attotime::never);
-	m_tmb2->adjust(attotime::never);
+	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::tmb_timer_tick<0>), this));
+	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::tmb_timer_tick<1>), this));
 
-	m_uart_tx_timer = timer_alloc(TIMER_UART_TX);
-	m_uart_tx_timer->adjust(attotime::never);
+	m_uart_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::uart_transmit_tick), this));
+	m_uart_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::uart_receive_tick), this));
 
-	m_uart_rx_timer = timer_alloc(TIMER_UART_RX);
-	m_uart_rx_timer->adjust(attotime::never);
+	m_4khz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::system_timer_tick), this));
 
-	m_4khz_timer = timer_alloc(TIMER_4KHZ);
-	m_4khz_timer->adjust(attotime::never);
+	m_timer_src_ab = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::timer_ab_tick), this));
+	m_timer_src_c = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::timer_c_tick), this));
+	m_rng_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::rng_clock_tick), this));
+	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::watchdog_tick), this));
+	m_spi_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::spi_tx_tick), this));
 
-	m_timer_src_ab = timer_alloc(TIMER_SRC_AB);
-	m_timer_src_ab->adjust(attotime::never);
-
-	m_timer_src_c = timer_alloc(TIMER_SRC_C);
-	m_timer_src_c->adjust(attotime::never);
-
-	m_rng_timer = timer_alloc(TIMER_RNG);
-	m_rng_timer->adjust(attotime::never);
-
-	m_watchdog_timer = timer_alloc(TIMER_WATCHDOG);
-	m_watchdog_timer->adjust(attotime::never);
-
-	m_spi_tx_timer = timer_alloc(TIMER_SPI_TX);
-	m_spi_tx_timer->adjust(attotime::never);
-
-	for (int i = 0; i < 4; i++)
-	{
-		m_adc_timer[i] = timer_alloc(TIMER_ADC0 + i);
-		m_adc_timer[i]->adjust(attotime::never);
-	}
+	m_adc_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<0>), this));
+	m_adc_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<1>), this));
+	m_adc_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<2>), this));
+	m_adc_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_io_device::adc_convert_tick<3>), this));
 
 	save_item(NAME(m_io_regs));
 
@@ -286,7 +270,7 @@ void spg2xx_io_device::update_spi_irqs()
 	set_spi_irq(ovf_set || rxi_set || txi_set);
 }
 
-void spg2xx_io_device::do_spi_tx()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::spi_tx_tick)
 {
 	if (!BIT(m_io_regs[REG_SPI_CTRL], 15) || m_spi_tx_fifo_count == 0)
 	{
@@ -385,6 +369,12 @@ void spg2xx_io_device::spi_rx(int state)
 	{
 		m_spi_rx_bit--;
 	}
+}
+
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::rng_clock_tick)
+{
+	clock_rng(0);
+	clock_rng(1);
 }
 
 uint16_t spg2xx_io_device::clock_rng(int which)
@@ -537,7 +527,6 @@ uint16_t spg2xx_io_device::io_extended_r(offs_t offset)
 					else
 					{
 						LOGMASKED(LOG_UART, "Remaining count %d, setting up timer\n", m_uart_rx_fifo_count);
-						//uart_receive_tick();
 						if (m_uart_rx_timer->remaining() == attotime::never)
 							m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[REG_UART_CTRL], 5) ? 11 : 10, m_uart_baud_rate));
 					}
@@ -710,7 +699,7 @@ void spg2xx_io_device::update_timer_b_rate()
 	}
 }
 
-void spg2xx_io_device::update_timer_ab_src()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::timer_ab_tick)
 {
 	if (m_timer_b_tick_rate == 0)
 		return;
@@ -737,7 +726,7 @@ void spg2xx_io_device::increment_timer_a()
 	}
 }
 
-void spg2xx_io_device::update_timer_c_src()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::timer_c_tick)
 {
 	m_io_regs[REG_TIMERB_DATA]++;
 	if (m_io_regs[REG_TIMERB_DATA] == 0)
@@ -1472,76 +1461,24 @@ void spg2xx_io_device::io_extended_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+template <int Which>
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::tmb_timer_tick)
 {
-	switch (id)
-	{
-		case TIMER_TMB1:
-		{
-			LOGMASKED(LOG_TIMERS, "TMB1 elapsed, setting IRQ Status bit 0 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 1, IO_IRQ_ENABLE);
-			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS |= 1;
-			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-			if (changed)
-				check_tmb_lofreq_key_irq();
-			break;
-		}
-
-		case TIMER_TMB2:
-		{
-			LOGMASKED(LOG_TIMERS, "TMB2 elapsed, setting IRQ Status bit 1 (old:%04x, new:%04x, enable:%04x)\n", IO_IRQ_STATUS, IO_IRQ_STATUS | 2, IO_IRQ_ENABLE);
-			const uint16_t old = IO_IRQ_STATUS;
-			IO_IRQ_STATUS |= 2;
-			const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
-			if (changed)
-				check_tmb_lofreq_key_irq();
-			break;
-		}
-
-		case TIMER_UART_TX:
-			uart_transmit_tick();
-			break;
-
-		case TIMER_UART_RX:
-			uart_receive_tick();
-			break;
-
-		case TIMER_4KHZ:
-			system_timer_tick();
-			break;
-
-		case TIMER_SRC_AB:
-			update_timer_ab_src();
-			break;
-
-		case TIMER_SRC_C:
-			update_timer_c_src();
-			break;
-
-		case TIMER_RNG:
-			clock_rng(0);
-			clock_rng(1);
-			break;
-
-		case TIMER_WATCHDOG:
-			m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			break;
-
-		case TIMER_SPI_TX:
-			do_spi_tx();
-			break;
-
-		case TIMER_ADC0:
-		case TIMER_ADC1:
-		case TIMER_ADC2:
-		case TIMER_ADC3:
-			do_adc_capture(id - TIMER_ADC0);
-			break;
-	}
+	LOGMASKED(LOG_TIMERS, "TMB%d elapsed, setting IRQ Status bit 0 (old:%04x, new:%04x, enable:%04x)\n", Which + 1, IO_IRQ_STATUS, IO_IRQ_STATUS | (1 << Which), IO_IRQ_ENABLE);
+	const uint16_t old = IO_IRQ_STATUS;
+	IO_IRQ_STATUS |= (1 << Which);
+	const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
+	if (changed)
+		check_tmb_lofreq_key_irq();
 }
 
-void spg2xx_io_device::system_timer_tick()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::watchdog_tick)
+{
+	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::system_timer_tick)
 {
 	IO_IRQ_STATUS |= 0x0040;
 
@@ -1574,7 +1511,7 @@ void spg2xx_io_device::system_timer_tick()
 		check_tmb_lofreq_key_irq();
 }
 
-void spg2xx_io_device::uart_transmit_tick()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::uart_transmit_tick)
 {
 	LOGMASKED(LOG_UART, "uart_transmit_tick: Transmitting %02x, setting TxReady, clearing TxBusy\n", (uint8_t)m_io_regs[REG_UART_TXBUF]);
 	m_uart_tx((uint8_t)m_io_regs[REG_UART_TXBUF]);
@@ -1594,7 +1531,7 @@ void spg2xx_io_device::uart_transmit_tick()
 	}
 }
 
-void spg2xx_io_device::uart_receive_tick()
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::uart_receive_tick)
 {
 	LOGMASKED(LOG_UART, "uart_receive_tick: Setting RBF and RxRDY\n");
 	m_io_regs[REG_UART_STATUS] |= 0x81;
@@ -1636,47 +1573,31 @@ void spg2xx_io_device::check_extint_irq(int channel)
 void spg2xx_io_device::check_timers_irq()
 {
 	LOGMASKED(LOG_TIMERS, "Checking IRQ2 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00);
-
-	if (m_timer_irq_cb)
-		m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
-	else
-		logerror("spg2xx_io_device::check_timers_irq, attempted to use m_timer_irq_cb without setting it\n");
+	m_timer_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0c00) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void spg2xx_io_device::check_data_irq()
 {
 	LOGMASKED(LOG_UART | LOG_SIO | LOG_SPI | LOG_I2C | LOG_ADC, "Checking IRQ3 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x2100);
-	if (m_uart_adc_irq_cb)
-		m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
-	else
-		logerror("spg2xx_io_device::check_data_irq, attempted to use m_uart_adc_irq_cb without setting it\n");
+	m_uart_adc_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x6100) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void spg2xx_io_device::check_external_irq()
 {
 	LOGMASKED(LOG_EXTINT, "Checking IRQ5 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200);
-	if (m_external_irq_cb)
-		m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
-	else
-		logerror("spg2xx_io_device::check_external_irq, attempted to use m_external_irq_cb without setting it\n");
+	m_external_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x1200) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void spg2xx_io_device::check_hifreq_periodic_irq()
 {
 	LOGMASKED(LOG_TIMERS, "Checking IRQ6 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070);
-	if (m_ffreq_tmr1_irq_cb)
-		m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
-	else
-		logerror("spg2xx_io_device::check_hifreq_periodic_irq, attempted to use m_ffreq_tmr1_irq_cb without setting it\n");
+	m_ffreq_tmr1_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x0070) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void spg2xx_io_device::check_tmb_lofreq_key_irq()
 {
 	LOGMASKED(LOG_IRQS, "Checking IRQ7 (%04x)\n", IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b);
-	if (m_ffreq_tmr2_irq_cb)
-		m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
-	else
-		logerror("spg2xx_io_device::check_tmb_lofreq_key_irq, attempted to use m_ffreq_tmr2_irq_cb without setting it\n");
+	m_ffreq_tmr2_irq_cb((IO_IRQ_ENABLE & IO_IRQ_STATUS & 0x008b) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void spg2xx_io_device::check_all_irqs(const uint16_t changed)
@@ -1765,9 +1686,10 @@ void spg2xx_io_device::do_gpio(uint32_t offset, bool write)
 	m_io_regs[5 * index + 1] = what;
 }
 
-void spg2xx_io_device::do_adc_capture(int channel)
+template <int Which>
+TIMER_CALLBACK_MEMBER(spg2xx_io_device::adc_convert_tick)
 {
-	m_io_regs[REG_ADC_DATA] = (m_adc_in[channel]() & 0x0fff) | 0x8000;
+	m_io_regs[REG_ADC_DATA] = (m_adc_in[Which]() & 0x0fff) | 0x8000;
 	m_io_regs[REG_ADC_CTRL] |= 0x2000;
 	if (BIT(m_io_regs[REG_ADC_CTRL], 9))
 	{
