@@ -114,6 +114,9 @@ DEFINE_DEVICE_TYPE(EPSON_SD_621L, epson_sd_621l, "epson_sd_621l", "EPSON SD-621L
 DEFINE_DEVICE_TYPE(EPSON_SD_680L, epson_sd_680l, "epson_sd_680l", "EPSON SD-680L Mini-Floppy Disk Drive")
 #endif
 
+// Panasonic 3.5" drive
+DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
+
 // Sony 3.5" drives
 DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Micro Floppydisk Drive")
 DEFINE_DEVICE_TYPE(SONY_OA_D32W, sony_oa_d32w, "sony_oa_d32w", "Sony OA-D32W Micro Floppydisk Drive")
@@ -741,7 +744,7 @@ uint32_t floppy_image_device::flux_screen_update(screen_device &device, bitmap_r
 				}
 				ppi++;
 			}
-		}		
+		}
 	} else {
 		for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
 			flux_per_pixel_info *ppi = m_flux_per_pixel_infos.data() + y * flux_screen_sx + cliprect.min_x;
@@ -2502,6 +2505,39 @@ void epson_sd_321::setup_characteristics()
 	form_factor = floppy_image::FF_525;
 	tracks = 40;
 	sides = 2;
+	set_rpm(300);
+
+	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
+	variants.push_back(floppy_image::DSDD);
+}
+
+
+//-------------------------------------------------
+//  3.5" Panasonic Flexible Disk Drive JU-363
+//
+//  track to track: 3 ms
+//  settling time: 15 ms
+//  motor start time: 500 ms
+//  transfer rate: 250 Kbits/s
+//
+//-------------------------------------------------
+
+pana_ju_363::pana_ju_363(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, PANA_JU_363, tag, owner, clock)
+{
+}
+
+pana_ju_363::~pana_ju_363()
+{
+}
+
+void pana_ju_363::setup_characteristics()
+{
+	form_factor = floppy_image::FF_35;
+	tracks = 84;
+	sides = 2;
+	dskchg_writable = true;
 	set_rpm(300);
 
 	variants.push_back(floppy_image::SSSD);
