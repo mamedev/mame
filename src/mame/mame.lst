@@ -43241,6 +43241,9 @@ xyonix                          // [1989 Philko]
 kof2002um                       // (c)2009 SNK Playmore / New Channel
 kof2002umj                      // (c)2009 SNK Playmore / New Channel
 
+@source:yes.cpp
+yes                             //
+
 @source:yiear.cpp
 yiear                           // GX407 (c) 1985
 yiear2                          // GX407 (c) 1985

@@ -3339,6 +3339,7 @@ files {
 	MAME_DIR .. "src/mame/machine/p2000t_mdcr.cpp",
 	MAME_DIR .. "src/mame/video/p2000t.cpp",
 	MAME_DIR .. "src/mame/drivers/vg5k.cpp",
+	MAME_DIR .. "src/mame/drivers/yes.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "poly")
