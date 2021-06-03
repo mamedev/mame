@@ -2806,7 +2806,11 @@ pwb7270e                        // Advanced Logic Research PWB 7270 REV E
 prolite286                      // CAF Prolite 286/16
 twinnet                         // Twinhead Netstation PC
 icldrsm40                       // ICL DRS M40 (286)
-
+peas286                         // Peacock 286-S
+minisys2k                       // SIIG MiniSys 2000
+ecs8517                         // ECS 8517 v3.3 (386sx)
+dfi386sx                        // Diamond Flower International 386SX-16/20CN Rev 1.0
+mokp386                         // Morse KP920121523 V2.20 (386)
 
 @source:atari_s1.cpp
 aavenger                        //
