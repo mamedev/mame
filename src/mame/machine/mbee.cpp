@@ -391,7 +391,7 @@ u8 mbee_state::telcom_r(offs_t offset)
 
 u8 mbee_state::pak_r(offs_t offset)
 {
-	u8 data = m_0a & 7;
+	u8 data = (m_0a & 7)+2;
 
 	if (m_pak[data] && m_pak[data]->exists())
 	{
@@ -417,15 +417,16 @@ u8 mbee_state::pak_r(offs_t offset)
 
 u8 mbee_state::net_r(offs_t offset)
 {
-	if (m_net && m_net->exists())
+	if (m_pak[1] && m_pak[1]->exists())
 	{
-		if (m_09 && m_net_extended)
-			return m_net->read_rom(0x1000 | offset);
+		if (m_09 && m_pak_extended[1])
+			return m_pak[1]->read_rom(0x1000 | offset);
 		else
-			return m_net->read_rom(offset);
+			return m_pak[1]->read_rom(offset);
 	}
 	else
 	{
+		m_pak_extended[1] = false;
 		if (m_netdef)
 			return m_p_netdef[(m_09<<12)|offset];
 		else
@@ -538,14 +539,14 @@ void mbee_state::machine_start()
 
 	// set pak index to true for 16k roms
 	if (m_pakdef)
-		for (u8 i = 8; i < 16; i++)
-			m_pak_extended[i & 7] = (m_p_pakdef[(i<<13)] == 0xff) ? false : true;
+		for (u8 i = 8; i < 14; i++)
+			m_pak_extended[(i & 7)+2] = (m_p_pakdef[(i<<13)] == 0xff) ? false : true;
 	else
-		for (u8 i = 0; i < 8; i++)
+		for (u8 i = 2; i < 8; i++)
 			m_pak_extended[i] = false;
 
 	// set net index to true for 8k roms
-	m_net_extended = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
+	m_pak_extended[1] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
 }
 
 void mbee_state::machine_reset()
@@ -719,61 +720,61 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 	return image_init_result::PASS;
 }
 
+// Index usage: 0 = not used; 1 = net rom; 2-7 = pak roms
 image_init_result mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
 {
 	u32 size = slot->common_get_size("rom");
 
-	if ((size == 0) || (size > 0x4000))
+	if (pak_index > 1)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
-		return image_init_result::FAIL;
+		// "mbp" roms
+		if ((size == 0) || (size > 0x4000))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			return image_init_result::FAIL;
+		}
+
+		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
+
+		slot->rom_alloc(m_pak_extended ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
+			slot->call_unload();
+			if (m_pakdef)
+				m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
+			else
+				m_pak_extended[pak_index] = false;
+			return image_init_result::FAIL;
+		}
 	}
-
-	m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
-
-	slot->rom_alloc(m_pak_extended ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
-	slot->common_load_rom(slot->get_rom_base(), size, "rom");
-
-	// Validate the rom
-	logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
-	if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
+	else
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
-		slot->call_unload();
-		if (m_pakdef)
-			m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
-		else
-			m_pak_extended[pak_index] = false;
-		return image_init_result::FAIL;
-	}
+		// "mbn" roms
+		if ((size == 0) || (size > 0x2000))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			return image_init_result::FAIL;
+		}
 
-	return image_init_result::PASS;
-}
+		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
 
-DEVICE_IMAGE_LOAD_MEMBER(mbee_state::net_load)
-{
-	uint32_t size = m_net->common_get_size("rom");
+		slot->rom_alloc(m_pak_extended ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	if ((size == 0) || (size > 0x2000))
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
-		return image_init_result::FAIL;
-	}
-
-	size = (size > 0x1000) ? 0x2000 : 0x1000;
-
-	m_net->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_net->common_load_rom(m_net->get_rom_base(), size, "rom");
-
-
-	// Validate the rom
-	logerror ("Rom header = %02X %02X %02X\n", m_net->read_rom(0), m_net->read_rom(1), m_net->read_rom(2));
-	if ((m_net->read_rom(0) != 0xc3) || ((m_net->read_rom(2) & 0xf0) != 0xe0))
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
-		m_net->call_unload();
-		m_net_extended = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
-		return image_init_result::FAIL;
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
+			slot->call_unload();
+			m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
+			return image_init_result::FAIL;
+		}
 	}
 
 	return image_init_result::PASS;

@@ -617,13 +617,13 @@ static void mbee_floppies(device_slot_interface &device)
 void mbee_state::remove_carts(machine_config &config)
 {
 	config.device_remove("cart_list");
-	config.device_remove("pak0");
-	config.device_remove("pak1");
-	config.device_remove("pak2");
-	config.device_remove("pak3");
-	config.device_remove("pak4");
-	config.device_remove("pak5");
-	config.device_remove("net");
+	config.device_remove("optrom1");
+	config.device_remove("optrom2");
+	config.device_remove("optrom3");
+	config.device_remove("optrom4");
+	config.device_remove("optrom5");
+	config.device_remove("optrom6");
+	config.device_remove("optrom7");
 }
 
 void mbee_state::mbee(machine_config &config)
@@ -681,8 +681,8 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "net",  generic_plain_slot, "mbee_cart", "mbn,rom").set_device_load(FUNC(mbee_state::net_load));
-	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<0U>));
+	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
+	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // edasm
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
@@ -745,13 +745,13 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "net",  generic_plain_slot, "mbee_cart", "mbn,rom").set_device_load(FUNC(mbee_state::net_load));
-	GENERIC_SOCKET(config, "pak0", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<0U>));
-	GENERIC_SOCKET(config, "pak1", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<1U>));
-	GENERIC_SOCKET(config, "pak2", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<2U>));
-	GENERIC_SOCKET(config, "pak3", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<3U>));
-	GENERIC_SOCKET(config, "pak4", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<4U>));
-	GENERIC_SOCKET(config, "pak5", generic_plain_slot, "mbee_cart", "mbp,rom").set_device_load(FUNC(mbee_state::pak_load<5U>));
+	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
+	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // pak0
+	GENERIC_SOCKET(config, "optrom3", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<3U>)); // pak1
+	GENERIC_SOCKET(config, "optrom4", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<4U>)); // pak2
+	GENERIC_SOCKET(config, "optrom5", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<5U>)); // pak3
+	GENERIC_SOCKET(config, "optrom6", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<6U>)); // pak4
+	GENERIC_SOCKET(config, "optrom7", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<7U>)); // pak5
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
@@ -850,11 +850,11 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 	config.device_remove("cass_list"); // mbeett is incompatible with the others
-	config.device_remove("pak1");
-	config.device_remove("pak2");
-	config.device_remove("pak3");
-	config.device_remove("pak4");
-	config.device_remove("pak5");
+	config.device_remove("optrom3");
+	config.device_remove("optrom4");
+	config.device_remove("optrom5");
+	config.device_remove("optrom6");
+	config.device_remove("optrom7");
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mbee_cart").set_filter("TT");
 }
 
@@ -880,7 +880,7 @@ ROM_START( mbeeic )
 	ROM_LOAD("bas522a.ic5",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.ic10",          0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-	ROM_REGION( 0x1000, "netdef", 0 )
+	ROM_REGION( 0x1000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL( "telcom10.mbn", 0x0000, 0x1000, CRC(d1617e4f) SHA1(c73dc4dcf4c69419842fa4b52aa92e86924a2e2b) ) // net
 
 	/* PAK option roms */
@@ -901,7 +901,7 @@ ROM_START( mbeepc )
 	ROM_LOAD("bas522a.ic5",           0x0000,  0x2000, CRC(7896a696) SHA1(a158f7803296766160e1f258dfc46134735a9477) )
 	ROM_LOAD("bas522b.ic10",          0x2000,  0x2000, CRC(b21d9679) SHA1(332844433763331e9483409cd7da3f90ac58259d) )
 
-	ROM_REGION( 0x1000, "netdef", 0 )
+	ROM_REGION( 0x1000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL( "telcom10.mbn", 0x0000, 0x1000, CRC(d1617e4f) SHA1(c73dc4dcf4c69419842fa4b52aa92e86924a2e2b) ) // net
 
 	/* PAK option roms */
@@ -922,7 +922,7 @@ ROM_START( mbeepc85 )
 	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
 	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION( 0x2000, "netdef", 0 )
+	ROM_REGION( 0x2000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("telcom321a.mbn", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
@@ -944,7 +944,7 @@ ROM_START( mbeepc85b )
 	ROM_LOAD("bas525a.rom",           0x0000,  0x2000, CRC(a6e02afe) SHA1(0495308c7e1d84b5989a3af6d3b881f4580b2641) )
 	ROM_LOAD("bas525b.rom",           0x2000,  0x2000, CRC(245dd36b) SHA1(dd288f3e6737627f50d3d2a49df3e57c423d3118) )
 
-	ROM_REGION( 0x2000, "netdef", 0 )
+	ROM_REGION( 0x2000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("telcom321a.mbn", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */
@@ -971,7 +971,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD("bas524a.rom",           0x0000,  0x2000, CRC(ec9c7a60) SHA1(a4021bcedc8da8c0eb0bda036a1d457619a175b0) )
 	ROM_LOAD("bas524b.rom",           0x2000,  0x2000, CRC(17d3eac7) SHA1(d40d376cc5e751d257d951909a34445e70506c7b) )
 
-	ROM_REGION( 0x2000, "netdef", 0 )
+	ROM_REGION( 0x2000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("telcom321s.mbp", 0x0000, 0x2000, CRC(00f8fde1) SHA1(eb881bbab90c85fd6e29540decd25e884c67f738) )
 
 	/* PAK roms - These are not optional and will only work in the correct slots. */
@@ -995,7 +995,7 @@ ROM_START( mbeett )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("kernel_106.rom",        0x0000,  0x2000, CRC(5ab9cb1d) SHA1(a1fb971622f85c4d866b91cb4bec6d75757e8c5f) )
 
-	ROM_REGION( 0x2000, "netdef", 0 )
+	ROM_REGION( 0x2000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD("wm_106.mbn",            0x0000,  0x2000, CRC(77e0b355) SHA1(1db6769cd6b12e1c335c83f17f8c139986c87758) )
 
 	ROM_REGION( 0x20000, "pakdef", ROMREGION_ERASEFF )
@@ -1018,7 +1018,7 @@ ROM_START( mbeeppc )
 	ROM_REGION( 0x4000, "basicrom", 0 )
 	ROM_LOAD("bas529a.rom",           0x0000,  0x4000, CRC(fe8242e1) SHA1(ff790edf4fcc7a134d451dbad7779157b07f6abf) )
 
-	ROM_REGION( 0x2000, "netdef", 0 )
+	ROM_REGION( 0x2000, "netdef", ROMREGION_ERASEFF )
 	ROM_LOAD_OPTIONAL("telco321.rom", 0x0000,  0x2000, CRC(36852a11) SHA1(c45b8d03629e86231c6b256a7435abd87d8872a4) )
 
 	/* PAK option roms - Wordbee must be in slot 0 and Shell must be in slot 5. */

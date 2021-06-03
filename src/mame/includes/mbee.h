@@ -58,14 +58,13 @@ public:
 		, m_p_netdef(*this, "netdef")
 		, m_basic(*this, "basic")
 		, m_io_x7(*this, "X.7")
-		, m_io_oldkb(*this, "X.%u", 0)
-		, m_io_newkb(*this, "Y.%u", 0)
+		, m_io_oldkb(*this, "X.%u", 0U)
+		, m_io_newkb(*this, "Y.%u", 0U)
 		, m_io_config(*this, "CONFIG")
 		, m_screen(*this, "screen")
-		, m_bankr(*this, "bankr%d", 0)
-		, m_bankw(*this, "bankw%d", 0)
-		, m_pak(*this, "pak%u", 0U)
-		, m_net(*this, "net")
+		, m_bankr(*this, "bankr%d", 0U)
+		, m_bankw(*this, "bankw%d", 0U)
+		, m_pak(*this, "optrom%u", 0U)  // "rom" causes issues
 		{ }
 
 	void mbee56(machine_config &config);
@@ -124,7 +123,6 @@ private:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, u8);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	template <u8 T> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak_load) { return load_cart(image, m_pak[T], T); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(net_load);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
@@ -167,8 +165,7 @@ private:
 	u8 m_sy6545_ind = 0;
 	u8 m_fdc_rq = 0;
 	u8 m_bank_array[33] = { 0, };
-	bool m_pak_extended[8] = { 0, };
-	bool m_net_extended = 0;
+	bool m_pak_extended[10] = { 0, };
 	std::unique_ptr<u8[]> m_dummy; // black hole for writes to rom
 	std::unique_ptr<u8[]> m_ram;   // main banked-switch ram, 128/256/pp
 	std::unique_ptr<u8[]> m_vram;  // video ram, all models
@@ -201,8 +198,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_memory_bank_array<16> m_bankr;
 	optional_memory_bank_array<16> m_bankw;
-	optional_device_array<generic_slot_device, 8> m_pak;
-	optional_device<generic_slot_device> m_net;
+	optional_device_array<generic_slot_device, 20> m_pak;
 };
 
 #endif // MAME_INCLUDES_MBEE_H
