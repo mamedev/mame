@@ -22845,11 +22845,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-<!-- Move Putty with second controller -->
 	<software name="puttsqup1" cloneof="puttsqup">
 		<description>Putty Squad (early prototype)</description>
 		<year>1992</year>
 		<publisher>System 3 / Ocean</publisher>
+		<info name="usage" value="Move Putty with second controller"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="0x100000">
 				<rom name="putty squad (early prototype).bin" size="0x100000" crc="4974ae73" sha1="68be5cc2aae704777bbe47fb4a0e8ffe9afca9d3"/>
