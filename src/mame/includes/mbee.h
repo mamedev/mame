@@ -77,6 +77,7 @@ public:
 	void mbeepc85(machine_config &config);
 	void mbee128p(machine_config &config);
 	void remove_carts(machine_config &config);
+	void remove_quick(machine_config &config);
 
 	void init_mbee()     { m_features = 0x00; };
 	void init_mbeett()   { m_features = 0x0d; };

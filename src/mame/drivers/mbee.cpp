@@ -626,6 +626,13 @@ void mbee_state::remove_carts(machine_config &config)
 	config.device_remove("optrom7");
 }
 
+void mbee_state::remove_quick(machine_config &config)
+{
+	config.device_remove("cass_list");
+	config.device_remove("quickload");
+	config.device_remove("quik_list");
+}
+
 void mbee_state::mbee(machine_config &config)
 {
 	/* basic machine hardware */
@@ -761,8 +768,6 @@ void mbee_state::mbeeic(machine_config &config)
 void mbee_state::mbeepc85(machine_config &config)
 {
 	mbeeic(config);
-	config.device_remove("quickload");
-	config.device_remove("quik_list");
 	SOFTWARE_LIST(config.replace(), "cart_list").set_original("mbee_cart").set_filter("3");
 }
 
@@ -793,10 +798,8 @@ void mbee_state::mbee56(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("1");
-	config.device_remove("quickload");
-	config.device_remove("quik_list");
-	config.device_remove("cass_list");
 	remove_carts(config);
+	remove_quick(config);
 }
 
 void mbee_state::mbee128(machine_config &config)
@@ -826,6 +829,7 @@ void mbee_state::mbee128p(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("3");
 	remove_carts(config);
+	remove_quick(config);
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -849,7 +853,7 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
-	config.device_remove("cass_list"); // mbeett is incompatible with the others
+	remove_quick(config);
 	config.device_remove("optrom3");
 	config.device_remove("optrom4");
 	config.device_remove("optrom5");
@@ -963,7 +967,7 @@ ROM_START( mbeepc85b )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) ) // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeepc85s )
@@ -980,7 +984,7 @@ ROM_START( mbeepc85s )
 	ROM_LOAD("db-s.mbp",              0x2000,  0x2000, CRC(e2094771) SHA1(62d7fb66c91d2bd24523bc84e4f005cf2c4480bb) ) // 1
 	ROM_LOAD("kalk-s.mbp",            0x4000,  0x2000, CRC(08dd71ee) SHA1(c9d506d8bb56f602c3481b253d4cac226f545d98) ) // 2
 	ROM_LOAD("bg-s.mbp",              0x6000,  0x2000, CRC(5aa4813e) SHA1(a8638e9046bfb9d5a98c878322295ce408bd879d) ) // 3
-	ROM_LOAD("vtex11s.mbp",        0x8000,  0x2000, CRC(67592b3f) SHA1(7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec) ) // 4
+	ROM_LOAD("vtex11s.mbp",           0x8000,  0x2000, CRC(67592b3f) SHA1(7f1d23ded34781ccda5f36b4a4fa118a8c0e44ec) ) // 4
 	ROM_LOAD("shell-s.mbp",           0xa000,  0x2000, CRC(bdf1768f) SHA1(4385351d07288cf94947ac63131eeed98572caa1) ) // 5
 
 	ROM_REGION( 0x1000, "chargen", 0 )
@@ -988,7 +992,7 @@ ROM_START( mbeepc85s )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "82s123.ic7",           0x0000,  0x0020, CRC(61b9c16c) SHA1(0ee72377831c21339360c376f7248861d476dc20) )
-	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) )   // video switching prom, not needed for emulation purposes
+	ROM_LOAD_OPTIONAL( "82s123.ic16", 0x0020,  0x0020, CRC(79fa1e9d) SHA1(0454051697b23e4561744466fb31e7a133d02246) ) // video switching prom, not needed for emulation purposes
 ROM_END
 
 ROM_START( mbeett )

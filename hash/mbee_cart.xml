@@ -64,7 +64,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 
 	<software name="ozlogo">
 		<description>OZLOGO</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
@@ -76,7 +76,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 	</software>
 
 	<software name="chess">
-		<description>CHESS</description>
+		<description>Sargon Chess</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="EDASM or PAK0"/>
@@ -116,7 +116,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 
 	<software name="mdisas">
 		<description>Mydas Dissassembler</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Mytek</publisher>
 		<info name="usage" value="EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
@@ -129,7 +129,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 
 	<software name="sdisas">
 		<description>Super Disassembler 3.0</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
@@ -145,7 +145,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Mytek</publisher>
 		<info name="usage" value="EDASM or PAK0"/>
-		<sharedfeat name="compatibility" value="1,2" />
+		<sharedfeat name="compatibility" value="2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
 				<rom name="mwordp.mbp" size="0x2000" crc="1bbec49f" sha1="12e0f78ec5550076c5f63bc8aaf28930c6c3ad09" />
@@ -590,45 +590,6 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
 				<rom name="shell-s.mbp" size="0x2000" crc="bdf1768f" sha1="4385351d07288cf94947ac63131eeed98572caa1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="busy">
-		<description>Busycalc III</description>
-		<year>198?</year>
-		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom4 = PAK2]"/>
-		<sharedfeat name="compatibility" value="2,3" />
-		<part name="cart" interface="mbee_pak">
-			<dataarea name="rom" size="0x4000">
-				<rom name="busy.mbp" size="0x4000" crc="56255f60" sha1="fd2e37209fd49290be6875bc460cfc05392938ba" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="busyp">
-		<description>Busycalc III (Premium)</description>
-		<year>198?</year>
-		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom4 = PAK2]"/>
-		<sharedfeat name="compatibility" value="2,3" />
-		<part name="cart" interface="mbee_pak">
-			<dataarea name="rom" size="0x4000">
-				<rom name="busy-p.mbp" size="0x4000" crc="f2897427" sha1="b4c351bdac72d89589980be6d654f9b931bcba6b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="busys">
-		<description>Busycalc III (Swedish)</description>
-		<year>198?</year>
-		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom4 = PAK2]"/>
-		<sharedfeat name="compatibility" value="2,3" />
-		<part name="cart" interface="mbee_pak">
-			<dataarea name="rom" size="0x2000">
-				<rom name="kalk-s.mbp" size="0x2000" crc="08dd71ee" sha1="c9d506d8bb56f602c3481b253d4cac226f545d98" />
 			</dataarea>
 		</part>
 	</software>
