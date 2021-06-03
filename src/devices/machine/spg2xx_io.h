@@ -149,26 +149,26 @@ protected:
 		REG_IO_DRIVE_CTRL
 	};
 	void check_extint_irq(int channel);
-	void check_irqs(const uint16_t changed);
-
-	static const device_timer_id TIMER_TMB1 = 0;
-	static const device_timer_id TIMER_TMB2 = 1;
-	static const device_timer_id TIMER_UART_TX = 4;
-	static const device_timer_id TIMER_UART_RX = 5;
-	static const device_timer_id TIMER_4KHZ = 6;
-	static const device_timer_id TIMER_SRC_AB = 7;
-	static const device_timer_id TIMER_SRC_C = 8;
-	static const device_timer_id TIMER_RNG = 9;
-	static const device_timer_id TIMER_WATCHDOG = 10;
-	static const device_timer_id TIMER_SPI_TX = 11;
-	static const device_timer_id TIMER_ADC0 = 12;
-	static const device_timer_id TIMER_ADC1 = 13;
-	static const device_timer_id TIMER_ADC2 = 14;
-	static const device_timer_id TIMER_ADC3 = 15;
+	void check_timers_irq();
+	void check_data_irq();
+	void check_external_irq();
+	void check_hifreq_periodic_irq();
+	void check_tmb_lofreq_key_irq();
+	void check_all_irqs(const uint16_t changed);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	TIMER_CALLBACK_MEMBER(timer_ab_tick);
+	TIMER_CALLBACK_MEMBER(timer_c_tick);
+	template <int Which> TIMER_CALLBACK_MEMBER(tmb_timer_tick);
+	TIMER_CALLBACK_MEMBER(uart_transmit_tick);
+	TIMER_CALLBACK_MEMBER(uart_receive_tick);
+	TIMER_CALLBACK_MEMBER(system_timer_tick);
+	TIMER_CALLBACK_MEMBER(rng_clock_tick);
+	TIMER_CALLBACK_MEMBER(watchdog_tick);
+	TIMER_CALLBACK_MEMBER(spi_tx_tick);
+	template <int Which> TIMER_CALLBACK_MEMBER(adc_convert_tick);
 
 	uint16_t clock_rng(int which);
 
@@ -178,22 +178,12 @@ protected:
 	uint16_t do_special_gpio(uint32_t index, uint16_t mask);
 
 	void update_timer_b_rate();
-	void update_timer_ab_src();
-	void update_timer_c_src();
 	void increment_timer_a();
 
-	void uart_transmit_tick();
-	void uart_receive_tick();
-
-	void system_timer_tick();
-
-	void do_spi_tx();
 	void set_spi_irq(bool set);
 	void update_spi_irqs();
 
 	void do_i2c();
-
-	void do_adc_capture(int channel);
 
 	uint16_t m_io_regs[0x100];
 
