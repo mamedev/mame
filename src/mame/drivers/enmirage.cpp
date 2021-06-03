@@ -9,28 +9,29 @@
 	Fleshed out by tim lindner
 
 	Models:
-		DSK-8 (early): Pratt-Reed keyboard (1984)
-		DSK-8 (late): Fatar keyboard (1984)
+		DSK-8: Pratt-Reed keyboard (early 1984)
+		DSK-8: Fatar keyboard (late 1984)
 		DMS-8: Rack mount (1985)
 		DSK-1: Unweighted keyboard, stereo output (1986)
 
-	Map for Mirage:
-	0000-7fff: 32k window on 128k of sample RAM
-	8000-bfff: main RAM
-	c000-dfff: optional expansion RAM
-	e100-e101: 6850 UART (for MIDI)
-	e200-e2ff: 6522 VIA
-	e400-e407: write to both filters
-	e408-e40f: filter cut-off frequency
-	e410-e417: filter resonance
-	e418-e41f: multiplexer address pre-set
-	e800-e803: WD1770 FDC
-	ec00-ecef: ES5503 "DOC" sound chip
-	f000-ffff: boot ROM
+	M6809 Map for Mirage:
+		0000-7fff: 32k window on 128k of sample RAM
+		8000-bfff: main RAM
+		c000-dfff: optional expansion RAM
+		e100-e101: 6850 UART (for MIDI)
+		e200-e2ff: 6522 VIA
+		e400-e407: write to both filters
+		e408-e40f: filter cut-off frequency
+		e410-e417: filter resonance
+		e418-e41f: DAC pre-set
+		e800-e803: WD1770 FDC
+		ec00-ecef: ES5503 "DOC" sound chip
+		f000-ffff: boot ROM
 
-	NMI: IRQ from WD1772
-	IRQ: DRQ from WD1772 wire-ORed with IRQ from ES5503 wire-ORed with IRQ from VIA6522
-	FIRQ: IRQ from 6850 UART
+	M6809 Interrupts:
+		NMI: IRQ from WD1772
+		IRQ: wired-ORed: DRQ from WD1772, IRQ from ES5503, IRQ from VIA6522, IRQ from cartridge
+		FIRQ: IRQ from 6850 UART
 
 	LED / switch matrix:
 
@@ -213,7 +214,7 @@ void enmirage_state::machine_reset()
 
 void enmirage_state::mirage_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankrw("samplebank"); // 32k window on 128k of audio RAM
+	map(0x0000, 0x7fff).bankrw("samplebank"); // 32k window on 128k of sample RAM
 	map(0x8000, 0xbfff).ram(); // main RAM
 	map(0xc000, 0xdfff).ram(); // expansion RAM
 	map(0xe100, 0xe101).rw("acia6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -434,4 +435,4 @@ void enmirage_state::init_mirage()
 	}
 }
 
-CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage", MACHINE_NOT_WORKING)
+CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)
