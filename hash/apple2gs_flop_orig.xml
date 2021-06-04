@@ -1790,4 +1790,288 @@ license:CC0
 		</part>
 	</software>
 
+<software name="mean18">
+		<description>Mean 18</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-06-03"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mean 18" is a 1987 sports game developed by Rex Bradford, George Karalias, and Mark Lesser, and distributed by Accolade. It requires a 512K Apple IIgs. This archive includes the three add-on disks that were available separately (Famous Courses Volume II, III, and IV).-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk ~ - Program disk"/>
+			<dataarea name="flop" size="1329494">
+				<rom name="mean 18 iigs - disk 1 - program disk.woz" size="1329494" crc="0bff6131" sha1="a4f312c1e20e1f6f56aa7a150b1e3c2a055a659b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Famous courses volume II"/>
+			<dataarea name="flop" size="1296258">
+				<rom name="mean 18 iigs - disk 2 - famous courses volume ii.woz" size="1296258" crc="13d63de6" sha1="1e2415846c7dc1c7ef213965c039fa2ae1cf07f9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Famous courses volume III"/>
+			<dataarea name="flop" size="1297284">
+				<rom name="mean 18 iigs - disk 3 - famous courses volume iii.woz" size="1297284" crc="57051e09" sha1="1f077302afab70811c901eb6f40d4e4b3d48a997"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 - Famous courses volume IV"/>
+			<dataarea name="flop" size="1297250">
+				<rom name="mean 18 iigs - disk 4 - famous courses volume iv.woz" size="1297250" crc="f9e50694" sha1="75871ecc202b0535e45253c5c28ef8447853389f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hoverbld">
+		<description>Hover Blade</description>
+		<year>1991</year>
+		<publisher>MCX</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value=",A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later -->
+		<!--"Hover Blade" is a 1991 action game developed by Shiraz Akmal and Eric Boden, and distributed by MCX. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1345297">
+				<rom name="hover blade iigs - disk 1.woz" size="1345297" crc="dea1f1bf" sha1="f15fa4a7894908b48fa7038521e0ca37cada2656"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1345297">
+				<rom name="hover blade iigs - disk 2.woz" size="1345297" crc="c63ec5d5" sha1="bb90b71a84b5f9d3809342e27a303638208194bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="fstbreak">
+		<description>Fast Break</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Fast Break" is a 1989 sports game developed by Steve Cartwright, Greg Hospelhorn, George Wong, Pam Levins, and Roseann Mitchell, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296720">
+				<rom name="fast break iigs.woz" size="1296720" crc="56b4f173" sha1="18e1ba72192ce9e059633a62be6aae0c8b92c686"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hmonte">
+		<description>Halls of Montezuma</description>
+		<year>1990</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Halls of Montezuma" is a 1990 simulation game developed by Roger Keating, Ian Trout, Allan Bell, Sue Bell, and Steven Hart, and distributed by Strategic Simulations Group. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296238">
+				<rom name="halls of montezuma iigs - disk 1.woz" size="1296238" crc="e9e5007e" sha1="d562bcf62a8b5dfab0d991279b9372ae0af55e35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296238">
+				<rom name="halls of montezuma iigs - disk 2.woz" size="1296238" crc="390131dd" sha1="0d75cf473647631351edb2871710cdd684094e7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="ss2tcm">
+		<description>Star Saga: Two - The Clathran Menace</description>
+		<year>1988</year>
+		<publisher>MasterPlay Publishing Corporation</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Star Saga: Two - The Clathran Menace" is a 1988 roleplaying game developed by Richard Dutton, Walter Freitag, Andrew C. Greenberg, Sheila M. Greenberg, Michael Massimilla, and Gerald M. Seixas, and distributed by MasterPlay Publishing Corporation. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296296">
+				<rom name="star saga two iigs.woz" size="1296296" crc="39e1e6ee" sha1="b712121eb0a254f6ef51010371e308f11ed931b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="cbackg">
+		<description>Club Backgammon</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Club Backgammon" is a 1988 board game developed by Staszek Bartkowski, Jarek Olszewski, Dorota B&#x142;aszczak, Maciej Markuszewski, and Marcin Szostakowski, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344899">
+				<rom name="club backgammon iigs.woz" size="1344899" crc="02fd734a" sha1="c62ad7673353aa21ccb1fab56e1df9b4e2a7a57e"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="bzorkcoq">
+		<description>Beyond Zork: The Coconut of Quendor (Revision 57 / 871221)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 00 or ROM 01. -->
+		<!--"Beyond Zork: The Coconut of Quendor" is a 1987 adventure game developed by Brian Moriarty and distributed by Infocom. This is revision 57 / 871221. It requires a 512K Apple IIgs ROM 00 or ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312556">
+				<rom name="beyond zork iigs.woz" size="1312556" crc="b312178d" sha1="e08df0adda743ee92f6716fbaaa2ddd3ba2c3a05"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="2088tcm2">
+		<description>2088: The Cryllan Mission - The Second Scenario</description>
+		<year>1990</year>
+		<publisher>Victory Software</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs ROM 01 or later. -->
+		<!--"2088: The Cryllan Mission - The Second Scenario" is a 1990 roleplaying game developed by Vinay Pai, Vivek Pai, and Vijay Pai, and distributed by Victory Software. It requires a 1.25MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System"/>
+			<dataarea name="flop" size="1345398">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 1 - system.woz" size="1345398" crc="389a2d46" sha1="d1132ba890573390db3906742ecc517a068a36cc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program"/>
+			<dataarea name="flop" size="1345399">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 2 - program.woz" size="1345399" crc="b500b6bb" sha1="fd86fd3aa3c8da2ff8b11189107786925eb2011e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Outdoors"/>
+			<dataarea name="flop" size="1345400">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 3 - outdoors.woz" size="1345400" crc="9dda11aa" sha1="d387c50de2c3591a48b2b4ee9a03558178b028c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="defcrown">
+		<description>Defender of the Crown</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Defender of the Crown" is a 1988 adventure game developed by Kellyn Beeck, James Sachs, Ivan Manley, Robert Jacob, Phyllis Jacob, Pat Cook, Jim Cuomo, Tom Warner, Jeff Hilbers, Steve Quinn, Richard La Barre, John Cutter, Rob Landeros, Doug Smith, Betsy Scafati, and Wayne Brockman, and distributed by Cinemaware Corporation. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Reel 1"/>
+			<dataarea name="flop" size="1296886">
+				<rom name="defender of the crown iigs - reel 1.woz" size="1296886" crc="73c57ecb" sha1="bfb82cc4c817ada07bff9e1dd06a84a2522af05a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Reel 2"/>
+			<dataarea name="flop" size="1296374">
+				<rom name="defender of the crown iigs - reel 2.woz" size="1296374" crc="5a8945a3" sha1="fac77abad75d71c2f05a31ce609a944a6dc0f46f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="sktordie">
+		<description>Skate or Die</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 01. Music requires 768K. -->
+		<!--"Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. It requires a 512K Apple IIgs ROM 01. Music requires 768K.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296713">
+				<rom name="skate or die iigs.woz" size="1296713" crc="300af7ee" sha1="7ef79447b14b2268bdbd6489188f951c995e9b7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="sssoccer">
+		<description>Street Sports Soccer</description>
+		<year>1988</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 00 or ROM 01. -->
+		<!--"Street Sports Soccer" is a 1988 sports game developed by Designer Software and distributed by Epyx. It requires a 512K Apple IIgs ROM 00 or ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296697">
+				<rom name="street sports soccer iigs.woz" size="1296697" crc="25b2491e" sha1="fd7231ff1fbba463fa6a0ae068b9ef37a284b64b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="ootworld">
+		<description>Out of this World</description>
+		<year>1992</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Out of this World" is a 1992 action game developed by Rebecca Heineman and distributed by Interplay Productions. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296230">
+				<rom name="out of this world iigs - disk 1 - program disk.woz" size="1296230" crc="114a8c7f" sha1="5821227cf3e7dc6b07d2255f63c77a66f355cc93"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Sounds disk"/>
+			<dataarea name="flop" size="1296229">
+				<rom name="out of this world iigs - disk 2 - sounds disk.woz" size="1296229" crc="df8eccc2" sha1="e8bf12708fd810db0ef8ec803df338c2a747781a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="thexder">
+		<description>Thexder (Version 2.7)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Thexder" is a 1987 action game developed by H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby, and distributed by Sierra On-Line. This is version 2.7. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296260">
+				<rom name="thexder iigs.woz" size="1296260" crc="98a49554" sha1="6c1389e558151f08234f25f6c0e04337e6290297"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="tunlarma">
+		<description>Tunnels of Armageddon (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-03"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Tunnels of Armageddon" is a 1989 action game developed by Adam Skorupiński, Mirek Zabłocki, Krzysiek Koziarski, Zbych Dąbrowski, Dorota Błaszczak, Marcin Grzegorzewski, Dick Vohlers, Tomek Meuś, and distributed by California Dreams. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344940">
+				<rom name="tunnels of armageddon iigs.woz" size="1344940" crc="5fbeadc3" sha1="3c3d99d4aea530e2eb529e085d31984e0d11dd28"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
