@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "render.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -70,7 +72,7 @@ public:
 
 	// retrieves the current location of the mouse
 	render_target *find_mouse(s32 *x, s32 *y, bool *button) const;
-	ioport_field *find_mouse_field() const;
+	ioport_field *find_mouse_field(float &xoffs, float &yoffs, render_target::item_handle &item) const;
 
 	// return true if a key down for the given user interface sequence is detected
 	bool pressed(int code);
@@ -119,6 +121,9 @@ private:
 	s32                         m_current_mouse_y;
 	bool                        m_current_mouse_down;
 	ioport_field *              m_current_mouse_field;
+	render_target::item_handle  m_current_mouse_drag_item;
+	float                       m_current_mouse_target_dx;
+	float                       m_current_mouse_target_dy;
 
 	// popped states; ring buffer of ui_events
 	ui_event                    m_events[EVENT_QUEUE_SIZE];

@@ -1493,7 +1493,7 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 //  field, if possible
 //-------------------------------------------------
 
-bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y)
+bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, item_handle &input_item, float &input_x, float &input_y)
 {
 	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
 	if (m_orientation & ORIENTATION_FLIP_X)
@@ -1535,8 +1535,9 @@ bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&in
 				{
 					// point successfully mapped
 					std::tie(input_port, input_mask) = item.input_tag_and_mask();
-					input_x = (target_f.first - bounds.x0) / bounds.width();
-					input_y = (target_f.second - bounds.y0) / bounds.height();
+					input_x = target_f.first - ((bounds.x0 + bounds.x1) / 2);
+					input_y = target_f.second - ((bounds.y0 + bounds.y1) / 2);
+					input_item = reinterpret_cast<item_handle>(&item);
 					return true;
 				}
 				else
@@ -1551,7 +1552,31 @@ bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&in
 	input_port = nullptr;
 	input_mask = 0;
 	input_x = input_y = -1.0f;
+	input_item = nullptr;
 	return false;
+}
+
+
+//-------------------------------------------------
+//  interpolated_value - return the interpolated
+//  value of an item given x,y coordinates and
+//  an x,y offset from the item's center
+//-------------------------------------------------
+
+ioport_value render_target::interpolated_value(s32 target_x, s32 target_y, item_handle item, float xoffs, float yoffs)
+{
+	std::pair<float, float> target_f(map_point_internal(target_x, target_y));
+	if (m_orientation & ORIENTATION_FLIP_X)
+		target_f.first = 1.0f - target_f.first;
+	if (m_orientation & ORIENTATION_FLIP_Y)
+		target_f.second = 1.0f - target_f.second;
+	if (m_orientation & ORIENTATION_SWAP_XY)
+		std::swap(target_f.first, target_f.second);
+
+	target_f.first -= xoffs;
+	target_f.second -= yoffs;
+
+	return reinterpret_cast<layout_view::item *>(item)->state_from_position(target_f.first, target_f.second);
 }
 
 

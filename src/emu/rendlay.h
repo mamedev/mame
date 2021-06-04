@@ -288,8 +288,8 @@ public:
 		render_container *screen_container() const { return m_screen ? &m_screen->container() : nullptr; }
 
 		// interactivity
-		bool has_input() const { return bool(m_input_port); }
-		std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return std::make_pair(m_input_port, m_input_mask); };
+		bool has_input() const { return bool(m_input_port) || (bounds_animated() && bool(m_animinput_port)); }
+		std::pair<ioport_port *, ioport_value> input_tag_and_mask() const { return m_animinput_port ? std::make_pair(m_animinput_port, m_animmask) : std::make_pair(m_input_port, m_input_mask); };
 		bool clickthrough() const { return m_clickthrough; }
 
 		// fetch state based on configured source
@@ -307,6 +307,9 @@ public:
 
 		// resolve tags, if any
 		void resolve_tags();
+
+		// return the best state relative to a point at the given position
+		ioport_value state_from_position(float x, float y);
 
 	private:
 		using bounds_vector = emu::render::detail::bounds_vector;

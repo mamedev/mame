@@ -1052,6 +1052,50 @@ inline render_bounds interpolate_bounds(emu::render::detail::bounds_vector const
 	}
 }
 
+int uninterpolate_bounds(emu::render::detail::bounds_vector const &steps, float x, float y)
+{
+	float smallest_distance = 1e10;
+	int state = 0;
+
+	auto first(steps.begin());
+	auto second(first);
+	while (steps.end() != ++second)
+	{
+		// create a line between the center of the first and the center of the second
+		float x0 = (first->bounds.x0 + first->bounds.x1) / 2;
+		float y0 = (first->bounds.y0 + first->bounds.y1) / 2;
+		float x1 = (second->bounds.x0 + second->bounds.x1) / 2;
+		float y1 = (second->bounds.y0 + second->bounds.y1) / 2;
+		float length = sqrtf((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+
+		// determine the distance to that line; if it's not the smallest so far, continue
+		float distance = fabsf((x1 - x0) * (y0 - y) - (x0 - x) * (y1 - y0)) / length;
+		if (distance > smallest_distance)
+			continue;
+		smallest_distance = distance;
+
+		// handle out of bounds
+		if (((x0 < x1 && x < x0) || (x0 > x1 && x > x0) || x0 == x1) && ((y0 < y1 && y < y0) || (y0 > y1 && y > y1) || y0 == y1))
+			state = first->state;
+		else if (((x1 < x0 && x < x1) || (x1 > x0 && x > x1) || x0 == x1) && ((y1 < y0 && y < y1) || (y1 > y0 && y > y0) || y0 == y1))
+			state = second->state;
+		else
+		{
+			// compute the distance from our point to the first center
+			float dist_to_first = sqrtf((x - x0) * (x - x0) + (y - y0) * (y - y0));
+
+			// using that, compute the fractional distance along the line
+			float dist_along_line = sqrtf(dist_to_first * dist_to_first - distance * distance) / length;
+
+			// clamp to max, else interpolate
+			if (dist_along_line > 1.0)
+				state = second->state;
+			else
+				state = first->state + (second->state - first->state) * dist_along_line;
+		}
+	}
+	return state;
+}
 
 bool add_color_step(emu::render::detail::layout_environment &env, emu::render::detail::color_vector &steps, util::xml::data_node const &node)
 {
@@ -4678,6 +4722,17 @@ void layout_view::item::resolve_tags()
 	m_get_anim_state = default_get_anim_state();
 	m_get_bounds = default_get_bounds();
 	m_get_color = default_get_color();
+}
+
+
+//-------------------------------------------------
+//  state_from_position - given a position,
+//  compute the effective state
+//-------------------------------------------------
+
+ioport_value layout_view::item::state_from_position(float x, float y)
+{
+	return uninterpolate_bounds(m_bounds, x, y);
 }
 
 

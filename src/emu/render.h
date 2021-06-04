@@ -509,6 +509,9 @@ class render_target
 	~render_target();
 
 public:
+	// abstraction of layout_view::item for hit testing
+	using item_handle = void *;
+
 	// getters
 	render_target *next() const { return m_next; }
 	render_manager &manager() const { return m_manager; }
@@ -562,7 +565,8 @@ public:
 
 	// hit testing
 	bool map_point_container(s32 target_x, s32 target_y, render_container &container, float &container_x, float &container_y);
-	bool map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, float &input_x, float &input_y);
+	bool map_point_input(s32 target_x, s32 target_y, ioport_port *&input_port, ioport_value &input_mask, item_handle &input_item, float &input_x, float &input_y);
+	ioport_value interpolated_value(s32 target_x, s32 target_y, item_handle item, float xoffs, float yoffs);
 
 	// reference tracking
 	void invalidate_all(void *refptr);
