@@ -260,6 +260,7 @@ template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsi
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
 				{
+				case 1: abort(); // can't happen
 				case 2: return T(m_bus[st].read_word_unaligned(physical));
 				case 4: return T(m_bus[st].read_dword_unaligned(physical));
 				case 8: return T(m_bus[st].read_qword_unaligned(physical));
@@ -274,6 +275,7 @@ template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsi
 				unsigned const shift = offset * 8;
 				switch (sizeof(T))
 				{
+				case 1: abort(); // can't happen
 				case 2: data |= m_bus[st].read_word(physical & ~unitmask, u16(-1) << shift) >> shift; break;
 				case 4: data |= m_bus[st].read_dword(physical & ~unitmask, u32(-1) << shift) >> shift; break;
 				case 8: data |= m_bus[st].read_qword(physical & ~unitmask, u64(-1) << shift) >> shift; break;
@@ -288,6 +290,7 @@ template <int Width> template<typename T> T ns32000_device<Width>::mem_read(unsi
 					unsigned const shift = (sizeof(T) - offset) * 8;
 					switch (sizeof(T))
 					{
+					case 1: abort(); // can't happen
 					case 2: data |= m_bus[st].read_word(physical & ~unitmask, u16(-1) >> shift) << shift; break;
 					case 4: data |= m_bus[st].read_dword(physical & ~unitmask, u32(-1) >> shift) << shift; break;
 					case 8: data |= m_bus[st].read_qword(physical & ~unitmask, u64(-1) >> shift) << shift; break;
@@ -337,6 +340,7 @@ template <int Width> template<typename T> void ns32000_device<Width>::mem_write(
 				// unaligned access, one page (or no mmu)
 				switch (sizeof(T))
 				{
+				case 1: abort(); // can't happen
 				case 2: m_bus[st].write_word_unaligned(physical, data); break;
 				case 4: m_bus[st].write_dword_unaligned(physical, data); break;
 				case 8: m_bus[st].write_qword_unaligned(physical, data); break;
@@ -350,6 +354,7 @@ template <int Width> template<typename T> void ns32000_device<Width>::mem_write(
 				unsigned const shift = offset * 8;
 				switch (sizeof(T))
 				{
+				case 1: abort(); // can't happen
 				case 2: m_bus[st].write_word(physical & ~unitmask, data << shift, u16(-1) << shift); break;
 				case 4: m_bus[st].write_dword(physical & ~unitmask, data << shift, u32(-1) << shift); break;
 				case 8: m_bus[st].write_qword(physical & ~unitmask, data << shift, u64(-1) << shift); break;
@@ -364,6 +369,7 @@ template <int Width> template<typename T> void ns32000_device<Width>::mem_write(
 					unsigned const shift = (sizeof(T) - offset) * 8;
 					switch (sizeof(T))
 					{
+					case 1: abort(); // can't happen
 					case 2: m_bus[st].write_word(physical & ~unitmask, data >> shift, u16(-1) >> shift); break;
 					case 4: m_bus[st].write_dword(physical & ~unitmask, data >> shift, u32(-1) >> shift); break;
 					case 8: m_bus[st].write_qword(physical & ~unitmask, data >> shift, u64(-1) >> shift); break;
