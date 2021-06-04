@@ -2811,6 +2811,13 @@ minisys2k                       // SIIG MiniSys 2000
 ecs8517                         // ECS 8517 v3.3 (386sx)
 dfi386sx                        // Diamond Flower International 386SX-16/20CN Rev 1.0
 mokp386                         // Morse KP920121523 V2.20 (386)
+sybaby386                       // SOYO Baby AT 386
+php3239                         // Philips P3239
+pcb303                          // Packard Bell PCB-303 Rev.01
+386schg							// FIC 386-SC-HG
+ctcc386mx                       // CACHING TECH CORPORATION C386MX
+tot3200sxc                      // Toshiba T3200SXC
+p386dx40                        // Peacock P386DX-40
 
 @source:atari_s1.cpp
 aavenger                        //
