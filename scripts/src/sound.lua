@@ -63,6 +63,20 @@ end
 
 
 ---------------------------------------------------
+-- Super A'Can
+--@src/devices/sound/acan.h,SOUNDS["ACAN"] = true
+---------------------------------------------------
+
+if (SOUNDS["ACAN"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/acan.cpp",
+		MAME_DIR .. "src/devices/sound/acan.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- CD audio
 --@src/devices/sound/cdda.h,SOUNDS["CDDA"] = true
 ---------------------------------------------------

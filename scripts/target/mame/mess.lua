@@ -324,6 +324,7 @@ SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
 SOUNDS["RP2C33_SOUND"] = true
 SOUNDS["UDA1344"] = true
+SOUNDS["ACAN"] = true
 
 --------------------------------------------------
 -- specify available video cores
