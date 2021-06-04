@@ -7,7 +7,7 @@ license:CC0
 <softwarelist name="apple2gs_flop_orig" description="Apple IIgs 3.5&quot; original disks">
 
 	<software name="rastan">
-		<description>Rastan (IIgs)</description>
+		<description>Rastan</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="release" value="2021-05-01"/>
@@ -31,7 +31,7 @@ license:CC0
 	</software>
 
 	<software name="zanygolf">
-		<description>Zany Golf (IIgs)</description>
+		<description>Zany Golf</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -48,7 +48,7 @@ license:CC0
 	</software>
 
 	<software name="marblmad">
-		<description>Marble Madness (IIgs)</description>
+		<description>Marble Madness</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -65,7 +65,7 @@ license:CC0
 	</software>
 
 	<software name="qix">
-		<description>Qix (IIgs)</description>
+		<description>Qix</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -83,7 +83,7 @@ license:CC0
 	</software>
 
 	<software name="tonetown">
-		<description>Tass Times in Tonetown (IIgs)</description>
+		<description>Tass Times in Tonetown</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -100,7 +100,7 @@ license:CC0
 	</software>
 
 	<software name="wldgames">
-		<description>World Games (IIgs)</description>
+		<description>World Games</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -116,7 +116,7 @@ license:CC0
 	</software>
 
 	<software name="gauntlet">
-		<description>Gauntlet (IIgs)</description>
+		<description>Gauntlet</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="release" value="2021-05-02"/>
@@ -132,7 +132,7 @@ license:CC0
 	</software>
 
 	<software name="batlches">
-		<description>Battle Chess (IIgs)</description>
+		<description>Battle Chess</description>
 		<year>1989</year>
 		<publisher>Interplay</publisher>
 		<info name="release" value="2021-05-03"/>
@@ -149,7 +149,7 @@ license:CC0
 	</software>
 
 	<software name="bjacadmy">
-		<description>Blackjack Academy (IIgs)</description>
+		<description>Blackjack Academy</description>
 		<year>1987</year>
 		<publisher>MicroIllusions</publisher>
 		<info name="release" value="2021-05-03"/>
@@ -166,7 +166,7 @@ license:CC0
 	</software>
 
 	<software name="blkout">
-		<description>Block Out (IIgs)</description>
+		<description>Block Out</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
 		<info name="release" value="2021-05-03"/>
@@ -183,7 +183,7 @@ license:CC0
 	</software>
 
 	<software name="xenocide">
-		<description>Xenocide (IIgs)</description>
+		<description>Xenocide</description>
 		<year>1989</year>
 		<publisher>Micro Revelations</publisher>
 		<info name="release" value="2021-05-03"/>
@@ -200,7 +200,7 @@ license:CC0
 	</software>
 
 	<software name="alnmind">
-		<description>Alien Mind (IIgs)</description>
+		<description>Alien Mind</description>
 		<year>1988</year>
 		<publisher>PBI Software</publisher>
 		<info name="release" value="2021-05-04"/>
@@ -224,7 +224,7 @@ license:CC0
 	</software>
 
 	<software name="goldrush">
-		<description>Gold Rush! (IIgs)</description>
+		<description>Gold Rush!</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-04"/>
@@ -260,7 +260,7 @@ license:CC0
 	</software>
 
 	<software name="uninvitd">
-		<description>Uninvited (IIgs)</description>
+		<description>Uninvited</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -284,7 +284,7 @@ license:CC0
 	</software>
 
 	<software name="cavcobra">
-		<description>Cavern Cobra (IIgs)</description>
+		<description>Cavern Cobra</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -301,7 +301,7 @@ license:CC0
 	</software>
 
 	<software name="hardball">
-		<description>Hardball! (IIgs)</description>
+		<description>Hardball!</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -318,7 +318,7 @@ license:CC0
 	</software>
 
 	<software name="taskfrce">
-		<description>Task Force (IIgs)</description>
+		<description>Task Force</description>
 		<year>1990</year>
 		<publisher>Britannica Software</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -342,7 +342,7 @@ license:CC0
 	</software>
 
 	<software name="shdwgate">
-		<description>Shadowgate (IIgs)</description>
+		<description>Shadowgate</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -366,7 +366,7 @@ license:CC0
 	</software>
 
 	<software name="srvvly">
-		<description>Serve and Volley (IIgs)</description>
+		<description>Serve and Volley</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -383,7 +383,7 @@ license:CC0
 	</software>
 
 	<software name="caligmes">
-		<description>California Games (IIgs)</description>
+		<description>California Games</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-07"/>
@@ -400,7 +400,7 @@ license:CC0
 	</software>
 
 	<software name="seastrk">
-		<description>Sea Strike (IIgs)</description>
+		<description>Sea Strike</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
 		<info name="release" value="2021-05-09"/>
@@ -417,7 +417,7 @@ license:CC0
 	</software>
 
 	<software name="tstdrv2">
-		<description>The Duel: Test Drive II (IIgs)</description>
+		<description>The Duel: Test Drive II</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-10"/>
@@ -453,7 +453,7 @@ license:CC0
 	</software>
 
 	<software name="keefthf">
-		<description>Keef the Thief (IIgs)</description>
+		<description>Keef the Thief</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="release" value="2021-05-10"/>
@@ -477,7 +477,7 @@ license:CC0
 	</software>
 
 	<software name="gprxcrct">
-		<description>Grand Prix Circuit (IIgs)</description>
+		<description>Grand Prix Circuit</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-11"/>
@@ -494,7 +494,7 @@ license:CC0
 	</software>
 
 	<software name="crystqst">
-		<description>Crystal Quest (IIgs)</description>
+		<description>Crystal Quest</description>
 		<year>1989</year>
 		<publisher>Cassidy and Greene</publisher>
 		<info name="release" value="2021-05-11"/>
@@ -511,7 +511,7 @@ license:CC0
 	</software>
 
 	<software name="impmsn2">
-		<description>Impossible Mission II (IIgs)</description>
+		<description>Impossible Mission II</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-11"/>
@@ -528,7 +528,7 @@ license:CC0
 	</software>
 
 	<software name="lstninja">
-		<description>The Last Ninja (IIgs)</description>
+		<description>The Last Ninja</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2021-05-11"/>
@@ -545,7 +545,7 @@ license:CC0
 	</software>
 
 	<software name="redoct">
-		<description>The Hunt for Red October (IIgs)</description>
+		<description>The Hunt for Red October</description>
 		<year>1989</year>
 		<publisher>The Software Toolworks</publisher>
 		<info name="release" value="2021-05-18"/>
@@ -561,7 +561,7 @@ license:CC0
 	</software>
 
 	<software name="fnlasslt">
-		<description>Final Assault (IIgs)</description>
+		<description>Final Assault</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-18"/>
@@ -577,7 +577,7 @@ license:CC0
 	</software>
 
 	<software name="darkcast">
-		<description>Dark Castle (IIgs)</description>
+		<description>Dark Castle</description>
 		<year>1989</year>
 		<publisher>Three Sixty</publisher>
 		<info name="release" value="2021-05-18"/>
@@ -600,7 +600,7 @@ license:CC0
 	</software>
 
 	<software name="silsrv">
-		<description>Silent Service (IIgs)</description>
+		<description>Silent Service</description>
 		<year>1987</year>
 		<publisher>Microprose</publisher>
 		<info name="release" value="2021-05-18"/>
@@ -616,7 +616,7 @@ license:CC0
 	</software>
 
 	<software name="gate">
-		<description>GATE (IIgs)</description>
+		<description>GATE</description>
 		<year>1992</year>
 		<publisher>Seven Hills Software</publisher>
 		<info name="release" value="2021-05-18"/>
@@ -639,7 +639,7 @@ license:CC0
 	</software>
 
 	<software name="balpowgs">
-		<description>Balance of Power: The 1990 Edition (IIgs)</description>
+		<description>Balance of Power: The 1990 Edition</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -655,7 +655,7 @@ license:CC0
 	</software>
 
 	<software name="brdg62gs">
-		<description>Bridge 6.0 (Version 2.49B) (IIgs)</description>
+		<description>Bridge 6.0 (Version 2.49B)</description>
 		<year>1989</year>
 		<publisher>Artworx</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -671,7 +671,7 @@ license:CC0
 	</software>
 
 	<software name="qstrn2gs">
-		<description>Questron II (Version 1.1) (IIgs)</description>
+		<description>Questron II (Version 1.1)</description>
 		<year>1988</year>
 		<publisher>Strategic Simulations</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -687,7 +687,7 @@ license:CC0
 	</software>
 
 	<software name="rchst2gs">
-		<description>Reach for the Stars (IIgs)</description>
+		<description>Reach for the Stars</description>
 		<year>1988</year>
 		<publisher>Strategic Studies Group</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -703,7 +703,7 @@ license:CC0
 	</software>
 
 	<software name="rwar2kgs">
-		<description>Roadwar 2000 (IIgs)</description>
+		<description>Roadwar 2000</description>
 		<year>1987</year>
 		<publisher>Strategic Simulations</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -719,7 +719,7 @@ license:CC0
 	</software>
 
 	<software name="siceh2gs">
-		<description>Superstar Ice Hockey (IIgs)</description>
+		<description>Superstar Ice Hockey</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -735,7 +735,7 @@ license:CC0
 	</software>
 
 	<software name="lfdth2gs">
-		<description>Life and Death (IIgs)</description>
+		<description>Life and Death</description>
 		<year>1989</year>
 		<publisher>The Software Toolworks</publisher>
 		<info name="release" value="2021-05-24"/>
@@ -758,7 +758,7 @@ license:CC0
 	</software>
 
 	<software name="tetrisgs">
-		<description>Tetris (IIgs)</description>
+		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>Spectrum HoloByte</publisher>
 		<info name="release" value="2021-05-29"/>
@@ -774,7 +774,7 @@ license:CC0
 	</software>
 
 	<software name="lasfrcgs">
-		<description>LaserForce (IIgs)</description>
+		<description>LaserForce</description>
 		<year>1989</year>
 		<publisher>Fanfare</publisher>
 		<info name="release" value="2021-05-24"/>
@@ -797,7 +797,7 @@ license:CC0
 	</software>
 
 	<software name="ark22gs">
-		<description>Arkanoid II: Revenge of Doh (IIgs)</description>
+		<description>Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
 		<info name="release" value="2021-05-26"/>
@@ -813,7 +813,7 @@ license:CC0
 	</software>
 
 	<software name="bublg2gs">
-		<description>Bubble Ghost (IIgs)</description>
+		<description>Bubble Ghost</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-26"/>
@@ -829,7 +829,7 @@ license:CC0
 	</software>
 
 	<software name="dejav2gs">
-		<description>Déjà Vu (IIgs)</description>
+		<description>Déjà Vu</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
 		<info name="release" value="2021-05-26"/>
@@ -852,7 +852,7 @@ license:CC0
 	</software>
 
 	<software name="hack22gs">
-		<description>Hacker II (IIgs)</description>
+		<description>Hacker II</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2021-05-26"/>
@@ -868,7 +868,7 @@ license:CC0
 	</software>
 
 	<software name="destr2gs">
-		<description>Destroyer (IIgs)</description>
+		<description>Destroyer</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -884,7 +884,7 @@ license:CC0
 	</software>
 
 	<software name="gbabskgs">
-		<description>GBA Championship Basketball (IIgs)</description>
+		<description>GBA Championship Basketball</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -900,7 +900,7 @@ license:CC0
 	</software>
 
 	<software name="jigs2gs">
-		<description>Jigsaw (IIgs)</description>
+		<description>Jigsaw</description>
 		<year>1988</year>
 		<publisher>Britannica Software</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -923,7 +923,7 @@ license:CC0
 	</software>
 
 	<software name="minip2gs">
-		<description>Mini-Putt (IIgs)</description>
+		<description>Mini-Putt</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -939,7 +939,7 @@ license:CC0
 	</software>
 
 	<software name="omga2gs">
-		<description>Omega (IIgs)</description>
+		<description>Omega</description>
 		<year>1988</year>
 		<publisher>Origin Systems</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -955,7 +955,7 @@ license:CC0
 	</software>
 
 	<software name="pnx146gs">
-		<description>Photonix (Version 1.46) (IIgs)</description>
+		<description>Photonix (Version 1.46)</description>
 		<year>1989</year>
 		<publisher>Free Tools Association</publisher>
 		<info name="release" value="2021-05-30"/>
@@ -971,7 +971,7 @@ license:CC0
 	</software>
 
 	<software name="silph2hs">
-		<description>Silpheed (IIgs)</description>
+		<description>Silpheed</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -994,7 +994,7 @@ license:CC0
 	</software>
 
 	<software name="sq12gs">
-		<description>Space Quest (IIgs)</description>
+		<description>Space Quest</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1017,7 +1017,7 @@ license:CC0
 	</software>
 
 	<software name="3rdc2gs">
-		<description>The Third Courier (IIgs)</description>
+		<description>The Third Courier</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1040,7 +1040,7 @@ license:CC0
 	</software>
 
 	<software name="warmdegs">
-		<description>War in Middle Earth (IIgs)</description>
+		<description>War in Middle Earth</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1063,7 +1063,7 @@ license:CC0
 	</software>
 
 	<software name="cswld2gs">
-		<description>Where in the World is Carmen Sandiego? (IIgs)</description>
+		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1086,7 +1086,7 @@ license:CC0
 	</software>
 
 	<software name="wndwk2gs">
-		<description>Windwalker (IIgs)</description>
+		<description>Windwalker</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1109,7 +1109,7 @@ license:CC0
 	</software>
 
 	<software name="warlk2gs">
-		<description>Warlock (IIgs)</description>
+		<description>Warlock</description>
 		<year>1988</year>
 		<publisher>Three-Sixty Pacific</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1125,7 +1125,7 @@ license:CC0
 	</software>
 
 	<software name="wntg2gs">
-		<description>Winter Games (IIgs)</description>
+		<description>Winter Games</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1141,7 +1141,7 @@ license:CC0
 	</software>
 
 	<software name="shngh2gs">
-		<description>Shanghai (IIgs)</description>
+		<description>Shanghai</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1157,7 +1157,7 @@ license:CC0
 	</software>
 
 	<software name="pq12gs">
-		<description>Police Quest (IIgs)</description>
+		<description>Police Quest</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1180,7 +1180,7 @@ license:CC0
 	</software>
 
 	<software name="drgwr2gs">
-		<description>Dragon Wars (IIgs)</description>
+		<description>Dragon Wars</description>
 		<year>1990</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="release" value="2021-05-30"/>
@@ -1196,7 +1196,7 @@ license:CC0
 	</software>
 
 	<software name="monte2gs">
-		<description>Monte Carlo (IIgs)</description>
+		<description>Monte Carlo</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1212,7 +1212,7 @@ license:CC0
 	</software>
 
 	<software name="sbsim2gs">
-		<description>Sub Battle Simulator (IIgs)</description>
+		<description>Sub Battle Simulator</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1228,7 +1228,7 @@ license:CC0
 	</software>
 
 	<software name="jeqrt2gs">
-		<description>John Elway's Quarterback (IIgs)</description>
+		<description>John Elway's Quarterback</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<info name="release" value="2021-05-27"/>
@@ -1244,7 +1244,7 @@ license:CC0
 	</software>
 
 	<software name="sq22gs">
-		<description>Space Quest II (IIgs)</description>
+		<description>Space Quest II</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1267,7 +1267,7 @@ license:CC0
 	</software>
 
 	<software name="kq32gs">
-		<description>King's Quest III (IIgs)</description>
+		<description>King's Quest III</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1290,7 +1290,7 @@ license:CC0
 	</software>
 
 	<software name="gwsht2gs">
-		<description>Great Western Shootout (IIgs)</description>
+		<description>Great Western Shootout</description>
 		<year>1989</year>
 		<publisher>Britannica Software</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1313,7 +1313,7 @@ license:CC0
 	</software>
 
 	<software name="lsl12gs">
-		<description>Leisure Suit Larry in the Land of the Lounge Lizards (IIgs)</description>
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1336,7 +1336,7 @@ license:CC0
 	</software>
 
 	<software name="blkc2gs">
-		<description>The Black Cauldron (IIgs)</description>
+		<description>The Black Cauldron</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1359,7 +1359,7 @@ license:CC0
 	</software>
 
 	<software name="kngc2gs">
-		<description>The King of Chicago (IIgs)</description>
+		<description>The King of Chicago</description>
 		<year>1988</year>
 		<publisher>Cinemaware</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1380,7 +1380,7 @@ license:CC0
 	</software>
 
 	<software name="kq42gs">
-		<description>King's Quest IV: The Perils of Rosella (IIgs)</description>
+		<description>King's Quest IV: The Perils of Rosella</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="release" value="2021-05-28"/>
@@ -1404,6 +1404,388 @@ license:CC0
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1296374">
 				<rom name="king's quest iv iigs - disk 3.woz" size="1296374" crc="65f8435a" sha1="e20ba8c160e6609efa9d3576bef83c798dd2c436"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="ss1beynd">
+		<description>Star Saga: One - Beyond The Boundary (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>Masterplay Publishing Corporation</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Star Saga: One - Beyond The Boundary" is a 1987 roleplaying game developed by Richard Dutton, Walter Freitag, Andrew C. Greenberg, and Michael Massimilla, and distributed by Masterplay Publishing Corporation. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296274">
+				<rom name="star saga one iigs.woz" size="1296274" crc="e96de728" sha1="d00257002b10a75f5418e53bf96aa33df914cd2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="dejavu2">
+		<description>Déjà Vu II: Lost in Las Vegas</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Déjà Vu II: Lost in Las Vegas" is a 1989 adventure game developed by Fred Allen, David Marsh, Michael Manning, Todd Squires, David Feldman, Paul Snively, Brian Baker, Karl Roelofs, Ed Dluzen, Darin Adler, Jay Zipnick, Waldemar Horwat, Julia Ulano, Tod Zipnick, and Mitch Adler, and distributed by Mindscape. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361905">
+				<rom name="deja vu ii lost in last vegas iigs.woz" size="1361905" crc="55d9e932" sha1="9a82f93d0a200435f05d0b1a0a9d37d4c1978c20"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="twrmyra">
+		<description>The Tower of Myraglen</description>
+		<year>1987</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"The Tower of Myraglen" is a 1987 roleplaying game developed by Richard L. Seaborne and Jeff A. Lamberts, and distributed by PBI Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Start-up disk"/>
+			<dataarea name="flop" size="1296187">
+				<rom name="the tower of myraglen iigs - disk 1 - start-up disk.woz" size="1296187" crc="9a571c95" sha1="359abb5dfd1150d129e90c95e501f2c89c17b62e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1345338">
+				<rom name="the tower of myraglen iigs - disk 2 - program disk.woz" size="1345338" crc="1e3a010b" sha1="a264a9be38d8ea804beea4d6b547ee25304af9df"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="dwnhillc">
+		<description>Downhill Challenge</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Downhill Challenge" is a 1989 sports game designed by Christian Bertrand, ported to the Apple IIgs by Jean Claude Levy, and distributed by Broderbund Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="1296205">
+				<rom name="downhill challenge iigs - disk 1 - system disk.woz" size="1296205" crc="ddcad7bf" sha1="6f56149da5cd8ca3f7a3ec7032a5278311e4d1ed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Game disk"/>
+			<dataarea name="flop" size="1296203">
+				<rom name="downhill challenge iigs - disk 2 - game disk.woz" size="1296203" crc="ffa192ba" sha1="3fef37aa6d9aa8fdba0df6e6cb5b2a8668eca0bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="wtgolf">
+		<description>World Tour Golf</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"World Tour Golf" is a 1987 sports game developed by Evan and Nicky Robinson and Paul Reiche III, ported to the Apple IIgs by John Selhorst, and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296185">
+				<rom name="world tour golf iigs.woz" size="1296185" crc="b3f3f81d" sha1="1b5b86f72a9219c07c6a421450e1bb900c81ca55"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="vegasgmb">
+		<description>Vegas Gambler</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Vegas Gambler" is a 1988 simulation game developed by Marek Jackiewicz, Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345393">
+				<rom name="vegas gambler iigs.woz" size="1345393" crc="22e59934" sha1="be3ebd77211d45f6169e21e09c26ee4359ca0398"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="chsm2100">
+		<description>The Fidelity Chessmaster 2100</description>
+		<year>1988</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Fidelity Chessmaster 2100" is a 1988 board game developed by Troy Heere and Mark Manyen, and distributed by The Software Toolworks. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296183">
+				<rom name="the fidelity chessmaster 2100 iigs - disk 1.woz" size="1296183" crc="281e93dc" sha1="2246f45d7deb3414c1bdcbad5d0b4f77a9db52d3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296183">
+				<rom name="the fidelity chessmaster 2100 iigs - disk 2.woz" size="1296183" crc="0c4704bc" sha1="d2ea3f4fbb3cf1127c23bb1ebd32fd3adef049f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="spaceace">
+		<description>Space Ace</description>
+		<year>1990</year>
+		<publisher>ReadySoft</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Space Ace" is a 1990 action game developed by David Foster, Simon Douglas, Jorge Freitas, Hugh MacLeod, Murray Foster, Laurie Williams, Adam Wolk, Michael Griffith, Peter Bayes, David Dimatteo, Sue McComb, and Joanne Ashdown, and distributed by ReadySoft. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 1.woz" size="1296303" crc="c9b1d81c" sha1="01d0768fea8f9f2f6fb198ec75cf64382eaaeed7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 2.woz" size="1296303" crc="213c7969" sha1="4f8c5a803705aa0a8856bd73295357d33277518b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 3.woz" size="1296303" crc="5846b4eb" sha1="2556bdf9afbf627c71c589dea05030e22bb6d736"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 4.woz" size="1296303" crc="852b6729" sha1="cfd808927c36559ba0f30780dacc040c2533e656"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 5.woz" size="1296303" crc="776d76db" sha1="d1979794cbf43d6df3b8ee19abd48af229d52d17"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 6.woz" size="1296303" crc="0ad79c66" sha1="dfe7a77e8bac698f5b582940d5e88c55484e8934"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 7.woz" size="1296303" crc="7a881dee" sha1="ac37a58f8a51482480cfe8f42ec57a0393f50c31"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 8.woz" size="1296303" crc="7eb87bb0" sha1="daa9af77d0e162ba55f3d76d326582d172a135ad"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 9.woz" size="1296303" crc="8f9cbeed" sha1="f478b959ba865feead8d73220805ccfdf7b930e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="arknoid2">
+		<description>Arkanoid</description>
+		<year>1988</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 01. -->
+		<!--"Arkanoid" is a 1988 action game developed by Ryan Ridges and John Lund, and distributed by Taito America. It requires a 512K Apple IIgs ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296671">
+				<rom name="arkanoid iigs.woz" size="1296671" crc="d82eee53" sha1="52914d5c1c05617eac17173de671f09ba7ef3c3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="jackn18g">
+		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Jack Nicklaus' Greatest 18 Holes of Major Championship Golf" is a 1989 sports game developed by Tony Manso and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk ~ - Program disk"/>
+			<dataarea name="flop" size="1296252">
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf iigs - disk 1 - program disk.woz" size="1296252" crc="42a132b9" sha1="ba9a7d0f8865b990b4c01d9b44fa82fe067f275e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Course disk"/>
+			<dataarea name="flop" size="1296251">
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf iigs - disk 2 - course disk.woz" size="1296251" crc="668bfa15" sha1="1b50bcfd3eeee7a0730f789bcda75530941c3770"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hostager">
+		<description>Hostage: Rescue Mission</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Hostage: Rescue Mission" is a 1990 simulation game developed by Infogrames and distributed by Mindscape. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361742">
+				<rom name="hostage- rescue mission iigs.woz" size="1361742" crc="e094007a" sha1="14ee3d0863bcb7170ba1bdab21876687f4ce619a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="capblood">
+		<description>Captain Blood</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Captain Blood" is a 1989 simulation game developed by Philippe Ulrich, Didier Bouchon, Jean-Michel Jarre, Alexis Martial, and Michael Rho, and distributed by Mindscape. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361758">
+				<rom name="captain blood iigs.woz" size="1361758" crc="45d2ab10" sha1="7f968e1704c2a969a33cf7a07c81629c12c7577d"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="crmnsusa">
+		<description>Where in the U.S.A. is Carmen Sandiego?</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Where in the U.S.A. is Carmen Sandiego?" is a 1989 educational game developed by Gene Portwood, Lauren Elliot, Peter Adams, Leila Bronstein, Julie Glavin, Michelle McBride, Dan Guerra, Les Pardue, Bevan Hulfenstein, Louis Evans, and Tom Rettig, and distributed by Broderbund Software. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296338">
+				<rom name="where in the u.s.a. is carmen sandiego iigs - disk 1.woz" size="1296338" crc="ca473b90" sha1="a48d9112106def7b6deed7146522152fb483bad0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296369">
+				<rom name="where in the u.s.a. is carmen sandiego iigs - disk 2.woz" size="1296369" crc="d150ccbb" sha1="3dbbfd2a1b14ded3bc6f307a32d9a003882305b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="brdstlun">
+		<description>The Bard's Tale: Tales of the Unknown</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Bard's Tale: Tales of the Unknown" is a 1987 roleplaying game developed by Rebecca Heineman and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296709">
+				<rom name="the bard's tale iigs.woz" size="1296709" crc="1b451e17" sha1="d41c827b989d73f32615e49904ecf93638e81625"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="neuromnc">
+		<description>Neuromancer</description>
+		<year>1989</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Neuromancer" is a 1989 adventure game developed by Rebecca Heineman and distributed by Interplay Productions. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345288">
+				<rom name="neuromancer iigs.woz" size="1345288" crc="6d21fbf3" sha1="2f461215cd9331a0a87a61b1497b92d08f64589d"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="drmzone">
+		<description>Dream Zone</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Dream Zone" is a 1987 adventure game developed by Andy Gavin, Jason Rubin, and Sarah Sidman, and distributed by Baudville. This is version 3.2. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296189">
+				<rom name="dream zone iigs - disk 1.woz" size="1296189" crc="05e8fc0d" sha1="17e950d8bb6c7f2119c0c6f41d17f4287056180e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296189">
+				<rom name="dream zone iigs - disk 2.woz" size="1296189" crc="73d7952e" sha1="379575a78e2ae4594793738c9b71b250ba67cf17"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="manhny">
+		<description>Manhunter: New York</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Manhunter: New York" is a 1987 adventure game developed by Dave Murry, Barry Murry, Dee Dee Murry, Jeff Stephenson, Chris Iden, Bob Heitman, Carlos Escobar, and Dr. Gary and Julie Stonedahl, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 1.woz" size="1345384" crc="8862c002" sha1="064b29d944f02fce20e407c451d435365a8fe0fb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 2.woz" size="1345384" crc="f17f2cfa" sha1="0d915aec7f33375d8ba46c1c4419d8986a6360b0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 3.woz" size="1345384" crc="bd448818" sha1="dcc058c912d3a291ede35a2b99ca59519f47d0c9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 4.woz" size="1345384" crc="660c6483" sha1="21aca32e5fb3fa843ca660de8c6a3354df99106a"/>
 			</dataarea>
 		</part>
 	</software>
