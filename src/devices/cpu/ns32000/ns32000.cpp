@@ -788,1696 +788,850 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 		try
 		{
-		if (m_nmi_line)
-		{
-			// acknowledge interrupt and discard vector
-			mem_read<u8>(ST_IAM, 0xffff00);
-			m_nmi_line = false;
-
-			// service interrupt
-			interrupt(NMI, m_pc, false);
-
-			// notify the debugger
-			if (machine().debug_enabled())
-				debug()->interrupt_hook(INPUT_LINE_NMI);
-		}
-		else if (m_int_line && (m_psr & PSR_I))
-		{
-			// acknowledge interrupt and read vector
-			s8 vector = mem_read<u8>(ST_IAM, 0xfffe00);
-
-			// check for vectored mode
-			if (m_cfg & CFG_I)
+			if (m_nmi_line)
 			{
-				if (vector < 0 && vector >= -16)
-				{
-					// vectored mode, cascaded
-					u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
+				// acknowledge interrupt and discard vector
+				mem_read<u8>(ST_IAM, 0xffff00);
+				m_nmi_line = false;
 
-					vector = mem_read<u8>(ST_IAC, cascade);
+				// service interrupt
+				interrupt(NMI, m_pc, false);
+
+				// notify the debugger
+				if (machine().debug_enabled())
+					debug()->interrupt_hook(INPUT_LINE_NMI);
+			}
+			else if (m_int_line && (m_psr & PSR_I))
+			{
+				// acknowledge interrupt and read vector
+				s8 vector = mem_read<u8>(ST_IAM, 0xfffe00);
+
+				// check for vectored mode
+				if (m_cfg & CFG_I)
+				{
+					if (vector < 0 && vector >= -16)
+					{
+						// vectored mode, cascaded
+						u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
+
+						vector = mem_read<u8>(ST_IAC, cascade);
+					}
 				}
+				else
+					// non-vectored mode
+					vector = NVI;
+
+				// service interrupt
+				interrupt(vector, m_pc, false);
+
+				// notify the debugger
+				if (machine().debug_enabled())
+					debug()->interrupt_hook(INPUT_LINE_IRQ0);
 			}
+
+			// update trace pending
+			if (m_psr & PSR_T)
+				m_psr |= PSR_P;
 			else
-				// non-vectored mode
-				vector = NVI;
+				m_psr &= ~PSR_P;
 
-			// service interrupt
-			interrupt(vector, m_pc, false);
+			debugger_instruction_hook(m_pc);
 
-			// notify the debugger
-			if (machine().debug_enabled())
-				debug()->interrupt_hook(INPUT_LINE_IRQ0);
-		}
+			// save state
+			m_ssp = SP;
+			m_sps = m_psr;
 
-		// update trace pending
-		if (m_psr & PSR_T)
-			m_psr |= PSR_P;
-		else
-			m_psr &= ~PSR_P;
+			unsigned bytes = 0;
+			u8 const opbyte = fetch<u8>(bytes);
+			unsigned tex = 1;
 
-		debugger_instruction_hook(m_pc);
-
-		// save state
-		m_ssp = SP;
-		m_sps = m_psr;
-
-		unsigned bytes = 0;
-		u8 const opbyte = fetch<u8>(bytes);
-		unsigned tex = 1;
-
-		if ((opbyte & 15) == 10)
-		{
-			// format 0: cccc 1010
-			// Bcond dst
-			//       disp
-			s32 const dst = displacement(bytes);
-
-			if (condition(BIT(opbyte, 4, 4)))
+			if ((opbyte & 15) == 10)
 			{
-				m_pc += dst;
-				m_sequential = false;
-				tex = 6;
-			}
-			else
-				tex = 7;
-		}
-		else if ((opbyte & 15) == 2)
-		{
-			// format 1: oooo 0010
-			switch (BIT(opbyte, 4, 4))
-			{
-			case 0x0:
-				// BSR dst
-				//     disp
+				// format 0: cccc 1010
+				// Bcond dst
+				//       disp
+				s32 const dst = displacement(bytes);
+
+				if (condition(BIT(opbyte, 4, 4)))
 				{
-					s32 const dst = displacement(bytes);
-
-					SP -= 4;
-					mem_write<u32>(ST_ODT, SP, m_pc + bytes);
-
 					m_pc += dst;
 					m_sequential = false;
-					tex = top(SIZE_D, SP) + 6;
-				}
-				break;
-			case 0x1:
-				// RET constant
-				//     disp
-				{
-					s32 const constant = displacement(bytes);
-
-					u32 const addr = mem_read<u32>(ST_ODT, SP);
-					SP += 4;
-
-					m_pc = addr;
-					m_sequential = false;
-					tex = top(SIZE_D, SP) + 2;
-					SP += constant;
-				}
-				break;
-			case 0x2:
-				// CXP index
-				//     disp
-				{
-					s32 const index = displacement(bytes);
-
-					u32 const link_base = mem_read<u32>(ST_ODT, m_mod + 4);
-					u16 const dlo = mem_read<u16>(ST_ODT, link_base + index * 4 + 0);
-					u16 const dhi = mem_read<u16>(ST_ODT, link_base + index * 4 + 2);
-
-					SP -= 4;
-					mem_write<u16>(ST_ODT, SP, m_mod);
-					SP -= 4;
-					mem_write<u32>(ST_ODT, SP, m_pc + bytes);
-
-					tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, dlo) * 2 + 16;
-
-					m_mod = dlo;
-					m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-					m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + dhi;
-					m_sequential = false;
-				}
-				break;
-			case 0x3:
-				// RXP constant
-				//     disp
-				{
-					s32 const constant = displacement(bytes);
-
-					m_pc = mem_read<u32>(ST_ODT, SP);
-					SP += 4;
-					m_mod = mem_read<u16>(ST_ODT, SP);
-					SP += 4;
-
-					m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-					tex = top(SIZE_D, SP) + top(SIZE_W, SP) + top(SIZE_D, SP) + 2;
-					SP += constant;
-					m_sequential = false;
-				}
-				break;
-			case 0x4:
-				// RETT constant
-				//      disp
-				if (!(m_psr & PSR_U))
-				{
-					s32 const constant = displacement(bytes);
-
-					u32 &sp(SP);
-					m_pc = mem_read<u32>(ST_ODT, sp);
-					sp += 4;
-					m_mod = mem_read<u16>(ST_ODT, sp);
-					sp += 2;
-					m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
-					sp += 2;
-
-					m_sb = mem_read<u32>(ST_ODT, m_mod);
-
-					SP += constant;
-					m_sequential = false;
-					tex = top(SIZE_D, sp) + top(SIZE_W, sp) * 2 + top(SIZE_D, m_mod) + 35;
-				}
-				else
-					interrupt(ILL, m_pc);
-				break;
-			case 0x5:
-				// RETI
-				if (!(m_psr & PSR_U))
-				{
-					// end of interrupt, master
-					s8 vector = mem_read<u8>(ST_EIM, 0xfffe00);
-
-					// check for vectored mode
-					if (m_cfg & CFG_I)
-					{
-						if (vector < 0 && vector >= -16)
-						{
-							u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
-
-							// end of interrupt, cascaded
-							vector = mem_read<u8>(ST_EIC, cascade);
-						}
-					}
-
-					u32 &sp(SP);
-					m_pc = mem_read<u32>(ST_ODT, sp);
-					sp += 2;
-					mem_read<u16>(ST_ODT, sp);
-					sp += 2;
-					m_mod = mem_read<u16>(ST_ODT, sp);
-					sp += 2;
-					m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
-					sp += 2;
-
-					m_sb = mem_read<u32>(ST_ODT, m_mod);
-					m_sequential = false;
-
-					tex = top(SIZE_B) + top(SIZE_W) * 3 + top(SIZE_D) * 3 + 39;
-				}
-				else
-					interrupt(ILL, m_pc);
-				break;
-			case 0x6:
-				// SAVE reglist
-				//      imm
-				{
-					u8 const reglist = fetch<u8>(bytes);
-
-					tex = 13;
-					for (unsigned i = 0; i < 8; i++)
-					{
-						if (BIT(reglist, i))
-						{
-							SP -= 4;
-							mem_write<u32>(ST_ODT, SP, m_r[i]);
-							tex += top(SIZE_D, SP) + 4;
-						}
-					}
-				}
-				break;
-			case 0x7:
-				// RESTORE reglist
-				//         imm
-				{
-					u8 const reglist = fetch<u8>(bytes);
-
-					tex = 12;
-					for (unsigned i = 0; i < 8; i++)
-					{
-						if (BIT(reglist, i))
-						{
-							m_r[7 - i] = mem_read<u32>(ST_ODT, SP);
-							tex += top(SIZE_D, SP) + 5;
-							SP += 4;
-						}
-					}
-				}
-				break;
-			case 0x8:
-				// ENTER reglist,constant
-				//       imm,disp
-				{
-					u8 const reglist = fetch<u8>(bytes);
-					s32 const constant = displacement(bytes);
-
-					SP -= 4;
-					mem_write<u32>(ST_ODT, SP, m_fp);
-					tex = top(SIZE_D, SP) + 18;
-					m_fp = SP;
-					SP -= constant;
-
-					for (unsigned i = 0; i < 8; i++)
-					{
-						if (BIT(reglist, i))
-						{
-							SP -= 4;
-							mem_write<u32>(ST_ODT, SP, m_r[i]);
-							tex += top(SIZE_D, SP) + 4;
-						}
-					}
-				}
-				break;
-			case 0x9:
-				// EXIT reglist
-				//      imm
-				{
-					u8 const reglist = fetch<u8>(bytes);
-
-					tex = 17;
-					for (unsigned i = 0; i < 8; i++)
-					{
-						if (BIT(reglist, i))
-						{
-							m_r[7 - i] = mem_read<u32>(ST_ODT, SP);
-							tex += top(SIZE_D, SP) + 5;
-							SP += 4;
-						}
-					}
-					SP = m_fp;
-					m_fp = mem_read<u32>(ST_ODT, SP);
-					tex += top(SIZE_D, SP);
-					SP += 4;
-				}
-				break;
-			case 0xa:
-				// NOP
-				tex = 3;
-				break;
-			case 0xb:
-				// WAIT
-				m_wait = true;
-				tex = 6;
-				break;
-			case 0xc:
-				// DIA
-				tex = 3;
-				m_sequential = false;
-				break;
-			case 0xd:
-				// FLAG
-				if (m_psr & PSR_F)
-				{
-					interrupt(FLG, m_pc);
-					tex = 44;
-				}
-				else
 					tex = 6;
-				break;
-			case 0xe:
-				// SVC
-				interrupt(SVC, m_pc);
-				tex = 40;
-				break;
-			case 0xf:
-				// BPT
-				interrupt(BPT, m_pc);
-				tex = 40;
-				break;
+				}
+				else
+					tex = 7;
 			}
-		}
-		else if ((opbyte & 15) == 12 || (opbyte & 15) == 13 || (opbyte & 15) == 15)
-		{
-			// format 2: gggg gsss sooo 11ii
-			u16 const opword = (u16(fetch<u8>(bytes)) << 8) | opbyte;
-
-			// HACK: use reserved mode for second unused type
-			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
-
-			unsigned const quick = BIT(opword, 7, 4);
-			size_code const size = size_code(opbyte & 3);
-
-			switch (BIT(opbyte, 4, 3))
+			else if ((opbyte & 15) == 2)
 			{
-			case 0:
-				// ADDQi src,dst
-				//       quick,gen
-				//             rmw.i
-				{
-					mode[0].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = s32(quick << 28) >> 28;
-					u32 const src2 = gen_read(mode[0]);
-
-					u32 const dst = src1 + src2;
-					flags(src1, src2, dst, size, false);
-
-					gen_write(mode[0], dst);
-
-					tex = (mode[0].type == REG) ? 4 : mode[0].tea + 6;
-				}
-				break;
-			case 1:
-				// CMPQi src1,src2
-				//       quick,gen
-				//             read.i
-				{
-					mode[0].read_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = (s32(quick << 28) >> 28) & size_mask[size];
-					u32 const src2 = gen_read(mode[0]);
-
-					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
-
-					if ((size == SIZE_D && s32(src1) > s32(src2))
-					|| ((size == SIZE_W && s16(src1) > s16(src2))
-					|| ((size == SIZE_B && s8(src1) > s8(src2)))))
-						m_psr |= PSR_N;
-
-					if (src1 == src2)
-						m_psr |= PSR_Z;
-
-					if ((size == SIZE_D && u32(src1) > u32(src2))
-					|| ((size == SIZE_W && u16(src1) > u16(src2))
-					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
-						m_psr |= PSR_L;
-
-					tex = (mode[0].type == REG) ? 3 : mode[0].tea + 3;
-				}
-				break;
-			case 2:
-				// SPRi procreg,dst
-				//      short,gen
-				//            write.i
-				mode[0].write_i(size);
-				decode(mode, bytes);
-
-				switch (quick)
-				{
-				case 0x0: // UPSR
-					gen_write(mode[0], u8(m_psr));
-					break;
-				case 0x8: // FP
-					gen_write(mode[0], m_fp);
-					break;
-				case 0x9: // SP
-					gen_write(mode[0], SP);
-					break;
-				case 0xa: // SB
-					gen_write(mode[0], m_sb);
-					break;
-				case 0xd: // PSR
-					if (!(m_psr & PSR_U))
-						gen_write(mode[0], m_psr);
-					else
-						interrupt(ILL, m_pc);
-					break;
-				case 0xe: // INTBASE
-					if (!(m_psr & PSR_U))
-						gen_write(mode[0], m_intbase);
-					else
-						interrupt(ILL, m_pc);
-					break;
-				case 0xf: // MOD
-					gen_write(mode[0], m_mod);
-					break;
-				}
-
-				// TODO: tcy 21-27
-				tex = mode[0].tea + 21;
-				break;
-			case 3:
-				// Scondi dst
-				//        gen
-				//        write.i
-				{
-					mode[0].write_i(size);
-					decode(mode, bytes);
-
-					bool const dst = condition(quick);
-					gen_write(mode[0], dst);
-
-					tex = mode[0].tea + (dst ? 10 : 9);
-				}
-				break;
-			case 4:
-				// ACBi inc,index,dst
-				//      quick,gen,disp
-				//            rmw.i
-				{
-					mode[0].rmw_i(size);
-					decode(mode, bytes);
-
-					s32 const inc = s32(quick << 28) >> 28;
-					u32 index = gen_read(mode[0]);
-					s32 const dst = displacement(bytes);
-
-					index += inc;
-					gen_write(mode[0], index);
-
-					if (index & size_mask[size])
-					{
-						m_pc += dst;
-						m_sequential = false;
-
-						tex = (mode[0].type == REG) ? 17 : mode[0].tea + 15;
-					}
-					else
-						tex = (mode[0].type == REG) ? 18 : mode[0].tea + 16;
-				}
-				break;
-			case 5:
-				// MOVQi src,dst
-				//       quick,gen
-				//             write.i
-				mode[0].write_i(size);
-				decode(mode, bytes);
-
-				gen_write(mode[0], s32(quick << 28) >> 28);
-
-				tex = (mode[0].type == REG) ? 3 : mode[0].tea + 2;
-				break;
-			case 6:
-				// LPRi procreg,src
-				//      short,gen
-				//            read.i
-				mode[0].read_i(size);
-				decode(mode, bytes);
-
-				switch (quick)
-				{
-				case 0x0: // UPSR
-					m_psr = ((m_psr & 0xff00) | u8(gen_read(mode[0]))) & PSR_MSK;
-					break;
-				case 0x8: // FP
-					m_fp = gen_read(mode[0]);
-					break;
-				case 0x9: // SP
-					SP = gen_read(mode[0]);
-					break;
-				case 0xa: // SB
-					m_sb = gen_read(mode[0]);
-					break;
-				case 0xd: // PSR
-					if (!(m_psr & PSR_U))
-					{
-						u32 const src = gen_read(mode[0]);
-
-						if (size == SIZE_B)
-							m_psr = ((m_psr & 0xff00) | u8(src)) & PSR_MSK;
-						else
-							m_psr = src & PSR_MSK;
-					}
-					else
-						interrupt(ILL, m_pc);
-					break;
-				case 0xe: // INTBASE
-					if (!(m_psr & PSR_U))
-						m_intbase = gen_read(mode[0]);
-					else
-						interrupt(ILL, m_pc);
-					break;
-				case 0xf: // MOD
-					m_mod = gen_read(mode[0]);
-					break;
-				default:
-					interrupt(UND, m_pc);
-					break;
-				}
-
-				// TODO: tcy 19-33
-				tex = mode[0].tea + 19;
-				break;
-			case 7:
-				// format 3: gggg gooo o111 11ii
-				switch (BIT(opword, 7, 4))
+				// format 1: oooo 0010
+				switch (BIT(opbyte, 4, 4))
 				{
 				case 0x0:
-					// CXPD desc
-					//      gen
-					//      addr
-					if (size == SIZE_D)
+					// BSR dst
+					//     disp
 					{
-						mode[0].addr();
-						decode(mode, bytes);
+						s32 const dst = displacement(bytes);
 
-						u32 const address = ea(mode[0]);
+						SP -= 4;
+						mem_write<u32>(ST_ODT, SP, m_pc + bytes);
+
+						m_pc += dst;
+						m_sequential = false;
+						tex = top(SIZE_D, SP) + 6;
+					}
+					break;
+				case 0x1:
+					// RET constant
+					//     disp
+					{
+						s32 const constant = displacement(bytes);
+
+						u32 const addr = mem_read<u32>(ST_ODT, SP);
+						SP += 4;
+
+						m_pc = addr;
+						m_sequential = false;
+						tex = top(SIZE_D, SP) + 2;
+						SP += constant;
+					}
+					break;
+				case 0x2:
+					// CXP index
+					//     disp
+					{
+						s32 const index = displacement(bytes);
+
+						u32 const link_base = mem_read<u32>(ST_ODT, m_mod + 4);
+						u16 const dlo = mem_read<u16>(ST_ODT, link_base + index * 4 + 0);
+						u16 const dhi = mem_read<u16>(ST_ODT, link_base + index * 4 + 2);
 
 						SP -= 4;
 						mem_write<u16>(ST_ODT, SP, m_mod);
 						SP -= 4;
 						mem_write<u32>(ST_ODT, SP, m_pc + bytes);
 
-						m_mod = mem_read<u16>(ST_ODT, address + 0);
-						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
-						m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + mem_read<u16>(ST_ODT, address + 2);
+						tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, dlo) * 2 + 16;
 
-						tex = mode[0].tea + top(SIZE_W, address) * 3 + top(SIZE_D, m_mod) * 3 + 13;
+						m_mod = dlo;
+						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
+						m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + dhi;
 						m_sequential = false;
 					}
-					else
-						interrupt(UND, m_pc);
 					break;
-				case 0x2:
-					// BICPSRi src
-					//         gen
-					//         read.[BW]
-					if (size == SIZE_B || size == SIZE_W)
+				case 0x3:
+					// RXP constant
+					//     disp
 					{
-						mode[0].read_i(size);
-						decode(mode, bytes);
+						s32 const constant = displacement(bytes);
 
-						if (size == SIZE_B || !(m_psr & PSR_U))
-						{
-							u16 const src = gen_read(mode[0]);
+						m_pc = mem_read<u32>(ST_ODT, SP);
+						SP += 4;
+						m_mod = mem_read<u16>(ST_ODT, SP);
+						SP += 4;
 
-							m_psr &= ~src;
-
-							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
-						}
-						else
-							interrupt(ILL, m_pc);
+						m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
+						tex = top(SIZE_D, SP) + top(SIZE_W, SP) + top(SIZE_D, SP) + 2;
+						SP += constant;
+						m_sequential = false;
 					}
-					else
-						interrupt(UND, m_pc);
 					break;
 				case 0x4:
-					// JUMP dst
-					//      gen
-					//      addr
-					if (size == SIZE_D)
-					{
-						mode[0].addr();
-						decode(mode, bytes);
-
-						m_pc = ea(mode[0]);
-						m_sequential = false;
-
-						tex = mode[0].tea + 2;
-					}
-					else
-						interrupt(UND, m_pc);
-					break;
-				case 0x6:
-					// BISPSRi src
-					//         gen
-					//         read.[BW]
-					if (size == SIZE_B || size == SIZE_W)
-					{
-						mode[0].read_i(size);
-						decode(mode, bytes);
-
-						if (size == SIZE_B || !(m_psr & PSR_U))
-						{
-							u16 const src = gen_read(mode[0]);
-
-							m_psr |= src & PSR_MSK;
-
-							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
-						}
-						else
-							interrupt(ILL, m_pc);
-					}
-					else
-						interrupt(UND, m_pc);
-					break;
-				case 0xa:
-					// ADJSPi src
-					//        gen
-					//        read.i
-					{
-						mode[0].read_i(size);
-						decode(mode, bytes);
-
-						s32 const src = gen_read_sx(mode[0]);
-
-						SP -= src;
-
-						tex = mode[0].tea + 6;
-					}
-					break;
-				case 0xc:
-					// JSR dst
-					//     gen
-					//     addr
-					if (size == SIZE_D)
-					{
-						mode[0].addr();
-						decode(mode, bytes);
-
-						SP -= 4;
-						mem_write<u32>(ST_ODT, SP, m_pc + bytes);
-
-						m_pc = ea(mode[0]);
-						m_sequential = false;
-
-						// TODO: where does the TOPi come from?
-						tex = mode[0].tea + top(SIZE_D, SP) + top(size) + 5;
-					}
-					else
-						interrupt(UND, m_pc);
-					break;
-				case 0xe:
-					// CASEi src
-					//       gen
-					//       read.i
-					{
-						mode[0].read_i(size);
-						decode(mode, bytes);
-
-						s32 const src = gen_read_sx(mode[0]);
-
-						m_pc += src;
-						m_sequential = false;
-
-						tex = mode[0].tea + 4;
-					}
-					break;
-				default:
-					interrupt(UND, m_pc);
-					break;
-				}
-				break;
-			}
-		}
-		else if ((opbyte & 3) != 2)
-		{
-			// format 4: xxxx xyyy yyoo ooii
-			u16 const opword = (u16(fetch<u8>(bytes)) << 8) | opbyte;
-
-			addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-			size_code const size = size_code(opbyte & 3);
-
-			switch (BIT(opbyte, 2, 4))
-			{
-			case 0x0:
-				// ADDi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = gen_read(mode[0]);
-					u32 const src2 = gen_read(mode[1]);
-
-					u32 const dst = src1 + src2;
-					flags(src1, src2, dst, size, false);
-
-					gen_write(mode[1], dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0x1:
-				// CMPi src1,src2
-				//      gen,gen
-				//      read.i,read.i
-				{
-					mode[0].read_i(size);
-					mode[1].read_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = gen_read(mode[0]);
-					u32 const src2 = gen_read(mode[1]);
-
-					m_psr &= ~(PSR_N | PSR_Z | PSR_L);
-
-					if ((size == SIZE_D && s32(src1) > s32(src2))
-					|| ((size == SIZE_W && s16(src1) > s16(src2))
-					|| ((size == SIZE_B && s8(src1) > s8(src2)))))
-						m_psr |= PSR_N;
-
-					if (src1 == src2)
-						m_psr |= PSR_Z;
-
-					if ((size == SIZE_D && u32(src1) > u32(src2))
-					|| ((size == SIZE_W && u16(src1) > u16(src2))
-					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
-						m_psr |= PSR_L;
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 3;
-					else
-						tex = 3;
-				}
-				break;
-			case 0x2:
-				// BICi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src = gen_read(mode[0]);
-					u32 const dst = gen_read(mode[1]);
-
-					gen_write(mode[1], dst & ~src);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0x4:
-				// ADDCi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = gen_read(mode[0]);
-					u32 const src2 = gen_read(mode[1]);
-
-					u32 const dst = src1 + src2 + (m_psr & PSR_C);
-					flags(src1, src2, dst, size, false);
-
-					gen_write(mode[1], dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0x5:
-				// MOVi src,dst
-				//      gen,gen
-				//      read.i,write.i
-				{
-					mode[0].read_i(size);
-					mode[1].write_i(size);
-					decode(mode, bytes);
-
-					u32 const src = gen_read(mode[0]);
-
-					gen_write(mode[1], src);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 1;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 3;
-					else
-						tex = 3;
-				}
-				break;
-			case 0x6:
-				// ORi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src = gen_read(mode[0]);
-					u32 const dst = gen_read(mode[1]);
-
-					gen_write(mode[1], src | dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0x8:
-				// SUBi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = gen_read(mode[0]);
-					u32 const src2 = gen_read(mode[1]);
-
-					u32 const dst = src2 - src1;
-					flags(src1, src2, dst, size, true);
-
-					gen_write(mode[1], dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0x9:
-				// ADDR src,dst
-				//      gen,gen
-				//      addr,write.D
-				if (size == SIZE_D)
-				{
-					mode[0].addr();
-					mode[1].write_i(size);
-					decode(mode, bytes);
-
-					gen_write(mode[1], ea(mode[0]));
-
-					tex = (mode[1].type == REG) ? mode[0].tea + 3 : mode[0].tea + mode[1].tea + 2;
-				}
-				else
-					interrupt(UND, m_pc);
-				break;
-			case 0xa:
-				// ANDi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src = gen_read(mode[0]);
-					u32 const dst = gen_read(mode[1]);
-
-					gen_write(mode[1], src & dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0xc:
-				// SUBCi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src1 = gen_read(mode[0]);
-					u32 const src2 = gen_read(mode[1]);
-
-					u32 const dst = src2 - src1 - (m_psr & PSR_C);
-					flags(src1, src2, dst, size, true);
-
-					gen_write(mode[1], dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			case 0xd:
-				// TBITi offset,base
-				//       gen,gen
-				//       read.i,regaddr
-				{
-					mode[0].read_i(size);
-					mode[1].regaddr();
-					decode(mode, bytes);
-
-					s32 const offset = gen_read_sx(mode[0]);
-
-					if (mode[1].type == REG)
-					{
-						if (BIT(m_r[mode[1].gen], offset & 31))
-							m_psr |= PSR_F;
-						else
-							m_psr &= ~PSR_F;
-
-						tex = mode[0].tea + 4;
-					}
-					else
-					{
-						u8 const byte = mem_read<u8>(ST_ODT, ea(mode[1]) + (offset >> 3));
-
-						if (BIT(byte, offset & 7))
-							m_psr |= PSR_F;
-						else
-							m_psr &= ~PSR_F;
-
-						tex = mode[0].tea + mode[1].tea + top(SIZE_B) + 14;
-					}
-				}
-				break;
-			case 0xe:
-				// XORi src,dst
-				//      gen,gen
-				//      read.i,rmw.i
-				{
-					mode[0].read_i(size);
-					mode[1].rmw_i(size);
-					decode(mode, bytes);
-
-					u32 const src = gen_read(mode[0]);
-					u32 const dst = gen_read(mode[1]);
-
-					gen_write(mode[1], src ^ dst);
-
-					if (mode[1].type != REG)
-						tex = mode[0].tea + mode[1].tea + 3;
-					else if (mode[0].type != REG)
-						tex = mode[0].tea + 4;
-					else
-						tex = 4;
-				}
-				break;
-			}
-		}
-		else switch (opbyte)
-		{
-		case 0x0e:
-			// format 5: 0000 0sss s0oo ooii 0000 1110
-			{
-				u16 const opword = fetch<u16>(bytes);
-
-				size_code const size = size_code(opword & 3);
-
-				// string instruction options
-				bool const translate = BIT(opword, 7);
-				bool const backward = BIT(opword, 8);
-				unsigned const uw = BIT(opword, 9, 2);
-
-				switch (BIT(opword, 2, 4))
-				{
-				case 0:
-					// MOVSi options
-					tex = (translate || backward || uw) ? 54 : 18;
-
-					m_psr &= ~PSR_F;
-					while (m_r[0])
-					{
-						u32 data =
-							(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
-							(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
-							mem_read<u8>(ST_ODT, m_r[1]);
-
-						if (translate)
-							data = mem_read<u8>(ST_ODT, m_r[3] + u8(data));
-
-						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 27 : (backward || uw) ? 24 : 13);
-
-						bool const match = !((m_r[4] ^ data) & size_mask[size]);
-						if ((uw == 1 && !match) || (uw == 3 && match))
-						{
-							m_psr |= PSR_F;
-							break;
-						}
-
-						if (size == SIZE_D)
-							mem_write<u32>(ST_ODT, m_r[2], data);
-						else if (size == SIZE_W)
-							mem_write<u16>(ST_ODT, m_r[2], data);
-						else
-							mem_write<u8>(ST_ODT, m_r[2], data);
-
-						tex += top(size, m_r[2]);
-
-						if (backward)
-						{
-							m_r[1] -= size + 1;
-							m_r[2] -= size + 1;
-						}
-						else
-						{
-							m_r[1] += size + 1;
-							m_r[2] += size + 1;
-						}
-
-						m_r[0]--;
-					}
-					break;
-				case 1:
-					// CMPSi options
-					tex = 53;
-
-					m_psr |= PSR_Z;
-					m_psr &= ~(PSR_N | PSR_F | PSR_L);
-					while (m_r[0])
-					{
-						u32 src1 =
-							(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
-							(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
-							mem_read<u8>(ST_ODT, m_r[1]);
-						u32 src2 =
-							(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[2]) :
-							(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[2]) :
-							mem_read<u8>(ST_ODT, m_r[2]);
-
-						if (translate)
-							src1 = mem_read<u8>(ST_ODT, m_r[3] + u8(src1));
-
-						tex += top(size, m_r[1]) + top(size, m_r[2]) + (translate ? top(SIZE_B) + 38 : 35);
-
-						bool const match = !((m_r[4] ^ src1) & size_mask[size]);
-						if ((uw == 1 && !match) || (uw == 3 && match))
-						{
-							m_psr |= PSR_F;
-							break;
-						}
-
-						if (src1 != src2)
-						{
-							m_psr &= ~PSR_Z;
-
-							if ((size == SIZE_D && s32(src1) > s32(src2))
-							|| ((size == SIZE_W && s16(src1) > s16(src2))
-							|| ((size == SIZE_B && s8(src1) > s8(src2)))))
-								m_psr |= PSR_N;
-
-							if ((size == SIZE_D && u32(src1) > u32(src2))
-							|| ((size == SIZE_W && u16(src1) > u16(src2))
-							|| ((size == SIZE_B && u8(src1) > u8(src2)))))
-								m_psr |= PSR_L;
-
-							break;
-						}
-
-						if (backward)
-						{
-							m_r[1] -= size + 1;
-							m_r[2] -= size + 1;
-						}
-						else
-						{
-							m_r[1] += size + 1;
-							m_r[2] += size + 1;
-						}
-
-						m_r[0]--;
-					}
-					break;
-				case 2:
-					// SETCFG cfglist
-					//        short
+					// RETT constant
+					//      disp
 					if (!(m_psr & PSR_U))
 					{
-						m_cfg = BIT(opword, 7, 4);
+						s32 const constant = displacement(bytes);
 
-						tex = 15;
+						u32 &sp(SP);
+						m_pc = mem_read<u32>(ST_ODT, sp);
+						sp += 4;
+						m_mod = mem_read<u16>(ST_ODT, sp);
+						sp += 2;
+						m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
+						sp += 2;
+
+						m_sb = mem_read<u32>(ST_ODT, m_mod);
+
+						SP += constant;
+						m_sequential = false;
+						tex = top(SIZE_D, sp) + top(SIZE_W, sp) * 2 + top(SIZE_D, m_mod) + 35;
 					}
 					else
 						interrupt(ILL, m_pc);
 					break;
-				case 3:
-					// SKPSi options
-					tex = 51;
-
-					m_psr &= ~PSR_F;
-					while (m_r[0])
-					{
-						u32 data =
-							(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
-							(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
-							mem_read<u8>(ST_ODT, m_r[1]);
-
-						if (translate)
-							data = mem_read<u8>(ST_ODT, m_r[3] + u8(data));
-
-						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 30 : 27);
-
-						bool const match = !((m_r[4] ^ data) & size_mask[size]);
-						if ((uw == 1 && !match) || (uw == 3 && match))
-						{
-							m_psr |= PSR_F;
-							break;
-						}
-
-						if (backward)
-							m_r[1] -= size + 1;
-						else
-							m_r[1] += size + 1;
-
-						m_r[0]--;
-					}
-					break;
-				default:
-					interrupt(UND, m_pc);
-					break;
-				}
-			}
-			break;
-		case 0x4e:
-			// format 6: xxxx xyyy yyoo ooii 0100 1110
-			{
-				u16 const opword = fetch<u16>(bytes);
-
-				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-				size_code const size = size_code(opword & 3);
-
-				switch (BIT(opword, 2, 4))
-				{
-				case 0x0:
-					// ROTi count,dst
-					//      gen,gen
-					//      read.B,rmw.i
-					{
-						mode[0].read_i(SIZE_B);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const count = gen_read_sx(mode[0]);
-						u32 const src = gen_read(mode[1]);
-
-						unsigned const limit = (size + 1) * 8 - 1;
-						u32 const dst = ((src << (count & limit)) & size_mask[size]) | ((src & size_mask[size]) >> (limit - (count & limit) + 1));
-
-						gen_write(mode[1], dst);
-
-						tex = mode[0].tea + mode[1].tea + 14 + (count & limit);
-					}
-					break;
-				case 0x1:
-					// ASHi count,dst
-					//      gen,gen
-					//      read.B,rmw.i
-					{
-						mode[0].read_i(SIZE_B);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const count = gen_read_sx(mode[0]);
-						s32 const src = gen_read_sx(mode[1]);
-
-						u32 const dst = (count < 0) ? (src >> -count) : (src << count);
-
-						gen_write(mode[1], dst);
-
-						tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
-					}
-					break;
-				case 0x2:
-					// CBITi offset,base
-					//       gen,gen
-					//       read.i,regaddr
-				case 0x3:
-					// CBITIi offset,base
-					//        gen,gen
-					//       read.i,regaddr
-					{
-						mode[0].read_i(size);
-						mode[1].regaddr();
-						decode(mode, bytes);
-
-						s32 const offset = gen_read_sx(mode[0]);
-
-						if (mode[1].type == REG)
-						{
-							if (BIT(m_r[mode[1].gen], offset & 31))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							m_r[mode[1].gen] &= ~(1U << (offset & 31));
-
-							tex = mode[0].tea + 7;
-						}
-						else
-						{
-							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
-
-							if (BIT(byte, offset & 7))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							mem_write<u8>(ST_ODT, byte_ea, byte & ~(1U << (offset & 7)));
-
-							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
-						}
-					}
-					break;
-				case 0x4:
-					interrupt(UND, m_pc);
-					break;
 				case 0x5:
-					// LSHi count,dst
-					//      gen,gen
-					//      read.B,rmw.i
+					// RETI
+					if (!(m_psr & PSR_U))
 					{
-						mode[0].read_i(SIZE_B);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
+						// end of interrupt, master
+						s8 vector = mem_read<u8>(ST_EIM, 0xfffe00);
 
-						s32 const count = gen_read_sx(mode[0]);
-						u32 const src = gen_read(mode[1]);
+						// check for vectored mode
+						if (m_cfg & CFG_I)
+						{
+							if (vector < 0 && vector >= -16)
+							{
+								u32 const cascade = mem_read<u32>(ST_ODT, m_intbase + vector * 4);
 
-						u32 const dst = (count < 0) ? (src >> -count) : (src << count);
+								// end of interrupt, cascaded
+								vector = mem_read<u8>(ST_EIC, cascade);
+							}
+						}
 
-						gen_write(mode[1], dst);
+						u32 &sp(SP);
+						m_pc = mem_read<u32>(ST_ODT, sp);
+						sp += 2;
+						mem_read<u16>(ST_ODT, sp);
+						sp += 2;
+						m_mod = mem_read<u16>(ST_ODT, sp);
+						sp += 2;
+						m_psr = mem_read<u16>(ST_ODT, sp) & PSR_MSK;
+						sp += 2;
 
-						tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
+						m_sb = mem_read<u32>(ST_ODT, m_mod);
+						m_sequential = false;
+
+						tex = top(SIZE_B) + top(SIZE_W) * 3 + top(SIZE_D) * 3 + 39;
 					}
+					else
+						interrupt(ILL, m_pc);
 					break;
 				case 0x6:
-					// SBITi offset,base
-					//       gen,gen
-					//       read.i,regaddr
-				case 0x7:
-					// SBITI offset,base
-					//       gen,gen
-					//       read.i,regaddr
+					// SAVE reglist
+					//      imm
 					{
-						mode[0].read_i(size);
-						mode[1].regaddr();
-						decode(mode, bytes);
+						u8 const reglist = fetch<u8>(bytes);
 
-						s32 const offset = gen_read_sx(mode[0]);
-
-						if (mode[1].type == REG)
+						tex = 13;
+						for (unsigned i = 0; i < 8; i++)
 						{
-							if (BIT(m_r[mode[1].gen], offset & 31))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							m_r[mode[1].gen] |= (1U << (offset & 31));
-
-							tex = mode[0].tea + 7;
+							if (BIT(reglist, i))
+							{
+								SP -= 4;
+								mem_write<u32>(ST_ODT, SP, m_r[i]);
+								tex += top(SIZE_D, SP) + 4;
+							}
 						}
-						else
+					}
+					break;
+				case 0x7:
+					// RESTORE reglist
+					//         imm
+					{
+						u8 const reglist = fetch<u8>(bytes);
+
+						tex = 12;
+						for (unsigned i = 0; i < 8; i++)
 						{
-							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
-
-							if (BIT(byte, offset & 7))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							mem_write<u8>(ST_ODT, byte_ea, byte | (1U << (offset & 7)));
-
-							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
+							if (BIT(reglist, i))
+							{
+								m_r[7 - i] = mem_read<u32>(ST_ODT, SP);
+								tex += top(SIZE_D, SP) + 5;
+								SP += 4;
+							}
 						}
 					}
 					break;
 				case 0x8:
-					// NEGi src,dst
-					//      gen,gen
-					//      read.i,write.i
+					// ENTER reglist,constant
+					//       imm,disp
 					{
-						mode[0].read_i(size);
-						mode[1].write_i(size);
-						decode(mode, bytes);
+						u8 const reglist = fetch<u8>(bytes);
+						s32 const constant = displacement(bytes);
 
-						u32 const src = gen_read(mode[0]);
+						SP -= 4;
+						mem_write<u32>(ST_ODT, SP, m_fp);
+						tex = top(SIZE_D, SP) + 18;
+						m_fp = SP;
+						SP -= constant;
 
-						if (src)
-							m_psr |= PSR_C;
-						else
-							m_psr &= ~PSR_C;
-
-						if ((src ^ ~(size_mask[size] >> 1)) & size_mask[size])
+						for (unsigned i = 0; i < 8; i++)
 						{
-							m_psr &= ~PSR_F;
-							gen_write(mode[1], -src);
+							if (BIT(reglist, i))
+							{
+								SP -= 4;
+								mem_write<u32>(ST_ODT, SP, m_r[i]);
+								tex += top(SIZE_D, SP) + 4;
+							}
 						}
-						else
-						{
-							m_psr |= PSR_F;
-							gen_write(mode[1], src);
-						}
-
-						tex = mode[0].tea + mode[1].tea + 5;
 					}
 					break;
 				case 0x9:
-					// NOTi src,dst
-					//      gen,gen
-					//      read.i,write.i
+					// EXIT reglist
+					//      imm
 					{
-						mode[0].read_i(size);
-						mode[1].write_i(size);
-						decode(mode, bytes);
+						u8 const reglist = fetch<u8>(bytes);
 
-						u32 const src = gen_read(mode[0]);
-
-						gen_write(mode[1], src ^ 1U);
-
-						tex = mode[0].tea + mode[1].tea + 5;
+						tex = 17;
+						for (unsigned i = 0; i < 8; i++)
+						{
+							if (BIT(reglist, i))
+							{
+								m_r[7 - i] = mem_read<u32>(ST_ODT, SP);
+								tex += top(SIZE_D, SP) + 5;
+								SP += 4;
+							}
+						}
+						SP = m_fp;
+						m_fp = mem_read<u32>(ST_ODT, SP);
+						tex += top(SIZE_D, SP);
+						SP += 4;
 					}
 					break;
 				case 0xa:
-					interrupt(UND, m_pc);
+					// NOP
+					tex = 3;
 					break;
 				case 0xb:
-					// SUBPi src,dst
-					//      gen,gen
-					//      read.i,rmw.i
-					fatalerror("unimplemented: subp (%s)\n", machine().describe_context());
-
-					// TODO: tcy 16/18
+					// WAIT
+					m_wait = true;
+					tex = 6;
 					break;
 				case 0xc:
-					// ABSi src,dst
-					//      gen,gen
-					//      read.i,write.i
-					{
-						mode[0].read_i(size);
-						mode[1].write_i(size);
-						decode(mode, bytes);
-
-						s32 const src = gen_read_sx(mode[0]);
-
-						m_psr &= ~PSR_F;
-						if (src == s32(0x80000000) >> (32 - (size + 1) * 8))
-						{
-							m_psr |= PSR_F;
-							gen_write(mode[1], src);
-						}
-						else
-							gen_write(mode[1], std::abs(src));
-
-						tex = mode[0].tea + mode[1].tea + ((src < 0) ? 9 : 8);
-					}
+					// DIA
+					tex = 3;
+					m_sequential = false;
 					break;
 				case 0xd:
-					// COMi src,dst
-					//      gen,gen
-					//      read.i,write.i
+					// FLAG
+					if (m_psr & PSR_F)
 					{
-						mode[0].read_i(size);
-						mode[1].write_i(size);
-						decode(mode, bytes);
-
-						u32 const src = gen_read(mode[0]);
-
-						gen_write(mode[1], ~src);
-
-						tex = mode[0].tea + mode[1].tea + 7;
+						interrupt(FLG, m_pc);
+						tex = 44;
 					}
+					else
+						tex = 6;
 					break;
 				case 0xe:
-					// IBITi offset,base
-					//       gen,gen
-					//       read.i,regaddr
-					{
-						mode[0].read_i(size);
-						mode[1].regaddr();
-						decode(mode, bytes);
-
-						s32 const offset = gen_read_sx(mode[0]);
-
-						if (mode[1].type == REG)
-						{
-							if (BIT(m_r[mode[1].gen], offset & 31))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							m_r[mode[1].gen] ^= (1U << (offset & 31));
-
-							tex = mode[0].tea + 9;
-						}
-						else
-						{
-							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
-
-							if (BIT(byte, offset & 7))
-								m_psr |= PSR_F;
-							else
-								m_psr &= ~PSR_F;
-
-							mem_write<u8>(ST_ODT, byte_ea, byte ^ (1U << (offset & 7)));
-
-							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 17;
-						}
-					}
+					// SVC
+					interrupt(SVC, m_pc);
+					tex = 40;
 					break;
 				case 0xf:
-					// ADDPi src,dst
-					//       gen,gen
-					//       read.i,rmw.i
-					fatalerror("unimplemented: addp (%s)\n", machine().describe_context());
-
-					// TODO: tcy 16/18
+					// BPT
+					interrupt(BPT, m_pc);
+					tex = 40;
 					break;
 				}
 			}
-			break;
-		case 0xce:
-			// format 7: xxxx xyyy yyoo ooii 1100 1110
+			else if ((opbyte & 15) == 12 || (opbyte & 15) == 13 || (opbyte & 15) == 15)
 			{
-				u16 const opword = fetch<u16>(bytes);
+				// format 2: gggg gsss sooo 11ii
+				u16 const opword = (u16(fetch<u8>(bytes)) << 8) | opbyte;
 
-				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-				size_code const size = size_code(opword & 3);
+				// HACK: use reserved mode for second unused type
+				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
 
-				switch (BIT(opword, 2, 4))
+				unsigned const quick = BIT(opword, 7, 4);
+				size_code const size = size_code(opbyte & 3);
+
+				switch (BIT(opbyte, 4, 3))
 				{
-				case 0x0:
-					// MOVMi block1,block2,length
-					//       gen,gen,disp
-					//       addr,addr
+				case 0:
+					// ADDQi src,dst
+					//       quick,gen
+					//             rmw.i
 					{
-						mode[0].addr();
-						mode[1].addr();
+						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						u32 block1 = ea(mode[0]);
-						u32 block2 = ea(mode[1]);
-						unsigned const num = displacement(bytes) / (size + 1) + 1;
+						u32 const src1 = s32(quick << 28) >> 28;
+						u32 const src2 = gen_read(mode[0]);
 
-						// TODO: aligned/unaligned transfers?
-						for (unsigned i = 0; i < num; i++)
+						u32 const dst = src1 + src2;
+						flags(src1, src2, dst, size, false);
+
+						gen_write(mode[0], dst);
+
+						tex = (mode[0].type == REG) ? 4 : mode[0].tea + 6;
+					}
+					break;
+				case 1:
+					// CMPQi src1,src2
+					//       quick,gen
+					//             read.i
+					{
+						mode[0].read_i(size);
+						decode(mode, bytes);
+
+						u32 const src1 = (s32(quick << 28) >> 28) & size_mask[size];
+						u32 const src2 = gen_read(mode[0]);
+
+						m_psr &= ~(PSR_N | PSR_Z | PSR_L);
+
+						if ((size == SIZE_D && s32(src1) > s32(src2))
+						|| ((size == SIZE_W && s16(src1) > s16(src2))
+						|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+							m_psr |= PSR_N;
+
+						if (src1 == src2)
+							m_psr |= PSR_Z;
+
+						if ((size == SIZE_D && u32(src1) > u32(src2))
+						|| ((size == SIZE_W && u16(src1) > u16(src2))
+						|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+							m_psr |= PSR_L;
+
+						tex = (mode[0].type == REG) ? 3 : mode[0].tea + 3;
+					}
+					break;
+				case 2:
+					// SPRi procreg,dst
+					//      short,gen
+					//            write.i
+					mode[0].write_i(size);
+					decode(mode, bytes);
+
+					switch (quick)
+					{
+					case 0x0: // UPSR
+						gen_write(mode[0], u8(m_psr));
+						break;
+					case 0x8: // FP
+						gen_write(mode[0], m_fp);
+						break;
+					case 0x9: // SP
+						gen_write(mode[0], SP);
+						break;
+					case 0xa: // SB
+						gen_write(mode[0], m_sb);
+						break;
+					case 0xd: // PSR
+						if (!(m_psr & PSR_U))
+							gen_write(mode[0], m_psr);
+						else
+							interrupt(ILL, m_pc);
+						break;
+					case 0xe: // INTBASE
+						if (!(m_psr & PSR_U))
+							gen_write(mode[0], m_intbase);
+						else
+							interrupt(ILL, m_pc);
+						break;
+					case 0xf: // MOD
+						gen_write(mode[0], m_mod);
+						break;
+					}
+
+					// TODO: tcy 21-27
+					tex = mode[0].tea + 21;
+					break;
+				case 3:
+					// Scondi dst
+					//        gen
+					//        write.i
+					{
+						mode[0].write_i(size);
+						decode(mode, bytes);
+
+						bool const dst = condition(quick);
+						gen_write(mode[0], dst);
+
+						tex = mode[0].tea + (dst ? 10 : 9);
+					}
+					break;
+				case 4:
+					// ACBi inc,index,dst
+					//      quick,gen,disp
+					//            rmw.i
+					{
+						mode[0].rmw_i(size);
+						decode(mode, bytes);
+
+						s32 const inc = s32(quick << 28) >> 28;
+						u32 index = gen_read(mode[0]);
+						s32 const dst = displacement(bytes);
+
+						index += inc;
+						gen_write(mode[0], index);
+
+						if (index & size_mask[size])
 						{
-							switch (size)
-							{
-							case SIZE_B: mem_write<u8>(ST_ODT, block2, mem_read<u8>(ST_ODT, block1)); break;
-							case SIZE_W: mem_write<u16>(ST_ODT, block2, mem_read<u16>(ST_ODT, block1)); break;
-							case SIZE_D: mem_write<u32>(ST_ODT, block2, mem_read<u32>(ST_ODT, block1)); break;
-							default:
-								// can't happen
-								break;
-							}
+							m_pc += dst;
+							m_sequential = false;
 
-							block1 += (size + 1);
-							block2 += (size + 1);
+							tex = (mode[0].type == REG) ? 17 : mode[0].tea + 15;
 						}
+						else
+							tex = (mode[0].type == REG) ? 18 : mode[0].tea + 16;
+					}
+					break;
+				case 5:
+					// MOVQi src,dst
+					//       quick,gen
+					//             write.i
+					mode[0].write_i(size);
+					decode(mode, bytes);
 
-						tex = mode[0].tea + mode[1].tea + (top(size, block1) + top(size, block2)) * num + 3 * num + 20;
+					gen_write(mode[0], s32(quick << 28) >> 28);
+
+					tex = (mode[0].type == REG) ? 3 : mode[0].tea + 2;
+					break;
+				case 6:
+					// LPRi procreg,src
+					//      short,gen
+					//            read.i
+					mode[0].read_i(size);
+					decode(mode, bytes);
+
+					switch (quick)
+					{
+					case 0x0: // UPSR
+						m_psr = ((m_psr & 0xff00) | u8(gen_read(mode[0]))) & PSR_MSK;
+						break;
+					case 0x8: // FP
+						m_fp = gen_read(mode[0]);
+						break;
+					case 0x9: // SP
+						SP = gen_read(mode[0]);
+						break;
+					case 0xa: // SB
+						m_sb = gen_read(mode[0]);
+						break;
+					case 0xd: // PSR
+						if (!(m_psr & PSR_U))
+						{
+							u32 const src = gen_read(mode[0]);
+
+							if (size == SIZE_B)
+								m_psr = ((m_psr & 0xff00) | u8(src)) & PSR_MSK;
+							else
+								m_psr = src & PSR_MSK;
+						}
+						else
+							interrupt(ILL, m_pc);
+						break;
+					case 0xe: // INTBASE
+						if (!(m_psr & PSR_U))
+							m_intbase = gen_read(mode[0]);
+						else
+							interrupt(ILL, m_pc);
+						break;
+					case 0xf: // MOD
+						m_mod = gen_read(mode[0]);
+						break;
+					default:
+						interrupt(UND, m_pc);
+						break;
+					}
+
+					// TODO: tcy 19-33
+					tex = mode[0].tea + 19;
+					break;
+				case 7:
+					// format 3: gggg gooo o111 11ii
+					switch (BIT(opword, 7, 4))
+					{
+					case 0x0:
+						// CXPD desc
+						//      gen
+						//      addr
+						if (size == SIZE_D)
+						{
+							mode[0].addr();
+							decode(mode, bytes);
+
+							u32 const address = ea(mode[0]);
+
+							SP -= 4;
+							mem_write<u16>(ST_ODT, SP, m_mod);
+							SP -= 4;
+							mem_write<u32>(ST_ODT, SP, m_pc + bytes);
+
+							m_mod = mem_read<u16>(ST_ODT, address + 0);
+							m_sb = mem_read<u32>(ST_ODT, m_mod + 0);
+							m_pc = mem_read<u32>(ST_ODT, m_mod + 8) + mem_read<u16>(ST_ODT, address + 2);
+
+							tex = mode[0].tea + top(SIZE_W, address) * 3 + top(SIZE_D, m_mod) * 3 + 13;
+							m_sequential = false;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x2:
+						// BICPSRi src
+						//         gen
+						//         read.[BW]
+						if (size == SIZE_B || size == SIZE_W)
+						{
+							mode[0].read_i(size);
+							decode(mode, bytes);
+
+							if (size == SIZE_B || !(m_psr & PSR_U))
+							{
+								u16 const src = gen_read(mode[0]);
+
+								m_psr &= ~src;
+
+								tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
+							}
+							else
+								interrupt(ILL, m_pc);
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x4:
+						// JUMP dst
+						//      gen
+						//      addr
+						if (size == SIZE_D)
+						{
+							mode[0].addr();
+							decode(mode, bytes);
+
+							m_pc = ea(mode[0]);
+							m_sequential = false;
+
+							tex = mode[0].tea + 2;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x6:
+						// BISPSRi src
+						//         gen
+						//         read.[BW]
+						if (size == SIZE_B || size == SIZE_W)
+						{
+							mode[0].read_i(size);
+							decode(mode, bytes);
+
+							if (size == SIZE_B || !(m_psr & PSR_U))
+							{
+								u16 const src = gen_read(mode[0]);
+
+								m_psr |= src & PSR_MSK;
+
+								tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
+							}
+							else
+								interrupt(ILL, m_pc);
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0xa:
+						// ADJSPi src
+						//        gen
+						//        read.i
+						{
+							mode[0].read_i(size);
+							decode(mode, bytes);
+
+							s32 const src = gen_read_sx(mode[0]);
+
+							SP -= src;
+
+							tex = mode[0].tea + 6;
+						}
+						break;
+					case 0xc:
+						// JSR dst
+						//     gen
+						//     addr
+						if (size == SIZE_D)
+						{
+							mode[0].addr();
+							decode(mode, bytes);
+
+							SP -= 4;
+							mem_write<u32>(ST_ODT, SP, m_pc + bytes);
+
+							m_pc = ea(mode[0]);
+							m_sequential = false;
+
+							// TODO: where does the TOPi come from?
+							tex = mode[0].tea + top(SIZE_D, SP) + top(size) + 5;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0xe:
+						// CASEi src
+						//       gen
+						//       read.i
+						{
+							mode[0].read_i(size);
+							decode(mode, bytes);
+
+							s32 const src = gen_read_sx(mode[0]);
+
+							m_pc += src;
+							m_sequential = false;
+
+							tex = mode[0].tea + 4;
+						}
+						break;
+					default:
+						interrupt(UND, m_pc);
+						break;
+					}
+					break;
+				}
+			}
+			else if ((opbyte & 3) != 2)
+			{
+				// format 4: xxxx xyyy yyoo ooii
+				u16 const opword = (u16(fetch<u8>(bytes)) << 8) | opbyte;
+
+				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+				size_code const size = size_code(opbyte & 3);
+
+				switch (BIT(opbyte, 2, 4))
+				{
+				case 0x0:
+					// ADDi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
+					{
+						mode[0].read_i(size);
+						mode[1].rmw_i(size);
+						decode(mode, bytes);
+
+						u32 const src1 = gen_read(mode[0]);
+						u32 const src2 = gen_read(mode[1]);
+
+						u32 const dst = src1 + src2;
+						flags(src1, src2, dst, size, false);
+
+						gen_write(mode[1], dst);
+
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
 					}
 					break;
 				case 0x1:
-					// CMPMi block1,block2,length
-					//       gen,gen,disp
-					//       addr,addr
+					// CMPi src1,src2
+					//      gen,gen
+					//      read.i,read.i
 					{
-						mode[0].addr();
-						mode[1].addr();
+						mode[0].read_i(size);
+						mode[1].read_i(size);
 						decode(mode, bytes);
 
-						u32 block1 = ea(mode[0]);
-						u32 block2 = ea(mode[1]);
-						unsigned const num = displacement(bytes) / (size + 1) + 1;
+						u32 const src1 = gen_read(mode[0]);
+						u32 const src2 = gen_read(mode[1]);
 
-						tex = mode[0].tea + mode[1].tea + 24;
+						m_psr &= ~(PSR_N | PSR_Z | PSR_L);
 
-						m_psr |= PSR_Z;
-						m_psr &= ~(PSR_N | PSR_L);
+						if ((size == SIZE_D && s32(src1) > s32(src2))
+						|| ((size == SIZE_W && s16(src1) > s16(src2))
+						|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+							m_psr |= PSR_N;
 
-						// TODO: aligned/unaligned transfers?
-						for (unsigned i = 0; i < num; i++)
-						{
-							s32 int1 = 0;
-							s32 int2 = 0;
+						if (src1 == src2)
+							m_psr |= PSR_Z;
 
-							switch (size)
-							{
-							case SIZE_B:
-								int1 = s8(mem_read<u8>(ST_ODT, block1));
-								int2 = s8(mem_read<u8>(ST_ODT, block2));
-								break;
-							case SIZE_W:
-								int1 = s16(mem_read<u16>(ST_ODT, block1));
-								int2 = s16(mem_read<u16>(ST_ODT, block2));
-								break;
-							case SIZE_D:
-								int1 = s32(mem_read<u32>(ST_ODT, block1));
-								int2 = s32(mem_read<u32>(ST_ODT, block2));
-								break;
-							default:
-								// can't happen
-								break;
-							}
+						if ((size == SIZE_D && u32(src1) > u32(src2))
+						|| ((size == SIZE_W && u16(src1) > u16(src2))
+						|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+							m_psr |= PSR_L;
 
-							tex += top(size, block1) + top(size, block2) + 9;
-
-							if (int1 != int2)
-							{
-								m_psr &= ~PSR_Z;
-								if (int1 > int2)
-									m_psr |= PSR_N;
-								if (u32(int1) > u32(int2))
-									m_psr |= PSR_L;
-
-								break;
-							}
-
-							block1 += (size + 1);
-							block2 += (size + 1);
-						}
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 3;
+						else
+							tex = 3;
 					}
 					break;
 				case 0x2:
-					// INSSi src,base,offset,length
-					//       gen,gen,imm
-					//       read.i,regaddr
+					// BICi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
 					{
 						mode[0].read_i(size);
-						mode[1].regaddr();
+						mode[1].rmw_i(size);
 						decode(mode, bytes);
-
-						u8 const imm = fetch<u8>(bytes);
-						unsigned const offset = imm >> 5;
-						u32 const mask = ((2ULL << (imm & 31)) - 1) << offset;
 
 						u32 const src = gen_read(mode[0]);
-						u32 const base = gen_read(mode[1]);
+						u32 const dst = gen_read(mode[1]);
 
-						gen_write(mode[1], (base & ~mask) | ((src << offset) & mask));
+						gen_write(mode[1], dst & ~src);
 
-						// TODO: tcy 39-49
-						tex = mode[0].tea + mode[1].tea + 39;
-					}
-					break;
-				case 0x3:
-					// EXTSi base,dst,offset,length
-					//       gen,gen,imm
-					//       regaddr,write.i
-					{
-						mode[0].regaddr();
-						mode[1].write_i(size);
-						decode(mode, bytes);
-
-						u8 const imm = fetch<u8>(bytes);
-						unsigned const offset = imm >> 5;
-						u32 const mask = (2ULL << (imm & 31)) - 1;
-
-						u32 const base = gen_read(mode[0]);
-						u32 const dst = (base >> offset) & mask;
-
-						gen_write(mode[1], dst);
-
-						// TODO: tcy 26-36
-						tex = mode[0].tea + mode[1].tea + 26;
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
 					}
 					break;
 				case 0x4:
-					// MOVXBW src,dst
-					//        gen,gen
-					//        read.B,write.W
-					if (size == SIZE_B)
+					// ADDCi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
 					{
 						mode[0].read_i(size);
-						mode[1].write_i(SIZE_W);
+						mode[1].rmw_i(size);
 						decode(mode, bytes);
 
-						u8 const src = gen_read(mode[0]);
-						s16 const dst = s8(src);
+						u32 const src1 = gen_read(mode[0]);
+						u32 const src2 = gen_read(mode[1]);
+
+						u32 const dst = src1 + src2 + (m_psr & PSR_C);
+						flags(src1, src2, dst, size, false);
 
 						gen_write(mode[1], dst);
 
-						tex = mode[0].tea + mode[1].tea + 6;
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
 					}
-					else
-						interrupt(UND, m_pc);
 					break;
 				case 0x5:
-					// MOVZBW src,dst
-					//        gen,gen
-					//        read.B,write.W
-					if (size == SIZE_B)
+					// MOVi src,dst
+					//      gen,gen
+					//      read.i,write.i
 					{
 						mode[0].read_i(size);
-						mode[1].write_i(SIZE_W);
-						decode(mode, bytes);
-
-						u8 const src = gen_read(mode[0]);
-						u16 const dst = src;
-
-						gen_write(mode[1], dst);
-
-						tex = mode[0].tea + mode[1].tea + 5;
-					}
-					else
-						interrupt(UND, m_pc);
-					break;
-				case 0x6:
-					// MOVZiD src,dst
-					//        gen,gen
-					//        read.[BW],write.D
-					if (size == SIZE_B || size == SIZE_W)
-					{
-						mode[0].read_i(size);
-						mode[1].write_i(SIZE_D);
+						mode[1].write_i(size);
 						decode(mode, bytes);
 
 						u32 const src = gen_read(mode[0]);
 
 						gen_write(mode[1], src);
 
-						tex = mode[0].tea + mode[1].tea + 5;
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 1;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 3;
+						else
+							tex = 3;
 					}
-					else
-						interrupt(UND, m_pc);
 					break;
-				case 0x7:
-					// MOVXiD src,dst
-					//        gen,gen
-					//        read.[BW],write.D
-					if (size == SIZE_B || size == SIZE_W)
+				case 0x6:
+					// ORi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
 					{
 						mode[0].read_i(size);
-						mode[1].write_i(SIZE_D);
+						mode[1].rmw_i(size);
 						decode(mode, bytes);
 
 						u32 const src = gen_read(mode[0]);
-						s32 const dst = (size == SIZE_W) ? s16(src) : s8(src);
+						u32 const dst = gen_read(mode[1]);
 
-						gen_write(mode[1], dst);
+						gen_write(mode[1], src | dst);
 
-						tex = mode[0].tea + mode[1].tea + 6;
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
 					}
-					else
-						interrupt(UND, m_pc);
 					break;
 				case 0x8:
-					// MULi src,dst
+					// SUBi src,dst
 					//      gen,gen
 					//      read.i,rmw.i
 					{
@@ -2488,810 +1642,1655 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						u32 const src1 = gen_read(mode[0]);
 						u32 const src2 = gen_read(mode[1]);
 
-						u32 const dst = src1 * src2;
+						u32 const dst = src2 - src1;
+						flags(src1, src2, dst, size, true);
 
 						gen_write(mode[1], dst);
 
-						tex = mode[0].tea + mode[1].tea + 15 + (size + 1) * 16; // 2+2 + 15 + 16 ==
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
 					}
 					break;
 				case 0x9:
-					// MEIi src,dst
+					// ADDR src,dst
 					//      gen,gen
-					//      read.i,rmw.2i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						u32 const src1 = gen_read(mode[0]);
-						u32 const src2 = gen_read(mode[1]);
-
-						mode[1].rmw_i(size_code(size * 2 + 1));
-						u64 const dst = mulu_32x32(src1, src2);
-
-						if (mode[1].type == REG)
-						{
-							m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | ((dst >> 0) & size_mask[size]);
-							m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | ((dst >> ((size + 1) * 8)) & size_mask[size]);
-						}
-						else
-							// TODO: write high dword first
-							gen_write(mode[1], dst);
-
-						tex = mode[0].tea + mode[1].tea + 23 + (size + 1) * 16;
-					}
-					break;
-				case 0xa:
-					interrupt(UND, m_pc);
-					break;
-				case 0xb:
-					// DEIi src,dst
-					//      gen,gen
-					//      read.i,rmw.2i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size_code(size * 2 + 1));
-						decode(mode, bytes);
-
-						u32 const src1 = gen_read(mode[0]);
-						if (src1)
-						{
-							u64 const src2 = (mode[1].type == REG)
-								? (u64(m_r[mode[1].gen ^ 1] & size_mask[size]) << ((size + 1) * 8)) | (m_r[mode[1].gen ^ 0] & size_mask[size])
-								: gen_read(mode[1]);
-
-							u32 const quotient = src2 / src1;
-							u32 const remainder = src2 % src1;
-
-							if (mode[1].type == REG)
-							{
-								m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | (remainder & size_mask[size]);
-								m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | (quotient & size_mask[size]);
-
-								tex = mode[0].tea + 31 + (size + 1) * 16;
-							}
-							else
-							{
-								gen_write(mode[1], (u64(quotient) << ((size + 1) * 8)) | remainder);
-
-								tex = mode[0].tea + mode[1].tea + 38 + (size + 1) * 16;
-							}
-						}
-						else
-							interrupt(DVZ, m_pc);
-					}
-					break;
-				case 0xc:
-					// QUOi src,dst
-					//      gen,gen
-					//      read.i,rmw.i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const src1 = gen_read_sx(mode[0]);
-						if (src1)
-						{
-							s32 const src2 = gen_read_sx(mode[1]);
-
-							s32 const dst = src2 / src1;
-
-							gen_write(mode[1], dst);
-
-							// TODO: tcy 49-55
-							tex = mode[0].tea + mode[1].tea + 49 + (size + 1) * 16;
-						}
-						else
-							interrupt(DVZ, m_pc);
-					}
-					break;
-				case 0xd:
-					// REMi src,dst
-					//      gen,gen
-					//      read.i,rmw.i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const src1 = gen_read_sx(mode[0]);
-						if (src1)
-						{
-							s32 const src2 = gen_read_sx(mode[1]);
-
-							s32 const dst = src2 % src1;
-
-							gen_write(mode[1], dst);
-
-							// TODO: tcy 57-62
-							tex = mode[0].tea + mode[1].tea + 57 + (size + 1) * 16;
-						}
-						else
-							interrupt(DVZ, m_pc);
-					}
-					break;
-				case 0xe:
-					// MODi src,dst
-					//      gen,gen
-					//      read.i,rmw.i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const src1 = gen_read_sx(mode[0]);
-						if (src1)
-						{
-							s32 const src2 = gen_read_sx(mode[1]);
-
-							s32 const dst = (src1 + (src2 % src1)) % src1;
-
-							gen_write(mode[1], dst);
-
-							// TODO: tcy 54-73
-							tex = mode[0].tea + mode[1].tea + 54 + (size + 1) * 16;
-						}
-						else
-							interrupt(DVZ, m_pc);
-					}
-					break;
-				case 0xf:
-					// DIVi src,dst
-					//      gen,gen
-					//      read.i,rmw.i
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(size);
-						decode(mode, bytes);
-
-						s32 const src1 = gen_read_sx(mode[0]);
-						if (src1)
-						{
-							s32 const src2 = gen_read_sx(mode[1]);
-
-							s32 const quotient = src2 / src1;
-							s32 const remainder = src2 % src1;
-
-							if ((quotient < 0) && remainder)
-								gen_write(mode[1], quotient - 1);
-							else
-								gen_write(mode[1], quotient);
-
-							// TODO: tcy 58-68
-							tex = mode[0].tea + mode[1].tea + 58 + (size + 1) * 16;
-						}
-						else
-							interrupt(DVZ, m_pc);
-					}
-					break;
-				}
-			}
-			break;
-		case 0x2e:
-		case 0x6e:
-		case 0xae:
-		case 0xee:
-			// format 8: xxxx xyyy yyrr roii oo10 1110
-			{
-				u16 const opword = fetch<u16>(bytes);
-
-				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-				unsigned const reg = BIT(opword, 3, 3);
-				size_code const size = size_code(opword & 3);
-
-				switch ((opword & 4) | BIT(opbyte, 6, 2))
-				{
-				case 0:
-					// EXTi offset,base,dst,length
-					//      reg,gen,gen,disp
-					//          regaddr,write.i
-					{
-						mode[0].regaddr();
-						mode[1].write_i(size);
-						decode(mode, bytes);
-
-						s32 const offset = m_r[reg];
-						s32 const length = displacement(bytes);
-						u32 const mask = (1U << length) - 1;
-
-						if (mode[0].type == REG)
-						{
-							gen_write(mode[1], (m_r[mode[0].gen] >> (offset & 31)) & mask);
-
-							// TODO: tcy 17-51
-							tex = mode[0].tea + mode[1].tea + 17;
-						}
-						else
-						{
-							u32 const base_ea = ea(mode[0]) + (offset >> 3);
-							u32 const base = mem_read<u32>(ST_ODT, base_ea);
-
-							gen_write(mode[1], (base >> (offset & 7)) & mask);
-
-							// TODO: tcy 19-29
-							tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) + 19;
-						}
-					}
-					break;
-				case 1:
-					// CVTP offset,base,dst
-					//      reg,gen,gen
-					//          addr,write.D
+					//      addr,write.D
 					if (size == SIZE_D)
 					{
 						mode[0].addr();
 						mode[1].write_i(size);
 						decode(mode, bytes);
 
-						s32 const offset = s32(m_r[reg]);
-						u32 const base = ea(mode[0]);
+						gen_write(mode[1], ea(mode[0]));
 
-						gen_write(mode[1], base * 8 + offset);
-
-						tex = mode[0].tea + mode[1].tea + 7;
+						tex = (mode[1].type == REG) ? mode[0].tea + 3 : mode[0].tea + mode[1].tea + 2;
 					}
 					else
 						interrupt(UND, m_pc);
 					break;
-				case 2:
-					// INSi offset,src,base,length
-					//      reg,gen,gen,disp
-					//          read.i,regaddr
+				case 0xa:
+					// ANDi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
+					{
+						mode[0].read_i(size);
+						mode[1].rmw_i(size);
+						decode(mode, bytes);
+
+						u32 const src = gen_read(mode[0]);
+						u32 const dst = gen_read(mode[1]);
+
+						gen_write(mode[1], src & dst);
+
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
+					}
+					break;
+				case 0xc:
+					// SUBCi src,dst
+					//      gen,gen
+					//      read.i,rmw.i
+					{
+						mode[0].read_i(size);
+						mode[1].rmw_i(size);
+						decode(mode, bytes);
+
+						u32 const src1 = gen_read(mode[0]);
+						u32 const src2 = gen_read(mode[1]);
+
+						u32 const dst = src2 - src1 - (m_psr & PSR_C);
+						flags(src1, src2, dst, size, true);
+
+						gen_write(mode[1], dst);
+
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
+						else
+							tex = 4;
+					}
+					break;
+				case 0xd:
+					// TBITi offset,base
+					//       gen,gen
+					//       read.i,regaddr
 					{
 						mode[0].read_i(size);
 						mode[1].regaddr();
 						decode(mode, bytes);
 
-						s32 const offset = m_r[reg];
-						s32 const length = displacement(bytes);
-						u32 const src = gen_read(mode[0]);
+						s32 const offset = gen_read_sx(mode[0]);
 
 						if (mode[1].type == REG)
 						{
-							u32 const mask = ((1U << length) - 1) << (offset & 31);
-
-							m_r[mode[1].gen] = (m_r[mode[1].gen] & ~mask) | ((src << (offset & 31)) & mask);
-
-							// TODO: tcy 28-96
-							tex = mode[0].tea + 28;
-						}
-						else
-						{
-							u32 const base_ea = ea(mode[1]) + (offset >> 3);
-							u32 const base = mem_read<u32>(ST_ODT, base_ea);
-							u32 const mask = ((1U << length) - 1) << (offset & 7);
-
-							mem_write<u32>(ST_ODT, base_ea, (base & ~mask) | ((src << (offset & 7)) & mask));
-
-							// TODO: tcy 29-39
-							tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) * 2 + 29;
-						}
-					}
-					break;
-				case 3:
-					// CHECKi dst,bounds,src
-					//        reg,gen,gen
-					//            addr,read.i
-					{
-						mode[0].addr();
-						mode[1].read_i(size);
-						decode(mode, bytes);
-
-						u32 const bounds = ea(mode[0]);
-						s32 const src = gen_read_sx(mode[1]);
-
-						s32 lower = 0;
-						s32 upper = 0;
-						switch (size)
-						{
-						case SIZE_B:
-							upper = s8(mem_read<u8>(ST_ODT, bounds + 0));
-							lower = s8(mem_read<u8>(ST_ODT, bounds + 1));
-							break;
-						case SIZE_W:
-							upper = s16(mem_read<u16>(ST_ODT, bounds + 0));
-							lower = s16(mem_read<u16>(ST_ODT, bounds + 2));
-							break;
-						case SIZE_D:
-							upper = s32(mem_read<u32>(ST_ODT, bounds + 0));
-							lower = s32(mem_read<u32>(ST_ODT, bounds + 4));
-							break;
-						default:
-							// can't happen
-							break;
-						}
-
-						if (src >= lower && src <= upper)
-						{
-							m_psr &= ~PSR_F;
-							m_r[reg] = src - lower;
-
-							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + 11;
-						}
-						else
-						{
-							m_psr |= PSR_F;
-
-							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
-						}
-					}
-					break;
-				case 4:
-					// INDEXi accum,length,index
-					//        reg,gen,gen
-					//            read.i,read.i
-					{
-						mode[0].read_i(size);
-						mode[1].read_i(size);
-						decode(mode, bytes);
-
-						u32 const length = gen_read(mode[0]);
-						u32 const index = gen_read(mode[1]);
-
-						m_r[reg] = m_r[reg] * (length + 1) + index;
-
-						tex = mode[0].tea + mode[1].tea + 25 + (size + 1) * 16;
-					}
-					break;
-				case 5:
-					// FFSi base,offset
-					//      gen,gen
-					//      read.i,rmw.B
-					{
-						mode[0].read_i(size);
-						mode[1].rmw_i(SIZE_B);
-						decode(mode, bytes);
-
-						u32 const base = gen_read(mode[0]);
-						u32 offset = gen_read(mode[1]);
-						unsigned const limit = (size + 1) * 8;
-
-						m_psr |= PSR_F;
-						while (offset < limit)
-							if (BIT(base, offset))
-							{
-								m_psr &= ~PSR_F;
-								break;
-							}
+							if (BIT(m_r[mode[1].gen], offset & 31))
+								m_psr |= PSR_F;
 							else
-								offset++;
+								m_psr &= ~PSR_F;
 
-						gen_write(mode[1], offset & (limit - 1));
-
-						// TODO: tcy 24-28
-						tex = mode[0].tea + mode[1].tea + 24 + (size + 1) * 24;
-					}
-					break;
-				case 6:
-					// MOVSU/MOVUS src,dst
-					//             gen,gen
-					//             addr,addr
-					if (!(m_psr & PSR_U))
-					{
-						if (reg == 1 || reg == 3)
-						{
-							mode[0].addr();
-							mode[1].addr();
-							decode(mode, bytes);
-
-							switch (size)
-							{
-							case SIZE_B: mem_write<u8>(ST_ODT, ea(mode[1]), mem_read<u8>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
-							case SIZE_W: mem_write<u16>(ST_ODT, ea(mode[1]), mem_read<u16>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
-							case SIZE_D: mem_write<u32>(ST_ODT, ea(mode[1]), mem_read<u32>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
-							default:
-								// can't happen
-								break;
-							}
-
-							tex = mode[0].tea + mode[1].tea + top(size) * 2 + 33;
+							tex = mode[0].tea + 4;
 						}
 						else
-							interrupt(UND, m_pc);
+						{
+							u8 const byte = mem_read<u8>(ST_ODT, ea(mode[1]) + (offset >> 3));
+
+							if (BIT(byte, offset & 7))
+								m_psr |= PSR_F;
+							else
+								m_psr &= ~PSR_F;
+
+							tex = mode[0].tea + mode[1].tea + top(SIZE_B) + 14;
+						}
 					}
-					else
-						interrupt(ILL, m_pc);
 					break;
-				}
-			}
-			break;
-		case 0x3e:
-			// format 9: xxxx xyyy yyoo ofii 0011 1110
-			if (m_cfg & CFG_F)
-			{
-				if (!m_fpu)
-					fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
-
-				u16 const opword = fetch<u16>(bytes);
-
-				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-				size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
-				size_code const size = size_code(opword & 3);
-
-				m_fpu->write_id(opbyte);
-				m_fpu->write_op(swapendian_int16(opword));
-
-				switch (BIT(opword, 3, 3))
-				{
-				case 0:
-					// MOVif src,dst
-					//       gen,gen
-					//       read.i,write.f
-					mode[0].read_i(size);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 1:
-					// LFSR src
-					//      gen
-					//      read.D
-					mode[0].read_i(size);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 2:
-					// MOVLF src,dst
-					//       gen,gen
-					//       read.L,write.F
-					mode[0].read_f(SIZE_Q);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 3:
-					// MOVFL src,dst
-					//       gen,gen
-					//       read.F,write.L
-					mode[0].read_f(SIZE_D);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 4:
-					// ROUNDfi src,dst
-					//         gen,gen
-					//         read.f,write.i
-					mode[0].read_f(size_f);
-					mode[1].write_i(size);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 5:
-					// TRUNCfi src,dst
-					//         gen,gen
-					//         read.f,write.i
-					mode[0].read_f(size_f);
-					mode[1].write_i(size);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 6:
-					// SFSR dst
-					//      gen
-					//      write.D
-					mode[0].write_i(size);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[1], mode[0]))
-						interrupt(SLV, m_pc);
-					break;
-				case 7:
-					// FLOORfi src,dst
-					//         gen,gen
-					//         read.f,write.i
-					mode[0].read_f(size_f);
-					mode[1].write_i(size);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				}
-			}
-			else
-				interrupt(UND, m_pc);
-			break;
-		case 0x7e: // format 10
-			interrupt(UND, m_pc);
-			break;
-		case 0xbe:
-			// format 11: xxxx xyyy yyoo oo0f 1011 1110
-			if (m_cfg & CFG_F)
-			{
-				if (!m_fpu)
-					fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
-
-				u16 const opword = fetch<u16>(bytes);
-
-				addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
-				size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
-
-				m_fpu->write_id(opbyte);
-				m_fpu->write_op(swapendian_int16(opword));
-
-				switch (BIT(opword, 2, 4))
-				{
-				case 0x0:
-					// ADDf src,dst
+				case 0xe:
+					// XORi src,dst
 					//      gen,gen
-					//      read.f,rmw.f
-					mode[0].read_f(size_f);
-					mode[1].rmw_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x1:
-					// MOVf src,dst
-					//      gen,gen
-					//      read.f,write.f
-					mode[0].read_f(size_f);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x2:
-					// CMPf src1,src2
-					//      gen,gen
-					//      read.f,read.f
+					//      read.i,rmw.i
 					{
-						mode[0].read_f(size_f);
-						mode[1].read_f(size_f);
+						mode[0].read_i(size);
+						mode[1].rmw_i(size);
 						decode(mode, bytes);
 
-						u16 const status = slave(m_fpu, mode[0], mode[1]);
-						if (!(status & ns32000_slave_interface::SLAVE_Q))
-						{
-							m_psr &= ~(PSR_N | PSR_Z | PSR_L);
-							m_psr |= status & (ns32000_slave_interface::SLAVE_N | ns32000_slave_interface::SLAVE_Z | ns32000_slave_interface::SLAVE_L);
-						}
+						u32 const src = gen_read(mode[0]);
+						u32 const dst = gen_read(mode[1]);
+
+						gen_write(mode[1], src ^ dst);
+
+						if (mode[1].type != REG)
+							tex = mode[0].tea + mode[1].tea + 3;
+						else if (mode[0].type != REG)
+							tex = mode[0].tea + 4;
 						else
-							interrupt(SLV, m_pc);
+							tex = 4;
 					}
-					break;
-				case 0x3:
-					// Trap(SLAVE)
-					// operands from ns32532 datasheet
-					mode[0].read_f(size_f);
-					mode[1].read_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x4:
-					// SUBf src,dst
-					//      gen,gen
-					//      read.f,rmw.f
-					mode[0].read_f(size_f);
-					mode[1].rmw_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x5:
-					// NEGf src,dst
-					//      gen,gen
-					//      read.f,write.f
-					mode[0].read_f(size_f);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x8:
-					// DIVf src,dst
-					//      gen,gen
-					//      read.f,rmw.f
-					mode[0].read_f(size_f);
-					mode[1].rmw_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0x9:
-					// Trap(SLAVE)
-					// operands from ns32532 datasheet
-					mode[0].read_f(size_f);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0xc:
-					// MULf src,dst
-					//      gen,gen
-					//      read.f,rmw.f
-					mode[0].read_f(size_f);
-					mode[1].rmw_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
-					break;
-				case 0xd:
-					// ABSf src,dst
-					//      gen,gen
-					//      read.f,write.f
-					mode[0].read_f(size_f);
-					mode[1].write_f(size_f);
-					decode(mode, bytes);
-
-					if (slave(m_fpu, mode[0], mode[1]))
-						interrupt(SLV, m_pc);
 					break;
 				}
 			}
-			else
-				interrupt(UND, m_pc);
-			break;
-		case 0xfe: // format 12
-		case 0x9e: // format 13
-			interrupt(UND, m_pc);
-			break;
-		case 0x1e:
-			// format 14: xxxx xsss s0oo ooii 0001 1110
-			if (!(m_psr & PSR_U))
+			else switch (opbyte)
 			{
-				if (m_cfg & CFG_M)
+			case 0x0e:
+				// format 5: 0000 0sss s0oo ooii 0000 1110
 				{
-					if (!m_mmu)
-						fatalerror("memory management unit not configured (%s)\n", machine().describe_context());
-
 					u16 const opword = fetch<u16>(bytes);
 
-					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
-
-					//unsigned const quick = BIT(opword, 7, 4);
 					size_code const size = size_code(opword & 3);
 
-					m_mmu->write_id(opbyte);
-					m_mmu->write_op(swapendian_int16(opword));
+					// string instruction options
+					bool const translate = BIT(opword, 7);
+					bool const backward = BIT(opword, 8);
+					unsigned const uw = BIT(opword, 9, 2);
 
 					switch (BIT(opword, 2, 4))
 					{
 					case 0:
-						// RDVAL loc
-						//       gen
-						//       addr
+						// MOVSi options
+						tex = (translate || backward || uw) ? 54 : 18;
+
+						m_psr &= ~PSR_F;
+						while (m_r[0])
 						{
-							mode[0].addr();
-							decode(mode, bytes);
+							u32 data =
+								(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
+								(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
+								mem_read<u8>(ST_ODT, m_r[1]);
 
-							// dummy read
-							mem_read<u8>(ST_ODT, ea(mode[0]), true);
+							if (translate)
+								data = mem_read<u8>(ST_ODT, m_r[3] + u8(data));
 
-							u16 const status = slave(m_mmu, mode[0], mode[1]);
-							if (!(status & ns32000_slave_interface::SLAVE_Q))
+							tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 27 : (backward || uw) ? 24 : 13);
+
+							bool const match = !((m_r[4] ^ data) & size_mask[size]);
+							if ((uw == 1 && !match) || (uw == 3 && match))
 							{
-								if (status & ns32000_slave_interface::SLAVE_F)
-									m_psr |= PSR_F;
-								else
-									m_psr &= ~PSR_F;
+								m_psr |= PSR_F;
+								break;
+							}
+
+							if (size == SIZE_D)
+								mem_write<u32>(ST_ODT, m_r[2], data);
+							else if (size == SIZE_W)
+								mem_write<u16>(ST_ODT, m_r[2], data);
+							else
+								mem_write<u8>(ST_ODT, m_r[2], data);
+
+							tex += top(size, m_r[2]);
+
+							if (backward)
+							{
+								m_r[1] -= size + 1;
+								m_r[2] -= size + 1;
 							}
 							else
-								interrupt(SLV, m_pc);
+							{
+								m_r[1] += size + 1;
+								m_r[2] += size + 1;
+							}
 
-							tex = mode[0].tea + top(SIZE_B) + 21;
+							m_r[0]--;
 						}
 						break;
 					case 1:
-						// WRVAL loc
-						//       gen
-						//       addr
+						// CMPSi options
+						tex = 53;
+
+						m_psr |= PSR_Z;
+						m_psr &= ~(PSR_N | PSR_F | PSR_L);
+						while (m_r[0])
 						{
-							mode[0].addr();
-							decode(mode, bytes);
+							u32 src1 =
+								(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
+								(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
+								mem_read<u8>(ST_ODT, m_r[1]);
+							u32 src2 =
+								(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[2]) :
+								(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[2]) :
+								mem_read<u8>(ST_ODT, m_r[2]);
 
-							// dummy read
-							mem_read<u8>(ST_ODT, ea(mode[0]), true);
+							if (translate)
+								src1 = mem_read<u8>(ST_ODT, m_r[3] + u8(src1));
 
-							u16 const status = slave(m_mmu, mode[0], mode[1]);
-							if (!(status & ns32000_slave_interface::SLAVE_Q))
+							tex += top(size, m_r[1]) + top(size, m_r[2]) + (translate ? top(SIZE_B) + 38 : 35);
+
+							bool const match = !((m_r[4] ^ src1) & size_mask[size]);
+							if ((uw == 1 && !match) || (uw == 3 && match))
 							{
-								if (status & ns32000_slave_interface::SLAVE_F)
-									m_psr |= PSR_F;
-								else
-									m_psr &= ~PSR_F;
+								m_psr |= PSR_F;
+								break;
+							}
+
+							if (src1 != src2)
+							{
+								m_psr &= ~PSR_Z;
+
+								if ((size == SIZE_D && s32(src1) > s32(src2))
+								|| ((size == SIZE_W && s16(src1) > s16(src2))
+								|| ((size == SIZE_B && s8(src1) > s8(src2)))))
+									m_psr |= PSR_N;
+
+								if ((size == SIZE_D && u32(src1) > u32(src2))
+								|| ((size == SIZE_W && u16(src1) > u16(src2))
+								|| ((size == SIZE_B && u8(src1) > u8(src2)))))
+									m_psr |= PSR_L;
+
+								break;
+							}
+
+							if (backward)
+							{
+								m_r[1] -= size + 1;
+								m_r[2] -= size + 1;
 							}
 							else
-								interrupt(SLV, m_pc);
+							{
+								m_r[1] += size + 1;
+								m_r[2] += size + 1;
+							}
 
-							tex = mode[0].tea + top(SIZE_B) + 21;
+							m_r[0]--;
 						}
 						break;
 					case 2:
-						// LMR mmureg,src
-						//     short,gen
-						//           read.D
-						mode[0].read_i(size);
-						decode(mode, bytes);
+						// SETCFG cfglist
+						//        short
+						if (!(m_psr & PSR_U))
+						{
+							m_cfg = BIT(opword, 7, 4);
 
-						if (slave(m_mmu, mode[0], mode[1]))
-							interrupt(SLV, m_pc);
-
-						tex = mode[0].tea + top(size);
+							tex = 15;
+						}
+						else
+							interrupt(ILL, m_pc);
 						break;
 					case 3:
-						// SMR mmureg,dst
-						//     short,gen
-						//           write.D
-						mode[0].write_i(size);
-						decode(mode, bytes);
+						// SKPSi options
+						tex = 51;
 
-						if (slave(m_mmu, mode[0], mode[1]))
-							interrupt(SLV, m_pc);
+						m_psr &= ~PSR_F;
+						while (m_r[0])
+						{
+							u32 data =
+								(size == SIZE_D) ? mem_read<u32>(ST_ODT, m_r[1]) :
+								(size == SIZE_W) ? mem_read<u16>(ST_ODT, m_r[1]) :
+								mem_read<u8>(ST_ODT, m_r[1]);
 
-						tex = mode[0].tea + top(size);
+							if (translate)
+								data = mem_read<u8>(ST_ODT, m_r[3] + u8(data));
+
+							tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 30 : 27);
+
+							bool const match = !((m_r[4] ^ data) & size_mask[size]);
+							if ((uw == 1 && !match) || (uw == 3 && match))
+							{
+								m_psr |= PSR_F;
+								break;
+							}
+
+							if (backward)
+								m_r[1] -= size + 1;
+							else
+								m_r[1] += size + 1;
+
+							m_r[0]--;
+						}
 						break;
 					default:
 						interrupt(UND, m_pc);
 						break;
 					}
 				}
+				break;
+			case 0x4e:
+				// format 6: xxxx xyyy yyoo ooii 0100 1110
+				{
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					size_code const size = size_code(opword & 3);
+
+					switch (BIT(opword, 2, 4))
+					{
+					case 0x0:
+						// ROTi count,dst
+						//      gen,gen
+						//      read.B,rmw.i
+						{
+							mode[0].read_i(SIZE_B);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const count = gen_read_sx(mode[0]);
+							u32 const src = gen_read(mode[1]);
+
+							unsigned const limit = (size + 1) * 8 - 1;
+							u32 const dst = ((src << (count & limit)) & size_mask[size]) | ((src & size_mask[size]) >> (limit - (count & limit) + 1));
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 14 + (count & limit);
+						}
+						break;
+					case 0x1:
+						// ASHi count,dst
+						//      gen,gen
+						//      read.B,rmw.i
+						{
+							mode[0].read_i(SIZE_B);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const count = gen_read_sx(mode[0]);
+							s32 const src = gen_read_sx(mode[1]);
+
+							u32 const dst = (count < 0) ? (src >> -count) : (src << count);
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
+						}
+						break;
+					case 0x2:
+						// CBITi offset,base
+						//       gen,gen
+						//       read.i,regaddr
+					case 0x3:
+						// CBITIi offset,base
+						//        gen,gen
+						//       read.i,regaddr
+						{
+							mode[0].read_i(size);
+							mode[1].regaddr();
+							decode(mode, bytes);
+
+							s32 const offset = gen_read_sx(mode[0]);
+
+							if (mode[1].type == REG)
+							{
+								if (BIT(m_r[mode[1].gen], offset & 31))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								m_r[mode[1].gen] &= ~(1U << (offset & 31));
+
+								tex = mode[0].tea + 7;
+							}
+							else
+							{
+								u32 const byte_ea = ea(mode[1]) + (offset >> 3);
+								u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
+
+								if (BIT(byte, offset & 7))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								mem_write<u8>(ST_ODT, byte_ea, byte & ~(1U << (offset & 7)));
+
+								tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
+							}
+						}
+						break;
+					case 0x4:
+						interrupt(UND, m_pc);
+						break;
+					case 0x5:
+						// LSHi count,dst
+						//      gen,gen
+						//      read.B,rmw.i
+						{
+							mode[0].read_i(SIZE_B);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const count = gen_read_sx(mode[0]);
+							u32 const src = gen_read(mode[1]);
+
+							u32 const dst = (count < 0) ? (src >> -count) : (src << count);
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
+						}
+						break;
+					case 0x6:
+						// SBITi offset,base
+						//       gen,gen
+						//       read.i,regaddr
+					case 0x7:
+						// SBITI offset,base
+						//       gen,gen
+						//       read.i,regaddr
+						{
+							mode[0].read_i(size);
+							mode[1].regaddr();
+							decode(mode, bytes);
+
+							s32 const offset = gen_read_sx(mode[0]);
+
+							if (mode[1].type == REG)
+							{
+								if (BIT(m_r[mode[1].gen], offset & 31))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								m_r[mode[1].gen] |= (1U << (offset & 31));
+
+								tex = mode[0].tea + 7;
+							}
+							else
+							{
+								u32 const byte_ea = ea(mode[1]) + (offset >> 3);
+								u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
+
+								if (BIT(byte, offset & 7))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								mem_write<u8>(ST_ODT, byte_ea, byte | (1U << (offset & 7)));
+
+								tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
+							}
+						}
+						break;
+					case 0x8:
+						// NEGi src,dst
+						//      gen,gen
+						//      read.i,write.i
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							u32 const src = gen_read(mode[0]);
+
+							if (src)
+								m_psr |= PSR_C;
+							else
+								m_psr &= ~PSR_C;
+
+							if ((src ^ ~(size_mask[size] >> 1)) & size_mask[size])
+							{
+								m_psr &= ~PSR_F;
+								gen_write(mode[1], -src);
+							}
+							else
+							{
+								m_psr |= PSR_F;
+								gen_write(mode[1], src);
+							}
+
+							tex = mode[0].tea + mode[1].tea + 5;
+						}
+						break;
+					case 0x9:
+						// NOTi src,dst
+						//      gen,gen
+						//      read.i,write.i
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							u32 const src = gen_read(mode[0]);
+
+							gen_write(mode[1], src ^ 1U);
+
+							tex = mode[0].tea + mode[1].tea + 5;
+						}
+						break;
+					case 0xa:
+						interrupt(UND, m_pc);
+						break;
+					case 0xb:
+						// SUBPi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						fatalerror("unimplemented: subp (%s)\n", machine().describe_context());
+
+						// TODO: tcy 16/18
+						break;
+					case 0xc:
+						// ABSi src,dst
+						//      gen,gen
+						//      read.i,write.i
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							s32 const src = gen_read_sx(mode[0]);
+
+							m_psr &= ~PSR_F;
+							if (src == s32(0x80000000) >> (32 - (size + 1) * 8))
+							{
+								m_psr |= PSR_F;
+								gen_write(mode[1], src);
+							}
+							else
+								gen_write(mode[1], std::abs(src));
+
+							tex = mode[0].tea + mode[1].tea + ((src < 0) ? 9 : 8);
+						}
+						break;
+					case 0xd:
+						// COMi src,dst
+						//      gen,gen
+						//      read.i,write.i
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							u32 const src = gen_read(mode[0]);
+
+							gen_write(mode[1], ~src);
+
+							tex = mode[0].tea + mode[1].tea + 7;
+						}
+						break;
+					case 0xe:
+						// IBITi offset,base
+						//       gen,gen
+						//       read.i,regaddr
+						{
+							mode[0].read_i(size);
+							mode[1].regaddr();
+							decode(mode, bytes);
+
+							s32 const offset = gen_read_sx(mode[0]);
+
+							if (mode[1].type == REG)
+							{
+								if (BIT(m_r[mode[1].gen], offset & 31))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								m_r[mode[1].gen] ^= (1U << (offset & 31));
+
+								tex = mode[0].tea + 9;
+							}
+							else
+							{
+								u32 const byte_ea = ea(mode[1]) + (offset >> 3);
+								u8 const byte = mem_read<u8>(ST_ODT, byte_ea);
+
+								if (BIT(byte, offset & 7))
+									m_psr |= PSR_F;
+								else
+									m_psr &= ~PSR_F;
+
+								mem_write<u8>(ST_ODT, byte_ea, byte ^ (1U << (offset & 7)));
+
+								tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 17;
+							}
+						}
+						break;
+					case 0xf:
+						// ADDPi src,dst
+						//       gen,gen
+						//       read.i,rmw.i
+						fatalerror("unimplemented: addp (%s)\n", machine().describe_context());
+
+						// TODO: tcy 16/18
+						break;
+					}
+				}
+				break;
+			case 0xce:
+				// format 7: xxxx xyyy yyoo ooii 1100 1110
+				{
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					size_code const size = size_code(opword & 3);
+
+					switch (BIT(opword, 2, 4))
+					{
+					case 0x0:
+						// MOVMi block1,block2,length
+						//       gen,gen,disp
+						//       addr,addr
+						{
+							mode[0].addr();
+							mode[1].addr();
+							decode(mode, bytes);
+
+							u32 block1 = ea(mode[0]);
+							u32 block2 = ea(mode[1]);
+							unsigned const num = displacement(bytes) / (size + 1) + 1;
+
+							// TODO: aligned/unaligned transfers?
+							for (unsigned i = 0; i < num; i++)
+							{
+								switch (size)
+								{
+								case SIZE_B: mem_write<u8>(ST_ODT, block2, mem_read<u8>(ST_ODT, block1)); break;
+								case SIZE_W: mem_write<u16>(ST_ODT, block2, mem_read<u16>(ST_ODT, block1)); break;
+								case SIZE_D: mem_write<u32>(ST_ODT, block2, mem_read<u32>(ST_ODT, block1)); break;
+								default:
+									// can't happen
+									break;
+								}
+
+								block1 += (size + 1);
+								block2 += (size + 1);
+							}
+
+							tex = mode[0].tea + mode[1].tea + (top(size, block1) + top(size, block2)) * num + 3 * num + 20;
+						}
+						break;
+					case 0x1:
+						// CMPMi block1,block2,length
+						//       gen,gen,disp
+						//       addr,addr
+						{
+							mode[0].addr();
+							mode[1].addr();
+							decode(mode, bytes);
+
+							u32 block1 = ea(mode[0]);
+							u32 block2 = ea(mode[1]);
+							unsigned const num = displacement(bytes) / (size + 1) + 1;
+
+							tex = mode[0].tea + mode[1].tea + 24;
+
+							m_psr |= PSR_Z;
+							m_psr &= ~(PSR_N | PSR_L);
+
+							// TODO: aligned/unaligned transfers?
+							for (unsigned i = 0; i < num; i++)
+							{
+								s32 int1 = 0;
+								s32 int2 = 0;
+
+								switch (size)
+								{
+								case SIZE_B:
+									int1 = s8(mem_read<u8>(ST_ODT, block1));
+									int2 = s8(mem_read<u8>(ST_ODT, block2));
+									break;
+								case SIZE_W:
+									int1 = s16(mem_read<u16>(ST_ODT, block1));
+									int2 = s16(mem_read<u16>(ST_ODT, block2));
+									break;
+								case SIZE_D:
+									int1 = s32(mem_read<u32>(ST_ODT, block1));
+									int2 = s32(mem_read<u32>(ST_ODT, block2));
+									break;
+								default:
+									// can't happen
+									break;
+								}
+
+								tex += top(size, block1) + top(size, block2) + 9;
+
+								if (int1 != int2)
+								{
+									m_psr &= ~PSR_Z;
+									if (int1 > int2)
+										m_psr |= PSR_N;
+									if (u32(int1) > u32(int2))
+										m_psr |= PSR_L;
+
+									break;
+								}
+
+								block1 += (size + 1);
+								block2 += (size + 1);
+							}
+						}
+						break;
+					case 0x2:
+						// INSSi src,base,offset,length
+						//       gen,gen,imm
+						//       read.i,regaddr
+						{
+							mode[0].read_i(size);
+							mode[1].regaddr();
+							decode(mode, bytes);
+
+							u8 const imm = fetch<u8>(bytes);
+							unsigned const offset = imm >> 5;
+							u32 const mask = ((2ULL << (imm & 31)) - 1) << offset;
+
+							u32 const src = gen_read(mode[0]);
+							u32 const base = gen_read(mode[1]);
+
+							gen_write(mode[1], (base & ~mask) | ((src << offset) & mask));
+
+							// TODO: tcy 39-49
+							tex = mode[0].tea + mode[1].tea + 39;
+						}
+						break;
+					case 0x3:
+						// EXTSi base,dst,offset,length
+						//       gen,gen,imm
+						//       regaddr,write.i
+						{
+							mode[0].regaddr();
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							u8 const imm = fetch<u8>(bytes);
+							unsigned const offset = imm >> 5;
+							u32 const mask = (2ULL << (imm & 31)) - 1;
+
+							u32 const base = gen_read(mode[0]);
+							u32 const dst = (base >> offset) & mask;
+
+							gen_write(mode[1], dst);
+
+							// TODO: tcy 26-36
+							tex = mode[0].tea + mode[1].tea + 26;
+						}
+						break;
+					case 0x4:
+						// MOVXBW src,dst
+						//        gen,gen
+						//        read.B,write.W
+						if (size == SIZE_B)
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(SIZE_W);
+							decode(mode, bytes);
+
+							u8 const src = gen_read(mode[0]);
+							s16 const dst = s8(src);
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 6;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x5:
+						// MOVZBW src,dst
+						//        gen,gen
+						//        read.B,write.W
+						if (size == SIZE_B)
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(SIZE_W);
+							decode(mode, bytes);
+
+							u8 const src = gen_read(mode[0]);
+							u16 const dst = src;
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 5;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x6:
+						// MOVZiD src,dst
+						//        gen,gen
+						//        read.[BW],write.D
+						if (size == SIZE_B || size == SIZE_W)
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(SIZE_D);
+							decode(mode, bytes);
+
+							u32 const src = gen_read(mode[0]);
+
+							gen_write(mode[1], src);
+
+							tex = mode[0].tea + mode[1].tea + 5;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x7:
+						// MOVXiD src,dst
+						//        gen,gen
+						//        read.[BW],write.D
+						if (size == SIZE_B || size == SIZE_W)
+						{
+							mode[0].read_i(size);
+							mode[1].write_i(SIZE_D);
+							decode(mode, bytes);
+
+							u32 const src = gen_read(mode[0]);
+							s32 const dst = (size == SIZE_W) ? s16(src) : s8(src);
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 6;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 0x8:
+						// MULi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							u32 const src1 = gen_read(mode[0]);
+							u32 const src2 = gen_read(mode[1]);
+
+							u32 const dst = src1 * src2;
+
+							gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 15 + (size + 1) * 16; // 2+2 + 15 + 16 ==
+						}
+						break;
+					case 0x9:
+						// MEIi src,dst
+						//      gen,gen
+						//      read.i,rmw.2i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							u32 const src1 = gen_read(mode[0]);
+							u32 const src2 = gen_read(mode[1]);
+
+							mode[1].rmw_i(size_code(size * 2 + 1));
+							u64 const dst = mulu_32x32(src1, src2);
+
+							if (mode[1].type == REG)
+							{
+								m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | ((dst >> 0) & size_mask[size]);
+								m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | ((dst >> ((size + 1) * 8)) & size_mask[size]);
+							}
+							else
+								// TODO: write high dword first
+								gen_write(mode[1], dst);
+
+							tex = mode[0].tea + mode[1].tea + 23 + (size + 1) * 16;
+						}
+						break;
+					case 0xa:
+						interrupt(UND, m_pc);
+						break;
+					case 0xb:
+						// DEIi src,dst
+						//      gen,gen
+						//      read.i,rmw.2i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size_code(size * 2 + 1));
+							decode(mode, bytes);
+
+							u32 const src1 = gen_read(mode[0]);
+							if (src1)
+							{
+								u64 const src2 = (mode[1].type == REG)
+									? (u64(m_r[mode[1].gen ^ 1] & size_mask[size]) << ((size + 1) * 8)) | (m_r[mode[1].gen ^ 0] & size_mask[size])
+									: gen_read(mode[1]);
+
+								u32 const quotient = src2 / src1;
+								u32 const remainder = src2 % src1;
+
+								if (mode[1].type == REG)
+								{
+									m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | (remainder & size_mask[size]);
+									m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | (quotient & size_mask[size]);
+
+									tex = mode[0].tea + 31 + (size + 1) * 16;
+								}
+								else
+								{
+									gen_write(mode[1], (u64(quotient) << ((size + 1) * 8)) | remainder);
+
+									tex = mode[0].tea + mode[1].tea + 38 + (size + 1) * 16;
+								}
+							}
+							else
+								interrupt(DVZ, m_pc);
+						}
+						break;
+					case 0xc:
+						// QUOi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const src1 = gen_read_sx(mode[0]);
+							if (src1)
+							{
+								s32 const src2 = gen_read_sx(mode[1]);
+
+								s32 const dst = src2 / src1;
+
+								gen_write(mode[1], dst);
+
+								// TODO: tcy 49-55
+								tex = mode[0].tea + mode[1].tea + 49 + (size + 1) * 16;
+							}
+							else
+								interrupt(DVZ, m_pc);
+						}
+						break;
+					case 0xd:
+						// REMi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const src1 = gen_read_sx(mode[0]);
+							if (src1)
+							{
+								s32 const src2 = gen_read_sx(mode[1]);
+
+								s32 const dst = src2 % src1;
+
+								gen_write(mode[1], dst);
+
+								// TODO: tcy 57-62
+								tex = mode[0].tea + mode[1].tea + 57 + (size + 1) * 16;
+							}
+							else
+								interrupt(DVZ, m_pc);
+						}
+						break;
+					case 0xe:
+						// MODi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const src1 = gen_read_sx(mode[0]);
+							if (src1)
+							{
+								s32 const src2 = gen_read_sx(mode[1]);
+
+								s32 const dst = (src1 + (src2 % src1)) % src1;
+
+								gen_write(mode[1], dst);
+
+								// TODO: tcy 54-73
+								tex = mode[0].tea + mode[1].tea + 54 + (size + 1) * 16;
+							}
+							else
+								interrupt(DVZ, m_pc);
+						}
+						break;
+					case 0xf:
+						// DIVi src,dst
+						//      gen,gen
+						//      read.i,rmw.i
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(size);
+							decode(mode, bytes);
+
+							s32 const src1 = gen_read_sx(mode[0]);
+							if (src1)
+							{
+								s32 const src2 = gen_read_sx(mode[1]);
+
+								s32 const quotient = src2 / src1;
+								s32 const remainder = src2 % src1;
+
+								if ((quotient < 0) && remainder)
+									gen_write(mode[1], quotient - 1);
+								else
+									gen_write(mode[1], quotient);
+
+								// TODO: tcy 58-68
+								tex = mode[0].tea + mode[1].tea + 58 + (size + 1) * 16;
+							}
+							else
+								interrupt(DVZ, m_pc);
+						}
+						break;
+					}
+				}
+				break;
+			case 0x2e:
+			case 0x6e:
+			case 0xae:
+			case 0xee:
+				// format 8: xxxx xyyy yyrr roii oo10 1110
+				{
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					unsigned const reg = BIT(opword, 3, 3);
+					size_code const size = size_code(opword & 3);
+
+					switch ((opword & 4) | BIT(opbyte, 6, 2))
+					{
+					case 0:
+						// EXTi offset,base,dst,length
+						//      reg,gen,gen,disp
+						//          regaddr,write.i
+						{
+							mode[0].regaddr();
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							s32 const offset = m_r[reg];
+							s32 const length = displacement(bytes);
+							u32 const mask = (1U << length) - 1;
+
+							if (mode[0].type == REG)
+							{
+								gen_write(mode[1], (m_r[mode[0].gen] >> (offset & 31)) & mask);
+
+								// TODO: tcy 17-51
+								tex = mode[0].tea + mode[1].tea + 17;
+							}
+							else
+							{
+								u32 const base_ea = ea(mode[0]) + (offset >> 3);
+								u32 const base = mem_read<u32>(ST_ODT, base_ea);
+
+								gen_write(mode[1], (base >> (offset & 7)) & mask);
+
+								// TODO: tcy 19-29
+								tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) + 19;
+							}
+						}
+						break;
+					case 1:
+						// CVTP offset,base,dst
+						//      reg,gen,gen
+						//          addr,write.D
+						if (size == SIZE_D)
+						{
+							mode[0].addr();
+							mode[1].write_i(size);
+							decode(mode, bytes);
+
+							s32 const offset = s32(m_r[reg]);
+							u32 const base = ea(mode[0]);
+
+							gen_write(mode[1], base * 8 + offset);
+
+							tex = mode[0].tea + mode[1].tea + 7;
+						}
+						else
+							interrupt(UND, m_pc);
+						break;
+					case 2:
+						// INSi offset,src,base,length
+						//      reg,gen,gen,disp
+						//          read.i,regaddr
+						{
+							mode[0].read_i(size);
+							mode[1].regaddr();
+							decode(mode, bytes);
+
+							s32 const offset = m_r[reg];
+							s32 const length = displacement(bytes);
+							u32 const src = gen_read(mode[0]);
+
+							if (mode[1].type == REG)
+							{
+								u32 const mask = ((1U << length) - 1) << (offset & 31);
+
+								m_r[mode[1].gen] = (m_r[mode[1].gen] & ~mask) | ((src << (offset & 31)) & mask);
+
+								// TODO: tcy 28-96
+								tex = mode[0].tea + 28;
+							}
+							else
+							{
+								u32 const base_ea = ea(mode[1]) + (offset >> 3);
+								u32 const base = mem_read<u32>(ST_ODT, base_ea);
+								u32 const mask = ((1U << length) - 1) << (offset & 7);
+
+								mem_write<u32>(ST_ODT, base_ea, (base & ~mask) | ((src << (offset & 7)) & mask));
+
+								// TODO: tcy 29-39
+								tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) * 2 + 29;
+							}
+						}
+						break;
+					case 3:
+						// CHECKi dst,bounds,src
+						//        reg,gen,gen
+						//            addr,read.i
+						{
+							mode[0].addr();
+							mode[1].read_i(size);
+							decode(mode, bytes);
+
+							u32 const bounds = ea(mode[0]);
+							s32 const src = gen_read_sx(mode[1]);
+
+							s32 lower = 0;
+							s32 upper = 0;
+							switch (size)
+							{
+							case SIZE_B:
+								upper = s8(mem_read<u8>(ST_ODT, bounds + 0));
+								lower = s8(mem_read<u8>(ST_ODT, bounds + 1));
+								break;
+							case SIZE_W:
+								upper = s16(mem_read<u16>(ST_ODT, bounds + 0));
+								lower = s16(mem_read<u16>(ST_ODT, bounds + 2));
+								break;
+							case SIZE_D:
+								upper = s32(mem_read<u32>(ST_ODT, bounds + 0));
+								lower = s32(mem_read<u32>(ST_ODT, bounds + 4));
+								break;
+							default:
+								// can't happen
+								break;
+							}
+
+							if (src >= lower && src <= upper)
+							{
+								m_psr &= ~PSR_F;
+								m_r[reg] = src - lower;
+
+								tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + 11;
+							}
+							else
+							{
+								m_psr |= PSR_F;
+
+								tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
+							}
+						}
+						break;
+					case 4:
+						// INDEXi accum,length,index
+						//        reg,gen,gen
+						//            read.i,read.i
+						{
+							mode[0].read_i(size);
+							mode[1].read_i(size);
+							decode(mode, bytes);
+
+							u32 const length = gen_read(mode[0]);
+							u32 const index = gen_read(mode[1]);
+
+							m_r[reg] = m_r[reg] * (length + 1) + index;
+
+							tex = mode[0].tea + mode[1].tea + 25 + (size + 1) * 16;
+						}
+						break;
+					case 5:
+						// FFSi base,offset
+						//      gen,gen
+						//      read.i,rmw.B
+						{
+							mode[0].read_i(size);
+							mode[1].rmw_i(SIZE_B);
+							decode(mode, bytes);
+
+							u32 const base = gen_read(mode[0]);
+							u32 offset = gen_read(mode[1]);
+							unsigned const limit = (size + 1) * 8;
+
+							m_psr |= PSR_F;
+							while (offset < limit)
+								if (BIT(base, offset))
+								{
+									m_psr &= ~PSR_F;
+									break;
+								}
+								else
+									offset++;
+
+							gen_write(mode[1], offset & (limit - 1));
+
+							// TODO: tcy 24-28
+							tex = mode[0].tea + mode[1].tea + 24 + (size + 1) * 24;
+						}
+						break;
+					case 6:
+						// MOVSU/MOVUS src,dst
+						//             gen,gen
+						//             addr,addr
+						if (!(m_psr & PSR_U))
+						{
+							if (reg == 1 || reg == 3)
+							{
+								mode[0].addr();
+								mode[1].addr();
+								decode(mode, bytes);
+
+								switch (size)
+								{
+								case SIZE_B: mem_write<u8>(ST_ODT, ea(mode[1]), mem_read<u8>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
+								case SIZE_W: mem_write<u16>(ST_ODT, ea(mode[1]), mem_read<u16>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
+								case SIZE_D: mem_write<u32>(ST_ODT, ea(mode[1]), mem_read<u32>(ST_ODT, ea(mode[0]), reg == 3), reg == 1); break;
+								default:
+									// can't happen
+									break;
+								}
+
+								tex = mode[0].tea + mode[1].tea + top(size) * 2 + 33;
+							}
+							else
+								interrupt(UND, m_pc);
+						}
+						else
+							interrupt(ILL, m_pc);
+						break;
+					}
+				}
+				break;
+			case 0x3e:
+				// format 9: xxxx xyyy yyoo ofii 0011 1110
+				if (m_cfg & CFG_F)
+				{
+					if (!m_fpu)
+						fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
+
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+					size_code const size = size_code(opword & 3);
+
+					m_fpu->write_id(opbyte);
+					m_fpu->write_op(swapendian_int16(opword));
+
+					switch (BIT(opword, 3, 3))
+					{
+					case 0:
+						// MOVif src,dst
+						//       gen,gen
+						//       read.i,write.f
+						mode[0].read_i(size);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 1:
+						// LFSR src
+						//      gen
+						//      read.D
+						mode[0].read_i(size);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 2:
+						// MOVLF src,dst
+						//       gen,gen
+						//       read.L,write.F
+						mode[0].read_f(SIZE_Q);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 3:
+						// MOVFL src,dst
+						//       gen,gen
+						//       read.F,write.L
+						mode[0].read_f(SIZE_D);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 4:
+						// ROUNDfi src,dst
+						//         gen,gen
+						//         read.f,write.i
+						mode[0].read_f(size_f);
+						mode[1].write_i(size);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 5:
+						// TRUNCfi src,dst
+						//         gen,gen
+						//         read.f,write.i
+						mode[0].read_f(size_f);
+						mode[1].write_i(size);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 6:
+						// SFSR dst
+						//      gen
+						//      write.D
+						mode[0].write_i(size);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[1], mode[0]))
+							interrupt(SLV, m_pc);
+						break;
+					case 7:
+						// FLOORfi src,dst
+						//         gen,gen
+						//         read.f,write.i
+						mode[0].read_f(size_f);
+						mode[1].write_i(size);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					}
+				}
 				else
 					interrupt(UND, m_pc);
+				break;
+			case 0x7e: // format 10
+				interrupt(UND, m_pc);
+				break;
+			case 0xbe:
+				// format 11: xxxx xyyy yyoo oo0f 1011 1110
+				if (m_cfg & CFG_F)
+				{
+					if (!m_fpu)
+						fatalerror("floating point unit not configured (%s)\n", machine().describe_context());
+
+					u16 const opword = fetch<u16>(bytes);
+
+					addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(BIT(opword, 6, 5)) };
+					size_code const size_f = BIT(opword, 0) ? SIZE_D : SIZE_Q;
+
+					m_fpu->write_id(opbyte);
+					m_fpu->write_op(swapendian_int16(opword));
+
+					switch (BIT(opword, 2, 4))
+					{
+					case 0x0:
+						// ADDf src,dst
+						//      gen,gen
+						//      read.f,rmw.f
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x1:
+						// MOVf src,dst
+						//      gen,gen
+						//      read.f,write.f
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x2:
+						// CMPf src1,src2
+						//      gen,gen
+						//      read.f,read.f
+						{
+							mode[0].read_f(size_f);
+							mode[1].read_f(size_f);
+							decode(mode, bytes);
+
+							u16 const status = slave(m_fpu, mode[0], mode[1]);
+							if (!(status & ns32000_slave_interface::SLAVE_Q))
+							{
+								m_psr &= ~(PSR_N | PSR_Z | PSR_L);
+								m_psr |= status & (ns32000_slave_interface::SLAVE_N | ns32000_slave_interface::SLAVE_Z | ns32000_slave_interface::SLAVE_L);
+							}
+							else
+								interrupt(SLV, m_pc);
+						}
+						break;
+					case 0x3:
+						// Trap(SLAVE)
+						// operands from ns32532 datasheet
+						mode[0].read_f(size_f);
+						mode[1].read_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x4:
+						// SUBf src,dst
+						//      gen,gen
+						//      read.f,rmw.f
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x5:
+						// NEGf src,dst
+						//      gen,gen
+						//      read.f,write.f
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x8:
+						// DIVf src,dst
+						//      gen,gen
+						//      read.f,rmw.f
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0x9:
+						// Trap(SLAVE)
+						// operands from ns32532 datasheet
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0xc:
+						// MULf src,dst
+						//      gen,gen
+						//      read.f,rmw.f
+						mode[0].read_f(size_f);
+						mode[1].rmw_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					case 0xd:
+						// ABSf src,dst
+						//      gen,gen
+						//      read.f,write.f
+						mode[0].read_f(size_f);
+						mode[1].write_f(size_f);
+						decode(mode, bytes);
+
+						if (slave(m_fpu, mode[0], mode[1]))
+							interrupt(SLV, m_pc);
+						break;
+					}
+				}
+				else
+					interrupt(UND, m_pc);
+				break;
+			case 0xfe: // format 12
+			case 0x9e: // format 13
+				interrupt(UND, m_pc);
+				break;
+			case 0x1e:
+				// format 14: xxxx xsss s0oo ooii 0001 1110
+				if (!(m_psr & PSR_U))
+				{
+					if (m_cfg & CFG_M)
+					{
+						if (!m_mmu)
+							fatalerror("memory management unit not configured (%s)\n", machine().describe_context());
+
+						u16 const opword = fetch<u16>(bytes);
+
+						addr_mode mode[] = { addr_mode(BIT(opword, 11, 5)), addr_mode(0x13) };
+
+						//unsigned const quick = BIT(opword, 7, 4);
+						size_code const size = size_code(opword & 3);
+
+						m_mmu->write_id(opbyte);
+						m_mmu->write_op(swapendian_int16(opword));
+
+						switch (BIT(opword, 2, 4))
+						{
+						case 0:
+							// RDVAL loc
+							//       gen
+							//       addr
+							{
+								mode[0].addr();
+								decode(mode, bytes);
+
+								// dummy read
+								mem_read<u8>(ST_ODT, ea(mode[0]), true);
+
+								u16 const status = slave(m_mmu, mode[0], mode[1]);
+								if (!(status & ns32000_slave_interface::SLAVE_Q))
+								{
+									if (status & ns32000_slave_interface::SLAVE_F)
+										m_psr |= PSR_F;
+									else
+										m_psr &= ~PSR_F;
+								}
+								else
+									interrupt(SLV, m_pc);
+
+								tex = mode[0].tea + top(SIZE_B) + 21;
+							}
+							break;
+						case 1:
+							// WRVAL loc
+							//       gen
+							//       addr
+							{
+								mode[0].addr();
+								decode(mode, bytes);
+
+								// dummy read
+								mem_read<u8>(ST_ODT, ea(mode[0]), true);
+
+								u16 const status = slave(m_mmu, mode[0], mode[1]);
+								if (!(status & ns32000_slave_interface::SLAVE_Q))
+								{
+									if (status & ns32000_slave_interface::SLAVE_F)
+										m_psr |= PSR_F;
+									else
+										m_psr &= ~PSR_F;
+								}
+								else
+									interrupt(SLV, m_pc);
+
+								tex = mode[0].tea + top(SIZE_B) + 21;
+							}
+							break;
+						case 2:
+							// LMR mmureg,src
+							//     short,gen
+							//           read.D
+							mode[0].read_i(size);
+							decode(mode, bytes);
+
+							if (slave(m_mmu, mode[0], mode[1]))
+								interrupt(SLV, m_pc);
+
+							tex = mode[0].tea + top(size);
+							break;
+						case 3:
+							// SMR mmureg,dst
+							//     short,gen
+							//           write.D
+							mode[0].write_i(size);
+							decode(mode, bytes);
+
+							if (slave(m_mmu, mode[0], mode[1]))
+								interrupt(SLV, m_pc);
+
+							tex = mode[0].tea + top(size);
+							break;
+						default:
+							interrupt(UND, m_pc);
+							break;
+						}
+					}
+					else
+						interrupt(UND, m_pc);
+				}
+				else
+					interrupt(ILL, m_pc);
+				break;
+			case 0x16: // format 15.0
+			case 0x36: // format 15.1
+			case 0xb6: // format 15.5
+				// TODO: custom coprocessor
+				break;
+			case 0x5e: // format 16
+			case 0xde: // format 17
+			case 0x8e: // format 18
+			case 0x06:
+			case 0x26:
+			case 0x46:
+			case 0x66:
+			case 0x86:
+			case 0xa6:
+			case 0xc6:
+			case 0xe6:
+				// format 19
+				interrupt(UND, m_pc);
+				break;
 			}
-			else
-				interrupt(ILL, m_pc);
-			break;
-		case 0x16: // format 15.0
-		case 0x36: // format 15.1
-		case 0xb6: // format 15.5
-			// TODO: custom coprocessor
-			break;
-		case 0x5e: // format 16
-		case 0xde: // format 17
-		case 0x8e: // format 18
-		case 0x06:
-		case 0x26:
-		case 0x46:
-		case 0x66:
-		case 0x86:
-		case 0xa6:
-		case 0xc6:
-		case 0xe6:
-			// format 19
-			interrupt(UND, m_pc);
-			break;
-		}
 
-		if (m_sequential)
-			m_pc += bytes;
+			if (m_sequential)
+				m_pc += bytes;
 
-		// trace trap
-		if (m_psr & PSR_P)
-			interrupt(TRC, m_pc);
+			// trace trap
+			if (m_psr & PSR_P)
+				interrupt(TRC, m_pc);
 
-		m_icount -= tex;
+			m_icount -= tex;
 		}
 		catch (ns32000_abort const &)
 		{
 			interrupt(ABT, m_pc);
 		}
-
 	}
 }
 
