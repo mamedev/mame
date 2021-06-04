@@ -260,7 +260,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 	void palette_init(palette_device &palette) const;
-	void screen_vblank(int state);
+	void sound_timer_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(hbl_callback);
 	TIMER_CALLBACK_MEMBER(line_on_callback);
@@ -1192,9 +1192,9 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-void supracan_state::screen_vblank(int state)
+void supracan_state::sound_timer_irq(int state)
 {
-	set_sound_irq(7, 1);
+	set_sound_irq(7, state);
 }
 
 void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
@@ -1399,7 +1399,7 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 	case 0x416:
 		// Intentional fall-through
 	default:
-		if (offset >= 0x300 && offset < 0x500)
+		if (offset >= 0x400 && offset < 0x500)
 		{
 			if (!machine().side_effects_disabled())
 			{
@@ -1461,7 +1461,7 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		break;
 	}
 	default:
-		if (offset >= 0x300 && offset < 0x500)
+		if (offset >= 0x400 && offset < 0x500)
 		{
 			LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: 6502_soundmem_w: Unknown register %04x = %02x\n", machine().describe_context(), offset, data);
 		}
@@ -1524,7 +1524,7 @@ void supracan_state::_68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_
 	m_soundram[offset * 2 + 1] = data & 0xff;
 	m_soundram[offset * 2] = data >> 8;
 
-	if (offset * 2 < 0x500 && offset * 2 >= 0x300)
+	if (offset * 2 < 0x500 && offset * 2 >= 0x400)
 	{
 		if (ACCESSING_BITS_8_15)
 		{
@@ -1543,7 +1543,7 @@ uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = m_soundram[offset * 2] << 8;
 	data |= m_soundram[offset * 2 + 1];
 
-	if (offset * 2 >= 0x300 && offset * 2 < 0x500)
+	if (offset * 2 >= 0x400 && offset * 2 < 0x500)
 	{
 		data = 0;
 		if (ACCESSING_BITS_8_15)
@@ -2102,7 +2102,7 @@ void supracan_state::supracan(machine_config &config)
 	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");
-	m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
+	//m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
 
 	PALETTE(config, "palette", FUNC(supracan_state::palette_init)).set_format(palette_device::xBGR_555, 32768);
 
@@ -2111,8 +2111,9 @@ void supracan_state::supracan(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ACANSND(config, m_sound, XTAL(3'579'545) / 16 / 5);
+	ACANSND(config, m_sound, XTAL(3'579'545));
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
+	m_sound->irq_handler().set(FUNC(supracan_state::sound_timer_irq));
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);
 

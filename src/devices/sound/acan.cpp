@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, superctr
 /***************************************************************************
 
     Super A'Can sound driver
@@ -21,6 +21,8 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, ACANSND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_timer(nullptr)
+	, m_irq_handler(*this)
 	, m_ram_read(*this)
 	, m_active_channels(0)
 {
@@ -29,8 +31,10 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 
 void acan_sound_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock());
+	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
+	m_timer = timer_alloc(0);
 
+	m_irq_handler.resolve();
 	m_ram_read.resolve_safe(0);
 
 	// register for savestates
@@ -54,11 +58,28 @@ void acan_sound_device::device_reset()
 {
 	m_active_channels = 0;
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+
+	m_timer->reset();
+	if (!m_irq_handler.isnull())
+		m_irq_handler(0);
+}
+
+void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (m_regs[0x14] & 0x40)
+	{
+		if (!m_irq_handler.isnull())
+			m_irq_handler(1);
+
+		// Update frequency
+		uint16_t period = (m_regs[0x12] << 8) + m_regs[0x11];
+		m_timer->adjust(clocks_to_attotime(10 * (0x10000 - period)), 0);
+	}
 }
 
 void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int32_t mix[clock()*2];
+	int32_t mix[(clock() / 16 / 5) * 2];
 
 	std::fill_n(&mix[0], outputs[0].samples() * 2, 0);
 
@@ -106,6 +127,12 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 uint8_t acan_sound_device::read(offs_t offset)
 {
+	if (offset == 0x14)
+	{
+		// acknowledge timer (?)
+		if(!m_irq_handler.isnull())
+			m_irq_handler(0);
+	}
 	return m_regs[offset];
 }
 
@@ -127,7 +154,18 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 				else
 					m_active_channels &= ~mask;
 			}
-			else
+			else if (lower == 0x4) // Timer control
+			{
+				if(data & 0x80)
+				{
+					// Update frequency
+					uint16_t period = (m_regs[0x12] << 8) + m_regs[0x11];
+					m_timer->adjust(clocks_to_attotime(10 * (0x10000 - period)), 0);
+				}
+				// the meaning of the data that is actually written is unknown
+				LOG("Sound timer control: %02x = %02x\n", offset, data);
+			}
+			else if (lower != 0x1 && lower != 0x2)
 			{
 				LOG("Unknown audio register: %02x = %02x\n", offset, data);
 			}
@@ -159,7 +197,8 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 			if (lower < 0xf)
 			{
 				acan_channel &channel = m_channels[lower];
-				channel.length = (data & ~0x01) << 6;
+				//channel.length = (data & ~0x01) << 6;
+				channel.length = (data & 0x0e) << 6;  // Temporary hack to make jttlaugh audible. Not the proper fix!
 				channel.end_addr = channel.curr_addr + channel.length;
 				channel.one_shot = BIT(data, 0);
 			}
