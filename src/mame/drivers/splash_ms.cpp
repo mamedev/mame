@@ -14,7 +14,7 @@
 #include "speaker.h"
 #include "tilemap.h"
 #include "sound/msm5205.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "machine/gen_latch.h"
 #include "machine/bankdev.h"
 

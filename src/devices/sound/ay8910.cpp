@@ -578,7 +578,7 @@ AY-3-8910/8912/8913 post-1983 manual: http://map.grauw.nl/resources/sound/genera
 AY-8930 datasheet: http://www.ym2149.com/ay8930.pdf
 YM2149 datasheet: http://www.ym2149.com/ym2149.pdf
 YM2203 English datasheet: http://www.appleii-box.de/APPLE2/JonasCard/YM2203%20datasheet.pdf
-YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/chip_ym2203.html
+YM2203 Japanese datasheet contents, translated: http://www.larwe.com/technical/chip_ymopn.html
 */
 
 #include "emu.h"

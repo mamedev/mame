@@ -195,7 +195,7 @@ actual code sent to the hardware.
 
 #include "emu.h"
 #include "includes/megasys1.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 
 
 

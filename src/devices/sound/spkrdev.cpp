@@ -74,14 +74,14 @@
 #include "emu.h"
 #include "sound/spkrdev.h"
 
-
-static constexpr double default_levels[2] = {0.0, 1.0};
+// The default is 1-bit, but can be customized with set_levels.
+static constexpr double default_levels[2] = { 0.0, 1.0 };
 
 // Internal oversampling factor (intermediate samples vs stream samples)
 static constexpr int RATE_MULTIPLIER = 4;
 
 
-DEFINE_DEVICE_TYPE(SPEAKER_SOUND, speaker_sound_device, "speaker_sound_device", "Filtered 1-bit DAC")
+DEFINE_DEVICE_TYPE(SPEAKER_SOUND, speaker_sound_device, "speaker_sound_device", "Filtered DAC")
 
 
 speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -143,9 +143,9 @@ void speaker_sound_device::device_start()
 	 */
 #define FILTER_STEP  (M_PI / 2 / RATE_MULTIPLIER)
 	/* Distribute symmetrically on x axis; center has x=0 if length is odd */
-	for (i = 0,             x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
+	for (i = 0, x = (0.5 - FILTER_LENGTH / 2.) * FILTER_STEP;
 			i < FILTER_LENGTH;
-			i++,                x += FILTER_STEP)
+			i++, x += FILTER_STEP)
 	{
 		if (x == 0)
 			m_ampl[i] = 1;

@@ -15,7 +15,7 @@
 
 #include "machine/pic8259.h"
 #include "sound/spkrdev.h"
-#include "sound/ymf262.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 

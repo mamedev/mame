@@ -317,7 +317,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "video/vsystem_gga.h"
 #include "emupal.h"
 #include "screen.h"

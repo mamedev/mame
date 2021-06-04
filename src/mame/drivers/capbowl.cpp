@@ -94,7 +94,7 @@
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK        XTAL(8'000'000)

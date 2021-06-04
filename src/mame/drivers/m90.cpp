@@ -25,7 +25,7 @@
 #include "machine/irem_cpu.h"
 #include "machine/rstbuf.h"
 #include "sound/dac.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

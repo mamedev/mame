@@ -143,7 +143,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

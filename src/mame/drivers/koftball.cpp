@@ -32,7 +32,7 @@ ft5_v6_c4.u58 /
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"

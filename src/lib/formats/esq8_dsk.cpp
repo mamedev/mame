@@ -80,7 +80,7 @@ void esq8img_format::find_size(io_generic *io, int &track_count, int &head_count
 	head_count = 1;
 	sector_count = 6;
 
-	if (size == 5632 * 80)
+	if(size == 5632 * 80)
 	{
 		return;
 	}
@@ -95,6 +95,7 @@ int esq8img_format::identify(io_generic *io, uint32_t form_factor, const std::ve
 
 	if(track_count)
 		return 50;
+
 	return 0;
 }
 
@@ -105,8 +106,9 @@ bool esq8img_format::load(io_generic *io, uint32_t form_factor, const std::vecto
 
 	uint8_t sectdata[(5*1024) + 512];
 	desc_s sectors[6];
-	for(int i=0; i<sector_count; i++) {
-		if (i < 5)
+	for(int i=0; i<sector_count; i++)
+	{
+		if(i < 5)
 		{
 			sectors[i].data = sectdata + (1024*i);  // 5 1024 byte sectors
 			sectors[i].size = 1024;
@@ -138,6 +140,7 @@ bool esq8img_format::load(io_generic *io, uint32_t form_factor, const std::vecto
 
 bool esq8img_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	uint64_t file_offset = 0;
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
 
@@ -151,13 +154,30 @@ bool esq8img_format::save(io_generic *io, const std::vector<uint32_t> &variants,
 	if(sector_count != 6)
 		sector_count = 6;
 
-	uint8_t sectdata[10*512];
-	int track_size = (5*1024) + 512;
+	for(int track=0; track < track_count; track++)
+	{
+		for(int head=0; head < head_count; head++)
+		{
+			auto bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
+			int sector_expected_size;
 
-	for(int track=0; track < track_count; track++) {
-		for(int head=0; head < head_count; head++) {
-			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			io_generic_write(io, sectdata, (track*head_count + head)*track_size, track_size);
+			for(int sector = 0; sector < sector_count; sector++)
+			{
+				if(sector < 5)
+					sector_expected_size = 1024;
+				else
+					sector_expected_size = 512;
+
+				if(sectors[sector].size() != sector_expected_size)
+				{
+					osd_printf_error("esq8img_format: track %d, sector %d invalid size: %d\n", track, sector, sectors[sector].size());
+					return false;
+				}
+
+				io_generic_write(io, sectors[sector].data(), file_offset, sector_expected_size);
+				file_offset += sector_expected_size;
+			}
 		}
 	}
 

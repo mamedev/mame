@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders: Roberto Fresca
+// copyright-holders: Roberto Fresca, Grull Osgo
 /**********************************************************************************
 
-    .-----------------------------------------------.
-    |                                               |
-    |            CAL OMEGA / CEI / UCMC             |
-    |       SYSTEMS 903 / 904 / 905 / 906-III       |
-    |                                               |
-    |           Driver by Roberto Fresca.           |
-    |                                               |
-    '-----------------------------------------------'
+    .-----------------------------------------.
+    |                                         |
+    |         CAL OMEGA / CEI / UCMC          |
+    |    SYSTEMS 903 / 904 / 905 / 906-III    |
+    |                                         |
+    |  Driver by Roberto Fresca & Grull Osgo  |
+    |                                         |
+    '-----------------------------------------'
 
 
     --- Technical Notes ---
@@ -131,7 +131,7 @@
 ***********************************************************************************
 
 
-   ++++ System 903/904/906-III official list of games (not complete) ++++
+   ++++ System 903/904/905/906-III official list of games (not complete) ++++
 
    -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
     VER |  NAME                    | SYSTEM  | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
@@ -148,7 +148,7 @@
  * 12.7 | Keno                     |  903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
  * 12.8 | Arcade Game (Draw Poker) |   903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
    13.4 | Nudge Bingo              |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   14.5 | Pixels                   |   903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   14.5 | Pixels                   |   903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | BD   | Yes
    14.7 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
    15.0 | Punchboard               |   903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
    15.7 | Double-Draw Poker        |   903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
@@ -209,7 +209,7 @@
  * 23.6 | Hotline                  |   905   | OCT/84  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
    23.7 | AWP Blackjack            |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    23.9 | G.Draw Poker (discard)   |   904   | JAN/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   24.0 | Gaming Draw Poker (hold) |   904   | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   24.0 | Gaming Draw Poker (hold) | 903/904 | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
    24.2 | Export Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
    24.3 | Gaming Blackjack         |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
    24.5 | Wild Double-Up           |    ?    |         | JKPKCG   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
@@ -258,6 +258,8 @@
    46.0x| Gaming Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
    47.0x| 4-Card Indian Bingo      |    ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
    48.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+        |                          |         |         |          |         |          |         |               |      |      |
+   51.07| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
    51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
         |                          |         |         |          |         |          |         |               |      |      |
  * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
@@ -443,23 +445,73 @@
     --------------
 
 
+    [2021-05]
+
+    Major improvements...
+    - Worked the analogic color system, adding the three R-G-B presets.
+    - Added the PORT_ADJUST for RGB in all games, defining the default values.
+    - Redumped the Cal Omega - Game 20.8 (Winner's Choice). Reworked proper inputs.
+    - Inputs from the scratch for all the Pixels, Keno and Hotline games. Promoted to WORKING.
+    - Specific inputs for games 12.8, 15.7, 15.9, 17.2, and 20.4. Promoted to WORKING.
+    - Fixed Pixels games colors.
+    - Connected System 903/904 PIA #0 IRQB line to CPU IRQ.
+    - Set a handler for System 903/904 PIA #0 CB1 line, as IRQ ack.
+    - Added external keyboard controller (i8035 + i8251) for Keno Games, system 903.
+    - Added virtual clickable keyboard layout to keno games, critical to get them working.
+    - Added hopper support to Cal Omega - Game 7.4 (Gaming Poker, W.Export).
+    - Added the following System 903 counters: coin in, coin out, and optional (per game).
+    - Fixed inputs on Cal Omega - Game 8.0 (Arcade Black Jack).
+    - Fixed inputs on Cal Omega - Game 12.5 (Bingo).
+    - Inputs for Cal Omega - Game 13.4 (Nudge). Promoted to WORKING.
+    - Inputs for Cal Omega - Game 17.6 (Nudge). Promoted to WORKING.
+    - Inputs for Cal Omega - Game 18.1 (Nudge). Promoted to WORKING.
+    - Added new set: CEI 51.07 (CEI 906-III Poker).
+    - Fixed/added technical notes.
+
+
+    [2021-04-26]
+
+    General improvements...
+    - Added support for extended graphics.
+    - Fixed cardbacks for 906-III games.
+    - Fixed Nudge Bingo graphics.
+    - Fixed rotten/bad bits from the program ROM with educated guess
+       to make Cal Omega - Game 7.9 (Arcade Poker) playable.
+    - Fixed inputs on Cal Omega - Game 7.6 (Arcade Poker). Now it's playable.
+    - Created proper inputs from the scratch for Cal Omega - Game 12.5 (Bingo), and promoted to WORKING.
+    - Added hopper to the 906-III games.
+    - Fixed docs / technical notes.
+
+
+    [2021-04-24]
+
+    General improvements...
+    - The PIAs set for each MACHINE_CONFIG were made independent.
+    - All the PIAs lines were adapted according to the needs of each platform.
+    - All the interrupts were set/placed as indicated in the schematics (903/905).
+    - A global hopper was added, currently assigned to platform 906-III, but it can be used by other platforms.
+    - Worked proper inputs for system 903: Cal Omega - Game 15.7 (Double-Draw Poker). The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 15.9 (Wild Double-Up). The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 17.2 (Double Double Poker). The game was promoted to WORKING.
+
+
     [2021-04-21]
 
     906-III improvements...
-	- Proper inputs for the IWC poker games.
-	- Fixed/Improved the interrupts system.
-	- Preliminary button-lamps support.
-	- Simplified and partially cleaned the code.
-	- Added technical notes.
+    - Proper inputs for the IWC poker games.
+    - Fixed/Improved the interrupts system.
+    - Preliminary button-lamps support.
+    - Simplified and partially cleaned the code.
+    - Added technical notes.
 
 
     [2021-04-20]
 
     - Reworked a lot of things to get the 906-III platform playable.
-	- Switched to Rockwell R65C02 CPU.
+    - Switched to Rockwell R65C02 CPU.
     - Added missing 906-III inputs, timers, clocks and connections.
     - Renamed Game 51.08 to CEI 51.08 (CEI 906-III Poker).
-      The game is promoted to WORKING.
+       The game is promoted to WORKING.
     - Added Casino 21 UCMC/IWC (ver 30.08). The game is working.
     - Added Poker UCMC/IWC (ver 162.03). The game is working.
     - Added Poker UCMC/IWC (ver 162.03 20-6-91). The game is working.
@@ -663,7 +715,7 @@
     - 906-III: Proper PIATs 65C24 devices.
     - 906-III: GFX banks, proper banks selector.
     - 906-III: EX and Turbo+ platforms support.
-	- Hopper support.
+    - Hopper support.
     - Parent/clone relationship.
     - Fix lamps.
 
@@ -673,10 +725,12 @@
 #include "emu.h"
 #include "includes/calomega.h"
 
-#define MASTER_CLOCK		XTAL(10'000'000)
-#define CPU_CLOCK			(MASTER_CLOCK/16)
-#define UART_CLOCK			(MASTER_CLOCK/16)
-#define SND_CLOCK			(MASTER_CLOCK/8)
+#include "kenokb.lh"
+
+#define MASTER_CLOCK        XTAL(10'000'000)
+#define CPU_CLOCK           (MASTER_CLOCK/16)
+#define UART_CLOCK          (MASTER_CLOCK/16)
+#define SND_CLOCK           (MASTER_CLOCK/8)
 
 
 /**************************************************
@@ -705,25 +759,40 @@ uint8_t calomega_state::s903_mux_port_r()
 
 void calomega_state::s903_mux_w(uint8_t data)
 {
-	m_s903_mux_data = data ^ 0xff;		// inverted
+	// bit 7 - bit 6 -bit 5 -bit 4 -> Mux. Scan Lines
+	m_s903_mux_data = data ^ 0xf0;    // inverted
+
+	// bit 0 - bit 1 -> Hopper
+	m_hopper->motor_w(BIT(~data, 0) && BIT(~data, 1));
+
+	// bit2 - bit3 -> No connected
 }
 
 uint8_t calomega_state::s905_mux_port_r()
 {
-	switch( m_s905_mux_data & 0x0f )	// bits 0-3
+	switch( m_s905_mux_data & 0x0f )    // bits 0-3
 	{
 		case 0x01: return m_in0_0->read();
 		case 0x02: return m_in0_1->read();
 		case 0x04: return m_in0_2->read();
 		case 0x08: return m_in0_3->read();
 	}
-
 	return 0xff;
 }
 
 void calomega_state::s905_mux_w(uint8_t data)
 {
-	m_s905_mux_data = data ^ 0xff;		// inverted
+//  Lower nibble
+	m_s905_mux_data = data ^ 0x0f;    // inverted
+
+/*  Upper nibble
+    PIA_1_PB_4 - Hopper1.
+    PIA_1_PB_5 - Hopper2.
+    PIA_1_PB_6 - Not Connected.
+    PIA_1_PB_7 - Lockout.
+*/
+	m_hopper->motor_w(BIT(~data, 4) && BIT(~data, 5));
+	m_lockout = BIT(data, 7);
 }
 
 
@@ -742,7 +811,10 @@ void calomega_state::pia0_aout_w(uint8_t data)
 
 void calomega_state::pia0_bout_w(uint8_t data)
 {
-	//logerror("PIA0: Port B out: %02X\n", data);
+	// Meters???...M1-M5
+	m_diverter = BIT(data, 3);
+	m_lockout = BIT(data, 5);
+	m_hopper->motor_w(BIT(~data, 6) && BIT(~data, 7));
 }
 
 uint8_t calomega_state::pia1_ain_r()
@@ -760,14 +832,13 @@ uint8_t calomega_state::pia1_ain_r()
 
 uint8_t calomega_state::pia1_bin_r()
 {
-	//logerror("PIA1: Port B in\n");
+	// logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia1_aout_w(uint8_t data)
 {
 	m_s905_mux_data = data >> 6;
-	//logerror("PIA1: Port A out (906-III mux): %02X\n", m_s905_mux_data);
 }
 
 void calomega_state::pia1_bout_w(uint8_t data)
@@ -794,36 +865,68 @@ void calomega_state::pia1_bout_w(uint8_t data)
 	m_lamps[6] = BIT(~data, 6);  // L7 (unknown)
 	m_lamps[7] = BIT(~data, 7);  // L8 (unknown)
 
-	//logerror("PIA1: Port B out: %02X\n", data);
+	// logerror("PIA1: Port B out: %02X\n", data);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_a )
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_0 )
 {
-	m_timera =! m_timera;
-	m_pia[1]->ca1_w(m_timera);
+	m_timer = !m_timer;
+	m_pia[0]->ca1_w(m_timer);
+	// logerror("Timer_0 event : state=%d\n", m_timer);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_1 )
+{
+	m_timer = !m_timer;
+	m_pia[1]->cb1_w(m_timer);
+	// logerror("Timer_1 event (TIMER) : state=%d\n", m_timer);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
+{
+	m_timer =! m_timer;
+	m_pia[1]->ca1_w(m_timer);
 	m_pia[1]->read(1);  // CRA
-	//logerror("Timer_A event : state=%d\n", m_timera);
+	// logerror("Timer_2 event : state=%d\n", m_timer);
 }
 
-READ_LINE_MEMBER(calomega_state::timera_r)
+READ_LINE_MEMBER(calomega_state::timer_r)
 {
-	//logerror("Timer_A read : state=%d\n", m_timera);
-	return m_timera;
+	// logerror("timer_1 read : state=%d\n", m_timer);
+	return m_timer;
 }
 
-WRITE_LINE_MEMBER(calomega_state::vblank_w)
+WRITE_LINE_MEMBER(calomega_state::vblank0_w)
+{
+	m_vblank = state;
+	m_pia[0]->read(0);
+	m_pia[0]->read(0);
+	m_pia[1]->cb1_w(state);
+	// m_pia[1]->read(3);  // CRB
+	// logerror("V_BLANK_0 event : state=%d\n", m_vblank);
+}
+
+WRITE_LINE_MEMBER(calomega_state::vblank1_w)
+{
+	m_vblank = state;
+	m_pia[0]->read(2);
+	m_pia[0]->cb1_w(state);
+	// logerror("V_BLANK_1 event (sale ): state=%d\n", m_vblank);
+}
+
+WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 {
 	m_vblank = state;
 	m_pia[1]->read(0);
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
-	m_pia[1]->read(3);  // CRB
-	//logerror("V_BLANK event : state=%d\n", m_vblank);
+
+	// logerror("V_BLANK_2 event : state=%d\n", m_vblank);
 }
 
 READ_LINE_MEMBER(calomega_state::vblank_r)
 {
-	//logerror("V_BLANK read : state=%d\n", m_vblank);
+	// logerror("V_BLANK read : state=%d\n", m_vblank);
 	return m_vblank;
 }
 
@@ -831,8 +934,28 @@ WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
 {
 	// Output to L9
 	m_lamps[8] = ~state;  // L9 (Door?)
-	//logerror("PIA1: CB2: %02X\n", state);
+	// logerror("PIA1: CB2: %02X\n", state);
 }
+
+// Dummy callbacks
+uint8_t calomega_state::dummy_pia_r()
+{
+	return 0xff;
+}
+
+void calomega_state::dummy_pia_w(uint8_t data)
+{
+	m_pia_data = data;
+}
+
+READ_LINE_MEMBER(calomega_state::dummy_pia_line_r)
+{
+	return false;
+}
+WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
+{
+}
+
 
 
 /********  Lamps debug  ********
@@ -857,12 +980,15 @@ WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
 */
 void calomega_state::lamps_903a_w(uint8_t data)
 {
-	// First 5 bits of PIA0 port B
+	// Whole 8 bits of PIA0 port B
 	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
 	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
 	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
 	m_lamps[3] = BIT(~data, 3);  // L4 (Hold 4)
 	m_lamps[4] = BIT(~data, 4);  // L5 (Hold 5)
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 5)); // M1 - Coins in.
+	machine().bookkeeping().coin_counter_w(1, BIT(~data, 6)); // M2 - Coins Out( 1 x 10 coins).
+	machine().bookkeeping().coin_counter_w(2, BIT(~data, 7)); // M3 - Optional (Per game).
 }
 
 void calomega_state::lamps_903b_w(uint8_t data)
@@ -887,6 +1013,14 @@ void calomega_state::lamps_905_w(uint8_t data)
 	m_lamps[7] = BIT(~data, 7);  // L8 (unknown)
 }
 
+uint8_t calomega_state::keyb_903_r()
+{
+	if(m_kbscan == 0x0d ) m_uart->write_cts(0);
+	if(m_kbscan == 0x0e ) m_uart->write_cts(1);
+	m_pia[1]->read(2); // TODO: Troubleshooting with vblank irq flag stuck
+	return m_key_row[m_kbscan]->read();
+}
+
 
 /*************************************************
 *             Memory map information             *
@@ -901,7 +1035,7 @@ void calomega_state::sys903_map(address_map &map)
 	map(0x0881, 0x0881).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x08c4, 0x08c7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x08c8, 0x08cb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x08d0, 0x08d1).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x08d0, 0x08d1).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(calomega_state::calomega_videoram_w)).share("videoram");
 	map(0x1400, 0x17ff).ram().w(FUNC(calomega_state::calomega_colorram_w)).share("colorram");
 	map(0x1800, 0x3fff).rom();
@@ -939,7 +1073,7 @@ void calomega_state::sys906_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x280c, 0x280f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x2810, 0x2811).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x2810, 0x2811).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x2824, 0x2827).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -949,6 +1083,16 @@ void calomega_state::sys906_map(address_map &map)
 	map(0x6000, 0xffff).rom();
 }
 
+void calomega_state::kstec_mem_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
+
+void calomega_state::kstec_io_map(address_map &map)
+{
+	map(0x00, 0x00).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /*************************************************
 *                  Input ports                   *
@@ -1083,48 +1227,60 @@ static INPUT_PORTS_START( stand903 )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
 
-#ifdef UNREFERENCED_CODE
-static INPUT_PORTS_START( stand904 )
+
+static INPUT_PORTS_START( keno_903 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)         // "5"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")  // "F2"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)  // "8"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
@@ -1149,7 +1305,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1164,7 +1320,33 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")    // settings (PIA0)
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1189,8 +1371,172 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  Keyboard matrix
+
+	PORT_START("KB_0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                // #81 0X51 BET   "M"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )               // #82 0X52 START "2"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("30")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("40")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_NAME("39")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("20")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("19")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("29")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("28")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("38")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("09")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("18")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("17")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("27")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("37")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("08")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("07")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("06")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("16")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("26")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("36")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("03")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("04")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("05")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("15")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("25")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("35")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("02")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("13")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("14")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("24")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("34")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("01")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("12")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("22")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("23")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("33")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("21")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("31")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("32")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("72")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("73")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("74")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("75")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("65")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("55")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("45")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("71")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("61")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("63")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("64")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("54")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("44")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_10")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("51")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("41")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("52")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("53")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("42")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("43")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Exit") PORT_CODE(KEYCODE_X)  // #84 0x54 TEST EXIT
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                                  // #83 0x53 CANCEL "N"
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("60")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("50")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("49")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_12")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("70")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("69")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("59")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("58")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("48")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_13")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("80")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("79")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("68")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("67")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("57")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("47")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KB_14")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("78")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("77")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("76")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("66")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("56")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("46")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
-#endif
+
 
 static INPUT_PORTS_START( stand905 )
 	PORT_START("IN0-0")
@@ -1236,57 +1582,44 @@ static INPUT_PORTS_START( stand905 )
 	// For System 905, SW1 uses the whole PIA1 portA.
 
 	PORT_START("SW1")    // settings (PIA1)
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")    // settings (PIA0)
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
-	PORT_DIPSETTING(    0x40, "60Hz." )
-	PORT_DIPSETTING(    0x00, "50Hz." )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( gdrwpkrd )
 	PORT_START("IN0-0")
@@ -1300,22 +1633,22 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dispute")  PORT_CODE(KEYCODE_0)    // in some games you need to open the door first
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")                      // in some games you need to open the door first
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Dispute")  PORT_CODE(KEYCODE_0)  // in some games you need to open the door first
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1323,8 +1656,8 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1415,7 +1748,20 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( gdrwpkrh )
 	PORT_START("IN0-0")
@@ -1432,19 +1778,19 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")                       // in some games you need to open the door first
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay")  PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Dispute")   PORT_CODE(KEYCODE_0)  // in some games you need to open the door first
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Hold 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Hold 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Hold 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Hold 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Hold 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1452,8 +1798,8 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1544,11 +1890,105 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( comg208 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")              PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Service/Clear")      PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Data / Audit")       PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt (Clr.Credits)") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, "Black Jack" )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Craps" )        PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Red Dog" )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Dup" )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Pay Table / Win Pair / BJ Wins" )  PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "250-50-20-8-6-4-3-2-1 / Jacks / Dealer Keeps Tier" )
+	PORT_DIPSETTING(    0x10, "250-50-25-10-8-5-3-2-1 / Aces" )
+	PORT_DIPSETTING(    0x20, "200-40-10-8-5-4-3-2-1 / Queens/ 2 to 1" )
+	PORT_DIPSETTING(    0x30, "200-40-10-8-5-4-3-2-1 / Kings / 3 to 1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Lockout" )      PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "1 Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2 Coin Lockout" )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 25, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 25, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 25, "BLUE Preset" )
+
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( arcadebj )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1558,27 +1998,27 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Door Open") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet/Play")    PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Start")       PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double Down") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hit")         PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Stand")       PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Bet/Play")    PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )        PORT_NAME("Start")       PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Hit")         PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")       PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service/Clear") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Service/Clear") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1674,7 +2114,20 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( comg074 )
 	PORT_START("IN0-0")
@@ -1683,37 +2136,37 @@ static INPUT_PORTS_START( comg074 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN0-0-6")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("IN0-1-2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN0-1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN0-1-6")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN0-3-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN0-3-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN0-3-6")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1804,11 +2257,24 @@ static INPUT_PORTS_START( comg074 )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( comg076 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // credits
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)  // credits
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
@@ -1828,22 +2294,21 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1933,7 +2398,465 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( biggame )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)  // 5 credits by coin.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)  // 10 credits by coin.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play/Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )      PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Select 1")  PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Select 2")  PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Select 3")  PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, "Coin A: 1; Coin B: 10" )
+	PORT_DIPSETTING(    0x80, "Coin A: 5; Coin B: 10" )
+
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
+	PORT_DIPSETTING(    0x80, "60Hz." )
+	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 50, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( nudgensw )    // nudge bingo
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Up") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Up") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 3 Up") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 4 Up") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 5 Up") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Replay / Credits")  PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test / Diagnostics")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Down") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Down") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 3 Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 4 Down") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 5 Down") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
+	PORT_DIPSETTING(    0x80, "60Hz." )
+	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 0, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( nudgesw )
+
+	PORT_INCLUDE( nudgensw )
+
+	PORT_MODIFY("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Options" )           PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Play 1" )
+	PORT_DIPSETTING(    0x40, "Play 1 to 3" )
+	PORT_DIPSETTING(    0x80, "Play 1 to 4" )
+	PORT_DIPSETTING(    0xc0, "Play 1 to 8" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( hotline ) // nudge bingo
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 4") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 5") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Credits")    PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn")      PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Clear Data") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Audit")      PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Down 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Down 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Down 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Down 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Down 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Tilt") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
+	PORT_DIPSETTING(    0x80, "60Hz." )
+	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 0, "BLUE Preset" )
+
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( comg128 )
 	PORT_START("IN0-0")
@@ -2063,7 +2986,298 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( comg157 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)      PORT_NAME("Coin-In A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )                  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                 PORT_NAME("Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)      PORT_NAME("Coin-In B")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Data / Audit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )                      PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )                  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )                  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )                  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )                  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )                  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )                  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )                   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x30, 0x00, "Minimum Winning Hand") PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPSETTING(    0x20, "Queens or Better" )
+	PORT_DIPSETTING(    0x30, "Kings or Better" )
+	PORT_DIPSETTING(    0x10, "Pair of Aces" )
+	PORT_DIPNAME( 0xC0, 0x80, "Maximum Bet")        PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "10" )
+	PORT_DIPSETTING(    0xC0, "20" )
+	PORT_DIPSETTING(    0x40, "50" )
+
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( comg159 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Settings (%)") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, "Game Type" )         PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Pay Table" )         PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, "250/100/25/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x20, "500/200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x00, "500/250/50/20/8/6/4/3/2/1" )
+	PORT_DIPSETTING(    0x10, "500/250/50/25/10/8/5/3/2/1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Low Winning Pair" )  PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, "Jacks" )
+	PORT_DIPSETTING(    0x80, "Queens" )
+	PORT_DIPSETTING(    0xc0, "Kings" )
+	PORT_DIPSETTING(    0x40, "Aces" )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( comg172 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Double Deal" )                    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Lower Pair to Win + Pay Table" )  PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "Jacks, 250/50/20/8/6/4/3/2/1" )
+	PORT_DIPSETTING(    0x20, "Queens, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x30, "Kings, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x10, "Aces, 250/50/25/10/8/5/3/2/1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin Lockout" )                   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "1-Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2-Coin Lockout" )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( elgrande )
 	PORT_START("IN0-0")
@@ -2157,7 +3371,20 @@ static INPUT_PORTS_START( elgrande )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 0, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( jjpoker )
 	PORT_START("IN0-0")
@@ -2251,7 +3478,20 @@ static INPUT_PORTS_START( jjpoker )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 0, "BLUE Preset" )
+
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( ssipkr )
 	PORT_START("IN0-0")
@@ -2345,6 +3585,100 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 0, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( comg204 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Hit (Pedir)") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
 
 
@@ -2361,7 +3695,7 @@ static INPUT_PORTS_START( stand906 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2)      PORT_NAME("Coin Out")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door")          PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
@@ -2369,6 +3703,7 @@ static INPUT_PORTS_START( stand906 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
 
 	PORT_START("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Discard 1")
@@ -2441,6 +3776,18 @@ static INPUT_PORTS_START( stand906 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
 
 
@@ -2457,7 +3804,7 @@ static INPUT_PORTS_START( cas21iwc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2)      PORT_NAME("Coin Out (Fichas Salida)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta)")              PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
@@ -2478,7 +3825,7 @@ static INPUT_PORTS_START( cas21iwc )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	                        PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2537,6 +3884,18 @@ static INPUT_PORTS_START( cas21iwc )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
 
 
@@ -2553,7 +3912,7 @@ static INPUT_PORTS_START( pokeriwc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2)      PORT_NAME("Coin Out (Fichas Salida)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight (Peso Tolva)") PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta Abierta)")      PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
@@ -2574,7 +3933,7 @@ static INPUT_PORTS_START( pokeriwc )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	                        PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_0) PORT_NAME("Prog Hit (Pozo Acumulado)")
@@ -2633,7 +3992,273 @@ static INPUT_PORTS_START( pokeriwc )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 0, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 0, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 75, "BLUE Preset" )
+
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pixels )  // sys905
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Bounce 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Bounce 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Bounce 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Bounce 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Bounce 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Play/Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Go/Start")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Learn")      PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Clear Data") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Audit")      PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Return") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Stay")   PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Tilt")   PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Female") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("Male")   PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 100, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 50, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 50, "BLUE Preset" )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pix903 )  // Pixels, sys903
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)  // credits
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Go/Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Return/Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Bounce 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Bounce 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Bounce 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Bounce 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Bounce 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt/Clear") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play/Bet")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Female") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Male")   PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
+	PORT_DIPSETTING(    0x80, "60Hz." )
+	PORT_DIPSETTING(    0x00, "50Hz." )
+
+//  RGB analogic pots (defaults are in %)
+
+	PORT_START("POT1_RED")
+	PORT_ADJUSTER( 100, "RED Preset" )
+
+	PORT_START("POT2_GREEN")
+	PORT_ADJUSTER( 50, "GREEN Preset" )
+
+	PORT_START("POT3_BLUE")
+	PORT_ADJUSTER( 50, "BLUE Preset" )
+
+INPUT_PORTS_END
+
 
 
 /*************************************************
@@ -2875,19 +4500,21 @@ GFXDECODE_END
 *                 ACIA Interface                 *
 *************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::write_acia_tx)
-{
-	m_tx_line = state;
-}
-
 WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 {
-	m_acia6850_0->write_txc(state);
-	m_acia6850_0->write_rxc(state);
-
+	m_acia6850[0]->write_txc(state);
+	m_acia6850[0]->write_rxc(state);
 	update_aciabaud_scale(0);
 }
 
+WRITE_LINE_MEMBER(calomega_state::w_903kb_acia_clock)
+{
+	m_acia6850[0]->write_txc(state);
+	m_acia6850[0]->write_rxc(state);
+	m_uart->write_txc(state);
+	m_uart->write_rxc(state);
+	update_aciabaud_scale(0);
+}
 
 /*************************************************
 *                Machine Drivers                 *
@@ -2898,26 +4525,38 @@ void calomega_state::sys903(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, CPU_CLOCK);   // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys903_map);
-	m_maincpu->set_vblank_int("screen", FUNC(calomega_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
+	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
+	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
+	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
 	PIA6821(config, m_pia[1], 0);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
+	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(subseconds::from_usec(0));
+	screen.set_vblank_time(subseconds::from_usec(100));
 	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
+
+	screen.screen_vblank().set(FUNC(calomega_state::vblank0_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
 	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256);
@@ -2933,12 +4572,94 @@ void calomega_state::sys903(machine_config &config)
 	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	// acia
-	ACIA6850(config, m_acia6850_0, 0);
-	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
+	// acia 0
+	ACIA6850(config, m_acia6850[0], 0);
+	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
 	aciabaud.signal_handler().set(FUNC(calomega_state::write_acia_clock));
+
+	TIMER(config, "timer_0").configure_periodic(FUNC(calomega_state::timer_0), attotime::from_hz(550*2));  // (time*2) - Each timer pulse -> half period
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+}
+
+
+void calomega_state::sys903kb(machine_config &config)
+{
+	// basic machine hardware
+	M6502(config, m_maincpu, CPU_CLOCK);   // confirmed
+	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys903_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	I8035(config, m_kstec, XTAL(5'185'000)); // from schematics
+	m_kstec->set_addrmap(AS_PROGRAM, &calomega_state::kstec_mem_map);
+	m_kstec->set_addrmap(AS_IO, &calomega_state::kstec_io_map);
+	m_kstec->p2_out_cb().set([this] (int data) { calomega_state::m_kbscan = (data & 0xf0) >> 4; });  // set keyboard scan lines
+	m_kstec->p1_in_cb().set(FUNC(calomega_state::keyb_903_r));                                       // get keyboard input lines
+	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
+	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
+
+	PIA6821(config, m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
+	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
+	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
+	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
+
+	PIA6821(config, m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: unknown reads.
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
+	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M4 pulsed out
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // M5 pulsed out
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
+
+	screen.screen_vblank().set(FUNC(calomega_state::vblank0_w));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256);
+
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));  // 6845 @ CPU clock
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK));  // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
+
+	// acia 0
+	ACIA6850(config, m_acia6850[0], 0);
+	m_acia6850[0]->txd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+
+	I8251(config, m_uart, 5'185'000);
+	m_uart->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
+	m_uart->rxrdy_handler().set([this] (int state) { calomega_state::m_rxrdy = state;});
+
+	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
+	aciabaud.signal_handler().set(FUNC(calomega_state::w_903kb_acia_clock));
+
+	TIMER(config, "timer_0").configure_periodic(FUNC(calomega_state::timer_0), attotime::from_hz(550*2));  // (time*2) - Each timer pulse -> half period
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 }
 
 
@@ -2947,7 +4668,6 @@ void calomega_state::s903mod(machine_config &config)
 	sys903(config);
 
 	// basic machine hardware
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::s903mod_map);
 
 	// sound hardware
@@ -2963,29 +4683,45 @@ void calomega_state::sys905(machine_config &config)
 	sys903(config);
 
 	// basic machine hardware
-
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys905_map);
 
-	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));
-	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));
+	// video hardware
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
+	screen.screen_vblank().set(FUNC(calomega_state::vblank1_w));
+
+	PIA6821(config.replace(), m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Muxed inputs read.
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
+	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
+
+	PIA6821(config.replace(), m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
 
 	// sound hardware
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
+	TIMER(config.replace(), "timer_0").configure_periodic(FUNC(calomega_state::timer_1), attotime::from_hz(520*2)); // (time*2) - Each timer pulse -> half period
+
 	config.device_remove("acia6850_0");
 	config.device_remove("aciabaud");
 }
+
 
 void calomega_state::sys906(machine_config &config)
 {
 	sys903(config);
 
 	// basic machine hardware
-	R65C02(config.replace(), m_maincpu, CPU_CLOCK);	// confirmed
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK);  // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys906_map);
-//	m_maincpu->sync_cb().set(FUNC(calomega_state::cpu_sync));
 
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -2994,31 +4730,33 @@ void calomega_state::sys906(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
-	screen.screen_vblank().set(FUNC(calomega_state::vblank_w));
+	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
+	PIA6821(config.replace(), m_pia[0], 0);
+	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
+	m_pia[0]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Ignored
+	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Diverter
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));       // Bit 7 - CGBANK ???? input?-output?
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));       // Meters ??? (M1-M5), coils, hopper
 
-	m_pia[0]->readpa_handler().set_ioport("SW1");
-	m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));
-	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));
-	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));
-
-	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));
+	PIA6821(config.replace(), m_pia[1], 0);
+	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
-	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timera_r));
-	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));
-	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
-	m_pia[1]->cb2_handler().set(FUNC(calomega_state::pia1_cb2_w));
-	m_pia[1]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);
-	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);
+	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.    (CPU -> PIA)
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));       // Mux. Scan lines
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));       // Lamps 1 to 8
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::pia1_cb2_w));            // V_BLANK interrupt line input (from Vertical Synch)
+	m_pia[1]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event.  (PIA -> CPU)
 
 	m_gfxdecode->set_info(gfx_sys906);
 
 	// sound hardware
-	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));	// confirmed
-	ay8912.port_a_read_callback().set_ioport("SW2");						// from schematics
+	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));     // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW2");                          // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	TIMER(config, "timer_a").configure_periodic(FUNC(calomega_state::timer_a), attotime::from_hz(610));
+	TIMER(config.replace(), "timer_0").configure_periodic(FUNC(calomega_state::timer_2), attotime::from_hz(380*2));  // (time*2) - Each timer pulse -> half period
 }
 
 
@@ -3049,8 +4787,8 @@ ROM_START( comg074 )  // Cal Omega v7.4 (Gaming Poker)
 	ROM_LOAD( "poker_cg2b.u69", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "poker_cg2a.u68", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, "proms", 0 ) // from other set
-	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, BAD_DUMP CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
 ROM_START( comg076 )  // Cal Omega v7.6 (Arcade Poker)
@@ -3074,13 +4812,14 @@ ROM_START( comg076 )  // Cal Omega v7.6 (Arcade Poker)
 ROM_END
 
 ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
+/*  The original code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
+    Also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
+    Found damaged bits on this program ROM. Fix details on init().
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "07-91.u5",   0x1800, 0x0800, CRC(da415c27) SHA1(be42f1d36579ff8fafd6df4e30a64a6141a7a2ae) )
 	ROM_LOAD( "07-92.u6",   0x2000, 0x0800, CRC(31211ed3) SHA1(799bc4ca77ee01a4d45320263e4cc2d066ec26e5) )
 
-	/* code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
-	also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
-	*/
 	ROM_LOAD( "07-93.u7",   0x2800, 0x0800, BAD_DUMP CRC(52c84b9c) SHA1(569d6384b9084a11fe84e291f1c165bc0df3ab49) )
 	ROM_LOAD( "07-94.u8",   0x3000, 0x0800, CRC(ed0e7d4a) SHA1(72f512ca2da573e4571ca6f164fb055daa26dd3c) )
 	ROM_LOAD( "07-95.u9",   0x3800, 0x0800, CRC(3acc8f49) SHA1(1a193cc292f79da869caddd11478d6ad55466d7b) )
@@ -3135,6 +4874,9 @@ ROM_START( comg094 )  // Cal Omega v9.4 (Keno)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 ROM_START( comg107 )  // Cal Omega v10.7c (Big Game)
@@ -3153,11 +4895,8 @@ ROM_START( comg107 )  // Cal Omega v10.7c (Big Game)
 	ROM_LOAD( "lotcgb.u69", 0x1000, 0x1000, CRC(5bda0f42) SHA1(d4b3340e9c8ca49483fa846103f0bd81d57a5ab3) )
 	ROM_LOAD( "lotcga.u68", 0x2000, 0x1000, CRC(0975e360) SHA1(7b9dbbae50c43ad99ee11798ada0a44e71c611f9) )
 
-	ROM_REGION( 0x0800, "user1", 0 )  // keyboard interfase ROM
-	ROM_LOAD( "lotkbd.sub", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
-
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
+	ROM_LOAD( "bgclr.u28",  0x0000, 0x0100, CRC(6c2d44c5) SHA1(01412dbb9e8e30f01cc24fbf900c02eaf8956622) )
 ROM_END
 
 ROM_START( comg123 )  // Cal Omega v12.3 (Ticket Poker)
@@ -3218,6 +4957,9 @@ ROM_START( comg127 )  // Cal Omega v12.7 (Keno)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 ROM_START( comg128 )  // Cal Omega v12.8 (Arcade Game)
@@ -3261,12 +5003,12 @@ ROM_START( comg134 )  // Cal Omega 13.4 (Nudge Keno)
 ROM_END
 
 ROM_START( comg145 )  // Cal Omega v14.5 (Pixels)
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14-51.u5",   0x1800, 0x0800, CRC(b173af4b) SHA1(2fd7d391c765e8e5bf148d92223ffc2a2619dcfd) )
-	ROM_LOAD( "14-52.u6",   0x2000, 0x0800, CRC(f12434c5) SHA1(f957831867cc8c98fb479cd2d859790d19883d26) )
-	ROM_LOAD( "14-53.u7",   0x2800, 0x0800, CRC(3b22802b) SHA1(8cc563e79fd90873132e358f2ce5942ddbd65144) )
-	ROM_LOAD( "14-54.u8",   0x3000, 0x0800, CRC(8a230410) SHA1(4ff31869a7389af20f6557d9306f19a5d3ba5766) )
-	ROM_LOAD( "14-55.u9",   0x3800, 0x0800, CRC(0e6e7413) SHA1(6e2b37f6cbb49ce3e0111777a3b197f5b2012ed0) )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // the set doesn't pass the checksum, so needs a redump.
+	ROM_LOAD( "14-51.u5",   0x1800, 0x0800, BAD_DUMP CRC(b173af4b) SHA1(2fd7d391c765e8e5bf148d92223ffc2a2619dcfd) )
+	ROM_LOAD( "14-52.u6",   0x2000, 0x0800, BAD_DUMP CRC(f12434c5) SHA1(f957831867cc8c98fb479cd2d859790d19883d26) )
+	ROM_LOAD( "14-53.u7",   0x2800, 0x0800, BAD_DUMP CRC(3b22802b) SHA1(8cc563e79fd90873132e358f2ce5942ddbd65144) )
+	ROM_LOAD( "14-54.u8",   0x3000, 0x0800, BAD_DUMP CRC(8a230410) SHA1(4ff31869a7389af20f6557d9306f19a5d3ba5766) )
+	ROM_LOAD( "14-55.u9",   0x3800, 0x0800, BAD_DUMP CRC(0e6e7413) SHA1(6e2b37f6cbb49ce3e0111777a3b197f5b2012ed0) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "pxcg0.u67",  0x0000, 0x0800, CRC(4b487d88) SHA1(ae8bf1c84c475a70ea98eb8419a920389bac1761) )
@@ -3338,6 +5080,9 @@ ROM_START( comg164 )  // Cal Omega v16.4 (Keno)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
@@ -3358,6 +5103,9 @@ ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 ROM_START( comg172 )  // Cal Omega v17.2 (Double Double Poker)
@@ -3460,6 +5208,26 @@ ROM_START( comg183 )  // Cal Omega v18.3 (Pixels)
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
+ROM_START( comg184 )  // Cal Omega v18.4 (Pixels)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "18-42.u6",   0x4000, 0x1000, CRC(b80f6912) SHA1(8675ebb57aa9f7d9dfa38920e31bc9d0824eeaac) )
+	ROM_LOAD( "18-43.u7",   0x5000, 0x1000, CRC(bb68fabc) SHA1(35b4bd0b1a9aa432fe1e341c63d839c3834b8684) )
+	ROM_LOAD( "18-44.u8",   0x6000, 0x1000, CRC(5ef0b953) SHA1(6da595404505fe50bf52bcb720ec46ca020dec97) )
+	ROM_LOAD( "18-45.u9",   0x7000, 0x1000, CRC(bc56398d) SHA1(9c6e328f2c81b57d797e9db4b083d1974fa1d159) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "pxcg0.u67",  0x0000, 0x0800, CRC(4b487d88) SHA1(ae8bf1c84c475a70ea98eb8419a920389bac1761) )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "pxcgc.u70",  0x0000, 0x1000, CRC(9750eea2) SHA1(4f8b04a161501840ad2576379f23e8be2d46a488) )
+	ROM_LOAD( "pxcgb.u69",  0x1000, 0x1000, CRC(a3bed6b1) SHA1(078cface4af9720bee3288f5f0236725c8bfb575) )
+	ROM_LOAD( "pxcga.u68",  0x2000, 0x1000, CRC(d80f064a) SHA1(1b22ca3e446ed3c6fb49a90c463394dec96bc4ec) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
+ROM_END
+
 ROM_START( comg185 )  // Cal Omega v18.5 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
@@ -3542,7 +5310,7 @@ ROM_END
 
 ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "20-81.u5",   0x3000, 0x1000, CRC(938be03a) SHA1(606252b5160a7af340faa3d4ed6af9dff849c9ac) )
+	ROM_LOAD( "20-81.u5",   0x3000, 0x1000, CRC(b042de4d) SHA1(6de8e5ca45fe8159d30da2754fab818e84bbcc0c) )
 	ROM_LOAD( "20-82.u6",   0x4000, 0x1000, CRC(7d42257c) SHA1(f1487bcc2475d1bcdfbc9bf866adcb0d510acef5) )
 	ROM_LOAD( "20-83.u7",   0x5000, 0x1000, CRC(b3b25958) SHA1(096f010db3164579ba81851a3f1062df0f46fc0f) )
 	ROM_LOAD( "20-84.u8",   0x6000, 0x1000, CRC(0bfb9f9d) SHA1(4a3c1e88faa90a9f4a483b053beb2c8af688d52d) )
@@ -3557,14 +5325,14 @@ ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_LOAD( "mlt2cga.u68",    0x2000, 0x1000, CRC(b7397d3a) SHA1(f35607a4cd60e4467e27474e8063b7a7a4a65d9f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
+	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(ab8960a6) SHA1(2414b445739860a0c3e533f2992291ff8a471d76) )
 ROM_END
 
 ROM_START( comg227 )  // Cal Omega v22.7 (Amusement Poker (Double Double))
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
-	ROM_LOAD( "22-73.u7",   0x5000, 0x1000, CRC(152d1ff9) SHA1(8bbfea1bae9e4fe2a2ac52507dc8dd0e33fbbd06) )
+	ROM_LOAD( "22-73.u7",   0x5000, 0x1000, BAD_DUMP CRC(152d1ff9) SHA1(8bbfea1bae9e4fe2a2ac52507dc8dd0e33fbbd06) )
 	ROM_LOAD( "22-74.u8",   0x6000, 0x1000, CRC(3af0f69d) SHA1(c34a0eab3ad4e4db310727805ba1ddc73533bfa6) )
 	ROM_LOAD( "22-75.u9",   0x7000, 0x1000, CRC(d1f3fe24) SHA1(8b43b521fb1be8ef4286b4bfee99b654c49cf9de) )
 
@@ -3731,6 +5499,9 @@ ROM_START( comg272a )  // Cal Omega v27.2 (Keno (amusement))
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
@@ -3751,6 +5522,9 @@ ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
+
+	ROM_REGION(0x1000, "kstec", 0)
+	ROM_LOAD( "903kstec.0", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 ROM_END
 
 /*
@@ -3766,7 +5540,7 @@ ROM_END
 
 ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // checked in offset $8034
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. checked in offset $8034
 	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
 	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
 	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
@@ -3777,7 +5551,24 @@ ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
 	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
-	ROM_REGION( 0x200, "proms", 0 )  // from other set, second half is empty
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
+	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
+ROM_END
+
+ROM_START( comg5107 )  // Cal Omega v51.07 (Poker)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // schedule eprom 05F. same as the 51.08 set
+	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(1cefe40d) SHA1(9169c466903485d6e78c53bd104dc61722437509) )
+	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(0bc9be3e) SHA1(bce88a6a37ded6396954ec8c11e19af66f658e4d) )
+	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(34e7d16f) SHA1(c4901e00a5dbaeb6277dbe9bdcad93827c5aa947) )
+	ROM_LOAD( "epr5.u32",   0xe000, 0x2000, CRC(e5a252b5) SHA1(7a226c771ba16944b4e50c22db0cd5d7fc530e11) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cg2c.u4",    0x0000, 0x2000, CRC(dc77a6db) SHA1(3af5f568de3f2af1a6bbb00d673bdbff16c87a40) )
+	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
+	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // second half is empty
 	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
@@ -4055,26 +5846,135 @@ ROM_END
 *                  Driver Init                   *
 *************************************************/
 
-void calomega_state::init_sys903()
+void calomega_state::init_comg079()
 {
-	save_item(NAME(m_tx_line));
-	save_item(NAME(m_s903_mux_data));
-}
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-void calomega_state::init_s903mod()
-{
-	save_item(NAME(m_s903_mux_data));
-}
-
-void calomega_state::init_sys905()
-{
-	save_item(NAME(m_s905_mux_data));
+	PRGROM[0x2ad2] = 0x00;  // checksum flag (0xe0)
+	PRGROM[0x2CD1] = 0x33;
+	PRGROM[0x2CD3] = 0x5A;
+	PRGROM[0x2CD5] = 0x76;
+	PRGROM[0x2CD9] = 0x13;
+	PRGROM[0x2CDB] = 0x30;
+	PRGROM[0x2CDD] = 0x06;
+	PRGROM[0x2D01] = 0x10;
+	PRGROM[0x2D06] = 0x36;
+	PRGROM[0x2D07] = 0x20;
+	PRGROM[0x2D08] = 0x7D;
+	PRGROM[0x2D09] = 0x3D;
+	PRGROM[0x2D0A] = 0x60;
+	PRGROM[0x2D30] = 0x26;
+	PRGROM[0x2D31] = 0x00;
+	PRGROM[0x2D33] = 0x00;
+	PRGROM[0x2D35] = 0x25;
+	PRGROM[0x2D36] = 0x00;
+	PRGROM[0x2D37] = 0x4C;
+	PRGROM[0x2D39] = 0x34;
+	PRGROM[0x2D3B] = 0x00;
+	PRGROM[0x2D3C] = 0x38;
+	PRGROM[0x2D3E] = 0x40;
+	PRGROM[0x2D3F] = 0x48;
+	PRGROM[0x2D41] = 0x01;
+	PRGROM[0x2D44] = 0x48;
+	PRGROM[0x2D46] = 0x02;
+	PRGROM[0x2D48] = 0x0F;
+	PRGROM[0x2D4A] = 0x0B;
+	PRGROM[0x2D4C] = 0x02;
+	PRGROM[0x2D4F] = 0x01;
+	PRGROM[0x2D50] = 0x68;
+	PRGROM[0x2D52] = 0x00;
+	PRGROM[0x2D53] = 0x4C;
+	PRGROM[0x2D54] = 0x3A;
+	PRGROM[0x2D55] = 0x2D;
+	PRGROM[0x2D56] = 0x68;
+	PRGROM[0x2D57] = 0x68;
+	PRGROM[0x2D58] = 0x60;
+	PRGROM[0x2D5A] = 0x00;
+	PRGROM[0x2D5C] = 0x06;
+	PRGROM[0x2D5E] = 0x01;
+	PRGROM[0x2D60] = 0x02;
+	PRGROM[0x2D62] = 0x02;
+	PRGROM[0x2D63] = 0x20;
+	PRGROM[0x2D64] = 0x3A;
+	PRGROM[0x2D65] = 0x2D;
+	PRGROM[0x2D66] = 0x60;
+	PRGROM[0x2D68] = 0x00;
+	PRGROM[0x2D6A] = 0x08;
+	PRGROM[0x2D6C] = 0x01;
+	PRGROM[0x2D6E] = 0x02;
+	PRGROM[0x2D79] = 0x0A;
+	PRGROM[0x2D7B] = 0x06;
+	PRGROM[0x2D80] = 0x78;
+	PRGROM[0x2D81] = 0x2D;
+	PRGROM[0x2D82] = 0x09;
+	PRGROM[0x2D84] = 0x60;
+	PRGROM[0x2D86] = 0x00;
+	PRGROM[0x2D87] = 0xBE;
+	PRGROM[0x2D88] = 0x97;
+	PRGROM[0x2D89] = 0x2D;
+	PRGROM[0x2D8C] = 0x97;
+	PRGROM[0x2D8F] = 0x9D;
+	PRGROM[0x2D90] = 0x00;
+	PRGROM[0x2D98] = 0x04;
+	PRGROM[0x2D9C] = 0x00;
+	PRGROM[0x2DAC] = 0x04;
+	PRGROM[0x2DB0] = 0x04;
+	PRGROM[0x2DB4] = 0x00;
+	PRGROM[0x2DB6] = 0x0F;
+	PRGROM[0x2DB8] = 0x04;
+	PRGROM[0x2DBC] = 0x04;
+	PRGROM[0x2DD1] = 0x20;
+	PRGROM[0x2DD3] = 0x00;
+	PRGROM[0x2DD5] = 0x00;
+	PRGROM[0x2DD6] = 0x10;
+	PRGROM[0x2DD7] = 0x99;
+	PRGROM[0x2DD9] = 0x11;
+	PRGROM[0x2DDB] = 0x00;
+	PRGROM[0x2DDD] = 0x99;
+	PRGROM[0x2DDE] = 0x00;
+	PRGROM[0x2DE3] = 0x8A;
+	PRGROM[0x2DE5] = 0x00;
+	PRGROM[0x2DE6] = 0x99;
+	PRGROM[0x2DE7] = 0x00;
+	PRGROM[0x2DE8] = 0x14;
+	PRGROM[0x2DE9] = 0x99;
+	PRGROM[0x2DEA] = 0x00;
+	PRGROM[0x2DEB] = 0x15;
+	PRGROM[0x2DED] = 0x00;
+	PRGROM[0x2DEE] = 0x16;
+	PRGROM[0x2DEF] = 0x99;
+	PRGROM[0x2E01] = 0x90;
+	PRGROM[0x2E03] = 0x45;
+	PRGROM[0x2E05] = 0x49;
+	PRGROM[0x2E06] = 0x01;
+	PRGROM[0x2E07] = 0x4A;
+	PRGROM[0x2E09] = 0x90;
+	PRGROM[0x2E0B] = 0x91;
+	PRGROM[0x2E0D] = 0x92;
+	PRGROM[0x2E0F] = 0x93;
+	PRGROM[0x2E30] = 0xE0;
+	PRGROM[0x2E31] = 0x12;
+	PRGROM[0x2E32] = 0x90;
+	PRGROM[0x2E34] = 0xAD;
+	PRGROM[0x2E35] = 0xC4;
+	PRGROM[0x2E36] = 0x08;
+	PRGROM[0x2E37] = 0x29;
+	PRGROM[0x2E38] = 0x80;
+	PRGROM[0x2E39] = 0xD0;
+	PRGROM[0x2E3A] = 0x13;
+	PRGROM[0x2E3B] = 0xA0;
+	PRGROM[0x2E3C] = 0x00;
+	PRGROM[0x2E3E] = 0x04;
+	PRGROM[0x2E67] = 0x2E;
+	PRGROM[0x2E68] = 0x8D;
+	PRGROM[0x2E69] = 0x08;
+	PRGROM[0x2E6A] = 0x00;
+	PRGROM[0x2E6E] = 0x8D;
+	PRGROM[0x2E6F] = 0x09;
 }
 
 void calomega_state::init_comg080()
 {
-	init_sys903();
-
 	/* Injecting missing Start and NMI vectors...
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
@@ -4090,89 +5990,87 @@ void calomega_state::init_comg080()
 	PRGROM[0x3fff] = 0x26;
 }
 
-void calomega_state::init_comg5108()
-{
-	uint8_t *PRGROM = memregion( "maincpu" )->base();
-	PRGROM[0xc080] = 0xff;   // CHECKSUM ERROR FLAG - No changes for now.
-	// Debug
-	// PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
-	// PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
-	// PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
-	// PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
-	// PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
-}
-
-void calomega_state::init_cas21iwc()
+void calomega_state::init_comg145()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0xB603] = 0xff;		// Checksum flag. No changes for now.
+	PRGROM[0x3ff8] = 0x0a;    // patching the checksum error.
+	PRGROM[0x3ff9] = 0xc1;    // patching the checksum error.
 }
 
-void calomega_state::init_pokeriwc()
+void calomega_state::init_comg176()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0x8000] = 0xa2;		// Checksum flag. No changes for now.
+	PRGROM[0x25df] = 0x00;    // patching the checksum flag.
 }
 
+// for debug purposes...
+void calomega_state::init_any()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+	PRGROM[0x0000] = 0x00;
+
+}
 
 /*************************************************
 *                  Game Drivers                  *
 *************************************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                           FLAGS   */
-GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",         MACHINE_SUPPORTS_SAVE )                          /* bad dump */
-GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
-GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                           FLAGS                                         LAYOUTS  */
+GAME(  1981, comg074,  0,        sys903,   comg074,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",    MACHINE_SUPPORTS_SAVE )
+GAME(  1981, comg076,  0,        sys903,   comg076,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )
+GAME(  1981, comg079,  0,        sys903,   comg076,  calomega_state, init_comg079, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",         MACHINE_SUPPORTS_SAVE )    // bad dump
+GAMEL( 1981, comg094,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
+GAME(  1982, comg107,  0,        sys903,   biggame,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_SUPPORTS_SAVE )
+GAME(  1982, comg123,  0,        sys903,   stand903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1982, comg125,  0,        sys903,   nudgesw,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_SUPPORTS_SAVE )
+GAMEL( 1982, comg127,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
+GAME(  1982, comg128,  0,        sys903,   comg128,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
+GAME(  1982, comg134,  0,        sys903,   nudgensw, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
+GAME(  1982, comg145,  0,        sys903,   pix903,   calomega_state, init_comg145, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1983, comg157,  0,        sys903,   comg157,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg159,  0,        sys905,   comg159,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
+GAMEL( 1983, comg164,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE,  layout_kenokb )    // incomplete dump
+GAMEL( 1983, comg168,  0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_SUPPORTS_SAVE,                        layout_kenokb )
+GAME(  1983, comg172,  0,        sys905,   comg172,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
+GAME(  1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
+GAME(  1982, comg181,  0,        sys903,   nudgesw,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg183,  0,        sys905,   pixels,   calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg184,  0,        sys905,   pixels,   calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.4 (Pixels)",                   MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg185,  0,        sys905,   pixels,   calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg186,  0,        sys905,   pixels,   calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_SUPPORTS_SAVE )
+GAME(  1983, comg187,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1984, comg204,  0,        sys905,   comg204,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg208,  0,        sys905,   comg208 , calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_SUPPORTS_SAVE )
+GAME(  1984, comg227,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1984, comg230,  0,        sys905,   stand905, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME(  1984, comg236,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )
+GAME(  1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",        MACHINE_SUPPORTS_SAVE )
+GAME(  1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",  MACHINE_SUPPORTS_SAVE )
+GAME(  1985, comg246,  0,        sys905,   hotline,  calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_SUPPORTS_SAVE )
+GAMEL( 1985, comg272a, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",          MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
+GAMEL( 1985, comg272b, 0,        sys903kb, keno_903, calomega_state, empty_init,   ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_SUPPORTS_SAVE,                         layout_kenokb )
 
 //************ Diagnostic Sets ************
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, empty_init,    ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_SUPPORTS_SAVE )
 
 //************* 906-III games **************
-GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, init_comg5108, ROT0, "Casino Electronics Inc.",              "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5107, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.07 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,    ROT0, "Casino Electronics Inc.",               "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 903/904/905 3rd part games *******
-GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, empty_init,   ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v2.4)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v3.0)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, empty_init,   ROT0, "SSI",                                     "SSI Poker (v4.0)",                               MACHINE_SUPPORTS_SAVE )
 
 //****** Unofficial 906-III family 3rd part games *******
-GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, init_cas21iwc, ROT0, "UCMC/IWC",                               "Casino 21 UCMC/IWC (ver 30.08)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03 20-6-91)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Casino 21 UCMC/IWC (ver 30.08)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, empty_init,   ROT0, "UCMC/IWC",                              "Poker UCMC/IWC (ver 162.03 20-6-91)",              MACHINE_SUPPORTS_SAVE )

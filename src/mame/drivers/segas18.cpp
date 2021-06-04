@@ -37,7 +37,7 @@
 
 #include "machine/nvram.h"
 #include "sound/rf5c68.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 /*************************************

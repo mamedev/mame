@@ -47,7 +47,7 @@ TODO:
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

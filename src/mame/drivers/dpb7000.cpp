@@ -50,12 +50,12 @@
 #define LOG_TDS             (1 << 17)
 #define LOG_TABLET          (1 << 18)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_CSR | LOG_CTRLBUS | LOG_SYS_CTRL | LOG_FDC_CTRL | LOG_FDC_PORT | LOG_FDC_CMD | LOG_FDC_MECH | LOG_BRUSH_ADDR | \
-							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD)
+							 LOG_STORE_ADDR | LOG_COMBINER | LOG_SIZE_CARD | LOG_FILTER_CARD | LOG_TABLET)
 
 #define VERBOSE             (LOG_TABLET)
 #include "logmacro.h"
 
-static const uint16_t fuck[4] = { 550, 856, 1040, 1136 };
+static const uint16_t temp_pen_reads[4] = { 573, 840, 1320, 1360 };
 
 class dpb7000_state : public driver_device
 {
@@ -91,6 +91,8 @@ public:
 		, m_tablet_cpu(*this, "tablet")
 		, m_tablet_dips(*this, "TABDIP%u", 0U)
 		, m_pen_prox(*this, "PENPROX")
+		, m_pen_x(*this, "PENX")
+		, m_pen_y(*this, "PENY")
 		, m_filter_signalprom(*this, "filter_signalprom")
 		, m_filter_multprom(*this, "filter_multprom")
 		, m_filter_signal(nullptr)
@@ -368,6 +370,8 @@ private:
 	required_device<z8681_device> m_tablet_cpu;
 	required_ioport_array<2> m_tablet_dips;
 	required_ioport m_pen_prox;
+	required_ioport m_pen_x;
+	required_ioport m_pen_y;
 	uint8_t tablet_p2_r(offs_t offset, uint8_t mem_mask);
 	void tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint8_t tablet_p3_r(offs_t offset, uint8_t mem_mask);
@@ -554,6 +558,12 @@ static INPUT_PORTS_START( dpb7000 )
 	PORT_START("PENPROX")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Pen Proximity") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, dpb7000_state, pen_prox_changed, 0)
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("PENX")
+	PORT_BIT( 0xffff, 5000, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(0, 10000) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0)
+
+	PORT_START("PENY")
+	PORT_BIT( 0xffff, 5000, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(0, 10000) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START("TDSDIPS")
 	PORT_DIPNAME(0x08, 0x00, "TDS Box Encoding")
@@ -1047,7 +1057,7 @@ void dpb7000_state::machine_reset()
 	m_tablet_counter_latch = 0;
 	m_tablet_tx_timer->adjust(attotime::from_hz(9600), 0, attotime::from_hz(9600));
 	m_tablet_irq_timer->adjust(attotime::never);
-	m_tablet_tx_bit = 0;
+	m_tablet_tx_bit = 1;
 	m_tablet_pen_in_proximity = false;
 	m_tablet_state = 0;
 }
@@ -2228,7 +2238,7 @@ uint8_t dpb7000_state::tds_adc_r()
 
 uint8_t dpb7000_state::tds_pen_switches_r()
 {
-	uint8_t data = m_pen_switches->read() << 4;
+	uint8_t data = 0;//m_pen_switches->read() << 4;
 	LOGMASKED(LOG_TDS, "%s: TDS Pen Switches Read: %02x\n", machine().describe_context(), data);
 	return data;
 }
@@ -2240,7 +2250,7 @@ void dpb7000_state::tablet_tx_tick()
 
 WRITE_LINE_MEMBER(dpb7000_state::duart_b_w)
 {
-	printf("B%d ", state);
+	//printf("B%d ", state);
 }
 
 uint8_t dpb7000_state::tds_p1_r()
@@ -2279,17 +2289,17 @@ void dpb7000_state::tds_p2_w(uint8_t data)
 INPUT_CHANGED_MEMBER(dpb7000_state::pen_prox_changed)
 {
 	m_tablet_pen_in_proximity = newval ? false : true;
-	if (m_tablet_pen_in_proximity && m_tablet_irq_timer->remaining() == attotime::never)
+	if (m_tablet_pen_in_proximity)
 	{
-		LOGMASKED(LOG_TABLET, "Setting up IRQ timer for proximity\n");
-		m_tablet_irq_timer->adjust(attotime::from_usec(55));
+		LOGMASKED(LOG_TABLET, "Triggering IRQ due to proximity\n");
+		m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	}
 }
 
 uint8_t dpb7000_state::tablet_p2_r(offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t dip_bit = BIT(m_tablet_dip_shifter, 15) << 7;
-	const uint8_t led_bit = 0;//(BIT(~m_tablet_p3_data, 5) << 6) & 0x40;
+	const uint8_t led_bit = (BIT(~m_tablet_p3_data, 5) << 6);
 	const uint8_t pen_prox = m_pen_prox->read() << 5;
 	uint8_t data = dip_bit | led_bit | pen_prox | (m_tablet_p2_data & 0x1f);
 
@@ -2313,22 +2323,22 @@ void dpb7000_state::tablet_p2_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		uint8_t old_drq = m_tablet_drq;
 		m_tablet_drq = BIT(data, 4);
 		LOGMASKED(LOG_TABLET, "Tablet DRQ: %d\n", m_tablet_drq);
-		//LOGMASKED(LOG_TABLET, "Clearing tablet CPU IRQ\n");
-		//m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-		if (old_drq && !m_tablet_drq) // DRQ transition to low
+		LOGMASKED(LOG_TABLET, "Clearing tablet CPU IRQ\n");
+		m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+		if (old_drq && !m_tablet_drq && m_tablet_pen_in_proximity) // DRQ transition to low
 		{
 			if (m_tablet_state == 0) // We're idle
 			{
 				m_tablet_state = 1; // We're reading
-				m_tablet_irq_timer->adjust(attotime::from_ticks(fuck[m_tablet_mux], 120000), 1);
-				LOGMASKED(LOG_TABLET, "Setting up IRQ timer for read (initial)\n");
+				m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+				LOGMASKED(LOG_TABLET, "Triggering IRQ for read (initial)\n");
 			}
 		}
-		if (!old_drq && m_tablet_drq) // DRQ transition back to high)
+		if (!old_drq && m_tablet_drq) // DRQ transition back to high
 		{
 			if (m_tablet_state == 1)
 			{
-				m_tablet_irq_timer->adjust(attotime::from_ticks(fuck[m_tablet_mux], 12000000), 1);
+				m_tablet_irq_timer->adjust(attotime::from_ticks(temp_pen_reads[3 - m_tablet_mux], 1200000), 1);
 				LOGMASKED(LOG_TABLET, "Setting up IRQ timer for read (continuous)\n");
 			}
 		}
@@ -2339,7 +2349,7 @@ void dpb7000_state::tablet_irq_tick()
 {
 	LOGMASKED(LOG_TABLET, "Triggering tablet CPU IRQ\n");
 	m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-	//m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	m_tablet_cpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 uint8_t dpb7000_state::tablet_p3_r(offs_t offset, uint8_t mem_mask)
@@ -2351,7 +2361,7 @@ uint8_t dpb7000_state::tablet_p3_r(offs_t offset, uint8_t mem_mask)
 
 void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	LOGMASKED(LOG_TABLET, "%s: Tablet Port 3 Write: %02x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_TABLET, "%s: Tablet Port 3 Write: %02x & %02x\n", machine().describe_context(), data, mem_mask);
 
 	if (BIT(mem_mask, 7))
 	{
@@ -2379,13 +2389,19 @@ void dpb7000_state::tablet_p3_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 uint8_t dpb7000_state::tablet_rdh_r()
 {
-	uint8_t data = ((~m_pen_switches->read() & 0x0f) << 4) | (m_tablet_counter_latch >> 8);
+	//m_tablet_counter_latch = temp_pen_reads[3 - m_tablet_mux];
+	uint8_t data = /*((~m_pen_switches->read() & 0x0f) << 4) |*/ (m_tablet_counter_latch >> 8);
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDH Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
 	return data;
 }
 
 uint8_t dpb7000_state::tablet_rdl_r()
 {
+	//if (m_tablet_mux == 3)
+		//m_tablet_state = 0;
+
+	m_tablet_counter_latch = rand() & 0xfff;//temp_pen_reads[m_tablet_mux];
+	LOGMASKED(LOG_TABLET, "%s: Random latch: %04x\n", machine().describe_context(), m_tablet_counter_latch);
 	uint8_t data = (uint8_t)m_tablet_counter_latch;
 	LOGMASKED(LOG_TABLET, "%s: Tablet RDL Read (Mux %d): %02x\n", machine().describe_context(), m_tablet_mux, data);
 	return data;

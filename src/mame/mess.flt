@@ -170,6 +170,7 @@ channelf.cpp
 chaos.cpp
 chessmate.cpp
 chessmst.cpp
+chessmstdm.cpp
 cit101.cpp
 cit101xl.cpp
 cit1500.cpp
@@ -201,6 +202,7 @@ controlid.cpp
 cortex.cpp
 cosmicos.cpp
 cp1.cpp
+crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
@@ -224,6 +226,7 @@ dccons.cpp
 dcebridge.cpp
 dct11em.cpp
 debut.cpp
+decmate2.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
@@ -499,6 +502,7 @@ kaypro.cpp
 kc.cpp
 kdt6.cpp
 kim1.cpp
+kminus.cpp
 konin.cpp
 korgds8.cpp
 korgdss1.cpp
@@ -520,6 +524,7 @@ lc80.cpp
 lcmate2.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
+leapfrog_leapster_explorer.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
@@ -600,6 +605,7 @@ mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
+mg1.cpp
 mice.cpp
 micral.cpp
 micro20.cpp
@@ -776,6 +782,7 @@ pes.cpp
 pet.cpp
 pg685.cpp
 phc25.cpp
+philipsbo.cpp
 phunsy.cpp
 picno.cpp
 pimps.cpp
@@ -929,7 +936,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -1019,6 +1025,7 @@ tecnbras.cpp
 tek405x.cpp
 tek410x.cpp
 tek440x.cpp
+tekigw.cpp
 tekxp33x.cpp
 teleray10.cpp
 telex1192.cpp
@@ -1144,6 +1151,7 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
+vtech_innotab.cpp
 wangpc.cpp
 wicat.cpp
 wizard.cpp
@@ -1169,11 +1177,13 @@ xbase09.cpp
 xbox.cpp
 xerox820.cpp
 xor100.cpp
+yes.cpp
 ymdx11.cpp
 ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr60.cpp
 ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp

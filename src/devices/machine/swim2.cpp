@@ -9,6 +9,14 @@
 #include "emu.h"
 #include "swim2.h"
 
+#define LOG_SETUP   (1 << 1U)
+#define LOG_MODE    (1 << 2U)
+#define VERBOSE     0
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP,   __VA_ARGS__)
+#define LOGMODE(...)  LOGMASKED(LOG_MODE,    __VA_ARGS__)
+
 DEFINE_DEVICE_TYPE(SWIM2, swim2_device, "swim2", "Apple SWIM2 (Sander/Wozniak Integrated Machine) version 2 floppy controller")
 
 swim2_device::swim2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -121,7 +129,7 @@ void swim2_device::flush_write(u64 when)
 
 void swim2_device::show_mode() const
 {
-	logerror("mode%s hdsel=%c %c%s %c%c%s\n",
+	LOGMODE("mode%s hdsel=%c %c%s %c%c%s\n",
 			 m_mode & 0x80 ? " motoron" : "",
 			 m_mode & 0x20 ? '1' : '0',
 			 m_mode & 0x10 ? 'w' : 'r',
@@ -209,7 +217,7 @@ u8 swim2_device::read(offs_t offset)
 	}
 
 	default:
-		logerror("read %s\n", names[offset & 7]);
+		LOG("read %s\n", names[offset & 7]);
 		break;
 	}
 	return 0xff;
@@ -245,7 +253,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		static const char *const pname[4] = {
 			"late", "time0", "early", "time1"
 		};
-		logerror("param[%s] = %02x\n", pname[m_param_idx], data);
+		LOG("param[%s] = %02x\n", pname[m_param_idx], data);
 		m_param[m_param_idx] = data;
 		m_param_idx = (m_param_idx + 1) & 3;
 		break;
@@ -259,7 +267,7 @@ void swim2_device::write(offs_t offset, u8 data)
 	case 5: // setup
 		m_setup = data;
 		m_sel35_cb((m_setup >> 1) & 1);
-		logerror("setup write=%s %s test=%s %s %s 3.5=%s %s\n",
+		LOGSETUP("setup write=%s %s test=%s %s %s 3.5=%s %s\n",
 				 m_setup & 0x40 ? "gcr" : "mfm",
 				 m_setup & 0x20 ? "ibm" : "apple",
 				 m_setup & 0x10 ? "on" : "off",
@@ -282,14 +290,14 @@ void swim2_device::write(offs_t offset, u8 data)
 		break;
 
 	default:
-		logerror("write %s, %02x\n", names[offset & 7], data);
+		LOG("write %s, %02x\n", names[offset & 7], data);
 		break;
 	}
 
 	if(m_mode & 0x01)
 		fifo_clear();
 
-	if((m_mode ^ prev_mode) & 0x06)
+	if((m_mode ^ prev_mode) & 0x86)
 		m_devsel_cb(m_mode & 0x80 ? (m_mode >> 1) & 3 : 0);
 	if((m_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_mode >> 5) & 1);
@@ -297,7 +305,7 @@ void swim2_device::write(offs_t offset, u8 data)
 	if((m_mode & 0x18) == 0x18 && ((prev_mode & 0x18) != 0x18)) {
 		// Entering write mode
 		m_current_bit = 0;
-		logerror("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x40 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+		LOG("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x40 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
 		m_flux_write_start = m_last_sync;
 		m_flux_write_count = 0;
 
@@ -307,7 +315,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		m_flux_write_start = 0;
 		m_current_bit = 0xff;
 		m_half_cycles_before_change = 0;
-		logerror("%s write end\n", machine().time().to_string());
+		LOG("%s write end\n", machine().time().to_string());
 	}
 
 	if((m_mode & 0x18) == 0x08 && ((prev_mode & 0x18) != 0x08)) {
@@ -315,20 +323,20 @@ void swim2_device::write(offs_t offset, u8 data)
 		m_current_bit = 0;
 		m_sr = 0;
 		m_mfm_sync_counter = 0;
-		logerror("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x04 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
+		LOG("%s read start %s %s floppy=%p\n", machine().time().to_string(), m_setup & 0x04 ? "gcr" : "mfm", m_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
 
 		m_pll.reset(machine().time());
 		static const int cycles_per_cell[4] = { 16, 31, 31, 63 };
 
 		m_pll.set_clock(attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()));
-		logerror("PLL read clock %s\n", attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()).to_string());
+		LOG("PLL read clock %s\n", attotime::from_ticks(cycles_per_cell[(m_setup >> 2) & 3], clock()).to_string());
 
 	} else if((prev_mode & 0x18) == 0x08 && (m_mode & 0x18) != 0x08) {
 		// Exiting read mode
 		flush_write();
 		m_current_bit = 0xff;
 		m_half_cycles_before_change = 0;
-		logerror("%s read end\n", machine().time().to_string());
+		LOG("%s read end\n", machine().time().to_string());
 	}
 }
 

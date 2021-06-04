@@ -99,7 +99,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

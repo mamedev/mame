@@ -262,7 +262,7 @@ license:CC0
 		<info name="alt_title" value="ビーボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="be ball (japan).pce" size="262144" crc="e439f299" sha1="14163a792777c246f35a0867d6b145a7cb7df3b7" offset="000000" />
+				<rom name="be ball (japan).pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -926,7 +926,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dragnegg" supported="no">
+	<software name="dragnegg">
 		<description>Dragon Egg!</description>
 		<year>1991</year>
 		<publisher>Masiya</publisher>
@@ -1450,7 +1450,7 @@ license:CC0
 		<info name="alt_title" value="ゴモラスピード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="gomola speed (japan).pce" size="393216" crc="9a353afd" sha1="38dd1bc9968d65119bfb638fb197ba45d7784cfc" offset="000000" />
+				<rom name="gomola speed (japan).pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4364,7 +4364,7 @@ license:CC0
 		<info name="alt_title" value="妖怪道中記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="youkai douchuuki (japan).pce" size="262144" crc="f131b706" sha1="f96913628138605374f2acc493c5c59dc635018a" offset="000000" />
+				<rom name="youkai douchuuki (japan).pce" size="262144" crc="80c3f824" sha1="a258201c6258c8e108c7ce80a39c456ef9116260" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -46,25 +46,25 @@
 #include "screen.h"
 #include "speaker.h"
 
-/* Memory Map */
+// Memory Map
 
-void nitedrvr_state::nitedrvr_map(address_map &map)
+void nitedrvr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().mirror(0x100); // SCRAM
-	map(0x0200, 0x027f).nopr().ram().mirror(0x180).share("videoram"); // PFW
-	map(0x0400, 0x042f).nopr().writeonly().mirror(0x1c0).share("hvc"); // POSH, POSV, CHAR
+	map(0x0200, 0x027f).nopr().ram().mirror(0x180).share(m_videoram); // PFW
+	map(0x0400, 0x042f).nopr().writeonly().mirror(0x1c0).share(m_hvc); // POSH, POSV, CHAR
 	map(0x0430, 0x043f).w("watchdog", FUNC(watchdog_timer_device::reset_w)).mirror(0x1c0);
-	map(0x0600, 0x07ff).r(FUNC(nitedrvr_state::nitedrvr_in0_r));
-	map(0x0800, 0x09ff).r(FUNC(nitedrvr_state::nitedrvr_in1_r));
-	map(0x0a00, 0x0bff).w(FUNC(nitedrvr_state::nitedrvr_out0_w));
-	map(0x0c00, 0x0dff).w(FUNC(nitedrvr_state::nitedrvr_out1_w));
-	map(0x8000, 0x807f).nopw().ram().mirror(0x380).share("videoram"); // PFR
-	map(0x8400, 0x87ff).rw(FUNC(nitedrvr_state::nitedrvr_steering_reset_r), FUNC(nitedrvr_state::nitedrvr_steering_reset_w));
+	map(0x0600, 0x07ff).r(FUNC(nitedrvr_state::in0_r));
+	map(0x0800, 0x09ff).r(FUNC(nitedrvr_state::in1_r));
+	map(0x0a00, 0x0bff).w(FUNC(nitedrvr_state::out0_w));
+	map(0x0c00, 0x0dff).w(FUNC(nitedrvr_state::out1_w));
+	map(0x8000, 0x807f).nopw().ram().mirror(0x380).share(m_videoram); // PFR
+	map(0x8400, 0x87ff).rw(FUNC(nitedrvr_state::steering_reset_r), FUNC(nitedrvr_state::steering_reset_w));
 	map(0x9000, 0x9fff).rom(); // ROM1-ROM2
 	map(0xfff0, 0xffff).rom(); // ROM2 for 6502 vectors
 }
 
-/* Input Ports */
+// Input Ports
 
 static INPUT_PORTS_START( nitedrvr )
 	PORT_START("DSW0")  // fake
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( nitedrvr )
 	PORT_ADJUSTER( 60, "Motor RPM" )
 INPUT_PORTS_END
 
-/* Graphics Layouts */
+// Graphics Layouts
 
 static const gfx_layout charlayout =
 {
@@ -132,43 +132,43 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-/* Graphics Decode Information */
+// Graphics Decode Information
 
 static GFXDECODE_START( gfx_nitedrvr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-/* Machine Driver */
+// Machine Driver
 
 void nitedrvr_state::nitedrvr(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 12.096_MHz_XTAL / 12); // 1 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &nitedrvr_state::nitedrvr_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nitedrvr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nitedrvr_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 3);
 
-	TIMER(config, "crash_timer").configure_periodic(FUNC(nitedrvr_state::nitedrvr_crash_toggle_callback), PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)));
+	TIMER(config, "crash_timer").configure_periodic(FUNC(nitedrvr_state::crash_toggle_callback), PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240);
 	// PROM derives VRESET, VBLANK, VSYNC, IRQ from vertical scan count and last VBLANK
-	screen.set_screen_update(FUNC(nitedrvr_state::screen_update_nitedrvr));
+	screen.set_screen_update(FUNC(nitedrvr_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_nitedrvr);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, nitedrvr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-/* ROMs */
+// ROMs
 
 /*
 ROM_START( nitedrvo )       // early revision has the program code stored in 8 chips
@@ -197,6 +197,6 @@ ROM_START( nitedrvr )
 	ROM_LOAD( "006559-01.h7", 0x0000, 0x0100, CRC(5a8d0e42) SHA1(772220c4c24f18769696ddba26db2bc2e5b0909d) ) // PROM, Sync
 ROM_END
 
-/* Game Drivers */
+// Game Drivers
 
 GAME( 1976, nitedrvr, 0, nitedrvr, nitedrvr, nitedrvr_state, empty_init, ROT0, "Atari", "Night Driver", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

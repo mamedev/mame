@@ -100,9 +100,8 @@ driver modified by Hau
 #include "cpu/z8/z8.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
-#include "sound/ym2413.h"
-#include "sound/ym2610.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #include <algorithm>

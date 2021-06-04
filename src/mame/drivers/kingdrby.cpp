@@ -78,7 +78,7 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"

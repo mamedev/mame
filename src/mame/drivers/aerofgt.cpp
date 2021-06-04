@@ -67,9 +67,9 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
 #include "machine/vs9209.h"
-#include "sound/ym2151.h"
-#include "sound/ym2610.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "video/vsystem_gga.h"
 #include "screen.h"
 #include "speaker.h"
@@ -2607,6 +2607,65 @@ ROM_START( spinlbrkj )
 ROM_END
 
 /*
+Dumper's notes:
+-board has sockets and jumpers for ROMS not fitted on the final board.
+-early version has game crashing bugs and other glitches.
+-the mask ROMs match the regular version.
+-RAM & ROM check is not shown.
+-region warning seems much slower to pass.
+-attract mode starts in the jungle, old dumps all start with a building with fences
+*/
+
+ROM_START( spinlbrkup ) // the labels are official Video System without numbering and handwritten on top
+	ROM_REGION( 0x60000, "maincpu", 0 ) // these differ quite a lot
+	ROM_LOAD16_BYTE( "spb0-e.ic98",  0x00000, 0x10000, CRC(421eaff2) SHA1(e0ffd37fa8361a544cd7a66da0b802367adccd7d) )
+	ROM_LOAD16_BYTE( "spb0-o.ic104", 0x00001, 0x10000, CRC(9576d508) SHA1(426a630a7a5bdaa0316391582b25274a6d923c79) )
+	ROM_LOAD16_BYTE( "sbp1-e.ic93",  0x20000, 0x10000, CRC(d6444d1e) SHA1(2aa80b8cf3c44e4a583b57f4a6cc673d984f3a05) )
+	ROM_LOAD16_BYTE( "sbp1-o.ic94",  0x20001, 0x10000, CRC(a3f7bd8e) SHA1(dc393b4911c6acadb97b0380db15ae5c972a3505) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "11-14-15.00.music.ic117", 0x00000, 0x08000, CRC(6b8c8f09) SHA1(d57699ea82f5e48ed8c9909a040c2fa6f988f8b3) ) // this differs quite a lot
+	ROM_LOAD( "11-14.m.bank.ic118",      0x08000, 0x10000, CRC(a1ed270b) SHA1(f513baed1f7efda3d843982e1fa4857f058e8595) ) // relatively minor differences
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
+	ROM_LOAD( "ic9",          0x080000, 0x80000, CRC(e071f674) SHA1(b6d98d7fcc28516d937d8c655d07305515be8a20) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "ic17",         0x000000, 0x80000, CRC(a63d5a55) SHA1(a942651a206a2abe4f60f0717e1d5d8e89b993d4) )
+	ROM_LOAD( "ic11",         0x080000, 0x80000, CRC(7dcc913d) SHA1(527bae5020581d1ac322ea25c8e0994d54bbc051) )
+	ROM_LOAD( "ic16",         0x100000, 0x80000, CRC(0d84af7f) SHA1(07356ee61c84c4c4ccb49c8dfe8c468990580041) ) //FIRST AND SECOND HALF IDENTICAL
+
+	ROM_REGION( 0x100000, "spritegfx", 0 )
+	ROM_LOAD( "ic12",         0x000000, 0x80000, CRC(d63fac4e) SHA1(bb96d2e41334d136b9208dbe7e88a45e3bbc6542) )
+	ROM_LOAD( "ic18",         0x080000, 0x80000, CRC(5a60444b) SHA1(62c418aedd1087dac82dcb44830cce00278103dd) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )
+	ROM_LOAD( "ic14",         0x000000, 0x80000, CRC(1befd0f3) SHA1(7ab6fb5bf814ef3ae9a306a0d32d1078ee594461) )
+	ROM_LOAD( "ic20",         0x080000, 0x80000, CRC(c2f84a61) SHA1(1dce538ced54a61c43ed25e1d71b5ac1c8935cc5) )
+	ROM_LOAD( "ic35",         0x100000, 0x80000, CRC(eba8e1a3) SHA1(976ef30437df9aba6fa6d5cd11728476f34eb05b) )
+	ROM_LOAD( "ic40",         0x180000, 0x80000, CRC(5ef5aa7e) SHA1(8d4b0f2348c536c6781c8ba25722301673aca289) )
+
+	ROM_REGION16_BE( 0x24000, "sprlookuprom", 0 ) // very minor differences
+	ROM_LOAD16_BYTE( "sbm-1-18.ic19",    0x00000, 0x10000, CRC(e155357f) SHA1(05864c5d281df52adce4e959c65260ee3f585988) )
+	ROM_LOAD16_BYTE( "sbm-0-18.ic13",    0x00001, 0x10000, CRC(16b79e45) SHA1(9f89381bc3949adf1317836fc35608c0982a4b46) )
+
+	// no "ymsnd:adpcmb"
+
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "ic166",        0x000000, 0x80000, CRC(6e0d063a) SHA1(313983e69f9625814de033fef7f6e9564694117a) )
+	ROM_LOAD( "ic163",        0x080000, 0x80000, CRC(e6621dfb) SHA1(85ee77c4720b7eb20ecf293c16b3105c8dcb1114) ) //FIRST AND SECOND HALF IDENTICAL
+
+	ROM_REGION( 0x0c00, "plds", 0 )
+	ROM_LOAD( "epl16p8bp.ic133", 0x0000, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic127", 0x0200, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic99",  0x0400, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "epl16p8bp.ic100", 0x0600, 0x0107, NO_DUMP ) // read protected
+	ROM_LOAD( "gal16v8a.ic95",   0x0800, 0x0117, NO_DUMP ) // read protected
+	ROM_LOAD( "gal16v8a.ic114",  0x0a00, 0x0117, NO_DUMP ) // read protected
+ROM_END
+
+/*
 
 Karate Blazers regions known to exist but not dumped or not verified:
 
@@ -3163,9 +3222,10 @@ void aerofgt_state::init_kickball()
 	}
 }
 
-GAME( 1990, spinlbrk,  0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrku, spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkj, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,      ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrk,   0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrku,  spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkj,  spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkup, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
 
 GAME( 1991, pspikes,   0,         pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, pspikesk,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

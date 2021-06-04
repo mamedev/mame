@@ -124,6 +124,7 @@
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
+#include "bus/a2bus/booti.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -2180,31 +2181,12 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline,
-// keeping borders in mind.
-
+// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
 int apple2gs_state::get_vpos()
 {
-	int result, scan;
-	static const u8 top_border_vert[BORDER_TOP] =
-	{
-		0xfa, 0xfa, 0xfa, 0xfa, 0xfb, 0xfb, 0xfb, 0xfb,
-		0xfc, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xfe, 0xff,
-
-	};
-
-	scan = m_screen->vpos();
-
-	if (scan < BORDER_TOP)
-	{
-		result = top_border_vert[scan];
-	}
-	else
-	{
-		result = scan - BORDER_TOP + 0x100 + 1;
-	}
-
-	return result;
+	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
+	// or scanline + 200 on PAL (312 lines)
+	return ((m_screen->vpos() + BORDER_TOP) % 262) + 250;
 }
 
 void apple2gs_state::process_clock()
@@ -2585,15 +2567,19 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return ((m_gameio->sw2_r() || (m_kbspecial->read() & 0x06)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x65:  // joy 1 Y axis
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x66: // joy 2 X axis
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x67: // joy 2 Y axis
+			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 			return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x68: // STATEREG, synthesizes all the IIe state regs
@@ -4790,6 +4776,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
+	device.option_add("booti", A2BUS_BOOTI);     /* Booti Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)
@@ -5002,15 +4989,6 @@ ROM_START(apple2gs)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	// i8048 microcontroller inside the IIgs ADB Standard Keyboard
-	ROM_REGION(0x400, "kmcu", 0)
-	// from early-production ROM 00 Woz Limited Edition IIgs.  keyboard "Part Number 658-4081  825-1301-A"
-	// ROM is marked "NEC Japan  8626XD 341-0232A  543" so 26th week of 1986
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	// from later non-Woz ROM 01.  keyboard "Model A9M0330"
-	// ROM is marked "NEC Japan 8806HD  8048HC610  341-0124-A  (c) APPLE 87" so 6th week of 1988
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
-
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
@@ -5030,10 +5008,6 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
-	ROM_REGION(0x400, "kmcu", 0)
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
-
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
@@ -5050,10 +5024,6 @@ ROM_START(apple2gsr1)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x400, "kmcu", 0)
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
-
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
@@ -5068,10 +5038,6 @@ ROM_END
 ROM_START(apple2gsr0)
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
-
-	ROM_REGION(0x400, "kmcu", 0)
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
 
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
@@ -5088,10 +5054,6 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
-	ROM_REGION(0x400, "kmcu", 0)
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
-
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
@@ -5106,10 +5068,6 @@ ROM_END
 ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing - Alpha 2.0"
 	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
-
-	ROM_REGION(0x400, "kmcu", 0)
-	ROM_LOAD( "341-0232a.bin", 0x000000, 0x000400, CRC(6a158b9f) SHA1(e8744180075182849d431fd8023a52a062a6da76) )
-	ROM_LOAD( "341-0124a.bin", 0x000000, 0x000400, CRC(2a3576bf) SHA1(58fbf770d3801a02d0944039829f9241b5279013) )
 
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))

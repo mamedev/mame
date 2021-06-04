@@ -9,7 +9,6 @@ with 4 4015 dual shift registers.
 *********************************************************************/
 
 #include "emu.h"
-
 #include "mmdisplay1.h"
 
 

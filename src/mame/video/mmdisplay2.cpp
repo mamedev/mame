@@ -9,8 +9,10 @@ but that part is emulated in the driver.
 *********************************************************************/
 
 #include "emu.h"
-
 #include "mmdisplay2.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay2", "Mephisto Display Module 2")
@@ -19,7 +21,7 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay
 //  constructor
 //-------------------------------------------------
 
-mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MEPHISTO_DISPLAY_MODULE2, tag, owner, clock)
 	, m_lcd(*this, "hd44780")
 	, m_dac(*this, "dac")
@@ -33,7 +35,7 @@ mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig
 
 void mephisto_display2_device::device_add_mconfig(machine_config &config)
 {
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(subseconds::from_usec(2500));
@@ -48,9 +50,11 @@ void mephisto_display2_device::device_add_mconfig(machine_config &config)
 	m_lcd->set_lcd_size(2, 16);
 	m_lcd->set_pixel_update_cb(FUNC(mephisto_display2_device::lcd_pixel_update));
 
-	/* sound hardware */
+	// sound hardware (using filtered dac because of aliasing)
 	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_dac->set_levels(4, speaker_levels);
 }
 
 void mephisto_display2_device::lcd_palette(palette_device &palette) const
@@ -93,17 +97,17 @@ void mephisto_display2_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
-void mephisto_display2_device::latch_w(uint8_t data)
+void mephisto_display2_device::latch_w(u8 data)
 {
 	m_latch = data;
 }
 
-void mephisto_display2_device::io_w(uint8_t data)
+void mephisto_display2_device::io_w(u8 data)
 {
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcd->write(BIT(data, 0), m_latch);
 
-	m_dac->write(data >> 2 & 3);
+	m_dac->level_w(data >> 2 & 3);
 
 	m_ctrl = data;
 }

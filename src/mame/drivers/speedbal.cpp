@@ -33,7 +33,7 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 #include "includes/speedbal.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 

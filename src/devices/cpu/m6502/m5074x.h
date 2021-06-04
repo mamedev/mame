@@ -40,6 +40,7 @@ public:
 
 	template <std::size_t Bit> auto read_p() { return m_read_p[Bit].bind(); }
 	template <std::size_t Bit> auto write_p() { return m_write_p[Bit].bind(); }
+	template <std::size_t Bit> void set_pullups(u8 mask) { m_pullups[Bit] = mask; }
 
 	uint8_t ports_r(offs_t offset);
 	void ports_w(offs_t offset, uint8_t data);
@@ -72,7 +73,7 @@ protected:
 	devcb_read8::array<5>  m_read_p;
 	devcb_write8::array<5> m_write_p;
 
-	uint8_t m_ports[5], m_ddrs[5];
+	uint8_t m_ports[5], m_ddrs[5], m_pullups[5];
 	uint8_t m_intctrl, m_tmrctrl;
 	uint8_t m_tmr12pre, m_tmr1, m_tmr2, m_tmrxpre, m_tmrx;
 	uint8_t m_tmr1latch, m_tmr2latch, m_tmrxlatch;

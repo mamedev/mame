@@ -2411,6 +2411,9 @@ ROM_START( popn4 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE( "gq986jaa02", 0, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(4a5c946c) SHA1(9de6085d45c39ba91934cea3abaa37e1203888c7))
 ROM_END
 
 ROM_START( popn5 )
@@ -2428,6 +2431,9 @@ ROM_START( popn5 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "a04jaa02", 0, SHA1(49a017dde76f84829f6e99a678524c40665c3bfd) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(adeba6fc) SHA1(a2266696bb0a68e2b70a07d580a3b471e72fa587))
 ROM_END
 
 ROM_START( popn6 )
@@ -2445,6 +2451,9 @@ ROM_START( popn6 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE( "gqa16jaa02", 0, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(9935427c) SHA1(f7095ea6360ca61d1e2914cf184e50e50777a168))
 ROM_END
 
 ROM_START( popn7 )
@@ -2462,6 +2471,9 @@ ROM_START( popn7 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "b00jaa02", 0, SHA1(c8ce2f8ee6aeeedef9c110a59e68fcec7b669ad6) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(fce30919) SHA1(9f875f5fe6ab6591ec024afc0a91966befa73ede))
 ROM_END
 
 ROM_START( popn8 )
@@ -2479,6 +2491,9 @@ ROM_START( popn8 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gqb30jaa02", 0, SHA1(f067d502c23efe0267aada5706f5bc7a54605942) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(1a91f33a) SHA1(510b5cbacb218e5588f3b725733e095b7914dcdb))
 ROM_END
 
 ROM_START( popnanm )
@@ -2496,6 +2511,9 @@ ROM_START( popnanm )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gq987jaa02", 0, SHA1(d72515bac3fcd9f28c39fa1402292009734df678) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(b08b454d) SHA1(33fc12ab148a379925b7b77016efba747f3b13cc))
 ROM_END
 
 ROM_START( popnanm2 )
@@ -2513,6 +2531,9 @@ ROM_START( popnanm2 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "gea02jaa02", 0, SHA1(7212e399779f37a5dcb8317a8f635a3b3f620aa9) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(90fcfeab) SHA1(f96e27e661259dc9e7f25a99bee9ffd6584fc1b8))
 ROM_END
 
 ROM_START( popnmt )
@@ -2530,6 +2551,9 @@ ROM_START( popnmt )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(3881bb1e4deb829ba272c541cb7d203924571f3b) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(a51bdc10) SHA1(99b759d9a575129abec556d381f3a041453d7136))
 ROM_END
 
 ROM_START( popnmt2 )
@@ -2548,6 +2572,9 @@ ROM_START( popnmt2 )
 
 	DISK_REGION( "spu_ata:0:cdrom" ) // data DVD-ROM
 	DISK_IMAGE_READONLY( "976jaa02", 0, SHA1(3881bb1e4deb829ba272c541cb7d203924571f3b) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(a51bdc10) SHA1(99b759d9a575129abec556d381f3a041453d7136))
 ROM_END
 
 ROM_START( bm3 )
@@ -2565,6 +2592,9 @@ ROM_START( bm3 )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "gc97202", 0, SHA1(84049bab473d29eca3c6d536956ef20ae410967d) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(20eff14e) SHA1(7d652ed4d9e245f9574dd0fec60ee078dc73ba61))
 ROM_END
 
 ROM_START( bm3core )
@@ -2582,6 +2612,9 @@ ROM_START( bm3core )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "a05jca02", 0, SHA1(1de7db35d20bbf728732f6a24c19315f9f4ad469) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(64bc48d3) SHA1(18ccba42545c7c11ea3b486a4469d7c599a41c80))
 ROM_END
 
 ROM_START( bm36th )
@@ -2599,6 +2632,9 @@ ROM_START( bm36th )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "a21jca02", 0, SHA1(8fa11848af40966e42b6304e37de92be5c1fe3dc) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(832ef42b) SHA1(b53b09a1287631d40caf456f13f09faa991ae38c))
 ROM_END
 
 ROM_START( bm37th )
@@ -2616,6 +2652,9 @@ ROM_START( bm37th )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "gcb07jca02", 0, SHA1(6b8e17635825a6a43dc8d2721fe2eb0e0f39e940) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(6383ed31) SHA1(296f32d5c6619d1b9eb882d9c3cd6db23bf52054))
 ROM_END
 
 ROM_START( bm3final )
@@ -2633,6 +2672,9 @@ ROM_START( bm3final )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
 	DISK_IMAGE_READONLY( "gcc01jca02", 0, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
+
+	ROM_REGION(0x1038, "rtc", ROMREGION_ERASE00)    // Default unlocked RTC
+	ROM_LOAD("rtc", 0x0000, 0x1038, CRC(bf7079cd) SHA1(7cf8ce9794d97e1ed8b12339f78c8678e895cb19))
 ROM_END
 
 } // Anonymous namespace
@@ -2663,7 +2705,6 @@ GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_pop
 GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Requires ST-224 emulation for optional toggleable external effects, but otherwise is fully playable
-// Core Remix and 6th Mix are marked as MACHINE_NOT_WORKING because of missing HDD dumps
 GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_IMPERFECT_SOUND )
 GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_IMPERFECT_SOUND )
 GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_IMPERFECT_SOUND )

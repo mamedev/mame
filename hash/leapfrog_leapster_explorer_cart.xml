@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- license:CC0 -->
+
+<softwarelist name="leapfrog_leapster_explorer_cart" description="LeapFrog Leapster Explorer Cartridges">
+
+	<software name="tblt" supported="no">
+		<description>TinkerBell and the Lost Treasure (USA)</description>
+		<year>2010</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14226-A"/>
+		<part name="cart" interface="leapfrog_leapster_explorer_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="leapster_explorer_tinker_bell_lost_treasure_mxic_c276.bin" size="0x4200000" crc="1d88cffa" sha1="50941cf44bcbec559f0110f9151ee98b82d755ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrpencil" supported="no">
+		<description>Mr. Pencil Saves Doodleburg (USA)</description>
+		<year>2010</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-14221-A"/>
+		<part name="cart" interface="leapfrog_leapster_explorer_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="leapster_explorer_mr_pencil_saves_doodleburg_mxic_c276.bin" size="0x4200000" crc="e30fdc01" sha1="fe58616c7d61c1651380bb71c11ad639e22d00da" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this has the same form factor as a Leapster Explorer cart, and is the same colour, but is marked 'Creativity Learning Game' instead, is it the same system? -->
+	<software name="advsktch" supported="no">
+		<description>Adventure Sketchers (USA) (Creativity Learning Game)</description>
+		<year>2013</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-15340-A"/>
+		<part name="cart" interface="leapfrog_leapster_explorer_cart">
+			<dataarea name="rom" size="0x4200000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="leapster_explorer_adventure_sketchers_mxic_c276.bin" size="0x4200000" crc="ecf7a832" sha1="98dda23b39c9f66e0d9783e7c9ce7b703235526d" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

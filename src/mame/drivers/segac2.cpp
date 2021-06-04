@@ -84,7 +84,7 @@
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/upd7759.h"
-#include "sound/ym2612.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "speaker.h"
 

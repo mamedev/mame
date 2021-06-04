@@ -56,6 +56,7 @@ known chips:
  @A45     HD38820  1982, Coleco Donkey Kong
  @A49     HD38820  1983, Bandai Zackman
  @A61     HD38820  1983, Coleco Ms. Pac-Man
+ *A62     HD38820  1983, Coleco Zaxxon
  @A63     HD38820  1983, Bandai Pengo
  @A65     HD38820  1983, Bandai Burger Time (PT-389)
  @A69     HD38820  1983, Gakken Dig Dug
@@ -90,7 +91,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - gckong: CGL Super Kong
 - ghalien: CGL Earth Invaders
 - kingman: Tandy Kingman

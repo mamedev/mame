@@ -43,6 +43,7 @@
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
 #include "coco_gmc.h"
+#include "coco_max.h"
 #include "coco_midi.h"
 #include "coco_multi.h"
 #include "coco_orch90.h"
@@ -699,6 +700,7 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("gmc", COCO_PAK_GMC);
+	device.option_add("max", COCO_PAK_MAX);
 	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
 	device.option_add("ram", COCO_PAK_RAM);

@@ -61,9 +61,9 @@
     with the trailing edge of writes to PIA0 CB1).  DEMO does not attempt
     to synchronize on horizontal sync; it relies on CPU timing.
 
-    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets TMR interrupts
-    and IRQ gets VBORD interrupts.  Since it does not use the PIA field
-    sync, it can be used to demonstrate how the GIME's VBORD interrupt
+    MOON: SockMaster demo.  Uses GIME interrupts; FIRQ gets fast interrupts
+    and IRQ gets slow interrupts.  Since it does not use the PIA field
+    sync, it can be used to demonstrate how the GIME's slow interrupt
     is distinct.
 
     BOINK: SockMaster demo.  Like DEMO, it SYNCs on the trailing edge
@@ -74,6 +74,8 @@
 
     CRYSTAL CITY: Jeremy Spiller game.  The intro uses an attribute-less
     GIME text mode
+
+    ARKANOID: Abuses TIMER = 0 for ball ricochet sounds
 
 **********************************************************************/
 
@@ -95,10 +97,21 @@
 #define GIME_TYPE_1987          0
 #define NO_ATTRIBUTE            0x80
 
-#define LOG_INT_MASKING         0
-#define LOG_GIME                0
-#define LOG_TIMER               0
-#define LOG_PALETTE             0
+#define LOG_INT_MASKING (1U <<  1)
+#define LOG_GIME        (1U <<  2)
+#define LOG_TIMER       (1U <<  3)
+#define LOG_PALETTE     (1U <<  4)
+
+#define VERBOSE (0)
+//#define VERBOSE (LOG_INT_MASKING|LOG_GIME|LOG_TIMER)
+
+#include "logmacro.h"
+
+#define LOGINTMASKING(...) LOGMASKED(LOG_INT_MASKING, __VA_ARGS__)
+#define LOGGIME(...) LOGMASKED(LOG_GIME, __VA_ARGS__)
+#define LOGTIMER(...) LOGMASKED(LOG_TIMER, __VA_ARGS__)
+#define LOGPALETTE(...) LOGMASKED(LOG_PALETTE, __VA_ARGS__)
+
 
 
 
@@ -184,6 +197,7 @@ void gime_device::device_start(void)
 	save_item(NAME(m_mmu));
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_ff22_value));
+	save_item(NAME(m_ff23_value));
 	save_item(NAME(m_interrupt_value));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_firq));
@@ -302,6 +316,7 @@ void gime_device::device_reset(void)
 	m_displayed_rgb = false;
 
 	m_ff22_value = 0;
+	m_ff23_value = 0;
 
 	update_memory();
 	reset_timer();
@@ -375,20 +390,18 @@ ioport_constructor gime_device::device_input_ports() const
 //**************************************************************************
 //  TIMER
 //
-//  The CoCo 3 had a timer that had would activate when first written to, and
+//  The CoCo 3 had a timer that was always running, it
 //  would decrement over and over again until zero was reached, and at that
 //  point, would flag an interrupt.  At this point, the timer starts back up
 //  again.
 //
 //  I am deducing that the timer interrupt line was asserted if the timer was
-//  zero and unasserted if the timer was non-zero.  Since we never truly track
-//  the timer, we just use timer callback (coco3_timer_callback() asserts the
-//  line)
+//  zero and unasserted if the timer was non-zero.
 //
 //  Most CoCo 3 docs, including the specs that Tandy released, say that the
 //  high speed timer is 70ns (half of the speed of the main clock crystal).
 //  However, it seems that this is in error, and the GIME timer is really a
-//  280ns timer (one eighth the speed of the main clock crystal.  Gault's
+//  279ns timer (one eighth the speed of the main clock crystal.  Gault's
 //  FAQ agrees with this
 //
 //**************************************************************************
@@ -400,7 +413,7 @@ ioport_constructor gime_device::device_input_ports() const
 gime_device::timer_type_t gime_device::timer_type(void)
 {
 	// wraps the GIME register access and returns an enumeration
-	return (m_gime_registers[0x01] & 0x20) ? GIME_TIMER_CLOCK : GIME_TIMER_HBORD;
+	return (m_gime_registers[0x01] & 0x20) ? GIME_TIMER_279NSEC : GIME_TIMER_63USEC;
 }
 
 
@@ -414,11 +427,11 @@ const char *gime_device::timer_type_string(void)
 	const char *result;
 	switch(timer_type())
 	{
-		case GIME_TIMER_CLOCK:
-			result = "CLOCK";
+		case GIME_TIMER_63USEC:
+			result = "63USEC";
 			break;
-		case GIME_TIMER_HBORD:
-			result = "HBORD";
+		case GIME_TIMER_279NSEC:
+			result = "279NSEC";
 			break;
 		default:
 			fatalerror("Should not get here\n");
@@ -454,7 +467,7 @@ void gime_device::timer_elapsed(void)
 void gime_device::reset_timer(void)
 {
 	/* value is from 0-4095 */
-	m_timer_value = ((m_gime_registers[0x04] & 0x0F) * 0x100) | m_gime_registers[0x05];
+	m_timer_value = ((m_gime_registers[0x04] & 0x0F) << 8) | m_gime_registers[0x05];
 
 	/* depending on the GIME type, canonicalize the value */
 	if (m_timer_value > 0)
@@ -463,22 +476,22 @@ void gime_device::reset_timer(void)
 			m_timer_value += 1; /* the 1987 GIME reset to the value plus one */
 		else
 			m_timer_value += 2; /* the 1986 GIME reset to the value plus two */
-	}
 
-	if ((timer_type() == GIME_TIMER_CLOCK) && (m_timer_value > 0))
-	{
-		/* we're starting a countdown on the GIME clock timer */
-		attotime duration = clocks_to_attotime(m_timer_value * 8);
-		m_gime_clock_timer->adjust(duration);
+		if (timer_type() == GIME_TIMER_63USEC)
+		{
+			m_gime_clock_timer->adjust(attotime::from_usec(63.695) * m_timer_value);
+		}
+		else
+		{
+			m_gime_clock_timer->adjust(attotime::from_nsec(279.365) * m_timer_value);
+		}
 	}
 	else
 	{
-		/* either the timer is off, or were not using the GIME clock timer */
 		m_gime_clock_timer->adjust(attotime::never);
 	}
 
-	if (LOG_TIMER)
-		logerror("%s: reset_timer(): timer_type=%s value=%d\n", describe_context(), timer_type_string(), m_timer_value);
+	LOGTIMER("%s: reset_timer(): timer_type=%s value=%d\n", describe_context(), timer_type_string(), m_timer_value);
 }
 
 
@@ -607,6 +620,22 @@ void gime_device::update_memory(int bank)
 uint8_t *gime_device::memory_pointer(uint32_t address)
 {
 	return &m_ram->pointer()[address % m_ram->size()];
+}
+
+
+
+//-------------------------------------------------
+//  pia_write - observe writes to pia 1
+//-------------------------------------------------
+
+void gime_device::pia_write(offs_t offset, uint8_t data)
+{
+	if (offset == 0x03)
+		m_ff23_value = data;
+
+	/* only cache writes to $FF22 if the data register is addressed */
+	if (offset == 0x02 && ((m_ff23_value & 0x04) == 0x04))
+		m_ff22_value = data;
 }
 
 
@@ -770,15 +799,10 @@ void gime_device::write(offs_t offset, uint8_t data)
 
 inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 {
-	// this is needed for writes to FF95
-	bool timer_was_off = (m_gime_registers[0x04] == 0x00) && (m_gime_registers[0x05] == 0x00);
-
 	// sanity check input
 	offset &= 0x0F;
 
-	// perform logging
-	if (LOG_GIME)
-		logerror("%s: CoCo3 GIME: $%04x <== $%02x\n", describe_context(), offset + 0xff90, data);
+	LOGGIME("%s: CoCo3 GIME: $%04x <== $%02x\n", describe_context(), offset + 0xff90, data);
 
 	// make the change, and track the difference
 	uint8_t xorval = m_gime_registers[offset] ^ data;
@@ -828,17 +852,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-			if (LOG_INT_MASKING)
-			{
-				logerror("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
-			}
+			LOGINTMASKING("%s: GIME IRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -846,6 +867,13 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//
 			// Kudos to Glen Hewlett for identifying this problem
 			change_gime_irq(m_irq & data);
+
+			// special case timer reset value of zero
+			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR ))
+			{
+				set_interrupt_value(INTERRUPT_TMR, true);
+				set_interrupt_value(INTERRUPT_TMR, false);
+			}
 			break;
 
 		case 0x03:
@@ -858,17 +886,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//      ! Bit 2 EI2 Serial data interrupt
 			//        Bit 1 EI1 Keyboard interrupt
 			//        Bit 0 EI0 Cartridge interrupt
-			if (LOG_INT_MASKING)
-			{
-				logerror("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
-					describe_context(),
-					(data & 0x20) ? "TMR " : "",
-					(data & 0x10) ? "HBORD " : "",
-					(data & 0x08) ? "VBORD " : "",
-					(data & 0x04) ? "EI2 " : "",
-					(data & 0x02) ? "EI1 " : "",
-					(data & 0x01) ? "EI0 " : "");
-			}
+			LOGINTMASKING("%s: GIME FIRQ: Interrupts { %s%s%s%s%s%s} enabled\n",
+				describe_context(),
+				(data & 0x20) ? "TMR " : "",
+				(data & 0x10) ? "HBORD " : "",
+				(data & 0x08) ? "VBORD " : "",
+				(data & 0x04) ? "EI2 " : "",
+				(data & 0x02) ? "EI1 " : "",
+				(data & 0x01) ? "EI0 " : "");
 
 			// While normally interrupts are acknowledged by reading from this
 			// register and not writing to it, the act of disabling these interrupts
@@ -876,6 +901,14 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//
 			// Kudos to Glen Hewlett for identifying this problem
 			change_gime_firq(m_firq & data);
+
+			// Special case timer reset value of zero
+			if (m_timer_value == 0 && (xorval & INTERRUPT_TMR))
+			{
+				set_interrupt_value(INTERRUPT_TMR, true);
+				set_interrupt_value(INTERRUPT_TMR, false);
+			}
+
 			break;
 
 		case 0x04:
@@ -888,20 +921,6 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 		case 0x05:
 			//  $FF95 Timer register LSB
 			//        Bits 0-7 Low order eight bits of the timer
-			if (timer_was_off && (m_gime_registers[0x05] != 0x00))
-			{
-				// Writes to $FF95 do not cause the timer to reset, but MESS
-				// will invoke coco3_timer_reset() if $FF94/5 was previously
-				// $0000.  The reason for this is because the timer is not
-				// actually off when $FF94/5 are loaded with $0000; rather it
-				// is continuously reloading the GIME's internal countdown
-				// register, even if it isn't causing interrupts to be raised.
-				//
-				// Failure to do this was the cause of bug #1065.  Special
-				// thanks to John Kowalski for pointing me in the right
-				// direction
-				reset_timer();
-			}
 			break;
 
 		case 0x08:
@@ -1015,9 +1034,7 @@ inline void gime_device::write_palette_register(offs_t offset, uint8_t data)
 {
 	offset &= 0x0F;
 
-	// perform logging
-	if (LOG_PALETTE)
-		logerror("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
+	LOGPALETTE("%s: CoCo3 Palette: $%04x <== $%02x\n", describe_context(), offset + 0xffB0, data);
 
 	/* has this entry changed? */
 	if (m_palette_rotated[m_palette_rotated_position][offset] != data)
@@ -1069,11 +1086,11 @@ inline void gime_device::write_sam_register(offs_t offset)
 void gime_device::interrupt_rising_edge(uint8_t interrupt)
 {
 	// evaluate IRQ
-	if ((m_gime_registers[0x00] & 0x20) && (m_gime_registers[0x02] & interrupt))
+	if (m_gime_registers[0x02] & interrupt)
 		change_gime_irq(m_irq | interrupt);
 
 	// evaluate FIRQ
-	if ((m_gime_registers[0x00] & 0x10) && (m_gime_registers[0x03] & interrupt))
+	if (m_gime_registers[0x03] & interrupt)
 		change_gime_firq(m_firq | interrupt);
 }
 
@@ -1088,7 +1105,8 @@ void gime_device::change_gime_irq(uint8_t data)
 	if (m_irq != data)
 	{
 		m_irq = data;
-		m_write_irq(irq_r());
+		if (m_gime_registers[0x00] & 0x20)
+			m_write_irq(irq_r());
 	}
 }
 
@@ -1103,7 +1121,8 @@ void gime_device::change_gime_firq(uint8_t data)
 	if (m_firq != data)
 	{
 		m_firq = data;
-		m_write_firq(firq_r());
+		if (m_gime_registers[0x00] & 0x10)
+			m_write_firq(firq_r());
 	}
 }
 
@@ -1180,14 +1199,6 @@ void gime_device::new_frame(void)
 void gime_device::horizontal_sync_changed(bool line)
 {
 	set_interrupt_value(INTERRUPT_HBORD, line);
-
-	/* decrement timer if appropriate */
-	if ((timer_type() == GIME_TIMER_HBORD) && (m_timer_value > 0) && line)
-	{
-		if (--m_timer_value == 0)
-			timer_elapsed();
-	}
-
 }
 
 

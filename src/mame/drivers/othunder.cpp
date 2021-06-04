@@ -285,7 +285,7 @@ TODO:
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/flt_vol.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -114,7 +114,7 @@ public:
 	void set_interface(char const *interface) { m_interface = interface; }
 	void set_default_card(char const *def) { m_default_card = def; }
 	void set_extensions(char const *exts) { m_extensions = exts; }
-	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; }
+	void set_must_be_loaded(bool mandatory) { m_must_be_loaded = mandatory; } // default false
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
 
@@ -145,7 +145,7 @@ public:
 	virtual void write_ram(offs_t offset, u8 data);
 
 	virtual void rom_alloc(u32 size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
-	virtual void ram_alloc(u32 size)  { if (m_cart) m_cart->ram_alloc(size); }
+	virtual void ram_alloc(u32 size) { if (m_cart) m_cart->ram_alloc(size); }
 
 	u8* get_rom_base()
 	{

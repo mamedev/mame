@@ -298,8 +298,12 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		m_ism_mode &= ~data;
 		m_ism_param_idx = 0;
 		ism_show_mode();
-		if(!(m_ism_mode & 0x40))
+		if(!(m_ism_mode & 0x40)) {
 			logerror("switch to iwm\n");
+			u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
+			if(ism_devsel != m_iwm_devsel)
+				m_devsel_cb(m_iwm_devsel);
+		}
 		break;
 
 	case 0x7:
@@ -315,7 +319,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	if(m_ism_mode & 0x01)
 		ism_fifo_clear();
 
-	if((m_ism_mode ^ prev_mode) & 0x06)
+	if((m_ism_mode ^ prev_mode) & 0x86)
 		m_devsel_cb(m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0);
 	if((m_ism_mode ^ prev_mode) & 0x20)
 		m_hdsel_cb((m_ism_mode >> 5) & 1);
@@ -533,6 +537,9 @@ u8 swim1_device::iwm_control(int offset, u8 data)
 			if(data & 0x40) {
 				m_ism_mode |= 0x40;
 				logerror("switch to ism\n");
+				u8 ism_devsel = m_ism_mode & 0x80 ? (m_ism_mode >> 1) & 3 : 0;
+				if(ism_devsel != m_iwm_devsel)
+					m_devsel_cb(ism_devsel);
 			}
 			break;
 		}

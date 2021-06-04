@@ -26,7 +26,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

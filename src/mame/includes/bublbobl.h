@@ -5,12 +5,13 @@
 
 #pragma once
 
+#include "cpu/m6800/m6801.h"
 #include "cpu/m6805/m68705.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/input_merger.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2203.h"
-#include "sound/ym3526.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -59,14 +60,7 @@ public:
 	/* mcu-related */
 
 	/* Bubble Bobble MCU */
-	uint8_t    m_ddr1;
-	uint8_t    m_ddr2;
-	uint8_t    m_ddr3;
-	uint8_t    m_ddr4;
-	uint8_t    m_port1_in;
-	uint8_t    m_port2_in;
 	uint8_t    m_port3_in;
-	uint8_t    m_port4_in;
 	uint8_t    m_port1_out;
 	uint8_t    m_port2_out;
 	uint8_t    m_port3_out;
@@ -90,7 +84,6 @@ public:
 	required_device<generic_latch_8_device> m_main_to_sound;
 	required_device<generic_latch_8_device> m_sound_to_main;
 
-
 	void common_sreset(int state);
 	void bublbobl_bankswitch_w(uint8_t data);
 	void tokio_bankswitch_w(uint8_t data);
@@ -100,21 +93,10 @@ public:
 	void bublbobl_soundcpu_reset_w(uint8_t data);
 	uint8_t common_sound_semaphores_r();
 	IRQ_CALLBACK_MEMBER(mcram_vect_r);
-	uint8_t bublbobl_mcu_ddr1_r();
-	void bublbobl_mcu_ddr1_w(uint8_t data);
-	uint8_t bublbobl_mcu_ddr2_r();
-	void bublbobl_mcu_ddr2_w(uint8_t data);
-	uint8_t bublbobl_mcu_ddr3_r();
-	void bublbobl_mcu_ddr3_w(uint8_t data);
-	uint8_t bublbobl_mcu_ddr4_r();
-	void bublbobl_mcu_ddr4_w(uint8_t data);
-	uint8_t bublbobl_mcu_port1_r();
 	void bublbobl_mcu_port1_w(uint8_t data);
-	uint8_t bublbobl_mcu_port2_r();
 	void bublbobl_mcu_port2_w(uint8_t data);
 	uint8_t bublbobl_mcu_port3_r();
 	void bublbobl_mcu_port3_w(uint8_t data);
-	uint8_t bublbobl_mcu_port4_r();
 	void bublbobl_mcu_port4_w(uint8_t data);
 	uint8_t boblbobl_ic43_a_r(offs_t offset);
 	void boblbobl_ic43_a_w(offs_t offset, uint8_t data);

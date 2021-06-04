@@ -936,6 +936,9 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 					goto head_done;
 			maxh--;
 		}
+	else
+		maxh = -1;
+
 	head_done:
 	_tracks = (maxt+4)/4;
 	_heads = maxh+1;
@@ -992,23 +995,6 @@ bool floppy_image_format_t::has_variant(const std::vector<uint32_t> &variants, u
 	return false;
 }
 
-floppy_image_format_t::floppy_image_format_t()
-{
-	next = nullptr;
-}
-
-floppy_image_format_t::~floppy_image_format_t()
-{
-}
-
-void floppy_image_format_t::append(floppy_image_format_t *_next)
-{
-	if(next)
-		next->append(_next);
-	else
-		next = _next;
-}
-
 bool floppy_image_format_t::save(io_generic *, const std::vector<uint32_t> &, floppy_image *)
 {
 	return false;
@@ -1035,7 +1021,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 	return false;
 }
 
-bool floppy_image_format_t::type_no_data(int type) const
+bool floppy_image_format_t::type_no_data(int type)
 {
 	return
 		type == CRC_CCITT_START ||
@@ -1052,7 +1038,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 		type == END;
 }
 
-bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs) const
+bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *crcs)
 {
 	return
 		type == MFM ||
@@ -1075,7 +1061,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		(type == CRC && (crcs[p1].type == CRC_CCITT || crcs[p1].type == CRC_AMIGA));
 }
 
-void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs) const
+void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 {
 	memset(crcs, 0, MAX_CRC_COUNT * sizeof(*crcs));
 	for(int i=0; i != MAX_CRC_COUNT; i++)
@@ -1117,7 +1103,7 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		}
 }
 
-int floppy_image_format_t::crc_cells_size(int type) const
+int floppy_image_format_t::crc_cells_size(int type)
 {
 	switch(type) {
 	case CRC_CCITT: return 32;

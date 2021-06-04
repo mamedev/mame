@@ -73,7 +73,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 

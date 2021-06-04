@@ -104,7 +104,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "sound/k053260.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "speaker.h"
 

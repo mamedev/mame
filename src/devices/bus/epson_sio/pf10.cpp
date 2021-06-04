@@ -118,7 +118,7 @@ void epson_pf10_device::device_start()
 
 void epson_pf10_device::device_reset()
 {
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(38400 * 8));
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(38400 * 16));
 }
 
 //-------------------------------------------------

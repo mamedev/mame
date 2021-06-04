@@ -97,6 +97,8 @@ protected:
 	C140_VOICE m_voi[MAX_VOICE];
 
 	emu_timer *m_int1_timer;
+
+	u8 keyon_status_read(u16 offset);
 };
 
 class c219_device : public c140_device

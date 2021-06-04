@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "includes/toaplan1.h"
 
 

@@ -96,9 +96,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/rf5c68.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
-#include "sound/ym2612.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

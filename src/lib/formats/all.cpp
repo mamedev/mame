@@ -457,6 +457,10 @@
 #include "oric_tap.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+#include "fs_oric_jasmin.h"
+#endif
+
 #ifdef HAS_FORMATS_IBMXDF_DSK
 #include "ibmxdf_dsk.h"
 #endif
@@ -647,6 +651,14 @@
 
 #ifdef HAS_FORMATS_VT_CAS
 #include "vt_cas.h"
+#endif
+
+#ifdef HAS_FORMATS_VT_DSK
+#include "vt_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_VTECH
+#include "fs_vtech.h"
 #endif
 
 #ifdef HAS_FORMATS_WD177X_DSK
@@ -1130,6 +1142,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_ORIC_DSK
 	en.add(FLOPPY_ORIC_DSK_FORMAT); // oric_dsk.h
+	en.add(FLOPPY_ORIC_JASMIN_FORMAT); // oric_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+	en.add(FS_ORIC_JASMIN); // fs_oric_jasmin.h
 #endif
 
 	en.category("Atari");
@@ -1370,6 +1386,13 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_VT_CAS
 	en.add(vtech1_cassette_formats); // vt_cas.h
 	en.add(vtech2_cassette_formats); // vt_cas.h
+#endif
+#ifdef HAS_FORMATS_VT_DSJ
+	en.add(FLOPPY_VTECH_BIN_FORMAT); // vt_dsk.h
+	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_VTECH
+	en.add(FS_VTECH); // fs_vtech.h
 #endif
 
 	en.category("Canon");

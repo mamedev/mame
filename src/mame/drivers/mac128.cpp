@@ -88,9 +88,6 @@ Scanline 0 is the start of vblank.
 
 #include "bus/mackbd/mackbd.h"
 #include "bus/macpds/hyperdrive.h"
-#include "bus/scsi/scsicd.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/iwm.h"
@@ -98,14 +95,13 @@ Scanline 0 is the start of vblank.
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_bus.h"
 #include "machine/rescap.h"
-#include "bus/nscsi/hd.h"
-#include "bus/nscsi/cd.h"
-#include "machine/ncr5380.h"
+#include "bus/nscsi/devices.h"
 #include "machine/ram.h"
 #include "machine/applefdintf.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
+#include "machine/macscsi.h"
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"
@@ -139,8 +135,8 @@ public:
 		m_via(*this, "via6522_0"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
-		m_ncr5380(*this, "ncr5380"),
 		m_scsibus(*this, "scsibus"),
+		m_scsihelp(*this, "scsihelp"),
 		m_ncr5380n(*this, "scsibus:7:ncr5380n"),
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -175,8 +171,8 @@ private:
 	required_device<via6522_device> m_via;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
-	optional_device<ncr5380_device> m_ncr5380;
 	optional_device<nscsi_bus_device> m_scsibus;
+	optional_device<mac_scsi_helper_device> m_scsihelp;
 	optional_device<ncr5380n_device> m_ncr5380n;
 	required_device<applefdintf_device> m_iwm;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -218,6 +214,7 @@ private:
 	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
+	void scsi_berr_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
@@ -619,6 +616,11 @@ WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
 	m_scsi_drq = state;
 }
 
+void mac128_state::scsi_berr_w(uint8_t data)
+{
+	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+}
+
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
@@ -664,12 +666,7 @@ uint16_t mac128_state::macse_scsi_r(offs_t offset, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
-	if ((reg == 6) && (offset == 0x130))
-	{
-		reg = R5380_CURDATA_DTACK;
-	}
-
-	return m_ncr5380->ncr5380_read_reg(reg)<<8;
+	return m_scsihelp->read_wrapper(BIT(offset, 8), reg)<<8;
 }
 
 void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -678,12 +675,7 @@ void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
-
-	m_ncr5380->ncr5380_write_reg(reg, data);
+	m_scsihelp->write_wrapper(BIT(offset, 8), reg, data>>8);
 }
 
 void mac128_state::scc_mouse_irq(int x, int y)
@@ -1125,12 +1117,6 @@ void mac128_state::macse_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-static void mac_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM);
-}
-
 static void mac_pds_cards(device_slot_interface &device)
 {
 	device.option_add("hyperdrive", PDS_HYPERDRIVE);  // GCC HyperDrive ST-506 interface
@@ -1256,7 +1242,6 @@ void mac128_state::macse(machine_config &config)
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
-	config.device_remove("scsibus");
 
 	IWM(config.replace(), m_iwm, C7M*2);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
@@ -1265,13 +1250,19 @@ void mac128_state::macse(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+	MAC_SCSI_HELPER(config, m_scsihelp);
+	m_scsihelp->scsi_read_callback().set(m_ncr5380n, FUNC(ncr5380n_device::read));
+	m_scsihelp->scsi_write_callback().set(m_ncr5380n, FUNC(ncr5380n_device::write));
+	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380n, FUNC(ncr5380n_device::dma_r));
+	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380n, FUNC(ncr5380n_device::dma_w));
+	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
-	m_ncr5380->irq_callback().set(FUNC(mac128_state::scsi_irq_w));
+	subdevice<nscsi_connector>("scsibus:7")->set_option_machine_config("ncr5380n", [this](device_t *device) {
+		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 
 	MACADB(config, m_macadb, C7M);
 	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
@@ -1312,6 +1303,12 @@ void mac128_state::macclasc(machine_config &config)
 
 	config.device_remove("pds");
 	config.device_remove("sepds");
+
+	NSCSI_CONNECTOR(config.replace(), "scsibus:7").option_set("ncr5380n", NCR53C80).machine_config([this](device_t *device) {
+		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	});
 }
 
 static INPUT_PORTS_START( macplus )

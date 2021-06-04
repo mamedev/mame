@@ -13,7 +13,6 @@ driver by Nicola Salmoria
 
   Similar or bootleg PCB:
     Dorodon (by Falcon)
-    Space Raider
 
 Memory map (preliminary)
 
@@ -51,65 +50,75 @@ TODO:
 
 ***************************************************************************/
 
-/*
- * Space Raider todo list:
- *
- * decode cpu#2 writes to port 0x30 and 0x38 - resistors for sound
- * decode cpu#2 writes to port 0x28-0x2f - ???
- * examine other bits from cpu#2 write to 0xe800
- * one unknown dip
- */
+/***************************************************************************
+
+Universal 8203-A + 8203-B PCB set
+
+Mrs. Dynamite
+Space Raider
+
+Space Raider also uses the Starfield generator board from Zero Hour,
+    Connected via flywires to these boards
+
+TODO:
+
+decode cpu#2 writes to port 0x30 and 0x38 - resistors for sound
+decode cpu#2 writes to port 0x28-0x2f - ???
+examine other bits from cpu#2 write to 0xe800
+unknown dips
+
+ ***************************************************************************/
 
 #include "emu.h"
 #include "includes/ladybug.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/latch8.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <algorithm>
 
+// documentation TBD - 556 dual timer
+uint8_t mrsdyna_state::mrsdyna_rnd_r()
+{
+	return rand() % 4;
+}
 
-// Protection?
-uint8_t sraider_state::sraider_8005_r()
+// Protection - documentation TBD
+uint8_t mrsdyna_state::mrsdyna_protection_r()
 {
 	// This must return X011111X or cpu #1 will hang
 	// see code at rst $10
 	return 0x3e;
 }
 
-// Unknown IO
-void sraider_state::sraider_misc_w(offs_t offset, uint8_t data)
+// Unknown IO - documentation TBD
+void mrsdyna_state::mrsdyna_weird_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
-	{
-	// These 8 bits are stored in the latch at A7
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03:
-	case 0x04:
-	case 0x05:
-	case 0x06:
-	case 0x07:
-		m_weird_value[offset & 7] = data & 1;
-		break;
-	// These 6 bits are stored in the latch at N7
-	case 0x08:
-		m_sraider_0x30 = data & 0x3f;
-		break;
-	// These 6 bits are stored in the latch at N8
-	case 0x10:
-		m_sraider_0x38 = data & 0x3f;
-		break;
-	default:
-		logerror("(%s) write to %02X\n", machine().describe_context(), offset);
-		break;
-	}
+	// These 8 bits are stored in the LS259 latch at A7,
+	// and connected to all the select lines on 2 4066s at B7/C7
+	m_weird_value[offset & 7] = data & 1;
 }
 
+// documentation TBD
+void mrsdyna_state::mrsdyna_0x30_w(offs_t offset, uint8_t data)
+{
+	// bits 0-2 select 4051s at M7 and M8
+	// bits 3-5 select 4051s at K7 and K8
+	m_0x30 = data & 0x3f;
+}
+
+// documentation TBD
+void mrsdyna_state::mrsdyna_0x38_w(offs_t offset, uint8_t data)
+{
+	// These 6 bits are stored in the LS174 latch at N8
+	// bits 0-2 select 4051s at H7 and H8
+	// bits 3-5 select 4051s at E7 and E8
+	m_0x38 = data & 0x3f;
+}
 
 void ladybug_state::ladybug_map(address_map &map)
 {
@@ -135,42 +144,75 @@ void dorodon_state::decrypted_opcodes_map(address_map &map)
 }
 
 
-void sraider_state::sraider_cpu1_map(address_map &map)
+void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x6fff).ram();
-	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w));
-	map(0x8005, 0x8005).r(FUNC(sraider_state::sraider_8005_r));  // protection check?
-	map(0x8006, 0x8006).writeonly().share("sound_low");
-	map(0x8007, 0x8007).writeonly().share("sound_high");
-	map(0x9000, 0x9000).portr("IN0");
-	map(0x9001, 0x9001).portr("IN1");
-	map(0x9002, 0x9002).portr("DSW0");
-	map(0x9003, 0x9003).portr("DSW1");
-	map(0xd000, 0xd7ff).w("video", FUNC(ladybug_video_device::bg_w));
-	map(0xe000, 0xe000).nopw();  //unknown 0x10 when in attract, 0x20 when coined/playing
+	// LS138 @ J4
+	map(0x0000, 0x5fff).rom();  // 2764s at R4, N4, and M4
+	// LS138 @ J4 and LS139 @ H4
+	map(0x6000, 0x6fff).ram();  // 6116s @ K3 & M3, also connected to clk on PAL K2 (16R6, U001)
+	map(0x7000, 0x73ff).w("video", FUNC(ladybug_video_device::spr_w)); // pin 29 on ribbon
+	//map(0x77ff, 0x7fff);  // LS139 @ H4 pin7 is NC
+
+	// LS138 @ J4, Pin11 (0x8000-0x9fff) and
+	// LS138 @ N3 (bottom 3 bits)
+	// (all of these are read/write)
+	map(0x8005, 0x8005).mirror(0x1ff8).r(FUNC(mrsdyna_state::mrsdyna_protection_r));  // OE on PAL @ K2 (16R6, U001) (100x xxxx xxxx x101)
+	map(0x8006, 0x8006).mirror(0x1ff8).w("soundlatch_low", FUNC(latch8_device::write)); // LS374 @ P6
+	map(0x8007, 0x8007).mirror(0x1ff8).w("soundlatch_high", FUNC(latch8_device::write)); // LS374 @ R6
+	map(0x8000, 0x8000).mirror(0x1ff8).portr("IN0");
+	map(0x8001, 0x8001).mirror(0x1ff8).portr("IN1");
+	map(0x8002, 0x8002).mirror(0x1ff8).portr("DSW0");
+	map(0x8003, 0x8003).mirror(0x1ff8).portr("DSW1");
+	//map(0x8004, 0x8004).mirror(0x1ff8).portr("IN2"); // extra JAMMA pins
+	// LS138 @ J4, Pin10 (0xa000-0xbfff) // NC
+	// LS138 @ J4, Pin9 (0xc000-0xdfff)
+	map(0xd000, 0xd7ff).w("video", FUNC(ladybug_video_device::bg_w)); // pin 27 on ribbon
+	// LS138 @ J4, Pin7 (0xe000-0xffff)
+	map(0xe000, 0xe000).nopw();  //unknown 0x10 when in attract, 0x20 when coined/playing - disabled watchdog based on LS123 @ F4
+}
+
+void mrsdyna_state::mrsdyna_cpu2_map(address_map &map)
+{
+	// LS138 @ P7
+	map(0x0000, 0x5fff).rom(); // 2764s at H6,J6, and L6
+	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(mrsdyna_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
+	// LS138 @ P7 (nY7) and LS139 @ H4
+	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
+	map(0xe800, 0xefff).w(FUNC(mrsdyna_state::mrsdyna_io_w)); // LS273 @ D4
+	//map(0xf000, 0xf7ff)  // NC
+	//map(0xf800, 0xffff)  // NC
 }
 
 void sraider_state::sraider_cpu2_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x63ff).ram();
-	map(0x8000, 0x8000).readonly().share("sound_low");
-	map(0xa000, 0xa000).readonly().share("sound_high");
-	map(0xc000, 0xc000).nopr(); //some kind of sync
-	map(0xe000, 0xe0ff).writeonly().share("grid_data");
-	map(0xe800, 0xe800).w(FUNC(sraider_state::sraider_io_w));
+	// LS138 @ P7
+	map(0x0000, 0x5fff).rom(); // 2764s at H6, J6, and L6
+	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
+	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(sraider_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
+	// LS138 @ P7 (nY7) and LS139 @ H4
+	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
+	map(0xe800, 0xefff).w(FUNC(sraider_state::sraider_io_w)); // LS273 @ D4
+	//map(0xf000, 0xf7ff)  // NC
+	//map(0xf800, 0xffff)  // NC
 }
 
-void sraider_state::sraider_cpu2_io_map(address_map &map)
+void mrsdyna_state::mrsdyna_cpu2_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489_device::write));
-	map(0x08, 0x08).w("sn2", FUNC(sn76489_device::write));
-	map(0x10, 0x10).w("sn3", FUNC(sn76489_device::write));
-	map(0x18, 0x18).w("sn4", FUNC(sn76489_device::write));
-	map(0x20, 0x20).w("sn5", FUNC(sn76489_device::write));
-	map(0x28, 0x3f).w(FUNC(sraider_state::sraider_misc_w));  // lots unknown
+	// LS138 @ A8
+	map(0x00, 0x07).w("sn1", FUNC(sn76489_device::write));   // J214X2 @ N9
+	map(0x08, 0x0f).w("sn2", FUNC(sn76489_device::write));   // J214X2 @ M9
+	map(0x10, 0x17).w("sn3", FUNC(sn76489_device::write));   // J214X2 @ L9
+	map(0x18, 0x1f).w("sn4", FUNC(sn76489_device::write));   // J214X2 @ K9
+	map(0x20, 0x27).w("sn5", FUNC(sn76489_device::write));   // J214X2 @ J9
+	map(0x28, 0x2f).w(FUNC(sraider_state::mrsdyna_weird_w)); // LS259 @ A7   ************
+	map(0x30, 0x37).w(FUNC(sraider_state::mrsdyna_0x30_w));  // LS174 @ N7   ************
+	map(0x38, 0x3f).w(FUNC(sraider_state::mrsdyna_0x38_w));  // LS174 @ N8   ************
 }
 
 
@@ -544,7 +586,7 @@ static INPUT_PORTS_START( dorodon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state,coin2_inserted, 0)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sraider )
+static INPUT_PORTS_START( mrsdyna )
 	PORT_START("IN0")   /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -553,7 +595,7 @@ static INPUT_PORTS_START( sraider )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // JAMMA PIN 12
 
 	PORT_START("IN1")   /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
@@ -561,37 +603,38 @@ static INPUT_PORTS_START( sraider )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // VBLANK????
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("DSW0")  /* DSW0 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
+	PORT_START("DSW0")  /* DSW0 @ R3 via '244 @ R2 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )  PORT_DIPLOCATION("SW0:6")
 	PORT_DIPSETTING(    0x00, "3 Letters" )
-	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, "12 Letters" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW0:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW0:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
 	/* Free Play setting works when it's set for both */
-	PORT_START("DSW1")  /* DSW1 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_START("DSW1")  /* DSW1 @ P3 via '244 @ P2 */
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6,5")
 	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -604,7 +647,82 @@ static INPUT_PORTS_START( sraider )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )    PORT_DIPLOCATION("SW1:4,3,2,1")
+	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sraider )
+	PORT_START("IN0")   /* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // JAMMA PIN 12
+
+	PORT_START("IN1")   /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // VBLANK????
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW0")  /* DSW0 @ R3 via '244 @ R2 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW0:7,8")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )     PORT_DIPLOCATION("SW0:6")
+	PORT_DIPSETTING(    0x00, "3 Letters" )
+	PORT_DIPSETTING(    0x04, "10 Letters" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )  PORT_DIPLOCATION("SW0:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW0:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW0:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )  PORT_DIPLOCATION("SW0:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+
+	/* Free Play setting works when it's set for both */
+	PORT_START("DSW1")  /* DSW1 @ P3 via '244 @ P2 */
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:8,7,6,5")
+	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )    PORT_DIPLOCATION("SW1:4,3,2,1")
 	/* settings 0x00 through 0x50 all give 1 Coin/1 Credit */
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
@@ -621,16 +739,6 @@ INPUT_PORTS_END
 
 
 static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	2,  /* 2 bits per pixel */
-	{ 0, 512*8*8 }, /* the two bitplanes are separated */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
-};
-static const gfx_layout charlayout2 =
 {
 	8,8,    /* 8*8 characters */
 	512,    /* 512 characters */
@@ -692,7 +800,7 @@ static GFXDECODE_START( gfx_ladybug )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_sraider )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout2,             0,  8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,              0,  8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,          4*8, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout2,         4*8, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, gridlayout,    4*8+4*16+32,  1 )
@@ -700,23 +808,23 @@ static GFXDECODE_START( gfx_sraider )
 GFXDECODE_END
 
 
-void sraider_state::machine_start()
+void mrsdyna_state::machine_start()
 {
 	ladybug_base_state::machine_start();
 
 	save_item(NAME(m_grid_color));
-	save_item(NAME(m_sraider_0x30));
-	save_item(NAME(m_sraider_0x38));
+	save_item(NAME(m_0x30));
+	save_item(NAME(m_0x38));
 	save_item(NAME(m_weird_value));
 }
 
-void sraider_state::machine_reset()
+void mrsdyna_state::machine_reset()
 {
 	ladybug_base_state::machine_reset();
 
 	m_grid_color = 0;
-	m_sraider_0x30 = 0;
-	m_sraider_0x38 = 0;
+	m_0x30 = 0;
+	m_0x38 = 0;
 	std::fill(std::begin(m_weird_value), std::end(m_weird_value), 0);
 }
 
@@ -755,17 +863,57 @@ void dorodon_state::dorodon(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &dorodon_state::decrypted_opcodes_map);
 }
 
+void mrsdyna_state::mrsdyna(machine_config &config)
+{
+	/* basic machine hardware */
+	z80_device &maincpu(Z80(config, "maincpu", 4000000));   /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu1_map);
+	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
+
+	LATCH8(config, "soundlatch_low");
+	LATCH8(config, "soundlatch_high");
+
+	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
+	sub.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu2_map);
+	sub.set_addrmap(AS_IO, &mrsdyna_state::mrsdyna_cpu2_io_map);
+	sub.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(9'828'000 / 2, 312, 8, 248, 262, 32, 224);
+	screen.set_screen_update(FUNC(mrsdyna_state::screen_update_mrsdyna));
+	//screen.screen_vblank().set(FUNC(sraider_state::screen_vblank_sraider));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ladybug);
+	PALETTE(config, m_palette, FUNC(mrsdyna_state::mrsdyna_palette), 4*8 + 4*16 + 32 + 2, 32 + 32 + 1);
+
+	LADYBUG_VIDEO(config, m_video, 4000000).set_gfxdecode_tag(m_gfxdecode);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 void sraider_state::sraider(machine_config &config)
 {
 	/* basic machine hardware */
 	z80_device &maincpu(Z80(config, "maincpu", 4000000));   /* 4 MHz */
-	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu1_map);
-	maincpu.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
+	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::mrsdyna_cpu1_map);
+	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
+
+	LATCH8(config, "soundlatch_low");
+	LATCH8(config, "soundlatch_high");
 
 	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
 	sub.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu2_map);
-	sub.set_addrmap(AS_IO, &sraider_state::sraider_cpu2_io_map);
-	sub.set_vblank_int("screen", FUNC(sraider_state::irq0_line_hold));
+	sub.set_addrmap(AS_IO, &sraider_state::mrsdyna_cpu2_io_map);
+	sub.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -966,6 +1114,34 @@ ROM_START( dorodon2 )
 	ROM_LOAD( "dorodon.bp2", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* timing?? */
 ROM_END
 
+ROM_START( mrsdyna )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// NOTE: Mrs. Dynamite returns ROM ERROR in test mode.  It does an 8-bit checksum on these 3
+	//       ROMs and computes 0xFF.  The answer to pass the test is 0x00.
+	//       THowever, these images were dumped twice, and seem to work fine.
+	ROM_LOAD( "mrsd-8203a-r4.f3", 0x0000, 0x2000, CRC(c944062c) SHA1(c61fc327d67595e601f6a7e5e337646f5f9d351b) )
+	ROM_LOAD( "mrsd-8203a-n4.f2", 0x2000, 0x2000, CRC(d1b9c7bb) SHA1(c139c8ae5b14924eb04a265095a7ab95ac5370af) )
+	ROM_LOAD( "mrsd-8203a-m4.f1", 0x4000, 0x2000, CRC(d25b1dfe) SHA1(f68c6fb2cda37fcffbe7c3c2a3cc5cb372c4101b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "mrsd-8203a-h6.f4", 0x0000, 0x2000, CRC(04f8617b) SHA1(64deef2269790d8460d0ad510548e178f0f61607) )
+	ROM_LOAD( "mrsd-8203a-j6.f5", 0x2000, 0x2000, CRC(1ffb5fc3) SHA1(e8fc7b95663a396ef7d46ba6ce24973a3c343381) )
+	ROM_LOAD( "mrsd-8203a-l6.f6", 0x4000, 0x2000, CRC(5a0f5030) SHA1(d1530230fe6c666f7920cb82cb47f5fcc7e1ecc8) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mrsd-8203b-k6.f10", 0x0000, 0x1000, CRC(e33cb26e) SHA1(207fa986754f8d7cd0bb3e56fd271ee0c1990269) )
+	ROM_LOAD( "mrsd-8203b-l6.f11", 0x1000, 0x1000, CRC(a327ba05) SHA1(5eac27b48d14fec179919fe0902a6c7ada95f2b2) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "mrsd-8203b-m2.f7", 0x0000, 0x1000, CRC(a00ae797) SHA1(adff7f38870b7e8fa114886792a3acbb7a5726ab) )
+	ROM_LOAD( "mrsd-8203b-n2.f8", 0x1000, 0x1000, CRC(81f2bdbd) SHA1(45ee1d62462cfadf7d2c46767f03ccfb3c876c08) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "mrsd-10-1.a2",  0x0000, 0x0020, CRC(4a819ad4) SHA1(d9072af7e52b506c1bcf8a327242d470eb240857) )
+	ROM_LOAD( "mrsd-10-2.l3",  0x0020, 0x0020, CRC(2d926a3a) SHA1(129fb60ce3df67614e39dcaac9c93f0652addbbb) )
+	ROM_LOAD( "mrsd-10-3.c1",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+ROM_END
+
 ROM_START( sraider )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sraid3.r4",    0x0000, 0x2000, CRC(0f389774) SHA1(c67596e6bf00175ff0a241506cd2f88114d05933) )
@@ -1013,4 +1189,5 @@ GAME( 1981, ladybugb2, ladybug, ladybug, ladybug,  ladybug_state, empty_init,   
 GAME( 1981, snapjack,  0,       ladybug, snapjack, ladybug_state, empty_init,   ROT0,   "Universal",              "Snap Jack",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dorodon,   0,       dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 1)",                         MACHINE_SUPPORTS_SAVE ) // license or bootleg?
 GAME( 1982, dorodon2,  dorodon, dorodon, dorodon,  dorodon_state, init_dorodon, ROT270, "UPL (Falcon license?)",  "Dorodon (set 2)",                         MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, mrsdyna,   0,       mrsdyna, mrsdyna,  mrsdyna_state, empty_init,   ROT270, "Universal",              "Mrs. Dynamite",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sraider,   0,       sraider, sraider,  sraider_state, empty_init,   ROT270, "Universal",              "Space Raider",                            MACHINE_SUPPORTS_SAVE )

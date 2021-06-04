@@ -2,14 +2,16 @@
 // copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
-    RAM device
+RAM device
 
-    Provides a configurable amount of RAM to drivers
+Provides a configurable amount of RAM to drivers
 
-    Limitations due to hardcoded RAM_TAG:
-    - *configurable* RAM device can only be added to root device
-      (that is the driver device)
-    - can only have one *configurable* RAM device per machine driver
+TODO:
+- add RAM size options to UI, eg. under Machine Configuration
+- remove limitations due to hardcoded RAM_TAG:
+  + *configurable* RAM device can only be added to root device
+    (that is the driver device)
+  + can only have one *configurable* RAM device per machine driver
 
 **************************************************************************/
 
@@ -122,7 +124,7 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	: device_t(mconfig, RAM, tag, owner, clock)
 	, m_size(0)
 	, m_default_size(0)
-	, m_default_value(0xCD)
+	, m_default_value(0xff)
 	, m_extra_options_string(nullptr)
 {
 }

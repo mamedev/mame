@@ -936,6 +936,11 @@ void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
 	if(m_bus_error)
 		return;
+	else if(!m_maincpu->executing())
+	{
+		m_hd63450->bec_w(0, hd63450_device::ERR_BUS);
+		return;
+	}
 	if(!ACCESSING_BITS_8_15)
 		address++;
 	m_bus_error = true;

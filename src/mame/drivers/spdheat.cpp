@@ -20,7 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/flt_vol.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 
 
 static constexpr XTAL MASTER_CLOCK  = 16_MHz_XTAL;

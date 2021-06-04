@@ -116,19 +116,12 @@ PCB - Handheld-Console:
 A = 24LC02B / SN0429
 
 
-
-
 ETCHES ON THE BACK OF THE PCB:
 
 "FAB-300-10069-C"
 
 "702800254.01A"
 "SW1208 Rev.5"
-
-
-
-
-
 
 
 
@@ -151,9 +144,6 @@ FRONT:
 
 B1: 24L002B
 
-
-
-
 24L002B:
 
              +-----+
@@ -165,11 +155,7 @@ B1: 24L002B
 
 
 
-
-
 PCB - LEAPSTER-TV:
-
-
 
 +-----------------------------------------------------------------------+
 |                                                                       |
@@ -197,12 +183,6 @@ PCB - LEAPSTER-TV:
           |          +-----------------------------+          |
            \                                                 /
             +-----------------------------------------------+
-
-
-
-
-
-
 
 */
 
@@ -254,11 +234,8 @@ private:
 };
 
 
-
-
 static INPUT_PORTS_START( leapster )
 INPUT_PORTS_END
-
 
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -293,7 +270,7 @@ void leapster_state::machine_reset()
 
 void leapster_state::leapster_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the bios region seem to be to the 40xxxxxx region, either we mirror there or something (real bios?) is acutally missing
+	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the BIOS region seem to be to the 40xxxxxx region, either we mirror there or something (real BIOS?) is acutally missing
 	map(0x0180D800, 0x0180D803).r(FUNC(leapster_state::leapster_random_r));
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
@@ -307,56 +284,82 @@ void leapster_state::leapster_aux(address_map &map)
 
 void leapster_state::leapster(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	ARCA5(config, m_maincpu, 96000000/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_size(160, 160);
 	screen.set_visarea(0, 160-1, 0, 160-1);
 	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
-	/* cartridge */
+	// Cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));
 
-	/* Software lists */
+	// Software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("leapster");
 }
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
-/* There are various build dates and revisions for different parts of the code, the date listed is the newest on in each rom.
-   This is always in the same place relative to the rest of the data
+/* There are various build dates and revisions for different parts of the code, the date listed is the newest on in each ROM.
+   This is always in the same place relative to the rest of the data.
 
-   V2.1 sets (except TV) are apparently larger because "Learning with Leap" was built in
+   V2.1 sets (except TV) are apparently larger because "Learning with Leap" was built in.
 */
 
 ROM_START(leapster)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_SYSTEM_BIOS( 0, "uni15", "Universal 1.5" ) // 152-10346 Leapster BaseROM Universal v1.5 - Sep 04 2003 10:46:47
+	ROM_SYSTEM_BIOS( 0, "uni15", "Universal v1.5" ) // 152-10346 Leapster BaseROM Universal v1.5 - Sep 04 2003 10:46:47
 	ROM_LOAD_BIOS( 0, "155-10072-a.bin"   , 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
-	ROM_SYSTEM_BIOS( 1, "uk21",  "UK 2.1" )        // 152-11452 Leapster BaseROM UK v2.1        - Aug 30 2005 16:01:46
-	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
-	ROM_SYSTEM_BIOS( 2, "ger21", "German 2.1" )    // 152-11435 Leapster BaseROM German v2.1    - Oct 21 2005 18:53:59
-	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
-	ROM_SYSTEM_BIOS( 3, "sp10",  "Spanish 1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
-	ROM_LOAD_BIOS( 3, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
+	ROM_SYSTEM_BIOS( 1, "us21",  "USA v2.1" )       // 152-11265 Leapster BaseROM US v2.1        - Apr 13 2005 15:34:57
+	ROM_LOAD_BIOS( 1, "152-11265_2.1.bin",  0x00000, 0x800000, CRC(9639b3ae) SHA1(002873b782e823c7a8159deed16c78c149f2afab) )
+	ROM_SYSTEM_BIOS( 2, "uk21",  "UK v2.1" )        // 152-11452 Leapster BaseROM UK v2.1        - Aug 30 2005 16:01:46
+	ROM_LOAD_BIOS( 2, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
+	ROM_SYSTEM_BIOS( 3, "ger21", "German v2.1" )    // 152-11435 Leapster BaseROM German v2.1    - Oct 21 2005 18:53:59
+	ROM_LOAD_BIOS( 3, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
+	ROM_SYSTEM_BIOS( 4, "sp10",  "Spanish v1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
+	ROM_LOAD_BIOS( 4, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
+	ROM_SYSTEM_BIOS( 5, "connb5",  "Connected B5" )  // 152-12076 Leapster Connected Baserom B5   - Feb 29 2008 18:11:21
+	ROM_LOAD_BIOS( 5, "152-12076_b5.bin",   0x00000, 0x800000, CRC(4d223022) SHA1(bdc10ad70aa7641716e16fbea16bd0ef35f6e85e) )
+	ROM_DEFAULT_BIOS( "connb5" )
 ROM_END
 
 ROM_START(leapstertv)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_SYSTEM_BIOS( 0,  "uni2111", "Universal 2.1.11" ) /* 152-11594 LeapsterTv Baserom Universal.v2.1.11 - Apr 13 2006 16:36:08 */ \
+	ROM_SYSTEM_BIOS( 0, "uni2111", "Universal v2.1.11" ) // 152-11594 LeapsterTv Baserom Universal.v2.1.11 - Apr 13 2006 16:36:08
 	ROM_LOAD_BIOS( 0, "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
+	ROM_DEFAULT_BIOS( "uni2111" )
+ROM_END
+
+ROM_START(leapster2)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS( 0, "2xcip3_m9", "2x CIP3 m9" ) // 152-12659 Leapster 2x CIP3 Baserom m9 - Mar 29 2011 14:13:45
+	ROM_LOAD_BIOS( 0, "152-12659_m9.bin",  0x00000, 0x800000, CRC(57bde604) SHA1(4b5eaac1e40bc605eb4cf6d4ad212343334762fd) )
+	ROM_SYSTEM_BIOS( 1, "2x_06",     "2x 0.6" )     // 152-12206 Leapster 2x Baserom 0.6     - Feb 02 2009 17:15:38
+	ROM_LOAD_BIOS( 1, "152-12206_0.6.bin", 0x00000, 0x800000, CRC(fa94d9a7) SHA1(c5bd84146701dc4a7635b0e37adedb90747adf32) )
+	ROM_DEFAULT_BIOS( "2xcip3_m9" )
+ROM_END
+
+ROM_START(leapsterlmx)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS( 0, "lmax_2_2",    "v2.2" )     // 152-11476 LMAX Baserom v2.2    - Jan 12 2006 11:22:50
+	ROM_LOAD_BIOS( 0, "152-11476_v2.2.bin",    0x00000, 0x800000, CRC(e1140475) SHA1(42089165db67005b6a0180e894ff8f36b97a081e) )
+	ROM_SYSTEM_BIOS( 1, "lmax_us_2_1", "USA v2.1" ) // 152-11238 LMAX BaseROM US v2.1 - Mar 04 2005 12:01:01
+	ROM_LOAD_BIOS( 1, "152-11238_us_v2.1.bin", 0x00000, 0x800000, CRC(80bb4e58) SHA1(7d8b1c23d08ce76a89cff1112957377c6a1d4b63) )
+	ROM_DEFAULT_BIOS( "lmax_2_2" )
 ROM_END
 
 void leapster_state::init_leapster()
 {
 }
 
-CONS( 2003, leapster,   0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",    MACHINE_IS_SKELETON )
-CONS( 2005, leapstertv, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV", MACHINE_IS_SKELETON )
+CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",       MACHINE_IS_SKELETON )
+CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV",    MACHINE_IS_SKELETON )
+CONS( 2005, leapsterlmx, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster L-MAX", MACHINE_IS_SKELETON )
+CONS( 2009, leapster2,   leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster 2",     MACHINE_IS_SKELETON )

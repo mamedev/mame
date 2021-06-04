@@ -173,7 +173,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/y8950.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "layout/generic.h"
 #include "screen.h"

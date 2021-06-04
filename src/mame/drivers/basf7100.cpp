@@ -4,7 +4,7 @@
 
     BASF 7100
 
-    This system is based on (or even identical to) the DigiLog Microterm II 
+    This system is based on (or even identical to) the DigiLog Microterm II
 
     Models:
     - 7120: 24k disk controller memory, 3x 5.25" single sided
@@ -39,9 +39,9 @@
 
     TODO:
     - Dump real character ROM
-	- Improve video emulation
-	- Find documentation for switches S2, S3, S4 (might app. specific)
-	- Serial interrupts, flags, control
+    - Improve video emulation
+    - Find documentation for switches S2, S3, S4 (might be app. specific)
+    - Serial interrupts, flags, control
 
     Notes:
     - Runs the BOS operating system, possibly also CP/M?
@@ -192,13 +192,13 @@ void basf7100_state::io_map(address_map &map)
 	map(0x12, 0x12).w("brg0", FUNC(com8116_device::stt_str_w)); // or str_stt_w
 	map(0x14, 0x15).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x16, 0x16).w("brg1", FUNC(com8116_device::stt_str_w)); // or str_stt_w
-//	map(0x17, 0x17) rs232 flags/control
+//  map(0x17, 0x17) rs232 flags/control
 	map(0x18, 0x18).lr8(NAME([this] () -> uint8_t { return m_int_flags; }));
 	map(0x1c, 0x1c).portr("S1");
 	map(0x1d, 0x1d).portr("S2");
 	map(0x1e, 0x1e).portr("S3");
 	map(0x1f, 0x1f).portr("S4");
-//	map(0xb0, 0xb3) display hardware clear
+//  map(0xb0, 0xb3) display hardware clear
 	map(0xb8, 0xbb).rw(m_ppi[3], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xbc, 0xbf).lr8(NAME([this] (offs_t offset) -> uint8_t { return m_ppi[4]->read(offset ^ 3); }));
 	map(0xbc, 0xbf).lw8(NAME([this] (offs_t offset, uint8_t data) { m_ppi[4]->write(offset ^ 3, data); }));
@@ -511,7 +511,7 @@ void basf7100_state::fdc_ctrl_w(uint8_t data)
 
 	if (data != 0x08)
 		logerror("fdc_ctrl_w: %04x\n", data);
-	
+
 	floppy_image_device *floppy = nullptr;
 
 	if ((data & 0x03) < 3)
@@ -559,7 +559,7 @@ void basf7100_state::mmio_w(offs_t offset, uint8_t data)
 IRQ_CALLBACK_MEMBER( basf7100_state::maincpu_irq_callback )
 {
 	uint32_t vector = 0;
-	
+
 	vector |= m_pic->acknowledge() << 16;
 	vector |= m_pic->acknowledge();
 	vector |= m_pic->acknowledge() << 8;
@@ -582,6 +582,7 @@ void basf7100_state::machine_start()
 	save_item(NAME(m_sod));
 	save_item(NAME(m_fdc_intrq_vector));
 	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_int_flags));
 }
 
 void basf7100_state::machine_reset()
@@ -693,6 +694,8 @@ void basf7100_state::basf7100(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 
+	SOFTWARE_LIST(config, "floppy_list").set_original("basf7100");
+
 	// keyboard
 	basf7100_kbd_device &keyboard(BASF7100_KBD(config, "keyboard"));
 	keyboard.int_handler().set(m_ppi[0], FUNC(i8255_device::pc2_w));
@@ -709,11 +712,11 @@ ROM_START( basf7120 )
 
 	ROM_REGION(0x400, "fdccpu", 0)
 	ROM_LOAD("19-2130-2h.u45", 0x000, 0x400, CRC(cb077c69) SHA1(dfa16082b88275442c48082aeb5f62fe1238ae3e)) // 2708
-	
+
 	ROM_REGION(0x50, "floppy_pal", 0)
 	ROM_LOAD("19-2131-1.u23", 0x00, 0x28, CRC(f37ed4bc) SHA1(824b4405f396c262cf8116f85eb0b548eabb4c04)) // PAL10L8MJ
 	ROM_LOAD("19-2132-1.u24", 0x28, 0x28, CRC(b918ff18) SHA1(c6d7cd9642ed32e56b5c1df1ddf3afe09d744ebc)) // PAL10L8MJ
-	
+
 	ROM_REGION(0x100, "prom", 0)
 	ROM_LOAD("video.30", 0x000, 0x100, CRC(89175ac9) SHA1(69b2055bee87e11cc74c70cef2f2bebcbd0004c9)) // N82S129N (label missing)
 
@@ -730,4 +733,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME  FLAGS
-COMP( 1982, basf7120, 0,      0,      basf7100, basf7100, basf7100_state, empty_init, "BASF",   "7120",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, basf7120, 0,      0,      basf7100, basf7100, basf7100_state, empty_init, "BASF",   "7120",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

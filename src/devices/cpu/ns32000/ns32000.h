@@ -13,6 +13,7 @@ class ns32000_device : public cpu_device
 {
 public:
 	template <typename T> void set_fpu(T &&tag) { m_fpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
 	// construction/destruction
 	ns32000_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -42,15 +43,14 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-private:
 	enum addr_mode_type : unsigned
 	{
-		IMM,
-		REG,
-		MEM,
-		IND,
-		EXT,
-		TOS,
+		IMM, // immediate
+		REG, // register
+		MEM, // memory space
+		REL, // memory relative
+		EXT, // external
+		TOS, // top of stack
 	};
 	enum access_class : unsigned
 	{
@@ -69,6 +69,23 @@ private:
 		SIZE_Q = 7,
 	};
 
+	// time needed to read or write a memory operand
+	unsigned top(size_code const size, u32 const address = 0) const
+	{
+		unsigned const tmmu = m_mmu ? 1 : 0;
+
+		switch (size)
+		{
+		case SIZE_B: return 3 + tmmu;
+		case SIZE_W: return (address & 1) ? 7 + 2 * tmmu : 3 + tmmu;
+		case SIZE_D: return (address & 1) ? 11 + 3 * tmmu : 7 + 2 * tmmu;
+		case SIZE_Q: return (address & 1) ? 19 + 5 * tmmu : 15 + 4 * tmmu;
+		}
+
+		// can't happen
+		return 0;
+	}
+
 	struct addr_mode
 	{
 		addr_mode(unsigned gen)
@@ -78,6 +95,7 @@ private:
 			, base(0)
 			, disp(0)
 			, imm(0)
+			, tea(0)
 		{};
 
 		void read_i(size_code code)  { access = READ;    size = code; }
@@ -97,9 +115,15 @@ private:
 		u32 base;
 		u32 disp;
 		u64 imm;
+		unsigned tea;
 	};
 
-	// instruction decoding helpers
+	// memory accessors
+	template <typename T> T mem_read(unsigned st, u32 address, bool user = false);
+	template <typename T> void mem_write(unsigned st, u32 address, T data, bool user = false);
+
+	// instruction fetch/decode helpers
+	template <typename T> T fetch(unsigned &bytes);
 	s32 displacement(unsigned &bytes);
 	void decode(addr_mode *mode, unsigned &bytes);
 
@@ -113,18 +137,23 @@ private:
 	bool condition(unsigned const cc);
 	void flags(u32 const src1, u32 const src2, u32 const dest, unsigned const size, bool const subtraction);
 	void interrupt(unsigned const vector, u32 const return_address, bool const trap = true);
-	u16 slave(addr_mode op1, addr_mode op2);
+	u16 slave(ns32000_slave_interface *slave, addr_mode op1, addr_mode op2);
 
+private:
 	// configuration
 	address_space_config m_program_config;
 	address_space_config m_interrupt_config;
 
 	optional_device<ns32000_slave_interface> m_fpu;
+	optional_device<ns32000_mmu_interface> m_mmu;
 
 	// emulation state
 	int m_icount;
 
-	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::cache m_bus[16];
+	typename memory_access<24, Width, 0, ENDIANNESS_LITTLE>::specific m_bus[16];
+
+	u32 m_ssp;     // saved stack pointer
+	u16 m_sps;     // saved program status
 
 	u32 m_pc;      // program counter
 	u32 m_sb;      // static base

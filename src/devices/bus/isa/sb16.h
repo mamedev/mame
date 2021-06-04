@@ -8,7 +8,7 @@
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/dac.h"
-#include "sound/ymf262.h"
+#include "sound/ymopl.h"
 
 //*********************************************************************
 //   TYPE DEFINITIONS

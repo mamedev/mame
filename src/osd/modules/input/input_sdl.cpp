@@ -377,13 +377,33 @@ public:
 		: sdl_device(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}})
 	{
+		#ifdef __APPLE__
+		m_capslock_hack = false;
+		machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&sdl_keyboard_device::frame_callback, this));
+		#endif
 	}
+
+	#ifdef __APPLE__
+	unsigned m_capslock_hack;
+	void frame_callback()
+	{
+		if (m_capslock_hack)
+			if (--m_capslock_hack == 0)
+				keyboard.state[SDL_SCANCODE_CAPSLOCK] = 0x00;
+	}
+	#endif
 
 	void process_event(SDL_Event &sdlevent) override
 	{
 		switch (sdlevent.type)
 		{
 		case SDL_KEYDOWN:
+
+			#ifdef __APPLE__
+			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+				m_capslock_hack = 2;
+			#endif
+
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x80;
 			if (sdlevent.key.keysym.sym < 0x20)
 				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), sdlevent.key.keysym.sym);
@@ -403,6 +423,11 @@ public:
 			break;
 
 		case SDL_KEYUP:
+			#ifdef __APPLE__
+			if (sdlevent.key.keysym.scancode == SDL_SCANCODE_CAPSLOCK)
+				break;
+			#endif
+
 			keyboard.state[sdlevent.key.keysym.scancode] = 0x00;
 			break;
 
@@ -437,6 +462,9 @@ public:
 	void reset() override
 	{
 		memset(&keyboard.state, 0, sizeof(keyboard.state));
+		#ifdef __APPLE__
+		m_capslock_hack = 0;
+		#endif
 	}
 };
 

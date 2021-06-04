@@ -5,25 +5,45 @@ license:CC0
 -->
 <softwarelist name="juicebox" description="Mattel Juice Box SmartMedia Flash ROM">
 
-<!-- Undumped items
+<!-- known items (* = dumped)
+     (many still missing from this list)
 
-* H???? - Juice Box Music Video
-* H2682 - Juiceware Animated Assortment
-* H2684 - Ed, Edd n Eddy vol.1
-* H2686 - Winx Club
-* H2687 - The Grim Adventures of Billy and Mandy vol.1
-* H2688 - Vans Triple Crown vol.1
-* H2689 - Vans Triple Crown vol.2
-* H2690 - Vans Pipeline Masters
-* H2692 - Teenage Mutant Ninja Turtles vol.1
-* H2694 - Trading Spaces vol.1
-* H2698 - WWE Rey Mysterio vol.1
-* H2701 - Dexter's Laboratory vol.1
-* H2702 - WWE Chris Benoit vol.1
-* H2706 - MyScene Jammin in Jamaica vol.1
-* H2707 - MyScene Masquerade Madness
-* H2708 - WWE Eugene vol.1
-* H2709 - Music Video Liz Phair Skye Bnip Stacie
+  H2679 - Ed, Edd n Eddy Episode #39
+  H2682 - Juiceware Animated Assortment
+* H2683 - Codename: Kids Next Door vol.1
+  H2684 - Ed, Edd n Eddy vol.1
+* H2685 - Yu-Gi-Oh! vol.1
+  H2686 - Winx Club
+  H2687 - The Grim Adventures of Billy and Mandy vol.1
+  H2688 - Vans Triple Crown vol.1
+  H2689 - Vans Triple Crown vol.2
+  H2690 - Vans Pipeline Masters
+  H2692 - Teenage Mutant Ninja Turtles vol.1
+  H2694 - Trading Spaces vol.1
+  H2697 - Megas XLR Vol. 1
+  H2698 - WWE Rey Mysterio vol.1
+  H2699 - Motocycle Mania 1 vol.1
+  H2701 - Dexter's Laboratory vol.1
+  H2702 - WWE Chris Benoit vol.1
+  H2706 - MyScene Jammin in Jamaica vol.1
+  H2707 - MyScene Masquerade Madness
+  H2708 - WWE Eugene vol.1
+  H2709 - Music Video Liz Phair Skye Bnip Stacie
+
+  H6225 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, Fan_3)
+  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
+  H6232 - Juice Box Music Video (Zoegirl, Jumps, Baha Men, Atomic Kitten)
+  H6248 - Codename: Kids Next Door - Episode #19
+  H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
+  H6259 - SonicX Episode 3: Missile Wrist Rampage
+  H6260 - Teenage Mutant Ninja Turtles Episode 36
+
+  H7416 - Streetball Classics Vol.1
+
+  H8084 - Yu-Gi-Oh! Episode 175
+  H8085 - Good Times with Carey Hart
+  H8143 - Yu-Gi-Oh! Episode 176
+
 -->
 
 	<software name="kidsnedo">

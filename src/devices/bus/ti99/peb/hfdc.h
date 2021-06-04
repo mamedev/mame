@@ -111,6 +111,12 @@ private:
 	// Currently selected hard drive
 	mfm_harddisk_device*    m_current_harddisk;
 
+	// Currently selected floppy disk index
+	int     m_current_floppy_index;
+
+	// Currently selected hard disk index
+	int     m_current_hd_index;
+
 	// True: Access to DIP switch settings, false: access to line states
 	bool    m_see_switches;
 

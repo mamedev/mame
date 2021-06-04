@@ -9073,6 +9073,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="aitdes" cloneof="aitd">
+		<description>Alone in the Dark (Spain, Top Games/Altaya release)</description>
+		<year>1993</year>
+		<publisher>Infogrames</publisher>
+		<info name="developer" value="Infogrames" />
+		<info name="distributor" value="Erbe Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="a8d09bad" sha1="bdbd4e99b49a1f9f34ff3eaf0f3301d8d2a86c40"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="6c0c7c05" sha1="2d183a8a1197f9117038a601679f1a9719beccc5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="dc17ab32" sha1="8f912f5df0be0eb57eef18d0d081bf62cd09a867"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Alone in the Dark (Spain) [Erbe] [1993] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="eb5de154" sha1="9ac3e6b2a148a0d9f9fcc84628f2b0484fc5d8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aitd2">
 		<description>Alone in the Dark 2 (UK)</description>
 		<year>1993</year>
@@ -11100,6 +11128,50 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="elvira2_525">
+		<description>Elvira II: Jaws of Cerberus (5.25" HD)</description>
+		<year>1991</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 1 of 3].img" size="1228800" crc="362023e3" sha1="a2494b47ef732dc1f50a1d4a009a355e64d1b0d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 2 of 3].img" size="1228800" crc="da6d97f5" sha1="95c54b267ef8bc909fdb005b759a11ff1ce81991"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Elvira 2 [Accolade] [1991] [5.25HD] [Disk 3 of 3].img" size="1228800" crc="f84f1271" sha1="d6da3b9360ce1b49f4bd375a0fef53aad2cc041f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elvira2it" cloneof="elvira2_525">
+		<description>Elvira II: Jaws of Cerberus (Italy)</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3dd97ff0" sha1="348da2bfbbf3a19581be8b1d9249fe556ce6a60d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="52ccd466" sha1="3c3e63f5c2d42375dd42cd575d933fbbd5b86f1d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Elvira 2 (Italy) [Accolade] [1992] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="585c7964" sha1="27a3374476988f4d75a1d7b56c84ab6636a995a9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epcrashb">
 		<description>Epic Pinball: Crash and Burn</description>
 		<year>1994</year>
@@ -11941,6 +12013,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="hoces" cloneof="hoc">
+		<description>Heart of China (Spain, MCM release)</description>
+		<year>1991</year>
+		<publisher>Dynamix</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="distributor" value="MCM Software" />
+		<info name="version" value="0.100" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="bce9a6e0" sha1="05cc67da0493c083bcbf196e286caad9cad7e237"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="728dadb3" sha1="5474672dbb1d936cabb8f021972f05dded7061ef"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="7bb68ce2" sha1="71575d514e62963f50d19cce5a95feabd771278d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="6c219d65" sha1="cc2cb73260056bbc95346439512eeb57ef17dcdf"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="9a85a4c3" sha1="e3e6c51ffef3135cbfd50ea935231cb53814716d"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Spain) [MCM] [1991] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="4e3d4503" sha1="d8c555ae7e00a3553c0995350e4d11426942aa14"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heimdall">
 		<description>Heimdall</description>
 		<year>1992</year>
@@ -12456,6 +12567,40 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="indyfatees" cloneof="indyfate">
+		<description>Indiana Jones and the Fate of Atlantis (3.5", Spain, Erbe release)</description>
+		<year>1992</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="distributor" value="Erbe Software" />
+		<info name="version" value="V1.0 30-4-92 H410 M32 V10 J19" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Spain) [Erbe] [1992] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="9b2f4f44" sha1="b8e4681e33c53ee04b8ffa8b8c0b7f9e49df1ecc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Spain) [Erbe] [1992] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="14455aa9" sha1="66c0f5ca1dc79b21eba75ed38930319d1bf80193"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Spain) [Erbe] [1992] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="3a506b55" sha1="a67bd8d0a29f4676a7da387fe005e1b7c96252a2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Spain) [Erbe] [1992] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="47540d13" sha1="49cc327ba348d8c882c0cd8b9ff51dae6cf38399"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Fate of Atlantis (Spain) [Erbe] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="93e9decf" sha1="a0b21b91f881286b8fcccece742f75de7f29d8fd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="indy4act">
 		<description>Indiana Jones and the Fate of Atlantis - The Action Game</description>
 		<year>1992</year>
@@ -12521,6 +12666,20 @@ license:CC0
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Indiana Jones and the Last Crusade - Adventure (VGA version) [US Gold] [1990] [5.25HD] [Disk 4 of 4].img" size="1228800" crc="1f6c8db2" sha1="53477730cf096a94f1581f78c431a3d3bcdca823"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indy3adves" cloneof="indy3adv">
+		<description>Indiana Jones and the Last Crusade - The Graphic Adventure (3.5", EGA version, Spain, Maxi Juegos/Erbe release)</description>
+		<year>1993</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="developer" value="Lucasfilm" />
+		<info name="distributor" value="Erbe Software" />
+		<info name="version" value="Version Spanish PC 1.4b 7.May.1990" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Indiana Jones and the Last Crusade - Adventure (Spain) [US Gold] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="6da985fd" sha1="44d09bcd35512915555b4c39c2099ed2864b4905"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12626,6 +12785,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ishar2es">
+		<description>Ishar 2: Messengers of Doom (Spain, Proein release)</description>
+		<year>1995</year>
+		<publisher>Silmarils</publisher>
+		<info name="developer" value="Silmarils" />
+		<info name="distributor" value="Proein" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ishar 2 (Spain) [Silmarils] [1995] [3.5HD] [Disk 1 of 2] [Disk A].img" size="1474560" crc="27d7b1d9" sha1="d0d263d17f4bae45dd9e9f0a28195c68151aae07"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Ishar 2 (Spain) [Silmarils] [1995] [3.5HD] [Disk 2 of 2] [Disk B].img" size="1474560" crc="3ea14189" sha1="be8895194524656fbf5956e417cd54630bd83d83"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jazz">
 		<description>Jazz Jackrabbit</description>
 		<year>1994</year>
@@ -12671,6 +12848,24 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Jill of the Jungle - The Complete Trilogy (USA) (5.25'').img" size="1228800" crc="323b0332" sha1="dd3dc2df11745e4858dfee1025f42d98e6970b4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joemac">
+		<description>Joe &amp; Mac: Caveman Ninja</description>
+		<year>1994</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="Data East" />
+		<info name="version" value="version 1.000.060" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Joe and Mac [New World Computing] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="75eb415b" sha1="c882f8a6cb9b616b15e3fcf1de46124f735a067b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Joe and Mac [New World Computing] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="bf703a53" sha1="edd25e6505774e34cde6d3d6e20ef60c44fbc277"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16466,6 +16661,33 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="waxworks">
+		<description>WaxWorks</description>
+		<year>1992</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Horror Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="c9ad3e52" sha1="8d03b1d4614fc7c17f8353f1d12e6c4e4d251200"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="c34c7c70" sha1="5a0c66f17ba80d9fc58400090131794ce0fe01b4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="51341c68" sha1="2f58bc66d52ddfe2bb66beb49dee7094aaf7e640"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="09d0c4c4" sha1="d936e2cd7ae0cab668d5bf7d62ee6e843061d699"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wingcom">
 		<description>Wing Commander</description>
 		<year>1990</year>
@@ -16810,6 +17032,23 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wolfenstein 3D (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7b233ee7" sha1="ce2bbf3c5b52602ebea2b78a8d4b0a839820ce44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dswa" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (shareware, 5.25" DD, CWI Information Services release)</description>
+		<year>1993</year>
+		<publisher>CWI Information Services</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 2 of 2].img" size="368640" crc="1f0e273a" sha1="a7d822d67742e25fdc56ba1346f13d2faa7a7a64"/>
 			</dataarea>
 		</part>
 	</software>

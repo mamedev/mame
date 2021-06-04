@@ -131,7 +131,7 @@ public:
 private:
 	INTERRUPT_GEN_MEMBER(rtc_via_nmi);
 	void radionic_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<u8[]> m_vram;  // video ram
 	std::unique_ptr<u8[]> m_cram;  // colour ram
 	void machine_start() override;
@@ -332,11 +332,11 @@ static GFXDECODE_START(gfx_radionic)
 GFXDECODE_END
 
 /* lores characters are in the character generator. Each character is 8x16. */
-uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t sy=0,ma=0;
-	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
-	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	u16 sy=0,ma=0;
+	u8 cols = m_cpl ? 32 : 64;
+	u8 skip = m_cpl ? 2 : 1;
 	// colours have to be enabled both by a poke and by switches on the side of the unit
 	bool col_en = BIT(m_cctrl, 2) && BIT(m_io_config->read(), 4);
 	bool auto_en = BIT(m_cctrl, 3) || !BIT(m_io_config->read(), 5);
@@ -344,26 +344,26 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	if (col_en && auto_en)
 		bg = 4;    // automatic colour
 
-	if (m_mode != m_size_store)
+	if (cols != m_cols)
 	{
-		m_size_store = m_mode;
+		m_cols = cols;
 		screen.set_visible_area(0, cols*8-1, 0, 16*16-1);
 	}
 
-	for (uint8_t y = 0; y < 16; y++)
+	for (u8 y = 0; y < 16; y++)
 	{
-		for (uint8_t ra = 0; ra < 16; ra++)
+		for (u8 ra = 0; ra < 16; ra++)
 		{
-			uint16_t *p = &bitmap.pix(sy++);
+			u16 *p = &bitmap.pix(sy++);
 
-			for (uint16_t x = ma; x < ma + 64; x+=skip)
+			for (u16 x = ma; x < ma + 64; x+=skip)
 			{
-				uint8_t chr = m_vram[x];
+				u8 chr = m_vram[x];
 				if (col_en && !auto_en)
 					bg = m_cram[x] & 15;
 
 				/* get pattern of pixels for that character scanline */
-				uint8_t gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
+				u8 gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
 				/* Display a scanline of a character (8 pixels) */
 				*p++ = BIT(gfx, 0) ? fg : bg;
@@ -503,8 +503,11 @@ void radionic_state::radionic(machine_config &config)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(radionic_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(radionic_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(radionic_state::intrq_w));
@@ -545,6 +548,10 @@ void radionic_state::radionic(machine_config &config)
 	m_ppi->out_pa_callback().set(FUNC(radionic_state::ppi_pa_w));    // Data for external plugin printer module
 	m_ppi->out_pb_callback().set(FUNC(radionic_state::ppi_pb_w));    // Control data to external
 	m_ppi->out_pc_callback().set(FUNC(radionic_state::ppi_pc_w));    // Printer strobe
+
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("1"); // R
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("1"); // R
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("1"); // R
 }
 
 

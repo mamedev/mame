@@ -38,18 +38,10 @@
 #include "sound/upd7759.h"
 #include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
-#include "sound/y8950.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
-#include "sound/ym2413.h"
-#include "sound/ym2608.h"
-#include "sound/ym2610.h"
-#include "sound/ym2612.h"
-#include "sound/ym3526.h"
-#include "sound/ym3812.h"
 #include "sound/ymf271.h"
-#include "sound/ymf262.h"
-#include "sound/ymf278b.h"
+#include "sound/ymopl.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "sound/ymz280b.h"
 #include "audio/vboy.h"
 #include "audio/wswan.h"
@@ -400,6 +392,13 @@ private:
 	int m_sega32x_channel_hack;
 	int m_nes_apu_channel_hack[2];
 	uint8_t m_c6280_channel[2];
+
+	// newer YM cores require writes to be spaced out in order to play back
+	// correctly; simulate this by introducing some extra accounting
+	void space_out_write(uint32_t address);
+	void decrement_icount(int count);
+	int m_icount_ahead = 0;
+	int m_last_write_icount[256] = { 0 };
 };
 
 DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
@@ -967,6 +966,34 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 	}
 }
 
+void vgmplay_device::space_out_write(uint32_t address)
+{
+	// use the top address bits as an index
+	int index = address >> 24;
+	uint32_t cycles = uint32_t(total_cycles());
+
+	// if the last write happened at the current time, steal a cycle
+	if (m_last_write_icount[index] == cycles)
+	{
+		m_icount--;
+		m_icount_ahead++;
+		cycles++;
+	}
+	m_last_write_icount[index] = cycles;
+}
+
+void vgmplay_device::decrement_icount(int count)
+{
+	// take back any cycles we stole
+	if (count >= m_icount_ahead)
+	{
+		m_icount -= count - m_icount_ahead;
+		m_icount_ahead = 0;
+	}
+	else
+		m_icount_ahead -= count;
+}
+
 void vgmplay_device::execute_run()
 {
 	if (m_leftover_icount > 0)
@@ -1009,7 +1036,7 @@ void vgmplay_device::execute_run()
 			if (m_paused)
 			{
 				machine().sound().system_mute(1);
-				m_icount = 0;
+				decrement_icount(m_icount);
 				return;
 			}
 			else
@@ -1049,6 +1076,7 @@ void vgmplay_device::execute_run()
 
 			case 0x51:
 				pulse_act_led(CT_YM2413);
+				space_out_write(A_YM2413_0);
 				m_io->write_byte(A_YM2413_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2413_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1057,6 +1085,7 @@ void vgmplay_device::execute_run()
 			case 0x52:
 			case 0x53:
 				pulse_act_led(CT_YM2612);
+				space_out_write(A_YM2612_0);
 				m_io->write_byte(A_YM2612_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2612_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1064,6 +1093,7 @@ void vgmplay_device::execute_run()
 
 			case 0x54:
 				pulse_act_led(CT_YM2151);
+				space_out_write(A_YM2151_0);
 				m_io->write_byte(A_YM2151_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2151_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1071,6 +1101,7 @@ void vgmplay_device::execute_run()
 
 			case 0x55:
 				pulse_act_led(CT_YM2203);
+				space_out_write(A_YM2203_0);
 				m_io->write_byte(A_YM2203_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2203_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1079,6 +1110,7 @@ void vgmplay_device::execute_run()
 			case 0x56:
 			case 0x57:
 				pulse_act_led(CT_YM2608);
+				space_out_write(A_YM2608_0);
 				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1087,6 +1119,7 @@ void vgmplay_device::execute_run()
 			case 0x58:
 			case 0x59:
 				pulse_act_led(CT_YM2610);
+				space_out_write(A_YM2610_0);
 				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1094,6 +1127,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5a:
 				pulse_act_led(CT_YM3812);
+				space_out_write(A_YM3812_0);
 				m_io->write_byte(A_YM3812_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3812_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1101,6 +1135,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5b:
 				pulse_act_led(CT_YM3526);
+				space_out_write(A_YM3526_0);
 				m_io->write_byte(A_YM3526_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3526_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1108,6 +1143,7 @@ void vgmplay_device::execute_run()
 
 			case 0x5c:
 				pulse_act_led(CT_Y8950);
+				space_out_write(A_Y8950_0);
 				m_io->write_byte(A_Y8950_0 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_Y8950_0 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1123,6 +1159,7 @@ void vgmplay_device::execute_run()
 			case 0x5e:
 			case 0x5f:
 				pulse_act_led(CT_YMF262);
+				space_out_write(A_YMF262_0);
 				m_io->write_byte(A_YMF262_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YMF262_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1131,18 +1168,18 @@ void vgmplay_device::execute_run()
 			case 0x61:
 			{
 				uint32_t duration = m_file->read_word(m_pc + 1);
-				m_icount -= duration;
+				decrement_icount(duration);
 				m_pc += 3;
 				break;
 			}
 
 			case 0x62:
-				m_icount -= 735;
+				decrement_icount(735);
 				m_pc++;
 				break;
 
 			case 0x63:
-				m_icount -= 882;
+				decrement_icount(882);
 				m_pc++;
 				break;
 
@@ -1175,7 +1212,7 @@ void vgmplay_device::execute_run()
 
 			case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-				m_icount -= 1 + (code & 0xf);
+				decrement_icount(1 + (code & 0xf));
 				m_pc += 1;
 				break;
 
@@ -1187,12 +1224,13 @@ void vgmplay_device::execute_run()
 					if (m_ym2612_stream_offset >= int(m_data_streams[0].size()))
 						m_ym2612_stream_offset = 0;
 
+					space_out_write(A_YM2612_0);
 					m_io->write_byte(A_YM2612_0 + 0, 0x2a);
 					m_io->write_byte(A_YM2612_0 + 1, m_data_streams[0][m_ym2612_stream_offset]);
 					m_ym2612_stream_offset++;
 				}
 				m_pc += 1;
-				m_icount -= code & 0xf;
+				decrement_icount(code & 0xf);
 				break;
 
 			case 0x90:
@@ -1398,6 +1436,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa1:
 				pulse_act_led(CT_YM2413);
+				space_out_write(A_YM2413_1);
 				m_io->write_byte(A_YM2413_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2413_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1406,6 +1445,7 @@ void vgmplay_device::execute_run()
 			case 0xa2:
 			case 0xa3:
 				pulse_act_led(CT_YM2612);
+				space_out_write(A_YM2612_1);
 				m_io->write_byte(A_YM2612_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2612_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1413,6 +1453,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa4:
 				pulse_act_led(CT_YM2151);
+				space_out_write(A_YM2151_1);
 				m_io->write_byte(A_YM2151_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2151_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1420,6 +1461,7 @@ void vgmplay_device::execute_run()
 
 			case 0xa5:
 				pulse_act_led(CT_YM2203);
+				space_out_write(A_YM2203_1);
 				m_io->write_byte(A_YM2203_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2203_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1428,6 +1470,7 @@ void vgmplay_device::execute_run()
 			case 0xa6:
 			case 0xa7:
 				pulse_act_led(CT_YM2608);
+				space_out_write(A_YM2608_0);
 				m_io->write_byte(A_YM2608_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2608_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1436,6 +1479,7 @@ void vgmplay_device::execute_run()
 			case 0xa8:
 			case 0xa9:
 				pulse_act_led(CT_YM2610);
+				space_out_write(A_YM2610_0);
 				m_io->write_byte(A_YM2610_0 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM2610_0 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1443,6 +1487,7 @@ void vgmplay_device::execute_run()
 
 			case 0xaa:
 				pulse_act_led(CT_YM3812);
+				space_out_write(A_YM3812_1);
 				m_io->write_byte(A_YM3812_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3812_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1450,6 +1495,7 @@ void vgmplay_device::execute_run()
 
 			case 0xab:
 				pulse_act_led(CT_YM3526);
+				space_out_write(A_YM3526_1);
 				m_io->write_byte(A_YM3526_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YM3526_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1457,6 +1503,7 @@ void vgmplay_device::execute_run()
 
 			case 0xac:
 				pulse_act_led(CT_Y8950);
+				space_out_write(A_Y8950_1);
 				m_io->write_byte(A_Y8950_1 + 0, m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_Y8950_1 + 1, m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1472,6 +1519,7 @@ void vgmplay_device::execute_run()
 			case 0xae:
 			case 0xaf:
 				pulse_act_led(CT_YMF262);
+				space_out_write(A_YMF262_1);
 				m_io->write_byte(A_YMF262_1 + 0 + ((code & 1) << 1), m_file->read_byte(m_pc + 1));
 				m_io->write_byte(A_YMF262_1 + 1 + ((code & 1) << 1), m_file->read_byte(m_pc + 2));
 				m_pc += 3;
@@ -1814,11 +1862,13 @@ void vgmplay_device::execute_run()
 				uint8_t offset = m_file->read_byte(m_pc + 1);
 				if (offset & 0x80)
 				{
+					space_out_write(A_YMF278B_1);
 					m_io->write_byte(A_YMF278B_1 + ((offset & 0x7f) << 1) + 0, m_file->read_byte(m_pc + 2));
 					m_io->write_byte(A_YMF278B_1 + ((offset & 0x7f) << 1) + 1, m_file->read_byte(m_pc + 3));
 				}
 				else
 				{
+					space_out_write(A_YMF278B_0);
 					m_io->write_byte(A_YMF278B_0 + ((offset & 0x7f) << 1) + 0, m_file->read_byte(m_pc + 2));
 					m_io->write_byte(A_YMF278B_0 + ((offset & 0x7f) << 1) + 1, m_file->read_byte(m_pc + 3));
 				}
@@ -1933,7 +1983,7 @@ void vgmplay_device::execute_run()
 					debugger_instruction_hook(m_pc);
 
 				m_state = DONE;
-				m_icount = 0;
+				decrement_icount(m_icount);
 				break;
 			}
 			break;
@@ -1941,7 +1991,7 @@ void vgmplay_device::execute_run()
 		case DONE:
 		{
 			machine().sound().system_mute(1);
-			m_icount = 0;
+			decrement_icount(m_icount);
 			break;
 		}
 		}

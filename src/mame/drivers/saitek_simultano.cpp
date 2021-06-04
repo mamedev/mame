@@ -181,8 +181,8 @@ void simultano_state::select_w(u8 data)
 	// d0-d3: input/chessboard mux
 	// d6,d7: side panel led mux
 	// d4,d5: led data
-	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf), false);
-	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3, true);
+	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
+	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
 	m_select = data;
 }
 
@@ -359,7 +359,7 @@ void simultano_state::simultano(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 

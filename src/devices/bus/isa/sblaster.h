@@ -10,7 +10,7 @@
 #include "bus/pc_joy/pc_joy.h"
 #include "sound/dac.h"
 #include "sound/saa1099.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "diserial.h"
 
 //**************************************************************************

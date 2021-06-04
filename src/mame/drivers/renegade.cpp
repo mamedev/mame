@@ -119,7 +119,7 @@ $8000 - $ffff   ROM
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ym3526.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

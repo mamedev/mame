@@ -3,6 +3,7 @@
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation
+    also known as NEC uPD7220
 
 **********************************************************************/
 
@@ -18,12 +19,11 @@
         - read data
         - modify data
         - write data
-    - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
       Can be fixed with a DRDY mechanism for RDAT/WDAT;
     - Some later SWs on PC-98 throws "Invalid command byte 05" (zettmj on Epson logo),
-	  actual undocumented command to reset something?
+      actual undocumented command to reset something or perhaps just check if upd7220 isn't really a upd72120 instead?
 
     - honor visible area
     - wide mode (32-bit access)
@@ -455,9 +455,7 @@ inline void upd7220_device::reset_figs_param()
 //-------------------------------------------------
 inline uint16_t upd7220_device::read_vram()
 {
-	uint16_t data;
-
-	data = readword(m_ead*2);
+	uint16_t const data = readword(m_ead*2);
 	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 	m_ead &= 0x3ffff;
 
@@ -466,7 +464,6 @@ inline uint16_t upd7220_device::read_vram()
 
 inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 {
-	uint16_t data;
 	if (type == 1)
 	{
 		LOG("uPD7220 invalid type 1 RDAT parameter\n");
@@ -478,7 +475,7 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 
 	while (m_figs.m_dc && m_fifo_ptr < (type ? 15 : 14))
 	{
-		data = read_vram();
+		uint16_t const data = read_vram();
 		switch(type)
 		{
 			case 0:
@@ -547,17 +544,13 @@ inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data)
 
 inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 {
-	uint16_t result;
-
-	if (type == 1)
+	if(type == 1)
 	{
 		logerror("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
-	result = 0;
-
-	result = m_pr[1] | (m_pr[2] << 8);
+	uint16_t result = m_pr[1] | (m_pr[2] << 8);
 
 	switch(type)
 	{
@@ -953,7 +946,6 @@ void upd7220_device::draw_arc(int x, int y)
 
 void upd7220_device::draw_rectangle(int x, int y)
 {
-	int i;
 	const int rect_x_dir[8] = { 0, 1, 0,-1, 1, 1,-1,-1 };
 	const int rect_y_dir[8] = { 1, 0,-1, 0, 1,-1,-1, 1 };
 	uint8_t rect_type,rect_dir;
@@ -964,7 +956,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 	rect_type = (m_figs.m_dir & 1) << 2;
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 0) & 3);
 
-	for(i = 0;i < m_figs.m_d;i++)
+	for(int i = 0; i < m_figs.m_d; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -973,7 +965,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 1) & 3);
 
-	for(i = 0;i < m_figs.m_d2;i++)
+	for(int i = 0; i < m_figs.m_d2; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -982,7 +974,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 2) & 3);
 
-	for(i = 0;i < m_figs.m_d;i++)
+	for(int i = 0; i < m_figs.m_d; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -991,7 +983,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 3) & 3);
 
-	for(i = 0;i < m_figs.m_d2;i++)
+	for(int i = 0; i < m_figs.m_d2; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -1000,7 +992,6 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
 	m_dad = x & 0x0f;
-
 }
 
 
@@ -1546,27 +1537,32 @@ void upd7220_device::write(offs_t offset, uint8_t data)
 uint8_t upd7220_device::dack_r()
 {
 	uint8_t result = 0;
-	switch(m_dma_type) {
-	case 0:
-		if (m_dma_transfer_length % 2 == 0) {
+	switch(m_dma_type)
+	{
+		case 0:
+			if (m_dma_transfer_length % 2 == 0)
+			{
+				m_dma_data = read_vram();
+				result = m_dma_data & 0xff;
+			}
+			else
+			{
+				result = (m_dma_data >> 8) & 0xff;
+			}
+			break;
+		case 2:
 			m_dma_data = read_vram();
 			result = m_dma_data & 0xff;
-		} else {
+			break;
+		case 3:
+			m_dma_data = read_vram();
 			result = (m_dma_data >> 8) & 0xff;
-		}
-		break;
-	case 2:
-		m_dma_data = read_vram();
-		result = m_dma_data & 0xff;
-		break;
-	case 3:
-		m_dma_data = read_vram();
-		result = (m_dma_data >> 8) & 0xff;
-		break;
-	default:
-		logerror("uPD7220 Invalid DMA Transfer Type\n");
+			break;
+		default:
+			logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
-	if (--m_dma_transfer_length == 0) {
+	if (--m_dma_transfer_length == 0)
+	{
 		stop_dma();
 	}
 	return result;
@@ -1579,34 +1575,40 @@ uint8_t upd7220_device::dack_r()
 
 void upd7220_device::dack_w(uint8_t data)
 {
-	switch(m_dma_type) {
-	case 0:
-		if (m_dma_transfer_length % 2) {
-			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
+	switch(m_dma_type)
+	{
+		case 0:
+			if (m_dma_transfer_length % 2)
+			{
+				m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
+				write_vram(m_dma_type, m_dma_mod, m_dma_data);
+			}
+			else
+			{
+				m_dma_data = (m_dma_data & 0xff00) | data;
+			}
+			break;
+		case 2:
+			m_dma_data = data & (m_mask & 0xff);
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		} else {
-			m_dma_data = (m_dma_data & 0xff00) | data;
-		}
-		break;
-	case 2:
-		m_dma_data = data & (m_mask & 0xff);
-		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		break;
-	case 3:
-		m_dma_data = (data << 8) & (m_mask & 0xff);
-		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		break;
-	default:
-		logerror("uPD7220 Invalid DMA Transfer Type\n");
+			break;
+		case 3:
+			m_dma_data = (data << 8) & (m_mask & 0xff00);
+			write_vram(m_dma_type, m_dma_mod, m_dma_data);
+			break;
+		default:
+			logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
-	if (--m_dma_transfer_length == 0) {
+	if (--m_dma_transfer_length == 0)
+	{
 		stop_dma();
 	}
 }
 
 void upd7220_device::start_dma()
 {
-	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == 0) {
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == 0)
+	{
 		m_write_drq(ASSERT_LINE);
 		m_sr |= UPD7220_SR_DMA_EXECUTE;
 	}
@@ -1614,7 +1616,8 @@ void upd7220_device::start_dma()
 
 void upd7220_device::stop_dma()
 {
-	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == UPD7220_SR_DMA_EXECUTE) {
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == UPD7220_SR_DMA_EXECUTE)
+	{
 		m_write_drq(CLEAR_LINE);
 		m_sr &= ~UPD7220_SR_DMA_EXECUTE;
 		reset_figs_param();
@@ -1667,18 +1670,19 @@ WRITE_LINE_MEMBER( upd7220_device::lpen_w )
 
 void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t addr, sad;
+	uint32_t sad;
 	uint16_t len;
 	int im, wd;
-	int y, sy = 0;
+	int sy = 0;
 
 	for (int area = 0; area < 4; area++)
 	{
 		get_text_partition(area, &sad, &len, &im, &wd);
 
+		int y;
 		for (y = sy; y < sy + len; y++)
 		{
-			addr = sad + (y * m_pitch);
+			uint32_t const addr = sad + (y * m_pitch);
 
 			if (!m_draw_text_cb.isnull())
 				m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
@@ -1695,9 +1699,9 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch)
 {
-	int sx, al = bitmap.cliprect().height();
+	int al = bitmap.cliprect().height();
 
-	for (sx = 0; sx < pitch; sx++)
+	for (int sx = 0; sx < pitch; sx++)
 	{
 		if((sx << 4) < m_aw * 16 && y < al)
 			m_display_cb(bitmap, y, sx << 4, addr);
@@ -1713,54 +1717,69 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int
 
 void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap)
 {
-	uint32_t addr, sad;
+	uint32_t sad;
 	uint16_t len;
-	int im, wd, area;
+	int im, wd;
 	int y = 0, tsy = 0, bsy = 0;
 	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
+	uint8_t zoom = m_disp + 1;
 
-	for (area = 0; area < 4; area++)
+	for(int area = 0; area < 4; area++)
 	{
 		get_graphics_partition(area, &sad, &len, &im, &wd);
 
-		if (im || force_bitmap)
+		if(im || force_bitmap)
 		{
-			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
+			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
+			// PC98 Quarth definitely needs area 2 for player section.
+			// TODO: what happens if combined area size is smaller than display height?
+			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
+			if(area >= 3)
 				break;
+
+			// PC98 madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
+			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.
+			// Suggests that length should be treated as max size if this occurs, this is also proven to be correct via real HW verification.
+			// TODO: check if text partition do the same.
+			if (len == 0)
+				len = 0x400;
 
 			if(!interlace)
 				len <<= 1;
 
-			for (y = 0; y < len; y++)
+			for(y = 0; y < len; y++)
 			{
-				/* TODO: again correct?
-				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
-				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
-				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
-				addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
-
-				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + bsy + m_vbp, wd, (m_pitch << interlace));
+				// TODO: not completely correct, all is drawn half size with real HW tests on pc98 msdos by just changing PRAM values.
+				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
+				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
+				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
+				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
+				for(int z = 0; z <= m_disp; ++z)
+				{
+					int yval = (y*zoom)+z + (bsy + m_vbp);
+					if(!m_display_cb.isnull() && yval <= cliprect.bottom())
+						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch << interlace));
+				}
 			}
 		}
 		else
 		{
 			if(m_lr)
 			{
-				for (y = 0; y < len; y+=m_lr)
+				for(y = 0; y < len; y += m_lr)
 				{
-					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
-
-					if (!m_draw_text_cb.isnull())
-						m_draw_text_cb(bitmap, addr, y + tsy + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
+					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
+					int yval = y * zoom + (tsy + m_vbp);
+					if (!m_draw_text_cb.isnull() && yval <= cliprect.bottom())
+						m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}
 
 		if (m_lr)
-			tsy += y;
-		bsy += y;
+			tsy += y * zoom;
+		bsy += y * zoom;
 	}
 }
 

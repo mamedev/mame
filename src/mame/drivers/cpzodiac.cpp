@@ -33,7 +33,7 @@ TODO:
 #include "audio/taitosnd.h"
 #include "machine/te7750.h"
 #include "machine/z80ctc.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 
@@ -96,7 +96,7 @@ void cpzodiac_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).w("syt", FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw("syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xea00, 0xea00).nopr();
@@ -191,7 +191,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2610_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL/2));
+	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "lspeaker", 0.25);
 	ymsnd.add_route(0, "rspeaker", 0.25);

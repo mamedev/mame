@@ -1169,6 +1169,18 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 		}
 	}
 
+	// handle %t in the template (for timestamp)
+	std::string snaptime("%t");
+	int pos_time = snapstr.find(snaptime);
+
+	if (pos_time != -1)
+	{
+		char t_str[15];
+		const std::time_t cur_time = std::time(nullptr);
+		strftime(t_str, sizeof(t_str), "%Y%m%d_%H%M%S", std::localtime(&cur_time));
+		strreplace(snapstr, "%t", t_str);
+	}
+
 	// add our own extension
 	snapstr.append(".").append(extension);
 

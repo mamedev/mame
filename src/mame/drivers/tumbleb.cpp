@@ -308,8 +308,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

@@ -124,8 +124,7 @@ mw-9.rom = ST M27C1001 / GFX
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
-#include "sound/ym2413.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1753,24 +1752,46 @@ ROM_END
 
 ROM_START( dokaben )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "db06.11h",     0x00000, 0x08000, CRC(413e0886) SHA1(e9e6117fbbd980bc0f5448ada6c1856919bf92b5) )
-	ROM_LOAD( "db07.13h",     0x10000, 0x20000, CRC(8bdcf49e) SHA1(7d845ae2e640ec7d8d642e3aeef741d9f7b0a57c) )
-	ROM_LOAD( "db08.14h",     0x30000, 0x20000, CRC(1643bdd9) SHA1(5805e749713dbffacbb1238b1b4d42e8473d3656) )
+	ROM_LOAD( "db_06.11h",    0x00000, 0x08000, CRC(413e0886) SHA1(e9e6117fbbd980bc0f5448ada6c1856919bf92b5) )
+	ROM_LOAD( "db_07.13h",    0x10000, 0x20000, CRC(8bdcf49e) SHA1(7d845ae2e640ec7d8d642e3aeef741d9f7b0a57c) )
+	ROM_LOAD( "db_08.14h",    0x30000, 0x20000, CRC(1643bdd9) SHA1(5805e749713dbffacbb1238b1b4d42e8473d3656) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
-	ROM_LOAD( "db02.1e",      0x000000, 0x20000, CRC(9aa8470c) SHA1(8acbed381d6140e70045da232dee9b4b165953f9) ) /* chars */
-	ROM_LOAD( "db03.2e",      0x020000, 0x20000, CRC(3324e43d) SHA1(ed273d4de56e382e24ab0f0a8bcd5e30a05a1c6d) )
+	ROM_LOAD( "db_02.1e",     0x000000, 0x20000, CRC(9aa8470c) SHA1(8acbed381d6140e70045da232dee9b4b165953f9) ) /* chars */
+	ROM_LOAD( "db_03.2e",     0x020000, 0x20000, CRC(3324e43d) SHA1(ed273d4de56e382e24ab0f0a8bcd5e30a05a1c6d) )
 	/* 40000-7ffff empty */
-	ROM_LOAD( "db04.1g",      0x080000, 0x20000, CRC(c0c5b6c2) SHA1(5d66d8b2a62ccab9574e04a867df9bbb8c0d15aa) )
-	ROM_LOAD( "db05.2g",      0x0a0000, 0x20000, CRC(d2ab25f2) SHA1(96eea06d1645e0aade4c1b3153c55e2b61fd52c7) )
+	ROM_LOAD( "db_04.1g",     0x080000, 0x20000, CRC(c0c5b6c2) SHA1(5d66d8b2a62ccab9574e04a867df9bbb8c0d15aa) )
+	ROM_LOAD( "db_05.2g",     0x0a0000, 0x20000, CRC(d2ab25f2) SHA1(96eea06d1645e0aade4c1b3153c55e2b61fd52c7) )
 	/* c0000-fffff empty */
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "db10.2k",      0x000000, 0x20000, CRC(9e70f7ae) SHA1(ff3833a52d3d198f14e915ce52f7449cf04a0cca) ) /* sprites */
-	ROM_LOAD( "db09.1k",      0x020000, 0x20000, CRC(2d9263f7) SHA1(fe2811ae47b9a250ea1485a91c2c3be742d90622) )
+	ROM_LOAD( "db_10.2k",     0x000000, 0x20000, CRC(9e70f7ae) SHA1(ff3833a52d3d198f14e915ce52f7449cf04a0cca) ) /* sprites */
+	ROM_LOAD( "db_09.1k",     0x020000, 0x20000, CRC(2d9263f7) SHA1(fe2811ae47b9a250ea1485a91c2c3be742d90622) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
-	ROM_LOAD( "db01.1d",      0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
+	ROM_LOAD( "db_01.1d",     0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
+ROM_END
+
+ROM_START( dokaben2 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "d2_06.11h",    0x00000, 0x08000, CRC(9adcc38c) SHA1(0cacc58a14d63dfb1565ff517cc45f3d8fc9b77c) )
+	ROM_LOAD( "d2_07.13h",    0x10000, 0x20000, CRC(43076e32) SHA1(fca84da82d427b3dca28ed2ec1e811eeddcee666) )
+	ROM_LOAD( "d2_08.14h",    0x30000, 0x20000, CRC(cb9deb7a) SHA1(a3e359e991a64190e25cf1c589c82008af2cb9b5) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD( "d2_02.1e",     0x000000, 0x20000, CRC(5dd7b941) SHA1(b0e93e733b9bbabe68896c92af34b90daf8dcd7c) ) /* chars */
+	ROM_LOAD( "d2_03.2e",     0x020000, 0x20000, CRC(b615e696) SHA1(f1ec11202fce23af4af15682b158795f7ff4234f) )
+	/* 40000-7ffff empty */
+	ROM_LOAD( "d2_04.1g",     0x080000, 0x20000, CRC(56b35605) SHA1(c065b03b5cb00ac75b8b439a4f35d9b04a886626) )
+	ROM_LOAD( "d2_05.2g",     0x0a0000, 0x20000, CRC(ce98ff74) SHA1(ddae2e035369886ab03074e947405ef916cc425a) )
+	/* c0000-fffff empty */
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "d2_10.2k",     0x000000, 0x20000, CRC(9b9bfb5f) SHA1(5969861e1fe900a3076785c7d1e304c10aa56435) ) /* sprites */
+	ROM_LOAD( "d2_09.1k",     0x020000, 0x20000, CRC(84de2e1d) SHA1(692304332b37ca3b26dc96bcad797ee81ab8b819) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKIM */
+	ROM_LOAD( "db_01.1d",     0x00000, 0x20000, CRC(62fa6b81) SHA1(0168b40df583f11cb28718aa8ab8be7cc08bf561) )
 ROM_END
 
 ROM_START( pang )
@@ -2724,13 +2745,19 @@ void mitchell_state::init_mstworld()
 
 GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,    mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state, init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state, init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
 GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
+
 GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1989, dokaben2,    0,        pang,       pang,       mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, pang,        0,        pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -2741,17 +2768,25 @@ GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state, init_
 GAME( 1989, pangbb,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
 GAME( 1989, pangbc,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state, init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state, init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state, init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state, init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spangbl,     spang,    spangbl,    spangbl,    mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
 GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    mitchell_state, init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
+
 GAME( 1994, mstworld,    0,        mstworld,   mstworld,   mitchell_state, init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state, init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1991, qtono1,      0,        pang,       qtono1,     mitchell_state, init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1991, qsangoku,    0,        pang,       qtono1,     mitchell_state, init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1991, block,       0,        pangnv,     blockjoy,   mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, blockr1,     block,    pangnv,     blockjoy,   mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state, init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )

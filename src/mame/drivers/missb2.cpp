@@ -19,7 +19,7 @@ written, so it may be normal behaviour.
 
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
-#include "sound/ym3526.h"
+#include "sound/ymopl.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"

@@ -30,8 +30,8 @@ Year + Game         PCB             Notes
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym3812.h"
+#include "sound/ymopm.h"
+#include "sound/ymopl.h"
 #include "speaker.h"
 
 

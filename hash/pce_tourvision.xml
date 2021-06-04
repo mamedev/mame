@@ -208,16 +208,15 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="beballa">
-		<description>Be Ball (alt) (TourVision PCE bootleg)</description>
+	<software name="beball">
+		<description>Be Ball (TourVision PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVision) / Hudson</publisher>
 		<info name="alt_title" value="ビーボール"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x5d"/>
 			<dataarea name="rom" size="262144">
-		<!-- NOT identical to the set in the PCE list, byte at 0xBCD is changed from 0x05 (PCE) to 0x02 (TV)-->
-				<rom name="be ball (japan) [a].pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" />
+				<rom name="be ball (japan).pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" />
 			</dataarea>
 		</part>
 	</software>
@@ -470,7 +469,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="dragnegg" supported="no">
+	<software name="dragnegg">
 		<description>Dragon Egg! (TourVision PCE bootleg)</description>
 		<year>1991</year>
 		<publisher>bootleg (TourVision) / Masiya</publisher>
@@ -640,16 +639,15 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="gomolaa">
-		<description>Gomola Speed (alt) (TourVision PCE bootleg)</description>
+	<software name="gomola">
+		<description>Gomola Speed (TourVision PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVision) / UPL</publisher>
 		<info name="alt_title" value="ゴモラスピード"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x1b"/>
 			<dataarea name="rom" size="393216">
-		<!-- NOT identical to the set in the PCE list, alt revison? -->
-				<rom name="gomolaa.pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" />
+				<rom name="gomola speed (japan).pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" />
 			</dataarea>
 		</part>
 	</software>

@@ -395,6 +395,7 @@ Notes:
                           Alpine Racer     'AR2 Ver.D'
                           Aqua Jet         'AJ2 Ver.B'
                           Armadillo Racing 'AM1 Ver.A'
+                          Armadillo Racing 'AM2 Ver.A'
                           Cyber Cycles     'CB2 Ver.C'
                           Prop Cycle       'PR2 Ver.A'
                           Time Crisis      'TS2 Ver.B'
@@ -418,6 +419,7 @@ Notes:
       This PCB is used on:
                           Game          Software revision
                           -------------------------------
+                          Alpine Racer  'AR1 Ver.C'
                           Time Crisis   'TS2 Ver.A'
                           Dirt Dash     'DT1 Ver.A'
                           Dirt Dash     'DT2 Ver.A'
@@ -446,6 +448,26 @@ Notes:
                           Alpine Racer 2 'ARS2 Ver.B'
 
 Type 4
+SYSTEM SUPER22 MPM(F8F) PCB 8646963400 (8646973400)
+|-------------------------|
+|                         |
+|      ROM3*    ROM4*     |
+|      ROM1     ROM2      |
+|                         |
+|                         |
+|  |-------------------|  |
+|  |-------------------|  |
+|-------------------------|
+Notes:
+      ROMx: Fujitsu MBM29F080 8MBit FlashROM (x4, TSOP44)
+      * denotes flash ROMs located on the top side of PCB
+
+      This PCB is used on:
+                          Game          Software revision
+                          -------------------------------
+                          Prop Cycle       'PR1 Ver.A'
+
+Type 5
 SYSTEM SUPER22 MPM(F16X4F) PCB 8646963500 (8646973500)
 SYSTEM SUPER22 MPM(F16X4F) PCB 8646963501 (8646973501) <-- very minor?
 |-------------------------|
@@ -2866,10 +2888,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 
 	if (pedal != 0)
 	{
-		// the pedal has a simple 1-bit "light interrupted" sensor. the faster you pedal,
-		// the faster it pulses.  this is connected to the clock input for timer A3,
+		// The pedal has a simple 1-bit "light interrupted" sensor. The faster you pedal,
+		// the faster it pulses. This is connected to the clock input for timer A3,
 		// and timer A3 is configured by the MCU program to cause an interrupt each time
-		// it's clocked. by counting the number of interrupts in a frame, we can determine
+		// it's clocked. By counting the number of interrupts in a frame, it can determine
 		// how fast the user is pedaling.
 
 		// these values(in usec) may need tweaking:
@@ -4724,9 +4746,9 @@ ROM_END
 
 ROM_START( propcyclj )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "pr1ver-a.1", 0x00003, 0x100000, CRC(dfea7ff7) SHA1(9c81b145d0b6fbe14e1c5ce93ea67dacb2567220) )
-	ROM_LOAD32_BYTE( "pr1ver-a.2", 0x00002, 0x100000, CRC(84a6f608) SHA1(c05ff3fce709bcdb7c30f019ae794979ba79970c) )
-	ROM_LOAD32_BYTE( "pr1ver-a.3", 0x00001, 0x100000, CRC(77f957d2) SHA1(c8a62464f427cc858d9ea33446a8648e9171ead9) )
+	ROM_LOAD32_BYTE( "pr1ver-a.1", 0x00003, 0x100000, CRC(dfea7ff7) SHA1(9c81b145d0b6fbe14e1c5ce93ea67dacb2567220) ) /* SYSTEM SUPER22 MPM(F8F) PCB stickered PR1 VER.A */
+	ROM_LOAD32_BYTE( "pr1ver-a.2", 0x00002, 0x100000, CRC(84a6f608) SHA1(c05ff3fce709bcdb7c30f019ae794979ba79970c) ) /* Fujitsu MBM29F080 flash ROMs at ROM1 & ROM2 on the underside */
+	ROM_LOAD32_BYTE( "pr1ver-a.3", 0x00001, 0x100000, CRC(77f957d2) SHA1(c8a62464f427cc858d9ea33446a8648e9171ead9) ) /* Fujitsu MBM29F080 flash ROMs at ROM3 & ROM4 on the upperside */
 	ROM_LOAD32_BYTE( "pr1ver-a.4", 0x00000, 0x100000, CRC(7b6844e4) SHA1(1b1c03d258c4a6d95ae227de7741f29b7d9e28d8) )
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
@@ -4954,6 +4976,59 @@ ROM_START( alpinerc )
 	ROM_LOAD32_BYTE( "ar2ver-c.2", 0x00002, 0x100000, CRC(43795b2d) SHA1(e060f3259661279a36300431c5ca7347bde8b6ec) )
 	ROM_LOAD32_BYTE( "ar2ver-c.3", 0x00001, 0x100000, CRC(acb3003b) SHA1(ea0cbf3a1607b06b108df051f38fec1f214f42d2) )
 	ROM_LOAD32_BYTE( "ar2ver-c.4", 0x00000, 0x100000, CRC(800acc21) SHA1(41d26766da2db46954a2351bbc50aea94bc1d564) )
+
+	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
+	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
+	ROM_LOAD( "ar1datab.8k", 0, 0x080000, CRC(c26306f8) SHA1(6d8d993c076d5ced523143a86bd0938b3794478d) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "ar1scg0.12f", 0x200000*0, 0x200000,CRC(e7be830a) SHA1(60e2162eecd7401a0c26c525de2715cbfb10c1c5) ) /* identical to "ar1scg0.12l" */
+	ROM_LOAD( "ar1scg1.10f", 0x200000*1, 0x200000,CRC(8f15a686) SHA1(bce2d4380c6c39aa402566ddb0f62bbe6d7bfa1d) ) /* identical to "ar1scg1.10l" */
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "ar1cg0.12b",  0x200000*0x0, 0x200000,CRC(93f3a9d9) SHA1(7e94c81ad5ace98a2f0d00d101d464883d38c197) ) /* identical to "ar1cg0.8d" */
+	ROM_LOAD( "ar1cg1.10d",  0x200000*0x1, 0x200000,CRC(39828c8b) SHA1(424aa67eb0b898c9cab8a4749893a9c5696ac430) ) /* identical to "ar1cg1.13b" */
+	ROM_LOAD( "ar1cg2.12d",  0x200000*0x2, 0x200000,CRC(f7b058d1) SHA1(fffd0f01724a26dd47b1ecceecf4a139d5746f81) ) /* identical to "ar1cg2.14b" */
+	ROM_LOAD( "ar1cg3.13d",  0x200000*0x3, 0x200000,CRC(c28a3d2a) SHA1(cdc44fdbc99274e860c834e42b4cfafb478d4d26) ) /* identical to "ar1cg3.16b" */
+	ROM_LOAD( "ar1cg4.14d",  0x200000*0x4, 0x200000,CRC(abdb161f) SHA1(260bff9b0e94c1b2ea4b9d7fa170fbca212e85ee) ) /* identical to "ar1cg4.18b" */
+	ROM_LOAD( "ar1cg5.16d",  0x200000*0x5, 0x200000,CRC(2381cfea) SHA1(1de4c8b94df233fd74771fa47843290a3d8df0c8) ) /* identical to "ar1cg5.19b" */
+	ROM_LOAD( "ar1cg6.18a",  0x200000*0x6, 0x200000,CRC(ca0b6d23) SHA1(df969e0eeec557a95584b06995b0d55f2c6ec70a) ) /* identical to "ar1cg6.18d" */
+	ROM_LOAD( "ar1cg7.15a",  0x200000*0x7, 0x200000,CRC(ffb9f9f9) SHA1(2b8c75b580f77e887df7d50909a3a95cda570e20) ) /* identical to "ar1cg7.19d" */
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "ar1ccrl.3d",  0x000000, 0x200000,CRC(17387b2c) SHA1(dfd7cadaf97917347c0fa98f395364a543e49612) ) /* identical to "ar1ccrl.7b" */
+	ROM_LOAD( "ar1ccrh.1d",  0x200000, 0x080000,CRC(ee7a4803) SHA1(8383c9a8ef5ed94df13446ca5cefa5f9e518f175) ) /* identical to "pr1ccrh.5b" */
+
+	ROM_REGION( 0x80000*12, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "ar1ptrl0.18k", 0x80000*0x0, 0x80000,CRC(82405108) SHA1(0a40882a9bc8621c620bede404c78f6b1333f223) )
+	ROM_LOAD( "ar1ptrl1.16k", 0x80000*0x1, 0x80000,CRC(8739b09c) SHA1(cd603c4dc2f9ffc4185f891eb83e4c383c564294) )
+	ROM_LOAD( "ar1ptrl2.15k", 0x80000*0x2, 0x80000,CRC(bda693a9) SHA1(fe71dd3c63198737aa2d39527f0004e977e3be20) )
+	ROM_LOAD( "ar1ptrl3.14k", 0x80000*0x3, 0x80000,CRC(82797405) SHA1(2f205fee2d33e183c80a906fb38900167c011240) )
+	ROM_LOAD( "ar1ptrm0.18j", 0x80000*0x4, 0x80000,CRC(64bd6620) SHA1(2e33ff22208805ece304128be8887646fc890f6d) )
+	ROM_LOAD( "ar1ptrm1.16j", 0x80000*0x5, 0x80000,CRC(2232f0a5) SHA1(3fccf6d4a0c4100cc85e3051024d659c4a1c769e) )
+	ROM_LOAD( "ar1ptrm2.15j", 0x80000*0x6, 0x80000,CRC(8ee14e6f) SHA1(f6f1cbb748b109b365255378c18e710ba6270c1c) )
+	ROM_LOAD( "ar1ptrm3.14j", 0x80000*0x7, 0x80000,CRC(1094a970) SHA1(d41b10f48e1ef312bcaf09f27fabc7252c30e648) )
+	ROM_LOAD( "ar1ptru0.18f", 0x80000*0x8, 0x80000,CRC(26d88467) SHA1(d528f989fab4dd5ac1aec9b596a05fbadcc0587a) )
+	ROM_LOAD( "ar1ptru1.16f", 0x80000*0x9, 0x80000,CRC(c5e2c208) SHA1(152fde0b95a5df8c781e4a83577cfbbc7672ae0d) )
+	ROM_LOAD( "ar1ptru2.15f", 0x80000*0xa, 0x80000,CRC(1321ec59) SHA1(dbd3687a4c6b1aa0b18e336f99dabb9010d36639) )
+	ROM_LOAD( "ar1ptru3.14f", 0x80000*0xb, 0x80000,CRC(139d7dc1) SHA1(6d25e6ad552a91a0c5fc03db7e1a801ccf9c9556) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // Samples
+	ROM_LOAD( "ar1wavea.2l", 0, 0x200000, CRC(dbf64562) SHA1(454fd7d5b860f0e5557d8900393be95d6c992ad1) )
+
+	ROM_REGION( 0x2000, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "alpiner_defaults.nv", 0x0000, 0x2000, CRC(efbef3d8) SHA1(459035600655cd83780db6c59aba044981cdcdc4) )
+ROM_END
+
+ROM_START( alpinerjc )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_WORD_SWAP( "ar1ver-c.1", 0x00002, 0x200000, CRC(8a87dc27) SHA1(ea3675667dce4c184da61dbb204e39da7ae93e82) ) /* SYSTEM SUPER22 MPM(F16) PCB stickered AR1 VER.C */
+	ROM_LOAD32_WORD_SWAP( "ar1ver-c.2", 0x00000, 0x200000, CRC(5f4f5615) SHA1(ff8f818a4017ee8546037a10522f2cf1de6dc7cd) ) /* intel E28F016SA flash ROMs at ROM1 & ROM2 */
 
 	ROM_REGION( 0x10000*2, "master", 0 ) /* Master DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
@@ -5782,6 +5857,7 @@ GAME( 1996, victlapj,  victlapw, namcos22,  victlap,   namcos22_state,  init_vic
 // System Super22 games
 GAME( 1994, alpinerd,  0,        alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerc,  alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerjc, alpinerd, alpine,    alpiner,   namcos22s_state, init_alpiner,   ROT0, "Namco", "Alpine Racer (Rev. AR1 Ver.C, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, airco22b,  0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, cybrcycc,  0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcyc,   ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
 GAME( 1995, dirtdash,  0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Rev. DT2 Ver.A, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56

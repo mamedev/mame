@@ -2,18 +2,17 @@
 // copyright-holders:Carlos A. Lozano
 /***************************************************************************
 
-Cops 01      (c) 1985 Nichibutsu
+Cop 01       (c) 1985 Nichibutsu
 Mighty Guy   (c) 1986 Nichibutsu
 
 driver by Carlos A. Lozano <calb@gsyc.inf.uc3m.es>
 
 TODO:
-----
 - Fix priority kludge (see video/cop01.c)
-mightguy:
-- missing emulation of the 1412M2 protection chip, used by the sound CPU.
+- Inaccurate 1412M2 protection chip emulation in mightguy, used by the sound CPU.
   This is probably an extra CPU (program rom is the ic2 one), presumably
   with data / address line scrambling
+- Some sound problems remaining, not just 1412M2, but see also MT7949
 
 
 Mighty Guy board layout:
@@ -59,7 +58,7 @@ Mighty Guy board layout:
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/ym3526.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 #include "sound/dac.h"
@@ -449,15 +448,14 @@ void cop01_state::machine_reset()
 void cop01_state::cop01(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown clock / divider */
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2); // unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &cop01_state::cop01_map);
 	m_maincpu->set_addrmap(AS_IO, &cop01_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, XTAL(3'000'000));    /* unknown clock / divider, hand-tuned to match audio reference */
+	Z80(config, m_audiocpu, XTAL(3'000'000)); // unknown clock / divider, hand-tuned to match audio reference
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cop01_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &cop01_state::audio_io_map);
-
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -476,22 +474,20 @@ void cop01_state::cop01(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); /* unknown clock / divider, hand-tuned to match audio reference */
-
-	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
-
-	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); /* unknown clock / divider, hand-tuned to match audio reference */
+	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
+	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
+	AY8910(config, "ay3", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
 }
 
 void mightguy_state::mightguy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MAINCPU_CLOCK/2);   /* unknown divider */
+	Z80(config, m_maincpu, MAINCPU_CLOCK/2); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &mightguy_state::cop01_map);
 	m_maincpu->set_addrmap(AS_IO, &mightguy_state::mightguy_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cop01_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, AUDIOCPU_CLOCK/2); /* unknown divider */
+	Z80(config, m_audiocpu, AUDIOCPU_CLOCK/2); // unknown divider
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mightguy_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &mightguy_state::mightguy_audio_io_map);
 
@@ -515,7 +511,7 @@ void mightguy_state::mightguy(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); /* unknown divider */
+	YM3526(config, "ymsnd", AUDIOCPU_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown divider
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
 }
@@ -663,6 +659,6 @@ void cop01_state::init_mightguy()
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    empty_init,    ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, init_mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

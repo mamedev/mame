@@ -49,7 +49,7 @@ Dip locations and factory settings verified with US manual
 #include "cpu/nec/nec.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

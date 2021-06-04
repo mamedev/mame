@@ -4,7 +4,7 @@
 Dynamic Ski
 (c)1984 Taiyo
 
-Dynamic Ski runs on a single Z80.  It has the same graphics format as the
+Dynamic Ski runs on a single Z80. It has the same graphics format as the
 newer Taiyo games.
 
 The game has some minor priority glitches.
@@ -40,7 +40,8 @@ There is a small smt IC on the video board with the numbers ground off.
 
 Some company history:
 
-Nihon Game changed their name to Culture Brain.
+Taiyo System (not to be confused with Taiyo Jidoki) was the subsidiary arcade
+brand of Nihon Game. Nihon Game changed their name to Culture Brain in 1987.
 
 Games by Nihon Game/Culture Brain:
     1982 Monster Zero
@@ -1030,10 +1031,10 @@ ROM_START( dynamski )
 ROM_END
 
 
-GAME( 1984, dynamski,  0,        dynamski, dynamski, dynamski_state, empty_init, ROT90, "Taiyo",                     "Dynamic Ski",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinhero,  0,        chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo",                     "Chinese Hero",                MACHINE_SUPPORTS_SAVE ) // by Nihon Game?
-GAME( 1984, chinhero2, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo",                     "Chinese Hero (older, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinhero3, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo",                     "Chinese Hero (older, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, chinherot, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo (Taito license)",     "Chinese Heroe (Taito)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shangkid,  0,        shangkid, shangkid, shangkid_state, empty_init, ROT0,  "Taiyo (Data East license)", "Shanghai Kid",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, hiryuken,  shangkid, shangkid, shangkid, shangkid_state, empty_init, ROT0,  "Taiyo (Taito license)",     "Hokuha Syourin Hiryu no Ken", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dynamski,  0,        dynamski, dynamski, dynamski_state, empty_init, ROT90, "Taiyo System (Nichibutsu license)","Dynamic Ski",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero,  0,        chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo System",                     "Chinese Hero",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero2, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo System",                     "Chinese Hero (older, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinhero3, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo System",                     "Chinese Hero (older, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, chinherot, chinhero, chinhero, chinhero, chinhero_state, empty_init, ROT90, "Taiyo System (Taito license)",     "Chinese Heroe (Taito)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shangkid,  0,        shangkid, shangkid, shangkid_state, empty_init, ROT0,  "Taiyo System (Data East license)", "Shanghai Kid",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hiryuken,  shangkid, shangkid, shangkid, shangkid_state, empty_init, ROT0,  "Taiyo System (Taito license)",     "Hokuha Syourin Hiryu no Ken", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

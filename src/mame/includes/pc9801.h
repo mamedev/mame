@@ -30,8 +30,9 @@
 #include "bus/scsi/scsihd.h"
 
 #include "sound/beep.h"
+//#include "sound/dac.h"
 #include "sound/spkrdev.h"
-#include "sound/ym2608.h"
+#include "sound/ymopn.h"
 
 #include "video/upd7220.h"
 
@@ -105,6 +106,7 @@ public:
 		m_video_ram_2(*this, "video_ram_2"),
 		m_ext_gvram(*this, "ext_gvram"),
 		m_beeper(*this, "beeper"),
+		m_dac(*this, "dac"),
 		m_ram(*this, RAM_TAG),
 		m_ipl(*this, "ipl_bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -175,7 +177,9 @@ private:
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
-	required_device<beep_device> m_beeper;
+	optional_device<beep_device> m_beeper;
+//  optional_device<dac_1bit_device> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	optional_device<ram_device> m_ram;
 	optional_device<address_map_bank_device> m_ipl;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -317,7 +321,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	void ppi_sys_portc_w(uint8_t data);
+	void ppi_sys_beep_portc_w(uint8_t data);
+	void ppi_sys_dac_portc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
@@ -329,7 +334,6 @@ private:
 	void ppi_mouse_portc_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	uint8_t unk_r();
-
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
@@ -392,6 +396,9 @@ private:
 	}m_mouse;
 
 	uint8_t m_ide_sel;
+
+	// starting from PC9801VF/U buzzer is substituted with a DAC1BIT
+	bool m_dac_disable;
 
 	/* PC9801RS specific, move to specific state */
 	uint8_t m_gate_a20; //A20 line

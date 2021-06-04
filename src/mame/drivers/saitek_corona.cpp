@@ -71,25 +71,17 @@ private:
 	u8 chessboard_r();
 	void lcd_reset_w(u8 data);
 
-	u8 m_control1;
-	u8 m_control2;
-	u8 m_select1;
-	u8 m_select2;
-	u8 m_led_data1;
-	u8 m_led_data2;
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_select1 = 0;
+	u8 m_select2 = 0;
+	u8 m_led_data1 = 0;
+	u8 m_led_data2 = 0;
 };
 
 void corona_state::machine_start()
 {
 	saitek_stratos_state::machine_start();
-
-	// zerofill
-	m_control1 = 0;
-	m_control2 = 0;
-	m_select1 = 0;
-	m_select2 = 0;
-	m_led_data1 = 0;
-	m_led_data2 = 0;
 
 	// register for savestates
 	save_item(NAME(m_control1));
@@ -119,11 +111,11 @@ void corona_state::machine_reset()
 void corona_state::update_leds()
 {
 	// button leds
-	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff, false);
+	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff);
 	m_display->write_row(2, ~m_select1 >> 4 & 0xf);
 
 	// chessboard leds
-	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2, true);
+	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2);
 }
 
 void corona_state::leds1_w(u8 data)
@@ -288,7 +280,7 @@ void corona_state::corona(machine_config &config)
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
 	/* extension rom */
-	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");
+	GENERIC_SOCKET(config, "extrom", generic_plain_slot, "saitek_egr");
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr").set_filter("egr2");
 }
 

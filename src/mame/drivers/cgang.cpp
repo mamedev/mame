@@ -64,7 +64,7 @@ Overall, the hardware has similarities with Wacky Gator, see wacky_gator.cpp.
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/upd7759.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/pwm.h"
 
 #include "speaker.h"

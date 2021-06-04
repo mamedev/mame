@@ -49,7 +49,7 @@ main PCB (marked 9101):
 #include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/mc6845.h"
 
 class changyu_state : public driver_device

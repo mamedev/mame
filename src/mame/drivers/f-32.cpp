@@ -31,7 +31,7 @@ f5
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -113,7 +113,7 @@ void mosaicf2_state::mosaicf2_io(address_map &map)
 	map(0x5400, 0x5403).portr("EEPROMIN");
 	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
 	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
-	map(0x6813, 0x6813).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0x6813, 0x6813).w("ymsnd", FUNC(ym2151_device::address_w));
 	map(0x7000, 0x7003).portw("EEPROMCLK");
 	map(0x7200, 0x7203).portw("EEPROMCS");
 	map(0x7400, 0x7403).portw("EEPROMOUT");

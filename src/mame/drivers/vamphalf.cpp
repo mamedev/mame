@@ -66,7 +66,7 @@ TODO:
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "sound/qs1000.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -537,7 +537,7 @@ void vamphalf_state::vamphalf_io(address_map &map)
 {
 	map(0x0c0, 0x0c1).noprw(); // return 0, when oki chip is read / written
 	map(0x0c3, 0x0c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x140, 0x143).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x140, 0x143).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x147, 0x147).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 	map(0x1c0, 0x1c3).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x240, 0x243).w(FUNC(vamphalf_state::flipscreen_w));
@@ -564,7 +564,7 @@ void vamphalf_state::coolmini_io(address_map &map)
 	map(0x308, 0x30b).w(FUNC(vamphalf_state::eeprom_w));
 	map(0x4c0, 0x4c1).noprw(); // return 0, when oki chip is read / written
 	map(0x4c3, 0x4c3).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x540, 0x543).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x540, 0x543).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x544, 0x547).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
 	map(0x7c0, 0x7c3).r(FUNC(vamphalf_state::eeprom_r));
 }
@@ -582,7 +582,7 @@ void vamphalf_state::suplup_io(address_map &map)
 	map(0x060, 0x063).portr("SYSTEM");
 	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
 	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
 	map(0x100, 0x103).r(FUNC(vamphalf_state::eeprom_r));
 }
@@ -641,7 +641,7 @@ void vamphalf_state::jmpbreak_io(address_map &map)
 	map(0x440, 0x441).noprw(); // return 0, when oki chip is read / written
 	map(0x443, 0x443).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x540, 0x543).portr("SYSTEM");
-	map(0x680, 0x683).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x680, 0x683).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x684, 0x687).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
 }
 
@@ -652,7 +652,7 @@ void vamphalf_state::worldadv_io(address_map &map)
 	map(0x340, 0x343).portr("SYSTEM");
 	map(0x640, 0x641).noprw(); // return 0, when oki chip is read / written
 	map(0x643, 0x643).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700, 0x703).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x700, 0x703).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x704, 0x707).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
 	map(0x780, 0x783).r(FUNC(vamphalf_state::eeprom_r));
 }
@@ -661,7 +661,7 @@ void vamphalf_state::mrdig_io(address_map &map)
 {
 	map(0x080, 0x081).noprw(); // return 0, when oki chip is read / written
 	map(0x083, 0x083).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::register_w)).umask16(0x00ff);
+	map(0x0c0, 0x0c3).w("ymsnd", FUNC(ym2151_device::address_w)).umask16(0x00ff);
 	map(0x0c4, 0x0c7).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w)).umask16(0x00ff);
 	map(0x180, 0x183).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x280, 0x283).portr("SYSTEM");
@@ -701,7 +701,7 @@ void vamphalf_state::boonggab_io(address_map &map)
 	map(0x600, 0x603).w(FUNC(vamphalf_state::boonggab_oki_bank_w));
 	map(0x700, 0x701).noprw(); // return 0, when oki chip is read / written
 	map(0x702, 0x703).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask32(0x000000ff);
-	map(0x743, 0x743).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0x743, 0x743).w("ymsnd", FUNC(ym2151_device::address_w));
 	map(0x747, 0x747).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 }
 

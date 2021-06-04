@@ -72,9 +72,9 @@ Updates:
 #include "sound/k054539.h"
 #include "sound/okim6295.h"
 #include "sound/samples.h"
-#include "sound/ym2151.h"
-#include "sound/ymfm.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
+#include "ymfm/src/ymfm.h"
 
 
 uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)
@@ -235,7 +235,7 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 	for (i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
-		m_sampledata[i] = ymfm_decode_fp(val >> 3);
+		m_sampledata[i] = ymfm::decode_fp(val >> 3);
 	}
 }
 

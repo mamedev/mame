@@ -431,8 +431,7 @@ license:CC0
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="14.2" y="6.5" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="14.2" y="16.5" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="14.2" y="26.5" width="2" height="2" /></element>
@@ -451,11 +450,10 @@ license:CC0
 		<element ref="text_g"><bounds x="81.5" y="84" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="91.5" y="84" width="2" height="2" /></element>
 
-	<!-- LCD panel -->
+		<!-- LCD panel -->
 		<group ref="panel"><bounds x="40" y="87.5" width="60" height="14" /></group>
 
 		<group ref="sb_board"><bounds x="17.5" y="2.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="3" width="10" height="80" /></group>
-
 	</view>
 </mamelayout>

@@ -27,7 +27,7 @@ To Do:
 metlclsh:
 - Clocks are all unknown
 - Text on the title screen has wrong colors the first time around
- (unitialized foreground palette 1, will be initialized shortly)
+  (uninitialized foreground palette 1, will be initialized shortly)
 - The background tilemap ram is bankswitched with other (not understood) ram
 - There are a few unknown writes
 
@@ -37,8 +37,8 @@ metlclsh:
 #include "includes/metlclsh.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/ym2203.h"
-#include "sound/ym3526.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -75,7 +75,7 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -115,6 +115,6 @@ u8 cd90_015_device::motor_r()
 		if(m_floppy[i]->get_device() && !m_floppy[i]->get_device()->mon_r())
 			res &= ~(1 << i);
 	if(!machine().side_effects_disabled())
-		logerror("motor_r %x\n", res); 
+		logerror("motor_r %x\n", res);
 	return res;
 }

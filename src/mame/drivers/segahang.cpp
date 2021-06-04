@@ -22,8 +22,8 @@
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 

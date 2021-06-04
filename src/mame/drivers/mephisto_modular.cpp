@@ -28,7 +28,8 @@ Portorose 32 Bit:
 Genius 68030:
 - M68EC030RP40B, 33.3330MHz XTAL, 6.144MHz XTAL
 - 256KB ROM (M27C2001)
-- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20)
+- 512+256 KB RAM (TC518512PL-10, 8*TC55465P-20), note: chess engine resides in the
+  256KB RAM, probably because the EPROM is too slow for this CPU at full speed.
 
 Display Modul:
 - HD44780, 2-line LCD display
@@ -42,8 +43,9 @@ Undocumented buttons:
 - holding CLEAR on boot will clear the battery backed RAM
 
 TODO:
-- match I/S= diag speed test with real hardware (good test for proper waitstates),
-  especially gen32 is way too fast when comparing sound pitch
+- match I/S= diag speed test with real hardware (good test for proper waitstates)
+- gen32 waitstates emulation is preliminary (without it, sound pitch is way too high
+  and lcd write speed too fast). Real gen32 sound is a bit lower pitched than MAME.
 
 ===============================================================================
 
@@ -84,7 +86,6 @@ Reminder: unsupported on Almeria and Portorose 1.01, this is not a bug.
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/mmboard.h"
@@ -104,6 +105,8 @@ public:
 	mmodular_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "maincpu"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_board(*this, "board"),
 		m_bav_busy(*this, "bav_busy"),
 		m_fake(*this, "FAKE")
@@ -127,6 +130,8 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
+	optional_region_ptr<u32> m_rom;
+	memory_share_creator<u8> m_nvram;
 	required_device<mephisto_board_device> m_board;
 	required_device<timer_device> m_bav_busy;
 	optional_ioport m_fake;
@@ -139,12 +144,15 @@ private:
 	void van16_mem(address_map &map);
 	void van32_mem(address_map &map);
 	void gen32_mem(address_map &map);
-	void nvram_map(address_map &map);
 
 	// I/O handlers
+	u32 rom_r(offs_t offset);
 	void bavaria_w(u8 data);
 	u8 bavaria1_r();
 	u8 bavaria2_r();
+
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
 	u8 spawn_cb(offs_t offset);
 	void set_sbtype(ioport_value newval);
@@ -159,7 +167,6 @@ void mmodular_state::machine_start()
 
 void mmodular_state::machine_reset()
 {
-	m_bav_data = 0;
 	set_sbtype(m_fake.read_safe(0) & 1);
 }
 
@@ -169,10 +176,21 @@ void mmodular_state::machine_reset()
     I/O
 ******************************************************************************/
 
+u32 mmodular_state::rom_r(offs_t offset)
+{
+	// waitstates for gen32 (preliminary)
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-20);
+
+	return m_rom[offset];
+}
+
+
 // Bavaria board
 
 void mmodular_state::set_sbtype(ioport_value newval)
 {
+	m_bav_data = 0;
 	m_board->get()->set_type(newval ? sensorboard_device::INDUCTIVE : sensorboard_device::MAGNETS);
 
 	if (machine().phase() == machine_phase::RUNNING)
@@ -234,17 +252,11 @@ u8 mmodular_state::bavaria2_r()
     Address Maps
 ******************************************************************************/
 
-void mmodular_state::nvram_map(address_map &map)
-{
-	// nvram is 8-bit (8KB)
-	map(0x0000, 0x1fff).ram().share("nvram");
-}
-
 void mmodular_state::alm16_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x400000, 0x47ffff).ram();
-	map(0x800000, 0x803fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
+	map(0x800000, 0x803fff).rw(FUNC(mmodular_state::nvram_r), FUNC(mmodular_state::nvram_w)).umask16(0xff00);
 	map(0xc00000, 0xc00000).r("board", FUNC(mephisto_board_device::input_r)); // 0xff on Bavaria
 	map(0xc80000, 0xc80000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0xd00000, 0xd00000).w("board", FUNC(mephisto_board_device::led_w));
@@ -285,7 +297,7 @@ void mmodular_state::alm32_mem(address_map &map)
 	map(0x90000000, 0x90000007).w("board", FUNC(mephisto_board_device::led_w)).umask32(0xff000000);
 	map(0xa0000000, 0xa0000000).w("display", FUNC(mephisto_display2_device::latch_w));
 	map(0xa0000010, 0xa0000010).w("display", FUNC(mephisto_display2_device::io_w));
-	map(0xa8000000, 0xa8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
+	map(0xa8000000, 0xa8007fff).rw(FUNC(mmodular_state::nvram_r), FUNC(mmodular_state::nvram_w)).umask32(0xff000000);
 }
 
 void mmodular_state::port32_mem(address_map &map)
@@ -307,7 +319,7 @@ void mmodular_state::van32_mem(address_map &map)
 
 void mmodular_state::gen32_mem(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).rom();
+	map(0x00000000, 0x0003ffff).r(FUNC(mmodular_state::rom_r));
 	map(0x40000000, 0x4007ffff).ram();
 	map(0x80000000, 0x8003ffff).ram();
 	map(0xc0000000, 0xc0000000).r("board", FUNC(mephisto_board_device::input_r));
@@ -320,7 +332,7 @@ void mmodular_state::gen32_mem(address_map &map)
 	map(0xd800000c, 0xd800000c).r(FUNC(mmodular_state::bavaria2_r));
 	map(0xe0000000, 0xe0000000).w("display", FUNC(mephisto_display2_device::latch_w));
 	map(0xe0000010, 0xe0000010).w("display", FUNC(mephisto_display2_device::io_w));
-	map(0xe8000000, 0xe8007fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
+	map(0xe8000000, 0xe8007fff).rw(FUNC(mmodular_state::nvram_r), FUNC(mmodular_state::nvram_w)).umask32(0xff000000);
 	map(0xf0000004, 0xf0000007).portr("KEY1");
 	map(0xf0000008, 0xf000000b).portr("KEY2");
 	map(0xf0000010, 0xf0000013).portr("KEY3");
@@ -407,7 +419,6 @@ void mmodular_state::alm16(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), attotime::from_hz(600));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmodular_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, m_board);
 	subdevice<sensorboard_device>("board:board")->set_spawnpoints(12+2); // 2 jokers
@@ -470,7 +481,6 @@ void mmodular_state::gen32(machine_config &config)
 	const attotime irq_period = attotime::from_hz(6.144_MHz_XTAL / 0x4000); // through 4060, 375Hz
 	m_maincpu->set_periodic_int(FUNC(mmodular_state::irq2_line_hold), irq_period);
 
-	subdevice<hd44780_device>("display:hd44780")->set_busy_factor(0.25); // problem with waitstates
 	config.set_default_layout(layout_mephisto_gen32);
 }
 
@@ -600,23 +610,23 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME     PARENT CMP MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm32,   0,      0, alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, alm16,   alm32,  0, alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32a, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port32b, port32, 0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, port16,  port32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, lyon16,  lyon32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon32,  0,      0, port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, lyon16,  lyon32, 0, port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1991, van32,   0,      0, van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, van16,   van32,  0, van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van32,   0,      0, van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, van16,   van32,  0, van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1993, gen32,   0,      0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.01)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1993, gen32a,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Genius 68030 (v4.00)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1996, gen32l,  gen32,  0, gen32,  gen32,  mmodular_state, empty_init, "Richard Lang", "Mephisto Genius 68030 (London upgrade)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1996, lond32,  0,      0, van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
-CONS( 1996, lond16,  lond32, 0, van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16
+CONS( 1996, lond32,  0,      0, van32,  port32, mmodular_state, empty_init, "Richard Lang", "Mephisto London 32 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm32/port32/lyon32/van32
+CONS( 1996, lond16,  lond32, 0, van16,  port16, mmodular_state, empty_init, "Richard Lang", "Mephisto London 16 Bit", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // for alm16/port16/lyon16/van16

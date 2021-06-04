@@ -1274,7 +1274,7 @@ DIP switches are not verified
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "sound/ym2610.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 #include "chasehq.lh"

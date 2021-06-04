@@ -108,7 +108,7 @@ char sound_pulse::peek_main()
 			return -1;
 		}
 		generic_error("peek_main: read");
-	}			
+	}
 	return c;
 }
 
@@ -130,7 +130,7 @@ char sound_pulse::get_main()
 			::exit(1);
 		}
 		generic_error("get_main: read");
-	}			
+	}
 	return c;
 }
 
@@ -147,7 +147,7 @@ void sound_pulse::send_main(char c)
 			::exit(1);
 		}
 		generic_error("send_main: write");
-	}			
+	}
 }
 
 void sound_pulse::send_sub(char c)
@@ -163,7 +163,7 @@ void sound_pulse::send_sub(char c)
 			::exit(1);
 		}
 		generic_error("send_sub: write");
-	}			
+	}
 }
 
 void sound_pulse::make_pipes()
@@ -325,7 +325,7 @@ void sound_pulse::update_audio_stream(bool is_throttled, const s16 *buffer, int 
 	buf.cpos = 0;
 	buf.data.resize(samples_this_frame);
 	memcpy(buf.data.data(), buffer, samples_this_frame*4);
-	m_last_sample = buf.data.back();	
+	m_last_sample = buf.data.back();
 
 	if(m_buffers.size() > 10)
 		// If there way too many buffers, drop some so only 10 are left (roughly 0.2s)
@@ -360,7 +360,7 @@ void sound_pulse::set_mastervolume(int attenuation)
 	if(!m_stream)
 		return;
 
-	
+
 	std::unique_lock<std::mutex> lock(m_mutex);
 	if(m_setting_volume) {
 		m_new_volume = true;
