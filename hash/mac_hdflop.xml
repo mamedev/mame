@@ -2889,19 +2889,19 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk01.img" size="1474560" crc="04489288" sha1="5d03758fbbfb7761f2545979b9b658c21e493714" />
+				<rom name="macwrite_pro_15v3_disk01.img" size="1474560" crc="04489288" sha1="5d03758fbbfb7761f2545979b9b658c21e493714" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk02.img" size="1474560" crc="1529122b" sha1="7b42da1380233489406f4b30dc2c57af3392e777" />
+				<rom name="macwrite_pro_15v3_disk02.img" size="1474560" crc="1529122b" sha1="7b42da1380233489406f4b30dc2c57af3392e777" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk03.img" size="1474560" crc="9693ecfd" sha1="eaf35fe598f0319d7da035ded83c8d4b2eafd0c4" />
+				<rom name="macwrite_pro_15v3_disk03.img" size="1474560" crc="9693ecfd" sha1="eaf35fe598f0319d7da035ded83c8d4b2eafd0c4" />
 			</dataarea>
 		</part>
 	</software>
@@ -2913,13 +2913,13 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk01.img" size="1474560" crc="c7b3a7a3" sha1="3f822f72bf15e301c4590db6090753a698301b3d" />
+				<rom name="macwrite_pro_15v1_disk01.img" size="1474560" crc="c7b3a7a3" sha1="3f822f72bf15e301c4590db6090753a698301b3d" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk02.img" size="1474560" crc="3faeb185" sha1="bc9bc42e1835cfbf7390e3dd5a95083e888c704e" />
+				<rom name="macwrite_pro_15v1_disk02.img" size="1474560" crc="3faeb185" sha1="bc9bc42e1835cfbf7390e3dd5a95083e888c704e" />
 			</dataarea>
 		</part>
 	</software>
