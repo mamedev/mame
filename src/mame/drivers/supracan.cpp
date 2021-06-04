@@ -260,8 +260,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 	void palette_init(palette_device &palette) const;
+	void screen_vblank(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
 	TIMER_CALLBACK_MEMBER(hbl_callback);
 	TIMER_CALLBACK_MEMBER(line_on_callback);
 	TIMER_CALLBACK_MEMBER(line_off_callback);
@@ -278,7 +278,7 @@ private:
 	void mark_active_tilemap_all_dirty(int layer);
 	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 
-	void set_sound_irq(uint8_t mask);
+	void set_sound_irq(uint8_t bit, uint8_t state);
 };
 
 
@@ -1192,6 +1192,10 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+void supracan_state::screen_vblank(int state)
+{
+	set_sound_irq(7, 1);
+}
 
 void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 {
@@ -1325,10 +1329,13 @@ uint8_t supracan_state::sound_ram_read(offs_t offset)
 	return m_soundram[offset];
 }
 
-void supracan_state::set_sound_irq(uint8_t mask)
+void supracan_state::set_sound_irq(uint8_t bit, uint8_t state)
 {
 	const uint8_t old = m_soundcpu_irq_source;
-	m_soundcpu_irq_source |= mask;
+	if (state)
+		m_soundcpu_irq_source |= 1 << bit;
+	else
+		m_soundcpu_irq_source &= ~(1 << bit);
 	const uint8_t changed = old ^ m_soundcpu_irq_source;
 	if (changed)
 	{
@@ -1573,7 +1580,7 @@ void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 	case 0x000a/2:  /* Sound cpu IRQ request. */
 		LOGMASKED(LOG_SOUND, "%s: Sound CPU IRQ request: %04x\n", machine().describe_context(), data);
-		set_sound_irq(0x20);
+		set_sound_irq(5, 1);
 		//m_soundcpu->set_input_line(0, ASSERT_LINE);
 		break;
 	case 0x001c/2:  /* Sound cpu control. Bit 0 tied to sound cpu RESET line */
@@ -2081,11 +2088,6 @@ static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram", 0, supracan_gfx1bpp_alt, 0, 0x80 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(supracan_state::sound_irq)
-{
-	set_sound_irq(0x80);
-}
-
 void supracan_state::supracan(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
@@ -2093,7 +2095,6 @@ void supracan_state::supracan(machine_config &config)
 
 	M6502(config, m_soundcpu, XTAL(3'579'545));     /* TODO: Verify actual clock */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
-	m_soundcpu->set_vblank_int("screen", FUNC(supracan_state::sound_irq));
 
 	config.set_perfect_quantum(m_soundcpu);
 
@@ -2101,6 +2102,7 @@ void supracan_state::supracan(machine_config &config)
 	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
 
 	PALETTE(config, "palette", FUNC(supracan_state::palette_init)).set_format(palette_device::xBGR_555, 32768);
 
@@ -2109,7 +2111,7 @@ void supracan_state::supracan(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ACANSND(config, m_sound, 32'768);
+	ACANSND(config, m_sound, XTAL(3'579'545) / 16 / 5);
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);

@@ -37,15 +37,13 @@ private:
 		uint16_t start_addr;
 		uint16_t curr_addr;
 		uint16_t end_addr;
-		uint16_t addr_increment;
+		uint32_t addr_increment;
 		uint32_t frac;
 		uint8_t  envelope[4];
 		uint8_t  volume;
 		uint8_t  volume_l;
 		uint8_t  volume_r;
 	};
-
-	void update_channel_pitch(acan_channel &channel);
 
 	sound_stream *m_stream;
 	devcb_read8 m_ram_read;
