@@ -39,10 +39,14 @@ void acan_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, length));
 	save_item(STRUCT_MEMBER(m_channels, start_addr));
 	save_item(STRUCT_MEMBER(m_channels, curr_addr));
+	save_item(STRUCT_MEMBER(m_channels, end_addr));
 	save_item(STRUCT_MEMBER(m_channels, addr_increment));
 	save_item(STRUCT_MEMBER(m_channels, frac));
 	save_item(STRUCT_MEMBER(m_channels, envelope));
 	save_item(STRUCT_MEMBER(m_channels, volume));
+	save_item(STRUCT_MEMBER(m_channels, volume_l));
+	save_item(STRUCT_MEMBER(m_channels, volume_r));
+	save_item(STRUCT_MEMBER(m_channels, one_shot));
 	save_item(NAME(m_regs));
 }
 
@@ -79,7 +83,14 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 				if (channel.curr_addr >= channel.end_addr)
 				{
-					channel.curr_addr -= channel.length;
+					if (channel.one_shot)
+					{
+						m_active_channels &= ~(1 << i);
+					}
+					else
+					{
+						channel.curr_addr -= channel.length;
+					}
 				}
 			}
 		}
@@ -148,8 +159,9 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 			if (lower < 0xf)
 			{
 				acan_channel &channel = m_channels[lower];
-				channel.length = data << 6;
+				channel.length = (data & ~0x01) << 6;
 				channel.end_addr = channel.curr_addr + channel.length;
+				channel.one_shot = BIT(data, 0);
 			}
 			break;
 

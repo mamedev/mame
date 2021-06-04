@@ -43,6 +43,7 @@ private:
 		uint8_t  volume;
 		uint8_t  volume_l;
 		uint8_t  volume_r;
+		bool     one_shot;
 	};
 
 	sound_stream *m_stream;
