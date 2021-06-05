@@ -15,7 +15,6 @@
 
 #include "softlist_dev.h"
 
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -29,17 +28,6 @@ class mc10cart_slot_device final : public device_t,
 								public device_image_interface
 {
 public:
-	// output lines on the mc10 cartridge slot
-	enum class line
-	{
-		NMI              // connects to NMI line on CPU
-	};
-
-	enum class line_value
-	{
-		CLEAR,
-		ASSERT
-	};
 
 	// construction/destruction
 	template <typename T>
@@ -58,6 +46,7 @@ public:
 	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }
 
+	// address map manipulations
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
 	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
@@ -78,35 +67,20 @@ public:
 	virtual const char *image_interface() const noexcept override { return "mc10_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "mcc,rom"; }
 
-	// manipulation of cartridge lines
-	void set_line_value(line line, line_value value);
-	line_value get_line_value(line line) const;
+	// manipulation of nmi line
+	void set_nmi_line(int state);
+	devcb_write_line m_nmi_callback;
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	devcb_write_line            m_nmi_callback;
-
 private:
-	struct mc10_cartridge_line
-	{
-		line_value                  value;
-		int                         line;
-		devcb_write_line *          callback;
-	};
-
-	// configuration
-	mc10_cartridge_line         m_nmi_line;
 
 	// cartridge
 	device_mc10cart_interface   *m_cart;
 
-	// methods
-	void set_line(line ln, mc10_cartridge_line &line, line_value value);
-
 protected:
 	required_address_space m_memspace;
-
 };
 
 // device type definition
@@ -132,6 +106,9 @@ public:
 
 	virtual memory_region *get_cart_memregion();
 
+	void raise_cart_nmi() { m_owning_slot->set_nmi_line(ASSERT_LINE); }
+	void lower_cart_nmi() { m_owning_slot->set_nmi_line(CLEAR_LINE); }
+
 protected:
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;
@@ -139,15 +116,8 @@ protected:
 	device_mc10cart_interface(const machine_config &mconfig, device_t &device);
 
 	// accessors for containers
-	mc10cart_slot_device &owning_slot()     { assert(m_owning_slot); return *m_owning_slot; }
-	device_mc10cart_host_interface &host()  { assert(m_host); return *m_host; }
-
-	// setting line values
-	void set_line_value(mc10cart_slot_device::line line, mc10cart_slot_device::line_value value);
-	void set_line_value(mc10cart_slot_device::line line, bool value) { set_line_value(line, value ? mc10cart_slot_device::line_value::ASSERT : mc10cart_slot_device::line_value::CLEAR); }
-
-	typedef mc10cart_slot_device::line line;
-	typedef mc10cart_slot_device::line_value line_value;
+	mc10cart_slot_device &owning_slot() { assert(m_owning_slot); return *m_owning_slot; }
+	device_mc10cart_host_interface &host() { assert(m_host); return *m_host; }
 
 private:
 	mc10cart_slot_device * m_owning_slot;

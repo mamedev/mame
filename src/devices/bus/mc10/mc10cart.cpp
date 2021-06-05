@@ -25,8 +25,10 @@
         14  A2                 31  !NMI
         15  A3                 32  +5V
         16  A3                 33  GND
-        17  A5                 34  GDN
+        17  A5                 34  GND
 
+	SEL is an input to the MC-10 that allows the cartridge to remove
+	the internal chips from the bus.
 
 *********************************************************************/
 
@@ -36,26 +38,11 @@
 #include "mc10_pak.h"
 #include "mc10_ram.h"
 
-
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
-#define LOG_NMI  (1U << 2) // shows switch changes
-// #define VERBOSE (LOG_CART)
-
-#include "logmacro.h"
-
-#define LOGNMI(...)  LOGMASKED(LOG_NMI,  __VA_ARGS__)
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MC10CART_SLOT, mc10cart_slot_device, "mc10cart_slot", "MC-10 Cartridge Slot")
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -74,25 +61,18 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 {
 }
 
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void mc10cart_slot_device::device_start()
 {
-	m_nmi_line.value = line_value::CLEAR;
 	m_nmi_callback.resolve();
-	m_nmi_line.callback = &m_nmi_callback;
-
 	m_cart = get_card_device();
 }
 
-
-
 //-------------------------------------------------
-//  install_bank - install ram in host computer
+//  install_bank - install RAM in host computer
 //-------------------------------------------------
 
 void mc10cart_slot_device::install_bank(offs_t start, offs_t end, uint8_t *data)
@@ -101,7 +81,7 @@ void mc10cart_slot_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 }
 
 //-------------------------------------------------
-//  install_bank - install ram in host computer
+//  install_bank - install ROM in host computer
 //-------------------------------------------------
 
 void mc10cart_slot_device::install_rom(offs_t start, offs_t end, uint8_t *data)
@@ -109,68 +89,15 @@ void mc10cart_slot_device::install_rom(offs_t start, offs_t end, uint8_t *data)
 	m_memspace->install_rom(start, end, data);
 }
 
-
 //-------------------------------------------------
-//  set_line
+//  set_nmi_line
 //-------------------------------------------------
 
-void mc10cart_slot_device::set_line(line ln, mc10_cartridge_line &line, mc10cart_slot_device::line_value value)
+void mc10cart_slot_device::set_nmi_line(int state)
 {
-	if ((line.value != value))
-	{
-		line.value = value;
-
-		switch (ln)
-		{
-		case line::NMI:
-			LOGNMI( "set_line: NMI, value: %s\n", value == line_value::CLEAR ? "CLEAR" : "ASSERT");
-			break;
-		}
-
-		/* invoke the callback, if present */
-		if (!(*line.callback).isnull())
-			(*line.callback)(line.line);
-	}
+		if (!(m_nmi_callback).isnull())
+			(m_nmi_callback)(state);
 }
-
-
-
-
-//-------------------------------------------------
-//  set_line_value
-//-------------------------------------------------
-
-void mc10cart_slot_device::set_line_value(mc10cart_slot_device::line which, mc10cart_slot_device::line_value value)
-{
-	switch (which)
-	{
-	case mc10cart_slot_device::line::NMI:
-		set_line(line::NMI, m_nmi_line, value);
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  get_line_value
-//-------------------------------------------------
-
-mc10cart_slot_device::line_value mc10cart_slot_device::get_line_value(mc10cart_slot_device::line which) const
-{
-	line_value result;
-	switch (which)
-	{
-	case mc10cart_slot_device::line::NMI:
-		result = m_nmi_line.value;
-		break;
-	default:
-		result = line_value::CLEAR;
-		break;
-	}
-
-	return result;
-}
-
 
 //-------------------------------------------------
 //  call_load
@@ -201,6 +128,7 @@ image_init_result mc10cart_slot_device::call_load()
 			read_length += len;
 		}
 	}
+
 	return image_init_result::PASS;
 }
 
@@ -213,8 +141,6 @@ std::string mc10cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	return software_get_default_slot("pak");
 }
-
-
 
 //**************************************************************************
 //  DEVICE MC-10 CART INTERFACE - Implemented by devices that plug into
@@ -235,7 +161,6 @@ device_mc10cart_interface::device_mc10cart_interface(const machine_config &mconf
 {
 }
 
-
 //-------------------------------------------------
 //  ~device_mc10cart_interface - destructor
 //-------------------------------------------------
@@ -243,7 +168,6 @@ device_mc10cart_interface::device_mc10cart_interface(const machine_config &mconf
 device_mc10cart_interface::~device_mc10cart_interface()
 {
 }
-
 
 //-------------------------------------------------
 //  interface_config_complete
@@ -257,7 +181,6 @@ void device_mc10cart_interface::interface_config_complete()
 			: nullptr;
 }
 
-
 //-------------------------------------------------
 //  interface_pre_start
 //-------------------------------------------------
@@ -270,7 +193,6 @@ void device_mc10cart_interface::interface_pre_start()
 		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_mc10cart_host_interface");
 }
 
-
 /*-------------------------------------------------
     get_cart_memregion
 -------------------------------------------------*/
@@ -279,16 +201,6 @@ memory_region *device_mc10cart_interface::get_cart_memregion()
 {
 	return 0;
 }
-
-//-------------------------------------------------
-//  set_line_value
-//-------------------------------------------------
-
-void device_mc10cart_interface::set_line_value(mc10cart_slot_device::line line, mc10cart_slot_device::line_value value)
-{
-	owning_slot().set_line_value(line, value);
-}
-
 
 //-------------------------------------------------
 //  mc10_cart_add_basic_devices
@@ -300,4 +212,3 @@ void mc10_cart_add_basic_devices(device_slot_interface &device)
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
 }
-
