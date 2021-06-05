@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sound/acan.h"
+#include "acan.h"
 
 #define VERBOSE		(1)
 #include "logmacro.h"
@@ -130,7 +130,7 @@ uint8_t acan_sound_device::read(offs_t offset)
 	if (offset == 0x14)
 	{
 		// acknowledge timer (?)
-		if(!m_irq_handler.isnull())
+		if (!m_irq_handler.isnull())
 			m_irq_handler(0);
 	}
 	return m_regs[offset];
@@ -156,7 +156,7 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 			}
 			else if (lower == 0x4) // Timer control
 			{
-				if(data & 0x80)
+				if (data & 0x80)
 				{
 					// Update frequency
 					uint16_t period = (m_regs[0x12] << 8) + m_regs[0x11];

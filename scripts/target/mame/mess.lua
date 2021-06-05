@@ -324,7 +324,6 @@ SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
 SOUNDS["RP2C33_SOUND"] = true
 SOUNDS["UDA1344"] = true
-SOUNDS["ACAN"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -2490,6 +2489,8 @@ files {
 createMESSProjects(_target, _subtarget, "funtech")
 files {
 	MAME_DIR .. "src/mame/drivers/supracan.cpp",
+	MAME_DIR .. "src/mame/audio/acan.cpp",
+	MAME_DIR .. "src/mame/audio/acan.h",
 }
 
 createMESSProjects(_target, _subtarget, "galaxy")

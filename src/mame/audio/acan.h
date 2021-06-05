@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_SOUND_ACAN_H
-#define MAME_SOUND_ACAN_H
+#ifndef MAME_AUDIO_ACAN_H
+#define MAME_AUDIO_ACAN_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ACANSND, acan_sound_device)
 
-#endif // MAME_SOUND_ACAN_H
+#endif // MAME_AUDIO_ACAN_H

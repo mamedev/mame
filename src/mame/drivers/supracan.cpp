@@ -80,7 +80,7 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "sound/acan.h"
+#include "audio/acan.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
