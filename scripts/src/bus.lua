@@ -1753,6 +1753,8 @@ if (BUSES["MC10"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/mc10/mc10cart.cpp",
 		MAME_DIR .. "src/devices/bus/mc10/mc10cart.h",
+		MAME_DIR .. "src/devices/bus/mc10/mc10_pak.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/mc10_pak.h",
 		MAME_DIR .. "src/devices/bus/mc10/mc10_ram.cpp",
 		MAME_DIR .. "src/devices/bus/mc10/mc10_ram.h",
 	}

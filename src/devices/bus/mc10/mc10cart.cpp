@@ -33,6 +33,7 @@
 #include "emu.h"
 #include "mc10cart.h"
 
+#include "mc10_pak.h"
 #include "mc10_ram.h"
 
 
@@ -99,6 +100,14 @@ void mc10cart_slot_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 	m_memspace->install_ram(start, end, data);
 }
 
+//-------------------------------------------------
+//  install_bank - install ram in host computer
+//-------------------------------------------------
+
+void mc10cart_slot_device::install_rom(offs_t start, offs_t end, uint8_t *data)
+{
+	m_memspace->install_rom(start, end, data);
+}
 
 
 //-------------------------------------------------
@@ -169,31 +178,30 @@ mc10cart_slot_device::line_value mc10cart_slot_device::get_line_value(mc10cart_s
 
 image_init_result mc10cart_slot_device::call_load()
 {
-// 	if (m_cart)
-// 	{
-// 		memory_region *cart_mem = m_cart->get_cart_memregion();
-// 		u8 *base = cart_mem->base();
-// 		offs_t read_length, cart_length = cart_mem->bytes();
-//
-// 		if (!loaded_through_softlist())
-// 		{
-// 			read_length = fread(base, cart_length);
-// 		}
-// 		else
-// 		{
-// 			read_length = get_software_region_length("rom");
-// 			memcpy(base, get_software_region("rom"), read_length);
-// 		}
-//
-// 		while (read_length < cart_length)
-// 		{
-// 			offs_t len = std::min(read_length, cart_length - read_length);
-// 			memcpy(base + read_length, base, len);
-// 			read_length += len;
-// 		}
-// 	}
-// 	return image_init_result::PASS;
- 	return image_init_result::FAIL;
+	if (m_cart)
+	{
+		memory_region *cart_mem = m_cart->get_cart_memregion();
+		u8 *base = cart_mem->base();
+		offs_t read_length, cart_length = cart_mem->bytes();
+
+		if (!loaded_through_softlist())
+		{
+			read_length = fread(base, cart_length);
+		}
+		else
+		{
+			read_length = get_software_region_length("rom");
+			memcpy(base, get_software_region("rom"), read_length);
+		}
+
+		while (read_length < cart_length)
+		{
+			offs_t len = std::min(read_length, cart_length - read_length);
+			memcpy(base + read_length, base, len);
+			read_length += len;
+		}
+	}
+	return image_init_result::PASS;
 }
 
 
@@ -263,6 +271,14 @@ void device_mc10cart_interface::interface_pre_start()
 }
 
 
+/*-------------------------------------------------
+    get_cart_memregion
+-------------------------------------------------*/
+
+memory_region *device_mc10cart_interface::get_cart_memregion()
+{
+	return 0;
+}
 
 //-------------------------------------------------
 //  set_line_value
@@ -281,6 +297,7 @@ void device_mc10cart_interface::set_line_value(mc10cart_slot_device::line line, 
 void mc10_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices
+	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
 }
 

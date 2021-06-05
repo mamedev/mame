@@ -362,7 +362,7 @@ void mc10_state::mc10(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_raw(9.828_MHz_XTAL / 2, 320, 0, 320, 243, 0, 243);
 
 	/* expansion port hardware */
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), mc10_cart, "ram"));
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), mc10_cart, "pak"));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

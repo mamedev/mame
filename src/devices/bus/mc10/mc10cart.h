@@ -59,6 +59,7 @@ public:
 	auto nmi_callback() { return m_nmi_callback.bind(); }
 
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -75,7 +76,7 @@ public:
 	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "mc10_cart"; }
-	virtual const char *file_extensions() const noexcept override { return "ccc,rom"; }
+	virtual const char *file_extensions() const noexcept override { return "mcc,rom"; }
 
 	// manipulation of cartridge lines
 	void set_line_value(line line, line_value value);
@@ -129,6 +130,7 @@ public:
 	// construction/destruction
 	virtual ~device_mc10cart_interface();
 
+	virtual memory_region *get_cart_memregion();
 
 protected:
 	virtual void interface_config_complete() override;
