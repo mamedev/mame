@@ -1747,6 +1747,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/mc10/mc10cart.h,BUSES["MC10"] = true
+---------------------------------------------------
+if (BUSES["MC10"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mc10/mc10cart.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/mc10cart.h",
+		MAME_DIR .. "src/devices/bus/mc10/mc10_ram.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/mc10_ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/kc/kc.h,BUSES["KC"] = true
 ---------------------------------------------------
 

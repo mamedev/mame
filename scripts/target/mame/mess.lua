@@ -904,6 +904,7 @@ BUSES["HP_IPC_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
 BUSES["M5"] = true
+BUSES["MC10"] = true
 BUSES["MACKBD"] = true
 BUSES["MACPDS"] = true
 BUSES["MIDI"] = true
