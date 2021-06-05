@@ -12,7 +12,7 @@
 #include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
-#include "sound/ym2151.h"
+#include "sound/ymopz.h"
 #include "speaker.h"
 
 class korgz3_state : public driver_device

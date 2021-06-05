@@ -5,7 +5,7 @@
 
 Rockwell PPS-4/1 MCU series handhelds
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - memoquiz: Mattel Mind Boggler
 
 ***************************************************************************/
@@ -1589,7 +1589,7 @@ CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_in
 
 CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )

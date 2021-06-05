@@ -609,6 +609,8 @@ includedirs {
 }
 
 files {
+	MAME_DIR .. "src/tools/image_handler.cpp",
+	MAME_DIR .. "src/tools/image_handler.h",
 	MAME_DIR .. "src/tools/floptool.cpp",
 }
 
@@ -677,8 +679,8 @@ files {
 	MAME_DIR .. "src/tools/imgtool/imghd.h",
 	MAME_DIR .. "src/tools/imgtool/charconv.cpp",
 	MAME_DIR .. "src/tools/imgtool/charconv.h",
-	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.cpp",
-	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.h",
+	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk_legacy.cpp",
+	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk_legacy.h",
 	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.cpp",
 	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.h",
 	MAME_DIR .. "src/tools/imgtool/formats/pc_dsk_legacy.cpp",

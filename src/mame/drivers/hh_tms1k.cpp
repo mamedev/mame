@@ -30,6 +30,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
+ *MP0220   TMS1000   1980, Tomy Teacher
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
@@ -113,6 +114,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
+ *M34137   TMS1100?  1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -129,7 +131,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
+ *M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:
 
@@ -138,7 +141,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
 - cmsport: Conic Basketball
@@ -10159,9 +10162,12 @@ ROM_END
 
 /***************************************************************************
 
-  TI-2550 III/TI-1265 (both have same chip)
+  TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
   * 9-digit cyan VFD display
+
+  Only the TI-2550 III has the top button row (RV, SQRT, etc).
+  TI-1600 doesn't have the memory buttons.
 
 ***************************************************************************/
 
@@ -12793,7 +12799,7 @@ COMP( 1978, lilprof78,  lilprof,   0, lilprof78, lilprof78, lilprof78_state, emp
 COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

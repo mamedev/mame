@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license: GPL-2.0+
+// copyright-holders: Dirk Best
 /***************************************************************************
 
     VTech Laser/VZ I/O Expansion Slot
@@ -29,8 +29,11 @@
 
 #pragma once
 
+#include "machine/bankdev.h"
+
 // include here so drivers don't need to
 #include "carts.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -54,13 +57,16 @@ public:
 	vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_ioexp_slot_device();
 
-	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	required_address_space m_io;
+private:
+	required_address_space m_iospace;
+
+	device_vtech_ioexp_interface *m_module;
 };
 
 // class representing interface-specific live ioexp device
@@ -70,12 +76,33 @@ public:
 	// construction/destruction
 	virtual ~device_vtech_ioexp_interface();
 
+	virtual uint8_t iorq_r(offs_t offset) { return 0xff; }
+	virtual void iorq_w(offs_t offset, uint8_t data) { }
+
 protected:
 	device_vtech_ioexp_interface(const machine_config &mconfig, device_t &device);
 
-	address_space &io_space() { return *m_slot->m_io; }
-
 	vtech_ioexp_slot_device *m_slot;
+};
+
+// base io expansion device
+class vtech_ioexp_device : public device_t, public device_vtech_ioexp_interface
+{
+public:
+	// construction/destruction
+	vtech_ioexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// from host
+	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	virtual void io_map(address_map &map) { };
+
+	required_device<address_map_bank_device> m_io;
 };
 
 // device type definition

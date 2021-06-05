@@ -7,11 +7,23 @@ Cassette tapes for the Microbee non-disk models. These extensions are supported:
 
 Compatibility flags:
 1 = mbee
-2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s
+2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s, mbeeppc
 
 If no flag is specified, it's assumed it works on all of them.
 
-They do not work on disk-based microbees, or on premium models.
+They do not work on disk-based microbees, or on the Teleterm.
+
+It's possible for a tape to work on some disk-based models but your mileage may vary.
+To try it out, boot the machine into the shell, select BASIC, then load the tape as loose software.
+You use the CLOAD command (rather than LOAD in the rom-based models). It will load. If you're
+lucky, it might even run.
+
+Cassette File Types:
+- This is a single letter that displays after the 6-character filename, while loading.
+- B = Basic, loaded by Basic. If it doesn't self-start type RUN.
+- M = Machine-code, loaded by Basic. If it doesn't self-start type EXEC.
+- W = Wordbee, loaded by Wordbee only.
+- T = Teleterm, loaded by Teleterm machine (mbeett) only.
 
 -->
 <softwarelist name="mbee_cass" description="Microbee cassettes">

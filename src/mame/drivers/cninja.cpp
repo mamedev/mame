@@ -49,8 +49,8 @@ Note about version levels using Mutant Fighter as the example:
 #include "cpu/m68000/m68000.h"
 #include "machine/decocrpt.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "speaker.h"
 
 /**********************************************************************************/

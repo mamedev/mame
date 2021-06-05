@@ -42,23 +42,26 @@ Expansion modules released:
 - Sparc (SPARClite, Spracklen's)
 
 TODO:
-- OSA module support (softwarelist, devices/bus)
-- OSA PC link (probably uses MCU serial interface)
-- add nvram
-- finish internal artwork
+- OSA module comms is not completely understood
+- OSA PC link, uses MCU serial interface
+- add nvram (MCU port $14?)
+- add power-off, not useful with missing nvram support
 
 ******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/saitek_osa/expansion.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/input_merger.h"
 #include "machine/sensorboard.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
 
 // internal artwork
+#include "saitek_galileo.lh" // clickable
 #include "saitek_leonardo.lh" // clickable
 
 
@@ -70,24 +73,30 @@ public:
 	leo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_expansion(*this, "exp"),
+		m_stb(*this, "stb"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void leo(machine_config &config);
-	void leoa(machine_config &config);
+	void leonardo(machine_config &config);
+	void leonardoa(machine_config &config);
+	void galileo(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// devices/pointers
 	required_device<hd6303y_cpu_device> m_maincpu;
+	required_device<saitekosa_expansion_device> m_expansion;
+	required_device<input_merger_device> m_stb;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
-	optional_device<dac_bit_interface> m_dac;
+	optional_device<speaker_sound_device> m_dac;
 	required_ioport_array<9> m_inputs;
 
 	void main_map(address_map &map);
@@ -97,6 +106,7 @@ private:
 	void leds_w(u8 data);
 	u8 unk_r();
 	void unk_w(u8 data);
+	void exp_rts_w(int state);
 
 	u8 p2_r();
 	void p2_w(u8 data);
@@ -113,6 +123,11 @@ void leo_state::machine_start()
 {
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));
+}
+
+void leo_state::machine_reset()
+{
+	m_stb->in_clear<0>();
 }
 
 
@@ -138,7 +153,7 @@ void leo_state::mux_w(u8 data)
 	update_display();
 
 	// d4: speaker out
-	m_dac->write(BIT(data, 4));
+	m_dac->level_w(BIT(data, 4));
 }
 
 void leo_state::leds_w(u8 data)
@@ -157,6 +172,11 @@ u8 leo_state::unk_r()
 void leo_state::unk_w(u8 data)
 {
 	// ?
+}
+
+void leo_state::exp_rts_w(int state)
+{
+	// NAND with ACK-P (not used by module)
 }
 
 
@@ -186,29 +206,39 @@ void leo_state::p2_w(u8 data)
 
 u8 leo_state::p5_r()
 {
-	// ?
+	// d1: N/C, d4: IS strobe (handled with inputline)
 	return 0xff ^ 0x10;
 }
 
 void leo_state::p5_w(u8 data)
 {
+	// d2: expansion NMI-P
+	m_expansion->nmi_w(BIT(data, 2));
+
+	// d3: NAND with STB-P
+	m_stb->in_w<1>(BIT(data, 3));
+
+	// d5: expansion ACK-P
+	m_expansion->ack_w(BIT(data, 5));
+
 	// d6,d7: chessboard led row data
 	m_led_data[0] = (m_led_data[0] & 3) | (~data >> 4 & 0xc);
 	update_display();
 
-	// d0: power-off
-	// other: ?
+	// d0: power-off on falling edge
+	m_expansion->pw_w(data & 1);
 }
 
 u8 leo_state::p6_r()
 {
-	// read chessboard sensors
-	return ~m_board->read_file(m_inp_mux & 0xf);
+	// read chessboard sensors and module data
+	return ~m_board->read_file(m_inp_mux & 0xf) & m_expansion->data_r();
 }
 
 void leo_state::p6_w(u8 data)
 {
 	// module data
+	m_expansion->data_w(data);
 }
 
 
@@ -234,46 +264,46 @@ void leo_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( leo )
+static INPUT_PORTS_START( leonardo )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // king
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // rook
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // knight
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("King")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // queen
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) // bishop
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) // pawn
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Pawn")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) // tab/color
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) // +
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) // freq sel
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) // function?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) // sound
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Function")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
 
 	PORT_START("IN.4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // freq sel
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // stop?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // library?
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("Stop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Library")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // info
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // play?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) // level
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Info")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) // -
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) // normal?
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) // analysis?
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Normal")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Analysis")
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) // new game
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) // setup?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_CUSTOM) // freq sel
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Set Up")
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN)
@@ -281,6 +311,43 @@ static INPUT_PORTS_START( leo )
 	PORT_CONFNAME( 0x04, 0x04, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Low" )
 	PORT_CONFSETTING(    0x04, DEF_STR( Normal ) )
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( galileo ) // same buttons, but different locations
+	PORT_INCLUDE( leonardo )
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Tab / Color")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Function")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Sound")
+
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Stop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Library")
+
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Info")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Play")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+
+	PORT_MODIFY("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Normal")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Analysis")
+
+	PORT_MODIFY("IN.7")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("Set Up")
+
+	PORT_MODIFY("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
 INPUT_PORTS_END
 
 
@@ -289,9 +356,9 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void leo_state::leo(machine_config &config)
+void leo_state::leonardo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	HD6303Y(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leo_state::main_map);
 	m_maincpu->in_p2_cb().set(FUNC(leo_state::p2_r));
@@ -301,25 +368,39 @@ void leo_state::leo(machine_config &config)
 	m_maincpu->in_p6_cb().set(FUNC(leo_state::p6_r));
 	m_maincpu->out_p6_cb().set(FUNC(leo_state::p6_w));
 
+	INPUT_MERGER_ANY_LOW(config, m_stb).initial_state(~u32(3));
+	m_stb->output_handler().set_inputline(m_maincpu, M6801_IS_LINE);
+
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8+2, 8+2);
 	config.set_default_layout(layout_saitek_leonardo);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// expansion module
+	SAITEKOSA_EXPANSION(config, m_expansion, saitekosa_expansion_modules);
+	m_expansion->stb_handler().set(m_stb, FUNC(input_merger_device::in_w<0>));
+	m_expansion->rts_handler().set(FUNC(leo_state::exp_rts_w));
 }
 
-void leo_state::leoa(machine_config &config)
+void leo_state::leonardoa(machine_config &config)
 {
-	leo(config);
+	leonardo(config);
+	m_board->set_delay(attotime::from_msec(250)); // slower chessboard response?
+}
 
-	// slower chessboard response?
-	m_board->set_delay(attotime::from_msec(250));
+void leo_state::galileo(machine_config &config)
+{
+	leonardo(config);
+	config.set_default_layout(layout_saitek_galileo);
 }
 
 
@@ -351,8 +432,8 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME       PARENT    CMP MACHINE INPUT CLASS      INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, leonardo,  0,        0,  leo,    leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
-CONS( 1986, leonardoa, leonardo, 0,  leoa,   leo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    CMP  MACHINE    INPUT      CLASS      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, leonardo,  0,        0,   leonardo,  leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, leonardoa, leonardo, 0,   leonardoa, leonardo,  leo_state, empty_init, "SciSys", "Kasparov Leonardo (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1988, galileo,   0,        0,  leo,    leo,  leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1988, galileo,   leonardo, 0,   galileo,   galileo,   leo_state, empty_init, "Saitek", "Kasparov Galileo", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

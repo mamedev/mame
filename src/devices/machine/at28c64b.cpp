@@ -229,7 +229,7 @@ uint8_t at28c64b_device::read(offs_t offset)
 	if( m_last_write >= 0 )
 	{
 		uint8_t data = m_last_write ^ 0x80;
-//		logerror( "%s: AT28C64B: read( %04x ) write status %02x\n", machine().describe_context(), offset, data );
+//      logerror( "%s: AT28C64B: read( %04x ) write status %02x\n", machine().describe_context(), offset, data );
 		return data;
 	}
 	else

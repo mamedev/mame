@@ -11,6 +11,8 @@
 #include "adb.h"
 
 #include "adbhle.h"
+#include "a9m0330.h"
+#include "a9m0331.h"
 
 DEFINE_DEVICE_TYPE(ADB_CONNECTOR, adb_connector, "adbslot", "ADB connector")
 
@@ -50,6 +52,8 @@ adb_device::adb_device(const machine_config &mconfig, device_type type, const ch
 
 void adb_device::device_start()
 {
+	m_adb_cb.resolve_safe();
+	m_poweron_cb.resolve_safe();
 }
 
 void adb_device::device_reset()
@@ -61,4 +65,6 @@ void adb_device::device_reset()
 void adb_device::default_devices(device_slot_interface &device)
 {
 	device.option_add("hle", ADB_HLE);
+	device.option_add("a9m0330", ADB_A9M0330);
+	device.option_add("a9m0331", ADB_A9M0331);
 }

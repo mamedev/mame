@@ -506,9 +506,8 @@
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "sound/okim6295.h"
-#include "sound/ym2203.h"
-#include "sound/ym2608.h"
-#include "sound/ym3812.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
 

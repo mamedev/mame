@@ -225,8 +225,8 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
-#include "sound/ym2151.h"
-#include "sound/ym2610.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -1578,6 +1578,32 @@ ROM_START( cadashg )
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
+ROM_START( cadashgo )
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "c21_23.ic11",  0x00000, 0x20000, CRC(fad37785) SHA1(f61bccb29d354a57cebaa0c773f212bffbba19d5) )
+	ROM_LOAD16_BYTE( "c21_25.ic15",  0x00001, 0x20000, CRC(594dda9f) SHA1(ab9fcd44fb316b64cbb8a5265563dcade417895d) )
+	ROM_LOAD16_BYTE( "c21_22.ic10",  0x40000, 0x20000, CRC(7610a9b4) SHA1(25c858f25efdbd4c25cbd1cc64fc68c9aba762ea) )
+	ROM_LOAD16_BYTE( "c21_24.ic14",  0x40001, 0x20000, CRC(551d947e) SHA1(237397dfe1e4dcd76acc37536304dd526d2d6f41) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) // SCR tiles (8 x 8)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) // Sprites (16 x 16)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) // banked
+
+	ROM_REGION( 0x08000, "subcpu", 0 )  // HD64180RP8 code (link)
+	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal16l8b-c21-09.ic34",   0x0000, 0x0104, CRC(4b296700) SHA1(79d6c8fb13e30795d9c1f49885ada658f9722b68) )
+	ROM_LOAD( "pal16l8b-c21-10.ic45",   0x0200, 0x0104, CRC(35642f00) SHA1(a04403536b0ef7e8e7251dfc47274a6c8772fd2d) )
+	ROM_LOAD( "pal16l8b-c21-11-1.ic46", 0x0400, 0x0104, CRC(f4791e24) SHA1(7e3bbffec7b8f9171e6e09706e5622fef3c99ca0) )
+	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
+ROM_END
+
 ROM_START( cadashs ) // no labels on the program ROMs
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ic11",  0x00000, 0x20000, CRC(6c11743e) SHA1(847266a04090b34e20985d65f4d1f7e7776efa02) )
@@ -1681,6 +1707,33 @@ ROM_START( earthjkra )
 	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
 ROM_END
 
+ROM_START( earthjkrb ) /* Taito PCB: K1100726A / J1100169B */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 1024k for 68000 code */
+	/* Very close to earthjkra set. Labels are numbered in the same way as earthjkrp, but 3 and 4 ones are swapped (Maybe a typo in earthjkrp ?). In this case 4 is placed at ic24 position and 3 is placed at ic8 position */
+	ROM_LOAD16_BYTE( "4.ic23", 0x00000, 0x20000, CRC(250f09f8) SHA1(124f65a499414b4ec06cf6c370850cdc962dd2ee) ) /* 4.ic23 vs ejok_ic23 99.967957% similar (42 changed bytes) */
+	ROM_LOAD16_BYTE( "3.ic8",  0x00001, 0x20000, CRC(88fc1c5d) SHA1(83d4177603c5671ece906810f01284a477388bf7) ) /* 3.ic8  vs ejok_ic8  99.967957% similar (42 changed bytes) */
+	/* 0x40000 - 0x7ffff is intentionally empty */
+	ROM_LOAD16_WORD( "ic30e.ic30", 0x80000, 0x80000, CRC(49d1f77f) SHA1(f6c9b2fc88b77cc9baa5be48da5c3eb72310e471) ) /* Fix ROM */
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "ej_chr-0.ic3", 0x00000, 0x80000, CRC(ac675297) SHA1(2a34e1eae3a4be84dbf709053f5e8a781b1073fc) )    /* SCR tiles (8 x 8) - mask ROM */
+
+	ROM_REGION( 0xa0000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "ej_obj-0.ic6", 0x00000, 0x80000, CRC(5f21ac47) SHA1(45c94ffb53ee9b822b0676f6fb151fed4ce6d967) ) /* Sprites (16 x 16) - mask ROM */
+	ROM_LOAD16_BYTE     ( "1.ic5",        0x80001, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
+	ROM_LOAD16_BYTE     ( "0.ic4",        0x80000, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
+
+	ROM_REGION( 0x10000, "msm", ROMREGION_ERASEFF )   /* ADPCM samples */
+	/* Empty socket on U.N. Defense Force: Earth Joker - but sound chips present */
+
+	ROM_REGION( 0x144, "pals", 0 )
+	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
+	ROM_LOAD( "b68-05.ic43", 0x00000, 0x104, CRC(d6524ccc) SHA1(f3b56253692aebb63278d47832fc27b8b212b59c) )
+ROM_END
+
 // Known to exist (not dumped) a Japanese version with ROMs 3 & 4 also stamped "A" same as above or different version??
 // Also known to exist (not dumped) a US version of Earth Joker, title screen shows "DISTRIBUTED BY ROMSTAR, INC."  ROMs were numbered
 // from 0 through 4 and the fix ROM at IC30 is labeled 1 even though IC5 is also labled as 1 similar to the below set:
@@ -1762,13 +1815,15 @@ GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,  asuka_state, init_cadash,  
 GAME( 1989, cadashi,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashf,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashg,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashgo,  cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 GAME( 1989, cadashp,   cadash,   cadash,   cadashj,  asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
 GAME( 1989, cadashs,   cadash,   cadash,   cadash,   asuka_state, init_cadash,   ROT0,   "Taito Corporation Japan",   "Cadash (Spain, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 
 GAME( 1992, galmedes,  0,        asuka,    galmedes, asuka_state, empty_init,    ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // sets 1 + 2 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
+GAME( 1993, earthjkr,  0,        asuka,    earthjkr, asuka_state, init_earthjkr, ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // sets 1 + 2 + 3 have ROMSTAR (US?) license and no region disclaimer if you change the dipswitch
 GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr, asuka_state, empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, earthjkrb, earthjkr, asuka,    earthjkr, asuka_state, empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp,asuka_state, empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, eto,       0,        eto,      eto,      asuka_state, empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )

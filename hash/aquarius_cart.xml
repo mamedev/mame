@@ -26,7 +26,7 @@ X-6203 : Chess
 
 	<software name="addtot">
 		<description>Advanced Dungeons and Dragons: Treasure of Tarmin</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4023" />
 		<part name="cart" interface="aquarius_cart">
@@ -63,7 +63,7 @@ X-6203 : Chess
 
 	<software name="astrsmah">
 		<description>Astrosmash</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4003" />
 		<part name="cart" interface="aquarius_cart">
@@ -85,9 +85,69 @@ X-6203 : Chess
 		</part>
 	</software>
 
+	<software name="blbasic10" cloneof="blbasic">
+		<description>Bootloader BASIC v1.0</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Martin v.d. Steenoven"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="blbasic10.bin" size="0x4000" crc="9f18b1ba" sha1="b3954fbd20623715900d075db7ae17a905b425bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blbasic11" cloneof="blbasic">
+		<description>Bootloader BASIC v1.1</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Martin v.d. Steenoven"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="blbasic11.bin" size="0x4000" crc="360c67fe" sha1="eaf41f661150cd34e4c0e09acb49e1f743ce3589"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blbasic20" cloneof="blbasic">
+		<description>Bootloader BASIC v2.0</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Martin v.d. Steenoven"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="blbasic20.bin" size="0x4000" crc="0a6e6dff" sha1="b928cb89aba31cc42105caec7a66489eb0dce214"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blbasic">
+		<description>Bootloader BASIC v2.1</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Martin v.d. Steenoven"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="blbasic21.bin" size="0x4000" crc="07853524" sha1="a3e2d85cf30dd16ac1afb756c7e718c894db631e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blbird">
+		<description>BL-Bird</description>
+		<year>2015</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="Martin v.d. Steenoven"/>
+		<part name="cart" interface="aquarius_cart">
+			<dataarea name="rom" size="0x4000">
+				<rom name="blbird.bin" size="0x4000" crc="8291827a" sha1="b25d9df9e86be5d6d49fdf7c7dcdd632ab68b5be"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="btime">
 		<description>Burgertime</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4653" />
 		<part name="cart" interface="aquarius_cart">
@@ -99,7 +159,7 @@ X-6203 : Chess
 
 	<software name="chess">
 		<description>Chess</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4594" />
 		<part name="cart" interface="aquarius_cart">
@@ -111,7 +171,7 @@ X-6203 : Chess
 
 	<software name="ebasic">
 		<description>Extended Microsoft BASIC</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Radofin Electronics</publisher>
 		<info name="serial" value="4392" />
 		<part name="cart" interface="aquarius_cart">
@@ -123,7 +183,7 @@ X-6203 : Chess
 
 	<software name="fileform">
 		<description>FileForm</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4177" />
 		<part name="cart" interface="aquarius_cart">
@@ -135,7 +195,7 @@ X-6203 : Chess
 
 	<software name="finform">
 		<description>FinForm</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4178" />
 		<part name="cart" interface="aquarius_cart">
@@ -159,7 +219,7 @@ X-6203 : Chess
 
 	<software name="demo">
 		<description>Demonstration</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
 			<dataarea name="rom" size="0x4000">
@@ -170,7 +230,7 @@ X-6203 : Chess
 
 	<software name="melchase">
 		<description>Melody Chase</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4652" />
 		<part name="cart" interface="aquarius_cart">
@@ -193,7 +253,7 @@ X-6203 : Chess
 
 	<software name="nstalker">
 		<description>Night Stalker</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4595" />
 		<part name="cart" interface="aquarius_cart">
@@ -204,7 +264,7 @@ X-6203 : Chess
 	</software>
 
 	<software name="shark">
-		<description>Shark! (Prototype)</description>
+		<description>Shark! (prototype)</description>
 		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<part name="cart" interface="aquarius_cart">
@@ -216,7 +276,7 @@ X-6203 : Chess
 
 	<software name="snafu">
 		<description>Snafu</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4028" />
 		<part name="cart" interface="aquarius_cart">
@@ -240,7 +300,7 @@ X-6203 : Chess
 
 	<software name="tron">
 		<description>TRON Deadly Discs</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4024" />
 		<part name="cart" interface="aquarius_cart">
@@ -252,7 +312,7 @@ X-6203 : Chess
 
 	<software name="utopia">
 		<description>Utopia</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4596" />
 		<part name="cart" interface="aquarius_cart">
@@ -275,7 +335,7 @@ X-6203 : Chess
 
 	<software name="zeroin">
 		<description>Zero-In</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="serial" value="4895C" />
 		<part name="cart" interface="aquarius_cart">
@@ -289,7 +349,7 @@ X-6203 : Chess
 
 	<software name="modem" supported="no">
 		<description>Modem Terminal Software</description>
-		<year>1982</year>
+		<year>1983</year>
 		<publisher>Mattel</publisher>
 		<info name="usage" value="Modem required" />
 		<part name="cart" interface="aquarius_cart">

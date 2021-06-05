@@ -48,7 +48,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

@@ -217,6 +217,8 @@ ROM_START( ltleappad )
 	ROM_DEFAULT_BIOS("mar_10_2005")
 	ROM_SYSTEM_BIOS( 0, "mar_10_2005",  "Mar 10 2005" )
 	ROMX_LOAD( "littletouchleappadbios.bin", 0x000000, 0x400000, CRC(13687b26) SHA1(6ec1a47aaef9c9ed134bb143c2631f4d89d7c236), ROM_BIOS(0) ) // contains "Mar 10 2005 07:01:53 152-11244" and "Copyright (c) 2002-2005 LeapFrog Enterprises, Inc."
+	ROM_SYSTEM_BIOS( 1, "germany",  "Germany, Jan 11 2005" )
+	ROMX_LOAD( "leappad_little_touch_german.bin", 0x000000, 0x400000, CRC(39ee76a2) SHA1(34f1b6e075e10e14380d925944f4c84d068ec58e), ROM_BIOS(1) ) // contains "Jan 11 2005 10:45:42 152-11010 Full Base ROM: V1.0 - Germany"
 ROM_END
 
 //    year, name,      parent, compat, machine,            input,            class,                  init,       company,    fullname,               flags

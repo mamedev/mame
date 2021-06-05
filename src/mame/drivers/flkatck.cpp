@@ -20,7 +20,7 @@ NOTE: There is known to exist a USA version of Flak Attack - currently not dumpe
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/k007452.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 

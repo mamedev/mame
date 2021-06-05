@@ -2,16 +2,16 @@
 // copyright-holders:R. Belmont
 
 /*
-	mboardd.cpp - Mockingboard D emulation
-	by R. Belmont
+    mboardd.cpp - Mockingboard D emulation
+    by R. Belmont
 
-	The Apple IIc didn't have slots, so Sweet Micro Systems came up with this, a Mockingboard
-	in a little box that attached to the IIc's modem port.  There's nothing special about the
-	IIc though - with a proper cable, anything that speaks 9600 8N1 RS-232 could drive this
-	device.
+    The Apple IIc didn't have slots, so Sweet Micro Systems came up with this, a Mockingboard
+    in a little box that attached to the IIc's modem port.  There's nothing special about the
+    IIc though - with a proper cable, anything that speaks 9600 8N1 RS-232 could drive this
+    device.
 
-	A decent disassembly of the 6803 firmware is available from the Apple II Documentation Project:
-	https://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Audio/Sweet%20Microsystems%20Mockingboard/Source%20Code/
+    A decent disassembly of the 6803 firmware is available from the Apple II Documentation Project:
+    https://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Interface%20Cards/Audio/Sweet%20Microsystems%20Mockingboard/Source%20Code/
 
 */
 
@@ -35,7 +35,7 @@ mockingboard_d_device::mockingboard_d_device(const machine_config &mconfig, cons
 
 void mockingboard_d_device::device_add_mconfig(machine_config &config)
 {
-	M6803(config, m_cpu, 4.9152_MHz_XTAL);	// value reverse-engineered from 9600 baud SCI rate needed
+	M6803(config, m_cpu, 4.9152_MHz_XTAL);  // value reverse-engineered from 9600 baud SCI rate needed
 	m_cpu->set_addrmap(AS_PROGRAM, &mockingboard_d_device::m6803_mem);
 	m_cpu->in_p2_cb().set(FUNC(mockingboard_d_device::p2_r));
 	m_cpu->out_p1_cb().set(FUNC(mockingboard_d_device::p1_w));

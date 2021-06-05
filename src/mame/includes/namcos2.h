@@ -80,6 +80,7 @@ public:
 	void sgunner2(machine_config &config);
 	void base2(machine_config &config);
 	void finallap_noio(machine_config &config);
+	void base_fl(machine_config &config);
 	void finallap(machine_config &config);
 	void finallap_c68(machine_config &config);
 	void finalap2(machine_config &config);

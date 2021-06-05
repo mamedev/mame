@@ -1146,6 +1146,14 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 
 	LOGCOMP("Initiating command %02x\n", val);
 
+	// INTRQ flip-flop logic from die schematics:
+	//  Reset conditions:
+	//   - Command register write
+	//   - Status register read
+	//  Setting conditions:
+	//   - While command register contain Dx (interrupt cmd) and one or more I0-I3 conditions met
+	//   - Command-specific based on PLL microprogram
+	// No other logic present in real chips, descriptions of "Forced interrupt" (Dx) command in datasheets are wrong.
 	if (intrq) {
 		intrq = false;
 		if(!intrq_cb.isnull())

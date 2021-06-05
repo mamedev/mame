@@ -7,13 +7,23 @@ license:CC0
 <!--
     Not dumped:
 
-    The Princess and the Frog
     Toy Story 3
 
     (it also needs confirming if US / UK cartridges are different, dumps are all from UK cartridges)
 
 -->
 <softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity Cartridges">
+
+	<software name="prinfrog" supported="no">
+		<description>The Princess and the Frog - Magical Bayou Adventure (500-13779-A) (UK)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_zippity_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="500-13779-A - The Princess and the Frog - Magical Bayou Adventure.bin" size="0x4200000" crc="f41715d0" sha1="c6654f021ac0b12fecb056f1d21058957a6e1e30" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cars" supported="no">
 		<description>The World of Cars - Driven to Learn (500-13589-B) (UK)</description>

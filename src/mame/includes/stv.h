@@ -125,7 +125,7 @@ private:
 	uint8_t     m_ioga_portg;
 	uint16_t    m_serial_tx;
 
-	// protection specific variables and functions (see machine/stvprot.cpp)
+	// protection specific variables and functions
 	uint32_t m_abus_protenable;
 	uint32_t m_abus_protkey;
 

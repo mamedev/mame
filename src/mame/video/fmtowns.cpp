@@ -761,14 +761,11 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	uint16_t xstart,xend,ystart,yend;
 	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
-	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if (rotation)
 	{
 		std::swap (x,y);
 		std::swap (xflip,yflip);
-		std::swap (width,height);
 	}
 
 	if(xflip)
@@ -841,7 +838,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
+			if(voffset < 0x20000 && xpos < 256 && ypos < 256 && pixel != 0 && voffset > linesize)
 			{
 				m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
 				m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
@@ -862,7 +859,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
-				if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
+				if(voffset < 0x20000 && xpos < 256 && ypos < 256 && pixel != 0 && voffset > linesize)
 				{
 					m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
 					m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
@@ -887,32 +884,29 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	uint16_t xstart,ystart,xend,yend;
 	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
-	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if (rotation)
 	{
 		std::swap (x,y);
 		std::swap (xflip,yflip);
-		std::swap (width,height);
 	}
 
 	if(xflip)
 	{
 		if (xhalfsize)
-			xstart = x+8;
+			xstart = x+7;
 		else
-			xstart = x+16;
-		xend = x;
+			xstart = x+15;
+		xend = x-1;
 		xdir = -1;
 	}
 	else
 	{
-		xstart = x+1;
+		xstart = x;
 		if (xhalfsize)
-			xend = x+9;
+			xend = x+8;
 		else
-			xend = x+17;
+			xend = x+16;
 		xdir = 1;
 	}
 	if(yflip)
@@ -955,7 +949,7 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if(voffset < 0x20000 && xpos < width && ypos < height && col< 0x8000 && voffset > linesize)
+			if(voffset < 0x20000 && xpos < 256 && ypos < 256 && col< 0x8000 && voffset > linesize)
 			{
 				m_towns_gfxvram[0x40000+vbase+voffset+1] = (col & 0xff00) >> 8;
 				m_towns_gfxvram[0x40000+vbase+voffset] = col & 0x00ff;
@@ -972,16 +966,14 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	}
 }
 
-void towns_state::draw_sprites(const rectangle* rect)
+TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 {
 	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
 	uint16_t yoff = (m_video.towns_sprite_reg[4] | (m_video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	uint32_t poffset,coffset;
+	const rectangle *rect = &m_video.towns_crtc_layerscr[1];
 	int linesize = m_video.towns_crtc_reg[24] * 4;
-
-	if(!(m_video.towns_sprite_reg[1] & 0x80))
-		return;
 
 	// TODO: I'm not confident about this but based on the behavior of aburner and rbisland, it's probably in the ballpark
 	// aburner writes the backgound color from 0 to 0x400 in both pages while rbisland from 0 to 0x800 (What's the difference?)
@@ -1020,7 +1012,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
+			logerror("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
@@ -1030,7 +1022,7 @@ void towns_state::draw_sprites(const rectangle* rect)
 		{
 			poffset = (attr & 0x3ff) << 7;
 #ifdef SPR_DEBUG
-			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x",
+			logerror("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x\n",
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
@@ -1039,12 +1031,16 @@ void towns_state::draw_sprites(const rectangle* rect)
 	}
 
 	if(m_video.towns_sprite_page == 0)  // flip VRAM page
+	{
 		m_video.towns_sprite_page = 1;
+		m_video.towns_crtc_reg[21] &= ~0x8000;
+	}
 	else
+	{
 		m_video.towns_sprite_page = 0;
-
-	m_video.towns_sprite_flag = 1;  // we are now drawing
-	m_video.sprite_timer->adjust(m_maincpu->cycles_to_attotime(128 * (1025-sprite_limit)));
+		m_video.towns_crtc_reg[21] |= 0x8000;
+	}
+	m_video.towns_sprite_flag = 0;
 }
 
 void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)
@@ -1465,14 +1461,14 @@ void towns_state::draw_text_layer()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
+void towns_state::towns_sprite_start()
 {
-	// sprite drawing is complete, lower flag
-	m_video.towns_sprite_flag = 0;
-	if(m_video.towns_sprite_page != 0)
-		m_video.towns_crtc_reg[21] |= 0x8000;
-	else
-		m_video.towns_crtc_reg[21] &= ~0x8000;
+	if(!(m_video.towns_sprite_reg[1] & 0x80))
+		return;
+
+	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
+	m_video.towns_sprite_flag = 1;  // we are now drawing
+	m_video.sprite_timer->adjust(m_maincpu->cycles_to_attotime(128 * (1025-sprite_limit)));
 }
 
 TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
@@ -1492,14 +1488,14 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)
-		draw_sprites(&m_video.towns_crtc_layerscr[1]);
+		towns_sprite_start();
 }
 
 void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_sprite_done),this));
+	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::draw_sprites),this));
 }
 
 uint32_t towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

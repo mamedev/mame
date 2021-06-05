@@ -3,7 +3,7 @@
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation
-	also known as NEC uPD7220
+    also known as NEC uPD7220
 
 **********************************************************************/
 
@@ -1732,12 +1732,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		if(im || force_bitmap)
 		{
 			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
-     		// PC98 Quarth definitely needs area 2 for player section.
+			// PC98 Quarth definitely needs area 2 for player section.
 			// TODO: what happens if combined area size is smaller than display height?
 			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
 			if(area >= 3)
 				break;
-			
+
 			// PC98 madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
 			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.
 			// Suggests that length should be treated as max size if this occurs, this is also proven to be correct via real HW verification.

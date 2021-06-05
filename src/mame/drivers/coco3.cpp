@@ -18,7 +18,6 @@
 #include "cpu/m6809/hd6309.h"
 #include "formats/coco_cas.h"
 #include "softlist.h"
-#include "coco3.lh"
 
 
 
@@ -201,11 +200,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco_lightgun )
 	PORT_START(DIECOM_LIGHTGUN_RX_TAG)
-	PORT_BIT( 0x1ff, 266, IPT_LIGHTGUN_X ) PORT_NAME("Lightgun X (Right Port)") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(116,416) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0xfff, 266, IPT_LIGHTGUN_X ) PORT_NAME("Lightgun X (Right Port)") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(105,420) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x03)
 	PORT_START(DIECOM_LIGHTGUN_RY_TAG)
 	PORT_BIT( 0xff, 121, IPT_LIGHTGUN_Y ) PORT_NAME("Lightgun Y (Right Port)") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,242) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0x0f, EQUALS, 0x03)
 	PORT_START(DIECOM_LIGHTGUN_LX_TAG)
-	PORT_BIT( 0x1ff, 266, IPT_LIGHTGUN_X ) PORT_NAME("Lightgun X (Left Port)") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(116,416) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0xfff, 266, IPT_LIGHTGUN_X ) PORT_NAME("Lightgun X (Left Port)") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(105,420) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x30)
 	PORT_START(DIECOM_LIGHTGUN_LY_TAG)
 	PORT_BIT( 0xff, 121, IPT_LIGHTGUN_Y ) PORT_NAME("Lightgun Y (Left Port)") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,242) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_PLAYER(1) PORT_CONDITION(CTRL_SEL_TAG, 0xf0, EQUALS, 0x30)
 	PORT_START(DIECOM_LIGHTGUN_BUTTONS_TAG)
@@ -219,6 +218,13 @@ INPUT_PORTS_END
 //  INPUT_PORTS( coco3 )
 //-------------------------------------------------
 
+static INPUT_PORTS_START( screen_config )
+	PORT_START("screen_config")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Composite" )
+	PORT_CONFSETTING(    0x01, "RGB" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco3_keyboard )
 	PORT_INCLUDE( coco3_joystick )
@@ -227,6 +233,7 @@ static INPUT_PORTS_START( coco3 )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport )
+	PORT_INCLUDE( screen_config )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco3dw )
@@ -237,6 +244,7 @@ static INPUT_PORTS_START( coco3dw )
 	PORT_INCLUDE( coco_lightgun )
 	PORT_INCLUDE( coco_rtc )
 	PORT_INCLUDE( coco_beckerport_dw )
+	PORT_INCLUDE( screen_config )
 INPUT_PORTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( rs_printer )
@@ -306,31 +314,18 @@ void coco3_state::coco3(machine_config &config)
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
 
 	// video hardware
-	config.set_default_layout(layout_coco3);
-
 	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
-	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
+	m_gime->set_screen("screen");
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
 	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
-	// composite monitor
-	screen_device &composite_screen(SCREEN(config, COMPOSITE_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	composite_screen.set_refresh_hz(60);
-	composite_screen.set_screen_update(FUNC(coco3_state::screen_update));
-	composite_screen.set_size(640, 243);
-	composite_screen.set_visarea(0, 640-1, 1, 241-1);
-	composite_screen.set_vblank_time(0);
-
-	// RGB monitor
-	screen_device &rgb_screen(SCREEN(config, RGB_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	rgb_screen.set_refresh_hz(60);
-	rgb_screen.set_screen_update(FUNC(coco3_state::screen_update));
-	rgb_screen.set_size(640, 243);
-	rgb_screen.set_visarea(0, 640-1, 1, 241-1);
-	rgb_screen.set_vblank_time(0);
+	// monitor
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640-1, 263, 1, 241-1);
+	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");
@@ -351,7 +346,7 @@ void coco3_state::coco3p(machine_config &config)
 
 	// An additional 4.433618 MHz XTAL is required for PAL color encoding
 	GIME_PAL(config.replace(), m_gime, XTAL(28'475'000), MAINCPU_TAG, RAM_TAG, CARTRIDGE_TAG, MAINCPU_TAG);
-	m_gime->set_screen(COMPOSITE_SCREEN_TAG);
+	m_gime->set_screen("screen");
 	m_gime->hsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::ca1_w));
 	m_gime->fsync_wr_callback().set(PIA0_TAG, FUNC(pia6821_device::cb1_w));
 	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));

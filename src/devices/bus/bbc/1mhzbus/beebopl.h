@@ -10,7 +10,7 @@
 #define MAME_BUS_BBC_1MHZBUS_BEEBOPL_H
 
 #include "1mhzbus.h"
-#include "sound/ym3812.h"
+#include "sound/ymopl.h"
 
 
 //**************************************************************************

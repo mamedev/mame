@@ -22,11 +22,29 @@
 #include "namcos2_sprite.h"
 
 DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE, namcos2_sprite_device, "namcos2_sprite", "Namco System 2 Sprites (C106,C134,C135,C146)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_FINALLAP, namcos2_sprite_finallap_device, "namcos2_sprite_finallap", "Namco System 2 Sprites (C106,C134,C135,C146) (Final Lap)")
+DEFINE_DEVICE_TYPE(NAMCOS2_SPRITE_METALHAWK, namcos2_sprite_metalhawk_device, "namcos2_sprite_metalhawk", "Namco System 2 Sprites (C106,C134,C135,C146) (Metal Hawk)")
 
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, NAMCOS2_SPRITE, tag, owner, clock),
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE, tag, owner, clock)
+{
+}
+
+namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG)
+{
+}
+
+
+namcos2_sprite_metalhawk_device::namcos2_sprite_metalhawk_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_METALHAWK, tag, owner, clock)
+{
+}
+
+namcos2_sprite_finallap_device::namcos2_sprite_finallap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namcos2_sprite_device(mconfig, NAMCOS2_SPRITE_FINALLAP, tag, owner, clock)
 {
 }
 
@@ -191,6 +209,22 @@ void namcos2_sprite_device::zdrawgfxzoom(
 	/* nop */
 }
 
+void namcos2_sprite_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	sprn = (word1 >> 2) & 0x0fff;
+	is_32 = bool(word0 & 0x200);
+}
+
+void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32)
+{
+	// Final Lap schematics show an older sprite board with lower capacity
+	// and the 32/16 pixel mode select on a different bit
+	// this is needed for the title screen to look correct, in addition to various in game sparks effects etc.
+
+	sprn = (word1 >> 2) & 0x07ff;
+	is_32 = bool((word1 >> 2) & 0x800);
+}
+
 void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
 	int offset = (control & 0x000f) * (128 * 4);
@@ -226,27 +260,30 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const u16 word0   = m_spriteram[offset + (loop * 4) + 0];
 			const u16 word1   = m_spriteram[offset + (loop * 4) + 1];
 			const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
+			const int sizey   = ((word0 >> 10) & 0x003f) + 1;
 
-			const int sizey = ((word0 >> 10) & 0x003f) + 1;
-			int sizex       =  (word3 >> 10) & 0x003f;
+			u32 sprn;
+			bool is_32;
 
-			if ((word0 & 0x0200) == 0) sizex >>= 1;
+			get_tilenum_and_size(word0, word1, sprn, is_32);
+
+			int sizex = (word3 >> 10) & 0x003f;
+			if (!is_32) sizex >>= 1;
 
 			if ((sizey - 1) && sizex)
 			{
 				const u32 color  = (word3 >> 4) & 0x000f;
-				const u32 sprn   = (word1 >> 2) & 0x0fff;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
 				const int xpos   = (offset4 & 0x03ff) - 0x50 + 0x07;
 				const bool flipy = word1 & 0x8000;
 				const bool flipx = word1 & 0x4000;
-				const int scalex = (sizex << 16) / ((word0 & 0x0200) ? 0x20 : 0x10);
-				const int scaley = (sizey << 16) / ((word0 & 0x0200) ? 0x20 : 0x10);
+				const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);
+				const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
 				if (scalex && scaley)
 				{
 					gfx_element *gfx = m_gfxdecode->gfx(0);
 
-					if ((word0 & 0x0200) == 0)
+					if (!is_32)
 						gfx->set_source_clip((word1 & 0x0001) ? 16 : 0, 16, (word1 & 0x0002) ? 16 : 0, 16);
 					else
 						gfx->set_source_clip(0, 32, 0, 32);
@@ -268,7 +305,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 } /* draw_sprites */
 
-void namcos2_sprite_device::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
 {
 	/**
 	 * word#0

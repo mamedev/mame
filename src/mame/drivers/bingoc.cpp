@@ -48,7 +48,7 @@ SOUND : 2 x ASSP 5C68A
 #include "machine/i8251.h"
 #include "sound/rf5c68.h"
 #include "sound/upd7759.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

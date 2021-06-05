@@ -685,14 +685,14 @@ void ns32202_device::cctl_w(u8 data)
 			{} // TODO: decrement l-counter
 	}
 
-	m_cctl = data & ~(CCTL_CRUNH | CCTL_CRUNL);
+	m_cctl = data & ~(CCTL_CDCRH | CCTL_CDCRL);
 }
 
 void ns32202_device::cictl_w(u8 data)
 {
 	u8 const mask =
-		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL) : 0) |
-		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH) : 0);
+		((data & CICTL_WENL) ? (CICTL_CERL | CICTL_CIRL | CICTL_CIEL | CICTL_WENL) : 0) |
+		((data & CICTL_WENH) ? (CICTL_CERH | CICTL_CIRH | CICTL_CIEH | CICTL_WENH) : 0);
 
 	m_cictl = (m_cictl & ~mask) | (data & mask);
 }
