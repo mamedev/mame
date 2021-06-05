@@ -76,7 +76,7 @@ void midiin_device::device_timer(timer_instance const &timer, device_timer_id id
 				// we could get called before we're supposed to start; show a countdown
 				attotime delta = m_sequence_start - curtime;
 				popmessage("Waiting to start MIDI playback... %d", delta.seconds());
-				m_timer->adjust(std::min(delta, attotime(1, 0)));
+				m_timer->adjust(std::min(delta, attotime(1)));
 			}
 			else
 			{
@@ -95,7 +95,7 @@ void midiin_device::device_timer(timer_instance const &timer, device_timer_id id
 				// if there are more events, set a timer to trigger them
 				// (minimum duration 1 sec so that our playback time doesn't skip)
 				if (event != nullptr)
-					m_timer->adjust(std::min(event->time() - curtime, attotime(1, 0)));
+					m_timer->adjust(std::min(event->time() - curtime, attotime(1)));
 				else
 					popmessage("End of MIDI file");
 			}
@@ -136,7 +136,7 @@ image_init_result midiin_device::call_load()
 		// TODO: this should perhaps be a driver-configurable parameter?
 		if (m_sequence.parse(reinterpret_cast<u8 *>(ptr()), length()))
 		{
-			m_sequence_start = std::max(machine().time(), attotime(10, 0));
+			m_sequence_start = std::max(machine().time(), attotime(10));
 			m_timer->adjust(attotime::zero);
 			return image_init_result::PASS;
 		}

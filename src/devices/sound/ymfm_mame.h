@@ -38,7 +38,6 @@ public:
 	ym_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_timer{ nullptr, nullptr },
 		m_update_irq(*this),
 		m_io_read{ *this, *this },
 		m_io_write{ *this, *this }
@@ -66,7 +65,7 @@ protected:
 	// engine_mode_write() method
 	virtual void ymfm_sync_mode_write(uint8_t data) override
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(ym_generic_device::fm_mode_write), this), data);
+		m_fm_mode_write.synchronize(data);
 	}
 
 	// the chip implementation calls this when the chip's status has changed,
@@ -79,7 +78,7 @@ protected:
 		// otherwise, do it directly
 		auto &scheduler = machine().scheduler();
 		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(ym_generic_device::fm_check_interrupts), this));
+			m_fm_check_interrupts.synchronize();
 		else
 			m_engine->engine_check_interrupts();
 	}
@@ -91,9 +90,9 @@ protected:
 	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) override
 	{
 		if (duration_in_clocks >= 0)
-			m_timer[tnum]->adjust(attotime::from_ticks(duration_in_clocks, device_t::clock()), tnum);
+			m_timer[tnum].adjust(attotime::from_ticks(duration_in_clocks, device_t::clock()), tnum);
 		else
-			m_timer[tnum]->enable(false);
+			m_timer[tnum].enable(false);
 	}
 
 	// the chip implementation calls this when the state of the IRQ signal has
@@ -143,7 +142,9 @@ protected:
 	{
 		// allocate our timers
 		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ym_generic_device::fm_timer_handler), this));
+			m_timer[tnum].init(*this, FUNC(ym_generic_device::fm_timer_handler));
+		m_fm_mode_write.init(*this, FUNC(ym_generic_device::fm_mode_write));
+		m_fm_check_interrupts.init(*this, FUNC(ym_generic_device::fm_check_interrupts));
 
 		// resolve the handlers
 		m_update_irq.resolve();
@@ -154,16 +155,18 @@ protected:
 	}
 
 	// timer callbacks
-	void fm_mode_write(void *ptr, int param) { m_engine->engine_mode_write(param); }
-	void fm_check_interrupts(void *ptr, int param) { m_engine->engine_check_interrupts(); }
-	void fm_timer_handler(void *ptr, int param) { m_engine->engine_timer_expired(param); }
+	void fm_mode_write(timer_instance const &timer) { m_engine->engine_mode_write(timer.param()); }
+	void fm_check_interrupts(timer_instance const &timer) { m_engine->engine_check_interrupts(); }
+	void fm_timer_handler(timer_instance const &timer) { m_engine->engine_timer_expired(timer.param()); }
 
 	// internal state
 	attotime m_busy_end;             // busy end time
-	emu_timer *m_timer[2];           // two timers
 	devcb_write_line m_update_irq;   // IRQ update callback
 	devcb_read8 m_io_read[2];        // up to 2 input port handlers
 	devcb_write8 m_io_write[2];      // up to 2 output port handlers
+	persistent_timer m_timer[2];     // two timers
+	transient_timer_factory m_fm_mode_write;
+	transient_timer_factory m_fm_check_interrupts;
 };
 
 

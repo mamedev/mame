@@ -142,7 +142,7 @@ private:
 	void ppi_pc_w(u8 data);
 	void recalc_irqs();
 
-	attoseconds_t cv_handler(attotime const &curtime);
+	subseconds cv_handler(attotime const &curtime);
 
 	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
 	u16 m_keyboard_select;
@@ -225,32 +225,28 @@ void psr60_state::ryp4_out_w(u8 data)
 	// modulation, which we simulate in a periodic timer
 }
 
-attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
+subseconds psr60_state::cv_handler(attotime const &cvtime)
 {
-	attotime curtime = cvtime;
-
 	// only two states have been observed to be measured: CT1=1/CT2=0 and CT1=0/CT2=1
 	double bbd_freq;
 	if (BIT(m_bbd_config, 1) && !BIT(m_bbd_config, 2))
 	{
 		// Stereo symphonic off: min freq 35 kHz, max freq 107 kHz, varies at 0,3 Hz
-		curtime.m_seconds %= 3;
-		double pos = curtime.as_double() / 3;
+		double pos = attotime(cvtime.seconds() % 3, cvtime.frac()).as_double() / 3;
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
 		bbd_freq = 35000 + (107000 - 35000) * pos;
 	}
 	else
 	{
 		// Stereo symphonic on: min freq 48 kHz, max freq 61 kHz, varies at 6 Hz
-		curtime.m_seconds = 0;
-		double pos = curtime.as_double() * 6;
+		double pos = cvtime.frac().as_double() * 6;
 		pos -= floor(pos);
 		pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
 		bbd_freq = 48000 + (61000 - 48000) * pos;
 	}
 
 	// BBD driver provides two out-of-phase clocks to basically run the BBD at 2x
-	return HZ_TO_ATTOSECONDS(bbd_freq * 2);
+	return subseconds::from_hz(bbd_freq * 2);
 }
 
 //

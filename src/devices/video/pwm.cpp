@@ -91,7 +91,6 @@ void pwm_display_device::device_start()
 		std::fill(std::begin(bri), std::end(bri), 0.0);
 
 	m_frame_timer = timer_alloc(*this, FUNC(pwm_display_device::frame_tick));
-	m_update_time = machine().time();
 
 	// register for savestates
 	save_item(NAME(m_width));

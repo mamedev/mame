@@ -22,7 +22,7 @@ public:
 	}
 
 protected:
-	using cv_delegate = device_delegate<attoseconds_t (attotime const &)>;
+	using cv_delegate = device_delegate<subseconds (attotime const &)>;
 
 	// internal constructor
 	bbd_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
