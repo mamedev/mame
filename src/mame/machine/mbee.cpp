@@ -262,7 +262,7 @@ void mbee_state::setup_banks(u8 data, bool first_time, u8 b_mask)
 {
 	b_mask &= 7;
 	u32 dbank = m_ramsize / 0x1000;
-	u8 extra_bits = data & 0xc0;
+	u8 extra_bits = (data & 0xc0) & (dbank - 1);
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	u8 *prom = memregion("pals")->base();
