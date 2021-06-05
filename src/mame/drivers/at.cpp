@@ -1823,7 +1823,7 @@ ROM_START( atturbo )
 	// Keyboard BIOS: AWARD
 	ROM_SYSTEM_BIOS(13, "digis286s", "DIGICOM DIGIS 286S")
 	ROMX_LOAD( "80286-286s_turbo_lo.bin", 0x10000, 0x8000, CRC(7ecc1082) SHA1(eb5231e169ab550749c44383da20ab049cdf2a6d), ROM_SKIP(1) | ROM_BIOS(13) )
-	ROMX_LOAD( "80286-286s_turbo_hi.bin", 0x10001, 0x8000, CRC(bea8047e) SHA1(17eb6ab8dbc61e372acdda060b84bc4914980322), ROM_SKIP(1) | ROM_BIOS(13) )	
+	ROMX_LOAD( "80286-286s_turbo_hi.bin", 0x10001, 0x8000, CRC(bea8047e) SHA1(17eb6ab8dbc61e372acdda060b84bc4914980322), ROM_SKIP(1) | ROM_BIOS(13) )
 ROM_END
 
 
@@ -1838,7 +1838,7 @@ ROM_START( peas286 ) // BIOS-String: 286 Modular BIOS Version - REFRESH TIMING E
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROMX_LOAD( "286-s-286-peacock-lo.bin", 0x10000, 0x08000, CRC(78efd1d5) SHA1(3b6c5c6e77a3f77de1c81c0936d7fb2eab7b2487), ROM_SKIP(1) )
 	ROMX_LOAD( "286-s-286-peacock-hi.bin", 0x10001, 0x08000, CRC(5b8ba43a) SHA1(a38ebb1d21f051065ede45643ed394cc5ac1dbf2), ROM_SKIP(1) )
-ROM_END	
+ROM_END
 
 // ID: PC CHIPS M209 - Chipset: UMC UM82C206L, PC 4L50F2052 - BIOS: AMI 286 BIOS 162020 CDTEK - Keyboard BIOS: AMI KEY BOARD BIOS 162020 CDTEK
 // CPU:AMD N80L286-16/S - RAM: SIPP30x4, 1MB DIP - BIOS-ID: S286-6181-101590-K0 - ISA8: 1, ISA16: 6 - OSC: 33.333MHz, 14.31818
@@ -1855,7 +1855,7 @@ ROM_START( asi100b0 ) // BIOS-String: D286-1112-040990-K0
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROMX_LOAD( "asi286_signetics_s-27c256-20fa-l.bin", 0x10000, 0x08000, CRC(54505e72) SHA1(024edd1b435252db38274626c84904422cdb8787), ROM_SKIP(1) )
 	ROMX_LOAD( "asi286_signetics_s-27c256-20fa-h.bin", 0x10001, 0x08000, CRC(9aff417a) SHA1(f74da97c797b0856ee6ff634c40eee6403416e4c), ROM_SKIP(1) )
-ROM_END	
+ROM_END
 
 // ID: Wearnes CL286-12/16S (CL286-12S and CL286-16S) - Chipset: Texas Instruments TACT82206FN / Micrel MIC9212CP, MIC9211CP, MIC9215CP, WD16C785-JT
 // BIOS/Version: AMI 080190 - Keyboard BIOS: KB-BIOS-VER-F - Rom Type : NMC27C256Q x 2, CL286-12S 080190 EVEN CS8A11, CL286-12S 080190 ODD CSD77D
@@ -2194,14 +2194,14 @@ ROM_START( ht12a )
 	ROMX_LOAD( "ht12l.bin", 0x10000, 0x8000, CRC(74fd178a) SHA1(97c8283e574abbed962b701f3e8091fb82823b80),ROM_SKIP(1) | ROM_BIOS(6) )
 	// 7: ID: H286-C3 158 - Chipset: Headland HT12/A3A0050 - BIOS: AMI 286 BIOS SETUP 649963 - Keyboard BIOS: JET ELECTRONICS CO LTD SN 9 0922133
 	// BIOS-String: DH12-1164-083090-K - CPU: AMD N80L286-12/S, FPU socket provided - RAM: SIMM30: 4, 1MB DIP - OSC: 8.000MHZ - ISA8: 1, ISA16: 5
-	ROM_SYSTEM_BIOS(7, "h286c3", "H286-C3") 
+	ROM_SYSTEM_BIOS(7, "h286c3", "H286-C3")
 	ROMX_LOAD( "h286-c3-158-hi.bin", 0x10001, 0x8000, CRC(ec0cbbba) SHA1(97d7f32cb9c622cfbd08909ac67d09a8aa734430),ROM_SKIP(1) | ROM_BIOS(7) )
 	ROMX_LOAD( "h286-c3-158-lo.bin", 0x10000, 0x8000, CRC(dedcf41a) SHA1(ede2c852b3e947ce4efa54640b2e37db83355a6c),ROM_SKIP(1) | ROM_BIOS(7) )
 	// 8: CPU: Harris 286-16, FPU socket provided - Chipset: Headland HT12P-16/A - BIOS: AMIBIOS 03/15/91 - BIOS-String: 20-0000-428022-00101111-031591-HT12-F
 	// RAM: 1MB DIP, 4xSIMM30 - ISA8: 1, ISA16: 6 - OSC: 32.000MHz, 14.31818
 	ROM_SYSTEM_BIOS(8, "8022", "8022") // no display
 	ROMX_LOAD( "20-0000-428022-00101111-031591-ht12 low.bin", 0x10000, 0x8000, CRC(cb74f8e3) SHA1(fc874787f960587ba37442d59af1beebcfd798b9),ROM_SKIP(1) | ROM_BIOS(8) )
-	ROMX_LOAD( "h20-0000-428022-00101111-031591-ht12 high.bin", 0x10001, 0x8000, CRC(36179ed9) SHA1(25968319bcd35ff06a0f0edac6ff0246f3f79c25),ROM_SKIP(1) | ROM_BIOS(8) )	
+	ROMX_LOAD( "h20-0000-428022-00101111-031591-ht12 high.bin", 0x10001, 0x8000, CRC(36179ed9) SHA1(25968319bcd35ff06a0f0edac6ff0246f3f79c25),ROM_SKIP(1) | ROM_BIOS(8) )
 ROM_END
 
 
@@ -2389,7 +2389,7 @@ ROM_END
 // SIIG MiniSys 2000 - Motherboard ID: Labway MS101V1.2 - This is a tiny 286 system, the width of a 3.5" disk drive with an external power supply.
 // A physical switch allows to change between VGA and composite video output.
 // CPU: Intel 286-12 - BIOS: AMIBIOS - Bios string: DH12-1422-061390-K0 - Chipset: Headland HT12/A, Acer M5105 - RAM: 2xSIMM30
-// OSC: 14.31818MHz, 24.000MHz, 24.000, another unreadable - ISA16: 1 (on riser board) - on board: IDE, Floppy, 2xser, par, game, composite, VGA, 
+// OSC: 14.31818MHz, 24.000MHz, 24.000, another unreadable - ISA16: 1 (on riser board) - on board: IDE, Floppy, 2xser, par, game, composite, VGA,
 // ext. FDD (motherboard and I/O board connected with a riser board - Mass storage: 3.5" FDD, 3.5" HDD (e.g. Seagate ST351A/X in AT mode)
 ROM_START( minisys2k )
 	ROM_REGION16_LE(0x20000, "bios", 0)
@@ -2406,13 +2406,13 @@ ROM_START( icldrsm40 ) // no POST, halts
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROMX_LOAD( "icl_m40_l_bin", 0x10000, 0x8000, CRC(1b493570) SHA1(2a3cee0e7a45f07439c54970513e85c9134fee32), ROM_SKIP(1) )
 	ROMX_LOAD( "icl_m40_h.bin", 0x10001, 0x8000, CRC(451421af) SHA1(82d3c94cf04df1b48540fbb3c4d9ad4d6eac8823), ROM_SKIP(1) )
-	
+
 	ROM_REGION( 0x8000, "vga", 0) // WDC WD90C11-LR VGA BIOS
 	ROMX_LOAD( "icl_m40_vga_bios_l.bin", 0x0000, 0x4000, CRC(522c5c02) SHA1(37f8299a0dcf6b028e1012313ae787bc389ed1f2), ROM_SKIP(1) )
 	ROMX_LOAD( "icl_m40_vga_bios_h.bin", 0x0001, 0x4000, CRC(ed29de22) SHA1(80a508a42dc731fc33584ba2da9e478c401e5d47), ROM_SKIP(1) )
 ROM_END
 
-// Twinhead PS-286V Rev 0.1 (used in Twinhead Netstation PC) - Chipset: Twinhead TH4100, TH6260, Zilog Z0765A08PSG FDC, 2x16C450PC, 
+// Twinhead PS-286V Rev 0.1 (used in Twinhead Netstation PC) - Chipset: Twinhead TH4100, TH6260, Zilog Z0765A08PSG FDC, 2x16C450PC,
 // BIOS: Phoenix NEAT - BIOS Version: 3.1003D 3462421, Keyboard BIOS: Phoenix - CPU: Intel N80286-12, FPU socket provided
 // RAM: 8xiT21014-08, 8xSIMM30 - ISA16: 1 - On board: WD VGA, floppy, ide, 2xser, par - Video: WD90C11-LR, IMSG176J-50Z, Twinhead VGA BIOS V1.20, RAM: 2xIntel T21014-08
 // OSC: 14.31818, 24.000MHz - DIP8: on-off-off-off-on-on-on-on
@@ -2420,7 +2420,7 @@ ROM_START( twinnet ) // BIOS-String: Phoenix ROM BIOS PLUS Version 3.10 03 - Twi
 	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROMX_LOAD( "ps-286v_lo.bin", 0x10000, 0x8000, CRC(71920f1b) SHA1(f6d76d10b17df7488c5c70a912403dd45f0afbc3), ROM_SKIP(1) )
 	ROMX_LOAD( "ps-286v_hi.bin", 0x10001, 0x8000, CRC(d79495e3) SHA1(e5d53ae7059502b2259d575ca8e8fdff7f712389), ROM_SKIP(1) )
-	
+
 	ROM_REGION( 0x8000, "vga", 0) // WDC WD90C11-LR VGA BIOS
 	ROM_LOAD( "wdc_vga.bin", 0x0000, 0x8000, CRC(f897048e) SHA1(3baeb553dae4f1c641fb01a16bfe4ae3ca95b13d))
 ROM_END
@@ -2895,7 +2895,7 @@ ROM_START( ct386sx )
 	// Keyboard BIOS: 1988 AMI 1131 KEYBOARD BIOS PLUS - OSC: 32.0000MHz, 40.000MHz, 14.31818 - ISA8: 3, ISA16: 5
 	ROM_SYSTEM_BIOS(4, "neatsx013", "NEATsx-013 PLUS") // initializes the graphics card, then dies
 	ROMX_LOAD( "neatsx-013_l.bin", 0x10000, 0x8000, CRC(7cd4d870) SHA1(c7a5b629dadb43779939043ae4adb5e78c770dc3), ROM_SKIP(1) | ROM_BIOS(4))
-	ROMX_LOAD( "neatsx-013_h.bin", 0x10001, 0x8000, CRC(388587d4) SHA1(8ae6f6b14a2f53438b6a02c4f032088edb2df484), ROM_SKIP(1) | ROM_BIOS(4))	
+	ROMX_LOAD( "neatsx-013_h.bin", 0x10001, 0x8000, CRC(388587d4) SHA1(8ae6f6b14a2f53438b6a02c4f032088edb2df484), ROM_SKIP(1) | ROM_BIOS(4))
 ROM_END
 
 ROM_START( at386 )
@@ -3015,7 +3015,7 @@ ROM_START( pcb303 ) // Phoenix 80386 ROM BIOS PLUS Version 1.10 2715 - 199204111
 	ROM_LOAD( "386-packard-pcb-303.bin", 0x00000, 0x20000, CRC(bbb18c76) SHA1(94f3785c3b96dfe7ab53a97d097bfb17c57229b7))
 ROM_END
 
-// Philips P3239 (aka Headstart / MaxStation / Magnum / Professional 1200, 48CD, 1600, 64CD, P160, SR16CDPhilips 5107-100-36154 (motherboard), 
+// Philips P3239 (aka Headstart / MaxStation / Magnum / Professional 1200, 48CD, 1600, 64CD, P160, SR16CDPhilips 5107-100-36154 (motherboard),
 // 5107-200-35452 (CPU card) - Chipset: VLSI VL82C311-FC2, VL82C107-VC, WD37C65CJM
 // CPU (on card): Intel 386sx-20, FPU socket provided - BIOS: M27C1001, 48805 P3239 - on board: 2xser, par, VGA, Floppy, IDE
 // RAM: 1MB, 1xSIMM72 - VGA on board: CL-GD5325-40QC-A, MUSIC TR9CI710-50DCA, 256KB - OSC: 9.600, 1.8432MHz, 14.31818, 16.000, 40.000 (on CPU card)
@@ -3289,7 +3289,7 @@ ROM_START( alim1419 )
 	// CPU: AMD Am386DX-40, solder pads for Intel 80386 socket provided, FPU socket provided - BIOS: AMI 386DX ISA BIOS AA1458354
 	// BIOS Version: "386DX Subversion 13.19.02 3/23/1993" - BIOS String: 40-0100-001374-00101111-121291-ALI1419-F - Keyboard BIOS: JETkey V3
 	// ISA8: 1, ISA16: 6 - OSC: 14.31818, 80.000 MHz
-	ROM_SYSTEM_BIOS( 3, "c3404", "C3404") // displayed BIOS-String in MAME has -0 instead of -F: this denotes the keyboard controller version http://www.idhw.com/textual/guide/inst_mobo_ami.html 
+	ROM_SYSTEM_BIOS( 3, "c3404", "C3404") // displayed BIOS-String in MAME has -0 instead of -F: this denotes the keyboard controller version http://www.idhw.com/textual/guide/inst_mobo_ami.html
 	ROMX_LOAD( "386c3404.bio", 0x10000, 0x10000, CRC(8005f1f6) SHA1(1c78a7a3f134fd1299b48cd12b08b013c212fa59), ROM_BIOS(3))
 ROM_END
 
@@ -3772,7 +3772,7 @@ ROM_END
 ROM_START( sisrabb )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// 0: BIOS-String: 30-0000-D01128-00101111-070791-SISD-0
-	ROM_SYSTEM_BIOS(0, "3sim001", "3sim001") 
+	ROM_SYSTEM_BIOS(0, "3sim001", "3sim001")
 	ROMX_LOAD( "3sim001.bin", 0x10000, 0x10000, CRC(2982f552) SHA1(f1849c207d8c802faaf8ef628f88b28256e7fb31), ROM_BIOS(0))
 	// 1: PLATO TECHNOLOGY CO., LTD. - Chipset: SiS 'rabbit': SIS 85C320, 85C330, 85C310, 85C206 - CPU: Intel 80386DX-33, FPU: i387DX-33
 	// RAM: 16xSIMM30, Cache: 8xKM688B65P-25, 2xQS8888-25P - BIOS: AMI 386 BIOS Ser# Z403736 - Keyboard BIOS: AMI - BIOS-String: ESIS-1393-040990-K0 / SIS-B 386 BIOS
@@ -3785,13 +3785,13 @@ ROM_END
 // ***** 386 Motherboards  using the Symphony SL82C362 SL82C461 SL82C465 chipset
 
 // FIC 386 SC Rev A2 - Chipset: Symphony SL82C461, SL82C465, SL82C362
-ROM_START( 386sc ) 
+ROM_START( 386sc )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	// 0: BIOS: AMI 386 BIOS Ser.#: ZZ006975, BIOS-String:  30-0200-DF1211-00101111-042591-SYMP-0 / 386DX BIOS for SYMLABS SL82C360 - Keyboard-BIOS: AMI #Z357365
 	// CPU: unreadable, FPU: Cyrix 387DX-25 - OSC: 40.000MHz, 14.31818 - ISA8: 1, ISA16: 7
 	ROM_SYSTEM_BIOS(0, "386sc1", "386SC #1")
 	ROMX_LOAD( "386_sc_symphony.bin", 0x10000, 0x10000, CRC(fabe369c) SHA1(211ff63dd874c273135d1427db3562d752c2bade), ROM_BIOS(0))
-	// 1: ID: FIC 386SC REV A2 MBZ86418 - CPU: AMD 386DX/DXL-40, FPU socket provided - RAM: 8xSIMM30, Cache: 512KB 
+	// 1: ID: FIC 386SC REV A2 MBZ86418 - CPU: AMD 386DX/DXL-40, FPU socket provided - RAM: 8xSIMM30, Cache: 512KB
 	// BIOS Version: AMI 386DX BIOS - ZZ000294 - BIOS String: 30-0200-ZZ1121-00101111-042591-SYMP-0 - 386DX BIOS FOR SYMLABS SL86C360 - ISA8: 1, ISA16: 7 - OSC: 14.31818, 80.000MHz
 	ROM_SYSTEM_BIOS(1, "386sc2", "386SC #2")
 	ROMX_LOAD("fic386sc.bio", 0x10000, 0x10000, CRC(6154adb7) SHA1(96c495d9a9975e1af9b42384712e609e3ffcff4e), ROM_BIOS(1))

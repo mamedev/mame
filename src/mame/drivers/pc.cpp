@@ -507,7 +507,7 @@ Ports: serial, parallel, ext. floppy, RTC (from model 3 up)
 
 ******************************************************************************/
 ROM_START( comdesk ) // set to juko16 specs, changed those to EGA ... period correct and gets comdesk running while the original CGA isn't emulated yet
-    ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROM_LOAD("compaq_bios_revision_j_106265-002.bin", 0xe000, 0x2000, CRC(d861c857) SHA1(62b8f15e5eddc035b51196e79bbca7bb26d73d1f))
 ROM_END
 

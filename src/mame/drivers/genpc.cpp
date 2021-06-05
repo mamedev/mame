@@ -276,7 +276,7 @@ ROM_START(pc)
 	// 45: AMI XT BIOS
 	// 8088-BIOS (C) 1985,1986, AMI - (C)AMI, (1255-013189)
 	ROM_SYSTEM_BIOS(45, "amixt", "AMI XT BIOS")
-	ROMX_LOAD( "ami_8088_bios_31jan89.bin", 0xe000, 0x2000, CRC(0bcafd1f) SHA1(cb30f01c46dad83343999c609d6f82092e2e8f54), ROM_BIOS(45))	
+	ROMX_LOAD( "ami_8088_bios_31jan89.bin", 0xe000, 0x2000, CRC(0bcafd1f) SHA1(cb30f01c46dad83343999c609d6f82092e2e8f54), ROM_BIOS(45))
 	// 46: From a motherboard marked VIP M X M/10
 	// Phoenix ROM BIOS Ver 2.52
 	ROM_SYSTEM_BIOS(46, "vipmxm10", "VIP M X M/10")
