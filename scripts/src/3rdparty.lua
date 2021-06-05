@@ -2273,6 +2273,8 @@ project "ymfm"
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_adpcm.h",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.h",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_fm.ipp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.cpp",
+		MAME_DIR .. "3rdparty/ymfm/src/ymfm_misc.h",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.cpp",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opl.h",
 		MAME_DIR .. "3rdparty/ymfm/src/ymfm_opm.cpp",

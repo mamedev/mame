@@ -2478,6 +2478,28 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="dheadp4" cloneof="dhead">
+		<description>Dynamite Headdy (prototype)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dynamite headdy [proto].bin" size="524288" crc="843556b1" sha1="1f5628e2aa21a3ede186297062caaa400dec2ea2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dheadp3" cloneof="dhead">
+		<description>Dynamite Headdy (prototype, 19940615)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dynamite headdy (prototype - jun 15,  1994).bin" size="524288" crc="7bf339c0" sha1="0e8bccb304898a80efcbae8351303103ec4145ee"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dheadp2" cloneof="dhead">
 		<description>Dynamite Headdy (prototype, 19940701)</description>
 		<year>1994</year>
@@ -2496,17 +2518,6 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dynamite headdy (prototype - jul 05,  1994).bin" size="524288" crc="c7bea89a" sha1="59807e03d32837db34e2912d0e85db812edf823c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dheadp3" cloneof="dhead">
-		<description>Dynamite Headdy (prototype, 19940615)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="dynamite headdy (prototype - jun 15,  1994).bin" size="524288" crc="7bf339c0" sha1="0e8bccb304898a80efcbae8351303103ec4145ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4954,6 +4965,17 @@ a certain item) -->
 			<feature name="ic1" value="MPR-15771" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15771.ic1" size="524288" crc="07494f2a" sha1="ef634649b846b3f49d2c68739b36019e4fae0464"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkp" cloneof="mk">
+		<description>Mortal Kombat (prototype)</description>
+		<year>1993</year>
+		<publisher>Arena</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mortal kombat [proto].bin" size="524288" crc="16db4f6a" sha1="0d2ca2de933993ed45b20ef736237bc774dd3914"/>
 			</dataarea>
 		</part>
 	</software>

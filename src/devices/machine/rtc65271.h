@@ -63,6 +63,8 @@ private:
 
 	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
+
+	optional_region_ptr<u8> m_default_data;
 };
 
 // device type definition

@@ -524,6 +524,7 @@ lc80.cpp
 lcmate2.cpp
 leapfrog_iquest.cpp
 leapfrog_leappad.cpp
+leapfrog_leapster_explorer.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
@@ -1150,6 +1151,7 @@ vta2000.cpp
 vtech1.cpp
 vtech2.cpp
 vtech_eu3a12.cpp
+vtech_innotab.cpp
 wangpc.cpp
 wicat.cpp
 wizard.cpp
@@ -1175,6 +1177,7 @@ xbase09.cpp
 xbox.cpp
 xerox820.cpp
 xor100.cpp
+yes.cpp
 ymdx11.cpp
 ymmu100.cpp
 ymmu5.cpp

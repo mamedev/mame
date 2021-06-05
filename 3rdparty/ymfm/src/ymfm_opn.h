@@ -257,59 +257,6 @@ using opna_registers = opn_registers_base<true>;
 
 
 //*********************************************************
-//  SSG IMPLEMENTATION CLASSES
-//*********************************************************
-
-// ======================> ym2149
-
-// ym2149 is just an SSG with no FM part, but we expose FM-like parts so that it
-// integrates smoothly with everything else; they just don't do anything
-class ym2149
-{
-public:
-	static constexpr uint32_t OUTPUTS = ssg_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
-	using output_data = ymfm_output<OUTPUTS>;
-	using output_data_ssg = ymfm_output<SSG_OUTPUTS>;
-
-	// constructor
-	ym2149(ymfm_interface &intf);
-
-	// configuration
-	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
-
-	// reset
-	void reset();
-
-	// save/restore
-	void save_restore(ymfm_saved_state &state);
-
-	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER / 8; }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER; }
-
-	// read access
-	uint8_t read_data();
-	uint8_t read(uint32_t offset);
-
-	// write access
-	void write_address(uint8_t data);
-	void write_data(uint8_t data);
-	void write(uint32_t offset, uint8_t data);
-
-	// generate one sample of sound
-	void generate(output_data *output, uint32_t numsamples = 1);
-	void generate_ssg(output_data_ssg *output, uint32_t numsamples = 1);
-
-protected:
-	// internal state
-	uint8_t m_address;               // address register
-	ssg_engine m_ssg;                // SSG engine
-};
-
-
-
-//*********************************************************
 //  OPN IMPLEMENTATION CLASSES
 //*********************************************************
 

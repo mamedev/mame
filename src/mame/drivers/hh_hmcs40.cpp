@@ -91,7 +91,7 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same game:
+ROM source notes when dumped from another publisher, but confident it's the same:
 - gckong: CGL Super Kong
 - ghalien: CGL Earth Invaders
 - kingman: Tandy Kingman

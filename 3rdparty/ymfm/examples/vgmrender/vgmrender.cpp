@@ -5,15 +5,15 @@
 //
 // Compile with:
 //
-//   g++ --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//   g++ --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
-//   clang --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
+//   clang --std=c++14 -I../../src vgmrender.cpp em_inflate.cpp ../../src/ymfm_misc.cpp ../../src/ymfm_opl.cpp ../../src/ymfm_opm.cpp ../../src/ymfm_opn.cpp ../../src/ymfm_adpcm.cpp ../../src/ymfm_pcm.cpp ../../src/ymfm_ssg.cpp -o vgmrender.exe
 //
 // or:
 //
-//   cl -I..\..\src vgmrender.cpp em_inflate.cpp ..\..\src\ymfm_opl.cpp ..\..\src\ymfm_opm.cpp ..\..\src\ymfm_opn.cpp ..\..\src\ymfm_adpcm.cpp ..\..\src\ymfm_pcm.cpp ..\..\src\ymfm_ssg.cpp /Od /Zi /std:c++14 /EHsc
+//   cl -I..\..\src vgmrender.cpp em_inflate.cpp ..\..\src\ymfm_misc.cpp ..\..\src\ymfm_opl.cpp ..\..\src\ymfm_opm.cpp ..\..\src\ymfm_opn.cpp ..\..\src\ymfm_adpcm.cpp ..\..\src\ymfm_pcm.cpp ..\..\src\ymfm_ssg.cpp /Od /Zi /std:c++14 /EHsc
 //
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -26,6 +26,7 @@
 #include <string>
 
 #include "em_inflate.h"
+#include "ymfm_misc.h"
 #include "ymfm_opl.h"
 #include "ymfm_opm.h"
 #include "ymfm_opn.h"

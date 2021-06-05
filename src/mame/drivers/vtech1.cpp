@@ -95,7 +95,6 @@ protected:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	uint8_t lightpen_r(offs_t offset);
 	uint8_t keyboard_r(offs_t offset);
 	virtual void latch_w(uint8_t data);
 	uint8_t vram_r(memory_share_creator<uint8_t> &vram, offs_t offset);
@@ -228,12 +227,6 @@ SNAPSHOT_LOAD_MEMBER(vtech1_base_state::snapshot_cb)
     INPUTS
 ***************************************************************************/
 
-uint8_t vtech1_base_state::lightpen_r(offs_t offset)
-{
-	logerror("vtech1_lightpen_r(%d)\n", offset);
-	return 0xff;
-}
-
 uint8_t vtech1_base_state::keyboard_r(offs_t offset)
 {
 	uint8_t result = 0x3f;
@@ -340,10 +333,13 @@ void laser310h_state::machine_start()
 
 void vtech1_base_state::laser110_mem(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom(); // basic rom
+	map(0x4000, 0x67ff).noprw(); // cartridge space
 	map(0x6800, 0x6fff).rw(FUNC(vtech1_base_state::keyboard_r), FUNC(vtech1_base_state::latch_w));
 	map(0x7000, 0x77ff).bankrw("vbank");
 	map(0x7800, 0x7fff).ram(); // 2k user ram
+	map(0x8000, 0xffff).noprw(); // expansion ram
 }
 
 void vtech1_base_state::laser210_mem(address_map &map)
@@ -360,8 +356,9 @@ void vtech1_base_state::laser310_mem(address_map &map)
 
 void vtech1_base_state::vtech1_io(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x40, 0x4f).r(FUNC(vtech1_base_state::lightpen_r));
+	map(0x00, 0xff).noprw(); // completely handled by expansion devices
 }
 
 void laser310h_state::vtech1_shrg_mem(address_map &map)
@@ -479,11 +476,11 @@ void vtech1_base_state::vtech1(machine_config &config)
 
 	// peripheral and memory expansion slots
 	VTECH_IOEXP_SLOT(config, m_ioexp);
-	m_ioexp->set_io_space(m_maincpu, AS_IO);
+	m_ioexp->set_iospace(m_maincpu, AS_IO);
 
 	VTECH_MEMEXP_SLOT(config, m_memexp);
-	m_memexp->set_program_space(m_maincpu, AS_PROGRAM);
-	m_memexp->set_io_space(m_maincpu, AS_IO);
+	m_memexp->set_memspace(m_maincpu, AS_PROGRAM);
+	m_memexp->set_iospace(m_maincpu, AS_IO);
 
 	// snapshot
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "vz"));

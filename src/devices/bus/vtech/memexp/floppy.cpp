@@ -21,12 +21,27 @@
 
 DEFINE_DEVICE_TYPE(VTECH_FLOPPY_CONTROLLER, vtech_floppy_controller_device, "vtech_fdc", "Laser/VZ Floppy Disk Controller")
 
-void vtech_floppy_controller_device::map(address_map &map)
+//-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_floppy_controller_device::mem_map(address_map &map)
 {
-	map(0, 0).w(FUNC(vtech_floppy_controller_device::latch_w));
-	map(1, 1).r(FUNC(vtech_floppy_controller_device::shifter_r));
-	map(2, 2).r(FUNC(vtech_floppy_controller_device::rd_r));
-	map(3, 3).r(FUNC(vtech_floppy_controller_device::wpt_r));
+	map.unmap_value_high();
+	map(0x4000, 0x5fff).rom().region("software", 0);
+}
+
+//-------------------------------------------------
+//  io_map - io space address map
+//-------------------------------------------------
+
+void vtech_floppy_controller_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x10, 0x10).w(FUNC(vtech_floppy_controller_device::latch_w));
+	map(0x11, 0x11).r(FUNC(vtech_floppy_controller_device::shifter_r));
+	map(0x12, 0x12).r(FUNC(vtech_floppy_controller_device::rd_r));
+	map(0x13, 0x13).r(FUNC(vtech_floppy_controller_device::wpt_r));
 }
 
 //-------------------------------------------------
@@ -34,7 +49,7 @@ void vtech_floppy_controller_device::map(address_map &map)
 //-------------------------------------------------
 
 ROM_START( floppy )
-	ROM_REGION(0x3000, "software", 0)
+	ROM_REGION(0x2000, "software", 0)
 	ROM_LOAD("vzdos.rom", 0x0000, 0x2000, CRC(b6ed6084) SHA1(59d1cbcfa6c5e1906a32704fbf0d9670f0d1fd8b))
 ROM_END
 
@@ -61,7 +76,12 @@ void vtech_floppy_controller_device::floppy_formats(format_registration &fr)
 
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 {
+	vtech_memexp_device::device_add_mconfig(config);
+
 	VTECH_MEMEXP_SLOT(config, m_memexp);
+	m_memexp->set_memspace(m_mem, AS_PROGRAM);
+	m_memexp->set_iospace(m_io, AS_PROGRAM);
+
 	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_formats);
 }
@@ -76,8 +96,7 @@ void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 vtech_floppy_controller_device::vtech_floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_FLOPPY_CONTROLLER, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this),
+	vtech_memexp_device(mconfig, VTECH_FLOPPY_CONTROLLER, tag, owner, clock),
 	m_memexp(*this, "mem"),
 	m_floppy0(*this, "0"),
 	m_floppy1(*this, "1"),
@@ -91,6 +110,9 @@ vtech_floppy_controller_device::vtech_floppy_controller_device(const machine_con
 
 void vtech_floppy_controller_device::device_start()
 {
+	vtech_memexp_device::device_start();
+
+	// register for save states
 	save_item(NAME(m_latch));
 	save_item(NAME(m_shifter));
 	save_item(NAME(m_latching_inverter));
@@ -101,13 +123,11 @@ void vtech_floppy_controller_device::device_start()
 
 	// TODO: save m_write_buffer and rebuild m_floppy after load
 
-	uint8_t *bios = memregion("software")->base();
-
 	// Obvious bugs... must have worked by sheer luck and very subtle
 	// timings.  Our current z80 is not subtle enough.
-
-	bios[0x1678] = 0x75;
-	bios[0x1688] = 0x85;
+	uint8_t *rom = memregion("software")->base();
+	rom[0x1678] = 0x75;
+	rom[0x1688] = 0x85;
 }
 
 //-------------------------------------------------
@@ -116,10 +136,6 @@ void vtech_floppy_controller_device::device_start()
 
 void vtech_floppy_controller_device::device_reset()
 {
-	program_space().install_rom(0x4000, 0x5fff, memregion("software")->base());
-
-	io_space().install_device(0x10, 0x1f, *this, &vtech_floppy_controller_device::map);
-
 	m_latch = 0x00;
 	m_floppy = nullptr;
 	m_current_cyl = 0;

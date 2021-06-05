@@ -12319,7 +12319,7 @@ GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_meta
 
 GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
 
-GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Seta",                      "Dragon Unit / Castle of Dragon", 0 )
+GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Athena / Seta",             "Dragon Unit / Castle of Dragon", 0 ) // Country/License: DSW
 
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
@@ -12356,7 +12356,7 @@ GAME( 1992, umanclub,  0,        umanclub,  umanclub,  seta_state,     empty_ini
 GAME( 1992, zingzip,   0,        zingzip,   zingzip,   seta_state,     empty_init,     ROT270, "Allumer / Tecmo",           "Zing Zing Zip", 0 ) // This set has Chinese Characters in Title screen, it distributed for Chinese market/or Title: DSW?
 GAME( 1992, zingzipbl, zingzip,  zingzipbl, zingzip,   seta_state,     empty_init,     ROT270, "bootleg",                   "Zing Zing Zip (bootleg)", MACHINE_NOT_WORKING )
 
-GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena ?", 0 )
+GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_init,     ROT0,   "Athena",                    "Athena no Hatena?", 0 )
 
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )

@@ -2181,7 +2181,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3") // This should be Alpha Fighter bonus life (Off 15000, On 10000) - didn't verify though
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, timer_value_r)
@@ -2192,9 +2192,9 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Unknown" ) PORT_DIPLOCATION("SW1:4") // related to soccer frequency (code at 0x4950)
-	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR ( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Final UFO Bonus" )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(vicdual_state, coin_status_r)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -4085,7 +4085,7 @@ ROM_START( alphaho )
 	ROM_LOAD( "cf.bin",       0x3c00, 0x0400, CRC(d03c5a09) SHA1(eebc1d2302bd2bae28c25187bb099ae618c5cd05) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "alphaho.col",  0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "alphaho.col", 0x0000, 0x0020, BAD_DUMP CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) ) // wasn't dumped for this set, use the one from sspacaho (the game Data East cloned and modified) for now
 ROM_END
 
 // Wanted uses 2 sound boards. One from Head On and one from Space Attack. The sound board has the name printed on the bottom

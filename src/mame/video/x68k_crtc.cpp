@@ -196,6 +196,7 @@ void x68k_crtc_device::refresh_mode()
 			logerror("Invalid mode %d", m_reg[20] & 0x1f); [[fallthrough]];
 		case 1:
 		case 5:
+		case 0x11:
 			div = 4;
 			break;
 		case 0x16:
@@ -204,7 +205,6 @@ void x68k_crtc_device::refresh_mode()
 		case 0x10:
 			div = 6;
 			break;
-		case 0x11:
 		case 0x15:
 			div = 3;
 			break;
@@ -225,9 +225,9 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 	if (m_operation & 8)
 		text_copy((m_reg[22] & 0xff00) >> 8, (m_reg[22] & 0x00ff), (m_reg[21] & 0xf));
 
+	int scan = screen().vpos();
 	if (hstate == 1)
 	{
-		int scan = screen().vpos();
 		hsync_time = screen().time_until_pos(scan, m_hend);
 		m_scanline_timer->adjust(hsync_time);
 		if ((scan != 0) && (scan < m_vend))
@@ -235,7 +235,11 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 	}
 	if (hstate == 0)
 	{
-		hsync_time = screen().time_until_pos(screen().vpos() + 1, m_hbegin);
+		if (scan == (m_vtotal - 1))
+			scan = 0;
+		else
+			scan++;
+		hsync_time = screen().time_until_pos(scan, m_hbegin);
 		m_scanline_timer->adjust(hsync_time, 1);
 	}
 }
@@ -434,6 +438,8 @@ u16 x68k_crtc_device::crtc_r(offs_t offset)
 		switch (offset)
 		{
 		case 9:
+			if (machine().side_effects_disabled())
+				return m_reg[9];
 			return 0;
 		case 10:  // Text X/Y scroll
 		case 11:

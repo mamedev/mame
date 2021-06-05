@@ -21,7 +21,7 @@
 
 // ======================> vtech_rs232_interface_device
 
-class vtech_rs232_interface_device : public device_t, public device_vtech_memexp_interface
+class vtech_rs232_interface_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -31,15 +31,15 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	virtual void mem_map(address_map &map) override;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
+	required_device<rs232_port_device> m_rs232;
+	
 	uint8_t receive_data_r();
 	void transmit_data_w(uint8_t data);
-
-	required_device<rs232_port_device> m_rs232;
-
+	
 	int m_rx;
 };
 

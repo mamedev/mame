@@ -81,16 +81,16 @@ void pcm_registers::cache_channel_data(uint32_t choffs, pcm_cache &cache)
 	int32_t panpot = int8_t(ch_panpot(choffs) << 4) >> 4;
 	if (panpot >= 0)
 	{
-		cache.pan_left = (panpot == 7) ? 96 : 3 * panpot;
+		cache.pan_left = (panpot == 7) ? 0x3ff : 0x20 * panpot;
 		cache.pan_right = 0;
 	}
 	else if (panpot >= -7)
 	{
 		cache.pan_left = 0;
-		cache.pan_right = (panpot == -7) ? 96 : -3 * panpot;
+		cache.pan_right = (panpot == -7) ? 0x3ff : -0x20 * panpot;
 	}
 	else
-		cache.pan_left = cache.pan_right = 96;
+		cache.pan_left = cache.pan_right = 0x3ff;
 
 	// determine the LFO stepping value; this how much to add to a running
 	// x.18 value for the LFO; steps were derived from frequencies in the

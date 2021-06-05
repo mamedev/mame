@@ -10320,7 +10320,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2020-01-20"/>
-		<sharedfeat name="compatibility" value=",A2P,A2E,A2EE,A2C,A2GS"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple II+ with 48K. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -10594,7 +10594,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2020-02-06"/>
-		<sharedfeat name="compatibility" value="A2fP,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">

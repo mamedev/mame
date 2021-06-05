@@ -20,7 +20,7 @@
 
 // ======================> vtech_wordpro_device
 
-class vtech_wordpro_device : public device_t, public device_vtech_memexp_interface
+class vtech_wordpro_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
@@ -29,7 +29,8 @@ public:
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	virtual void mem_map(address_map &map) override;
 };
 
 // device type definition

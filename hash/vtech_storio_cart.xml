@@ -36,7 +36,7 @@ license:CC0
 	       | 80-280123(??)   | Toy Story 3 (Netherlands)
 	       | 80-280200(US)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
 	       | 80-280203(UK)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
-	       | 80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
+	  XX   | 80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
 	       | 80-280303(UK)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
 	       | 80-280304(GER)  | Disney Fairies - Tinkerbell Ein Sommer Voller Abenteuer
 	       | 80-280323(??)   | Disney Fairies - Tinkerbell en de Grote Reddingsoperatie (Netherlands)
@@ -50,19 +50,19 @@ license:CC0
 	       | 80-280700(US)   | The Little Engine That Could
 	       | 80-280804(GER)  | Rufus in der Stadt (Storio Pack-in cart)
 	       | 80-280???(??)   | Rufus arriva in città (Italy, Storio Pack-in cart, product code unconfirmed)
-	       | 80-280900(US)   | Dora the Explorer - Dora and the Three Little Pigs
+	  XX   | 80-280900(US)   | Dora the Explorer - Dora and the Three Little Pigs
 	       | 80-280903(UK)   | Dora the Explorer - Dora and the Three Little Pigs
 	  XX   | 80-280904(GER)  | Dora - Dora und die drei Schweinchen
 	       | 80-280905(FR)   | Dora l'exploratrice - Dora et les trois petit cochons
 	       | 80-280922(SP)   | Dora la exploradora - Dora y los Tres Cerditos
 	       | 80-280923(??)   | Dora - Dora en de Drie Kleine Biggetjes (Netherlands)
-	       | 80-281000(US)   | Mickey Mouse Clubhouse
+	  XX   | 80-281000(US)   | Mickey Mouse Clubhouse
 	       | 80-281003(UK)   | Mickey Mouse Clubhouse
 	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
 	       | 80-281005(FR)   | La Maison de Mickey
 	       | 80-281022(SP)   | La casa de Mickey Mouse
 	       | 80-281023(??)   | Mickey Mouse Clubhuis - Mickey zoekt en vindt! (Netherlands)
-	       | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
+	  XX   | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenk
 	       | 80-281105(FR)   | Disney Princess - Une surprise pour Belle / Un cadeau qui vient du coeur
@@ -89,7 +89,7 @@ license:CC0
 	       | 80-281723(??)   | De Pinguïns van Madagascar - De Helm (Netherlands)
 	       | 80-281800(US)   | Kung Fu Panda 2
 	       | 80-281803(UK)   | Kung Fu Panda 2
-	       | 80-281900(US)   | Disney/Pixar Cars 2
+	  XX   | 80-281900(US)   | Disney/Pixar Cars 2
 	       | 80-281903(UK)   | Disney/Pixar Cars 2
 	       | 80-281904(GER)  | Disney/Pixar Cars 2
 	       | 80-281905(FR)   | Disney/Pixar Cars 2
@@ -109,7 +109,7 @@ license:CC0
 	       | 80-282222(SP)   | Madagascar 3 - De marcha por Europa
 	       | 80-282223(??)   | Madagascar 3 - Op Avontuur in Europa (Netherlands)
 	       | 80-282300(US)   | Dinosaur Train - T.Rex Teeth
-	       | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
+	  XX   | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung!
 	       | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty
@@ -135,29 +135,70 @@ license:CC0
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (SP).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" offset="0" />
+				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (SP).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="doragr" supported="no">
+	<software name="dora3pig" supported="no">
+		<description>Dora and the 3 Little Pigs (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-280900(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_dora_and_the_3_little_pigs_n23512t_c276.bin" size="0x4200000" crc="b46e42c8" sha1="292d9fc201448df38c03e530a69ead497b477a1c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doragr" cloneof="dora3pig" supported="no">
 		<description>Dora und die drei Schweinchen (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-280904 - Dora und die drei Schweinchen (GER).bin" size="0x4200000" crc="34f85a56" sha1="93b27d5c2a5b9e23470a3cb48099e3aa1f36bde6" offset="0" />
+				<rom name="80-280904 - Dora und die drei Schweinchen (GER).bin" size="0x4200000" crc="34f85a56" sha1="93b27d5c2a5b9e23470a3cb48099e3aa1f36bde6" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mickeychgr" supported="no">
+	<software name="mmclub" supported="no">
+		<description>Mickey Mouse Clubhouse (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-281000(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_mickey_mouse_clubhouse_n231gt_c276.bin" size="0x4200000" crc="67dea606" sha1="cdee41449bd5ba15fd8b9e5e6ca4ad2836397eae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
+	     the data structure is very different, and doesn't start with the FAT16 filesystem?
+		 does the system BIOS detect different cartridge types and handle them in different ways? -->
+	<software name="mmcluba" cloneof="mmclub" supported="no">
+		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-281000(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_mickey_mouse_clubhouse_h27u518s2ctr_ad76.bin" size="0x4200000" crc="8b7eb4b5" sha1="f68d4e826b786710d0bea6669ab62648b0a09ff1" />
+			</dataarea>
+		</part>
+	</software>
+
+	
+
+	<software name="mickeychgr" cloneof="mmclub" supported="no">
 		<description>Micky Maus Wunderhaus (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-281004 - Micky Maus Wunderhaus (GER).bin" size="0x4200000" crc="036fc056" sha1="28f5b7c13eaceadeca5f4e8ec8b1ef2f2d85d1ba" offset="0" />
+				<rom name="80-281004 - Micky Maus Wunderhaus (GER).bin" size="0x4200000" crc="036fc056" sha1="28f5b7c13eaceadeca5f4e8ec8b1ef2f2d85d1ba" />
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +209,7 @@ license:CC0
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-281404 - Spongebob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" offset="0" />
+				<rom name="80-281404 - Spongebob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" />
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +220,55 @@ license:CC0
 		<publisher>VTech</publisher>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
-				<rom name="80-281504 - Rapunzel - Neu verfohnt (GER).bin" size="0x4200000" crc="70fd0039" sha1="85823b4fcbcb3ff644154c3c0f3f3bd962846e50" offset="0" />
+				<rom name="80-281504 - Rapunzel - Neu verfohnt (GER).bin" size="0x4200000" crc="70fd0039" sha1="85823b4fcbcb3ff644154c3c0f3f3bd962846e50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2" supported="no">
+		<description>Cars 2 (USA)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-281900(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="v.reader_cars_2_n231gt_c279.bin" size="0x8400000" crc="c59126cc" sha1="8bd36e0dc2633ebf8ec6ac4d05edc6a60ca94e45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hkitty" supported="no">
+		<description>Hello Kitty's Surprise (USA)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-282400(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_Hello_Kittys_Surprise_GPR27P512A_c276.bin" size="0x4200000" crc="f8ecdc4e" sha1="9e5b60f03a2526225b621f7bd3e52cad53afeda4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dprinc" supported="no">
+		<description>Disney Princess - A Gift From The Heart &amp; Belle's Special Treat (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-281100(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_Princess_Gift_From_the_Heart_Belles_Special_Treat_GPR27P512A_c276.bin" size="0x4200000" crc="43159ded" sha1="dec9f3cafa4382fabb2a7596d9b35ec2292b4b0c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbell" supported="no">
+		<description>TinkerBell and the Great Fairy Rescue (USA)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-280300(US)"/>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="v.reader_tinkerbell_great_fairy_rescue_n23512t_c276.bin" size="0x4200000" crc="79989a39" sha1="25d6a200556f8aa8784a4e86e25e65d80c797e50" />
 			</dataarea>
 		</part>
 	</software>

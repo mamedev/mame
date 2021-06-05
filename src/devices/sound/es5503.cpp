@@ -352,7 +352,7 @@ u8 es5503_device::read(offs_t offset)
 					}
 				}
 
-				return retval;
+				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
 				return oscsenabled<<1;

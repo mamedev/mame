@@ -7,7 +7,7 @@ Quickloads for the Microbee non-disk models. These extensions are supported: BEE
 
 Compatibility flags:
 1 = mbee
-2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s
+2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s, mbeeppc
 
 If no flag is specified, it's assumed it works on all of them.
 
@@ -16,7 +16,9 @@ are monochrome, the colour machines may exhibit coloured or black areas. It's re
 programs on "mbee" so they run at the correct speed. However you can use the other systems if needed. Colour programs
 should be run on colour systems, but most should work on "mbee" where they will appear in monochrome.
 
-Quickloads do not work on disk-based microbees, or on premium models.
+Quickloads do not work on disk-based microbees, or on the Teleterm.
+
+For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select Basic from the menu before loading the game.
 
 -->
 <softwarelist name="mbee_quik" description="Microbee quickload">

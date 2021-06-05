@@ -56,6 +56,7 @@ SOUNDS["VGMVIZ"] = true
 SOUNDS["WAVE"] = true
 SOUNDS["X1_010"] = true
 SOUNDS["Y8950"] = true
+SOUNDS["YM2154"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2414"] = true
 SOUNDS["YM3806"] = true

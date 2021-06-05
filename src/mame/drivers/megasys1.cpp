@@ -2157,7 +2157,7 @@ interrupts: 1] 1aa  2] 1b4
 ***************************************************************************/
 
 
-ROM_START( astyanax )
+ROM_START( astyanax )  // EPROM version
 	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "astyan2.bin", 0x00000, 0x20000, CRC(1b598dcc) SHA1(f6b733d9b0e81226eb784aaddda1791e3e95b816) )
 	ROM_LOAD16_BYTE( "astyan1.bin", 0x00001, 0x20000, CRC(1a1ad3cf) SHA1(e094b4528e6f36eb30bfc148f2ad50d876e9280a) )
@@ -2204,6 +2204,43 @@ ROM_START( astyanax )
 	ROM_LOAD( "rd.bpr",       0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
 
+ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, here for completeness
+	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "astyan2.bin", 0x00000, 0x20000, CRC(1b598dcc) SHA1(f6b733d9b0e81226eb784aaddda1791e3e95b816) )
+	ROM_LOAD16_BYTE( "astyan1.bin", 0x00001, 0x20000, CRC(1a1ad3cf) SHA1(e094b4528e6f36eb30bfc148f2ad50d876e9280a) )
+	ROM_LOAD16_BYTE( "astyan3.bin", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
+	ROM_LOAD16_BYTE( "astyan4.bin", 0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
+	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // M50747 MCU Code
+	ROM_LOAD( "m50747", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "14.bin", 0x00000, 0x80000, CRC(37388363) SHA1(13526b60cf1a1189c8783a4f802dcb63deacbed0) )
+
+	ROM_REGION( 0x80000, "scroll1", 0 )
+	ROM_LOAD( "18.bin", 0x00000, 0x80000, CRC(76932191) SHA1(b14fcccef1c446cdd7df6c118152d218c36f7375) )
+
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "astyan19.bin", 0x000000, 0x020000, CRC(98158623) SHA1(e9088d0d4b8c07bd21398f68966cb8633716a9b7) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "23.bin", 0x00000, 0x80000, CRC(9bd34a6b) SHA1(ef23a23a54552d98ce7967bba21130969f729b2b) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) // Samples
+	ROM_LOAD( "10.bin", 0x00000, 0x40000, CRC(d888ab84) SHA1(38657a242a7fc2c23a84d27c5352123e5e11993f) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x40000 )
+
+	ROM_REGION( 0x40000, "oki2", 0 ) // Samples
+	ROM_LOAD( "8.bin", 0x00000, 0x40000, CRC(8d060fe9) SHA1(89bc6e4b34e766addb9233cbc57d5634c781cc5a) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x40000 )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // Priority PROM
+	ROM_LOAD( "rd.bpr", 0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+ROM_END
 
 ROM_START( lordofk )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
@@ -5030,7 +5067,8 @@ GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, ini
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, iganinjub,kazan,    system_A_iganinju, kazan,    megasys1_state, empty_init   , ROT0,   "bootleg","Iga Ninjyutsuden (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, astyanaxa,astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofkb, astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the two audio CPU ROMs are suspect. May be bootleg crappiness, but doubtful
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )

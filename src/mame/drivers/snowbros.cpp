@@ -2783,7 +2783,7 @@ ROM_START( ballboy )
 ROM_END
 
 
-ROM_START( ballboy3p ) //PCB etched JOYCUS10 (or JOYCU510) 2081627 (0, 6 and 8 aren't clearly readable)
+ROM_START( ballboy3p ) //PCB etched JOYCUS1B and 2001927
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "ur4",  0x00000, 0x20000, CRC(32153d8f) SHA1(1fa698b93507fb775dfff6da8701ab65c986cac5) )
 	ROM_LOAD16_BYTE( "ur3",  0x00001, 0x20000, CRC(4d462a75) SHA1(30a84a618bea5c64201329d02847382c2d0c84ba) )
