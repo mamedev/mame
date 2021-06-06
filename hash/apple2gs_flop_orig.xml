@@ -47,7 +47,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="marblmad">
+	<software name="marbl">
 		<description>Marble Madness</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
@@ -82,7 +82,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tonetown">
+	<software name="tasstime">
 		<description>Tass Times in Tonetown</description>
 		<year>1986</year>
 		<publisher>Activision</publisher>
@@ -131,7 +131,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="batlches">
+	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1989</year>
 		<publisher>Interplay</publisher>
@@ -165,7 +165,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="blkout">
+	<software name="blockout">
 		<description>Block Out</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
@@ -199,7 +199,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="alnmind">
+	<software name="alienmnd">
 		<description>Alien Mind</description>
 		<year>1988</year>
 		<publisher>PBI Software</publisher>
@@ -259,7 +259,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="uninvitd">
+	<software name="uninvite">
 		<description>Uninvited</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
@@ -382,7 +382,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="caligmes">
+	<software name="calgames">
 		<description>California Games</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -399,7 +399,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="seastrk">
+	<software name="seastrke">
 		<description>Sea Strike</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
@@ -416,7 +416,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tstdrv2">
+	<software name="td2">
 		<description>The Duel: Test Drive II</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -452,7 +452,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="keefthf">
+	<software name="keef">
 		<description>Keef the Thief</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
@@ -476,7 +476,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gprxcrct">
+	<software name="gpcirc">
 		<description>Grand Prix Circuit</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -493,7 +493,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="crystqst">
+	<software name="crstlqst">
 		<description>Crystal Quest</description>
 		<year>1989</year>
 		<publisher>Cassidy and Greene</publisher>
@@ -510,7 +510,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="impmsn2">
+	<software name="impmiss2">
 		<description>Impossible Mission II</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
@@ -544,7 +544,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="redoct">
+	<software name="redoctbr">
 		<description>The Hunt for Red October</description>
 		<year>1989</year>
 		<publisher>The Software Toolworks</publisher>
@@ -560,7 +560,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fnlasslt">
+	<software name="finalass">
 		<description>Final Assault</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -576,7 +576,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="darkcast">
+	<software name="darkcstl">
 		<description>Dark Castle</description>
 		<year>1989</year>
 		<publisher>Three Sixty</publisher>
@@ -599,7 +599,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="silsrv">
+	<software name="slntsvce">
 		<description>Silent Service</description>
 		<year>1987</year>
 		<publisher>Microprose</publisher>
@@ -638,7 +638,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="balpowgs">
+	<software name="bop90s">
 		<description>Balance of Power: The 1990 Edition</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
@@ -654,7 +654,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="brdg62gs">
+	<software name="bridge6">
 		<description>Bridge 6.0 (Version 2.49B)</description>
 		<year>1989</year>
 		<publisher>Artworx</publisher>
@@ -670,7 +670,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="qstrn2gs">
+	<software name="qustron2">
 		<description>Questron II (Version 1.1)</description>
 		<year>1988</year>
 		<publisher>Strategic Simulations</publisher>
@@ -686,7 +686,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rchst2gs">
+	<software name="rchstars">
 		<description>Reach for the Stars</description>
 		<year>1988</year>
 		<publisher>Strategic Studies Group</publisher>
@@ -702,7 +702,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rwar2kgs">
+	<software name="roadwr2k">
 		<description>Roadwar 2000</description>
 		<year>1987</year>
 		<publisher>Strategic Simulations</publisher>
@@ -718,7 +718,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="siceh2gs">
+	<software name="sshockey">
 		<description>Superstar Ice Hockey</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
@@ -734,7 +734,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lfdth2gs">
+	<software name="lifendth">
 		<description>Life and Death</description>
 		<year>1989</year>
 		<publisher>The Software Toolworks</publisher>
@@ -757,7 +757,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisgs">
+	<software name="tetris">
 		<description>Tetris</description>
 		<year>1988</year>
 		<publisher>Spectrum HoloByte</publisher>
@@ -773,7 +773,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lasfrcgs">
+	<software name="lasrforc">
 		<description>LaserForce</description>
 		<year>1989</year>
 		<publisher>Fanfare</publisher>
@@ -796,7 +796,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ark22gs">
+	<software name="arknoid2u">
 		<description>Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -812,7 +812,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bublg2gs">
+	<software name="bghost">
 		<description>Bubble Ghost</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
@@ -828,7 +828,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dejav2gs">
+	<software name="dejavu">
 		<description>Déjà Vu</description>
 		<year>1988</year>
 		<publisher>ICOM Simulations</publisher>
@@ -851,7 +851,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hack22gs">
+	<software name="hacker2">
 		<description>Hacker II</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
@@ -867,7 +867,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="destr2gs">
+	<software name="destryr">
 		<description>Destroyer</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
@@ -883,7 +883,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gbabskgs">
+	<software name="gbabsktb">
 		<description>GBA Championship Basketball</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
@@ -899,7 +899,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jigs2gs">
+	<software name="jigsaw">
 		<description>Jigsaw</description>
 		<year>1988</year>
 		<publisher>Britannica Software</publisher>
@@ -922,7 +922,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="minip2gs">
+	<software name="miniputt">
 		<description>Mini-Putt</description>
 		<year>1988</year>
 		<publisher>Accolade</publisher>
@@ -938,7 +938,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="omga2gs">
+	<software name="omega">
 		<description>Omega</description>
 		<year>1988</year>
 		<publisher>Origin Systems</publisher>
@@ -954,7 +954,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pnx146gs">
+	<software name="phtnx146">
 		<description>Photonix (Version 1.46)</description>
 		<year>1989</year>
 		<publisher>Free Tools Association</publisher>
@@ -970,7 +970,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="silph2hs">
+	<software name="silpheed">
 		<description>Silpheed</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -993,7 +993,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sq12gs">
+	<software name="spquest">
 		<description>Space Quest</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1016,7 +1016,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="3rdc2gs">
+	<software name="thrdcrir">
 		<description>The Third Courier</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -1039,7 +1039,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="warmdegs">
+	<software name="warmidle">
 		<description>War in Middle Earth</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
@@ -1062,7 +1062,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cswld2gs">
+	<software name="carmnwld">
 		<description>Where in the World is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -1085,7 +1085,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wndwk2gs">
+	<software name="windwlkr">
 		<description>Windwalker</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
@@ -1108,7 +1108,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="warlk2gs">
+	<software name="warlock">
 		<description>Warlock</description>
 		<year>1988</year>
 		<publisher>Three-Sixty Pacific</publisher>
@@ -1124,7 +1124,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wntg2gs">
+	<software name="wingames">
 		<description>Winter Games</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
@@ -1140,7 +1140,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="shngh2gs">
+	<software name="shanghai">
 		<description>Shanghai</description>
 		<year>1987</year>
 		<publisher>Activision</publisher>
@@ -1156,7 +1156,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pq12gs">
+	<software name="pquest">
 		<description>Police Quest</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1179,7 +1179,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="drgwr2gs">
+	<software name="drgnwars">
 		<description>Dragon Wars</description>
 		<year>1990</year>
 		<publisher>Interplay Productions</publisher>
@@ -1195,7 +1195,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="monte2gs">
+	<software name="monte">
 		<description>Monte Carlo</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
@@ -1211,7 +1211,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sbsim2gs">
+	<software name="subbatl">
 		<description>Sub Battle Simulator</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
@@ -1227,7 +1227,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jeqrt2gs">
+	<software name="jelwayqb">
 		<description>John Elway's Quarterback</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
@@ -1243,7 +1243,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sq22gs">
+	<software name="spquest2">
 		<description>Space Quest II</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1266,7 +1266,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kq32gs">
+	<software name="kingqst3">
 		<description>King's Quest III</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1289,7 +1289,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gwsht2gs">
+	<software name="gwshoot">
 		<description>Great Western Shootout</description>
 		<year>1989</year>
 		<publisher>Britannica Software</publisher>
@@ -1312,7 +1312,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lsl12gs">
+	<software name="lslarry">
 		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1335,7 +1335,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="blkc2gs">
+	<software name="bcauldrn">
 		<description>The Black Cauldron</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1358,7 +1358,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kngc2gs">
+	<software name="kingchgo">
 		<description>The King of Chicago</description>
 		<year>1988</year>
 		<publisher>Cinemaware</publisher>
@@ -1379,7 +1379,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kq42gs">
+	<software name="kingqst4">
 		<description>King's Quest IV: The Perils of Rosella</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1408,7 +1408,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="ss1beynd">
+<software name="starsg1">
 		<description>Star Saga: One - Beyond The Boundary (Version 1.1)</description>
 		<year>1987</year>
 		<publisher>Masterplay Publishing Corporation</publisher>
@@ -1440,7 +1440,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="twrmyra">
+<software name="twrmyrgl">
 		<description>The Tower of Myraglen</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
@@ -1463,7 +1463,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="dwnhillc">
+<software name="dhilchl">
 		<description>Downhill Challenge</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -1486,7 +1486,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="wtgolf">
+<software name="wltrgolf">
 		<description>World Tour Golf</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
@@ -1606,7 +1606,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="arknoid2">
+<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
@@ -1622,7 +1622,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="jackn18g">
+<software name="nicklaus">
 		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -1645,7 +1645,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hostager">
+<software name="hostage">
 		<description>Hostage: Rescue Mission</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
@@ -1661,7 +1661,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="capblood">
+<software name="captbld">
 		<description>Captain Blood</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
@@ -1677,7 +1677,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="crmnsusa">
+<software name="carmnusa">
 		<description>Where in the U.S.A. is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -1700,7 +1700,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="brdstlun">
+<software name="brdtale">
 		<description>The Bard's Tale: Tales of the Unknown</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
@@ -1732,7 +1732,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="drmzone">
+<software name="dreamzne">
 		<description>Dream Zone</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
@@ -1755,7 +1755,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="manhny">
+<software name="manhuntr">
 		<description>Manhunter: New York</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1825,7 +1825,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hoverbld">
+<software name="hvrblade">
 		<description>Hover Blade</description>
 		<year>1991</year>
 		<publisher>MCX</publisher>
@@ -1848,7 +1848,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="fstbreak">
+<software name="fastbrk">
 		<description>Fast Break</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -1864,7 +1864,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hmonte">
+<software name="hallsmzm">
 		<description>Halls of Montezuma</description>
 		<year>1990</year>
 		<publisher>Strategic Simulations</publisher>
@@ -1887,7 +1887,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="ss2tcm">
+<software name="starsg2">
 		<description>Star Saga: Two - The Clathran Menace</description>
 		<year>1988</year>
 		<publisher>MasterPlay Publishing Corporation</publisher>
@@ -1903,7 +1903,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="cbackg">
+<software name="clbbgmn">
 		<description>Club Backgammon</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
@@ -1919,7 +1919,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="bzorkcoq">
+<software name="byondzrk">
 		<description>Beyond Zork: The Coconut of Quendor (Revision 57 / 871221)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
@@ -1935,7 +1935,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="2088tcm2">
+<software name="crylmsn2">
 		<description>2088: The Cryllan Mission - The Second Scenario</description>
 		<year>1990</year>
 		<publisher>Victory Software</publisher>
@@ -1987,7 +1987,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="sktordie">
+<software name="skatedie">
 		<description>Skate or Die</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
@@ -2003,7 +2003,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="sssoccer">
+<software name="strsoccr">
 		<description>Street Sports Soccer</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -2019,7 +2019,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="ootworld">
+<software name="ootw">
 		<description>Out of this World</description>
 		<year>1992</year>
 		<publisher>Interplay Productions</publisher>
@@ -2058,7 +2058,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="tunlarma">
+<software name="tunarmg">
 		<description>Tunnels of Armageddon (Version 1.0)</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
