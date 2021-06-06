@@ -204,6 +204,18 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector
 		return false;
 
 	const format &f = formats[type];
+	int max_tracks, max_heads;
+	image->get_maximal_geometry(max_tracks, max_heads);
+
+	if(f.track_count > max_tracks) {
+		osd_printf_error("wd177x_format: Number of tracks in image file too high for floppy drive (%d > %d)\n", f.track_count, max_tracks);
+		return false;
+	}
+
+	if(f.head_count > max_heads) {
+		osd_printf_error("wd177x_format: Number of sides in image file too high for floppy drive (%d > %d)\n", f.track_count, max_heads);
+		return false;
+	}
 
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
