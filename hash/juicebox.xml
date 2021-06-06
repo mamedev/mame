@@ -223,13 +223,15 @@ license:CC0
 		<info name="serial" value="H6258" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_wmxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" offset="0x00000"/>
+				<rom name="jb_wmxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- ==============================================================================
 	     Cartridges below don't boot properly
+		 - code seems to go off the rails in most cases compared to other sets
+		   so assume these are bad dumps even if they read consistently
 	     ==============================================================================
 	-->
 
@@ -241,7 +243,7 @@ license:CC0
 		<info name="serial" value="H6230A" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="9e8eb81a" sha1="1c794df474352f7a9c15680ad073545ff92b7d1b" />
+				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="9e8eb81a" sha1="1c794df474352f7a9c15680ad073545ff92b7d1b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -254,7 +256,7 @@ license:CC0
 		<info name="serial" value="H6226" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c13e7784" sha1="08d3791977715abc17c89fb3bc457d5ba45725de" />
+				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c13e7784" sha1="08d3791977715abc17c89fb3bc457d5ba45725de" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +269,7 @@ license:CC0
 		<info name="serial" value="H2690" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="0b8dcfce" sha1="70bdf7b4d5ea252ef23e0a49c8988b9ec06b177e" />
+				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="0b8dcfce" sha1="70bdf7b4d5ea252ef23e0a49c8988b9ec06b177e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -280,7 +282,7 @@ license:CC0
 		<info name="serial" value="H2686" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_wmxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="2ceb0119" sha1="98509595b2b3088725d2e826f5e657de455fe328" />
+				<rom name="jb_wmxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="2ceb0119" sha1="98509595b2b3088725d2e826f5e657de455fe328" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
