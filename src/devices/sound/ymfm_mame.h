@@ -76,8 +76,7 @@ protected:
 	{
 		// if we're currently executing a CPU, schedule the interrupt check;
 		// otherwise, do it directly
-		auto &scheduler = machine().scheduler();
-		if (scheduler.currently_executing())
+		if (machine().scheduler().currently_executing())
 			m_fm_check_interrupts.synchronize();
 		else
 			m_engine->engine_check_interrupts();
@@ -90,7 +89,7 @@ protected:
 	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) override
 	{
 		if (duration_in_clocks >= 0)
-			m_timer[tnum].adjust(attotime::from_ticks(duration_in_clocks, device_t::clock()), tnum);
+			m_timer[tnum].adjust(attotime::from_ticks(duration_in_clocks, device_t::clock()));
 		else
 			m_timer[tnum].enable(false);
 	}
@@ -141,8 +140,8 @@ protected:
 	virtual void device_start() override
 	{
 		// allocate our timers
-		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum].init(*this, FUNC(ym_generic_device::fm_timer_handler));
+		m_timer[0].init(*this, FUNC(ym_generic_device::fm_timer_handler<0>));
+		m_timer[1].init(*this, FUNC(ym_generic_device::fm_timer_handler<1>));
 		m_fm_mode_write.init(*this, FUNC(ym_generic_device::fm_mode_write));
 		m_fm_check_interrupts.init(*this, FUNC(ym_generic_device::fm_check_interrupts));
 
@@ -157,7 +156,7 @@ protected:
 	// timer callbacks
 	void fm_mode_write(timer_instance const &timer) { m_engine->engine_mode_write(timer.param()); }
 	void fm_check_interrupts(timer_instance const &timer) { m_engine->engine_check_interrupts(); }
-	void fm_timer_handler(timer_instance const &timer) { m_engine->engine_timer_expired(timer.param()); }
+	template<int Num> void fm_timer_handler(timer_instance const &timer) { m_engine->engine_timer_expired(Num); }
 
 	// internal state
 	attotime m_busy_end;             // busy end time
