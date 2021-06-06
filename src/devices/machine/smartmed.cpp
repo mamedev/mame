@@ -461,8 +461,8 @@ void nand_device::command_w(uint8_t data)
 			}
 		}
 		break;
-		/*case 0x11:
-			break;*/
+	//case 0x11:
+	//	break;
 	case 0x60: // Block Erase (1st cycle)
 		m_mode = SM_M_ERASE;
 		m_page_addr = 0;
@@ -493,14 +493,14 @@ void nand_device::command_w(uint8_t data)
 	case 0x70: // Read Status
 		m_mode = SM_M_READSTATUS;
 		break;
-		/*case 0x71:
-			break;*/
+	//case 0x71:
+	//	break;
 	case 0x90: // Read ID
 		m_mode = SM_M_READID;
 		m_addr_load_ptr = 0;
 		break;
-		/*case 0x91:
-			break;*/
+	//case 0x91:
+	//	break;
 	case 0x30: // Read (2nd cycle)
 		if (m_col_address_cycles == 1)
 		{
