@@ -124,9 +124,8 @@ void nand_device::device_start()
 image_init_result smartmedia_image_device::smartmedia_format_1()
 {
 	SM_disk_image_header custom_header;
-	int bytes_read;
 
-	bytes_read = fread(&custom_header, sizeof(custom_header));
+	const int bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
 		return image_init_result::FAIL;
@@ -298,9 +297,8 @@ void smartmedia_image_device::call_unload()
 		if (m_image_format == 1)
 		{
 			SM_disk_image_header custom_header;
-			int bytes_read;
 			fseek(0, SEEK_SET);
-			bytes_read = fread(&custom_header, sizeof(custom_header));
+			const int bytes_read = fread(&custom_header, sizeof(custom_header));
 			if (bytes_read == sizeof(custom_header))
 			{
 				if (custom_header.version == 0)
@@ -443,10 +441,9 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			int i;
 			m_status = (m_status & 0x80) | m_accumulated_status;
 			//logerror( "smartmedia: program, page_addr %08X\n", m_page_addr);
-			for (i = 0; i < m_page_total_size; i++)
+			for (int i = 0; i < m_page_total_size; i++)
 				m_data_ptr[m_page_addr * m_page_total_size + i] &= m_pagereg[i];
 			m_status |= 0x40;
 			if (data == 0x15)
