@@ -17,7 +17,7 @@ public:
 		IRQ_LINE = INPUT_LINE_IRQ0,
 		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
-		V_LINE   = INPUT_LINE_IRQ0 + 16
+		V_LINE   = INPUT_LINE_IRQ0 + 15
 	};
 
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

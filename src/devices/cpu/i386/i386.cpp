@@ -2681,15 +2681,12 @@ void i386_device::execute_set_input(int irqline, int state)
 	}
 	else
 	{
-		if (irqline >= 0 && irqline <= MAX_INPUT_LINES)
+		if ( state != CLEAR_LINE && m_halted )
 		{
-			if ( state != CLEAR_LINE && m_halted )
-			{
-				m_halted = 0;
-			}
-
-			m_irq_state = state;
+			m_halted = 0;
 		}
+
+		m_irq_state = state;
 	}
 }
 

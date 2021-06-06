@@ -16,6 +16,9 @@
 #include "debug/debugcpu.h"
 
 
+#define VERIFY_INPUT_LINE_IN_RANGE (1)
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -50,7 +53,6 @@ enum line_state
 enum
 {
 	// input lines
-	MAX_INPUT_LINES = 64+3,
 	INPUT_LINE_IRQ0 = 0,
 	INPUT_LINE_IRQ1 = 1,
 	INPUT_LINE_IRQ2 = 2,
@@ -61,11 +63,12 @@ enum
 	INPUT_LINE_IRQ7 = 7,
 	INPUT_LINE_IRQ8 = 8,
 	INPUT_LINE_IRQ9 = 9,
-	INPUT_LINE_NMI = MAX_INPUT_LINES - 3,
 
 	// special input lines that are implemented in the core
-	INPUT_LINE_RESET = MAX_INPUT_LINES - 2,
-	INPUT_LINE_HALT = MAX_INPUT_LINES - 1
+	INPUT_LINES_INTERNAL = 3,
+	INPUT_LINE_NMI = -1,
+	INPUT_LINE_RESET = -2,
+	INPUT_LINE_HALT = -3,
 };
 
 
@@ -103,6 +106,15 @@ class device_execute_interface : public device_interface
 	friend class device_input;
 
 	using execute_delegate = delegate<void ()>;
+
+	// internal information about the state of inputs
+	struct device_input
+	{
+		attotime m_last_event_time; // time of last enqueued event
+		s32 m_stored_vector;        // most recently written vector
+		s32 m_live_vector;          // most recently processed vector
+		u8 m_live_state;            // most recently processed state
+	};
 
 public:
 	// construction/destruction
@@ -169,10 +181,10 @@ public:
 	void abort_timeslice() noexcept;
 
 	// input and interrupt management
-	void set_input_line(int linenum, int state) { enqueue_input_line_change(linenum, state, m_input[linenum].m_stored_vector); }
-	void set_input_line_vector(int linenum, int vector) { m_input[linenum].m_stored_vector = vector; }
+	void set_input_line(int linenum, int state) { enqueue_input_line_change(linenum, state, input_from_line(linenum).m_stored_vector); }
+	void set_input_line_vector(int linenum, int vector) { input_from_line(linenum).m_stored_vector = vector; }
 	void set_input_line_and_vector(int linenum, int state, int vector) { enqueue_input_line_change(linenum, state, vector); }
-	int input_state(int linenum) const { return m_input[linenum].m_live_state; }
+	int input_state(int linenum) const { return input_from_line(linenum).m_live_state; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
 	// suspend/resume
@@ -251,7 +263,7 @@ protected:
 	bool update_suspend();
 
 	// for use by devcpu for now...
-	int current_input_state(unsigned i) const { return m_input[i].m_live_state; }
+	int current_input_state(unsigned linenum) const { return input_from_line(linenum).m_live_state; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
 	int standard_irq_callback(int irqline);
@@ -267,18 +279,21 @@ private:
 	void periodic_interrupt(timer_instance const &timer);
 	void process_input_event(timer_instance const &timer);
 
-	void enqueue_input_line_change(int line, int state, int vector);
-
-	// internal information about the state of inputs
-	struct device_input
+	device_input &input_from_line(int linenum)
 	{
-		attotime m_last_event_time; // time of last enqueued event
-		s32 m_stored_vector;        // most recently written vector
-		s32 m_enqueued_vector;      // most recently enqueued vector
-		s32 m_live_vector;          // most recently processed vector
-		u8 m_enqueued_state;        // most recently enqueued state
-		u8 m_live_state;            // most recently processed state
-	};
+		int index = linenum + INPUT_LINES_INTERNAL;
+		if (VERIFY_INPUT_LINE_IN_RANGE && (index < 0 || index >= m_input.size()))
+			throw emu_fatalerror("%s: input_from_line(%d) failure", device().tag(), linenum);
+		return m_input[index];
+	}
+	device_input const &input_from_line(int linenum) const
+	{
+		int index = linenum + INPUT_LINES_INTERNAL;
+		if (VERIFY_INPUT_LINE_IN_RANGE && (index < 0 || index >= m_input.size()))
+			throw emu_fatalerror("%s: input_from_line(%d) failure", device().tag(), linenum);
+		return m_input[index];
+	}
+	void enqueue_input_line_change(int line, int state, int vector);
 
 	// core execution state: keep all these members close to the top
 	// so they live within the first 128 bytes of the object; this helps
@@ -336,7 +351,7 @@ private:
 
 	// input states and IRQ callbacks
 	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
-	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
+	std::vector<device_input> m_input;                  // data about inputs
 };
 
 // iterator

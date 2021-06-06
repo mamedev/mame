@@ -407,6 +407,9 @@ void device_execute_interface::interface_pre_start()
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
+	// size the input array
+	m_input.resize(INPUT_LINES_INTERNAL + execute_input_lines());
+
 	// allocate timers if we need them
 	if (m_periodic_interrupt_period != attotime::zero)
 		m_periodic_interrupt_timer.init(*this, FUNC(device_execute_interface::periodic_interrupt));
@@ -438,14 +441,14 @@ void device_execute_interface::interface_post_start()
 	device().save_item(NAME(m_localtime.m_base));
 
 	// it's more efficient and causes less clutter to save these this way
-	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_enqueued_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_live_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_enqueued_state));
-	device().save_item(STRUCT_MEMBER(m_input, m_live_state));
 
-	for (int index = 0; index < std::size(m_input); index++)
+	for (int index = 0; index < m_input.size(); index++)
+	{
 		device().save_item(NAME(m_input[index].m_last_event_time), index);
+		device().save_item(NAME(m_input[index].m_stored_vector), index);
+		device().save_item(NAME(m_input[index].m_live_vector), index);
+		device().save_item(NAME(m_input[index].m_live_state), index);
+	}
 }
 
 
@@ -475,11 +478,11 @@ void device_execute_interface::interface_pre_reset()
 void device_execute_interface::interface_post_reset()
 {
 	// reset the interrupt vectors
-	for (int linenum = 0; linenum < std::size(m_input); linenum++)
+	for (int linenum = 0; linenum < m_input.size(); linenum++)
 	{
 		auto &input = m_input[linenum];
 		input.m_last_event_time = attotime::zero;
-		input.m_stored_vector = input.m_live_vector = default_irq_vector(linenum);
+		input.m_stored_vector = input.m_live_vector = default_irq_vector(linenum - INPUT_LINES_INTERNAL);
 	}
 
 	// reconfingure VBLANK interrupts
@@ -540,7 +543,7 @@ IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
 
 int device_execute_interface::standard_irq_callback(int irqline)
 {
-	auto &input = m_input[irqline];
+	auto &input = input_from_line(irqline);
 
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = input.m_live_vector;
@@ -627,13 +630,7 @@ void device_execute_interface::periodic_interrupt(timer_instance const &timer)
 
 void device_execute_interface::enqueue_input_line_change(int line, int state, int vector)
 {
-	auto &input = m_input[line];
-
-	// don't bother enqueuing redundant states
-	if (state == input.m_enqueued_state && vector == input.m_enqueued_vector)
-		return;
-	input.m_enqueued_state = state;
-	input.m_enqueued_vector = vector;
+	auto &input = input_from_line(line);
 
 	// the event should land now, but never enqueue events earlier than the last
 	// one we enqueued or else we'll get in a bad state
@@ -653,8 +650,7 @@ void device_execute_interface::enqueue_input_line_change(int line, int state, in
 void device_execute_interface::process_input_event(timer_instance const &timer)
 {
 	int linenum = timer.param(0);
-	assert(linenum < MAX_INPUT_LINES);
-	auto &input = m_input[linenum];
+	auto &input = input_from_line(linenum);
 
 	int state = timer.param(1);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
