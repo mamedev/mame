@@ -12,7 +12,8 @@ license:CC0
 
    Known Releases
 
-   (* = dumped and boots in MAME + = dumped, but doesn't boot properly, possibly bad or requires improved emulation) (V = validated with 2nd cartridge)
+   (* = dumped and boots in MAME + = dumped, but doesn't boot properly, possibly bad or requires improved emulation
+    B = confirmed bad dump, V = validated with 2nd cartridge)
 
    The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
    the data.
@@ -26,7 +27,7 @@ license:CC0
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
    H2688 - Vans Triple Crown Volume 1
    H2689 - Vans Triple Crown vol.2
-+  H2690 - Vans Pipeline Masters Volume 1
+B  H2690 - Vans Pipeline Masters Volume 1
 *  H2692 - Teenage Mutant Ninja Turtles Volume 1
    H2694 - Trading Spaces Volume 1
    H2697 - Megas XLR Vol. 1
@@ -61,9 +62,28 @@ license:CC0
 
 	<!--
 	contains:
+	The Shredder Strikes Part I
+	The Shredder Strikes Part II
+	-->
+	<!-- PVPlayer Build of Aug 07 2004 at 14:25:28 -->
+	<software name="tmnt1" supported="partial">
+		<description>Teenage Mustant Ninja Turtles Volume 1 (H2692)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2692" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_tmnt_vol1_h2692_matrix11247_9875.smc" size="0x2100400" crc="dccdff36" sha1="57332cd1fc90cdb6433af79f1f27863e3f68cdf2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
 	Operation: B.E.A.C.H / Operation: U.N.D.E.R.C.O.V.E.R
 	Operation: F.U.T.U.R.E
 	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
 	<software name="knd1" supported="partial">
 		<description>Codename: Kids Next Door Volume 1 (H2683)</description>
 		<year>2004</year>
@@ -81,6 +101,7 @@ license:CC0
 	Friends Till The End - Part III
 	Friends Till The End - Part IV
 	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
 	<software name="yugiv1" supported="partial">
 		<description>Yu-Gi-Oh! Volume 1 (H2685)</description>
 		<year>2004</year>
@@ -93,27 +114,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!--
-	contains:
-	The Shredder Strikes Part I
-	The Shredder Strikes Part II
-	-->
-	<software name="tmnt1" supported="partial">
-		<description>Teenage Mustant Ninja Turtles Volume 1 (H2692)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H2692" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_tmnt_vol1_h2692_matrix11247_9875.smc" size="0x2100400" crc="dccdff36" sha1="57332cd1fc90cdb6433af79f1f27863e3f68cdf2" />
-			</dataarea>
-		</part>
-	</software>
+
 
 	<!-- contains:
 	The Ultimate Ninja
 	Crash Dummies: Ruff Driving (bonus)
 	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
 	<software name="tmnte36" supported="partial">
 		<description>Teenage Mustant Ninja Turtles Episode 36 (H6260)</description>
 		<year>2004</year>
@@ -128,64 +135,13 @@ license:CC0
 
 	<!--
 	contains:
-	Friends 'Til The End - Part I
-	-->
-	<software name="yugie175" supported="partial">
-		<description>Yu-Gi-Oh! Episode 175 (H8084)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H8084" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_yugioh_ep175_h8084_matrix11252_9873.smc" size="0x1080400" crc="04b2c825" sha1="977e9c20384bdbc65c2b90ed32d09624e95a0e0a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	contains:
-	Friends 'Til The End - Part II
-	-->
-	<software name="yugie176" supported="partial">
-		<description>Yu-Gi-Oh! Episode 176 (H8143)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H8143" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_yugioh_ep176_h8143_matrix11252_9873.smc" size="0x1080400" crc="f1a0edd4" sha1="553e74100f9969117f0240f98e84515823cce108" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	contains:
-	ZOEgirl - You Get Me
-	Jump5 - All I Can Do
-	Jump5 - Spinnin' Around
-	Baha Men - Who Let The Dogs Out
-	Atomic Kitten - Eternal Flame
-	-->
-	<software name="jbm_6232" supported="partial">
-		<description>Juicebox Music Video - ZOEgirl, Jump5, Jump5, Baha Men, Atomic Kitten (H6232)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H6232" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6232_matrix11247_9875.smc" size="0x2100400" crc="27b85bb6" sha1="673937106788dd6c4a3647454f4583e97eb2d1a9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!--
-	contains:
 	Avril Lavigne - Don't Tell Me
 	The Calling - Our Lives
 	Avril Lavigne - My Happy Ending
 	Clay Aiken - The Way
 	Ruben Studdard - Superstar
 	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
 	<software name="jbm_6228" supported="partial">
 		<description>Juicebox Music Video - Avril Lavigne, The Calling, Avril Lavigne, Clay Aiken, Ruben Studdard (H6228)</description>
 		<year>2004</year>
@@ -204,6 +160,7 @@ license:CC0
 	Stacie Orrico - Stuck
 	Skye Sweetnam - Tangled Up In Me
 	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
 	<software name="jbm_2709" supported="partial">
 		<description>Juicebox Music Video - Liz Phair, Stacie Orrico, Skye Sweetnam (H2709)</description>
 		<year>2004</year>
@@ -216,6 +173,28 @@ license:CC0
 		</part>
 	</software>
 
+	<!--
+	contains:
+	ZOEgirl - You Get Me
+	Jump5 - All I Can Do
+	Jump5 - Spinnin' Around
+	Baha Men - Who Let The Dogs Out
+	Atomic Kitten - Eternal Flame
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="jbm_6232" supported="partial">
+		<description>Juicebox Music Video - ZOEgirl, Jump5, Jump5, Baha Men, Atomic Kitten (H6232)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6232" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_musicvideo_h6232_matrix11247_9875.smc" size="0x2100400" crc="27b85bb6" sha1="673937106788dd6c4a3647454f4583e97eb2d1a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
 	<software name="winxe103" supported="partial">
 		<description>Winx Club Episode 103 (H6258)</description>
 		<year>2004</year>
@@ -228,14 +207,49 @@ license:CC0
 		</part>
 	</software>
 
+	<!--
+	contains:
+	Friends 'Til The End - Part I
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="yugie175" supported="partial">
+		<description>Yu-Gi-Oh! Episode 175 (H8084)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H8084" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_yugioh_ep175_h8084_matrix11252_9873.smc" size="0x1080400" crc="04b2c825" sha1="977e9c20384bdbc65c2b90ed32d09624e95a0e0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Friends 'Til The End - Part II
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="yugie176" supported="partial">
+		<description>Yu-Gi-Oh! Episode 176 (H8143)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H8143" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_yugioh_ep176_h8143_matrix11252_9873.smc" size="0x1080400" crc="f1a0edd4" sha1="553e74100f9969117f0240f98e84515823cce108" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- ==============================================================================
 	     Cartridges below don't boot properly
-		 - code seems to go off the rails in most cases compared to other sets
-		   so assume these are bad dumps even if they read consistently
+	     - code seems to go off the rails in most cases compared to other sets
+	       so assume these are bad dumps even if they read consistently
 	     ==============================================================================
 	-->
 
 	<!-- shows logo, but bad sound and commandline printf spam -->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
 	<software name="jbm_6230a" supported="no">
 		<description>Juicebox Music Video (H6230A)</description>
 		<year>2004</year>
@@ -249,6 +263,7 @@ license:CC0
 	</software>
 
 	<!-- shows logo, but bad sound and commandline printf spam -->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
 	<software name="jb_6226" supported="no">
 		<description>Juicebox Music Video (H6226)</description>
 		<year>2004</year>
@@ -261,7 +276,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen -->
+	<!-- black screen, confirmed bad dump, some bytes have been skipped over in various blocks, resulting in code being incorrecly offset -->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
 	<software name="plmv1" supported="no">
 		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
 		<year>2004</year>
@@ -275,6 +291,7 @@ license:CC0
 	</software>
 
 	<!-- shows garbage, code crashes, fails to boot -->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
 	<software name="winxv1" supported="no">
 		<description>Winx Club Volume 1 (H2686)</description>
 		<year>2004</year>
