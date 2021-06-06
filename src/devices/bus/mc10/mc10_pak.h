@@ -39,4 +39,4 @@ protected:
 // device type definitions
 DECLARE_DEVICE_TYPE(MC10_PAK, mc10_pak_device)
 
-#endif // MAME_BUS_MC10_COCO_PAK_H
+#endif // MAME_BUS_MC10_MC10_PAK_H

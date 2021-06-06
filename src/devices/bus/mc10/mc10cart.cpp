@@ -35,6 +35,7 @@
 #include "emu.h"
 #include "mc10cart.h"
 
+#include "mc10_mcx128.h"
 #include "mc10_pak.h"
 #include "mc10_ram.h"
 
@@ -209,6 +210,7 @@ memory_region *device_mc10cart_interface::get_cart_memregion()
 void mc10_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices
+	device.option_add("mcx128", MC10_PAK_MCX128);
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
 }

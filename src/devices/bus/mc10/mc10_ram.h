@@ -10,5 +10,5 @@
 // device type definition
 DECLARE_DEVICE_TYPE(MC10_PAK_RAM, device_mc10cart_interface)
 
-#endif // MAME_BUS_MC10_COCO_RAM_H
+#endif // MAME_BUS_MC10_MC10_RAM_H
 
