@@ -47,7 +47,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="marbl">
+	<software name="marble">
 		<description>Marble Madness</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
@@ -796,7 +796,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="arknoid2u">
+	<software name="arknoid2">
 		<description>Arkanoid II: Revenge of Doh</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -954,7 +954,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="phtnx146">
+	<software name="photonix">
 		<description>Photonix (Version 1.46)</description>
 		<year>1989</year>
 		<publisher>Free Tools Association</publisher>
