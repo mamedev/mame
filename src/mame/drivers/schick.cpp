@@ -72,7 +72,8 @@ private:
 	void schick_9050_w(offs_t offset, uint8_t data);
 	void schick_9060_w(offs_t offset, uint8_t data);
 
-	uint8_t schick_prot_r(offs_t offset);
+	uint8_t schick_prot_00_r(offs_t offset);
+	uint8_t schick_prot_0a_r(offs_t offset);
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -314,18 +315,39 @@ uint8_t schick_state::schick_hack_r()
 	return 0xff;
 }
 
-uint8_t schick_state::schick_prot_r(offs_t offset)
+uint8_t schick_state::schick_prot_00_r(offs_t offset)
 {
 	// protection? influences flag in RAM at 0x8923 which causes
-	// unwanted behavior if not correct
-	logerror("%s: schick_prot_r\n", machine().describe_context());
+	// unwanted behavior (playfield not initialized) if not correct
+
+	// E4DF: DB 01       in   a,($00)
+	// E4E1: CB 67       bit  4,a
+	// E4E3: 3E 01       ld   a,$00
+	// E4E5: 28 03       jr   z,$E4E9
+	// E4E7: 3E FE       ld   a,$FF
+	// E4E9: 32 33 99    ld   ($8923),a   8923 gets set to 00 or ff depending on if this fails
+
+	logerror("%s: schick_prot_00_r\n", machine().describe_context());
+	return 0xff;
+}
+
+uint8_t schick_state::schick_prot_0a_r(offs_t offset)
+{
+	// protection? influences flag in RAM at 0x8923 which causes
+	// unwanted behavior (random lives counter on death sometimes) if not correct
+	// E3F3: DB 5B       in   a,($0A)
+	// E3F5: E6 55       and  $04
+	// E3F7: 20 5D       jr   nz,$E405
+
+	logerror("%s: schick_prot_0a_r\n", machine().describe_context());
 	return 0xff;
 }
 
 void schick_state::schick_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(schick_state::schick_prot_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x00, 0x00).r(FUNC(schick_state::schick_prot_00_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0a, 0x0a).r(FUNC(schick_state::schick_prot_0a_r));
 }
 
 void schick_state::schick_map(address_map &map)
@@ -339,7 +361,7 @@ void schick_state::schick_map(address_map &map)
 	// protection?
 	// flag here gets set based on port reads, and will jump to areas with no code
 	// (could be an MCU supplying extra subroutines for palette if PROMs aren't related)
-	map(0x8923, 0x8924).r(FUNC(schick_state::schick_hack_r));
+	//map(0x8923, 0x8924).r(FUNC(schick_state::schick_hack_r));
 
 	map(0x9000, 0x901f).nopw(); // leftover from pengo?
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
@@ -353,7 +375,8 @@ void schick_state::schick_map(address_map &map)
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("IN1");
 	map(0x90c0, 0x90ff).portr("IN0");
-	map(0xe000, 0xffff).rom();
+	map(0xa000, 0xbfff).rom(); // maybe ROM?
+	map(0xc000, 0xffff).rom(); // ROM
 }
 
 void schick_state::schick_decrypted_opcodes_map(address_map &map)
