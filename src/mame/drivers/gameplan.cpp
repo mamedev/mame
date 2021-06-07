@@ -938,6 +938,7 @@ void gameplan_state::machine_start()
 	save_item(NAME(m_video_y));
 	save_item(NAME(m_video_command));
 	save_item(NAME(m_video_data));
+	save_item(NAME(m_video_previous));
 }
 
 
@@ -948,6 +949,7 @@ void gameplan_state::machine_reset()
 	m_video_y = 0;
 	m_video_command = 0;
 	m_video_data = 0;
+	m_video_previous = 0;
 }
 
 void gameplan_state::gameplan(machine_config &config)

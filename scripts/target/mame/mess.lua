@@ -814,6 +814,7 @@ MACHINES["CXD1185"] = true
 MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
+MACHINES["NS32082"] = true
 
 --------------------------------------------------
 -- specify available bus cores

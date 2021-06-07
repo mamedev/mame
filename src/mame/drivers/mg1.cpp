@@ -21,7 +21,7 @@
 
 // various hardware
 #include "machine/ns32081.h"
-//#include "machine/ns32082.h"
+#include "machine/ns32082.h"
 #include "machine/ns32202.h"
 #include "machine/am79c90.h"
 //#include "machine/am9516.h"
@@ -53,6 +53,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_fpu(*this, "fpu")
+		, m_mmu(*this, "mmu")
 		, m_icu(*this, "icu")
 		, m_ram(*this, "ram")
 		, m_sram(*this, "sram")
@@ -96,6 +97,7 @@ private:
 	// devices
 	required_device<ns32016_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
+	required_device<ns32082_device> m_mmu;
 	required_device<ns32202_device> m_icu;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_sram;
@@ -293,8 +295,11 @@ void mg1_state::mg1(machine_config &config)
 	m_cpu->set_addrmap(0, &mg1_state::cpu_map<0>);
 	m_cpu->set_addrmap(6, &mg1_state::cpu_map<6>);
 	m_cpu->set_fpu(m_fpu);
+	m_cpu->set_mmu(m_mmu);
 
 	NS32081(config, m_fpu, 16_MHz_XTAL / 2);
+
+	NS32082(config, m_mmu, 16_MHz_XTAL / 2);
 
 	NS32202(config, m_icu, 5_MHz_XTAL);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0);
