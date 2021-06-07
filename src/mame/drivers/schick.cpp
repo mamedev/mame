@@ -72,6 +72,8 @@ private:
 	void schick_9050_w(offs_t offset, uint8_t data);
 	void schick_9060_w(offs_t offset, uint8_t data);
 
+	uint8_t schick_prot_r(offs_t offset);
+
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	optional_device<ls259_device> m_latch;
@@ -107,10 +109,7 @@ private:
 	uint8_t m_inv_spr;
 	uint8_t m_extrabank;
 
-	uint8_t schick_hack_r()
-	{
-		return 0xff;
-	}
+	uint8_t schick_hack_r();
 };
 
 #define MASTER_CLOCK        (18432000)
@@ -308,11 +307,25 @@ void schick_state::schick_9060_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_all_dirty();
 }
 
+uint8_t schick_state::schick_hack_r()
+{
+	// HACK
+	// always return 0xff from this flag in RAM (this doesn't work in all cases, sometimes you get stuck and can't more, or are given 64 lives)
+	return 0xff;
+}
+
+uint8_t schick_state::schick_prot_r(offs_t offset)
+{
+	// protection? influences flag in RAM at 0x8923 which causes
+	// unwanted behavior if not correct
+	logerror("%s: schick_prot_r\n", machine().describe_context());
+	return 0xff;
+}
 
 void schick_state::schick_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x00, 0x00).r(FUNC(schick_state::schick_prot_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void schick_state::schick_map(address_map &map)
@@ -485,13 +498,13 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_schick )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128/4 ) // title screen
 	GFXDECODE_ENTRY( "gfx1", 0x2000, tilelayout,   0, 128/4 ) // attract landscape sequence
-	GFXDECODE_ENTRY( "gfx1", 0x4000, tilelayout,   0, 128/4 ) // gameplay, 'P' block not highlighted
-	GFXDECODE_ENTRY( "gfx1", 0x6000, tilelayout,   0, 128/4 ) // gameplay, 'P' block highlighted
+	GFXDECODE_ENTRY( "gfx1", 0x4000, tilelayout,   0, 128/4 ) // gameplay, 'C' block not highlighted
+	GFXDECODE_ENTRY( "gfx1", 0x6000, tilelayout,   0, 128/4 ) // gameplay, 'C' block covered with a 'P' block
 
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout, 0, 128/4 ) // title screen
 	GFXDECODE_ENTRY( "gfx1", 0x3000, spritelayout, 0, 128/4 ) // attract landscape sequence
-	GFXDECODE_ENTRY( "gfx1", 0x5000, spritelayout, 0, 128/4 ) // gameplay, has C, H, I block tiles 
-	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items)
+	GFXDECODE_ENTRY( "gfx1", 0x5000, spritelayout, 0, 128/4 ) // gameplay, has C, H, I block tiles (for levels 1,2,3?)
+	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items) (for levels 4,5,6?)
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(schick_state::vblank_irq)
