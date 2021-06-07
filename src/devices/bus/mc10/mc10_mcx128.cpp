@@ -66,7 +66,6 @@ namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
 
-
 //-------------------------------------------------
 //  mc10_pak_device - constructor
 //-------------------------------------------------
@@ -104,26 +103,48 @@ void mc10_pak_mcx128_device::device_start()
  	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
 
  	m_view[0](0x0000, 0x3fff).bankrw("bank0");
- 	m_view[0](0x4000, 0xbeff).bankrw("bank1");
+//	0x4000, 0xbeff: internal RAM
  	m_view[0](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
  	m_view[0](0xc000, 0xffff).rom().region("eprom",0).bankw("bank2");
 
  	m_view[1](0x0000, 0x3fff).bankrw("bank0");
- 	m_view[1](0x4000, 0xbeff).bankrw("bank1");
+//	0x4000, 0xbeff: internal RAM
  	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
  	m_view[1](0xc000, 0xdfff).bankrw("bank2");
  	m_view[1](0xe000, 0xffff).rom().region("eprom",0x2000).bankw("bank3");
 
  	m_view[2](0x0000, 0x3fff).bankrw("bank0");
- 	m_view[2](0x4000, 0xbeff).bankrw("bank1");
- 	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+//	0x4000, 0xbeff: internal RAM
+ 	m_view[2](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
  	m_view[2](0xc000, 0xdfff).bankrw("bank2");
 // 	0xe000, 0xffff: internal ROM
 
  	m_view[3](0x0000, 0x3fff).bankrw("bank0");
- 	m_view[3](0x4000, 0xbeff).bankrw("bank1");
- 	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+//	0x4000, 0xbeff: internal RAM
+ 	m_view[3](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
  	m_view[3](0xc000, 0xffff).bankrw("bank2");
+
+ 	m_view[4](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[4](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[4](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[4](0xc000, 0xffff).rom().region("eprom",0).bankw("bank2");
+
+ 	m_view[5](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[5](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[5](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[5](0xc000, 0xdfff).bankrw("bank2");
+ 	m_view[5](0xe000, 0xffff).rom().region("eprom",0x2000).bankw("bank3");
+
+ 	m_view[6](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[6](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[6](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[6](0xc000, 0xdfff).bankrw("bank2");
+// 	0xe000, 0xffff: internal ROM
+
+ 	m_view[7](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[7](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[7](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[7](0xc000, 0xffff).bankrw("bank2");
 }
 
 //-------------------------------------------------
@@ -162,7 +183,7 @@ void mc10_pak_mcx128_device::update_banks()
 	m_bank_array[2]->set_entry(ram_bank_cr & 0x01);
 	m_bank_array[3]->set_entry(ram_bank_cr & 0x01);
 
-	m_view.select(rom_map_cr & 0x03);
+	m_view.select(((ram_bank_cr & 0x02) << 1) | (rom_map_cr & 0x03));
 }
 
 
