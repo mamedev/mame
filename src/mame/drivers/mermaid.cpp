@@ -471,6 +471,7 @@ void mermaid_state::mermaid(machine_config &config)
 void mermaid_state::rougien(machine_config &config)
 {
 	mermaid(config);
+	m_bg_split = 1;
 
 	m_latch[0]->q_out_cb<2>().set(FUNC(mermaid_state::rougien_sample_playback_w));
 

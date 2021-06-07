@@ -38,6 +38,7 @@ public:
 		m_palette(*this, "palette"),
 		m_latch(*this, "latch%u", 1U)
 	{
+		m_bg_split = 0;
 	}
 
 	void rougien(machine_config &config);
@@ -63,6 +64,7 @@ private:
 	int m_coll_bit2;
 	int m_coll_bit3;
 	int m_coll_bit6;
+	int m_bg_split;
 	int m_bg_mask;
 	int m_bg_bank;
 	int m_rougien_gfxbank1;
