@@ -240,6 +240,8 @@ public:
 	void init_mimonkey();
 	void init_mimonkeyb();
 	void init_victoryc();
+	void init_guttangt();
+
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
 	void moonwar_palette(palette_device &palette);
@@ -295,6 +297,7 @@ public:
 	void mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void monsterz_set_latch();
 	void decode_mooncrst(int length, uint8_t *dest);
 	void decode_checkman();
@@ -375,6 +378,7 @@ public:
 	void astroamb(machine_config &config);
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
+	void guttangt(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
@@ -454,6 +458,7 @@ protected:
 	void turtles_map(address_map &map);
 	void victoryc_map(address_map &map);
 	void zigzag_map(address_map &map);
+	void guttangt_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
@@ -528,6 +533,7 @@ protected:
 	uint8_t m_gfxbank[5];
 	uint8_t m_leftspriteclip;
 
+	void guttangt_rombank_w(uint8_t data);
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
 	void videight_rombank_w(offs_t offset, uint8_t data);
 	void videight_gfxbank_w(offs_t offset, uint8_t data);
