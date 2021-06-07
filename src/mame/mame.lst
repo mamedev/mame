@@ -2517,6 +2517,7 @@ mb133340                        // Biostar MB-1333/40PMB-CH, rev B.3
 c286lt                          // 1990 Commodore Laptop 286-LT
 csl286                          // Commodore SL 286-16
 c386sx16                        // 1990 Commodore 386SX-16
+c386sx25                        // Commodore 386SX-25
 c386sxlt                        // 1992 Commodore Laptop C386SX-LT
 dt386                           // Commodore DT386
 dt486                           // Commodore DT486
@@ -2604,6 +2605,7 @@ mba009                          // HLB-286 MBA-009 motherboard (286)
 pccm205                         // PC-Chips M205 motherboard (286)
 pccm209                         // PC-Chips M209 motherboard (286)
 pccm216                         // PC-Chips M216 motherboard (286)
+pccm317                         // PC_Chips M317 motherboard (386)
 pccm321                         // PC-Chips M321 motherboard (386)
 pccm326                         // PC-Chips M326 motherboard (386)
 pccm396f                        // PC-Chips M396F motherboard (386sx)
@@ -2818,6 +2820,16 @@ pcb303                          // Packard Bell PCB-303 Rev.01
 ctcc386mx                       // CACHING TECH CORPORATION C386MX
 tot3200sxc                      // Toshiba T3200SXC
 p386dx40                        // Peacock P386DX-40
+zeos386sx                       // ZEOS 386 SX-16
+ktx20t02                        // Quadtel QTC-SXM KT X20T02/HI Rev.3
+eltp9                           // ELT-P9 / Most likely ELT-386SX-160D
+ecs386a                         // ECS (Elitegroup) 386A
+mom3v3                          // Morse M3 V3.00
+p386sx25pw                      // Prolink P386SX-25PW VER:2.00
+ilm396b                         // ILON USA, INC. M-396B (386sx)
+mmbo4088                        // 486MMBO4088 (486SLC)
+386sxvhcom                      // 80386SX-VH-COM
+mba032q                         // DTK MBA-032Q TK83305-4N-D-03
 
 @source:atari_s1.cpp
 aavenger                        //
