@@ -1465,7 +1465,6 @@ void sound_manager::update()
 	// determine the duration of this update
 	attotime update_period = machine().time() - m_last_update;
 	sound_assert(update_period.seconds() == 0);
-printf("Update: %s\n", machine().time().as_string());
 
 	// use that to compute the number of samples we need from the speakers
 	subseconds sample_rate_sub = subseconds::from_hz(machine().sample_rate());
