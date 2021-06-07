@@ -147,6 +147,13 @@ VIDEO_START_MEMBER(schick_state,schick)
 	m_extrabank = 0;
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(schick_state::schick_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(schick_state::schick_scan_rows)), 8, 8, 36, 28);
+
+	// the MAME default palette is only 8 colours repeated, which hides some details on 16 colour tiles
+	// do this until we have a PROM or otherwise figure out how the palette works.
+	for (int i = 0; i < m_palette->entries(); i++)
+	{
+		m_palette->set_pen_color(i, rgb_t(pal2bit(i >> 2), pal2bit(i >> 0), pal2bit(i >> 1)));
+	}
 }
 
 TILEMAP_MAPPER_MEMBER(schick_state::schick_scan_rows)
@@ -478,13 +485,13 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( gfx_schick )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128/4 ) // title screen
 	GFXDECODE_ENTRY( "gfx1", 0x2000, tilelayout,   0, 128/4 ) // attract landscape sequence
-	GFXDECODE_ENTRY( "gfx1", 0x4000, tilelayout,   0, 128/4 ) // gameplay
-	GFXDECODE_ENTRY( "gfx1", 0x6000, tilelayout,   0, 128/4 ) // gameplay but with 'P' block
+	GFXDECODE_ENTRY( "gfx1", 0x4000, tilelayout,   0, 128/4 ) // gameplay, 'P' block not highlighted
+	GFXDECODE_ENTRY( "gfx1", 0x6000, tilelayout,   0, 128/4 ) // gameplay, 'P' block highlighted
 
 	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout, 0, 128/4 ) // title screen
 	GFXDECODE_ENTRY( "gfx1", 0x3000, spritelayout, 0, 128/4 ) // attract landscape sequence
-	GFXDECODE_ENTRY( "gfx1", 0x5000, spritelayout, 0, 128/4 ) // gameplay
-	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay alt tiles
+	GFXDECODE_ENTRY( "gfx1", 0x5000, spritelayout, 0, 128/4 ) // gameplay, has C, H, I block tiles 
+	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items)
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(schick_state::vblank_irq)
