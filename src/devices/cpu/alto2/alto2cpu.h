@@ -251,9 +251,9 @@ private:
 	uint32_t m_ucode_size;                    //!< Size of both, CROM and CRAM together
 	uint32_t m_sreg_banks;                    //!< Number of S register banks; derived from m_cram_config
 
-	uint8_t* m_ucode_crom;
+	std::unique_ptr<uint8_t[]> m_ucode_crom;
 	std::unique_ptr<uint8_t[]> m_ucode_cram;
-	uint8_t* m_const_data;
+	std::unique_ptr<uint8_t[]> m_const_data;
 
 	void ucode_map(address_map &map);
 	void const_map(address_map &map);
@@ -655,7 +655,7 @@ private:
 	 * access it. Also both, address and data lines, are inverted.
 	 * </PRE>
 	 */
-	uint8_t* m_ctl2k_u3;
+	std::unique_ptr<uint8_t[]> m_ctl2k_u3;
 
 	/**
 	 * @brief 2KCTL PROM u38; 82S23; 32x8 bit
@@ -704,7 +704,7 @@ private:
 	 *  B7     9      NEXT[06]'
 	 * </PRE>
 	 */
-	uint8_t* m_ctl2k_u38;
+	std::unique_ptr<uint8_t[]> m_ctl2k_u38;
 
 	//! output lines of the 2KCTL U38 PROM
 	enum {
@@ -776,22 +776,22 @@ private:
 	 * depending on the current NEXT[01]' level.
 	 * </PRE>
 	 */
-	uint8_t* m_ctl2k_u76;
+	std::unique_ptr<uint8_t[]> m_ctl2k_u76;
 
 	/**
 	 * @brief 3k CRAM PROM a37
 	 */
-	uint8_t* m_cram3k_a37;
+	std::unique_ptr<uint8_t[]> m_cram3k_a37;
 
 	/**
 	 * @brief memory addressing PROM a64
 	 */
-	uint8_t* m_madr_a64;
+	std::unique_ptr<uint8_t[]> m_madr_a64;
 
 	/**
 	 * @brief memory addressing PROM a65
 	 */
-	uint8_t* m_madr_a65;
+	std::unique_ptr<uint8_t[]> m_madr_a65;
 
 	/**
 	 * @brief unused PROM a90
@@ -806,7 +806,7 @@ private:
 	 *
 	 * I haven't found yet where KP3-KP5 are used
 	 */
-	uint8_t* m_madr_a90;
+	std::unique_ptr<uint8_t[]> m_madr_a90;
 
 	/**
 	 * @brief unused PROM a91
@@ -833,12 +833,12 @@ private:
 	 * KE(6)    KB(^L)  KB(RTN) KB(")   KB(/)   KB(S3)  KB(<-)    KB(])  KB(\)
 	 * KE(7)    KB(S1)  KB(DEL) KB(S2)  KB(LF)  KB(S4)  KB(S5)   KB(BW) KB(BS)
 	 */
-	uint8_t* m_madr_a91;
+	std::unique_ptr<uint8_t[]> m_madr_a91;
 
 	/**
 	 * @brief ALU function to 74181 operation lookup PROM
 	 */
-	uint8_t* m_alu_a10;
+	std::unique_ptr<uint8_t[]> m_alu_a10;
 
 	//! output lines of the ALU a10 PROM
 	enum {

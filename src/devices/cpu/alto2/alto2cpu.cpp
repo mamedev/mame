@@ -1009,7 +1009,7 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 uint32_t alto2_cpu_device::crom_cram_r(offs_t offset)
 {
 	if (offset < m_ucode_ram_base)
-		return *reinterpret_cast<uint32_t *>(m_ucode_crom + offset * 4);
+		return *reinterpret_cast<uint32_t *>(m_ucode_crom.get() + offset * 4);
 	return *reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (offset - m_ucode_ram_base) * 4);
 }
 
@@ -1024,12 +1024,12 @@ void alto2_cpu_device::crom_cram_w(offs_t offset, uint32_t data)
 //! read constants PROM
 uint16_t alto2_cpu_device::const_r(offs_t offset)
 {
-	return *reinterpret_cast<uint16_t *>(m_const_data + offset * 2);
+	return *reinterpret_cast<uint16_t *>(m_const_data.get() + offset * 2);
 }
 
 //! direct read access to the microcode CROM or CRAM
 #define RD_UCODE(addr) (addr < m_ucode_ram_base ? \
-	*reinterpret_cast<uint32_t *>(m_ucode_crom + addr * 4) : \
+	*reinterpret_cast<uint32_t *>(m_ucode_crom.get() + addr * 4) : \
 	*reinterpret_cast<uint32_t *>(m_ucode_cram.get() + (addr - m_ucode_ram_base) * 4))
 
 //-------------------------------------------------
