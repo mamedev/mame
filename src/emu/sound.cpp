@@ -1102,7 +1102,7 @@ sound_manager::sound_manager(running_machine &machine) :
 
 	// start the periodic update flushing timer
 	m_update_timer.init(machine.scheduler(), *this, FUNC(sound_manager::update));
-	m_update_timer.adjust(STREAMS_UPDATE_ATTOTIME);
+	m_update_timer.adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 }
 
 
@@ -1590,16 +1590,6 @@ void sound_manager::update()
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();
-
-	// adjust ourselves for next time; to keep things precisely on the second,
-	// we check for overflow into the next second and ensure that it ends up
-	// at 0 in the fractional part (due to rounding it will be slightly over
-	// otherwise)
-	attotime const &curr = m_update_timer.expire();
-	attotime next = curr + STREAMS_UPDATE_ATTOTIME;
-	if (next.seconds() != curr.seconds())
-		next = attotime(next.seconds(), subseconds::zero());
-	m_update_timer.adjust_absolute(next);
 
 	g_profiler.stop();
 }

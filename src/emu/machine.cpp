@@ -910,6 +910,7 @@ void running_machine::scheduled_event(int event)
 	{
 		// flush out the sound, handle auto-save and final snapshot, then force an immediate stop
 		case EVENT_EXIT:
+			m_sound->update();
 			if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 				immediate_save("auto");
 			if (options().seconds_to_run() != 0)

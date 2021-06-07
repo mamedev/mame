@@ -737,6 +737,7 @@ struct mixer_input
 
 class sound_manager
 {
+	friend class running_machine;
 	friend class sound_stream;
 
 	// reasons for muting
