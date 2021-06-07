@@ -41,23 +41,28 @@ namespace
 	protected:
 		// device-level overrides
 		virtual void device_start() override;
+		virtual void device_reset() override;
 
 		virtual const tiny_rom_entry *device_rom_region() const override
 		{
 			return ROM_NAME(mc10_mcx128);
 		}
 
+		u8 control_register_read(offs_t offset);
+		void control_register_write(offs_t offset, u8 data);
+
 	private:
 		memory_share_creator<u8> m_share;
 		memory_view m_view;
+		required_memory_bank_array<4> m_bank_array;
+
+		uint8_t ram_bank_cr;
+		uint8_t rom_map_cr;
+
+		void update_banks();
+
 	};
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(MC10_PAK_MCX128, device_mc10cart_interface, mc10_pak_mcx128_device, "mc10_mcx128", "Darren Atkinson's MCX-128 cartridge")
 
@@ -71,14 +76,9 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, co
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*128, ENDIANNESS_BIG)
 	, m_view(*this, "mcx_view")
+	, m_bank_array(*this, "bank%u", 0U)
 {
 }
-
-
-
-//**************************************************************************
-//  MACHINE FRAGMENTS AND ADDRESS MAPS
-//**************************************************************************
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -86,5 +86,87 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, co
 
 void mc10_pak_mcx128_device::device_start()
 {
-	owning_slot().install_bank(0x5000, 0x8fff, &m_share[0]);
+	save_item(NAME(ram_bank_cr));
+	save_item(NAME(rom_map_cr));
+
+	m_bank_array[0]->configure_entry(0, &m_share[0x00000]);
+	m_bank_array[0]->configure_entry(1, &m_share[0x10000]);
+
+	m_bank_array[1]->configure_entry(0, &m_share[0x08000]);
+	m_bank_array[1]->configure_entry(1, &m_share[0x18000]);
+
+	m_bank_array[2]->configure_entry(0, &m_share[0x04000]);
+	m_bank_array[2]->configure_entry(1, &m_share[0x14000]);
+
+	m_bank_array[3]->configure_entry(0, &m_share[0x06000]);
+	m_bank_array[3]->configure_entry(1, &m_share[0x16000]);
+
+ 	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
+
+ 	m_view[0](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[0](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[0](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[0](0xc000, 0xffff).rom().region("eprom",0).bankw("bank2");
+
+ 	m_view[1](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[1](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[1](0xc000, 0xdfff).bankrw("bank2");
+ 	m_view[1](0xe000, 0xffff).rom().region("eprom",0x2000).bankw("bank3");
+
+ 	m_view[2](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[2](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[2](0xc000, 0xdfff).bankrw("bank2");
+// 	0xe000, 0xffff: internal ROM
+
+ 	m_view[3](0x0000, 0x3fff).bankrw("bank0");
+ 	m_view[3](0x4000, 0xbeff).bankrw("bank1");
+ 	m_view[1](0xbf00, 0xbf01).rw(FUNC(mc10_pak_mcx128_device::control_register_read), FUNC(mc10_pak_mcx128_device::control_register_write));
+ 	m_view[3](0xc000, 0xffff).bankrw("bank2");
 }
+
+//-------------------------------------------------
+//  device_reset - device-specific startup
+//-------------------------------------------------
+
+void mc10_pak_mcx128_device::device_reset()
+{
+	ram_bank_cr = 0;
+	rom_map_cr = 0;
+	update_banks();
+}
+
+u8 mc10_pak_mcx128_device::control_register_read(offs_t offset)
+{
+	if (offset==0)
+		return ram_bank_cr & 0x03;
+
+	return rom_map_cr & 0x03;
+}
+
+void mc10_pak_mcx128_device::control_register_write(offs_t offset, u8 data)
+{
+	if (offset==0)
+		ram_bank_cr = data;
+	else
+		rom_map_cr = data;
+
+	update_banks();
+}
+
+void mc10_pak_mcx128_device::update_banks()
+{
+	m_bank_array[0]->set_entry(ram_bank_cr & 0x01);
+	m_bank_array[1]->set_entry((ram_bank_cr & 0x02) >> 1);
+	m_bank_array[2]->set_entry(ram_bank_cr & 0x01);
+	m_bank_array[3]->set_entry(ram_bank_cr & 0x01);
+
+	m_view.select(rom_map_cr & 0x03);
+}
+
+
+
+
+
+

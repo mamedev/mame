@@ -47,6 +47,7 @@ public:
 	auto nmi_callback() { return m_nmi_callback.bind(); }
 
 	// address map manipulations
+	address_space &memspace() const { return *m_memspace; };
 	void install_bank(offs_t start, offs_t end, uint8_t *data);
 	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
@@ -116,8 +117,8 @@ protected:
 	device_mc10cart_interface(const machine_config &mconfig, device_t &device);
 
 	// accessors for containers
-	mc10cart_slot_device &owning_slot() { assert(m_owning_slot); return *m_owning_slot; }
-	device_mc10cart_host_interface &host() { assert(m_host); return *m_host; }
+	mc10cart_slot_device &owning_slot() const { assert(m_owning_slot); return *m_owning_slot; }
+	device_mc10cart_host_interface &host() const { assert(m_host); return *m_host; }
 
 private:
 	mc10cart_slot_device * m_owning_slot;
