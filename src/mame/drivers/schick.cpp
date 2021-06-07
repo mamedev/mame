@@ -111,8 +111,6 @@ private:
 	uint8_t m_bgpriority;
 	uint8_t m_inv_spr;
 	uint8_t m_extrabank;
-
-	uint8_t schick_hack_r();
 };
 
 #define MASTER_CLOCK        (18432000)
@@ -310,13 +308,6 @@ void schick_state::schick_9060_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_all_dirty();
 }
 
-uint8_t schick_state::schick_hack_r()
-{
-	// HACK
-	// always return 0xff from this flag in RAM (this doesn't work in all cases, sometimes you get stuck and can't more, or are given 64 lives)
-	return 0xff;
-}
-
 uint8_t schick_state::schick_prot_00_r(offs_t offset)
 {
 	// protection? influences flag in RAM at 0x8923 which causes
@@ -378,11 +369,6 @@ void schick_state::schick_map(address_map &map)
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 
-	// protection?
-	// flag here gets set based on port reads, and will jump to areas with no code
-	// (could be an MCU supplying extra subroutines for palette if PROMs aren't related)
-	//map(0x8923, 0x8924).r(FUNC(schick_state::schick_hack_r));
-
 	map(0x9000, 0x901f).nopw(); // leftover from pengo?
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9000, 0x903f).portr("SW2");
@@ -399,7 +385,7 @@ void schick_state::schick_map(address_map &map)
 //	map(0xa000, 0xbfff).rom(); // maybe ROM?
 	map(0xa808, 0xa808).r(FUNC(schick_state::schick_prot_a808_r));	
 
-	map(0xc000, 0xffff).rom(); // ROM
+	map(0xe000, 0xffff).rom(); // ROM
 }
 
 void schick_state::schick_decrypted_opcodes_map(address_map &map)
