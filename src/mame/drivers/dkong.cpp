@@ -1670,7 +1670,8 @@ WRITE_LINE_MEMBER(dkong_state::vblank_irq)
 WRITE_LINE_MEMBER(dkong_state::busreq_w )
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	if (m_maincpu->type() == Z80)
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	if(m_z80dma)
 		m_z80dma->bai_w(state); // tell dma that bus has been granted
