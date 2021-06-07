@@ -74,6 +74,7 @@ private:
 
 	uint8_t schick_prot_00_r(offs_t offset);
 	uint8_t schick_prot_0a_r(offs_t offset);
+	uint8_t schick_prot_76_r(offs_t offset);
 	uint8_t schick_prot_78_r(offs_t offset);
 	uint8_t schick_prot_a808_r(offs_t offset);
 
@@ -336,6 +337,18 @@ uint8_t schick_state::schick_prot_0a_r(offs_t offset)
 	return 0xff;
 }
 
+uint8_t schick_state::schick_prot_76_r(offs_t offset)
+{
+	// if you get the ? blocks together on round 6?
+	// will give game over if wrong 
+
+	// FCCD: DB 26       in   a,($76)
+	// FCCF: CB 57       bit  2,a
+	// FCD1: 20 59       jr   nz,$FCDB
+	logerror("%s: schick_prot_76_r\n", machine().describe_context());
+	return 0xff;
+}
+
 uint8_t schick_state::schick_prot_78_r(offs_t offset)
 {
 	// E35B: DB 68       in   a,($78)
@@ -344,6 +357,16 @@ uint8_t schick_state::schick_prot_78_r(offs_t offset)
 	logerror("%s: schick_prot_78_r\n", machine().describe_context());
 	return 0xff;
 }
+
+/*
+
+these start happening on round 4?
+[:maincpu] ':maincpu' (F127): unmapped program memory read from A191 & FF
+[:maincpu] ':maincpu' (F12B): unmapped io memory write to 0091 = C2 & FF
+[:maincpu] ':maincpu' (F125): unmapped io memory write to 0091 = 22 & FF
+
+*/
+
 
 uint8_t schick_state::schick_prot_a808_r(offs_t offset)
 {
@@ -358,6 +381,7 @@ void schick_state::schick_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(schick_state::schick_prot_00_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0a, 0x0a).r(FUNC(schick_state::schick_prot_0a_r));
+	map(0x76, 0x76).r(FUNC(schick_state::schick_prot_76_r));
 	map(0x78, 0x78).r(FUNC(schick_state::schick_prot_78_r));
 }
 
