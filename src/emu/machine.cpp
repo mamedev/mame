@@ -201,9 +201,11 @@ void running_machine::start()
 	m_event_timer.init(m_scheduler, *this, FUNC(running_machine::scheduled_event));
 
 	// if we've been requested to run for a fixed period, set a hard stop
+	// at 1 subsecond past so that we can exit immediately after all timers
+	// have fired at that moment
 	m_exit_timer.init(m_scheduler, *this, FUNC(running_machine::scheduled_event));
 	if (options().seconds_to_run() != 0)
-		m_exit_timer.adjust(attotime::from_seconds(options().seconds_to_run()), EVENT_EXIT);
+		m_exit_timer.adjust(attotime(options().seconds_to_run(), subseconds::unit()), EVENT_EXIT);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -906,10 +908,12 @@ void running_machine::scheduled_event(int event)
 {
 	switch (event)
 	{
-		// handle auto-save, then force an immediate stop
+		// flush out the sound, handle auto-save and final snapshot, then force an immediate stop
 		case EVENT_EXIT:
 			if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 				immediate_save("auto");
+			if (options().seconds_to_run() != 0)
+				m_video->save_final_snapshot();
 			m_scheduler.hard_stop();
 			m_event_timer.set_param(EVENT_EXIT);
 			break;
