@@ -47,7 +47,7 @@ void nes_action53_device::device_start()
 	save_item(NAME(m_reg));
 }
 
-void nes_action53_device::pcb_start(running_machine &machine, uint8_t *ciram_ptr, bool cart_mounted)
+void nes_action53_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
 {
 	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
 	// at power on last 16K of ROM is mapped to $C000-$FFFF
@@ -117,7 +117,7 @@ void nes_action53_device::update_prg()
 	u8 inner = (m_reg[1] << b32k) & ~mask;    // Inner PRG reg bits
 
 	prg_hi = prg_lo = (outer & mask) | inner;
-	if (b32k)		      // 32K mode
+	if (b32k)                     // 32K mode
 		prg_hi++;
 	else if (BIT(m_reg[2], 2))    // 16K mode with fixed HI
 		prg_hi = ++outer;

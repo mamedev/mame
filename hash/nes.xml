@@ -76833,7 +76833,7 @@ be better to redump them properly. -->
 	</software>
 
 
-<!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. What follows are freely available digital releases which need to be checked against commercial physical carts. -->
+<!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. The following roms are freely available digital releases. They need to be checked against commercial physical carts. -->
 
 	<software name="a53vol1">
 		<description>Streemerz - Action 53 Function 16 Volume 1 (R.C.#2)</description>
