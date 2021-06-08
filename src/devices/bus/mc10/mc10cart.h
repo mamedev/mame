@@ -78,7 +78,7 @@ public:
 private:
 
 	// cartridge
-	device_mc10cart_interface   *m_cart;
+	device_mc10cart_interface *m_cart;
 
 protected:
 	required_address_space m_memspace;

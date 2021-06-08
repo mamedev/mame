@@ -13,7 +13,7 @@
 
 // #include "machine/ram.h"
 
-// #define VERBOSE (LOG_GENERAL )
+#define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
 
 
@@ -42,6 +42,7 @@ namespace
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
+		virtual void device_post_load() override;
 
 		virtual const tiny_rom_entry *device_rom_region() const override
 		{
@@ -54,8 +55,7 @@ namespace
 	private:
 		memory_share_creator<u8> m_share;
 		memory_view m_view;
-		required_memory_bank_array<4> m_bank_array;
-
+		memory_bank_creator m_bank0, m_bank1, m_bank2, m_bank3;
 		uint8_t ram_bank_cr;
 		uint8_t rom_map_cr;
 
@@ -75,7 +75,10 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, co
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*128, ENDIANNESS_BIG)
 	, m_view(*this, "mcx_view")
-	, m_bank_array(*this, "bank%u", 0U)
+	, m_bank0(*this, "bank0")
+	, m_bank1(*this, "bank1")
+	, m_bank2(*this, "bank2")
+	, m_bank3(*this, "bank3")
 {
 }
 
@@ -88,19 +91,21 @@ void mc10_pak_mcx128_device::device_start()
 	save_item(NAME(ram_bank_cr));
 	save_item(NAME(rom_map_cr));
 
-	m_bank_array[0]->configure_entry(0, &m_share[0x00000]);
-	m_bank_array[0]->configure_entry(1, &m_share[0x10000]);
+	m_bank0->configure_entry(0, &m_share[0x00000]);
+	m_bank0->configure_entry(1, &m_share[0x10000]);
 
-	m_bank_array[1]->configure_entry(0, &m_share[0x08000]);
-	m_bank_array[1]->configure_entry(1, &m_share[0x18000]);
+	m_bank1->configure_entry(0, &m_share[0x08000]);
+	m_bank1->configure_entry(1, &m_share[0x18000]);
 
-	m_bank_array[2]->configure_entry(0, &m_share[0x04000]);
-	m_bank_array[2]->configure_entry(1, &m_share[0x14000]);
+	m_bank2->configure_entry(0, &m_share[0x04000]);
+	m_bank2->configure_entry(1, &m_share[0x14000]);
 
-	m_bank_array[3]->configure_entry(0, &m_share[0x06000]);
-	m_bank_array[3]->configure_entry(1, &m_share[0x16000]);
+	m_bank3->configure_entry(0, &m_share[0x06000]);
+	m_bank3->configure_entry(1, &m_share[0x16000]);
 
- 	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
+//  	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
+	memory_region *memregion("eprom");
+	owning_slot().install_rom(0xc000, 0xffff, memregion->base())
 
  	m_view[0](0x0000, 0x3fff).bankrw("bank0");
 //	0x4000, 0xbeff: internal RAM
@@ -158,6 +163,11 @@ void mc10_pak_mcx128_device::device_reset()
 	update_banks();
 }
 
+void mc10_pak_mcx128_device::device_post_load()
+{
+	update_banks();
+}
+
 u8 mc10_pak_mcx128_device::control_register_read(offs_t offset)
 {
 	if (offset==0)
@@ -178,16 +188,12 @@ void mc10_pak_mcx128_device::control_register_write(offs_t offset, u8 data)
 
 void mc10_pak_mcx128_device::update_banks()
 {
-	m_bank_array[0]->set_entry(ram_bank_cr & 0x01);
-	m_bank_array[1]->set_entry((ram_bank_cr & 0x02) >> 1);
-	m_bank_array[2]->set_entry(ram_bank_cr & 0x01);
-	m_bank_array[3]->set_entry(ram_bank_cr & 0x01);
+	m_bank0->set_entry(ram_bank_cr & 0x01);
+	m_bank1->set_entry((ram_bank_cr & 0x02) >> 1);
+	m_bank2->set_entry(ram_bank_cr & 0x01);
+	m_bank3->set_entry(ram_bank_cr & 0x01);
 
 	m_view.select(((ram_bank_cr & 0x02) << 1) | (rom_map_cr & 0x03));
+
+	LOG("view select: %d, bank cr: %d\n", ((ram_bank_cr & 0x02) << 1) | (rom_map_cr & 0x03), ram_bank_cr & 0x03 );
 }
-
-
-
-
-
-
