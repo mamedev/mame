@@ -26,10 +26,11 @@
 #pragma once
 
 #include "machine/am9517a.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/ds128x.h"
 #include "machine/at_keybc.h"
+#include "machine/ds128x.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
 
 class cs4031_device : public device_t
 {
@@ -150,6 +151,7 @@ private:
 	// internal state
 	required_device<device_memory_interface> m_cpu;
 	required_device<at_kbc_device_base> m_keybc;
+	required_device<ram_device> m_ram_dev;
 	required_region_ptr<uint8_t> m_isa;
 	required_region_ptr<uint8_t> m_bios;
 

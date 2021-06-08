@@ -82,6 +82,7 @@ nes_bcbattle_device::nes_bcbattle_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, NES_BARCODE_BATTLER, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_reader(*this, "battler")
+	, m_maincpu(*this, ":maincpu")
 	, m_pending_code(0), m_new_code(0), m_transmitting(0), m_cur_bit(0), m_cur_byte(0), battler_timer(nullptr)
 {
 }
@@ -97,7 +98,7 @@ void nes_bcbattle_device::device_start()
 	// proper emulation would have the standalone unit acknowledging that a new barcode has been scanned
 	// and sending the proper serial bits, instead of our read_current_bit() function!
 	battler_timer = timer_alloc(TIMER_BATTLER);
-	battler_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1000));
+	battler_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1000));
 
 	save_item(NAME(m_current_barcode));
 	save_item(NAME(m_new_code));

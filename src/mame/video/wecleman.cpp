@@ -852,11 +852,10 @@ void wecleman_state::video_start()
 		8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15
 	};
 
-	uint8_t *buffer;
 	int i, j;
 
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
-	buffer = auto_alloc_array(machine(), uint8_t, 0x12c00);   // working buffer for sprite operations
+	m_sprite_buffer = std::make_unique<uint8_t[]>(0x12c00);   // working buffer for sprite operations
 
 	m_gameid = WECLEMAN_ID;
 	m_gfx_bank = bank;
@@ -869,11 +868,11 @@ void wecleman_state::video_start()
 	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
 	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
 
-	m_rgb_half     =   (uint16_t*)(buffer + 0x00000);
-	m_t32x32pm     =        (int*)(buffer + 0x10020);
-	m_spr_ptr_list = (sprite_t **)(buffer + 0x12000);
-	m_spr_idx_list =       (int *)(buffer + 0x12400);
-	m_spr_pri_list =       (int *)(buffer + 0x12800);
+	m_rgb_half     =   (uint16_t*)(&m_sprite_buffer[0x00000]);
+	m_t32x32pm     =        (int*)(&m_sprite_buffer[0x10020]);
+	m_spr_ptr_list = (sprite_t **)(&m_sprite_buffer[0x12000]);
+	m_spr_idx_list =       (int *)(&m_sprite_buffer[0x12400]);
+	m_spr_pri_list =       (int *)(&m_sprite_buffer[0x12800]);
 
 	for (i=0; i<0x8000; i++)
 	{
@@ -956,9 +955,7 @@ void hotchase_state::video_start()
 		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 	};
 
-	uint8_t *buffer;
-
-	buffer = auto_alloc_array(machine(), uint8_t, 0x400); // reserve 1k for sprite list
+	m_sprite_buffer = std::make_unique<uint8_t[]>(0x400); // reserve 1k for sprite list
 
 	m_gameid = HOTCHASE_ID;
 	m_gfx_bank = bank;
@@ -968,7 +965,7 @@ void hotchase_state::video_start()
 	std::fill(std::begin(m_bgpage), std::end(m_bgpage), 0);
 	std::fill(std::begin(m_fgpage), std::end(m_fgpage), 0);
 
-	m_spr_ptr_list = (sprite_t **)buffer;
+	m_spr_ptr_list = (sprite_t **)m_sprite_buffer.get();
 
 	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 }

@@ -183,15 +183,13 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 
 	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
-	int16_t* sampledata = auto_alloc_array(machine(), int16_t, length);
+	m_sampledata = std::make_unique<int16_t[]>(length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
 	{
-		sampledata[i] = rom[i] << 7;
+		m_sampledata[i] = rom[i] << 7;
 	}
-
-	m_sampledata = sampledata;
 }
 
 void ninjakd2_state::ninjakd2_pcm_play_w(uint8_t data)

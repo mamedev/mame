@@ -55,6 +55,7 @@ protected:
 	void xmit_char(uint8_t data);
 
 	required_device<midi_port_device> m_midiin, m_midiout;
+	required_device<cpu_device> m_maincpu;
 
 	emu_timer *strobe_timer;
 

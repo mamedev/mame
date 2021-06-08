@@ -924,19 +924,19 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP49_G_MODEL  ? (512 * 1024) :
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
-	uint8_t *ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
-	subdevice<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+	m_allocated_ram = std::make_unique<uint8_t[]>(2 * ram_size);
+	subdevice<nvram_device>("nvram")->set_base(m_allocated_ram.get(), 2 * ram_size);
 
 
 	/* ROM load */
 	uint32_t rom_size =
 		HP49_G_MODEL  ? (2048 * 1024) :
 		HP48_S_SERIES ?  (256 * 1024) : (512 * 1024);
-	m_rom = auto_alloc_array(machine(), uint8_t, 2 * rom_size);
-	decode_nibble(m_rom, memregion("maincpu")->base(), rom_size);
+	m_allocated_rom = std::make_unique<uint8_t[]>(2 * rom_size);
+	decode_nibble(m_allocated_rom.get(), memregion("maincpu")->base(), rom_size);
 
 	/* init state */
-	memset(ram, 0, 2 * ram_size);
+	std::fill_n(&m_allocated_ram[0], 2 * ram_size, 0);
 	memset(m_io, 0, sizeof(m_io));
 	m_out = 0;
 	m_kdn = 0;
@@ -954,16 +954,16 @@ void hp48_state::base_machine_start(hp48_models model)
 	if (HP49_G_MODEL)
 	{
 		m_modules[HP48_NCE2].off_mask = 2 * 256 * 1024 - 1;
-		m_modules[HP48_NCE2].data     = ram;
+		m_modules[HP48_NCE2].data     = &m_allocated_ram[0];
 		m_modules[HP48_CE2].off_mask  = 2 * 128 * 1024 - 1;
-		m_modules[HP48_CE2].data      = ram + 2 * 256 * 1024;
+		m_modules[HP48_CE2].data      = &m_allocated_ram[2 * 256 * 1024];
 		m_modules[HP48_NCE3].off_mask = 2 * 128 * 1024 - 1;
-		m_modules[HP48_NCE3].data     = ram + 2 * (128+256) * 1024;
+		m_modules[HP48_NCE3].data     = &m_allocated_ram[2 * (128+256) * 1024];
 	}
 	else
 	{
 		m_modules[HP48_NCE2].off_mask = 2 * ram_size - 1;
-		m_modules[HP48_NCE2].data     = ram;
+		m_modules[HP48_NCE2].data     = &m_allocated_ram[0];
 	}
 
 	/* bank switcher */

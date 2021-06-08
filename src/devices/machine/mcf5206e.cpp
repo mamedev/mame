@@ -826,6 +826,7 @@ DEFINE_DEVICE_TYPE(MCF5206E_PERIPHERAL, mcf5206e_peripheral_device, "mcf5206e_pe
 mcf5206e_peripheral_device::mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCF5206E_PERIPHERAL, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
+		m_cpu(*this, ":maincpu"),
 		m_space_config("coldfire_regs", ENDIANNESS_BIG, 32,10, 0, address_map_constructor(FUNC(mcf5206e_peripheral_device::coldfire_regs_map), this))
 
 {
@@ -870,8 +871,6 @@ void mcf5206e_peripheral_device::device_start()
 
 void mcf5206e_peripheral_device::device_reset()
 {
-	m_cpu = (cpu_device*)machine().device(":maincpu"); // hack. this device should really be attached to a modern CPU core
-
 	init_regs(false);
 	m_timer1->adjust(attotime::never);
 }

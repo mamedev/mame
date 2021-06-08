@@ -170,7 +170,7 @@ md_rom_soulb_device::md_rom_soulb_device(const machine_config &mconfig, const ch
 }
 
 md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_CHINF3, tag, owner, clock), m_bank(0)
+	: md_std_rom_device(mconfig, MD_ROM_CHINF3, tag, owner, clock), m_bank(0), m_maincpu(*this, ":maincpu")
 {
 }
 
@@ -240,7 +240,7 @@ md_rom_tekkensp_device::md_rom_tekkensp_device(const machine_config &mconfig, co
 }
 
 md_rom_topf_device::md_rom_topf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_TOPF, tag, owner, clock), m_latch(0)
+	: md_std_rom_device(mconfig, MD_ROM_TOPF, tag, owner, clock), m_latch(0), m_maincpu(*this, ":maincpu")
 {
 }
 
@@ -647,47 +647,47 @@ uint16_t md_rom_chinf3_device::read(offs_t offset)
 		 04dc10 chifi3, prot_r? 2800
 		 04cefa chifi3, prot_r? 65262
 		 */
-		if (machine().device<cpu_device>("maincpu")->pc() == 0x01782) // makes 'VS' screen appear
+		if (m_maincpu->pc() == 0x01782) // makes 'VS' screen appear
 		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
+			retdat = m_maincpu->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x1c24) // background gfx etc.
+		else if (m_maincpu->pc() == 0x1c24) // background gfx etc.
 		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
+			retdat = m_maincpu->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c4a) // unknown
+		else if (m_maincpu->pc() == 0x10c4a) // unknown
 		{
 			return machine().rand();
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c50) // unknown
+		else if (m_maincpu->pc() == 0x10c50) // unknown
 		{
 			return machine().rand();
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x10c52) // relates to the game speed..
+		else if (m_maincpu->pc() == 0x10c52) // relates to the game speed..
 		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D4) & 0xff;
+			retdat = m_maincpu->state_int(M68K_D4) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061ae)
+		else if (m_maincpu->pc() == 0x061ae)
 		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
+			retdat = m_maincpu->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
-		else if (machine().device<cpu_device>("maincpu")->pc() == 0x061b0)
+		else if (m_maincpu->pc() == 0x061b0)
 		{
-			retdat = machine().device<cpu_device>("maincpu")->state_int(M68K_D3) & 0xff;
+			retdat = m_maincpu->state_int(M68K_D3) & 0xff;
 			retdat <<= 8;
 			return retdat;
 		}
 		else
 		{
-			logerror("%06x chifi3, prot_r? %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset);
+			logerror("%06x chifi3, prot_r? %04x\n", m_maincpu->pc(), offset);
 		}
 		return 0;
 	}
@@ -712,7 +712,7 @@ void md_rom_chinf3_device::write(offs_t offset, uint16_t data, uint16_t mem_mask
 		else if (data == 0x0000)
 			m_bank = 0;
 		else
-			logerror("%06x chifi3, bankw? %04x %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
+			logerror("%06x chifi3, bankw? %04x %04x\n", m_maincpu->pc(), offset, data);
 	}
 }
 
@@ -1367,22 +1367,22 @@ uint16_t md_rom_topf_device::read(offs_t offset)
 		 cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
 		 */
 
-		if (machine().device<cpu_device>("maincpu")->pc()==0x1771a2) return 0x50;
+		if (m_maincpu->pc()==0x1771a2) return 0x50;
 		else
 		{
 			m_latch++;
-			logerror("%06x topfig_6BD294_r %04x\n",machine().device<cpu_device>("maincpu")->pc(), m_latch);
+			logerror("%06x topfig_6BD294_r %04x\n",m_maincpu->pc(), m_latch);
 			return m_latch;
 		}
 	}
 	if (offset == 0x6f5344/2)
 	{
-		if (machine().device<cpu_device>("maincpu")->pc()==0x4C94E)
-			return machine().device<cpu_device>("maincpu")->state_int((M68K_D0)) & 0xff;
+		if (m_maincpu->pc()==0x4C94E)
+			return m_maincpu->state_int((M68K_D0)) & 0xff;
 		else
 		{
 			m_latch++;
-			logerror("%06x topfig_6F5344_r %04x\n", machine().device<cpu_device>("maincpu")->pc(), m_latch);
+			logerror("%06x topfig_6F5344_r %04x\n", m_maincpu->pc(), m_latch);
 			return m_latch;
 		}
 	}
@@ -1420,7 +1420,7 @@ void md_rom_topf_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 			m_bank[2] = 0;
 		}
 		else
-			logerror("%06x offset %06x, data %04x\n", machine().device<cpu_device>("maincpu")->pc(), offset, data);
+			logerror("%06x offset %06x, data %04x\n", m_maincpu->pc(), offset, data);
 	}
 }
 

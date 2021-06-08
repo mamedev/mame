@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(A26_ROM_SUPERCHARGER, a26_rom_ss_device, "a2600_ss", "Atari 2
 a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: a26_rom_f6_device(mconfig, A26_ROM_SUPERCHARGER, tag, owner, clock),
 	m_cassette(*this, "cassette"),
-	m_maincpu(nullptr),
+	m_maincpu(*this, ":maincpu"),
 	m_reg(0),
 	m_write_delay(0),
 	m_ram_write_enabled(0),
@@ -60,8 +60,6 @@ a26_rom_ss_device::a26_rom_ss_device(const machine_config &mconfig, const char *
 
 void a26_rom_ss_device::device_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-
 	save_item(NAME(m_base_banks));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_write_delay));

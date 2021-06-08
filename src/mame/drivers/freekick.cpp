@@ -1599,10 +1599,10 @@ void freekick_state::init_gigasb()
 
 void freekick_state::init_pbillrds()
 {
-	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0x10000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0x10000);
-	membank("bank0d")->set_base(decrypted_opcodes);
-	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x10000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x10000);
+	membank("bank0d")->set_base(m_decrypted_opcodes.get());
+	m_bank1d->configure_entries(0, 2, &m_decrypted_opcodes[0x8000], 0x4000);
 }
 
 
@@ -1615,10 +1615,10 @@ void freekick_state::init_pbillrdbl()
 
 void freekick_state::init_gigas()
 {
-	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0xc000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0xc000);
-	membank("bank0d")->set_base(decrypted_opcodes);
-	m_bank1d->set_base(decrypted_opcodes + 0x8000);
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0xc000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0xc000);
+	membank("bank0d")->set_base(m_decrypted_opcodes.get());
+	m_bank1d->set_base(&m_decrypted_opcodes[0x8000]);
 }
 
 

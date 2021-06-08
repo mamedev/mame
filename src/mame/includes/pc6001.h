@@ -118,6 +118,7 @@ protected:
 
 	emu_timer *m_timer_irq_timer;
 	uint8_t *m_video_ram;
+	std::unique_ptr<uint8_t[]> m_video_ram_alloc;
 	uint8_t m_irq_vector;
 	uint8_t m_cas_switch;
 	uint8_t m_sys_latch;

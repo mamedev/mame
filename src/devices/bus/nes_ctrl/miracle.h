@@ -64,6 +64,7 @@ private:
 	int m_xmit_read, m_xmit_write;
 	int m_recv_read, m_recv_write;
 	bool m_tx_busy, m_read_status, m_status_bit;
+	required_device<cpu_device> m_maincpu;
 };
 
 // device type definition

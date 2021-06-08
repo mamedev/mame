@@ -263,7 +263,7 @@ void pci_bus_legacy_device::device_start()
 	m_write_callback.resolve_all();
 
 	if (m_father) {
-		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
+		pci_bus_legacy_device *father = machine().root_device().subdevice<pci_bus_legacy_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);
 	}

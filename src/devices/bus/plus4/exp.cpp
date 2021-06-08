@@ -95,7 +95,7 @@ void plus4_expansion_slot_device::device_start()
 	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
 	if (clock() == 0)
 	{
-		plus4_expansion_slot_device *root = machine().device<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
+		plus4_expansion_slot_device *root = machine().root_device().subdevice<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
 		assert(root);
 		set_unscaled_clock(root->clock());
 	}

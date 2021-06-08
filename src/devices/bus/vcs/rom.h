@@ -305,6 +305,7 @@ protected:
 	virtual void device_reset() override;
 
 	int m_locked;
+	required_device<cpu_device> m_maincpu;
 };
 
 

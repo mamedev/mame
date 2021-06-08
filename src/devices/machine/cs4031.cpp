@@ -28,8 +28,6 @@
 #include "emu.h"
 #include "machine/cs4031.h"
 
-#include "machine/ram.h"
-
 #define LOG_GENERAL     (1U << 0)
 #define LOG_REGISTER    (1U << 1)
 #define LOG_MEMORY      (1U << 2)
@@ -175,6 +173,7 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 	m_write_spkr(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_keybc(*this, finder_base::DUMMY_TAG),
+	m_ram_dev(*this, RAM_TAG),
 	m_isa(*this, finder_base::DUMMY_TAG),
 	m_bios(*this, finder_base::DUMMY_TAG),
 	m_space(nullptr),
@@ -211,10 +210,8 @@ cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, dev
 
 void cs4031_device::device_start()
 {
-	ram_device *ram_dev = machine().device<ram_device>(RAM_TAG);
-
 	// make sure the ram device is already running
-	if (!ram_dev->started())
+	if (!m_ram_dev->started())
 		throw device_missing_dependencies();
 
 	// resolve callbacks
@@ -249,8 +246,8 @@ void cs4031_device::device_start()
 	m_space = &m_cpu->memory().space(AS_PROGRAM);
 	m_space_io = &m_cpu->memory().space(AS_IO);
 
-	m_ram = ram_dev->pointer();
-	uint32_t ram_size = ram_dev->size();
+	m_ram = m_ram_dev->pointer();
+	uint32_t ram_size = m_ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);

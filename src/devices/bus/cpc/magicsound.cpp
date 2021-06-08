@@ -73,7 +73,9 @@ al_magicsound_device::al_magicsound_device(const machine_config &mconfig, const 
 	m_dmac(*this,"dmac"),
 	m_timer1(*this,"timer1"),
 	m_timer2(*this,"timer2"),
-	m_current_channel(0), m_ramptr(nullptr), m_current_output(0)
+	m_ramptr(*this, ":" RAM_TAG),
+	m_current_channel(0),
+	m_current_output(0)
 {
 }
 
@@ -89,8 +91,6 @@ void al_magicsound_device::device_start()
 	space.install_write_handler(0xf9d0,0xf9df, write8sm_delegate(*this, FUNC(al_magicsound_device::timer_w)));
 	space.install_write_handler(0xfad0,0xfadf, write8sm_delegate(*this, FUNC(al_magicsound_device::volume_w)));
 	space.install_write_handler(0xfbd0,0xfbdf, write8sm_delegate(*this, FUNC(al_magicsound_device::mapper_w)));
-
-	m_ramptr = machine().device<ram_device>(":" RAM_TAG);
 
 	save_item(NAME(m_output));
 }

@@ -149,7 +149,7 @@ a26_rom_dc_device::a26_rom_dc_device(const machine_config &mconfig, const char *
 
 
 a26_rom_fv_device::a26_rom_fv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a26_rom_f6_device(mconfig, A26_ROM_FV, tag, owner, clock), m_locked(0)
+	: a26_rom_f6_device(mconfig, A26_ROM_FV, tag, owner, clock), m_locked(0), m_maincpu(*this, ":maincpu")
 {
 }
 
@@ -934,7 +934,7 @@ uint8_t a26_rom_fv_device::read_rom(offs_t offset)
 	{
 		if (offset == 0xfd0)
 		{
-			if (!m_locked && (machine().device<cpu_device>("maincpu")->pc() & 0x1f00) == 0x1f00)
+			if (!m_locked && (m_maincpu->pc() & 0x1f00) == 0x1f00)
 			{
 				m_locked = 1;
 				m_base_bank = m_base_bank ^ 0x01;
@@ -949,7 +949,7 @@ void a26_rom_fv_device::write_bank(address_space &space, offs_t offset, uint8_t 
 {
 	if (offset == 0xfd0)
 	{
-		if (!m_locked && (machine().device<cpu_device>("maincpu")->pc() & 0x1f00) == 0x1f00)
+		if (!m_locked && (m_maincpu->pc() & 0x1f00) == 0x1f00)
 		{
 			m_locked = 1;
 			m_base_bank = m_base_bank ^ 0x01;

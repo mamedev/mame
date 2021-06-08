@@ -171,6 +171,7 @@ protected:
 
 private:
 	int m_bank;
+	required_device<cpu_device> m_maincpu;
 };
 
 // ======================> md_rom_16mj2_device
@@ -546,6 +547,7 @@ protected:
 private:
 	uint16_t m_latch;
 	uint8_t m_bank[3];
+	required_device<cpu_device> m_maincpu;
 };
 
 // ======================> md_rom_radica_device

@@ -38,6 +38,7 @@ protected:
 	required_device<ym_generic_device> m_ym2151;
 	required_device<msx_audio_kbdc_port_device> m_kbdc;
 	required_device<ym2148_device> m_ym2148;
+	required_device<cpu_device> m_maincpu;
 	int m_ym2151_irq_state;
 	int m_ym2148_irq_state;
 	uint32_t m_rom_mask;

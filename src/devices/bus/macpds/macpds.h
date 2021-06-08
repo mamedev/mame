@@ -70,7 +70,7 @@ public:
 
 	~macpds_device() { m_device_list.detach_all(); }
 	// inline configuration
-	void set_cputag(const char *tag) { m_cputag = tag; }
+	template<typename T> void set_cputag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	void add_macpds_card(device_macpds_card_interface *card);
 	template<typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask=0xffffffff);
@@ -85,10 +85,8 @@ protected:
 	virtual void device_reset() override;
 
 	// internal state
-	cpu_device   *m_maincpu;
-
+	required_device<cpu_device> m_maincpu;
 	simple_list<device_macpds_card_interface> m_device_list;
-	const char *m_cputag;
 };
 
 

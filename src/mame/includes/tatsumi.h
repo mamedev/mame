@@ -254,6 +254,7 @@ private:
 	uint16_t m_road_color_bank, m_prev_road_bank;
 	uint16_t m_layer_page_size[4];
 	bool m_layer1_can_be_road;
+	std::unique_ptr<uint8_t[]> m_decoded_gfx;
 
 	void tile_expand();
 	void draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority);

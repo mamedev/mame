@@ -42,6 +42,7 @@ protected:
 	int read_current_bit();
 
 	required_device<barcode_reader_device> m_reader;
+	required_device<cpu_device> m_maincpu;
 	uint8_t m_current_barcode[20];
 	int m_pending_code, m_new_code, m_transmitting, m_cur_bit, m_cur_byte;
 	emu_timer *battler_timer;

@@ -160,7 +160,7 @@ private:
 		MAX_ICR
 	};
 
-	cpu_device* m_cpu;
+	required_device<cpu_device> m_cpu;
 
 	address_space_config m_space_config;
 

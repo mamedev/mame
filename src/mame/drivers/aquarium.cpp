@@ -335,10 +335,10 @@ void aquarium_state::expand_gfx(int low, int hi)
 	gfx_element *gfx_h = m_gfxdecode->gfx(hi);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gfx_l->elements() * gfx_l->width() * gfx_l->height());
+	m_decoded_gfx = std::make_unique<u8[]>(gfx_l->elements() * gfx_l->width() * gfx_l->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_decoded_gfx.get();
 	for (int c = 0; c < gfx_l->elements(); c++)
 	{
 		const u8 *c0base = gfx_l->get_data(c);
@@ -360,7 +360,7 @@ void aquarium_state::expand_gfx(int low, int hi)
 		}
 	}
 
-	gfx_l->set_raw_layout(srcdata, gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
+	gfx_l->set_raw_layout(m_decoded_gfx.get(), gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
 	gfx_l->set_granularity(32);
 	m_gfxdecode->set_gfx(hi, nullptr);
 }

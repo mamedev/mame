@@ -53,6 +53,7 @@ private:
 	tilemap_t  *m_txt_tilemap;
 	tilemap_t  *m_mid_tilemap;
 	tilemap_t  *m_bak_tilemap;
+	std::unique_ptr<u8[]> m_decoded_gfx;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

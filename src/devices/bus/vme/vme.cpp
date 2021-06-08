@@ -481,7 +481,7 @@ void device_vme_card_interface::set_vme_tag(const char *tag, const char *slottag
 void device_vme_card_interface::set_vme_device()
 {
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
-	m_vme = dynamic_cast<vme_device *>(device().machine().device(m_vme_tag));
+	m_vme = device().machine().root_device().subdevice<vme_device>(m_vme_tag);
 	//  printf("*** %s %sfound\n", m_vme_tag, m_vme ? "" : "not ");
 	if (m_vme) m_vme->add_vme_card(this);
 }

@@ -171,7 +171,7 @@ static void ensoniq_floppies(device_slot_interface &device)
 
 uint8_t enmirage_state::mirage_adc_read()
 {
-	uint8_t value;
+	uint8_t value = 0;
 	switch(m_mux_value & 0x03)
 	{
 		case 0:

@@ -84,7 +84,7 @@ void vic10_expansion_slot_device::device_start()
 	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
 	if (clock() == 0)
 	{
-		vic10_expansion_slot_device *root = machine().device<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
+		vic10_expansion_slot_device *root = machine().root_device().subdevice<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
 		assert(root);
 		set_unscaled_clock(root->clock());
 	}

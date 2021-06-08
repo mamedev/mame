@@ -141,7 +141,8 @@ image_init_result smartmedia_image_device::smartmedia_format_1()
 	m_page_total_size = get_UINT32BE(custom_header.page_total_size);
 	m_num_pages = get_UINT32BE(custom_header.num_pages);
 	m_log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	m_data_ptr = auto_alloc_array(machine(), uint8_t, m_page_total_size*m_num_pages);
+	m_data_ptr_alloc = std::make_unique<uint8_t[]>(m_page_total_size*m_num_pages);
+	m_data_ptr = &m_data_ptr_alloc[0];
 	m_data_uid_ptr = std::make_unique<uint8_t[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;
@@ -236,7 +237,8 @@ image_init_result smartmedia_image_device::smartmedia_format_2()
 		return image_init_result::FAIL;
 	}
 
-	m_data_ptr = auto_alloc_array(machine(), uint8_t, m_page_total_size*m_num_pages);
+	m_data_ptr_alloc = std::make_unique<uint8_t[]>(m_page_total_size*m_num_pages);
+	m_data_ptr = &m_data_ptr_alloc[0];
 	m_data_uid_ptr = std::make_unique<uint8_t[]>(256 + 16);
 	m_mode = SM_M_INIT;
 	m_pointer_mode = SM_PM_A;

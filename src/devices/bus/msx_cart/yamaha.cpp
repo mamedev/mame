@@ -24,6 +24,7 @@ msx_cart_sfg_device::msx_cart_sfg_device(const machine_config &mconfig, const de
 	, m_ym2151(*this, "ym2151")
 	, m_kbdc(*this, "kbdc")
 	, m_ym2148(*this, "ym2148")
+	, m_maincpu(*this, ":maincpu")
 	, m_ym2151_irq_state(CLEAR_LINE)
 	, m_ym2148_irq_state(CLEAR_LINE)
 	, m_rom_mask(0)
@@ -112,8 +113,7 @@ void msx_cart_sfg_device::device_start()
 	m_rom_mask = m_region_sfg->bytes() - 1;
 
 	// This should probably moved up in the bus/slot hierarchy for the msx driver
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
+	m_maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
 }
 
 

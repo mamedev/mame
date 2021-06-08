@@ -31,8 +31,8 @@ private:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cassette_image_device> m_cassette;
+	required_device<cpu_device> m_maincpu;
 
-	cpu_device   *m_maincpu;
 	inline uint8_t read_byte(uint32_t offset);
 
 	int m_base_banks[2];

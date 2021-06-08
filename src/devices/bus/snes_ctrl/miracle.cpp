@@ -57,6 +57,7 @@ snes_miracle_device::snes_miracle_device(const machine_config &mconfig, const ch
 	device_snes_control_port_interface(mconfig, *this),
 	m_midiin(*this, "mdin"),
 	m_midiout(*this, "mdout"),
+	m_maincpu(*this, ":maincpu"),
 	strobe_timer(nullptr),
 	m_strobe_on(0), m_midi_mode(0), m_sent_bits(0), m_strobe_clock(0),
 	m_data_sent(0), m_xmit_read(0), m_xmit_write(0), m_recv_read(0), m_recv_write(0), m_tx_busy(false), m_read_status(false), m_status_bit(false)
@@ -153,7 +154,7 @@ void snes_miracle_device::write_strobe(uint8_t data)
 
 	if (data == 1 && !m_strobe_on)
 	{
-		strobe_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+		strobe_timer->adjust(attotime::zero, 0, m_maincpu->cycles_to_attotime(1));
 		m_strobe_on = 1;
 		return;
 	}

@@ -91,6 +91,7 @@ protected:
 	int m_sound_hw_type;
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
+	std::unique_ptr<uint8_t[]> m_sprite_buffer;
 
 	uint16_t wecleman_protection_r();
 	void wecleman_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
