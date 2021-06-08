@@ -241,6 +241,53 @@ inline void m68000_base_device::store_pack_float80(u32 ea, int k, floatx80 fpr)
 	m68ki_write_32(ea+8, dw3);
 }
 
+inline floatx80 propagateFloatx80NaNOneArg(floatx80 a)
+{
+	if (floatx80_is_signaling_nan(a))
+		float_raise(float_flag_invalid);
+
+	a.low |= 0xC000000000000000U;
+
+	return a;
+}
+
+static void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
+{
+	int shiftCount = countLeadingZeros64(aSig);
+	*zSigPtr = aSig << shiftCount;
+	*zExpPtr = 1 - shiftCount;
+}
+
+inline floatx80 getman(floatx80 src)
+{
+	const flag sign = (src.high >> 15);
+	int32_t exp = (src.high & 0x7fff);
+	uint64_t signific = src.low;
+
+	if (exp == 0x7fff)
+	{
+		if ((uint64_t)(signific << 1))
+		{
+			return propagateFloatx80NaNOneArg(src);
+		}
+		else
+		{
+			return packFloatx80(0, 0xffff, 0xffffffffffffffffU);
+		}
+	}
+
+	if (exp == 0)
+	{
+		if (signific == 0)
+		{
+			return packFloatx80(sign, 0, 0);
+		}
+		normalizeFloatx80Subnormal(signific, &exp, &signific);
+	}
+
+	return packFloatx80(sign, 0x3fff, signific);
+}
+
 inline void m68000_base_device::SET_CONDITION_CODES(floatx80 reg)
 {
 //  u64 *regi;
@@ -347,6 +394,10 @@ u8 m68000_base_device::READ_EA_8(int ea)
 		{
 			return REG_D()[reg];
 		}
+		case 1: // An
+		{
+			return REG_A()[reg];
+		}
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
@@ -422,6 +473,10 @@ u16 m68000_base_device::READ_EA_16(int ea)
 		case 0:     // Dn
 		{
 			return (u16)(REG_D()[reg]);
+		}
+		case 1:     // An
+		{
+			return (u16)REG_A()[reg];
 		}
 		case 2:     // (An)
 		{
@@ -499,6 +554,10 @@ u32 m68000_base_device::READ_EA_32(int ea)
 		case 0:     // Dn
 		{
 			return REG_D()[reg];
+		}
+		case 1:     // An
+		{
+			return REG_A()[reg];
 		}
 		case 2:     // (An)
 		{
@@ -1163,11 +1222,11 @@ void m68000_base_device::WRITE_EA_PACK(int ea, int k, floatx80 fpr)
 
 void m68000_base_device::fpgen_rm_reg(u16 w2)
 {
-	int ea = m_ir & 0x3f;
-	int rm = (w2 >> 14) & 0x1;
-	int src = (w2 >> 10) & 0x7;
-	int dst = (w2 >>  7) & 0x7;
-	int opmode = w2 & 0x7f;
+	const int ea = m_ir & 0x3f;
+	const int rm = (w2 >> 14) & 0x1;
+	const int src = (w2 >> 10) & 0x7;
+	const int dst = (w2 >>  7) & 0x7;
+	const int opmode = w2 & 0x7f;
 	floatx80 source;
 
 	// fmovecr #$f, fp0 f200 5c0f
@@ -1460,6 +1519,13 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 6;
 			break;
 		}
+		case 0x1f:      // FGETMAN
+		{
+			m_fpr[dst] = getman(source);
+			SET_CONDITION_CODES(m_fpr[dst]);
+			m_icount -= 31;
+			break;
+		}
 		case 0x60:      // FSDIVS
 		case 0x20:      // FDIV
 		{
@@ -1532,6 +1598,17 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_fpr[dst] = floatx80_sub(m_fpr[dst], source);
 			SET_CONDITION_CODES(m_fpr[dst]);
 			m_icount -= 9;
+			break;
+		}
+		case 0x31:      // FSINCOS
+		{
+			m_fpr[dst] = source;
+			floatx80_fsin(m_fpr[dst]);
+			SET_CONDITION_CODES(m_fpr[dst]);    // condition codes are set for the sine result
+
+			m_fpr[(w2 & 0x7)] = source;
+			floatx80_fcos(m_fpr[(w2 & 0x7)]);
+			m_icount -= 451;
 			break;
 		}
 		case 0x38:      // FCMP
