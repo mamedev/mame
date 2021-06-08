@@ -595,7 +595,7 @@ private:
 	void guttangt_map(address_map &map);
 	void guttangt_rombank_w(uint8_t data);
 
-	memory_bank_creator m_rombank;
+	required_memory_bank m_rombank;
 };
 
 

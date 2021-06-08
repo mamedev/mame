@@ -2531,7 +2531,7 @@ void guttangt_state::guttangt_rombank_w(uint8_t data)
 void guttangt_state::guttangt_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().nopw();
-	map(0x2000, 0x27ff).bankr("rombank"); // 0x2000-0x27ff is banked (so they have room for the new music player), see init / rom loading
+	map(0x2000, 0x27ff).bankr(m_rombank); // 0x2000-0x27ff is banked (so they have room for the new music player), see init / rom loading
 	map(0x2800, 0x3fff).rom().nopw();
 
 	map(0x4000, 0x47ff).ram();
