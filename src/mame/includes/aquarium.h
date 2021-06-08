@@ -71,7 +71,7 @@ private:
 	u8 oki_r();
 	void oki_w(u8 data);
 
-	void expand_gfx(std::unique_ptr<u8[]> &decoded, int low, int hi);
+	std::unique_ptr<u8[]> expand_gfx(int low, int hi);
 	void txt_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void mid_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bak_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
