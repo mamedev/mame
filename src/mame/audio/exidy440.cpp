@@ -21,7 +21,6 @@
 
 
 /* internal caching */
-#define MAX_CACHE_ENTRIES       64                  /* maximum separate samples we expect to ever see */
 #define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
 
 /* FIR digital filter parameters */
@@ -536,13 +535,6 @@ void exidy440_sound_device::m6844_w(offs_t offset, uint8_t data)
 
 int16_t *exidy440_sound_device::add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency)
 {
-	/* if this will overflow the cache, reset and re-add */
-	if (m_sound_cache.size() > MAX_CACHE_ENTRIES)
-	{
-		m_sound_cache.clear();
-		return add_to_sound_cache(input, address, length, bits, frequency);
-	}
-
 	/* fill in this entry */
 	m_sound_cache.emplace_back();
 	auto &current = m_sound_cache.back();
