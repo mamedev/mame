@@ -76833,7 +76833,55 @@ be better to redump them properly. -->
 	</software>
 
 
-<!-- Multicarts (these have to be better examined: some dumps are possibly incomplete, e.g. menu + 1 game: thes eincomplete dumps should be removed) -->
+<!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. What follows are freely available digital releases which need to be checked against commercial physical carts. -->
+
+	<software name="a53vol1">
+		<description>Streemerz - Action 53 Function 16 Volume 1 (R.C.#2)</description>
+		<year>2013</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nes_action53" />
+			<dataarea name="prg" size="524288">
+				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" offset="00000" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a53vol2">
+		<description>Double Action 53 Volume 2 (R.C.#2)</description>
+		<year>2014</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nes_action53" />
+			<dataarea name="prg" size="524288">
+				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" offset="00000" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a53vol3">
+		<description>Action 53 Vol. 3 - Revenge of the Twins</description>
+		<year>2018</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nes_action53" />
+			<dataarea name="prg" size="1048576">
+				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" offset="00000" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? Sinking Feeling needs this much. -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Multicarts (these have to be better examined: some dumps are possibly incomplete, e.g. menu + 1 game: these incomplete dumps should be removed) -->
 
 	<software name="mc_10og" supported="no">
 		<description>10 in 1 Omake Game (FC Mobile)</description>
@@ -81540,4 +81588,3 @@ that the real dumps might surface -->
 	</software>
 
 </softwarelist>
-
