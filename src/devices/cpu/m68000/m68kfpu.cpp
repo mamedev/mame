@@ -1524,6 +1524,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_fpr[dst] = getman(source);
 			SET_CONDITION_CODES(m_fpr[dst]);
 			m_icount -= 31;
+			break;
 		}
 		case 0x60:      // FSDIVS
 		case 0x20:      // FDIV
@@ -1608,6 +1609,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_fpr[(w2 & 0x7)] = source;
 			floatx80_fcos(m_fpr[(w2 & 0x7)]);
 			m_icount -= 451;
+			break;
 		}
 		case 0x38:      // FCMP
 		{
