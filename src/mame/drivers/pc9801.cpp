@@ -2495,6 +2495,18 @@ void pc9801_state::pc9801ux(machine_config &config)
 //  AM9157A(config, "i8237", 10000000); // unknown clock
 }
 
+void pc9801_state::pc9801vx(machine_config &config)
+{
+	pc9801rs(config);
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 9'830'400));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801_state::pc9801ux_map);
+	maincpu.set_addrmap(AS_IO, &pc9801_state::pc9801ux_io);
+	maincpu.set_a20_callback(i80286_cpu_device::a20_cb(&pc9801_state::a20_286, this));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	//how to set NEC V30 the 2nd CPU?
+//  AM9157A(config, "i8237", 10000000); // unknown clock
+}
+
 void pc9801_state::pc9801bx2(machine_config &config)
 {
 	pc9801rs(config);
@@ -2841,6 +2853,43 @@ ROM_START( pc9801vm11 )
 //  LOAD_IDE_ROM
 ROM_END
 
+/*
+VX - 80286 8 + V30 10
+
+A80286-8 @ 8
+NEC D70116D-10 @ 10
+640KB? RAM
+256KB EGC(uPD7220AD) VRAM
+3.5'2DD/2HDx2
+CBus: 3 slots
+
+UVPROM label on extension board for CPU board (4 * NEC D27C256D-15):
+YLL01/YLL02/YLL03/YLL04
+00
+(C) '86 NEC
+
+Current dump is waiting to complete and is from a dead machine, all machine configs are guessed upon some board photos.
+ROM loads with guessed location.
+*/
+ROM_START( pc9801vx )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll01.bin", 0x00000, 0x08000, CRC(1b235313) SHA1(d2c5e2cea3ee0a643d3c5d384d134404b58db793) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll03.bin", 0x00001, 0x08000, CRC(33605ae3) SHA1(f644ff15c54c8568e643324f38aa3b6211912af0) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll02.bin", 0x10000, 0x08000, CRC(948f8658) SHA1(674378d4e90fee715ccfdd49378cd5c2fe8d7f62) )
+	ROM_LOAD16_BYTE( "nec_d27c256d-15_cpu_extboard_yll04.bin", 0x10001, 0x08000, CRC(2ce2101b) SHA1(2158d022d5424daf6981bf4da0ab9613bf9646f5) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_COPY( "biosrom", 0x18000, 0x10000, 0x08000 )  //ITF ROM
+	ROM_COPY( "biosrom", 0x08000, 0x18000, 0x08000 )  //BIOS ROM
+	ROM_COPY( "biosrom", 0x00000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x28000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+
+	LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
 
 
 /*
@@ -3304,6 +3353,7 @@ COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9
 COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
 COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1987, pc9801vx,   pc9801ux, 0, pc9801vx,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VX(Lin test)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // VX class (first model using an EGC)
 // ...
