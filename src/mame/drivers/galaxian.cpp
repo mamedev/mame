@@ -2522,22 +2522,24 @@ void galaxian_state::froggeram_map(address_map &map)
 	map(0xb807, 0xb807).w(FUNC(galaxian_state::galaxian_flip_screen_y_w)); // always set to 0?
 }
 
-void galaxian_state::guttangt_rombank_w(uint8_t data)
+void guttangt_state::guttangt_rombank_w(uint8_t data)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + (data & 1 ? 0x4000 : 0x2000));
+	m_rombank->set_entry(data & 1);
 }
 
 // map not derived from schematics
-void galaxian_state::guttangt_map(address_map &map)
+void guttangt_state::guttangt_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().nopw(); // 0x2000-0x27ff is banked (so they have room for the new music player), see init
+	map(0x0000, 0x1fff).rom().nopw();
+	map(0x2000, 0x27ff).bankr("rombank"); // 0x2000-0x27ff is banked (so they have room for the new music player), see init / rom loading
+	map(0x2800, 0x3fff).rom().nopw();
+
 	map(0x4000, 0x47ff).ram();
 
 	map(0x5000, 0x53ff).ram().w(FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x5800, 0x58ff).ram().w(FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
-	map(0x6000, 0x6000).portr("IN0").w(FUNC(galaxian_state::guttangt_rombank_w));
+	map(0x6000, 0x6000).portr("IN0").w(FUNC(guttangt_state::guttangt_rombank_w));
 	map(0x6800, 0x6800).portr("IN1");
 
 	galaxian_map_discrete(map);
@@ -7335,10 +7337,10 @@ void galaxian_state::timefgtr(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(galaxian_state::timefgtr_scanline), "screen", 0, 1);
 }
 
-void galaxian_state::guttangt(machine_config &config)
+void guttangt_state::guttangt(machine_config &config)
 {
 	galaxian(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::guttangt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &guttangt_state::guttangt_map);
 }
 
 
@@ -8294,11 +8296,13 @@ void galaxian_state::init_videight()
 	common_init(NULL, NULL, &galaxian_state::videight_extend_tile_info, &galaxian_state::videight_extend_sprite_info);
 }
 
-void galaxian_state::init_guttangt()
+void guttangt_state::init_guttangt()
 {
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, nullptr, &galaxian_state::guttangt_extend_sprite_info);
 
-	m_maincpu->space(AS_PROGRAM).install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
+	m_rombank->configure_entry( 0, memregion("maincpu")->base() + 0x2000);
+	m_rombank->configure_entry( 1, memregion("maincpu")->base() + 0x4000);
+	m_rombank->set_entry(0);
 }
 
 /*************************************
@@ -14851,7 +14855,7 @@ ROM_START( guttangt )
 	ROM_LOAD( "gg3-2716.rom",           0x1000, 0x0800, CRC(38d71df3) SHA1(f1771256b52ba1bfc1bd472f8a78d6302a7b1299) )
 	ROM_LOAD( "gg4-2716.rom",           0x1800, 0x0800, CRC(7623125a) SHA1(3f3abb9c66751908918fa52e22e153da5fdc0902) )
 	ROM_LOAD( "gg5-2732.rom",           0x2000, 0x0800, CRC(1fe33f92) SHA1(d3e00459015b8bf43fe2e8f6cb57cef775bbb330) )
-	ROM_CONTINUE(0x4000,0x800) // banked code, maps at 0x2000
+	ROM_CONTINUE(0x4000,0x800) // double sized ROM containing banked code, maps at 0x2000
 	ROM_LOAD( "gg6-2716.rom",           0x2800, 0x0800, CRC(60606cd5) SHA1(9a4bf0134c7fa66d2ecd3a745421091b0a086572) )
 	ROM_LOAD( "gg7-2516.rom",           0x3000, 0x0800, CRC(ce0d0a93) SHA1(339bd9c6c40eb2501d1a1adcea0cfa82e3224967) )
 	ROM_LOAD( "gg8-2716.rom",           0x3800, 0x0800, CRC(b8716081) SHA1(e2d1db27ad44876b891cc0a2232ac887bcc5516f) )
@@ -14933,7 +14937,7 @@ GAME( 19??, chewing,     luctoday, galaxian,   luctoday,   galaxian_state, init_
 GAME( 1982, catacomb,    0,        galaxian,   catacomb,   galaxian_state, init_galaxian,   ROT90,  "MTM Games",                       "Catacomb",         MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 19??, omegab,      theend,   galaxian,   omegab,     galaxian_state, init_galaxian,   ROT270, "bootleg?",                        "Omega (bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, highroll,    0,        highroll,   highroll,   galaxian_state, init_highroll,   ROT90,  "bootleg?",                        "High Roller",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // auto starts game after inserting coin, bad cards GFX, bad inputs response, not all inputs are mapped
-GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   galaxian_state, init_guttangt,   ROT90,  "bootleg (Recreativos Franco?)",   "Guttang Gottong (bootleg on Galaxian type hardware)",        MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
+GAME( 1982, guttangt,    locomotn, guttangt,   guttangt,   guttangt_state, init_guttangt,   ROT90,  "bootleg (Recreativos Franco?)",   "Guttang Gottong (bootleg on Galaxian type hardware)",        MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 // Basic hardware + extra RAM
 GAME( 1982, victoryc,    0,        victoryc,   victoryc,   galaxian_state, init_victoryc,   ROT270, "Comsoft", "Victory (Comsoft)",           MACHINE_SUPPORTS_SAVE )

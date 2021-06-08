@@ -240,7 +240,6 @@ public:
 	void init_mimonkey();
 	void init_mimonkeyb();
 	void init_victoryc();
-	void init_guttangt();
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
@@ -378,7 +377,6 @@ public:
 	void astroamb(machine_config &config);
 	void mimonkey(machine_config &config);
 	void mimonscr(machine_config &config);
-	void guttangt(machine_config &config);
 
 	template <int Mask> CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
 	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
@@ -458,7 +456,6 @@ protected:
 	void turtles_map(address_map &map);
 	void victoryc_map(address_map &map);
 	void zigzag_map(address_map &map);
-	void guttangt_map(address_map &map);
 
 	virtual void machine_start() override { m_lamps.resolve(); }
 	virtual void video_start() override;
@@ -533,7 +530,6 @@ protected:
 	uint8_t m_gfxbank[5];
 	uint8_t m_leftspriteclip;
 
-	void guttangt_rombank_w(uint8_t data);
 	void fourplay_rombank_w(offs_t offset, uint8_t data);
 	void videight_rombank_w(offs_t offset, uint8_t data);
 	void videight_gfxbank_w(offs_t offset, uint8_t data);
@@ -582,5 +578,25 @@ private:
 	void namenayo_extattr_w(offs_t offset, uint8_t data);
 	void namenayo_unk_d800_w(uint8_t data);
 };
+
+class guttangt_state : public galaxian_state
+{
+public:
+	guttangt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_rombank(*this, "rombank")
+	{
+	}
+
+	void guttangt(machine_config &config);
+	void init_guttangt();
+
+private:
+	void guttangt_map(address_map &map);
+	void guttangt_rombank_w(uint8_t data);
+
+	memory_bank_creator m_rombank;
+};
+
 
 #endif // MAME_INCLUDES_GALAXIAN_H
