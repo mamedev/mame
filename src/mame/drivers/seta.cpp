@@ -12145,7 +12145,7 @@ u16 downtown_state::downtown_protection_r(offs_t offset)
 				return word[offset - 0x100/2];
 			
 			// definitely wants to read-back hi-score table from 0x110-0x15f
-			[[fallthrough]];
+			break;
 		}
 	}
 
