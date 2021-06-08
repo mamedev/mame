@@ -1441,6 +1441,13 @@ void galaxian_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectan
 	m_bg_tilemap->draw(*m_screen, bitmap, draw, TILEMAP_DRAW_OPAQUE, 0);
 }
 
+// Guttang Gottong bootleg
+void galaxian_state::guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	// is this configurable or a hardwired mod?
+	*code |= 0x40;
+}
+
 
 /*************************************
  *

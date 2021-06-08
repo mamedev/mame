@@ -339,41 +339,8 @@ void galaxold_state::scrambleo_map(address_map &map)
 	map(0x7001, 0x7001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
 }
 
-void galaxold_state::guttang_rombank_w(uint8_t data)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-//  printf("rombank %02x\n",data);
-	space.install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + (data & 1 ? 0x4000 : 0x2000));
-}
 
 
-void galaxold_state::guttang_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom().nopw(); // 0x2000-0x27ff is banked (so they have room for the new music player), see init
-	map(0x4000, 0x47ff).ram();
-
-	map(0x5000, 0x53ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
-
-	map(0x5800, 0x583f).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x5840, 0x585f).ram().share("spriteram");
-	map(0x5860, 0x587f).ram().share("bulletsram");
-	map(0x5880, 0x58ff).ram();
-
-	map(0x6000, 0x6000).portr("IN0").w(FUNC(galaxold_state::guttang_rombank_w));
-	map(0x6800, 0x6800).portr("IN1");
-
-	map(0x6800, 0x6802).w("cust", FUNC(galaxian_sound_device::background_enable_w));
-	map(0x6803, 0x6803).w("cust", FUNC(galaxian_sound_device::noise_enable_w));
-	map(0x6805, 0x6805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
-	map(0x6806, 0x6807).w("cust", FUNC(galaxian_sound_device::vol_w));
-
-
-	map(0x7000, 0x7000).portr("IN2");
-	map(0x7001, 0x7001).w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-
-	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("cust", FUNC(galaxian_sound_device::pitch_w));
-
-}
 
 
 void galaxold_state::_4in1_map(address_map &map)
@@ -1593,68 +1560,6 @@ INPUT_PORTS_END
 
 
 
-static INPUT_PORTS_START( guttangt )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_DIPNAME( 0x40, 0x40, "IN0:6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x04, 0x00, "IN1:3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN1:4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN1:5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN1:6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN1:7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN1:8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2:1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN2:2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "IN2:3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN2:4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN2:5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN2:6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN2:7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN2:8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 
 static const gfx_layout galaxold_charlayout =
 {
@@ -1894,22 +1799,6 @@ void galaxold_state::scrambleo(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::scrambleo_map);
 }
-
-void galaxold_state::guttang(machine_config &config)
-{
-	galaxian(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::guttang_map);
-
-	// video hardware
-	m_palette->set_entries(32+2+64+1); // 32 for the characters, 2 for the bullets, 64 for the stars, 1 for background
-	m_palette->set_init(FUNC(galaxold_state::galaxold_palette));
-//  m_palette->set_init(FUNC(galaxold_state::scrambold_palette));
-
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
-}
-
 
 void galaxold_state::_4in1(machine_config &config)
 {
@@ -2710,26 +2599,7 @@ ROM_START( trvchlng )
 ROM_END
 
 
-// PCB made by Recreativos Franco
-ROM_START( guttangt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gg1-2716.rom",           0x0000, 0x0800, CRC(7f338d91) SHA1(d203f229f4f5934467b80ed0f2208e5551aaa383) )
-	ROM_LOAD( "gg2-2758.rom",           0x0800, 0x0800, CRC(ecdbb62b) SHA1(c2eb0316ab789a69b74aeec25e5c690b4334c7c2) )
-	ROM_LOAD( "gg3-2716.rom",           0x1000, 0x0800, CRC(38d71df3) SHA1(f1771256b52ba1bfc1bd472f8a78d6302a7b1299) )
-	ROM_LOAD( "gg4-2716.rom",           0x1800, 0x0800, CRC(7623125a) SHA1(3f3abb9c66751908918fa52e22e153da5fdc0902) )
-	ROM_LOAD( "gg5-2732.rom",           0x2000, 0x0800, CRC(1fe33f92) SHA1(d3e00459015b8bf43fe2e8f6cb57cef775bbb330) )
-	ROM_CONTINUE(0x4000,0x800) // banked code, maps at 0x2000
-	ROM_LOAD( "gg6-2716.rom",           0x2800, 0x0800, CRC(60606cd5) SHA1(9a4bf0134c7fa66d2ecd3a745421091b0a086572) )
-	ROM_LOAD( "gg7-2516.rom",           0x3000, 0x0800, CRC(ce0d0a93) SHA1(339bd9c6c40eb2501d1a1adcea0cfa82e3224967) )
-	ROM_LOAD( "gg8-2716.rom",           0x3800, 0x0800, CRC(b8716081) SHA1(e2d1db27ad44876b891cc0a2232ac887bcc5516f) )
 
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "gg9-2732.rom",           0x0000, 0x1000, CRC(be6bf522) SHA1(23a09409b7de4bfdb970e4ff23d89a2439a0aee5) )
-	ROM_LOAD( "gg10-2732.rom",          0x1000, 0x1000, CRC(b04c34c5) SHA1(a37db70ce67d64daa5f0c41cce1136d1c9d8c175) )
-
-	ROM_REGION( 0x0020, "proms", 0 ) // no PROM was present..
-	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
 
 
 /*
@@ -2779,10 +2649,6 @@ ROM_START( bullsdrtg )
 	ROM_LOAD( "prom.bin",   0x0000, 0x0020, CRC(16b19bfa) SHA1(a0e9217f9bc5b06212d5f22dcc3dc4b2838788ba) )
 ROM_END
 
-void galaxold_state::init_guttangt()
-{
-	m_maincpu->space(AS_PROGRAM).install_rom(0x2000, 0x27ff, memregion("maincpu")->base() + 0x2000);
-}
 
 
 // Z80 games
@@ -2799,7 +2665,6 @@ GAME( 1982, dkongjrm,  dkongjr,  dkongjrm,  dkongjrm,  galaxold_state, empty_ini
 GAME( 1982, dkongjrmc, dkongjr,  dkongjrmc, dkongjrmc, galaxold_state, empty_init,     ROT90,  "bootleg (Centromatic)",         "Donkey Kong Jr. (bootleg on Moon Cresta hardware, set 2)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // sprites leave artifacts
 GAME( 1982, tazzmang,  tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware)",                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, tazzmang2, tazmania, tazzmang,  tazzmang,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Tazz-Mania (bootleg on Galaxian hardware with Starfield)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, guttangt,  locomotn, guttang,   guttangt,  galaxold_state, init_guttangt,  ROT270, "bootleg (Recreativos Franco?)", "Guttang Gottong (bootleg on Galaxian type hardware)",      MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // or by 'Tren' ?
 
 // Videotron cartridge system
 GAME( 1981, hustlerb3, hustler,  videotron, hustlerb3, galaxold_state, empty_init,     ROT90,  "bootleg (Videotron)",            "Video Pool (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
