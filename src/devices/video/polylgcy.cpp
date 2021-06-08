@@ -204,7 +204,6 @@ struct legacy_poly_manager
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void **allocate_array(running_machine &machine, std::vector<uint8_t> &buffer, size_t *itemsize, uint32_t itemcount);
 static void *poly_item_callback(void *param, int threadid);
 static void poly_state_presave(legacy_poly_manager &poly);
 
