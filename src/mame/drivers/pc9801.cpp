@@ -3353,7 +3353,7 @@ COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9
 COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
 COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1987, pc9801vx,   pc9801ux, 0, pc9801vx,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VX(Lin test)",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1987, pc9801vx,   pc9801ux, 0, pc9801vx,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // VX class (first model using an EGC)
 // ...
