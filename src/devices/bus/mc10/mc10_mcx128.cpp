@@ -103,9 +103,7 @@ void mc10_pak_mcx128_device::device_start()
 	m_bank3->configure_entry(0, &m_share[0x06000]);
 	m_bank3->configure_entry(1, &m_share[0x16000]);
 
-//  	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
-	memory_region *memregion("eprom");
-	owning_slot().install_rom(0xc000, 0xffff, memregion->base())
+ 	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
 
  	m_view[0](0x0000, 0x3fff).bankrw("bank0");
 //	0x4000, 0xbeff: internal RAM
