@@ -256,12 +256,15 @@ uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind1
 		draw_sprites(bitmap, cliprect);
 
 		m_bg_tilemap->draw(screen, m_helper_mask, cliprect, 0, 0);
+		int max_x = cliprect.max_x;
+		if (max_x >= 26*8)
+			max_x = 26*8-1;
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			const u16 *s = &m_helper_mask.pix(y, cliprect.min_x);
 			u16 *p = &bitmap.pix(y, cliprect.min_x);
 			bool on = false;
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.min_x; x <= max_x; x++)
 			{
 				if (*s++ & 1)
 					on = !on;
