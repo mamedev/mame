@@ -50,6 +50,8 @@ private:
 		bool     one_shot;
 	};
 
+	void keyon_voice(uint8_t voice);
+
 	sound_stream *m_stream;
 	emu_timer *m_timer;
 	devcb_write_line m_timer_irq_handler;

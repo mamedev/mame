@@ -112,8 +112,7 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 					if (channel.register9)
 					{
 						m_dma_irq_handler(1);
-						channel.curr_addr = channel.start_addr << 6;
-						channel.end_addr = channel.curr_addr + 0x200;
+						keyon_voice(i);
 					}
 					else if (channel.one_shot)
 					{
@@ -149,6 +148,17 @@ uint8_t acan_sound_device::read(offs_t offset)
 		m_dma_irq_handler(0);
 	}
 	return m_regs[offset];
+}
+
+void acan_sound_device::keyon_voice(uint8_t voice)
+{
+	acan_channel &channel = m_channels[voice];
+	channel.curr_addr = channel.start_addr << 6;
+	channel.end_addr = channel.curr_addr + channel.length;
+
+	m_active_channels |= (1 << voice);
+
+	//printf("Keyon voice %d\n", voice);
 }
 
 void acan_sound_device::write(offs_t offset, uint8_t data)
@@ -190,21 +200,11 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 
 		case 0x7: // Keyon/keyoff
 		{
-			LOG("%s: Sound key control, voice %d key%s\n", machine().describe_context(), data & 0xf, (data & 0xf0) ? "on" : "off");
+			LOG("%s: Sound key control, voice %02x key%s\n", machine().describe_context(), data & 0xf, (data & 0xf0) ? "on" : "off");
 			const uint16_t mask = 1 << (data & 0xf);
 			if (data & 0xf0)
 			{
-				m_active_channels |= mask;
-				acan_channel &channel = m_channels[data & 0xf];
-				channel.curr_addr = channel.start_addr << 6;
-				if (channel.register9)
-				{
-					channel.end_addr = channel.curr_addr + 0x200;
-				}
-				else
-				{
-					channel.end_addr = channel.curr_addr + channel.length;
-				}
+				keyon_voice(data & 0xf);
 			}
 			else
 			{
@@ -240,8 +240,7 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 	case 0x5: // Waveform length
 	{
 		acan_channel &channel = m_channels[lower];
-		//channel.length = (data & ~0x01) << 6;
-		channel.length = (data & 0x0e) << 6;  // Temporary hack to make jttlaugh audible. Not the proper fix!
+		channel.length = 0x40 << ((data & 0x0e) >> 1);
 		channel.one_shot = BIT(data, 0);
 		LOG("%s: Waveform length and attributes (voice %02x): %02x\n", machine().describe_context(), lower, data);
 		break;
@@ -278,7 +277,7 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 	case 0xc:
 	case 0xd:
 		m_channels[lower].envelope[upper - 0xa] = data;
-		LOG("%s: Evenlope parameter %d (voice %02x) = %02x\n", machine().describe_context(), upper - 0xa, lower, data);
+		LOG("%s: Envelope parameter %d (voice %02x) = %02x\n", machine().describe_context(), upper - 0xa, lower, data);
 		break;
 
 	case 0xe: // Volume
@@ -287,6 +286,7 @@ void acan_sound_device::write(offs_t offset, uint8_t data)
 		channel.volume = data;
 		channel.volume_l = (data & 0xf0) | (data >> 4);
 		channel.volume_r = (data & 0x0f) | (data << 4);
+		LOG("%s: Volume register (voice %02x) = = %02x\n", machine().describe_context(), lower, data);
 		break;
 	}
 
