@@ -117,7 +117,7 @@ void pc6001_state::video_start()
 	cfg.get_char_rom = pc6001_get_char_rom;
 	m6847_init(machine(), &cfg);
 	#endif
-	m_video_ram = std::make_unique<uint8_t[]>(0x4000);
+	m_video_ram = make_unique_clear<uint8_t[]>(0x4000);
 	m_video_base = &m_video_ram[0];
 }
 
