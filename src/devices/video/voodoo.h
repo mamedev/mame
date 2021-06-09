@@ -20,8 +20,6 @@
 
 /*
 cleanup to do:
- de-static-fy (find vd->)
- uint->u
  voodoo_regs class
  rasterizer template
 */
@@ -473,7 +471,7 @@ enum
  *
  *************************************/
 
-static const uint8_t dither_matrix_4x4[16] =
+static const u8 dither_matrix_4x4[16] =
 {
 	 0,  8,  2, 10,
 	12,  4, 14,  6,
@@ -481,7 +479,7 @@ static const uint8_t dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 
-//static const uint8_t dither_matrix_2x2[16] =
+//static const u8 dither_matrix_2x2[16] =
 //{
 //      2, 10,  2, 10,
 //  14,  6, 14,  6,
@@ -489,7 +487,7 @@ static const uint8_t dither_matrix_4x4[16] =
 //  14,  6, 14,  6
 //};
 // Using this matrix allows iteagle video memory tests to pass
-static const uint8_t dither_matrix_2x2[16] =
+static const u8 dither_matrix_2x2[16] =
 {
 	8, 10, 8, 10,
 	11, 9, 11, 9,
@@ -498,7 +496,7 @@ static const uint8_t dither_matrix_2x2[16] =
 };
 
 // Dither 4x4 subtraction matrix used in alpha blending
-static const uint8_t dither_subtract_4x4[16] =
+static const u8 dither_subtract_4x4[16] =
 {
 	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
 	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
@@ -507,7 +505,7 @@ static const uint8_t dither_subtract_4x4[16] =
 };
 
 // Dither 2x2 subtraction matrix used in alpha blending
-static const uint8_t dither_subtract_2x2[16] =
+static const u8 dither_subtract_2x2[16] =
 {
 	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
 	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
@@ -534,7 +532,7 @@ static const uint8_t dither_subtract_2x2[16] =
 	(b) = (((val) >> 3) & 0xf8) | (((val) >> 8) & 0x07);    \
 	(c) = (((val) << 2) & 0xf8) | (((val) >> 3) & 0x07);
 #define EXTRACT_1555_TO_8888(val, a, b, c, d)               \
-	(a) = ((int16_t)(val) >> 15) & 0xff;                      \
+	(a) = ((s16)(val) >> 15) & 0xff;                      \
 	EXTRACT_x555_TO_888(val, b, c, d)
 #define EXTRACT_5551_TO_8888(val, a, b, c, d)               \
 	EXTRACT_555x_TO_888(val, a, b, c)                       \
@@ -853,17 +851,17 @@ static const uint8_t dither_subtract_2x2[16] =
 struct rgba
 {
 #ifdef LSB_FIRST
-	uint8_t               b, g, r, a;
+	u8               b, g, r, a;
 #else
-	uint8_t               a, r, g, b;
+	u8               a, r, g, b;
 #endif
 };
 
 
 union voodoo_reg
 {
-	int32_t               i;
-	uint32_t              u;
+	s32               i;
+	u32              u;
 	float               f;
 	rgba                rgb;
 };
@@ -925,10 +923,10 @@ public:
 	int voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int voodoo_get_type();
 	int voodoo_is_stalled();
-	void voodoo_set_init_enable(uint32_t newval);
+	void voodoo_set_init_enable(u32 newval);
 
 protected:
-	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
+	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -946,25 +944,25 @@ protected:
 			buffer[0] = 0;
 		}
 
-		uint8_t             lastkey = 0;            // last key state
-		uint8_t             display = 0;            // display stats?
-		int32_t             swaps = 0;              // total swaps
-		int32_t             stalls = 0;             // total stalls
-		int32_t             total_triangles = 0;    // total triangles
-		int32_t             total_pixels_in = 0;    // total pixels in
-		int32_t             total_pixels_out = 0;   // total pixels out
-		int32_t             total_chroma_fail = 0;  // total chroma fail
-		int32_t             total_zfunc_fail = 0;   // total z func fail
-		int32_t             total_afunc_fail = 0;   // total a func fail
-		int32_t             total_clipped = 0;      // total clipped
-		int32_t             total_stippled = 0;     // total stippled
-		int32_t             lfb_writes = 0;         // LFB writes
-		int32_t             lfb_reads = 0;          // LFB reads
-		int32_t             reg_writes = 0;         // register writes
-		int32_t             reg_reads = 0;          // register reads
-		int32_t             tex_writes = 0;         // texture writes
-		int32_t             texture_mode[16];       // 16 different texture modes
-		uint8_t             render_override = 0;    // render override
+		u8             lastkey = 0;            // last key state
+		u8             display = 0;            // display stats?
+		s32             swaps = 0;              // total swaps
+		s32             stalls = 0;             // total stalls
+		s32             total_triangles = 0;    // total triangles
+		s32             total_pixels_in = 0;    // total pixels in
+		s32             total_pixels_out = 0;   // total pixels out
+		s32             total_chroma_fail = 0;  // total chroma fail
+		s32             total_zfunc_fail = 0;   // total z func fail
+		s32             total_afunc_fail = 0;   // total a func fail
+		s32             total_clipped = 0;      // total clipped
+		s32             total_stippled = 0;     // total stippled
+		s32             lfb_writes = 0;         // LFB writes
+		s32             lfb_reads = 0;          // LFB reads
+		s32             reg_writes = 0;         // register writes
+		s32             reg_reads = 0;          // register reads
+		s32             tex_writes = 0;         // texture writes
+		s32             texture_mode[16];       // 16 different texture modes
+		u8             render_override = 0;    // render override
 		char                buffer[1024];           // string
 	};
 
@@ -972,58 +970,58 @@ protected:
 	/* note that this structure is an even 64 bytes long */
 	struct thread_stats_block
 	{
-		int32_t             pixels_in = 0;          // pixels in statistic
-		int32_t             pixels_out = 0;         // pixels out statistic
-		int32_t             chroma_fail = 0;        // chroma test fail statistic
-		int32_t             zfunc_fail = 0;         // z function test fail statistic
-		int32_t             afunc_fail = 0;         // alpha function test fail statistic
-		int32_t             clip_fail = 0;          // clipping fail statistic
-		int32_t             stipple_count = 0;      // stipple statistic
-		int32_t             filler[64/4 - 7];       // pad this structure to 64 bytes
+		s32             pixels_in = 0;          // pixels in statistic
+		s32             pixels_out = 0;         // pixels out statistic
+		s32             chroma_fail = 0;        // chroma test fail statistic
+		s32             zfunc_fail = 0;         // z function test fail statistic
+		s32             afunc_fail = 0;         // alpha function test fail statistic
+		s32             clip_fail = 0;          // clipping fail statistic
+		s32             stipple_count = 0;      // stipple statistic
+		s32             filler[64/4 - 7];       // pad this structure to 64 bytes
 	};
 
 
 	struct fifo_state
 	{
 		void reset() { in = out = 0; }
-		void add(uint32_t data);
-		uint32_t remove();
-		uint32_t peek() { return base[out]; }
+		void add(u32 data);
+		u32 remove();
+		u32 peek() { return base[out]; }
 		bool empty() const { return in == out; }
 		bool full() const { return ((in + 1) == out) || ((in == (size - 1)) && (out == 0)); }
-		int32_t items() const;
-		int32_t space() const { return size - 1 - items(); }
+		s32 items() const;
+		s32 space() const { return size - 1 - items(); }
 
-		uint32_t *          base = nullptr;         // base of the FIFO
-		int32_t             size = 0;               // size of the FIFO
-		int32_t             in = 0;                 // input pointer
-		int32_t             out = 0;                // output pointer
+		u32 *          base = nullptr;         // base of the FIFO
+		s32             size = 0;               // size of the FIFO
+		s32             in = 0;                 // input pointer
+		s32             out = 0;                // output pointer
 	};
 
 
 	struct cmdfifo_info
 	{
-		uint8_t             enable = 0;             // enabled?
-		uint8_t             count_holes = 0;        // count holes?
-		uint32_t            base = 0;               // base address in framebuffer RAM
-		uint32_t            end = 0;                // end address in framebuffer RAM
-		uint32_t            rdptr = 0;              // current read pointer
-		uint32_t            amin = 0;               // minimum address
-		uint32_t            amax = 0;               // maximum address
-		uint32_t            depth = 0;              // current depth
-		uint32_t            holes = 0;              // number of holes
+		u8             enable = 0;             // enabled?
+		u8             count_holes = 0;        // count holes?
+		u32            base = 0;               // base address in framebuffer RAM
+		u32            end = 0;                // end address in framebuffer RAM
+		u32            rdptr = 0;              // current read pointer
+		u32            amin = 0;               // minimum address
+		u32            amax = 0;               // maximum address
+		u32            depth = 0;              // current depth
+		u32            holes = 0;              // number of holes
 	};
 
 
 	struct pci_state
 	{
 		fifo_state          fifo;                   // PCI FIFO
-		uint32_t            init_enable = 0;        // initEnable value
-		uint8_t             stall_state = 0;        // state of the system if we're stalled
-		uint8_t             op_pending = 0;         // true if an operation is pending
+		u32            init_enable = 0;        // initEnable value
+		u8             stall_state = 0;        // state of the system if we're stalled
+		u8             op_pending = 0;         // true if an operation is pending
 		attotime            op_end_time = attotime::zero; // time when the pending operation ends
 		emu_timer *         continue_timer = nullptr; // timer to use to continue processing
-		uint32_t            fifo_mem[64*2];         // memory backing the PCI FIFO
+		u32            fifo_mem[64*2];         // memory backing the PCI FIFO
 	};
 
 
@@ -1031,54 +1029,54 @@ protected:
 	{
 		class stw_t;
 		void recompute_texture_params();
-		void init(uint8_t vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
-		int32_t prepare();
-		static int32_t new_log2(double &value, const int &offset);
-		rgbaint_t genTexture(int32_t x, const uint8_t *dither4, const uint32_t TEXMODE, rgb_t *LOOKUP, int32_t LODBASE, const stw_t &iterstw, int32_t &lod);
-		rgbaint_t combineTexture(const uint32_t TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, int32_t lod);
+		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
+		s32 prepare();
+		static s32 new_log2(double &value, const int &offset);
+		rgbaint_t genTexture(s32 x, const u8 *dither4, const u32 TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
+		rgbaint_t combineTexture(const u32 TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod);
 
 		struct ncc_table
 		{
-			void write(offs_t regnum, uint32_t data);
+			void write(offs_t regnum, u32 data);
 			void update();
 
-			uint8_t             dirty = 0;              // is the texel lookup dirty?
+			u8             dirty = 0;              // is the texel lookup dirty?
 			voodoo_reg *        m_reg = nullptr;          // pointer to our registers
-			int32_t             ir[4], ig[4], ib[4];    // I values for R,G,B
-			int32_t             qr[4], qg[4], qb[4];    // Q values for R,G,B
-			int32_t             y[16];                  // Y values
+			s32             ir[4], ig[4], ib[4];    // I values for R,G,B
+			s32             qr[4], qg[4], qb[4];    // Q values for R,G,B
+			s32             y[16];                  // Y values
 			rgb_t *             palette = nullptr;      // pointer to associated RGB palette
 			rgb_t *             palettea = nullptr;     // pointer to associated ARGB palette
 			rgb_t               texel[256];             // texel lookup
 		};
 
-		uint8_t *           ram = nullptr;          // pointer to our RAM
-		uint32_t            mask = 0;               // mask to apply to pointers
+		u8 *           ram = nullptr;          // pointer to our RAM
+		u32            mask = 0;               // mask to apply to pointers
 		voodoo_reg *        m_reg = nullptr;          // pointer to our register base
-		uint32_t            regdirty = 0;           // true if the LOD/mode/base registers have changed
+		u32            regdirty = 0;           // true if the LOD/mode/base registers have changed
 
-		uint32_t            texaddr_mask = 0;       // mask for texture address
-		uint8_t             texaddr_shift = 0;      // shift for texture address
+		u32            texaddr_mask = 0;       // mask for texture address
+		u8             texaddr_shift = 0;      // shift for texture address
 
-		int64_t             starts = 0, startt = 0; // starting S,T (14.18)
-		int64_t             startw = 0;             // starting W (2.30)
-		int64_t             dsdx = 0, dtdx = 0;     // delta S,T per X
-		int64_t             dwdx = 0;               // delta W per X
-		int64_t             dsdy = 0, dtdy = 0;     // delta S,T per Y
-		int64_t             dwdy = 0;               // delta W per Y
+		s64             starts = 0, startt = 0; // starting S,T (14.18)
+		s64             startw = 0;             // starting W (2.30)
+		s64             dsdx = 0, dtdx = 0;     // delta S,T per X
+		s64             dwdx = 0;               // delta W per X
+		s64             dsdy = 0, dtdy = 0;     // delta S,T per Y
+		s64             dwdy = 0;               // delta W per Y
 
-		int32_t             lodmin = 0, lodmax = 0; // min, max LOD values
-		int32_t             lodbias = 0;            // LOD bias
-		uint32_t            lodmask = 0;            // mask of available LODs
-		uint32_t            lodoffset[9];           // offset of texture base for each LOD
-		int32_t             detailmax = 0;          // detail clamp
-		int32_t             detailbias = 0;         // detail bias
-		uint8_t             detailscale = 0;        // detail scale
+		s32             lodmin = 0, lodmax = 0; // min, max LOD values
+		s32             lodbias = 0;            // LOD bias
+		u32            lodmask = 0;            // mask of available LODs
+		u32            lodoffset[9];           // offset of texture base for each LOD
+		s32             detailmax = 0;          // detail clamp
+		s32             detailbias = 0;         // detail bias
+		u8             detailscale = 0;        // detail scale
 
-		uint32_t            wmask = 0;              // mask for the current texture width
-		uint32_t            hmask = 0;              // mask for the current texture height
+		u32            wmask = 0;              // mask for the current texture width
+		u32            hmask = 0;              // mask for the current texture height
 
-		uint32_t            bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
+		u32            bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
 
 		ncc_table           ncc[2];                 // two NCC tables
 
@@ -1116,81 +1114,81 @@ protected:
 			float               s1, t1, w1;             // W, S, T for TMU 1
 		};
 
-		uint8_t *           ram = nullptr;          // pointer to frame buffer RAM
-		uint32_t            mask = 0;               // mask to apply to pointers
-		uint32_t            rgboffs[3] = { 0, 0, 0 }; // word offset to 3 RGB buffers
-		uint32_t            auxoffs = 0;            // word offset to 1 aux buffer
+		u8 *           ram = nullptr;          // pointer to frame buffer RAM
+		u32            mask = 0;               // mask to apply to pointers
+		u32            rgboffs[3] = { 0, 0, 0 }; // word offset to 3 RGB buffers
+		u32            auxoffs = 0;            // word offset to 1 aux buffer
 
-		uint8_t             frontbuf = 0;           // front buffer index
-		uint8_t             backbuf = 0;            // back buffer index
-		uint8_t             swaps_pending = 0;      // number of pending swaps
-		uint8_t             video_changed = 0;      // did the frontbuffer video change?
+		u8             frontbuf = 0;           // front buffer index
+		u8             backbuf = 0;            // back buffer index
+		u8             swaps_pending = 0;      // number of pending swaps
+		u8             video_changed = 0;      // did the frontbuffer video change?
 
-		uint32_t            yorigin = 0;            // Y origin subtract value
-		uint32_t            lfb_base = 0;           // base of LFB in memory
-		uint8_t             lfb_stride = 0;         // stride of LFB accesses in bits
+		u32            yorigin = 0;            // Y origin subtract value
+		u32            lfb_base = 0;           // base of LFB in memory
+		u8             lfb_stride = 0;         // stride of LFB accesses in bits
 
-		uint32_t            width = 0;              // width of current frame buffer
-		uint32_t            height = 0;             // height of current frame buffer
-		uint32_t            xoffs = 0;              // horizontal offset (back porch)
-		uint32_t            yoffs = 0;              // vertical offset (back porch)
-		uint32_t            vsyncstart = 0;         // vertical sync start scanline
-		uint32_t            vsyncstop = 0;          // vertical sync stop
-		uint32_t            rowpixels = 0;          // pixels per row
-		uint32_t            tile_width = 0;         // width of video tiles
-		uint32_t            tile_height = 0;        // height of video tiles
-		uint32_t            x_tiles = 0;            // number of tiles in the X direction
+		u32            width = 0;              // width of current frame buffer
+		u32            height = 0;             // height of current frame buffer
+		u32            xoffs = 0;              // horizontal offset (back porch)
+		u32            yoffs = 0;              // vertical offset (back porch)
+		u32            vsyncstart = 0;         // vertical sync start scanline
+		u32            vsyncstop = 0;          // vertical sync stop
+		u32            rowpixels = 0;          // pixels per row
+		u32            tile_width = 0;         // width of video tiles
+		u32            tile_height = 0;        // height of video tiles
+		u32            x_tiles = 0;            // number of tiles in the X direction
 
 		emu_timer *         vsync_stop_timer = nullptr; // VBLANK End timer
 		emu_timer *         vsync_start_timer = nullptr; // VBLANK timer
-		uint8_t             vblank = 0;             // VBLANK state
-		uint8_t             vblank_count = 0;       // number of VBLANKs since last swap
-		uint8_t             vblank_swap_pending = 0;// a swap is pending, waiting for a vblank
-		uint8_t             vblank_swap = 0;        // swap when we hit this count
-		uint8_t             vblank_dont_swap = 0;   // don't actually swap when we hit this point
+		u8             vblank = 0;             // VBLANK state
+		u8             vblank_count = 0;       // number of VBLANKs since last swap
+		u8             vblank_swap_pending = 0;// a swap is pending, waiting for a vblank
+		u8             vblank_swap = 0;        // swap when we hit this count
+		u8             vblank_dont_swap = 0;   // don't actually swap when we hit this point
 
 		/* triangle setup info */
-		uint8_t             cheating_allowed = 0;   // allow cheating?
-		int32_t             sign;                   // triangle sign
-		int16_t             ax, ay;                 // vertex A x,y (12.4)
-		int16_t             bx, by;                 // vertex B x,y (12.4)
-		int16_t             cx, cy;                 // vertex C x,y (12.4)
-		int32_t             startr, startg, startb, starta; // starting R,G,B,A (12.12)
-		int32_t             startz;                 // starting Z (20.12)
-		int64_t             startw;                 // starting W (16.32)
-		int32_t             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
-		int32_t             dzdx;                   // delta Z per X
-		int64_t             dwdx;                   // delta W per X
-		int32_t             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
-		int32_t             dzdy;                   // delta Z per Y
-		int64_t             dwdy;                   // delta W per Y
+		u8             cheating_allowed = 0;   // allow cheating?
+		s32             sign;                   // triangle sign
+		s16             ax, ay;                 // vertex A x,y (12.4)
+		s16             bx, by;                 // vertex B x,y (12.4)
+		s16             cx, cy;                 // vertex C x,y (12.4)
+		s32             startr, startg, startb, starta; // starting R,G,B,A (12.12)
+		s32             startz;                 // starting Z (20.12)
+		s64             startw;                 // starting W (16.32)
+		s32             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
+		s32             dzdx;                   // delta Z per X
+		s64             dwdx;                   // delta W per X
+		s32             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
+		s32             dzdy;                   // delta Z per Y
+		s64             dwdy;                   // delta W per Y
 
 		thread_stats_block  lfb_stats;              // LFB-access statistics
 
-		uint8_t             sverts = 0;             // number of vertices ready */
+		u8             sverts = 0;             // number of vertices ready */
 		setup_vertex        svert[3];               // 3 setup vertices */
 
 		fifo_state          fifo;                   // framebuffer memory fifo */
 		cmdfifo_info        cmdfifo[2];             // command FIFOs */
 
-		uint8_t             fogblend[64];           // 64-entry fog table */
-		uint8_t             fogdelta[64];           // 64-entry fog table */
-		uint8_t             fogdelta_mask;          // mask for for delta (0xff for V1, 0xfc for V2) */
+		u8             fogblend[64];           // 64-entry fog table */
+		u8             fogdelta[64];           // 64-entry fog table */
+		u8             fogdelta_mask;          // mask for for delta (0xff for V1, 0xfc for V2) */
 
 		rgb_t               pen[65536];             // mapping from pixels to pens */
 		rgb_t               clut[512];              // clut gamma data */
-		uint8_t             clut_dirty = 1;         // do we need to recompute? */
+		u8             clut_dirty = 1;         // do we need to recompute? */
 		rgb_t               rgb565[65536];          // RGB 5-6-5 lookup table */
 	};
 
 
 	struct dac_state
 	{
-		void data_w(uint8_t regum, uint8_t data);
-		void data_r(uint8_t regnum);
+		void data_w(u8 regum, u8 data);
+		void data_r(u8 regnum);
 
-		uint8_t             m_reg[8];                 // 8 registers
-		uint8_t             read_result;            // pending read result
+		u8             m_reg[8];                 // 8 registers
+		u8             read_result;            // pending read result
 	};
 
 
@@ -1199,36 +1197,36 @@ protected:
 	{
 		voodoo_device * device;
 		raster_info *       info;                   // pointer to rasterizer information
-		uint16_t *destbase;
+		u16 *destbase;
 
-		int16_t             ax, ay;                 // vertex A x,y (12.4)
-		int32_t             startr, startg, startb, starta; // starting R,G,B,A (12.12)
-		int32_t             startz;                 // starting Z (20.12)
-		int64_t             startw;                 // starting W (16.32)
-		int32_t             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
-		int32_t             dzdx;                   // delta Z per X
-		int64_t             dwdx;                   // delta W per X
-		int32_t             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
-		int32_t             dzdy;                   // delta Z per Y
-		int64_t             dwdy;                   // delta W per Y
+		s16             ax, ay;                 // vertex A x,y (12.4)
+		s32             startr, startg, startb, starta; // starting R,G,B,A (12.12)
+		s32             startz;                 // starting Z (20.12)
+		s64             startw;                 // starting W (16.32)
+		s32             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
+		s32             dzdx;                   // delta Z per X
+		s64             dwdx;                   // delta W per X
+		s32             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
+		s32             dzdy;                   // delta Z per Y
+		s64             dwdy;                   // delta W per Y
 
-		int64_t             starts0, startt0;       // starting S,T (14.18)
-		int64_t             startw0;                // starting W (2.30)
-		int64_t             ds0dx, dt0dx;           // delta S,T per X
-		int64_t             dw0dx;                  // delta W per X
-		int64_t             ds0dy, dt0dy;           // delta S,T per Y
-		int64_t             dw0dy;                  // delta W per Y
-		int32_t             lodbase0;               // used during rasterization
+		s64             starts0, startt0;       // starting S,T (14.18)
+		s64             startw0;                // starting W (2.30)
+		s64             ds0dx, dt0dx;           // delta S,T per X
+		s64             dw0dx;                  // delta W per X
+		s64             ds0dy, dt0dy;           // delta S,T per Y
+		s64             dw0dy;                  // delta W per Y
+		s32             lodbase0;               // used during rasterization
 
-		int64_t             starts1, startt1;       // starting S,T (14.18)
-		int64_t             startw1;                // starting W (2.30)
-		int64_t             ds1dx, dt1dx;           // delta S,T per X
-		int64_t             dw1dx;                  // delta W per X
-		int64_t             ds1dy, dt1dy;           // delta S,T per Y
-		int64_t             dw1dy;                  // delta W per Y
-		int32_t             lodbase1;               // used during rasterization
+		s64             starts1, startt1;       // starting S,T (14.18)
+		s64             startw1;                // starting W (2.30)
+		s64             ds1dx, dt1dx;           // delta S,T per X
+		s64             dw1dx;                  // delta W per X
+		s64             ds1dy, dt1dy;           // delta S,T per Y
+		s64             dw1dy;                  // delta W per Y
+		s32             lodbase1;               // used during rasterization
 
-		uint16_t            dither[16];             // dither matrix, for fastfill
+		u16            dither[16];             // dither matrix, for fastfill
 	};
 
 
@@ -1238,21 +1236,21 @@ protected:
 		voodoo_renderer(running_machine &machine) :
 			poly_manager(machine) { }
 
-		using mfp = void (voodoo_device::*)(int32_t, const extent_t &, const poly_extra_data &, int);
+		using mfp = void (voodoo_device::*)(s32, const extent_t &, const poly_extra_data &, int);
 	};
 
 
 	struct static_raster_info
 	{
-		constexpr uint32_t compute_hash() const;
+		constexpr u32 compute_hash() const;
 
 		voodoo_renderer::mfp callback_mfp;
-		uint32_t            eff_color_path;         // effective fbzColorPath value
-		uint32_t            eff_alpha_mode;         // effective alphaMode value
-		uint32_t            eff_fog_mode;           // effective fogMode value
-		uint32_t            eff_fbz_mode;           // effective fbzMode value
-		uint32_t            eff_tex_mode_0;         // effective textureMode value for TMU #0
-		uint32_t            eff_tex_mode_1;         // effective textureMode value for TMU #1
+		u32            eff_color_path;         // effective fbzColorPath value
+		u32            eff_alpha_mode;         // effective alphaMode value
+		u32            eff_fog_mode;           // effective fogMode value
+		u32            eff_fbz_mode;           // effective fbzMode value
+		u32            eff_tex_mode_0;         // effective textureMode value for TMU #0
+		u32            eff_tex_mode_1;         // effective textureMode value for TMU #1
 	};
 
 
@@ -1260,41 +1258,41 @@ protected:
 	{
 		raster_info *       next = nullptr;         // pointer to next entry with the same hash
 		voodoo_renderer::render_delegate callback; // callback pointer
-		uint8_t             display;                // display index
-		uint32_t            hits;                   // how many hits (pixels) we've used this for
-		uint32_t            polys;                  // how many polys we've used this for
-		uint32_t            hash = 0U;
+		u8             display;                // display index
+		u32            hits;                   // how many hits (pixels) we've used this for
+		u32            polys;                  // how many polys we've used this for
+		u32            hash = 0U;
 		static_raster_info const *static_info;
 	};
 
 
 	struct banshee_info
 	{
-		uint32_t            io[0x40];               // I/O registers
-		uint32_t            agp[0x80];              // AGP registers
-		uint8_t             vga[0x20];              // VGA registers
-		uint8_t             crtc[0x27];             // VGA CRTC registers
-		uint8_t             seq[0x05];              // VGA sequencer registers
-		uint8_t             gc[0x05];               // VGA graphics controller registers
-		uint8_t             att[0x15];              // VGA attribute registers
-		uint8_t             attff;                  // VGA attribute flip-flop
+		u32            io[0x40];               // I/O registers
+		u32            agp[0x80];              // AGP registers
+		u8             vga[0x20];              // VGA registers
+		u8             crtc[0x27];             // VGA CRTC registers
+		u8             seq[0x05];              // VGA sequencer registers
+		u8             gc[0x05];               // VGA graphics controller registers
+		u8             att[0x15];              // VGA attribute registers
+		u8             attff;                  // VGA attribute flip-flop
 
-		uint32_t            blt_regs[0x20];         // 2D Blitter registers
-		uint32_t            blt_dst_base = 0;
-		uint32_t            blt_dst_x = 0;
-		uint32_t            blt_dst_y = 0;
-		uint32_t            blt_dst_width = 0;
-		uint32_t            blt_dst_height = 0;
-		uint32_t            blt_dst_stride = 0;
-		uint32_t            blt_dst_bpp = 0;
-		uint32_t            blt_cmd = 0;
-		uint32_t            blt_src_base = 0;
-		uint32_t            blt_src_x = 0;
-		uint32_t            blt_src_y = 0;
-		uint32_t            blt_src_width = 0;
-		uint32_t            blt_src_height = 0;
-		uint32_t            blt_src_stride = 0;
-		uint32_t            blt_src_bpp = 0;
+		u32            blt_regs[0x20];         // 2D Blitter registers
+		u32            blt_dst_base = 0;
+		u32            blt_dst_x = 0;
+		u32            blt_dst_y = 0;
+		u32            blt_dst_width = 0;
+		u32            blt_dst_height = 0;
+		u32            blt_dst_stride = 0;
+		u32            blt_dst_bpp = 0;
+		u32            blt_cmd = 0;
+		u32            blt_src_base = 0;
+		u32            blt_src_x = 0;
+		u32            blt_src_y = 0;
+		u32            blt_src_width = 0;
+		u32            blt_src_height = 0;
+		u32            blt_src_stride = 0;
+		u32            blt_src_bpp = 0;
 	};
 
 
@@ -1306,23 +1304,23 @@ protected:
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);
 	void init_fbi(fbi_state *f, void *memory, int fbmem);
-	int32_t register_w(offs_t offset, uint32_t data);
-	int32_t swapbuffer(uint32_t data);
-	int32_t lfb_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	uint32_t lfb_r(offs_t offset, bool lfb_3d);
-	int32_t texture_w(offs_t offset, uint32_t data);
-	int32_t lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	int32_t banshee_2d_w(offs_t offset, uint32_t data);
+	s32 register_w(offs_t offset, u32 data);
+	s32 swapbuffer(u32 data);
+	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 lfb_r(offs_t offset, bool lfb_3d);
+	s32 texture_w(offs_t offset, u32 data);
+	s32 lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
+	s32 banshee_2d_w(offs_t offset, u32 data);
 	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
 	void recompute_video_memory();
 	void adjust_vblank_timer();
-	int32_t fastfill();
-	int32_t triangle();
-	int32_t begin_triangle();
-	int32_t draw_triangle();
-	int32_t setup_and_draw_triangle();
-	int32_t triangle_create_work_item(uint16_t *drawbuf, int texcount);
+	s32 fastfill();
+	s32 triangle();
+	s32 begin_triangle();
+	s32 draw_triangle();
+	s32 setup_and_draw_triangle();
+	s32 triangle_create_work_item(u16 *drawbuf, int texcount);
 	raster_info *add_rasterizer(static_raster_info const &cinfo, bool is_generic);
 	raster_info *find_rasterizer(int texcount);
 	void dump_rasterizer_stats();
@@ -1331,54 +1329,54 @@ protected:
 	void update_statistics(bool accumulate);
 	void reset_counters();
 
-	uint32_t register_r(offs_t offset);
+	u32 register_r(offs_t offset);
 
 	void swap_buffers();
 	int cmdfifo_compute_expected_depth(cmdfifo_info &f);
-	uint32_t cmdfifo_execute(cmdfifo_info *f);
-	int32_t cmdfifo_execute_if_ready(cmdfifo_info &f);
-	void cmdfifo_w(cmdfifo_info *f, offs_t offset, uint32_t data);
+	u32 cmdfifo_execute(cmdfifo_info *f);
+	s32 cmdfifo_execute_if_ready(cmdfifo_info &f);
+	void cmdfifo_w(cmdfifo_info *f, offs_t offset, u32 data);
 
 	void init_save_state();
 
-	void raster_fastfill(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_0tmu(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_1tmu(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_2tmu(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
+	void raster_fastfill(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
+	void raster_generic_0tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
+	void raster_generic_1tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
+	void raster_generic_2tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
 
 #define RASTERIZER_HEADER(name) \
-	void raster_##name(int32_t y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
+	void raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
 #include "voodoo_rast.ipp"
 
 #undef RASTERIZER_ENTRY
 
-	bool chroma_key_test(thread_stats_block &stats, uint32_t fbzModeReg, rgbaint_t rgaIntColor);
-	bool alpha_mask_test(thread_stats_block &stats, uint32_t fbzModeReg, uint8_t alpha);
-	bool alpha_test(uint8_t alpharef, thread_stats_block &stats, uint32_t alphaModeReg, uint8_t alpha);
-	bool depth_test(uint16_t zaColorReg, thread_stats_block &stats, int32_t destDepth, uint32_t fbzModeReg, int32_t biasdepth);
-	bool combine_color(thread_stats_block &STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
-	void apply_fogging(uint32_t fbzModeReg, uint32_t fogModeReg, uint32_t fbzCpReg,  int32_t x, const uint8_t *dither4, int32_t wFloat, rgbaint_t &color, int32_t iterz, int64_t iterw, const rgbaint_t &iterargb);
+	bool chroma_key_test(thread_stats_block &stats, u32 fbzModeReg, rgbaint_t rgaIntColor);
+	bool alpha_mask_test(thread_stats_block &stats, u32 fbzModeReg, u8 alpha);
+	bool alpha_test(u8 alpharef, thread_stats_block &stats, u32 alphaModeReg, u8 alpha);
+	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, u32 fbzModeReg, s32 biasdepth);
+	bool combine_color(thread_stats_block &STATS, u32 FBZCOLORPATH, u32 FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
+	void apply_fogging(u32 fbzModeReg, u32 fogModeReg, u32 fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
-	void banshee_blit_2d(uint32_t data);
+	void banshee_blit_2d(u32 data);
 
 // FIXME: this stuff should not be public
 public:
 	voodoo_reg          m_reg[0x400];             // raw registers
-	const uint8_t       m_type;                // type of system
-	uint8_t             m_alt_regmap;             // enable alternate register map?
-	uint8_t             m_chipmask;               // mask for which chips are available
-	uint8_t             m_index;                  // index of board
+	const u8       m_type;                // type of system
+	u8             m_alt_regmap;             // enable alternate register map?
+	u8             m_chipmask;               // mask for which chips are available
+	u8             m_index;                  // index of board
 
 
 	screen_device *     m_screen;               // the screen we are acting on
 	cpu_device *        m_cpu;                  // the CPU we interact with
-	uint32_t            m_freq;                   // operating frequency
+	u32            m_freq;                   // operating frequency
 	attoseconds_t       m_attoseconds_per_cycle;  // attoseconds per cycle
 	int                 m_trigger;                // trigger used for stalling
 
-	const uint8_t *     m_regaccess;              // register access array
+	const u8 *     m_regaccess;              // register access array
 	const char *const * m_regnames;               // register names array
 
 	std::unique_ptr<voodoo_renderer> m_poly;              // polygon manager
@@ -1387,7 +1385,7 @@ public:
 	voodoo_stats        m_stats;                  // internal statistics
 
 	offs_t              m_last_status_pc;         // PC of last status description (for logging)
-	uint32_t            m_last_status_value;      // value of last status read (for logging)
+	u32            m_last_status_value;      // value of last status read (for logging)
 
 	int                 m_next_rasterizer;        // next rasterizer index
 	raster_info         m_rasterizer[MAX_RASTERIZERS]; // array of rasterizers
@@ -1395,11 +1393,11 @@ public:
 	raster_info *       m_generic_rasterizer[3];
 
 	bool                m_send_config;
-	uint32_t            m_tmu_config;
+	u32            m_tmu_config;
 
-	uint8_t             m_fbmem;
-	uint8_t             m_tmumem0;
-	uint8_t             m_tmumem1;
+	u8             m_fbmem;
+	u8             m_tmumem0;
+	u8             m_tmumem1;
 	devcb_write_line    m_vblank;
 	devcb_write_line    m_stall;
 	// This is for internally generated PCI interrupts in Voodoo3
@@ -1415,28 +1413,28 @@ public:
 	optional_device<screen_device> m_screen_finder; // the screen we are acting on
 	optional_device<cpu_device> m_cpu_finder;   // the CPU we interact with
 
-	std::unique_ptr<uint8_t[]> m_fbmem_alloc;
-	std::unique_ptr<uint8_t[]> m_tmumem_alloc[2];
+	std::unique_ptr<u8[]> m_fbmem_alloc;
+	std::unique_ptr<u8[]> m_tmumem_alloc[2];
 };
 
 class voodoo_1_device : public voodoo_device
 {
 public:
-	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class voodoo_2_device : public voodoo_device
 {
 public:
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class voodoo_banshee_device : public voodoo_device
 {
 public:
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	u32 banshee_r(offs_t offset, u32 mem_mask = ~0);
 	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -1449,7 +1447,7 @@ public:
 	void banshee_vga_w(offs_t offset, u8 data);
 
 protected:
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
 
 	// device-level overrides
 	u32 banshee_agp_r(offs_t offset);
@@ -1460,7 +1458,7 @@ protected:
 class voodoo_3_device : public voodoo_banshee_device
 {
 public:
-	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
@@ -1496,7 +1494,7 @@ public:
 		m_st = _mm_add_pd(m_st, other.m_st);
 		m_w = _mm_add_pd(m_w, other.m_w);
 	}
-	void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
 	{
 		__m128d tmp = _mm_div_pd(m_st, m_w);
 		// Allow for 8 bits of decimal in integer
@@ -1539,7 +1537,7 @@ public:
 	}
 	// Computes s/w and t/w and returns log2 of 1/w
 	// s, t and c are 16.32 values.  The results are 24.8.
-	inline void calc_stow(s32 &sow, s32 &tow, int32_t &oowlog) const
+	inline void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
 	{
 		double recip = double(1ULL << (47 - 39)) / m_w;
 		double resAD = m_s * recip;
