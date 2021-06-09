@@ -18,6 +18,14 @@
 #include "screen.h"
 
 
+
+cleanup to do:
+ de-static-fy (find vd->)
+ uint->u
+ voodoo_regs class
+ rasterizer template
+
+
 /*************************************
  *
  *  Misc. constants
@@ -907,14 +915,6 @@ public:
 	u32 voodoo_r(offs_t offset);
 	void voodoo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	uint8_t             m_fbmem;
-	uint8_t             m_tmumem0;
-	uint8_t             m_tmumem1;
-	devcb_write_line    m_vblank;
-	devcb_write_line    m_stall;
-	// This is for internally generated PCI interrupts in Voodoo3
-	devcb_write_line    m_pciint;
-
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
@@ -1042,7 +1042,7 @@ protected:
 			void update();
 
 			uint8_t             dirty = 0;              // is the texel lookup dirty?
-			voodoo_reg *        reg = nullptr;          // pointer to our registers
+			voodoo_reg *        m_reg = nullptr;          // pointer to our registers
 			int32_t             ir[4], ig[4], ib[4];    // I values for R,G,B
 			int32_t             qr[4], qg[4], qb[4];    // Q values for R,G,B
 			int32_t             y[16];                  // Y values
@@ -1053,7 +1053,7 @@ protected:
 
 		uint8_t *           ram = nullptr;          // pointer to our RAM
 		uint32_t            mask = 0;               // mask to apply to pointers
-		voodoo_reg *        reg = nullptr;          // pointer to our register base
+		voodoo_reg *        m_reg = nullptr;          // pointer to our register base
 		uint32_t            regdirty = 0;           // true if the LOD/mode/base registers have changed
 
 		uint32_t            texaddr_mask = 0;       // mask for texture address
@@ -1188,7 +1188,7 @@ protected:
 		void data_w(uint8_t regum, uint8_t data);
 		void data_r(uint8_t regnum);
 
-		uint8_t             reg[8];                 // 8 registers
+		uint8_t             m_reg[8];                 // 8 registers
 		uint8_t             read_result;            // pending read result
 	};
 
@@ -1362,50 +1362,58 @@ protected:
 
 // FIXME: this stuff should not be public
 public:
+	voodoo_reg          m_reg[0x400];             // raw registers
+	const uint8_t       m_type;                // type of system
+	uint8_t             m_alt_regmap;             // enable alternate register map?
+	uint8_t             m_chipmask;               // mask for which chips are available
+	uint8_t             m_index;                  // index of board
+
+
+	screen_device *     m_screen;               // the screen we are acting on
+	cpu_device *        m_cpu;                  // the CPU we interact with
+	uint32_t            m_freq;                   // operating frequency
+	attoseconds_t       m_attoseconds_per_cycle;  // attoseconds per cycle
+	int                 m_trigger;                // trigger used for stalling
+
+	const uint8_t *     m_regaccess;              // register access array
+	const char *const * m_regnames;               // register names array
+
+	std::unique_ptr<voodoo_renderer> m_poly;              // polygon manager
+	std::unique_ptr<thread_stats_block[]> m_thread_stats; // per-thread statistics
+
+	voodoo_stats        m_stats;                  // internal statistics
+
+	offs_t              m_last_status_pc;         // PC of last status description (for logging)
+	uint32_t            m_last_status_value;      // value of last status read (for logging)
+
+	int                 m_next_rasterizer;        // next rasterizer index
+	raster_info         m_rasterizer[MAX_RASTERIZERS]; // array of rasterizers
+	raster_info *       m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
+	raster_info *       m_generic_rasterizer[3];
+
+	bool                m_send_config;
+	uint32_t            m_tmu_config;
+
+	uint8_t             m_fbmem;
+	uint8_t             m_tmumem0;
+	uint8_t             m_tmumem1;
+	devcb_write_line    m_vblank;
+	devcb_write_line    m_stall;
+	// This is for internally generated PCI interrupts in Voodoo3
+	devcb_write_line    m_pciint;
+
+	pci_state           m_pci;                    // PCI state
+	dac_state           m_dac;                    // DAC state
+	fbi_state           m_fbi;                    // FBI states
+	tmu_state           m_tmu[MAX_TMU];           // TMU states
+	tmu_shared_state    m_tmushare;               // TMU shared state
+	banshee_info        m_banshee;                // Banshee state
+
 	optional_device<screen_device> m_screen_finder; // the screen we are acting on
 	optional_device<cpu_device> m_cpu_finder;   // the CPU we interact with
 
 	std::unique_ptr<uint8_t[]> m_fbmem_alloc;
 	std::unique_ptr<uint8_t[]> m_tmumem_alloc[2];
-
-	uint8_t             index;                  // index of board
-	screen_device *     m_screen;               // the screen we are acting on
-	cpu_device *        m_cpu;                  // the CPU we interact with
-	const uint8_t       vd_type;                // type of system
-	uint8_t             chipmask;               // mask for which chips are available
-	uint32_t            freq;                   // operating frequency
-	attoseconds_t       attoseconds_per_cycle;  // attoseconds per cycle
-	uint32_t            extra_cycles;           // extra cycles not yet accounted for
-	int                 trigger;                // trigger used for stalling
-
-	voodoo_reg          reg[0x400];             // raw registers
-	const uint8_t *     regaccess;              // register access array
-	const char *const * regnames;               // register names array
-	uint8_t             alt_regmap;             // enable alternate register map?
-
-	pci_state           pci;                    // PCI state
-	dac_state           dac;                    // DAC state
-
-	fbi_state           fbi;                    // FBI states
-	tmu_state           tmu[MAX_TMU];           // TMU states
-	tmu_shared_state    tmushare;               // TMU shared state
-	banshee_info        banshee;                // Banshee state
-
-	std::unique_ptr<voodoo_renderer> m_poly;              // polygon manager
-	std::unique_ptr<thread_stats_block[]> thread_stats; // per-thread statistics
-
-	voodoo_stats        stats;                  // internal statistics
-
-	offs_t              last_status_pc;         // PC of last status description (for logging)
-	uint32_t            last_status_value;      // value of last status read (for logging)
-
-	int                 next_rasterizer;        // next rasterizer index
-	raster_info         rasterizer[MAX_RASTERIZERS]; // array of rasterizers
-	raster_info *       raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
-	raster_info *       m_generic_rasterizer[3];
-
-	bool                send_config;
-	uint32_t            tmu_config;
 };
 
 class voodoo_1_device : public voodoo_device
