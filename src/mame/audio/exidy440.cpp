@@ -536,8 +536,7 @@ void exidy440_sound_device::m6844_w(offs_t offset, uint8_t data)
 int16_t *exidy440_sound_device::add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency)
 {
 	/* fill in this entry */
-	m_sound_cache.emplace_back();
-	auto &current = m_sound_cache.back();
+	auto &current = m_sound_cache.emplace_back();
 	current.address = address;
 	current.length = length;
 	current.bits = bits;
