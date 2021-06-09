@@ -223,9 +223,9 @@ void mc10_state::driver_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	u32 ram_size = m_ram->size();
 
-	// don't step on hardware register at 0xbfff
+	// don't step on hardware page at 0xbf00
 	if (ram_size == 0x8000)
-		ram_size--;
+		ram_size -= 0xff;
 
 	space.install_ram(0x4000, 0x4000+ram_size-1, m_ram->pointer());
 }
