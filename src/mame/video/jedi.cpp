@@ -35,7 +35,7 @@ void jedi_state::video_start()
 	gfx_element *gx0 = m_gfxdecode->gfx(2);
 
 	// allocate memory for the assembled data
-	m_gfxdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_gfxdata = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
 	u8 *dest = m_gfxdata.get();
