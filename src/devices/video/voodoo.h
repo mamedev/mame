@@ -133,7 +133,7 @@ namespace voodoo
 class fbz_colorpath
 {
 public:
-	static constexpr u32 DECODE_LIVE = 0xffffffff;
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
 	constexpr fbz_colorpath(u32 value) :
 		m_value(value) { }
@@ -176,7 +176,7 @@ private:
 class fbz_mode
 {
 public:
-	static constexpr u32 DECODE_LIVE = 0xffffffff;
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
 	constexpr fbz_mode(u32 value) :
 		m_value(value) { }
@@ -217,7 +217,7 @@ private:
 class alpha_mode
 {
 public:
-	static constexpr u32 DECODE_LIVE = 0xffffffff;
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
 	constexpr alpha_mode(u32 value) :
 		m_value(value) { }
@@ -258,7 +258,7 @@ private:
 class fog_mode
 {
 public:
-	static constexpr u32 DECODE_LIVE = 0xffffffff;
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
 	constexpr fog_mode(u32 value) :
 		m_value(value) { }
@@ -278,6 +278,61 @@ public:
 	{
 		// only care about the rest if fog is enabled
 		return enable_fog() ? m_value : 0;
+	}
+
+private:
+	u32 m_value;
+};
+
+class texture_mode
+{
+public:
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
+
+	constexpr texture_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr texture_mode(u32 normalized, u32 live) :
+		m_value((normalized == DECODE_LIVE) ? live : ((normalized & 0xfffff0ff) | (live & 0x00000f00))) { }
+
+	constexpr u32 enable_perspective() const   { return BIT(m_value, 0, 1); }
+	constexpr u32 minification_filter() const  { return BIT(m_value, 1, 1); }
+	constexpr u32 magnification_filter() const { return BIT(m_value, 2, 1); }
+	constexpr u32 clamp_neg_w() const          { return BIT(m_value, 3, 1); }
+	constexpr u32 enable_lod_dither() const    { return BIT(m_value, 4, 1); }
+	constexpr u32 ncc_table_select() const     { return BIT(m_value, 5, 1); }
+	constexpr u32 clamp_s() const              { return BIT(m_value, 6, 1); }
+	constexpr u32 clamp_t() const              { return BIT(m_value, 7, 1); }
+	constexpr u32 format() const               { return BIT(m_value, 8, 4); }
+	constexpr u32 tc_zero_other() const        { return BIT(m_value, 12, 1); }
+	constexpr u32 tc_sub_clocal() const        { return BIT(m_value, 13, 1); }
+	constexpr u32 tc_mselect() const           { return BIT(m_value, 14, 3); }
+	constexpr u32 tc_reverse_blend() const     { return BIT(m_value, 17, 1); }
+	constexpr u32 tc_add_aclocal() const       { return BIT(m_value, 18, 2); }
+	constexpr u32 tc_invert_output() const     { return BIT(m_value, 20, 1); }
+	constexpr u32 tca_zero_other() const       { return BIT(m_value, 21, 1); }
+	constexpr u32 tca_sub_clocal() const       { return BIT(m_value, 22, 1); }
+	constexpr u32 tca_mselect() const          { return BIT(m_value, 23, 3); }
+	constexpr u32 tca_reverse_blend() const    { return BIT(m_value, 26, 1); }
+	constexpr u32 tca_add_aclocal() const      { return BIT(m_value, 27, 2); }
+	constexpr u32 tca_invert_output() const    { return BIT(m_value, 29, 1); }
+	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }
+	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }
+
+	constexpr u32 normalize()
+	{
+		// ignore the NCC table and seq_8_downld flags
+		u32 result = m_value & ~((1 << 5) | (1 << 31));
+
+		// classify texture formats into 3 format categories
+		if (format() < 8)
+			result = (result & ~(0xf << 8)) | (0 << 8);
+		else if (format() >= 10 && format() <= 12)
+			result = (result & ~(0xf << 8)) | (10 << 8);
+		else
+			result = (result & ~(0xf << 8)) | (8 << 8);
+
+		return result;
 	}
 
 private:
@@ -925,30 +980,6 @@ static const u8 dither_subtract_2x2[16] =
 #define FBIINIT7_CMDFIFO_PCI_TIMEOUT(val)   (((val) >> 20) & 0x7f)  /* voodoo 2 only */
 #define FBIINIT7_ENABLE_TEXTURE_BURST(val)  (((val) >> 27) & 1)     /* voodoo 2 only */
 
-#define TEXMODE_ENABLE_PERSPECTIVE(val)     (((val) >> 0) & 1)
-#define TEXMODE_MINIFICATION_FILTER(val)    (((val) >> 1) & 1)
-#define TEXMODE_MAGNIFICATION_FILTER(val)   (((val) >> 2) & 1)
-#define TEXMODE_CLAMP_NEG_W(val)            (((val) >> 3) & 1)
-#define TEXMODE_ENABLE_LOD_DITHER(val)      (((val) >> 4) & 1)
-#define TEXMODE_NCC_TABLE_SELECT(val)       (((val) >> 5) & 1)
-#define TEXMODE_CLAMP_S(val)                (((val) >> 6) & 1)
-#define TEXMODE_CLAMP_T(val)                (((val) >> 7) & 1)
-#define TEXMODE_FORMAT(val)                 (((val) >> 8) & 0xf)
-#define TEXMODE_TC_ZERO_OTHER(val)          (((val) >> 12) & 1)
-#define TEXMODE_TC_SUB_CLOCAL(val)          (((val) >> 13) & 1)
-#define TEXMODE_TC_MSELECT(val)             (((val) >> 14) & 7)
-#define TEXMODE_TC_REVERSE_BLEND(val)       (((val) >> 17) & 1)
-#define TEXMODE_TC_ADD_ACLOCAL(val)         (((val) >> 18) & 3)
-#define TEXMODE_TC_INVERT_OUTPUT(val)       (((val) >> 20) & 1)
-#define TEXMODE_TCA_ZERO_OTHER(val)         (((val) >> 21) & 1)
-#define TEXMODE_TCA_SUB_CLOCAL(val)         (((val) >> 22) & 1)
-#define TEXMODE_TCA_MSELECT(val)            (((val) >> 23) & 7)
-#define TEXMODE_TCA_REVERSE_BLEND(val)      (((val) >> 26) & 1)
-#define TEXMODE_TCA_ADD_ACLOCAL(val)        (((val) >> 27) & 3)
-#define TEXMODE_TCA_INVERT_OUTPUT(val)      (((val) >> 29) & 1)
-#define TEXMODE_TRILINEAR(val)              (((val) >> 30) & 1)
-#define TEXMODE_SEQ_8_DOWNLD(val)           (((val) >> 31) & 1)
-
 #define TEXLOD_LODMIN(val)                  (((val) >> 0) & 0x3f)
 #define TEXLOD_LODMAX(val)                  (((val) >> 6) & 0x3f)
 #define TEXLOD_LODBIAS(val)                 (((val) >> 12) & 0x3f)
@@ -1142,8 +1173,8 @@ protected:
 		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		s32 prepare();
 		static s32 new_log2(double &value, const int &offset);
-		rgbaint_t genTexture(s32 x, const u8 *dither4, const u32 TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
-		rgbaint_t combineTexture(const u32 TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod);
+		rgbaint_t genTexture(s32 x, const u8 *dither4, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
+		rgbaint_t combineTexture(voodoo::texture_mode const TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod);
 
 		struct ncc_table
 		{

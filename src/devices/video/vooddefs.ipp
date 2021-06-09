@@ -235,23 +235,6 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
  *
  *************************************/
 
-static inline u32 normalize_tex_mode(u32 eff_tex_mode)
-{
-	/* ignore the NCC table and seq_8_downld flags */
-	eff_tex_mode &= ~((1 << 5) | (1 << 31));
-
-	/* classify texture formats into 3 format categories */
-	if (TEXMODE_FORMAT(eff_tex_mode) < 8)
-		eff_tex_mode = (eff_tex_mode & ~(0xf << 8)) | (0 << 8);
-	else if (TEXMODE_FORMAT(eff_tex_mode) >= 10 && TEXMODE_FORMAT(eff_tex_mode) <= 12)
-		eff_tex_mode = (eff_tex_mode & ~(0xf << 8)) | (10 << 8);
-	else
-		eff_tex_mode = (eff_tex_mode & ~(0xf << 8)) | (8 << 8);
-
-	return eff_tex_mode;
-}
-
-
 constexpr u32 voodoo_device::static_raster_info::compute_hash() const
 {
 	u32 result = eff_color_path;
@@ -1424,7 +1407,7 @@ do                                                                              
 	rgb_union c_local;                                                          \
 																				\
 	/* determine the S/T/LOD values for this texture */                         \
-	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))                                    \
+	if (TEXMODE.enable_perspective())                                    \
 	{                                                                           \
 		if (USE_FAST_RECIP) {                                                     \
 			const s32 oow = fast_reciplog((ITERW), &lod);                         \
@@ -1443,12 +1426,12 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* clamp W */                                                               \
-	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && (ITERW) < 0)                            \
+	if (TEXMODE.clamp_neg_w() && (ITERW) < 0)                            \
 		s = t = 0;                                                              \
 																				\
 	/* clamp the LOD */                                                         \
 	lod += (TT)->lodbias;                                                       \
-	if (TEXMODE_ENABLE_LOD_DITHER(TEXMODE))                                     \
+	if (TEXMODE.enable_lod_dither())                                     \
 		lod += DITHER4[(XX) & 3] << 4;                                          \
 	if (lod < (TT)->lodmin)                                                     \
 		lod = (TT)->lodmin;                                                     \
@@ -1468,8 +1451,8 @@ do                                                                              
 	tmax = (TT)->hmask >> ilod;                                                 \
 																				\
 	/* determine whether we are point-sampled or bilinear */                    \
-	if ((lod == (TT)->lodmin && !TEXMODE_MAGNIFICATION_FILTER(TEXMODE)) ||      \
-		(lod != (TT)->lodmin && !TEXMODE_MINIFICATION_FILTER(TEXMODE)))         \
+	if ((lod == (TT)->lodmin && !TEXMODE.magnification_filter()) ||      \
+		(lod != (TT)->lodmin && !TEXMODE.minification_filter()))         \
 	{                                                                           \
 		/* point sampled */                                                     \
 																				\
@@ -1480,16 +1463,16 @@ do                                                                              
 		t >>= ilod + 18;                                                        \
 																				\
 		/* clamp/wrap S/T if necessary */                                       \
-		if (TEXMODE_CLAMP_S(TEXMODE))                                           \
+		if (TEXMODE.clamp_s())                                           \
 			CLAMP(s, 0, smax);                                                  \
-		if (TEXMODE_CLAMP_T(TEXMODE))                                           \
+		if (TEXMODE.clamp_t())                                           \
 			CLAMP(t, 0, tmax);                                                  \
 		s &= smax;                                                              \
 		t &= tmax;                                                              \
 		t *= smax + 1;                                                          \
 																				\
 		/* fetch texel data */                                                  \
-		if (TEXMODE_FORMAT(TEXMODE) < 8)                                        \
+		if (TEXMODE.format() < 8)                                        \
 		{                                                                       \
 			texel0 = *(u8 *)&(TT)->ram[(texbase + t + s) & (TT)->mask];      \
 			c_local.u = (LOOKUP)[texel0];                                       \
@@ -1497,7 +1480,7 @@ do                                                                              
 		else                                                                    \
 		{                                                                       \
 			texel0 = *(u16 *)&(TT)->ram[(texbase + 2*(t + s)) & (TT)->mask]; \
-			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12) \
+			if (TEXMODE.format() >= 10 && TEXMODE.format() <= 12) \
 				c_local.u = (LOOKUP)[texel0];                                   \
 			else                                                                \
 				c_local.u = ((LOOKUP)[texel0 & 0xff] & 0xffffff) |              \
@@ -1532,12 +1515,12 @@ do                                                                              
 		t1 = t + 1;                                                             \
 																				\
 		/* clamp/wrap S/T if necessary */                                       \
-		if (TEXMODE_CLAMP_S(TEXMODE))                                           \
+		if (TEXMODE.clamp_s())                                           \
 		{                                                                       \
 			CLAMP(s, 0, smax);                                                  \
 			CLAMP(s1, 0, smax);                                                 \
 		}                                                                       \
-		if (TEXMODE_CLAMP_T(TEXMODE))                                           \
+		if (TEXMODE.clamp_t())                                           \
 		{                                                                       \
 			CLAMP(t, 0, tmax);                                                  \
 			CLAMP(t1, 0, tmax);                                                 \
@@ -1550,7 +1533,7 @@ do                                                                              
 		t1 *= smax + 1;                                                         \
 																				\
 		/* fetch texel data */                                                  \
-		if (TEXMODE_FORMAT(TEXMODE) < 8)                                        \
+		if (TEXMODE.format() < 8)                                        \
 		{                                                                       \
 			texel0 = *(u8 *)&(TT)->ram[(texbase + t + s) & (TT)->mask];      \
 			texel1 = *(u8 *)&(TT)->ram[(texbase + t + s1) & (TT)->mask];     \
@@ -1567,7 +1550,7 @@ do                                                                              
 			texel1 = *(u16 *)&(TT)->ram[(texbase + 2*(t + s1)) & (TT)->mask];\
 			texel2 = *(u16 *)&(TT)->ram[(texbase + 2*(t1 + s)) & (TT)->mask];\
 			texel3 = *(u16 *)&(TT)->ram[(texbase + 2*(t1 + s1)) & (TT)->mask];\
-			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12) \
+			if (TEXMODE.format() >= 10 && TEXMODE.format() <= 12) \
 			{                                                                   \
 				texel0 = (LOOKUP)[texel0];                                      \
 				texel1 = (LOOKUP)[texel1];                                      \
@@ -1592,7 +1575,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* select zero/other for RGB */                                             \
-	if (!TEXMODE_TC_ZERO_OTHER(TEXMODE))                                        \
+	if (!TEXMODE.tc_zero_other())                                        \
 	{                                                                           \
 		tr = COTHER.rgb.r;                                                      \
 		tg = COTHER.rgb.g;                                                      \
@@ -1602,23 +1585,23 @@ do                                                                              
 		tr = tg = tb = 0;                                                       \
 																				\
 	/* select zero/other for alpha */                                           \
-	if (!TEXMODE_TCA_ZERO_OTHER(TEXMODE))                                       \
+	if (!TEXMODE.tca_zero_other())                                       \
 		ta = COTHER.rgb.a;                                                      \
 	else                                                                        \
 		ta = 0;                                                                 \
 																				\
 	/* potentially subtract c_local */                                          \
-	if (TEXMODE_TC_SUB_CLOCAL(TEXMODE))                                         \
+	if (TEXMODE.tc_sub_clocal())                                         \
 	{                                                                           \
 		tr -= c_local.rgb.r;                                                    \
 		tg -= c_local.rgb.g;                                                    \
 		tb -= c_local.rgb.b;                                                    \
 	}                                                                           \
-	if (TEXMODE_TCA_SUB_CLOCAL(TEXMODE))                                        \
+	if (TEXMODE.tca_sub_clocal())                                        \
 		ta -= c_local.rgb.a;                                                    \
 																				\
 	/* blend RGB */                                                             \
-	switch (TEXMODE_TC_MSELECT(TEXMODE))                                        \
+	switch (TEXMODE.tc_mselect())                                        \
 	{                                                                           \
 		default:    /* reserved */                                              \
 		case 0:     /* zero */                                                  \
@@ -1657,7 +1640,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* blend alpha */                                                           \
-	switch (TEXMODE_TCA_MSELECT(TEXMODE))                                       \
+	switch (TEXMODE.tca_mselect())                                       \
 	{                                                                           \
 		default:    /* reserved */                                              \
 		case 0:     /* zero */                                                  \
@@ -1693,7 +1676,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* reverse the RGB blend */                                                 \
-	if (!TEXMODE_TC_REVERSE_BLEND(TEXMODE))                                     \
+	if (!TEXMODE.tc_reverse_blend())                                     \
 	{                                                                           \
 		blendr ^= 0xff;                                                         \
 		blendg ^= 0xff;                                                         \
@@ -1701,7 +1684,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* reverse the alpha blend */                                               \
-	if (!TEXMODE_TCA_REVERSE_BLEND(TEXMODE))                                    \
+	if (!TEXMODE.tca_reverse_blend())                                    \
 		blenda ^= 0xff;                                                         \
 																				\
 	/* do the blend */                                                          \
@@ -1711,7 +1694,7 @@ do                                                                              
 	ta = (ta * (blenda + 1)) >> 8;                                              \
 																				\
 	/* add clocal or alocal to RGB */                                           \
-	switch (TEXMODE_TC_ADD_ACLOCAL(TEXMODE))                                    \
+	switch (TEXMODE.tc_add_aclocal())                                    \
 	{                                                                           \
 		case 3:     /* reserved */                                              \
 		case 0:     /* nothing */                                               \
@@ -1731,7 +1714,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* add clocal or alocal to alpha */                                         \
-	if (TEXMODE_TCA_ADD_ACLOCAL(TEXMODE))                                       \
+	if (TEXMODE.tca_add_aclocal())                                       \
 		ta += c_local.rgb.a;                                                    \
 																				\
 	/* clamp */                                                                 \
@@ -1741,9 +1724,9 @@ do                                                                              
 	RESULT.rgb.a = (ta < 0) ? 0 : (ta > 0xff) ? 0xff : ta;                      \
 																				\
 	/* invert */                                                                \
-	if (TEXMODE_TC_INVERT_OUTPUT(TEXMODE))                                      \
+	if (TEXMODE.tc_invert_output())                                      \
 		RESULT.u ^= 0x00ffffff;                                                 \
-	if (TEXMODE_TCA_INVERT_OUTPUT(TEXMODE))                                     \
+	if (TEXMODE.tca_invert_output())                                     \
 		RESULT.rgb.a ^= 0xff;                                                   \
 }                                                                               \
 while (0)
@@ -2580,11 +2563,13 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, _FOGMODE, TEXMODE0, TEXMODE1) \
+#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, _FOGMODE, _TEXMODE0, _TEXMODE1) \
 																				\
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
 	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
+	voodoo::texture_mode const TEXMODE0(_TEXMODE0, (TMUS < 1) ? 0 : m_tmu[0].m_reg[textureMode].u); \
+	voodoo::texture_mode const TEXMODE1(_TEXMODE1, (TMUS < 2) ? 0 : m_tmu[1].m_reg[textureMode].u); \
 	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
 	voodoo::alpha_mode const ALPHAMODE(_ALPHAMODE, m_reg[alphaMode].u); \
 	voodoo::fbz_mode const FBZMODE(_FBZMODE, m_reg[fbzMode].u); \
@@ -2781,14 +2766,14 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::tmu_state::new_log2(double &value, c
 	return exp;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, const u8 *dither4, const u32 TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, const u8 *dither4, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod)
 {
 	rgbaint_t result;
 	s32 s, t, ilod;
 
 	/* determine the S/T/LOD values for this texture */
 	lod = (LODBASE);
-	if (TEXMODE_ENABLE_PERSPECTIVE(TEXMODE))
+	if (TEXMODE.enable_perspective())
 	{
 		s32 wLog;
 		iterstw.calc_stow(s, t, wLog);
@@ -2805,14 +2790,14 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 	}
 
 	/* clamp W */
-	if (TEXMODE_CLAMP_NEG_W(TEXMODE) && iterstw.is_w_neg())
+	if (TEXMODE.clamp_neg_w() && iterstw.is_w_neg())
 	{
 		s = t = 0;
 	}
 
 	/* clamp the LOD */
 	lod += lodbias;
-	if (TEXMODE_ENABLE_LOD_DITHER(TEXMODE))
+	if (TEXMODE.enable_lod_dither())
 		lod += dither4[x&3] << 4;
 	CLAMP(lod, lodmin, lodmax);
 
@@ -2829,8 +2814,8 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 	s32 tmax = hmask >> ilod;
 
 	/* determine whether we are point-sampled or bilinear */
-	if ((lod == lodmin && !TEXMODE_MAGNIFICATION_FILTER(TEXMODE)) ||
-		(lod != lodmin && !TEXMODE_MINIFICATION_FILTER(TEXMODE)))
+	if ((lod == lodmin && !TEXMODE.magnification_filter()) ||
+		(lod != lodmin && !TEXMODE.minification_filter()))
 	{
 		/* point sampled */
 
@@ -2841,16 +2826,16 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 		t >>= ilod + (18-10);
 
 		/* clamp/wrap S/T if necessary */
-		if (TEXMODE_CLAMP_S(TEXMODE))
+		if (TEXMODE.clamp_s())
 			CLAMP(s, 0, smax);
-		if (TEXMODE_CLAMP_T(TEXMODE))
+		if (TEXMODE.clamp_t())
 			CLAMP(t, 0, tmax);
 		s &= smax;
 		t &= tmax;
 		t *= smax + 1;
 
 		/* fetch texel data */
-		if (TEXMODE_FORMAT(TEXMODE) < 8)
+		if (TEXMODE.format() < 8)
 		{
 			texel0 = *(u8 *)&ram[(texbase + t + s) & mask];
 			result.set((LOOKUP)[texel0]);
@@ -2858,7 +2843,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 		else
 		{
 			texel0 = *(u16 *)&ram[(texbase + 2*(t + s)) & mask];
-			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12)
+			if (TEXMODE.format() >= 10 && TEXMODE.format() <= 12)
 				result.set((LOOKUP)[texel0]);
 			else
 				result.set(((LOOKUP)[texel0 & 0xff] & 0xffffff) | ((texel0 & 0xff00) << 16));
@@ -2892,7 +2877,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 		t1 = t + 1;
 
 		/* clamp/wrap S/T if necessary */
-		if (TEXMODE_CLAMP_S(TEXMODE))
+		if (TEXMODE.clamp_s())
 		{
 			if (s < 0) {
 				s = 0;
@@ -2908,7 +2893,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 			s1 &= smax;
 		}
 
-		if (TEXMODE_CLAMP_T(TEXMODE))
+		if (TEXMODE.clamp_t())
 		{
 			if (t < 0) {
 				t = 0;
@@ -2927,7 +2912,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 		t1 *= smax + 1;
 
 		/* fetch texel data */
-		if (TEXMODE_FORMAT(TEXMODE) < 8)
+		if (TEXMODE.format() < 8)
 		{
 			texel0 = *(u8 *)&ram[(texbase + t + s) & mask];
 			texel1 = *(u8 *)&ram[(texbase + t + s1) & mask];
@@ -2944,7 +2929,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 			texel1 = *(u16 *)&ram[(texbase + 2*(t + s1)) & mask];
 			texel2 = *(u16 *)&ram[(texbase + 2*(t1 + s)) & mask];
 			texel3 = *(u16 *)&ram[(texbase + 2*(t1 + s1)) & mask];
-			if (TEXMODE_FORMAT(TEXMODE) >= 10 && TEXMODE_FORMAT(TEXMODE) <= 12)
+			if (TEXMODE.format() >= 10 && TEXMODE.format() <= 12)
 			{
 				texel0 = (LOOKUP)[texel0];
 				texel1 = (LOOKUP)[texel1];
@@ -2967,34 +2952,34 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 	return result;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(const u32 TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(voodoo::texture_mode const TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod)
 {
 	rgbaint_t blend_color, blend_factor;
 	rgbaint_t add_val;
 
 	/* select zero/other for RGB */
-	if (TEXMODE_TC_ZERO_OTHER(TEXMODE))
+	if (TEXMODE.tc_zero_other())
 		blend_color.zero();
 	else
 		blend_color.set(c_other);
 
 	/* select zero/other for alpha */
-	if (TEXMODE_TCA_ZERO_OTHER(TEXMODE))
+	if (TEXMODE.tca_zero_other())
 		blend_color.zero_alpha();
 	else
 		blend_color.merge_alpha16(c_other);
 
-	if (TEXMODE_TC_SUB_CLOCAL(TEXMODE) || TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
+	if (TEXMODE.tc_sub_clocal() || TEXMODE.tca_sub_clocal())
 	{
 		rgbaint_t sub_val;
 
 		/* potentially subtract c_local */
-		if (!TEXMODE_TC_SUB_CLOCAL(TEXMODE))
+		if (!TEXMODE.tc_sub_clocal())
 			sub_val.zero();
 		else
 			sub_val.set(c_local);
 
-		if (!TEXMODE_TCA_SUB_CLOCAL(TEXMODE))
+		if (!TEXMODE.tca_sub_clocal())
 			sub_val.zero_alpha();
 		else
 			sub_val.merge_alpha16(c_local);
@@ -3003,7 +2988,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	}
 
 	/* blend RGB */
-	switch (TEXMODE_TC_MSELECT(TEXMODE))
+	switch (TEXMODE.tc_mselect())
 	{
 		default:    /* reserved */
 		case 0:     /* zero */
@@ -3041,7 +3026,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	}
 
 	/* blend alpha */
-	switch (TEXMODE_TCA_MSELECT(TEXMODE))
+	switch (TEXMODE.tca_mselect())
 	{
 		default:    /* reserved */
 		case 0:     /* zero */
@@ -3079,11 +3064,11 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	}
 
 	/* reverse the RGB blend */
-	if (!TEXMODE_TC_REVERSE_BLEND(TEXMODE))
+	if (!TEXMODE.tc_reverse_blend())
 		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
 	/* reverse the alpha blend */
-	if (!TEXMODE_TCA_REVERSE_BLEND(TEXMODE))
+	if (!TEXMODE.tca_reverse_blend())
 		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
 	/* do the blend */
@@ -3093,7 +3078,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	//ta = (ta * (blenda + 1)) >> 8;
 
 	/* add clocal or alocal to RGB */
-	switch (TEXMODE_TC_ADD_ACLOCAL(TEXMODE))
+	switch (TEXMODE.tc_add_aclocal())
 	{
 		case 3:     /* reserved */
 		case 0:     /* nothing */
@@ -3110,7 +3095,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	}
 
 	/* add clocal or alocal to alpha */
-	if (!TEXMODE_TCA_ADD_ACLOCAL(TEXMODE))
+	if (!TEXMODE.tca_add_aclocal())
 		add_val.zero_alpha();
 	else
 		add_val.merge_alpha16(c_local);
@@ -3124,9 +3109,9 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combineTexture(cons
 	blend_color.scale_add_and_clamp(blend_factor, add_val);
 
 	/* invert */
-	if (TEXMODE_TC_INVERT_OUTPUT(TEXMODE))
+	if (TEXMODE.tc_invert_output())
 		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
-	if (TEXMODE_TCA_INVERT_OUTPUT(TEXMODE))
+	if (TEXMODE.tca_invert_output())
 		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
 	return blend_color;
 }

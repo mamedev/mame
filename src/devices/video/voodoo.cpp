@@ -1838,7 +1838,8 @@ void voodoo_device::tmu_state::recompute_texture_params()
 		wmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
 
 	/* determine the bpp of the texture */
-	bppscale = TEXMODE_FORMAT(m_reg[textureMode].u) >> 3;
+	voodoo::texture_mode const texmode(m_reg[textureMode].u);
+	bppscale = texmode.format() >> 3;
 
 	/* start with the base of LOD 0 */
 	if (texaddr_shift == 0 && (m_reg[texBaseAddr].u & 1))
@@ -1886,10 +1887,10 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	}
 
 	/* set the NCC lookup appropriately */
-	texel[1] = texel[9] = ncc[TEXMODE_NCC_TABLE_SELECT(m_reg[textureMode].u)].texel;
+	texel[1] = texel[9] = ncc[texmode.ncc_table_select()].texel;
 
 	/* pick the lookup table */
-	lookup = texel[TEXMODE_FORMAT(m_reg[textureMode].u)];
+	lookup = texel[texmode.format()];
 
 	/* compute the detail parameters */
 	detailmax = TEXDETAIL_DETAIL_MAX(m_reg[tDetail].u);
@@ -1897,9 +1898,9 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	detailscale = TEXDETAIL_DETAIL_SCALE(m_reg[tDetail].u);
 
 	/* ensure that the NCC tables are up to date */
-	if ((TEXMODE_FORMAT(m_reg[textureMode].u) & 7) == 1)
+	if ((texmode.format() & 7) == 1)
 	{
-		ncc_table &n = ncc[TEXMODE_NCC_TABLE_SELECT(m_reg[textureMode].u)];
+		ncc_table &n = ncc[texmode.ncc_table_select()];
 		texel[1] = texel[9] = n.texel;
 		if (n.dirty)
 			n.update();
@@ -3989,7 +3990,8 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		data = (data >> 16) | (data << 16);
 
 	/* 8-bit texture case */
-	if (TEXMODE_FORMAT(t->m_reg[textureMode].u) < 8)
+	voodoo::texture_mode const texmode(t->m_reg[textureMode].u);
+	if (texmode.format() < 8)
 	{
 		int lod, tt, ts;
 		u32 tbaseaddr;
@@ -4002,7 +4004,7 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 			tt = (offset >> 7) & 0xff;
 
 			/* old code has a bit about how this is broken in gauntleg unless we always look at TMU0 */
-			if (TEXMODE_SEQ_8_DOWNLD(m_tmu[0].m_reg/*t->reg*/[textureMode].u)) {
+			if (voodoo::texture_mode(m_tmu[0].m_reg/*t->m_reg*/[textureMode].u).seq_8_downld()) {
 				ts = (offset << 2) & 0xfc;
 			}
 			else {
@@ -6270,7 +6272,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 		extra.dt0dy = m_tmu[0].dtdy;
 		extra.dw0dy = m_tmu[0].dwdy;
 		extra.lodbase0 = m_tmu[0].prepare();
-		m_stats.texture_mode[TEXMODE_FORMAT(m_tmu[0].m_reg[textureMode].u)]++;
+		m_stats.texture_mode[voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).format()]++;
 
 		/* fill in texture 1 parameters */
 		if (texcount > 1)
@@ -6285,7 +6287,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 			extra.dt1dy = m_tmu[1].dtdy;
 			extra.dw1dy = m_tmu[1].dwdy;
 			extra.lodbase1 = m_tmu[1].prepare();
-			m_stats.texture_mode[TEXMODE_FORMAT(m_tmu[1].m_reg[textureMode].u)]++;
+			m_stats.texture_mode[voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).format()]++;
 		}
 	}
 
@@ -6354,8 +6356,8 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(int texcount)
 	curinfo.eff_alpha_mode = voodoo::alpha_mode(m_reg[alphaMode].u).normalize();
 	curinfo.eff_fog_mode = voodoo::fog_mode(m_reg[fogMode].u).normalize();
 	curinfo.eff_fbz_mode = voodoo::fbz_mode(m_reg[fbzMode].u).normalize();
-	curinfo.eff_tex_mode_0 = (texcount >= 1) ? normalize_tex_mode(m_tmu[0].m_reg[textureMode].u) : 0xffffffff;
-	curinfo.eff_tex_mode_1 = (texcount >= 2) ? normalize_tex_mode(m_tmu[1].m_reg[textureMode].u) : 0xffffffff;
+	curinfo.eff_tex_mode_0 = (texcount >= 1) ? voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).normalize() : 0xffffffff;
+	curinfo.eff_tex_mode_1 = (texcount >= 2) ? voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).normalize() : 0xffffffff;
 
 	/* compute the hash */
 	hash = curinfo.compute_hash();
@@ -6595,7 +6597,7 @@ RASTERIZER(generic_0tmu, 0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode
 -------------------------------------------------*/
 
 RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			voodoo::fog_mode::DECODE_LIVE, m_tmu[0].m_reg[textureMode].u, 0)
+			voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, 0)
 
 
 /*-------------------------------------------------
@@ -6603,4 +6605,4 @@ RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode
 -------------------------------------------------*/
 
 RASTERIZER(generic_2tmu, 2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			voodoo::fog_mode::DECODE_LIVE, m_tmu[0].m_reg[textureMode].u, m_tmu[1].m_reg[textureMode].u)
+			voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE)
