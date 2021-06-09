@@ -3556,6 +3556,8 @@ files {
 	MAME_DIR .. "src/mame/machine/dc-ctrl.h",
 	MAME_DIR .. "src/mame/machine/jvs13551.cpp",
 	MAME_DIR .. "src/mame/machine/jvs13551.h",
+	MAME_DIR .. "src/mame/machine/segashiobd.cpp",
+	MAME_DIR .. "src/mame/machine/segashiobd.h",
 	MAME_DIR .. "src/mame/drivers/triforce.cpp",
 	MAME_DIR .. "src/mame/drivers/puckpkmn.cpp",
 	MAME_DIR .. "src/mame/drivers/segac2.cpp",

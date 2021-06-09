@@ -1570,6 +1570,8 @@ files {
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.h",
 	MAME_DIR .. "src/mame/machine/315-6154.cpp",
 	MAME_DIR .. "src/mame/machine/315-6154.h",
+	MAME_DIR .. "src/mame/machine/segashiobd.cpp",
+	MAME_DIR .. "src/mame/machine/segashiobd.h",
 	MAME_DIR .. "src/mame/video/powervr2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.h",
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",

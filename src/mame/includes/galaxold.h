@@ -149,7 +149,6 @@ public:
 	void galaxold_gfxbank_w(offs_t offset, uint8_t data);
 	void rockclim_videoram_w(offs_t offset, uint8_t data);
 	void rockclim_scroll_w(offs_t offset, uint8_t data);
-	void guttang_rombank_w(uint8_t data);
 	uint8_t rockclim_videoram_r(offs_t offset);
 	void dambustr_bg_split_line_w(uint8_t data);
 	void dambustr_bg_color_w(uint8_t data);
@@ -163,7 +162,6 @@ public:
 	void init_bullsdrtg();
 	void init_ladybugg();
 	void init_4in1();
-	void init_guttangt();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -282,7 +280,6 @@ public:
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
 	void mooncrst(machine_config &config);
-	void guttang(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
@@ -292,7 +289,6 @@ public:
 	void drivfrcg_program(address_map &map);
 	void drivfrcg_io(address_map &map);
 	void galaxold_map(address_map &map);
-	void guttang_map(address_map &map);
 	void hexpoola_data(address_map &map);
 	void hexpoola_io(address_map &map);
 	void hunchbkg_map(address_map &map);

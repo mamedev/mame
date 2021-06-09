@@ -240,6 +240,7 @@ public:
 	void init_mimonkey();
 	void init_mimonkeyb();
 	void init_victoryc();
+
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
 	void moonwar_palette(palette_device &palette);
@@ -295,6 +296,7 @@ public:
 	void mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void namenayo_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void monsterz_set_latch();
 	void decode_mooncrst(int length, uint8_t *dest);
 	void decode_checkman();
@@ -576,5 +578,25 @@ private:
 	void namenayo_extattr_w(offs_t offset, uint8_t data);
 	void namenayo_unk_d800_w(uint8_t data);
 };
+
+class guttangt_state : public galaxian_state
+{
+public:
+	guttangt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_rombank(*this, "rombank")
+	{
+	}
+
+	void guttangt(machine_config &config);
+	void init_guttangt();
+
+private:
+	void guttangt_map(address_map &map);
+	void guttangt_rombank_w(uint8_t data);
+
+	required_memory_bank m_rombank;
+};
+
 
 #endif // MAME_INCLUDES_GALAXIAN_H
