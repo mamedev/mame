@@ -235,16 +235,6 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
  *
  *************************************/
 
-static inline u32 normalize_fog_mode(u32 eff_fog_mode)
-{
-	/* if not doing fogging, ignore all the other fog bits */
-	if (!FOGMODE_ENABLE_FOG(eff_fog_mode))
-		eff_fog_mode = 0;
-
-	return eff_fog_mode;
-}
-
-
 static inline u32 normalize_tex_mode(u32 eff_tex_mode)
 {
 	/* ignore the NCC table and seq_8_downld flags */
@@ -300,7 +290,7 @@ constexpr u32 voodoo_device::static_raster_info::compute_hash() const
 #define COMPUTE_DITHER_POINTERS(FBZMODE, YY, FOGMODE)                           \
 do                                                                              \
 {                                                                               \
-	if (FBZMODE.enable_dithering() || FOGMODE_FOG_DITHER(FOGMODE))        \
+	if (FBZMODE.enable_dithering() || FOGMODE.fog_dither())        \
 		dither4 = &dither_matrix_4x4[((YY) & 3) * 4];                           \
 	/* compute the dithering pointers */                                        \
 	if (FBZMODE.enable_dithering())                                      \
@@ -1177,13 +1167,13 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 #define APPLY_FOGGING(FOGMODE, FBZCP, XX, DITHER4, RR, GG, BB, ITERZ, ITERW, ITERAXXX)  \
 do                                                                              \
 {                                                                               \
-	if (FOGMODE_ENABLE_FOG(FOGMODE))                                            \
+	if (FOGMODE.enable_fog())                                            \
 	{                                                                           \
 		rgb_union fogcolor = m_reg[fogColor];                               \
 		s32 fr, fg, fb;                                                       \
 																				\
 		/* constant fog bypasses everything else */                             \
-		if (FOGMODE_FOG_CONSTANT(FOGMODE))                                      \
+		if (FOGMODE.fog_constant())                                      \
 		{                                                                       \
 			fr = fogcolor.rgb.r;                                                \
 			fg = fogcolor.rgb.g;                                                \
@@ -1196,7 +1186,7 @@ do                                                                              
 			s32 fogblend = 0;                                                 \
 																				\
 			/* if fog_add is zero, we start with the fog color */               \
-			if (FOGMODE_FOG_ADD(FOGMODE) == 0)                                  \
+			if (FOGMODE.fog_add() == 0)                                  \
 			{                                                                   \
 				fr = fogcolor.rgb.r;                                            \
 				fg = fogcolor.rgb.g;                                            \
@@ -1206,7 +1196,7 @@ do                                                                              
 				fr = fg = fb = 0;                                               \
 																				\
 			/* if fog_mult is zero, we subtract the incoming color */           \
-			if (FOGMODE_FOG_MULT(FOGMODE) == 0)                                 \
+			if (FOGMODE.fog_mult() == 0)                                 \
 			{                                                                   \
 				fr -= (RR);                                                     \
 				fg -= (GG);                                                     \
@@ -1214,7 +1204,7 @@ do                                                                              
 			}                                                                   \
 																				\
 			/* fog blending mode */                                             \
-			switch (FOGMODE_FOG_ZALPHA(FOGMODE))                                \
+			switch (FOGMODE.fog_zalpha())                                \
 			{                                                                   \
 				case 0:     /* fog table */                                     \
 				{                                                               \
@@ -1226,12 +1216,12 @@ do                                                                              
 								((fogdepth >> 2) & 0xff);                         \
 																				\
 					/* fog zones allow for negating this value */               \
-					if (FOGMODE_FOG_ZONES(FOGMODE) && (delta & 2))              \
+					if (FOGMODE.fog_zones() && (delta & 2))              \
 						deltaval = -deltaval;                                   \
 					deltaval >>= 6;                                             \
 																				\
 					/* apply dither */                                          \
-					if (FOGMODE_FOG_DITHER(FOGMODE))                            \
+					if (FOGMODE.fog_dither())                            \
 						deltaval += DITHER4[(XX) & 3];                          \
 					deltaval >>= 4;                                             \
 																				\
@@ -1262,7 +1252,7 @@ do                                                                              
 		}                                                                       \
 																				\
 		/* if fog_mult is 0, we add this to the original color */               \
-		if (FOGMODE_FOG_MULT(FOGMODE) == 0)                                     \
+		if (FOGMODE.fog_mult() == 0)                                     \
 		{                                                                       \
 			(RR) += fr;                                                         \
 			(GG) += fg;                                                         \
@@ -1285,17 +1275,17 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode const fbzmode, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat,
+inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp,  s32 x, const u8 *dither4, s32 wFloat,
 	rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb)
 {
 	{
 		/* constant fog bypasses everything else */
 		rgbaint_t fogColorLocal(m_reg[fogColor].u);
 
-		if (FOGMODE_FOG_CONSTANT(fogModeReg))
+		if (fogmode.fog_constant())
 		{
 			/* if fog_mult is 0, we add this to the original color */
-			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
+			if (fogmode.fog_mult() == 0)
 			{
 				fogColorLocal.add(color);
 				fogColorLocal.clamp_to_uint8();
@@ -1315,12 +1305,12 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode cons
 			s32 fogblend = 0;
 
 			/* if fog_add is zero, we start with the fog color */
-			if (FOGMODE_FOG_ADD(fogModeReg))
+			if (fogmode.fog_add())
 				fogColorLocal.zero();
 				//fr = fg = fb = 0;
 
 			/* if fog_mult is zero, we subtract the incoming color */
-			if (!FOGMODE_FOG_MULT(fogModeReg))
+			if (!fogmode.fog_mult())
 			{
 				// Need to check this, manual states 9 bits
 				fogColorLocal.sub(color);
@@ -1331,7 +1321,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode cons
 			}
 
 			/* fog blending mode */
-			switch (FOGMODE_FOG_ZALPHA(fogModeReg))
+			switch (fogmode.fog_zalpha())
 			{
 				case 0:     /* fog table */
 				{
@@ -1350,12 +1340,12 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode cons
 								((fogDepth >> 2) & 0xff);
 
 					/* fog zones allow for negating this value */
-					if (FOGMODE_FOG_ZONES(fogModeReg) && (delta & 2))
+					if (fogmode.fog_zones() && (delta & 2))
 						deltaval = -deltaval;
 					deltaval >>= 6;
 
 					/* apply dither */
-					if (FOGMODE_FOG_DITHER(fogModeReg))
+					if (fogmode.fog_dither())
 						deltaval += dither4[x&3];
 					deltaval >>= 4;
 
@@ -1369,12 +1359,12 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode cons
 					break;
 
 				case 2:     /* iterated Z */
-					CLAMPED_Z(iterz, fbzCpReg, fogblend);
+					CLAMPED_Z(iterz, fbzcp, fogblend);
 					fogblend >>= 8;
 					break;
 
 				case 3:     /* iterated W - Voodoo 2 only */
-					CLAMPED_W(iterw, fbzCpReg, fogblend);
+					CLAMPED_W(iterw, fbzcp, fogblend);
 					break;
 			}
 
@@ -1386,7 +1376,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode cons
 			//fb = (fb * fogblend) >> 8;
 			/* if fog_mult is 0, we add this to the original color */
 			fogColorLocal.scale_imm_and_clamp((s16)fogblend);
-			if (FOGMODE_FOG_MULT(fogModeReg) == 0)
+			if (fogmode.fog_mult() == 0)
 			{
 				fogColorLocal.add(color);
 				fogColorLocal.clamp_to_uint8();
@@ -2590,7 +2580,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
+#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, _FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
@@ -2598,6 +2588,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
 	voodoo::alpha_mode const ALPHAMODE(_ALPHAMODE, m_reg[alphaMode].u); \
 	voodoo::fbz_mode const FBZMODE(_FBZMODE, m_reg[fbzMode].u); \
+	voodoo::fog_mode const FOGMODE(_FOGMODE, m_reg[fogMode].u); \
 	DECLARE_DITHER_POINTERS;                                                    \
 	s32 startx = extent.startx;                                              \
 	s32 stopx = extent.stopx;                                                \
@@ -2742,7 +2733,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 																						 \
 		/* perform fogging */                                                            \
 		preFog.set(color);                                                               \
-		if (FOGMODE_ENABLE_FOG(FOGMODE))                                                                         \
+		if (FOGMODE.enable_fog())                                                                         \
 			apply_fogging(FBZMODE, FOGMODE, FBZCOLORPATH, x, dither4, wfloat, color, iterz, iterw, iterargb); \
 																												 \
 		/* perform alpha blending */                                                \

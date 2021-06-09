@@ -255,6 +255,35 @@ private:
 	u32 m_value;
 };
 
+class fog_mode
+{
+public:
+	static constexpr u32 DECODE_LIVE = 0xffffffff;
+
+	constexpr fog_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr fog_mode(u32 normalized, u32 live) :
+		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
+
+	constexpr u32 enable_fog() const   { return BIT(m_value, 0, 1); }
+	constexpr u32 fog_add() const      { return BIT(m_value, 1, 1); }
+	constexpr u32 fog_mult() const     { return BIT(m_value, 2, 1); }
+	constexpr u32 fog_zalpha() const   { return BIT(m_value, 3, 2); }
+	constexpr u32 fog_constant() const { return BIT(m_value, 5, 1); }
+	constexpr u32 fog_dither() const   { return BIT(m_value, 6, 1); }	// voodoo 2 only
+	constexpr u32 fog_zones() const    { return BIT(m_value, 7, 1); }	// voodoo 2 only
+
+	constexpr u32 normalize()
+	{
+		// only care about the rest if fog is enabled
+		return enable_fog() ? m_value : 0;
+	}
+
+private:
+	u32 m_value;
+};
+
 }
 
 class voodoo_regs
@@ -757,14 +786,6 @@ static const u8 dither_subtract_2x2[16] =
 #define INITEN_ENABLE_NAND_TREE_TEST(val)   (((val) >> 22) & 1)     /* voodoo 2 only */
 #define INITEN_ENABLE_SLI_ADDRESS_SNOOP(val) (((val) >> 23) & 1)    /* voodoo 2 only */
 #define INITEN_SLI_SNOOP_ADDRESS(val)       (((val) >> 24) & 0xff)  /* voodoo 2 only */
-
-#define FOGMODE_ENABLE_FOG(val)             (((val) >> 0) & 1)
-#define FOGMODE_FOG_ADD(val)                (((val) >> 1) & 1)
-#define FOGMODE_FOG_MULT(val)               (((val) >> 2) & 1)
-#define FOGMODE_FOG_ZALPHA(val)             (((val) >> 3) & 3)
-#define FOGMODE_FOG_CONSTANT(val)           (((val) >> 5) & 1)
-#define FOGMODE_FOG_DITHER(val)             (((val) >> 6) & 1)      /* voodoo 2 only */
-#define FOGMODE_FOG_ZONES(val)              (((val) >> 7) & 1)      /* voodoo 2 only */
 
 #define LFBMODE_WRITE_FORMAT(val)           (((val) >> 0) & 0xf)
 #define LFBMODE_WRITE_BUFFER_SELECT(val)    (((val) >> 4) & 3)
@@ -1446,7 +1467,7 @@ protected:
 	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
 	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth);
 	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, voodoo::fbz_mode const FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
-	void apply_fogging(voodoo::fbz_mode const fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void apply_fogging(voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
 	void banshee_blit_2d(u32 data);
 

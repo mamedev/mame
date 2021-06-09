@@ -3822,7 +3822,8 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_fbi.rowpixels;
 
 		/* compute dithering */
-		COMPUTE_DITHER_POINTERS(fbzmode, y, m_reg[fogMode].u);
+		voodoo::fog_mode const fogmode(m_reg[fogMode].u);
+		COMPUTE_DITHER_POINTERS(fbzmode, y, fogmode);
 
 		/* loop over up to two pixels */
 		voodoo::alpha_mode const alphamode(m_reg[alphaMode].u);
@@ -3925,8 +3926,11 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 				/* perform fogging */
 				preFog.set(color);
-				if (FOGMODE_ENABLE_FOG(m_reg[fogMode].u))
-					apply_fogging(fbzmode, m_reg[fogMode].u, m_reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
+				if (fogmode.enable_fog())
+				{
+					voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
+					apply_fogging(fbzmode, fogmode, fbzcp, x, dither4, biasdepth, color, iterz, iterw, iterargb);
+				}
 
 				/* wait for any outstanding work to finish */
 				m_poly->wait("LFB Write");
@@ -6348,7 +6352,7 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(int texcount)
 	/* build an info struct with all the parameters */
 	curinfo.eff_color_path = voodoo::fbz_colorpath(m_reg[fbzColorPath].u).normalize();
 	curinfo.eff_alpha_mode = voodoo::alpha_mode(m_reg[alphaMode].u).normalize();
-	curinfo.eff_fog_mode = normalize_fog_mode(m_reg[fogMode].u);
+	curinfo.eff_fog_mode = voodoo::fog_mode(m_reg[fogMode].u).normalize();
 	curinfo.eff_fbz_mode = voodoo::fbz_mode(m_reg[fbzMode].u).normalize();
 	curinfo.eff_tex_mode_0 = (texcount >= 1) ? normalize_tex_mode(m_tmu[0].m_reg[textureMode].u) : 0xffffffff;
 	curinfo.eff_tex_mode_1 = (texcount >= 2) ? normalize_tex_mode(m_tmu[1].m_reg[textureMode].u) : 0xffffffff;
@@ -6583,7 +6587,7 @@ void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &exte
 -------------------------------------------------*/
 
 RASTERIZER(generic_0tmu, 0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			m_reg[fogMode].u, 0, 0)
+			voodoo::fog_mode::DECODE_LIVE, 0, 0)
 
 
 /*-------------------------------------------------
@@ -6591,7 +6595,7 @@ RASTERIZER(generic_0tmu, 0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode
 -------------------------------------------------*/
 
 RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			m_reg[fogMode].u, m_tmu[0].m_reg[textureMode].u, 0)
+			voodoo::fog_mode::DECODE_LIVE, m_tmu[0].m_reg[textureMode].u, 0)
 
 
 /*-------------------------------------------------
@@ -6599,4 +6603,4 @@ RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode
 -------------------------------------------------*/
 
 RASTERIZER(generic_2tmu, 2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			m_reg[fogMode].u, m_tmu[0].m_reg[textureMode].u, m_tmu[1].m_reg[textureMode].u)
+			voodoo::fog_mode::DECODE_LIVE, m_tmu[0].m_reg[textureMode].u, m_tmu[1].m_reg[textureMode].u)
