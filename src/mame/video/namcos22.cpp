@@ -530,8 +530,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 	}
 	else
 	{
-		m_scenenode_alloc.emplace_back();
-		node = &m_scenenode_alloc.back();
+		node = &m_scenenode_alloc.emplace_back();
 	}
 	memset(node, 0, sizeof(*node));
 	return node;
