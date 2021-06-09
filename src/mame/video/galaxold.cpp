@@ -575,7 +575,14 @@ void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind1
 
 void galaxold_state::rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	if (m_gfxbank[2])    *code|=0x40;
+	if ((*code & 0x30) == 0x20)
+	{
+		if (m_gfxbank[2] & 1)
+		{
+			int bank = (((m_gfxbank[0] & 1) << 5) | ((m_gfxbank[1] & 1) << 4));
+			*code = (0x40 + bank) | (*code & 0x0f);
+		}
+	}
 }
 
 VIDEO_START_MEMBER(galaxold_state,rockclim)
