@@ -335,12 +335,12 @@ constexpr u32 voodoo_device::static_raster_info::compute_hash() const
 #define COMPUTE_DITHER_POINTERS(FBZMODE, YY, FOGMODE)                           \
 do                                                                              \
 {                                                                               \
-	if (FBZMODE_ENABLE_DITHERING(FBZMODE) || FOGMODE_FOG_DITHER(FOGMODE))        \
+	if (FBZMODE.enable_dithering() || FOGMODE_FOG_DITHER(FOGMODE))        \
 		dither4 = &dither_matrix_4x4[((YY) & 3) * 4];                           \
 	/* compute the dithering pointers */                                        \
-	if (FBZMODE_ENABLE_DITHERING(FBZMODE))                                      \
+	if (FBZMODE.enable_dithering())                                      \
 	{                                                                           \
-		if (FBZMODE_DITHER_TYPE(FBZMODE) == 0)                                  \
+		if (FBZMODE.dither_type() == 0)                                  \
 		{                                                                       \
 			dither = &dither_subtract_4x4[((YY) & 3) * 4];                      \
 			dither_lookup = &dither4_lookup[(YY & 3) << 11];                    \
@@ -358,9 +358,9 @@ while (0)
 do                                                                              \
 {                                                                               \
 	/* compute the dithering pointers */                                        \
-	if (FBZMODE_ENABLE_DITHERING(FBZMODE))                                      \
+	if (FBZMODE.enable_dithering())                                      \
 	{                                                                           \
-		if (FBZMODE_DITHER_TYPE(FBZMODE) == 0)                                  \
+		if (FBZMODE.dither_type() == 0)                                  \
 		{                                                                       \
 			dither_lookup = &dither4_lookup[(YY & 3) << 11];                    \
 		}                                                                       \
@@ -376,7 +376,7 @@ while (0)
 do                                                                              \
 {                                                                               \
 	/* apply dithering */                                                       \
-	if (FBZMODE_ENABLE_DITHERING(FBZMODE))                                      \
+	if (FBZMODE.enable_dithering())                                      \
 	{                                                                           \
 		/* look up the dither value from the appropriate matrix */              \
 		const u8 *dith = &DITHER_LOOKUP[((XX) & 3) << 1];                    \
@@ -535,7 +535,7 @@ while (0)
 #define APPLY_CHROMAKEY(STATS, FBZMODE, COLOR)                              \
 do                                                                              \
 {                                                                               \
-	if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE))                                      \
+	if (FBZMODE.enable_chromakey())                                      \
 	{                                                                           \
 		/* non-range version */                                                 \
 		if (!CHROMARANGE_ENABLE(m_reg[chromaRange].u))                      \
@@ -598,7 +598,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block &threadstats, u32 fbzModeReg, rgbaint_t rgbaIntColor)
+inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block &threadstats, voodoo::fbz_mode const  fbzmode, rgbaint_t rgbaIntColor)
 {
 	{
 		rgb_union color;
@@ -675,7 +675,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block 
 #define APPLY_ALPHAMASK(STATS, FBZMODE, AA)                                 \
 do                                                                              \
 {                                                                               \
-	if (FBZMODE_ENABLE_ALPHA_MASK(FBZMODE))                                     \
+	if (FBZMODE.enable_alpha_mask())                                     \
 	{                                                                           \
 		if (((AA) & 1) == 0)                                                    \
 		{                                                                       \
@@ -686,7 +686,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, u32 fbzModeReg, u8 alpha)
+inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, u8 alpha)
 {
 	{
 		if ((alpha & 1) == 0)
@@ -850,7 +850,7 @@ do                                                                              
 		int dpix = dest[XX];                                                    \
 		int dr, dg, db;                                                         \
 		EXTRACT_565_TO_888(dpix, dr, dg, db);                                   \
-		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depth[XX] : 0xff;       \
+		int da = FBZMODE.enable_alpha_planes() ? depth[XX] : 0xff;       \
 		int sr = (RR);                                                          \
 		int sg = (GG);                                                          \
 		int sb = (BB);                                                          \
@@ -858,7 +858,7 @@ do                                                                              
 		int ta;                                                                 \
 																				\
 		/* apply dither subtraction */                                          \
-		if (FBZMODE_ALPHA_DITHER_SUBTRACT(FBZMODE))                             \
+		if (FBZMODE.alpha_dither_subtract())                             \
 		{                                                                       \
 			/* look up the dither value from the appropriate matrix */          \
 			int dith = DITHER[(XX) & 3];                                        \
@@ -998,7 +998,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline void ATTR_FORCE_INLINE alpha_blend(u32 FBZMODE, u32 ALPHAMODE, s32 x, const u8 *dither, int dpix, u16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
+static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE, u32 ALPHAMODE, s32 x, const u8 *dither, int dpix, u16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
 {
 	{
 		//int dpix = dest[XX];
@@ -1006,7 +1006,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(u32 FBZMODE, u32 ALPHAMODE, s32
 		//EXTRACT_565_TO_888(dpix, dr, dg, db);
 		rgb_t drgb = convTable[dpix];
 		drgb.expand_rgb(dr, dg, db);
-		int da = FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) ? depth[x] : 0xff;
+		int da = FBZMODE.enable_alpha_planes() ? depth[x] : 0xff;
 		//int sr = (RR);
 		//int sg = (GG);
 		//int sb = (BB);
@@ -1017,7 +1017,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(u32 FBZMODE, u32 ALPHAMODE, s32
 		rgbaint_t srcScale, destScale;
 
 		/* apply dither subtraction */
-		if (FBZMODE_ALPHA_DITHER_SUBTRACT(FBZMODE))
+		if (FBZMODE.alpha_dither_subtract())
 		{
 			/* look up the dither value from the appropriate matrix */
 			int dith = dither[x & 3];
@@ -1320,7 +1320,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(u32 fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat,
+inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode const fbzmode, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat,
 	rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb)
 {
 	{
@@ -1372,7 +1372,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(u32 fbzModeReg, u32 f
 				{
 					s32 fogDepth = wFloat;
 					/* add the bias for fog selection*/
-					if (FBZMODE_ENABLE_DEPTH_BIAS(fbzModeReg))
+					if (fbzmode.enable_depth_bias())
 					{
 						fogDepth += (s16)m_reg[zaColor].u;
 						CLAMP(fogDepth, 0, 0xffff);
@@ -1813,10 +1813,10 @@ do                                                                              
 	/* note that for perf reasons, we assume the caller has done clipping */    \
 																				\
 	/* handle stippling */                                                      \
-	if (FBZMODE_ENABLE_STIPPLE(FBZMODE))                                        \
+	if (FBZMODE.enable_stipple())                                        \
 	{                                                                           \
 		/* rotate mode */                                                       \
-		if (FBZMODE_STIPPLE_PATTERN(FBZMODE) == 0)                              \
+		if (FBZMODE.stipple_pattern() == 0)                              \
 		{                                                                       \
 			m_reg[stipple].u = (m_reg[stipple].u << 1) | (m_reg[stipple].u >> 31);\
 			if ((m_reg[stipple].u & 0x80000000) == 0)                         \
@@ -1854,9 +1854,9 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* compute depth value (W or Z) for this pixel */                           \
-	if (FBZMODE_WBUFFER_SELECT(FBZMODE))                                        \
+	if (FBZMODE.wbuffer_select())                                   \
 	{                                                                           \
-		if (!FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE))                               \
+		if (!FBZMODE.depth_float_select())                          \
 			depthval = wfloat;                                                      \
 		else                                                                        \
 		{                                                                           \
@@ -1880,8 +1880,8 @@ do                                                                              
 		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
 	}                                                                           \
 	/* add the bias */                                                          \
-	biasdepth = depthval;                                                       \
-	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
+	biasdepth = depthval;                                                     \
+	if (FBZMODE.enable_depth_bias())                                     \
 	{                                                                           \
 		biasdepth += (s16)m_reg[zaColor].u;                                \
 		CLAMP(biasdepth, 0, 0xffff);                                             \
@@ -1892,19 +1892,19 @@ do                                                                              
 do                                                                              \
 {                                                                               \
 	/* handle depth buffer testing */                                           \
-	if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                       \
+	if (FBZMODE.enable_depthbuf())                                       \
 	{                                                                           \
 		s32 depthsource;                                                      \
 																				\
 		/* the source depth is either the iterated W/Z+bias or a */             \
 		/* constant value */                                                    \
-		if (FBZMODE_DEPTH_SOURCE_COMPARE(FBZMODE) == 0)                         \
-			depthsource = biasdepth;                                            \
+		if (FBZMODE.depth_source_compare() == 0)                         \
+			depthsource = biasdepth;                                             \
 		else                                                                    \
 			depthsource = (u16)m_reg[zaColor].u;                         \
 																				\
 		/* test against the depth buffer */                                     \
-		switch (FBZMODE_DEPTH_FUNCTION(FBZMODE))                                \
+		switch (FBZMODE.depth_function())                                \
 		{                                                                       \
 			case 0:     /* depthOP = never */                                   \
 				(THREADSTATS).zfunc_fail++;                                          \
@@ -1965,7 +1965,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_stats_block &threadstats, s32 destDepth, u32 fbzModeReg, s32 biasdepth)
+inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_stats_block &threadstats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth)
 {
 	/* handle depth buffer testing */
 	{
@@ -1973,13 +1973,13 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_s
 
 		/* the source depth is either the iterated W/Z+bias or a */
 		/* constant value */
-		if (FBZMODE_DEPTH_SOURCE_COMPARE(fbzModeReg) == 0)
+		if (fbzmode.depth_source_compare() == 0)
 			depthsource = biasdepth;
 		else
 			depthsource = zaColorReg;
 
 		/* test against the depth buffer */
-		switch (FBZMODE_DEPTH_FUNCTION(fbzModeReg))
+		switch (fbzmode.depth_function())
 		{
 			case 0:     /* depthOP = never */
 				threadstats.zfunc_fail++;
@@ -2047,7 +2047,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_s
 	MODIFY_PIXEL();                                                           \
 																				\
 	/* write to framebuffer */                                                  \
-	if (FBZMODE_RGB_BUFFER_MASK(FBZMODE))                                       \
+	if (FBZMODE.rgb_buffer_mask())                                       \
 	{                                                                           \
 		/* apply dithering */                                                   \
 		APPLY_DITHER(FBZMODE, XX, DITHER_LOOKUP, r, g, b);                      \
@@ -2056,9 +2056,9 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_s
 																				\
 	/* write to aux buffer */                                                   \
 	/*if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))*/                              \
-	if (FBZMODE_AUX_BUFFER_MASK(FBZMODE))                              \
+	if (FBZMODE.aux_buffer_mask())                              \
 	{                                                                           \
-		if (FBZMODE_ENABLE_ALPHA_PLANES(FBZMODE) == 0)                          \
+		if (FBZMODE.enable_alpha_planes() == 0)                          \
 			depth[XX] = biasdepth;                                               \
 		else                                                                    \
 			depth[XX] = color.get_a();                                          \
@@ -2084,7 +2084,7 @@ while (0)
 
     c_other_is_used:
 
-        if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE) ||
+        if (FBZMODE.enable_chromakey() ||
             FBZCP.cc_zero_other() == 0)
 
     c_local_is_used:
@@ -2105,8 +2105,8 @@ while (0)
 
     NEEDS_ITER_Z:
 
-        if (FBZMODE_WBUFFER_SELECT(FBZMODE) == 0 ||
-            FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE) != 0 ||
+        if (FBZMODE.wbuffer_select() == 0 ||
+            FBZMODE.depth_float_select() != 0 ||
             FBZCP.cca_localselect() == 2)
 
 
@@ -2371,7 +2371,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &THREADSTATS, voodoo::fbz_colorpath const FBZCP, u32 FBZMODE,
+inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &THREADSTATS, voodoo::fbz_colorpath const FBZCP, voodoo::fbz_mode const FBZMODE,
 													rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor)
 {
 	rgbaint_t c_other;
@@ -2400,7 +2400,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* handle chroma key */
-	if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE))
+	if (FBZMODE.enable_chromakey())
 		if (!chroma_key_test(THREADSTATS, FBZMODE, c_other))
 			return false;
 	//APPLY_CHROMAKEY(m_vds, THREADSTATS, FBZMODE, c_other);
@@ -2426,7 +2426,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* handle alpha mask */
-	if (FBZMODE_ENABLE_ALPHA_MASK(FBZMODE))
+	if (FBZMODE.enable_alpha_mask())
 		if (!alpha_mask_test(THREADSTATS, FBZMODE, c_other.get_a()))
 			return false;
 	//APPLY_ALPHAMASK(m_vds, THREADSTATS, FBZMODE, c_other.rgb.a);
@@ -2625,12 +2625,13 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, _FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
+#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
 	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
 	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH); \
+	voodoo::fbz_mode const FBZMODE(_FBZMODE); \
 	DECLARE_DITHER_POINTERS;                                                    \
 	s32 startx = extent.startx;                                              \
 	s32 stopx = extent.stopx;                                                \
@@ -2647,14 +2648,14 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 																				\
 	/* determine the screen Y */                                                \
 	scry = y;                                                                   \
-	if (FBZMODE_Y_ORIGIN(FBZMODE))                                              \
+	if (FBZMODE.y_origin())                                              \
 		scry = (m_fbi.yorigin - y);                                    \
 																				\
 	/* compute dithering */                                                     \
 	COMPUTE_DITHER_POINTERS(FBZMODE, y, FOGMODE);                               \
 																				\
 	/* apply clipping */                                                        \
-	if (FBZMODE_ENABLE_CLIPPING(FBZMODE))                                       \
+	if (FBZMODE.enable_clipping())                                       \
 	{                                                                           \
 		s32 tempclip;                                                         \
 																				\
@@ -2732,7 +2733,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		/* pixel pipeline part 1 handles depth setup and stippling */         \
 		PIXEL_PIPELINE_BEGIN(threadstats, x, y, FBZCOLORPATH, FBZMODE, iterz, iterw); \
 		/* depth testing */         \
-		if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                                  \
+		if (FBZMODE.enable_depthbuf())                                                  \
 			if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], FBZMODE, biasdepth)) \
 				goto skipdrawdepth; \
 																				\

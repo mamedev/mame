@@ -3745,6 +3745,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	depthmax = (m_fbi.mask + 1 - m_fbi.auxoffs) / 2;
 
 	/* simple case: no pipeline */
+	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	if (!LFBMODE_ENABLE_PIXEL_PIPELINE(m_reg[lfbMode].u))
 	{
 		DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
@@ -3761,7 +3762,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		bufoffs = scry * m_fbi.rowpixels + x;
 
 		/* compute dithering */
-		COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(m_reg[fbzMode].u, y);
+		COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(fbzmode, y);
 
 		/* wait for any outstanding work to finish */
 		m_poly->wait("LFB Write");
@@ -3776,7 +3777,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if ((mask & LFB_RGB_PRESENT) && bufoffs < destmax)
 				{
 					/* apply dithering and write to the screen */
-					APPLY_DITHER(m_reg[fbzMode].u, x, dither_lookup, sr[pix], sg[pix], sb[pix]);
+					APPLY_DITHER(fbzmode, x, dither_lookup, sr[pix], sg[pix], sb[pix]);
 					dest[bufoffs] = (sr[pix] << 11) | (sg[pix] << 5) | sb[pix];
 				}
 
@@ -3784,11 +3785,11 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if (depth && bufoffs < depthmax)
 				{
 					/* write to the alpha buffer */
-					if ((mask & LFB_ALPHA_PRESENT) && FBZMODE_ENABLE_ALPHA_PLANES(m_reg[fbzMode].u))
+					if ((mask & LFB_ALPHA_PRESENT) && fbzmode.enable_alpha_planes())
 						depth[bufoffs] = sa[pix];
 
 					/* write to the depth buffer */
-					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !FBZMODE_ENABLE_ALPHA_PLANES(m_reg[fbzMode].u))
+					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !fbzmode.enable_alpha_planes())
 						depth[bufoffs] = sz[pix];
 				}
 
@@ -3812,7 +3813,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 		/* determine the screen Y */
 		scry = y;
-		if (FBZMODE_Y_ORIGIN(m_reg[fbzMode].u))
+		if (fbzmode.y_origin())
 			scry = (m_fbi.yorigin - y);
 
 		/* advance pointers to the proper row */
@@ -3821,7 +3822,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_fbi.rowpixels;
 
 		/* compute dithering */
-		COMPUTE_DITHER_POINTERS(m_reg[fbzMode].u, y, m_reg[fogMode].u);
+		COMPUTE_DITHER_POINTERS(fbzmode, y, m_reg[fogMode].u);
 
 		/* loop over up to two pixels */
 		for (pix = 0; mask; pix++)
@@ -3840,7 +3841,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				s32 iterz = sz[pix] << 12;
 
 				/* apply clipping */
-				if (FBZMODE_ENABLE_CLIPPING(m_reg[fbzMode].u))
+				if (fbzmode.enable_clipping())
 				{
 					if (x < ((m_reg[clipLeftRight].u >> 16) & 0x3ff) ||
 						x >= (m_reg[clipLeftRight].u & 0x3ff) ||
@@ -3858,7 +3859,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
-				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, m_reg[fbzColorPath].u, m_reg[fbzMode].u, iterz, iterw);
+				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, m_reg[fbzColorPath].u, fbzmode, iterz, iterw);
 // Start PIXEL_PIPE_BEGIN copy
 				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
 					s32 biasdepth;
@@ -3870,10 +3871,10 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 					/* note that for perf reasons, we assume the caller has done clipping */
 
 					/* handle stippling */
-					if (FBZMODE_ENABLE_STIPPLE(m_reg[fbzMode].u))
+					if (fbzmode.enable_stipple())
 					{
 						/* rotate mode */
-						if (FBZMODE_STIPPLE_PATTERN(m_reg[fbzMode].u) == 0)
+						if (fbzmode.stipple_pattern() == 0)
 						{
 							m_reg[stipple].u = (m_reg[stipple].u << 1) | (m_reg[stipple].u >> 31);
 							if ((m_reg[stipple].u & 0x80000000) == 0)
@@ -3901,20 +3902,20 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 				/* Perform depth testing */
-				if (FBZMODE_ENABLE_DEPTHBUF(m_reg[fbzMode].u))
-					if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], m_reg[fbzMode].u, biasdepth))
+				if (fbzmode.enable_depthbuf())
+					if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], fbzmode, biasdepth))
 						goto nextpixel;
 
 				/* use the RGBA we stashed above */
 				color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 				/* handle chroma key */
-				if (FBZMODE_ENABLE_CHROMAKEY(m_reg[fbzMode].u))
-					if (!chroma_key_test(threadstats, m_reg[fbzMode].u, color))
+				if (fbzmode.enable_chromakey())
+					if (!chroma_key_test(threadstats, fbzmode, color))
 						goto nextpixel;
 				/* handle alpha mask */
-				if (FBZMODE_ENABLE_ALPHA_MASK(m_reg[fbzMode].u))
-					if (!alpha_mask_test(threadstats, m_reg[fbzMode].u, color.get_a()))
+				if (fbzmode.enable_alpha_mask())
+					if (!alpha_mask_test(threadstats, fbzmode, color.get_a()))
 						goto nextpixel;
 				/* handle alpha test */
 				if (ALPHAMODE_ALPHATEST(m_reg[alphaMode].u))
@@ -3924,17 +3925,17 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				/* perform fogging */
 				preFog.set(color);
 				if (FOGMODE_ENABLE_FOG(m_reg[fogMode].u))
-					apply_fogging(m_reg[fbzMode].u, m_reg[fogMode].u, m_reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
+					apply_fogging(fbzmode, m_reg[fogMode].u, m_reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
 
 				/* wait for any outstanding work to finish */
 				m_poly->wait("LFB Write");
 
 				/* perform alpha blending */
 				if (ALPHAMODE_ALPHABLEND(m_reg[alphaMode].u))
-					alpha_blend(m_reg[fbzMode].u, m_reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565);
+					alpha_blend(fbzmode, m_reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565);
 
 				/* pixel pipeline part 2 handles final output */
-				PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, m_reg[fbzMode].u) { };
+				PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, fbzmode) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5809,19 +5810,20 @@ s32 voodoo_device::fastfill()
 	int sy = (m_reg[clipLowYHighY].u >> 16) & 0x3ff;
 	int ey = (m_reg[clipLowYHighY].u >> 0) & 0x3ff;
 	voodoo_renderer::extent_t extents[64];
+	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	u16 dithermatrix[16];
 	u16 *drawbuf = nullptr;
 	u32 pixels = 0;
 
 	/* if we're not clearing either, take no time */
-	if (!FBZMODE_RGB_BUFFER_MASK(m_reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(m_reg[fbzMode].u))
+	if (!fbzmode.rgb_buffer_mask() && !fbzmode.aux_buffer_mask())
 		return 0;
 
 	/* are we clearing the RGB buffer? */
-	if (FBZMODE_RGB_BUFFER_MASK(m_reg[fbzMode].u))
+	if (fbzmode.rgb_buffer_mask())
 	{
 		/* determine the draw buffer */
-		int destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(m_reg[fbzMode].u);
+		int destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : fbzmode.draw_buffer();
 		switch (destbuf)
 		{
 			case 0:     /* front buffer */
@@ -5840,14 +5842,14 @@ s32 voodoo_device::fastfill()
 		for (int y = 0; y < 4; y++)
 		{
 			DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
-			COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(m_reg[fbzMode].u, y);
+			COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(fbzmode, y);
 			for (int x = 0; x < 4; x++)
 			{
 				int r = m_reg[color1].rgb.r;
 				int g = m_reg[color1].rgb.g;
 				int b = m_reg[color1].rgb.b;
 
-				APPLY_DITHER(m_reg[fbzMode].u, x, dither_lookup, r, g, b);
+				APPLY_DITHER(fbzmode, x, dither_lookup, r, g, b);
 				dithermatrix[y*4 + x] = (r << 11) | (g << 5) | b;
 			}
 		}
@@ -5919,6 +5921,7 @@ s32 voodoo_device::triangle()
 	/* determine the number of TMUs involved */
 	texcount = 0;
 	voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
+	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	if (!FBIINIT3_DISABLE_TMUS(m_reg[fbiInit3].u) && fbzcp.texture_enable())
 	{
 		texcount = 1;
@@ -5961,7 +5964,7 @@ s32 voodoo_device::triangle()
 //  m_poly->wait("triangle");
 
 	/* determine the draw buffer */
-	destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(m_reg[fbzMode].u);
+	destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : fbzmode.draw_buffer();
 	switch (destbuf)
 	{
 		case 0:     /* front buffer */
@@ -6531,17 +6534,18 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
 	thread_stats_block &stats = m_thread_stats[threadid];
+	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	s32 startx = extent.startx;
 	s32 stopx = extent.stopx;
 	int scry, x;
 
 	/* determine the screen Y */
 	scry = y;
-	if (FBZMODE_Y_ORIGIN(m_reg[fbzMode].u))
+	if (fbzmode.y_origin())
 		scry = (m_fbi.yorigin - y);
 
 	/* fill this RGB row */
-	if (FBZMODE_RGB_BUFFER_MASK(m_reg[fbzMode].u))
+	if (fbzmode.rgb_buffer_mask())
 	{
 		const u16 *ditherow = &extra.dither[(y & 3) * 4];
 		u64 expanded = *(u64 *)ditherow;
@@ -6557,7 +6561,7 @@ void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &exte
 	}
 
 	/* fill this dest buffer row */
-	if (FBZMODE_AUX_BUFFER_MASK(m_reg[fbzMode].u) && m_fbi.auxoffs != ~0)
+	if (fbzmode.aux_buffer_mask() && m_fbi.auxoffs != ~0)
 	{
 		u16 depth = m_reg[zaColor].u;
 		u64 expanded = ((u64)depth << 48) | ((u64)depth << 32) | ((u64)depth << 16) | (u64)depth;

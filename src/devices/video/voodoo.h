@@ -161,6 +161,35 @@ private:
 	u32 m_value;
 };
 
+class fbz_mode
+{
+public:
+	constexpr fbz_mode(u32 value) : m_value(value) { }
+
+	constexpr u32 enable_clipping() const       { return BIT(m_value, 0, 1); }
+	constexpr u32 enable_chromakey() const      { return BIT(m_value, 1, 1); }
+	constexpr u32 enable_stipple() const        { return BIT(m_value, 2, 1); }
+	constexpr u32 wbuffer_select() const        { return BIT(m_value, 3, 1); }
+	constexpr u32 enable_depthbuf() const       { return BIT(m_value, 4, 1); }
+	constexpr u32 depth_function() const        { return BIT(m_value, 5, 3); }
+	constexpr u32 enable_dithering() const      { return BIT(m_value, 8, 1); }
+	constexpr u32 rgb_buffer_mask() const       { return BIT(m_value, 9, 1); }
+	constexpr u32 aux_buffer_mask() const       { return BIT(m_value, 10, 1); }
+	constexpr u32 dither_type() const           { return BIT(m_value, 11, 1); }
+	constexpr u32 stipple_pattern() const       { return BIT(m_value, 12, 1); }
+	constexpr u32 enable_alpha_mask() const     { return BIT(m_value, 13, 1); }
+	constexpr u32 draw_buffer() const           { return BIT(m_value, 14, 2); }
+	constexpr u32 enable_depth_bias() const     { return BIT(m_value, 16, 1); }
+	constexpr u32 y_origin() const              { return BIT(m_value, 17, 1); }
+	constexpr u32 enable_alpha_planes() const   { return BIT(m_value, 18, 1); }
+	constexpr u32 alpha_dither_subtract() const { return BIT(m_value, 19, 1); }
+	constexpr u32 depth_source_compare() const  { return BIT(m_value, 20, 1); }
+	constexpr u32 depth_float_select() const    { return BIT(m_value, 21, 1); }	// voodoo 2 only
+
+private:
+	u32 m_value;
+};
+
 }
 
 class voodoo_regs
@@ -681,26 +710,6 @@ static const u8 dither_subtract_2x2[16] =
 #define FOGMODE_FOG_CONSTANT(val)           (((val) >> 5) & 1)
 #define FOGMODE_FOG_DITHER(val)             (((val) >> 6) & 1)      /* voodoo 2 only */
 #define FOGMODE_FOG_ZONES(val)              (((val) >> 7) & 1)      /* voodoo 2 only */
-
-#define FBZMODE_ENABLE_CLIPPING(val)        (((val) >> 0) & 1)
-#define FBZMODE_ENABLE_CHROMAKEY(val)       (((val) >> 1) & 1)
-#define FBZMODE_ENABLE_STIPPLE(val)         (((val) >> 2) & 1)
-#define FBZMODE_WBUFFER_SELECT(val)         (((val) >> 3) & 1)
-#define FBZMODE_ENABLE_DEPTHBUF(val)        (((val) >> 4) & 1)
-#define FBZMODE_DEPTH_FUNCTION(val)         (((val) >> 5) & 7)
-#define FBZMODE_ENABLE_DITHERING(val)       (((val) >> 8) & 1)
-#define FBZMODE_RGB_BUFFER_MASK(val)        (((val) >> 9) & 1)
-#define FBZMODE_AUX_BUFFER_MASK(val)        (((val) >> 10) & 1)
-#define FBZMODE_DITHER_TYPE(val)            (((val) >> 11) & 1)
-#define FBZMODE_STIPPLE_PATTERN(val)        (((val) >> 12) & 1)
-#define FBZMODE_ENABLE_ALPHA_MASK(val)      (((val) >> 13) & 1)
-#define FBZMODE_DRAW_BUFFER(val)            (((val) >> 14) & 3)
-#define FBZMODE_ENABLE_DEPTH_BIAS(val)      (((val) >> 16) & 1)
-#define FBZMODE_Y_ORIGIN(val)               (((val) >> 17) & 1)
-#define FBZMODE_ENABLE_ALPHA_PLANES(val)    (((val) >> 18) & 1)
-#define FBZMODE_ALPHA_DITHER_SUBTRACT(val)  (((val) >> 19) & 1)
-#define FBZMODE_DEPTH_SOURCE_COMPARE(val)   (((val) >> 20) & 1)
-#define FBZMODE_DEPTH_FLOAT_SELECT(val)     (((val) >> 21) & 1)     /* voodoo 2 only */
 
 #define LFBMODE_WRITE_FORMAT(val)           (((val) >> 0) & 0xf)
 #define LFBMODE_WRITE_BUFFER_SELECT(val)    (((val) >> 4) & 3)
@@ -1377,12 +1386,12 @@ protected:
 
 #undef RASTERIZER_ENTRY
 
-	bool chroma_key_test(thread_stats_block &stats, u32 fbzModeReg, rgbaint_t rgaIntColor);
-	bool alpha_mask_test(thread_stats_block &stats, u32 fbzModeReg, u8 alpha);
+	bool chroma_key_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, rgbaint_t rgaIntColor);
+	bool alpha_mask_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, u8 alpha);
 	bool alpha_test(u8 alpharef, thread_stats_block &stats, u32 alphaModeReg, u8 alpha);
-	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, u32 fbzModeReg, s32 biasdepth);
-	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, u32 FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
-	void apply_fogging(u32 fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth);
+	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, voodoo::fbz_mode const FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
+	void apply_fogging(voodoo::fbz_mode const fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
 	void banshee_blit_2d(u32 data);
 
