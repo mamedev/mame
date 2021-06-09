@@ -18,12 +18,13 @@
 #include "screen.h"
 
 
-
+/*
 cleanup to do:
  de-static-fy (find vd->)
  uint->u
  voodoo_regs class
  rasterizer template
+*/
 
 
 /*************************************
@@ -1303,41 +1304,42 @@ protected:
 	// not all of these need to be static, review.
 
 	void check_stalled_cpu(attotime current_time);
-	static void flush_fifos( voodoo_device* vd, attotime current_time);
-	static void init_fbi(voodoo_device *vd, fbi_state *f, void *memory, int fbmem);
-	static int32_t register_w(voodoo_device *vd, offs_t offset, uint32_t data);
-	static int32_t swapbuffer(voodoo_device *vd, uint32_t data);
-	static int32_t lfb_w(voodoo_device *vd, offs_t offset, uint32_t data, uint32_t mem_mask);
-	static int32_t texture_w(voodoo_device *vd, offs_t offset, uint32_t data);
+	void flush_fifos(attotime current_time);
+	void init_fbi(fbi_state *f, void *memory, int fbmem);
+	int32_t register_w(offs_t offset, uint32_t data);
+	int32_t swapbuffer(uint32_t data);
+	int32_t lfb_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t lfb_r(offs_t offset, bool lfb_3d);
+	int32_t texture_w(offs_t offset, uint32_t data);
 	int32_t lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_mask);
-	static int32_t banshee_2d_w(voodoo_device *vd, offs_t offset, uint32_t data);
+	int32_t banshee_2d_w(offs_t offset, uint32_t data);
 	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
 	void recompute_video_memory();
 	void adjust_vblank_timer();
-	static int32_t fastfill(voodoo_device *vd);
-	static int32_t triangle(voodoo_device *vd);
-	static int32_t begin_triangle(voodoo_device *vd);
-	static int32_t draw_triangle(voodoo_device *vd);
-	static int32_t setup_and_draw_triangle(voodoo_device *vd);
-	static int32_t triangle_create_work_item(voodoo_device* vd,uint16_t *drawbuf, int texcount);
+	int32_t fastfill();
+	int32_t triangle();
+	int32_t begin_triangle();
+	int32_t draw_triangle();
+	int32_t setup_and_draw_triangle();
+	int32_t triangle_create_work_item(uint16_t *drawbuf, int texcount);
 	raster_info *add_rasterizer(static_raster_info const &cinfo, bool is_generic);
-	static raster_info *find_rasterizer(voodoo_device *vd, int texcount);
-	static void dump_rasterizer_stats(voodoo_device *vd);
+	raster_info *find_rasterizer(int texcount);
+	void dump_rasterizer_stats();
 
 	void accumulate_statistics(const thread_stats_block &block);
 	void update_statistics(bool accumulate);
 	void reset_counters();
 
-	static uint32_t register_r(voodoo_device *vd, offs_t offset);
+	uint32_t register_r(offs_t offset);
 
-	static void swap_buffers(voodoo_device *vd);
+	void swap_buffers();
 	int cmdfifo_compute_expected_depth(cmdfifo_info &f);
-	static uint32_t cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f);
+	uint32_t cmdfifo_execute(cmdfifo_info *f);
 	int32_t cmdfifo_execute_if_ready(cmdfifo_info &f);
-	static void cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset, uint32_t data);
+	void cmdfifo_w(cmdfifo_info *f, offs_t offset, uint32_t data);
 
-	static void init_save_state(voodoo_device *vd);
+	void init_save_state();
 
 	void raster_fastfill(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
 	void raster_generic_0tmu(int32_t scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
@@ -1359,6 +1361,7 @@ protected:
 	bool combine_color(thread_stats_block &STATS, uint32_t FBZCOLORPATH, uint32_t FBZMODE, rgbaint_t TEXELARGB, int32_t ITERZ, int64_t ITERW, rgbaint_t &srcColor);
 	void apply_fogging(uint32_t fbzModeReg, uint32_t fogModeReg, uint32_t fbzCpReg,  int32_t x, const uint8_t *dither4, int32_t wFloat, rgbaint_t &color, int32_t iterz, int64_t iterw, const rgbaint_t &iterargb);
 
+	void banshee_blit_2d(uint32_t data);
 
 // FIXME: this stuff should not be public
 public:
