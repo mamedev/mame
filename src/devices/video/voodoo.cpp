@@ -3825,6 +3825,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		COMPUTE_DITHER_POINTERS(fbzmode, y, m_reg[fogMode].u);
 
 		/* loop over up to two pixels */
+		voodoo::alpha_mode const alphamode(m_reg[alphaMode].u);
 		for (pix = 0; mask; pix++)
 		{
 			/* make sure we care about this pixel */
@@ -3918,8 +3919,8 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 					if (!alpha_mask_test(threadstats, fbzmode, color.get_a()))
 						goto nextpixel;
 				/* handle alpha test */
-				if (ALPHAMODE_ALPHATEST(m_reg[alphaMode].u))
-					if (!alpha_test(m_reg[alphaMode].rgb.a, threadstats, m_reg[alphaMode].u, color.get_a()))
+				if (alphamode.alphatest())
+					if (!alpha_test(threadstats, alphamode, color.get_a()))
 						goto nextpixel;
 
 				/* perform fogging */
@@ -3931,8 +3932,8 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				m_poly->wait("LFB Write");
 
 				/* perform alpha blending */
-				if (ALPHAMODE_ALPHABLEND(m_reg[alphaMode].u))
-					alpha_blend(fbzmode, m_reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565);
+				if (alphamode.alphablend())
+					alpha_blend(fbzmode, alphamode, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565);
 
 				/* pixel pipeline part 2 handles final output */
 				PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, fbzmode) { };
@@ -6345,10 +6346,10 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(int texcount)
 	int hash;
 
 	/* build an info struct with all the parameters */
-	curinfo.eff_color_path = normalize_color_path(m_reg[fbzColorPath].u);
-	curinfo.eff_alpha_mode = normalize_alpha_mode(m_reg[alphaMode].u);
+	curinfo.eff_color_path = voodoo::fbz_colorpath(m_reg[fbzColorPath].u).normalize();
+	curinfo.eff_alpha_mode = voodoo::alpha_mode(m_reg[alphaMode].u).normalize();
 	curinfo.eff_fog_mode = normalize_fog_mode(m_reg[fogMode].u);
-	curinfo.eff_fbz_mode = normalize_fbz_mode(m_reg[fbzMode].u);
+	curinfo.eff_fbz_mode = voodoo::fbz_mode(m_reg[fbzMode].u).normalize();
 	curinfo.eff_tex_mode_0 = (texcount >= 1) ? normalize_tex_mode(m_tmu[0].m_reg[textureMode].u) : 0xffffffff;
 	curinfo.eff_tex_mode_1 = (texcount >= 2) ? normalize_tex_mode(m_tmu[1].m_reg[textureMode].u) : 0xffffffff;
 
@@ -6581,7 +6582,7 @@ void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &exte
     generic_0tmu - generic rasterizer for 0 TMUs
 -------------------------------------------------*/
 
-RASTERIZER(generic_0tmu, 0, m_reg[fbzColorPath].u, m_reg[fbzMode].u, m_reg[alphaMode].u,
+RASTERIZER(generic_0tmu, 0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
 			m_reg[fogMode].u, 0, 0)
 
 
@@ -6589,7 +6590,7 @@ RASTERIZER(generic_0tmu, 0, m_reg[fbzColorPath].u, m_reg[fbzMode].u, m_reg[alpha
     generic_1tmu - generic rasterizer for 1 TMU
 -------------------------------------------------*/
 
-RASTERIZER(generic_1tmu, 1, m_reg[fbzColorPath].u, m_reg[fbzMode].u, m_reg[alphaMode].u,
+RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
 			m_reg[fogMode].u, m_tmu[0].m_reg[textureMode].u, 0)
 
 
@@ -6597,5 +6598,5 @@ RASTERIZER(generic_1tmu, 1, m_reg[fbzColorPath].u, m_reg[fbzMode].u, m_reg[alpha
     generic_2tmu - generic rasterizer for 2 TMUs
 -------------------------------------------------*/
 
-RASTERIZER(generic_2tmu, 2, m_reg[fbzColorPath].u, m_reg[fbzMode].u, m_reg[alphaMode].u,
+RASTERIZER(generic_2tmu, 2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
 			m_reg[fogMode].u, m_tmu[0].m_reg[textureMode].u, m_tmu[1].m_reg[textureMode].u)

@@ -133,7 +133,13 @@ namespace voodoo
 class fbz_colorpath
 {
 public:
-	constexpr fbz_colorpath(u32 value) : m_value(value) { }
+	static constexpr u32 DECODE_LIVE = 0xffffffff;
+
+	constexpr fbz_colorpath(u32 value) :
+		m_value(value) { }
+
+	constexpr fbz_colorpath(u32 normalized, u32 live) :
+		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
 
 	constexpr u32 cc_rgbselect() const            { return BIT(m_value, 0, 2); }
 	constexpr u32 cc_aselect() const              { return BIT(m_value, 2, 2); }
@@ -157,6 +163,12 @@ public:
 	constexpr u32 rgbzw_clamp() const             { return BIT(m_value, 28, 1); }
 	constexpr u32 anti_alias() const              { return BIT(m_value, 29, 1); }
 
+	constexpr u32 normalize()
+	{
+		// ignore the subpixel adjust and texture enable flags
+		return m_value & ~((1 << 26) | (1 << 27));
+	}
+
 private:
 	u32 m_value;
 };
@@ -164,7 +176,13 @@ private:
 class fbz_mode
 {
 public:
-	constexpr fbz_mode(u32 value) : m_value(value) { }
+	static constexpr u32 DECODE_LIVE = 0xffffffff;
+
+	constexpr fbz_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr fbz_mode(u32 normalized, u32 live) :
+		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
 
 	constexpr u32 enable_clipping() const       { return BIT(m_value, 0, 1); }
 	constexpr u32 enable_chromakey() const      { return BIT(m_value, 1, 1); }
@@ -185,6 +203,53 @@ public:
 	constexpr u32 alpha_dither_subtract() const { return BIT(m_value, 19, 1); }
 	constexpr u32 depth_source_compare() const  { return BIT(m_value, 20, 1); }
 	constexpr u32 depth_float_select() const    { return BIT(m_value, 21, 1); }	// voodoo 2 only
+
+	constexpr u32 normalize()
+	{
+		// ignore the draw buffer
+		return m_value & ~(3 << 14);
+	}
+
+private:
+	u32 m_value;
+};
+
+class alpha_mode
+{
+public:
+	static constexpr u32 DECODE_LIVE = 0xffffffff;
+
+	constexpr alpha_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr alpha_mode(u32 normalized, u32 live) :
+		m_value((normalized == DECODE_LIVE) ? live : ((normalized & 0x00ffffff) | (live & 0xff000000))) { }
+
+	constexpr u32 alphatest() const     { return BIT(m_value, 0, 1); }
+	constexpr u32 alphafunction() const { return BIT(m_value, 1, 3); }
+	constexpr u32 alphablend() const    { return BIT(m_value, 4, 1); }
+	constexpr u32 antialias() const     { return BIT(m_value, 5, 1); }
+	constexpr u32 srcrgbblend() const   { return BIT(m_value, 8, 4); }
+	constexpr u32 dstrgbblend() const   { return BIT(m_value, 12, 4); }
+	constexpr u32 srcalphablend() const { return BIT(m_value, 16, 4); }
+	constexpr u32 dstalphablend() const { return BIT(m_value, 20, 4); }
+	constexpr u32 alpharef() const      { return BIT(m_value, 24, 8); }
+
+	constexpr u32 normalize()
+	{
+		// always ignore alpha ref value
+		u32 result = m_value & ~(0xff << 24);
+
+		// if not doing alpha testing, ignore the alpha function
+		if (!alphatest())
+			result &= ~(7 << 1);
+
+		// if not doing alpha blending, ignore the source and dest blending factors
+		if (!alphablend())
+			result &= ~((15 << 8) | (15 << 12) | (15 << 16) | (15 << 20));
+
+		return result;
+	}
 
 private:
 	u32 m_value;
@@ -692,16 +757,6 @@ static const u8 dither_subtract_2x2[16] =
 #define INITEN_ENABLE_NAND_TREE_TEST(val)   (((val) >> 22) & 1)     /* voodoo 2 only */
 #define INITEN_ENABLE_SLI_ADDRESS_SNOOP(val) (((val) >> 23) & 1)    /* voodoo 2 only */
 #define INITEN_SLI_SNOOP_ADDRESS(val)       (((val) >> 24) & 0xff)  /* voodoo 2 only */
-
-#define ALPHAMODE_ALPHATEST(val)            (((val) >> 0) & 1)
-#define ALPHAMODE_ALPHAFUNCTION(val)        (((val) >> 1) & 7)
-#define ALPHAMODE_ALPHABLEND(val)           (((val) >> 4) & 1)
-#define ALPHAMODE_ANTIALIAS(val)            (((val) >> 5) & 1)
-#define ALPHAMODE_SRCRGBBLEND(val)          (((val) >> 8) & 15)
-#define ALPHAMODE_DSTRGBBLEND(val)          (((val) >> 12) & 15)
-#define ALPHAMODE_SRCALPHABLEND(val)        (((val) >> 16) & 15)
-#define ALPHAMODE_DSTALPHABLEND(val)        (((val) >> 20) & 15)
-#define ALPHAMODE_ALPHAREF(val)             (((val) >> 24) & 0xff)
 
 #define FOGMODE_ENABLE_FOG(val)             (((val) >> 0) & 1)
 #define FOGMODE_FOG_ADD(val)                (((val) >> 1) & 1)
@@ -1388,7 +1443,7 @@ protected:
 
 	bool chroma_key_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, rgbaint_t rgaIntColor);
 	bool alpha_mask_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, u8 alpha);
-	bool alpha_test(u8 alpharef, thread_stats_block &stats, u32 alphaModeReg, u8 alpha);
+	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
 	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth);
 	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, voodoo::fbz_mode const FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
 	void apply_fogging(voodoo::fbz_mode const fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);

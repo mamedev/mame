@@ -235,32 +235,6 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
  *
  *************************************/
 
-static inline u32 normalize_color_path(u32 eff_color_path)
-{
-	/* ignore the subpixel adjust and texture enable flags */
-	eff_color_path &= ~((1 << 26) | (1 << 27));
-
-	return eff_color_path;
-}
-
-
-static inline u32 normalize_alpha_mode(u32 eff_alpha_mode)
-{
-	/* always ignore alpha ref value */
-	eff_alpha_mode &= ~(0xff << 24);
-
-	/* if not doing alpha testing, ignore the alpha function and ref value */
-	if (!ALPHAMODE_ALPHATEST(eff_alpha_mode))
-		eff_alpha_mode &= ~(7 << 1);
-
-	/* if not doing alpha blending, ignore the source and dest blending factors */
-	if (!ALPHAMODE_ALPHABLEND(eff_alpha_mode))
-		eff_alpha_mode &= ~((15 << 8) | (15 << 12) | (15 << 16) | (15 << 20));
-
-	return eff_alpha_mode;
-}
-
-
 static inline u32 normalize_fog_mode(u32 eff_fog_mode)
 {
 	/* if not doing fogging, ignore all the other fog bits */
@@ -268,15 +242,6 @@ static inline u32 normalize_fog_mode(u32 eff_fog_mode)
 		eff_fog_mode = 0;
 
 	return eff_fog_mode;
-}
-
-
-static inline u32 normalize_fbz_mode(u32 eff_fbz_mode)
-{
-	/* ignore the draw buffer */
-	eff_fbz_mode &= ~(3 << 14);
-
-	return eff_fbz_mode;
 }
 
 
@@ -707,10 +672,10 @@ inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, vood
 #define APPLY_ALPHATEST(STATS, ALPHAMODE, AA)                               \
 do                                                                              \
 {                                                                               \
-	if (ALPHAMODE_ALPHATEST(ALPHAMODE))                                         \
+	if (ALPHAMODE.alphatest())                                         \
 	{                                                                           \
-		u8 alpharef = m_reg[alphaMode].rgb.a;                            \
-		switch (ALPHAMODE_ALPHAFUNCTION(ALPHAMODE))                             \
+		u8 alpharef = ALPHAMODE.alpharef();                            \
+		switch (ALPHAMODE.alphafunction())                             \
 		{                                                                       \
 			case 0:     /* alphaOP = never */                                   \
 				(STATS)->afunc_fail++;                                          \
@@ -771,17 +736,17 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stats_block &threadstats, u32 alphaModeReg, u8 alpha)
+inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(thread_stats_block &threadstats, voodoo::alpha_mode const alphamode, u8 alpha)
 {
 	{
-		switch (ALPHAMODE_ALPHAFUNCTION(alphaModeReg))
+		switch (alphamode.alphafunction())
 		{
 			case 0:     /* alphaOP = never */
 				threadstats.afunc_fail++;
 				return false;
 
 			case 1:     /* alphaOP = less than */
-				if (alpha >= alpharef)
+				if (alpha >= alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -789,7 +754,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 				break;
 
 			case 2:     /* alphaOP = equal */
-				if (alpha != alpharef)
+				if (alpha != alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -797,7 +762,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 				break;
 
 			case 3:     /* alphaOP = less than or equal */
-				if (alpha > alpharef)
+				if (alpha > alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -805,7 +770,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 				break;
 
 			case 4:     /* alphaOP = greater than */
-				if (alpha <= alpharef)
+				if (alpha <= alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -813,7 +778,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 				break;
 
 			case 5:     /* alphaOP = not equal */
-				if (alpha == alpharef)
+				if (alpha == alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -821,7 +786,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 				break;
 
 			case 6:     /* alphaOP = greater than or equal */
-				if (alpha < alpharef)
+				if (alpha < alphamode.alpharef())
 				{
 					threadstats.afunc_fail++;
 					return false;
@@ -845,7 +810,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(u8 alpharef, thread_stat
 #define APPLY_ALPHA_BLEND(FBZMODE, ALPHAMODE, XX, DITHER, RR, GG, BB, AA)       \
 do                                                                              \
 {                                                                               \
-	if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                        \
+	if (ALPHAMODE.alphablend())                                        \
 	{                                                                           \
 		int dpix = dest[XX];                                                    \
 		int dr, dg, db;                                                         \
@@ -870,7 +835,7 @@ do                                                                              
 		}                                                                       \
 																				\
 		/* compute source portion */                                            \
-		switch (ALPHAMODE_SRCRGBBLEND(ALPHAMODE))                               \
+		switch (ALPHAMODE.srcrgbblend())                               \
 		{                                                                       \
 			default:    /* reserved */                                          \
 			case 0:     /* AZERO */                                             \
@@ -925,7 +890,7 @@ do                                                                              
 		}                                                                       \
 																				\
 		/* add in dest portion */                                               \
-		switch (ALPHAMODE_DSTRGBBLEND(ALPHAMODE))                               \
+		switch (ALPHAMODE.dstrgbblend())                               \
 		{                                                                       \
 			default:    /* reserved */                                          \
 			case 0:     /* AZERO */                                             \
@@ -982,11 +947,11 @@ do                                                                              
 																				\
 		/* blend the source alpha */                                            \
 		(AA) = 0;                                                               \
-		if (ALPHAMODE_SRCALPHABLEND(ALPHAMODE) == 4)                            \
+		if (ALPHAMODE.srcalphablend() == 4)                            \
 			(AA) = sa;                                                          \
 																				\
 		/* blend the dest alpha */                                              \
-		if (ALPHAMODE_DSTALPHABLEND(ALPHAMODE) == 4)                            \
+		if (ALPHAMODE.dstalphablend() == 4)                            \
 			(AA) += da;                                                         \
 																				\
 		/* clamp */                                                             \
@@ -998,7 +963,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE, u32 ALPHAMODE, s32 x, const u8 *dither, int dpix, u16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
+static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE, voodoo::alpha_mode const ALPHAMODE, s32 x, const u8 *dither, int dpix, u16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
 {
 	{
 		//int dpix = dest[XX];
@@ -1029,14 +994,14 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 		}
 
 		/* blend the source alpha */
-		if (ALPHAMODE_SRCALPHABLEND(ALPHAMODE) == 4)
+		if (ALPHAMODE.srcalphablend() == 4)
 			srcAlphaScale = 256;
 			//(AA) = sa;
 		else
 			srcAlphaScale = 0;
 
 		/* compute source portion */
-		switch (ALPHAMODE_SRCRGBBLEND(ALPHAMODE))
+		switch (ALPHAMODE.srcrgbblend())
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
@@ -1108,14 +1073,14 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 		srcScale.set_a16(srcAlphaScale);
 
 		/* blend the dest alpha */
-		if (ALPHAMODE_DSTALPHABLEND(ALPHAMODE) == 4)
+		if (ALPHAMODE.dstalphablend() == 4)
 			destAlphaScale = 256;
 			//(AA) += da;
 		else
 			destAlphaScale = 0;
 
 		/* add in dest portion */
-		switch (ALPHAMODE_DSTRGBBLEND(ALPHAMODE))
+		switch (ALPHAMODE.dstrgbblend())
 		{
 			default:    /* reserved */
 			case 0:     /* AZERO */
@@ -2625,13 +2590,14 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
+#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
 	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
-	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH); \
-	voodoo::fbz_mode const FBZMODE(_FBZMODE); \
+	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
+	voodoo::alpha_mode const ALPHAMODE(_ALPHAMODE, m_reg[alphaMode].u); \
+	voodoo::fbz_mode const FBZMODE(_FBZMODE, m_reg[fbzMode].u); \
 	DECLARE_DITHER_POINTERS;                                                    \
 	s32 startx = extent.startx;                                              \
 	s32 stopx = extent.stopx;                                                \
@@ -2770,8 +2736,8 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		if (!combine_color(threadstats, FBZCOLORPATH, FBZMODE, texel, iterz, iterw, color)) \
 			goto skipdrawdepth;                                                          \
 		/* handle alpha test */                                                          \
-		if (ALPHAMODE_ALPHATEST(ALPHAMODE))                                              \
-			if (!alpha_test(m_reg[alphaMode].rgb.a, threadstats, ALPHAMODE, color.get_a()))   \
+		if (ALPHAMODE.alphatest())                                              \
+			if (!alpha_test(threadstats, ALPHAMODE, color.get_a()))   \
 				goto skipdrawdepth;                                                      \
 																						 \
 		/* perform fogging */                                                            \
@@ -2780,7 +2746,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 			apply_fogging(FBZMODE, FOGMODE, FBZCOLORPATH, x, dither4, wfloat, color, iterz, iterw, iterargb); \
 																												 \
 		/* perform alpha blending */                                                \
-		if (ALPHAMODE_ALPHABLEND(ALPHAMODE))                                                            \
+		if (ALPHAMODE.alphablend())                                                            \
 			alpha_blend(FBZMODE, ALPHAMODE, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565); \
 																				\
 		/* pixel pipeline part 2 handles final output */        \
