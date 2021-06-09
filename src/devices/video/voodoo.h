@@ -293,7 +293,7 @@ public:
 		m_value(value) { }
 
 	constexpr texture_mode(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : ((normalized & 0xfffff0ff) | (live & 0x00000f00))) { }
+		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
 
 	constexpr u32 enable_perspective() const   { return BIT(m_value, 0, 1); }
 	constexpr u32 minification_filter() const  { return BIT(m_value, 1, 1); }
@@ -1497,8 +1497,8 @@ protected:
 	bool alpha_mask_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, u8 alpha);
 	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
 	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth);
-	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, voodoo::fbz_mode const FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
-	void apply_fogging(voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, voodoo::fbz_colorpath const fbzcp, voodoo::fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
+	void apply_fogging(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, u8 const *dither4, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
 	void banshee_blit_2d(u32 data);
 

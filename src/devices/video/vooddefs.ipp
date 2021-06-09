@@ -341,126 +341,72 @@ while (0)
  *
  *************************************/
 
-#define CLAMPED_ARGB(ITERR, ITERG, ITERB, ITERA, FBZCP, RESULT)                 \
-do                                                                              \
-{                                                                               \
-	r = (s32)(ITERR) >> 12;                                             \
-	g = (s32)(ITERG) >> 12;                                             \
-	b = (s32)(ITERB) >> 12;                                             \
-	a = (s32)(ITERA) >> 12;                                             \
-																				\
-	if (FBZCP.rgbzw_clamp() == 0)                                          \
-	{                                                                           \
-		r &= 0xfff;                                                             \
-		RESULT.rgb.r = r;                                                       \
-		if (r == 0xfff)                                                         \
-			RESULT.rgb.r = 0;                                                   \
-		else if (r == 0x100)                                                    \
-			RESULT.rgb.r = 0xff;                                                \
-																				\
-		g &= 0xfff;                                                             \
-		RESULT.rgb.g = g;                                                       \
-		if (g == 0xfff)                                                         \
-			RESULT.rgb.g = 0;                                                   \
-		else if (g == 0x100)                                                    \
-			RESULT.rgb.g = 0xff;                                                \
-																				\
-		b &= 0xfff;                                                             \
-		RESULT.rgb.b = b;                                                       \
-		if (b == 0xfff)                                                         \
-			RESULT.rgb.b = 0;                                                   \
-		else if (b == 0x100)                                                    \
-			RESULT.rgb.b = 0xff;                                                \
-																				\
-		a &= 0xfff;                                                             \
-		RESULT.rgb.a = a;                                                       \
-		if (a == 0xfff)                                                         \
-			RESULT.rgb.a = 0;                                                   \
-		else if (a == 0x100)                                                    \
-			RESULT.rgb.a = 0xff;                                                \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		RESULT.rgb.r = (r < 0) ? 0 : (r > 0xff) ? 0xff : r;                     \
-		RESULT.rgb.g = (g < 0) ? 0 : (g > 0xff) ? 0xff : g;                     \
-		RESULT.rgb.b = (b < 0) ? 0 : (b > 0xff) ? 0xff : b;                     \
-		RESULT.rgb.a = (a < 0) ? 0 : (a > 0xff) ? 0xff : a;                     \
-	}                                                                           \
-}                                                                               \
-while (0)
-
-static inline rgbaint_t ATTR_FORCE_INLINE clamp_argb(const rgbaint_t &iterargb, voodoo::fbz_colorpath const FBZCP)
+static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, voodoo::fbz_colorpath const fbzcp)
 {
 	rgbaint_t result(iterargb);
-	//rgbaint_t colorint((s32) (itera>>12), (s32) (iterr>>12), (s32) (iterg>>12), (s32) (iterb>>12));
 	result.shr_imm(12);
 
-	if (!FBZCP.rgbzw_clamp())
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
 	{
-		//r &= 0xfff;
-		result.and_imm(0xfff);
-		//if (r == 0xfff)
-		rgbaint_t temp(result);
-		temp.cmpeq_imm(0xfff);
-		//  result.rgb.r = 0;
-		result.andnot_reg(temp);
-		//else if (r == 0x100)
-		//  result.rgb.r = 0xff;
-		temp.set(result);
-		temp.cmpeq_imm(0x100);
-		result.or_reg(temp);
-		// else wrap
-		result.and_imm(0xff);
-	}
-	else
-	{
-		//return colorint.to_rgba_clamp();
 		result.clamp_to_uint8();
+		return result;
 	}
+
+	// for each component:
+	//    result = val & 0xfff;
+	//    if (result == 0xfff) result = 0;
+	//    if (result == 0x100) result = 0xff;
+	result.and_imm(0xfff);
+
+	// check against 0xfff and force to 0
+	rgbaint_t temp(result);
+	temp.cmpeq_imm(0xfff);
+	result.andnot_reg(temp);
+
+	// check against 0x100 and force to 0xff
+	temp.set(result);
+	temp.cmpeq_imm(0x100);
+	result.or_reg(temp);
+
+	// always mask against 0xff
+	result.and_imm(0xff);
 	return result;
 }
 
-#define CLAMPED_Z(ITERZ, FBZCP, RESULT)                                         \
-do                                                                              \
-{                                                                               \
-	(RESULT) = (s32)(ITERZ) >> 12;                                            \
-	if (FBZCP.rgbzw_clamp() == 0)                                          \
-	{                                                                           \
-		(RESULT) &= 0xfffff;                                                    \
-		if ((RESULT) == 0xfffff)                                                \
-			(RESULT) = 0;                                                       \
-		else if ((RESULT) == 0x10000)                                           \
-			(RESULT) = 0xffff;                                                  \
-		else                                                                    \
-			(RESULT) &= 0xffff;                                                 \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		CLAMP((RESULT), 0, 0xffff);                                             \
-	}                                                                           \
-}                                                                               \
-while (0)
+static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, voodoo::fbz_colorpath const fbzcp)
+{
+	s32 result = iterz >> 12;
 
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
+		return std::clamp(result, 0, 0xffff);
 
-#define CLAMPED_W(ITERW, FBZCP, RESULT)                                         \
-do                                                                              \
-{                                                                               \
-	(RESULT) = (s16)((ITERW) >> 32);                                          \
-	if (FBZCP.rgbzw_clamp() == 0)                                          \
-	{                                                                           \
-		(RESULT) &= 0xffff;                                                     \
-		if ((RESULT) == 0xffff)                                                 \
-			(RESULT) = 0;                                                       \
-		else if ((RESULT) == 0x100)                                             \
-			(RESULT) = 0xff;                                                    \
-		(RESULT) &= 0xff;                                                       \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		CLAMP((RESULT), 0, 0xff);                                               \
-	}                                                                           \
-}                                                                               \
-while (0)
+	// non-clamped case has specific behaviors
+	result &= 0xfffff;
+	if (result == 0xfffff)
+		return 0;
+	if (result == 0x10000)
+		return 0xffff;
+	return result & 0xffff;
+}
+
+static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, voodoo::fbz_colorpath const fbzcp)
+{
+	s32 result = iterw >> 32;
+
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
+		return std::clamp(result, 0, 0xff);
+
+	// non-clamped case has specific behaviors
+	result &= 0xffff;
+	if (result == 0xffff)
+		return 0;
+	if (result == 0x100)
+		return 0xff;
+	return result & 0xff;
+}
 
 
 
@@ -1147,246 +1093,101 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
  *
  *************************************/
 
-#define APPLY_FOGGING(FOGMODE, FBZCP, XX, DITHER4, RR, GG, BB, ITERZ, ITERW, ITERAXXX)  \
-do                                                                              \
-{                                                                               \
-	if (FOGMODE.enable_fog())                                            \
-	{                                                                           \
-		rgb_union fogcolor = m_reg[fogColor];                               \
-		s32 fr, fg, fb;                                                       \
-																				\
-		/* constant fog bypasses everything else */                             \
-		if (FOGMODE.fog_constant())                                      \
-		{                                                                       \
-			fr = fogcolor.rgb.r;                                                \
-			fg = fogcolor.rgb.g;                                                \
-			fb = fogcolor.rgb.b;                                                \
-		}                                                                       \
-																				\
-		/* non-constant fog comes from several sources */                       \
-		else                                                                    \
-		{                                                                       \
-			s32 fogblend = 0;                                                 \
-																				\
-			/* if fog_add is zero, we start with the fog color */               \
-			if (FOGMODE.fog_add() == 0)                                  \
-			{                                                                   \
-				fr = fogcolor.rgb.r;                                            \
-				fg = fogcolor.rgb.g;                                            \
-				fb = fogcolor.rgb.b;                                            \
-			}                                                                   \
-			else                                                                \
-				fr = fg = fb = 0;                                               \
-																				\
-			/* if fog_mult is zero, we subtract the incoming color */           \
-			if (FOGMODE.fog_mult() == 0)                                 \
-			{                                                                   \
-				fr -= (RR);                                                     \
-				fg -= (GG);                                                     \
-				fb -= (BB);                                                     \
-			}                                                                   \
-																				\
-			/* fog blending mode */                                             \
-			switch (FOGMODE.fog_zalpha())                                \
-			{                                                                   \
-				case 0:     /* fog table */                                     \
-				{                                                               \
-					s32 delta = m_fbi.fogdelta[fogdepth >> 10];             \
-					s32 deltaval;                                             \
-																				\
-					/* perform the multiply against lower 8 bits of wfloat */   \
-					deltaval = (delta & m_fbi.fogdelta_mask) *              \
-								((fogdepth >> 2) & 0xff);                         \
-																				\
-					/* fog zones allow for negating this value */               \
-					if (FOGMODE.fog_zones() && (delta & 2))              \
-						deltaval = -deltaval;                                   \
-					deltaval >>= 6;                                             \
-																				\
-					/* apply dither */                                          \
-					if (FOGMODE.fog_dither())                            \
-						deltaval += DITHER4[(XX) & 3];                          \
-					deltaval >>= 4;                                             \
-																				\
-					/* add to the blending factor */                            \
-					fogblend = m_fbi.fogblend[fogdepth >> 10] + deltaval;     \
-					break;                                                      \
-				}                                                               \
-																				\
-				case 1:     /* iterated A */                                    \
-					fogblend = ITERAXXX.rgb.a;                                  \
-					break;                                                      \
-																				\
-				case 2:     /* iterated Z */                                    \
-					CLAMPED_Z((ITERZ), FBZCP, fogblend);                        \
-					fogblend >>= 8;                                             \
-					break;                                                      \
-																				\
-				case 3:     /* iterated W - Voodoo 2 only */                    \
-					CLAMPED_W((ITERW), FBZCP, fogblend);                        \
-					break;                                                      \
-			}                                                                   \
-																				\
-			/* perform the blend */                                             \
-			fogblend++;                                                         \
-			fr = (fr * fogblend) >> 8;                                          \
-			fg = (fg * fogblend) >> 8;                                          \
-			fb = (fb * fogblend) >> 8;                                          \
-		}                                                                       \
-																				\
-		/* if fog_mult is 0, we add this to the original color */               \
-		if (FOGMODE.fog_mult() == 0)                                     \
-		{                                                                       \
-			(RR) += fr;                                                         \
-			(GG) += fg;                                                         \
-			(BB) += fb;                                                         \
-		}                                                                       \
-																				\
-		/* otherwise this just becomes the new color */                         \
-		else                                                                    \
-		{                                                                       \
-			(RR) = fr;                                                          \
-			(GG) = fg;                                                          \
-			(BB) = fb;                                                          \
-		}                                                                       \
-																				\
-		/* clamp */                                                             \
-		CLAMP((RR), 0x00, 0xff);                                                \
-		CLAMP((GG), 0x00, 0xff);                                                \
-		CLAMP((BB), 0x00, 0xff);                                                \
-	}                                                                           \
-}                                                                               \
-while (0)
-
-inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp,  s32 x, const u8 *dither4, s32 wFloat,
-	rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb)
+inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
+	rgbaint_t &color,
+	voodoo::fbz_mode const fbzmode,
+	voodoo::fog_mode const fogmode,
+	voodoo::fbz_colorpath const fbzcp,
+	s32 x,
+	u8 const *dither4,
+	s32 wfloat,
+	s32 iterz,
+	s64 iterw,
+	rgbaint_t const &iterargb)
 {
+	// constant fog bypasses everything else
+	rgbaint_t fog_color_local(m_reg[fogColor].u);
+	if (fogmode.fog_constant())
 	{
-		/* constant fog bypasses everything else */
-		rgbaint_t fogColorLocal(m_reg[fogColor].u);
-
-		if (fogmode.fog_constant())
+		// if fog_mult is 0, we add this to the original color
+		if (fogmode.fog_mult() == 0)
 		{
-			/* if fog_mult is 0, we add this to the original color */
-			if (fogmode.fog_mult() == 0)
-			{
-				fogColorLocal.add(color);
-				fogColorLocal.clamp_to_uint8();
-				//color += fog;
-			}
-
-			/* otherwise this just becomes the new color */
-			else
-			{
-				//color = fogColorLocal;
-				//color = fog;
-			}
+			fog_color_local.add(color);
+			fog_color_local.clamp_to_uint8();
 		}
-		/* non-constant fog comes from several sources */
-		else
-		{
-			s32 fogblend = 0;
-
-			/* if fog_add is zero, we start with the fog color */
-			if (fogmode.fog_add())
-				fogColorLocal.zero();
-				//fr = fg = fb = 0;
-
-			/* if fog_mult is zero, we subtract the incoming color */
-			if (!fogmode.fog_mult())
-			{
-				// Need to check this, manual states 9 bits
-				fogColorLocal.sub(color);
-				//fog.rgb -= color.rgb;
-				//fr -= (RR);
-				//fg -= (GG);
-				//fb -= (BB);
-			}
-
-			/* fog blending mode */
-			switch (fogmode.fog_zalpha())
-			{
-				case 0:     /* fog table */
-				{
-					s32 fogDepth = wFloat;
-					/* add the bias for fog selection*/
-					if (fbzmode.enable_depth_bias())
-					{
-						fogDepth += (s16)m_reg[zaColor].u;
-						CLAMP(fogDepth, 0, 0xffff);
-					}
-					s32 delta = m_fbi.fogdelta[fogDepth >> 10];
-					s32 deltaval;
-
-					/* perform the multiply against lower 8 bits of wfloat */
-					deltaval = (delta & m_fbi.fogdelta_mask) *
-								((fogDepth >> 2) & 0xff);
-
-					/* fog zones allow for negating this value */
-					if (fogmode.fog_zones() && (delta & 2))
-						deltaval = -deltaval;
-					deltaval >>= 6;
-
-					/* apply dither */
-					if (fogmode.fog_dither())
-						deltaval += dither4[x&3];
-					deltaval >>= 4;
-
-					/* add to the blending factor */
-					fogblend = m_fbi.fogblend[fogDepth >> 10] + deltaval;
-					break;
-				}
-
-				case 1:     /* iterated A */
-					fogblend = iterargb.get_a();
-					break;
-
-				case 2:     /* iterated Z */
-					CLAMPED_Z(iterz, fbzcp, fogblend);
-					fogblend >>= 8;
-					break;
-
-				case 3:     /* iterated W - Voodoo 2 only */
-					CLAMPED_W(iterw, fbzcp, fogblend);
-					break;
-			}
-
-			/* perform the blend */
-			fogblend++;
-
-			//fr = (fr * fogblend) >> 8;
-			//fg = (fg * fogblend) >> 8;
-			//fb = (fb * fogblend) >> 8;
-			/* if fog_mult is 0, we add this to the original color */
-			fogColorLocal.scale_imm_and_clamp((s16)fogblend);
-			if (fogmode.fog_mult() == 0)
-			{
-				fogColorLocal.add(color);
-				fogColorLocal.clamp_to_uint8();
-				//color += fog;
-				//(RR) += fr;
-				//(GG) += fg;
-				//(BB) += fb;
-			}
-
-			/* otherwise this just becomes the new color */
-			else
-			{
-				//color = fog;
-				//(RR) = fr;
-				//(GG) = fg;
-				//(BB) = fb;
-			}
-		}
-
-
-		/* clamp */
-		//CLAMP((RR), 0x00, 0xff);
-		//CLAMP((GG), 0x00, 0xff);
-		//CLAMP((BB), 0x00, 0xff);
-		fogColorLocal.merge_alpha16(color);
-		color.set(fogColorLocal);
 	}
+
+	// non-constant fog comes from several sources
+	else
+	{
+		s32 fogblend = 0;
+
+		// if fog_add is zero, we start with the fog color
+		if (fogmode.fog_add())
+			fog_color_local.zero();
+
+		// if fog_mult is zero, we subtract the incoming color
+		// Need to check this, manual states 9 bits
+		if (!fogmode.fog_mult())
+			fog_color_local.sub(color);
+
+		// fog blending mode
+		switch (fogmode.fog_zalpha())
+		{
+			case 0:     // fog table
+			{
+				s32 fog_depth = wfloat;
+
+				// add the bias for fog selection
+				if (fbzmode.enable_depth_bias())
+					fog_depth = std::clamp(fog_depth + s16(m_reg[zaColor].u), 0, 0xffff);
+
+				// perform the multiply against lower 8 bits of wfloat
+				s32 delta = m_fbi.fogdelta[fog_depth >> 10];
+				s32 deltaval = (delta & m_fbi.fogdelta_mask) * ((fog_depth >> 2) & 0xff);
+
+				// fog zones allow for negating this value
+				if (fogmode.fog_zones() && (delta & 2))
+					deltaval = -deltaval;
+				deltaval >>= 6;
+
+				// apply dither
+				if (fogmode.fog_dither())
+					deltaval += dither4[x & 3];
+				deltaval >>= 4;
+
+				// add to the blending factor
+				fogblend = m_fbi.fogblend[fog_depth >> 10] + deltaval;
+				break;
+			}
+
+			case 1:     // iterated A
+				fogblend = iterargb.get_a();
+				break;
+
+			case 2:     // iterated Z
+				fogblend = clamped_z(iterz, fbzcp) >> 8;
+				break;
+
+			case 3:     // iterated W - Voodoo 2 only
+				fogblend = clamped_w(iterw, fbzcp);
+				break;
+		}
+
+		// perform the blend
+		fogblend++;
+
+		// if fog_mult is 0, we add this to the original color
+		fog_color_local.scale_imm_and_clamp(s16(fogblend));
+		if (fogmode.fog_mult() == 0)
+		{
+			fog_color_local.add(color);
+			fog_color_local.clamp_to_uint8();
+		}
+	}
+
+	fog_color_local.merge_alpha16(color);
+	color.set(fog_color_local);
 }
 
 
@@ -1815,7 +1616,7 @@ do                                                                              
 	}                                                                           \
 	else                                                                        \
 	{                                                                           \
-		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
+		depthval = clamped_z(ITERZ, FBZCOLORPATH);                               \
 	}                                                                           \
 	/* add the bias */                                                          \
 	biasdepth = depthval;                                                     \
@@ -2022,423 +1823,156 @@ while (0)
 
     c_other_is_used:
 
-        if (FBZMODE.enable_chromakey() ||
-            FBZCP.cc_zero_other() == 0)
+        if (fbzmode.enable_chromakey() ||
+            fbzcp.cc_zero_other() == 0)
 
     c_local_is_used:
 
-        if (FBZCP.cc_sub_clocal() ||
-            FBZCP.cc_mselect() == 1 ||
-            FBZCP.cc_add_aclocal() == 1)
+        if (fbzcp.cc_sub_clocal() ||
+            fbzcp.cc_mselect() == 1 ||
+            fbzcp.cc_add_aclocal() == 1)
 
     NEEDS_ITER_RGB:
 
-        if ((c_other_is_used && FBZCP.cc_rgbselect() == 0) ||
-            (c_local_is_used && (FBZCP.cc_localselect_override() != 0 || FBZCP.cc_localselect() == 0))
+        if ((c_other_is_used && fbzcp.cc_rgbselect() == 0) ||
+            (c_local_is_used && (fbzcp.cc_localselect_override() != 0 || fbzcp.cc_localselect() == 0))
 
     NEEDS_ITER_A:
 
-        if ((a_other_is_used && FBZCP.cc_aselect() == 0) ||
-            (a_local_is_used && FBZCP.cca_localselect() == 0))
+        if ((a_other_is_used && fbzcp.cc_aselect() == 0) ||
+            (a_local_is_used && fbzcp.cca_localselect() == 0))
 
     NEEDS_ITER_Z:
 
-        if (FBZMODE.wbuffer_select() == 0 ||
-            FBZMODE.depth_float_select() != 0 ||
-            FBZCP.cca_localselect() == 2)
+        if (fbzmode.wbuffer_select() == 0 ||
+            fbzmode.depth_float_select() != 0 ||
+            fbzcp.cca_localselect() == 2)
 
 
 */
 
-/*
-    Expects the following declarations to be outside of this scope:
-
-    s32 r, g, b, a;
-*/
-#define COLORPATH_PIPELINE(THREADSTATS, FBZCP, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
-do                                                                              \
-{                                                                               \
-	s32 blendr, blendg, blendb, blenda;                                       \
-	rgb_union c_other;                                                          \
-	rgb_union c_local;                                                          \
-																				\
-	/* compute c_other */                                                       \
-	switch (FBZCP.cc_rgbselect())                                   \
-	{                                                                           \
-		case 0:     /* iterated RGB */                                          \
-			c_other.u = ITERARGB.u;                                             \
-			break;                                                              \
-																				\
-		case 1:     /* texture RGB */                                           \
-			c_other.u = TEXELARGB.u;                                            \
-			break;                                                              \
-																				\
-		case 2:     /* color1 RGB */                                            \
-			c_other.u = m_reg[color1].u;                                    \
-			break;                                                              \
-																				\
-		default:    /* reserved - voodoo3 framebufferRGB */                   \
-			c_other.u = 0;                                                      \
-			break;                                                              \
-	}                                                                           \
-																				\
-	/* handle chroma key */                                                     \
-	APPLY_CHROMAKEY(THREADSTATS, FBZMODE, c_other);                               \
-																				\
-	/* compute a_other */                                                       \
-	switch (FBZCP.cc_aselect())                                     \
-	{                                                                           \
-		case 0:     /* iterated alpha */                                        \
-			c_other.rgb.a = ITERARGB.rgb.a;                                     \
-			break;                                                              \
-																				\
-		case 1:     /* texture alpha */                                         \
-			c_other.rgb.a = TEXELARGB.rgb.a;                                    \
-			break;                                                              \
-																				\
-		case 2:     /* color1 alpha */                                          \
-			c_other.rgb.a = m_reg[color1].rgb.a;                            \
-			break;                                                              \
-																				\
-		default:    /* reserved */                                              \
-			c_other.rgb.a = 0;                                                  \
-			break;                                                              \
-	}                                                                           \
-																				\
-	/* handle alpha mask */                                                     \
-	APPLY_ALPHAMASK(THREADSTATS, FBZMODE, c_other.rgb.a);                         \
-																				\
-	/* compute c_local */                                                       \
-	if (FBZCP.cc_localselect_override() == 0)                       \
-	{                                                                           \
-		if (FBZCP.cc_localselect() == 0)    /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = m_reg[color0].u;                                    \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		if (!(TEXELARGB.rgb.a & 0x80))                  /* iterated RGB */      \
-			c_local.u = ITERARGB.u;                                             \
-		else                                            /* color0 RGB */        \
-			c_local.u = m_reg[color0].u;                                    \
-	}                                                                           \
-																				\
-	/* compute a_local */                                                       \
-	switch (FBZCP.cca_localselect())                                \
-	{                                                                           \
-		default:                                                                \
-		case 0:     /* iterated alpha */                                        \
-			c_local.rgb.a = ITERARGB.rgb.a;                                     \
-			break;                                                              \
-																				\
-		case 1:     /* color0 alpha */                                          \
-			c_local.rgb.a = m_reg[color0].rgb.a;                            \
-			break;                                                              \
-																				\
-		case 2:     /* clamped iterated Z[27:20] */                             \
-		{                                                                       \
-			int temp;                                                           \
-			CLAMPED_Z(ITERZ, FBZCOLORPATH, temp);                               \
-			c_local.rgb.a = (u8)temp;                                        \
-			break;                                                              \
-		}                                                                       \
-																				\
-		case 3:     /* clamped iterated W[39:32] */                             \
-		{                                                                       \
-			int temp;                                                           \
-			CLAMPED_W(ITERW, FBZCOLORPATH, temp);           /* Voodoo 2 only */ \
-			c_local.rgb.a = (u8)temp;                                        \
-			break;                                                              \
-		}                                                                       \
-	}                                                                           \
-																				\
-	/* select zero or a_other */                                                \
-	if (!FBZCP.cca_zero_other())                                \
-		a = c_other.rgb.a;                                                      \
-	else                                                                        \
-		a = 0;                                                                  \
-																				\
-	/* subtract a_local */                                                      \
-	if (FBZCP.cca_sub_clocal())                                     \
-		a -= c_local.rgb.a;                                                     \
-																				\
-	/* blend alpha */                                                           \
-	switch (FBZCP.cca_mselect())                                    \
-	{                                                                           \
-		default:    /* reserved */                                              \
-		case 0:     /* 0 */                                                     \
-			blenda = 0;                                                         \
-			break;                                                              \
-																				\
-		case 1:     /* a_local */                                               \
-			blenda = c_local.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 2:     /* a_other */                                               \
-			blenda = c_other.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 3:     /* a_local */                                               \
-			blenda = c_local.rgb.a;                                             \
-			break;                                                              \
-																				\
-		case 4:     /* texture alpha */                                         \
-			blenda = TEXELARGB.rgb.a;                                           \
-			break;                                                              \
-	}                                                                           \
-																				\
-	/* reverse the alpha blend */                                               \
-	if (!FBZCP.cca_reverse_blend())                                 \
-		blenda ^= 0xff;                                                         \
-																				\
-	/* do the blend */                                                          \
-	a = (a * (blenda + 1)) >> 8;                                                \
-																				\
-	/* add clocal or alocal to alpha */                                         \
-	if (FBZCP.cca_add_aclocal())                                    \
-		a += c_local.rgb.a;                                                     \
-																				\
-	/* clamp */                                                                 \
-	CLAMP(a, 0x00, 0xff);                                                       \
-																				\
-	/* invert */                                                                \
-	if (FBZCP.cca_invert_output(FBZCOLORPATH                                  \
-		a ^= 0xff;                                                              \
-																				\
-	/* handle alpha test */                                                     \
-	APPLY_ALPHATEST(THREADSTATS, ALPHAMODE, a);                                   \
-																				\
-																				\
-	/* select zero or c_other */                                                \
-	if (FBZCP.cc_zero_other() == 0)                                 \
-	{                                                                           \
-		r = c_other.rgb.r;                                                      \
-		g = c_other.rgb.g;                                                      \
-		b = c_other.rgb.b;                                                      \
-	}                                                                           \
-	else                                                                        \
-		r = g = b = 0;                                                          \
-																				\
-	/* subtract c_local */                                                      \
-	if (FBZCP.cc_sub_clocal())                                      \
-	{                                                                           \
-		r -= c_local.rgb.r;                                                     \
-		g -= c_local.rgb.g;                                                     \
-		b -= c_local.rgb.b;                                                     \
-	}                                                                           \
-																				\
-	/* blend RGB */                                                             \
-	switch (FBZCP.cc_mselect())                                     \
-	{                                                                           \
-		default:    /* reserved */                                              \
-		case 0:     /* 0 */                                                     \
-			blendr = blendg = blendb = 0;                                       \
-			break;                                                              \
-																				\
-		case 1:     /* c_local */                                               \
-			blendr = c_local.rgb.r;                                             \
-			blendg = c_local.rgb.g;                                             \
-			blendb = c_local.rgb.b;                                             \
-			break;                                                              \
-																				\
-		case 2:     /* a_other */                                               \
-			blendr = blendg = blendb = c_other.rgb.a;                           \
-			break;                                                              \
-																				\
-		case 3:     /* a_local */                                               \
-			blendr = blendg = blendb = c_local.rgb.a;                           \
-			break;                                                              \
-																				\
-		case 4:     /* texture alpha */                                         \
-			blendr = blendg = blendb = TEXELARGB.rgb.a;                         \
-			break;                                                              \
-																				\
-		case 5:     /* texture RGB (Voodoo 2 only) */                           \
-			blendr = TEXELARGB.rgb.r;                                           \
-			blendg = TEXELARGB.rgb.g;                                           \
-			blendb = TEXELARGB.rgb.b;                                           \
-			break;                                                              \
-	}                                                                           \
-																				\
-	/* reverse the RGB blend */                                                 \
-	if (!FBZCP.cc_reverse_blend())                                  \
-	{                                                                           \
-		blendr ^= 0xff;                                                         \
-		blendg ^= 0xff;                                                         \
-		blendb ^= 0xff;                                                         \
-	}                                                                           \
-																				\
-	/* do the blend */                                                          \
-	r = (r * (blendr + 1)) >> 8;                                                \
-	g = (g * (blendg + 1)) >> 8;                                                \
-	b = (b * (blendb + 1)) >> 8;                                                \
-																				\
-	/* add clocal or alocal to RGB */                                           \
-	switch (FBZCP.cc_add_aclocal())                                 \
-	{                                                                           \
-		case 3:     /* reserved */                                              \
-		case 0:     /* nothing */                                               \
-			break;                                                              \
-																				\
-		case 1:     /* add c_local */                                           \
-			r += c_local.rgb.r;                                                 \
-			g += c_local.rgb.g;                                                 \
-			b += c_local.rgb.b;                                                 \
-			break;                                                              \
-																				\
-		case 2:     /* add_alocal */                                            \
-			r += c_local.rgb.a;                                                 \
-			g += c_local.rgb.a;                                                 \
-			b += c_local.rgb.a;                                                 \
-			break;                                                              \
-	}                                                                           \
-																				\
-	/* clamp */                                                                 \
-	CLAMP(r, 0x00, 0xff);                                                       \
-	CLAMP(g, 0x00, 0xff);                                                       \
-	CLAMP(b, 0x00, 0xff);                                                       \
-																				\
-	/* invert */                                                                \
-	if (FBZCP.cc_invert_output())                                   \
-	{                                                                           \
-		r ^= 0xff;                                                              \
-		g ^= 0xff;                                                              \
-		b ^= 0xff;                                                              \
-	}                                                                           \
-}                                                                               \
-while (0)
-
-inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &THREADSTATS, voodoo::fbz_colorpath const FBZCP, voodoo::fbz_mode const FBZMODE,
-													rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor)
+inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
+	rgbaint_t &color,
+	thread_stats_block &threadstats,
+	voodoo::fbz_colorpath const fbzcp,
+	voodoo::fbz_mode const fbzmode,
+	rgbaint_t texel,
+	s32 iterz,
+	s64 iterw)
 {
+	// compute c_other
 	rgbaint_t c_other;
-	rgbaint_t c_local;
-	rgbaint_t blend_color, blend_factor;
-	rgbaint_t add_val;
-
-	/* compute c_other */
-	switch (FBZCP.cc_rgbselect())
+	switch (fbzcp.cc_rgbselect())
 	{
-		case 0:     /* iterated RGB */
-			c_other.set(srcColor);
+		case 0:     // iterated RGB
+			c_other.set(color);
 			break;
 
-		case 1:     /* texture RGB */
-			c_other.set(TEXELARGB);
+		case 1:     // texture RGB
+			c_other.set(texel);
 			break;
 
-		case 2:     /* color1 RGB */
+		case 2:     // color1 RGB
 			c_other.set(m_reg[color1].u);
 			break;
 
-		default:    /* reserved - voodoo3 LFB RGB */
+		default:    // reserved - voodoo3 LFB RGB
 			c_other.zero();
 			break;
 	}
 
-	/* handle chroma key */
-	if (FBZMODE.enable_chromakey())
-		if (!chroma_key_test(THREADSTATS, FBZMODE, c_other))
+	// handle chroma key
+	if (fbzmode.enable_chromakey())
+		if (!chroma_key_test(threadstats, fbzmode, c_other))
 			return false;
-	//APPLY_CHROMAKEY(m_vds, THREADSTATS, FBZMODE, c_other);
 
-	/* compute a_other */
-	switch (FBZCP.cc_aselect())
+	// compute a_other
+	switch (fbzcp.cc_aselect())
 	{
-		case 0:     /* iterated alpha */
-			c_other.merge_alpha16(srcColor);
+		case 0:     // iterated alpha
+			c_other.merge_alpha16(color);
 			break;
 
-		case 1:     /* texture alpha */
-			c_other.merge_alpha16(TEXELARGB);
+		case 1:     // texture alpha
+			c_other.merge_alpha16(texel);
 			break;
 
-		case 2:     /* color1 alpha */
+		case 2:     // color1 alpha
 			c_other.set_a16(m_reg[color1].rgb.a);
 			break;
 
-		default:    /* reserved - voodoo3  LFB Alpha*/
+		default:    // reserved - voodoo3  LFB Alpha
 			c_other.zero_alpha();
 			break;
 	}
 
-	/* handle alpha mask */
-	if (FBZMODE.enable_alpha_mask())
-		if (!alpha_mask_test(THREADSTATS, FBZMODE, c_other.get_a()))
+	// handle alpha mask
+	if (fbzmode.enable_alpha_mask())
+		if (!alpha_mask_test(threadstats, fbzmode, c_other.get_a()))
 			return false;
-	//APPLY_ALPHAMASK(m_vds, THREADSTATS, FBZMODE, c_other.rgb.a);
 
-
-	/* compute c_local */
-	if (FBZCP.cc_localselect_override() == 0)
+	// compute c_local
+	rgbaint_t c_local;
+	if (fbzcp.cc_localselect_override() == 0)
 	{
-		if (FBZCP.cc_localselect() == 0)    /* iterated RGB */
-			c_local.set(srcColor);
-		else                                            /* color0 RGB */
+		if (fbzcp.cc_localselect() == 0)    // iterated RGB
+			c_local.set(color);
+		else                                // color0 RGB
 			c_local.set(m_reg[color0].u);
 	}
 	else
 	{
-		if (!(TEXELARGB.get_a() & 0x80))                  /* iterated RGB */
-			c_local.set(srcColor);
-		else                                            /* color0 RGB */
+		if (!(texel.get_a() & 0x80))        // iterated RGB
+			c_local.set(color);
+		else                                // color0 RGB
 			c_local.set(m_reg[color0].u);
 	}
 
-	/* compute a_local */
-	switch (FBZCP.cca_localselect())
+	// compute a_local
+	switch (fbzcp.cca_localselect())
 	{
 		default:
-		case 0:     /* iterated alpha */
-			c_local.merge_alpha16(srcColor);
+		case 0:     // iterated alpha
+			c_local.merge_alpha16(color);
 			break;
 
-		case 1:     /* color0 alpha */
+		case 1:     // color0 alpha
 			c_local.set_a16(m_reg[color0].rgb.a);
 			break;
 
-		case 2:     /* clamped iterated Z[27:20] */
-		{
-			int temp;
-			CLAMPED_Z(ITERZ, FBZCP, temp);
-			c_local.set_a16((u8) temp);
+		case 2:     // clamped iterated Z[27:20]
+			c_local.set_a16(u8(clamped_z(iterz, fbzcp) >> 8));
 			break;
-		}
 
-		case 3:     /* clamped iterated W[39:32] */
-		{
-			int temp;
-			CLAMPED_W(ITERW, FBZCP, temp);           /* Voodoo 2 only */
-			c_local.set_a16((u8) temp);
+		case 3:     // clamped iterated W[39:32] (Voodoo 2 only)
+			c_local.set_a16(u8(clamped_w(iterw, fbzcp)));
 			break;
-		}
 	}
 
-	/* select zero or c_other */
-	if (FBZCP.cc_zero_other())
-		//r = g = b = 0;
+	// select zero or c_other
+	rgbaint_t blend_color;
+	if (fbzcp.cc_zero_other())
 		blend_color.zero();
 	else
 		blend_color.set(c_other);
 
-	/* select zero or a_other */
-	if (FBZCP.cca_zero_other())
+	// select zero or a_other
+	if (fbzcp.cca_zero_other())
 		blend_color.zero_alpha();
 	else
 		blend_color.merge_alpha16(c_other);
 
-	/* subtract a/c_local */
-	if (FBZCP.cc_sub_clocal() || (FBZCP.cca_sub_clocal()))
+	// subtract a/c_local
+	if (fbzcp.cc_sub_clocal() || fbzcp.cca_sub_clocal())
 	{
 		rgbaint_t sub_val;
 
-		if (!FBZCP.cc_sub_clocal())
+		if (!fbzcp.cc_sub_clocal())
 			sub_val.zero();
 		else
 			sub_val.set(c_local);
 
-		if (!FBZCP.cca_sub_clocal())
+		if (!fbzcp.cca_sub_clocal())
 			sub_val.zero_alpha();
 		else
 			sub_val.merge_alpha16(c_local);
@@ -2446,112 +1980,101 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 		blend_color.sub(sub_val);
 	}
 
-	/* blend RGB */
-	switch (FBZCP.cc_mselect())
+	// blend RGB
+	rgbaint_t blend_factor;
+	switch (fbzcp.cc_mselect())
 	{
-		default:    /* reserved */
-		case 0:     /* 0 */
+		default:    // reserved
+		case 0:     // 0
 			blend_factor.zero();
 			break;
 
-		case 1:     /* c_local */
+		case 1:     // c_local
 			blend_factor.set(c_local);
 			break;
 
-		case 2:     /* a_other */
+		case 2:     // a_other
 			blend_factor.set(c_other.select_alpha32());
 			break;
 
-		case 3:     /* a_local */
+		case 3:     // a_local
 			blend_factor.set(c_local.select_alpha32());
 			break;
 
-		case 4:     /* texture alpha */
-			blend_factor.set(TEXELARGB.select_alpha32());
+		case 4:     // texture alpha
+			blend_factor.set(texel.select_alpha32());
 			break;
 
-		case 5:     /* texture RGB (Voodoo 2 only) */
-			blend_factor.set(TEXELARGB);
+		case 5:     // texture RGB (Voodoo 2 only)
+			blend_factor.set(texel);
 			break;
 	}
 
-	/* blend alpha */
-	switch (FBZCP.cca_mselect())
+	// blend alpha
+	switch (fbzcp.cca_mselect())
 	{
-		default:    /* reserved */
-		case 0:     /* 0 */
+		default:    // reserved
+		case 0:     // 0
 			blend_factor.zero_alpha();
 			break;
 
-		case 1:     /* a_local */
-		case 3:     /* a_local */
+		case 1:     // a_local
+		case 3:     // a_local
 			blend_factor.merge_alpha16(c_local);
 			break;
 
-		case 2:     /* a_other */
+		case 2:     // a_other
 			blend_factor.merge_alpha16(c_other);
 			break;
 
-		case 4:     /* texture alpha */
-			blend_factor.merge_alpha16(TEXELARGB);
+		case 4:     // texture alpha
+			blend_factor.merge_alpha16(texel);
 			break;
 	}
 
-	/* reverse the RGB blend */
-	if (!FBZCP.cc_reverse_blend())
+	// reverse the RGB blend
+	if (!fbzcp.cc_reverse_blend())
 		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
-	/* reverse the alpha blend */
-	if (!FBZCP.cca_reverse_blend())
+	// reverse the alpha blend
+	if (!fbzcp.cca_reverse_blend())
 		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
-	/* do the blend */
-	//color.rgb.a = (color.rgb.a * (blenda + 1)) >> 8;
-	//color.rgb.r = (color.rgb.r * (blendr + 1)) >> 8;
-	//color.rgb.g = (color.rgb.g * (blendg + 1)) >> 8;
-	//color.rgb.b = (color.rgb.b * (blendb + 1)) >> 8;
-
-	/* add clocal or alocal to RGB */
-	switch (FBZCP.cc_add_aclocal())
+	// add clocal or alocal to RGB
+	rgbaint_t add_val;
+	switch (fbzcp.cc_add_aclocal())
 	{
-		case 3:     /* reserved */
-		case 0:     /* nothing */
+		case 3:     // reserved
+		case 0:     // nothing
 			add_val.zero();
 			break;
 
-		case 1:     /* add c_local */
+		case 1:     // add c_local
 			add_val.set(c_local);
 			break;
 
-		case 2:     /* add_alocal */
+		case 2:     // add_alocal
 			add_val.set(c_local.select_alpha32());
 			break;
 	}
 
-	/* add clocal or alocal to alpha */
-	if (!FBZCP.cca_add_aclocal())
+	// add clocal or alocal to alpha
+	if (!fbzcp.cca_add_aclocal())
 		add_val.zero_alpha();
 	else
-		//color.rgb.a += c_local.rgb.a;
 		add_val.merge_alpha16(c_local);
 
-	/* clamp */
-	//CLAMP(color.rgb.a, 0x00, 0xff);
-	//CLAMP(color.rgb.r, 0x00, 0xff);
-	//CLAMP(color.rgb.g, 0x00, 0xff);
-	//CLAMP(color.rgb.b, 0x00, 0xff);
+	// add and clamp
 	blend_factor.add_imm(1);
 	blend_color.scale_add_and_clamp(blend_factor, add_val);
 
-	/* invert */
-	if (FBZCP.cca_invert_output())
+	// invert
+	if (fbzcp.cca_invert_output())
 		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
-	/* invert */
-	if (FBZCP.cc_invert_output())
+	if (fbzcp.cc_invert_output())
 		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
-	srcColor.set(blend_color);
-
+	color.set(blend_color);
 	return true;
 }
 
@@ -2568,36 +2091,28 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
 	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
-	voodoo::texture_mode const TEXMODE0(_TEXMODE0, (TMUS < 1) ? 0 : m_tmu[0].m_reg[textureMode].u); \
-	voodoo::texture_mode const TEXMODE1(_TEXMODE1, (TMUS < 2) ? 0 : m_tmu[1].m_reg[textureMode].u); \
-	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
-	voodoo::alpha_mode const ALPHAMODE(_ALPHAMODE, m_reg[alphaMode].u); \
-	voodoo::fbz_mode const FBZMODE(_FBZMODE, m_reg[fbzMode].u); \
-	voodoo::fog_mode const FOGMODE(_FOGMODE, m_reg[fogMode].u); \
+	voodoo::texture_mode const texmode0(_TEXMODE0, (TMUS < 1) ? 0 : m_tmu[0].m_reg[textureMode].u); \
+	voodoo::texture_mode const texmode1(_TEXMODE1, (TMUS < 2) ? 0 : m_tmu[1].m_reg[textureMode].u); \
+	voodoo::fbz_colorpath const fbzcp(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
+	voodoo::alpha_mode const alphamode(_ALPHAMODE, m_reg[alphaMode].u); \
+	voodoo::fbz_mode const fbzmode(_FBZMODE, m_reg[fbzMode].u); \
+	voodoo::fog_mode const fogmode(_FOGMODE, m_reg[fogMode].u); \
 	DECLARE_DITHER_POINTERS;                                                    \
-	s32 startx = extent.startx;                                              \
-	s32 stopx = extent.stopx;                                                \
-	rgbaint_t iterargb, iterargbDelta;                                           \
-	s32 iterz;                                                                \
-	s64 iterw;                                                                \
 	tmu_state::stw_t iterstw0, iterstw1;                                                     \
 	tmu_state::stw_t deltastw0, deltastw1;                                                   \
-	u16 *depth;                                                              \
-	u16 *dest;                                                               \
-	s32 dx, dy;                                                               \
-	s32 scry;                                                                 \
-	s32 x;                                                                    \
 																				\
 	/* determine the screen Y */                                                \
-	scry = y;                                                                   \
-	if (FBZMODE.y_origin())                                              \
+	s32 scry = y;                                                                   \
+	if (fbzmode.y_origin())                                              \
 		scry = (m_fbi.yorigin - y);                                    \
 																				\
 	/* compute dithering */                                                     \
-	COMPUTE_DITHER_POINTERS(FBZMODE, y, FOGMODE);                               \
+	COMPUTE_DITHER_POINTERS(fbzmode, y, fogmode);                               \
 																				\
 	/* apply clipping */                                                        \
-	if (FBZMODE.enable_clipping())                                       \
+	s32 startx = extent.startx;                                              \
+	s32 stopx = extent.stopx;                                                \
+	if (fbzmode.enable_clipping())                                       \
 	{                                                                           \
 		s32 tempclip;                                                         \
 																				\
@@ -2635,20 +2150,22 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	}                                                                           \
 																				\
 	/* get pointers to the target buffer and depth buffer */                    \
-	dest = extra.destbase + scry * m_fbi.rowpixels;                        \
-	depth = (m_fbi.auxoffs != ~0) ? ((u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels) : nullptr; \
+	u16 *dest = extra.destbase + scry * m_fbi.rowpixels;                        \
+	u16 *depth = (m_fbi.auxoffs != ~0) ? ((u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels) : nullptr; \
 																				\
 	/* compute the starting parameters */                                       \
-	dx = startx - (extra.ax >> 4);                                             \
-	dy = y - (extra.ay >> 4);                                                  \
+	s32 dx = startx - (extra.ax >> 4);                                             \
+	s32 dy = y - (extra.ay >> 4);                                                  \
 	s32 iterr = extra.startr + dy * extra.drdy + dx * extra.drdx;                \
 	s32 iterg = extra.startg + dy * extra.dgdy + dx * extra.dgdx;                \
 	s32 iterb = extra.startb + dy * extra.dbdy + dx * extra.dbdx;                \
 	s32 itera = extra.starta + dy * extra.dady + dx * extra.dadx;                \
+\
+	rgbaint_t iterargb, iterargb_delta;                                           \
 	iterargb.set(itera, iterr, iterg, iterb); \
-	iterargbDelta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx); \
-	iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;                \
-	iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;                \
+	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx); \
+	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;                \
+	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;                \
 	if (TMUS >= 1)                                                              \
 	{                                                                           \
 		iterstw0.set(                                                           \
@@ -2667,16 +2184,16 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	}                                                                           \
 	extra.info->hits++;                                                        \
 	/* loop in X */                                                             \
-	for (x = startx; x < stopx; x++)                                            \
+	for (s32 x = startx; x < stopx; x++)                                            \
 	{                                                                           \
 		rgbaint_t texel(0);                                                \
 		rgbaint_t color, preFog;                                                \
 																				\
 		/* pixel pipeline part 1 handles depth setup and stippling */         \
-		PIXEL_PIPELINE_BEGIN(threadstats, x, y, FBZCOLORPATH, FBZMODE, iterz, iterw); \
+		PIXEL_PIPELINE_BEGIN(threadstats, x, y, fbzcp, fbzmode, iterz, iterw); \
 		/* depth testing */         \
-		if (FBZMODE.enable_depthbuf())                                                  \
-			if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], FBZMODE, biasdepth)) \
+		if (fbzmode.enable_depthbuf())                                                  \
+			if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], fbzmode, biasdepth)) \
 				goto skipdrawdepth; \
 																				\
 		/* run the texture pipeline on TMU1 to produce a value in texel */      \
@@ -2684,9 +2201,9 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		if (TMUS >= 2 && m_tmu[1].lodmin < (8 << 8))                    {       \
 			s32 tmp; \
 			const rgbaint_t texelZero(0);  \
-			texel = m_tmu[1].genTexture(x, dither4, TEXMODE1, m_tmu[1].lookup, extra.lodbase1, \
+			texel = m_tmu[1].genTexture(x, dither4, texmode1, m_tmu[1].lookup, extra.lodbase1, \
 														iterstw1, tmp); \
-			texel = m_tmu[1].combineTexture(TEXMODE1, texel, texelZero, tmp); \
+			texel = m_tmu[1].combineTexture(texmode1, texel, texelZero, tmp); \
 		} \
 		/* run the texture pipeline on TMU0 to produce a final */               \
 		/* result in texel */                                                   \
@@ -2697,9 +2214,9 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 			{                                                                   \
 				s32 lod0; \
 				rgbaint_t texelT0;                                                \
-				texelT0 = m_tmu[0].genTexture(x, dither4, TEXMODE0, m_tmu[0].lookup, extra.lodbase0, \
+				texelT0 = m_tmu[0].genTexture(x, dither4, texmode0, m_tmu[0].lookup, extra.lodbase0, \
 																iterstw0, lod0); \
-				texel = m_tmu[0].combineTexture(TEXMODE0, texelT0, texel, lod0); \
+				texel = m_tmu[0].combineTexture(texmode0, texelT0, texel, lod0); \
 			}                                                                   \
 			else                                                                \
 			{                                                                   \
@@ -2708,28 +2225,28 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		}                                                                   \
 																				\
 		/* colorpath pipeline selects source colors and does blending */        \
-		color = clamp_argb(iterargb, FBZCOLORPATH);                                      \
-		if (!combine_color(threadstats, FBZCOLORPATH, FBZMODE, texel, iterz, iterw, color)) \
+		color = clamped_argb(iterargb, fbzcp);                                      \
+		if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw)) \
 			goto skipdrawdepth;                                                          \
 		/* handle alpha test */                                                          \
-		if (ALPHAMODE.alphatest())                                              \
-			if (!alpha_test(threadstats, ALPHAMODE, color.get_a()))   \
+		if (alphamode.alphatest())                                              \
+			if (!alpha_test(threadstats, alphamode, color.get_a()))   \
 				goto skipdrawdepth;                                                      \
 																						 \
 		/* perform fogging */                                                            \
 		preFog.set(color);                                                               \
-		if (FOGMODE.enable_fog())                                                                         \
-			apply_fogging(FBZMODE, FOGMODE, FBZCOLORPATH, x, dither4, wfloat, color, iterz, iterw, iterargb); \
+		if (fogmode.enable_fog())                                                                         \
+			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither4, wfloat, iterz, iterw, iterargb); \
 																												 \
 		/* perform alpha blending */                                                \
-		if (ALPHAMODE.alphablend())                                                            \
-			alpha_blend(FBZMODE, ALPHAMODE, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565); \
+		if (alphamode.alphablend())                                                            \
+			alpha_blend(fbzmode, alphamode, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565); \
 																				\
 		/* pixel pipeline part 2 handles final output */        \
-		PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, FBZMODE);  \
+		PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, fbzmode);  \
 																				\
 		/* update the iterated parameters */                                    \
-		iterargb += iterargbDelta;                                              \
+		iterargb += iterargb_delta;                                              \
 		iterz += extra.dzdx;                                                   \
 		iterw += extra.dwdx;                                                   \
 		if (TMUS >= 1)                                                          \

@@ -3930,7 +3930,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if (fogmode.enable_fog())
 				{
 					voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
-					apply_fogging(fbzmode, fogmode, fbzcp, x, dither4, biasdepth, color, iterz, iterw, iterargb);
+					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither4, biasdepth, iterz, iterw, iterargb);
 				}
 
 				/* wait for any outstanding work to finish */
