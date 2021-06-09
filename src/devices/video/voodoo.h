@@ -110,6 +110,70 @@ enum
  *
  *************************************/
 
+struct rgba
+{
+#ifdef LSB_FIRST
+	u8               b, g, r, a;
+#else
+	u8               a, r, g, b;
+#endif
+};
+
+union voodoo_reg
+{
+	s32               i;
+	u32              u;
+	float               f;
+	rgba                rgb;
+};
+
+namespace voodoo
+{
+
+class fbz_colorpath
+{
+public:
+	constexpr fbz_colorpath(u32 value) : m_value(value) { }
+
+	constexpr u32 cc_rgbselect() const            { return BIT(m_value, 0, 2); }
+	constexpr u32 cc_aselect() const              { return BIT(m_value, 2, 2); }
+	constexpr u32 cc_localselect() const          { return BIT(m_value, 4, 1); }
+	constexpr u32 cca_localselect() const         { return BIT(m_value, 5, 2); }
+	constexpr u32 cc_localselect_override() const { return BIT(m_value, 7, 1); }
+	constexpr u32 cc_zero_other() const           { return BIT(m_value, 8, 1); }
+	constexpr u32 cc_sub_clocal() const           { return BIT(m_value, 9, 1); }
+	constexpr u32 cc_mselect() const              { return BIT(m_value, 10, 3); }
+	constexpr u32 cc_reverse_blend() const        { return BIT(m_value, 13, 1); }
+	constexpr u32 cc_add_aclocal() const          { return BIT(m_value, 14, 2); }
+	constexpr u32 cc_invert_output() const        { return BIT(m_value, 16, 1); }
+	constexpr u32 cca_zero_other() const          { return BIT(m_value, 17, 1); }
+	constexpr u32 cca_sub_clocal() const          { return BIT(m_value, 18, 1); }
+	constexpr u32 cca_mselect() const             { return BIT(m_value, 19, 3); }
+	constexpr u32 cca_reverse_blend() const       { return BIT(m_value, 22, 1); }
+	constexpr u32 cca_add_aclocal() const         { return BIT(m_value, 23, 2); }
+	constexpr u32 cca_invert_output() const       { return BIT(m_value, 25, 1); }
+	constexpr u32 cca_subpixel_adjust() const     { return BIT(m_value, 26, 1); }
+	constexpr u32 texture_enable() const          { return BIT(m_value, 27, 1); }
+	constexpr u32 rgbzw_clamp() const             { return BIT(m_value, 28, 1); }
+	constexpr u32 anti_alias() const              { return BIT(m_value, 29, 1); }
+
+private:
+	u32 m_value;
+};
+
+}
+
+class voodoo_regs
+{
+public:
+	voodoo_regs();
+
+	voodoo_reg &operator[](int index) { return m_regs[index]; }
+
+private:
+	voodoo_reg m_regs[0x400];
+};
+
 /* Codes to the right:
     R = readable
     W = writeable
@@ -600,28 +664,6 @@ static const u8 dither_subtract_2x2[16] =
 #define INITEN_ENABLE_SLI_ADDRESS_SNOOP(val) (((val) >> 23) & 1)    /* voodoo 2 only */
 #define INITEN_SLI_SNOOP_ADDRESS(val)       (((val) >> 24) & 0xff)  /* voodoo 2 only */
 
-#define FBZCP_CC_RGBSELECT(val)             (((val) >> 0) & 3)
-#define FBZCP_CC_ASELECT(val)               (((val) >> 2) & 3)
-#define FBZCP_CC_LOCALSELECT(val)           (((val) >> 4) & 1)
-#define FBZCP_CCA_LOCALSELECT(val)          (((val) >> 5) & 3)
-#define FBZCP_CC_LOCALSELECT_OVERRIDE(val)  (((val) >> 7) & 1)
-#define FBZCP_CC_ZERO_OTHER(val)            (((val) >> 8) & 1)
-#define FBZCP_CC_SUB_CLOCAL(val)            (((val) >> 9) & 1)
-#define FBZCP_CC_MSELECT(val)               (((val) >> 10) & 7)
-#define FBZCP_CC_REVERSE_BLEND(val)         (((val) >> 13) & 1)
-#define FBZCP_CC_ADD_ACLOCAL(val)           (((val) >> 14) & 3)
-#define FBZCP_CC_INVERT_OUTPUT(val)         (((val) >> 16) & 1)
-#define FBZCP_CCA_ZERO_OTHER(val)           (((val) >> 17) & 1)
-#define FBZCP_CCA_SUB_CLOCAL(val)           (((val) >> 18) & 1)
-#define FBZCP_CCA_MSELECT(val)              (((val) >> 19) & 7)
-#define FBZCP_CCA_REVERSE_BLEND(val)        (((val) >> 22) & 1)
-#define FBZCP_CCA_ADD_ACLOCAL(val)          (((val) >> 23) & 3)
-#define FBZCP_CCA_INVERT_OUTPUT(val)        (((val) >> 25) & 1)
-#define FBZCP_CCA_SUBPIXEL_ADJUST(val)      (((val) >> 26) & 1)
-#define FBZCP_TEXTURE_ENABLE(val)           (((val) >> 27) & 1)
-#define FBZCP_RGBZW_CLAMP(val)              (((val) >> 28) & 1)     /* voodoo 2 only */
-#define FBZCP_ANTI_ALIAS(val)               (((val) >> 29) & 1)     /* voodoo 2 only */
-
 #define ALPHAMODE_ALPHATEST(val)            (((val) >> 0) & 1)
 #define ALPHAMODE_ALPHAFUNCTION(val)        (((val) >> 1) & 7)
 #define ALPHAMODE_ALPHABLEND(val)           (((val) >> 4) & 1)
@@ -848,23 +890,6 @@ static const u8 dither_subtract_2x2[16] =
 
 
 
-struct rgba
-{
-#ifdef LSB_FIRST
-	u8               b, g, r, a;
-#else
-	u8               a, r, g, b;
-#endif
-};
-
-
-union voodoo_reg
-{
-	s32               i;
-	u32              u;
-	float               f;
-	rgba                rgb;
-};
 
 
 
@@ -1356,8 +1381,8 @@ protected:
 	bool alpha_mask_test(thread_stats_block &stats, u32 fbzModeReg, u8 alpha);
 	bool alpha_test(u8 alpharef, thread_stats_block &stats, u32 alphaModeReg, u8 alpha);
 	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, u32 fbzModeReg, s32 biasdepth);
-	bool combine_color(thread_stats_block &STATS, u32 FBZCOLORPATH, u32 FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
-	void apply_fogging(u32 fbzModeReg, u32 fogModeReg, u32 fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	bool combine_color(thread_stats_block &STATS, voodoo::fbz_colorpath const FBZCOLORPATH, u32 FBZMODE, rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor);
+	void apply_fogging(u32 fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat, rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
 	void banshee_blit_2d(u32 data);
 

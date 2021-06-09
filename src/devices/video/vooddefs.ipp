@@ -411,7 +411,7 @@ do                                                                              
 	b = (s32)(ITERB) >> 12;                                             \
 	a = (s32)(ITERA) >> 12;                                             \
 																				\
-	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)                                          \
+	if (FBZCP.rgbzw_clamp() == 0)                                          \
 	{                                                                           \
 		r &= 0xfff;                                                             \
 		RESULT.rgb.r = r;                                                       \
@@ -451,13 +451,13 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, u32 FBZCP)
+static inline rgbaint_t ATTR_FORCE_INLINE clamp_argb(const rgbaint_t &iterargb, voodoo::fbz_colorpath const FBZCP)
 {
 	rgbaint_t result(iterargb);
 	//rgbaint_t colorint((s32) (itera>>12), (s32) (iterr>>12), (s32) (iterg>>12), (s32) (iterb>>12));
 	result.shr_imm(12);
 
-	if (!FBZCP_RGBZW_CLAMP(FBZCP))
+	if (!FBZCP.rgbzw_clamp())
 	{
 		//r &= 0xfff;
 		result.and_imm(0xfff);
@@ -486,7 +486,7 @@ static inline rgbaint_t ATTR_FORCE_INLINE clampARGB(const rgbaint_t &iterargb, u
 do                                                                              \
 {                                                                               \
 	(RESULT) = (s32)(ITERZ) >> 12;                                            \
-	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)                                          \
+	if (FBZCP.rgbzw_clamp() == 0)                                          \
 	{                                                                           \
 		(RESULT) &= 0xfffff;                                                    \
 		if ((RESULT) == 0xfffff)                                                \
@@ -508,7 +508,7 @@ while (0)
 do                                                                              \
 {                                                                               \
 	(RESULT) = (s16)((ITERW) >> 32);                                          \
-	if (FBZCP_RGBZW_CLAMP(FBZCP) == 0)                                          \
+	if (FBZCP.rgbzw_clamp() == 0)                                          \
 	{                                                                           \
 		(RESULT) &= 0xffff;                                                     \
 		if ((RESULT) == 0xffff)                                                 \
@@ -1320,7 +1320,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(u32 fbzModeReg, u32 fogModeReg, u32 fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat,
+inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(u32 fbzModeReg, u32 fogModeReg, voodoo::fbz_colorpath const fbzCpReg,  s32 x, const u8 *dither4, s32 wFloat,
 	rgbaint_t &color, s32 iterz, s64 iterw, const rgbaint_t &iterargb)
 {
 	{
@@ -2085,29 +2085,29 @@ while (0)
     c_other_is_used:
 
         if (FBZMODE_ENABLE_CHROMAKEY(FBZMODE) ||
-            FBZCP_CC_ZERO_OTHER(FBZCOLORPATH) == 0)
+            FBZCP.cc_zero_other() == 0)
 
     c_local_is_used:
 
-        if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH) ||
-            FBZCP_CC_MSELECT(FBZCOLORPATH) == 1 ||
-            FBZCP_CC_ADD_ACLOCAL(FBZCOLORPATH) == 1)
+        if (FBZCP.cc_sub_clocal() ||
+            FBZCP.cc_mselect() == 1 ||
+            FBZCP.cc_add_aclocal() == 1)
 
     NEEDS_ITER_RGB:
 
-        if ((c_other_is_used && FBZCP_CC_RGBSELECT(FBZCOLORPATH) == 0) ||
-            (c_local_is_used && (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) != 0 || FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0))
+        if ((c_other_is_used && FBZCP.cc_rgbselect() == 0) ||
+            (c_local_is_used && (FBZCP.cc_localselect_override() != 0 || FBZCP.cc_localselect() == 0))
 
     NEEDS_ITER_A:
 
-        if ((a_other_is_used && FBZCP_CC_ASELECT(FBZCOLORPATH) == 0) ||
-            (a_local_is_used && FBZCP_CCA_LOCALSELECT(FBZCOLORPATH) == 0))
+        if ((a_other_is_used && FBZCP.cc_aselect() == 0) ||
+            (a_local_is_used && FBZCP.cca_localselect() == 0))
 
     NEEDS_ITER_Z:
 
         if (FBZMODE_WBUFFER_SELECT(FBZMODE) == 0 ||
             FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE) != 0 ||
-            FBZCP_CCA_LOCALSELECT(FBZCOLORPATH) == 2)
+            FBZCP.cca_localselect() == 2)
 
 
 */
@@ -2117,7 +2117,7 @@ while (0)
 
     s32 r, g, b, a;
 */
-#define COLORPATH_PIPELINE(THREADSTATS, FBZCOLORPATH, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
+#define COLORPATH_PIPELINE(THREADSTATS, FBZCP, FBZMODE, ALPHAMODE, TEXELARGB, ITERZ, ITERW, ITERARGB) \
 do                                                                              \
 {                                                                               \
 	s32 blendr, blendg, blendb, blenda;                                       \
@@ -2125,7 +2125,7 @@ do                                                                              
 	rgb_union c_local;                                                          \
 																				\
 	/* compute c_other */                                                       \
-	switch (FBZCP_CC_RGBSELECT(FBZCOLORPATH))                                   \
+	switch (FBZCP.cc_rgbselect())                                   \
 	{                                                                           \
 		case 0:     /* iterated RGB */                                          \
 			c_other.u = ITERARGB.u;                                             \
@@ -2148,7 +2148,7 @@ do                                                                              
 	APPLY_CHROMAKEY(THREADSTATS, FBZMODE, c_other);                               \
 																				\
 	/* compute a_other */                                                       \
-	switch (FBZCP_CC_ASELECT(FBZCOLORPATH))                                     \
+	switch (FBZCP.cc_aselect())                                     \
 	{                                                                           \
 		case 0:     /* iterated alpha */                                        \
 			c_other.rgb.a = ITERARGB.rgb.a;                                     \
@@ -2171,9 +2171,9 @@ do                                                                              
 	APPLY_ALPHAMASK(THREADSTATS, FBZMODE, c_other.rgb.a);                         \
 																				\
 	/* compute c_local */                                                       \
-	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)                       \
+	if (FBZCP.cc_localselect_override() == 0)                       \
 	{                                                                           \
-		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */      \
+		if (FBZCP.cc_localselect() == 0)    /* iterated RGB */      \
 			c_local.u = ITERARGB.u;                                             \
 		else                                            /* color0 RGB */        \
 			c_local.u = m_reg[color0].u;                                    \
@@ -2187,7 +2187,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* compute a_local */                                                       \
-	switch (FBZCP_CCA_LOCALSELECT(FBZCOLORPATH))                                \
+	switch (FBZCP.cca_localselect())                                \
 	{                                                                           \
 		default:                                                                \
 		case 0:     /* iterated alpha */                                        \
@@ -2216,17 +2216,17 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* select zero or a_other */                                                \
-	if (!FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH))                                \
+	if (!FBZCP.cca_zero_other())                                \
 		a = c_other.rgb.a;                                                      \
 	else                                                                        \
 		a = 0;                                                                  \
 																				\
 	/* subtract a_local */                                                      \
-	if (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))                                     \
+	if (FBZCP.cca_sub_clocal())                                     \
 		a -= c_local.rgb.a;                                                     \
 																				\
 	/* blend alpha */                                                           \
-	switch (FBZCP_CCA_MSELECT(FBZCOLORPATH))                                    \
+	switch (FBZCP.cca_mselect())                                    \
 	{                                                                           \
 		default:    /* reserved */                                              \
 		case 0:     /* 0 */                                                     \
@@ -2251,21 +2251,21 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* reverse the alpha blend */                                               \
-	if (!FBZCP_CCA_REVERSE_BLEND(FBZCOLORPATH))                                 \
+	if (!FBZCP.cca_reverse_blend())                                 \
 		blenda ^= 0xff;                                                         \
 																				\
 	/* do the blend */                                                          \
 	a = (a * (blenda + 1)) >> 8;                                                \
 																				\
 	/* add clocal or alocal to alpha */                                         \
-	if (FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))                                    \
+	if (FBZCP.cca_add_aclocal())                                    \
 		a += c_local.rgb.a;                                                     \
 																				\
 	/* clamp */                                                                 \
 	CLAMP(a, 0x00, 0xff);                                                       \
 																				\
 	/* invert */                                                                \
-	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))                                  \
+	if (FBZCP.cca_invert_output(FBZCOLORPATH                                  \
 		a ^= 0xff;                                                              \
 																				\
 	/* handle alpha test */                                                     \
@@ -2273,7 +2273,7 @@ do                                                                              
 																				\
 																				\
 	/* select zero or c_other */                                                \
-	if (FBZCP_CC_ZERO_OTHER(FBZCOLORPATH) == 0)                                 \
+	if (FBZCP.cc_zero_other() == 0)                                 \
 	{                                                                           \
 		r = c_other.rgb.r;                                                      \
 		g = c_other.rgb.g;                                                      \
@@ -2283,7 +2283,7 @@ do                                                                              
 		r = g = b = 0;                                                          \
 																				\
 	/* subtract c_local */                                                      \
-	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH))                                      \
+	if (FBZCP.cc_sub_clocal())                                      \
 	{                                                                           \
 		r -= c_local.rgb.r;                                                     \
 		g -= c_local.rgb.g;                                                     \
@@ -2291,7 +2291,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* blend RGB */                                                             \
-	switch (FBZCP_CC_MSELECT(FBZCOLORPATH))                                     \
+	switch (FBZCP.cc_mselect())                                     \
 	{                                                                           \
 		default:    /* reserved */                                              \
 		case 0:     /* 0 */                                                     \
@@ -2324,7 +2324,7 @@ do                                                                              
 	}                                                                           \
 																				\
 	/* reverse the RGB blend */                                                 \
-	if (!FBZCP_CC_REVERSE_BLEND(FBZCOLORPATH))                                  \
+	if (!FBZCP.cc_reverse_blend())                                  \
 	{                                                                           \
 		blendr ^= 0xff;                                                         \
 		blendg ^= 0xff;                                                         \
@@ -2337,7 +2337,7 @@ do                                                                              
 	b = (b * (blendb + 1)) >> 8;                                                \
 																				\
 	/* add clocal or alocal to RGB */                                           \
-	switch (FBZCP_CC_ADD_ACLOCAL(FBZCOLORPATH))                                 \
+	switch (FBZCP.cc_add_aclocal())                                 \
 	{                                                                           \
 		case 3:     /* reserved */                                              \
 		case 0:     /* nothing */                                               \
@@ -2362,7 +2362,7 @@ do                                                                              
 	CLAMP(b, 0x00, 0xff);                                                       \
 																				\
 	/* invert */                                                                \
-	if (FBZCP_CC_INVERT_OUTPUT(FBZCOLORPATH))                                   \
+	if (FBZCP.cc_invert_output())                                   \
 	{                                                                           \
 		r ^= 0xff;                                                              \
 		g ^= 0xff;                                                              \
@@ -2371,7 +2371,7 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &THREADSTATS, u32 FBZCOLORPATH, u32 FBZMODE,
+inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &THREADSTATS, voodoo::fbz_colorpath const FBZCP, u32 FBZMODE,
 													rgbaint_t TEXELARGB, s32 ITERZ, s64 ITERW, rgbaint_t &srcColor)
 {
 	rgbaint_t c_other;
@@ -2380,7 +2380,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	rgbaint_t add_val;
 
 	/* compute c_other */
-	switch (FBZCP_CC_RGBSELECT(FBZCOLORPATH))
+	switch (FBZCP.cc_rgbselect())
 	{
 		case 0:     /* iterated RGB */
 			c_other.set(srcColor);
@@ -2406,7 +2406,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	//APPLY_CHROMAKEY(m_vds, THREADSTATS, FBZMODE, c_other);
 
 	/* compute a_other */
-	switch (FBZCP_CC_ASELECT(FBZCOLORPATH))
+	switch (FBZCP.cc_aselect())
 	{
 		case 0:     /* iterated alpha */
 			c_other.merge_alpha16(srcColor);
@@ -2433,9 +2433,9 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 
 
 	/* compute c_local */
-	if (FBZCP_CC_LOCALSELECT_OVERRIDE(FBZCOLORPATH) == 0)
+	if (FBZCP.cc_localselect_override() == 0)
 	{
-		if (FBZCP_CC_LOCALSELECT(FBZCOLORPATH) == 0)    /* iterated RGB */
+		if (FBZCP.cc_localselect() == 0)    /* iterated RGB */
 			c_local.set(srcColor);
 		else                                            /* color0 RGB */
 			c_local.set(m_reg[color0].u);
@@ -2449,7 +2449,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* compute a_local */
-	switch (FBZCP_CCA_LOCALSELECT(FBZCOLORPATH))
+	switch (FBZCP.cca_localselect())
 	{
 		default:
 		case 0:     /* iterated alpha */
@@ -2463,7 +2463,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 		case 2:     /* clamped iterated Z[27:20] */
 		{
 			int temp;
-			CLAMPED_Z(ITERZ, FBZCOLORPATH, temp);
+			CLAMPED_Z(ITERZ, FBZCP, temp);
 			c_local.set_a16((u8) temp);
 			break;
 		}
@@ -2471,36 +2471,36 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 		case 3:     /* clamped iterated W[39:32] */
 		{
 			int temp;
-			CLAMPED_W(ITERW, FBZCOLORPATH, temp);           /* Voodoo 2 only */
+			CLAMPED_W(ITERW, FBZCP, temp);           /* Voodoo 2 only */
 			c_local.set_a16((u8) temp);
 			break;
 		}
 	}
 
 	/* select zero or c_other */
-	if (FBZCP_CC_ZERO_OTHER(FBZCOLORPATH))
+	if (FBZCP.cc_zero_other())
 		//r = g = b = 0;
 		blend_color.zero();
 	else
 		blend_color.set(c_other);
 
 	/* select zero or a_other */
-	if (FBZCP_CCA_ZERO_OTHER(FBZCOLORPATH))
+	if (FBZCP.cca_zero_other())
 		blend_color.zero_alpha();
 	else
 		blend_color.merge_alpha16(c_other);
 
 	/* subtract a/c_local */
-	if (FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH) || (FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH)))
+	if (FBZCP.cc_sub_clocal() || (FBZCP.cca_sub_clocal()))
 	{
 		rgbaint_t sub_val;
 
-		if (!FBZCP_CC_SUB_CLOCAL(FBZCOLORPATH))
+		if (!FBZCP.cc_sub_clocal())
 			sub_val.zero();
 		else
 			sub_val.set(c_local);
 
-		if (!FBZCP_CCA_SUB_CLOCAL(FBZCOLORPATH))
+		if (!FBZCP.cca_sub_clocal())
 			sub_val.zero_alpha();
 		else
 			sub_val.merge_alpha16(c_local);
@@ -2509,7 +2509,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* blend RGB */
-	switch (FBZCP_CC_MSELECT(FBZCOLORPATH))
+	switch (FBZCP.cc_mselect())
 	{
 		default:    /* reserved */
 		case 0:     /* 0 */
@@ -2538,7 +2538,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* blend alpha */
-	switch (FBZCP_CCA_MSELECT(FBZCOLORPATH))
+	switch (FBZCP.cca_mselect())
 	{
 		default:    /* reserved */
 		case 0:     /* 0 */
@@ -2560,11 +2560,11 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* reverse the RGB blend */
-	if (!FBZCP_CC_REVERSE_BLEND(FBZCOLORPATH))
+	if (!FBZCP.cc_reverse_blend())
 		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
 	/* reverse the alpha blend */
-	if (!FBZCP_CCA_REVERSE_BLEND(FBZCOLORPATH))
+	if (!FBZCP.cca_reverse_blend())
 		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
 	/* do the blend */
@@ -2574,7 +2574,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	//color.rgb.b = (color.rgb.b * (blendb + 1)) >> 8;
 
 	/* add clocal or alocal to RGB */
-	switch (FBZCP_CC_ADD_ACLOCAL(FBZCOLORPATH))
+	switch (FBZCP.cc_add_aclocal())
 	{
 		case 3:     /* reserved */
 		case 0:     /* nothing */
@@ -2591,7 +2591,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	}
 
 	/* add clocal or alocal to alpha */
-	if (!FBZCP_CCA_ADD_ACLOCAL(FBZCOLORPATH))
+	if (!FBZCP.cca_add_aclocal())
 		add_val.zero_alpha();
 	else
 		//color.rgb.a += c_local.rgb.a;
@@ -2606,10 +2606,10 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
 	blend_color.scale_add_and_clamp(blend_factor, add_val);
 
 	/* invert */
-	if (FBZCP_CCA_INVERT_OUTPUT(FBZCOLORPATH))
+	if (FBZCP.cca_invert_output())
 		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
 	/* invert */
-	if (FBZCP_CC_INVERT_OUTPUT(FBZCOLORPATH))
+	if (FBZCP.cc_invert_output())
 		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
 	srcColor.set(blend_color);
@@ -2625,11 +2625,12 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(thread_stats_block &T
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
+#define RASTERIZER(name, TMUS, _FBZCOLORPATH, FBZMODE, ALPHAMODE, FOGMODE, TEXMODE0, TEXMODE1) \
 																				\
 void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
 {                                                                               \
 	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
+	voodoo::fbz_colorpath const FBZCOLORPATH(_FBZCOLORPATH); \
 	DECLARE_DITHER_POINTERS;                                                    \
 	s32 startx = extent.startx;                                              \
 	s32 stopx = extent.stopx;                                                \
@@ -2764,7 +2765,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		}                                                                   \
 																				\
 		/* colorpath pipeline selects source colors and does blending */        \
-		color = clampARGB(iterargb, FBZCOLORPATH);                                      \
+		color = clamp_argb(iterargb, FBZCOLORPATH);                                      \
 		if (!combine_color(threadstats, FBZCOLORPATH, FBZMODE, texel, iterz, iterw, color)) \
 			goto skipdrawdepth;                                                          \
 		/* handle alpha test */                                                          \

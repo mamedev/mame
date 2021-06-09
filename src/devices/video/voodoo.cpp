@@ -5918,7 +5918,8 @@ s32 voodoo_device::triangle()
 
 	/* determine the number of TMUs involved */
 	texcount = 0;
-	if (!FBIINIT3_DISABLE_TMUS(m_reg[fbiInit3].u) && FBZCP_TEXTURE_ENABLE(m_reg[fbzColorPath].u))
+	voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
+	if (!FBIINIT3_DISABLE_TMUS(m_reg[fbiInit3].u) && fbzcp.texture_enable())
 	{
 		texcount = 1;
 		if (m_chipmask & 0x04)
@@ -5926,7 +5927,7 @@ s32 voodoo_device::triangle()
 	}
 
 	/* perform subpixel adjustments */
-	if (FBZCP_CCA_SUBPIXEL_ADJUST(m_reg[fbzColorPath].u))
+	if (fbzcp.cca_subpixel_adjust())
 	{
 		s32 dx = 8 - (m_fbi.ax & 15);
 		s32 dy = 8 - (m_fbi.ay & 15);
