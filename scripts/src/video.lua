@@ -807,18 +807,6 @@ end
 
 --------------------------------------------------
 --
---@src/devices/video/polylgcy.h,VIDEOS["POLY"] = true
---------------------------------------------------
-
-if (VIDEOS["POLY"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/video/polylgcy.cpp",
-		MAME_DIR .. "src/devices/video/polylgcy.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/devices/video/psx.h,VIDEOS["PSX"] = true
 --------------------------------------------------
 
