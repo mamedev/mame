@@ -28,12 +28,19 @@ typedef float VECTOR3[3];
 
 struct cached_texture
 {
+	cached_texture(int texwidth, int texheight, int texformat) :
+		next(nullptr),
+		width(texwidth),
+		height(texheight),
+		format(texformat),
+		alpha(~0),
+		data(new rgb_t[(32 << texwidth) * (32 << texheight) * 4]) { }
 	cached_texture *next;
 	uint8_t       width;
 	uint8_t       height;
 	uint8_t       format;
 	uint8_t       alpha;
-	rgb_t       data[1];
+	std::unique_ptr<rgb_t[]> data;
 };
 
 struct m3_vertex

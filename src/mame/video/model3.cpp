@@ -514,7 +514,7 @@ void model3_state::invalidate_texture(int page, int texx, int texy, int texwidth
 			{
 				cached_texture *freeme = m_texcache[page][texy + y][texx + x];
 				m_texcache[page][texy + y][texx + x] = freeme->next;
-				delete[] reinterpret_cast<uint8_t *>(freeme);
+				delete freeme;
 			}
 }
 
@@ -532,10 +532,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			return tex;
 
 	/* create a new texture */
-	tex = reinterpret_cast<cached_texture *>(new uint8_t[sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t)]);
-	tex->width = texwidth;
-	tex->height = texheight;
-	tex->format = format;
+	tex = new cached_texture(texwidth, texheight, format);
 
 	/* set the new texture */
 	tex->next = m_texcache[page][texy][texx];
@@ -545,7 +542,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	for (y = 0; y < pixheight; y++)
 	{
 		const uint16_t *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
-		rgb_t *dest = tex->data + 2 * pixwidth * y;
+		rgb_t *dest = &tex->data[2 * pixwidth * y];
 
 		switch (format)
 		{
@@ -624,7 +621,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
 	/* create the vertical mirror of the texture */
 	for (y = 0; y < pixheight; y++)
-		memcpy(tex->data + 2 * pixwidth * (pixheight * 2 - 1 - y), tex->data + 2 * pixwidth * y, sizeof(rgb_t) * pixwidth * 2);
+		memcpy(&tex->data[2 * pixwidth * (pixheight * 2 - 1 - y)], &tex->data[2 * pixwidth * y], sizeof(rgb_t) * pixwidth * 2);
 
 	/* remember the overall alpha */
 	tex->alpha = alpha >> 24;
