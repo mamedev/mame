@@ -123,19 +123,20 @@ private:
 
 	required_memory_bank m_mainbank;
 
+	// output finders
 	output_finder<3> m_lamps_r;
 	output_finder<3> m_lamps_g;
 	output_finder<3> m_lamps_b;
-
-	// video-related
-	u8 m_vbuffer = 0;
-	bitmap_ind16 m_bg_bitmap[2];
-	bitmap_ind16 m_fg_bitmap[2];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
+
+	// video-related
+	u8 m_vbuffer = 0;
+	bitmap_ind16 m_bg_bitmap[2];
+	bitmap_ind16 m_fg_bitmap[2];
 
 	// video functions
 	void vbuffer_set_w(u16 data);
