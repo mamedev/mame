@@ -721,43 +721,6 @@ const char *const banshee_agp_reg_name[] =
 } // anonymous namespace
 
 
-struct voodoo_device::poly_extra_data
-{
-	voodoo_device * device;
-	raster_info *       info;                   // pointer to rasterizer information
-
-	int16_t             ax, ay;                 // vertex A x,y (12.4)
-	int32_t             startr, startg, startb, starta; // starting R,G,B,A (12.12)
-	int32_t             startz;                 // starting Z (20.12)
-	int64_t             startw;                 // starting W (16.32)
-	int32_t             drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
-	int32_t             dzdx;                   // delta Z per X
-	int64_t             dwdx;                   // delta W per X
-	int32_t             drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
-	int32_t             dzdy;                   // delta Z per Y
-	int64_t             dwdy;                   // delta W per Y
-
-	int64_t             starts0, startt0;       // starting S,T (14.18)
-	int64_t             startw0;                // starting W (2.30)
-	int64_t             ds0dx, dt0dx;           // delta S,T per X
-	int64_t             dw0dx;                  // delta W per X
-	int64_t             ds0dy, dt0dy;           // delta S,T per Y
-	int64_t             dw0dy;                  // delta W per Y
-	int32_t             lodbase0;               // used during rasterization
-
-	int64_t             starts1, startt1;       // starting S,T (14.18)
-	int64_t             startw1;                // starting W (2.30)
-	int64_t             ds1dx, dt1dx;           // delta S,T per X
-	int64_t             dw1dx;                  // delta W per X
-	int64_t             ds1dy, dt1dy;           // delta S,T per Y
-	int64_t             dw1dy;                  // delta W per Y
-	int32_t             lodbase1;               // used during rasterization
-
-	uint16_t            dither[16];             // dither matrix, for fastfill
-};
-
-
-
 /*************************************
  *
  *  Statics
@@ -799,15 +762,22 @@ uint32_t voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ nullptr, voodoo_device::raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, false, 0, 0, 0, fbzcp, alpha, fog, fbz, tex0, tex1 },
+	{ &voodoo_device::raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, fbzcp, alpha, fog, fbz, tex0, tex1 },
 
-const voodoo_device::raster_info voodoo_device::predef_raster_table[] =
+voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 {
 #include "voodoo_rast.ipp"
-	{ nullptr }
+	{ nullptr, 0xffffffff }
 };
 
 #undef RASTERIZER_ENTRY
+
+voodoo_device::static_raster_info voodoo_device::generic_raster_table[3] =
+{
+	{ &voodoo_device::raster_generic_0tmu, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::raster_generic_1tmu, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::raster_generic_2tmu, 0, 0, 0, 0, 0, 0 },
+};
 
 
 
@@ -1311,7 +1281,7 @@ void voodoo_device::init_save_state(voodoo_device *vd)
  *
  *************************************/
 
-void voodoo_device::accumulate_statistics(const stats_block &block)
+void voodoo_device::accumulate_statistics(const thread_stats_block &block)
 {
 	/* apply internal voodoo statistics */
 	reg[fbiPixelsIn].u += block.pixels_in;
@@ -3010,21 +2980,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 
 		/* mask off invalid bits for different cards */
 		case fbzColorPath:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x0fffffff;
 			if (chips & 1) vd->reg[fbzColorPath].u = data;
 			break;
 
 		case fbzMode:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x001fffff;
 			if (chips & 1) vd->reg[fbzMode].u = data;
 			break;
 
 		case fogMode:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type < TYPE_VOODOO_2)
 				data &= 0x0000003f;
 			if (chips & 1) vd->reg[fogMode].u = data;
@@ -3053,7 +3023,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 
 		/* other commands */
 		case nopCMD:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (data & 1)
 				vd->reset_counters();
 			if (data & 2)
@@ -3065,12 +3035,12 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			break;
 
 		case swapbufferCMD:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			cycles = swapbuffer(vd, data);
 			break;
 
 		case userIntrCMD:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			// Bit 5 of intrCtrl enables user interrupts
 			if (vd->reg[intrCtrl].u & 0x20) {
 				// Bits 19:12 are set to cmd 9:2, bit 11 is user interrupt flag
@@ -3087,7 +3057,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case clutData:
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
-				poly_wait(vd->poly, vd->regnames[regnum]);
+				vd->m_poly->wait(vd->regnames[regnum]);
 				if (!FBIINIT1_VIDEO_TIMING_RESET(vd->reg[fbiInit1].u))
 				{
 					int index = data >> 24;
@@ -3106,7 +3076,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case dacData:
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
-				poly_wait(vd->poly, vd->regnames[regnum]);
+				vd->m_poly->wait(vd->regnames[regnum]);
 				if (!(data & 0x800))
 					vd->dac.data_w((data >> 8) & 7, data & 0xff);
 				else
@@ -3121,7 +3091,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case videoDimensions:
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
-				poly_wait(vd->poly, vd->regnames[regnum]);
+				vd->m_poly->wait(vd->regnames[regnum]);
 				vd->reg[regnum].u = data;
 				if (vd->reg[hSync].u != 0 && vd->reg[vSync].u != 0 && vd->reg[videoDimensions].u != 0)
 				{
@@ -3211,7 +3181,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 
 		/* fbiInit0 can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		case fbiInit0:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(vd->pci.init_enable))
 			{
 				vd->reg[fbiInit0].u = data;
@@ -3235,7 +3205,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case fbiInit1:
 		case fbiInit2:
 		case fbiInit4:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(vd->pci.init_enable))
 			{
 				vd->reg[regnum].u = data;
@@ -3245,7 +3215,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			break;
 
 		case fbiInit3:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (vd->vd_type <= TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(vd->pci.init_enable))
 			{
 				vd->reg[regnum].u = data;
@@ -3259,7 +3229,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 /*      case swapPending: -- Banshee */
 			if (vd->vd_type == TYPE_VOODOO_2 && (chips & 1) && INITEN_ENABLE_HW_INIT(vd->pci.init_enable))
 			{
-				poly_wait(vd->poly, vd->regnames[regnum]);
+				vd->m_poly->wait(vd->regnames[regnum]);
 				vd->reg[regnum].u = data;
 				vd->fbi.cmdfifo[0].enable = FBIINIT7_CMDFIFO_ENABLE(data);
 				vd->fbi.cmdfifo[0].count_holes = !FBIINIT7_DISABLE_CMDFIFO_HOLES(data);
@@ -3272,7 +3242,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case cmdFifoBaseAddr:
 			if (vd->vd_type == TYPE_VOODOO_2 && (chips & 1))
 			{
-				poly_wait(vd->poly, vd->regnames[regnum]);
+				vd->m_poly->wait(vd->regnames[regnum]);
 				vd->reg[regnum].u = data;
 				vd->fbi.cmdfifo[0].base = (data & 0x3ff) << 12;
 				vd->fbi.cmdfifo[0].end = (((data >> 16) & 0x3ff) + 1) << 12;
@@ -3348,7 +3318,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case nccTable+9:
 		case nccTable+10:
 		case nccTable+11:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (chips & 2) vd->tmu[0].ncc[0].write(regnum - nccTable, data);
 			if (chips & 4) vd->tmu[1].ncc[0].write(regnum - nccTable, data);
 			break;
@@ -3365,7 +3335,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case nccTable+21:
 		case nccTable+22:
 		case nccTable+23:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (chips & 2) vd->tmu[0].ncc[1].write(regnum - (nccTable+12), data);
 			if (chips & 4) vd->tmu[1].ncc[1].write(regnum - (nccTable+12), data);
 			break;
@@ -3403,7 +3373,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case fogTable+29:
 		case fogTable+30:
 		case fogTable+31:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			if (chips & 1)
 			{
 				int base = 2 * (regnum - fogTable);
@@ -3425,7 +3395,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			if (chips & 2)
 			{
 				if (vd->tmu[0].reg[regnum].u != data) {
-					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->m_poly->wait(vd->regnames[regnum]);
 					vd->tmu[0].regdirty = true;
 					vd->tmu[0].reg[regnum].u = data;
 				}
@@ -3433,7 +3403,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 			if (chips & 4)
 			{
 				if (vd->tmu[1].reg[regnum].u != data) {
-					poly_wait(vd->poly, vd->regnames[regnum]);
+					vd->m_poly->wait(vd->regnames[regnum]);
 					vd->tmu[1].regdirty = true;
 					vd->tmu[1].reg[regnum].u = data;
 				}
@@ -3457,7 +3427,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case color0:
 		case clipLowYHighY:
 		case clipLeftRight:
-			poly_wait(vd->poly, vd->regnames[regnum]);
+			vd->m_poly->wait(vd->regnames[regnum]);
 			[[fallthrough]];
 		/* by default, just feed the data to the chips */
 		default:
@@ -3795,7 +3765,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 		COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(vd->reg[fbzMode].u, y);
 
 		/* wait for any outstanding work to finish */
-		poly_wait(vd->poly, "LFB Write");
+		vd->m_poly->wait("LFB Write");
 
 		/* loop over up to two pixels */
 		for (pix = 0; mask; pix++)
@@ -3860,7 +3830,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 			/* make sure we care about this pixel */
 			if (mask & 0x0f)
 			{
-				stats_block *stats = &vd->fbi.lfb_stats;
+				thread_stats_block &threadstats = vd->fbi.lfb_stats;
 				int64_t iterw;
 				if (LFBMODE_WRITE_W_SELECT(vd->reg[lfbMode].u)) {
 					iterw = (uint32_t) vd->reg[zaColor].u << 16;
@@ -3878,8 +3848,8 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 						scry < ((vd->reg[clipLowYHighY].u >> 16) & 0x3ff) ||
 						scry >= (vd->reg[clipLowYHighY].u & 0x3ff))
 					{
-						stats->pixels_in++;
-						stats->clip_fail++;
+						threadstats.pixels_in++;
+						threadstats.clip_fail++;
 						goto nextpixel;
 					}
 				}
@@ -3895,7 +3865,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 					int32_t biasdepth;
 					int32_t r, g, b;
 
-					(stats)->pixels_in++;
+					(threadstats).pixels_in++;
 
 					/* apply clipping */
 					/* note that for perf reasons, we assume the caller has done clipping */
@@ -3933,7 +3903,7 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 
 				/* Perform depth testing */
 				if (FBZMODE_ENABLE_DEPTHBUF(vd->reg[fbzMode].u))
-					if (!depthTest((uint16_t) vd->reg[zaColor].u, stats, depth[x], vd->reg[fbzMode].u, biasdepth))
+					if (!vd->depth_test((uint16_t) vd->reg[zaColor].u, threadstats, depth[x], vd->reg[fbzMode].u, biasdepth))
 						goto nextpixel;
 
 				/* use the RGBA we stashed above */
@@ -3941,31 +3911,31 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 
 				/* handle chroma key */
 				if (FBZMODE_ENABLE_CHROMAKEY(vd->reg[fbzMode].u))
-					if (!chromaKeyTest(vd, stats, vd->reg[fbzMode].u, color))
+					if (!vd->chroma_key_test(threadstats, vd->reg[fbzMode].u, color))
 						goto nextpixel;
 				/* handle alpha mask */
 				if (FBZMODE_ENABLE_ALPHA_MASK(vd->reg[fbzMode].u))
-					if (!alphaMaskTest(stats, vd->reg[fbzMode].u, color.get_a()))
+					if (!vd->alpha_mask_test(threadstats, vd->reg[fbzMode].u, color.get_a()))
 						goto nextpixel;
 				/* handle alpha test */
 				if (ALPHAMODE_ALPHATEST(vd->reg[alphaMode].u))
-					if (!alphaTest(vd->reg[alphaMode].rgb.a, stats, vd->reg[alphaMode].u, color.get_a()))
+					if (!vd->alpha_test(vd->reg[alphaMode].rgb.a, threadstats, vd->reg[alphaMode].u, color.get_a()))
 						goto nextpixel;
 
 				/* perform fogging */
 				preFog.set(color);
 				if (FOGMODE_ENABLE_FOG(vd->reg[fogMode].u))
-					applyFogging(vd, vd->reg[fbzMode].u, vd->reg[fogMode].u, vd->reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
+					vd->apply_fogging(vd->reg[fbzMode].u, vd->reg[fogMode].u, vd->reg[fbzColorPath].u, x, dither4, biasdepth, color, iterz, iterw, iterargb);
 
 				/* wait for any outstanding work to finish */
-				poly_wait(vd->poly, "LFB Write");
+				vd->m_poly->wait("LFB Write");
 
 				/* perform alpha blending */
 				if (ALPHAMODE_ALPHABLEND(vd->reg[alphaMode].u))
-					alphaBlend(vd->reg[fbzMode].u, vd->reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565);
+					alpha_blend(vd->reg[fbzMode].u, vd->reg[alphaMode].u, x, dither, dest[x], depth, preFog, color, vd->fbi.rgb565);
 
 				/* pixel pipeline part 2 handles final output */
-				PIXEL_PIPELINE_END(stats, dither_lookup, x, dest, depth, vd->reg[fbzMode].u) { };
+				PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, vd->reg[fbzMode].u) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -4001,7 +3971,7 @@ int32_t voodoo_device::texture_w(voodoo_device *vd, offs_t offset, uint32_t data
 		fatalerror("Texture direct write!\n");
 
 	/* wait for any outstanding work to finish */
-	poly_wait(vd->poly, "Texture write");
+	vd->m_poly->wait("Texture write");
 
 	/* update texture info if dirty */
 	if (t->regdirty)
@@ -4690,7 +4660,7 @@ static uint32_t lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 	}
 
 	/* wait for any outstanding work to finish */
-	poly_wait(vd->poly, "LFB read");
+	vd->m_poly->wait("LFB read");
 
 	/* compute the data */
 	data = buffer[bufoffs + 0] | (buffer[bufoffs + 1] << 16);
@@ -5642,6 +5612,8 @@ void voodoo_device::device_start()
 	if (!m_screen || !m_cpu)
 		throw device_missing_dependencies();
 
+	m_poly = std::make_unique<voodoo_renderer>(machine());
+
 	/* validate configuration */
 	assert(m_fbmem > 0);
 
@@ -5652,8 +5624,7 @@ void voodoo_device::device_start()
 	m_pciint.resolve();
 
 	/* create a multiprocessor work queue */
-	poly_alloc(poly, machine(), 64, sizeof(poly_extra_data), 0);
-	thread_stats = std::make_unique<stats_block[]>(WORK_MAX_THREADS);
+	thread_stats = std::make_unique<thread_stats_block[]>(WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -5741,8 +5712,10 @@ void voodoo_device::device_start()
 
 	/* build the rasterizer table */
 	std::fill(std::begin(raster_hash), std::end(raster_hash), nullptr);
-	for (const raster_info *info = predef_raster_table; info->callback; info++)
-		add_rasterizer(this, info);
+	for (const static_raster_info *info = predef_raster_table; info->eff_color_path != 0xffffffff; info++)
+		add_rasterizer(*info, false);
+	for (int index = 0; index < std::size(generic_raster_table); index++)
+		m_generic_rasterizer[index] = add_rasterizer(generic_raster_table[index], true);
 
 	/* set up the PCI FIFO */
 	pci.fifo.base = pci.fifo_mem;
@@ -5836,7 +5809,7 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	int ex = (vd->reg[clipLeftRight].u >> 0) & 0x3ff;
 	int sy = (vd->reg[clipLowYHighY].u >> 16) & 0x3ff;
 	int ey = (vd->reg[clipLowYHighY].u >> 0) & 0x3ff;
-	poly_extent extents[64];
+	voodoo_renderer::extent_t extents[64];
 	uint16_t dithermatrix[16];
 	uint16_t *drawbuf = nullptr;
 	uint32_t pixels = 0;
@@ -5887,15 +5860,17 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	/* iterate over blocks of extents */
+	voodoo_renderer::render_delegate fastfill_cb(&voodoo_device::raster_fastfill, vd);
 	for (int y = sy; y < ey; y += std::size(extents))
 	{
-		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
+		poly_extra_data &extra = vd->m_poly->object_data_alloc();
 		int count = (std::min)(ey - y, int(std::size(extents)));
 
-		extra->device = vd;
-		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));
+		extra.device = vd;
+		extra.destbase = drawbuf;
+		memcpy(extra.dither, dithermatrix, sizeof(extra.dither));
 
-		pixels += poly_render_triangle_custom(vd->poly, drawbuf, global_cliprect, raster_fastfill, y, count, extents);
+		pixels += vd->m_poly->render_triangle_custom(global_cliprect, fastfill_cb, y, count, extents);
 	}
 
 	/* 2 pixels per clock */
@@ -5983,7 +5958,7 @@ int32_t voodoo_device::triangle(voodoo_device *vd)
 	}
 
 	/* wait for any outstanding work to finish */
-//  poly_wait(vd->poly, "triangle");
+//  vd->m_poly->wait("triangle");
 
 	/* determine the draw buffer */
 	destbuf = (vd->vd_type >= TYPE_VOODOO_BANSHEE) ? 1 : FBZMODE_DRAW_BUFFER(vd->reg[fbzMode].u);
@@ -6234,10 +6209,10 @@ int32_t voodoo_device::setup_and_draw_triangle(voodoo_device *vd)
 
 int32_t voodoo_device::triangle_create_work_item(voodoo_device* vd, uint16_t *drawbuf, int texcount)
 {
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
+	poly_extra_data &extra = vd->m_poly->object_data_alloc();
 
 	raster_info *info = find_rasterizer(vd, texcount);
-	poly_vertex vert[3];
+	voodoo_renderer::vertex_t vert[3];
 
 	/* fill in the vertex data */
 	vert[0].x = (float)vd->fbi.ax * (1.0f / 16.0f);
@@ -6248,66 +6223,67 @@ int32_t voodoo_device::triangle_create_work_item(voodoo_device* vd, uint16_t *dr
 	vert[2].y = (float)vd->fbi.cy * (1.0f / 16.0f);
 
 	/* fill in the extra data */
-	extra->device = vd;
-	extra->info = info;
+	extra.device = vd;
+	extra.info = info;
+	extra.destbase = drawbuf;
 
 	/* fill in triangle parameters */
-	extra->ax = vd->fbi.ax;
-	extra->ay = vd->fbi.ay;
-	extra->startr = vd->fbi.startr;
-	extra->startg = vd->fbi.startg;
-	extra->startb = vd->fbi.startb;
-	extra->starta = vd->fbi.starta;
-	extra->startz = vd->fbi.startz;
-	extra->startw = vd->fbi.startw;
-	extra->drdx = vd->fbi.drdx;
-	extra->dgdx = vd->fbi.dgdx;
-	extra->dbdx = vd->fbi.dbdx;
-	extra->dadx = vd->fbi.dadx;
-	extra->dzdx = vd->fbi.dzdx;
-	extra->dwdx = vd->fbi.dwdx;
-	extra->drdy = vd->fbi.drdy;
-	extra->dgdy = vd->fbi.dgdy;
-	extra->dbdy = vd->fbi.dbdy;
-	extra->dady = vd->fbi.dady;
-	extra->dzdy = vd->fbi.dzdy;
-	extra->dwdy = vd->fbi.dwdy;
+	extra.ax = vd->fbi.ax;
+	extra.ay = vd->fbi.ay;
+	extra.startr = vd->fbi.startr;
+	extra.startg = vd->fbi.startg;
+	extra.startb = vd->fbi.startb;
+	extra.starta = vd->fbi.starta;
+	extra.startz = vd->fbi.startz;
+	extra.startw = vd->fbi.startw;
+	extra.drdx = vd->fbi.drdx;
+	extra.dgdx = vd->fbi.dgdx;
+	extra.dbdx = vd->fbi.dbdx;
+	extra.dadx = vd->fbi.dadx;
+	extra.dzdx = vd->fbi.dzdx;
+	extra.dwdx = vd->fbi.dwdx;
+	extra.drdy = vd->fbi.drdy;
+	extra.dgdy = vd->fbi.dgdy;
+	extra.dbdy = vd->fbi.dbdy;
+	extra.dady = vd->fbi.dady;
+	extra.dzdy = vd->fbi.dzdy;
+	extra.dwdy = vd->fbi.dwdy;
 
 	/* fill in texture 0 parameters */
 	if (texcount > 0)
 	{
-		extra->starts0 = vd->tmu[0].starts;
-		extra->startt0 = vd->tmu[0].startt;
-		extra->startw0 = vd->tmu[0].startw;
-		extra->ds0dx = vd->tmu[0].dsdx;
-		extra->dt0dx = vd->tmu[0].dtdx;
-		extra->dw0dx = vd->tmu[0].dwdx;
-		extra->ds0dy = vd->tmu[0].dsdy;
-		extra->dt0dy = vd->tmu[0].dtdy;
-		extra->dw0dy = vd->tmu[0].dwdy;
-		extra->lodbase0 = vd->tmu[0].prepare();
+		extra.starts0 = vd->tmu[0].starts;
+		extra.startt0 = vd->tmu[0].startt;
+		extra.startw0 = vd->tmu[0].startw;
+		extra.ds0dx = vd->tmu[0].dsdx;
+		extra.dt0dx = vd->tmu[0].dtdx;
+		extra.dw0dx = vd->tmu[0].dwdx;
+		extra.ds0dy = vd->tmu[0].dsdy;
+		extra.dt0dy = vd->tmu[0].dtdy;
+		extra.dw0dy = vd->tmu[0].dwdy;
+		extra.lodbase0 = vd->tmu[0].prepare();
 		vd->stats.texture_mode[TEXMODE_FORMAT(vd->tmu[0].reg[textureMode].u)]++;
 
 		/* fill in texture 1 parameters */
 		if (texcount > 1)
 		{
-			extra->starts1 = vd->tmu[1].starts;
-			extra->startt1 = vd->tmu[1].startt;
-			extra->startw1 = vd->tmu[1].startw;
-			extra->ds1dx = vd->tmu[1].dsdx;
-			extra->dt1dx = vd->tmu[1].dtdx;
-			extra->dw1dx = vd->tmu[1].dwdx;
-			extra->ds1dy = vd->tmu[1].dsdy;
-			extra->dt1dy = vd->tmu[1].dtdy;
-			extra->dw1dy = vd->tmu[1].dwdy;
-			extra->lodbase1 = vd->tmu[1].prepare();
+			extra.starts1 = vd->tmu[1].starts;
+			extra.startt1 = vd->tmu[1].startt;
+			extra.startw1 = vd->tmu[1].startw;
+			extra.ds1dx = vd->tmu[1].dsdx;
+			extra.dt1dx = vd->tmu[1].dtdx;
+			extra.dw1dx = vd->tmu[1].dwdx;
+			extra.ds1dy = vd->tmu[1].dsdy;
+			extra.dt1dy = vd->tmu[1].dtdy;
+			extra.dw1dy = vd->tmu[1].dwdy;
+			extra.lodbase1 = vd->tmu[1].prepare();
 			vd->stats.texture_mode[TEXMODE_FORMAT(vd->tmu[1].reg[textureMode].u)]++;
 		}
 	}
 
 	/* farm the rasterization out to other threads */
 	info->polys++;
-	return poly_render_triangle(vd->poly, drawbuf, global_cliprect, info->callback, 0, &vert[0], &vert[1], &vert[2]);
+	return vd->m_poly->render_triangle(global_cliprect, info->callback, 0, vert[0], vert[1], vert[2]);
 }
 
 
@@ -6321,33 +6297,35 @@ int32_t voodoo_device::triangle_create_work_item(voodoo_device* vd, uint16_t *dr
     hash table
 -------------------------------------------------*/
 
-voodoo_device::raster_info *voodoo_device::add_rasterizer(voodoo_device *vd, const raster_info *cinfo)
+voodoo_device::raster_info *voodoo_device::add_rasterizer(static_raster_info const &cinfo, bool is_generic)
 {
-	raster_info *info = &vd->rasterizer[vd->next_rasterizer++];
-	int hash = cinfo->compute_hash();
+	raster_info &info = rasterizer[next_rasterizer++];
+	int hash = cinfo.compute_hash();
 
-	if (vd->next_rasterizer > MAX_RASTERIZERS)
+	if (next_rasterizer > MAX_RASTERIZERS)
 		throw emu_fatalerror("voodoo_device::add_rasterizer: Out of space for new rasterizers!");
 
-	/* make a copy of the info */
-	*info = *cinfo;
-
 	/* fill in the data */
-	info->hits = 0;
-	info->polys = 0;
-	info->hash = hash;
+	info.callback = voodoo_renderer::render_delegate(cinfo.callback_mfp, this);
+	info.display = 0;
+	info.hits = 0;
+	info.polys = 0;
+	info.hash = hash;
+	info.static_info = &cinfo;
 
 	/* hook us into the hash table */
-	info->next = vd->raster_hash[hash];
-	vd->raster_hash[hash] = info;
+	if (!is_generic)
+	{
+		info.next = raster_hash[hash];
+		raster_hash[hash] = &info;
+	}
 
 	if (LOG_RASTERIZERS)
-		printf("Adding rasterizer @ %p : cp=%08X am=%08X %08X fbzM=%08X tm0=%08X tm1=%08X (hash=%d)\n",
-				(void *)info->callback,
-				info->eff_color_path, info->eff_alpha_mode, info->eff_fog_mode, info->eff_fbz_mode,
-				info->eff_tex_mode_0, info->eff_tex_mode_1, hash);
+		printf("Adding rasterizer : cp=%08X am=%08X %08X fbzM=%08X tm0=%08X tm1=%08X (hash=%d)\n",
+				cinfo.eff_color_path, cinfo.eff_alpha_mode, cinfo.eff_fog_mode, cinfo.eff_fbz_mode,
+				cinfo.eff_tex_mode_0, cinfo.eff_tex_mode_1, hash);
 
-	return info;
+	return &info;
 }
 
 
@@ -6360,7 +6338,7 @@ voodoo_device::raster_info *voodoo_device::add_rasterizer(voodoo_device *vd, con
 voodoo_device::raster_info *voodoo_device::find_rasterizer(voodoo_device *vd, int texcount)
 {
 	raster_info *info, *prev = nullptr;
-	raster_info curinfo;
+	static_raster_info curinfo;
 	int hash;
 
 	/* build an info struct with all the parameters */
@@ -6376,12 +6354,12 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(voodoo_device *vd, in
 
 	/* find the appropriate hash entry */
 	for (info = vd->raster_hash[hash]; info; prev = info, info = info->next)
-		if (info->eff_color_path == curinfo.eff_color_path &&
-			info->eff_alpha_mode == curinfo.eff_alpha_mode &&
-			info->eff_fog_mode == curinfo.eff_fog_mode &&
-			info->eff_fbz_mode == curinfo.eff_fbz_mode &&
-			info->eff_tex_mode_0 == curinfo.eff_tex_mode_0 &&
-			info->eff_tex_mode_1 == curinfo.eff_tex_mode_1)
+		if (info->static_info->eff_color_path == curinfo.eff_color_path &&
+			info->static_info->eff_alpha_mode == curinfo.eff_alpha_mode &&
+			info->static_info->eff_fog_mode == curinfo.eff_fog_mode &&
+			info->static_info->eff_fbz_mode == curinfo.eff_fbz_mode &&
+			info->static_info->eff_tex_mode_0 == curinfo.eff_tex_mode_0 &&
+			info->static_info->eff_tex_mode_1 == curinfo.eff_tex_mode_1)
 		{
 			/* got it, move us to the head of the list */
 			if (prev)
@@ -6396,15 +6374,7 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(voodoo_device *vd, in
 		}
 
 	/* generate a new one using the generic entry */
-	curinfo.callback = (texcount == 0) ? raster_generic_0tmu : (texcount == 1) ? raster_generic_1tmu : raster_generic_2tmu;
-	curinfo.is_generic = true;
-	curinfo.display = 0;
-	curinfo.polys = 0;
-	curinfo.hits = 0;
-	curinfo.next = nullptr;
-	curinfo.hash = hash;
-
-	return add_rasterizer(vd, &curinfo);
+	return vd->m_generic_rasterizer[texcount];
 }
 
 
@@ -6438,17 +6408,22 @@ void voodoo_device::dump_rasterizer_stats(voodoo_device *vd)
 			break;
 
 		/* print it */
-		printf("RASTERIZER_ENTRY( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %c %2d %8d %10d */\n",
-			best->eff_color_path,
-			best->eff_alpha_mode,
-			best->eff_fog_mode,
-			best->eff_fbz_mode,
-			best->eff_tex_mode_0,
-			best->eff_tex_mode_1,
-			best->is_generic ? '*' : ' ',
-			best->hash,
-			best->polys,
-			best->hits);
+		if (best->static_info != nullptr)
+			printf("(generic) /* %2d %8d %10d */\n",
+				best->hash,
+				best->polys,
+				best->hits);
+		else
+			printf("RASTERIZER_ENTRY( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %2d %8d %10d */\n",
+				best->static_info->eff_color_path,
+				best->static_info->eff_alpha_mode,
+				best->static_info->eff_fog_mode,
+				best->static_info->eff_fbz_mode,
+				best->static_info->eff_tex_mode_0,
+				best->static_info->eff_tex_mode_1,
+				best->hash,
+				best->polys,
+				best->hits);
 
 		/* reset */
 		best->display = display_index;
@@ -6505,9 +6480,6 @@ void voodoo_device::device_reset()
 
 void voodoo_device::device_stop()
 {
-	/* release the work queue, ensuring all work is finished */
-	if (poly != nullptr)
-		poly_free(poly);
 }
 
 
@@ -6558,26 +6530,24 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
     implementation of the 'fastfill' command
 -------------------------------------------------*/
 
-void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent *extent, const void *extradata, int threadid)
+void voodoo_device::raster_fastfill(int32_t y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
-	const poly_extra_data *extra = (const poly_extra_data *)extradata;
-	voodoo_device* vd = extra->device;
-	stats_block *stats = &vd->thread_stats[threadid];
-	int32_t startx = extent->startx;
-	int32_t stopx = extent->stopx;
+	thread_stats_block &stats = thread_stats[threadid];
+	int32_t startx = extent.startx;
+	int32_t stopx = extent.stopx;
 	int scry, x;
 
 	/* determine the screen Y */
 	scry = y;
-	if (FBZMODE_Y_ORIGIN(vd->reg[fbzMode].u))
-		scry = (vd->fbi.yorigin - y);
+	if (FBZMODE_Y_ORIGIN(reg[fbzMode].u))
+		scry = (fbi.yorigin - y);
 
 	/* fill this RGB row */
-	if (FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u))
+	if (FBZMODE_RGB_BUFFER_MASK(reg[fbzMode].u))
 	{
-		const uint16_t *ditherow = &extra->dither[(y & 3) * 4];
+		const uint16_t *ditherow = &extra.dither[(y & 3) * 4];
 		uint64_t expanded = *(uint64_t *)ditherow;
-		uint16_t *dest = (uint16_t *)destbase + scry * vd->fbi.rowpixels;
+		uint16_t *dest = extra.destbase + scry * fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)
 			dest[x] = ditherow[x & 3];
@@ -6585,15 +6555,15 @@ void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent
 			*(uint64_t *)&dest[x] = expanded;
 		for ( ; x < stopx; x++)
 			dest[x] = ditherow[x & 3];
-		stats->pixels_out += stopx - startx;
+		stats.pixels_out += stopx - startx;
 	}
 
 	/* fill this dest buffer row */
-	if (FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u) && vd->fbi.auxoffs != ~0)
+	if (FBZMODE_AUX_BUFFER_MASK(reg[fbzMode].u) && fbi.auxoffs != ~0)
 	{
-		uint16_t depth = vd->reg[zaColor].u;
+		uint16_t depth = reg[zaColor].u;
 		uint64_t expanded = ((uint64_t)depth << 48) | ((uint64_t)depth << 32) | ((uint64_t)depth << 16) | (uint64_t)depth;
-		uint16_t *dest = (uint16_t *)(vd->fbi.ram + vd->fbi.auxoffs) + scry * vd->fbi.rowpixels;
+		uint16_t *dest = (uint16_t *)(fbi.ram + fbi.auxoffs) + scry * fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)
 			dest[x] = depth;
@@ -6609,21 +6579,21 @@ void voodoo_device::raster_fastfill(void *destbase, int32_t y, const poly_extent
     generic_0tmu - generic rasterizer for 0 TMUs
 -------------------------------------------------*/
 
-RASTERIZER(generic_0tmu, 0, vd->reg[fbzColorPath].u, vd->reg[fbzMode].u, vd->reg[alphaMode].u,
-			vd->reg[fogMode].u, 0, 0)
+RASTERIZER(generic_0tmu, 0, reg[fbzColorPath].u, reg[fbzMode].u, reg[alphaMode].u,
+			reg[fogMode].u, 0, 0)
 
 
 /*-------------------------------------------------
     generic_1tmu - generic rasterizer for 1 TMU
 -------------------------------------------------*/
 
-RASTERIZER(generic_1tmu, 1, vd->reg[fbzColorPath].u, vd->reg[fbzMode].u, vd->reg[alphaMode].u,
-			vd->reg[fogMode].u, vd->tmu[0].reg[textureMode].u, 0)
+RASTERIZER(generic_1tmu, 1, reg[fbzColorPath].u, reg[fbzMode].u, reg[alphaMode].u,
+			reg[fogMode].u, tmu[0].reg[textureMode].u, 0)
 
 
 /*-------------------------------------------------
     generic_2tmu - generic rasterizer for 2 TMUs
 -------------------------------------------------*/
 
-RASTERIZER(generic_2tmu, 2, vd->reg[fbzColorPath].u, vd->reg[fbzMode].u, vd->reg[alphaMode].u,
-			vd->reg[fogMode].u, vd->tmu[0].reg[textureMode].u, vd->tmu[1].reg[textureMode].u)
+RASTERIZER(generic_2tmu, 2, reg[fbzColorPath].u, reg[fbzMode].u, reg[alphaMode].u,
+			reg[fogMode].u, tmu[0].reg[textureMode].u, tmu[1].reg[textureMode].u)
