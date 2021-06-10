@@ -2638,35 +2638,195 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- S/N: Z93350-001A -->
-	<software name="clarisw20sv">
-		<description>ClarisWorks 2.0 (Swedish)</description>
-		<year>1993</year>
+	<software name="clarisor20v1">
+		<description>Claris Organizer 2.0v1</description>
+		<year>1996</year>
 		<publisher>Claris</publisher>
-		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 1).img" size="1474560" crc="25da86b7" sha1="99e9fa57e0d7d03fb89611745bd04b4d7c4af998" />
+				<rom name="disk01.img" size="1474560" crc="1135cf50" sha1="2b1c7c5b2f934dda6f68e8d256f993f7becb5637" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 2).img" size="1474560" crc="76e73be8" sha1="46921d446169d949b37879f6cbbdfb802323b7ef" />
+				<rom name="disk02.img" size="1474560" crc="d87e6699" sha1="89d0ceb73aea2d8c64daff8b88089b27eaea06b4" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 3).img" size="1474560" crc="8e2dbabc" sha1="6b2b982348874be31899b6b2bace55518e5e9477" />
+				<rom name="disk03.img" size="1474560" crc="449e882d" sha1="4094f3868451a097920e398454c6d00dff1fd84d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clarisw20">
+		<description>ClarisWorks 2.0CDv1 (UK English)</description>
+		<year>1993</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk 1.img" size="1474560" crc="3bb6af5f" sha1="8f1d97e0825c8b876ee6b86db3b13de74a494159" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk 2.img" size="1474560" crc="c51a46b7" sha1="cec8bdc88e37e5c28822f154d10655379b2e30a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clarisw30">
+		<description>ClarisWorks 3.0CDv1 (UK English)</description>
+		<year>1994</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk1.img" size="1474560" crc="92724e5a" sha1="0fba282bb5cd1d5b511640de307a675d2ecd8492" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk2.img" size="1474560" crc="9dbf71ba" sha1="edd0de558066b76a23ff5ab55a342915b88a086b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk3.img" size="1474560" crc="a70d8dac" sha1="74821c8bdfccda0b987587ab223ee526b5861510" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 4).img" size="1474560" crc="9ad039ef" sha1="18777ffd48cb9a016b169e38cf867f81367271b0" />
+				<rom name="Disk4.img" size="1474560" crc="fabee185" sha1="3bb8304a65845737e9ca80e70fb452f9064628cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- S/N: Z93350-001A -->
+	<software name="clarisw30sv">
+		<description>ClarisWorks 3.0Sv1 (Swedish)</description>
+		<year>1994</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 3.0 (swe) (disk 1).img" size="1474560" crc="25da86b7" sha1="99e9fa57e0d7d03fb89611745bd04b4d7c4af998" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 3.0 (swe) (disk 2).img" size="1474560" crc="76e73be8" sha1="46921d446169d949b37879f6cbbdfb802323b7ef" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 3.0 (swe) (disk 3).img" size="1474560" crc="8e2dbabc" sha1="6b2b982348874be31899b6b2bace55518e5e9477" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="clarisworks 3.0 (swe) (disk 4).img" size="1474560" crc="9ad039ef" sha1="18777ffd48cb9a016b169e38cf867f81367271b0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
 			<dataarea name="flop" size="1474560">
-				<rom name="clarisworks 2.0 (swe) (disk 5).img" size="1474560" crc="f74f6289" sha1="b60aae3606fec538dc60ba15bbec47e3da607a65" />
+				<rom name="clarisworks 3.0 (swe) (disk 5).img" size="1474560" crc="f74f6289" sha1="b60aae3606fec538dc60ba15bbec47e3da607a65" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clarisw40">
+		<description>ClarisWorks 4.0v4 (US English)</description>
+		<year>1996</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk1.img" size="1474560" crc="aef73fce" sha1="f47bc8ccbd3cafd9c9fa18a43073b16b9d984d31" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk2.img" size="1474560" crc="862f508e" sha1="c8ddfe91138780e503785709a0d9996e5cabdf01" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk3.img" size="1474560" crc="e78a544f" sha1="cfa3d23ea8bdbc16ed8410e563959df096e55b81" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk4.img" size="1474560" crc="cd93b6f6" sha1="895405f08925f602671f21e19721837ad0ec022d" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk5.img" size="1474560" crc="6fb58895" sha1="001f98e16609e857c7a030bcbe8ce1bdb6303a0e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk6.img" size="1474560" crc="63bc36c9" sha1="ae1704aacf8ba86ddeb6ce8ee22110ab8b1d8472" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clarisw40sv">
+		<description>ClarisWorks 4.0Sv1 (Swedish)</description>
+		<year>1996</year>
+		<publisher>Claris</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="6d566478" sha1="ccfba94cdba82b458d1d50de28eabd1f5da4d210" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="45b58b88" sha1="514c39d87c7c79d82252c6b798165d67a8dd86c7" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="21a9608b" sha1="6cb7a246c9396bdd7dae8aaf224df662c8305c81" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="851eeb5f" sha1="7dcc7871f6df8e32d62174fbe81df694a667c7c1" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="ee35a6ea" sha1="c0557af7c8778a4a96aa2f0e00bcf53e6b31843f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk06.img" size="1474560" crc="e590bf7a" sha1="c2b2d4482e35a06fe59caf210d1183031153969d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2697,6 +2857,475 @@ license:CC0
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1474560">
 				<rom name="disk04.img" size="1474560" crc="f5255a93" sha1="5d33684db86afd3804b9c5b9984f847873ee8391" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excel50a">
+		<description>Microsoft Excel 5.0a (US English)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="8db45c87" sha1="f4b200d69b198010b33408dc618e81c9c74c3012" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="80ab8a52" sha1="fff7c5dcbb270fc9bb47f030cb5923d63b945f24" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="d20f9451" sha1="71b6b1e40ae5369617ab7b08a1e10b8d1d91cb05" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="cfa7d9a1" sha1="304c2aaa76200da0dfa67dc09f3c153e6243a6c9" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="3b6ab75d" sha1="518c78b25810321015590039b237d22f8667496a" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="aa39e221" sha1="81912976e2ab6ced1ff09cc564fa7436a0fb3237" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="c33d0acf" sha1="a842ac840d94803edbe5dedb8dbbc4db1f76e9db" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="6523b5b9" sha1="4eee59762a542831256e3f2b1128ace8ef212983" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="5a1c1556" sha1="61127a76972eb92907094241d2739f5b82695c84" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="62b400a1" sha1="7326de47d9b1e62a338a43b205198bf3849a5cbd" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="de196ac6" sha1="a5cb17a5c0e31a12f2d37aac5d7c8f40bf4be444" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="70eede1c" sha1="37d46361fb0a1fb4424f34236b3be7c798f913a2" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="83577345" sha1="bfb6bc8d3a290215a686e20889093f1289a5b5ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excel50de">
+		<description>Microsoft Excel 5.0 (German)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1-Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="3c312373" sha1="378eb214688de309cdeaa7f0f9fd3006cb67bd2e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="78188dbd" sha1="5bdbc053aa95d8e761535f0c31ad3fe7efd13f9a" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="d221035c" sha1="4c111955135cfe2acde9a8b1c8660b98848b1490" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="d29601ef" sha1="a718a969608f0187113c263e93a682dc1c07b871" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="c33936de" sha1="20210408dff1b0108fb4b4644a54c02831cedef8" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="042b188b" sha1="44d89f0015e3504b7f5184b1bdbd6e6539f1c7e8" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="d4a2ae47" sha1="04865af2705f48ae1688f8453db7d858a7ec23ab" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="e53a6de0" sha1="ed666e14ba3e5032a5bfddda916f60124998d280" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="5fafae14" sha1="62ee8357d6f460a9c8d6ca4b25a46943afc0766e" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="b8c2b23b" sha1="28f95002bac642e8d348ed43d4a3f00a2272947b" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="07dbd990" sha1="e074d53fb63f231263a2f955c47f22e30d61828c" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="11bdcf07" sha1="c0ae8d849b2f7cba5e5b5373c33448349f15a88b" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="3dba10d7" sha1="0042e0ba0caea0dfd9058e644521155a3c60b458" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't work with System 7.0 or newer -->
+	<software name="foxbase20">
+		<description>FoxBASE+/Mac 2.00</description>
+		<year>1989</year>
+		<publisher>Fox Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="FoxBASE+ 2.00" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="f367df6b" sha1="da29b8e7741ff42050a0eac140a89eadcfed151c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="6f61ff89" sha1="ba61f65a2126f7f097eb4a887f040af9cf19acb8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foxpro25cde">
+		<description>Microsoft FoxPro 2.5c (German)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installationsdiskette 1" />
+			<dataarea name="flop1" size="1474560">
+				<rom name="Installationsdiskette 1.img" size="1474560" crc="90daa796" sha1="034c8927f2a745e7aa4113f2f753544a796f8b6e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 2" />
+			<dataarea name="flop2" size="1474560">
+				<rom name="Diskette - 2.img" size="1474560" crc="4949f610" sha1="e55bc536f216fae5f683c99e61f66d2834c8770d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 3" />
+			<dataarea name="flop3" size="1474560">
+				<rom name="Diskette - 3.img" size="1474560" crc="28220e1c" sha1="decb0f7c2438eaaf49281b7108352d28ba059510" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 3" />
+			<dataarea name="flop4" size="1474560">
+				<rom name="Diskette - 4.img" size="1474560" crc="128e0503" sha1="d2624840e73a7bd9418b97e87c20919da09befe7" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 4" />
+			<dataarea name="flop5" size="1474560">
+				<rom name="Diskette - 5.img" size="1474560" crc="9c5dfd0a" sha1="9f248a472394199797592ac1167818fedf929829" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 5" />
+			<dataarea name="flop6" size="1474560">
+				<rom name="Diskette - 6.img" size="1474560" crc="e9ee45d2" sha1="8813d260422d208485b12d71cf00cd8ba6c68624" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette - 6" />
+			<dataarea name="flop7" size="1474560">
+				<rom name="Diskette - 7.img" size="1474560" crc="5c1fe418" sha1="2bf4b1b006f7409e77b921bc9727397e95f09b68" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Zeichensätze" />
+			<dataarea name="flop9" size="1474560">
+				<rom name="Zeichensatze.img" size="1474560" crc="323d16c8" sha1="e25d301dbed989871b12426d3335f431025c444a" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="ASLM Installer" />
+			<dataarea name="flop8" size="1474560">
+				<rom name="ASLM Installer.img" size="1474560" crc="a49ff03e" sha1="f21e7c3989a03d12cec82ac8168b9585ca752f03" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foxpro25cfr">
+		<description>Microsoft FoxPro 2.5c (French)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 1 - Install" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 1 - Install.img" size="1474560" crc="1f999b44" sha1="125ccdd1144e0a27591abe22dcde96f962022974" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 2.img" size="1474560" crc="b7a593b6" sha1="c494fbcdd517b0b139399734db3715ce8ebb423f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 3.img" size="1474560" crc="2725930f" sha1="307f0c208c19d000eb7c1916df3d02950bc49d7d" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 4.img" size="1474560" crc="c6eb25fd" sha1="3fcc50f0e1bc78e5176bfb4841f7d490f84e4c50" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 5.img" size="1474560" crc="f4f5ee4a" sha1="89d33130a64e80832ea5fd13a6ba84dde965cb61" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 6.img" size="1474560" crc="29c1d561" sha1="8f4992b9aaa85890095db0fea117f8f7fc4bd58d" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette 7.img" size="1474560" crc="a165fe0e" sha1="7fd9dfa9afd77834f99537137ac0ae1438f67622" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Polices" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Polices.img" size="1474560" crc="b6bb9767" sha1="6689790613cef5678d9bda856bada2475d5c7448" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="ASLM Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ASLM Installer.img" size="1474560" crc="81f5aa50" sha1="ec329213326f157871ed9616e4718e3d7161f864" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmaker402">
+		<description>FrameMaker 4.0.2</description>
+		<year>1994</year>
+		<publisher>Frame Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="f56604cc" sha1="6dc9a0d12c4832e897567d9387ec7860f4e1f96f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="3c9c920e" sha1="8a2519cb963e5ede96a48fe47bda79f03d1ca538" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="d2f42054" sha1="b5a2b74d72dc68c88e32ba30b47f0e660fd8bce0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="af93d3e7" sha1="20eb316490feb8838ef642615db21c6d10918f16" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="57c0d547" sha1="89b66f4d1259e7ad528a1e701fc7626e6030172f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk06.img" size="1474560" crc="604a7ce0" sha1="3c08718f8796a321f5e33719a25724ea2a0673bb" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk07.img" size="1474560" crc="0fb76ceb" sha1="b2433abdf3ad1c8e0adc73c7b77a7cfe13a3912b" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="PSPrinter 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="PSPrinter 1.img" size="1474560" crc="9819461c" sha1="635830bd023d14a95026d9ff776c5a2c97cf5b8d" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="PSPrinter 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="PSPrinter 2.img" size="1474560" crc="13d3b88e" sha1="151344efdb66bf0070c5cb788abcfdad06a88140" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmaker50">
+		<description>FrameMaker 5.0</description>
+		<year>1995</year>
+		<publisher>Frame Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="1f266e11" sha1="6169128b22f8811fd88e763fbc61eecb4d935733" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="63eb5ff5" sha1="d27755258a402756fa00903cf652330cc65836d3" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="204ac644" sha1="59c21e1f8ecc46d84a70ee8897ba24ecaa10929f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="51bff2d0" sha1="d695ffb871d1e4812bb4e543425075e662f0a7c6" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="eba63ffa" sha1="d80d612faddeb8db5d32e9c38fdc108a086984cd" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="45cbf3a8" sha1="acec609fb2e1d80c07555337672af00e78c9030a" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="44404563" sha1="669b2817084e5ecba7f2faa2092ca59c84f9afad" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="3f09490c" sha1="c7dab9625d37ae4c7c4e94971a11337ace6749a9" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="97de54aa" sha1="3e7fef35765501a4bf3aa6d5716cbcde1a30fed3" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="b1c03805" sha1="2f76f25128065d9220861a0871511da5bd09be66" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="bcf46d1d" sha1="f1ce6d8480eac41374755d0c0b2fa0b24e0f439c" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="fbcbaf81" sha1="8fb229b366283ea025bcf20dbb6496f5218164e1" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="9a8552a1" sha1="a97d9ef6925ab72c1bd6c8734dc72737470f97a0" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="95dfcebf" sha1="d7443eebee892a253379aa9c4245c546dd74c3da" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="ASLM Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="aslm.img" size="1474560" crc="5d4781a9" sha1="4eb591d5d1baafa457f55c51ef66a661801b6e7e" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="HTML Lite Installer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="HTML Lite Installer.img" size="1474560" crc="17eef145" sha1="a45378b9b1b6abd875c24d7e82bd48875aa9e696" />
 			</dataarea>
 		</part>
 	</software>
@@ -2924,6 +3553,2088 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- MAME crashes on startup with "Fatal error: fpgen_rm_reg: unimplemented opmode 0A at 01ED4FB6" -->
+	<software name="matlabst40" supported="no">
+		<description>Matlab 4.0 Student Edition</description>
+		<year>1995</year>
+		<publisher>The MathWorks</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="1b645647" sha1="8364ff516efbd6bb802a4a3420999ea86493205c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="d6748ac6" sha1="6feed5319bb47c8d520166a9096118761a5ae36c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="8e3588bd" sha1="401c8182e14126b922e6ce46b9b8ed6d5a267239" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="netadm10">
+		<description>Apple Network Administration Toolkit 1.0</description>
+		<year>1996</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install 1.img" size="1474560" crc="7346ea46" sha1="3cca3d439216934e0eb1f634343a5eb8442ed933" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install 2.img" size="1474560" crc="7985a749" sha1="4a948ec3f8093f134e10ed9cbaeca349acd67923" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install 3.img" size="1474560" crc="41d5de06" sha1="452fd357d4738af69296490515e169f9beddeb6f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Server Install" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Server Install.img" size="1474560" crc="3c722a60" sha1="3e1a98e82442d9ce3b490c3a5d678c9e677e6df3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="netadm10u">
+		<description>Apple Network Administration Toolkit 1.0 Updates</description>
+		<year>1996</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="At Ease 4.0.1 Updater" />
+			<dataarea name="flop" size="1474560">
+				<rom name="At Ease 4.0.1 Updater.img" size="1474560" crc="85b63cce" sha1="43ba982af150264c6639715ef52b9d0e1fceb08e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Network Assistant 2.0.1 Updater" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Network Assist 2.0.1 Updtr.img" size="1474560" crc="3673197b" sha1="52df3715657ef75235253cd4ae0afc21b446c61f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="netadm20u">
+		<description>Apple Network Administration Toolkit 2.0 Updates</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="At Ease 5.0.1 Updater" />
+			<dataarea name="flop" size="1474560">
+				<rom name="At Ease 5.0.1 Updater.img" size="1474560" crc="0a273067" sha1="299ab067081df730d86e2bcec04ed2ca815dda60" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="At Ease 5.0.1 Web Extras" />
+			<dataarea name="flop" size="1474560">
+				<rom name="At Ease 5.0.1 Web Extras.img" size="1474560" crc="68d9637e" sha1="e7a7a6901893c2cd449ebac62d8894c7c91fb503" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="At Ease for Workgroups 5.0.2 Updater" />
+			<dataarea name="flop" size="1620480">
+				<rom name="At Ease WG 5.0.2 Updater.img" size="1620480" crc="afe39210" sha1="c4f56cbfb1660d16f186178b28489b142fbf06e0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Network Assistant 3.0.1 Startup" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Network Asst Startup 3.0.1.img" size="1474560" crc="101cdafe" sha1="76b5116ac85a9c31b8557609fd8db933b2ccaa76" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Network Assistant 3.0.2 Updater" />
+			<dataarea name="flop" size="1474560">
+				<rom name="NetworkAsst Update 3.0.2.img" size="1474560" crc="b4adfed5" sha1="a41147e794919634f228b0186640992c54a0d0a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nutils313">
+		<description>Norton Utilities for Macintosh 3.1.3</description>
+		<year>1994</year>
+		<publisher>Symantec</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Me First" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install Me First.img" size="1474560" crc="1b122860" sha1="82cbb1a75a2c1e246f4713298e552dff3b651e43" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="NUM 3.1 Emergency Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="NUM 3.1 Emergency Disk.img" size="1474560" crc="99bb16ca" sha1="c1fedd13981f552bcbd0edd3f8ed3bd780f220e4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 1.img" size="1474560" crc="42c3b670" sha1="9b6bbbe82470ccede5e4f14e81ecbfc77399a032" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 2.img" size="1474560" crc="d4ce19f8" sha1="6a87c155c9eefff12c40845f14baee4dd481c2ee" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nutils321">
+		<description>Norton Utilities for Macintosh 3.2.1</description>
+		<year>1995</year>
+		<publisher>Symantec</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Me First" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install Me First.img" size="1474560" crc="88d0c5b5" sha1="c4090dbb66930f554054698f66ef23c6bcf26e85" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="NUM Emergency Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="NUM Emergency Disk.img" size="1474560" crc="e7cf0268" sha1="e3431d31d8d4440ba445aeda4ed46b028040e573" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 1.img" size="1474560" crc="17d00de9" sha1="ecf9d7e967fe01f81eeadac59785baf3027e3908" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 2.img" size="1474560" crc="f6177aa6" sha1="544c84195de7767dbae3b713869188bbe684d29e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nutils353">
+		<description>Norton Utilities for Macintosh 3.5.3</description>
+		<year>1998</year>
+		<publisher>Symantec</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Me First" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Install Me First.img" size="1474560" crc="bbe4862d" sha1="d8d547fe882c159da547b8a621745f00429b8025" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 1.img" size="1474560" crc="b04fcc05" sha1="8d27b6c2cbbcfd82ded8d842f865e45c50573f89" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 2.img" size="1474560" crc="46d20927" sha1="c3e25827ffc28e3dac01ea8d653b5ef639445c1f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 3.img" size="1474560" crc="3e00bfa6" sha1="0d425ff47a13c853511371865e5b6f80e481f307" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Utilities Disk 4.img" size="1474560" crc="a2d81854" sha1="12e126f3d2b8f47505a41761628a825c22b0aea0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk Builder Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Startup Disk Builder Disk.img" size="1474560" crc="28c031ec" sha1="7e26b08be41fdbbe9e097fd43258f59e0b14985c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42">
+		<description>Microsoft Office 4.2 (US English)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop1" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="8985d17e" sha1="9a54aa313f13626017a1ea44425cf933c04f4f39" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop2" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="1fd054f3" sha1="5f79613de264fa9d09a7c3f80bf58804bcb4fd3f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop3" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="8f135105" sha1="2215c0462b381ac46c7e3c1517e6dd5a419cd7d2" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop4" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="d7e2ab81" sha1="df2233e41781a613cf750462f84dac4a47b2c42b" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop5" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="7c6989bb" sha1="3461c75d46342bd427b62d4ef605d4614776baa9" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop6" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="eabf36e9" sha1="1c2ae32d0912b7a30c7e9defe6c5b18f7f4e5449" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop7" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="f3ccec55" sha1="1fa2749ac551283e82173a922fd083ee8393d2de" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop8" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="58746b7b" sha1="f5e47405ebba17319365458a741960465dc3c206" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop9" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="53d35c5a" sha1="a4dfc2e31e6ac868c4620377eddebff2a9eb0ba5" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop10" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="2fd82337" sha1="d17915be3c33dd45c4d63b15bb2975b42b82aa9a" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop11" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="1fc91094" sha1="bf4413a3365453e5a433cd224ff86494e1e14443" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop12" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="bded7c6d" sha1="424903d56feca3c15de2289b5f3117795099dd99" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop13" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="41193aa3" sha1="ac452deab5179b00d07913b1d66bd3065235d4a5" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 14" />
+			<dataarea name="flop14" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="e58e1681" sha1="8d0b4b4a65d9651f7b19965f14cdef08f5d2fdce" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 15" />
+			<dataarea name="flop15" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="88bc447f" sha1="1411aeef33ba5e2a124f8d99e385c618568ab1de" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 16" />
+			<dataarea name="flop16" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="fb8e272f" sha1="b088c3cd7ad31892d73932925c2f0db6aab9a1aa" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 17" />
+			<dataarea name="flop17" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="c4ab095a" sha1="7a13903555d49fc77e60200df16bae1f07442a45" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 18" />
+			<dataarea name="flop18" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="1b9eae80" sha1="a7ecaada74bb9de9c7d0ce1fdd4b6bab9c69b27f" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 19" />
+			<dataarea name="flop19" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="cf26cb8f" sha1="a9279c663585226f242ec9bdcb589048f7140026" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 20" />
+			<dataarea name="flop20" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="71af4c78" sha1="6573a07181e9c44adaa21d6185250c70323e663b" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 21" />
+			<dataarea name="flop21" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="9663a69b" sha1="9b5a5d40b8e3fa68a072fae3a0a89cbe0bab0b29" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 22" />
+			<dataarea name="flop22" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="6144d187" sha1="a58ac1f0b2c5bb47b1495df8ea5c5d589d403076" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 23" />
+			<dataarea name="flop23" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="929fef1b" sha1="8f0208d91e830ce73ffcef374857e414b25d89da" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 24" />
+			<dataarea name="flop24" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="a8594f3d" sha1="2b6a54de65290c8d6b32f182b16dbaf18486afc5" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 25" />
+			<dataarea name="flop25" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="5b37e30a" sha1="edf5fad02e3ba76f923486f30307208cef2882a5" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 26" />
+			<dataarea name="flop26" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="ed844f27" sha1="fd9ab1efed8faebcecc87359f4c46e8ccb5e2bda" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 27" />
+			<dataarea name="flop27" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="ac43f7d8" sha1="6a122d7b58fc15f8d86b46b495e76f312bf28932" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 28" />
+			<dataarea name="flop28" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="d8c59316" sha1="8a93d6ba84812aecff658e09ecb497fcc7ca0bc7" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 29" />
+			<dataarea name="flop29" size="1474560">
+				<rom name="disk29.img" size="1474560" crc="3baf5baf" sha1="aa560ca5ccf26b8e1eca0e2c37bf2fb13ef59e88" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 30" />
+			<dataarea name="flop30" size="1474560">
+				<rom name="disk30.img" size="1474560" crc="69c46621" sha1="b22805409500c7cd91a957c56fb860af50885747" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 31" />
+			<dataarea name="flop31" size="1474560">
+				<rom name="disk31.img" size="1474560" crc="20864783" sha1="204919f7e878925ec64af9442f9f514760934466" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 32" />
+			<dataarea name="flop32" size="1474560">
+				<rom name="disk32.img" size="1474560" crc="9edda715" sha1="a12df353fc0d342260aaf1c095c9847741df45fa" />
+			</dataarea>
+		</part>
+		<part name="flop33" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 33" />
+			<dataarea name="flop33" size="1474560">
+				<rom name="disk33.img" size="1474560" crc="ad945723" sha1="a4530b97435e9fbd041b85aab1030aa32dee2c74" />
+			</dataarea>
+		</part>
+		<part name="flop34" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 34" />
+			<dataarea name="flop34" size="1474560">
+				<rom name="disk34.img" size="1474560" crc="77bfc0c6" sha1="dd219fe404b181f00b0a4ea8fcf61d5f2f6e9ce9" />
+			</dataarea>
+		</part>
+		<part name="flop35" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 35" />
+			<dataarea name="flop35" size="1474560">
+				<rom name="disk35.img" size="1474560" crc="7c374735" sha1="602634f8d4e891fb8abba5b5cd4366de8d055c9a" />
+			</dataarea>
+		</part>
+		<part name="flop36" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 36" />
+			<dataarea name="flop36" size="1474560">
+				<rom name="disk36.img" size="1474560" crc="1f23ec83" sha1="d0849a88c0e290619a40dda3af61d62f000a953a" />
+			</dataarea>
+		</part>
+		<part name="flop37" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 37" />
+			<dataarea name="flop37" size="1474560">
+				<rom name="disk37.img" size="1474560" crc="c750c7d6" sha1="b71f4064ddd6d42e385579377c23a449dc1d9830" />
+			</dataarea>
+		</part>
+		<part name="flop38" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 38" />
+			<dataarea name="flop38" size="1474560">
+				<rom name="disk38.img" size="1474560" crc="da0faafd" sha1="7cb1e08ec259e9f1db9a5780b136c75424ce223c" />
+			</dataarea>
+		</part>
+		<part name="flop39" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 39" />
+			<dataarea name="flop39" size="1474560">
+				<rom name="disk39.img" size="1474560" crc="439e9bdf" sha1="64370c3c683cda3dfed9a34d99495ff031626e13" />
+			</dataarea>
+		</part>
+		<part name="flop40" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 40" />
+			<dataarea name="flop40" size="1474560">
+				<rom name="disk40.img" size="1474560" crc="4af34c8a" sha1="5ae38c3ae5e24959e10253ec9b10c010b837d8fd" />
+			</dataarea>
+		</part>
+		<part name="flop41" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="27ba6536" sha1="a51a14a60ebec0d5360cc208e99eb46d0d61953b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42aus">
+		<description>Microsoft Office 4.2 (Australian English)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop1" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="84f792cc" sha1="750d985041ab0f43824828cd5f908a90116cee53" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop2" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="ff7ff5cb" sha1="27f983f9cbf234640a8e574f11f71b54aaa2623e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop3" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="93b416ee" sha1="1633899534d39439a3fb4d30610de91e5f411936" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop4" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="53c62735" sha1="1f443016cd938e6b0080f8b9b63e881c47015046" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop5" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="050b6015" sha1="c6f0bd9b03aab5832c0f8533290cd7291c25bebb" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop6" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="34945a75" sha1="86d1e5d4262a2ed229c270d6cd29dcdedfe8bdab" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop7" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="4b56eeb2" sha1="190829b4b3aea1c38c42944d43c317e63ecc19fe" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop8" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="47d78827" sha1="d7e8fe690931af70b581492c9cf9e2389c140a87" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop9" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="ae6de126" sha1="6a11fbbe02c0369b463f051da83bd30ccd99e018" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop10" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="3b92346c" sha1="7196ad3e03c7431ce0ee21fd57293330e616f700" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop11" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="8f52a6ff" sha1="31f876fdcbe22dd4a514d5900c4d3dc91116d1f1" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop12" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="0f2f167c" sha1="bc04ac851ed43b683eb1a8fb6ac30fe410516530" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop13" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="ede9b1e2" sha1="68576a3e178c57dbb1b107ba97f0bbd9c5670c90" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 14" />
+			<dataarea name="flop14" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="9ce23fae" sha1="ef607d2dbb561e32b1ef0d38617455a0d3e3da74" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 15" />
+			<dataarea name="flop15" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="1b503041" sha1="2d2152912de6e241e8089ec88198cde8f276bf5b" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 16" />
+			<dataarea name="flop16" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="97757bd0" sha1="88a2e4fb8dbc6fdacef089e6650a917a74e5d270" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 17" />
+			<dataarea name="flop17" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="4b79d560" sha1="b458a2be9d07c9684ee729c501fe46b75071a01c" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 18" />
+			<dataarea name="flop18" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="32798624" sha1="854e2b683999db518f96f0b74ef33c4787efdc91" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 19" />
+			<dataarea name="flop19" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="5644f447" sha1="2d559202be378e6d038938d8277f19538d37555e" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 20" />
+			<dataarea name="flop20" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="c71b61e4" sha1="24ea8778705dc24960e885e955183196a01ba5c7" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 21" />
+			<dataarea name="flop21" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="193765e4" sha1="11409a61de844936d7a3f10bd48613aeed708a07" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 22" />
+			<dataarea name="flop22" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="90bc2e72" sha1="51577d13587ad5b0869d73db5bbd6af9a16b442b" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 23" />
+			<dataarea name="flop23" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="3f29cc23" sha1="9eccd37755973d0bf190b777e9b57b37ea8564b5" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 24" />
+			<dataarea name="flop24" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="798d6fc7" sha1="cf7db37af155b2f82cd7fe7c276b2338c9d11907" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 25" />
+			<dataarea name="flop25" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="c03b1933" sha1="8f94e3623dda944308301b63d972ff7e8affb65c" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 26" />
+			<dataarea name="flop26" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="5eb60920" sha1="b60138d96f0cd4fb1f35925813890fca37e01a07" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 27" />
+			<dataarea name="flop27" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="fa9c79b3" sha1="6787a9f601b5b705f8dbe390fe3c8e58f7c72b52" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 28" />
+			<dataarea name="flop28" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="6d61af71" sha1="03fc05c4391e6b7fcb883497020d9f69f59918d2" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 29" />
+			<dataarea name="flop29" size="1474560">
+				<rom name="disk29.img" size="1474560" crc="9d1d23b4" sha1="b8e8ec8a8c4dad45d5ab9477538a5d3d2892d4b1" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 30" />
+			<dataarea name="flop30" size="1474560">
+				<rom name="disk30.img" size="1474560" crc="5bbd224c" sha1="6f7d98d32b16dcc92109f2492f5ac38b5de64288" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 31" />
+			<dataarea name="flop31" size="1474560">
+				<rom name="disk31.img" size="1474560" crc="1de5c993" sha1="b2902dedaa1eed00ebdd73fcc3c7b189d7e0c880" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 32" />
+			<dataarea name="flop32" size="1474560">
+				<rom name="disk32.img" size="1474560" crc="e9641142" sha1="bd18243138d85a8744c754077a7080aff26c530b" />
+			</dataarea>
+		</part>
+		<part name="flop33" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 33" />
+			<dataarea name="flop33" size="1474560">
+				<rom name="disk33.img" size="1474560" crc="c80f376c" sha1="74ceee0592c39dd7dfb240f6a96c8141e8e42db8" />
+			</dataarea>
+		</part>
+		<part name="flop34" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 34" />
+			<dataarea name="flop34" size="1474560">
+				<rom name="disk34.img" size="1474560" crc="b167b725" sha1="ed084f7d7ba049775f9cf7edeaeecf5b65433a22" />
+			</dataarea>
+		</part>
+		<part name="flop35" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 35" />
+			<dataarea name="flop35" size="1474560">
+				<rom name="disk35.img" size="1474560" crc="6cc472e5" sha1="e74d6c57230391e8dd7983aa005e16fd66dba4fc" />
+			</dataarea>
+		</part>
+		<part name="flop36" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 36" />
+			<dataarea name="flop36" size="1474560">
+				<rom name="disk36.img" size="1474560" crc="854bf2f6" sha1="d2e947fe4620eea332791e1bc7792bf05e4d0f7d" />
+			</dataarea>
+		</part>
+		<part name="flop37" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 37" />
+			<dataarea name="flop37" size="1474560">
+				<rom name="disk37.img" size="1474560" crc="2570d6fa" sha1="a632b9e99e974e6aa8d8f9378561cc5bfd65953f" />
+			</dataarea>
+		</part>
+		<part name="flop38" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 38" />
+			<dataarea name="flop38" size="1474560">
+				<rom name="disk38.img" size="1474560" crc="a6c96b69" sha1="aafdb4a93533226812c0bffda0b73ad60224a96d" />
+			</dataarea>
+		</part>
+		<part name="flop39" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 39" />
+			<dataarea name="flop39" size="1474560">
+				<rom name="disk39.img" size="1474560" crc="8d63307c" sha1="021add356e45f66e7f3954e6627b1ca022d667ec" />
+			</dataarea>
+		</part>
+		<part name="flop40" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 40" />
+			<dataarea name="flop40" size="1474560">
+				<rom name="disk40.img" size="1474560" crc="dfdfba2b" sha1="71c35d87597891d5031bb02f7c8d7648042421ff" />
+			</dataarea>
+		</part>
+		<part name="flop41" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="viewer.img" size="1474560" crc="27ba6536" sha1="a51a14a60ebec0d5360cc208e99eb46d0d61953b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42da">
+		<description>Microsoft Office 4.2 (Danish)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="7f6d9dea" sha1="07c1526eb99dee2fa336571eecf7658d5050a490" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="db012a6e" sha1="1140a9bb8edbfa7247c229e3516bbdfb73c30119" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="be71decf" sha1="a2be1cd97e2c1455680d790e04db1ea1fa02454d" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="9bec4c73" sha1="235fdceb72ddc50d82cdb9882718bea55e273cd6" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="498e9a53" sha1="aca405f6a604d1be97c676e31fe5df3bd11f1df6" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk06.img" size="1474560" crc="6b70d2dc" sha1="0953c5c2429586309abd348660dbf1e65c3fd967" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk07.img" size="1474560" crc="1b2d3ee9" sha1="95ad11646db9defe015017d40ab4985e7332f78c" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk08.img" size="1474560" crc="d59bccb2" sha1="1fb94ef825826a8c7f3ad365c1dc4198f86afe5b" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk09.img" size="1474560" crc="d2c13fba" sha1="9399da5672e5507ea457b29a57da49d36b3fbf82" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk10.img" size="1474560" crc="dd6c065c" sha1="caaaad42961d7c9b0952cb7553e2e50576140bea" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk11.img" size="1474560" crc="775ab025" sha1="256387a6b92d75a36b28b7ee056c99c961b9fd08" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk12.img" size="1474560" crc="cfe490e8" sha1="210f71eacc4effdb42976b81b7ae64402b9026bb" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk13.img" size="1474560" crc="a4bd6ca0" sha1="0da5dab1c81a98ee10c10685ba26455f966f3236" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk14.img" size="1474560" crc="e3e40fed" sha1="cd379f7e7beb9022acd402e56caa27c3e0837ffe" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk15.img" size="1474560" crc="eeeb55f9" sha1="b2d7ea495bed467fa6b502ef8da63ee372339624" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk16.img" size="1474560" crc="3ad946e9" sha1="bd1ccb12765717affcfbabc5ffa021fe4d00216f" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk17.img" size="1474560" crc="efa4e6cf" sha1="fdb85f48647ea1bc1f62b61d769b9a53aa412ac6" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk18.img" size="1474560" crc="82c1fa70" sha1="16aeb9b567a517f146e8ede062f3a76f31363d05" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk19.img" size="1474560" crc="3f530320" sha1="b25f4837e1f5c9288bd8b86820328f54194cbd06" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk20.img" size="1474560" crc="593d9528" sha1="006c66168a64d2e60f059af50e53e2d094cb56f7" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk21.img" size="1474560" crc="233ebafc" sha1="93551dc7c6a45f379c22eef73d9f70f50ef86677" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk22.img" size="1474560" crc="77e575ca" sha1="a7723a262b4995409377d3450720e9bf26ab6f7b" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk23.img" size="1474560" crc="97acc417" sha1="7f6364a5315ad9650d932c3113eecd58090c93ec" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk24.img" size="1474560" crc="3e2bac89" sha1="b300dced6c447bbfb811f0306fbab6dc44f8a7f2" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk25.img" size="1474560" crc="cc5b541b" sha1="479a0f5b28577ea51a0599870f223356db18e688" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk26.img" size="1474560" crc="f8de7b6b" sha1="7dadf7a86e01317619aa89d7e03cc197a5bd0949" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk27.img" size="1474560" crc="7fecf440" sha1="913ef15084a6876dcb48431831216bfdb0228a5f" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk28.img" size="1474560" crc="f137bfbf" sha1="aefb6af9f357e953dae8ad728b9e543b40218276" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="b0b24503" sha1="fe6f981f8ffe664b4b69582c6ff1d7ff5aa69de5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42fr">
+		<description>Microsoft Office 4.2 (French)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="b1caf505" sha1="2806f1c77cee3eea1d7d14c2b68cdd4a7fd6cef9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="ff5f3086" sha1="2447b68b6eaa12e4edc021eb51ee1ac97378aa3a" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="6f5e3b7e" sha1="869c42056402476dc8b6c2ed99f6f9ad70d76bdc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="96a73d6a" sha1="869e80a82a6546f4c7174c978c7c86fa00ad4e81" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="ea4cbf1b" sha1="5f2789a4af0d0ce489f6216623ac08f597de20f4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk06.img" size="1474560" crc="818a82ea" sha1="b833ad0be0073cc95d6d867a5f2816bc0cc15043" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk07.img" size="1474560" crc="b577e454" sha1="fe0343b677dfd27302dd52f80b1e877a768f0e36" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk08.img" size="1474560" crc="3710b217" sha1="a3df741494d9038aadfbc181f290dedc0fc7ad72" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk09.img" size="1474560" crc="54b04889" sha1="64ef4f8076eb47042883a2e1fc9859fb421b56ad" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk10.img" size="1474560" crc="8ef6da72" sha1="17a1226186d206c5edb46be33715723f62ff7f9b" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk11.img" size="1474560" crc="e0489874" sha1="19651469f99f9668e74c3f5367c4ff6a74866c3d" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk12.img" size="1474560" crc="625064e4" sha1="95a932b9a7a19642330f2c27b1eed986921d56f6" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk13.img" size="1474560" crc="83f1e7e7" sha1="bd689bc8bb1a7ceb967497131cc8181cb9434c2a" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk14.img" size="1474560" crc="7dda7f88" sha1="51aae18f8259d2e2c4d5060c5addc3501714634b" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk15.img" size="1474560" crc="25ee86dd" sha1="9a0606b0a2f5011094de632ac3bf43c33ac70c36" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk16.img" size="1474560" crc="6766a390" sha1="07edbaa6647bafffa23ff34354f2d42d42ea0769" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk17.img" size="1474560" crc="311c2c8c" sha1="2ee9a47a823b514309a91e470c71eca8acb4cf35" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk18.img" size="1474560" crc="7efb157a" sha1="9a34ec6f2dc5b8246ec3e03a8f58ee29f326e085" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk19.img" size="1474560" crc="5f631633" sha1="c31167871b08bc9d76a4c15076f2b1cb6def775e" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk20.img" size="1474560" crc="104835f3" sha1="ab789b005a0c9424a203095e1454b789f35e2adb" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk21.img" size="1474560" crc="574d4151" sha1="861deb8746e4470750e974f18d75b7960b4e1074" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk22.img" size="1474560" crc="909012dc" sha1="94f0504664618e53634cb34cfdffe3820cd42c60" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk23.img" size="1474560" crc="e1c660af" sha1="c4da11922c0f1842984f2b2cca1a4e080e788f94" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk24.img" size="1474560" crc="28360f02" sha1="5a05310d514f57ab7f24987a0fbafef514c9d4ce" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk25.img" size="1474560" crc="f326683d" sha1="dc54f537d3204949712d6445e18f3f902c080086" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk26.img" size="1474560" crc="9c25ba1c" sha1="b6ba86369230b99d0691b7e1c4c0744730616824" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk27.img" size="1474560" crc="2629bf13" sha1="9f25cbc6bfd3f1c71829fcaa33e55c7fd8736d32" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk28.img" size="1474560" crc="629747ac" sha1="3049c949057a4c6d2a69a09c9d866d98e69ab86f" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 29" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk29.img" size="1474560" crc="4f8ff9c6" sha1="1c8f192bea42db5734fda2fb53b8981ec41854ad" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 30" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk30.img" size="1474560" crc="dbfa1010" sha1="ea8201a149b50900e4a7aed7762cf9ce5fb1d064" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette 31" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk31.img" size="1474560" crc="755d0704" sha1="1142035a585a38d628aa7fd5330371900608f9f2" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Visionneuse" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disquette Visionneuse.img" size="1474560" crc="3cd0dc72" sha1="e284e3dcd5fc1b2f57fe16be1d782663cc2c5a7e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42it">
+		<description>Microsoft Office 4.2 (Italian)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 1 - Installazione" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="af099fa0" sha1="e33222630f5fdb4112173761808fc0c885a29208" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="8370f403" sha1="ac2a266b36c8a770d18002c2f2e8e362435120f5" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="f4dfd1e6" sha1="f258b9efd9a8cef24c4e729c560752844aeb7de1" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="190fb672" sha1="45134eaeedffd943c9b25e1b24be5587c8a8c7c5" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="5147c47f" sha1="fcbc5f3ebd9bff7a1176a7ff93fa23f38e95bb1e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="a940fccf" sha1="9d7bc1e8c666e5edba71ef35c1be5337cd02a2e4" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="3d125d86" sha1="c7b67c502f989829035b900860fe91b7873af457" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="618d17d5" sha1="322e68dfa8c5d5953c57445c90cb15e0323926fe" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="87c252ae" sha1="d1ea14a20efbe5c19d0acd10b6bb49512212b227" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="51dff582" sha1="40fb9db89a42ead242ad42f6bd1a99d1c6005697" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="7c8c479c" sha1="01f1f5837cfbd62375e3bdaf4e9996c243920a15" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="c9061829" sha1="4bc5dd0e601d3b052ead1fa38b89106ad1f2cbdd" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="7311af0a" sha1="faa6335bc1d295d9461e8f758552ec25f4eacb78" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="fd5aa447" sha1="a389e5cb4688fa2632d7ceac6182f72468e91696" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="9a10b915" sha1="7798c7906dc3f8b5e9c1b67e9c31afe1b16f5016" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="be2aa7cb" sha1="f068d3f1f3ab962a04d20c4a1234290aa3ddd594" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="0453b2dc" sha1="5d93360884398870ab1345135a27ca8d4e2c4c0b" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="271c7605" sha1="ba72249350b969651192956251b3f00c43cfd59a" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="788c751b" sha1="f95dfce34ef010e3006cb9fc84762bc7ab8351b3" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="663a86de" sha1="19ebdfeb3808318d5bbdadedcf3a1ed39f9e8a50" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="e2bcb579" sha1="aa265a247a248a8ea9413ff351998cd28b977bfb" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="f3abfb53" sha1="483c6a90e09c1a723abaf475959bbf5f94193e1c" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="b4bc91e6" sha1="395ac4d2f5802bc74a73105edd45cfa40cdac0e9" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="0b09e7e9" sha1="c7c3647734c19c3fc8fa3203a28a2dd8b3dbb58c" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="06f5fb82" sha1="0c68e81ff7e2476315da265b783026427bb9ba38" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="c5c7315e" sha1="5a89535d30ba7ccb1b27d001eec8760d5b4126f4" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="d8cfff91" sha1="415db6e986433907d9ddd02781391e2e06bb94b9" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="7bbea5eb" sha1="0b5eba49f13986430859731e07195731a370b195" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 29" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk29.img" size="1474560" crc="0377f6f2" sha1="f4d3a61b1c21416ab7233a0f99f7881bfed96e54" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="74cce1b6" sha1="a6f441d654d3f7bef30253489ca2848dca9cf17e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42nl">
+		<description>Microsoft Office 4.2 (Dutch)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1 - Setup" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="daab0c1b" sha1="0e695d5e669bf11e23dba303cd4945963c25d8ca" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="9c0f0f3c" sha1="346cba216f3888f6ff0c08066fbfd852fb0f6f28" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="9122c757" sha1="585ff591879ba88c07670e498b35e83389140cd8" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="0f3f6775" sha1="7f6fda2ff85c9756605242dd5a7497c5a566dec8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="0f4ce6fa" sha1="8643b0e6216cbfefd90532eec2cc1f6bb765771a" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk06.img" size="1474560" crc="4b583121" sha1="5ec48d9f4431737699f8dd2c9951a108d3d9e76c" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk07.img" size="1474560" crc="119f40b1" sha1="8f41b9349e2c5e43609448fb0e714fb0a960de5d" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk08.img" size="1474560" crc="02c5475a" sha1="2ba9caa08d62659d3a31abc7d6aad1beed5b9450" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk09.img" size="1474560" crc="b5565f45" sha1="1ea219f83baa5ee6fc0acb2cce5f7412a8423715" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk10.img" size="1474560" crc="d5d94143" sha1="330d656d612a3fd76569b01cff6f3f8f3b754d11" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk11.img" size="1474560" crc="b2446806" sha1="4baa5d9516cc46464166f32dabdd14d1d973cf4b" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk12.img" size="1474560" crc="803368a2" sha1="d297eae7d59c034546417801a7a7893267b13001" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk13.img" size="1474560" crc="00c24974" sha1="aff4716754f98d8922e65e5624837146970e47a8" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk14.img" size="1474560" crc="ba4ef2d0" sha1="db252bbd61b8042fcf4c0ad82e4a12fe0d6b7d29" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk15.img" size="1474560" crc="dea5e4de" sha1="e517a39eb3ec276c54579c8f59ec6d3049c62761" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk16.img" size="1474560" crc="92144f37" sha1="19133f32c7631e5557b4c64d618737e62f3e3c20" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk17.img" size="1474560" crc="a83becee" sha1="6fadab308ec1332155510f732d3dde93320b9e1d" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk18.img" size="1474560" crc="9d64ffad" sha1="165a3fe00672cc4ce7f604e660928986564e3a3a" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk19.img" size="1474560" crc="73d6c7ba" sha1="0ebc2bdadc014510a0e715d180ad64d0d2a28e70" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk20.img" size="1474560" crc="ad197d0a" sha1="b29292b97ae9750d2189e55820b2f0bba457e1a8" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk21.img" size="1474560" crc="691dc0e7" sha1="69caca0d0b82c11bcbb4ec5a1af399925e83e463" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk22.img" size="1474560" crc="e307a73e" sha1="7c290c32dec5c10baeb7f50a8e9f1acec1c0593c" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk23.img" size="1474560" crc="4a34c839" sha1="d30de7eba0c3422257e633101186dff42f140326" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk24.img" size="1474560" crc="3c67efc0" sha1="a04613f78a6814ec7f07560bf03ab8e96d0f327b" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk25.img" size="1474560" crc="24baf00b" sha1="9d5d6595677c74e3de14d271d579482d7b69ba90" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk26.img" size="1474560" crc="cb6cea84" sha1="212e53dde6d207266a55edc8b2f31310721409fa" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk27.img" size="1474560" crc="f7f38687" sha1="9e8053b110b2c18d57e9e2670ae7f2d1d539eefb" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk28.img" size="1474560" crc="bfd6dc90" sha1="83d7dedd37d42fe7a05ae00088a2037af06a70e8" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="55a025e3" sha1="11d69ccf2be65b228534ec4e1ee63877f8ff7d56" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42no">
+		<description>Microsoft Office 4.2 (Norwegian)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 - Installasjon" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="b6d51d51" sha1="dd63eb20e0f9c1bab905e2ddd8a9d3fa96ec5e0c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="d683ba07" sha1="694e6900d99c22ff542bdd1cf168962433d2c09f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="9b539735" sha1="f5d5d5f0066996f46d0b0d973465429e6de5c4fb" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="0efc1e3d" sha1="f72246cb85d60ccb729c6a46a328fe360ba6a732" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="7cace157" sha1="e12a9c2163d75965dadf6312a9411108c1e7f46f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="b1316eac" sha1="c53cd5cbedd9405751bbdb100677f214d5f52b3c" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="5955d127" sha1="9753cc71b1135cc271a78aa2f323d7701e702e4b" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="a43cdc25" sha1="410aaa3cfe8e468485fdc179850662955147cf82" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="004492d2" sha1="da08ba22922c04a724548c663e4d6728752b0da2" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="1bb0d314" sha1="40167b597da21712e1377999d46d94237e25fedf" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="aaeaf451" sha1="d24dd5d04bdbd5bd9ca5213a4331608095cd4ae9" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="e86ed823" sha1="288a7eb8f944fca512fbdedffe6bfc61c8404671" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="8f509bc4" sha1="5cd74daad6076f56d95ed1b64eda8dba7df5580c" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="0dcfe2f3" sha1="c0ce5dcbec856693f1122fe5df828e96a8b4c816" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="8bc69b08" sha1="3eedb050a10fda057b67f71ddee8952ee9862a72" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="e2d73071" sha1="075d0d9d095bf78fa7edf1fb329df059e12816ce" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="f0b4d978" sha1="ca1fe777c3c2577fc4f50da880a9d72206ebe00b" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="6f432310" sha1="1984cf25ba293dd4d91c25148c661923e02a1874" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="97ce99ad" sha1="b6992f5109ef1325abf9c7a5275cf6231d1c6740" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="e8be489b" sha1="e477322627246294aa61a4042a72c6945b7e83f7" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="f5d321af" sha1="ed78dd643c45e41accc3060a00b37944a6c5f65e" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="c1d0ce57" sha1="c66ae3e8e30b3575c7e0095a6b525844803f2772" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="84802abd" sha1="0098cc9369f8975b5469f3be6a781edfbe3e7249" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="b707acef" sha1="b9c2984595578309c8b0b3a8a3d9c7ff703902cd" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="6c3ec005" sha1="12ea89976bbb83a57ac9f71502f95242c57c1c0a" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="bdba0333" sha1="bd6cfd710b19809083f206c89821f62a9f3cb572" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="16551d5e" sha1="78c1937c96068d83099f7474a28595be83cf3cec" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="013727ba" sha1="eb4a99ab31353c40fadb7e26103f401334386843" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="8a1cfa87" sha1="3129bc7ca7350ec86e882bababa9fee84e66530d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office42sv">
+		<description>Microsoft Office 4.2 (Swedish)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="99ca6229" sha1="79a2c00f9f74e7323126d521119faf455535def9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="f7a38b90" sha1="eafc27d7798090a3b47852a95d9a4c1a8c2c02b1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="8693b471" sha1="b8eb5edbe75bbc2a8f7f05e028c1c9de5c2b38a0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="ab327d67" sha1="536b58b3ac333b889ca3798d123917a71daa30fc" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="2a79d860" sha1="7b624380189e9b5ff425a0dad102551771b0f4c0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="364ff1c8" sha1="4b7b9fe2f5ade46fed85f54bd6ab4d41ba17e5cd" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="c3a17f4b" sha1="4492ba83d6a9277df3bcd7b14628053c0b537ae0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="80f53ead" sha1="19d98024166c28233ccb12521b2045ba3136d3c0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="5c7f50b2" sha1="89dda26bb0b9391a493fd8f13a489665c6cfdb6e" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="d84bd97f" sha1="236f07cbfe08c66d10b23aebfba77d9487e52d34" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="a90433f6" sha1="a817382241805f83e2b5d05bef37c9a4386fd8e0" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="374f5c89" sha1="dd14435a09c5849bb61c074645cdf535099b98d9" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="bf4e491a" sha1="8e9e003d8d4ae01e2c1a058f554910d4ca045d9e" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="47cd2701" sha1="3c4ce49a2e4bd93ab1793d0050c80e8b3aad940d" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="82423f47" sha1="27b2c3ec6b0ed5f45b074aea2c3db7b759c34e3d" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 16" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="eb8a33d7" sha1="a9e040f60e5b35471f3e02c78a68d0cac01f06cb" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 17" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="0b507a03" sha1="6677a3b9cf27ef83cbc9a94c589523df43522495" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 18" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="30ccb24d" sha1="9e20ba8bb7fcc60a3ca3860b71260660fb7f7ab5" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 19" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="cb81867b" sha1="a5d5c84fb11195fe7db08c5df7d00c18205b9481" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 20" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="e3281b46" sha1="adb0f0e5eec3906e075181e44496c89a2630b236" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 21" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="da7b938a" sha1="f03892a2e1f77f6b95c9b44a4f1cd109d59922e5" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 22" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="d83e8070" sha1="d75e46c957140e701bfd17ce6cc772ec85fb2c79" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 23" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="218e4be4" sha1="c422891cd5df731ad398070b72d0ba414909b15f" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 24" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="2df57ebb" sha1="bb239ed297a2a1ed4d0a16f561e2c0b1f852d299" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 25" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="248d949e" sha1="37fe8c23c9416b707f48df3b09911495bed11adc" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 26" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="faeec71e" sha1="6e147cd7e9b52c349cb3c4b41400bc70d57077af" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 27" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="430e22b0" sha1="95dd3c02c525aa5a9deecac2f458195ac783e012" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 28" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="813968b2" sha1="89a0d03f79997d5803151eb780f76baf3930527a" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Viewer Disk.img" size="1474560" crc="6da97be9" sha1="c6531f6eedc0795f0b4d246152f1bc082cbb8d1e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="office421">
+		<description>Microsoft Office 4.2.1 (US English)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop1" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="1584659d" sha1="789965dc878169db5790630e9cbd19c808e553f9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop2" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="0904fefa" sha1="6cf54bbb90b263e188caf9b8a5ff30f1ec74d3a8" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop3" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="91a5ed8b" sha1="273c4e44b8a0ca1faf5ff34711f6d45e333489d5" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop4" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="292c9ccc" sha1="2c9282665451e21fc5ee03e56653aa893dac4323" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop5" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="0f4543a2" sha1="f1d2f3a26de29383a4d4f479f061bb3278987263" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop6" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="2152d59e" sha1="aa998d143924740955b873f77ce3faa387c3be7b" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop7" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="13947265" sha1="5fbc7a93bda658bec7678da810d529f9565f2458" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop8" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="054cc9d3" sha1="16a24e618f9d8e180dd328cc649389727b96d077" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop9" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="1b6c4377" sha1="01f1b5a41041ad1b732434d623e3c9dc5da0562d" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop10" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="0627187f" sha1="6e877f9a6abaee231199779062e04cfb9f1fe17e" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop11" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="bd25637e" sha1="b604f18b46ec668c2a492cd4441c890b1e8f87db" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop12" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="752d48cf" sha1="1361078c09c369e00b5902cdb736fb3ab62a90da" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop13" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="772444d0" sha1="df8fccfb5733cd52c6adaca83edd9fb76b87b966" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 14" />
+			<dataarea name="flop14" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="9c2aa453" sha1="530efa8b8b5059732e54d2b86fe91b77b9f5f8b5" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 15" />
+			<dataarea name="flop15" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="4334b3d0" sha1="8bf3db6a37a1608645ddc7ea37fcd8aca206f626" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 16" />
+			<dataarea name="flop16" size="1474560">
+				<rom name="disk16.img" size="1474560" crc="dad7b3ef" sha1="a4678900033bf7063381e0812b0f6e82b17f33e2" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 17" />
+			<dataarea name="flop17" size="1474560">
+				<rom name="disk17.img" size="1474560" crc="5d956733" sha1="6414c049f405433411ddf43f22087e3237589f61" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 18" />
+			<dataarea name="flop18" size="1474560">
+				<rom name="disk18.img" size="1474560" crc="a773a378" sha1="b41825b99ff305619e5de96e6b156a0aee309872" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 19" />
+			<dataarea name="flop19" size="1474560">
+				<rom name="disk19.img" size="1474560" crc="42a7fc7e" sha1="0d7534636127a537b3a401493fa88e64de8c625c" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 20" />
+			<dataarea name="flop20" size="1474560">
+				<rom name="disk20.img" size="1474560" crc="34d746b2" sha1="02588b67a07da37de77ec6e8f5f14fa5f3cef107" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 21" />
+			<dataarea name="flop21" size="1474560">
+				<rom name="disk21.img" size="1474560" crc="a7290f8e" sha1="efc4b20b91125afb19ae41fba81be12f7557806f" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 22" />
+			<dataarea name="flop22" size="1474560">
+				<rom name="disk22.img" size="1474560" crc="7ffdc321" sha1="677a4e9e84bd3271ffcd5bd674ecbcb10bc81f7d" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 23" />
+			<dataarea name="flop23" size="1474560">
+				<rom name="disk23.img" size="1474560" crc="0f93a6ea" sha1="fd331192bd5d8195bf6d1fe607df23fc22c3f2b6" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 24" />
+			<dataarea name="flop24" size="1474560">
+				<rom name="disk24.img" size="1474560" crc="8db24cae" sha1="fb79273394c8bb7ac47bca3a9391b70f5f2acf50" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 25" />
+			<dataarea name="flop25" size="1474560">
+				<rom name="disk25.img" size="1474560" crc="7e7a530f" sha1="3de058a404f18e478bd67b16e3b00f0e7e7bfba2" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 26" />
+			<dataarea name="flop26" size="1474560">
+				<rom name="disk26.img" size="1474560" crc="58a7c09b" sha1="e1183a453a19331de3cb9d372ef88cade8caab00" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 27" />
+			<dataarea name="flop27" size="1474560">
+				<rom name="disk27.img" size="1474560" crc="ac2d9617" sha1="3f71e2a43d59bf9baea1a8719c78093b4ddb4db8" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 28" />
+			<dataarea name="flop28" size="1474560">
+				<rom name="disk28.img" size="1474560" crc="66656cdc" sha1="65eff6a995a806dde1bec412b3053a6334fa9da0" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 29" />
+			<dataarea name="flop29" size="1474560">
+				<rom name="disk29.img" size="1474560" crc="2d641107" sha1="005c434843e1264e1ebc399ea02be1ec0652cf0d" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 30" />
+			<dataarea name="flop30" size="1474560">
+				<rom name="disk30.img" size="1474560" crc="a12b1be9" sha1="3f95efb161c73095fd41fa9484cf3c6fb3af3297" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 31" />
+			<dataarea name="flop31" size="1474560">
+				<rom name="disk31.img" size="1474560" crc="6bcae48f" sha1="5906048b9c43577dde54362daa66623cb4cfbb9c" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 32" />
+			<dataarea name="flop32" size="1474560">
+				<rom name="disk32.img" size="1474560" crc="f30d794d" sha1="711e37f6ab24bf9cb4138178464eb9a7f4e7ecc8" />
+			</dataarea>
+		</part>
+		<part name="flop33" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 33" />
+			<dataarea name="flop33" size="1474560">
+				<rom name="disk33.img" size="1474560" crc="e7629f9f" sha1="cea9655cdb70d77ab07daa0b20ec5172194ffb36" />
+			</dataarea>
+		</part>
+		<part name="flop41" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="viewer.img" size="1474560" crc="521c5278" sha1="872f5d9e232441ee57b62fd8121f422c7da4d066" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offman42de">
+		<description>Microsoft Office Manager 4.2 (German)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1-Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="886acadb" sha1="73b6061c0716819d926cbb2222bd4152c1588f8d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="e8c1614f" sha1="da0ea3d5796a1170e895198432170776d9eefa1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ptalk121">
+		<description>PlainTalk 1.2.1</description>
+		<year>1994</year>
+		<publisher>Apple</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="PlainTalk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="cbf3538f" sha1="3f29fd9f9e24544c5069d90a16872afd17edae72" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="PlainTalk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="3e0f5aa1" sha1="02027310f12f098124b97a9db3ee9a548fa14c1e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="PlainTalk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="dd8cec40" sha1="8a876241d9104f9353cc56f75e0a211e9849d617" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="PlainTalk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="5f0e040f" sha1="66d88a4d43ec12bbd79a2b27da18ef62e4ce4521" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="PlainTalk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="6356ec12" sha1="abaec86d62949844cddf296c2fe21199d07102b4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pmaker50">
 		<description>Aldus PageMaker 5.0 (English)</description>
 		<year>1993</year>
@@ -3039,49 +5750,49 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk01.img" size="1474560" crc="13a2eb9a" sha1="57c6ec46c3a3708895ee3e7fea63da7e48eecd08" offset="0"/>
+				<rom name="disk01.img" size="1474560" crc="13a2eb9a" sha1="57c6ec46c3a3708895ee3e7fea63da7e48eecd08" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk02.img" size="1474560" crc="be33175e" sha1="a1366c7f6379ac5905f3d2de169d54819d6ba52f" offset="0"/>
+				<rom name="disk02.img" size="1474560" crc="be33175e" sha1="a1366c7f6379ac5905f3d2de169d54819d6ba52f" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk03.img" size="1474560" crc="863639ab" sha1="20edf0eb78fd89496ac437316cc88a1ab58873e6" offset="0"/>
+				<rom name="disk03.img" size="1474560" crc="863639ab" sha1="20edf0eb78fd89496ac437316cc88a1ab58873e6" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="4" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk04.img" size="1474560" crc="9fd925c3" sha1="f70cb9ce0484a5ae247743f4105062ae7f6fc1f7" offset="0"/>
+				<rom name="disk04.img" size="1474560" crc="9fd925c3" sha1="f70cb9ce0484a5ae247743f4105062ae7f6fc1f7" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="5" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk05.img" size="1474560" crc="d2e6f62c" sha1="3b0ddf1961daede5acaee9199feb49ed1787e3f5" offset="0"/>
+				<rom name="disk05.img" size="1474560" crc="d2e6f62c" sha1="3b0ddf1961daede5acaee9199feb49ed1787e3f5" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="6" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk06.img" size="1474560" crc="763323d9" sha1="f03e4bf827500a5e3f81b256def24b29ead7665f" offset="0"/>
+				<rom name="disk06.img" size="1474560" crc="763323d9" sha1="f03e4bf827500a5e3f81b256def24b29ead7665f" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="7" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk07.img" size="1474560" crc="f1585a37" sha1="7a1631fe8cf7ebadb616fd736a54f47dbfb0b6bb" offset="0"/>
+				<rom name="disk07.img" size="1474560" crc="f1585a37" sha1="7a1631fe8cf7ebadb616fd736a54f47dbfb0b6bb" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="8" />
 			<dataarea name="flop" size="1474560">
-				<rom name="disk08.img" size="1474560" crc="db3c38e6" sha1="72533f9e2b28350c1e6e92ecc96e3dc38538f163" offset="0"/>
+				<rom name="disk08.img" size="1474560" crc="db3c38e6" sha1="72533f9e2b28350c1e6e92ecc96e3dc38538f163" />
 			</dataarea>
 		</part>
 	</software>
@@ -3093,55 +5804,103 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="1" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk01.img" size="1474560" crc="32778c17" sha1="7157acd292fc7391c5c0039a7c1f90de8c0bdf0a" offset="0"/>
+				<rom name="Disk01.img" size="1474560" crc="32778c17" sha1="7157acd292fc7391c5c0039a7c1f90de8c0bdf0a" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="2" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk02.img" size="1474560" crc="83d3273a" sha1="5e0113740d235d6b26e326efc1804707fc9fa1f7" offset="0"/>
+				<rom name="Disk02.img" size="1474560" crc="83d3273a" sha1="5e0113740d235d6b26e326efc1804707fc9fa1f7" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="3" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk03.img" size="1474560" crc="ae59d9ae" sha1="4ce5515ab650ac62f338ddb9683eb7c403631c01" offset="0"/>
+				<rom name="Disk03.img" size="1474560" crc="ae59d9ae" sha1="4ce5515ab650ac62f338ddb9683eb7c403631c01" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="4" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk04.img" size="1474560" crc="5af3839c" sha1="57e8740a4036dbd1323358735663ceadd768346c" offset="0"/>
+				<rom name="Disk04.img" size="1474560" crc="5af3839c" sha1="57e8740a4036dbd1323358735663ceadd768346c" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="5" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk05.img" size="1474560" crc="ddd2697e" sha1="95f7b1034324403e127865f12514308fe9ef4ad2" offset="0"/>
+				<rom name="Disk05.img" size="1474560" crc="ddd2697e" sha1="95f7b1034324403e127865f12514308fe9ef4ad2" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="6" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk06.img" size="1474560" crc="81ebe4a8" sha1="386875d33e6e8f36d65d398d990c964b243e53aa" offset="0"/>
+				<rom name="Disk06.img" size="1474560" crc="81ebe4a8" sha1="386875d33e6e8f36d65d398d990c964b243e53aa" />
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="7" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk07.img" size="1474560" crc="285ff02f" sha1="9a7db99eb10374bd2e44747a79fab0b2e679a17f" offset="0"/>
+				<rom name="Disk07.img" size="1474560" crc="285ff02f" sha1="9a7db99eb10374bd2e44747a79fab0b2e679a17f" />
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="8" />
 			<dataarea name="flop" size="1474560">
-				<rom name="Disk08.img" size="1474560" crc="8cc3fdf2" sha1="d48e7550bdfb2a1a4a0b7d9b1d2b80905d71ede4" offset="0"/>
+				<rom name="Disk08.img" size="1474560" crc="8cc3fdf2" sha1="d48e7550bdfb2a1a4a0b7d9b1d2b80905d71ede4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppoint30b">
+		<description>Microsoft PowerPoint 3.0b</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 with Installer" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Disk 1 with Installer.img" size="1474644" crc="cde7e099" sha1="e86cad6d2779fe3781e5377c7b48938de5072bbd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Disk 2.img" size="1474644" crc="ebfdf739" sha1="1e69c724b4c067ba0212645c22973e9f6f87101a" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Disk 3.img" size="1474644" crc="e64dc5a2" sha1="40b319f1ab571a04a9fe4919fb9337dc2108244b" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Disk 4.img" size="1474644" crc="ec0ddcbb" sha1="96c05da916d35055c47fd369ed96d74673346c46" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="TrueType Fonts Disk 1" />
+			<dataarea name="flop" size="1474644">
+				<rom name="TrueType Fonts Disk 1.img" size="1474644" crc="d12618ff" sha1="d6da846d890e06499e2f14da1d6ae2fdf1887b06" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="TrueType Fonts Disk 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="TrueType Fonts Disk 2.img" size="1474644" crc="ee8a87bf" sha1="616bd41f1db84a971e32331105ada84e25d04373" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="PowerPoint Viewer" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PowerPoint Viewer.img" size="1474644" crc="b0c274eb" sha1="7a1a9decd9c661a20d1d0074a6da725935070267" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="ppoint40">
-		<description>Microsoft PowerPoint 4.0</description>
+		<description>Microsoft PowerPoint 4.0 (English)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3224,6 +5983,322 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ppoint40de">
+		<description>Microsoft PowerPoint 4.0 (German)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 1.img" size="1474560" crc="5faad435" sha1="de030887f8a92a24421d85b4b105174725e1970a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 2.img" size="1474560" crc="bca4d88d" sha1="c6d739f04558961634f70933d219655ba4c9b2ec" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 3.img" size="1474560" crc="66c4b40c" sha1="6575f828ab3a7a0cf4c5d26709fde97e947623ae" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 4.img" size="1474560" crc="a1b28768" sha1="80d8b3402c401ff05e4f115e1d49d9f40f8d338e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 5.img" size="1474560" crc="6890f2cf" sha1="14a1042855878df2736d0775f8d249b086450616" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 6.img" size="1474560" crc="02d2f9dd" sha1="1b69c42edb7481e4d2b7d1629fe4a3d4007f13eb" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 7.img" size="1474560" crc="4c710498" sha1="b105f8b5a885539473989942fdedd501afa6cbbd" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 8.img" size="1474560" crc="47af7530" sha1="9d369c24bebfc4bdea13ef7ab4c6d2e0ce32296f" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 9.img" size="1474560" crc="d5e94bca" sha1="6900ffc15d0778d576bb49e84d3ac06a624da195" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 10.img" size="1474560" crc="11b49b99" sha1="343c246e0878016911632b5e3e654c17c9d60fc4" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 11.img" size="1474560" crc="128ed16e" sha1="5150890c732fbb14675d9cd565dae26c68e9f5a7" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Setup-Diskette 12.img" size="1474560" crc="2c06f7f5" sha1="96c4a2d52da1672ee50f78c3f7385fc6c0ff4e7b" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Projektor-Diskette" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Projektor-Diskette.img" size="1474560" crc="ed54465d" sha1="b5a65d1957a553c16643ec229215b8d5a30eb8b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppoint40it">
+		<description>Microsoft PowerPoint 4.0 (Italian)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 1 - Installazione" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="0ec61a2e" sha1="af290e3e84e64008c8ff6ef4dc6061e792e26650" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="7a9a2190" sha1="80c4371a978d667078abadda179260dcfbc846f3" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="d6886216" sha1="c04da5d17184ac420ed73fe1ea02031cb82323b7" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="8a1d9a8b" sha1="338d8fb6701c02fa3717ab69d9788eef3a451ad8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="c920a56a" sha1="9763b42f487c2e1d764e3159a74ad73e7aae7fa7" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="597f2107" sha1="753af10c94d14dab37dcc535052439ab37c8084f" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="dbeb4add" sha1="7566143a28e8a96dc10bc9610c543e48385a754a" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="6d385835" sha1="d52af7df1087c7bfe8ea1442d426ad2d9a42f3ff" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="65101ed6" sha1="b66149fe127b43de1d7129f37d134d8927a5574f" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="b0893634" sha1="632167af777318df06470e8e341e4e53fec368e8" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="2651e95a" sha1="cd48203020f0d63ab3e6ef6e3318ccfeb61a700b" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="31b41d7c" sha1="1449897864ef33c2f524f5936eb79fbed92c8cea" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="viewer.img" size="1474560" crc="f8cfc107" sha1="eaad40aad6d0d58fefd734f4083df9da455cc573" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ppoint40sv">
+		<description>Microsoft PowerPoint 4.0 (Swedish)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="c3c57fc3" sha1="81620fce877a5440678bbbd1ccd218b02d1971e5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="a9542bc6" sha1="e584e04bf4c359bd687f2fc4dbfea260959a0474" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="659c00a4" sha1="d22168c778d84e3193dd416cfbedbfa14c8a0c12" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="d7eecb75" sha1="2fb4aea9682cbeac3117ffefce4103511fd06e87" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="9f7bb9a4" sha1="2bec74e70b13c7f6a10a16f20484e808d167320f" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="750d5955" sha1="b1dd7c227eb2375a86a0e342bfefe5dc8a2b2ff9" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="42b3ea55" sha1="9a50f85960eb7e2f7fa144d411f42e7bbc71391c" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="81b3cd1e" sha1="ecbcf5ddfd508f0bf75ed5ad0032b027f6df85c2" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="be10d3dc" sha1="b0b4d22279d962421b69de83a26022de4c2394f4" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="02f35d8f" sha1="54d653f5d69cddf593ee2a732c441e40c522cab9" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="7b516100" sha1="edd7ef1d2d00acfc623220e30eece5ef6912a406" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="6b12ce31" sha1="578a2b9eedf2515ef9f61849c2f54cd8a9d1a173" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Viewer" />
+			<dataarea name="flop" size="1474560">
+				<rom name="viewer.img" size="1474560" crc="44014914" sha1="aaf6a246452ebf9a716588ea1b3c7dacecc6723a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qxpress211fr">
+		<description>QuarkXPress 2.11 (French)</description>
+		<year>1989</year>
+		<publisher>Quark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="QuarkXPress-211.img" size="1474560" crc="3a82c753" sha1="9fa67ade5e8c577d031a5261b7592edf43c6d6b2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qxpress33">
+		<description>QuarkXPress 3.3 (English)</description>
+		<year>1994</year>
+		<publisher>Quark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Program Disk 1.img" size="1474560" crc="1785fec7" sha1="93f3ca94bf12e59a8d11af64c2625d04503109f5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Program Disk 2.img" size="1474560" crc="f107b76e" sha1="a5db9f02fb251c6e99aae6f6eb3e445f1dd69abe" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Program Disk 3.img" size="1474560" crc="642aac41" sha1="1614033aac23688f238cacdb3daaa123b09e8852" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Apple Events" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Apple Events.img" size="1474560" crc="dd5d7f61" sha1="444dbfe3936db8e98f808220c266d244057c63e3" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="EfiColor XTension" />
+			<dataarea name="flop" size="1474560">
+				<rom name="EfiColor XTension.img" size="1474560" crc="74cd0565" sha1="91e8b107b69fe35d3681cf9775354e1ec7754fe7" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Tutorials/Samples" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Tutorials_Samples.img" size="1474560" crc="ad36f5b9" sha1="41b1656f940cc5c0acfc9d346ea42b78426bb9f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rsg45a">
+		<description>Ready, Set, Go! 4.5a</description>
+		<year>1989</year>
+		<publisher>Manhattan Graphics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="af781736" sha1="20de9d9be3e2074ed66ed2a65a8e7b4c7f684155" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!--
 	    These disks were bundled as part of a single package that also contained:
 	    WordPerfect 3.0
@@ -3272,6 +6347,73 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires a PowerPC CPU -->
+	<software name="softwin30" supported="no">
+		<description>SoftWindows 3.0</description>
+		<year>1996</year>
+		<publisher>Insignia Solutions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 1.img" size="1474560" crc="2b7fb1d9" sha1="660da9b7f7ba2977c8467030d08dc1b29e162d58" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 2.img" size="1474560" crc="8e2d1383" sha1="5126617dbcf199872d4786489c76ea6229b117ba" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 3.img" size="1474560" crc="37d595bd" sha1="16080dc773ad7fae198ea0bbf814419c3c158eea" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 4.img" size="1474560" crc="36a989dc" sha1="99bd6875da731611a711c7b1f71f9b36debc5cf5" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 5.img" size="1474560" crc="0fd7b1ec" sha1="78f09de983063a86c9cb829559bd988f1d100e80" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 6.img" size="1474560" crc="3bbd3db0" sha1="f61e4ff320e73c10555bbf962c1f8f752ad94f6a" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 7.img" size="1474560" crc="2f5def86" sha1="deccb205d04af943d862255d7352dcce9055ebe2" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 8.img" size="1474560" crc="eabde44b" sha1="e3bb54709134aaaa8601813da5d2f091119aadcd" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 9.img" size="1474560" crc="9a6b9941" sha1="55734726f2d772a99d748b36a6bd6f77d355e19f" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Win Install 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Win Install 10.img" size="1474560" crc="154f0faa" sha1="8963c2db51406fa88580903a0e42f07530c6bc3b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="symcpp60">
 		<description>Symantec C++ for Macintosh 6.0</description>
 		<year>1993</year>
@@ -3296,6 +6438,48 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="symcpp70">
+		<description>Symantec C++ for Macintosh 7.0</description>
+		<year>1994</year>
+		<publisher>Symantec</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk #1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk01.img" size="1474560" crc="53dc4601" sha1="f98b4b0df5da33097e02b357e0072ee678325cf5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk #2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk02.img" size="1474560" crc="1fa3618c" sha1="b11517ca4b7960164e8c2952505e1ab7f94add09" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk #3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk03.img" size="1474560" crc="5bd4628e" sha1="03aa890ca987fa4d7fa253535892287b39a371c0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk #4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk04.img" size="1474560" crc="29d5cdcc" sha1="885b5395cbeb6cabefc1dc3abbbd93b9db2aa918" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk #5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="Disk05.img" size="1474560" crc="af4cec3e" sha1="46a2950c674870de12cf66d4b9d354234f9fb65b" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="AppleScript Setup" />
+			<dataarea name="flop" size="1474560">
+				<rom name="AppleScript Setup.img" size="1474560" crc="7b37f0ce" sha1="d08d47511a26200fa117a3d153abec5f1b61f190" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Requires a PowerPC CPU -->
 	<software name="vellum269" supported="no">
 		<description>Vellum 3D 2.6.9</description>
@@ -3311,6 +6495,922 @@ license:CC0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1474560">
 				<rom name="disk02.img" size="1474560" crc="d1f15563" sha1="f334ac6a09d3bfdd800d1ad319939d4bd13a88b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60">
+		<description>Microsoft Word 6.0 (International English)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="5451b485" sha1="99948405f74e6ea3fc7a58911ddbd3af47df8753" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="d84fca21" sha1="16d2d0c6725ca169d4edb99f3266b8124291f6cf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="d72ce1f9" sha1="304a050a5dc7f532323f6ee73d7f42463156895c" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="e61102ee" sha1="d39f52758e4d72411d8722687b39352739345db0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="1d60717a" sha1="fff3316417420176f66226f461cbe2db70d87434" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="75fc3816" sha1="9ebd75823e4a031717ab2ff812ebac5072c5b187" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="aacb80dc" sha1="efa2d6f1b888be5c0a3d490022efbc49ad6c67aa" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="ba4b9f03" sha1="2e45b486c38915a4c0f0c396b616c46c85c40eaf" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="065bcb5c" sha1="ce02e776360a90526b171a0836e8ef60469628a9" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="1964bcdd" sha1="1ffd9c92e37149fe84b571040fc640d201c69249" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="6a6b206c" sha1="bcfac459f3e3d10abc6abc1b996718c633e5954e" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="d4530f01" sha1="59c9012a31154f541b9a1a4ad06b63bdedbcd780" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="f650432e" sha1="1a2ab6e191085a4dc4c3c35eb0b5a87fcc619d14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60da">
+		<description>Microsoft Word 6.0 (Danish)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="d1a74135" sha1="cae7f53c74ce5ea19d6bf043d3ebd2b5c628bc10" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="19fcbd70" sha1="36de7fedf0880c639edd9719a378d44dd3eff580" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="a9a3c531" sha1="5a43dd32ff8e470d5f93e268096c2afeab90f27c" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="65388fd3" sha1="cf89f29c3f535f00525c42cb26c53e420877177d" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="34005e83" sha1="32f9943b168b13710273d523ed9bbc7853998e3c" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="3e407fc8" sha1="3f519062e6aa4c45a84d169017df48857ab21cfa" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="ec6a4924" sha1="2af1b7faec588675031a09d77d5527c559f8c315" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="76a622ff" sha1="cbce57c476ffd207509251c0d5b3b24df4330ab1" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="e3306a6c" sha1="52c8df3438906c700603ccf61e4be84147001822" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="07d962b8" sha1="58fe7d68b4758d229a69dfebab3ca3c2522263fe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60de">
+		<description>Microsoft Word 6.0 (German)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="96d65b6e" sha1="f0b262feb8d006cdbe6d497781b68376e21c79c2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="539643f0" sha1="ef8488bd972e0ed3f904807de0d2d631634845a4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="5ba5e5b7" sha1="0d86bc1563cf480a2029b8ce25b4f0d69f094798" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="4ef74611" sha1="c7b495e31b8ba73abe1aa22ef95f42244c8c686c" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="c2f7c047" sha1="e9f5b1e8e759d13b22663f917e4c688682174db9" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="97a92429" sha1="83d932b05fb1daa1c0e970ca4875627533873326" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="1ebcb9ee" sha1="2c4ab4819e899e486273244f700753a64290e89c" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="dfe5eb27" sha1="cd009a32288a1df52ce4252600c83501b1975ddb" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="0b5660de" sha1="0be05a7fc78b8eed35e070b0627b88ad7199aa5b" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="9ef17db0" sha1="3c54754e544167d7b26329313f04532747c4fd7a" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="4bd4a8f8" sha1="b6944c63a39f5ee763ea26415b24e12e97cba69a" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="06bf1708" sha1="8bb2bdc597990ceaeb9670272fb23607c5c84aa3" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="bd37feb7" sha1="d50ebe0beddf029f6631d8375967ebbeb08242ec" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="568f329c" sha1="fc6c1a0b49ada85eff2d3509ce8c275877a77960" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk 15" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk15.img" size="1474560" crc="1f1beda5" sha1="0a330cb04a57339d7c8c39cec42d1dbbe0d58b04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60fr">
+		<description>Microsoft Word 6.0 (French)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="82550af2" sha1="650ce66df8030596e5c85a4c727dac2f268ed65d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="fdf91e57" sha1="c69cf6cd91fd19760d0104b879b5bb5c78b2c938" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="214cab22" sha1="02d77a0574cc764013967f889638399dd8dae92c" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="91319542" sha1="0266c0ebd8cac4f0fdf1ad6c4bb732be2edfa99f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="43b56186" sha1="6f736efdb17560014a6a1c9ae53128ca5fd7f112" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="8338c9fb" sha1="c20ece61359c435270309e89b91ae9145b5a14dc" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="71f96425" sha1="59c0105a133e73ba7a88dd1bf4ab669cfbbbd231" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="85ecbcdc" sha1="d2b2eb839fdc180c48cf9230fcf1bb67a68bf258" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="cc92662c" sha1="d56033aa2b1891d98d5df0a37dff15ad7f1e8535" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="35beab3b" sha1="222878afd0470d289cbd912b083cbe7b37af17da" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="5cf1b46e" sha1="0168bc540a0c268ad558c6b96bbb31fcc1ec3329" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="5934d6e5" sha1="6fbf1ad0fe3196fd7fc1c130015c6b2388bf50a0" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="5cabb0d1" sha1="b56229d6e7205eca195baaa0d61c83d9c455098d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60frc">
+		<description>Microsoft Word 6.0 (Canadian French)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="c7c8a5bf" sha1="b5c2dc485828a78dd88aabd9baf1ead9d75d9b27" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="24055688" sha1="d897108660c4aead8b30cb4cc3281f4645e79dbf" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="402ba591" sha1="774bafcc093309dac523f369b4657af112793325" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="38a656d2" sha1="5042b8907745609c268dde9fad141c228d65722d" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="d1e6cf35" sha1="da78cdc61d8b01b33a59f3e3d0f324ec11afe8fe" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="63730adc" sha1="2e5e807ab25b3b12dfe1f995775ad66f2ae48d6a" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="302f751c" sha1="f6aaf17a9954e5119d11e01132d79ed80ecb8866" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="cefaeb48" sha1="ac484dad8369deadbc0d15e8adff242138fb1acb" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="eac44e35" sha1="c52e641bfe8f8e76d9f679afb6fe6f238ab54cdb" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="72308957" sha1="bc144d2824ab98d2345d3b73fbc08980300d54eb" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="a86b18f0" sha1="6733f3291b290a12663be0aecba73a9e172283fc" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="400e6c95" sha1="0de9b2143edfb0248588abf94421234eed79dd18" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disquette Installation 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="68245b14" sha1="2a5a0c320039caade2b34b0a0b1467724bb0e11f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60it">
+		<description>Microsoft Word 6.0 (Italian)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 1 - Installazione" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="4db62c49" sha1="0d8aaf01ea3c903a7f11e81f8951356fd0bd8b7c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="ed84f073" sha1="54cf9f1ae1e8c132d56bc299215119e0d6b3cc35" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="8427118f" sha1="6323646bb8fa9492b7e784a215530fd80e1f5505" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="fec4f4ef" sha1="e20bb8c7cf02d3ce13192e4cbccc81b8dd2ecf45" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="42a4949a" sha1="27c12d29d2207ea7cb9a7b6a77d11e0d0d32c903" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="dcfc6586" sha1="0d655d2421840c6a0e5dacb5a073d1a5a5704d02" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="045657c4" sha1="bed4c68338cbe1ae61cd3cddda9c9257711339a3" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="52412162" sha1="7d7d09735659b9a1664595a289727829d0f83d8c" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="a8aa4f14" sha1="f26a56f6c1e59fb8e8b326c8e4b5a827ee086d23" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="66dc2eed" sha1="21eb5a603c8ab326285d9517f77fb6155ee80067" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="c8fcec7c" sha1="0fe85e5377580685d90f8fd141b79bf60b6226a6" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="bc3b5dc2" sha1="db0c493ac3f2efca5f2728629739417f6e621be1" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disco 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="ca32c9f5" sha1="0c47ffd8a33de42a08c348c9e6a4b07c6a565aaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60ja">
+		<description>Microsoft Word 6.0 (Japanese)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="814042b6" sha1="2f626b5714055f171fa318aa509a82b16e0112e4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="77c2f115" sha1="da235802115f8774de4ec5c957aa910e65977441" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="d7443f8a" sha1="761628a3a0f65bb978a0e06bef4470326fa52111" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="3bb73aef" sha1="9bc4e552979ba7f3351df4d64e75ffe9cb022bcf" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="5586adbd" sha1="59c46225800b8f6e28efcc6050e978d98422e443" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="8f4e0e7d" sha1="9d3173c872162770aef230a43620fd2c4ad94d3e" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="4d3169df" sha1="0e9a246dc2d3c07840837e0aaaa35a63109d787a" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="a441d3bf" sha1="fa8b69ed22446b420dbf590902ce88bf626d2316" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="b0cd46c8" sha1="3b76b678950cad180a3ed40d4aac9c17807e5134" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="d5dc2afe" sha1="e6bce7c973680dfc34876a5b0024eb44af8ae809" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="9fadb892" sha1="47485827da852980a7c3d2741cb2aa21c39e6a8b" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 12" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk12.img" size="1474560" crc="49199133" sha1="d8dcf229fe90ef5405ee665038ca5e9d2f8806ee" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 13" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk13.img" size="1474560" crc="09025e83" sha1="eef20deba7791968e6337520a65385c51934d418" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 14" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk14.img" size="1474560" crc="02c7969a" sha1="8665c2028a92f08688cbeb99e3d2989526372685" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60nl">
+		<description>Microsoft Word 6.0 (Dutch)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 1 - Setup" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="369768dc" sha1="7787f50c4d9b429c36bcc3b616def522a23f2907" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="4c826b81" sha1="16c421feba8ee11e813739b6d1af7232f8a1959d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="59ee0d19" sha1="e1d29aa31df20d71d0abade177339623c3a1de34" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="c5838266" sha1="5eff05adc7e9b49b0dfdfc1abdf87074ab638857" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="73b8940d" sha1="b58ecb82167271cc48c756f69b9ea404749c89ac" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="223517a3" sha1="c524e849312af5f7656fa2ddf18f907980fc6c8e" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="a5df817b" sha1="4ba47f5f32d54ca3854506739713a0f454bf215b" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="1ace6786" sha1="267b622044f1d0f6b2016a9b287f617aa42213bd" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="ea6908ea" sha1="c3982a0dff2dc55cc9fb4392fa7ec55bc8348eb0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskette 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="334770fb" sha1="6b5c596e886f2b191ab58341d404114701448750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60sv">
+		<description>Microsoft Word 6.0 (Swedish)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 - Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="342d1bdb" sha1="eec0cef397ce7e5bee4d7bda3d945a2705cd3152" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="43de8d62" sha1="58940438e7c95185f38530bdc11e569341240423" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="e12efb34" sha1="86e88f3709b39bf9f3b654682ad183ef372be33a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="d4a74aa9" sha1="d702bee7f9166cfee203d14489ee78e6b1fe66a7" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="72731117" sha1="5938daff0b472d5b1d05af796440b472abd2b439" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="0f03758a" sha1="fa2ee923bb8856b557f8731568a40967c607a065" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="475f1a03" sha1="540dfb52f735e120e640dcbdfebde4df81ddb9de" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="4212945f" sha1="c3e2eebb270f38b570d82093a98370f19bad198e" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="55d7b0b1" sha1="a755923dbd78b92578a3409ebc97d9a5a1d359a1" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="386d93a2" sha1="9be8866712d106cb0d3484b606a1b9fd04e80738" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 11" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk11.img" size="1474560" crc="eaf3d57c" sha1="bb78e80dcb143374d1d88078c0be991343154170" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="word60ano">
+		<description>Microsoft Word 6.0a (Norwegian)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 - Installasjon" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk01.img" size="1474560" crc="b8df07c7" sha1="1609b11a3ff329d110efcfb80a73dd1c149e1318" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk02.img" size="1474560" crc="1197e850" sha1="10f31c6825b259eeabc6e4534ddf7607f2b9ec4a" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk03.img" size="1474560" crc="bfdbd895" sha1="d399dc4eced9bb4bd7c21012f20999c065261794" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk04.img" size="1474560" crc="cfb68df8" sha1="606bf011a03a046de6dd3c1fdd93f3a90c8f5096" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk05.img" size="1474560" crc="b050aea4" sha1="a2acde547a5782805bc810b8c036deba168cb5ef" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk06.img" size="1474560" crc="9c8b893b" sha1="f6a40b9942243f8d9550488a909f892b220a0e24" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk07.img" size="1474560" crc="c0c3420b" sha1="b030d2aeb57c509d0215b3f4133d67c896a93ba0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk08.img" size="1474560" crc="8fc4c109" sha1="f60df564074f311b087e61e641fa15f6dc34c63b" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 9" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk09.img" size="1474560" crc="bf7b2aba" sha1="c8ba3a647a4efce022901ab2310274fbbc7d9691" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 10" />
+			<dataarea name="flop" size="1474560">
+				<rom name="disk10.img" size="1474560" crc="835f34e4" sha1="67de4d2d9d8d8c79b4c3ceea8b8c8269bf7f3ea9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a PowerPC CPU and an existing installation of the 68k version -->
+	<software name="works40pm" supported="no">
+		<description>Microsoft Works 4.0b (US English, Power Macintosh upgrade)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 1" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 1.img" size="1474644" crc="deb18ea5" sha1="21332cb729268bcd8cc38930650c32fc3947b159" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 2.img" size="1474644" crc="0bfefc44" sha1="c33d2adab03cfc6625a50cf11bdb26646228adfc" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 3" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 3.img" size="1474644" crc="da7e1fc5" sha1="f2e3076b315284868c4322973e671d50015d1a12" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 4" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 4.img" size="1474644" crc="ebc15e3d" sha1="8ce2fd708b205c811234d9660b982de8e2549ca4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a PowerPC CPU and an existing installation of the 68k version -->
+	<software name="works40pmau" supported="no">
+		<description>Microsoft Works 4.0b (Australian English, Power Macintosh upgrade)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 1" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 1.img" size="1474644" crc="5a3e46db" sha1="90b547a038dd62b1b68c19e469752bdf4234d71c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 2.img" size="1474644" crc="845c1379" sha1="ad1df3f81ea118e45c06558f0ff83aeb3e21482f" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 3" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 3.img" size="1474644" crc="fe5ef23a" sha1="b4e72aa3b1ba73572b1e726fefe4571115ac9da6" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 4" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 4.img" size="1474644" crc="8fa0878a" sha1="efb4369cd00f12c1ba2203aac688d09581e0bbc2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a PowerPC CPU and an existing installation of the 68k version -->
+	<software name="works40pmde" supported="no">
+		<description>Microsoft Works 4.0b (German, Power Macintosh upgrade)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 1" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Setup-Diskette 1.img" size="1474644" crc="723262c0" sha1="ca95671c6a044ff78109ab021c8ae9ef9953d21f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Setup-Diskette 2.img" size="1474644" crc="6249e21a" sha1="3d2211ffe8bfb7df74fbca96d5b9526223954c43" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 3" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Setup-Diskette 3.img" size="1474644" crc="f3e40df2" sha1="45f750b7b6c1b57e7266bc16ca800e6a9442a0d8" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Setup-Diskette 4" />
+			<dataarea name="flop" size="1474644">
+				<rom name="Setup-Diskette 4.img" size="1474644" crc="4ccfb7a0" sha1="8ff8a9eafb7db6e87e3f8950617baa083ee65de3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires a PowerPC CPU and an existing installation of the 68k version -->
+	<software name="works40pmint" supported="no">
+		<description>Microsoft Works 4.0b (International English, Power Macintosh upgrade)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 1" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 1.img" size="1474644" crc="d645e42b" sha1="6aa52eedb1f12dd983a7d38fe1fabc55003a3c82" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 2" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 2.img" size="1474644" crc="10807f88" sha1="c7635ce7bf83fcd9a55f83561bcbeb512b11a61b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 3" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 3.img" size="1474644" crc="44c09d53" sha1="a19b8fac9307768cb68cf342b211c7bc5c3e83fc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="PPC Install Disk 4" />
+			<dataarea name="flop" size="1474644">
+				<rom name="PPC Install Disk 4.img" size="1474644" crc="f5875ef3" sha1="5f1e4043e70d8083c4b15dd024f5c6e0bc18df31" />
 			</dataarea>
 		</part>
 	</software>
@@ -3347,6 +7447,102 @@ license:CC0
 			<feature name="part_id" value="WordPerfect 5" />
 			<dataarea name="flop" size="1474560">
 				<rom name="WordPerfect 5.img" size="1474560" crc="edad9018" sha1="c3058bff39e6436cce392abe6ca682263cb82311" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wp31">
+		<description>WordPerfect 3.1</description>
+		<year>1994</year>
+		<publisher>Novell</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 1" />
+			<dataarea name="flop1" size="1474560">
+				<rom name="WordPerfect 1.img" size="1474560" crc="528ff795" sha1="51c53ee4e50fbabef2031aa2bc88d05c938474b9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 2" />
+			<dataarea name="flop2" size="1474560">
+				<rom name="WordPerfect 2.img" size="1474560" crc="37b98183" sha1="10370cf115aad128564a150d068b5cc2d24651d2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 3" />
+			<dataarea name="flop3" size="1474560">
+				<rom name="WordPerfect 3.img" size="1474560" crc="88948ad1" sha1="96e48f6b5714873c3d0757cf491410e211f49108" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 4" />
+			<dataarea name="flop4" size="1474560">
+				<rom name="WordPerfect 4.img" size="1474560" crc="2665b8f8" sha1="f69975caf918eb0cf14c451156eb2f02874ab07e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 5" />
+			<dataarea name="flop5" size="1474560">
+				<rom name="WordPerfect 5.img" size="1474560" crc="1d57d06e" sha1="52e77beb481a6ede5849e043e24b76a14edd6f4e" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Install Document Experts" />
+			<dataarea name="flop6" size="1474560">
+				<rom name="Install Document Experts.img" size="1474560" crc="16a89a61" sha1="34e91a4667a9e634c05bfb7e867f1f0f2a05f0f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wp35">
+		<description>WordPerfect 3.5</description>
+		<year>1995</year>
+		<publisher>Novell</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 1.img" size="1474560" crc="334287a2" sha1="d3f6181db8a58e161c06207023f42c739abf375e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 2.img" size="1474560" crc="0cd7e6c1" sha1="30514d2602a097a2072cf65b039d0b9ae47362e1" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 3.img" size="1474560" crc="8ad1aaea" sha1="f12a4a87f20b358089cfb4e1e816501d712c3850" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 4" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 4.img" size="1474560" crc="4f86e4db" sha1="460b069a633e4b90eacfced944dcdecc9663c72f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 5" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 5.img" size="1474560" crc="787d2ceb" sha1="9a88c60aec6ae2f0c80d2aba77e86278c5d73aaa" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 6" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 6.img" size="1474560" crc="9c26c636" sha1="050e0c85d4782f2986376dd87bf807c14d24c83c" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 7" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 7.img" size="1474560" crc="8d4a3f6c" sha1="aedc18bea06f6e6151b7a7c3ad915dae2cfc65df" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="WordPerfect 8" />
+			<dataarea name="flop" size="1474560">
+				<rom name="WordPerfect 8.img" size="1474560" crc="1cfc8337" sha1="75a373def0588bbad24e3cefb6f28939854f5d65" />
 			</dataarea>
 		</part>
 	</software>
