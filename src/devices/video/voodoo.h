@@ -1126,9 +1126,10 @@ protected:
 		void recompute_texture_params();
 		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		s32 prepare();
-		static s32 new_log2(double &value, const int &offset);
-		rgbaint_t genTexture(s32 x, voodoo::dither_helper const &dither, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
-		rgbaint_t combineTexture(voodoo::texture_mode const TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod);
+		static s32 new_log2(double const &value, int offset);
+		rgb_t lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t);
+		rgbaint_t fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const stw_t &iterstw, s32 lodbase, s32 &lod);
+		rgbaint_t combine_texture(voodoo::texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
 
 		struct ncc_table
 		{
@@ -1447,12 +1448,17 @@ protected:
 
 #undef RASTERIZER_ENTRY
 
-	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &rgaIntColor);
-	bool alpha_mask_test(thread_stats_block &stats, u8 alpha);
-	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
+	bool stipple_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, s32 x, s32 y);
+	s32 compute_wfloat(s64 iterw);
+	s32 compute_depthval(voodoo::fbz_mode const fbzmode, voodoo::fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
 	bool depth_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
+	bool alpha_mask_test(thread_stats_block &stats, u8 alpha);
+	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &rgaIntColor);
 	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, voodoo::fbz_colorpath const fbzcp, voodoo::fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
+	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
 	void apply_fogging(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void alpha_blend(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
+	void write_pixel(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);
 
 	void banshee_blit_2d(u32 data);
 
@@ -1577,8 +1583,9 @@ public:
 
 	void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s << 8, t << 8); m_w = _mm_set1_pd(w); }
 	int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
-	void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
 	{
+		shift += 8;
 		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
 		s = tmpS >> shift;
 		s64 tmpT = _mm_cvtsd_si64(m_st);
@@ -1619,7 +1626,7 @@ public:
 
 	void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
 	int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
-	void get_st_shiftr(s32 &s, s32 &t, const s32 &shift) const
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
 	{
 		s = m_s >> shift;
 		t = m_t >> shift;

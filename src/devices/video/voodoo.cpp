@@ -3879,80 +3879,49 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 					}
 				}
 
-				rgbaint_t color, preFog;
+				rgbaint_t color, prefog;
 				rgbaint_t iterargb(0);
-
+				s32 depthval;
 
 				/* pixel pipeline part 1 handles depth testing and stippling */
-				//PIXEL_PIPELINE_BEGIN(v, stats, x, y, m_reg[fbzColorPath].u, fbzmode, iterz, iterw);
-// Start PIXEL_PIPE_BEGIN copy
-				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
-					s32 biasdepth;
+				(threadstats).pixels_in++;
 
-					(threadstats).pixels_in++;
+				/* apply clipping */
+				/* note that for perf reasons, we assume the caller has done clipping */
 
-					/* apply clipping */
-					/* note that for perf reasons, we assume the caller has done clipping */
-
-					/* handle stippling */
-					if (fbzmode.enable_stipple())
-					{
-						/* rotate mode */
-						if (fbzmode.stipple_pattern() == 0)
-						{
-							m_reg[stipple].u = (m_reg[stipple].u << 1) | (m_reg[stipple].u >> 31);
-							if ((m_reg[stipple].u & 0x80000000) == 0)
-							{
-								m_stats.total_stippled++;
-								goto skipdrawdepth;
-							}
-						}
-
-						/* pattern mode */
-						else
-						{
-							int stipple_index = ((y & 3) << 3) | (~x & 7);
-							if (((m_reg[stipple].u >> stipple_index) & 1) == 0)
-							{
-								m_stats.total_stippled++;
-								goto nextpixel;
-							}
-						}
-					}
+				/* handle stippling */
+				if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y))
+					goto nextpixel;
 // End PIXEL_PIPELINE_BEGIN COPY
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				biasdepth = u32(sz[pix]);
+				depthval = u32(sz[pix]);
 
 				/* Perform depth testing */
-				if (fbzmode.enable_depthbuf())
-					if (!depth_test(threadstats, fbzmode, depth[x], biasdepth))
-						goto nextpixel;
+				if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
+					goto nextpixel;
 
 				/* use the RGBA we stashed above */
 				color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
 
 				/* handle chroma key */
-				if (fbzmode.enable_chromakey())
-					if (!chroma_key_test(threadstats, color))
-						goto nextpixel;
+				if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
+					goto nextpixel;
 
 				/* handle alpha mask */
-				if (fbzmode.enable_alpha_mask())
-					if (!alpha_mask_test(threadstats, color.get_a()))
-						goto nextpixel;
+				if (fbzmode.enable_alpha_mask() && !alpha_mask_test(threadstats, color.get_a()))
+					goto nextpixel;
 
 				/* handle alpha test */
-				if (alphamode.alphatest())
-					if (!alpha_test(threadstats, alphamode, color.get_a()))
-						goto nextpixel;
+				if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
+					goto nextpixel;
 
 				/* perform fogging */
-				preFog.set(color);
+				prefog.set(color);
 				if (fogmode.enable_fog())
 				{
 					voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
-					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, biasdepth, iterz, iterw, iterargb);
+					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
 				}
 
 				/* wait for any outstanding work to finish */
@@ -3960,10 +3929,11 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 				/* perform alpha blending */
 				if (alphamode.alphablend())
-					alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, preFog, m_fbi.rgb565);
+					alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
 
 				/* pixel pipeline part 2 handles final output */
-				PIXEL_PIPELINE_END(threadstats, dither, x, dest, depth, fbzmode) { };
+				write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+			}
 nextpixel:
 			/* advance our pointers */
 			x++;
