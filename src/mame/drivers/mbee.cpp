@@ -433,7 +433,7 @@ static INPUT_PORTS_START( mbee128 )
 	PORT_CONFSETTING(    0x20, "Amber")
 	PORT_CONFSETTING(    0x30, "White")
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
+	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ for clock
 	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
@@ -568,7 +568,7 @@ static INPUT_PORTS_START( mbee256 )
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
 	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
 	// Wire links on motherboard
-	PORT_CONFNAME( 0xc0, 0x40, "PIO B7")
+	PORT_CONFNAME( 0xc0, 0x80, "PIO B7")
 	PORT_CONFSETTING(    0x00, "VS") // sync pulse to enable telcom clock
 	PORT_CONFSETTING(    0x40, "RTC") // RTC IRQ must be used on teleterm
 	PORT_CONFSETTING(    0x80, "Tied high") // default resistor to vcc
