@@ -768,12 +768,15 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 
 		// Validate the rom
 		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
-		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+		if (!image.loaded_through_softlist())  // need to let pascal through without testing
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
-			slot->call_unload();
-			m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
-			return image_init_result::FAIL;
+			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+			{
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
+				slot->call_unload();
+				m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
+				return image_init_result::FAIL;
+			}
 		}
 	}
 
