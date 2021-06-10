@@ -1625,179 +1625,181 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
  *
  *************************************/
 
-#define RASTERIZER(name, TMUS, _FBZCOLORPATH, _FBZMODE, _ALPHAMODE, _FOGMODE, _TEXMODE0, _TEXMODE1) \
-																				\
-void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid) \
-{                                                                               \
-	thread_stats_block &threadstats = m_thread_stats[threadid];                            \
-	voodoo::texture_mode const texmode0(_TEXMODE0, (TMUS < 1) ? 0 : m_tmu[0].m_reg[textureMode].u); \
-	voodoo::texture_mode const texmode1(_TEXMODE1, (TMUS < 2) ? 0 : m_tmu[1].m_reg[textureMode].u); \
-	voodoo::fbz_colorpath const fbzcp(_FBZCOLORPATH, m_reg[fbzColorPath].u); \
-	voodoo::alpha_mode const alphamode(_ALPHAMODE, m_reg[alphaMode].u); \
-	voodoo::fbz_mode const fbzmode(_FBZMODE, m_reg[fbzMode].u); \
-	voodoo::fog_mode const fogmode(_FOGMODE, m_reg[fogMode].u); \
-	tmu_state::stw_t iterstw0, iterstw1;                                                     \
-	tmu_state::stw_t deltastw0, deltastw1;                                                   \
-																				\
-	/* determine the screen Y */                                                \
-	s32 scry = y;                                                                   \
-	if (fbzmode.y_origin())                                              \
-		scry = (m_fbi.yorigin - y);                                    \
-																				\
-	/* apply clipping */                                                        \
-	s32 startx = extent.startx;                                              \
-	s32 stopx = extent.stopx;                                                \
-	if (fbzmode.enable_clipping())                                       \
-	{                                                                           \
-		s32 tempclip;                                                         \
-																				\
-		/* Y clipping buys us the whole scanline */                             \
-		if (scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) ||                 \
-			scry >= (m_reg[clipLowYHighY].u & 0x3ff))                          \
-		{                                                                       \
-			threadstats.pixels_in += stopx - startx;                                 \
-			threadstats.clip_fail += stopx - startx;                                 \
-			return;                                                             \
-		}                                                                       \
-																				\
-		/* X clipping */                                                        \
-		tempclip = m_reg[clipLeftRight].u & 0x3ff;                             \
-		/* Check for start outsize of clipping boundary */                        \
-		if (startx >= tempclip)                                                  \
-		{                                                                       \
-			threadstats.pixels_in += stopx - startx;                               \
-			threadstats.clip_fail += stopx - startx;                         \
-			return;                                               \
-		}                                                                       \
-		if (stopx > tempclip)                                                  \
-		{                                                                       \
-			threadstats.pixels_in += stopx - tempclip;                               \
-			threadstats.clip_fail += stopx - tempclip;                         \
-			stopx = tempclip;                                               \
-		}                                                                       \
-		tempclip = (m_reg[clipLeftRight].u >> 16) & 0x3ff;                     \
-		if (startx < tempclip)                                                  \
-		{                                                                       \
-			threadstats.pixels_in += tempclip - startx;                              \
-			threadstats.clip_fail += tempclip - startx;                        \
-			startx = tempclip;                                                  \
-		}                                                                       \
-	}                                                                           \
-																				\
-	/* get pointers to the target buffer and depth buffer */                    \
-	u16 *dest = extra.destbase + scry * m_fbi.rowpixels;                        \
-	u16 *depth = (m_fbi.auxoffs != ~0) ? ((u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels) : nullptr; \
-																				\
-	/* compute the starting parameters */                                       \
-	s32 dx = startx - (extra.ax >> 4);                                             \
-	s32 dy = y - (extra.ay >> 4);                                                  \
-	s32 iterr = extra.startr + dy * extra.drdy + dx * extra.drdx;                \
-	s32 iterg = extra.startg + dy * extra.dgdy + dx * extra.dgdx;                \
-	s32 iterb = extra.startb + dy * extra.dbdy + dx * extra.dbdx;                \
-	s32 itera = extra.starta + dy * extra.dady + dx * extra.dadx;                \
-\
-	rgbaint_t iterargb, iterargb_delta;                                           \
-	iterargb.set(itera, iterr, iterg, iterb); \
-	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx); \
-	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;                \
-	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;                \
-	if (TMUS >= 1)                                                              \
-	{                                                                           \
-		iterstw0.set(                                                           \
-		extra.starts0 + dy * extra.ds0dy + dx * extra.ds0dx,        \
-		extra.startt0 + dy * extra.dt0dy + dx * extra.dt0dx,        \
-		extra.startw0 + dy * extra.dw0dy +   dx * extra.dw0dx);     \
-		deltastw0.set(extra.ds0dx, extra.dt0dx, extra.dw0dx);       \
-	}                                                                           \
-	if (TMUS >= 2)                                                              \
-	{                                                                           \
-		iterstw1.set(                                                           \
-		extra.starts1 + dy * extra.ds1dy + dx * extra.ds1dx,        \
-		extra.startt1 + dy * extra.dt1dy + dx * extra.dt1dx,        \
-		extra.startw1 + dy * extra.dw1dy + dx * extra.dw1dx);       \
-		deltastw1.set(extra.ds1dx, extra.dt1dx, extra.dw1dx);       \
-	}                                                                           \
-	extra.info->hits++;                                                        \
-	/* loop in X */                                                             \
-	voodoo::dither_helper dither(y, fbzmode, fogmode);           \
-	for (s32 x = startx; x < stopx; x++)                                            \
-	{                                                                           \
-		rgbaint_t texel(0);                                                \
-		rgbaint_t color, prefog;                                                \
-		s32 wfloat, depthval; \
-																				\
-		/* pixel pipeline part 1 handles depth setup and stippling */         \
-		threadstats.pixels_in++; \
-		\
-		/* handle stippling */                                                      \
-		if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y)) \
-			goto skipdrawdepth; \
-																					\
-		/* compute "floating point" W value (used for depth and fog) */             \
-		wfloat = compute_wfloat(iterw); \
-																					\
-		/* compute depth value (W or Z) for this pixel */                           \
-		depthval = compute_depthval(fbzmode, fbzcp, wfloat, iterz); \
-		\
-		/* depth testing */         \
-		if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval)) \
-			goto skipdrawdepth; \
-																				\
-		/* run the texture pipeline on TMU1 to produce a value in texel */      \
-		/* note that they set LOD min to 8 to "disable" a TMU */                \
-		if (TMUS >= 2 && m_tmu[1].lodmin < (8 << 8))                           \
-		{ \
-			s32 tmp; \
-			const rgbaint_t texel_zero(0);  \
-			texel = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, tmp); \
-			texel = m_tmu[1].combine_texture(texmode1, texel, texel_zero, tmp); \
-		} \
-		/* run the texture pipeline on TMU0 to produce a final */               \
-		/* result in texel */                                                   \
-		/* note that they set LOD min to 8 to "disable" a TMU */                \
-		if (TMUS >= 1 && m_tmu[0].lodmin < (8 << 8))                           \
-		{                                                                   \
-			if (!m_send_config)                                                \
-			{                                                                   \
-				s32 lod0; \
-				rgbaint_t texel_t0 = m_tmu[0].fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0); \
-				texel = m_tmu[0].combine_texture(texmode0, texel_t0, texel, lod0); \
-			}                                                                   \
-			else                                                                \
-				texel.set(m_tmu_config);                                              \
-		}                                                                   \
-																				\
-		/* colorpath pipeline selects source colors and does blending */        \
-		color = clamped_argb(iterargb, fbzcp);                                      \
-		if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw)) \
-			goto skipdrawdepth;                                                          \
-			\
-		/* handle alpha test */                                                          \
-		if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))   \
-			goto skipdrawdepth;                                                      \
-																						 \
-		/* perform fogging */                                                            \
-		prefog.set(color);                                                               \
-		if (fogmode.enable_fog())                                                                         \
-			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb); \
-																												 \
-		/* perform alpha blending */                                                \
-		if (alphamode.alphablend())                                                            \
-			alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog); \
-																				\
-		/* pixel pipeline part 2 handles final output */        \
-		write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);  \
-skipdrawdepth:\
-																				\
-		/* update the iterated parameters */                                    \
-		iterargb += iterargb_delta;                                              \
-		iterz += extra.dzdx;                                                   \
-		iterw += extra.dwdx;                                                   \
-		if (TMUS >= 1)                                                          \
-			iterstw0.add(deltastw0);                                            \
-		if (TMUS >= 2)                                                          \
-			iterstw1.add(deltastw1);                                            \
-	}                                                                           \
+template<int _TMUs, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
+{
+	thread_stats_block &threadstats = m_thread_stats[threadid];
+	voodoo::texture_mode const texmode0(_TexMode0, (_TMUs < 1) ? 0 : m_tmu[0].m_reg[textureMode].u);
+	voodoo::texture_mode const texmode1(_TexMode1, (_TMUs < 2) ? 0 : m_tmu[1].m_reg[textureMode].u);
+	voodoo::fbz_colorpath const fbzcp(_FbzCp, m_reg[fbzColorPath].u);
+	voodoo::alpha_mode const alphamode(_AlphaMode, m_reg[alphaMode].u);
+	voodoo::fbz_mode const fbzmode(_FbzMode, m_reg[fbzMode].u);
+	voodoo::fog_mode const fogmode(_FogMode, m_reg[fogMode].u);
+	tmu_state::stw_t iterstw0, iterstw1;
+	tmu_state::stw_t deltastw0, deltastw1;
+
+	// determine the screen Y
+	s32 scry = y;
+	if (fbzmode.y_origin())
+		scry = (m_fbi.yorigin - y);
+
+	// apply clipping
+	s32 startx = extent.startx;
+	s32 stopx = extent.stopx;
+	if (fbzmode.enable_clipping())
+	{
+		// Y clipping buys us the whole scanline
+		if (scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) || scry >= (m_reg[clipLowYHighY].u & 0x3ff))
+		{
+			threadstats.pixels_in += stopx - startx;
+			threadstats.clip_fail += stopx - startx;
+			return;
+		}
+
+		// X clipping
+		s32 tempclip = m_reg[clipLeftRight].u & 0x3ff;
+
+		// check for start outsize of clipping boundary
+		if (startx >= tempclip)
+		{
+			threadstats.pixels_in += stopx - startx;
+			threadstats.clip_fail += stopx - startx;
+			return;
+		}
+
+		// clip the right side
+		if (stopx > tempclip)
+		{
+			threadstats.pixels_in += stopx - tempclip;
+			threadstats.clip_fail += stopx - tempclip;
+			stopx = tempclip;
+		}
+
+		// clip the left side
+		tempclip = (m_reg[clipLeftRight].u >> 16) & 0x3ff;
+		if (startx < tempclip)
+		{
+			threadstats.pixels_in += tempclip - startx;
+			threadstats.clip_fail += tempclip - startx;
+			startx = tempclip;
+		}
+	}
+
+	// get pointers to the target buffer and depth buffer
+	u16 *dest = extra.destbase + scry * m_fbi.rowpixels;
+	u16 *depth = (m_fbi.auxoffs != ~0) ? ((u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels) : nullptr;
+
+	// compute the starting parameters
+	s32 dx = startx - (extra.ax >> 4);
+	s32 dy = y - (extra.ay >> 4);
+	s32 iterr = extra.startr + dy * extra.drdy + dx * extra.drdx;
+	s32 iterg = extra.startg + dy * extra.dgdy + dx * extra.dgdx;
+	s32 iterb = extra.startb + dy * extra.dbdy + dx * extra.dbdx;
+	s32 itera = extra.starta + dy * extra.dady + dx * extra.dadx;
+
+	rgbaint_t iterargb, iterargb_delta;
+	iterargb.set(itera, iterr, iterg, iterb);
+	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx);
+	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;
+	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;
+	if (_TMUs >= 1)
+	{
+		iterstw0.set(
+			extra.starts0 + dy * extra.ds0dy + dx * extra.ds0dx,
+			extra.startt0 + dy * extra.dt0dy + dx * extra.dt0dx,
+			extra.startw0 + dy * extra.dw0dy + dx * extra.dw0dx);
+		deltastw0.set(extra.ds0dx, extra.dt0dx, extra.dw0dx);
+	}
+	if (_TMUs >= 2)
+	{
+		iterstw1.set(
+			extra.starts1 + dy * extra.ds1dy + dx * extra.ds1dx,
+			extra.startt1 + dy * extra.dt1dy + dx * extra.dt1dx,
+			extra.startw1 + dy * extra.dw1dy + dx * extra.dw1dx);
+		deltastw1.set(extra.ds1dx, extra.dt1dx, extra.dw1dx);
+	}
+	extra.info->hits++;
+
+	// loop in X
+	voodoo::dither_helper dither(y, fbzmode, fogmode);
+	for (s32 x = startx; x < stopx; x++)
+	{
+		rgbaint_t texel(0);
+		rgbaint_t color, prefog;
+		s32 wfloat, depthval;
+
+		threadstats.pixels_in++;
+
+		// handle stippling
+		if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y))
+			goto skipdrawdepth;
+
+		// compute "floating point" W value (used for depth and fog)
+		wfloat = compute_wfloat(iterw);
+
+		// compute depth value (W or Z) for this pixel
+		depthval = compute_depthval(fbzmode, fbzcp, wfloat, iterz);
+
+		// depth testing
+		if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
+			goto skipdrawdepth;
+
+		// run the texture pipeline on TMU1 to produce a value in texel
+		// note that they set LOD min to 8 to "disable" a TMU
+		if (_TMUs >= 2 && m_tmu[1].lodmin < (8 << 8))
+		{
+			s32 tmp;
+			const rgbaint_t texel_zero(0);
+			texel = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, tmp);
+			texel = m_tmu[1].combine_texture(texmode1, texel, texel_zero, tmp);
+		}
+
+		// run the texture pipeline on TMU0 to produce a final result in texel
+		// note that they set LOD min to 8 to "disable" a TMU
+		if (_TMUs >= 1 && m_tmu[0].lodmin < (8 << 8))
+		{
+			if (!m_send_config)
+			{
+				s32 lod0;
+				rgbaint_t texel_t0 = m_tmu[0].fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
+				texel = m_tmu[0].combine_texture(texmode0, texel_t0, texel, lod0);
+			}
+			else
+				texel.set(m_tmu_config);
+		}
+
+		// colorpath pipeline selects source colors and does blending
+		color = clamped_argb(iterargb, fbzcp);
+		if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw))
+			goto skipdrawdepth;
+
+		// handle alpha test
+		if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
+			goto skipdrawdepth;
+
+		// perform fogging
+		prefog.set(color);
+		if (fogmode.enable_fog())
+			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
+
+		// perform alpha blending
+		if (alphamode.alphablend())
+			alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
+
+		// store the pixel and depth value
+		write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+
+skipdrawdepth:
+
+		// update the iterated parameters
+		iterargb += iterargb_delta;
+		iterz += extra.dzdx;
+		iterw += extra.dwdx;
+		if (_TMUs >= 1)
+			iterstw0.add(deltastw0);
+		if (_TMUs >= 2)
+			iterstw1.add(deltastw1);
+	}
 }
 
 

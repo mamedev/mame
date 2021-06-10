@@ -1436,17 +1436,8 @@ protected:
 	void init_save_state();
 
 	void raster_fastfill(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_0tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_1tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	void raster_generic_2tmu(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-
-#define RASTERIZER_HEADER(name) \
-	void raster_##name(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-#define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
-#include "voodoo_rast.ipp"
-
-#undef RASTERIZER_ENTRY
+	template<int _TMUs, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+	void rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid);
 
 	bool stipple_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, s32 x, s32 y);
 	s32 compute_wfloat(s64 iterw);

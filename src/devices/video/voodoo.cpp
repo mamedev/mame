@@ -768,23 +768,6 @@ u32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 
 
-
-
-/*************************************
- *
- *  Specific rasterizers
- *
- *************************************/
-
-#define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
-
-#include "voodoo_rast.ipp"
-
-#undef RASTERIZER_ENTRY
-
-
-
 /*************************************
  *
  *  Rasterizer table
@@ -792,7 +775,7 @@ u32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ &voodoo_device::raster_##fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, fbzcp, alpha, fog, fbz, tex0, tex1 },
+	{ &voodoo_device::rasterizer<int(tex0 != 0xffffffff) + int(tex1 != 0xffffffff), fbzcp, fbz, alpha, fog, tex0, tex1>, fbzcp, alpha, fog, fbz, tex0, tex1 },
 
 voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 {
@@ -804,9 +787,9 @@ voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 
 voodoo_device::static_raster_info voodoo_device::generic_raster_table[3] =
 {
-	{ &voodoo_device::raster_generic_0tmu, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::raster_generic_1tmu, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::raster_generic_2tmu, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, 0, 0>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, 0>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE>, 0, 0, 0, 0, 0, 0 },
 };
 
 
@@ -6553,27 +6536,3 @@ void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &exte
 			dest[x] = depth;
 	}
 }
-
-
-/*-------------------------------------------------
-    generic_0tmu - generic rasterizer for 0 TMUs
--------------------------------------------------*/
-
-RASTERIZER(generic_0tmu, 0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			voodoo::fog_mode::DECODE_LIVE, 0, 0)
-
-
-/*-------------------------------------------------
-    generic_1tmu - generic rasterizer for 1 TMU
--------------------------------------------------*/
-
-RASTERIZER(generic_1tmu, 1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, 0)
-
-
-/*-------------------------------------------------
-    generic_2tmu - generic rasterizer for 2 TMUs
--------------------------------------------------*/
-
-RASTERIZER(generic_2tmu, 2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE,
-			voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE)
