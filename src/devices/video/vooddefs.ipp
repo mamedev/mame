@@ -40,9 +40,6 @@ static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
 /* macro for clamping a value between minimum and maximum values */
 #define CLAMP(val,min,max)      do { if ((val) < (min)) { (val) = (min); } else if ((val) > (max)) { (val) = (max); } } while (0)
 
-/* macro to compute the base 2 log for LOD calculations */
-#define LOGB2(x)                (log((double)(x)) / log(2.0))
-
 
 
 /*************************************
@@ -1406,13 +1403,13 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::tmu_state::new_log2(double const &va
 inline rgb_t voodoo_device::tmu_state::lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t)
 {
 	if (texmode.format() < 8)
-		return lookup[*(u8 *)&ram[(texbase + t + s) & mask]];
+		return m_lookup[*(u8 *)&m_ram[(texbase + t + s) & m_mask]];
 	else if (texmode.format() >= 10 && texmode.format() <= 12)
-		return lookup[*(u16 *)&ram[(texbase + 2*(t + s)) & mask]];
+		return m_lookup[*(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask]];
 	else
 	{
-		u32 texel = *(u16 *)&ram[(texbase + 2*(t + s)) & mask];
-		return (lookup[texel & 0xff] & 0xffffff) | ((texel & 0xff00) << 16);
+		u32 texel = *(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask];
+		return (m_lookup[texel & 0xff] & 0xffffff) | ((texel & 0xff00) << 16);
 	}
 }
 
@@ -1436,26 +1433,26 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo:
 		s = t = 0;
 
 	// clamp the LOD
-	lod += lodbias;
+	lod += m_lodbias;
 	if (texmode.enable_lod_dither())
 		lod += dither.raw_4x4(x) << 4;
-	lod = std::clamp(lod, lodmin, lodmax);
+	lod = std::clamp(lod, m_lodmin, m_lodmax);
 
 	// now the LOD is in range; if we don't own this LOD, take the next one
 	s32 ilod = lod >> 8;
-	if (((lodmask >> ilod) & 1) == 0)
+	if (((m_lodmask >> ilod) & 1) == 0)
 		ilod++;
 
 	// fetch the texture base
-	u32 texbase = lodoffset[ilod];
+	u32 texbase = m_lodoffset[ilod];
 
 	// compute the maximum s and t values at this LOD
-	s32 smax = wmask >> ilod;
-	s32 tmax = hmask >> ilod;
+	s32 smax = m_wmask >> ilod;
+	s32 tmax = m_hmask >> ilod;
 
 	// determine whether we are point-sampled or bilinear
 	rgbaint_t result;
-	if ((lod == lodmin && !texmode.magnification_filter()) || (lod != lodmin && !texmode.minification_filter()))
+	if ((lod == m_lodmin && !texmode.magnification_filter()) || (lod != m_lodmin && !texmode.minification_filter()))
 	{
 		// adjust S/T for the LOD and strip off the fractions
 		ilod += 18 - 10;
@@ -1485,8 +1482,8 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo:
 		t -= 0x80;
 
 		// extract the fractions
-		u32 sfrac = s & bilinear_mask;
-		u32 tfrac = t & bilinear_mask;
+		u32 sfrac = s & m_bilinear_mask;
+		u32 tfrac = t & m_bilinear_mask;
 
 		// now toss the rest
 		s >>= 8;
@@ -1587,14 +1584,14 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
 			break;
 
 		case 4:     // LOD (detail factor)
-			if (detailbias <= lod)
+			if (m_detailbias <= lod)
 				blend_factor.zero();
 			else
 			{
 				u8 tmp;
-				tmp = (((detailbias - lod) << detailscale) >> 8);
-				if (tmp > detailmax)
-					tmp = detailmax;
+				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
+				if (tmp > m_detailmax)
+					tmp = m_detailmax;
 				blend_factor.set_all(tmp);
 			}
 			break;
@@ -1625,14 +1622,14 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
 			break;
 
 		case 4:     // LOD (detail factor)
-			if (detailbias <= lod)
+			if (m_detailbias <= lod)
 				blend_factor.zero_alpha();
 			else
 			{
 				u8 tmp;
-				tmp = (((detailbias - lod) << detailscale) >> 8);
-				if (tmp > detailmax)
-					tmp = detailmax;
+				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
+				if (tmp > m_detailmax)
+					tmp = m_detailmax;
 				blend_factor.set_a16(tmp);
 			}
 			break;
@@ -1815,7 +1812,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 
 		// run the texture pipeline on TMU1 to produce a value in texel
 		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TMUs >= 2 && m_tmu[1].lodmin < (8 << 8))
+		if (_TMUs >= 2 && m_tmu[1].m_lodmin < (8 << 8))
 		{
 			s32 tmp;
 			const rgbaint_t texel_zero(0);
@@ -1825,7 +1822,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 
 		// run the texture pipeline on TMU0 to produce a final result in texel
 		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TMUs >= 1 && m_tmu[0].lodmin < (8 << 8))
+		if (_TMUs >= 1 && m_tmu[0].m_lodmin < (8 << 8))
 		{
 			if (!m_send_config)
 			{

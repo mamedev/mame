@@ -229,41 +229,41 @@ protected:
 			rgb_t texel[256];             // texel lookup
 		};
 
-		u8 *ram = nullptr;          // pointer to our RAM
-		u32 mask = 0;               // mask to apply to pointers
+		u8 *m_ram = nullptr;          // pointer to our RAM
+		u32 m_mask = 0;               // mask to apply to pointers
 		voodoo_reg *m_reg = nullptr;          // pointer to our register base
-		u32 regdirty = 0;           // true if the LOD/mode/base registers have changed
+		u32 m_regdirty = 0;           // true if the LOD/mode/base registers have changed
 
-		u32 texaddr_mask = 0;       // mask for texture address
-		u8 texaddr_shift = 0;      // shift for texture address
+		u32 m_texaddr_mask = 0;       // mask for texture address
+		u8 m_texaddr_shift = 0;      // shift for texture address
 
-		s64 starts = 0, startt = 0; // starting S,T (14.18)
-		s64 startw = 0;             // starting W (2.30)
-		s64 dsdx = 0, dtdx = 0;     // delta S,T per X
-		s64 dwdx = 0;               // delta W per X
-		s64 dsdy = 0, dtdy = 0;     // delta S,T per Y
-		s64 dwdy = 0;               // delta W per Y
+		s64 m_starts = 0, m_startt = 0; // starting S,T (14.18)
+		s64 m_startw = 0;             // starting W (2.30)
+		s64 m_dsdx = 0, m_dtdx = 0;     // delta S,T per X
+		s64 m_dwdx = 0;               // delta W per X
+		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
+		s64 m_dwdy = 0;               // delta W per Y
 
-		s32 lodmin = 0, lodmax = 0; // min, max LOD values
-		s32 lodbias = 0;            // LOD bias
-		u32 lodmask = 0;            // mask of available LODs
-		u32 lodoffset[9];           // offset of texture base for each LOD
-		s32 detailmax = 0;          // detail clamp
-		s32 detailbias = 0;         // detail bias
-		u8 detailscale = 0;        // detail scale
+		s32 m_lodmin = 0, m_lodmax = 0; // min, max LOD values
+		s32 m_lodbias = 0;            // LOD bias
+		u32 m_lodmask = 0;            // mask of available LODs
+		u32 m_lodoffset[9];           // offset of texture base for each LOD
+		s32 m_detailmax = 0;          // detail clamp
+		s32 m_detailbias = 0;         // detail bias
+		u8 m_detailscale = 0;        // detail scale
 
-		u32 wmask = 0;              // mask for the current texture width
-		u32 hmask = 0;              // mask for the current texture height
+		u32 m_wmask = 0;              // mask for the current texture width
+		u32 m_hmask = 0;              // mask for the current texture height
 
-		u32 bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
+		u32 m_bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
 
-		ncc_table ncc[2];                 // two NCC tables
+		ncc_table m_ncc[2];                 // two NCC tables
 
-		rgb_t *lookup = nullptr;       // currently selected lookup
-		rgb_t *texel[16];              // texel lookups for each format
+		rgb_t *m_lookup = nullptr;       // currently selected lookup
+		rgb_t *m_texel[16];              // texel lookups for each format
 
-		rgb_t palette[256];           // palette lookup table
-		rgb_t palettea[256];          // palette+alpha lookup table
+		rgb_t m_palette[256];           // palette lookup table
+		rgb_t m_palettea[256];          // palette+alpha lookup table
 	};
 
 

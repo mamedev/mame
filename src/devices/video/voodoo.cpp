@@ -1057,51 +1057,51 @@ void voodoo_device::tmu_shared_state::init()
 void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem)
 {
 	/* allocate texture RAM */
-	ram = reinterpret_cast<u8 *>(memory);
-	mask = tmem - 1;
+	m_ram = reinterpret_cast<u8 *>(memory);
+	m_mask = tmem - 1;
 	m_reg = r;
-	regdirty = false;
-	bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
+	m_regdirty = false;
+	m_bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
-	ncc[0].dirty = ncc[1].dirty = true;
-	ncc[0].m_reg = &m_reg[nccTable+0];
-	ncc[1].m_reg = &m_reg[nccTable+12];
+	m_ncc[0].dirty = m_ncc[1].dirty = true;
+	m_ncc[0].m_reg = &m_reg[nccTable+0];
+	m_ncc[1].m_reg = &m_reg[nccTable+12];
 
 	/* create pointers to all the tables */
-	texel[0] = share.rgb332;
-	texel[1] = ncc[0].texel;
-	texel[2] = share.alpha8;
-	texel[3] = share.int8;
-	texel[4] = share.ai44;
-	texel[5] = palette;
-	texel[6] = (vdt >= TYPE_VOODOO_2) ? palettea : nullptr;
-	texel[7] = nullptr;
-	texel[8] = share.rgb332;
-	texel[9] = ncc[0].texel;
-	texel[10] = share.rgb565;
-	texel[11] = share.argb1555;
-	texel[12] = share.argb4444;
-	texel[13] = share.int8;
-	texel[14] = palette;
-	texel[15] = nullptr;
-	lookup = texel[0];
+	m_texel[0] = share.rgb332;
+	m_texel[1] = m_ncc[0].texel;
+	m_texel[2] = share.alpha8;
+	m_texel[3] = share.int8;
+	m_texel[4] = share.ai44;
+	m_texel[5] = m_palette;
+	m_texel[6] = (vdt >= TYPE_VOODOO_2) ? m_palettea : nullptr;
+	m_texel[7] = nullptr;
+	m_texel[8] = share.rgb332;
+	m_texel[9] = m_ncc[0].texel;
+	m_texel[10] = share.rgb565;
+	m_texel[11] = share.argb1555;
+	m_texel[12] = share.argb4444;
+	m_texel[13] = share.int8;
+	m_texel[14] = m_palette;
+	m_texel[15] = nullptr;
+	m_lookup = m_texel[0];
 
 	/* attach the palette to NCC table 0 */
-	ncc[0].palette = palette;
+	m_ncc[0].palette = m_palette;
 	if (vdt >= TYPE_VOODOO_2)
-		ncc[0].palettea = palettea;
+		m_ncc[0].palettea = m_palettea;
 
 	/* set up texture address calculations */
 	if (vdt <= TYPE_VOODOO_2)
 	{
-		texaddr_mask = 0x0fffff;
-		texaddr_shift = 3;
+		m_texaddr_mask = 0x0fffff;
+		m_texaddr_shift = 3;
 	}
 	else
 	{
-		texaddr_mask = 0xfffff0;
-		texaddr_shift = 0;
+		m_texaddr_mask = 0xfffff0;
+		m_texaddr_shift = 0;
 	}
 }
 
@@ -1111,8 +1111,8 @@ void voodoo_device::voodoo_postload()
 	m_fbi.clut_dirty = true;
 	for (tmu_state &tm : m_tmu)
 	{
-		tm.regdirty = true;
-		for (tmu_state::ncc_table &ncc : tm.ncc)
+		tm.m_regdirty = true;
+		for (tmu_state::ncc_table &ncc : tm.m_ncc)
 			ncc.dirty = true;
 	}
 
@@ -1235,26 +1235,26 @@ void voodoo_device::init_save_state()
 	for (int index = 0; index < std::size(m_tmu); index++)
 	{
 		tmu_state *tmu = &m_tmu[index];
-		if (tmu->ram == nullptr)
+		if (tmu->m_ram == nullptr)
 			continue;
-		if (tmu->ram != m_fbi.ram)
-			save_pointer(NAME(tmu->ram), tmu->mask + 1, index);
-		save_item(NAME(tmu->starts), index);
-		save_item(NAME(tmu->startt), index);
-		save_item(NAME(tmu->startw), index);
-		save_item(NAME(tmu->dsdx), index);
-		save_item(NAME(tmu->dtdx), index);
-		save_item(NAME(tmu->dwdx), index);
-		save_item(NAME(tmu->dsdy), index);
-		save_item(NAME(tmu->dtdy), index);
-		save_item(NAME(tmu->dwdy), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, ir), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, ig), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, ib), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, qr), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, qg), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, qb), index);
-		save_item(STRUCT_MEMBER(tmu->ncc, y), index);
+		if (tmu->m_ram != m_fbi.ram)
+			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
+		save_item(NAME(tmu->m_starts), index);
+		save_item(NAME(tmu->m_startt), index);
+		save_item(NAME(tmu->m_startw), index);
+		save_item(NAME(tmu->m_dsdx), index);
+		save_item(NAME(tmu->m_dtdx), index);
+		save_item(NAME(tmu->m_dwdx), index);
+		save_item(NAME(tmu->m_dsdy), index);
+		save_item(NAME(tmu->m_dtdy), index);
+		save_item(NAME(tmu->m_dwdy), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, ir), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, ig), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, ib), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, qr), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, qg), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, qb), index);
+		save_item(STRUCT_MEMBER(tmu->m_ncc, y), index);
 	}
 
 	/* register states: banshee */
@@ -1805,41 +1805,37 @@ void voodoo_device::dac_state::data_r(u8 regnum)
 
 void voodoo_device::tmu_state::recompute_texture_params()
 {
-	int bppscale;
-	u32 base;
-	int lod;
-
 	/* extract LOD parameters */
-	lodmin = TEXLOD_LODMIN(m_reg[tLOD].u) << 6;
-	lodmax = TEXLOD_LODMAX(m_reg[tLOD].u) << 6;
-	lodbias = (s8)(TEXLOD_LODBIAS(m_reg[tLOD].u) << 2) << 4;
+	m_lodmin = TEXLOD_LODMIN(m_reg[tLOD].u) << 6;
+	m_lodmax = TEXLOD_LODMAX(m_reg[tLOD].u) << 6;
+	m_lodbias = s8(TEXLOD_LODBIAS(m_reg[tLOD].u) << 2) << 4;
 
 	/* determine which LODs are present */
-	lodmask = 0x1ff;
+	m_lodmask = 0x1ff;
 	if (TEXLOD_LOD_TSPLIT(m_reg[tLOD].u))
 	{
 		if (!TEXLOD_LOD_ODD(m_reg[tLOD].u))
-			lodmask = 0x155;
+			m_lodmask = 0x155;
 		else
-			lodmask = 0x0aa;
+			m_lodmask = 0x0aa;
 	}
 
 	/* determine base texture width/height */
-	wmask = hmask = 0xff;
+	m_wmask = m_hmask = 0xff;
 	if (TEXLOD_LOD_S_IS_WIDER(m_reg[tLOD].u))
-		hmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
+		m_hmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
 	else
-		wmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
+		m_wmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
 
 	/* determine the bpp of the texture */
 	voodoo::texture_mode const texmode(m_reg[textureMode].u);
-	bppscale = texmode.format() >> 3;
+	int bppscale = texmode.format() >> 3;
 
 	/* start with the base of LOD 0 */
-	if (texaddr_shift == 0 && (m_reg[texBaseAddr].u & 1))
+	if (m_texaddr_shift == 0 && (m_reg[texBaseAddr].u & 1))
 		osd_printf_debug("Tiled texture\n");
-	base = (m_reg[texBaseAddr].u & texaddr_mask) << texaddr_shift;
-	lodoffset[0] = base & mask;
+	u32 base = (m_reg[texBaseAddr].u & m_texaddr_mask) << m_texaddr_shift;
+	m_lodoffset[0] = base & m_mask;
 
 	/* LODs 1-3 are different depending on whether we are in multitex mode */
 	/* Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think */
@@ -1848,60 +1844,60 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
 	if (TEXLOD_TMULTIBASEADDR(m_reg[tLOD].u) && (m_reg[tLOD].u >> 28) == 0)
 	{
-		base = (m_reg[texBaseAddr_1].u & texaddr_mask) << texaddr_shift;
-		lodoffset[1] = base & mask;
-		base = (m_reg[texBaseAddr_2].u & texaddr_mask) << texaddr_shift;
-		lodoffset[2] = base & mask;
-		base = (m_reg[texBaseAddr_3_8].u & texaddr_mask) << texaddr_shift;
-		lodoffset[3] = base & mask;
+		base = (m_reg[texBaseAddr_1].u & m_texaddr_mask) << m_texaddr_shift;
+		m_lodoffset[1] = base & m_mask;
+		base = (m_reg[texBaseAddr_2].u & m_texaddr_mask) << m_texaddr_shift;
+		m_lodoffset[2] = base & m_mask;
+		base = (m_reg[texBaseAddr_3_8].u & m_texaddr_mask) << m_texaddr_shift;
+		m_lodoffset[3] = base & m_mask;
 	}
 	else
 	{
-		if (lodmask & (1 << 0))
-			base += (((wmask >> 0) + 1) * ((hmask >> 0) + 1)) << bppscale;
-		lodoffset[1] = base & mask;
-		if (lodmask & (1 << 1))
-			base += (((wmask >> 1) + 1) * ((hmask >> 1) + 1)) << bppscale;
-		lodoffset[2] = base & mask;
-		if (lodmask & (1 << 2))
-			base += (((wmask >> 2) + 1) * ((hmask >> 2) + 1)) << bppscale;
-		lodoffset[3] = base & mask;
+		if (m_lodmask & (1 << 0))
+			base += (((m_wmask >> 0) + 1) * ((m_hmask >> 0) + 1)) << bppscale;
+		m_lodoffset[1] = base & m_mask;
+		if (m_lodmask & (1 << 1))
+			base += (((m_wmask >> 1) + 1) * ((m_hmask >> 1) + 1)) << bppscale;
+		m_lodoffset[2] = base & m_mask;
+		if (m_lodmask & (1 << 2))
+			base += (((m_wmask >> 2) + 1) * ((m_hmask >> 2) + 1)) << bppscale;
+		m_lodoffset[3] = base & m_mask;
 	}
 
 	/* remaining LODs make sense */
-	for (lod = 4; lod <= 8; lod++)
+	for (int lod = 4; lod <= 8; lod++)
 	{
-		if (lodmask & (1 << (lod - 1)))
+		if (m_lodmask & (1 << (lod - 1)))
 		{
-			u32 size = ((wmask >> (lod - 1)) + 1) * ((hmask >> (lod - 1)) + 1);
+			u32 size = ((m_wmask >> (lod - 1)) + 1) * ((m_hmask >> (lod - 1)) + 1);
 			if (size < 4) size = 4;
 			base += size << bppscale;
 		}
-		lodoffset[lod] = base & mask;
+		m_lodoffset[lod] = base & m_mask;
 	}
 
 	/* set the NCC lookup appropriately */
-	texel[1] = texel[9] = ncc[texmode.ncc_table_select()].texel;
+	m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
 
 	/* pick the lookup table */
-	lookup = texel[texmode.format()];
+	m_lookup = m_texel[texmode.format()];
 
 	/* compute the detail parameters */
-	detailmax = TEXDETAIL_DETAIL_MAX(m_reg[tDetail].u);
-	detailbias = (s8)(TEXDETAIL_DETAIL_BIAS(m_reg[tDetail].u) << 2) << 6;
-	detailscale = TEXDETAIL_DETAIL_SCALE(m_reg[tDetail].u);
+	m_detailmax = TEXDETAIL_DETAIL_MAX(m_reg[tDetail].u);
+	m_detailbias = (s8)(TEXDETAIL_DETAIL_BIAS(m_reg[tDetail].u) << 2) << 6;
+	m_detailscale = TEXDETAIL_DETAIL_SCALE(m_reg[tDetail].u);
 
 	/* ensure that the NCC tables are up to date */
 	if ((texmode.format() & 7) == 1)
 	{
-		ncc_table &n = ncc[texmode.ncc_table_select()];
-		texel[1] = texel[9] = n.texel;
+		ncc_table &n = m_ncc[texmode.ncc_table_select()];
+		m_texel[1] = m_texel[9] = n.texel;
 		if (n.dirty)
 			n.update();
 	}
 
 	/* no longer dirty */
-	regdirty = false;
+	m_regdirty = false;
 
 	/* check for separate RGBA filtering */
 	if (TEXDETAIL_SEPARATE_RGBA_FILTER(m_reg[tDetail].u))
@@ -1915,12 +1911,12 @@ inline s32 voodoo_device::tmu_state::prepare()
 	s32 lodbase;
 
 	/* if the texture parameters are dirty, update them */
-	if (regdirty)
+	if (m_regdirty)
 		recompute_texture_params();
 
 	/* compute (ds^2 + dt^2) in both X and Y as 28.36 numbers */
-	texdx = s64(dsdx >> 14) * s64(dsdx >> 14) + s64(dtdx >> 14) * s64(dtdx >> 14);
-	texdy = s64(dsdy >> 14) * s64(dsdy >> 14) + s64(dtdy >> 14) * s64(dtdy >> 14);
+	texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
+	texdy = s64(m_dsdy >> 14) * s64(m_dsdy >> 14) + s64(m_dtdy >> 14) * s64(m_dtdy >> 14);
 
 	/* pick whichever is larger and shift off some high bits -> 28.20 */
 	if (texdx < texdy)
@@ -2860,99 +2856,99 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		/* S,T data is 14.18 formatted fixed point, converted to 16.32 internally */
 		case fstartS:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].starts = data64;
-			if (chips & 4) m_tmu[1].starts = data64;
+			if (chips & 2) m_tmu[0].m_starts = data64;
+			if (chips & 4) m_tmu[1].m_starts = data64;
 			break;
 		case startS:
-			if (chips & 2) m_tmu[0].starts = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].starts = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_starts = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_starts = (s64)(s32)data << 14;
 			break;
 
 		case fstartT:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].startt = data64;
-			if (chips & 4) m_tmu[1].startt = data64;
+			if (chips & 2) m_tmu[0].m_startt = data64;
+			if (chips & 4) m_tmu[1].m_startt = data64;
 			break;
 		case startT:
-			if (chips & 2) m_tmu[0].startt = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].startt = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_startt = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_startt = (s64)(s32)data << 14;
 			break;
 
 		case fdSdX:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].dsdx = data64;
-			if (chips & 4) m_tmu[1].dsdx = data64;
+			if (chips & 2) m_tmu[0].m_dsdx = data64;
+			if (chips & 4) m_tmu[1].m_dsdx = data64;
 			break;
 		case dSdX:
-			if (chips & 2) m_tmu[0].dsdx = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].dsdx = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_dsdx = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_dsdx = (s64)(s32)data << 14;
 			break;
 
 		case fdTdX:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].dtdx = data64;
-			if (chips & 4) m_tmu[1].dtdx = data64;
+			if (chips & 2) m_tmu[0].m_dtdx = data64;
+			if (chips & 4) m_tmu[1].m_dtdx = data64;
 			break;
 		case dTdX:
-			if (chips & 2) m_tmu[0].dtdx = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].dtdx = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_dtdx = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_dtdx = (s64)(s32)data << 14;
 			break;
 
 		case fdSdY:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].dsdy = data64;
-			if (chips & 4) m_tmu[1].dsdy = data64;
+			if (chips & 2) m_tmu[0].m_dsdy = data64;
+			if (chips & 4) m_tmu[1].m_dsdy = data64;
 			break;
 		case dSdY:
-			if (chips & 2) m_tmu[0].dsdy = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].dsdy = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_dsdy = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_dsdy = (s64)(s32)data << 14;
 			break;
 
 		case fdTdY:
 			data64 = float_to_int64(data, 32);
-			if (chips & 2) m_tmu[0].dtdy = data64;
-			if (chips & 4) m_tmu[1].dtdy = data64;
+			if (chips & 2) m_tmu[0].m_dtdy = data64;
+			if (chips & 4) m_tmu[1].m_dtdy = data64;
 			break;
 		case dTdY:
-			if (chips & 2) m_tmu[0].dtdy = (s64)(s32)data << 14;
-			if (chips & 4) m_tmu[1].dtdy = (s64)(s32)data << 14;
+			if (chips & 2) m_tmu[0].m_dtdy = (s64)(s32)data << 14;
+			if (chips & 4) m_tmu[1].m_dtdy = (s64)(s32)data << 14;
 			break;
 
 		/* W data is 2.30 formatted fixed point, converted to 16.32 internally */
 		case fstartW:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.startw = data64;
-			if (chips & 2) m_tmu[0].startw = data64;
-			if (chips & 4) m_tmu[1].startw = data64;
+			if (chips & 2) m_tmu[0].m_startw = data64;
+			if (chips & 4) m_tmu[1].m_startw = data64;
 			break;
 		case startW:
 			if (chips & 1) m_fbi.startw = (s64)(s32)data << 2;
-			if (chips & 2) m_tmu[0].startw = (s64)(s32)data << 2;
-			if (chips & 4) m_tmu[1].startw = (s64)(s32)data << 2;
+			if (chips & 2) m_tmu[0].m_startw = (s64)(s32)data << 2;
+			if (chips & 4) m_tmu[1].m_startw = (s64)(s32)data << 2;
 			break;
 
 		case fdWdX:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.dwdx = data64;
-			if (chips & 2) m_tmu[0].dwdx = data64;
-			if (chips & 4) m_tmu[1].dwdx = data64;
+			if (chips & 2) m_tmu[0].m_dwdx = data64;
+			if (chips & 4) m_tmu[1].m_dwdx = data64;
 			break;
 		case dWdX:
 			if (chips & 1) m_fbi.dwdx = (s64)(s32)data << 2;
-			if (chips & 2) m_tmu[0].dwdx = (s64)(s32)data << 2;
-			if (chips & 4) m_tmu[1].dwdx = (s64)(s32)data << 2;
+			if (chips & 2) m_tmu[0].m_dwdx = (s64)(s32)data << 2;
+			if (chips & 4) m_tmu[1].m_dwdx = (s64)(s32)data << 2;
 			break;
 
 		case fdWdY:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.dwdy = data64;
-			if (chips & 2) m_tmu[0].dwdy = data64;
-			if (chips & 4) m_tmu[1].dwdy = data64;
+			if (chips & 2) m_tmu[0].m_dwdy = data64;
+			if (chips & 4) m_tmu[1].m_dwdy = data64;
 			break;
 		case dWdY:
 			if (chips & 1) m_fbi.dwdy = (s64)(s32)data << 2;
-			if (chips & 2) m_tmu[0].dwdy = (s64)(s32)data << 2;
-			if (chips & 4) m_tmu[1].dwdy = (s64)(s32)data << 2;
+			if (chips & 2) m_tmu[0].m_dwdy = (s64)(s32)data << 2;
+			if (chips & 4) m_tmu[1].m_dwdy = (s64)(s32)data << 2;
 			break;
 
 		/* setup bits */
@@ -3306,8 +3302,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case nccTable+10:
 		case nccTable+11:
 			m_poly->wait(m_regnames[regnum]);
-			if (chips & 2) m_tmu[0].ncc[0].write(regnum - nccTable, data);
-			if (chips & 4) m_tmu[1].ncc[0].write(regnum - nccTable, data);
+			if (chips & 2) m_tmu[0].m_ncc[0].write(regnum - nccTable, data);
+			if (chips & 4) m_tmu[1].m_ncc[0].write(regnum - nccTable, data);
 			break;
 
 		case nccTable+12:
@@ -3323,8 +3319,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case nccTable+22:
 		case nccTable+23:
 			m_poly->wait(m_regnames[regnum]);
-			if (chips & 2) m_tmu[0].ncc[1].write(regnum - (nccTable+12), data);
-			if (chips & 4) m_tmu[1].ncc[1].write(regnum - (nccTable+12), data);
+			if (chips & 2) m_tmu[0].m_ncc[1].write(regnum - (nccTable+12), data);
+			if (chips & 4) m_tmu[1].m_ncc[1].write(regnum - (nccTable+12), data);
 			break;
 
 		/* fogTable entries are processed and expanded immediately */
@@ -3384,7 +3380,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 				if (m_tmu[0].m_reg[regnum].u != data)
 				{
 					m_poly->wait(m_regnames[regnum]);
-					m_tmu[0].regdirty = true;
+					m_tmu[0].m_regdirty = true;
 					m_tmu[0].m_reg[regnum].u = data;
 				}
 			}
@@ -3393,7 +3389,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 				if (m_tmu[1].m_reg[regnum].u != data)
 				{
 					m_poly->wait(m_regnames[regnum]);
-					m_tmu[1].regdirty = true;
+					m_tmu[1].m_regdirty = true;
 					m_tmu[1].m_reg[regnum].u = data;
 				}
 			}
@@ -3933,7 +3929,7 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 	m_poly->wait("Texture write");
 
 	/* update texture info if dirty */
-	if (t->regdirty)
+	if (t->m_regdirty)
 		t->recompute_texture_params();
 
 	/* swizzle the data */
@@ -3968,21 +3964,21 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 				return 0;
 
 			/* compute the base address */
-			tbaseaddr = t->lodoffset[lod];
-			tbaseaddr += tt * ((t->wmask >> lod) + 1) + ts;
+			tbaseaddr = t->m_lodoffset[lod];
+			tbaseaddr += tt * ((t->m_wmask >> lod) + 1) + ts;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
-			tbaseaddr = t->lodoffset[0] + offset*4;
+			tbaseaddr = t->m_lodoffset[0] + offset*4;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
 
 		/* write the four bytes in little-endian order */
-		dest = t->ram;
-		tbaseaddr &= t->mask;
+		dest = t->m_ram;
+		tbaseaddr &= t->m_mask;
 		dest[BYTE4_XOR_LE(tbaseaddr + 0)] = (data >> 0) & 0xff;
 		dest[BYTE4_XOR_LE(tbaseaddr + 1)] = (data >> 8) & 0xff;
 		dest[BYTE4_XOR_LE(tbaseaddr + 2)] = (data >> 16) & 0xff;
@@ -4008,21 +4004,21 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 				return 0;
 
 			/* compute the base address */
-			tbaseaddr = t->lodoffset[lod];
-			tbaseaddr += 2 * (tt * ((t->wmask >> lod) + 1) + ts);
+			tbaseaddr = t->m_lodoffset[lod];
+			tbaseaddr += 2 * (tt * ((t->m_wmask >> lod) + 1) + ts);
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
-			tbaseaddr = t->lodoffset[0] + offset*4;
+			tbaseaddr = t->m_lodoffset[0] + offset*4;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
 
 		/* write the two words in little-endian order */
-		dest = (u16 *)t->ram;
-		tbaseaddr &= t->mask;
+		dest = (u16 *)t->m_ram;
+		tbaseaddr &= t->m_mask;
 		tbaseaddr >>= 1;
 		dest[BYTE_XOR_LE(tbaseaddr + 0)] = (data >> 0) & 0xffff;
 		dest[BYTE_XOR_LE(tbaseaddr + 1)] = (data >> 16) & 0xffff;
@@ -5861,16 +5857,16 @@ s32 voodoo_device::triangle()
 		/* adjust iterated W/S/T for TMU 0 */
 		if (texcount >= 1)
 		{
-			m_tmu[0].startw += (dy * m_tmu[0].dwdy + dx * m_tmu[0].dwdx) >> 4;
-			m_tmu[0].starts += (dy * m_tmu[0].dsdy + dx * m_tmu[0].dsdx) >> 4;
-			m_tmu[0].startt += (dy * m_tmu[0].dtdy + dx * m_tmu[0].dtdx) >> 4;
+			m_tmu[0].m_startw += (dy * m_tmu[0].m_dwdy + dx * m_tmu[0].m_dwdx) >> 4;
+			m_tmu[0].m_starts += (dy * m_tmu[0].m_dsdy + dx * m_tmu[0].m_dsdx) >> 4;
+			m_tmu[0].m_startt += (dy * m_tmu[0].m_dtdy + dx * m_tmu[0].m_dtdx) >> 4;
 
 			/* adjust iterated W/S/T for TMU 1 */
 			if (texcount >= 2)
 			{
-				m_tmu[1].startw += (dy * m_tmu[1].dwdy + dx * m_tmu[1].dwdx) >> 4;
-				m_tmu[1].starts += (dy * m_tmu[1].dsdy + dx * m_tmu[1].dsdx) >> 4;
-				m_tmu[1].startt += (dy * m_tmu[1].dtdy + dx * m_tmu[1].dtdx) >> 4;
+				m_tmu[1].m_startw += (dy * m_tmu[1].m_dwdy + dx * m_tmu[1].m_dwdx) >> 4;
+				m_tmu[1].m_starts += (dy * m_tmu[1].m_dsdy + dx * m_tmu[1].m_dsdx) >> 4;
+				m_tmu[1].m_startt += (dy * m_tmu[1].m_dtdy + dx * m_tmu[1].m_dtdx) >> 4;
 			}
 		}
 	}
@@ -6071,47 +6067,47 @@ s32 voodoo_device::setup_and_draw_triangle()
 	tdiv = divisor * 65536.0f * 65536.0f;
 	if (m_reg[sSetupMode].u & (1 << 3))
 	{
-		m_fbi.startw = m_tmu[0].startw = m_tmu[1].startw = (s64)(m_fbi.svert[0].wb * 65536.0f * 65536.0f);
-		m_fbi.dwdx = m_tmu[0].dwdx = m_tmu[1].dwdx = ((m_fbi.svert[0].wb - m_fbi.svert[1].wb) * dx1 - (m_fbi.svert[0].wb - m_fbi.svert[2].wb) * dx2) * tdiv;
-		m_fbi.dwdy = m_tmu[0].dwdy = m_tmu[1].dwdy = ((m_fbi.svert[0].wb - m_fbi.svert[2].wb) * dy1 - (m_fbi.svert[0].wb - m_fbi.svert[1].wb) * dy2) * tdiv;
+		m_fbi.startw = m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.svert[0].wb * 65536.0f * 65536.0f);
+		m_fbi.dwdx = m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.svert[0].wb - m_fbi.svert[1].wb) * dx1 - (m_fbi.svert[0].wb - m_fbi.svert[2].wb) * dx2) * tdiv;
+		m_fbi.dwdy = m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = ((m_fbi.svert[0].wb - m_fbi.svert[2].wb) * dy1 - (m_fbi.svert[0].wb - m_fbi.svert[1].wb) * dy2) * tdiv;
 	}
 
 	/* set up W0 */
 	if (m_reg[sSetupMode].u & (1 << 4))
 	{
-		m_tmu[0].startw = m_tmu[1].startw = (s64)(m_fbi.svert[0].w0 * 65536.0f * 65536.0f);
-		m_tmu[0].dwdx = m_tmu[1].dwdx = ((m_fbi.svert[0].w0 - m_fbi.svert[1].w0) * dx1 - (m_fbi.svert[0].w0 - m_fbi.svert[2].w0) * dx2) * tdiv;
-		m_tmu[0].dwdy = m_tmu[1].dwdy = ((m_fbi.svert[0].w0 - m_fbi.svert[2].w0) * dy1 - (m_fbi.svert[0].w0 - m_fbi.svert[1].w0) * dy2) * tdiv;
+		m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.svert[0].w0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.svert[0].w0 - m_fbi.svert[1].w0) * dx1 - (m_fbi.svert[0].w0 - m_fbi.svert[2].w0) * dx2) * tdiv;
+		m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = ((m_fbi.svert[0].w0 - m_fbi.svert[2].w0) * dy1 - (m_fbi.svert[0].w0 - m_fbi.svert[1].w0) * dy2) * tdiv;
 	}
 
 	/* set up S0,T0 */
 	if (m_reg[sSetupMode].u & (1 << 5))
 	{
-		m_tmu[0].starts = m_tmu[1].starts = (s64)(m_fbi.svert[0].s0 * 65536.0f * 65536.0f);
-		m_tmu[0].dsdx = m_tmu[1].dsdx = ((m_fbi.svert[0].s0 - m_fbi.svert[1].s0) * dx1 - (m_fbi.svert[0].s0 - m_fbi.svert[2].s0) * dx2) * tdiv;
-		m_tmu[0].dsdy = m_tmu[1].dsdy = ((m_fbi.svert[0].s0 - m_fbi.svert[2].s0) * dy1 - (m_fbi.svert[0].s0 - m_fbi.svert[1].s0) * dy2) * tdiv;
-		m_tmu[0].startt = m_tmu[1].startt = (s64)(m_fbi.svert[0].t0 * 65536.0f * 65536.0f);
-		m_tmu[0].dtdx = m_tmu[1].dtdx = ((m_fbi.svert[0].t0 - m_fbi.svert[1].t0) * dx1 - (m_fbi.svert[0].t0 - m_fbi.svert[2].t0) * dx2) * tdiv;
-		m_tmu[0].dtdy = m_tmu[1].dtdy = ((m_fbi.svert[0].t0 - m_fbi.svert[2].t0) * dy1 - (m_fbi.svert[0].t0 - m_fbi.svert[1].t0) * dy2) * tdiv;
+		m_tmu[0].m_starts = m_tmu[1].m_starts = (s64)(m_fbi.svert[0].s0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dsdx = m_tmu[1].m_dsdx = ((m_fbi.svert[0].s0 - m_fbi.svert[1].s0) * dx1 - (m_fbi.svert[0].s0 - m_fbi.svert[2].s0) * dx2) * tdiv;
+		m_tmu[0].m_dsdy = m_tmu[1].m_dsdy = ((m_fbi.svert[0].s0 - m_fbi.svert[2].s0) * dy1 - (m_fbi.svert[0].s0 - m_fbi.svert[1].s0) * dy2) * tdiv;
+		m_tmu[0].m_startt = m_tmu[1].m_startt = (s64)(m_fbi.svert[0].t0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dtdx = m_tmu[1].m_dtdx = ((m_fbi.svert[0].t0 - m_fbi.svert[1].t0) * dx1 - (m_fbi.svert[0].t0 - m_fbi.svert[2].t0) * dx2) * tdiv;
+		m_tmu[0].m_dtdy = m_tmu[1].m_dtdy = ((m_fbi.svert[0].t0 - m_fbi.svert[2].t0) * dy1 - (m_fbi.svert[0].t0 - m_fbi.svert[1].t0) * dy2) * tdiv;
 	}
 
 	/* set up W1 */
 	if (m_reg[sSetupMode].u & (1 << 6))
 	{
-		m_tmu[1].startw = (s64)(m_fbi.svert[0].w1 * 65536.0f * 65536.0f);
-		m_tmu[1].dwdx = ((m_fbi.svert[0].w1 - m_fbi.svert[1].w1) * dx1 - (m_fbi.svert[0].w1 - m_fbi.svert[2].w1) * dx2) * tdiv;
-		m_tmu[1].dwdy = ((m_fbi.svert[0].w1 - m_fbi.svert[2].w1) * dy1 - (m_fbi.svert[0].w1 - m_fbi.svert[1].w1) * dy2) * tdiv;
+		m_tmu[1].m_startw = (s64)(m_fbi.svert[0].w1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dwdx = ((m_fbi.svert[0].w1 - m_fbi.svert[1].w1) * dx1 - (m_fbi.svert[0].w1 - m_fbi.svert[2].w1) * dx2) * tdiv;
+		m_tmu[1].m_dwdy = ((m_fbi.svert[0].w1 - m_fbi.svert[2].w1) * dy1 - (m_fbi.svert[0].w1 - m_fbi.svert[1].w1) * dy2) * tdiv;
 	}
 
 	/* set up S1,T1 */
 	if (m_reg[sSetupMode].u & (1 << 7))
 	{
-		m_tmu[1].starts = (s64)(m_fbi.svert[0].s1 * 65536.0f * 65536.0f);
-		m_tmu[1].dsdx = ((m_fbi.svert[0].s1 - m_fbi.svert[1].s1) * dx1 - (m_fbi.svert[0].s1 - m_fbi.svert[2].s1) * dx2) * tdiv;
-		m_tmu[1].dsdy = ((m_fbi.svert[0].s1 - m_fbi.svert[2].s1) * dy1 - (m_fbi.svert[0].s1 - m_fbi.svert[1].s1) * dy2) * tdiv;
-		m_tmu[1].startt = (s64)(m_fbi.svert[0].t1 * 65536.0f * 65536.0f);
-		m_tmu[1].dtdx = ((m_fbi.svert[0].t1 - m_fbi.svert[1].t1) * dx1 - (m_fbi.svert[0].t1 - m_fbi.svert[2].t1) * dx2) * tdiv;
-		m_tmu[1].dtdy = ((m_fbi.svert[0].t1 - m_fbi.svert[2].t1) * dy1 - (m_fbi.svert[0].t1 - m_fbi.svert[1].t1) * dy2) * tdiv;
+		m_tmu[1].m_starts = (s64)(m_fbi.svert[0].s1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dsdx = ((m_fbi.svert[0].s1 - m_fbi.svert[1].s1) * dx1 - (m_fbi.svert[0].s1 - m_fbi.svert[2].s1) * dx2) * tdiv;
+		m_tmu[1].m_dsdy = ((m_fbi.svert[0].s1 - m_fbi.svert[2].s1) * dy1 - (m_fbi.svert[0].s1 - m_fbi.svert[1].s1) * dy2) * tdiv;
+		m_tmu[1].m_startt = (s64)(m_fbi.svert[0].t1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dtdx = ((m_fbi.svert[0].t1 - m_fbi.svert[1].t1) * dx1 - (m_fbi.svert[0].t1 - m_fbi.svert[2].t1) * dx2) * tdiv;
+		m_tmu[1].m_dtdy = ((m_fbi.svert[0].t1 - m_fbi.svert[2].t1) * dy1 - (m_fbi.svert[0].t1 - m_fbi.svert[1].t1) * dy2) * tdiv;
 	}
 
 	/* draw the triangle */
@@ -6168,30 +6164,30 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 	/* fill in texture 0 parameters */
 	if (texcount > 0)
 	{
-		extra.starts0 = m_tmu[0].starts;
-		extra.startt0 = m_tmu[0].startt;
-		extra.startw0 = m_tmu[0].startw;
-		extra.ds0dx = m_tmu[0].dsdx;
-		extra.dt0dx = m_tmu[0].dtdx;
-		extra.dw0dx = m_tmu[0].dwdx;
-		extra.ds0dy = m_tmu[0].dsdy;
-		extra.dt0dy = m_tmu[0].dtdy;
-		extra.dw0dy = m_tmu[0].dwdy;
+		extra.starts0 = m_tmu[0].m_starts;
+		extra.startt0 = m_tmu[0].m_startt;
+		extra.startw0 = m_tmu[0].m_startw;
+		extra.ds0dx = m_tmu[0].m_dsdx;
+		extra.dt0dx = m_tmu[0].m_dtdx;
+		extra.dw0dx = m_tmu[0].m_dwdx;
+		extra.ds0dy = m_tmu[0].m_dsdy;
+		extra.dt0dy = m_tmu[0].m_dtdy;
+		extra.dw0dy = m_tmu[0].m_dwdy;
 		extra.lodbase0 = m_tmu[0].prepare();
 		m_stats.texture_mode[voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).format()]++;
 
 		/* fill in texture 1 parameters */
 		if (texcount > 1)
 		{
-			extra.starts1 = m_tmu[1].starts;
-			extra.startt1 = m_tmu[1].startt;
-			extra.startw1 = m_tmu[1].startw;
-			extra.ds1dx = m_tmu[1].dsdx;
-			extra.dt1dx = m_tmu[1].dtdx;
-			extra.dw1dx = m_tmu[1].dwdx;
-			extra.ds1dy = m_tmu[1].dsdy;
-			extra.dt1dy = m_tmu[1].dtdy;
-			extra.dw1dy = m_tmu[1].dwdy;
+			extra.starts1 = m_tmu[1].m_starts;
+			extra.startt1 = m_tmu[1].m_startt;
+			extra.startw1 = m_tmu[1].m_startw;
+			extra.ds1dx = m_tmu[1].m_dsdx;
+			extra.dt1dx = m_tmu[1].m_dtdx;
+			extra.dw1dx = m_tmu[1].m_dwdx;
+			extra.ds1dy = m_tmu[1].m_dsdy;
+			extra.dt1dy = m_tmu[1].m_dtdy;
+			extra.dw1dy = m_tmu[1].m_dwdy;
 			extra.lodbase1 = m_tmu[1].prepare();
 			m_stats.texture_mode[voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).format()]++;
 		}
