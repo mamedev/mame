@@ -65,7 +65,10 @@ public:
 		, m_bankr(*this, "bankr%d", 0U)
 		, m_bankw(*this, "bankw%d", 0U)
 		, m_pak(*this, "optrom%u", 0U)  // "rom" causes issues
-		{ }
+		{
+			for (u8 n : m_pak_extended)
+				m_pak_extended[n] = 0;
+		}
 
 	void mbee56(machine_config &config);
 	void mbeeppc(machine_config &config);
