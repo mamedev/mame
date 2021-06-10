@@ -171,8 +171,6 @@ bits(7:4) and bit(24)), X, and Y:
 #define LOG_CMDFIFO_VERBOSE (0)
 #define LOG_BANSHEE_2D      (0)
 
-#define MODIFY_PIXEL(VV)
-
 // Need to turn off cycle eating when debugging MIPS drc
 // otherwise timer interrupts won't match nodrc debug mode.
 #define EAT_CYCLES          (1)
@@ -730,8 +728,40 @@ const char *const banshee_agp_reg_name[] =
 static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
 
 /* fast dither lookup */
-static u8 dither4_lookup[256*16*2];
-static u8 dither2_lookup[256*16*2];
+std::unique_ptr<u8[]> voodoo::dither_helper::s_dither4_lookup;
+std::unique_ptr<u8[]> voodoo::dither_helper::s_dither2_lookup;
+std::unique_ptr<u8[]> voodoo::dither_helper::s_nodither_lookup;
+
+u8 const voodoo::dither_helper::s_dither_matrix_4x4[16] =
+{
+	 0,  8,  2, 10,
+	12,  4, 14,  6,
+	 3, 11,  1,  9,
+	15,  7, 13,  5
+};
+// Using this matrix allows iteagle video memory tests to pass
+u8 const voodoo::dither_helper::s_dither_matrix_2x2[16] =
+{
+	 8, 10,  8, 10,
+	11,  9, 11,  9,
+	 8, 10,  8, 10,
+	11,  9, 11,  9
+};
+
+u8 const voodoo::dither_helper::s_dither_matrix_4x4_subtract[16] =
+{
+	(15 -  0) >> 1, (15 -  8) >> 1, (15 -  2) >> 1, (15 - 10) >> 1,
+	(15 - 12) >> 1, (15 -  4) >> 1, (15 - 14) >> 1, (15 -  6) >> 1,
+	(15 -  3) >> 1, (15 - 11) >> 1, (15 -  1) >> 1, (15 -  9) >> 1,
+	(15 - 15) >> 1, (15 -  7) >> 1, (15 - 13) >> 1, (15 -  5) >> 1
+};
+u8 const voodoo::dither_helper::s_dither_matrix_2x2_subtract[16] =
+{
+	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1,
+	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
+	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1
+};
 
 /* fast reciprocal+log2 lookup */
 u32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
@@ -3749,7 +3779,6 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	if (!LFBMODE_ENABLE_PIXEL_PIPELINE(m_reg[lfbMode].u))
 	{
-		DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
 		u32 bufoffs;
 
 		if (LOG_LFB) logerror("VOODOO.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", LFBMODE_WRITE_FORMAT(m_reg[lfbMode].u), x, y, data, mem_mask);
@@ -3762,13 +3791,11 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		/* advance pointers to the proper row */
 		bufoffs = scry * m_fbi.rowpixels + x;
 
-		/* compute dithering */
-		COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(fbzmode, y);
-
 		/* wait for any outstanding work to finish */
 		m_poly->wait("LFB Write");
 
 		/* loop over up to two pixels */
+		voodoo::dither_helper dither(y, fbzmode);
 		for (pix = 0; mask; pix++)
 		{
 			/* make sure we care about this pixel */
@@ -3778,8 +3805,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if ((mask & LFB_RGB_PRESENT) && bufoffs < destmax)
 				{
 					/* apply dithering and write to the screen */
-					APPLY_DITHER(fbzmode, x, dither_lookup, sr[pix], sg[pix], sb[pix]);
-					dest[bufoffs] = (sr[pix] << 11) | (sg[pix] << 5) | sb[pix];
+					dest[bufoffs] = dither.pixel(x, sr[pix], sg[pix], sb[pix]);
 				}
 
 				/* make sure we have an aux buffer to write to */
@@ -3808,8 +3834,6 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	/* tricky case: run the full pixel pipeline on the pixel */
 	else
 	{
-		DECLARE_DITHER_POINTERS;
-
 		if (LOG_LFB) logerror("VOODOO.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", LFBMODE_WRITE_FORMAT(m_reg[lfbMode].u), x, y, data, mem_mask);
 
 		/* determine the screen Y */
@@ -3822,12 +3846,10 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		if (depth)
 			depth += scry * m_fbi.rowpixels;
 
-		/* compute dithering */
-		voodoo::fog_mode const fogmode(m_reg[fogMode].u);
-		COMPUTE_DITHER_POINTERS(fbzmode, y, fogmode);
-
 		/* loop over up to two pixels */
 		voodoo::alpha_mode const alphamode(m_reg[alphaMode].u);
+		voodoo::fog_mode const fogmode(m_reg[fogMode].u);
+		voodoo::dither_helper dither(y, fbzmode, fogmode);
 		for (pix = 0; mask; pix++)
 		{
 			/* make sure we care about this pixel */
@@ -3866,7 +3888,6 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 // Start PIXEL_PIPE_BEGIN copy
 				//#define PIXEL_PIPELINE_BEGIN(VV, STATS, XX, YY, FBZCOLORPATH, FBZMODE, ITERZ, ITERW)
 					s32 biasdepth;
-					s32 r, g, b;
 
 					(threadstats).pixels_in++;
 
@@ -3901,12 +3922,11 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 // End PIXEL_PIPELINE_BEGIN COPY
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				biasdepth = (u32) sz[pix];
-
+				biasdepth = u32(sz[pix]);
 
 				/* Perform depth testing */
 				if (fbzmode.enable_depthbuf())
-					if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], fbzmode, biasdepth))
+					if (!depth_test(threadstats, fbzmode, depth[x], biasdepth))
 						goto nextpixel;
 
 				/* use the RGBA we stashed above */
@@ -3914,12 +3934,14 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 				/* handle chroma key */
 				if (fbzmode.enable_chromakey())
-					if (!chroma_key_test(threadstats, fbzmode, color))
+					if (!chroma_key_test(threadstats, color))
 						goto nextpixel;
+
 				/* handle alpha mask */
 				if (fbzmode.enable_alpha_mask())
-					if (!alpha_mask_test(threadstats, fbzmode, color.get_a()))
+					if (!alpha_mask_test(threadstats, color.get_a()))
 						goto nextpixel;
+
 				/* handle alpha test */
 				if (alphamode.alphatest())
 					if (!alpha_test(threadstats, alphamode, color.get_a()))
@@ -3930,7 +3952,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if (fogmode.enable_fog())
 				{
 					voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
-					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither4, biasdepth, iterz, iterw, iterargb);
+					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, biasdepth, iterz, iterw, iterargb);
 				}
 
 				/* wait for any outstanding work to finish */
@@ -3938,10 +3960,10 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 				/* perform alpha blending */
 				if (alphamode.alphablend())
-					alpha_blend(fbzmode, alphamode, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565);
+					alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, preFog, m_fbi.rgb565);
 
 				/* pixel pipeline part 2 handles final output */
-				PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, fbzmode) { };
+				PIXEL_PIPELINE_END(threadstats, dither, x, dest, depth, fbzmode) { };
 nextpixel:
 			/* advance our pointers */
 			x++;
@@ -5642,25 +5664,7 @@ void voodoo_device::device_start()
 		voodoo_reciplog[val*2 + 1] = (u32)(LOGB2((double)value / (double)(1 << RECIPLOG_LOOKUP_BITS)) * (double)(1 << RECIPLOG_LOOKUP_PREC));
 	}
 
-	/* create dithering tables */
-	for (int val = 0; val < 256*16*2; val++)
-	{
-		int g = (val >> 0) & 1;
-		int x = (val >> 1) & 3;
-		int color = (val >> 3) & 0xff;
-		int y = (val >> 11) & 3;
-
-		if (!g)
-		{
-			dither4_lookup[val] = DITHER_RB(color, dither_matrix_4x4[y * 4 + x]) >> 3;
-			dither2_lookup[val] = DITHER_RB(color, dither_matrix_2x2[y * 4 + x]) >> 3;
-		}
-		else
-		{
-			dither4_lookup[val] = DITHER_G(color, dither_matrix_4x4[y * 4 + x]) >> 2;
-			dither2_lookup[val] = DITHER_G(color, dither_matrix_2x2[y * 4 + x]) >> 2;
-		}
-	}
+	voodoo::dither_helper::init_static();
 
 	m_tmu_config = 0x11;   // revision 1
 
@@ -5848,16 +5852,13 @@ s32 voodoo_device::fastfill()
 		/* determine the dither pattern */
 		for (int y = 0; y < 4; y++)
 		{
-			DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
-			COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(fbzmode, y);
+			voodoo::dither_helper dither(y, fbzmode);
 			for (int x = 0; x < 4; x++)
 			{
 				int r = m_reg[color1].rgb.r;
 				int g = m_reg[color1].rgb.g;
 				int b = m_reg[color1].rgb.b;
-
-				APPLY_DITHER(fbzmode, x, dither_lookup, r, g, b);
-				dithermatrix[y*4 + x] = (r << 11) | (g << 5) | b;
+				dithermatrix[y*4 + x] = dither.pixel(x, r, g, b);
 			}
 		}
 	}

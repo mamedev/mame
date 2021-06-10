@@ -130,6 +130,8 @@ union voodoo_reg
 namespace voodoo
 {
 
+class dither_helper;
+
 class fbz_colorpath
 {
 public:
@@ -709,54 +711,6 @@ private:
 
 /*************************************
  *
- *  Dithering tables
- *
- *************************************/
-
-static const u8 dither_matrix_4x4[16] =
-{
-	 0,  8,  2, 10,
-	12,  4, 14,  6,
-	 3, 11,  1,  9,
-	15,  7, 13,  5
-};
-
-//static const u8 dither_matrix_2x2[16] =
-//{
-//      2, 10,  2, 10,
-//  14,  6, 14,  6,
-//      2, 10,  2, 10,
-//  14,  6, 14,  6
-//};
-// Using this matrix allows iteagle video memory tests to pass
-static const u8 dither_matrix_2x2[16] =
-{
-	8, 10, 8, 10,
-	11, 9, 11, 9,
-	8, 10, 8, 10,
-	11, 9, 11, 9
-};
-
-// Dither 4x4 subtraction matrix used in alpha blending
-static const u8 dither_subtract_4x4[16] =
-{
-	(15 - 0) >> 1,  (15 - 8) >> 1,  (15 - 2) >> 1, (15 - 10) >> 1,
-	(15 - 12) >> 1,  (15 - 4) >> 1, (15 - 14) >> 1,  (15 - 6) >> 1,
-	(15 - 3) >> 1, (15 - 11) >> 1,  (15 - 1) >> 1,  (15 - 9) >> 1,
-	(15 - 15) >> 1,  (15 - 7) >> 1, (15 - 13) >> 1,  (15 - 5) >> 1
-};
-
-// Dither 2x2 subtraction matrix used in alpha blending
-static const u8 dither_subtract_2x2[16] =
-{
-	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1,
-	(15 - 8) >> 1, (15 - 10) >> 1, (15 - 8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 - 9) >> 1, (15 - 11) >> 1, (15 - 9) >> 1
-};
-
-/*************************************
- *
  *  Macros for extracting pixels
  *
  *************************************/
@@ -1173,7 +1127,7 @@ protected:
 		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		s32 prepare();
 		static s32 new_log2(double &value, const int &offset);
-		rgbaint_t genTexture(s32 x, const u8 *dither4, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
+		rgbaint_t genTexture(s32 x, voodoo::dither_helper const &dither, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod);
 		rgbaint_t combineTexture(voodoo::texture_mode const TEXMODE, const rgbaint_t& c_local, const rgbaint_t& c_other, s32 lod);
 
 		struct ncc_table
@@ -1493,12 +1447,12 @@ protected:
 
 #undef RASTERIZER_ENTRY
 
-	bool chroma_key_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, rgbaint_t rgaIntColor);
-	bool alpha_mask_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, u8 alpha);
+	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &rgaIntColor);
+	bool alpha_mask_test(thread_stats_block &stats, u8 alpha);
 	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
-	bool depth_test(u16 zaColorReg, thread_stats_block &stats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth);
+	bool depth_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
 	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, voodoo::fbz_colorpath const fbzcp, voodoo::fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
-	void apply_fogging(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, u8 const *dither4, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void apply_fogging(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 
 	void banshee_blit_2d(u32 data);
 

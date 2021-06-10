@@ -259,80 +259,120 @@ constexpr u32 voodoo_device::static_raster_info::compute_hash() const
  *
  *************************************/
 
-/* note that these equations and the dither matrixes have
-   been confirmed to be exact matches to the real hardware */
-#define DITHER_RB(val,dith) ((((val) << 1) - ((val) >> 4) + ((val) >> 7) + (dith)) >> 1)
-#define DITHER_G(val,dith)  ((((val) << 2) - ((val) >> 4) + ((val) >> 6) + (dith)) >> 2)
+namespace voodoo
+{
 
-#define DECLARE_DITHER_POINTERS                                                 \
-	const u8 *dither_lookup = nullptr;                                          \
-	const u8 *dither4 = nullptr;                                                \
-	const u8 *dither = nullptr
-#define DECLARE_DITHER_POINTERS_NO_DITHER_VAR                                               \
-	const u8 *dither_lookup = nullptr;
-#define COMPUTE_DITHER_POINTERS(FBZMODE, YY, FOGMODE)                           \
-do                                                                              \
-{                                                                               \
-	if (FBZMODE.enable_dithering() || FOGMODE.fog_dither())        \
-		dither4 = &dither_matrix_4x4[((YY) & 3) * 4];                           \
-	/* compute the dithering pointers */                                        \
-	if (FBZMODE.enable_dithering())                                      \
-	{                                                                           \
-		if (FBZMODE.dither_type() == 0)                                  \
-		{                                                                       \
-			dither = &dither_subtract_4x4[((YY) & 3) * 4];                      \
-			dither_lookup = &dither4_lookup[(YY & 3) << 11];                    \
-		}                                                                       \
-		else                                                                    \
-		{                                                                       \
-			dither = &dither_subtract_2x2[((YY) & 3) * 4];                      \
-			dither_lookup = &dither2_lookup[(YY & 3) << 11];                    \
-		}                                                                       \
-	}                                                                           \
-}                                                                               \
-while (0)
+class dither_helper
+{
+public:
+	// constructor to pre-cache based on mode and Y coordinate
+	dither_helper(int y, fbz_mode const fbzmode, fog_mode const fogmode = fog_mode(0)) :
+		m_dither_lookup(nullptr),
+		m_dither_raw(&s_dither_matrix_4x4[(y & 3) * 4]),
+		m_dither_subtract(nullptr)
+	{
+		// still use a lookup for no dithering since it's rare and we
+		// can avoid yet another conditional on the hot path
+		if (!fbzmode.enable_dithering())
+			m_dither_lookup = &s_nodither_lookup[0];
+		else if (fbzmode.dither_type() == 0)
+			m_dither_lookup = &s_dither4_lookup[(y & 3) << 11];
+		else
+			m_dither_lookup = &s_dither2_lookup[(y & 3) << 11];
+	}
 
-#define COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(FBZMODE, YY)                                  \
-do                                                                              \
-{                                                                               \
-	/* compute the dithering pointers */                                        \
-	if (FBZMODE.enable_dithering())                                      \
-	{                                                                           \
-		if (FBZMODE.dither_type() == 0)                                  \
-		{                                                                       \
-			dither_lookup = &dither4_lookup[(YY & 3) << 11];                    \
-		}                                                                       \
-		else                                                                    \
-		{                                                                       \
-			dither_lookup = &dither2_lookup[(YY & 3) << 11];                    \
-		}                                                                       \
-	}                                                                           \
-}                                                                               \
-while (0)
+	// apply dithering to a pixel in separate R/G/B format and assemble as 5-6-5
+	u16 pixel(s32 x, s32 r, s32 g, s32 b) const
+	{
+		u8 const *table = &m_dither_lookup[(x & 3) << 9];
+		return (table[r] << 11) | (table[g + 256] << 5) | table[b];
+	}
 
-#define APPLY_DITHER(FBZMODE, XX, DITHER_LOOKUP, RR, GG, BB)                    \
-do                                                                              \
-{                                                                               \
-	/* apply dithering */                                                       \
-	if (FBZMODE.enable_dithering())                                      \
-	{                                                                           \
-		/* look up the dither value from the appropriate matrix */              \
-		const u8 *dith = &DITHER_LOOKUP[((XX) & 3) << 1];                    \
-																				\
-		/* apply dithering to R,G,B */                                          \
-		(RR) = dith[((RR) << 3) + 0];                                           \
-		(GG) = dith[((GG) << 3) + 1];                                           \
-		(BB) = dith[((BB) << 3) + 0];                                           \
-	}                                                                           \
-	else                                                                        \
-	{                                                                           \
-		(RR) >>= 3;                                                             \
-		(GG) >>= 2;                                                             \
-		(BB) >>= 3;                                                             \
-	}                                                                           \
-}                                                                               \
-while (0)
+	// apply dithering to an rgbint_t pixel and assemble as 5-6-5
+	u16 pixel(s32 x, rgbaint_t const &color) const
+	{
+		u8 const *table = &m_dither_lookup[(x & 3) << 9];
+		return (table[color.get_r()] << 11) | (table[color.get_g() + 256] << 5) | table[color.get_b()];
+	}
 
+	// return the raw 4x4 dither pattern
+	u32 raw(s32 x) const
+	{
+		return m_dither_raw[x & 3];
+	}
+
+	// return the subtractive dither value for alpha blending
+	u32 subtract(s32 x) const
+	{
+		return (m_dither_subtract != nullptr) ? m_dither_subtract[x & 3] : 0;
+	}
+
+	// allocate and initialize static tables
+	static void init_static()
+	{
+		// create static dithering tables
+		s_dither4_lookup = std::make_unique<u8[]>(256*4*4*2);
+		s_dither2_lookup = std::make_unique<u8[]>(256*4*4*2);
+		s_nodither_lookup = std::make_unique<u8[]>(256*4*2);
+		for (int val = 0; val < 256*4*4*2; val++)
+		{
+			int color = (val >> 0) & 0xff;
+			int g = (val >> 8) & 1;
+			int x = (val >> 9) & 3;
+			int y = (val >> 11) & 3;
+
+			if (!g)
+			{
+				s_dither4_lookup[val] = dither_rb(color, s_dither_matrix_4x4[y * 4 + x]);
+				s_dither2_lookup[val] = dither_rb(color, s_dither_matrix_2x2[y * 4 + x]);
+			}
+			else
+			{
+				s_dither4_lookup[val] = dither_g(color, s_dither_matrix_4x4[y * 4 + x]);
+				s_dither2_lookup[val] = dither_g(color, s_dither_matrix_2x2[y * 4 + x]);
+			}
+		}
+		for (int val = 0; val < 256*4*2; val++)
+		{
+			int color = (val >> 0) & 0xff;
+			int g = (val >> 8) & 1;
+
+			if (!g)
+				s_nodither_lookup[val] = color >> 3;
+			else
+				s_nodither_lookup[val] = color >> 2;
+		}
+	}
+
+private:
+	// hardware-verified equation for applying dither to the red/blue components
+	static constexpr u8 dither_rb(u8 value, u8 dither)
+	{
+		return ((value << 1) - (value >> 4) + (value >> 7) + dither) >> (1+3);
+	}
+
+	// hardware-verified equation for applying dither to the green componenets
+	static constexpr u8 dither_g(u8 value, u8 dither)
+	{
+		return ((value << 2) - (value >> 4) + (value >> 6) + dither) >> (2+2);
+	}
+
+	// internal state
+	u8 const *m_dither_lookup;
+	u8 const *m_dither_raw;
+	u8 const *m_dither_subtract;
+
+	// static tables
+	static std::unique_ptr<u8[]> s_dither4_lookup;
+	static std::unique_ptr<u8[]> s_dither2_lookup;
+	static std::unique_ptr<u8[]> s_nodither_lookup;
+	static u8 const s_dither_matrix_4x4[4*4];
+	static u8 const s_dither_matrix_2x2[4*4];
+	static u8 const s_dither_matrix_4x4_subtract[4*4];
+	static u8 const s_dither_matrix_2x2_subtract[4*4];
+};
+
+}
 
 
 /*************************************
@@ -482,11 +522,11 @@ do                                                                              
 }                                                                               \
 while (0)
 
-inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block &threadstats, voodoo::fbz_mode const  fbzmode, rgbaint_t rgbaIntColor)
+inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin)
 {
 	{
 		rgb_union color;
-		color.u = rgbaIntColor.to_rgba();
+		color.u = colorin.to_rgba();
 		/* non-range version */
 		if (!CHROMARANGE_ENABLE(m_reg[chromaRange].u))
 		{
@@ -556,28 +596,12 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(thread_stats_block 
  *
  *************************************/
 
-#define APPLY_ALPHAMASK(STATS, FBZMODE, AA)                                 \
-do                                                                              \
-{                                                                               \
-	if (FBZMODE.enable_alpha_mask())                                     \
-	{                                                                           \
-		if (((AA) & 1) == 0)                                                    \
-		{                                                                       \
-			(STATS)->afunc_fail++;                                              \
-			goto skipdrawdepth;                                                 \
-		}                                                                       \
-	}                                                                           \
-}                                                                               \
-while (0)
-
-inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, u8 alpha)
+inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, u8 alpha)
 {
+	if ((alpha & 1) == 0)
 	{
-		if ((alpha & 1) == 0)
-		{
-			threadstats.afunc_fail++;
-			return false;
-		}
+		threadstats.afunc_fail++;
+		return false;
 	}
 	return true;
 }
@@ -588,133 +612,67 @@ inline bool voodoo_device::alpha_mask_test(thread_stats_block &threadstats, vood
  *
  *************************************/
 
-#define APPLY_ALPHATEST(STATS, ALPHAMODE, AA)                               \
-do                                                                              \
-{                                                                               \
-	if (ALPHAMODE.alphatest())                                         \
-	{                                                                           \
-		u8 alpharef = ALPHAMODE.alpharef();                            \
-		switch (ALPHAMODE.alphafunction())                             \
-		{                                                                       \
-			case 0:     /* alphaOP = never */                                   \
-				(STATS)->afunc_fail++;                                          \
-				goto skipdrawdepth;                                             \
-																				\
-			case 1:     /* alphaOP = less than */                               \
-				if ((AA) >= alpharef)                                           \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 2:     /* alphaOP = equal */                                   \
-				if ((AA) != alpharef)                                           \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 3:     /* alphaOP = less than or equal */                      \
-				if ((AA) > alpharef)                                            \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 4:     /* alphaOP = greater than */                            \
-				if ((AA) <= alpharef)                                           \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 5:     /* alphaOP = not equal */                               \
-				if ((AA) == alpharef)                                           \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 6:     /* alphaOP = greater than or equal */                   \
-				if ((AA) < alpharef)                                            \
-				{                                                               \
-					(STATS)->afunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 7:     /* alphaOP = always */                                  \
-				break;                                                          \
-		}                                                                       \
-	}                                                                           \
-}                                                                               \
-while (0)
-
-inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(thread_stats_block &threadstats, voodoo::alpha_mode const alphamode, u8 alpha)
+inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(
+	thread_stats_block &threadstats,
+	voodoo::alpha_mode const alphamode,
+	u8 alpha)
 {
+	switch (alphamode.alphafunction())
 	{
-		switch (alphamode.alphafunction())
-		{
-			case 0:     /* alphaOP = never */
+		case 0:     // alphaOP = never
+			threadstats.afunc_fail++;
+			return false;
+
+		case 1:     // alphaOP = less than
+			if (alpha >= alphamode.alpharef())
+			{
 				threadstats.afunc_fail++;
 				return false;
+			}
+			break;
 
-			case 1:     /* alphaOP = less than */
-				if (alpha >= alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
+		case 2:     // alphaOP = equal
+			if (alpha != alphamode.alpharef())
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
 
-			case 2:     /* alphaOP = equal */
-				if (alpha != alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
+		case 3:     // alphaOP = less than or equal
+			if (alpha > alphamode.alpharef())
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
 
-			case 3:     /* alphaOP = less than or equal */
-				if (alpha > alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
+		case 4:     // alphaOP = greater than
+			if (alpha <= alphamode.alpharef())
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
 
-			case 4:     /* alphaOP = greater than */
-				if (alpha <= alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
+		case 5:     // alphaOP = not equal
+			if (alpha == alphamode.alpharef())
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
 
-			case 5:     /* alphaOP = not equal */
-				if (alpha == alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
+		case 6:     // alphaOP = greater than or equal
+			if (alpha < alphamode.alpharef())
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
 
-			case 6:     /* alphaOP = greater than or equal */
-				if (alpha < alphamode.alpharef())
-				{
-					threadstats.afunc_fail++;
-					return false;
-				}
-				break;
-
-			case 7:     /* alphaOP = always */
-				break;
-		}
+		case 7:     // alphaOP = always
+			break;
 	}
 	return true;
 }
@@ -745,7 +703,7 @@ do                                                                              
 		if (FBZMODE.alpha_dither_subtract())                             \
 		{                                                                       \
 			/* look up the dither value from the appropriate matrix */          \
-			int dith = DITHER[(XX) & 3];                                        \
+			int dith = dither.subtract(XX);                                        \
 																				\
 			/* subtract the dither value */                                     \
 			dr = ((dr << 1) + 15 - dith) >> 1;                                  \
@@ -882,7 +840,16 @@ do                                                                              
 }                                                                               \
 while (0)
 
-static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE, voodoo::alpha_mode const ALPHAMODE, s32 x, const u8 *dither, int dpix, u16 *depth, rgbaint_t &preFog, rgbaint_t &srcColor, rgb_t *convTable)
+static inline void ATTR_FORCE_INLINE alpha_blend(
+		rgbaint_t &color,
+		voodoo::fbz_mode const FBZMODE,
+		voodoo::alpha_mode const ALPHAMODE,
+		s32 x,
+		voodoo::dither_helper const &dither,
+		int dpix,
+		u16 *depth,
+		rgbaint_t const &prefog,
+		rgb_t *convTable)
 {
 	{
 		//int dpix = dest[XX];
@@ -895,7 +862,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 		//int sg = (GG);
 		//int sb = (BB);
 		//int sa = (AA);
-		int sa = srcColor.get_a();
+		int sa = color.get_a();
 		int ta;
 		int srcAlphaScale, destAlphaScale;
 		rgbaint_t srcScale, destScale;
@@ -904,7 +871,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 		if (FBZMODE.alpha_dither_subtract())
 		{
 			/* look up the dither value from the appropriate matrix */
-			int dith = dither[x & 3];
+			int dith = dither.subtract(x & 3);
 
 			/* subtract the dither value */
 			dr += dith;
@@ -1015,7 +982,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 				break;
 
 			case 2:     /* A_COLOR */
-				destScale.set(srcColor);
+				destScale.set(color);
 				destScale.add_imm(1);
 				//(RR) += (dr * (sr + 1)) >> 8;
 				//(GG) += (dg * (sg + 1)) >> 8;
@@ -1047,7 +1014,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 
 			case 6:     /* AOM_COLOR */
 				destScale.set_all(0x100);
-				destScale.sub(srcColor);
+				destScale.sub(color);
 				//destScale.set(destAlphaScale, (0x100 - color.rgb.r), (0x100 - color.rgb.g), (0x100 - color.rgb.b));
 				//(RR) += (dr * (0x100 - sr)) >> 8;
 				//(GG) += (dg * (0x100 - sg)) >> 8;
@@ -1063,7 +1030,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 				break;
 
 			case 15:    /* A_COLORBEFOREFOG */
-				destScale.set(preFog);
+				destScale.set(prefog);
 				destScale.add_imm(1);
 				//(RR) += (dr * (prefogr + 1)) >> 8;
 				//(GG) += (dg * (prefogg + 1)) >> 8;
@@ -1077,7 +1044,7 @@ static inline void ATTR_FORCE_INLINE alpha_blend(voodoo::fbz_mode const FBZMODE,
 		// Main blend
 		rgbaint_t destColor(da, dr, dg, db);
 
-		srcColor.scale2_add_and_clamp(srcScale, destColor, destScale);
+		color.scale2_add_and_clamp(srcScale, destColor, destScale);
 		/* clamp */
 		//CLAMP((RR), 0x00, 0xff);
 		//CLAMP((GG), 0x00, 0xff);
@@ -1099,7 +1066,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 	voodoo::fog_mode const fogmode,
 	voodoo::fbz_colorpath const fbzcp,
 	s32 x,
-	u8 const *dither4,
+	voodoo::dither_helper const &dither,
 	s32 wfloat,
 	s32 iterz,
 	s64 iterw,
@@ -1153,7 +1120,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 
 				// apply dither
 				if (fogmode.fog_dither())
-					deltaval += dither4[x & 3];
+					deltaval += dither.raw(x);
 				deltaval >>= 4;
 
 				// add to the blending factor
@@ -1197,7 +1164,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
  *
  *************************************/
 
-#define TEXTURE_PIPELINE(TT, XX, DITHER4, TEXMODE, COTHER, LOOKUP, LODBASE, ITERS, ITERT, ITERW, RESULT) \
+#define TEXTURE_PIPELINE(TT, XX, DITHER, TEXMODE, COTHER, LOOKUP, LODBASE, ITERS, ITERT, ITERW, RESULT) \
 do                                                                              \
 {                                                                               \
 	s32 blendr, blendg, blendb, blenda;                                       \
@@ -1233,7 +1200,7 @@ do                                                                              
 	/* clamp the LOD */                                                         \
 	lod += (TT)->lodbias;                                                       \
 	if (TEXMODE.enable_lod_dither())                                     \
-		lod += DITHER4[(XX) & 3] << 4;                                          \
+		lod += dither.raw(XX) << 4;                                          \
 	if (lod < (TT)->lodmin)                                                     \
 		lod = (TT)->lodmin;                                                     \
 	if (lod > (TT)->lodmax)                                                     \
@@ -1544,7 +1511,6 @@ while (0)
 do                                                                              \
 {                                                                               \
 	s32 depthval, wfloat, biasdepth;                                  \
-	s32 r, g, b;                                                           \
 																				\
 	(THREADSTATS).pixels_in++;                                                       \
 																				\
@@ -1560,7 +1526,7 @@ do                                                                              
 			m_reg[stipple].u = (m_reg[stipple].u << 1) | (m_reg[stipple].u >> 31);\
 			if ((m_reg[stipple].u & 0x80000000) == 0)                         \
 			{                                                                   \
-				m_stats.total_stippled++;                                     \
+				THREADSTATS.stipple_count++;                                     \
 				goto skipdrawdepth;                                             \
 			}                                                                   \
 		}                                                                       \
@@ -1571,7 +1537,7 @@ do                                                                              
 			int stipple_index = (((YY) & 3) << 3) | (~(XX) & 7);                \
 			if (((m_reg[stipple].u >> stipple_index) & 1) == 0)               \
 			{                                                                   \
-				m_stats.total_stippled++;                                     \
+				THREADSTATS.stipple_count++;                                     \
 				goto skipdrawdepth;                                             \
 			}                                                                   \
 		}                                                                       \
@@ -1627,171 +1593,83 @@ do                                                                              
 	}
 
 
-#define DEPTH_TEST(THREADSTATS, XX, FBZMODE)    \
-do                                                                              \
-{                                                                               \
-	/* handle depth buffer testing */                                           \
-	if (FBZMODE.enable_depthbuf())                                       \
-	{                                                                           \
-		s32 depthsource;                                                      \
-																				\
-		/* the source depth is either the iterated W/Z+bias or a */             \
-		/* constant value */                                                    \
-		if (FBZMODE.depth_source_compare() == 0)                         \
-			depthsource = biasdepth;                                             \
-		else                                                                    \
-			depthsource = (u16)m_reg[zaColor].u;                         \
-																				\
-		/* test against the depth buffer */                                     \
-		switch (FBZMODE.depth_function())                                \
-		{                                                                       \
-			case 0:     /* depthOP = never */                                   \
-				(THREADSTATS).zfunc_fail++;                                          \
-				goto skipdrawdepth;                                             \
-																				\
-			case 1:     /* depthOP = less than */                               \
-				if (depthsource >= depth[XX])                                   \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 2:     /* depthOP = equal */                                   \
-				if (depthsource != depth[XX])                                   \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 3:     /* depthOP = less than or equal */                      \
-				if (depthsource > depth[XX])                                    \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 4:     /* depthOP = greater than */                            \
-				if (depthsource <= depth[XX])                                   \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 5:     /* depthOP = not equal */                               \
-				if (depthsource == depth[XX])                                   \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 6:     /* depthOP = greater than or equal */                   \
-				if (depthsource < depth[XX])                                    \
-				{                                                               \
-					(THREADSTATS).zfunc_fail++;                                      \
-					goto skipdrawdepth;                                         \
-				}                                                               \
-				break;                                                          \
-																				\
-			case 7:     /* depthOP = always */                                  \
-				break;                                                          \
-		}                                                                       \
-	}                                                                       \
-}                                                                               \
-while (0)
-
-inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(u16 zaColorReg, thread_stats_block &threadstats, s32 destDepth, voodoo::fbz_mode const fbzmode, s32 biasdepth)
+inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
+	thread_stats_block &threadstats,
+	voodoo::fbz_mode const fbzmode,
+	s32 depthdest,
+	s32 biasdepth)
 {
-	/* handle depth buffer testing */
+	// the source depth is either the iterated W/Z+bias or a constant value
+	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? biasdepth : u16(m_reg[zaColor].u);
+
+	/* test against the depth buffer */
+	switch (fbzmode.depth_function())
 	{
-		s32 depthsource;
+		case 0:     /* depthOP = never */
+			threadstats.zfunc_fail++;
+			return false;
 
-		/* the source depth is either the iterated W/Z+bias or a */
-		/* constant value */
-		if (fbzmode.depth_source_compare() == 0)
-			depthsource = biasdepth;
-		else
-			depthsource = zaColorReg;
-
-		/* test against the depth buffer */
-		switch (fbzmode.depth_function())
-		{
-			case 0:     /* depthOP = never */
+		case 1:     /* depthOP = less than */
+			if (depthsource >= depthdest)
+			{
 				threadstats.zfunc_fail++;
 				return false;
+			}
+			break;
 
-			case 1:     /* depthOP = less than */
-				if (depthsource >= destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
+		case 2:     /* depthOP = equal */
+			if (depthsource != depthdest)
+			{
+				threadstats.zfunc_fail++;
+				return false;
+			}
+			break;
 
-			case 2:     /* depthOP = equal */
-				if (depthsource != destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
+		case 3:     /* depthOP = less than or equal */
+			if (depthsource > depthdest)
+			{
+				threadstats.zfunc_fail++;
+				return false;
+			}
+			break;
 
-			case 3:     /* depthOP = less than or equal */
-				if (depthsource > destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
+		case 4:     /* depthOP = greater than */
+			if (depthsource <= depthdest)
+			{
+				threadstats.zfunc_fail++;
+				return false;
+			}
+			break;
 
-			case 4:     /* depthOP = greater than */
-				if (depthsource <= destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
+		case 5:     /* depthOP = not equal */
+			if (depthsource == depthdest)
+			{
+				threadstats.zfunc_fail++;
+				return false;
+			}
+			break;
 
-			case 5:     /* depthOP = not equal */
-				if (depthsource == destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
+		case 6:     /* depthOP = greater than or equal */
+			if (depthsource < depthdest)
+			{
+				threadstats.zfunc_fail++;
+				return false;
+			}
+			break;
 
-			case 6:     /* depthOP = greater than or equal */
-				if (depthsource < destDepth)
-				{
-					threadstats.zfunc_fail++;
-					return false;
-				}
-				break;
-
-			case 7:     /* depthOP = always */
-				break;
-		}
+		case 7:     /* depthOP = always */
+			break;
 	}
 	return true;
 }
 
-#define PIXEL_PIPELINE_END(THREADSTATS, DITHER_LOOKUP, XX, dest, depth, FBZMODE) \
+#define PIXEL_PIPELINE_END(THREADSTATS, DITHER, XX, dest, depth, FBZMODE) \
 																				\
-	r = color.get_r(); g = color.get_g(); b = color.get_b();                     \
-	/* modify the pixel for debugging purposes */                               \
-	MODIFY_PIXEL();                                                           \
+/*	r = color.get_r(); g = color.get_g(); b = color.get_b(); */                    \
 																				\
 	/* write to framebuffer */                                                  \
 	if (FBZMODE.rgb_buffer_mask())                                       \
-	{                                                                           \
-		/* apply dithering */                                                   \
-		APPLY_DITHER(FBZMODE, XX, DITHER_LOOKUP, r, g, b);                      \
-		dest[XX] = (r << 11) | (g << 5) | b;                                    \
-	}                                                                           \
+		dest[XX] = dither.pixel(XX, color);                                    \
 																				\
 	/* write to aux buffer */                                                   \
 	/*if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))*/                              \
@@ -1883,7 +1761,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 
 	// handle chroma key
 	if (fbzmode.enable_chromakey())
-		if (!chroma_key_test(threadstats, fbzmode, c_other))
+		if (!chroma_key_test(threadstats, c_other))
 			return false;
 
 	// compute a_other
@@ -1908,7 +1786,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 
 	// handle alpha mask
 	if (fbzmode.enable_alpha_mask())
-		if (!alpha_mask_test(threadstats, fbzmode, c_other.get_a()))
+		if (!alpha_mask_test(threadstats, c_other.get_a()))
 			return false;
 
 	// compute c_local
@@ -2097,7 +1975,6 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	voodoo::alpha_mode const alphamode(_ALPHAMODE, m_reg[alphaMode].u); \
 	voodoo::fbz_mode const fbzmode(_FBZMODE, m_reg[fbzMode].u); \
 	voodoo::fog_mode const fogmode(_FOGMODE, m_reg[fogMode].u); \
-	DECLARE_DITHER_POINTERS;                                                    \
 	tmu_state::stw_t iterstw0, iterstw1;                                                     \
 	tmu_state::stw_t deltastw0, deltastw1;                                                   \
 																				\
@@ -2105,9 +1982,6 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	s32 scry = y;                                                                   \
 	if (fbzmode.y_origin())                                              \
 		scry = (m_fbi.yorigin - y);                                    \
-																				\
-	/* compute dithering */                                                     \
-	COMPUTE_DITHER_POINTERS(fbzmode, y, fogmode);                               \
 																				\
 	/* apply clipping */                                                        \
 	s32 startx = extent.startx;                                              \
@@ -2131,20 +2005,20 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		if (startx >= tempclip)                                                  \
 		{                                                                       \
 			threadstats.pixels_in += stopx - startx;                               \
-			m_stats.total_clipped += stopx - startx;                         \
+			threadstats.clip_fail += stopx - startx;                         \
 			return;                                               \
 		}                                                                       \
 		if (stopx > tempclip)                                                  \
 		{                                                                       \
 			threadstats.pixels_in += stopx - tempclip;                               \
-			m_stats.total_clipped += stopx - tempclip;                         \
+			threadstats.clip_fail += stopx - tempclip;                         \
 			stopx = tempclip;                                               \
 		}                                                                       \
 		tempclip = (m_reg[clipLeftRight].u >> 16) & 0x3ff;                     \
 		if (startx < tempclip)                                                  \
 		{                                                                       \
 			threadstats.pixels_in += tempclip - startx;                              \
-			m_stats.total_clipped += tempclip - startx;                        \
+			threadstats.clip_fail += tempclip - startx;                        \
 			startx = tempclip;                                                  \
 		}                                                                       \
 	}                                                                           \
@@ -2184,16 +2058,17 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 	}                                                                           \
 	extra.info->hits++;                                                        \
 	/* loop in X */                                                             \
+	voodoo::dither_helper dither(y, fbzmode, fogmode);           \
 	for (s32 x = startx; x < stopx; x++)                                            \
 	{                                                                           \
 		rgbaint_t texel(0);                                                \
-		rgbaint_t color, preFog;                                                \
+		rgbaint_t color, prefog;                                                \
 																				\
 		/* pixel pipeline part 1 handles depth setup and stippling */         \
 		PIXEL_PIPELINE_BEGIN(threadstats, x, y, fbzcp, fbzmode, iterz, iterw); \
 		/* depth testing */         \
 		if (fbzmode.enable_depthbuf())                                                  \
-			if (!depth_test((u16) m_reg[zaColor].u, threadstats, depth[x], fbzmode, biasdepth)) \
+			if (!depth_test(threadstats, fbzmode, depth[x], biasdepth)) \
 				goto skipdrawdepth; \
 																				\
 		/* run the texture pipeline on TMU1 to produce a value in texel */      \
@@ -2201,7 +2076,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 		if (TMUS >= 2 && m_tmu[1].lodmin < (8 << 8))                    {       \
 			s32 tmp; \
 			const rgbaint_t texelZero(0);  \
-			texel = m_tmu[1].genTexture(x, dither4, texmode1, m_tmu[1].lookup, extra.lodbase1, \
+			texel = m_tmu[1].genTexture(x, dither, texmode1, m_tmu[1].lookup, extra.lodbase1, \
 														iterstw1, tmp); \
 			texel = m_tmu[1].combineTexture(texmode1, texel, texelZero, tmp); \
 		} \
@@ -2214,7 +2089,7 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 			{                                                                   \
 				s32 lod0; \
 				rgbaint_t texelT0;                                                \
-				texelT0 = m_tmu[0].genTexture(x, dither4, texmode0, m_tmu[0].lookup, extra.lodbase0, \
+				texelT0 = m_tmu[0].genTexture(x, dither, texmode0, m_tmu[0].lookup, extra.lodbase0, \
 																iterstw0, lod0); \
 				texel = m_tmu[0].combineTexture(texmode0, texelT0, texel, lod0); \
 			}                                                                   \
@@ -2234,16 +2109,16 @@ void voodoo_device::raster_##name(s32 y, const voodoo_renderer::extent_t &extent
 				goto skipdrawdepth;                                                      \
 																						 \
 		/* perform fogging */                                                            \
-		preFog.set(color);                                                               \
+		prefog.set(color);                                                               \
 		if (fogmode.enable_fog())                                                                         \
-			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither4, wfloat, iterz, iterw, iterargb); \
+			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb); \
 																												 \
 		/* perform alpha blending */                                                \
 		if (alphamode.alphablend())                                                            \
-			alpha_blend(fbzmode, alphamode, x, dither, dest[x], depth, preFog, color, m_fbi.rgb565); \
+			alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog, m_fbi.rgb565); \
 																				\
 		/* pixel pipeline part 2 handles final output */        \
-		PIXEL_PIPELINE_END(threadstats, dither_lookup, x, dest, depth, fbzmode);  \
+		PIXEL_PIPELINE_END(threadstats, dither, x, dest, depth, fbzmode);  \
 																				\
 		/* update the iterated parameters */                                    \
 		iterargb += iterargb_delta;                                              \
@@ -2283,7 +2158,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::tmu_state::new_log2(double &value, c
 	return exp;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, const u8 *dither4, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, voodoo::dither_helper const &dither, voodoo::texture_mode const TEXMODE, rgb_t *LOOKUP, s32 LODBASE, const stw_t &iterstw, s32 &lod)
 {
 	rgbaint_t result;
 	s32 s, t, ilod;
@@ -2315,7 +2190,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::genTexture(s32 x, c
 	/* clamp the LOD */
 	lod += lodbias;
 	if (TEXMODE.enable_lod_dither())
-		lod += dither4[x&3] << 4;
+		lod += dither.raw(x) << 4;
 	CLAMP(lod, lodmin, lodmax);
 
 	/* now the LOD is in range; if we don't own this LOD, take the next one */
