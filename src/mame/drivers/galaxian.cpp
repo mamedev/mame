@@ -730,13 +730,12 @@ WRITE_LINE_MEMBER(galaxian_state::vblank_interrupt_w)
 		m_maincpu->set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(galaxian_state::tenspot_fake)
+INPUT_CHANGED_MEMBER(tenspot_state::tenspot_fake)
 {
 	if (newval)
 	{
-		m_tenspot_current_game++;
-		m_tenspot_current_game%=10;
-		tenspot_set_game_bank(m_tenspot_current_game, 1);
+		m_current_game = (m_current_game + 1) % 10;
+		set_game_bank(m_current_game, true);
 	}
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1585,9 +1584,23 @@ uint8_t galaxian_state::dingoe_3001_r()
  *
  *************************************/
 
-void galaxian_state::moonwar_port_select_w(uint8_t data)
+void moonwar_state::machine_start()
 {
-	m_moonwar_port_select = data & 0x10;
+	galaxian_state::machine_start();
+
+	m_port_select = 0;
+	std::fill(std::begin(m_direction), std::end(m_direction), 0);
+	std::fill(std::begin(m_counter_74ls161), std::end(m_counter_74ls161), 0);
+
+	save_item(NAME(m_port_select));
+	save_item(NAME(m_direction));
+	save_item(NAME(m_counter_74ls161));
+}
+
+
+void moonwar_state::port_select_w(uint8_t data)
+{
+	m_port_select = BIT(~data, 4);
 }
 
 
@@ -2526,32 +2539,54 @@ void videight_state::videight_map(address_map &map)
 }
 
 
-void galaxian_state::tenspot_unk_6000_w(uint8_t data)
+void tenspot_state::machine_start()
+{
+	galaxian_state::machine_start();
+
+	m_current_game = 0;
+
+	save_item(NAME(m_current_game));
+
+	for (unsigned i = 0; 10U > i; ++i)
+		m_mainbank->configure_entry(i, memregion(util::string_format("game_%u_cpu", i))->base());
+
+	set_game_bank(m_current_game, false);
+}
+
+void tenspot_state::unk_6000_w(uint8_t data)
 {
 	logerror("tenspot_unk_6000_w %02x\n",data);
 }
 
-void galaxian_state::tenspot_unk_8000_w(uint8_t data)
+void tenspot_state::unk_8000_w(uint8_t data)
 {
 	logerror("tenspot_unk_8000_w %02x\n",data);
 }
 
-void galaxian_state::tenspot_unk_e000_w(uint8_t data)
+void tenspot_state::unk_e000_w(uint8_t data)
 {
 	logerror("tenspot_unk_e000_w %02x\n",data);
 }
 
-void galaxian_state::tenspot_select_map(address_map &map)
+void tenspot_state::tenspot_map(address_map &map)
+{
+	galaxian_map(map);
+	map(0x0000, 0x3fff).bankr(m_mainbank);
+	map(0x6002, 0x6002).mirror(0x07f8).w(FUNC(tenspot_state::artic_gfxbank_w));
+	map(0x7000, 0x7000).r(*this, FUNC(tenspot_state::dsw_read));
+}
+
+void tenspot_state::tenspot_select_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x4000, 0x4000).portr("SELECT2");
-	map(0x6000, 0x6000).w(FUNC(galaxian_state::tenspot_unk_6000_w));
+	map(0x6000, 0x6000).w(FUNC(tenspot_state::unk_6000_w));
 	map(0xc000, 0xc000).portr("SELECT");
-	map(0x8000, 0x8000).w(FUNC(galaxian_state::tenspot_unk_8000_w));
+	map(0x8000, 0x8000).w(FUNC(tenspot_state::unk_8000_w));
 	map(0xa000, 0xa03f).ram();
-	map(0xe000, 0xe000).w(FUNC(galaxian_state::tenspot_unk_e000_w));
+	map(0xe000, 0xe000).w(FUNC(tenspot_state::unk_e000_w));
 }
 
 
@@ -3621,7 +3656,7 @@ static INPUT_PORTS_START( tenspot )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("FAKE_SELECT") /* fake button to move onto next game - until select rom is understood! */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, galaxian_state, tenspot_fake, 0)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Next Game (Fake)") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tenspot_state, tenspot_fake, 0)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -6255,26 +6290,23 @@ static INPUT_PORTS_START( scobras )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
+CUSTOM_INPUT_MEMBER(moonwar_state::dial_r)
 {
-	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
-	int p = (~m_moonwar_port_select >> 4) & 1;
-
 	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
-	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	// i.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
 
-	signed char dialread = ioport(dialname[p])->read();
+	const int8_t dialread = int8_t(uint8_t(m_dials[m_port_select]->read()));
 
-	uint8_t ret;
+	if (dialread < 0)
+		m_direction[m_port_select] = 0x00;
+	else if (dialread > 0)
+		m_direction[m_port_select] = 0x10;
 
-	if (dialread < 0) m_direction[p] = 0x00;
-	else if (dialread > 0) m_direction[p] = 0x10;
+	m_counter_74ls161[m_port_select] += std::abs(dialread);
+	m_counter_74ls161[m_port_select] &= 0xf;
 
-	m_counter_74ls161[p] += abs(dialread);
-	m_counter_74ls161[p] &= 0xf;
-
-	ret = m_counter_74ls161[p] | m_direction[p];
-	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[p], ret);
+	const uint8_t ret = m_counter_74ls161[m_port_select] | m_direction[m_port_select];
+	//logerror("dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, m_counter_74ls161[m_port_select], ret);
 
 	return ret;
 }
@@ -6282,7 +6314,7 @@ CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
 /* verified from Z80 code */
 static INPUT_PORTS_START( moonwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(galaxian_state, moonwar_dial_r)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(moonwar_state, dial_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL // cocktail: p2 shield
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -7247,16 +7279,19 @@ void galaxian_state::pacmanbl(machine_config &config)
 	m_gfxdecode->set_info(gfx_pacmanbl);
 }
 
-void galaxian_state::tenspot(machine_config &config)
+void tenspot_state::tenspot(machine_config &config)
 {
 	galaxian(config);
 
-	/* basic machine hardware */
-	z80_device &selectcpu(Z80(config, "selectcpu", GALAXIAN_PIXEL_CLOCK/3/2)); // ?? mhz
-	selectcpu.set_addrmap(AS_PROGRAM, &galaxian_state::tenspot_select_map);
-	//selectcpu.set_vblank_int("screen", FUNC(galaxian_state::nmi_line_pulse));
 
-	/* separate tile/sprite ROMs */
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &tenspot_state::tenspot_map);
+
+	z80_device &selectcpu(Z80(config, "selectcpu", GALAXIAN_PIXEL_CLOCK/3/2)); // ?? mhz
+	selectcpu.set_addrmap(AS_PROGRAM, &tenspot_state::tenspot_select_map);
+	//selectcpu.set_vblank_int("screen", FUNC(tenspot_state::nmi_line_pulse));
+
+	// separate tile/sprite ROMs
 	m_gfxdecode->set_info(gfx_tenspot);
 }
 
@@ -7960,13 +7995,13 @@ void galaxian_state::anteaterg(machine_config &config)
 }
 
 
-void galaxian_state::moonwar(machine_config &config)
+void moonwar_state::moonwar(machine_config &config)
 {
 	scobra(config);
 
-	m_ppi8255[0]->out_pc_callback().set(FUNC(galaxian_state::moonwar_port_select_w));
+	m_ppi8255[0]->out_pc_callback().set(FUNC(moonwar_state::port_select_w));
 
-	m_palette->set_init(FUNC(galaxian_state::moonwar_palette)); // bullets are less yellow
+	m_palette->set_init(FUNC(moonwar_state::moonwar_palette)); // bullets are less yellow
 }
 
 void fourplay_state::fourplay(machine_config &config)
@@ -8462,26 +8497,22 @@ void galaxian_state::init_pacmanbl()
 	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
 }
 
-uint8_t galaxian_state::tenspot_dsw_read()
+uint8_t tenspot_state::dsw_read()
 {
-	if (m_tenspot_current_game >= 0 && m_tenspot_current_game < 10)
-		return m_tenspot_game_dsw[m_tenspot_current_game]->read();
+	if (m_current_game < m_game_dsw.size())
+		return m_game_dsw[m_current_game]->read();
 	else
 		return 0x00;
 }
 
 
-void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
+void tenspot_state::set_game_bank(int bank, bool invalidate_gfx)
 {
 	char tmp[64];
 	uint8_t* srcregion;
 	uint8_t* dstregion;
-	int x;
 
-	sprintf(tmp,"game_%d_cpu", bank);
-	srcregion = memregion(tmp)->base();
-	dstregion = memregion("maincpu")->base();
-	memcpy(dstregion, srcregion, 0x4000);
+	m_mainbank->set_entry(bank);
 
 	sprintf(tmp,"game_%d_temp", bank);
 	srcregion = memregion(tmp)->base();
@@ -8490,17 +8521,13 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("gfx2")->base();
 	memcpy(dstregion, srcregion, 0x2000);
 
-	if (from_game)
+	if (invalidate_gfx)
 	{
-		for (x=0;x<0x200;x++)
-		{
+		for (int x = 0; x < 0x200; x++)
 			m_gfxdecode->gfx(0)->mark_dirty(x);
-		}
 
-		for (x=0;x<0x80;x++)
-		{
+		for (int x = 0; x < 0x80; x++)
 			m_gfxdecode->gfx(1)->mark_dirty(x);
-		}
 	}
 
 	sprintf(tmp,"game_%d_prom", bank);
@@ -8511,9 +8538,9 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	galaxian_palette(*m_palette);
 }
 
-void galaxian_state::init_tenspot()
+void tenspot_state::init_tenspot()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
 	   which tenspot appears to have copied */
@@ -8526,14 +8553,6 @@ void galaxian_state::init_tenspot()
 
 
 	init_galaxian();
-
-	space.install_write_handler(0x6002, 0x6002, 0, 0x7f8, 0, write8smo_delegate(*this, FUNC(galaxian_state::artic_gfxbank_w)));
-
-	m_tenspot_current_game = 0;
-
-	tenspot_set_game_bank(m_tenspot_current_game, 0);
-
-	space.install_read_handler(0x7000, 0x7000, read8smo_delegate(*this, FUNC(galaxian_state::tenspot_dsw_read)));
 }
 
 
@@ -8972,15 +8991,6 @@ void galaxian_state::init_calipso()
 {
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, &galaxian_state::calipso_extend_sprite_info);
-}
-
-
-void galaxian_state::init_moonwar()
-{
-	/* video extensions */
-	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
-
-	save_item(NAME(m_moonwar_port_select));
 }
 
 
@@ -10942,11 +10952,10 @@ ROM_START( tenspot )
 
 
 	/* temporary - replace game_x with the game number you want to test. */
-	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
-	ROM_END
+ROM_END
 
 
 ROM_START( fourplay )
@@ -15014,7 +15023,7 @@ GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_
 GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                              MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
 GAME( 1983, ladybugg,    ladybug,  pisces,     ladybugg,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg",                      "Battle of Atlantis (bootleg)",                               MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
-GAME( 1982, tenspot,     0,        tenspot,    tenspot,    galaxian_state, init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                   MACHINE_NOT_WORKING ) // Work out how menu works
+GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                   MACHINE_NOT_WORKING ) // Work out how menu works
 
 // Separate tile/sprite ROMs, plus INT instead of NMI
 GAME( 1984, devilfsg,    devilfsh, devilfsg,   devilfsg,   galaxian_state, init_galaxian,   ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", MACHINE_SUPPORTS_SAVE )
@@ -15244,8 +15253,8 @@ GAME( 1981, scobrag,     scobra,   scobra,     scobras,    galaxian_state, init_
 GAME( 1981, scobraggi,   scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg (Cocamatic)",                "Super Cobra (bootleg, set 3)",                                      MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // uses the scramble color PROM
 GAME( 1981, suprheli,    scobra,   scobra,     scobras,    galaxian_state, init_scobra,     ROT90,  "bootleg",                            "Super Heli (Super Cobra bootleg)",                                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, moonwar,     0,        moonwar,    moonwar,    galaxian_state, init_moonwar,    ROT90,  "Stern Electronics", "Moonwar",         MACHINE_SUPPORTS_SAVE )
-GAME( 1981, moonwara,    moonwar,  moonwar,    moonwara,   galaxian_state, init_moonwar,    ROT90,  "Stern Electronics", "Moonwar (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, moonwar,     0,        moonwar,    moonwar,    moonwar_state,  init_scobra,     ROT90,  "Stern Electronics", "Moonwar",         MACHINE_SUPPORTS_SAVE )
+GAME( 1981, moonwara,    moonwar,  moonwar,    moonwara,   moonwar_state,  init_scobra,     ROT90,  "Stern Electronics", "Moonwar (older)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1981, armorcar,    0,        scobra,     armorcar,   galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Armored Car (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, armorcar2,   armorcar, scobra,     armorcar2,  galaxian_state, init_scobra,     ROT90,  "Stern Electronics", "Armored Car (set 2)", MACHINE_SUPPORTS_SAVE )

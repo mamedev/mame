@@ -358,7 +358,7 @@ void galaxian_state::galaxian_palette(palette_device &palette)
 	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
-void galaxian_state::moonwar_palette(palette_device &palette)
+void moonwar_state::moonwar_palette(palette_device &palette)
 {
 	galaxian_palette(palette);
 

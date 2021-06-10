@@ -80,7 +80,6 @@ public:
 		, m_filter_ctl(*this, "konami:ctl%u", 0)
 		, m_ckong_coinage(*this, "COINAGE")
 		, m_fake_select(*this, "FAKE_SELECT")
-		, m_tenspot_game_dsw(*this, {"IN2_GAME0", "IN2_GAME1", "IN2_GAME2", "IN2_GAME3", "IN2_GAME4", "IN2_GAME5", "IN2_GAME6", "IN2_GAME7", "IN2_GAME8", "IN2_GAME9"})
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -110,7 +109,6 @@ public:
 	void scramble_background_blue_w(uint8_t data);
 	void galaxian_gfxbank_w(offs_t offset, uint8_t data);
 	template <int N> DECLARE_READ_LINE_MEMBER(azurian_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(moonwar_dial_r);
 	void irq_enable_w(uint8_t data);
 	void start_lamp_w(offs_t offset, uint8_t data);
 	void coin_lock_w(uint8_t data);
@@ -146,13 +144,9 @@ public:
 	uint8_t dingo_3000_r();
 	uint8_t dingo_3035_r();
 	uint8_t dingoe_3001_r();
-	void tenspot_unk_6000_w(uint8_t data);
-	void tenspot_unk_8000_w(uint8_t data);
-	void tenspot_unk_e000_w(uint8_t data);
 	uint8_t froggeram_ppi8255_r(offs_t offset);
 	void froggeram_ppi8255_w(offs_t offset, uint8_t data);
 	void artic_gfxbank_w(uint8_t data);
-	uint8_t tenspot_dsw_read();
 	void konami_sound_control_w(uint8_t data);
 	uint8_t konami_sound_timer_r();
 	void konami_portc_0_w(uint8_t data);
@@ -164,7 +158,6 @@ public:
 	void monsterz_portb_1_w(uint8_t data);
 	void monsterz_portc_1_w(uint8_t data);
 	uint8_t frogger_sound_timer_r();
-	void moonwar_port_select_w(uint8_t data);
 	void init_galaxian();
 	void init_nolock();
 	void init_azurian();
@@ -176,7 +169,6 @@ public:
 	void init_mooncrgx();
 	void init_moonqsr();
 	void init_pacmanbl();
-	void init_tenspot();
 	void init_jumpbug();
 	void init_checkman();
 	void init_checkmaj();
@@ -206,7 +198,6 @@ public:
 	void init_anteateruk();
 	void init_superbon();
 	void init_calipso();
-	void init_moonwar();
 	void init_ghostmun();
 	void init_froggrs();
 	void init_warofbugg();
@@ -217,12 +208,9 @@ public:
 
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	void galaxian_palette(palette_device &palette);
-	void moonwar_palette(palette_device &palette);
 	void eagle_palette(palette_device &palette);
-	void tenspot_set_game_bank(int bank, int from_game);
 	uint32_t screen_update_galaxian(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
-	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
@@ -302,7 +290,6 @@ public:
 	void quaak(machine_config &config);
 	void galaxian(machine_config &config);
 	void highroll(machine_config &config);
-	void tenspot(machine_config &config);
 	void devilfsg(machine_config &config);
 	void froggers(machine_config &config);
 	void froggervd(machine_config &config);
@@ -310,7 +297,6 @@ public:
 	void monsterz(machine_config &config);
 	void anteaterg(machine_config &config);
 	void anteater(machine_config &config);
-	void moonwar(machine_config &config);
 	void turpins(machine_config &config);
 	void explorer(machine_config &config);
 	void scramble(machine_config &config);
@@ -405,7 +391,6 @@ protected:
 	void spactrai_map(address_map &map);
 	void takeoff_sound_map(address_map &map);
 	void takeoff_sound_portmap(address_map &map);
-	void tenspot_select_map(address_map &map);
 	void theend_map(address_map &map);
 	void thepitm_map(address_map &map);
 	void turpins_map(address_map &map);
@@ -436,7 +421,6 @@ protected:
 	optional_device_array<netlist_mame_logic_input_device, 12> m_filter_ctl;
 	optional_ioport m_ckong_coinage;
 	optional_ioport m_fake_select;
-	optional_ioport_array<10> m_tenspot_game_dsw;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -446,16 +430,12 @@ protected:
 	int m_bullets_base = 0x60;
 	int m_sprites_base = 0x40;
 	int m_numspritegens = 1;
-	int m_counter_74ls161[2];
-	int m_direction[2];
 	uint16_t m_protection_state;
 	uint8_t m_protection_result;
 	uint8_t m_konami_sound_control;
 	uint8_t m_sfx_sample_control;
-	uint8_t m_moonwar_port_select;
 	uint8_t m_irq_enabled;
 	int m_irq_line = INPUT_LINE_NMI;
-	int m_tenspot_current_game;
 	uint8_t m_frogger_adjust = false;
 	uint8_t m_x_scale = GALAXIAN_XSCALE;
 	uint8_t m_h0_start = GALAXIAN_H0START;
@@ -674,6 +654,43 @@ private:
 };
 
 
+class tenspot_state : public galaxian_state
+{
+public:
+	tenspot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_game_dsw(*this, "IN2_GAME%u", 0U)
+		, m_mainbank(*this, "mainbank")
+	{
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(tenspot_fake);
+
+	void tenspot(machine_config &config);
+
+	void init_tenspot();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void unk_6000_w(uint8_t data);
+	void unk_8000_w(uint8_t data);
+	void unk_e000_w(uint8_t data);
+	uint8_t dsw_read();
+
+	void set_game_bank(int bank, bool invalidate_gfx);
+
+	void tenspot_map(address_map &map);
+	void tenspot_select_map(address_map &map);
+
+	required_ioport_array<10> m_game_dsw;
+	required_memory_bank m_mainbank;
+
+	uint8_t m_current_game;
+};
+
+
 class zigzagb_state : public galaxian_state
 {
 public:
@@ -767,6 +784,34 @@ private:
 	void scorpion_sound_portmap(address_map &map);
 
 	required_device<digitalker_device> m_digitalker;
+};
+
+
+class moonwar_state : public galaxian_state
+{
+public:
+	moonwar_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_dials(*this, "P%u_DIAL", 1U)
+	{
+	}
+
+	DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
+
+	void moonwar(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void port_select_w(uint8_t data);
+	void moonwar_palette(palette_device &palette);
+
+	required_ioport_array<2> m_dials;
+
+	uint8_t m_port_select;
+	uint8_t m_direction[2];
+	uint8_t m_counter_74ls161[2];
 };
 
 #endif // MAME_INCLUDES_GALAXIAN_H
