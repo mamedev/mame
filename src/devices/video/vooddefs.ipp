@@ -449,7 +449,7 @@ private:
 static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, voodoo::fbz_colorpath const fbzcp)
 {
 	rgbaint_t result(iterargb);
-	result.shr_imm(12);
+	result.shr_imm(20);
 
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
@@ -462,19 +462,14 @@ static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb
 	//    result = val & 0xfff;
 	//    if (result == 0xfff) result = 0;
 	//    if (result == 0x100) result = 0xff;
-	result.and_imm(0xfff);
 
 	// check against 0xfff and force to 0
-	rgbaint_t temp(result);
-	temp.cmpeq_imm(0xfff);
-	result.andnot_reg(temp);
-
-	// check against 0x100 and force to 0xff
-	temp.set(result);
-	temp.cmpeq_imm(0x100);
-	result.or_reg(temp);
-
-	// always mask against 0xff
+	rgbaint_t temp1(result);
+	rgbaint_t temp2(result);
+	temp1.cmpeq_imm(0xfff);
+	temp2.cmpeq_imm(0x100);
+	result.andnot_reg(temp1);
+	result.or_reg(temp2);
 	result.and_imm(0xff);
 	return result;
 }
@@ -1757,14 +1752,15 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	// compute the starting parameters
 	s32 dx = startx - (extra.ax >> 4);
 	s32 dy = y - (extra.ay >> 4);
-	s32 iterr = extra.startr + dy * extra.drdy + dx * extra.drdx;
-	s32 iterg = extra.startg + dy * extra.dgdy + dx * extra.dgdx;
-	s32 iterb = extra.startb + dy * extra.dbdy + dx * extra.dbdx;
-	s32 itera = extra.starta + dy * extra.dady + dx * extra.dadx;
+	s32 iterr = (extra.startr + dy * extra.drdy + dx * extra.drdx) << 8;
+	s32 iterg = (extra.startg + dy * extra.dgdy + dx * extra.dgdx) << 8;
+	s32 iterb = (extra.startb + dy * extra.dbdy + dx * extra.dbdx) << 8;
+	s32 itera = (extra.starta + dy * extra.dady + dx * extra.dadx) << 8;
 
 	rgbaint_t iterargb, iterargb_delta;
 	iterargb.set(itera, iterr, iterg, iterb);
 	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx);
+	iterargb_delta.shl_imm(8);
 	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;
 	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;
 	if (_TexMode0 != 0xffffffff)
