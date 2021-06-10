@@ -7,14 +7,14 @@
       -Futbol Champ
 
     Hardware:
-      -Z80
+      -8080
       -MEA-8000 Voice Synth
       -AY-3-8910
       -MOSEL MS6516L-10PC 2Kx8 Static RAM
 ****************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "sound/mea8000.h"
 #include "speaker.h"
@@ -43,7 +43,7 @@ INPUT_PORTS_END
 void inorbubble_state::inorbubble(machine_config &config)
 {
 	// Basic machine hardware
-	Z80(config, m_maincpu, 4'000'000); // Unknown clock
+	I8080(config, m_maincpu, 4'000'000); // Unknown clock // AMD 8080 CPU, exact model unknown
 
 	// Sound hardware
 	SPEAKER(config, "measnd").front_center();
