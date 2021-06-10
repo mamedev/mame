@@ -1691,12 +1691,12 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
  *
  *************************************/
 
-template<int _TMUs, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
 void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	voodoo::texture_mode const texmode0(_TexMode0, (_TMUs < 1) ? 0 : m_tmu[0].m_reg[textureMode].u);
-	voodoo::texture_mode const texmode1(_TexMode1, (_TMUs < 2) ? 0 : m_tmu[1].m_reg[textureMode].u);
+	voodoo::texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : m_tmu[0].m_reg[textureMode].u);
+	voodoo::texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : m_tmu[1].m_reg[textureMode].u);
 	voodoo::fbz_colorpath const fbzcp(_FbzCp, m_reg[fbzColorPath].u);
 	voodoo::alpha_mode const alphamode(_AlphaMode, m_reg[alphaMode].u);
 	voodoo::fbz_mode const fbzmode(_FbzMode, m_reg[fbzMode].u);
@@ -1707,17 +1707,19 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	// determine the screen Y
 	s32 scry = y;
 	if (fbzmode.y_origin())
-		scry = (m_fbi.yorigin - y);
+		scry = m_fbi.yorigin - y;
 
-	// apply clipping
+	// pre-increment the pixels_in unconditionally
 	s32 startx = extent.startx;
 	s32 stopx = extent.stopx;
+	threadstats.pixels_in += stopx - startx;
+
+	// apply clipping
 	if (fbzmode.enable_clipping())
 	{
 		// Y clipping buys us the whole scanline
 		if (scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) || scry >= (m_reg[clipLowYHighY].u & 0x3ff))
 		{
-			threadstats.pixels_in += stopx - startx;
 			threadstats.clip_fail += stopx - startx;
 			return;
 		}
@@ -1728,7 +1730,6 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 		// check for start outsize of clipping boundary
 		if (startx >= tempclip)
 		{
-			threadstats.pixels_in += stopx - startx;
 			threadstats.clip_fail += stopx - startx;
 			return;
 		}
@@ -1736,7 +1737,6 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 		// clip the right side
 		if (stopx > tempclip)
 		{
-			threadstats.pixels_in += stopx - tempclip;
 			threadstats.clip_fail += stopx - tempclip;
 			stopx = tempclip;
 		}
@@ -1745,7 +1745,6 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 		tempclip = (m_reg[clipLeftRight].u >> 16) & 0x3ff;
 		if (startx < tempclip)
 		{
-			threadstats.pixels_in += tempclip - startx;
 			threadstats.clip_fail += tempclip - startx;
 			startx = tempclip;
 		}
@@ -1768,7 +1767,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx);
 	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;
 	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;
-	if (_TMUs >= 1)
+	if (_TexMode0 != 0xffffffff)
 	{
 		iterstw0.set(
 			extra.starts0 + dy * extra.ds0dy + dx * extra.ds0dx,
@@ -1776,7 +1775,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 			extra.startw0 + dy * extra.dw0dy + dx * extra.dw0dx);
 		deltastw0.set(extra.ds0dx, extra.dt0dx, extra.dw0dx);
 	}
-	if (_TMUs >= 2)
+	if (_TexMode1 != 0xffffffff)
 	{
 		iterstw1.set(
 			extra.starts1 + dy * extra.ds1dy + dx * extra.ds1dx,
@@ -1794,8 +1793,6 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 		rgbaint_t color, prefog;
 		s32 wfloat, depthval;
 
-		threadstats.pixels_in++;
-
 		// handle stippling
 		if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y))
 			goto skipdrawdepth;
@@ -1812,17 +1809,17 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 
 		// run the texture pipeline on TMU1 to produce a value in texel
 		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TMUs >= 2 && m_tmu[1].m_lodmin < (8 << 8))
+		if (_TexMode1 != 0xffffffff && m_tmu[1].m_lodmin < (8 << 8))
 		{
-			s32 tmp;
+			s32 lod1;
 			const rgbaint_t texel_zero(0);
-			texel = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, tmp);
-			texel = m_tmu[1].combine_texture(texmode1, texel, texel_zero, tmp);
+			texel = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, lod1);
+			texel = m_tmu[1].combine_texture(texmode1, texel, texel_zero, lod1);
 		}
 
 		// run the texture pipeline on TMU0 to produce a final result in texel
 		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TMUs >= 1 && m_tmu[0].m_lodmin < (8 << 8))
+		if (_TexMode0 != 0xffffffff && m_tmu[0].m_lodmin < (8 << 8))
 		{
 			if (!m_send_config)
 			{
@@ -1861,9 +1858,9 @@ skipdrawdepth:
 		iterargb += iterargb_delta;
 		iterz += extra.dzdx;
 		iterw += extra.dwdx;
-		if (_TMUs >= 1)
+		if (_TexMode0 != 0xffffffff)
 			iterstw0.add(deltastw0);
-		if (_TMUs >= 2)
+		if (_TexMode1 != 0xffffffff)
 			iterstw1.add(deltastw1);
 	}
 }

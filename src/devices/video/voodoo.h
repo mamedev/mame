@@ -516,7 +516,7 @@ protected:
 	void init_save_state();
 
 	void raster_fastfill(s32 scanline, const voodoo_renderer::extent_t &extent, const poly_extra_data &extradata, int threadid);
-	template<int _TMUs, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+	template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
 	void rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid);
 
 	bool stipple_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, s32 x, s32 y);

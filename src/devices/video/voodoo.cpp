@@ -774,7 +774,7 @@ u8 const voodoo::dither_helper::s_dither_matrix_2x2_subtract[16] =
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ &voodoo_device::rasterizer<int(tex0 != 0xffffffff) + int(tex1 != 0xffffffff), fbzcp, fbz, alpha, fog, tex0, tex1>, fbzcp, alpha, fog, fbz, tex0, tex1 },
+	{ &voodoo_device::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, fbzcp, alpha, fog, fbz, tex0, tex1 },
 
 voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 {
@@ -786,9 +786,9 @@ voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 
 voodoo_device::static_raster_info voodoo_device::generic_raster_table[3] =
 {
-	{ &voodoo_device::rasterizer<0, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, 0, 0>, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::rasterizer<1, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, 0>, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::rasterizer<2, voodoo::fbz_colorpath::DECODE_LIVE, voodoo::fbz_mode::DECODE_LIVE, voodoo::alpha_mode::DECODE_LIVE, voodoo::fog_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE, voodoo::texture_mode::DECODE_LIVE>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, texture_mode::DECODE_LIVE, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, texture_mode::DECODE_LIVE, texture_mode::DECODE_LIVE>, 0, 0, 0, 0, 0, 0 },
 };
 
 
@@ -6258,8 +6258,8 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(int texcount)
 	curinfo.eff_alpha_mode = voodoo::alpha_mode(m_reg[alphaMode].u).normalize();
 	curinfo.eff_fog_mode = voodoo::fog_mode(m_reg[fogMode].u).normalize();
 	curinfo.eff_fbz_mode = voodoo::fbz_mode(m_reg[fbzMode].u).normalize();
-	curinfo.eff_tex_mode_0 = (texcount >= 1) ? voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).normalize() : 0xffffffff;
-	curinfo.eff_tex_mode_1 = (texcount >= 2) ? voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).normalize() : 0xffffffff;
+	curinfo.eff_tex_mode_0 = (texcount >= 1 && m_tmu[0].m_lodmin < (8 << 8)) ? voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).normalize() : 0xffffffff;
+	curinfo.eff_tex_mode_1 = (texcount >= 2 && m_tmu[1].m_lodmin < (8 << 8)) ? voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).normalize() : 0xffffffff;
 
 	/* compute the hash */
 	hash = curinfo.compute_hash();
