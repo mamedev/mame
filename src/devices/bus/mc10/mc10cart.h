@@ -127,5 +127,6 @@ private:
 
 // methods for configuring MC-10 slot devices
 void mc10_cart_add_basic_devices(device_slot_interface &device);
+void alice_cart_add_basic_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_MC10_MC10CART_H
