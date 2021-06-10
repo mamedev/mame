@@ -688,8 +688,12 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
-	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // edasm
+	generic_slot_device &optrom1(GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn")); // net
+	optrom1.set_device_load(FUNC(mbee_state::pak_load<1U>));
+	optrom1.set_device_unload(FUNC(mbee_state::pak_unload<1U>));
+	generic_slot_device &optrom2(GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp")); // edasm
+	optrom2.set_device_load(FUNC(mbee_state::pak_load<2U>));
+	optrom2.set_device_unload(FUNC(mbee_state::pak_unload<2U>));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
@@ -752,13 +756,27 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mbee_cass");
 
-	GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn").set_device_load(FUNC(mbee_state::pak_load<1U>)); // net
-	GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<2U>)); // pak0
-	GENERIC_SOCKET(config, "optrom3", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<3U>)); // pak1
-	GENERIC_SOCKET(config, "optrom4", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<4U>)); // pak2
-	GENERIC_SOCKET(config, "optrom5", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<5U>)); // pak3
-	GENERIC_SOCKET(config, "optrom6", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<6U>)); // pak4
-	GENERIC_SOCKET(config, "optrom7", generic_plain_slot, "mbee_pak", "mbp").set_device_load(FUNC(mbee_state::pak_load<7U>)); // pak5
+	generic_slot_device &optrom1(GENERIC_SOCKET(config, "optrom1", generic_plain_slot, "mbee_net", "mbn")); // net
+	optrom1.set_device_load(FUNC(mbee_state::pak_load<1U>));
+	optrom1.set_device_unload(FUNC(mbee_state::pak_unload<1U>));
+	generic_slot_device &optrom2(GENERIC_SOCKET(config, "optrom2", generic_plain_slot, "mbee_pak", "mbp")); // pak0
+	optrom2.set_device_load(FUNC(mbee_state::pak_load<2U>));
+	optrom2.set_device_unload(FUNC(mbee_state::pak_unload<2U>));
+	generic_slot_device &optrom3(GENERIC_SOCKET(config, "optrom3", generic_plain_slot, "mbee_pak", "mbp")); // pak1
+	optrom3.set_device_load(FUNC(mbee_state::pak_load<3U>));
+	optrom3.set_device_unload(FUNC(mbee_state::pak_unload<3U>));
+	generic_slot_device &optrom4(GENERIC_SOCKET(config, "optrom4", generic_plain_slot, "mbee_pak", "mbp")); // pak2
+	optrom4.set_device_load(FUNC(mbee_state::pak_load<4U>));
+	optrom4.set_device_unload(FUNC(mbee_state::pak_unload<4U>));
+	generic_slot_device &optrom5(GENERIC_SOCKET(config, "optrom5", generic_plain_slot, "mbee_pak", "mbp")); // pak3
+	optrom5.set_device_load(FUNC(mbee_state::pak_load<5U>));
+	optrom5.set_device_unload(FUNC(mbee_state::pak_unload<5U>));
+	generic_slot_device &optrom6(GENERIC_SOCKET(config, "optrom6", generic_plain_slot, "mbee_pak", "mbp")); // pak4
+	optrom6.set_device_load(FUNC(mbee_state::pak_load<6U>));
+	optrom6.set_device_unload(FUNC(mbee_state::pak_unload<6U>));
+	generic_slot_device &optrom7(GENERIC_SOCKET(config, "optrom7", generic_plain_slot, "mbee_pak", "mbp")); // pak5
+	optrom7.set_device_load(FUNC(mbee_state::pak_load<7U>));
+	optrom7.set_device_unload(FUNC(mbee_state::pak_unload<7U>));
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
 	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
@@ -794,8 +812,8 @@ void mbee_state::mbee56(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("1");
 	remove_carts(config);
@@ -824,12 +842,18 @@ void mbee_state::mbee128p(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("3");
 	remove_carts(config);
 	remove_quick(config);
+}
+
+void mbee_state::mbeepp(machine_config &config)
+{
+	mbee128p(config);
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("2,3");
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -838,10 +862,6 @@ void mbee_state::mbee256(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbee256_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbee256_io);
 
-	config.device_remove("fdc:0");
-	config.device_remove("fdc:1");
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("4");
@@ -1154,4 +1174,4 @@ COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeep
 COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Microbee Systems",   "Microbee Teleterm",           MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Microbee Systems",   "Microbee 128k Premium",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, mbee256,   mbee,   0,      mbee256,  mbee256, mbee_state, init_mbee256,  "Microbee Systems",   "Microbee 256TC",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2012, mbeepp,    mbee,   0,      mbee256,  mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2012, mbeepp,    mbee,   0,      mbeepp,   mbee128, mbee_state, init_mbeepp,   "Microbee Systems",   "Microbee Premium Plus+",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

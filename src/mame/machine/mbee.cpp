@@ -746,10 +746,6 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
 			slot->call_unload();
-			if (m_pakdef)
-				m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
-			else
-				m_pak_extended[pak_index] = false;
 			return image_init_result::FAIL;
 		}
 	}
@@ -774,12 +770,24 @@ image_init_result mbee_state::load_cart(device_image_interface &image, generic_s
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
 				slot->call_unload();
-				m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
 				return image_init_result::FAIL;
 			}
 		}
 	}
 
 	return image_init_result::PASS;
+}
+
+void mbee_state::unload_cart(u8 pak_index)
+{
+	if (pak_index > 1)
+	{
+		if (m_pakdef)
+			m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
+		else
+			m_pak_extended[pak_index] = false;
+	}
+	else
+		m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
 }
 

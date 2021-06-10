@@ -79,6 +79,7 @@ public:
 	void mbeeic(machine_config &config);
 	void mbeepc85(machine_config &config);
 	void mbee128p(machine_config &config);
+	void mbeepp(machine_config &config);
 	void remove_carts(machine_config &config);
 	void remove_quick(machine_config &config);
 
@@ -125,8 +126,10 @@ private:
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, u8);
+	void unload_cart(u8);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	template <u8 T> DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pak_load) { return load_cart(image, m_pak[T], T); }
+	template <u8 T> DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(pak_unload) { unload_cart(T); }
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);

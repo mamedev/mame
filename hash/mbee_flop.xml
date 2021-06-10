@@ -1435,7 +1435,7 @@ At the time of writing (2021-06-04) any floppy image will work in any emulated d
 	</software>
 
 	<software name="jandhb_01">
-		<description>JHBeesware1</description>
+		<description>JHBeesware 1</description>
 		<year>19??</year>
 		<publisher>J and H Beesware</publisher>
 		<sharedfeat name="compatibility" value="1,2,3" />
