@@ -56,6 +56,8 @@ static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 namespace voodoo
 {
 
+class dither_helper;
+
 class fifo_state
 {
 public:
@@ -117,8 +119,6 @@ public:
 	void voodoo_postload();
 
 	int voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	int voodoo_get_type();
-	int voodoo_is_stalled();
 	void voodoo_set_init_enable(u32 newval);
 
 protected:

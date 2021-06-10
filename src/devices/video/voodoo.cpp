@@ -148,6 +148,8 @@ bits(7:4) and bit(24)), X, and Y:
 
 #include "screen.h"
 
+using namespace voodoo;
+
 
 /*************************************
  *
@@ -941,19 +943,6 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *  Chip reset
  *
  *************************************/
-
-
-int voodoo_device::voodoo_get_type()
-{
-	return m_type;
-}
-
-
-int voodoo_device::voodoo_is_stalled()
-{
-	return m_pci.stall_state != NOT_STALLED;
-}
-
 
 void voodoo_device::voodoo_set_init_enable(u32 newval)
 {

@@ -15,6 +15,8 @@
 
 #include "voodoo.h"
 
+using namespace voodoo;
+
 
 // enumeration describing reasons we might be stalled
 enum
