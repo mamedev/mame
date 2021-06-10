@@ -73,14 +73,243 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "includes/inufuku.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+#include "video/bufsprite.h"
+#include "video/vsystem_spr.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+class inufuku_state : public driver_device
+{
+public:
+	inufuku_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_bg_videoram(*this, "bg_videoram")
+		, m_bg_rasterram(*this, "bg_rasterram")
+		, m_tx_videoram(*this, "tx_videoram")
+		, m_sprtileram(*this, "sprtileram")
+		, m_audiobank(*this, "audiobank")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spr(*this, "vsystem_spr")
+		, m_soundlatch(*this, "soundlatch")
+		, m_sprattrram(*this, "sprattrram")
+		{ }
+
+	void inufuku(machine_config &config);
+	void _3on3dunk(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(soundflag_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	// memory pointers
+	required_shared_ptr<u16> m_bg_videoram;
+	required_shared_ptr<u16> m_bg_rasterram;
+	required_shared_ptr<u16> m_tx_videoram;
+	required_shared_ptr<u16> m_sprtileram;
+
+	required_memory_bank m_audiobank;
+
+	// video-related
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_tx_tilemap;
+	int       m_bg_scrollx = 0;
+	int       m_bg_scrolly = 0;
+	int       m_tx_scrollx = 0;
+	int       m_tx_scrolly = 0;
+	bool      m_bg_raster = false;
+	u8        m_bg_palettebank = 0;
+	u8        m_tx_palettebank = 0;
+	u32       tile_callback( u32 code );
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<vsystem_spr_device> m_spr;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<buffered_spriteram16_device> m_sprattrram;
+
+	void soundrombank_w(u8 data);
+	void palettereg_w(offs_t offset, u16 data);
+	void scrollreg_w(offs_t offset, u16 data);
+	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+/******************************************************************************
+
+    Memory handlers
+
+******************************************************************************/
+
+void inufuku_state::palettereg_w(offs_t offset, u16 data)
+{
+	switch (offset)
+	{
+		case 0x02:
+			m_bg_palettebank = (data & 0xf000) >> 12;
+			m_bg_tilemap->mark_all_dirty();
+			/*
+				if (data & ~0xf000)
+					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			*/
+			break;
+		case 0x03:
+			m_tx_palettebank = (data & 0xf000) >> 12;
+			m_tx_tilemap->mark_all_dirty();
+			/*
+				if (data & ~0xf000)
+					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			*/
+			break;
+		default:
+			//logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			break;
+	}
+}
+
+
+void inufuku_state::scrollreg_w(offs_t offset, u16 data)
+{
+	switch (offset)
+	{
+		case 0x00:  m_bg_scrollx = data + 1; break;
+		case 0x01:  m_bg_scrolly = data + 0; break;
+		case 0x02:  m_tx_scrollx = data - 3; break;
+		case 0x03:  m_tx_scrolly = data + 1; break;
+		case 0x04:
+			m_bg_raster = BIT(~data, 9);
+			/*
+				if (data & ~0x0200)
+					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			*/
+			break;
+		default:
+			//logerror("%s: scrollreg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			break;
+	}
+}
+
+
+/******************************************************************************
+
+    Tilemap callbacks
+
+******************************************************************************/
+
+TILE_GET_INFO_MEMBER(inufuku_state::get_bg_tile_info)
+{
+	tileinfo.set(0,
+			m_bg_videoram[tile_index],
+			m_bg_palettebank,
+			0);
+}
+
+
+TILE_GET_INFO_MEMBER(inufuku_state::get_tx_tile_info)
+{
+	tileinfo.set(1,
+			m_tx_videoram[tile_index],
+			m_tx_palettebank,
+			0);
+}
+
+
+void inufuku_state::bg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void inufuku_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_tx_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
+}
+
+
+u32 inufuku_state::tile_callback( u32 code )
+{
+	return ((m_sprtileram[code * 2] & 0x0007) << 16) + m_sprtileram[(code * 2) + 1];
+}
+
+
+/******************************************************************************
+
+    Start the video hardware emulation
+
+******************************************************************************/
+
+void inufuku_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(inufuku_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(inufuku_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+
+	m_bg_tilemap->set_transparent_pen(255);
+	m_tx_tilemap->set_transparent_pen(255);
+}
+
+
+/******************************************************************************
+
+    Display refresh
+
+******************************************************************************/
+
+u32 inufuku_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	screen.priority().fill(0);
+
+	if (m_bg_raster)
+	{
+		m_bg_tilemap->set_scroll_rows(512);
+		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
+			m_bg_tilemap->set_scrollx((m_bg_scrolly + i) & 0x1ff, m_bg_scrollx + m_bg_rasterram[i]);
+	}
+	else
+	{
+		m_bg_tilemap->set_scroll_rows(1);
+		m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
+	}
+	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	m_tx_tilemap->set_scrollx(0, m_tx_scrollx);
+	m_tx_tilemap->set_scrolly(0, m_tx_scrolly);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 4);
+
+	m_spr->draw_sprites( m_sprattrram->buffer(), m_sprattrram->bytes(), screen, bitmap, cliprect );
+	return 0;
+}
 
 
 /******************************************************************************
@@ -94,6 +323,7 @@ void inufuku_state::soundrombank_w(u8 data)
 	m_audiobank->set_entry(data & 0x03);
 }
 
+
 /******************************************************************************
 
     Input/Output port interface
@@ -104,6 +334,7 @@ READ_LINE_MEMBER(inufuku_state::soundflag_r)
 {
 	return m_soundlatch->pending_r() ? 0 : 1;
 }
+
 
 /******************************************************************************
 
@@ -157,6 +388,7 @@ void inufuku_state::sound_map(address_map &map)
 	map(0x8000, 0xffff).bankr(m_audiobank);
 }
 
+
 void inufuku_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -164,6 +396,7 @@ void inufuku_state::sound_io_map(address_map &map)
 	map(0x04, 0x04).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x08, 0x0b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
+
 
 /******************************************************************************
 
@@ -242,8 +475,6 @@ static INPUT_PORTS_START( inufuku )
 INPUT_PORTS_END
 
 
-
-
 /******************************************************************************
 
     Graphics definitions
@@ -255,6 +486,7 @@ static GFXDECODE_START( gfx_inufuku )
 	GFXDECODE_ENTRY( "txtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // text
 	GFXDECODE_ENTRY( "sprtile", 0, gfx_16x16x4_packed_msb, 0, 4096/16  )  // sprite
 GFXDECODE_END
+
 
 static GFXDECODE_START( gfx_3on3dunk )
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x8_raw,          0, 4096/256 )  // bg
@@ -283,6 +515,7 @@ void inufuku_state::machine_start()
 	save_item(NAME(m_tx_palettebank));
 }
 
+
 void inufuku_state::machine_reset()
 {
 	m_bg_scrollx = 0;
@@ -293,6 +526,7 @@ void inufuku_state::machine_reset()
 	m_bg_palettebank = 0;
 	m_tx_palettebank = 0;
 }
+
 
 void inufuku_state::inufuku(machine_config &config)
 {
@@ -343,14 +577,12 @@ void inufuku_state::inufuku(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.75);
 }
 
+
 void inufuku_state::_3on3dunk(machine_config &config)
 {
 	inufuku(config);
 	m_gfxdecode->set_info(gfx_3on3dunk);
 }
-
-
-
 
 
 /******************************************************************************
@@ -383,6 +615,7 @@ ROM_START( inufuku )
 	ROM_LOAD( "lhmn5ku6.u53", 0x0000000, 0x400000, CRC(b320c5c9) SHA1(7c99da2d85597a3c008ed61a3aa5f47ad36186ec) )
 ROM_END
 
+
 ROM_START( 3on3dunk )
 	ROM_REGION( 0x0500000, "maincpu", 0 )   // main cpu + data
 	ROM_LOAD16_WORD_SWAP( "prog0_2_4_usa.u147", 0x0000000, 0x080000, CRC(957924ab) SHA1(6fe8ca711d11239310d58188e9d6d28cd27bc5af) )
@@ -412,7 +645,6 @@ ROM_START( 3on3dunk )
 	ROM_REGION( 0x0400000, "ymsnd:adpcmb", 0 ) // speech
 	ROM_LOAD( "lh536pkl.u51", 0x0000000, 0x300000, CRC(e4919abf) SHA1(d6af4b9c6ff62f92216c9927027d3b2376416bae) )
 ROM_END
-
 
 
 /******************************************************************************
