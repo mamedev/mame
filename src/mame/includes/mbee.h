@@ -140,6 +140,7 @@ private:
 
 	required_device<palette_device> m_palette;
 	void mbee128_io(address_map &map);
+	void mbee128p_io(address_map &map);
 	void mbee256_io(address_map &map);
 	void mbee256_mem(address_map &map);
 	void mbee56_io(address_map &map);
