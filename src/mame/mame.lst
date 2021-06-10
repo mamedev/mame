@@ -17011,6 +17011,9 @@ in213ae                         // Informer 213 AE
 @source:innotv_innotabmax.cpp
 innotv
 
+@source:inorbubble.cpp
+olihock                         // (c) 1986? Inor
+
 @source:instantm.cpp
 instantm                        //
 
