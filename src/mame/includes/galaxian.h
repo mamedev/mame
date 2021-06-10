@@ -67,8 +67,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_audio2(*this, "audio2")
-		, m_dac(*this, "dac")
 		, m_ay8910(*this, "8910.%u", 0)
 		, m_ay8910_cclimber(*this, "cclimber_audio:aysnd")
 		, m_ppi8255(*this, "ppi8255_%u", 0)
@@ -79,7 +77,6 @@ public:
 		, m_netlist(*this, "konami")
 		, m_filter_ctl(*this, "konami:ctl%u", 0)
 		, m_ckong_coinage(*this, "COINAGE")
-		, m_fake_select(*this, "FAKE_SELECT")
 		, m_spriteram(*this, "spriteram")
 		, m_videoram(*this, "videoram")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -123,9 +120,6 @@ public:
 	uint8_t theend_protection_r();
 	template <int N> DECLARE_READ_LINE_MEMBER(theend_protection_alt_r);
 	void explorer_sound_control_w(uint8_t data);
-	uint8_t sfx_sample_io_r(offs_t offset);
-	void sfx_sample_io_w(offs_t offset, uint8_t data);
-	uint8_t monsterz_protection_r();
 	uint8_t frogger_ppi8255_r(offs_t offset);
 	void frogger_ppi8255_w(offs_t offset, uint8_t data);
 	uint8_t frogger_ay8910_r(offs_t offset);
@@ -153,10 +147,6 @@ public:
 	void konami_portc_1_w(uint8_t data);
 	void theend_coin_counter_w(uint8_t data);
 	uint8_t explorer_sound_latch_r();
-	void sfx_sample_control_w(uint8_t data);
-	void monsterz_porta_1_w(uint8_t data);
-	void monsterz_portb_1_w(uint8_t data);
-	void monsterz_portc_1_w(uint8_t data);
 	uint8_t frogger_sound_timer_r();
 	void init_galaxian();
 	void init_nolock();
@@ -182,7 +172,6 @@ public:
 	void init_explorer();
 	void init_mandinga();
 	void init_mandingaeg();
-	void init_sfx();
 	void init_atlantis();
 	void init_scobra();
 	void init_scobrae();
@@ -228,7 +217,6 @@ public:
 	void anteater_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
 	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
@@ -254,7 +242,6 @@ public:
 	void mimonkey_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 	void mimonkey_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void guttangt_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
-	void monsterz_set_latch();
 	void decode_mooncrst(int length, uint8_t *dest);
 	void decode_checkman();
 	void decode_dingoe();
@@ -294,7 +281,6 @@ public:
 	void froggers(machine_config &config);
 	void froggervd(machine_config &config);
 	void anteateruk(machine_config &config);
-	void monsterz(machine_config &config);
 	void anteaterg(machine_config &config);
 	void anteater(machine_config &config);
 	void turpins(machine_config &config);
@@ -305,7 +291,6 @@ public:
 	void froggeram(machine_config &config);
 	void spactrai(machine_config &config);
 	void takeoff(machine_config &config);
-	void sfx(machine_config &config);
 	void mooncrst(machine_config &config);
 	void eagle(machine_config &config);
 	void ckongs(machine_config &config);
@@ -375,8 +360,6 @@ protected:
 	void mandingarf_map(address_map &map);
 	void mimonkey_map(address_map &map);
 	void mimonscr_map(address_map &map);
-	void monsterz_map(address_map &map);
-	void monsterz_sound_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void mooncrst_map_base(address_map &map);
 	void mooncrst_map_discrete(address_map &map);
@@ -385,9 +368,6 @@ protected:
 	void ozon1_io_map(address_map &map);
 	void scobra_map(address_map &map);
 	void scorpnmc_map(address_map &map);
-	void sfx_map(address_map &map);
-	void sfx_sample_map(address_map &map);
-	void sfx_sample_portmap(address_map &map);
 	void spactrai_map(address_map &map);
 	void takeoff_sound_map(address_map &map);
 	void takeoff_sound_portmap(address_map &map);
@@ -408,8 +388,6 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_audio2;
-	optional_device<dac_byte_interface> m_dac;
 	optional_device_array<ay8910_device, 3> m_ay8910;
 	optional_device<ay8910_device> m_ay8910_cclimber;
 	optional_device_array<i8255_device, 3> m_ppi8255;
@@ -420,7 +398,6 @@ protected:
 	optional_device<netlist_mame_sound_device> m_netlist;
 	optional_device_array<netlist_mame_logic_input_device, 12> m_filter_ctl;
 	optional_ioport m_ckong_coinage;
-	optional_ioport m_fake_select;
 
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -433,7 +410,6 @@ protected:
 	uint16_t m_protection_state;
 	uint8_t m_protection_result;
 	uint8_t m_konami_sound_control;
-	uint8_t m_sfx_sample_control;
 	uint8_t m_irq_enabled;
 	int m_irq_line = INPUT_LINE_NMI;
 	uint8_t m_frogger_adjust = false;
@@ -601,6 +577,7 @@ class kingball_state : public galaxian_state
 public:
 	kingball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxian_state(mconfig, type, tag)
+		, m_dac(*this, "dac")
 		, m_mux_port(*this, "FAKE")
 	{
 	}
@@ -623,6 +600,7 @@ private:
 	void kingball_sound_map(address_map &map);
 	void kingball_sound_portmap(address_map &map);
 
+	required_device<dac_byte_interface> m_dac;
 	required_ioport m_mux_port;
 
 	uint8_t m_speech_dip;
@@ -784,6 +762,50 @@ private:
 	void scorpion_sound_portmap(address_map &map);
 
 	required_device<digitalker_device> m_digitalker;
+};
+
+
+class taiyo_sfx_state : public galaxian_state
+{
+public:
+	taiyo_sfx_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+		, m_audio2(*this, "audio2")
+		, m_dac(*this, "dac")
+	{
+	}
+
+	void sfx(machine_config &config);
+	void monsterz(machine_config &config);
+
+	void init_sfx();
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	uint8_t sample_io_r(offs_t offset);
+	void sample_io_w(offs_t offset, uint8_t data);
+	void sample_control_w(uint8_t data);
+
+	uint8_t monsterz_protection_r();
+	void monsterz_porta_1_w(uint8_t data);
+	void monsterz_portb_1_w(uint8_t data);
+	void monsterz_portc_1_w(uint8_t data);
+	void monsterz_set_latch();
+
+	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void sfx_map(address_map &map);
+	void sfx_sample_map(address_map &map);
+	void sfx_sample_portmap(address_map &map);
+	void monsterz_map(address_map &map);
+	void monsterz_sound_map(address_map &map);
+
+	required_device<cpu_device> m_audio2;
+	required_device<dac_byte_interface> m_dac;
+
+	uint8_t m_sample_control;
 };
 
 

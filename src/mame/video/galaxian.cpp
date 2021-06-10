@@ -589,11 +589,10 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 		}
 
 		/* draw */
-
-				m_gfxdecode->gfx(1)->transpen(bitmap,clip,
-				code, color,
-				flipx, flipy,
-				m_h0_start + m_x_scale * sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap,clip,
+		code, color,
+		flipx, flipy,
+		m_h0_start + m_x_scale * sx, sy, 0);
 	}
 }
 
@@ -1067,9 +1066,9 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 }
 
 
-void galaxian_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void taiyo_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* current schematics are unreadable, assuming like Turtles */
+	// current schematics are unreadable, assuming like Turtles
 	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -1507,7 +1506,7 @@ void videight_state::videight_gfxbank_w(offs_t offset, uint8_t data)
 	/* Moon Cresta (mooncrgx) */
 	if ((data < 2) && (m_gfxbank[4] == 3))
 	{
-		uint8_t gfxbanks[] = { 8, 12, 8, 14, 8, 13, 8, 15 };
+		static constexpr uint8_t gfxbanks[] = { 8, 12, 8, 14, 8, 13, 8, 15 };
 		if (!offset) m_gfxbank[3] = (m_gfxbank[3] & 6) | data;
 		if (offset == 1) m_gfxbank[3] = (m_gfxbank[3] & 5) | (data << 1);
 		if (offset == 2) m_gfxbank[3] = (m_gfxbank[3] & 3) | (data << 2);
