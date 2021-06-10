@@ -10961,7 +10961,8 @@ ROM_START( tenspot )
 	ROM_LOAD( "u1.u1",    0x0000, 0x100, CRC(f18006f7) SHA1(f9a3541cd7f2b75816227d8befc03d2e33eeebac) )
 
 
-	/* temporary - replace game_x with the game number you want to test. */
+	// temporary - replace game_x with the game number you want to test.
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_ERASEFF )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASEFF )
 	ROM_REGION( 0x0020, "proms", ROMREGION_ERASEFF )
