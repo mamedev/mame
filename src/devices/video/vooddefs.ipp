@@ -1,4 +1,4 @@
-	// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
@@ -16,160 +16,139 @@
 #include "voodoo.h"
 
 
-
-/*************************************
- *
- *  Core types
- *
- *************************************/
-
-typedef voodoo_reg rgb_union;
-
-
-
-
-
-/*************************************
- *
- *  Inline FIFO management
- *
- *************************************/
-
-inline void voodoo_device::fifo_state::add(u32 data)
+// enumeration describing reasons we might be stalled
+enum
 {
-	/* compute the value of 'in' after we add this item */
-	s32 next_in = in + 1;
-	if (next_in >= size)
+	NOT_STALLED = 0,
+	STALLED_UNTIL_FIFO_LWM,
+	STALLED_UNTIL_FIFO_EMPTY
+};
+
+// number of clocks to set up a triangle (just a guess)
+static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
+
+
+
+/*************************************
+ *
+ *  Misc. macros
+ *
+ *************************************/
+
+/* macro for clamping a value between minimum and maximum values */
+#define CLAMP(val,min,max)      do { if ((val) < (min)) { (val) = (min); } else if ((val) > (max)) { (val) = (max); } } while (0)
+
+/* macro to compute the base 2 log for LOD calculations */
+#define LOGB2(x)                (log((double)(x)) / log(2.0))
+
+
+
+/*************************************
+ *
+ *  Macros for extracting pixels
+ *
+ *************************************/
+
+#define EXTRACT_565_TO_888(val, a, b, c)                    \
+	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);   \
+	(b) = (((val) >> 3) & 0xfc) | (((val) >> 9) & 0x03);    \
+	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);
+#define EXTRACT_x555_TO_888(val, a, b, c)                   \
+	(a) = (((val) >> 7) & 0xf8) | (((val) >> 12) & 0x07);   \
+	(b) = (((val) >> 2) & 0xf8) | (((val) >> 7) & 0x07);    \
+	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);
+#define EXTRACT_555x_TO_888(val, a, b, c)                   \
+	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);   \
+	(b) = (((val) >> 3) & 0xf8) | (((val) >> 8) & 0x07);    \
+	(c) = (((val) << 2) & 0xf8) | (((val) >> 3) & 0x07);
+#define EXTRACT_1555_TO_8888(val, a, b, c, d)               \
+	(a) = ((s16)(val) >> 15) & 0xff;                      \
+	EXTRACT_x555_TO_888(val, b, c, d)
+#define EXTRACT_5551_TO_8888(val, a, b, c, d)               \
+	EXTRACT_555x_TO_888(val, a, b, c)                       \
+	(d) = ((val) & 0x0001) ? 0xff : 0x00;
+#define EXTRACT_x888_TO_888(val, a, b, c)                   \
+	(a) = ((val) >> 16) & 0xff;                             \
+	(b) = ((val) >> 8) & 0xff;                              \
+	(c) = ((val) >> 0) & 0xff;
+#define EXTRACT_888x_TO_888(val, a, b, c)                   \
+	(a) = ((val) >> 24) & 0xff;                             \
+	(b) = ((val) >> 16) & 0xff;                             \
+	(c) = ((val) >> 8) & 0xff;
+#define EXTRACT_8888_TO_8888(val, a, b, c, d)               \
+	(a) = ((val) >> 24) & 0xff;                             \
+	(b) = ((val) >> 16) & 0xff;                             \
+	(c) = ((val) >> 8) & 0xff;                              \
+	(d) = ((val) >> 0) & 0xff;
+#define EXTRACT_4444_TO_8888(val, a, b, c, d)               \
+	(a) = (((val) >> 8) & 0xf0) | (((val) >> 12) & 0x0f);   \
+	(b) = (((val) >> 4) & 0xf0) | (((val) >> 8) & 0x0f);    \
+	(c) = (((val) >> 0) & 0xf0) | (((val) >> 4) & 0x0f);    \
+	(d) = (((val) << 4) & 0xf0) | (((val) >> 0) & 0x0f);
+#define EXTRACT_332_TO_888(val, a, b, c)                    \
+	(a) = (((val) >> 0) & 0xe0) | (((val) >> 3) & 0x1c) | (((val) >> 6) & 0x03); \
+	(b) = (((val) << 3) & 0xe0) | (((val) >> 0) & 0x1c) | (((val) >> 3) & 0x03); \
+	(c) = (((val) << 6) & 0xc0) | (((val) << 4) & 0x30) | (((val) << 2) & 0x0c) | (((val) << 0) & 0x03);
+
+
+
+
+//**************************************************************************
+//  FIFO MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  fifo_state - constructor
+//-------------------------------------------------
+
+voodoo::fifo_state::fifo_state() :
+	m_base(nullptr),
+	m_size(0),
+	m_in(0),
+	m_out(0)
+{
+}
+
+
+//-------------------------------------------------
+//  add - append an item to the fifo
+//-------------------------------------------------
+
+inline void voodoo::fifo_state::add(u32 data)
+{
+	// compute the value of 'in' after we add this item
+	s32 next_in = m_in + 1;
+	if (next_in >= m_size)
 		next_in = 0;
 
-	/* as long as it's not equal to the output pointer, we can do it */
-	if (next_in != out)
+	// as long as it's not equal to the output pointer, we can do it
+	if (next_in != m_out)
 	{
-		base[in] = data;
-		in = next_in;
+		m_base[m_in] = data;
+		m_in = next_in;
 	}
 }
 
 
-inline u32 voodoo_device::fifo_state::remove()
+//-------------------------------------------------
+//  remove - remove the next item from the fifo
+//-------------------------------------------------
+
+inline u32 voodoo::fifo_state::remove()
 {
-	u32 data = 0xffffffff;
+	// return invalid data if empty
+	if (m_out == m_in)
+		return 0xffffffff;
 
-	/* as long as we have data, we can do it */
-	if (out != in)
-	{
-		s32 next_out;
+	// determine next output
+	s32 next_out = m_out + 1;
+	if (next_out >= m_size)
+		next_out = 0;
 
-		/* fetch the data */
-		data = base[out];
-
-		/* advance the output pointer */
-		next_out = out + 1;
-		if (next_out >= size)
-			next_out = 0;
-		out = next_out;
-	}
+	// fetch current and advance
+	u32 data = m_base[m_out];
+	m_out = next_out;
 	return data;
-}
-
-
-inline s32 voodoo_device::fifo_state::items() const
-{
-	s32 items = in - out;
-	if (items < 0)
-		items += size;
-	return items;
-}
-
-
-
-/*************************************
- *
- *  Computes a fast 16.16 reciprocal
- *  of a 16.32 value; used for
- *  computing 1/w in the rasterizer.
- *
- *  Since it is trivial to also
- *  compute log2(1/w) = -log2(w) at
- *  the same time, we do that as well
- *  to 16.8 precision for LOD
- *  calculations.
- *
- *  On a Pentium M, this routine is
- *  20% faster than a 64-bit integer
- *  divide and also produces the log
- *  for free.
- *
- *************************************/
-
-static inline s32 fast_reciplog(s64 value, s32 *log2)
-{
-	extern u32 voodoo_reciplog[];
-	u32 temp, recip, rlog;
-	u32 interp;
-	u32 *table;
-	int neg = false;
-	int lz, exp = 0;
-
-	/* always work with unsigned numbers */
-	if (value < 0)
-	{
-		value = -value;
-		neg = true;
-	}
-
-	/* if we've spilled out of 32 bits, push it down under 32 */
-	if (value & 0xffff00000000U)
-	{
-		temp = (u32)(value >> 16);
-		exp -= 16;
-	}
-	else
-		temp = (u32)value;
-
-	/* if the resulting value is 0, the reciprocal is infinite */
-	if (UNEXPECTED(temp == 0))
-	{
-		*log2 = 1000 << LOG_OUTPUT_PREC;
-		return neg ? 0x80000000 : 0x7fffffff;
-	}
-
-	/* determine how many leading zeros in the value and shift it up high */
-	lz = count_leading_zeros_32(temp);
-	temp <<= lz;
-	exp += lz;
-
-	/* compute a pointer to the table entries we want */
-	/* math is a bit funny here because we shift one less than we need to in order */
-	/* to account for the fact that there are two u32's per table entry */
-	table = &voodoo_reciplog[(temp >> (31 - RECIPLOG_LOOKUP_BITS - 1)) & ((2 << RECIPLOG_LOOKUP_BITS) - 2)];
-
-	/* compute the interpolation value */
-	interp = (temp >> (31 - RECIPLOG_LOOKUP_BITS - 8)) & 0xff;
-
-	/* do a linear interpolatation between the two nearest table values */
-	/* for both the log and the reciprocal */
-	rlog = (table[1] * (0x100 - interp) + table[3] * interp) >> 8;
-	recip = (table[0] * (0x100 - interp) + table[2] * interp) >> 8;
-
-	/* the log result is the fractional part of the log; round it to the output precision */
-	rlog = (rlog + (1 << (RECIPLOG_LOOKUP_PREC - LOG_OUTPUT_PREC - 1))) >> (RECIPLOG_LOOKUP_PREC - LOG_OUTPUT_PREC);
-
-	/* the exponent is the non-fractional part of the log; normally, we would subtract it from rlog */
-	/* but since we want the log(1/value) = -log(value), we subtract rlog from the exponent */
-	*log2 = ((exp - (31 - RECIPLOG_INPUT_PREC)) << LOG_OUTPUT_PREC) - rlog;
-
-	/* adjust the exponent to account for all the reciprocal-related parameters to arrive at a final shift amount */
-	exp += (RECIP_OUTPUT_PREC - RECIPLOG_LOOKUP_PREC) - (31 - RECIPLOG_INPUT_PREC);
-
-	/* shift by the exponent */
-	if (exp < 0)
-		recip >>= -exp;
-	else
-		recip <<= exp;
-
-	/* on the way out, apply the original sign to the reciprocal */
-	return neg ? -recip : recip;
 }
 
 
@@ -227,6 +206,93 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
 	return result;
 }
 
+
+
+
+// use SSE on 64-bit implementations, where it can be assumed
+#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+#include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() { }
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s << 8, t << 8); m_w = _mm_set1_pd(w); }
+	int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
+	{
+		shift += 8;
+		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
+		s = tmpS >> shift;
+		s64 tmpT = _mm_cvtsd_si64(m_st);
+		t = tmpT >> shift;
+	}
+	void add(const stw_t& other)
+	{
+		m_st = _mm_add_pd(m_st, other.m_st);
+		m_w = _mm_add_pd(m_w, other.m_w);
+	}
+	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
+	{
+		__m128d tmp = _mm_div_pd(m_st, m_w);
+		// Allow for 8 bits of decimal in integer
+		//tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
+		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
+#ifdef __SSE4_1__
+		sow = _mm_extract_epi32(tmp2, 1);
+		tow = _mm_extract_epi32(tmp2, 0);
+#else
+		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
+		tow = _mm_cvtsi128_si32(tmp2);
+#endif
+		double dW = _mm_cvtsd_f64(m_w);
+		oowlog = -new_log2(dW, 0);
+	}
+private:
+	__m128d m_st;
+	__m128d m_w;
+};
+#else
+class voodoo_device::tmu_state::stw_t
+{
+public:
+	stw_t() {}
+	stw_t(const stw_t& other) = default;
+	stw_t &operator=(const stw_t& other) = default;
+
+	void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
+	int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
+	{
+		s = m_s >> shift;
+		t = m_t >> shift;
+	}
+	inline void add(const stw_t& other)
+	{
+		m_s += other.m_s;
+		m_t += other.m_t;
+		m_w += other.m_w;
+	}
+	// Computes s/w and t/w and returns log2 of 1/w
+	// s, t and c are 16.32 values.  The results are 24.8.
+	inline void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
+	{
+		double recip = double(1ULL << (47 - 39)) / m_w;
+		double resAD = m_s * recip;
+		double resBD = m_t * recip;
+		oowlog = new_log2(recip, 56);
+		sow = resAD;
+		tow = resBD;
+	}
+private:
+	s64 m_s, m_t, m_w;
+};
+#endif
 
 
 /*************************************
@@ -460,11 +526,12 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
 	thread_stats_block &threadstats,
 	rgbaint_t const &colorin)
 {
-	rgb_union color;
+	voodoo_reg color;
 	color.u = colorin.to_rgba();
 
 	// non-range version
-	if (!CHROMARANGE_ENABLE(m_reg[chromaRange].u))
+	voodoo::chroma_range chromarange(m_reg[chromaRange].u);
+	if (!chromarange.enable())
 	{
 		if (((color.u ^ m_reg[chromaKey].u) & 0xffffff) == 0)
 		{
@@ -481,29 +548,29 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
 
 		// check blue
 		low = m_reg[chromaKey].rgb.b;
-		high = m_reg[chromaRange].rgb.b;
+		high = chromarange.blue();
 		test = color.rgb.b;
 		results = (test >= low && test <= high);
-		results ^= CHROMARANGE_BLUE_EXCLUSIVE(m_reg[chromaRange].u);
+		results ^= chromarange.blue_exclusive();
 		results <<= 1;
 
 		// check green
 		low = m_reg[chromaKey].rgb.g;
-		high = m_reg[chromaRange].rgb.g;
+		high = chromarange.green();
 		test = color.rgb.g;
 		results |= (test >= low && test <= high);
-		results ^= CHROMARANGE_GREEN_EXCLUSIVE(m_reg[chromaRange].u);
+		results ^= chromarange.green_exclusive();
 		results <<= 1;
 
 		// check red
 		low = m_reg[chromaKey].rgb.r;
-		high = m_reg[chromaRange].rgb.r;
+		high = chromarange.red();
 		test = color.rgb.r;
 		results |= (test >= low && test <= high);
-		results ^= CHROMARANGE_RED_EXCLUSIVE(m_reg[chromaRange].u);
+		results ^= chromarange.red_exclusive();
 
 		// final result
-		if (CHROMARANGE_UNION_MODE(m_reg[chromaRange].u))
+		if (chromarange.union_mode())
 		{
 			if (results != 0)
 			{
