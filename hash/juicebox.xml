@@ -27,7 +27,7 @@ license:CC0
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
    H2688 - Vans Triple Crown Volume 1
    H2689 - Vans Triple Crown vol.2
-B  H2690 - Vans Pipeline Masters Volume 1
+*  H2690 - Vans Pipeline Masters Volume 1
 *  H2692 - Teenage Mutant Ninja Turtles Volume 1
    H2694 - Trading Spaces Volume 1
    H2697 - Megas XLR Vol. 1
@@ -241,6 +241,19 @@ B  H2690 - Vans Pipeline Masters Volume 1
 		</part>
 	</software>
 
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
+	<software name="plmv1" supported="no">
+		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2690" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="e8cca1d4" sha1="5cd2b29bc28d20d9c9b455edb750fbbb530b8e5b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- ==============================================================================
 	     Cartridges below don't boot properly
 	     - code seems to go off the rails in most cases compared to other sets
@@ -272,20 +285,6 @@ B  H2690 - Vans Pipeline Masters Volume 1
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
 				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c13e7784" sha1="08d3791977715abc17c89fb3bc457d5ba45725de" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- black screen, confirmed bad dump, some bytes have been skipped over in various blocks, resulting in code being incorrecly offset -->
-	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="plmv1" supported="no">
-		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H2690" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="0b8dcfce" sha1="70bdf7b4d5ea252ef23e0a49c8988b9ec06b177e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
