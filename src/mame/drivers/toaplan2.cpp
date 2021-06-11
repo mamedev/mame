@@ -332,7 +332,7 @@ Sound Chips:
 
 Graphics Custom 208pin QFP:
  GP9001 L7A0498 TOA PLAN
- (emulated in video/gp9001.c)
+ (emulated in video/gp9001.cpp)
 
 *********************************************************************
 
@@ -395,7 +395,7 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z180/hd647180x.h"
+#include "cpu/z180/hd64x180x.h"
 #include "machine/nvram.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
@@ -1485,10 +1485,10 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 
 	map(0x60, 0x60).nopr();
 	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
-	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x83, 0x83).w("ymsnd", FUNC(ym3812_device::data_w));
+	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 
@@ -4287,7 +4287,7 @@ ROM_START( tekipaki )
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
+	ROM_REGION( 0x8000, "audiocpu:internal", 0 )    /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, CRC(d5157c12) SHA1(b2c6c087bb539456a9e562d0b40f05dde26cacd3) )
 
 	ROM_REGION( 0x100000, "gp9001_0", 0 )
@@ -4301,7 +4301,7 @@ ROM_START( tekipakit ) /* Location Test version */
 	ROM_LOAD16_BYTE( "e.e5", 0x000000, 0x010000, CRC(89affc73) SHA1(3930bf0c2528de28dcb0cf2cd537adb62a2172e3) ) /* hand written "E"  27C512 chip */
 	ROM_LOAD16_BYTE( "o.e6", 0x000001, 0x010000, CRC(a2244558) SHA1(5291cfbea4d4d1c45d6d4bd21b3c466459a0fa17) ) /* hand written "O"  27C512 chip */
 
-	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
+	ROM_REGION( 0x8000, "audiocpu:internal", 0 )    /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, CRC(d5157c12) SHA1(b2c6c087bb539456a9e562d0b40f05dde26cacd3) )
 
 	ROM_REGION( 0x100000, "gp9001_0", 0 )
@@ -4315,7 +4315,7 @@ ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu:internal", 0 )            /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, CRC(6ab59e5b) SHA1(d814dd3a8f1ee638794e2bd422eed4247ba4a15e) )
 
 	ROM_REGION( 0x100000, "gp9001_0", 0 )
@@ -4329,7 +4329,7 @@ ROM_START( ghoxj ) /* 8-way joystick for controls */
 	ROM_LOAD16_BYTE( "tp021-01a.u10", 0x000000, 0x020000, CRC(c11b13c8) SHA1(da7defc1d3b6ddded910ba56c31fbbdb5ed57b09) )
 	ROM_LOAD16_BYTE( "tp021-02a.u11", 0x000001, 0x020000, CRC(8d426767) SHA1(1ed4a8bcbf4352257e7d58cb5c2c91eb48c2f047) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu:internal", 0 )            /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, CRC(6ab59e5b) SHA1(d814dd3a8f1ee638794e2bd422eed4247ba4a15e) )
 
 	ROM_REGION( 0x100000, "gp9001_0", 0 )
@@ -4342,7 +4342,7 @@ ROM_START( ghoxjo ) /* older version (with fewer regions) of the 8-way joystick 
 	ROM_LOAD16_BYTE( "tp021-01.ghoxsticker.u10", 0x000000, 0x020000, CRC(ad3a8817) SHA1(317267e0c00934a86bf05c5afd6c69a7944a2ed3) ) // TP021 ?01? label covered with a handwriten 'GHOX' sticker
 	ROM_LOAD16_BYTE( "tp021-02.ghoxsticker.u11", 0x000001, 0x020000, CRC(2340e981) SHA1(d8e3f55e67fe6500f9e6c7eed1388dc895c5f574) ) // TP021 ?02? label covered with a handwriten 'GHOX' sticker
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu:internal", 0 )            /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, CRC(6ab59e5b) SHA1(d814dd3a8f1ee638794e2bd422eed4247ba4a15e) )
 
 	ROM_REGION( 0x100000, "gp9001_0", 0 )
@@ -4556,7 +4556,7 @@ ROM_START( whoopee )
 	ROM_LOAD16_BYTE( "whoopee.1", 0x000000, 0x020000, CRC(28882e7e) SHA1(8fcd278a7d005eb81cd9e461139c0c0f756a4fa4) )
 	ROM_LOAD16_BYTE( "whoopee.2", 0x000001, 0x020000, CRC(6796f133) SHA1(d4e657be260ba3fd3f0556ade617882513b52685) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
+	ROM_REGION( 0x10000, "audiocpu:internal", 0 )            /* Sound HD647180 code */
 	ROM_LOAD( "hd647180.025", 0x00000, 0x08000, CRC(c02436f6) SHA1(385343f88991646ec23b385eaea82718f1251ea6) )
 
 	ROM_REGION( 0x200000, "gp9001_0", 0 )

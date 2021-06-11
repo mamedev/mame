@@ -439,7 +439,7 @@
 */
 
 #include "emu.h"
-#include "cpu/z180/hd647180x.h"
+#include "cpu/z180/hd64x180x.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 #include "machine/74259.h"
@@ -846,8 +846,10 @@ void mastboy_state::mastboy(machine_config &config)
 /* Romsets */
 
 ROM_START( mastboy )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu:internal", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.ic77",       0x04000, 0x4000, CRC(64a712ba) SHA1(a8318fa6f5b3fe1aaff4cef07aced927e3503542) ) // data (1ST AND 2ND HALF IDENTICAL)
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
@@ -883,8 +885,10 @@ ROM_END
 
 // this set has a number of strings used in the boot-up display intentionally terminated at the first character so they don't display
 ROM_START( mastboya )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu:internal", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+	
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // data (1ST AND 2ND HALF IDENTICAL)
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
@@ -920,8 +924,10 @@ ROM_END
 
 /* Is this actually official, or a hack? - I think the internal ROM should be different on the Italian sets as it indexes the wrong strings on the startup screens, showing MARK instead of PLAY MARK etc. so marked as BAD_DUMP on these sets */
 ROM_START( mastboyi )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu:internal", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
@@ -955,8 +961,10 @@ ROM_END
 
 // only one of the question roms differs (minor wording / spelling changes in most cases)
 ROM_START( mastboyia )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu:internal", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
+
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_CONTINUE(             0x04000, 0x4000 )
