@@ -57,6 +57,7 @@ namespace voodoo
 {
 
 class dither_helper;
+class stw_helper;
 
 class fifo_state
 {
@@ -205,13 +206,11 @@ protected:
 
 	struct tmu_state
 	{
-		class stw_t;
 		void recompute_texture_params();
 		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
 		s32 prepare();
-		static s32 new_log2(double const &value, int offset);
 		rgb_t lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t);
-		rgbaint_t fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const stw_t &iterstw, s32 lodbase, s32 &lod);
+		rgbaint_t fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
 		rgbaint_t combine_texture(voodoo::texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
 
 		struct ncc_table

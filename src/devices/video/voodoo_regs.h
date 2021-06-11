@@ -300,6 +300,55 @@ private:
 };
 
 
+// ======================> texture_lod
+
+class texture_lod
+{
+public:
+	constexpr texture_lod(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 lod_min() const        { return BIT(m_value, 0, 6); }
+	constexpr u32 lod_max() const        { return BIT(m_value, 6, 6); }
+	constexpr u32 lod_bias() const       { return BIT(m_value, 12, 6); }
+	constexpr u32 lod_odd() const        { return BIT(m_value, 18, 1); }
+	constexpr u32 lod_tsplit() const     { return BIT(m_value, 19, 1); }
+	constexpr u32 lod_s_is_wider() const { return BIT(m_value, 20, 1); }
+	constexpr u32 lod_aspect() const     { return BIT(m_value, 21, 2); }
+	constexpr u32 lod_zerofrac() const   { return BIT(m_value, 23, 1); }
+	constexpr u32 tmultibaseaddr() const { return BIT(m_value, 24, 1); }
+	constexpr u32 tdata_swizzle() const  { return BIT(m_value, 25, 1); }
+	constexpr u32 tdata_swap() const     { return BIT(m_value, 26, 1); }
+	constexpr u32 tdirect_write() const  { return BIT(m_value, 27, 1); }  // Voodoo 2 only
+	constexpr u32 magic() const          { return BIT(m_value, 28, 4); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> texture_detail
+
+class texture_detail
+{
+public:
+	constexpr texture_detail(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 detail_max() const           { return BIT(m_value, 0, 8); }
+	constexpr u32 detail_bias() const          { return BIT(m_value, 8, 6); }
+	constexpr u32 detail_scale() const         { return BIT(m_value, 14, 3); }
+	constexpr u32 rgb_min_filter() const       { return BIT(m_value, 17, 1); }
+	constexpr u32 rgb_mag_filter() const       { return BIT(m_value, 18, 1); }
+	constexpr u32 alpha_min_filter() const     { return BIT(m_value, 19, 1); }
+	constexpr u32 alpha_mag_filter() const     { return BIT(m_value, 20, 1); }
+	constexpr u32 separate_rgba_filter() const { return BIT(m_value, 21, 1); }
+
+private:
+	u32 m_value;
+};
+
+
 // ======================> init_en
 
 class init_en
@@ -872,28 +921,6 @@ static constexpr u32 crc2 =                    0x130/4;
 #define FBIINIT7_ENABLE_CHROMA_STUFF(val)   (((val) >> 19) & 1)     /* voodoo 2 only */
 #define FBIINIT7_CMDFIFO_PCI_TIMEOUT(val)   (((val) >> 20) & 0x7f)  /* voodoo 2 only */
 #define FBIINIT7_ENABLE_TEXTURE_BURST(val)  (((val) >> 27) & 1)     /* voodoo 2 only */
-
-#define TEXLOD_LODMIN(val)                  (((val) >> 0) & 0x3f)
-#define TEXLOD_LODMAX(val)                  (((val) >> 6) & 0x3f)
-#define TEXLOD_LODBIAS(val)                 (((val) >> 12) & 0x3f)
-#define TEXLOD_LOD_ODD(val)                 (((val) >> 18) & 1)
-#define TEXLOD_LOD_TSPLIT(val)              (((val) >> 19) & 1)
-#define TEXLOD_LOD_S_IS_WIDER(val)          (((val) >> 20) & 1)
-#define TEXLOD_LOD_ASPECT(val)              (((val) >> 21) & 3)
-#define TEXLOD_LOD_ZEROFRAC(val)            (((val) >> 23) & 1)
-#define TEXLOD_TMULTIBASEADDR(val)          (((val) >> 24) & 1)
-#define TEXLOD_TDATA_SWIZZLE(val)           (((val) >> 25) & 1)
-#define TEXLOD_TDATA_SWAP(val)              (((val) >> 26) & 1)
-#define TEXLOD_TDIRECT_WRITE(val)           (((val) >> 27) & 1)     /* Voodoo 2 only */
-
-#define TEXDETAIL_DETAIL_MAX(val)           (((val) >> 0) & 0xff)
-#define TEXDETAIL_DETAIL_BIAS(val)          (((val) >> 8) & 0x3f)
-#define TEXDETAIL_DETAIL_SCALE(val)         (((val) >> 14) & 7)
-#define TEXDETAIL_RGB_MIN_FILTER(val)       (((val) >> 17) & 1)     /* Voodoo 2 only */
-#define TEXDETAIL_RGB_MAG_FILTER(val)       (((val) >> 18) & 1)     /* Voodoo 2 only */
-#define TEXDETAIL_ALPHA_MIN_FILTER(val)     (((val) >> 19) & 1)     /* Voodoo 2 only */
-#define TEXDETAIL_ALPHA_MAG_FILTER(val)     (((val) >> 20) & 1)     /* Voodoo 2 only */
-#define TEXDETAIL_SEPARATE_RGBA_FILTER(val) (((val) >> 21) & 1)     /* Voodoo 2 only */
 
 #define TREXINIT_SEND_TMU_CONFIG(val)       (((val) >> 18) & 1)
 

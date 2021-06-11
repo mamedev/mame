@@ -989,13 +989,7 @@ void voodoo_device::init_fbi(fbi_state *f, void *memory, int fbmem)
 
 	// build static 16-bit rgb565 to rgb888 conversion table
 	for (int val = 0; val < 65536; val++)
-	{
-		int r, g, b;
-
-		/* table 10 = 16-bit RGB (5-6-5) */
-		EXTRACT_565_TO_888(val, r, g, b);
-		m_fbi.rgb565[val] = rgb_t(0xff, r, g, b);
-	}
+		m_fbi.rgb565[val] = rgbexpand<5,6,5>(val, 11, 5, 0).set_a(0xff);
 
 	/* allocate a VBLANK timer */
 	f->vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback), this), this);
@@ -1015,11 +1009,8 @@ void voodoo_device::tmu_shared_state::init()
 	/* build static 8-bit texel tables */
 	for (int val = 0; val < 256; val++)
 	{
-		int r, g, b, a;
-
 		/* 8-bit RGB (3-3-2) */
-		EXTRACT_332_TO_888(val, r, g, b);
-		rgb332[val] = rgb_t(0xff, r, g, b);
+		rgb332[val] = rgbexpand<3,3,2>(val, 5, 2, 0).set_a(0xff);
 
 		/* 8-bit alpha */
 		alpha8[val] = rgb_t(val, val, val, val);
@@ -1028,26 +1019,20 @@ void voodoo_device::tmu_shared_state::init()
 		int8[val] = rgb_t(0xff, val, val, val);
 
 		/* 8-bit alpha, intensity */
-		a = ((val >> 0) & 0xf0) | ((val >> 4) & 0x0f);
-		r = ((val << 4) & 0xf0) | ((val << 0) & 0x0f);
-		ai44[val] = rgb_t(a, r, r, r);
+		ai44[val] = argbexpand<4,4,4,4>(val, 4, 0, 0, 0);
 	}
 
 	/* build static 16-bit texel tables */
 	for (int val = 0; val < 65536; val++)
 	{
-		int r, g, b, a;
-
 		/* table 10 = 16-bit RGB (5-6-5) */
 		// Use frame buffer table
 
 		/* table 11 = 16 ARGB (1-5-5-5) */
-		EXTRACT_1555_TO_8888(val, a, r, g, b);
-		argb1555[val] = rgb_t(a, r, g, b);
+		argb1555[val] = argbexpand<1,5,5,5>(val, 15, 10, 5, 0);
 
 		/* table 12 = 16-bit ARGB (4-4-4-4) */
-		EXTRACT_4444_TO_8888(val, a, r, g, b);
-		argb4444[val] = rgb_t(a, r, g, b);
+		argb4444[val] = argbexpand<4,4,4,4>(val, 12, 8, 4, 0);
 	}
 
 	rgb565 = nullptr;
@@ -1738,14 +1723,9 @@ void voodoo_device::tmu_state::ncc_table::update()
 		r = g = b = y[(i >> 4) & 0x0f];
 
 		/* add the coloring */
-		r += ir[vi] + qr[vq];
-		g += ig[vi] + qg[vq];
-		b += ib[vi] + qb[vq];
-
-		/* clamp */
-		CLAMP(r, 0, 255);
-		CLAMP(g, 0, 255);
-		CLAMP(b, 0, 255);
+		r = std::clamp(r + ir[vi] + qr[vq], 0, 255);
+		g = std::clamp(g + ig[vi] + qg[vq], 0, 255);
+		b = std::clamp(b + ib[vi] + qb[vq], 0, 255);
 
 		/* fill in the table */
 		texel[i] = rgb_t(0xff, r, g, b);
@@ -1805,44 +1785,40 @@ void voodoo_device::dac_state::data_r(u8 regnum)
 
 void voodoo_device::tmu_state::recompute_texture_params()
 {
-	/* extract LOD parameters */
-	m_lodmin = TEXLOD_LODMIN(m_reg[tLOD].u) << 6;
-	m_lodmax = TEXLOD_LODMAX(m_reg[tLOD].u) << 6;
-	m_lodbias = s8(TEXLOD_LODBIAS(m_reg[tLOD].u) << 2) << 4;
+	// extract LOD parameters
+	texture_lod const texlod(m_reg[tLOD].u);
+	m_lodmin = texlod.lod_min() << 6;
+	m_lodmax = texlod.lod_max() << 6;
+	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
 
-	/* determine which LODs are present */
+	// determine which LODs are present
 	m_lodmask = 0x1ff;
-	if (TEXLOD_LOD_TSPLIT(m_reg[tLOD].u))
-	{
-		if (!TEXLOD_LOD_ODD(m_reg[tLOD].u))
-			m_lodmask = 0x155;
-		else
-			m_lodmask = 0x0aa;
-	}
+	if (texlod.lod_tsplit())
+		m_lodmask = texlod.lod_odd() ? 0x0aa : 0x155;
 
-	/* determine base texture width/height */
+	// determine base texture width/height
 	m_wmask = m_hmask = 0xff;
-	if (TEXLOD_LOD_S_IS_WIDER(m_reg[tLOD].u))
-		m_hmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
+	if (texlod.lod_s_is_wider())
+		m_hmask >>= texlod.lod_aspect();
 	else
-		m_wmask >>= TEXLOD_LOD_ASPECT(m_reg[tLOD].u);
+		m_wmask >>= texlod.lod_aspect();
 
-	/* determine the bpp of the texture */
+	// determine the bpp of the texture
 	voodoo::texture_mode const texmode(m_reg[textureMode].u);
 	int bppscale = texmode.format() >> 3;
 
-	/* start with the base of LOD 0 */
+	// start with the base of LOD 0
 	if (m_texaddr_shift == 0 && (m_reg[texBaseAddr].u & 1))
 		osd_printf_debug("Tiled texture\n");
 	u32 base = (m_reg[texBaseAddr].u & m_texaddr_mask) << m_texaddr_shift;
 	m_lodoffset[0] = base & m_mask;
 
-	/* LODs 1-3 are different depending on whether we are in multitex mode */
-	/* Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think */
-	/* they want multitex mode when they really don't -- disable for now */
+	// LODs 1-3 are different depending on whether we are in multitex mode
+	// Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think
+	// they want multitex mode when they really don't -- disable for now
 	// Enable for Voodoo 3 or Viper breaks - VL.
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
-	if (TEXLOD_TMULTIBASEADDR(m_reg[tLOD].u) && (m_reg[tLOD].u >> 28) == 0)
+	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
 		base = (m_reg[texBaseAddr_1].u & m_texaddr_mask) << m_texaddr_shift;
 		m_lodoffset[1] = base & m_mask;
@@ -1864,7 +1840,7 @@ void voodoo_device::tmu_state::recompute_texture_params()
 		m_lodoffset[3] = base & m_mask;
 	}
 
-	/* remaining LODs make sense */
+	// remaining LODs make sense
 	for (int lod = 4; lod <= 8; lod++)
 	{
 		if (m_lodmask & (1 << (lod - 1)))
@@ -1876,18 +1852,19 @@ void voodoo_device::tmu_state::recompute_texture_params()
 		m_lodoffset[lod] = base & m_mask;
 	}
 
-	/* set the NCC lookup appropriately */
+	// set the NCC lookup appropriately
 	m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
 
-	/* pick the lookup table */
+	// pick the lookup table
 	m_lookup = m_texel[texmode.format()];
 
-	/* compute the detail parameters */
-	m_detailmax = TEXDETAIL_DETAIL_MAX(m_reg[tDetail].u);
-	m_detailbias = (s8)(TEXDETAIL_DETAIL_BIAS(m_reg[tDetail].u) << 2) << 6;
-	m_detailscale = TEXDETAIL_DETAIL_SCALE(m_reg[tDetail].u);
+	// compute the detail parameters
+	texture_detail const texdetail(m_reg[tDetail].u);
+	m_detailmax = texdetail.detail_max();
+	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
+	m_detailscale = texdetail.detail_scale();
 
-	/* ensure that the NCC tables are up to date */
+	// ensure that the NCC tables are up to date
 	if ((texmode.format() & 7) == 1)
 	{
 		ncc_table &n = m_ncc[texmode.ncc_table_select()];
@@ -1896,40 +1873,37 @@ void voodoo_device::tmu_state::recompute_texture_params()
 			n.update();
 	}
 
-	/* no longer dirty */
+	// no longer dirty
 	m_regdirty = false;
 
-	/* check for separate RGBA filtering */
-	if (TEXDETAIL_SEPARATE_RGBA_FILTER(m_reg[tDetail].u))
+	// check for separate RGBA filtering
+	if (texdetail.separate_rgba_filter())
 		fatalerror("Separate RGBA filters!\n");
 }
 
 
 inline s32 voodoo_device::tmu_state::prepare()
 {
-	s64 texdx, texdy;
-	s32 lodbase;
-
-	/* if the texture parameters are dirty, update them */
+	// if the texture parameters are dirty, update them
 	if (m_regdirty)
 		recompute_texture_params();
 
-	/* compute (ds^2 + dt^2) in both X and Y as 28.36 numbers */
-	texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
-	texdy = s64(m_dsdy >> 14) * s64(m_dsdy >> 14) + s64(m_dtdy >> 14) * s64(m_dtdy >> 14);
+	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
+	s64 texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
+	s64 texdy = s64(m_dsdy >> 14) * s64(m_dsdy >> 14) + s64(m_dtdy >> 14) * s64(m_dtdy >> 14);
 
-	/* pick whichever is larger and shift off some high bits -> 28.20 */
+	// pick whichever is larger and shift off some high bits -> 28.20
 	if (texdx < texdy)
 		texdx = texdy;
 	texdx >>= 16;
 
-	/* use our fast reciprocal/log on this value; it expects input as a */
-	/* 16.32 number, and returns the log of the reciprocal, so we have to */
-	/* adjust the result: negative to get the log of the original value */
-	/* plus 12 to account for the extra exponent, and divided by 2 to */
-	/* get the log of the square root of texdx */
-	double tmpTex = texdx;
-	lodbase = new_log2(tmpTex, 0);
+	// use our fast reciprocal/log on this value; it expects input as a
+	// 16.32 number, and returns the log of the reciprocal, so we have to
+	// adjust the result: negative to get the log of the original value
+	// plus 12 to account for the extra exponent, and divided by 2 to
+	// get the log of the square root of texdx
+	double texdx_fp = texdx;
+	s32 lodbase = fast_log2(texdx_fp, 0);
 	return (lodbase + (12 << 8)) / 2;
 }
 
@@ -3487,18 +3461,10 @@ s32 voodoo_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 
 s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u16 *dest, *depth;
-	u32 destmax, depthmax;
-	int sa[2], sz[2];
-	u8 sr[2], sg[2], sb[2];
-	int x, y, scry, mask;
-	int pix, destbuf;
-	rgb_t sourceColor;
-
-	/* statistics */
+	// statistics
 	m_stats.lfb_writes++;
 
-	/* byte swizzling */
+	// byte swizzling
 	voodoo::lfb_mode const lfbmode(m_reg[lfbMode].u);
 	if (lfbmode.byte_swizzle_writes())
 	{
@@ -3506,398 +3472,389 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		mem_mask = swapendian_int32(mem_mask);
 	}
 
-	/* word swapping */
+	// word swapping
 	if (lfbmode.word_swap_writes())
 	{
 		data = (data << 16) | (data >> 16);
 		mem_mask = (mem_mask << 16) | (mem_mask >> 16);
 	}
 
-	/* extract default depth and alpha values */
+	// extract default depth value from low bits of zaColor
+	u16 sz[2];
 	sz[0] = sz[1] = m_reg[zaColor].u & 0xffff;
-	sa[0] = sa[1] = m_reg[zaColor].u >> 24;
 
-	/* first extract A,R,G,B from the data */
-	switch (lfbmode.write_format() + 16 * lfbmode.rgba_lanes())
+	// if not otherwise specified, alpha defaults to the upper bits of zaColor
+	u32 src_alpha = m_reg[zaColor].u >> 24;
+
+	// extract color information from the data
+	rgb_t src_color[2];
+	u32 mask = 0;
+	switch (16 * lfbmode.rgba_lanes() + lfbmode.write_format())
 	{
-		case 16*0 + 0:      /* ARGB, 16-bit RGB 5-6-5 */
-		case 16*2 + 0:      /* RGBA, 16-bit RGB 5-6-5 */
-			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
-			//EXTRACT_565_TO_888(data >> 16, sr[1], sg[1], sb[1]);
-			sourceColor = m_fbi.rgb565[data & 0xffff];
-			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
-			sourceColor = m_fbi.rgb565[data >> 16];
-			sourceColor.expand_rgb(sr[1], sg[1], sb[1]);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-		case 16*1 + 0:      /* ABGR, 16-bit RGB 5-6-5 */
-		case 16*3 + 0:      /* BGRA, 16-bit RGB 5-6-5 */
-			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
-			//EXTRACT_565_TO_888(data >> 16, sb[1], sg[1], sr[1]);
-			sourceColor = m_fbi.rgb565[data & 0xffff];
-			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
-			sourceColor = m_fbi.rgb565[data >> 16];
-			sourceColor.expand_rgb(sb[1], sg[1], sr[1]);
+		case 16*0 + 0:      // ARGB, format 0: 16-bit RGB 5-6-5
+		case 16*2 + 0:      // RGBA, format 0: 16-bit RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,6,5>(data, 27, 21, 16).set_a(src_alpha);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 1:      /* ARGB, 16-bit RGB x-5-5-5 */
-			EXTRACT_x555_TO_888(data, sr[0], sg[0], sb[0]);
-			EXTRACT_x555_TO_888(data >> 16, sr[1], sg[1], sb[1]);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-		case 16*1 + 1:      /* ABGR, 16-bit RGB x-5-5-5 */
-			EXTRACT_x555_TO_888(data, sb[0], sg[0], sr[0]);
-			EXTRACT_x555_TO_888(data >> 16, sb[1], sg[1], sr[1]);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-		case 16*2 + 1:      /* RGBA, 16-bit RGB x-5-5-5 */
-			EXTRACT_555x_TO_888(data, sr[0], sg[0], sb[0]);
-			EXTRACT_555x_TO_888(data >> 16, sr[1], sg[1], sb[1]);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-		case 16*3 + 1:      /* BGRA, 16-bit RGB x-5-5-5 */
-			EXTRACT_555x_TO_888(data, sb[0], sg[0], sr[0]);
-			EXTRACT_555x_TO_888(data >> 16, sb[1], sg[1], sr[1]);
+		case 16*1 + 0:      // ABGR, format 0: 16-bit RGB 5-6-5
+		case 16*3 + 0:      // BGRA, format 0: 16-bit RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,6,5>(data, 16, 21, 27).set_a(src_alpha);
 			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 2:      /* ARGB, 16-bit ARGB 1-5-5-5 */
-			EXTRACT_1555_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
-			EXTRACT_1555_TO_8888(data >> 16, sa[1], sr[1], sg[1], sb[1]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+		case 16*0 + 1:      // ARGB, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 26, 21, 16).set_a(src_alpha);
+			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*1 + 2:      /* ABGR, 16-bit ARGB 1-5-5-5 */
-			EXTRACT_1555_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
-			EXTRACT_1555_TO_8888(data >> 16, sa[1], sb[1], sg[1], sr[1]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+
+		case 16*1 + 1:      // ABGR, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 16, 21, 26).set_a(src_alpha);
+			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*2 + 2:      /* RGBA, 16-bit ARGB 1-5-5-5 */
-			EXTRACT_5551_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
-			EXTRACT_5551_TO_8888(data >> 16, sr[1], sg[1], sb[1], sa[1]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+
+		case 16*2 + 1:      // RGBA, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 27, 22, 17).set_a(src_alpha);
+			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
 			offset <<= 1;
 			break;
-		case 16*3 + 2:      /* BGRA, 16-bit ARGB 1-5-5-5 */
-			EXTRACT_5551_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
-			EXTRACT_5551_TO_8888(data >> 16, sb[1], sg[1], sr[1], sa[1]);
+
+		case 16*3 + 1:      // BGRA, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 17, 22, 27).set_a(src_alpha);
+			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
+			offset <<= 1;
+			break;
+
+		case 16*0 + 2:      // ARGB, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
+			src_color[1] = argbexpand<1,5,5,5>(data, 31, 26, 21, 16);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
 			offset <<= 1;
 			break;
 
-		case 16*0 + 4:      /* ARGB, 32-bit RGB x-8-8-8 */
-			EXTRACT_x888_TO_888(data, sr[0], sg[0], sb[0]);
+		case 16*1 + 2:      // ABGR, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
+			src_color[1] = argbexpand<1,5,5,5>(data, 31, 16, 21, 26);
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+			offset <<= 1;
+			break;
+
+		case 16*2 + 2:      // RGBA, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
+			src_color[1] = argbexpand<1,5,5,5>(data, 16, 27, 22, 17);
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+			offset <<= 1;
+			break;
+
+		case 16*3 + 2:      // BGRA, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
+			src_color[1] = argbexpand<1,5,5,5>(data, 16, 17, 22, 27);
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
+			offset <<= 1;
+			break;
+
+		case 16*0 + 4:      // ARGB, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data, 16,  8,  0);
 			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*1 + 4:      /* ABGR, 32-bit RGB x-8-8-8 */
-			EXTRACT_x888_TO_888(data, sb[0], sg[0], sr[0]);
-			mask = LFB_RGB_PRESENT;
-			break;
-		case 16*2 + 4:      /* RGBA, 32-bit RGB x-8-8-8 */
-			EXTRACT_888x_TO_888(data, sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT;
-			break;
-		case 16*3 + 4:      /* BGRA, 32-bit RGB x-8-8-8 */
-			EXTRACT_888x_TO_888(data, sb[0], sg[0], sr[0]);
+
+		case 16*1 + 4:      // ABGR, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data,  0,  8, 16);
 			mask = LFB_RGB_PRESENT;
 			break;
 
-		case 16*0 + 5:      /* ARGB, 32-bit ARGB 8-8-8-8 */
-			EXTRACT_8888_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
+		case 16*2 + 4:      // RGBA, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data, 24, 16,  8);
+			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*1 + 5:      /* ABGR, 32-bit ARGB 8-8-8-8 */
-			EXTRACT_8888_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
+
+		case 16*3 + 4:      // BGRA, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data,  8, 16, 24);
+			mask = LFB_RGB_PRESENT;
 			break;
-		case 16*2 + 5:      /* RGBA, 32-bit ARGB 8-8-8-8 */
-			EXTRACT_8888_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
-			break;
-		case 16*3 + 5:      /* BGRA, 32-bit ARGB 8-8-8-8 */
-			EXTRACT_8888_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
+
+		case 16*0 + 5:      // ARGB, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data, 24, 16,  8,  0);
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
 
-		case 16*0 + 12:     /* ARGB, 32-bit depth+RGB 5-6-5 */
-		case 16*2 + 12:     /* RGBA, 32-bit depth+RGB 5-6-5 */
-			sz[0] = data >> 16;
-			//EXTRACT_565_TO_888(data, sr[0], sg[0], sb[0]);
-			sourceColor = m_fbi.rgb565[data & 0xffff];
-			sourceColor.expand_rgb(sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
+		case 16*1 + 5:      // ABGR, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data, 24,  0,  8, 16);
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
 			break;
-		case 16*1 + 12:     /* ABGR, 32-bit depth+RGB 5-6-5 */
-		case 16*3 + 12:     /* BGRA, 32-bit depth+RGB 5-6-5 */
+
+		case 16*2 + 5:      // RGBA, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data,  0, 24, 16,  8);
+			break;
+
+		case 16*3 + 5:      // BGRA, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data,  0,  8, 16, 24);
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
+			break;
+
+		case 16*0 + 12:     // ARGB, format 12: 32-bit depth+RGB 5-6-5
+		case 16*2 + 12:     // RGBA, format 12: 32-bit depth+RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
 			sz[0] = data >> 16;
-			//EXTRACT_565_TO_888(data, sb[0], sg[0], sr[0]);
-			sourceColor = m_fbi.rgb565[data & 0xffff];
-			sourceColor.expand_rgb(sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 13:     /* ARGB, 32-bit depth+RGB x-5-5-5 */
+		case 16*1 + 12:     // ABGR, format 12: 32-bit depth+RGB 5-6-5
+		case 16*3 + 12:     // BGRA, format 12: 32-bit depth+RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
 			sz[0] = data >> 16;
-			EXTRACT_x555_TO_888(data, sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-		case 16*1 + 13:     /* ABGR, 32-bit depth+RGB x-5-5-5 */
-			sz[0] = data >> 16;
-			EXTRACT_x555_TO_888(data, sb[0], sg[0], sr[0]);
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-		case 16*2 + 13:     /* RGBA, 32-bit depth+RGB x-5-5-5 */
-			sz[0] = data >> 16;
-			EXTRACT_555x_TO_888(data, sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-		case 16*3 + 13:     /* BGRA, 32-bit depth+RGB x-5-5-5 */
-			sz[0] = data >> 16;
-			EXTRACT_555x_TO_888(data, sb[0], sg[0], sr[0]);
 			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 14:     /* ARGB, 32-bit depth+ARGB 1-5-5-5 */
+		case 16*0 + 13:     // ARGB, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
 			sz[0] = data >> 16;
-			EXTRACT_1555_TO_8888(data, sa[0], sr[0], sg[0], sb[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*1 + 14:     /* ABGR, 32-bit depth+ARGB 1-5-5-5 */
+
+		case 16*1 + 13:     // ABGR, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
 			sz[0] = data >> 16;
-			EXTRACT_1555_TO_8888(data, sa[0], sb[0], sg[0], sr[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*2 + 14:     /* RGBA, 32-bit depth+ARGB 1-5-5-5 */
+
+		case 16*2 + 13:     // RGBA, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
 			sz[0] = data >> 16;
-			EXTRACT_5551_TO_8888(data, sr[0], sg[0], sb[0], sa[0]);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
-		case 16*3 + 14:     /* BGRA, 32-bit depth+ARGB 1-5-5-5 */
+
+		case 16*3 + 13:     // BGRA, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
 			sz[0] = data >> 16;
-			EXTRACT_5551_TO_8888(data, sb[0], sg[0], sr[0], sa[0]);
+			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			break;
+
+		case 16*0 + 14:     // ARGB, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
+			sz[0] = data >> 16;
 			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
 			break;
 
-		case 16*0 + 15:     /* ARGB, 16-bit depth */
-		case 16*1 + 15:     /* ARGB, 16-bit depth */
-		case 16*2 + 15:     /* ARGB, 16-bit depth */
-		case 16*3 + 15:     /* ARGB, 16-bit depth */
+		case 16*1 + 14:     // ABGR, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
+			sz[0] = data >> 16;
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			break;
+
+		case 16*2 + 14:     // RGBA, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
+			sz[0] = data >> 16;
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			break;
+
+		case 16*3 + 14:     // BGRA, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
+			sz[0] = data >> 16;
+			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
+			break;
+
+		case 16*0 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*1 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*2 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*3 + 15:     // ARGB, format 15: 16-bit depth
 			sz[0] = data & 0xffff;
 			sz[1] = data >> 16;
 			mask = LFB_DEPTH_PRESENT | (LFB_DEPTH_PRESENT << 4);
 			offset <<= 1;
 			break;
 
-		default:            /* reserved */
+		default:            // reserved
 			logerror("lfb_w: Unknown format\n");
 			return 0;
 	}
 
-	/* compute X,Y */
-	x = offset & ((1 << m_fbi.lfb_stride) - 1);
-	y = (offset >> m_fbi.lfb_stride) & 0x3ff;
+	// compute X,Y
+	s32 x = offset & ((1 << m_fbi.lfb_stride) - 1);
+	s32 y = (offset >> m_fbi.lfb_stride) & 0x3ff;
 
-	/* adjust the mask based on which half of the data is written */
+	// adjust the mask based on which half of the data is written
 	if (!ACCESSING_BITS_0_15)
 		mask &= ~(0x0f - LFB_DEPTH_PRESENT_MSW);
 	if (!ACCESSING_BITS_16_31)
 		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
 
-	/* select the target buffer */
-	destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : lfbmode.write_buffer_select();
+	// select the target buffer
+	int destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : lfbmode.write_buffer_select();
+	u32 destmax;
+	u16 *dest;
 	switch (destbuf)
 	{
-		case 0:         /* front buffer */
+		case 0:         // front buffer
 			dest = (u16 *)(m_fbi.ram + m_fbi.rgboffs[m_fbi.frontbuf]);
 			destmax = (m_fbi.mask + 1 - m_fbi.rgboffs[m_fbi.frontbuf]) / 2;
 			m_fbi.video_changed = true;
 			break;
 
-		case 1:         /* back buffer */
+		case 1:         // back buffer
 			dest = (u16 *)(m_fbi.ram + m_fbi.rgboffs[m_fbi.backbuf]);
 			destmax = (m_fbi.mask + 1 - m_fbi.rgboffs[m_fbi.backbuf]) / 2;
 			break;
 
-		default:        /* reserved */
+		default:        // reserved
 			return 0;
 	}
-	depth = (u16 *)(m_fbi.ram + m_fbi.auxoffs);
-	depthmax = (m_fbi.mask + 1 - m_fbi.auxoffs) / 2;
+	u16 *depth = (u16 *)(m_fbi.ram + m_fbi.auxoffs);
+	u32 depthmax = (m_fbi.mask + 1 - m_fbi.auxoffs) / 2;
 
-	/* simple case: no pipeline */
+	// simple case: no pipeline
 	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
 	if (!lfbmode.enable_pixel_pipeline())
 	{
-		u32 bufoffs;
-
 		if (LOG_LFB) logerror("VOODOO.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
 
-		/* determine the screen Y */
-		scry = y;
+		// determine the screen Y
+		s32 scry = y;
 		if (lfbmode.y_origin())
-			scry = (m_fbi.yorigin - y);
+			scry = m_fbi.yorigin - y;
 
-		/* advance pointers to the proper row */
-		bufoffs = scry * m_fbi.rowpixels + x;
+		// advance pointers to the proper row
+		u32 bufoffs = scry * m_fbi.rowpixels + x;
 
-		/* wait for any outstanding work to finish */
+		// wait for any outstanding work to finish
 		m_poly->wait("LFB Write");
 
-		/* loop over up to two pixels */
-		voodoo::dither_helper dither(y, fbzmode);
-		for (pix = 0; mask; pix++)
+		// loop over up to two pixels
+		voodoo::dither_helper dither(scry, fbzmode);
+		for (int pix = 0; mask != 0; pix++)
 		{
-			/* make sure we care about this pixel */
-			if (mask & 0x0f)
+			// make sure we care about this pixel
+			if ((mask & 0x0f) != 0)
 			{
-				/* write to the RGB buffer */
+				// write to the RGB buffer
+				rgb_t pixel = src_color[pix];
 				if ((mask & LFB_RGB_PRESENT) && bufoffs < destmax)
-				{
-					/* apply dithering and write to the screen */
-					dest[bufoffs] = dither.pixel(x, sr[pix], sg[pix], sb[pix]);
-				}
+					dest[bufoffs] = dither.pixel(x, pixel.r(), pixel.g(), pixel.b());
 
-				/* make sure we have an aux buffer to write to */
-				if (depth && bufoffs < depthmax)
+				// make sure we have an aux buffer to write to
+				if (depth != nullptr && bufoffs < depthmax)
 				{
-					/* write to the alpha buffer */
+					// write to the alpha buffer
 					if ((mask & LFB_ALPHA_PRESENT) && fbzmode.enable_alpha_planes())
-						depth[bufoffs] = sa[pix];
+						depth[bufoffs] = pixel.a();
 
-					/* write to the depth buffer */
+					// write to the depth buffer
 					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !fbzmode.enable_alpha_planes())
 						depth[bufoffs] = sz[pix];
 				}
 
-				/* track pixel writes to the frame buffer regardless of mask */
+				// track pixel writes to the frame buffer regardless of mask
 				m_reg[fbiPixelsOut].u++;
 			}
 
-			/* advance our pointers */
+			// advance our pointers
 			bufoffs++;
 			x++;
 			mask >>= 4;
 		}
 	}
 
-	/* tricky case: run the full pixel pipeline on the pixel */
+	// tricky case: run the full pixel pipeline on the pixel
 	else
 	{
 		if (LOG_LFB) logerror("VOODOO.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
 
-		/* determine the screen Y */
-		scry = y;
+		// determine the screen Y
+		s32 scry = y;
 		if (fbzmode.y_origin())
-			scry = (m_fbi.yorigin - y);
+			scry = m_fbi.yorigin - y;
 
-		/* advance pointers to the proper row */
+		// advance pointers to the proper row
 		dest += scry * m_fbi.rowpixels;
-		if (depth)
+		if (depth != nullptr)
 			depth += scry * m_fbi.rowpixels;
 
-		/* loop over up to two pixels */
+		// loop over up to two pixels
+		voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
 		voodoo::alpha_mode const alphamode(m_reg[alphaMode].u);
 		voodoo::fog_mode const fogmode(m_reg[fogMode].u);
-		voodoo::dither_helper dither(y, fbzmode, fogmode);
-		for (pix = 0; mask; pix++)
+		voodoo::dither_helper dither(scry, fbzmode, fogmode);
+		thread_stats_block &threadstats = m_fbi.lfb_stats;
+		rgbaint_t iterargb(0);
+		for (int pix = 0; mask != 0; pix++)
 		{
-			/* make sure we care about this pixel */
-			if (mask & 0x0f)
+			// make sure we care about this pixel
+			if ((mask & 0x0f) != 0) do
 			{
-				thread_stats_block &threadstats = m_fbi.lfb_stats;
-				s64 iterw;
-				if (lfbmode.write_w_select()) {
-					iterw = (u32) m_reg[zaColor].u << 16;
-				} else {
-					// The most significant fractional bits of 16.32 W are set to z
-					iterw = (u32) sz[pix] << 16;
-				}
-				s32 iterz = sz[pix] << 12;
+				threadstats.pixels_in++;
 
-				/* apply clipping */
+				// apply clipping
 				if (fbzmode.enable_clipping())
 				{
-					if (x < ((m_reg[clipLeftRight].u >> 16) & 0x3ff) ||
-						x >= (m_reg[clipLeftRight].u & 0x3ff) ||
-						scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) ||
-						scry >= (m_reg[clipLowYHighY].u & 0x3ff))
+					if (x < ((m_reg[clipLeftRight].u >> 16) & 0x3ff) || x >= (m_reg[clipLeftRight].u & 0x3ff) ||
+						scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) || scry >= (m_reg[clipLowYHighY].u & 0x3ff))
 					{
-						threadstats.pixels_in++;
 						threadstats.clip_fail++;
-						goto nextpixel;
+						break;
 					}
 				}
 
-				rgbaint_t color, prefog;
-				rgbaint_t iterargb(0);
-				s32 depthval;
-
-				/* pixel pipeline part 1 handles depth testing and stippling */
-				(threadstats).pixels_in++;
-
-				/* apply clipping */
-				/* note that for perf reasons, we assume the caller has done clipping */
-
-				/* handle stippling */
-				if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y))
-					goto nextpixel;
-// End PIXEL_PIPELINE_BEGIN COPY
+				// handle stippling
+				if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+					break;
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				depthval = u32(sz[pix]);
+				s32 depthval = u32(sz[pix]);
 
-				/* Perform depth testing */
+				// Perform depth testing
 				if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
-					goto nextpixel;
+					break;
 
-				/* use the RGBA we stashed above */
-				color.set(sa[pix], sr[pix], sg[pix], sb[pix]);
+				// use the RGBA we stashed above
+				rgbaint_t color(src_color[pix]);
 
-				/* handle chroma key */
+				// handle chroma key
 				if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
-					goto nextpixel;
+					break;
 
-				/* handle alpha mask */
+				// handle alpha mask
 				if (fbzmode.enable_alpha_mask() && !alpha_mask_test(threadstats, color.get_a()))
-					goto nextpixel;
+					break;
 
-				/* handle alpha test */
+				// handle alpha test
 				if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
-					goto nextpixel;
+					break;
 
-				/* perform fogging */
-				prefog.set(color);
+				// perform fogging
+				rgbaint_t prefog(color);
 				if (fogmode.enable_fog())
 				{
-					voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
+					s32 iterz = sz[pix] << 12;
+					s64 iterw = lfbmode.write_w_select() ? u32(m_reg[zaColor].u << 16) : u32(sz[pix] << 16);
 					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
 				}
 
-				/* wait for any outstanding work to finish */
+				// wait for any outstanding work to finish
 				m_poly->wait("LFB Write");
 
-				/* perform alpha blending */
+				// perform alpha blending
 				if (alphamode.alphablend())
 					alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
 
-				/* pixel pipeline part 2 handles final output */
+				// pixel pipeline part 2 handles final output
 				write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
-			}
-nextpixel:
-			/* advance our pointers */
+			} while (0);
+
+			// advance our pointers
 			x++;
 			mask >>= 4;
 		}
 	}
-
 	return 0;
 }
 
@@ -3922,7 +3879,8 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		return 0;
 	t = &m_tmu[tmunum];
 
-	if (TEXLOD_TDIRECT_WRITE(t->m_reg[tLOD].u))
+	texture_lod const texlod(t->m_reg[tLOD].u);
+	if (texlod.tdirect_write())
 		fatalerror("Texture direct write!\n");
 
 	/* wait for any outstanding work to finish */
@@ -3933,9 +3891,9 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		t->recompute_texture_params();
 
 	/* swizzle the data */
-	if (TEXLOD_TDATA_SWIZZLE(t->m_reg[tLOD].u))
+	if (texlod.tdata_swizzle())
 		data = swapendian_int32(data);
-	if (TEXLOD_TDATA_SWAP(t->m_reg[tLOD].u))
+	if (texlod.tdata_swap())
 		data = (data >> 16) | (data << 16);
 
 	/* 8-bit texture case */

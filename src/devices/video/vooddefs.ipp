@@ -31,64 +31,107 @@ static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
 
 
 
-/*************************************
- *
- *  Misc. macros
- *
- *************************************/
+//**************************************************************************
+//  MATH HELPERS
+//**************************************************************************
 
-/* macro for clamping a value between minimum and maximum values */
-#define CLAMP(val,min,max)      do { if ((val) < (min)) { (val) = (min); } else if ((val) > (max)) { (val) = (max); } } while (0)
+//-------------------------------------------------
+//  fast_log2 - computes the log2 of a double-
+//  precision value as a 24.8 value
+//-------------------------------------------------
+
+static inline s32 fast_log2(double value, int offset)
+{
+	// negative values return 0
+	if (UNEXPECTED(value < 0))
+		return 0;
+
+	// convert the value to a raw integer
+	union { double d; u64 i; } temp;
+	temp.d = value;
+
+	// we only care about the 11-bit exponent and top 4 bits of mantissa
+	// (sign is already assured to be 0)
+	u32 ival = temp.i >> 48;
+
+	// exponent in the upper bits, plus an 8-bit log value from 4 bits of mantissa
+	s32 exp = (ival >> 4) - 1023 + 32 - offset;
+
+	// the maximum error using a 4 bit lookup from the mantissa is 0.0875, which is
+	// less than 1/2 lsb (0.125) for 2 bits of fraction
+	static u8 const s_log2_table[16] = { 0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244 };
+	return (exp << 8) + s_log2_table[ival & 15];
+}
 
 
+//-------------------------------------------------
+//  float_to_int32 - convert a floating-point
+//  value in raw IEEE format into an integer with
+//  the given number of fractional bits
+//-------------------------------------------------
 
-/*************************************
- *
- *  Macros for extracting pixels
- *
- *************************************/
+static inline s32 float_to_int32(u32 data, int fixedbits)
+{
+	// compute the effective exponent
+	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
 
-#define EXTRACT_565_TO_888(val, a, b, c)                    \
-	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);   \
-	(b) = (((val) >> 3) & 0xfc) | (((val) >> 9) & 0x03);    \
-	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);
-#define EXTRACT_x555_TO_888(val, a, b, c)                   \
-	(a) = (((val) >> 7) & 0xf8) | (((val) >> 12) & 0x07);   \
-	(b) = (((val) >> 2) & 0xf8) | (((val) >> 7) & 0x07);    \
-	(c) = (((val) << 3) & 0xf8) | (((val) >> 2) & 0x07);
-#define EXTRACT_555x_TO_888(val, a, b, c)                   \
-	(a) = (((val) >> 8) & 0xf8) | (((val) >> 13) & 0x07);   \
-	(b) = (((val) >> 3) & 0xf8) | (((val) >> 8) & 0x07);    \
-	(c) = (((val) << 2) & 0xf8) | (((val) >> 3) & 0x07);
-#define EXTRACT_1555_TO_8888(val, a, b, c, d)               \
-	(a) = ((s16)(val) >> 15) & 0xff;                      \
-	EXTRACT_x555_TO_888(val, b, c, d)
-#define EXTRACT_5551_TO_8888(val, a, b, c, d)               \
-	EXTRACT_555x_TO_888(val, a, b, c)                       \
-	(d) = ((val) & 0x0001) ? 0xff : 0x00;
-#define EXTRACT_x888_TO_888(val, a, b, c)                   \
-	(a) = ((val) >> 16) & 0xff;                             \
-	(b) = ((val) >> 8) & 0xff;                              \
-	(c) = ((val) >> 0) & 0xff;
-#define EXTRACT_888x_TO_888(val, a, b, c)                   \
-	(a) = ((val) >> 24) & 0xff;                             \
-	(b) = ((val) >> 16) & 0xff;                             \
-	(c) = ((val) >> 8) & 0xff;
-#define EXTRACT_8888_TO_8888(val, a, b, c, d)               \
-	(a) = ((val) >> 24) & 0xff;                             \
-	(b) = ((val) >> 16) & 0xff;                             \
-	(c) = ((val) >> 8) & 0xff;                              \
-	(d) = ((val) >> 0) & 0xff;
-#define EXTRACT_4444_TO_8888(val, a, b, c, d)               \
-	(a) = (((val) >> 8) & 0xf0) | (((val) >> 12) & 0x0f);   \
-	(b) = (((val) >> 4) & 0xf0) | (((val) >> 8) & 0x0f);    \
-	(c) = (((val) >> 0) & 0xf0) | (((val) >> 4) & 0x0f);    \
-	(d) = (((val) << 4) & 0xf0) | (((val) >> 0) & 0x0f);
-#define EXTRACT_332_TO_888(val, a, b, c)                    \
-	(a) = (((val) >> 0) & 0xe0) | (((val) >> 3) & 0x1c) | (((val) >> 6) & 0x03); \
-	(b) = (((val) << 3) & 0xe0) | (((val) >> 0) & 0x1c) | (((val) >> 3) & 0x03); \
-	(c) = (((val) << 6) & 0xc0) | (((val) << 4) & 0x30) | (((val) << 2) & 0x0c) | (((val) << 0) & 0x03);
+	// extract the mantissa and return the implied leading 1 bit
+	s32 result = (data & 0x7fffff) | 0x800000;
 
+	// shift by the exponent, handling minimum/maximum
+	if (exponent < 0)
+	{
+		if (exponent > -32)
+			result >>= -exponent;
+		else
+			result = 0;
+	}
+	else
+	{
+		if (exponent < 32)
+			result <<= exponent;
+		else
+			result = 0x7fffffff;
+	}
+
+	// negate based on the sign
+	return (data & 0x80000000) ? -result : result;
+}
+
+
+//-------------------------------------------------
+//  float_to_int64 - convert a floating-point
+//  value in raw IEEE format into an integer with
+//  the given number of fractional bits
+//-------------------------------------------------
+
+static inline s64 float_to_int64(u32 data, int fixedbits)
+{
+	// compute the effective exponent
+	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
+
+	// extract the mantissa and return the implied leading 1 bit
+	s64 result = (data & 0x7fffff) | 0x800000;
+
+	// shift by the exponent, handling minimum/maximum
+	if (exponent < 0)
+	{
+		if (exponent > -64)
+			result >>= -exponent;
+		else
+			result = 0;
+	}
+	else
+	{
+		if (exponent < 64)
+			result <<= exponent;
+		else
+			result = 0x7fffffffffffffffull;
+	}
+
+	// negate based on the sign
+	return (data & 0x80000000) ? -result : result;
+}
 
 
 
@@ -152,147 +195,6 @@ inline u32 voodoo::fifo_state::remove()
 
 
 
-/*************************************
- *
- *  Float-to-int conversions
- *
- *************************************/
-
-static inline s32 float_to_int32(u32 data, int fixedbits)
-{
-	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
-	s32 result = (data & 0x7fffff) | 0x800000;
-	if (exponent < 0)
-	{
-		if (exponent > -32)
-			result >>= -exponent;
-		else
-			result = 0;
-	}
-	else
-	{
-		if (exponent < 32)
-			result <<= exponent;
-		else
-			result = 0x7fffffff;
-	}
-	if (data & 0x80000000)
-		result = -result;
-	return result;
-}
-
-
-static inline s64 float_to_int64(u32 data, int fixedbits)
-{
-	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
-	s64 result = (data & 0x7fffff) | 0x800000;
-	if (exponent < 0)
-	{
-		if (exponent > -64)
-			result >>= -exponent;
-		else
-			result = 0;
-	}
-	else
-	{
-		if (exponent < 64)
-			result <<= exponent;
-		else
-			result = 0x7fffffffffffffffU;
-	}
-	if (data & 0x80000000)
-		result = -result;
-	return result;
-}
-
-
-
-
-// use SSE on 64-bit implementations, where it can be assumed
-#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
-#include <emmintrin.h>
-#ifdef __SSE4_1__
-#include <smmintrin.h>
-#endif
-class voodoo_device::tmu_state::stw_t
-{
-public:
-	stw_t() { }
-	stw_t(const stw_t& other) = default;
-	stw_t &operator=(const stw_t& other) = default;
-
-	void set(s64 s, s64 t, s64 w) { m_st = _mm_set_pd(s << 8, t << 8); m_w = _mm_set1_pd(w); }
-	int is_w_neg() const { return _mm_comilt_sd(m_w, _mm_set1_pd(0.0)); }
-	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
-	{
-		shift += 8;
-		s64 tmpS = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1));
-		s = tmpS >> shift;
-		s64 tmpT = _mm_cvtsd_si64(m_st);
-		t = tmpT >> shift;
-	}
-	void add(const stw_t& other)
-	{
-		m_st = _mm_add_pd(m_st, other.m_st);
-		m_w = _mm_add_pd(m_w, other.m_w);
-	}
-	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
-	{
-		__m128d tmp = _mm_div_pd(m_st, m_w);
-		// Allow for 8 bits of decimal in integer
-		//tmp = _mm_mul_pd(tmp, _mm_set1_pd(256.0));
-		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
-#ifdef __SSE4_1__
-		sow = _mm_extract_epi32(tmp2, 1);
-		tow = _mm_extract_epi32(tmp2, 0);
-#else
-		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
-		tow = _mm_cvtsi128_si32(tmp2);
-#endif
-		double dW = _mm_cvtsd_f64(m_w);
-		oowlog = -new_log2(dW, 0);
-	}
-private:
-	__m128d m_st;
-	__m128d m_w;
-};
-#else
-class voodoo_device::tmu_state::stw_t
-{
-public:
-	stw_t() {}
-	stw_t(const stw_t& other) = default;
-	stw_t &operator=(const stw_t& other) = default;
-
-	void set(s64 s, s64 t, s64 w) { m_s = s; m_t = t; m_w = w; }
-	int is_w_neg() const { return (m_w < 0) ? 1 : 0; }
-	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
-	{
-		s = m_s >> shift;
-		t = m_t >> shift;
-	}
-	inline void add(const stw_t& other)
-	{
-		m_s += other.m_s;
-		m_t += other.m_t;
-		m_w += other.m_w;
-	}
-	// Computes s/w and t/w and returns log2 of 1/w
-	// s, t and c are 16.32 values.  The results are 24.8.
-	inline void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
-	{
-		double recip = double(1ULL << (47 - 39)) / m_w;
-		double resAD = m_s * recip;
-		double resBD = m_t * recip;
-		oowlog = new_log2(recip, 56);
-		sow = resAD;
-		tow = resBD;
-	}
-private:
-	s64 m_s, m_t, m_w;
-};
-#endif
-
 
 /*************************************
  *
@@ -318,11 +220,9 @@ constexpr u32 voodoo_device::static_raster_info::compute_hash() const
 
 
 
-/*************************************
- *
- *  Dithering macros
- *
- *************************************/
+//**************************************************************************
+//  DITHER HELPER
+//**************************************************************************
 
 namespace voodoo
 {
@@ -436,6 +336,124 @@ private:
 	static u8 const s_dither_matrix_4x4_subtract[4*4];
 	static u8 const s_dither_matrix_2x2_subtract[4*4];
 };
+
+}
+
+
+//**************************************************************************
+//  STW HELPER
+//**************************************************************************
+
+namespace voodoo
+{
+
+// use SSE on 64-bit implementations, where it can be assumed
+#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
+
+#include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
+
+class stw_helper
+{
+public:
+	stw_helper() { }
+	stw_helper(stw_helper const &other) = default;
+	stw_helper &operator=(stw_helper const &other) = default;
+
+	void set(s64 s, s64 t, s64 w)
+	{
+		m_st = _mm_set_pd(s << 8, t << 8);
+		m_w = _mm_set1_pd(w);
+	}
+
+	bool is_w_neg() const
+	{
+		return _mm_comilt_sd(m_w, _mm_set1_pd(0.0));
+	}
+
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
+	{
+		shift += 8;
+		s = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1)) >> shift;
+		t = _mm_cvtsd_si64(m_st) >> shift;
+	}
+
+	void add(stw_helper const &delta)
+	{
+		m_st = _mm_add_pd(m_st, delta.m_st);
+		m_w = _mm_add_pd(m_w, delta.m_w);
+	}
+
+	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
+	{
+		__m128d tmp = _mm_div_pd(m_st, m_w);
+		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
+#ifdef __SSE4_1__
+		sow = _mm_extract_epi32(tmp2, 1);
+		tow = _mm_extract_epi32(tmp2, 0);
+#else
+		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
+		tow = _mm_cvtsi128_si32(tmp2);
+#endif
+		oowlog = -fast_log2(_mm_cvtsd_f64(m_w), 0);
+	}
+
+private:
+	__m128d m_st;
+	__m128d m_w;
+};
+
+#else
+
+class voodoo_device::tmu_state::stw_helper
+{
+public:
+	stw_helper() {}
+	stw_helper(stw_helper const &other) = default;
+	stw_helper &operator=(stw_helper const &other) = default;
+
+	void set(s64 s, s64 t, s64 w)
+	{
+		m_s = s;
+		m_t = t;
+		m_w = w;
+	}
+
+	bool is_w_neg() const
+	{
+		return (m_w < 0) ? true : false;
+	}
+
+	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
+	{
+		s = m_s >> shift;
+		t = m_t >> shift;
+	}
+
+	inline void add(stw_helper const &other)
+	{
+		m_s += other.m_s;
+		m_t += other.m_t;
+		m_w += other.m_w;
+	}
+
+	// Computes s/w and t/w and returns log2 of 1/w
+	// s, t and c are 16.32 values.  The results are 24.8.
+	inline void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
+	{
+		double recip = double(1ULL << (47 - 39)) / m_w;
+		sow = s32(m_s * recip);
+		tow = tow(m_t * recip);
+		oowlog = fast_log2(recip, 56);
+	}
+
+private:
+	s64 m_s, m_t, m_w;
+};
+
+#endif
 
 }
 
@@ -932,7 +950,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 	thread_stats_block &threadstats,
 	voodoo::fbz_mode const fbzmode,
 	s32 x,
-	s32 y)
+	s32 scry)
 {
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
@@ -948,7 +966,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 	// pattern mode
 	else
 	{
-		int stipple_index = ((y & 3) << 3) | (~x & 7);
+		int stipple_index = ((scry & 3) << 3) | (~x & 7);
 		if (((m_reg[stipple].u >> stipple_index) & 1) == 0)
 		{
 			threadstats.stipple_count++;
@@ -960,25 +978,12 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 
 inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
 {
-#if 1
 	int exp = count_leading_zeros_64(iterw) - 16;
 	if (exp < 0)
 		return 0x0000;
 	if (exp >= 16)
 		return 0xffff;
 	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
-#else
-	// compute "floating point" W value (used for depth and fog)
-	if ((iterw & 0xffff000000000000ull) != 0)
-		return 0x0000;
-
-	u32 temp = u32(iterw >> 16);
-	if ((temp & 0xffff0000) == 0)
-		return 0xffff;
-
-	int exp = count_leading_zeros(temp);
-	return ((exp << 12) | ((temp >> (19 - exp)) ^ 0x1fff)) + 1;
-#endif
 }
 
 inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode const fbzmode, voodoo::fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
@@ -1376,24 +1381,6 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 
 
 
-// ******************************************************************************************************************************
-// Computes a log2 of a 16.32 value to 2 fractional bits of precision.
-// The return value is coded as a 24.8 value.
-// The maximum error using a 4 bit lookup from the mantissa is 0.0875, which is less than 1/2 lsb (0.125) for 2 bits of fraction.
-// An offset of  +(56 << 8) is added for alignment in multi_reciplog
-// ******************************************************************************************************************************
-inline s32 ATTR_FORCE_INLINE voodoo_device::tmu_state::new_log2(double const &value, int offset)
-{
-	static u8 const s_log2_table[16] = {0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244};
-	u64 ival = *((u64 *)&value);
-	// Return 0 if negative
-	if (UNEXPECTED(s64(ival) < 0))
-		return 0;
-	// We zero the result if negative so don't worry about the sign bit
-	s32 exp = (ival >> 52) - 1023 + 32 - offset;
-	return (exp << 8) + s_log2_table[(ival >> 48) & 15];
-}
-
 inline rgb_t voodoo_device::tmu_state::lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t)
 {
 	if (texmode.format() < 8)
@@ -1407,7 +1394,7 @@ inline rgb_t voodoo_device::tmu_state::lookup_single_texel(voodoo::texture_mode 
 	}
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const stw_t &iterstw, s32 lodbase, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
 {
 	lod = lodbase;
 
@@ -1695,8 +1682,8 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	voodoo::alpha_mode const alphamode(_AlphaMode, m_reg[alphaMode].u);
 	voodoo::fbz_mode const fbzmode(_FbzMode, m_reg[fbzMode].u);
 	voodoo::fog_mode const fogmode(_FogMode, m_reg[fogMode].u);
-	tmu_state::stw_t iterstw0, iterstw1;
-	tmu_state::stw_t deltastw0, deltastw1;
+	voodoo::stw_helper iterstw0, iterstw1;
+	voodoo::stw_helper deltastw0, deltastw1;
 
 	// determine the screen Y
 	s32 scry = y;
@@ -1782,73 +1769,70 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	extra.info->hits++;
 
 	// loop in X
-	voodoo::dither_helper dither(y, fbzmode, fogmode);
+	voodoo::dither_helper dither(scry, fbzmode, fogmode);
 	for (s32 x = startx; x < stopx; x++)
 	{
-		rgbaint_t texel(0);
-		rgbaint_t color, prefog;
-		s32 wfloat, depthval;
-
-		// handle stippling
-		if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, y))
-			goto skipdrawdepth;
-
-		// compute "floating point" W value (used for depth and fog)
-		wfloat = compute_wfloat(iterw);
-
-		// compute depth value (W or Z) for this pixel
-		depthval = compute_depthval(fbzmode, fbzcp, wfloat, iterz);
-
-		// depth testing
-		if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
-			goto skipdrawdepth;
-
-		// run the texture pipeline on TMU1 to produce a value in texel
-		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TexMode1 != 0xffffffff && m_tmu[1].m_lodmin < (8 << 8))
+		do
 		{
-			s32 lod1;
-			const rgbaint_t texel_zero(0);
-			texel = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, lod1);
-			texel = m_tmu[1].combine_texture(texmode1, texel, texel_zero, lod1);
-		}
+			// handle stippling
+			if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+				break;
 
-		// run the texture pipeline on TMU0 to produce a final result in texel
-		// note that they set LOD min to 8 to "disable" a TMU
-		if (_TexMode0 != 0xffffffff && m_tmu[0].m_lodmin < (8 << 8))
-		{
-			if (!m_send_config)
+			// compute "floating point" W value (used for depth and fog)
+			s32 wfloat = compute_wfloat(iterw);
+
+			// compute depth value (W or Z) for this pixel
+			s32 depthval = compute_depthval(fbzmode, fbzcp, wfloat, iterz);
+
+			// depth testing
+			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
+				break;
+
+			// run the texture pipeline on TMU1 to produce a value in texel
+			// note that they set LOD min to 8 to "disable" a TMU
+			rgbaint_t texel(0);
+			if (_TexMode1 != 0xffffffff && m_tmu[1].m_lodmin < (8 << 8))
 			{
-				s32 lod0;
-				rgbaint_t texel_t0 = m_tmu[0].fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
-				texel = m_tmu[0].combine_texture(texmode0, texel_t0, texel, lod0);
+				s32 lod1;
+				rgbaint_t texel_t1 = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, lod1);
+				texel = m_tmu[1].combine_texture(texmode1, texel_t1, texel, lod1);
 			}
-			else
-				texel.set(m_tmu_config);
-		}
 
-		// colorpath pipeline selects source colors and does blending
-		color = clamped_argb(iterargb, fbzcp);
-		if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw))
-			goto skipdrawdepth;
+			// run the texture pipeline on TMU0 to produce a final result in texel
+			// note that they set LOD min to 8 to "disable" a TMU
+			if (_TexMode0 != 0xffffffff && m_tmu[0].m_lodmin < (8 << 8))
+			{
+				if (!m_send_config)
+				{
+					s32 lod0;
+					rgbaint_t texel_t0 = m_tmu[0].fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
+					texel = m_tmu[0].combine_texture(texmode0, texel_t0, texel, lod0);
+				}
+				else
+					texel.set(m_tmu_config);
+			}
 
-		// handle alpha test
-		if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
-			goto skipdrawdepth;
+			// colorpath pipeline selects source colors and does blending
+			rgbaint_t color = clamped_argb(iterargb, fbzcp);
+			if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw))
+				break;
 
-		// perform fogging
-		prefog.set(color);
-		if (fogmode.enable_fog())
-			apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
+			// handle alpha test
+			if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
+				break;
 
-		// perform alpha blending
-		if (alphamode.alphablend())
-			alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
+			// perform fogging
+			rgbaint_t prefog(color);
+			if (fogmode.enable_fog())
+				apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
 
-		// store the pixel and depth value
-		write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+			// perform alpha blending
+			if (alphamode.alphablend())
+				alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
 
-skipdrawdepth:
+			// store the pixel and depth value
+			write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+		} while (0);
 
 		// update the iterated parameters
 		iterargb += iterargb_delta;
