@@ -2,7 +2,7 @@
 // copyright-holders:Hans Andersson
 /*************************************************************************
 
-    audio\sprint2.c
+    audio\sprint2.cpp
 
 *************************************************************************/
 #include "emu.h"
@@ -17,16 +17,16 @@
 static const discrete_lfsr_desc sprint2_lfsr =
 {
 	DISC_CLK_IS_FREQ,
-	16,                  /* Bit Length */
-	0,                   /* Reset Value */
-	0,                   /* Use Bit 0 as XOR input 0 */
-	14,                  /* Use Bit 14 as XOR input 1 */
-	DISC_LFSR_XNOR,      /* Feedback stage1 is XNOR */
-	DISC_LFSR_OR,        /* Feedback stage2 is just stage 1 output OR with external feed */
-	DISC_LFSR_REPLACE,   /* Feedback stage3 replaces the shifted register contents */
-	0x000001,            /* Everything is shifted into the first bit only */
-	0,                   /* Output is not inverted */
-	15                   /* Output bit */
+	16,                  // Bit Length
+	0,                   // Reset Value
+	0,                   // Use Bit 0 as XOR input 0
+	14,                  // Use Bit 14 as XOR input 1
+	DISC_LFSR_XNOR,      // Feedback stage1 is XNOR
+	DISC_LFSR_OR,        // Feedback stage2 is just stage 1 output OR with external feed
+	DISC_LFSR_REPLACE,   // Feedback stage3 replaces the shifted register contents
+	0x000001,            // Everything is shifted into the first bit only
+	0,                   // Output is not inverted
+	15                   // Output bit
 };
 
 static const discrete_dac_r1_ladder sprint2_motor_v_dac =
@@ -90,7 +90,7 @@ static const discrete_mixer_desc sprint2_mixer =
 	30000   // final gain
 };
 
-/* Nodes - Sounds */
+// Nodes - Sounds
 #define SPRINT2_MOTORSND1       NODE_10
 #define SPRINT2_MOTORSND2       NODE_11
 #define SPRINT2_CRASHSND        NODE_12
@@ -118,7 +118,7 @@ DISCRETE_SOUND_START(sprint2_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* drive three counters, that are summed up     */
 	/* and are output through a DAC                 */
 	/************************************************/
@@ -140,18 +140,18 @@ DISCRETE_SOUND_START(sprint2_discrete)
 			RES_M(3.3), 0, 0,   // R22
 			&sprint2_motor_vco)
 
-	/* QB-D of 7492 */
+	// QB-D of 7492
 	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22, DISC_CLK_ON_F_EDGE)
 
-	/* Mask the bits and XOR for clock input */
+	// Mask the bits and XOR for clock input
 	DISCRETE_TRANSFORM2(NODE_24, NODE_23, 1, "01&")
 	DISCRETE_TRANSFORM2(NODE_25, NODE_23, 4, "01&")
 	DISCRETE_LOGIC_XOR(NODE_26, NODE_24, NODE_25)
 
-	/* QA of 7492 */
+	// QA of 7492
 	DISCRETE_COUNTER(NODE_27, 1, SPRINT2_ATTRACT_EN, NODE_26, 0, 1, 1, 0, DISC_CLK_ON_F_EDGE)
 
-	/* Mix QA and QB-D together */
+	// Mix QA and QB-D together
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")
 
 	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, NODE_28,
@@ -178,18 +178,18 @@ DISCRETE_SOUND_START(sprint2_discrete)
 			RES_M(3.3), 0, 0,
 			&sprint2_motor_vco)
 
-	/* QB-D of 7492 */
+	// QB-D of 7492
 	DISCRETE_COUNTER_7492(NODE_43, 1, SPRINT2_ATTRACT_EN, NODE_42, DISC_CLK_ON_F_EDGE)
 
-	/* Mask the bits and XOR for clock input */
+	// Mask the bits and XOR for clock input
 	DISCRETE_TRANSFORM2(NODE_44, NODE_43, 1, "01&")
 	DISCRETE_TRANSFORM2(NODE_45, NODE_43, 4, "01&")
 	DISCRETE_LOGIC_XOR(NODE_46, NODE_44, NODE_45)
 
-	/* QA of 7492 */
+	// QA of 7492
 	DISCRETE_COUNTER(NODE_47, 1, SPRINT2_ATTRACT_EN, NODE_46, 0, 1, 1, 0, DISC_CLK_ON_F_EDGE)
 
-	/* Mix QA and QB-D together */
+	// Mix QA and QB-D together
 	DISCRETE_TRANSFORM3(NODE_48, NODE_43, 2, NODE_47, "01*2+")
 
 	DISCRETE_DAC_R1(SPRINT2_MOTORSND2, NODE_48,
@@ -241,7 +241,7 @@ DISCRETE_SOUND_START(sprint1_discrete)
 	/************************************************/
 	/* Motor sound circuit is based on a 556 VCO    */
 	/* with the input frequency set by the MotorSND */
-	/* latch (4 bit). This freqency is then used to */
+	/* latch (4 bit). This frequency is then used to*/
 	/* drive three counters, that are summed up     */
 	/* and are output through a DAC                 */
 	/************************************************/
@@ -263,18 +263,18 @@ DISCRETE_SOUND_START(sprint1_discrete)
 			RES_M(3.3), 0, 0,   // R22
 			&sprint2_motor_vco)
 
-	/* QB-D of 7492 */
+	// QB-D of 7492
 	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22, DISC_CLK_ON_F_EDGE)
 
-	/* Mask the bits and XOR for clock input */
+	// Mask the bits and XOR for clock input
 	DISCRETE_TRANSFORM2(NODE_24, NODE_23, 1, "01&")
 	DISCRETE_TRANSFORM2(NODE_25, NODE_23, 4, "01&")
 	DISCRETE_LOGIC_XOR(NODE_26, NODE_24, NODE_25)
 
-	/* QA of 7492 */
+	// QA of 7492
 	DISCRETE_COUNTER(NODE_27, 1, SPRINT2_ATTRACT_EN, NODE_26, 0, 1, 1, 0, DISC_CLK_ON_F_EDGE)
 
-	/* Mix QA and QB-D together */
+	// Mix QA and QB-D together
 	DISCRETE_TRANSFORM3(NODE_28, NODE_23, 2, NODE_27, "01*2+")
 
 	DISCRETE_DAC_R1(SPRINT2_MOTORSND1, NODE_28,
@@ -355,10 +355,10 @@ static const discrete_mixer_desc dominos_mixer =
 	40000   // final gain
 };
 
-/* Nodes - Sounds */
+// Nodes - Sounds
 #define DOMINOS_TONE_SND        NODE_10
 #define DOMINOS_TOPPLE_SND      NODE_11
-/* Nodes - Adjusters */
+// Nodes - Adjusters
 #define DOMINOS_R23             NODE_15
 
 DISCRETE_SOUND_START(dominos_discrete)

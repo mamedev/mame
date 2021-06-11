@@ -198,7 +198,6 @@ protected:
 		int bg_hshift;
 		int bg_vshift;
 		int bg_hvres;  // bits 0,1 = H-Res, bits 2,3 = V-Res, bit 4 = L/H Freq (0=15.98kHz, 1=31.5kHz)
-		int bg_double;  // 1 if PCG is to be doubled.
 	} m_video;
 	struct
 	{
@@ -335,6 +334,7 @@ protected:
 	bool draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, uint8_t priority);
 	void draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	void draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer, bool opaque, rectangle rect);
 
 public:
 	static rgb_t GGGGGRRRRRBBBBBI(uint32_t raw);

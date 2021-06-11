@@ -15,7 +15,7 @@
     - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
       (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-	- DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
+    - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
     - clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
     - Remove kludge for POR bit in a20_ctrl_w fn;
@@ -2150,7 +2150,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 
 	for(i=0;i<0x1000;i++)
 		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
-	
+
 	m_beeper->set_state(0);
 }
 
@@ -2171,7 +2171,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 		else
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
 	}
-	
+
 	m_dac_disable = true;
 }
 
@@ -2359,7 +2359,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_ppi_sys->in_pa_callback().set_ioport("DSW2");
 	m_ppi_sys->in_pb_callback().set_ioport("DSW1");
 	m_ppi_sys->in_pc_callback().set_constant(0xa0); // 0x80 cpu triple fault reset flag?
-//	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
+//  m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_portc_w));
 
 	I8255(config, m_ppi_prn, 0);
 	// TODO: check this one
@@ -2465,7 +2465,7 @@ void pc9801_state::pc9801rs(machine_config &config)
 
 	m_hgdc2->set_addrmap(0, &pc9801_state::upd7220_grcg_2_map);
 
-//	DAC_1BIT(config, m_dac, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
+//  DAC_1BIT(config, m_dac, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.40);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16 + 16);
 }

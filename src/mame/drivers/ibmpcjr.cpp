@@ -597,7 +597,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 void pcjr_state::ibmpcjr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4900000);
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));

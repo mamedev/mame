@@ -77,7 +77,7 @@ public:
 
 		impl(fsblk_t &blockdev);
 		virtual ~impl() = default;
-		
+
 		virtual void format(const fs_meta_data &meta) override;
 		virtual fs_meta_data metadata() override;
 		virtual void metadata_change(const fs_meta_data &info) override;
@@ -102,6 +102,9 @@ public:
 
 	fs_oric_jasmin() : filesystem_manager_t() {}
 
+	virtual const char *name() const override;
+	virtual const char *description() const override;
+
 	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;
 
@@ -116,6 +119,6 @@ public:
 	static bool validate_filename(std::string name);
 };
 
-extern const filesystem_manager_type FS_ORIC_JASMIN;
+extern const fs_oric_jasmin FS_ORIC_JASMIN;
 
 #endif

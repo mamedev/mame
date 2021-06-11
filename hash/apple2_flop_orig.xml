@@ -5190,7 +5190,7 @@ license:CC0
 		<info name="release" value="2019-05-23"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
-		<!-- This is the Ultima Trilogy rerelease version. -->
+		<!-- This is the Ultima Trilogy re-release version. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234735">
@@ -8025,12 +8025,12 @@ license:CC0
 	</software>
 
 	<software name="covetmir">
-		<description>The Coveted Mirror (1985 Polarware rerelease)</description>
+		<description>The Coveted Mirror (1985 Polarware Re-release)</description>
 		<year>1985</year>
 		<publisher>Polarware</publisher>
 		<info name="release" value="2019-10-14"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- This rerelease requires a 64K Apple II+ or later;
+		<!-- This re-release requires a 64K Apple II+ or later;
 		the optional double hi-res graphics mode requires a
 		128K Apple //e or later. -->
 
@@ -10320,7 +10320,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Adventure International</publisher>
 		<info name="release" value="2020-01-20"/>
-		<sharedfeat name="compatibility" value=",A2P,A2E,A2EE,A2C,A2GS"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple II+ with 48K. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -10594,7 +10594,7 @@ license:CC0
 		<year>1984</year>
 		<publisher>Sunburst Communications</publisher>
 		<info name="release" value="2020-02-06"/>
-		<sharedfeat name="compatibility" value="A2fP,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 48K Apple II+ or later. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -16710,6 +16710,176 @@ license:CC0
 			<feature name="part_id" value="Side 4"/>
 			<dataarea name="flop" size="234826">
 				<rom name="modern biology - genetics side 4.woz" size="234826" crc="9406020a" sha1="817e6ea052ae32a20ca4e231413d1f9076307f61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="afctadv">
+		<description>Animals Facts and Adventures</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi (design, graphics, animation, and script), Diane Ashachik (editing), and Gregory Truex (programming)"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Animal Facts and Adventures" is a 1992 educational program developed by Nancy Patrissi (design, graphics, animation, and script), Diane Ashachik (editing), and Gregory Truex (programming), and distributed by Troll Associates. This was distributed as a non-bootable disk; it requires a separate ProDOS boot disk or hard drive. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234891">
+				<rom name="animal facts and adventures.woz" size="234891" crc="f27a7a8b" sha1="1440109b0e7ad34a16016cd698a03ad38c06dfbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinodigd">
+		<description>Dino Dig: Dictionary Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi (design, script, graphics, and animation), Alison Bennett (programming and sound), Diane Ashachik (editing), and Gregory Truex (programming advisor)"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Dino Dig: Dictionary Skills" is a 1992 educational program developed by Nancy Patrissi (design, script, graphics, and animation), Alison Bennett (programming and sound), Diane Ashachik (editing), and Gregory Truex (programming advisor), and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234834">
+				<rom name="dino dig.woz" size="234834" crc="942e36e3" sha1="c7d0c175c4a1e515efa2377f5600a217694a4a2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinosplb">
+		<description>Dino Speller: Beginning Dictionary Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi and Alison Bennett"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Dino Speller: Beginning Dictionary Skills" is a 1992 educational program developed by Nancy Patrissi and Alison Bennett, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234819">
+				<rom name="dino speller.woz" size="234819" crc="91be9f89" sha1="4c34a08c73e0f30dd520053ab17b7e534497ccb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyworksf">
+		<description>Keyworks: First Keyboarding Skills</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Hudson Ansley and Millicent Sabater"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Keyworks: First Keyboarding Skills" is a 1992 educational program developed by Hudson Ansley and Millicent Sabater, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="keyworks.woz" size="234814" crc="22a1847c" sha1="e45ef79a88f1f92b34641f48d66ce299bb5fa450"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="posfwnap">
+		<description>Parts of Speech: Fun with Nouns and Pronouns</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi, Gregory Truex, Thomas Whiting, and Diane Ashachik"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Parts of Speech: Fun with Nouns and Pronouns" is a 1992 educational program developed by Nancy Patrissi, Gregory Truex, Thomas Whiting, and Diane Ashachik, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234851">
+				<rom name="parts of speech- fun with nouns and pronouns.woz" size="234851" crc="b004e1f5" sha1="2aafd05be7c8743d431db41ff4b1a684a53f8c96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tomsawyr">
+		<description>Troll Reading Games: The Adventures of Tom Sawyer</description>
+		<year>1992</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Thomas Whiting, Hudson Ansley, and Diane Ashachik"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Troll Reading Games: The Adventures of Tom Sawyer" is a 1992 educational program developed by Millicent Sabater, Thomas Whiting, Hudson Ansley, and Diane Ashachik, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234859">
+				<rom name="troll reading games- the adventures of tom sawyer.woz" size="234859" crc="fcbae0cb" sha1="1e2370fbda9c6738ff82fb7acac45b3c257f39da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="graphmkr">
+		<description>Graph Maker: Introduction to Graphs and Charts</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Hudson Ansley, Bonnie Seiler, and Nancy Patrissi"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Graph Maker: Introduction to Graphs and Charts" is a 1993 educational program developed by Millicent Sabater, Hudson Ansley, Bonnie Seiler, and Nancy Patrissi, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234855">
+				<rom name="graph maker- introduction to graphs and charts.woz" size="234855" crc="5903ea17" sha1="5c38eb87ebd336dab53ed7e0f7aa305d49508baa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgtmapsk">
+		<description>Let's Go There: Beginning Map and Geography Skills</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Nancy Patrissi, Alison Bennett, and Bonnie Seiler"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Let's Go There: Beginning Maps and Geography Skills" is a 1993 educational program developed by Nancy Patrissi, Alison Bennett, and Bonnie Seiler, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234842">
+				<rom name="let's go there- beginning map and geography skills.woz" size="234842" crc="4b4956f9" sha1="be9bb6e647067ab1ba880322c7641686022e8983"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llacomp">
+		<description>Let's Learn About Computers</description>
+		<year>1994</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Millicent Sabater, Thomas Whiting, Bonnie Seiler, and Nancy Patrissi"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Let's Learn About Computers" is a 1994 educational program developed by Millicent Sabater, Thomas Whiting, Bonnie Seiler, and Nancy Patrissi, and distributed by Troll Associates. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="let's learn about computers.woz" size="234829" crc="53113bee" sha1="e5f069b6306ad52e7580e1d68e57aa7b4be57613"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdyply89">
+		<description>Teddy's Playground (1989 Rerelease) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Donna Stanger and Lon Koenig"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Teddy's Playground" is a 1985 educational program developed by Donna Stanger and Lon Koenig, and distributed by Sunburst Communications. This is the 1989 re-release. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="teddy's playground 1989.woz" size="234815" crc="3adfcaa3" sha1="852e2457948c44681c5e3b598166ce410e3f7b51"/>
 			</dataarea>
 		</part>
 	</software>

@@ -761,14 +761,11 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 	uint16_t xstart,xend,ystart,yend;
 	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
-	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if (rotation)
 	{
 		std::swap (x,y);
 		std::swap (xflip,yflip);
-		std::swap (width,height);
 	}
 
 	if(xflip)
@@ -841,7 +838,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
+			if(voffset < 0x20000 && xpos < 256 && ypos < 256 && pixel != 0 && voffset > linesize)
 			{
 				m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
 				m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
@@ -862,7 +859,7 @@ void towns_state::render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x
 
 				pixel = m_towns_txtvram[poffset] & 0x0f;
 				col = (m_towns_txtvram[coffset+(pixel*2)] | (m_towns_txtvram[coffset+(pixel*2)+1] << 8)) & 0x7fff;
-				if(voffset < 0x20000 && xpos < width && ypos < height && pixel != 0 && voffset > linesize)
+				if(voffset < 0x20000 && xpos < 256 && ypos < 256 && pixel != 0 && voffset > linesize)
 				{
 					m_towns_gfxvram[0x40000+voffset+vbase+1] = (col & 0xff00) >> 8;
 					m_towns_gfxvram[0x40000+voffset+vbase] = col & 0x00ff;
@@ -887,32 +884,29 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	uint16_t xstart,ystart,xend,yend;
 	int linesize = m_video.towns_crtc_reg[24] * 4;
 	int xdir,ydir;
-	int width = (m_video.towns_crtc_reg[12] - m_video.towns_crtc_reg[11]) / (((m_video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (m_video.towns_crtc_reg[16] - m_video.towns_crtc_reg[15]) / (((m_video.towns_crtc_reg[27] & 0xf000) >> 12)+2);
 
 	if (rotation)
 	{
 		std::swap (x,y);
 		std::swap (xflip,yflip);
-		std::swap (width,height);
 	}
 
 	if(xflip)
 	{
 		if (xhalfsize)
-			xstart = x+8;
+			xstart = x+7;
 		else
-			xstart = x+16;
-		xend = x;
+			xstart = x+15;
+		xend = x-1;
 		xdir = -1;
 	}
 	else
 	{
-		xstart = x+1;
+		xstart = x;
 		if (xhalfsize)
-			xend = x+9;
+			xend = x+8;
 		else
-			xend = x+17;
+			xend = x+16;
 		xdir = 1;
 	}
 	if(yflip)
@@ -955,7 +949,7 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 				voffset += linesize * (ypos & 0x1ff);  // scanline size in bytes * y pos
 				voffset += (xpos & 0x1ff) * 2;
 			}
-			if(voffset < 0x20000 && xpos < width && ypos < height && col< 0x8000 && voffset > linesize)
+			if(voffset < 0x20000 && xpos < 256 && ypos < 256 && col< 0x8000 && voffset > linesize)
 			{
 				m_towns_gfxvram[0x40000+vbase+voffset+1] = (col & 0xff00) >> 8;
 				m_towns_gfxvram[0x40000+vbase+voffset] = col & 0x00ff;
@@ -1018,7 +1012,7 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
+			logerror("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
@@ -1028,7 +1022,7 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 		{
 			poffset = (attr & 0x3ff) << 7;
 #ifdef SPR_DEBUG
-			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x",
+			logerror("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x\n",
 				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))

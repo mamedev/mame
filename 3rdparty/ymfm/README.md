@@ -23,12 +23,14 @@ Currently, support is present for the following chips (organized by header file)
 	* YM2612 (OPN2)
 	* YM3438 (OPN2C)
 	* YMF276 (OPN2L)
+	* YMF288 (OPN3L)
 * ymfm_opl.h:
 	* YM3526 (OPL)
 	* Y8950 (MSX-Audio)
 	* YM3812 (OPL2)
 	* YMF262 (OPL3)
-	* YMF278B (OPL4) -- partial (only the FM side)
+	* YMF289B (OPL3L)
+	* YMF278B (OPL4)
 	* YM2413 (OPLL)
 	* YM2423 (OPLL-X)
 	* YMF281 (OPLLP)
@@ -37,6 +39,11 @@ Currently, support is present for the following chips (organized by header file)
 	* YM3806 (OPQ) -- preliminary
 * ymfm_opz.h:
 	* YM2414 (OPZ) -- preliminary
+
+There are some obviously-related chips that also are on my horizon but have no implementation as yet:
+
+* YMW-258-F 'GEW8' (aka Sega 315-5560 aka Sega Multi-PCM)
+* YMF271 (OPX)
 
 ## History
 

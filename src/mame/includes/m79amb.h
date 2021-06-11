@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/i8085/i8085.h"
 #include "sound/discrete.h"
 
 class m79amb_state : public driver_device
@@ -30,8 +31,7 @@ private:
 	void m79amb_8000_w(uint8_t data);
 	void m79amb_8002_w(uint8_t data);
 	void m79amb_8003_w(uint8_t data);
-
-	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
+	uint8_t inta_r();
 
 	void machine_start() override;
 
@@ -42,7 +42,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_mask;
 	required_device<discrete_device> m_discrete;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080_cpu_device> m_maincpu;
 
 	output_finder<> m_self_test;
 

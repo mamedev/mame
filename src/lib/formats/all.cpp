@@ -653,6 +653,14 @@
 #include "vt_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_VT_DSK
+#include "vt_dsk.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_VTECH
+#include "fs_vtech.h"
+#endif
+
 #ifdef HAS_FORMATS_WD177X_DSK
 #include "wd177x_dsk.h"
 #endif
@@ -1378,6 +1386,13 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_VT_CAS
 	en.add(vtech1_cassette_formats); // vt_cas.h
 	en.add(vtech2_cassette_formats); // vt_cas.h
+#endif
+#ifdef HAS_FORMATS_VT_DSJ
+	en.add(FLOPPY_VTECH_BIN_FORMAT); // vt_dsk.h
+	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_VTECH
+	en.add(FS_VTECH); // fs_vtech.h
 #endif
 
 	en.category("Canon");

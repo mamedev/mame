@@ -71,25 +71,17 @@ private:
 	u8 chessboard_r();
 	void lcd_reset_w(u8 data);
 
-	u8 m_control1;
-	u8 m_control2;
-	u8 m_select1;
-	u8 m_select2;
-	u8 m_led_data1;
-	u8 m_led_data2;
+	u8 m_control1 = 0;
+	u8 m_control2 = 0;
+	u8 m_select1 = 0;
+	u8 m_select2 = 0;
+	u8 m_led_data1 = 0;
+	u8 m_led_data2 = 0;
 };
 
 void corona_state::machine_start()
 {
 	saitek_stratos_state::machine_start();
-
-	// zerofill
-	m_control1 = 0;
-	m_control2 = 0;
-	m_select1 = 0;
-	m_select2 = 0;
-	m_led_data1 = 0;
-	m_led_data2 = 0;
 
 	// register for savestates
 	save_item(NAME(m_control1));

@@ -4734,3 +4734,14 @@ if (MACHINES["NS32202"]~=null) then
 		MAME_DIR .. "src/devices/machine/ns32202.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32082.h,MACHINES["NS32082"] = true
+---------------------------------------------------
+if (MACHINES["NS32082"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32082.cpp",
+		MAME_DIR .. "src/devices/machine/ns32082.h",
+	}
+end

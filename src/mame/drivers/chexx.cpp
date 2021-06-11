@@ -13,6 +13,67 @@ Electro-mechanical bubble hockey games:
 
 (Some sources indicate these may have been copied from a earlier Sega game called Face-Off)
 
+Olimpic Hockey (UNDUMPED Spanish clone from Inor, probably unlicensed) runs on an almost
+exact clone of the 1st generation ICE Chexx hardware (https://www.recreativas.org/olimpic-hockey-1110-inor):
+
+ Inor Olympic Hockey PCB
+ ________________________________________
+ |                                       |
+ | : <- Conn P4            ____________  |
+ |                        |/B8342 SJLC|  |
+ |                        |___________|  |
+ |                        ____________   |
+ |                        |/B8342 SJLC|  |
+ |                        |___________|  |
+ |                        ____________   |
+ |                        |/B8342 SJLC|  |
+ |                        |___________|  |
+ |                        ____________   |
+ |/o\ <- Conn p5          |/B8342 SJLC|  |
+ ||o|                     |___________|  |
+ ||o|                     ____________   |
+ |                        |/B8342 SJLC|  |
+ |                        |___________|  |
+ | : <- Conn P7           ____________   |
+ | :                      |/B8342 SJLC|  |
+ |                        |___________|  |
+ | ____                   ____________   |
+ | LM358N                 |EMPTY      |  |
+ |                        |___________|  |
+ |                        ____________   |
+ |       _________        |EMPTY      |  |
+ |       74LS138B1        |___________|  |
+ |              ______________________   |
+ |              | 54104 DIGITALKER    |  |
+ |              |_____________________|  |
+ |                         _________   : |
+ |    _________            |________|  : |
+ |    |74LS74B1|            Conn P2 -> : |
+ |              ______________________   |
+ |              | UM6522A             |  |
+ |  _________   |_____________________|  |
+ |  |________|                           |
+ |                 ____________          |
+ | :               | EF68B10P  |         |
+ | : <- Conn P1    |___________|         |
+ | :   o <- Conn P8                      |
+ |     o   : <- Conn P6                  |
+ |     0   :                             |
+ | :            ______________________   |
+ | : <- Conn P3 | UM6502A             |  |
+ |              |_____________________|  |
+ |                            _________  |
+ |  _________  ____________  PC74HCT74P  |
+ |  |74LS04_|  | EPROM     |             |
+ |             |___________|             |
+ | Xtal                                  |
+ | 4.000 MHz  DSW _________      DSW     |
+ |            x2  T74LS365B1     x2      |
+ |___________ COST _____________ TIME ___|
+
+The electromechanical game Fire Escape (1984, Mech-Tronic Games, Inc.)
+appears to run on very similar hardware, with a AY8912 but no Digitalker.
+
 ***************************************************************************/
 
 #include "emu.h"

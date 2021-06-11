@@ -1049,7 +1049,8 @@ license:CC0
 		<publisher>Sega</publisher>
 		<part name="cart" interface="stv_cart">
 			<dataarea name="rom" size="0x3000000">
-				<rom name="epr17944.13" size="0x100000" crc="a5bdc560" sha1="d3830480a611b7d88760c672ce46a2ea74076487" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="epr17944.13" size="0x080000" crc="3304c175" sha1="6d847efad73d361cac4d7fcb452ccf89efa13e24" offset="0x000001" loadflag="load16_byte"/>
+				<rom size="0x080000" offset="0x100001" loadflag="reload"/>
 				<rom name="mpr17946.2" size="0x400000" crc="4cb245f7" sha1="363d9936b27043b5858c956a45736ac05aefc54e" offset="0x400000" loadflag="load16_word_swap"/>
 				<rom name="mpr17947.3" size="0x400000" crc="fef4a9fb" sha1="1b4bd095962db769da17d3644df10f62d041e914" offset="0x800000" loadflag="load16_word_swap"/>
 				<rom name="mpr17948.4" size="0x400000" crc="3e2b251a" sha1="be6191c18727d7cbc6399fd4c1aaae59304af30c" offset="0xc00000" loadflag="load16_word_swap"/>

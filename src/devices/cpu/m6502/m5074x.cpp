@@ -370,7 +370,7 @@ void m5074x_device::ports_w(offs_t offset, uint8_t data)
 			break;
 
 		case 0xa: // p4 (4-bit open drain)
-			send_port(4, (data & m_ddrs[4] & 0x0f) | (m_pullups[4] & ~m_ddrs[4]));	
+			send_port(4, (data & m_ddrs[4] & 0x0f) | (m_pullups[4] & ~m_ddrs[4]));
 			m_ports[4] = data & 0x0f;
 			break;
 

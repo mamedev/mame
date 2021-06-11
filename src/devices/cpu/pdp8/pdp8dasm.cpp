@@ -866,7 +866,7 @@ offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const pdp
 	case 4:
 		stream << "JMS";
 		dasm_memory_reference(stream, inst, pc);
-		return 1 | SUPPORTED | STEP_OVER; 
+		return 1 | SUPPORTED | STEP_OVER;
 
 	case 5:
 		stream << "JMP";

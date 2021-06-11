@@ -974,6 +974,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_ram->set_extra_options("4M,6M,8M");
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 }
 

@@ -116,13 +116,11 @@ public:
 	static constexpr uint32_t CHANNELS = IsOpnA ? 6 : 3;
 	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr uint32_t WAVEFORMS = 1;
 	static constexpr uint32_t REGISTERS = IsOpnA ? 0x200 : 0x100;
 	static constexpr uint32_t REG_MODE = 0x27;
 	static constexpr uint32_t DEFAULT_PRESCALE = 6;
 	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = true;
 	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr uint32_t CSM_TRIGGER_MASK = 1 << 2;
@@ -163,6 +161,9 @@ public:
 	// return an array of operator indices for each channel
 	struct operator_mapping { uint32_t chan[CHANNELS]; };
 	void operator_map(operator_mapping &dest) const;
+
+	// read a register value
+	uint8_t read(uint16_t index) const { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
@@ -252,59 +253,6 @@ protected:
 
 using opn_registers = opn_registers_base<false>;
 using opna_registers = opn_registers_base<true>;
-
-
-
-//*********************************************************
-//  SSG IMPLEMENTATION CLASSES
-//*********************************************************
-
-// ======================> ym2149
-
-// ym2149 is just an SSG with no FM part, but we expose FM-like parts so that it
-// integrates smoothly with everything else; they just don't do anything
-class ym2149
-{
-public:
-	static constexpr uint32_t OUTPUTS = ssg_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
-	using output_data = ymfm_output<OUTPUTS>;
-	using output_data_ssg = ymfm_output<SSG_OUTPUTS>;
-
-	// constructor
-	ym2149(ymfm_interface &intf);
-
-	// configuration
-	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
-
-	// reset
-	void reset();
-
-	// save/restore
-	void save_restore(ymfm_saved_state &state);
-
-	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER / 8; }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / ssg_engine::CLOCK_DIVIDER; }
-
-	// read access
-	uint8_t read_data();
-	uint8_t read(uint32_t offset);
-
-	// write access
-	void write_address(uint8_t data);
-	void write_data(uint8_t data);
-	void write(uint32_t offset, uint8_t data);
-
-	// generate one sample of sound
-	void generate(output_data *output, uint32_t numsamples = 1);
-	void generate_ssg(output_data_ssg *output, uint32_t numsamples = 1);
-
-protected:
-	// internal state
-	uint8_t m_address;               // address register
-	ssg_engine m_ssg;                // SSG engine
-};
 
 
 
@@ -615,6 +563,80 @@ protected:
 	ssg_resampler<output_data, 2, true> m_ssg_resampler; // SSG resampler helper
 	adpcm_a_engine m_adpcm_a;           // ADPCM-A engine
 	adpcm_b_engine m_adpcm_b;           // ADPCM-B engine
+};
+
+
+// ======================> ymf288
+
+class ymf288
+{
+public:
+	using fm_engine = fm_engine_base<opna_registers>;
+	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t SSG_OUTPUTS = 1;
+	static constexpr uint32_t OUTPUTS = FM_OUTPUTS + SSG_OUTPUTS;
+	using output_data = ymfm_output<OUTPUTS>;
+
+	// constructor
+	ymf288(ymfm_interface &intf);
+
+	// configuration
+	void ssg_override(ssg_override &intf) { m_ssg.override(intf); }
+	void set_fidelity(opn_fidelity fidelity) { m_fidelity = fidelity; update_prescale(); }
+
+	// reset
+	void reset();
+
+	// save/restore
+	void save_restore(ymfm_saved_state &state);
+
+	// pass-through helpers
+	uint32_t sample_rate(uint32_t input_clock) const
+	{
+		switch (m_fidelity)
+		{
+			case OPN_FIDELITY_MIN:	return input_clock / 144;
+			case OPN_FIDELITY_MED:	return input_clock / 144;
+			default:
+			case OPN_FIDELITY_MAX:	return input_clock / 16;
+		}
+	}
+	uint32_t ssg_effective_clock(uint32_t input_clock) const { return input_clock / 4; }
+	void invalidate_caches() { m_fm.invalidate_caches(); }
+
+	// read access
+	uint8_t read_status();
+	uint8_t read_data();
+	uint8_t read_status_hi();
+	uint8_t read(uint32_t offset);
+
+	// write access
+	void write_address(uint8_t data);
+	void write_data(uint8_t data);
+	void write_address_hi(uint8_t data);
+	void write_data_hi(uint8_t data);
+	void write(uint32_t offset, uint8_t data);
+
+	// generate one sample of sound
+	void generate(output_data *output, uint32_t numsamples = 1);
+
+protected:
+	// internal helpers
+	bool ymf288_mode() { return ((m_fm.regs().read(0x20) & 0x02) != 0); }
+	void update_prescale();
+	void clock_fm_and_adpcm();
+
+	// internal state
+	opn_fidelity m_fidelity;            // configured fidelity
+	uint16_t m_address;                 // address register
+	uint8_t m_fm_samples_per_output;    // how many samples to repeat
+	uint8_t m_irq_enable;               // IRQ enable register
+	uint8_t m_flag_control;             // flag control register
+	fm_engine::output_data m_last_fm;   // last FM output
+	fm_engine m_fm;                     // core FM engine
+	ssg_engine m_ssg;                   // SSG engine
+	ssg_resampler<output_data, 2, true> m_ssg_resampler; // SSG resampler helper
+	adpcm_a_engine m_adpcm_a;           // ADPCM-A engine
 };
 
 

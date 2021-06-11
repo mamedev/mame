@@ -80,13 +80,13 @@ opl_registers_base<Revision>::opl_registers_base() :
 	uint16_t *wf7 = &m_waveform[7 % WAVEFORMS][0];
 
 	// create the waveforms
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		wf0[index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
 	if (WAVEFORMS >= 4)
 	{
 		uint16_t zeroval = wf0[0];
-		for (int index = 0; index < WAVEFORM_LENGTH; index++)
+		for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		{
 			wf1[index] = bitfield(index, 9) ? zeroval : wf0[index];
 			wf2[index] = wf0[index] & 0x7fff;
@@ -96,7 +96,7 @@ opl_registers_base<Revision>::opl_registers_base() :
 				wf4[index] = bitfield(index, 9) ? zeroval : wf0[index * 2];
 				wf5[index] = bitfield(index, 9) ? zeroval : wf0[(index * 2) & 0x1ff];
 				wf6[index] = bitfield(index, 9) << 15;
-				wf7[index] = (zeroval - wf0[(index / 2)]) | (bitfield(index, 9) << 15);
+				wf7[index] = (bitfield(index, 9) ? (index ^ 0x13ff) : index) << 3;
 			}
 		}
 	}
@@ -440,17 +440,17 @@ opll_registers::opll_registers() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
 	uint16_t zeroval = m_waveform[0][0];
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[1][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
 
 	// initialize the instruments to something sane
-	for (int choffs = 0; choffs < CHANNELS; choffs++)
+	for (uint32_t choffs = 0; choffs < CHANNELS; choffs++)
 		m_chinst[choffs] = &m_regdata[0];
-	for (int opoffs = 0; opoffs < OPERATORS; opoffs++)
+	for (uint32_t opoffs = 0; opoffs < OPERATORS; opoffs++)
 		m_opinst[opoffs] = &m_regdata[bitfield(opoffs, 0)];
 }
 
@@ -794,7 +794,7 @@ void ym3526::write_address(uint8_t data)
 {
 	// YM3526 doesn't expose a busy signal, and the datasheets don't indicate
 	// delays, but all other OPL chips need 12 cycles for address writes
-	m_fm.intf().ymfm_set_busy_end(12);
+	m_fm.intf().ymfm_set_busy_end(12 * m_fm.clock_prescale());
 
 	// just set the address
 	m_address = data;
@@ -810,7 +810,7 @@ void ym3526::write_data(uint8_t data)
 {
 	// YM3526 doesn't expose a busy signal, and the datasheets don't indicate
 	// delays, but all other OPL chips need 84 cycles for data writes
-	m_fm.intf().ymfm_set_busy_end(84);
+	m_fm.intf().ymfm_set_busy_end(84 * m_fm.clock_prescale());
 
 	// write to FM
 	m_fm.write(m_address, data);
@@ -933,7 +933,7 @@ uint8_t y8950::read_data()
 	switch (m_address)
 	{
 		case 0x05:  // keyboard in
-			result = m_fm.intf().ymfm_io_read(1);
+			result = m_fm.intf().ymfm_external_read(ACCESS_IO, 1);
 			break;
 
 		case 0x09:  // ADPCM data
@@ -942,7 +942,7 @@ uint8_t y8950::read_data()
 			break;
 
 		case 0x19:  // I/O data
-			result = m_fm.intf().ymfm_io_read(0);
+			result = m_fm.intf().ymfm_external_read(ACCESS_IO, 0);
 			break;
 
 		default:
@@ -983,7 +983,7 @@ void y8950::write_address(uint8_t data)
 {
 	// Y8950 doesn't expose a busy signal, but it does indicate that
 	// address writes should be no faster than every 12 clocks
-	m_fm.intf().ymfm_set_busy_end(12);
+	m_fm.intf().ymfm_set_busy_end(12 * m_fm.clock_prescale());
 
 	// just set the address
 	m_address = data;
@@ -1000,7 +1000,7 @@ void y8950::write_data(uint8_t data)
 	// Y8950 doesn't expose a busy signal, but it does indicate that
 	// data writes should be no faster than every 12 clocks for
 	// registers 00-1A, or every 84 clocks for other registers
-	m_fm.intf().ymfm_set_busy_end((m_address <= 0x1a) ? 12 : 84);
+	m_fm.intf().ymfm_set_busy_end(((m_address <= 0x1a) ? 12 : 84) * m_fm.clock_prescale());
 
 	// handle special addresses
 	switch (m_address)
@@ -1011,7 +1011,7 @@ void y8950::write_data(uint8_t data)
 			break;
 
 		case 0x06:  // keyboard out
-			m_fm.intf().ymfm_io_write(1, data);
+			m_fm.intf().ymfm_external_write(ACCESS_IO, 1, data);
 			break;
 
 		case 0x08:  // split FM/ADPCM-B
@@ -1041,7 +1041,7 @@ void y8950::write_data(uint8_t data)
 			break;
 
 		case 0x19:  // I/O data
-			m_fm.intf().ymfm_io_write(0, data & m_io_ddr);
+			m_fm.intf().ymfm_external_write(ACCESS_IO, 0, data & m_io_ddr);
 			break;
 
 		default:    // everything else to FM
@@ -1174,7 +1174,7 @@ void ym3812::write_address(uint8_t data)
 {
 	// YM3812 doesn't expose a busy signal, but it does indicate that
 	// address writes should be no faster than every 12 clocks
-	m_fm.intf().ymfm_set_busy_end(12);
+	m_fm.intf().ymfm_set_busy_end(12 * m_fm.clock_prescale());
 
 	// just set the address
 	m_address = data;
@@ -1190,7 +1190,7 @@ void ym3812::write_data(uint8_t data)
 {
 	// YM3812 doesn't expose a busy signal, but it does indicate that
 	// data writes should be no faster than every 84 clocks
-	m_fm.intf().ymfm_set_busy_end(84);
+	m_fm.intf().ymfm_set_busy_end(84 * m_fm.clock_prescale());
 
 	// write to FM
 	m_fm.write(m_address, data);
@@ -1318,7 +1318,7 @@ void ymf262::write_address(uint8_t data)
 {
 	// YMF262 doesn't expose a busy signal, but it does indicate that
 	// address writes should be no faster than every 32 clocks
-	m_fm.intf().ymfm_set_busy_end(32);
+	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
 
 	// just set the address
 	m_address = data;
@@ -1334,7 +1334,7 @@ void ymf262::write_data(uint8_t data)
 {
 	// YMF262 doesn't expose a busy signal, but it does indicate that
 	// data writes should be no faster than every 32 clocks
-	m_fm.intf().ymfm_set_busy_end(32);
+	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
 
 	// write to FM
 	m_fm.write(m_address, data);
@@ -1350,7 +1350,7 @@ void ymf262::write_address_hi(uint8_t data)
 {
 	// YMF262 doesn't expose a busy signal, but it does indicate that
 	// address writes should be no faster than every 32 clocks
-	m_fm.intf().ymfm_set_busy_end(32);
+	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
 
 	// just set the address
 	m_address = data | 0x100;
@@ -1412,6 +1412,213 @@ void ymf262::generate(output_data *output, uint32_t numsamples)
 
 
 //*********************************************************
+//  YMF289B
+//*********************************************************
+
+// YMF289B is a YMF262 with the following changes:
+//   * "Power down" mode added
+//   * Bulk register clear added
+//   * Busy flag added to the status register
+//   * Shorter busy times
+//   * All registers can be read
+//   * Only 2 outputs exposed
+
+//-------------------------------------------------
+//  ymf289b - constructor
+//-------------------------------------------------
+
+ymf289b::ymf289b(ymfm_interface &intf) :
+	m_address(0),
+	m_fm(intf)
+{
+}
+
+
+//-------------------------------------------------
+//  reset - reset the system
+//-------------------------------------------------
+
+void ymf289b::reset()
+{
+	// reset the engines
+	m_fm.reset();
+}
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void ymf289b::save_restore(ymfm_saved_state &state)
+{
+	state.save_restore(m_address);
+	m_fm.save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  read_status - read the status register
+//-------------------------------------------------
+
+uint8_t ymf289b::read_status()
+{
+	uint8_t result = m_fm.status();
+
+	// YMF289B adds a busy flag
+	if (ymf289b_mode() && m_fm.intf().ymfm_is_busy())
+		result |= STATUS_BUSY_FLAGS;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  read_data - read the data register
+//-------------------------------------------------
+
+uint8_t ymf289b::read_data()
+{
+	uint8_t result = 0xff;
+
+	// YMF289B can read register data back
+	if (ymf289b_mode())
+		result = m_fm.regs().read(m_address);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  read - handle a read from the device
+//-------------------------------------------------
+
+uint8_t ymf289b::read(uint32_t offset)
+{
+	uint8_t result = 0xff;
+	switch (offset & 3)
+	{
+		case 0: // status port
+			result = read_status();
+			break;
+
+		case 1:	// data port
+			result = read_data();
+			break;
+
+		case 2:
+		case 3:
+			debug::log_unexpected_read_write("Unexpected read from YMF289B offset %d\n", offset & 3);
+			break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_address - handle a write to the address
+//  register
+//-------------------------------------------------
+
+void ymf289b::write_address(uint8_t data)
+{
+	m_address = data;
+
+	// count busy time
+	m_fm.intf().ymfm_set_busy_end(56);
+}
+
+
+//-------------------------------------------------
+//  write_data - handle a write to the data
+//  register
+//-------------------------------------------------
+
+void ymf289b::write_data(uint8_t data)
+{
+	// write to FM
+	m_fm.write(m_address, data);
+
+	// writes to 0x108 with the CLR flag set clear the registers
+	if (m_address == 0x108 && bitfield(data, 2) != 0)
+		m_fm.regs().reset();
+
+	// count busy time
+	m_fm.intf().ymfm_set_busy_end(56);
+}
+
+
+//-------------------------------------------------
+//  write_address_hi - handle a write to the upper
+//  address register
+//-------------------------------------------------
+
+void ymf289b::write_address_hi(uint8_t data)
+{
+	// just set the address
+	m_address = data | 0x100;
+
+	// tests reveal that in compatibility mode, upper bit is masked
+	// except for register 0x105
+	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
+		m_address &= 0xff;
+
+	// count busy time
+	m_fm.intf().ymfm_set_busy_end(56);
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the register
+//  interface
+//-------------------------------------------------
+
+void ymf289b::write(uint32_t offset, uint8_t data)
+{
+	switch (offset & 3)
+	{
+		case 0: // address port
+			write_address(data);
+			break;
+
+		case 1: // data port
+			write_data(data);
+			break;
+
+		case 2: // address port
+			write_address_hi(data);
+			break;
+
+		case 3: // data port
+			write_data(data);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  generate - generate samples of sound
+//-------------------------------------------------
+
+void ymf289b::generate(output_data *output, uint32_t numsamples)
+{
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+	{
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
+
+		// update the FM content; mixing details for YMF262 need verification
+		fm_engine::output_data full;
+		m_fm.output(full.clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+
+		// YMF278B output is 16-bit offset serial via YAC512 DAC, but
+		// only 2 of the 4 outputs are exposed
+		output->data[0] = full.data[0];
+		output->data[1] = full.data[1];
+		output->clamp16();
+	}
+}
+
+
+
+//*********************************************************
 //  YMF278B
 //*********************************************************
 
@@ -1421,7 +1628,11 @@ void ymf262::generate(output_data *output, uint32_t numsamples)
 
 ymf278b::ymf278b(ymfm_interface &intf) :
 	m_address(0),
-	m_fm(intf)
+	m_fm_pos(0),
+	m_load_remaining(0),
+	m_next_status_id(false),
+	m_fm(intf),
+	m_pcm(intf)
 {
 }
 
@@ -1434,6 +1645,10 @@ void ymf278b::reset()
 {
 	// reset the engines
 	m_fm.reset();
+	m_pcm.reset();
+
+	// next status read will return ID
+	m_next_status_id = true;
 }
 
 
@@ -1444,7 +1659,11 @@ void ymf278b::reset()
 void ymf278b::save_restore(ymfm_saved_state &state)
 {
 	state.save_restore(m_address);
+	state.save_restore(m_fm_pos);
+	state.save_restore(m_load_remaining);
+	state.save_restore(m_next_status_id);
 	m_fm.save_restore(state);
+	m_pcm.save_restore(state);
 }
 
 
@@ -1454,7 +1673,47 @@ void ymf278b::save_restore(ymfm_saved_state &state)
 
 uint8_t ymf278b::read_status()
 {
-	return m_fm.status();
+	uint8_t result;
+
+	// first status read after initialization returns a chip ID, which
+	// varies based on the "new" flags, indicating the mode
+	if (m_next_status_id)
+	{
+		if (m_fm.regs().new2flag())
+			result = 0x02;
+		else if (m_fm.regs().newflag())
+			result = 0x00;
+		else
+			result = 0x06;
+		m_next_status_id = false;
+	}
+	else
+	{
+		result = m_fm.status();
+		if (m_fm.intf().ymfm_is_busy())
+			result |= STATUS_BUSY;
+		if (m_load_remaining != 0)
+			result |= STATUS_LD;
+
+		// if new2 flag is not set, we're in OPL2 or OPL3 mode
+		if (!m_fm.regs().new2flag())
+			result &= ~(STATUS_BUSY | STATUS_LD);
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_data_pcm - handle a write to the PCM data
+//  register
+//-------------------------------------------------
+
+uint8_t ymf278b::read_data_pcm()
+{
+	// write to FM
+	if (bitfield(m_address, 9) != 0)
+		return m_pcm.read(m_address & 0xff);
+	return 0;
 }
 
 
@@ -1471,8 +1730,8 @@ uint8_t ymf278b::read(uint32_t offset)
 			result = read_status();
 			break;
 
-		case 5: // PCM data port (not supported for now)
-			//result = read_data_pcm();
+		case 5: // PCM data port
+			result = read_data_pcm();
 			break;
 
 		default:
@@ -1503,7 +1762,19 @@ void ymf278b::write_address(uint8_t data)
 void ymf278b::write_data(uint8_t data)
 {
 	// write to FM
-	m_fm.write(m_address, data);
+	if (bitfield(m_address, 9) == 0)
+	{
+		uint8_t old = m_fm.regs().new2flag();
+		m_fm.write(m_address, data);
+
+		// changing NEW2 from 0->1 causes the next status read to
+		// return the chip ID
+		if (old == 0 && m_fm.regs().new2flag() != 0)
+			m_next_status_id = true;
+	}
+
+	// BUSY goes for 56 clocks on FM writes
+	m_fm.intf().ymfm_set_busy_end(56);
 }
 
 
@@ -1521,6 +1792,44 @@ void ymf278b::write_address_hi(uint8_t data)
 	// except for register 0x105; assuming YMF278B works the same way?
 	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
 		m_address &= 0xff;
+}
+
+
+//-------------------------------------------------
+//  write_address_pcm - handle a write to the upper
+//  address register
+//-------------------------------------------------
+
+void ymf278b::write_address_pcm(uint8_t data)
+{
+	// just set the address
+	m_address = data | 0x200;
+
+	// YMF262, in compatibility mode, treats the upper bit as masked
+	// except for register 0x105; assuming YMF278B works the same way?
+	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
+		m_address &= 0xff;
+}
+
+
+//-------------------------------------------------
+//  write_data_pcm - handle a write to the PCM data
+//  register
+//-------------------------------------------------
+
+void ymf278b::write_data_pcm(uint8_t data)
+{
+	// write to FM
+	if (bitfield(m_address, 9) != 0)
+		m_pcm.write(m_address & 0xff, data);
+
+	// writes to the waveform number cause loads to happen for "about 300usec"
+	// which is ~13 samples at the nominal output frequency of 44.1kHz
+	if (m_address >= 0x08 && m_address <= 0x1f)
+		m_load_remaining = 13;
+
+	// BUSY goes for 88 clocks on PCM writes
+	m_fm.intf().ymfm_set_busy_end(88);
 }
 
 
@@ -1549,12 +1858,12 @@ void ymf278b::write(uint32_t offset, uint8_t data)
 			write_data(data);
 			break;
 
-		case 4: // PCM address port (not supported for now)
-			//write_address_pcm(data);
+		case 4: // PCM address port
+			write_address_pcm(data);
 			break;
 
-		case 5: // PCM address port (not supported for now)
-			//write_data_pcm(data);
+		case 5: // PCM address port
+			write_data_pcm(data);
 			break;
 
 		default:
@@ -1570,17 +1879,50 @@ void ymf278b::write(uint32_t offset, uint8_t data)
 
 void ymf278b::generate(output_data *output, uint32_t numsamples)
 {
-	for (uint32_t samp = 0; samp < numsamples; samp++)
+	static const int16_t s_mix_scale[8] = { 0x7fa, 0x5a4, 0x3fd, 0x2d2, 0x1fe, 0x169, 0xff, 0 };
+	int32_t const pcm_l = s_mix_scale[m_pcm.regs().mix_pcm_l()];
+	int32_t const pcm_r = s_mix_scale[m_pcm.regs().mix_pcm_r()];
+	int32_t const fm_l = s_mix_scale[m_pcm.regs().mix_fm_l()];
+	int32_t const fm_r = s_mix_scale[m_pcm.regs().mix_fm_r()];
+	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
 	{
 		// clock the system
+		m_fm_pos += FM_EXTRA_SAMPLE_STEP;
+		if (m_fm_pos >= FM_EXTRA_SAMPLE_THRESH)
+		{
+			m_fm.clock(fm_engine::ALL_CHANNELS);
+			m_fm_pos -= FM_EXTRA_SAMPLE_THRESH;
+		}
 		m_fm.clock(fm_engine::ALL_CHANNELS);
+		m_pcm.clock(pcm_engine::ALL_CHANNELS);
 
 		// update the FM content; mixing details for YMF278B need verification
-		m_fm.output(output->clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+		fm_engine::output_data fmout;
+		m_fm.output(fmout.clear(), 0, 32767, fm_engine::ALL_CHANNELS);
+
+		// update the PCM content
+		pcm_engine::output_data pcmout;
+		m_pcm.output(pcmout.clear(), pcm_engine::ALL_CHANNELS);
+
+		// DO0 output: FM channels 2+3 only
+		output->data[0] = fmout.data[2];
+		output->data[1] = fmout.data[3];
+
+		// DO1 output: wavetable channels 2+3 only
+		output->data[2] = pcmout.data[2];
+		output->data[3] = pcmout.data[3];
+
+		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
+		output->data[4] = (fmout.data[0] * fm_l + pcmout.data[0] * pcm_l) >> 11;
+		output->data[5] = (fmout.data[1] * fm_r + pcmout.data[1] * pcm_r) >> 11;
 
 		// YMF278B output is 16-bit 2s complement serial
 		output->clamp16();
 	}
+
+	// decrement the load waiting count
+	if (m_load_remaining > 0)
+		m_load_remaining -= std::min(m_load_remaining, numsamples);
 }
 
 

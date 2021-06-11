@@ -109,17 +109,17 @@ void a9m0331_device::mcu_port_c_w(u8 data)
 	logerror("%02x to port C\n", data);
 }
 
-u8 mcu_port_a_r()
+u8 a9m0331_device::mcu_port_a_r()
 {
 	return 0xff;
 }
 
-u8 mcu_port_b_r()
+u8 a9m0331_device::mcu_port_b_r()
 {
 	return 0xff;
 }
 
-u8 mcu_port_c_r()
+u8 a9m0331_device::mcu_port_c_r()
 {
 	return 0xff;
 }

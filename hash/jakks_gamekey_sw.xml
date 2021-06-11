@@ -25,4 +25,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tdyodap" cloneof="tdyoda">
+		<description>Turret Defense &amp; Yoda's Escape (prototype)</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Griptonite Games</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="turretdefense_yodasescape_prototype.bin" size="0x400000" crc="f87cb070" sha1="570ab1eb37a6b6d9ab8c49b86f335389167c3697" offset="0" />
+				<rom size="0x400000" offset="0x400000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="igefcc">
+		<description>Imperial Gunner &amp; Escape From Cloud City (Dec 22 2005, prototype)</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Amaze Entertainment</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="imerialgunner_escapefromcloudcity_prototype.bin" size="0x400000" crc="93b20a57" sha1="85c53930907d5b2ddaba32dd01e060054ab62c9b" offset="0" />
+				<rom size="0x400000" offset="0x400000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cscfp">
+		<description>Catamaran Strike &amp; Coruscant Fire Patrol (Jun 2 2005, prototype)</description>
+		<year>2005</year>
+		<publisher>JAKKS Pacific / Griptonite Games</publisher>
+		<part name="cart" interface="jakks_gamekey">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x800000">
+				<rom name="catamaranstrike_coruscantfirepatrol_prototype.bin" size="0x400000" crc="9204cb1b" sha1="f94ac47faf5fcc98fc4b5166e51a61c9f890f375" offset="0" />
+				<rom size="0x400000" offset="0x400000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

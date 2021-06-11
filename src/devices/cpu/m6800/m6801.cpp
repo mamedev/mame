@@ -1787,7 +1787,7 @@ void hd6301x_cpu_device::increment_t2cnt(int amount)
 		}
 
 		m_tcsr3 |= 0x80;
-	 	m_timer_next = 0; // HACK
+		m_timer_next = 0; // HACK
 	}
 	else
 		m_t2cnt += amount;

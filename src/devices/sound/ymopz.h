@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifndef MAME_SOUND_YM2414_H
-#define MAME_SOUND_YM2414_H
+#ifndef MAME_SOUND_YMOPZ_H
+#define MAME_SOUND_YMOPZ_H
 
 #pragma once
 
@@ -26,4 +26,4 @@ public:
 	auto port_write_handler() { return io_write_handler(); }
 };
 
-#endif // MAME_SOUND_YM2414_H
+#endif // MAME_SOUND_YMOPZ_H

@@ -80,11 +80,13 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 				bitmap.pix(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
 			}
 
-			else if (shifted)
+			else
 			{
-				dst[x * GALAXIAN_XSCALE + 0] = m_palette->pen_color(shifted & 0x0f);
-				dst[x * GALAXIAN_XSCALE + 1] = m_palette->pen_color(shifted & 0x0f);
-				dst[x * GALAXIAN_XSCALE + 2] = m_palette->pen_color(shifted & 0x0f);
+				auto color = m_palette->pen_color(shifted & 0x0f);
+				u32 *dbase = dst + x * GALAXIAN_XSCALE;
+				if(shifted || dbase[0] == 0xff000000) dbase[0] = color;
+				if(shifted || dbase[1] == 0xff000000) dbase[1] = color;
+				if(shifted || dbase[2] == 0xff000000) dbase[2] = color;
 			}
 		}
 	}
@@ -110,12 +112,11 @@ uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, 
 			uint8_t effy = (y ^ xory) + yscroll;
 			uint8_t vrambyte = m_videoram[effy * 128 + effx / 2];
 			uint8_t shifted = vrambyte >> (4 * (effx % 2));
-			if (shifted)
-			{
-				dst[x * GALAXIAN_XSCALE + 0] = m_palette->pen_color(shifted & 0x0f);
-				dst[x * GALAXIAN_XSCALE + 1] = m_palette->pen_color(shifted & 0x0f);
-				dst[x * GALAXIAN_XSCALE + 2] = m_palette->pen_color(shifted & 0x0f);
-			}
+			auto color = m_palette->pen_color(shifted & 0x0f);
+			u32 *dbase = dst + x * GALAXIAN_XSCALE;
+			if(shifted || dbase[0] == 0xff000000) dbase[0] = color;
+			if(shifted || dbase[1] == 0xff000000) dbase[1] = color;
+			if(shifted || dbase[2] == 0xff000000) dbase[2] = color;
 		}
 	}
 

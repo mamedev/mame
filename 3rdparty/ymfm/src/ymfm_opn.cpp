@@ -48,7 +48,7 @@ opn_registers_base<IsOpnA>::opn_registers_base() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+	for (uint32_t index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 }
 
@@ -207,7 +207,12 @@ int32_t opn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	// when we cross the divider count, add enough to zero it and cause an
 	// increment at bit 8; the 7-bit value lives from bits 8-14
 	if (subcount >= lfo_max_count[lfo_rate()])
-		m_lfo_counter += subcount ^ 0xff;
+	{
+		// note: to match the published values this should be 0x100 - subcount;
+		// however, tests on the hardware and nuked bear out an off-by-one
+		// error exists that causes the max LFO rate to be faster than published
+		m_lfo_counter += 0x101 - subcount;
+	}
 
 	// AM value is 7 bits, staring at bit 8; grab the low 6 directly
 	m_lfo_am = bitfield(m_lfo_counter, 8, 6);
@@ -661,160 +666,6 @@ void ssg_resampler<OutputType, FirstOutput, MixTo1>::resample_nop(OutputType *ou
 {
 	// nothing to do except increment the sample index
 	m_sampindex += numsamples;
-}
-
-
-
-//*********************************************************
-//  YM2149
-//*********************************************************
-
-//-------------------------------------------------
-//  ym2149 - constructor
-//-------------------------------------------------
-
-ym2149::ym2149(ymfm_interface &intf) :
-	m_address(0),
-	m_ssg(intf)
-{
-}
-
-
-//-------------------------------------------------
-//  reset - reset the system
-//-------------------------------------------------
-
-void ym2149::reset()
-{
-	// reset the engines
-	m_ssg.reset();
-}
-
-
-//-------------------------------------------------
-//  save_restore - save or restore the data
-//-------------------------------------------------
-
-void ym2149::save_restore(ymfm_saved_state &state)
-{
-	state.save_restore(m_address);
-	m_ssg.save_restore(state);
-}
-
-
-//-------------------------------------------------
-//  read_data - read the data register
-//-------------------------------------------------
-
-uint8_t ym2149::read_data()
-{
-	return m_ssg.read(m_address & 0x0f);
-}
-
-
-//-------------------------------------------------
-//  read - handle a read from the device
-//-------------------------------------------------
-
-uint8_t ym2149::read(uint32_t offset)
-{
-	uint8_t result = 0xff;
-	switch (offset & 3)	// BC2,BC1
-	{
-		case 0: // inactive
-			break;
-
-		case 1: // address
-			break;
-
-		case 2: // inactive
-			break;
-
-		case 3: // read
-			result = read_data();
-			break;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  write_address - handle a write to the address
-//  register
-//-------------------------------------------------
-
-void ym2149::write_address(uint8_t data)
-{
-	// just set the address
-	m_address = data;
-}
-
-
-//-------------------------------------------------
-//  write - handle a write to the register
-//  interface
-//-------------------------------------------------
-
-void ym2149::write_data(uint8_t data)
-{
-	m_ssg.write(m_address & 0x0f, data);
-}
-
-
-//-------------------------------------------------
-//  write - handle a write to the register
-//  interface
-//-------------------------------------------------
-
-void ym2149::write(uint32_t offset, uint8_t data)
-{
-	switch (offset & 3)	// BC2,BC1
-	{
-		case 0: // address
-			write_address(data);
-			break;
-
-		case 1: // inactive
-			break;
-
-		case 2: // write
-			write_data(data);
-			break;
-
-		case 3: // address
-			write_address(data);
-			break;
-	}
-}
-
-
-//-------------------------------------------------
-//  generate - generate one sample of FM sound
-//-------------------------------------------------
-
-void ym2149::generate(output_data *output, uint32_t numsamples)
-{
-	// no FM output, just clear
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-		output->clear();
-}
-
-
-//-------------------------------------------------
-//  generate_ssg - generate one sample of SSG
-//  sound
-//-------------------------------------------------
-
-void ym2149::generate_ssg(output_data_ssg *output, uint32_t numsamples)
-{
-	for (uint32_t samp = 0; samp < numsamples; samp++, output++)
-	{
-		// clock the SSG
-		m_ssg.clock();
-
-		// YM2149 keeps the three SSG outputs independent
-		m_ssg.output(*output);
-	}
 }
 
 
@@ -1542,9 +1393,427 @@ void ym2608::clock_fm_and_adpcm()
 	// update the FM content; OPNA is 13-bit with no intermediate clipping
 	m_fm.output(m_last_fm.clear(), 1, 32767, fmmask);
 
+	// mix in the ADPCM and clamp
+	m_adpcm_a.output(m_last_fm, 0x3f);
+	m_adpcm_b.output(m_last_fm, 1);
+	m_last_fm.clamp16();
+}
+
+
+//*********************************************************
+//  YMF288
+//*********************************************************
+
+// YMF288 is a YM2608 with the following changes:
+//   * ADPCM-B part removed
+//   * prescaler removed (fixed at 6)
+//   * CSM removed
+//   * Low power mode added
+//   * SSG tone frequency is altered in some way? (explicitly DC for Tp 0-7, also double volume in some cases)
+//   * I/O ports removed
+//   * Shorter busy times
+//   * All registers can be read
+
+//-------------------------------------------------
+//  ymf288 - constructor
+//-------------------------------------------------
+
+ymf288::ymf288(ymfm_interface &intf) :
+	m_fidelity(OPN_FIDELITY_MAX),
+	m_address(0),
+	m_irq_enable(0x03),
+	m_flag_control(0x03),
+	m_fm(intf),
+	m_ssg(intf),
+	m_ssg_resampler(m_ssg),
+	m_adpcm_a(intf, 0)
+{
+	m_last_fm.clear();
+	update_prescale();
+}
+
+
+//-------------------------------------------------
+//  reset - reset the system
+//-------------------------------------------------
+
+void ymf288::reset()
+{
+	// reset the engines
+	m_fm.reset();
+	m_ssg.reset();
+	m_adpcm_a.reset();
+
+	// configure ADPCM percussion sounds; these are present in an embedded ROM
+	m_adpcm_a.set_start_end(0, 0x0000, 0x01bf); // bass drum
+	m_adpcm_a.set_start_end(1, 0x01c0, 0x043f); // snare drum
+	m_adpcm_a.set_start_end(2, 0x0440, 0x1b7f); // top cymbal
+	m_adpcm_a.set_start_end(3, 0x1b80, 0x1cff); // high hat
+	m_adpcm_a.set_start_end(4, 0x1d00, 0x1f7f); // tom tom
+	m_adpcm_a.set_start_end(5, 0x1f80, 0x1fff); // rim shot
+
+	// initialize our special interrupt states, then read the upper status
+	// register, which updates the IRQs
+	m_irq_enable = 0x03;
+	m_flag_control = 0x00;
+	read_status_hi();
+}
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void ymf288::save_restore(ymfm_saved_state &state)
+{
+	state.save_restore(m_address);
+	state.save_restore(m_irq_enable);
+	state.save_restore(m_flag_control);
+	state.save_restore(m_last_fm.data);
+
+	m_fm.save_restore(state);
+	m_ssg.save_restore(state);
+	m_ssg_resampler.save_restore(state);
+	m_adpcm_a.save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  read_status - read the status register
+//-------------------------------------------------
+
+uint8_t ymf288::read_status()
+{
+	uint8_t result = m_fm.status() & (fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB);
+	if (m_fm.intf().ymfm_is_busy())
+		result |= fm_engine::STATUS_BUSY;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  read_data - read the data register
+//-------------------------------------------------
+
+uint8_t ymf288::read_data()
+{
+	uint8_t result = 0;
+	if (m_address < 0x0e)
+	{
+		// 00-0D: Read from SSG
+		result = m_ssg.read(m_address & 0x0f);
+	}
+	else if (m_address < 0x10)
+	{
+		// 0E-0F: I/O ports not supported
+		result = 0xff;
+	}
+	else if (m_address == 0xff)
+	{
+		// FF: ID code
+		result = 2;
+	}
+	else if (ymf288_mode())
+	{
+		// registers are readable in YMF288 mode
+		result = m_fm.regs().read(m_address);
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  read_status_hi - read the extended status
+//  register
+//-------------------------------------------------
+
+uint8_t ymf288::read_status_hi()
+{
+	// fetch regular status
+	uint8_t status = m_fm.status() & (fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB);
+
+	// turn off any bits that have been requested to be masked
+	status &= ~(m_flag_control & 0x03);
+
+	// update the status so that IRQs are propagated
+	m_fm.set_reset_status(status, ~status);
+
+	// merge in the busy flag
+	if (m_fm.intf().ymfm_is_busy())
+		status |= fm_engine::STATUS_BUSY;
+	return status;
+}
+
+
+//-------------------------------------------------
+//  read - handle a read from the device
+//-------------------------------------------------
+
+uint8_t ymf288::read(uint32_t offset)
+{
+	uint8_t result = 0;
+	switch (offset & 3)
+	{
+		case 0: // status port, YM2203 compatible
+			result = read_status();
+			break;
+
+		case 1: // data port
+			result = read_data();
+			break;
+
+		case 2: // status port, extended
+			result = read_status_hi();
+			break;
+
+		case 3: // unmapped
+			debug::log_unexpected_read_write("Unexpected read from YMF288 offset %d\n", offset & 3);
+			break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_address - handle a write to the address
+//  register
+//-------------------------------------------------
+
+void ymf288::write_address(uint8_t data)
+{
+	// just set the address
+	m_address = data;
+
+	// in YMF288 mode, busy is signaled after address writes too
+	if (ymf288_mode())
+		m_fm.intf().ymfm_set_busy_end(16);
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the data register
+//-------------------------------------------------
+
+void ymf288::write_data(uint8_t data)
+{
+	// ignore if paired with upper address
+	if (bitfield(m_address, 8))
+		return;
+
+	// wait times are shorter in YMF288 mode
+	int busy_cycles = ymf288_mode() ? 16 : 32 * m_fm.clock_prescale();
+	if (m_address < 0x0e)
+	{
+		// 00-0D: write to SSG
+		m_ssg.write(m_address & 0x0f, data);
+	}
+	else if (m_address < 0x10)
+	{
+		// 0E-0F: I/O ports not supported
+	}
+	else if (m_address < 0x20)
+	{
+		// 10-1F: write to ADPCM-A
+		m_adpcm_a.write(m_address & 0x0f, data);
+		busy_cycles = 32 * m_fm.clock_prescale();
+	}
+	else if (m_address == 0x27)
+	{
+		// 27: mode register; CSM isn't supported so disable it
+		data &= 0x7f;
+		m_fm.write(m_address, data);
+	}
+	else if (m_address == 0x29)
+	{
+		// 29: special IRQ mask register
+		m_irq_enable = data;
+		m_fm.set_irq_mask(m_irq_enable & ~m_flag_control & 0x03);
+	}
+	else
+	{
+		// 20-27, 2A-FF: write to FM
+		m_fm.write(m_address, data);
+	}
+
+	// mark busy for a bit
+	m_fm.intf().ymfm_set_busy_end(busy_cycles);
+}
+
+
+//-------------------------------------------------
+//  write_address_hi - handle a write to the upper
+//  address register
+//-------------------------------------------------
+
+void ymf288::write_address_hi(uint8_t data)
+{
+	// just set the address
+	m_address = 0x100 | data;
+
+	// in YMF288 mode, busy is signaled after address writes too
+	if (ymf288_mode())
+		m_fm.intf().ymfm_set_busy_end(16);
+}
+
+
+//-------------------------------------------------
+//  write_data_hi - handle a write to the upper
+//  data register
+//-------------------------------------------------
+
+void ymf288::write_data_hi(uint8_t data)
+{
+	// ignore if paired with upper address
+	if (!bitfield(m_address, 8))
+		return;
+
+	// wait times are shorter in YMF288 mode
+	int busy_cycles = ymf288_mode() ? 16 : 32 * m_fm.clock_prescale();
+	if (m_address == 0x110)
+	{
+		// 110: IRQ flag control
+		if (bitfield(data, 7))
+			m_fm.set_reset_status(0, 0xff);
+		else
+		{
+			m_flag_control = data;
+			m_fm.set_irq_mask(m_irq_enable & ~m_flag_control & 0x03);
+		}
+	}
+	else
+	{
+		// 100-10F,111-1FF: write to FM
+		m_fm.write(m_address, data);
+	}
+
+	// mark busy for a bit
+	m_fm.intf().ymfm_set_busy_end(busy_cycles);
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the register
+//  interface
+//-------------------------------------------------
+
+void ymf288::write(uint32_t offset, uint8_t data)
+{
+	switch (offset & 3)
+	{
+		case 0: // address port
+			write_address(data);
+			break;
+
+		case 1: // data port
+			write_data(data);
+			break;
+
+		case 2: // upper address port
+			write_address_hi(data);
+			break;
+
+		case 3: // upper data port
+			write_data_hi(data);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  generate - generate one sample of sound
+//-------------------------------------------------
+
+void ymf288::generate(output_data *output, uint32_t numsamples)
+{
+	// FM output is just repeated the prescale number of times; note that
+	// 0 is a special 1.5 case
+	if (m_fm_samples_per_output != 0)
+	{
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			if ((m_ssg_resampler.sampindex() + samp) % m_fm_samples_per_output == 0)
+				clock_fm_and_adpcm();
+			output->data[0] = m_last_fm.data[0];
+			output->data[1] = m_last_fm.data[1];
+		}
+	}
+	else
+	{
+		for (uint32_t samp = 0; samp < numsamples; samp++, output++)
+		{
+			uint32_t step = (m_ssg_resampler.sampindex() + samp) % 3;
+			if (step == 0)
+				clock_fm_and_adpcm();
+			output->data[0] = m_last_fm.data[0];
+			output->data[1] = m_last_fm.data[1];
+			if (step == 1)
+			{
+				clock_fm_and_adpcm();
+				output->data[0] = (output->data[0] + m_last_fm.data[0]) / 2;
+				output->data[1] = (output->data[1] + m_last_fm.data[1]) / 2;
+			}
+		}
+	}
+
+	// resample the SSG as configured
+	m_ssg_resampler.resample(output - numsamples, numsamples);
+}
+
+
+//-------------------------------------------------
+//  update_prescale - update the prescale value,
+//  recomputing derived values
+//-------------------------------------------------
+
+void ymf288::update_prescale()
+{
+	// Fidelity:   ---- minimum ----    ---- medium -----    ---- maximum-----
+	//              rate = clock/144     rate = clock/144     rate = clock/16
+	// Prescale    FM rate  SSG rate    FM rate  SSG rate    FM rate  SSG rate
+	//     6          1:1     2:9          1:1     2:9         9:1     2:1
+
+	// compute the number of FM samples per output sample, and select the
+	// resampler function
+	if (m_fidelity == OPN_FIDELITY_MIN || m_fidelity == OPN_FIDELITY_MED)
+	{
+		m_fm_samples_per_output = 1;
+		m_ssg_resampler.configure(2, 9);
+	}
+	else
+	{
+		m_fm_samples_per_output = 9;
+		m_ssg_resampler.configure(2, 1);
+	}
+
+	// if overriding the SSG, override the configuration with the nop
+	// resampler to at least keep the sample index moving forward
+	if (m_ssg.overridden())
+		m_ssg_resampler.configure(0, 0);
+}
+
+
+//-------------------------------------------------
+//  clock_fm_and_adpcm - clock FM and ADPCM state
+//-------------------------------------------------
+
+void ymf288::clock_fm_and_adpcm()
+{
+	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
+	uint32_t fmmask = bitfield(m_irq_enable, 7) ? 0x3f : 0x07;
+
+	// clock the system
+	uint32_t env_counter = m_fm.clock(fm_engine::ALL_CHANNELS);
+
+	// clock the ADPCM-A engine on every envelope cycle
+	// (channels 4 and 5 clock every 2 envelope clocks)
+	if (bitfield(env_counter, 0, 2) == 0)
+		m_adpcm_a.clock(bitfield(env_counter, 2) ? 0x0f : 0x3f);
+
+	// update the FM content; OPNA is 13-bit with no intermediate clipping
+	m_fm.output(m_last_fm.clear(), 1, 32767, fmmask);
+
 	// mix in the ADPCM
 	m_adpcm_a.output(m_last_fm, 0x3f);
-	m_adpcm_b.output(m_last_fm, 2);
 }
 
 
@@ -1629,10 +1898,15 @@ uint8_t ym2610::read_status()
 uint8_t ym2610::read_data()
 {
 	uint8_t result = 0;
-	if (m_address < 0x10)
+	if (m_address < 0x0e)
 	{
-		// 00-0F: Read from SSG
+		// 00-0D: Read from SSG
 		result = m_ssg.read(m_address & 0x0f);
+	}
+	else if (m_address < 0x10)
+	{
+		// 0E-0F: I/O ports not supported
+		result = 0xff;
 	}
 	else if (m_address == 0xff)
 	{
@@ -1716,10 +1990,14 @@ void ym2610::write_data(uint8_t data)
 	if (bitfield(m_address, 8))
 		return;
 
-	if (m_address < 0x10)
+	if (m_address < 0x0e)
 	{
-		// 00-0F: write to SSG
+		// 00-0D: write to SSG
 		m_ssg.write(m_address & 0x0f, data);
+	}
+	else if (m_address < 0x10)
+	{
+		// 0E-0F: I/O ports not supported
 	}
 	else if (m_address < 0x1c)
 	{
@@ -1888,7 +2166,7 @@ void ym2610::clock_fm_and_adpcm()
 
 	// mix in the ADPCM and clamp
 	m_adpcm_a.output(m_last_fm, 0x3f);
-	m_adpcm_b.output(m_last_fm, 2);
+	m_adpcm_b.output(m_last_fm, 1);
 	m_last_fm.clamp16();
 }
 

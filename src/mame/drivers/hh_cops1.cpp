@@ -7,8 +7,12 @@ National Semiconductor COPS(MM57 MCU series) handhelds
 
 MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
+ROM source notes when dumped from another publisher, but confident it's the same:
+- cambrp: Radio Shack EC-4001 Programmable
+
 TODO:
-- qkracerm link cable
+- qkracerm link cable (already tested locally and it works, so driver notes
+  and MCU serial emulation are good enough)
 
 ***************************************************************************/
 
@@ -22,6 +26,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
+#include "cambrp.lh"
 #include "mbaskb.lh"
 #include "mhockey.lh"
 #include "msoccer.lh"
@@ -632,6 +637,165 @@ ROM_END
 
 
 
+
+
+/***************************************************************************
+
+  Sinclair Radionics Cambridge Programmable
+  * MM5799 MCU (label MM5799NBP/N, die label MM4799 C NBP)
+  * DS8874 LED driver, 9-digit 7seg led display
+
+  It's a programmable pocket calculator, up to 36 steps. 2 MCU revisions
+  are known: MM5799EHY and MM5799NBP.
+
+  4 program libraries were available:
+  - Vol. 1: General / Finance / Statistics
+  - Vol. 2: Mathematics
+  - Vol. 3: Physics & Engineering
+  - Vol. 4: Electronics
+
+  Paste example: CCSS200SR 2-32+.12131*.5=.5.201=50.200 CSS200C
+  Now enter a value under 70, followed by RUN, to calculate its factorial.
+
+  known releases:
+  - World: Cambridge Programmable, published by Sinclair Radionics
+  - USA: EC-4001 Programmable, published by Tandy Corporation, Radio Shack brand
+
+***************************************************************************/
+
+class cambrp_state : public hh_cops1_state
+{
+public:
+	cambrp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_cops1_state(mconfig, type, tag),
+		m_ds8874(*this, "ds8874")
+	{ }
+
+	required_device<ds8874_device> m_ds8874;
+	void ds8874_output_w(u16 data);
+
+	void update_display();
+	void write_do(u8 data);
+	void write_s(u8 data);
+	u8 read_f();
+	u8 read_k();
+	void cambrp(machine_config &config);
+};
+
+// handlers
+
+void cambrp_state::update_display()
+{
+	m_display->matrix(m_grid, m_s);
+}
+
+void cambrp_state::ds8874_output_w(u16 data)
+{
+	// DS8874 outputs: digit select, input mux
+	m_grid = ~data;
+	m_inp_mux = m_grid >> 2;
+	update_display();
+}
+
+void cambrp_state::write_do(u8 data)
+{
+	// DO1: DS8874 CP
+	// DO4: DS8874 _DATA
+	m_ds8874->cp_w(BIT(data, 0));
+	m_ds8874->data_w(BIT(data, 3));
+}
+
+void cambrp_state::write_s(u8 data)
+{
+	// S: digit segment data
+	// (DS8874 low battery out also connects to Sp)
+	m_s = data;
+	update_display();
+}
+
+u8 cambrp_state::read_f()
+{
+	// F2: K3, other: N/C
+	return (~read_inputs(6) >> 1 & 2) | (m_maincpu->f_output_r() & ~2);
+}
+
+u8 cambrp_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( cambrp )
+	PORT_START("IN.0") // DS8874 OUT 3 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_NAME("0 / stop / +/-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_NAME("6 / () / R>D")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('=') PORT_NAME("= / -")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_NAME("Up/Downshift")
+
+	PORT_START("IN.1") // DS8874 OUT 4 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME("1 / \xe2\x88\x9ax / go if neg")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / sin / arcsin")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("- / -x / F")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR('C') PORT_NAME("C/CE / step")
+
+	PORT_START("IN.2") // DS8874 OUT 5 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_NAME("2 / sto / go to")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8') PORT_NAME("8 / cos / arccos")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('/') PORT_NAME(u8"÷ / 1/x / G")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_NAME("RUN / learn")
+
+	PORT_START("IN.3") // DS8874 OUT 6 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_NAME("3 / ChN/# / D>R")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_NAME("9 / tan / arctan")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+') PORT_NAME("+ / 2x / E")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // DS8874 OUT 7 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME("4 / ln x / e\xcb\xa3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR('.') PORT_NAME("./EE/_ / Downshift / A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME(u8"× / x\xc2\xb2 / .")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // DS8874 OUT 8 port K
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / rcl / MEx")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void cambrp_state::cambrp(machine_config &config)
+{
+	/* basic machine hardware */
+	MM5799(config, m_maincpu, 200000); // approximation
+	m_maincpu->set_option_ram_d12(true);
+	m_maincpu->set_option_lb_10(4);
+	m_maincpu->write_do().set(FUNC(cambrp_state::write_do));
+	m_maincpu->write_s().set(FUNC(cambrp_state::write_s));
+	m_maincpu->read_f().set(FUNC(cambrp_state::read_f));
+	m_maincpu->read_k().set(FUNC(cambrp_state::read_k));
+
+	/* video hardware */
+	DS8874(config, m_ds8874).write_output().set(FUNC(cambrp_state::ds8874_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_cambrp);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( cambrp )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mm5799nbp_n", 0x0000, 0x0200, CRC(f4e9063b) SHA1(04b7bf24e994cd453584d233405621f8110feded) )
+	ROM_CONTINUE(            0x0400, 0x0400 )
+
+	ROM_REGION( 254, "maincpu:opla", 0 )
+	ROM_LOAD( "mm5799_cambrp_output.pla", 0, 254, CRC(eb882256) SHA1(acd77c066a7b7d18c3ea10f137a45ab83d1c53e1) )
+ROM_END
+
+
+
 } // anonymous namespace
 
 /***************************************************************************
@@ -647,6 +811,8 @@ CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
 CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+
+COMP( 1977, cambrp,    0,       0, cambrp,    cambrp,    cambrp_state,    empty_init, "Sinclair Radionics", "Cambridge Programmable", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

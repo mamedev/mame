@@ -152,18 +152,14 @@ void x68k_crtc_device::refresh_mode()
 {
 	// Calculate data from register values
 	m_vmultiple = 1;
-	if ((m_reg[20] & 0x10) != 0 && (m_reg[20] & 0x0c) == 0)
-		m_vmultiple = 2;  // 31.5kHz + 256 lines = doublescan
 	if (m_interlace)
 		m_vmultiple = 0.5f;  // 31.5kHz + 1024 lines or 15kHz + 512 lines = interlaced
 	m_htotal = (m_reg[0] + 1) * 8;
 	m_vtotal = (m_reg[4] + 1) / m_vmultiple; // default is 567 (568 scanlines)
 	m_hbegin = (m_reg[2] * 8) + 1;
-	m_hend = (m_reg[3] * 8);
-	m_vbegin = (m_reg[6]) / m_vmultiple;
+	m_hend = m_reg[3] * 8;
+	m_vbegin = m_reg[6] / m_vmultiple;
 	m_vend = (m_reg[7] - 1) / m_vmultiple;
-	if ((m_vmultiple == 2) && !(m_reg[7] & 1)) // otherwise if the raster irq line == vblank line, the raster irq fires too late
-		m_vend++;
 	m_hsync_end = (m_reg[1]) * 8;
 	m_vsync_end = (m_reg[5]) / m_vmultiple;
 	m_hsyncadjust = m_reg[8];
@@ -175,19 +171,9 @@ void x68k_crtc_device::refresh_mode()
 		scr.max_x = m_hend + 2;
 	rectangle visiblescr(m_hbegin, m_hend, m_vbegin, m_vend);
 
-	// expand visible area to the size indicated by CRTC reg 20
-	int length = m_hend - m_hbegin;
-	if (length < m_width)
-	{
-		visiblescr.min_x = m_hbegin - ((m_width - length)/2);
-		visiblescr.max_x = m_hend + ((m_width - length)/2);
-	}
-	length = m_vend - m_vbegin;
-	if (length < m_height)
-	{
-		visiblescr.min_y = m_vbegin - ((m_height - length)/2);
-		visiblescr.max_y = m_vend + ((m_height - length)/2);
-	}
+	if ((visiblescr.max_y > m_height) || (visiblescr.max_x > m_width))
+		logerror("visarea larger then reg[20]: %dx%d, %dx%d\n", visiblescr.max_x, visiblescr.max_y, m_width, m_height);
+
 	// bounds check
 	if (visiblescr.min_x < 0)
 		visiblescr.min_x = 0;
@@ -200,11 +186,29 @@ void x68k_crtc_device::refresh_mode()
 
 //  LOG("CRTC regs - %i %i %i %i  - %i %i %i %i - %i - %i\n", m_reg[0], m_reg[1], m_reg[2], m_reg[3],
 //      m_reg[4], m_reg[5], m_reg[6], m_reg[7], m_reg[8], m_reg[9]);
-	unsigned div = (m_reg[20] & 0x03) == 0 ? 4 : 2;
-	if (BIT(m_reg[20], 4) && !BIT(m_reg[20], 1))
-		div = BIT(m_reg[20], 0) ? 3 : 6;
-	if ((m_reg[20] & 0x0c) == 0)
-		div *= 2;
+	int div;
+	switch (m_reg[20] & 0x1f)
+	{
+		case 0:
+			div = 8;
+			break;
+		default:
+			logerror("Invalid mode %d", m_reg[20] & 0x1f); [[fallthrough]];
+		case 1:
+		case 5:
+		case 0x11:
+			div = 4;
+			break;
+		case 0x16:
+			div = 2;
+			break;
+		case 0x10:
+			div = 6;
+			break;
+		case 0x15:
+			div = 3;
+			break;
+	}
 	attotime refresh = attotime::from_hz((BIT(m_reg[20], 4) ? clock_69m() : clock_39m()) / div) * (scr.max_x * scr.max_y);
 	LOG("screen().configure(%i,%i,[%i,%i,%i,%i],%f)\n", scr.max_x, scr.max_y, visiblescr.min_x, visiblescr.min_y, visiblescr.max_x, visiblescr.max_y, refresh.as_hz());
 	screen().configure(scr.max_x, scr.max_y, visiblescr, refresh.as_attoseconds());
@@ -221,59 +225,22 @@ TIMER_CALLBACK_MEMBER(x68k_crtc_device::hsync)
 	if (m_operation & 8)
 		text_copy((m_reg[22] & 0xff00) >> 8, (m_reg[22] & 0x00ff), (m_reg[21] & 0xf));
 
-	if (m_vmultiple == 2) // 256-line (doublescan)
+	int scan = screen().vpos();
+	if (hstate == 1)
 	{
-		if (hstate == 1)
-		{
-			if (m_oddscanline)
-			{
-				int scan = screen().vpos();
-				hsync_time = screen().time_until_pos(scan, (m_htotal + m_hend) / 2);
-				m_scanline_timer->adjust(hsync_time);
-				if ((scan != 0) && (scan < m_vend))
-					screen().update_partial(scan - 1);
-			}
-			else
-			{
-				int scan = screen().vpos();
-				hsync_time = screen().time_until_pos(scan, m_hend / 2);
-				m_scanline_timer->adjust(hsync_time);
-				if ((scan != 0) && (scan < m_vend))
-					screen().update_partial(scan - 1);
-			}
-		}
-		if (hstate == 0)
-		{
-			if (m_oddscanline)
-			{
-				int scan = screen().vpos() + 1;
-				hsync_time = screen().time_until_pos(scan, m_hbegin / 2);
-				m_scanline_timer->adjust(hsync_time, 1);
-				m_oddscanline = false;
-			}
-			else
-			{
-				hsync_time = screen().time_until_pos(screen().vpos(), (m_htotal + m_hbegin) / 2);
-				m_scanline_timer->adjust(hsync_time, 1);
-				m_oddscanline = true;
-			}
-		}
+		hsync_time = screen().time_until_pos(scan, m_hend);
+		m_scanline_timer->adjust(hsync_time);
+		if ((scan != 0) && (scan < m_vend))
+			screen().update_partial(scan - 1);
 	}
-	else  // 512-line
+	if (hstate == 0)
 	{
-		if (hstate == 1)
-		{
-			int scan = screen().vpos();
-			hsync_time = screen().time_until_pos(scan, m_hend);
-			m_scanline_timer->adjust(hsync_time);
-			if ((scan != 0) && (scan < m_vend))
-				screen().update_partial(scan - 1);
-		}
-		if (hstate == 0)
-		{
-			hsync_time = screen().time_until_pos(screen().vpos() + 1, m_hbegin);
-			m_scanline_timer->adjust(hsync_time, 1);
-		}
+		if (scan == (m_vtotal - 1))
+			scan = 0;
+		else
+			scan++;
+		hsync_time = screen().time_until_pos(scan, m_hbegin);
+		m_scanline_timer->adjust(hsync_time, 1);
 	}
 }
 
@@ -400,7 +367,7 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 			attotime irq_time = attotime::zero;
 			if ((data / m_vmultiple) != screen().vpos())
 			{
-				irq_time = screen().time_until_pos((data) / m_vmultiple,2);
+				irq_time = screen().time_until_pos((data - 1) / m_vmultiple,2);
 				m_rint_callback(1);
 			}
 			m_raster_irq_timer->adjust(irq_time, (data) / m_vmultiple);
@@ -471,6 +438,8 @@ u16 x68k_crtc_device::crtc_r(offs_t offset)
 		switch (offset)
 		{
 		case 9:
+			if (machine().side_effects_disabled())
+				return m_reg[9];
 			return 0;
 		case 10:  // Text X/Y scroll
 		case 11:

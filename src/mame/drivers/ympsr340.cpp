@@ -100,7 +100,7 @@ void psr340_state::psr340_map(address_map &map)
 
 	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
 
-//	map(0xffe000, 0xffe7ff).ram();
+//  map(0xffe000, 0xffe7ff).ram();
 
 	map(0xffe027, 0xffe027).r(FUNC(psr340_state::matrix_r));
 

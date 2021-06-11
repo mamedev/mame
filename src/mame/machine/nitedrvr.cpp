@@ -20,9 +20,9 @@ because D6 and D7 are apparently checked at different times, and a
 change in-between can affect the direction you move.
 ***************************************************************************/
 
-int nitedrvr_state::nitedrvr_steering(  )
+int nitedrvr_state::steering()
 {
-	int this_val = ioport("STEER")->read();
+	int this_val = m_steer->read();
 	int delta = this_val - m_last_steering_val;
 
 	m_last_steering_val = this_val;
@@ -32,7 +32,7 @@ int nitedrvr_state::nitedrvr_steering(  )
 	else if (delta < -128)
 		delta += 256;
 
-	/* Divide by four to make our steering less sensitive */
+	// Divide by four to make our steering less sensitive
 	m_steering_buf += (delta / 4);
 
 	if (m_steering_buf > 0)
@@ -54,23 +54,23 @@ int nitedrvr_state::nitedrvr_steering(  )
 }
 
 /***************************************************************************
-nitedrvr_steering_reset
+steering_reset
 ***************************************************************************/
 
-uint8_t nitedrvr_state::nitedrvr_steering_reset_r()
+uint8_t nitedrvr_state::steering_reset_r()
 {
 	m_steering_val = 0;
 	return 0;
 }
 
-void nitedrvr_state::nitedrvr_steering_reset_w(uint8_t data)
+void nitedrvr_state::steering_reset_w(uint8_t data)
 {
 	m_steering_val = 0;
 }
 
 
 /***************************************************************************
-nitedrvr_in0_r
+in0_r
 
 Night Driver looks for the following:
     A: $00
@@ -97,22 +97,25 @@ Night Driver looks for the following:
 Fill in the steering and gear bits in a special way.
 ***************************************************************************/
 
-uint8_t nitedrvr_state::nitedrvr_in0_r(offs_t offset)
+uint8_t nitedrvr_state::in0_r(offs_t offset)
 {
-	int gear = ioport("GEARS")->read();
+	int gear = m_gears->read();
 
 	if (gear & 0x10)                m_gear = 1;
 	else if (gear & 0x20)           m_gear = 2;
 	else if (gear & 0x40)           m_gear = 3;
 	else if (gear & 0x80)           m_gear = 4;
 
+	for (uint8_t i = 0; i < 4; i++)
+		m_gear_sel[i] = ((m_gear == (i + 1)) ? 1 : 0);
+
 	switch (offset & 0x03)
 	{
-		case 0x00:                      /* No remapping necessary */
-			return ioport("DSW0")->read();
-		case 0x01:                      /* No remapping necessary */
-			return ioport("DSW1")->read();
-		case 0x02:                      /* Remap our gear shift */
+		case 0x00:                      // No remapping necessary
+			return m_dsw[0]->read();
+		case 0x01:                      // No remapping necessary
+			return m_dsw[1]->read();
+		case 0x02:                      // Remap our gear shift
 			if (m_gear == 1)
 				return 0xe0;
 			else if (m_gear == 2)
@@ -121,15 +124,15 @@ uint8_t nitedrvr_state::nitedrvr_in0_r(offs_t offset)
 				return 0xb0;
 			else
 				return 0x70;
-		case 0x03:                      /* Remap our steering */
-			return (ioport("DSW2")->read() | nitedrvr_steering());
+		case 0x03:                      // Remap our steering
+			return (m_dsw[2]->read() | steering());
 		default:
 			return 0xff;
 	}
 }
 
 /***************************************************************************
-nitedrvr_in1_r
+in1_r
 
 Night Driver looks for the following:
     A: $00
@@ -160,15 +163,18 @@ Night Driver looks for the following:
 Fill in the track difficulty switch and special signal in a special way.
 ***************************************************************************/
 
-uint8_t nitedrvr_state::nitedrvr_in1_r(offs_t offset)
+uint8_t nitedrvr_state::in1_r(offs_t offset)
 {
-	int port = ioport("IN0")->read();
+	int port = m_in0->read();
 
 	m_ac_line = (m_ac_line + 1) % 3;
 
 	if (port & 0x10)                m_track = 0;
 	else if (port & 0x20)           m_track = 1;
 	else if (port & 0x40)           m_track = 2;
+
+	for (uint8_t i = 0; i < 3; i++)
+		m_track_sel[i] = (m_track == i ? 1 : 0);
 
 	switch (offset & 0x07)
 	{
@@ -185,7 +191,7 @@ uint8_t nitedrvr_state::nitedrvr_in1_r(offs_t offset)
 		case 0x05:
 			if (m_track == 0) return 0x80; else return 0x00;
 		case 0x06:
-			/* TODO: fix alternating signal? */
+			// TODO: fix alternating signal?
 			if (m_ac_line==0) return 0x80; else return 0x00;
 		case 0x07:
 			return 0x00;
@@ -195,7 +201,7 @@ uint8_t nitedrvr_state::nitedrvr_in1_r(offs_t offset)
 }
 
 /***************************************************************************
-nitedrvr_out0_w
+out0_w
 
 Sound bits:
 
@@ -207,7 +213,7 @@ D4 = SKID1
 D5 = SKID2
 ***************************************************************************/
 
-void nitedrvr_state::nitedrvr_out0_w(uint8_t data)
+void nitedrvr_state::out0_w(uint8_t data)
 {
 	m_discrete->write(NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
 	m_discrete->write(NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
@@ -215,7 +221,7 @@ void nitedrvr_state::nitedrvr_out0_w(uint8_t data)
 }
 
 /***************************************************************************
-nitedrvr_out1_w
+out1_w
 
 D0 = !CRASH - also drives a video invert signal
 D1 = ATTRACT
@@ -225,7 +231,7 @@ D4 = LED START
 D5 = Spare (Not used)
 ***************************************************************************/
 
-void nitedrvr_state::nitedrvr_out1_w(uint8_t data)
+void nitedrvr_state::out1_w(uint8_t data)
 {
 	m_led = BIT(data, 4);
 
@@ -236,18 +242,18 @@ void nitedrvr_state::nitedrvr_out1_w(uint8_t data)
 
 	if (!m_crash_en)
 	{
-		/* Crash reset, set counter high and enable output */
+		// Crash reset, set counter high and enable output
 		m_crash_data_en = 1;
 		m_crash_data = 0x0f;
-		/* Invert video */
-		m_palette->set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* BLACK */
-		m_palette->set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* WHITE */
+		// Invert video
+		m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
+		m_palette->set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // WHITE
 	}
 	m_discrete->write(NITEDRVR_BANG_DATA, m_crash_data_en ? m_crash_data : 0);    // Crash Volume
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::crash_toggle_callback)
 {
 	if (m_crash_en && m_crash_data_en)
 	{
@@ -258,15 +264,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 
 		if (m_crash_data & 0x01)
 		{
-			/* Invert video */
-			m_palette->set_pen_color(1, rgb_t(0x00,0x00,0x00)); /* BLACK */
-			m_palette->set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* WHITE */
+			// Invert video
+			m_palette->set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
+			m_palette->set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // WHITE
 		}
 		else
 		{
-			/* Normal video */
-			m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00)); /* BLACK */
-			m_palette->set_pen_color(1, rgb_t(0xff,0xff,0xff)); /* WHITE */
+			// Normal video
+			m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00)); // BLACK
+			m_palette->set_pen_color(1, rgb_t(0xff,0xff,0xff)); // WHITE
 		}
 	}
 }
@@ -274,6 +280,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 void nitedrvr_state::machine_start()
 {
 	m_led.resolve();
+	m_track_sel.resolve();
+	m_gear_sel.resolve();
 
 	save_item(NAME(m_gear));
 	save_item(NAME(m_track));

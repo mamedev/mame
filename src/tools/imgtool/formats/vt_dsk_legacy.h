@@ -2,17 +2,17 @@
 // copyright-holders:Juergen Buchmueller
 /*********************************************************************
 
-    formats/vt_dsk.h
+    formats/vt_dsk_legacy.h
 
-    Tandy Color Computer / Dragon disk images
+    VTech Laser/VZ disk images (legacy support)
 
 *********************************************************************/
 
-#ifndef VT_DSK_H
-#define VT_DSK_H
+#ifndef VT_DSK_LEGACY_H
+#define VT_DSK_LEGACY_H
 
 #include "formats/flopimg.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(vz);
 
-#endif /* VT_DSK_H */
+#endif /* VT_DSK_LEGACY_H */

@@ -27,7 +27,7 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
 
-void mbee_state::pio_port_b_w(uint8_t data)
+void mbee_state::pio_port_b_w(u8 data)
 {
 /*  PIO port B - d5..d2 not emulated
     d7 interrupt from network or rtc or vsync or not used (see config switch)
@@ -43,9 +43,9 @@ void mbee_state::pio_port_b_w(uint8_t data)
 	m_speaker->level_w(BIT(data, 6));
 }
 
-uint8_t mbee_state::pio_port_b_r()
+u8 mbee_state::pio_port_b_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	if (m_cassette->input() > 0.03)
 		data |= 1;
@@ -55,16 +55,16 @@ uint8_t mbee_state::pio_port_b_r()
 	switch (m_io_config->read() & 0xc0)
 	{
 		case 0x00:
-			data |= (uint8_t)m_b7_vs << 7;
+			data |= (u8)m_b7_vs << 7;
 			break;
 		case 0x40:
-			data |= (uint8_t)m_b7_rtc << 7;
+			data |= (u8)m_b7_rtc << 7;
 			break;
 		case 0x80:
 			data |= 0x80;
 			break;
 	}
-	data |= (uint8_t)m_b2 << 1; // key pressed on new keyboard
+	data |= (u8)m_b2 << 1; // key pressed on new keyboard
 
 	return data;
 }
@@ -88,7 +88,7 @@ WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
 
-uint8_t mbee_state::fdc_status_r()
+u8 mbee_state::fdc_status_r()
 {
 /*  d7 indicate if IRQ or DRQ is occurring (1=happening)
     d6..d0 not used */
@@ -96,7 +96,7 @@ uint8_t mbee_state::fdc_status_r()
 	return m_fdc_rq ? 0xff : 0x7f;
 }
 
-void mbee_state::fdc_motor_w(uint8_t data)
+void mbee_state::fdc_motor_w(u8 data)
 {
 /*  d7..d4 not used
     d3 density (1=MFM)
@@ -147,7 +147,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 	if (!BIT(m_features, 2))
 		return;
 
-	uint8_t i, j, pressed;
+	u8 i, j, pressed;
 
 	// find what has changed
 	for (i = 0; i < 15; i++)
@@ -161,7 +161,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 				if (BIT(pressed^m_newkb_was_pressed[i], j))
 				{
 					// put it in the queue
-					uint8_t code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
+					u8 code = (i << 3) | j | (BIT(pressed, j) ? 0x80 : 0);
 					m_newkb_q[m_newkb_q_pos] = code;
 					if (m_newkb_q_pos < (std::size(m_newkb_q)-1))
 						m_newkb_q_pos++;
@@ -179,9 +179,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( mbee_state::newkb_timer )
 		m_pio->port_b_write(pio_port_b_r());
 }
 
-uint8_t mbee_state::port18_r()
+u8 mbee_state::port18_r()
 {
-	uint8_t i, data = m_newkb_q[0]; // get oldest key
+	u8 i, data = m_newkb_q[0]; // get oldest key
 
 	if (m_newkb_q_pos)
 	{
@@ -202,18 +202,11 @@ uint8_t mbee_state::port18_r()
 
 ************************************************************/
 
-uint8_t mbee_state::speed_low_r()
+u8 mbee_state::speed_r(offs_t offset)
 {
-	m_maincpu->set_unscaled_clock(3375000);
+	m_maincpu->set_unscaled_clock(BIT(offset, 8, 2) ? 6750000 : 3375000);
 	return 0xff;
 }
-
-uint8_t mbee_state::speed_high_r()
-{
-	m_maincpu->set_unscaled_clock(6750000);
-	return 0xff;
-}
-
 
 
 /***********************************************************
@@ -222,17 +215,17 @@ uint8_t mbee_state::speed_high_r()
 
 ************************************************************/
 
-void mbee_state::port04_w(uint8_t data)  // address
+void mbee_state::port04_w(u8 data)  // address
 {
 	m_rtc->write(0, data);
 }
 
-void mbee_state::port06_w(uint8_t data)  // write
+void mbee_state::port06_w(u8 data)  // write
 {
 	m_rtc->write(1, data);
 }
 
-uint8_t mbee_state::port07_r()   // read
+u8 mbee_state::port07_r()   // read
 {
 	return m_rtc->read(1);
 }
@@ -265,16 +258,16 @@ WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
 
 ************************************************************/
 
-void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
+void mbee_state::setup_banks(u8 data, bool first_time, u8 b_mask)
 {
 	b_mask &= 7;
 	u32 dbank = m_ramsize / 0x1000;
-	u8 extra_bits = data & 0xc0;
+	u8 extra_bits = (data & 0xc0) & (dbank - 1);
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	uint8_t *prom = memregion("pals")->base();
-	uint8_t b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
-	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
+	u8 *prom = memregion("pals")->base();
+	u8 b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	u8 b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	uint16_t b_vid;
 
 	if (first_time || (b_data != m_bank_array[0])) // if same data as last time, leave now
@@ -377,38 +370,69 @@ void mbee_state::port50_w(u8 data)
     Output the PAK number to choose an optional PAK ROM.
 
     The bios will support 256 PAKs, although normally only
-    8 are available in hardware. Each PAK is normally a 4K
-    ROM. If 8K ROMs are used, the 2nd half becomes PAK+8,
+    6 are available in hardware. Each PAK is normally a 8K
+    ROM. If 16K ROMs are used, the 2nd half becomes PAK+8,
     thus 16 PAKs in total. This is used in the PC85 models.
 
 ************************************************************/
 
-void mbee_state::port0a_w(uint8_t data)
+void mbee_state::port0a_w(u8 data)
 {
-	m_0a = data;
-
-	if (m_pak)
-		m_pak->set_entry(data & 15);
+	m_0a = data & 15;
 }
 
-uint8_t mbee_state::telcom_low_r()
+// Banking of Telcom rom
+// Some boards use bits 8 and 9, but there are no roms big enough in existence.
+u8 mbee_state::telcom_r(offs_t offset)
 {
-/* Read of port 0A - set Telcom rom to first half */
-	if (m_telcom)
-		m_telcom->set_entry(0);
-
-	return m_0a;
+	m_09 = BIT(offset, 8);
+	return m_09;
 }
 
-uint8_t mbee_state::telcom_high_r()
+u8 mbee_state::pak_r(offs_t offset)
 {
-/* Read of port 10A - set Telcom rom to 2nd half */
-	if (m_telcom)
-		m_telcom->set_entry(1);
+	u8 data = (m_0a & 7)+2;
 
-	return m_0a;
+	if (m_pak[data] && m_pak[data]->exists())
+	{
+		if (BIT(m_0a, 3))
+		{
+			if (m_pak_extended[data])
+				return m_pak[data]->read_rom(0x2000 | offset);
+			else
+				return 0xff;
+		}
+		else
+			return m_pak[data]->read_rom(offset);
+	}
+	else
+	{
+		m_pak_extended[data] = false;
+		if (m_pakdef)
+			return m_p_pakdef[(m_0a<<13)|offset];
+		else
+			return 0xff;
+	}
 }
 
+u8 mbee_state::net_r(offs_t offset)
+{
+	if (m_pak[1] && m_pak[1]->exists())
+	{
+		if (m_09 && m_pak_extended[1])
+			return m_pak[1]->read_rom(0x1000 | offset);
+		else
+			return m_pak[1]->read_rom(offset);
+	}
+	else
+	{
+		m_pak_extended[1] = false;
+		if (m_netdef)
+			return m_p_netdef[(m_09<<12)|offset];
+		else
+			return 0xff;
+	}
+}
 
 /***********************************************************
 
@@ -431,6 +455,7 @@ void mbee_state::machine_start()
 	save_item(NAME(m_b2));
 	save_item(NAME(m_framecnt)); // not important
 	save_item(NAME(m_08));
+	save_item(NAME(m_09));
 	save_item(NAME(m_0a));
 	save_item(NAME(m_0b));
 	save_item(NAME(m_1c));
@@ -449,20 +474,6 @@ void mbee_state::machine_start()
 	{
 		u8 *b = memregion("basicrom")->base();
 		m_basic->configure_entries(0, 2, b, 0x2000);
-	}
-
-	// banking of the TELCOM rom
-	if (m_telcom)
-	{
-		u8 *t = memregion("telcomrom")->base();
-		m_telcom->configure_entries(0, 2, t, 0x1000);
-	}
-
-	// PAKs fitted
-	if (m_pak)
-	{
-		u8 *p = memregion("pakrom")->base();
-		m_pak->configure_entries(0, 16, p, 0x2000);
 	}
 
 	// videoram
@@ -525,12 +536,25 @@ void mbee_state::machine_start()
 			m_bankw[b_bank]->configure_entry(banks, d); // dummy rom
 		}
 	}
+
+	// set pak index to true for 16k roms
+	if (m_pakdef)
+		for (u8 i = 8; i < 14; i++)
+			if (!(m_pak[i-8] && m_pak[i-8]->exists()))
+				if (m_p_pakdef[(i<<13)] != 0xff)
+					m_pak_extended[(i & 7)+2] = true;
+
+	// set net index to true for 8k roms
+	if (m_netdef && (m_netdef->bytes() > 0x1000))
+		if (!(m_pak[1] && m_pak[1]->exists()))
+			m_pak_extended[1] = true;
 }
 
 void mbee_state::machine_reset()
 {
 	m_fdc_rq = 0;
 	m_08 = 0;
+	m_09 = 0;
 	m_0a = 0;
 	m_0b = 0;
 	m_1c = 0;
@@ -540,12 +564,6 @@ void mbee_state::machine_reset()
 
 	if (m_basic)
 		m_basic->set_entry(0);
-
-	if (m_telcom)
-		m_telcom->set_entry(0);
-
-	if (m_pak)
-		m_pak->set_entry(5);
 
 	m_maincpu->set_pc(m_size);
 
@@ -614,7 +632,7 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 	}
 
 	uint16_t i, j;
-	uint8_t data;
+	u8 data;
 
 	size_t quickload_size = image.length();
 	if (image.is_filetype("mwb"))
@@ -701,5 +719,75 @@ QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_cb)
 	}
 
 	return image_init_result::PASS;
+}
+
+// Index usage: 0 = not used; 1 = net rom; 2-7 = pak roms
+image_init_result mbee_state::load_cart(device_image_interface &image, generic_slot_device *slot, u8 pak_index)
+{
+	u32 size = slot->common_get_size("rom");
+
+	if (pak_index > 1)
+	{
+		// "mbp" roms
+		if ((size == 0) || (size > 0x4000))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			return image_init_result::FAIL;
+		}
+
+		m_pak_extended[pak_index] = (size > 0x2000) ? true : false;
+
+		slot->rom_alloc(m_pak_extended ? 0x4000 : 0x2000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc the amount for a real rom
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xe0) != 0xc0))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a PAK rom");
+			slot->call_unload();
+			return image_init_result::FAIL;
+		}
+	}
+	else
+	{
+		// "mbn" roms
+		if ((size == 0) || (size > 0x2000))
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+			return image_init_result::FAIL;
+		}
+		m_pak_extended[pak_index] = (size > 0x1000) ? true : false;
+
+		slot->rom_alloc(m_pak_extended ? 0x2000 : 0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+		slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+		// Validate the rom
+		logerror ("Rom header = %02X %02X %02X\n", slot->read_rom(0), slot->read_rom(1), slot->read_rom(2));
+		if (!image.loaded_through_softlist())  // need to let pascal through without testing
+		{
+			if ((slot->read_rom(0) != 0xc3) || ((slot->read_rom(2) & 0xf0) != 0xe0))
+			{
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Not a NET rom");
+				slot->call_unload();
+				return image_init_result::FAIL;
+			}
+		}
+	}
+
+	return image_init_result::PASS;
+}
+
+void mbee_state::unload_cart(u8 pak_index)
+{
+	if (pak_index > 1)
+	{
+		if (m_pakdef)
+			m_pak_extended[pak_index] = (m_p_pakdef[((pak_index+8)<<13)] == 0xff) ? false : true;
+		else
+			m_pak_extended[pak_index] = false;
+	}
+	else
+		m_pak_extended[pak_index] = (m_netdef && (m_netdef->bytes() > 0x1000)) ? true : false;
 }
 

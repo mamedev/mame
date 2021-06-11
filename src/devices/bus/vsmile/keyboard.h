@@ -42,7 +42,7 @@ public:
 
 	enum comms_state : uint8_t
 	{
-		STATE_POWERUP			= 0U,
+		STATE_POWERUP           = 0U,
 		STATE_HELLO_MESSAGE,
 		STATE_HELLO_RECEIVE_BYTE1,
 		STATE_HELLO_RECEIVE_BYTE2,

@@ -2,16 +2,16 @@
 // copyright-holders:Juergen Buchmueller
 /*********************************************************************
 
-    formats/vt_dsk.c
+    formats/vt_dsk_legacy.cpp
 
-    VTech Laser/VZ disk images
+    VTech Laser/VZ disk images (legacy support)
 
 *********************************************************************/
 
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include "formats/vt_dsk.h"
+#include "formats/vt_dsk_legacy.h"
 #include "formats/basicdsk.h"
 
 static FLOPPY_IDENTIFY(vz_identify)

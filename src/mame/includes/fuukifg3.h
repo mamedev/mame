@@ -15,8 +15,6 @@
 #define CPU_CLOCK       (XTAL(40'000'000) / 2)        /* clock for 68020 */
 #define SOUND_CPU_CLOCK     (XTAL(12'000'000) / 2)        /* clock for Z80 sound CPU */
 
-/* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
-
 
 class fuuki32_state : public driver_device
 {

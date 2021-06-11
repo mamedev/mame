@@ -2407,6 +2407,9 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
+	ROM_REGION( 0x400000, "set_4.04.09_alt", ROMREGION_ERASEFF ) /* setchip v4.04.09 alternate? u7 matches, u11 is almost identical. Checksum-16 of the dump matches what's on the label */ \
+	ROM_LOAD32_WORD( "clear_mk5_u_7_ck_eb68.u7",   0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
+	ROM_LOAD32_WORD( "clear_mk5_u_11_ck_3a6f.u11", 0x000002, 0x80000, CRC(4cf70173) SHA1(f3dda0f188c035a36954048b449b9b96787709f2) ) \
 	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
@@ -2422,6 +2425,9 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
+	ROM_REGION( 0x400000, "set_4.02.04_alt", ROMREGION_ERASEFF ) /* setchip v4.02.04, but seems to have more code and some different strings */ \
+	ROM_LOAD32_WORD( "setchip v4.02.04_alt.u7",  0x000000, 0x80000, CRC(41275334) SHA1(d4a63dbc77c2c44f6a9c72b389bd270f2137997f) ) /* _alt suffix added to avoid having same ROM labels */ \
+	ROM_LOAD32_WORD( "setchip v4.02.04_alt.u11", 0x000002, 0x80000, CRC(254e8b03) SHA1(0ed9723258d3f86b21bf132cbe2fd0bae978cd5e) ) /* _alt suffix added to avoid having same ROM labels */ \
 	ROM_REGION( 0x400000, "set_1.0",     ROMREGION_ERASEFF ) /* setchip v1.0 */ \
 	ROM_LOAD32_WORD( "setchip v1.0.u7",      0x000000, 0x80000, CRC(16c2828d) SHA1(87218a76bb2791bce27b4b8ab341ba73cbbf6ffe) ) \
 	ROM_LOAD32_WORD( "setchip v1.0.u11",     0x000002, 0x80000, CRC(a969f12b) SHA1(fc6d234ce1f5c6b5aceb97b73aad60144352023b) )

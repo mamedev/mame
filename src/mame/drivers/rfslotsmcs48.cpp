@@ -54,7 +54,7 @@ protected:
 	required_device<i8035_device> m_maincpu;
 	required_device<i8748_device> m_audiocpu;
 };
-	
+
 INPUT_PORTS_START(ajofrin)
 INPUT_PORTS_END
 

@@ -89,7 +89,7 @@ void egret_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &egret_device::egret_map);
 
 	#if USE_BUS_ADB
-	ADB_CONNECTOR(config, "adb1", adb_device::default_devices, "a9m0331", false);
+	ADB_CONNECTOR(config, "adb1", adb_device::default_devices, "a9m0330", false);
 	#endif
 }
 
@@ -371,7 +371,7 @@ egret_device::egret_device(const machine_config &mconfig, const char *tag, devic
 	  write_via_data(*this),
 	  m_maincpu(*this, EGRET_CPU_TAG)
 #if USE_BUS_ADB
-	, m_adb_connector{{*this, ":adb1"}, {*this, finder_base::DUMMY_TAG}}
+	, m_adb_connector{{*this, "adb1"}, {*this, finder_base::DUMMY_TAG}}
 #endif
 {
 }

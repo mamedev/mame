@@ -79,6 +79,8 @@ protected:
 	virtual const inline bool ch_mulaw(C140_VOICE *v) { return BIT(v->mode, 3); }
 	// bit 6 used, unknown
 
+	u8 keyon_status_read(u16 offset);
+
 	TIMER_CALLBACK_MEMBER(int1_on);
 
 	devcb_write_line m_int1_callback;

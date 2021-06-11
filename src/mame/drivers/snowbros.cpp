@@ -664,6 +664,23 @@ static INPUT_PORTS_START( snowbroj )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ballboy3p )
+	PORT_INCLUDE(snowbros)
+
+	PORT_MODIFY("DSW1") // on the PCB in place of the dips there's the plug for the controls of the 3rd player
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( honeydol )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )
@@ -2766,6 +2783,27 @@ ROM_START( ballboy )
 ROM_END
 
 
+ROM_START( ballboy3p ) //PCB etched JOYCUS1B and 2001927
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "ur4",  0x00000, 0x20000, CRC(32153d8f) SHA1(1fa698b93507fb775dfff6da8701ab65c986cac5) )
+	ROM_LOAD16_BYTE( "ur3",  0x00001, 0x20000, CRC(4d462a75) SHA1(30a84a618bea5c64201329d02847382c2d0c84ba) )
+
+	// the sound is driven by an MCU
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "sound.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "ua5",        0x000000, 0x80000, CRC(fc72011f) SHA1(f1f10b34fd3365c6542299bd0224dad926d650b4) )   // 16x16 tiles
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // 16x16 BG Tiles
+	ROM_LOAD( "un7",        0x000000, 0x400000, CRC(fe427e9d) SHA1(6932ad18b6807af860f8430e2a00e959d6c36a23) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    // OKIM6295 samples
+	ROM_LOAD( "us5",     0x00000, 0x20000, CRC(7c6368ef) SHA1(53393c570c605f7582b61c630980041e2ed32e2d) ) // only ROM identical to the 2 player version
+	ROM_CONTINUE(0x80000,0x60000)
+ROM_END
+
+
 /*
 
 Information from Korean arcade gaming magazine
@@ -2912,6 +2950,13 @@ void snowbros_state::init_snowbro3()
 	save_item(NAME(m_sb3_music));
 }
 
+void snowbros_state::init_ballboy3p()
+{
+	init_snowbro3();
+
+	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x400001); // unmap flipscreen as the DSW has been removed in favor of the controls for the 3rd player
+}
+
 uint16_t snowbros_state::_3in1_read()
 {
 	return 0x000a;
@@ -3028,9 +3073,9 @@ GAME( 1996, multi96,    twinadv,  twinadv,     twinadv,  snowbros_state, empty_i
 // The Korean games database shows an earlier version of this called Ball Boy with a different title screen to the version of Ball Boy we have
 // http://mamedev.emulab.it/undumped/images/Ballboy.jpg
 // it is possible this 'ball boy' is the original bootleg, with snwobro3 being a hack of that, and the ballboy set we have a further hack of that
-// there is also a later 2004 version with 3 player support
 // these use an MCU to drive the sound
-GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
-GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj, snowbros_state, init_snowbro3, ROT0, "bootleg", "Ball Boy", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj,  snowbros_state, init_snowbro3,  ROT0, "Syrmex",  "Snow Brothers 3 - Magical Adventure", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj,  snowbros_state, init_snowbro3,  ROT0, "bootleg", "Ball Boy (2 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, ballboy3p,  snowbro3, snowbro3,    ballboy3p, snowbros_state, init_ballboy3p, ROT0, "bootleg", "Ball Boy (3 players)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // protection appears to handle the sound, should check if it's just a block of code that is conditionally executed like some of the Semicom titles.
-GAME( 1999, yutnori,    0,        yutnori,     yutnori,  snowbros_state, init_yutnori,  ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
+GAME( 1999, yutnori,    0,        yutnori,     yutnori,   snowbros_state, init_yutnori,   ROT0, "Nunal",   "Puzzle Yutnori (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer

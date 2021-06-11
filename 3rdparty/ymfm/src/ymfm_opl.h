@@ -36,6 +36,7 @@
 #include "ymfm.h"
 #include "ymfm_adpcm.h"
 #include "ymfm_fm.h"
+#include "ymfm_pcm.h"
 
 namespace ymfm
 {
@@ -170,7 +171,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// OPL4 apparently can read back FM registers?
-	uint8_t read(uint16_t index) { return m_regdata[index]; }
+	uint8_t read(uint16_t index) const { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
@@ -374,6 +375,9 @@ public:
 	// return an array of operator indices for each channel
 	struct operator_mapping { uint32_t chan[CHANNELS]; };
 	void operator_map(operator_mapping &dest) const;
+
+	// read a register value
+	uint8_t read(uint16_t index) const { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
@@ -673,22 +677,19 @@ protected:
 };
 
 
+// ======================> ymf289b
 
-//*********************************************************
-//  OPL4 IMPLEMENTATION CLASSES
-//*********************************************************
-
-// ======================> ymf278b
-
-class ymf278b
+class ymf289b
 {
+	static constexpr uint8_t STATUS_BUSY_FLAGS = 0x05;
+
 public:
-	using fm_engine = fm_engine_base<opl4_registers>;
+	using fm_engine = fm_engine_base<opl3_registers>;
 	using output_data = fm_engine::output_data;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t OUTPUTS = 2;
 
 	// constructor
-	ymf278b(ymfm_interface &intf);
+	ymf289b(ymfm_interface &intf);
 
 	// reset
 	void reset();
@@ -702,6 +703,7 @@ public:
 
 	// read access
 	uint8_t read_status();
+	uint8_t read_data();
 	uint8_t read(uint32_t offset);
 
 	// write access
@@ -714,9 +716,80 @@ public:
 	void generate(output_data *output, uint32_t numsamples = 1);
 
 protected:
+	// internal helpers
+	bool ymf289b_mode() { return ((m_fm.regs().read(0x105) & 0x04) != 0); }
+
 	// internal state
 	uint16_t m_address;              // address register
 	fm_engine m_fm;                  // core FM engine
+};
+
+
+
+//*********************************************************
+//  OPL4 IMPLEMENTATION CLASSES
+//*********************************************************
+
+// ======================> ymf278b
+
+class ymf278b
+{
+	// Using the nominal datasheet frequency of 33.868MHz, the output of the
+	// chip will be clock/768 = 44.1kHz. However, the FM engine is clocked
+	// internally at clock/(19*36), or 49.515kHz, so the FM output needs to
+	// be downsampled. We treat this as needing to clock the FM engine an
+	// extra tick every few samples. The exact ratio is 768/(19*36) or
+	// 768/684 = 192/171. So if we always clock the FM once, we'll have
+	// 192/171 - 1 = 21/171 left. Thus we count 21 for each sample and when
+	// it gets above 171, we tick an extra time.
+	static constexpr uint32_t FM_EXTRA_SAMPLE_THRESH = 171;
+	static constexpr uint32_t FM_EXTRA_SAMPLE_STEP = 192 - FM_EXTRA_SAMPLE_THRESH;
+
+public:
+	using fm_engine = fm_engine_base<opl4_registers>;
+	static constexpr uint32_t OUTPUTS = 6;
+	using output_data = ymfm_output<OUTPUTS>;
+
+	static constexpr uint8_t STATUS_BUSY = 0x01;
+	static constexpr uint8_t STATUS_LD = 0x02;
+
+	// constructor
+	ymf278b(ymfm_interface &intf);
+
+	// reset
+	void reset();
+
+	// save/restore
+	void save_restore(ymfm_saved_state &state);
+
+	// pass-through helpers
+	uint32_t sample_rate(uint32_t input_clock) const { return input_clock / 768; }
+	void invalidate_caches() { m_fm.invalidate_caches(); }
+
+	// read access
+	uint8_t read_status();
+	uint8_t read_data_pcm();
+	uint8_t read(uint32_t offset);
+
+	// write access
+	void write_address(uint8_t data);
+	void write_data(uint8_t data);
+	void write_address_hi(uint8_t data);
+	void write_address_pcm(uint8_t data);
+	void write_data_pcm(uint8_t data);
+	void write(uint32_t offset, uint8_t data);
+
+	// generate samples of sound
+	void generate(output_data *output, uint32_t numsamples = 1);
+
+protected:
+	// internal state
+	uint16_t m_address;              // address register
+	uint32_t m_fm_pos;               // FM resampling position
+	uint32_t m_load_remaining;       // how many more samples until LD flag clears
+	bool m_next_status_id;           // flag to track which status ID to return
+	fm_engine m_fm;                  // core FM engine
+	pcm_engine m_pcm;                // core PCM engine
 };
 
 

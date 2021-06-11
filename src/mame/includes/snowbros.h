@@ -44,6 +44,7 @@ public:
 
 	void init_pzlbreak();
 	void init_snowbro3();
+	void init_ballboy3p();
 	void init_cookbib3();
 	void init_4in1boot();
 	void init_3in1semi();

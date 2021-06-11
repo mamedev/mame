@@ -1130,7 +1130,7 @@ void atari_slapstic_device::alt_select_111_118::test(offs_t addr) const
 atari_slapstic_device::alt_commit::alt_commit(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
 {
 	m_reset  = check.test_reset();
-	m_commit = check.test_any(data->alt4);
+	m_commit = check.test_in(data->alt4);
 }
 
 void atari_slapstic_device::alt_commit::test(offs_t addr) const

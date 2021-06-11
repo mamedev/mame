@@ -68,12 +68,14 @@ public:
 	u8 data_state() { return m_data; }
 	int nmi_state() { return m_nmi; }
 	int ack_state() { return m_ack; }
+	int pw_state() { return m_pw; }
 
 	// called from host
 	u8 data_r();
 	void data_w(u8 data);
 	void nmi_w(int state);
 	void ack_w(int state);
+	void pw_w(int state);
 
 protected:
 	// device-level overrides
@@ -90,6 +92,7 @@ private:
 	u8 m_data = 0;
 	int m_nmi = 0;
 	int m_ack = 0;
+	int m_pw = 0;
 
 	device_saitekosa_expansion_interface *m_module;
 };
@@ -106,6 +109,7 @@ public:
 	virtual void data_w(u8 data) { }
 	virtual void nmi_w(int state) { }
 	virtual void ack_w(int state) { }
+	virtual void pw_w(int state) { }
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return UPDATE_HAS_NOT_CHANGED; }
 

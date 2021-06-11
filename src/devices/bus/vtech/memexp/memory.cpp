@@ -25,12 +25,21 @@ DEFINE_DEVICE_TYPE(VTECH_LASER_64K,    vtech_laser_64k_device,    "vtech_laser_6
 //**************************************************************************
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_laser110_16k_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x8000, 0xbfff).ram();
+}
+
+//-------------------------------------------------
 //  laser110_16k_device - constructor
 //-------------------------------------------------
 
 vtech_laser110_16k_device::vtech_laser110_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_LASER110_16K, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this)
+	vtech_memexp_device(mconfig, VTECH_LASER110_16K, tag, owner, clock)
 {
 }
 
@@ -40,16 +49,7 @@ vtech_laser110_16k_device::vtech_laser110_16k_device(const machine_config &mconf
 
 void vtech_laser110_16k_device::device_start()
 {
-	m_ram.resize(16 * 1024);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_laser110_16k_device::device_reset()
-{
-	program_space().install_ram(0x8000, 0xbfff, &m_ram[0]);
+	vtech_memexp_device::device_start();
 }
 
 
@@ -58,12 +58,21 @@ void vtech_laser110_16k_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_laser210_16k_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x9000, 0xcfff).ram();
+}
+
+//-------------------------------------------------
 //  vtech_laser210_16k_device - constructor
 //-------------------------------------------------
 
 vtech_laser210_16k_device::vtech_laser210_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_LASER210_16K, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this)
+	vtech_memexp_device(mconfig, VTECH_LASER210_16K, tag, owner, clock)
 {
 }
 
@@ -73,16 +82,7 @@ vtech_laser210_16k_device::vtech_laser210_16k_device(const machine_config &mconf
 
 void vtech_laser210_16k_device::device_start()
 {
-	m_ram.resize(16 * 1024);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_laser210_16k_device::device_reset()
-{
-	program_space().install_ram(0x9000, 0xcfff, &m_ram[0]);
+	vtech_memexp_device::device_start();
 }
 
 
@@ -91,12 +91,21 @@ void vtech_laser210_16k_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_laser310_16k_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xb800, 0xf7ff).ram();
+}
+
+//-------------------------------------------------
 //  vtech_laser310_16k_device - constructor
 //-------------------------------------------------
 
 vtech_laser310_16k_device::vtech_laser310_16k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_LASER310_16K, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this)
+	vtech_memexp_device(mconfig, VTECH_LASER310_16K, tag, owner, clock)
 {
 }
 
@@ -106,16 +115,7 @@ vtech_laser310_16k_device::vtech_laser310_16k_device(const machine_config &mconf
 
 void vtech_laser310_16k_device::device_start()
 {
-	m_ram.resize(16 * 1024);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_laser310_16k_device::device_reset()
-{
-	program_space().install_ram(0xb800, 0xf7ff, &m_ram[0]);
+	vtech_memexp_device::device_start();
 }
 
 
@@ -124,12 +124,33 @@ void vtech_laser310_16k_device::device_reset()
 //**************************************************************************
 
 //-------------------------------------------------
+//  mem_map - memory space address map
+//-------------------------------------------------
+
+void vtech_laser_64k_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x8000, 0xbfff).bankrw(m_fixed_bank);
+	map(0xc000, 0xffff).bankrw(m_bank);
+}
+
+//-------------------------------------------------
+//  io_map - memory space address map
+//-------------------------------------------------
+
+void vtech_laser_64k_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x70, 0x70).mirror(0x0f).lw8(NAME([this] (uint8_t data) { m_bank->set_entry(data & 0x03); }));
+}
+
+//-------------------------------------------------
 //  vtech_laser_64k_device - constructor
 //-------------------------------------------------
 
 vtech_laser_64k_device::vtech_laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VTECH_LASER_64K, tag, owner, clock),
-	device_vtech_memexp_interface(mconfig, *this),
+	vtech_memexp_device(mconfig, VTECH_LASER_64K, tag, owner, clock),
+	m_fixed_bank(*this, "fixed_bank"),
 	m_bank(*this, "bank")
 {
 }
@@ -140,29 +161,17 @@ vtech_laser_64k_device::vtech_laser_64k_device(const machine_config &mconfig, co
 
 void vtech_laser_64k_device::device_start()
 {
-	m_ram.resize(64 * 1024);
-}
+	vtech_memexp_device::device_start();
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
+	// init ram
+	m_ram = std::make_unique<uint8_t[]>(0x10000);
 
-void vtech_laser_64k_device::device_reset()
-{
-	// fixed first bank
-	program_space().install_ram(0x8000, 0xbfff, &m_ram[0]);
+	// configure banking
+	m_fixed_bank->set_base(m_ram.get());
 
-	// other banks
-	program_space().install_readwrite_bank(0xc000, 0xffff, m_bank);
-
-	m_bank->configure_entries(0, 4, &m_ram[0], 0x4000);
+	m_bank->configure_entries(0, 4, m_ram.get(), 0x4000);
 	m_bank->set_entry(1);
 
-	// bank switch
-	io_space().install_write_handler(0x70, 0x7f, write8smo_delegate(*this, FUNC(vtech_laser_64k_device::bankswitch_w)));
-}
-
-void vtech_laser_64k_device::bankswitch_w(uint8_t data)
-{
-	m_bank->set_entry(data & 0x03);
+	// register for savestates
+	save_pointer(NAME(m_ram), 0x10000);
 }

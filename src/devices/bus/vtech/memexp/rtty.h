@@ -20,20 +20,22 @@
 
 // ======================> vtech_rtty_interface_device
 
-class vtech_rtty_interface_device : public device_t, public device_vtech_memexp_interface
+class vtech_rtty_interface_device : public vtech_memexp_device
 {
 public:
 	// construction/destruction
 	vtech_rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t receive_data_r();
-	void transmit_data_w(uint8_t data);
-	void relay_w(uint8_t data);
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
+
+	virtual void mem_map(address_map &map) override;
+
+private:
+	uint8_t receive_data_r();
+	void transmit_data_w(uint8_t data);
+	void relay_w(uint8_t data);
 };
 
 // device type definition

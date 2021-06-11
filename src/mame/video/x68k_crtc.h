@@ -39,6 +39,7 @@ public:
 	u16 yscr_gfx(int page) const { return m_reg[13 + page * 2]; }
 	u8 vfactor() const { return (m_reg[20] & 0x0c) >> 2; }
 	bool is_1024x1024() const { return BIT(m_reg[20], 10); }
+	bool gfx_double_scan() const { return (m_reg[20] & 0x1e) == 0x10; }
 	bool gfx_layer_buffer() const { return BIT(m_reg[20], 11); }
 	bool text_layer_buffer() const { return BIT(m_reg[20], 12); }
 	u16 hbegin() const { return m_hbegin; }

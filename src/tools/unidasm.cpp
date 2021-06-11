@@ -98,6 +98,7 @@ using util::BIT;
 #include "cpu/m68000/m68kdasm.h"
 #include "cpu/m6805/6805dasm.h"
 #include "cpu/m6809/6x09dasm.h"
+#include "cpu/m68hc16/cpu16dasm.h"
 #include "cpu/m88000/m88000d.h"
 #include "cpu/mb86233/mb86233d.h"
 #include "cpu/mb86235/mb86235d.h"
@@ -396,6 +397,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cop444",          le,  0, []() -> util::disasm_interface * { return new cop444_disassembler; } },
 	{ "cop424",          le,  0, []() -> util::disasm_interface * { return new cop424_disassembler; } },
 	{ "cp1610",          be, -1, []() -> util::disasm_interface * { return new cp1610_disassembler; } },
+	{ "cpu16",           be,  0, []() -> util::disasm_interface * { return new cpu16_disassembler; } },
 	{ "cr16a",           le,  0, []() -> util::disasm_interface * { return new cr16a_disassembler; } },
 	{ "cr16b",           le,  0, []() -> util::disasm_interface * { return new cr16b_disassembler; } },
 	{ "cr16c",           le,  0, []() -> util::disasm_interface * { return new cr16c_disassembler; } },

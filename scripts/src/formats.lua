@@ -1991,6 +1991,30 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/vt_dsk.h,FORMATS["VT_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "VT_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/vt_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/vt_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_vtech.h,FORMATS["FS_VTECH"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_VTECH") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_vtech.cpp",
+		MAME_DIR.. "src/lib/formats/fs_vtech.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/wd177x_dsk.h,FORMATS["WD177X_DSK"] = true
 --------------------------------------------------
 

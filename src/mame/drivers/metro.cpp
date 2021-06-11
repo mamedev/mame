@@ -102,7 +102,6 @@ driver modified by Hau
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
 #include "sound/ymopn.h"
-#include "sound/ymf278b.h"
 #include "speaker.h"
 
 #include <algorithm>

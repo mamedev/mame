@@ -71,7 +71,7 @@ void saitekosa_expansion_device::device_add_mconfig(machine_config &config)
 	// optional embedded screen
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_size(100, 100);
+	screen.set_size(99, 16);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(saitekosa_expansion_device::screen_update));
 }
@@ -114,6 +114,16 @@ void saitekosa_expansion_device::ack_w(int state)
 		m_module->ack_w(state);
 
 	m_ack = state;
+}
+
+void saitekosa_expansion_device::pw_w(int state)
+{
+	state = (state) ? 1 : 0;
+
+	if (m_module)
+		m_module->pw_w(state);
+
+	m_pw = state;
 }
 
 u32 saitekosa_expansion_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

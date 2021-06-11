@@ -1295,6 +1295,8 @@ void mac128_state::macsefd(machine_config &config)
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
+
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }
 
 void mac128_state::macclasc(machine_config &config)

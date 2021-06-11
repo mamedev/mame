@@ -1,0 +1,1040 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<!-- container boxes for top sections -->
+	<element name="box-174">
+		<rect>
+			<bounds left="0" top="0" right="174" bottom="450" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="170" bottom="446" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-237">
+		<rect>
+			<bounds left="0" top="0" right="237" bottom="450" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="233" bottom="446" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-382">
+		<rect>
+			<bounds left="0" top="0" right="398" bottom="450" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="394" bottom="446" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+	<element name="box-398">
+		<rect>
+			<bounds left="0" top="0" right="398" bottom="450" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds left="4" top="0" right="394" bottom="446" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<!-- logo substitutes -->
+	<element name="yamaha"><text string="YAMAHA" align="0" /></element>
+	<element name="psr70"><text string="PSR-70" align="0" /></element>
+
+	<!-- slider labels -->
+	<element name="slidermin"><text string="MIN" align="1" /></element>
+	<element name="slidermax"><text string="MAX" align="2" /></element>
+	<element name="slideroff"><text string="OFF" align="1" /></element>
+	<element name="slideron"><text string="ON" align="2" /></element>
+	<element name="sliderslow"><text string="SLOW" align="1" /></element>
+	<element name="sliderfast"><text string="FAST" align="2" /></element>
+
+	<!-- power section text -->
+	<element name="power"><text string="POWER" align="0" /></element>
+	<element name="mastervolume"><text string="MASTER VOLUME" align="0" /></element>
+
+	<!-- pitch section text -->
+	<element name="pitch"><text string="PITCH" align="1" /></element>
+	<element name="transposer"><text string="TRANSPOSER" align="1" /></element>
+	<element name="uparrow"><text string="▲" align="1" /></element>
+	<element name="downarrow"><text string="▼" align="1" /></element>
+
+	<!-- auto bass chord section text -->
+	<element name="autobasschord"><text string="AUTO BASS CHORD" align="1" /></element>
+	<element name="off"><text string="OFF" align="1" /></element>
+	<element name="singlefinger"><text string="SINGLE FINGER" align="1" /></element>
+	<element name="fingered"><text string="FINGERED" align="1" /></element>
+	<element name="memory"><text string="MEMORY" align="1" /></element>
+	<element name="chordvolume"><text string="CHORD VOLUME" align="0" /></element>
+	<element name="bassvolume"><text string="BASS VOLUME" align="0" /></element>
+
+	<!-- rhythm section text -->
+	<element name="rhythm"><text string="RHYTHM" align="1" /></element>
+	<element name="handclap"><text string="HAND CLAP" align="1" /></element>
+	<element name="custom"><text string="CUSTOM" align="1" /></element>
+	<element name="one"><text string="1" align="1" /></element>
+	<element name="two"><text string="2" align="1" /></element>
+	<element name="three"><text string="3" align="1" /></element>
+	<element name="bigband"><text string="BIG BAND" align="2" /></element>
+	<element name="swing"><text string="SWING" align="1" /></element>
+	<element name="reggae"><text string="REGGAE" align="2" /></element>
+	<element name="slow"><text string="SLOW" align="1" /></element>
+	<element name="rock"><text string="ROCK" align="1" /></element>
+	<element name="disco"><text string="DISCO" align="2" /></element>
+	<element name="heavy"><text string="HEAVY" align="1" /></element>
+	<element name="metal"><text string="METAL" align="1" /></element>
+	<element name="pops"><text string="POPS" align="2" /></element>
+	<element name="16beat"><text string="16 BEAT" align="1" /></element>
+	<element name="rocknroll"><text string="ROCK'N'ROLL" align="2" /></element>
+	<element name="country"><text string="COUNTRY" align="1" /></element>
+	<element name="salsa"><text string="SALSA" align="2" /></element>
+	<element name="rhumba"><text string="RHUMBA" align="1" /></element>
+	<element name="samba"><text string="SAMBA" align="2" /></element>
+	<element name="bossanova"><text string="BOSSANOVA" align="1" /></element>
+	<element name="variation"><text string="VARIATION" align="1" /></element>
+	<element name="marchpolka"><text string="MARCH/POLKA" align="2" /></element>
+	<element name="waltz"><text string="WALTZ" align="1" /></element>
+	<element name="volume"><text string="VOLUME" align="0" /></element>
+	<element name="tempo"><text string="TEMPO" align="0" /></element>
+
+	<!-- custom accompaniment section text -->
+	<element name="accompaniment"><text string="ACCOMPANIMENT" align="1" /></element>
+	<element name="program"><text string="PROGRAM" align="1" /></element>
+	<element name="clear"><text string="CLEAR" align="1" /></element>
+
+	<!-- orchestra section text -->
+	<element name="orchestra"><text string="ORCHESTRA" align="1" /></element>
+	<element name="tolower"><text string="TO LOWER" align="1" /></element>
+	<element name="duet"><text string="DUET" align="1" /></element>
+	<element name="trio"><text string="TRIO" align="1" /></element>
+	<element name="sustain1"><text string="SUSTAIN 1" align="1" /></element>
+	<element name="sustain2"><text string="SUSTAIN 2" align="1" /></element>
+	<element name="stereo"><text string="STEREO" align="1" /></element>
+	<element name="symphonic"><text string="SYMPHONIC" align="1" /></element>
+	<element name="jazzorgan"><text string="JAZZ ORGAN" align="2" /></element>
+	<element name="piano"><text string="PIANO" align="1" /></element>
+	<element name="pipeorgan"><text string="PIPE ORGAN" align="2" /></element>
+	<element name="electric"><text string="ELECTRIC" align="1" /></element>
+	<element name="strings"><text string="STRINGS" align="2" /></element>
+	<element name="harpsi"><text string="HARPSI-" align="1" /></element>
+	<element name="chord"><text string="CHORD" align="1" /></element>
+	<element name="brass"><text string="BRASS" align="2" /></element>
+	<element name="oner"><text string="1" align="2" /></element>
+	<element name="vibes"><text string="VIBES" align="1" /></element>
+	<element name="twor"><text string="2" align="2" /></element>
+	<element name="jazz"><text string="JAZZ" align="1" /></element>
+	<element name="jazzflute"><text string="JAZZ FLUTE" align="2" /></element>
+	<element name="electricguitar"><text string="ELECTRIC GUITAR" align="1" /></element>
+	<element name="guitar"><text string="GUITAR" align="1" /></element>
+	<element name="brassand"><text string="BRASS&amp;" align="2" /></element>
+	<element name="chimes"><text string="CHIMES" align="2" /></element>
+	<element name="hawaiian"><text string="HAWAIIAN" align="1" /></element>
+	<element name="clarinet"><text string="CLARINET" align="2" /></element>
+	<element name="music"><text string="MUSIC" align="1" /></element>
+	<element name="box"><text string="BOX" align="1" /></element>
+	<element name="calliope"><text string="CALLIOPE" align="2" /></element>
+	<element name="cosmic"><text string="COSMIC" align="1" /></element>
+	<element name="on"><text string="ON" align="1" /></element>
+
+	<!-- solo section text -->
+	<element name="solo"><text string="SOLO" align="1" /></element>
+	<element name="sustain"><text string="SUSTAIN" align="1" /></element>
+	<element name="flute"><text string="FLUTE" align="1" /></element>
+	<element name="piccolo"><text string="PICCOLO" align="2" /></element>
+	<element name="percuss"><text string="PERCUSS" align="1" /></element>
+	<element name="violin"><text string="VIOLIN" align="2" /></element>
+	<element name="trumpet"><text string="TRUMPET" align="2" /></element>
+	<element name="popsynth"><text string="POPSYNTH" align="1" /></element>
+	<element name="trombone"><text string="TROMBONE" align="2" /></element>
+	<element name="bluessynth"><text string="BLUESSYNTH" align="1" /></element>
+	<element name="horn"><text string="HORN" align="2" /></element>
+	<element name="funksynth"><text string="FUNKSYNTH" align="1" /></element>
+	<element name="saxophone"><text string="SAXOPHONE" align="2" /></element>
+	<element name="slapsynth"><text string="SLAPSYNTH" align="1" /></element>
+	<element name="oboe"><text string="OBOE" align="2" /></element>
+	<element name="bass"><text string="BASS" align="1" /></element>
+
+	<!-- music programmer section text -->
+	<element name="musicprogrammer"><text string="MUSIC PROGRAMMER" align="1" /></element>
+	<element name="record"><text string="RECORD" align="1" /></element>
+	<element name="playback"><text string="PLAY BACK" align="1" /></element>
+	<element name="pause"><text string="PAUSE" align="1" /></element>
+	<element name="chordbass"><text string="CHORD/BASS" align="1" /></element>
+	<element name="offc"><text string="OFF" align="0" /></element>
+
+	<!-- tape section text -->
+	<element name="tape"><text string="TAPE" align="1" /></element>
+	<element name="save"><text string="SAVE" align="1" /></element>
+	<element name="load"><text string="LOAD" align="1" /></element>
+
+	<!-- above keys text -->
+	<element name="keysplit"><text string="KEY SPLIT" align="1" /></element>
+	<element name="midimode"><text string="MIDI MODE" align="1" /></element>
+	<element name="keyboardpercussion"><text string="KEYBOARD PERCUSSION" align="1" /></element>
+	<element name="fillin"><text string="FILL IN" align="2" /></element>
+	<element name="synchrostart"><text string="SYNCHRO START" align="2" /></element>
+	<element name="start"><text string="START" align="1" /></element>
+	<element name="stop"><text string="STOP" align="2" /></element>
+	<element name="introending"><text string="INTRO/ENDING" align="1" /></element>
+	<element name="registrationmemory"><text string="REGISTRATION MEMORY" align="2" /></element>
+	<element name="programr"><text string="PROGRAM" align="2" /></element>
+
+	<!-- button primitives -->
+	<element name="button-grey" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.67" green="0.65" blue="0.65" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.83" green="0.83" blue="0.83" /></rect>
+	</element>
+	<element name="button-cyan" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.70" green="0.97" blue="0.96" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.85" green="0.99" blue="0.98" /></rect>
+	</element>
+	<element name="button-yellow" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.95" green="0.85" blue="0.58" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.98" green="0.93" blue="0.79" /></rect>
+	</element>
+	<element name="button-green" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.66" green="0.92" blue="0.78" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.83" green="0.96" blue="0.89" /></rect>
+	</element>
+	<element name="button-white" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.4" green="0.4" blue="0.4" /></rect>
+	</element>
+	<element name="button-pink" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.93" green="0.85" blue="0.87" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.96" green="0.92" blue="0.93" /></rect>
+	</element>
+	<element name="button-red" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.83" green="0.21" blue="0.19" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.91" green="0.60" blue="0.59" /></rect>
+	</element>
+	<element name="button-orange" defstate="0">
+		<rect><bounds x="0" y="0" width="40" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="36" height="11" /><color red="0.98" green="0.77" blue="0.65" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="36" height="11" /><color red="0.99" green="0.88" blue="0.82" /></rect>
+	</element>
+
+	<element name="button-wide-blue" defstate="0">
+		<rect><bounds x="0" y="0" width="106" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="102" height="11" /><color red="0.68" green="0.74" blue="0.86" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="102" height="11" /><color red="0.84" green="0.87" blue="0.93" /></rect>
+	</element>
+	<element name="button-wide-red" defstate="0">
+		<rect><bounds x="0" y="0" width="106" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="102" height="11" /><color red="0.83" green="0.21" blue="0.19" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="102" height="11" /><color red="0.91" green="0.60" blue="0.59" /></rect>
+	</element>
+	<element name="button-wide-orange" defstate="0">
+		<rect><bounds x="0" y="0" width="106" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="102" height="11" /><color red="0.98" green="0.77" blue="0.65" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="102" height="11" /><color red="0.99" green="0.88" blue="0.82" /></rect>
+	</element>
+	<element name="button-wide-yellow" defstate="0">
+		<rect><bounds x="0" y="0" width="106" height="15" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="2" y="2" width="102" height="11" /><color red="0.95" green="0.85" blue="0.58" /></rect>
+		<rect state="1"><bounds x="2" y="2" width="102" height="11" /><color red="0.98" green="0.93" blue="0.79" /></rect>
+	</element>
+
+	<!-- slider primitives -->
+	<element name="slider">
+		<rect><bounds x="0" y="0" width="116" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="112" height="18" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+	</element>
+	<element name="slider-tempo">
+		<rect><bounds x="0" y="0" width="152" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="148" height="18" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+	</element>
+	<element name="slider-bar-grey">
+		<rect><bounds x="0" y="0" width="40" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="36" height="18" /><color red="0.67" green="0.65" blue="0.65" /></rect>
+		<rect><bounds x="18" y="2" width="5" height="18" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-red">
+		<rect><bounds x="0" y="0" width="40" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="36" height="18" /><color red="0.83" green="0.21" blue="0.19" /></rect>
+		<rect><bounds x="18" y="2" width="5" height="18" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-cyan">
+		<rect><bounds x="0" y="0" width="40" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="36" height="18" /><color red="0.70" green="0.97" blue="0.96" /></rect>
+		<rect><bounds x="18" y="2" width="5" height="18" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-yellow">
+		<rect><bounds x="0" y="0" width="40" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="36" height="18" /><color red="0.95" green="0.85" blue="0.58" /></rect>
+		<rect><bounds x="18" y="2" width="5" height="18" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+	<element name="slider-bar-green">
+		<rect><bounds x="0" y="0" width="40" height="22" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="2" y="2" width="36" height="18" /><color red="0.66" green="0.92" blue="0.78" /></rect>
+		<rect><bounds x="18" y="2" width="5" height="18" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+	</element>
+
+	<!-- LED primitives -->
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
+	</element>
+	<element name="splitled" defstate="0">
+		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
+		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
+	</element>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="324" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- top box area -->
+	<element name="top-box">
+		<rect><bounds x="669" y="37" width="1966" height="103" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect><bounds x="671" y="39" width="1962" height="99" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+	</element>
+
+	<!-- speaker grill -->
+	<element name="speaker">
+		<rect><bounds x="0" y="0" width="630" height="555" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<disk><bounds x="60" y="11" width="510" height="510" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="2" y="2" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="25" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="48" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="71" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="94" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="117" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="140" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="163" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="186" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="209" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="232" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="255" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="278" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="301" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="324" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="347" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="370" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="393" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="416" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="439" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="462" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="485" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="508" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect><bounds x="2" y="531" width="626" height="21" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+	</element>
+
+	<!-- pitch group -->
+	<group name="group-pitch">
+		<element ref="box-174"><bounds x="669" y="142" width="174" height="450" /></element>
+		<element ref="pitch"><bounds x="699" y="166" width="138" height="14" /></element>
+
+		<element ref="button-grey" inputtag="DRVIF_1" inputmask="0x80"><bounds x="700" y="205" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_1_DP1"><bounds x="743" y="206" width="12" height="12" /></element>
+		<element ref="uparrow"><bounds x="761" y="203" width="60" height="14" /></element>
+
+		<element ref="button-grey" inputtag="DRVIF_1" inputmask="0x40"><bounds x="700" y="245" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_1_DP2"><bounds x="743" y="246" width="12" height="12" /></element>
+		<element ref="downarrow"><bounds x="761" y="243" width="60" height="14" /></element>
+
+		<element ref="transposer"><bounds x="699" y="324" width="138" height="14" /></element>
+
+		<element ref="button-grey" inputtag="DRVIF_1" inputmask="0x20"><bounds x="700" y="363" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_1_DP3"><bounds x="743" y="363" width="12" height="12" /></element>
+		<element ref="uparrow"><bounds x="761" y="361" width="60" height="14" /></element>
+
+		<element ref="button-grey" inputtag="DRVIF_1" inputmask="0x10"><bounds x="700" y="403" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_1_DP4"><bounds x="743" y="403" width="12" height="12" /></element>
+		<element ref="downarrow"><bounds x="761" y="401" width="60" height="14" /></element>
+
+		<element ref="slidermin"><bounds x="689" y="468" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="689" y="468" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="699" y="480" width="116" height="22" /></element>
+		<element ref="slider-bar-grey">
+			<animate inputtag="MASTERVOL" mask="0xff" />
+			<bounds state="0" x="699" y="480" width="40" height="23" />
+			<bounds state="100" x="775" y="480" width="40" height="23" />
+		</element>
+		<element ref="mastervolume"><bounds x="699" y="504" width="139" height="13" /></element>
+
+		<element ref="slideroff"><bounds x="719" y="522" width="76" height="13" /></element>
+		<element ref="slideron"><bounds x="719" y="522" width="76" height="13" /></element>
+		<element ref="slider"><bounds x="699" y="534" width="116" height="22" /></element>
+		<element ref="slider-bar-red"><bounds x="755" y="534" width="40" height="23" /></element>
+		<element ref="power"><bounds x="699" y="558" width="116" height="13" /></element>
+		<element ref="led" name="DRVIF_0_DP4"><bounds x="820" y="539" width="12" height="12" /></element>
+	</group>
+
+	<!-- auto bass chord group -->
+	<group name="group-autobasschord">
+		<element ref="box-174"><bounds x="848" y="142" width="174" height="450" /></element>
+		<element ref="autobasschord"><bounds x="878" y="166" width="138" height="14" /></element>
+
+		<element ref="button-cyan" inputtag="DRVIF_2" inputmask="0x80"><bounds x="879" y="245" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_2_DP1"><bounds x="922" y="246" width="12" height="12" /></element>
+		<element ref="memory"><bounds x="940" y="244" width="65" height="13" /></element>
+
+		<element ref="button-cyan" inputtag="DRVIF_2" inputmask="0x40"><bounds x="879" y="320" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_2_DP2"><bounds x="922" y="321" width="12" height="12" /></element>
+		<element ref="fingered"><bounds x="940" y="319" width="65" height="13" /></element>
+
+		<element ref="button-cyan" inputtag="DRVIF_2" inputmask="0x20"><bounds x="879" y="363" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_2_DP3"><bounds x="922" y="364" width="12" height="12" /></element>
+		<element ref="singlefinger"><bounds x="940" y="362" width="65" height="13" /></element>
+
+		<element ref="button-cyan" inputtag="DRVIF_2" inputmask="0x10"><bounds x="879" y="403" width="40" height="15" /></element>
+		<element ref="off"><bounds x="940" y="402" width="65" height="13" /></element>
+
+		<element ref="slidermin"><bounds x="868" y="468" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="868" y="468" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="878" y="480" width="116" height="22" /></element>
+		<element ref="slider-bar-cyan">
+			<animate inputtag="RYP4_6" mask="0xff" />
+			<bounds state="0" x="878" y="480" width="40" height="23" />
+			<bounds state="100" x="954" y="480" width="40" height="23" />
+		</element>
+		<element ref="bassvolume"><bounds x="878" y="504" width="139" height="13" /></element>
+
+		<element ref="slidermin"><bounds x="868" y="522" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="868" y="522" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="878" y="534" width="116" height="22" /></element>
+		<element ref="slider-bar-cyan">
+			<animate inputtag="RYP4_5" mask="0xff" />
+			<bounds state="0" x="878" y="534" width="40" height="23" />
+			<bounds state="100" x="954" y="534" width="40" height="23" />
+		</element>
+		<element ref="chordvolume"><bounds x="878" y="558" width="139" height="13" /></element>
+	</group>
+
+	<!-- rhythm group -->
+	<group name="group-rhythm">
+		<element ref="box-398"><bounds x="1027" y="142" width="398" height="450" /></element>
+		<element ref="rhythm"><bounds x="1052" y="166" width="138" height="14" /></element>
+		<element ref="led" name="DRVIF_3_DP4"><bounds x="1123" y="167" width="12" height="12" /></element>
+		<element ref="led" name="DRVIF_3_DP3"><bounds x="1143" y="167" width="12" height="12" /></element>
+		<element ref="led" name="DRVIF_3_DP2"><bounds x="1163" y="167" width="12" height="12" /></element>
+		<element ref="led" name="DRVIF_3_DP1"><bounds x="1183" y="167" width="12" height="12" /></element>
+
+		<!-- left column -->
+		<element ref="bigband"><bounds x="1033" y="203" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_4_DP4"><bounds x="1119" y="205" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_4" inputmask="0x10"><bounds x="1134" y="204" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_6_DP4"><bounds x="1177" y="205" width="12" height="12" /></element>
+		<element ref="swing"><bounds x="1195" y="203" width="80" height="13" /></element>
+
+		<element ref="reggae"><bounds x="1033" y="242" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_4_DP3"><bounds x="1119" y="244" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_4" inputmask="0x20"><bounds x="1134" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_6_DP3"><bounds x="1177" y="244" width="12" height="12" /></element>
+		<element ref="slow"><bounds x="1195" y="242" width="80" height="13" /></element>
+		<element ref="rock"><bounds x="1195" y="252" width="80" height="13" /></element>
+
+		<element ref="disco"><bounds x="1033" y="281" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_4_DP2"><bounds x="1119" y="283" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_4" inputmask="0x40"><bounds x="1134" y="282" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_6_DP2"><bounds x="1177" y="283" width="12" height="12" /></element>
+		<element ref="heavy"><bounds x="1195" y="281" width="80" height="13" /></element>
+		<element ref="metal"><bounds x="1195" y="291" width="80" height="13" /></element>
+
+		<element ref="pops"><bounds x="1033" y="320" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_4_DP1"><bounds x="1119" y="322" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_4" inputmask="0x80"><bounds x="1134" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_6_DP1"><bounds x="1177" y="322" width="12" height="12" /></element>
+		<element ref="16beat"><bounds x="1195" y="320" width="80" height="13" /></element>
+
+		<element ref="rocknroll"><bounds x="1033" y="359" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_5_DP4"><bounds x="1119" y="361" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_5" inputmask="0x10"><bounds x="1134" y="360" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_7_DP4"><bounds x="1177" y="361" width="12" height="12" /></element>
+		<element ref="country"><bounds x="1195" y="359" width="80" height="13" /></element>
+
+		<element ref="salsa"><bounds x="1033" y="398" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_5_DP3"><bounds x="1119" y="400" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_5" inputmask="0x20"><bounds x="1134" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_7_DP3"><bounds x="1177" y="400" width="12" height="12" /></element>
+		<element ref="rhumba"><bounds x="1195" y="398" width="80" height="13" /></element>
+
+		<element ref="samba"><bounds x="1033" y="437" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_5_DP2"><bounds x="1119" y="439" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_5" inputmask="0x40"><bounds x="1134" y="438" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_7_DP2"><bounds x="1177" y="439" width="12" height="12" /></element>
+		<element ref="bossanova"><bounds x="1195" y="437" width="80" height="13" /></element>
+
+		<element ref="marchpolka"><bounds x="1033" y="476" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_5_DP1"><bounds x="1119" y="478" width="12" height="12" /></element>
+		<element ref="button-yellow" inputtag="DRVIF_5" inputmask="0x80"><bounds x="1134" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_7_DP1"><bounds x="1177" y="478" width="12" height="12" /></element>
+		<element ref="waltz"><bounds x="1195" y="476" width="80" height="13" /></element>
+
+		<!-- right column -->
+		<element ref="button-yellow" inputtag="DRVIF_8" inputmask="0x40"><bounds x="1278" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_8_DP2"><bounds x="1321" y="244" width="12" height="12" /></element>
+		<element ref="variation"><bounds x="1339" y="242" width="65" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_8" inputmask="0x10"><bounds x="1278" y="282" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_8_DP4"><bounds x="1321" y="283" width="12" height="12" /></element>
+		<element ref="handclap"><bounds x="1339" y="281" width="65" height="13" /></element>
+		<element ref="one"><bounds x="1339" y="291" width="65" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_8" inputmask="0x20"><bounds x="1278" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_8_DP3"><bounds x="1321" y="322" width="12" height="12" /></element>
+		<element ref="handclap"><bounds x="1339" y="320" width="65" height="13" /></element>
+		<element ref="two"><bounds x="1339" y="330" width="65" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_9" inputmask="0x10"><bounds x="1278" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_9_DP4"><bounds x="1321" y="400" width="12" height="12" /></element>
+		<element ref="custom"><bounds x="1339" y="398" width="65" height="13" /></element>
+		<element ref="one"><bounds x="1339" y="408" width="65" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_9" inputmask="0x20"><bounds x="1278" y="438" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_9_DP3"><bounds x="1321" y="439" width="12" height="12" /></element>
+		<element ref="custom"><bounds x="1339" y="437" width="65" height="13" /></element>
+		<element ref="two"><bounds x="1339" y="447" width="65" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_9" inputmask="0x40"><bounds x="1278" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_9_DP2"><bounds x="1321" y="478" width="12" height="12" /></element>
+		<element ref="custom"><bounds x="1339" y="476" width="65" height="13" /></element>
+		<element ref="three"><bounds x="1339" y="486" width="65" height="13" /></element>
+
+		<!-- bottom -->
+		<element ref="slidermin"><bounds x="1047" y="522" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="1047" y="522" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="1057" y="534" width="116" height="22" /></element>
+		<element ref="slider-bar-yellow">
+			<animate inputtag="RYP4_3" mask="0xff" />
+			<bounds state="0" x="1057" y="534" width="40" height="23" />
+			<bounds state="100" x="1133" y="534" width="40" height="23" />
+		</element>
+		<element ref="volume"><bounds x="1057" y="558" width="116" height="13" /></element>
+
+		<element ref="sliderslow"><bounds x="1232" y="522" width="172" height="13" /></element>
+		<element ref="sliderfast"><bounds x="1232" y="522" width="172" height="13" /></element>
+		<element ref="slider-tempo"><bounds x="1242" y="534" width="152" height="22" /></element>
+		<element ref="slider-bar-yellow">
+			<animate inputtag="RYP4_4" mask="0xff" />
+			<bounds state="0" x="1242" y="534" width="40" height="23" />
+			<bounds state="100" x="1354" y="534" width="40" height="23" />
+		</element>
+		<element ref="tempo"><bounds x="1242" y="558" width="152" height="13" /></element>
+	</group>
+
+	<!-- custom accompaniment group -->
+	<group name="group-custom">
+		<element ref="box-174"><bounds x="1430" y="142" width="174" height="450" /></element>
+		<element ref="custom"><bounds x="1455" y="166" width="138" height="14" /></element>
+		<element ref="accompaniment"><bounds x="1455" y="178" width="138" height="14" /></element>
+
+		<element ref="button-red" inputtag="DRVIF_10" inputmask="0x80"><bounds x="1460" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_10_DP1"><bounds x="1503" y="244" width="12" height="12" /></element>
+		<element ref="program"><bounds x="1521" y="242" width="65" height="13" /></element>
+
+		<element ref="button-pink" inputtag="DRVIF_10" inputmask="0x40"><bounds x="1460" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_10_DP2"><bounds x="1503" y="322" width="12" height="12" /></element>
+		<element ref="rhythm"><bounds x="1521" y="320" width="65" height="13" /></element>
+
+		<element ref="button-pink" inputtag="DRVIF_10" inputmask="0x20"><bounds x="1460" y="360" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_10_DP3"><bounds x="1503" y="361" width="12" height="12" /></element>
+		<element ref="bass"><bounds x="1521" y="359" width="65" height="13" /></element>
+
+		<element ref="button-pink" inputtag="DRVIF_10" inputmask="0x10"><bounds x="1460" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_10_DP4"><bounds x="1503" y="400" width="12" height="12" /></element>
+		<element ref="chord"><bounds x="1521" y="398" width="65" height="13" /></element>
+
+		<element ref="button-pink" inputtag="DRVIF_7" inputmask="0x10"><bounds x="1460" y="477" width="40" height="15" /></element>
+		<element ref="clear"><bounds x="1521" y="476" width="65" height="13" /></element>
+	</group>
+
+	<!-- orchestra group -->
+	<group name="group-orchestra">
+		<element ref="box-398"><bounds x="1608" y="142" width="398" height="450" /></element>
+		<element ref="orchestra"><bounds x="1633" y="166" width="138" height="14" /></element>
+
+		<!-- left column -->
+		<element ref="jazzorgan"><bounds x="1613" y="203" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_12_DP4"><bounds x="1699" y="205" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_12" inputmask="0x10"><bounds x="1714" y="204" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_14_DP4"><bounds x="1757" y="205" width="12" height="12" /></element>
+		<element ref="piano"><bounds x="1775" y="203" width="80" height="13" /></element>
+
+		<element ref="pipeorgan"><bounds x="1613" y="242" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_12_DP3"><bounds x="1699" y="244" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_12" inputmask="0x20"><bounds x="1714" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_14_DP3"><bounds x="1757" y="244" width="12" height="12" /></element>
+		<element ref="electric"><bounds x="1775" y="242" width="80" height="13" /></element>
+		<element ref="piano"><bounds x="1775" y="252" width="80" height="13" /></element>
+
+		<element ref="strings"><bounds x="1613" y="281" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_12_DP2"><bounds x="1699" y="283" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_12" inputmask="0x40"><bounds x="1714" y="282" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_14_DP2"><bounds x="1757" y="283" width="12" height="12" /></element>
+		<element ref="harpsi"><bounds x="1775" y="281" width="80" height="13" /></element>
+		<element ref="chord"><bounds x="1775" y="291" width="80" height="13" /></element>
+
+		<element ref="brass"><bounds x="1613" y="320" width="80" height="13" /></element>
+		<element ref="oner"><bounds x="1613" y="330" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_12_DP1"><bounds x="1699" y="322" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_12" inputmask="0x80"><bounds x="1714" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_14_DP1"><bounds x="1757" y="322" width="12" height="12" /></element>
+		<element ref="vibes"><bounds x="1775" y="320" width="80" height="13" /></element>
+
+		<element ref="brass"><bounds x="1613" y="359" width="80" height="13" /></element>
+		<element ref="twor"><bounds x="1613" y="369" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_13_DP4"><bounds x="1699" y="361" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_13" inputmask="0x10"><bounds x="1714" y="360" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_15_DP4"><bounds x="1757" y="361" width="12" height="12" /></element>
+		<element ref="jazz"><bounds x="1775" y="359" width="80" height="13" /></element>
+		<element ref="guitar"><bounds x="1775" y="369" width="80" height="13" /></element>
+
+		<element ref="brassand"><bounds x="1613" y="398" width="80" height="13" /></element>
+		<element ref="chimes"><bounds x="1613" y="408" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_13_DP3"><bounds x="1699" y="400" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_13" inputmask="0x20"><bounds x="1714" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_15_DP3"><bounds x="1757" y="400" width="12" height="12" /></element>
+		<element ref="hawaiian"><bounds x="1775" y="398" width="80" height="13" /></element>
+		<element ref="guitar"><bounds x="1775" y="408" width="80" height="13" /></element>
+
+		<element ref="clarinet"><bounds x="1613" y="437" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_13_DP2"><bounds x="1699" y="439" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_13" inputmask="0x40"><bounds x="1714" y="438" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_15_DP2"><bounds x="1757" y="439" width="12" height="12" /></element>
+		<element ref="music"><bounds x="1775" y="437" width="80" height="13" /></element>
+		<element ref="box"><bounds x="1775" y="447" width="80" height="13" /></element>
+
+		<element ref="calliope"><bounds x="1613" y="476" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_13_DP1"><bounds x="1699" y="478" width="12" height="12" /></element>
+		<element ref="button-green" inputtag="DRVIF_13" inputmask="0x80"><bounds x="1714" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_15_DP1"><bounds x="1757" y="478" width="12" height="12" /></element>
+		<element ref="cosmic"><bounds x="1775" y="476" width="80" height="13" /></element>
+
+		<element ref="slidermin"><bounds x="1629" y="522" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="1629" y="522" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="1639" y="534" width="116" height="22" /></element>
+		<element ref="slider-bar-green">
+			<animate inputtag="RYP4_2" mask="0xff" />
+			<bounds state="0" x="1639" y="534" width="40" height="23" />
+			<bounds state="100" x="1715" y="534" width="40" height="23" />
+		</element>
+		<element ref="volume"><bounds x="1639" y="558" width="116" height="13" /></element>
+
+		<!-- right column -->
+		<element ref="button-green" inputtag="DRVIF_11" inputmask="0x10"><bounds x="1858" y="204" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_11_DP4"><bounds x="1901" y="205" width="12" height="12" /></element>
+		<element ref="duet"><bounds x="1919" y="203" width="80" height="13" /></element>
+
+		<element ref="button-green" inputtag="DRVIF_11" inputmask="0x20"><bounds x="1858" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_11_DP3"><bounds x="1901" y="244" width="12" height="12" /></element>
+		<element ref="trio"><bounds x="1919" y="242" width="80" height="13" /></element>
+
+		<element ref="button-green" inputtag="DRVIF_16" inputmask="0x10"><bounds x="1858" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_16_DP4"><bounds x="1901" y="322" width="12" height="12" /></element>
+		<element ref="sustain1"><bounds x="1919" y="320" width="80" height="13" /></element>
+
+		<element ref="button-green" inputtag="DRVIF_16" inputmask="0x20"><bounds x="1858" y="360" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_16_DP3"><bounds x="1901" y="361" width="12" height="12" /></element>
+		<element ref="sustain2"><bounds x="1919" y="359" width="80" height="13" /></element>
+
+		<element ref="button-green" inputtag="DRVIF_16" inputmask="0x40"><bounds x="1858" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_16_DP2"><bounds x="1901" y="400" width="12" height="12" /></element>
+		<element ref="stereo"><bounds x="1919" y="398" width="80" height="13" /></element>
+		<element ref="symphonic"><bounds x="1919" y="408" width="80" height="13" /></element>
+
+		<element ref="button-green" inputtag="DRVIF_11" inputmask="0x40"><bounds x="1858" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_11_DP2"><bounds x="1901" y="478" width="12" height="12" /></element>
+		<element ref="tolower"><bounds x="1919" y="476" width="80" height="13" /></element>
+
+		<element ref="button-red" inputtag="DRVIF_8" inputmask="0x80"><bounds x="1858" y="537" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_8_DP1"><bounds x="1901" y="538" width="12" height="12" /></element>
+		<element ref="on"><bounds x="1919" y="536" width="80" height="13" /></element>
+	</group>
+
+	<!-- solo group -->
+	<group name="group-solo">
+		<element ref="box-382"><bounds x="2011" y="142" width="382" height="450" /></element>
+		<element ref="solo"><bounds x="2036" y="166" width="138" height="14" /></element>
+
+		<!-- left column -->
+		<element ref="jazzflute"><bounds x="2013" y="203" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_17_DP4"><bounds x="2099" y="205" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_17" inputmask="0x10"><bounds x="2114" y="204" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_19_DP4"><bounds x="2157" y="205" width="12" height="12" /></element>
+		<element ref="electricguitar"><bounds x="2175" y="203" width="80" height="13" /></element>
+
+		<element ref="piccolo"><bounds x="2013" y="242" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_17_DP3"><bounds x="2099" y="244" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_17" inputmask="0x20"><bounds x="2114" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_19_DP3"><bounds x="2157" y="244" width="12" height="12" /></element>
+		<element ref="percuss"><bounds x="2175" y="242" width="80" height="13" /></element>
+		<element ref="one"><bounds x="2175" y="252" width="80" height="13" /></element>
+
+		<element ref="violin"><bounds x="2013" y="281" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_17_DP2"><bounds x="2099" y="283" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_17" inputmask="0x40"><bounds x="2114" y="282" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_19_DP2"><bounds x="2157" y="283" width="12" height="12" /></element>
+		<element ref="percuss"><bounds x="2175" y="281" width="80" height="13" /></element>
+		<element ref="two"><bounds x="2175" y="291" width="80" height="13" /></element>
+
+		<element ref="trumpet"><bounds x="2013" y="320" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_17_DP1"><bounds x="2099" y="322" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_17" inputmask="0x80"><bounds x="2114" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_19_DP1"><bounds x="2157" y="322" width="12" height="12" /></element>
+		<element ref="popsynth"><bounds x="2175" y="320" width="80" height="13" /></element>
+
+		<element ref="trombone"><bounds x="2013" y="359" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_18_DP4"><bounds x="2099" y="361" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_18" inputmask="0x10"><bounds x="2114" y="360" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_20_DP4"><bounds x="2157" y="361" width="12" height="12" /></element>
+		<element ref="bluessynth"><bounds x="2175" y="359" width="80" height="13" /></element>
+
+		<element ref="horn"><bounds x="2013" y="398" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_18_DP3"><bounds x="2099" y="400" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_18" inputmask="0x20"><bounds x="2114" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_20_DP3"><bounds x="2157" y="400" width="12" height="12" /></element>
+		<element ref="funksynth"><bounds x="2175" y="398" width="80" height="13" /></element>
+
+		<element ref="saxophone"><bounds x="2013" y="437" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_18_DP2"><bounds x="2099" y="439" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_18" inputmask="0x40"><bounds x="2114" y="438" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_20_DP2"><bounds x="2157" y="439" width="12" height="12" /></element>
+		<element ref="slapsynth"><bounds x="2175" y="437" width="80" height="13" /></element>
+
+		<element ref="oboe"><bounds x="2013" y="476" width="80" height="13" /></element>
+		<element ref="led" name="DRVIF_18_DP1"><bounds x="2099" y="478" width="12" height="12" /></element>
+		<element ref="button-grey" inputtag="DRVIF_18" inputmask="0x80"><bounds x="2114" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_20_DP1"><bounds x="2157" y="478" width="12" height="12" /></element>
+		<element ref="bass"><bounds x="2175" y="476" width="80" height="13" /></element>
+
+		<element ref="slidermin"><bounds x="2029" y="522" width="136" height="13" /></element>
+		<element ref="slidermax"><bounds x="2029" y="522" width="136" height="13" /></element>
+		<element ref="slider"><bounds x="2038" y="534" width="116" height="22" /></element>
+		<element ref="slider-bar-grey">
+			<animate inputtag="RYP4_1" mask="0xff" />
+			<bounds state="0" x="2038" y="534" width="40" height="23" />
+			<bounds state="100" x="2114" y="534" width="40" height="23" />
+		</element>
+		<element ref="volume"><bounds x="2038" y="558" width="116" height="13" /></element>
+
+		<!-- right column -->
+		<element ref="button-grey" inputtag="DRVIF_16" inputmask="0x80"><bounds x="2259" y="321" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_16_DP1"><bounds x="2302" y="322" width="12" height="12" /></element>
+		<element ref="sustain"><bounds x="2320" y="320" width="60" height="13" /></element>
+
+		<element ref="button-red" inputtag="DRVIF_11" inputmask="0x80"><bounds x="2259" y="537" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_11_DP1"><bounds x="2302" y="538" width="12" height="12" /></element>
+		<element ref="on"><bounds x="2320" y="536" width="60" height="13" /></element>
+	</group>
+
+	<!-- tape/music programmer group -->
+	<group name="group-tape">
+		<element ref="box-237"><bounds x="2398" y="142" width="237" height="450" /></element>
+		<element ref="tape"><bounds x="2423" y="166" width="138" height="14" /></element>
+
+		<!-- tape -->
+		<element ref="button-orange" inputtag="DRVIF_21" inputmask="0x80"><bounds x="2422" y="204" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_21_DP1"><bounds x="2465" y="205" width="12" height="12" /></element>
+		<element ref="save"><bounds x="2483" y="203" width="80" height="13" /></element>
+
+		<element ref="button-orange" inputtag="DRVIF_22" inputmask="0x80"><bounds x="2422" y="243" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_22_DP1"><bounds x="2465" y="244" width="12" height="12" /></element>
+		<element ref="load"><bounds x="2483" y="242" width="80" height="13" /></element>
+
+		<!-- music programmer -->
+		<element ref="musicprogrammer"><bounds x="2423" y="327" width="138" height="14" /></element>
+
+		<element ref="offc"><bounds x="2422" y="349" width="106" height="13" /></element>
+		<element ref="button-wide-orange" inputtag="DRVIF_19" inputmask="0x10"><bounds x="2422" y="363" width="106" height="15" /></element>
+
+		<element ref="record"><bounds x="2422" y="382" width="80" height="13" /></element>
+		<element ref="playback"><bounds x="2487" y="382" width="80" height="13" /></element>
+
+		<element ref="led" name="DRVIF_21_DP2"><bounds x="2407" y="400" width="12" height="12" /></element>
+		<element ref="button-red" inputtag="DRVIF_21" inputmask="0x40"><bounds x="2422" y="399" width="40" height="15" /></element>
+		<element ref="button-orange" inputtag="DRVIF_22" inputmask="0x40"><bounds x="2488" y="399" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_22_DP2"><bounds x="2531" y="400" width="12" height="12" /></element>
+		<element ref="solo"><bounds x="2549" y="398" width="80" height="14" /></element>
+
+		<element ref="led" name="DRVIF_21_DP3"><bounds x="2407" y="439" width="12" height="12" /></element>
+		<element ref="button-red" inputtag="DRVIF_21" inputmask="0x20"><bounds x="2422" y="438" width="40" height="15" /></element>
+		<element ref="button-orange" inputtag="DRVIF_22" inputmask="0x20"><bounds x="2488" y="438" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_22_DP3"><bounds x="2531" y="439" width="12" height="12" /></element>
+		<element ref="orchestra"><bounds x="2549" y="437" width="80" height="14" /></element>
+
+		<element ref="led" name="DRVIF_21_DP4"><bounds x="2407" y="478" width="12" height="12" /></element>
+		<element ref="button-red" inputtag="DRVIF_21" inputmask="0x10"><bounds x="2422" y="477" width="40" height="15" /></element>
+		<element ref="button-orange" inputtag="DRVIF_22" inputmask="0x10"><bounds x="2488" y="477" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_22_DP4"><bounds x="2531" y="478" width="12" height="12" /></element>
+		<element ref="chordbass"><bounds x="2549" y="476" width="80" height="14" /></element>
+
+		<element ref="button-orange" inputtag="DRVIF_9" inputmask="0x80"><bounds x="2488" y="537" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_9_DP1"><bounds x="2531" y="538" width="12" height="12" /></element>
+		<element ref="pause"><bounds x="2549" y="536" width="80" height="13" /></element>
+	</group>
+
+	<!-- above keyboard group -->
+	<group name="group-abovekeys">
+		<element ref="button-green" inputtag="DRVIF_0" inputmask="0x10"><bounds x="204" y="618" width="40" height="15" /></element>
+		<element ref="keysplit"><bounds x="247" y="617" width="85" height="13" /></element>
+
+		<element ref="button-yellow" inputtag="DRVIF_3" inputmask="0x10"><bounds x="338" y="618" width="40" height="15" /></element>
+		<element ref="led" name="DRVIF_2_DP4"><bounds x="381" y="619" width="12" height="12" /></element>
+		<element ref="keyboardpercussion"><bounds x="399" y="617" width="160" height="13" /></element>
+
+		<element ref="fillin"><bounds x="532" y="617" width="60" height="13" /></element>
+		<element ref="button-wide-yellow" inputtag="DRVIF_3" inputmask="0x20"><bounds x="595" y="618" width="106" height="15" /></element>
+		<element ref="one"><bounds x="704" y="617" width="60" height="13" /></element>
+
+		<element ref="button-wide-yellow" inputtag="DRVIF_3" inputmask="0x40"><bounds x="727" y="618" width="106" height="15" /></element>
+		<element ref="two"><bounds x="836" y="617" width="60" height="13" /></element>
+
+		<element ref="button-wide-yellow" inputtag="DRVIF_3" inputmask="0x80"><bounds x="860" y="618" width="106" height="15" /></element>
+		<element ref="three"><bounds x="969" y="617" width="60" height="13" /></element>
+
+		<element ref="synchrostart"><bounds x="1019" y="617" width="100" height="13" /></element>
+		<element ref="button-wide-red" inputtag="DRVIF_6" inputmask="0x20"><bounds x="1122" y="618" width="106" height="15" /></element>
+
+		<element ref="button-wide-red" inputtag="DRVIF_6" inputmask="0x40"><bounds x="1256" y="618" width="106" height="15" /></element>
+		<element ref="start"><bounds x="1365" y="617" width="60" height="13" /></element>
+
+		<element ref="stop"><bounds x="1441" y="617" width="60" height="14" /></element>
+		<element ref="button-wide-yellow" inputtag="DRVIF_6" inputmask="0x10"><bounds x="1504" y="618" width="106" height="15" /></element>
+
+		<element ref="button-wide-yellow" inputtag="DRVIF_6" inputmask="0x80"><bounds x="1637" y="618" width="106" height="15" /></element>
+		<element ref="introending"><bounds x="1746" y="617" width="80" height="13" /></element>
+
+		<element ref="button-red" inputtag="DRVIF_20" inputmask="0x80"><bounds x="2031" y="618" width="40" height="15" /></element>
+		<element ref="registrationmemory"><bounds x="1908" y="617" width="120" height="13" /></element>
+
+		<element ref="programr"><bounds x="2068" y="617" width="60" height="13" /></element>
+		<element ref="button-wide-blue" inputtag="DRVIF_20" inputmask="0x10"><bounds x="2131" y="618" width="106" height="15" /></element>
+		<element ref="one"><bounds x="2240" y="617" width="20" height="13" /></element>
+
+		<element ref="button-wide-blue" inputtag="DRVIF_20" inputmask="0x20"><bounds x="2265" y="618" width="106" height="15" /></element>
+		<element ref="two"><bounds x="2374" y="617" width="20" height="13" /></element>
+
+		<element ref="button-wide-blue" inputtag="DRVIF_20" inputmask="0x40"><bounds x="2398" y="618" width="106" height="15" /></element>
+		<element ref="three"><bounds x="2507" y="617" width="20" height="13" /></element>
+
+		<element ref="button-grey" inputtag="DRVIF_7" inputmask="0x80"><bounds x="2634" y="618" width="40" height="15" /></element>
+		<element ref="midimode"><bounds x="2677" y="617" width="80" height="13" /></element>
+	</group>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="564" y="494" width="2969" height="524" /></element>
+
+		<!-- key layout:
+			wwwww bbbbbb wwwwwww bbbbbbbb wwwwwwww   wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww
+		      45    44      53      44       45         45       44       44       44       44       44      45
+			0->45 48->92 95->148 151->195 198->243   243->288 291->335 338->382 385->429 432->476 479->523 526->571
+			0->79        82->161          164->243   246->325          328->407          410->489          492->571
+		-->
+
+		<!-- split leds -->
+		<element ref="splitled" name="DRVIF_0_DP4"><bounds x="1476" y="494" width="10" height="10" /></element>
+		<element ref="splitled" name="DRVIF_0_DP3"><bounds x="1715" y="494" width="10" height="10" /></element>
+		<element ref="splitled" name="DRVIF_0_DP2"><bounds x="1961" y="494" width="10" height="10" /></element>
+
+		<!-- octave 0 -->
+		<element ref="blackkey" inputtag="P1_9" inputmask="0x20"><bounds x="622" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_9" inputmask="0x08"><bounds x="725" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_9" inputmask="0x01"><bounds x="865" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_8" inputmask="0x10"><bounds x="959" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_8" inputmask="0x04"><bounds x="1053" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P1_9" inputmask="0x40"><bounds x="574" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1_9" inputmask="0x10"><bounds x="656" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_9" inputmask="0x04"><bounds x="738" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1_9" inputmask="0x02"><bounds x="820" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P1_8" inputmask="0x20"><bounds x="902" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P1_8" inputmask="0x08"><bounds x="984" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_8" inputmask="0x02"><bounds x="1066" y="504" width="79" height="504" /></element>
+
+		<!-- octave 1 -->
+		<element ref="blackkey" inputtag="P1_7" inputmask="0x20"><bounds x="1196" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_7" inputmask="0x08"><bounds x="1299" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_7" inputmask="0x01"><bounds x="1439" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_6" inputmask="0x10"><bounds x="1533" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_6" inputmask="0x04"><bounds x="1627" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P1_8" inputmask="0x01"><bounds x="1148" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1_7" inputmask="0x10"><bounds x="1230" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_7" inputmask="0x04"><bounds x="1312" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1_7" inputmask="0x02"><bounds x="1394" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P1_6" inputmask="0x20"><bounds x="1476" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P1_6" inputmask="0x08"><bounds x="1558" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_6" inputmask="0x02"><bounds x="1640" y="504" width="79" height="504" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey" inputtag="P1_5" inputmask="0x20"><bounds x="1770" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_5" inputmask="0x08"><bounds x="1873" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_5" inputmask="0x01"><bounds x="2013" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_4" inputmask="0x10"><bounds x="2107" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_4" inputmask="0x04"><bounds x="2201" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P1_6" inputmask="0x01"><bounds x="1722" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1_5" inputmask="0x10"><bounds x="1804" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_5" inputmask="0x04"><bounds x="1886" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1_5" inputmask="0x02"><bounds x="1968" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P1_4" inputmask="0x20"><bounds x="2050" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P1_4" inputmask="0x08"><bounds x="2132" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_4" inputmask="0x02"><bounds x="2214" y="504" width="79" height="504" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey" inputtag="P1_3" inputmask="0x20"><bounds x="2344" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_3" inputmask="0x08"><bounds x="2447" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_3" inputmask="0x01"><bounds x="2587" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_2" inputmask="0x10"><bounds x="2681" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_2" inputmask="0x04"><bounds x="2775" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P1_4" inputmask="0x01"><bounds x="2296" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1_3" inputmask="0x10"><bounds x="2378" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_3" inputmask="0x04"><bounds x="2460" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1_3" inputmask="0x02"><bounds x="2542" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P1_2" inputmask="0x20"><bounds x="2624" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P1_2" inputmask="0x08"><bounds x="2706" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_2" inputmask="0x02"><bounds x="2788" y="504" width="79" height="504" /></element>
+
+		<!-- octave 4 -->
+		<element ref="blackkey" inputtag="P1_1" inputmask="0x20"><bounds x="2918" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_1" inputmask="0x08"><bounds x="3021" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_1" inputmask="0x01"><bounds x="3161" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_0" inputmask="0x10"><bounds x="3255" y="504" width="44" height="324" /></element>
+		<element ref="blackkey" inputtag="P1_0" inputmask="0x04"><bounds x="3349" y="504" width="44" height="324" /></element>
+		<element ref="whitekey-l" inputtag="P1_2" inputmask="0x01"><bounds x="2870" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-m" inputtag="P1_1" inputmask="0x10"><bounds x="2952" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_1" inputmask="0x04"><bounds x="3034" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-l" inputtag="P1_1" inputmask="0x02"><bounds x="3116" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="P1_0" inputmask="0x20"><bounds x="3198" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="P1_0" inputmask="0x08"><bounds x="3280" y="504" width="79" height="504" /></element>
+		<element ref="whitekey-r" inputtag="P1_0" inputmask="0x02"><bounds x="3362" y="504" width="79" height="504" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey" inputtag="P1_0" inputmask="0x01"><bounds x="3444" y="504" width="79" height="504" /></element>
+	</group>
+
+	<view name="Keyboard">
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="0" width="3295" height="1194" /></element>
+		<element ref="top-box"><bounds x="669" y="37" width="1966" height="103" /></element>
+
+		<!-- pitch box -->
+		<group ref="group-pitch"><bounds x="669" y="142" width="174" height="450" /></group>
+
+		<!-- auto bass chord box -->
+		<group ref="group-autobasschord"><bounds x="848" y="142" width="174" height="450" /></group>
+
+		<!-- rhythm box -->
+		<group ref="group-rhythm"><bounds x="1027" y="142" width="398" height="450" /></group>
+
+		<!-- custom accompaniment box -->
+		<group ref="group-custom"><bounds x="1430" y="142" width="174" height="450" /></group>
+
+		<!-- orchestra box -->
+		<group ref="group-orchestra"><bounds x="1609" y="142" width="398" height="450" /></group>
+
+		<!-- solo box -->
+		<group ref="group-solo"><bounds x="2011" y="142" width="382" height="450" /></group>
+
+		<!-- tape box -->
+		<group ref="group-tape"><bounds x="2398" y="142" width="237" height="450" /></group>
+
+		<!-- left speaker -->
+		<element ref="speaker"><bounds x="27" y="37" width="630" height="555" /></element>
+
+		<!-- above keys -->
+		<group ref="group-abovekeys"><bounds x="204" y="618" width="2553" height="15" /></group>
+
+		<!-- logo -->
+		<element ref="yamaha"><bounds x="2948" y="619" width="135" height="36" /></element>
+		<element ref="psr70"><bounds x="2870" y="641" width="57" height="15" /></element>
+
+		<!-- keyboard -->
+		<group ref="keyboard"><bounds x="155" y="680" width="2969" height="524" /></group>
+
+		<!-- right speaker -->
+		<element ref="speaker"><bounds x="2645" y="37" width="630" height="555" /></element>
+	</view>
+
+	<view name="16:9 Friendly">
+		<!-- pitch box -->
+		<group ref="group-pitch"><bounds x="170" y="-84" width="261" height="676" /></group>
+
+		<!-- auto bass chord box -->
+		<group ref="group-autobasschord"><bounds x="436" y="-84" width="261" height="676" /></group>
+
+		<!-- rhythm box -->
+		<group ref="group-rhythm"><bounds x="702" y="-84" width="598" height="676" /></group>
+
+		<!-- custom accompaniment box -->
+		<group ref="group-custom"><bounds x="1305" y="-84" width="261" height="676" /></group>
+
+		<!-- orchestra box -->
+		<group ref="group-orchestra"><bounds x="1571" y="-84" width="598" height="676" /></group>
+
+		<!-- solo box -->
+		<group ref="group-solo"><bounds x="2174" y="-84" width="574" height="676" /></group>
+
+		<!-- tape box -->
+		<group ref="group-tape"><bounds x="2753" y="-84" width="356" height="676" /></group>
+
+		<!-- above keys -->
+		<group ref="group-abovekeys"><bounds x="165" y="618" width="2959" height="18" /></group>
+
+		<!-- keyboard -->
+		<group ref="keyboard"><bounds x="155" y="680" width="2969" height="524" /></group>
+	</view>
+</mamelayout>

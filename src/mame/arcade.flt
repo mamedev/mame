@@ -440,6 +440,7 @@ funworld.cpp
 funybubl.cpp
 fuukifg2.cpp
 fuukifg3.cpp
+fwheel.cpp
 g627.cpp
 gaelco.cpp
 gaelco2.cpp
@@ -976,6 +977,7 @@ play_1.cpp
 play_2.cpp
 play_3.cpp
 playcenter.cpp
+plsonic4.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp
@@ -1093,6 +1095,7 @@ sbmjb.cpp
 sbowling.cpp
 sbrkout.cpp
 sbugger.cpp
+schexx4gen.cpp
 schick.cpp
 scm_500.cpp
 scobra.cpp

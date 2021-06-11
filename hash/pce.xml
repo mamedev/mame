@@ -13,7 +13,7 @@ license:CC0
 		<info name="alt_title" value="1943改"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="1943 kai (japan).pce" size="524288" crc="fde08d6d" sha1="3ac86354155ca01859c53e2f2287a715cd3fca13" offset="000000" />
+				<rom name="1943 kai (japan).pce" size="524288" crc="fde08d6d" sha1="3ac86354155ca01859c53e2f2287a715cd3fca13" />
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@ license:CC0
 		<info name="alt_title" value="藤子・F・不二雄の21エモン めざせ!ホテル王"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="21 emon - mezase hotel ou (japan).pce" size="524288" crc="73614660" sha1="de80a0d266916799ee5666815d9fd11602bdbdec" offset="000000" />
+				<rom name="21 emon - mezase hotel ou (japan).pce" size="524288" crc="73614660" sha1="de80a0d266916799ee5666815d9fd11602bdbdec" />
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@ license:CC0
 		<info name="alt_title" value="アドベンチャーアイランド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="adventure island (japan).pce" size="262144" crc="8e71d4f3" sha1="01ad5bbd7316740409e01917c19494cb26173ff5" offset="000000" />
+				<rom name="adventure island (japan).pce" size="262144" crc="8e71d4f3" sha1="01ad5bbd7316740409e01917c19494cb26173ff5" />
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@ license:CC0
 		<info name="alt_title" value="エアロブラスターズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="aero blasters (japan).pce" size="524288" crc="25be2b81" sha1="748ec92246140565d95f6fb727de6167227b85d3" offset="000000" />
+				<rom name="aero blasters (japan).pce" size="524288" crc="25be2b81" sha1="748ec92246140565d95f6fb727de6167227b85d3" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@ license:CC0
 		<info name="alt_title" value="アフターバーナーII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="after burner ii (japan).pce" size="524288" crc="ca72a828" sha1="50b9d22fe5179aee5cb95022472714ef8483841f" offset="000000" />
+				<rom name="after burner ii (japan).pce" size="524288" crc="ca72a828" sha1="50b9d22fe5179aee5cb95022472714ef8483841f" />
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@ license:CC0
 		<info name="alt_title" value="エイリアンクラッシュ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="alien crush (japan).pce" size="262144" crc="60edf4e1" sha1="a1e6ad82b66a82c25e0a9e25fb8be370f49c8c2d" offset="000000" />
+				<rom name="alien crush (japan).pce" size="262144" crc="60edf4e1" sha1="a1e6ad82b66a82c25e0a9e25fb8be370f49c8c2d" />
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@ license:CC0
 		<info name="alt_title" value="暗黒伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="ankoku densetsu (japan).pce" size="262144" crc="cacc06fb" sha1="b6ae249f0a4954df6e53c21ba81646ecbc7c2945" offset="000000" />
+				<rom name="ankoku densetsu (japan).pce" size="262144" crc="cacc06fb" sha1="b6ae249f0a4954df6e53c21ba81646ecbc7c2945" />
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@ license:CC0
 		<info name="alt_title" value="青いブリンク"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="aoi blink (japan).pce" size="393216" crc="08a09b9a" sha1="367aa348fca42a2aa1ce28bb88800d2fb0cd0ed7" offset="000000" />
+				<rom name="aoi blink (japan).pce" size="393216" crc="08a09b9a" sha1="367aa348fca42a2aa1ce28bb88800d2fb0cd0ed7" />
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@ license:CC0
 		<info name="alt_title" value="あっぱれ!ゲートボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="appare gateball (japan).pce" size="262144" crc="2b54cba2" sha1="5efee117bb8fd24ccbc8ed68ae5d36cea960f37e" offset="000000" />
+				<rom name="appare gateball (japan).pce" size="262144" crc="2b54cba2" sha1="5efee117bb8fd24ccbc8ed68ae5d36cea960f37e" />
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@ license:CC0
 		<info name="alt_title" value="FORMATION アームドF"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="armed formation f (japan).pce" size="262144" crc="20ef87fd" sha1="a326c9cece6f14b82629c4c79b34df819b022dce" offset="000000" />
+				<rom name="armed formation f (japan).pce" size="262144" crc="20ef87fd" sha1="a326c9cece6f14b82629c4c79b34df819b022dce" />
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@ license:CC0
 		<info name="alt_title" value="アーティストツール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="artist tool (japan).pce" size="262144" crc="5e4fa713" sha1="691ac36ccfcade010e34e2d1dedbcc9af6ed5cd4" offset="000000" />
+				<rom name="artist tool (japan).pce" size="262144" crc="5e4fa713" sha1="691ac36ccfcade010e34e2d1dedbcc9af6ed5cd4" />
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@ license:CC0
 		<info name="alt_title" value="アトミックロボキッド スペシャル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="atomic robo-kid special (japan).pce" size="524288" crc="dd175efd" sha1="1ea46287855ef25e4614a3f37a7037baa5a49545" offset="000000" />
+				<rom name="atomic robo-kid special (japan).pce" size="524288" crc="dd175efd" sha1="1ea46287855ef25e4614a3f37a7037baa5a49545" />
 			</dataarea>
 		</part>
 	</software>
@@ -178,7 +178,7 @@ license:CC0
 		<publisher>Games Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="av poker (japan).pce" size="524288" crc="b866d282" sha1="9d71b3dca401ea02595917ce5a3dbe8fb6edb7bb" offset="000000" />
+				<rom name="av poker (japan).pce" size="524288" crc="b866d282" sha1="9d71b3dca401ea02595917ce5a3dbe8fb6edb7bb" />
 			</dataarea>
 		</part>
 	</software>
@@ -192,7 +192,7 @@ license:CC0
 		<info name="alt_title" value="バリスティックス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="ballistix (japan).pce" size="262144" crc="8acfc8aa" sha1="e687abeb0f94e85fafa52e92b0beb82542f0c368" offset="000000" />
+				<rom name="ballistix (japan).pce" size="262144" crc="8acfc8aa" sha1="e687abeb0f94e85fafa52e92b0beb82542f0c368" />
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@ license:CC0
 		<info name="alt_title" value="バリバリ伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="bari bari densetsu (japan).pce" size="393216" crc="c267e25d" sha1="d063cf1b378a4741e4eb01e9de99d6f618b077da" offset="000000" />
+				<rom name="bari bari densetsu (japan).pce" size="393216" crc="c267e25d" sha1="d063cf1b378a4741e4eb01e9de99d6f618b077da" />
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@ license:CC0
 		<info name="alt_title" value="バルンバ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="barunba (japan).pce" size="524288" crc="4a3df3ca" sha1="5f110864af252462e144aa01a7a6ecb88d2a4eb1" offset="000000" />
+				<rom name="barunba (japan).pce" size="524288" crc="4a3df3ca" sha1="5f110864af252462e144aa01a7a6ecb88d2a4eb1" />
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@ license:CC0
 		<info name="alt_title" value="バットマン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="batman (japan).pce" size="393216" crc="106bb7b2" sha1="87e93e23c0c3ef960e9a226fc10a5fc9625d43a7" offset="000000" />
+				<rom name="batman (japan).pce" size="393216" crc="106bb7b2" sha1="87e93e23c0c3ef960e9a226fc10a5fc9625d43a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -248,7 +248,7 @@ license:CC0
 		<info name="alt_title" value="バトルロードランナー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="battle lode runner (japan).pce" size="262144" crc="59e44f45" sha1="0907d3a3503bd7dc2cae0d1b88c1f3f5be56fa22" offset="000000" />
+				<rom name="battle lode runner (japan).pce" size="262144" crc="59e44f45" sha1="0907d3a3503bd7dc2cae0d1b88c1f3f5be56fa22" />
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@ license:CC0
 		<info name="alt_title" value="ビーボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="be ball (japan).pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" offset="000000" />
+				<rom name="be ball (japan).pce" size="262144" crc="261f1013" sha1="55d8815a4a432e587fc7483b63b73114fe40e710" />
 			</dataarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@ license:CC0
 		<info name="alt_title" value="弁慶 外伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="benkei gaiden (japan).pce" size="393216" crc="e1a73797" sha1="4bc46592f3707a7c3e514abc23e640e3194879ad" offset="000000" />
+				<rom name="benkei gaiden (japan).pce" size="393216" crc="e1a73797" sha1="4bc46592f3707a7c3e514abc23e640e3194879ad" />
 			</dataarea>
 		</part>
 	</software>
@@ -290,7 +290,7 @@ license:CC0
 		<info name="alt_title" value="弁慶 外伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="benkei gaiden (japan) [a].pce" size="393216" crc="c9626a43" sha1="0be41c774e7ee75b84efdc2b05a7a45ec0201503" offset="000000" />
+				<rom name="benkei gaiden (japan) [a].pce" size="393216" crc="c9626a43" sha1="0be41c774e7ee75b84efdc2b05a7a45ec0201503" />
 			</dataarea>
 		</part>
 	</software>
@@ -304,7 +304,7 @@ license:CC0
 		<info name="alt_title" value="ビックリマンワールド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="bikkuriman world (japan).pce" size="262144" crc="2841fd1e" sha1="5c09536bbd46337bd563818f637afe2a609bb08b" offset="000000" />
+				<rom name="bikkuriman world (japan).pce" size="262144" crc="2841fd1e" sha1="5c09536bbd46337bd563818f637afe2a609bb08b" />
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +318,7 @@ license:CC0
 		<info name="alt_title" value="ビックリマンワールド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="bikkuriman world (japan) [a].pce" size="262144" crc="34893891" sha1="b063dc0057ab7cd00a6a46f080ea5af776948043" offset="000000" />
+				<rom name="bikkuriman world (japan) [a].pce" size="262144" crc="34893891" sha1="b063dc0057ab7cd00a6a46f080ea5af776948043" />
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +332,7 @@ license:CC0
 		<info name="alt_title" value="ブロディア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="blodia (japan).pce" size="131072" crc="958bcd09" sha1="bcb3070f617059c9d0d781ece2aee9ae74951f6a" offset="000000" />
+				<rom name="blodia (japan).pce" size="131072" crc="958bcd09" sha1="bcb3070f617059c9d0d781ece2aee9ae74951f6a" />
 			</dataarea>
 		</part>
 	</software>
@@ -343,7 +343,7 @@ license:CC0
 		<publisher>Games Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="body conquest ii (japan).pce" size="524288" crc="ffd92458" sha1="72edaf529c41f7c81d1e1fc7dc27bae8e598da9b" offset="000000" />
+				<rom name="body conquest ii (japan).pce" size="524288" crc="ffd92458" sha1="72edaf529c41f7c81d1e1fc7dc27bae8e598da9b" />
 			</dataarea>
 		</part>
 	</software>
@@ -357,7 +357,7 @@ license:CC0
 		<info name="alt_title" value="ボンバーマン'93"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bomberman '93 (japan).pce" size="524288" crc="b300c5d0" sha1="64131aeb6753bffde2910d641c73b56108874320" offset="000000" />
+				<rom name="bomberman '93 (japan).pce" size="524288" crc="b300c5d0" sha1="64131aeb6753bffde2910d641c73b56108874320" />
 			</dataarea>
 		</part>
 	</software>
@@ -368,7 +368,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bomberman '93 (special version) (japan).pce" size="524288" crc="02309aa0" sha1="79af6d5987267238cf8f729af79e25349cb0bf03" offset="000000" />
+				<rom name="bomberman '93 (special version) (japan).pce" size="524288" crc="02309aa0" sha1="79af6d5987267238cf8f729af79e25349cb0bf03" />
 			</dataarea>
 		</part>
 	</software>
@@ -382,7 +382,7 @@ license:CC0
 		<info name="alt_title" value="ボンバーマン'94"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bomberman '94 (japan).pce" size="1048576" crc="05362516" sha1="9085b474199531259b4ebbc05a279ae96cb7c5bd" offset="000000" />
+				<rom name="bomberman '94 (japan).pce" size="1048576" crc="05362516" sha1="9085b474199531259b4ebbc05a279ae96cb7c5bd" />
 			</dataarea>
 		</part>
 	</software>
@@ -396,7 +396,7 @@ license:CC0
 		<info name="alt_title" value="ボンバーマン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="bomberman (japan).pce" size="262144" crc="9abb4d1f" sha1="738bbced47d87cd438d7972eba58c08f5c031a74" offset="000000" />
+				<rom name="bomberman (japan).pce" size="262144" crc="9abb4d1f" sha1="738bbced47d87cd438d7972eba58c08f5c031a74" />
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="bomberman - users battle (japan).pce" size="262144" crc="1489fa51" sha1="96ba02050843cacb149859128a8f3313bff44358" offset="000000" />
+				<rom name="bomberman - users battle (japan).pce" size="262144" crc="1489fa51" sha1="96ba02050843cacb149859128a8f3313bff44358" />
 			</dataarea>
 		</part>
 	</software>
@@ -421,7 +421,7 @@ license:CC0
 		<info name="alt_title" value="冒険男爵ドン サン＝ハート編"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bouken danshaku don - the lost sunheart (japan).pce" size="524288" crc="8f4d9f94" sha1="a0ae06b1ced94a2dea20b8c62ad64dcf701e1a25" offset="000000" />
+				<rom name="bouken danshaku don - the lost sunheart (japan).pce" size="524288" crc="8f4d9f94" sha1="a0ae06b1ced94a2dea20b8c62ad64dcf701e1a25" />
 			</dataarea>
 		</part>
 	</software>
@@ -435,7 +435,7 @@ license:CC0
 		<info name="alt_title" value="ブレイク・イン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="break in (japan).pce" size="262144" crc="c9d7426a" sha1="2a409cbe09529c6995954b3985168882bad80aa4" offset="000000" />
+				<rom name="break in (japan).pce" size="262144" crc="c9d7426a" sha1="2a409cbe09529c6995954b3985168882bad80aa4" />
 			</dataarea>
 		</part>
 	</software>
@@ -449,7 +449,7 @@ license:CC0
 		<info name="alt_title" value="バブルガムクラッシュ!"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="bubblegum crash - knight sabers 2034 (japan).pce" size="524288" crc="0d766139" sha1="03d0638f27d35b28b7e5e7db16f823de0726c2c5" offset="000000" />
+				<rom name="bubblegum crash - knight sabers 2034 (japan).pce" size="524288" crc="0d766139" sha1="03d0638f27d35b28b7e5e7db16f823de0726c2c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -463,7 +463,7 @@ license:CC0
 		<info name="alt_title" value="ブルファイト リングの覇者"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="bull fight - ring no haja (japan).pce" size="393216" crc="5c4d1991" sha1="6cd94e6209da2939752ab6b1c2d46e5b48c8e0cb" offset="000000" />
+				<rom name="bull fight - ring no haja (japan).pce" size="393216" crc="5c4d1991" sha1="6cd94e6209da2939752ab6b1c2d46e5b48c8e0cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -477,7 +477,7 @@ license:CC0
 		<info name="alt_title" value="バーニングエンジェル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="burning angels (japan).pce" size="393216" crc="d233c05a" sha1="d34f38058ac1d8276e145a47fc4fdc1310f49a60" offset="000000" />
+				<rom name="burning angels (japan).pce" size="393216" crc="d233c05a" sha1="d34f38058ac1d8276e145a47fc4fdc1310f49a60" />
 			</dataarea>
 		</part>
 	</software>
@@ -491,7 +491,7 @@ license:CC0
 		<info name="alt_title" value="武装刑事 サイバークロス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="busou keiji - cyber cross (japan).pce" size="393216" crc="d0c250ca" sha1="902deeca17b897091d6f581d1d5db916ba0cb0f7" offset="000000" />
+				<rom name="busou keiji - cyber cross (japan).pce" size="393216" crc="d0c250ca" sha1="902deeca17b897091d6f581d1d5db916ba0cb0f7" />
 			</dataarea>
 		</part>
 	</software>
@@ -505,7 +505,7 @@ license:CC0
 		<info name="alt_title" value="カダッシュ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="cadash (japan).pce" size="393216" crc="8dc0d85f" sha1="3755cb2b883bc106e58019e1cd82708a63394f35" offset="000000" />
+				<rom name="cadash (japan).pce" size="393216" crc="8dc0d85f" sha1="3755cb2b883bc106e58019e1cd82708a63394f35" />
 			</dataarea>
 		</part>
 	</software>
@@ -519,7 +519,7 @@ license:CC0
 		<info name="alt_title" value="チャンピオン・レスラー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="champion wrestler (japan).pce" size="393216" crc="9edc0aea" sha1="c865834d69b765bfb9f7730d98dfc167c360e964" offset="000000" />
+				<rom name="champion wrestler (japan).pce" size="393216" crc="9edc0aea" sha1="c865834d69b765bfb9f7730d98dfc167c360e964" />
 			</dataarea>
 		</part>
 	</software>
@@ -533,7 +533,7 @@ license:CC0
 		<info name="alt_title" value="ちびまる子ちゃん クイズでピーヒャラ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chibi maruko chan - quiz de piihyara (japan).pce" size="524288" crc="951ed380" sha1="de35c38944c42f2c14581e3ea003c1168b609aa6" offset="000000" />
+				<rom name="chibi maruko chan - quiz de piihyara (japan).pce" size="524288" crc="951ed380" sha1="de35c38944c42f2c14581e3ea003c1168b609aa6" />
 			</dataarea>
 		</part>
 	</software>
@@ -547,7 +547,7 @@ license:CC0
 		<info name="alt_title" value="逐電屋 藤兵衛 BIT2の首斬り館より"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chikudenya toubei - kubikiri yakata yori (japan).pce" size="524288" crc="cab21b2e" sha1="75805bfd024c105bf450d5367953d0f9d4517eef" offset="000000" />
+				<rom name="chikudenya toubei - kubikiri yakata yori (japan).pce" size="524288" crc="cab21b2e" sha1="75805bfd024c105bf450d5367953d0f9d4517eef" />
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +561,7 @@ license:CC0
 		<info name="alt_title" value="逐電屋 藤兵衛 BIT2の首斬り館より"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chikudenya toubei - kubikiri yakata yori (japan) [a].pce" size="524288" crc="84098884" sha1="d35065ea90324765742cfbd1b72aa56acc585f98" offset="000000" />
+				<rom name="chikudenya toubei - kubikiri yakata yori (japan) [a].pce" size="524288" crc="84098884" sha1="d35065ea90324765742cfbd1b72aa56acc585f98" />
 			</dataarea>
 		</part>
 	</software>
@@ -575,7 +575,7 @@ license:CC0
 		<info name="alt_title" value="超絶倫人ベラボーマン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chouzetsu rinjin - bravoman (japan).pce" size="524288" crc="0df57c90" sha1="9abb7d96a4dba96a26f7073ea06cb8b2deb24a43" offset="000000" />
+				<rom name="chouzetsu rinjin - bravoman (japan).pce" size="524288" crc="0df57c90" sha1="9abb7d96a4dba96a26f7073ea06cb8b2deb24a43" />
 			</dataarea>
 		</part>
 	</software>
@@ -589,7 +589,7 @@ license:CC0
 		<info name="alt_title" value="サーカスライド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="circus lido (japan).pce" size="262144" crc="c3212c24" sha1="b7a4157ad47d1f89ede201b56d5cd57650bcf18e" offset="000000" />
+				<rom name="circus lido (japan).pce" size="262144" crc="c3212c24" sha1="b7a4157ad47d1f89ede201b56d5cd57650bcf18e" />
 			</dataarea>
 		</part>
 	</software>
@@ -603,7 +603,7 @@ license:CC0
 		<info name="alt_title" value="シティーハンター"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="city hunter (japan).pce" size="393216" crc="f91b055f" sha1="8265cb33901609ec1cf156b8e0c7fc3884bc1acd" offset="000000" />
+				<rom name="city hunter (japan).pce" size="393216" crc="f91b055f" sha1="8265cb33901609ec1cf156b8e0c7fc3884bc1acd" />
 			</dataarea>
 		</part>
 	</software>
@@ -617,7 +617,7 @@ license:CC0
 		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="columns (japan).pce" size="131072" crc="99f7a572" sha1="238f9ee6cc80b31c5c93a4f43281e690200bdea3" offset="000000" />
+				<rom name="columns (japan).pce" size="131072" crc="99f7a572" sha1="238f9ee6cc80b31c5c93a4f43281e690200bdea3" />
 			</dataarea>
 		</part>
 	</software>
@@ -631,7 +631,7 @@ license:CC0
 		<info name="alt_title" value="コリューン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="coryoon - child of dragon (japan).pce" size="524288" crc="b4d29e3b" sha1="709595f04defcc55181f7502a0065e4c22d5fb19" offset="000000" />
+				<rom name="coryoon - child of dragon (japan).pce" size="524288" crc="b4d29e3b" sha1="709595f04defcc55181f7502a0065e4c22d5fb19" />
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +645,7 @@ license:CC0
 		<info name="alt_title" value="コリューン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="coryoon - child of dragon (japan) [a].pce" size="524288" crc="d5389889" sha1="9c840b7452b6ec87db24cc75180ebb1c970bd3e8" offset="000000" />
+				<rom name="coryoon - child of dragon (japan) [a].pce" size="524288" crc="d5389889" sha1="9c840b7452b6ec87db24cc75180ebb1c970bd3e8" />
 			</dataarea>
 		</part>
 	</software>
@@ -659,7 +659,7 @@ license:CC0
 		<info name="alt_title" value="クロスワイバー CYBER-COMBAT-POLICE"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="cross wiber - cyber combat police (japan).pce" size="524288" crc="2df97bd0" sha1="9eed16c7df8e00faf9758cd5987fb06dbdf99cef" offset="000000" />
+				<rom name="cross wiber - cyber combat police (japan).pce" size="524288" crc="2df97bd0" sha1="9eed16c7df8e00faf9758cd5987fb06dbdf99cef" />
 			</dataarea>
 		</part>
 	</software>
@@ -673,7 +673,7 @@ license:CC0
 		<info name="alt_title" value="サイバーコア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="cyber core (japan).pce" size="393216" crc="a98d276a" sha1="75bbd695e55a01a423a6c2404335d75f5bb65437" offset="000000" />
+				<rom name="cyber core (japan).pce" size="393216" crc="a98d276a" sha1="75bbd695e55a01a423a6c2404335d75f5bb65437" />
 			</dataarea>
 		</part>
 	</software>
@@ -687,7 +687,7 @@ license:CC0
 		<info name="alt_title" value="サイバードッジ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="cyber dodge (japan).pce" size="524288" crc="b5326b16" sha1="fd6e6ed4f8124a6db42dcddd34d08beacbb6dd52" offset="000000" />
+				<rom name="cyber dodge (japan).pce" size="524288" crc="b5326b16" sha1="fd6e6ed4f8124a6db42dcddd34d08beacbb6dd52" />
 			</dataarea>
 		</part>
 	</software>
@@ -701,7 +701,7 @@ license:CC0
 		<info name="alt_title" value="サイバーナイト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="cyber knight (japan).pce" size="524288" crc="a594fac0" sha1="3a860735700dcf7b5dfd83e63b2a50c715abccb5" offset="000000" />
+				<rom name="cyber knight (japan).pce" size="524288" crc="a594fac0" sha1="3a860735700dcf7b5dfd83e63b2a50c715abccb5" />
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@ license:CC0
 		<info name="alt_title" value="大旋風"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dai senpu (japan).pce" size="524288" crc="9107bcc8" sha1="81f8c8f01530bb3d22e2dd463202d0e26e7faf24" offset="000000" />
+				<rom name="dai senpu (japan).pce" size="524288" crc="9107bcc8" sha1="81f8c8f01530bb3d22e2dd463202d0e26e7faf24" />
 			</dataarea>
 		</part>
 	</software>
@@ -729,7 +729,7 @@ license:CC0
 		<info name="alt_title" value="大地くんクライシス DO NATURAL"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="daichi kun crisis - do natural (japan).pce" size="393216" crc="61a2935f" sha1="5bbf5e6bd3d2cda38c3a6ef8189a159aaf709a98" offset="000000" />
+				<rom name="daichi kun crisis - do natural (japan).pce" size="393216" crc="61a2935f" sha1="5bbf5e6bd3d2cda38c3a6ef8189a159aaf709a98" />
 			</dataarea>
 		</part>
 	</software>
@@ -741,7 +741,7 @@ license:CC0
 		<publisher>NEC Avenue</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="darius alpha (japan).pce" size="393216" crc="b0ba689f" sha1="f59c538fa632f687c356af70659fb07b37933f78" offset="000000" />
+				<rom name="darius alpha (japan).pce" size="393216" crc="b0ba689f" sha1="f59c538fa632f687c356af70659fb07b37933f78" />
 			</dataarea>
 		</part>
 	</software>
@@ -756,7 +756,7 @@ license:CC0
 		<info name="alt_title" value="ダライアス・プラス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="darius plus (japan).pce" size="786432" crc="bebfe042" sha1="a362c06e4466b2b3dc7a682f892988189117ef62" offset="000000" />
+				<rom name="darius plus (japan).pce" size="786432" crc="bebfe042" sha1="a362c06e4466b2b3dc7a682f892988189117ef62" />
 			</dataarea>
 		</part>
 	</software>
@@ -770,7 +770,7 @@ license:CC0
 		<info name="alt_title" value="デッドムーン 月世界の悪夢"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dead moon (japan).pce" size="524288" crc="56739bc7" sha1="d86ba171b459c286243306407311d85d013a2833" offset="000000" />
+				<rom name="dead moon (japan).pce" size="524288" crc="56739bc7" sha1="d86ba171b459c286243306407311d85d013a2833" />
 			</dataarea>
 		</part>
 	</software>
@@ -784,7 +784,7 @@ license:CC0
 		<info name="alt_title" value="ディープブルー・海底神話"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="deep blue - kaitei shinwa (japan).pce" size="262144" crc="053a0f83" sha1="f9cb1e26b4274759890844c36d8fd8e9cd1a195c" offset="000000" />
+				<rom name="deep blue - kaitei shinwa (japan).pce" size="262144" crc="053a0f83" sha1="f9cb1e26b4274759890844c36d8fd8e9cd1a195c" />
 			</dataarea>
 		</part>
 	</software>
@@ -798,7 +798,7 @@ license:CC0
 		<info name="alt_title" value="出たな!!ツインビー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="detana twinbee (japan).pce" size="524288" crc="5cf59d80" sha1="e1d07a2f71c695b53755bade6fe81e46e4c4828c" offset="000000" />
+				<rom name="detana twinbee (japan).pce" size="524288" crc="5cf59d80" sha1="e1d07a2f71c695b53755bade6fe81e46e4c4828c" />
 			</dataarea>
 		</part>
 	</software>
@@ -812,7 +812,7 @@ license:CC0
 		<info name="alt_title" value="デビルクラッシュ ナグザットピンボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="devil crash - naxat pinball (japan).pce" size="393216" crc="4ec81a80" sha1="808638c33e110285d0d9415bc046b94a84b02c6a" offset="000000" />
+				<rom name="devil crash - naxat pinball (japan).pce" size="393216" crc="4ec81a80" sha1="808638c33e110285d0d9415bc046b94a84b02c6a" />
 			</dataarea>
 		</part>
 	</software>
@@ -826,7 +826,7 @@ license:CC0
 		<info name="alt_title" value="ダイハード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="die hard (japan).pce" size="524288" crc="1b5b1cb1" sha1="96aeca126bb6ac0ca0df5ee260a8a1ee25f44d6d" offset="000000" />
+				<rom name="die hard (japan).pce" size="524288" crc="1b5b1cb1" sha1="96aeca126bb6ac0ca0df5ee260a8a1ee25f44d6d" />
 			</dataarea>
 		</part>
 	</software>
@@ -840,7 +840,7 @@ license:CC0
 		<info name="alt_title" value="デジタルチャンプ バトルボクシング"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="digital champ (japan).pce" size="262144" crc="17ba3032" sha1="e0af39b67be8c5086795b3dca95f469624aca428" offset="000000" />
+				<rom name="digital champ (japan).pce" size="262144" crc="17ba3032" sha1="e0af39b67be8c5086795b3dca95f469624aca428" />
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +854,7 @@ license:CC0
 		<info name="alt_title" value="ドンドコドン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="don doko don (japan).pce" size="393216" crc="f42aa73e" sha1="a32d06bf7951607059d0eb789d74009b865b6764" offset="000000" />
+				<rom name="don doko don (japan).pce" size="393216" crc="f42aa73e" sha1="a32d06bf7951607059d0eb789d74009b865b6764" />
 			</dataarea>
 		</part>
 	</software>
@@ -868,7 +868,7 @@ license:CC0
 		<info name="alt_title" value="ドラえもん 迷宮大作戦"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="doraemon - meikyuu dai sakusen (japan).pce" size="262144" crc="dc760a07" sha1="81769dc4e2e669f6ae98872d22c52ac290530a28" offset="000000" />
+				<rom name="doraemon - meikyuu dai sakusen (japan).pce" size="262144" crc="dc760a07" sha1="81769dc4e2e669f6ae98872d22c52ac290530a28" />
 			</dataarea>
 		</part>
 	</software>
@@ -882,7 +882,7 @@ license:CC0
 		<info name="alt_title" value="ドラえもん のび太のドラビアンナイト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="doraemon - nobita no dorabian night (japan).pce" size="524288" crc="013a747f" sha1="feea7cb74d4e256eb75ab46fcfc40c21743d5487" offset="000000" />
+				<rom name="doraemon - nobita no dorabian night (japan).pce" size="524288" crc="013a747f" sha1="feea7cb74d4e256eb75ab46fcfc40c21743d5487" />
 			</dataarea>
 		</part>
 	</software>
@@ -893,7 +893,7 @@ license:CC0
 		<publisher>NCS</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="double dungeons - w (japan).pce" size="262144" crc="86087b39" sha1="a5a032283f24a4e487715ffb36b3fc4615656b37" offset="000000" />
+				<rom name="double dungeons - w (japan).pce" size="262144" crc="86087b39" sha1="a5a032283f24a4e487715ffb36b3fc4615656b37" />
 			</dataarea>
 		</part>
 	</software>
@@ -907,7 +907,7 @@ license:CC0
 		<info name="alt_title" value="ダウンロード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="download (japan).pce" size="524288" crc="85101c20" sha1="847bd22cccdf929def8fc348b973faee2688e648" offset="000000" />
+				<rom name="download (japan).pce" size="524288" crc="85101c20" sha1="847bd22cccdf929def8fc348b973faee2688e648" />
 			</dataarea>
 		</part>
 	</software>
@@ -921,12 +921,12 @@ license:CC0
 		<info name="alt_title" value="ダウンロード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="download (japan) [a].pce" size="524288" crc="4e0de488" sha1="ee4a7f7dda0b22aaf043eaa4820759ddc20dff37" offset="000000" />
+				<rom name="download (japan) [a].pce" size="524288" crc="4e0de488" sha1="ee4a7f7dda0b22aaf043eaa4820759ddc20dff37" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dragnegg" supported="no">
+	<software name="dragnegg">
 		<description>Dragon Egg!</description>
 		<year>1991</year>
 		<publisher>Masiya</publisher>
@@ -935,7 +935,7 @@ license:CC0
 		<info name="alt_title" value="どらごんEGG!"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dragon egg (japan).pce" size="524288" crc="442405d5" sha1="56c69f24b542fea72cc753ddf0e4bb23974adbdf" offset="000000" />
+				<rom name="dragon egg (japan).pce" size="524288" crc="442405d5" sha1="56c69f24b542fea72cc753ddf0e4bb23974adbdf" />
 			</dataarea>
 		</part>
 	</software>
@@ -949,7 +949,7 @@ license:CC0
 		<info name="alt_title" value="ドラゴンセイバー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dragon saber - after story of dragon spirit (japan).pce" size="524288" crc="3219849c" sha1="6d94cd3e27dbe1694229f7f006dc821be4764aa2" offset="000000" />
+				<rom name="dragon saber - after story of dragon spirit (japan).pce" size="524288" crc="3219849c" sha1="6d94cd3e27dbe1694229f7f006dc821be4764aa2" />
 			</dataarea>
 		</part>
 	</software>
@@ -963,7 +963,7 @@ license:CC0
 		<info name="alt_title" value="ドラゴンセイバー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="dragon saber - after story of dragon spirit (japan) [a].pce" size="524288" crc="c89ce75a" sha1="a2f17e33a36d6e67052ad4a1c3343e2e6624eb85" offset="000000" />
+				<rom name="dragon saber - after story of dragon spirit (japan) [a].pce" size="524288" crc="c89ce75a" sha1="a2f17e33a36d6e67052ad4a1c3343e2e6624eb85" />
 			</dataarea>
 		</part>
 	</software>
@@ -977,7 +977,7 @@ license:CC0
 		<info name="alt_title" value="ドラゴンスピリット"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="dragon spirit (japan).pce" size="262144" crc="01a76935" sha1="09b037fde801b71d1ff343c40ff5a58372b9a514" offset="000000" />
+				<rom name="dragon spirit (japan).pce" size="262144" crc="01a76935" sha1="09b037fde801b71d1ff343c40ff5a58372b9a514" />
 			</dataarea>
 		</part>
 	</software>
@@ -991,7 +991,7 @@ license:CC0
 		<info name="alt_title" value="ドロップロック ほらホラ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="drop rock hora hora (japan).pce" size="262144" crc="67ec5ec4" sha1="b1b28d6dac76c3e3547f0a5a695110fd506643e0" offset="000000" />
+				<rom name="drop rock hora hora (japan).pce" size="262144" crc="67ec5ec4" sha1="b1b28d6dac76c3e3547f0a5a695110fd506643e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1005,7 +1005,7 @@ license:CC0
 		<info name="alt_title" value="ドロップロック ほらホラ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="drop rock hora hora (japan) [a].pce" size="262144" crc="8e81fcac" sha1="0ccbc76f4861b7ff4d5615a3a8149d0055c38a00" offset="000000" />
+				<rom name="drop rock hora hora (japan) [a].pce" size="262144" crc="8e81fcac" sha1="0ccbc76f4861b7ff4d5615a3a8149d0055c38a00" />
 			</dataarea>
 		</part>
 	</software>
@@ -1019,7 +1019,7 @@ license:CC0
 		<info name="alt_title" value="ダンジョン エクスプローラー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="dungeon explorer (japan).pce" size="393216" crc="1b1a80a2" sha1="77caece9655a0e14330884673ffb41ff2bb625c4" offset="000000" />
+				<rom name="dungeon explorer (japan).pce" size="393216" crc="1b1a80a2" sha1="77caece9655a0e14330884673ffb41ff2bb625c4" />
 			</dataarea>
 		</part>
 	</software>
@@ -1033,7 +1033,7 @@ license:CC0
 		<info name="alt_title" value="エナジー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="energy (japan).pce" size="262144" crc="ca68ff21" sha1="8a43ac4f92cf6715e95b607c75e5c9e43b1c7575" offset="000000" />
+				<rom name="energy (japan).pce" size="262144" crc="ca68ff21" sha1="8a43ac4f92cf6715e95b607c75e5c9e43b1c7575" />
 			</dataarea>
 		</part>
 	</software>
@@ -1047,7 +1047,7 @@ license:CC0
 		<info name="alt_title" value="F-1ドリーム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="f-1 dream (japan).pce" size="262144" crc="d50ff730" sha1="3e1b0829cc44cd254bbfdbcc29a4045d53d32639" offset="000000" />
+				<rom name="f-1 dream (japan).pce" size="262144" crc="d50ff730" sha1="3e1b0829cc44cd254bbfdbcc29a4045d53d32639" />
 			</dataarea>
 		</part>
 	</software>
@@ -1061,7 +1061,7 @@ license:CC0
 		<info name="alt_title" value="F1パイロット YOU'RE KING OF KINGS"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="f-1 pilot - you're king of kings (japan).pce" size="393216" crc="09048174" sha1="ba89f45d9b2ebd331da570f9e03ab0c8ae2cc835" offset="000000" />
+				<rom name="f-1 pilot - you're king of kings (japan).pce" size="393216" crc="09048174" sha1="ba89f45d9b2ebd331da570f9e03ab0c8ae2cc835" />
 			</dataarea>
 		</part>
 	</software>
@@ -1075,7 +1075,7 @@ license:CC0
 		<info name="alt_title" value="エフワンサーカス'91 ワールド・チャンピオンシップ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f1 circus '91 - world championship (japan).pce" size="524288" crc="d7cfd70f" sha1="e424bb52a3739c7c4723a81d16a091ae2dba49eb" offset="000000" />
+				<rom name="f1 circus '91 - world championship (japan).pce" size="524288" crc="d7cfd70f" sha1="e424bb52a3739c7c4723a81d16a091ae2dba49eb" />
 			</dataarea>
 		</part>
 	</software>
@@ -1089,7 +1089,7 @@ license:CC0
 		<info name="alt_title" value="エフワンサーカス'92 ザ・スピード・オブ・サウンド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="f1 circus '92 - the speed of sound (japan).pce" size="786432" crc="b268f2a2" sha1="c2ccd2110ae6a9d6cd64cce26b0264868d684933" offset="000000" />
+				<rom name="f1 circus '92 - the speed of sound (japan).pce" size="786432" crc="b268f2a2" sha1="c2ccd2110ae6a9d6cd64cce26b0264868d684933" />
 			</dataarea>
 		</part>
 	</software>
@@ -1103,7 +1103,7 @@ license:CC0
 		<info name="alt_title" value="エフワン サーカス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f1 circus (japan).pce" size="524288" crc="e14dee08" sha1="9a83f109f785fe75d58661645c95ff25a0699571" offset="000000" />
+				<rom name="f1 circus (japan).pce" size="524288" crc="e14dee08" sha1="9a83f109f785fe75d58661645c95ff25a0699571" />
 			</dataarea>
 		</part>
 	</software>
@@ -1117,7 +1117,7 @@ license:CC0
 		<info name="alt_title" value="エフワン サーカス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f1 circus (japan) [a].pce" size="524288" crc="79705779" sha1="6eeb1a6db725c9e96d1a4b24a8d3a944b12813e1" offset="000000" />
+				<rom name="f1 circus (japan) [a].pce" size="524288" crc="79705779" sha1="6eeb1a6db725c9e96d1a4b24a8d3a944b12813e1" />
 			</dataarea>
 		</part>
 	</software>
@@ -1131,7 +1131,7 @@ license:CC0
 		<info name="alt_title" value="F1トリプルバトル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="f1 triple battle (japan).pce" size="393216" crc="13bf0409" sha1="0a219b433529b3214f42734c2a144d238cb3c99c" offset="000000" />
+				<rom name="f1 triple battle (japan).pce" size="393216" crc="13bf0409" sha1="0a219b433529b3214f42734c2a144d238cb3c99c" />
 			</dataarea>
 		</part>
 	</software>
@@ -1145,7 +1145,7 @@ license:CC0
 		<info name="alt_title" value="ファンタジーゾーン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="fantasy zone (japan).pce" size="262144" crc="72cb0f9d" sha1="9dfc979fdf65d6425504aff68dc80e83c69e7b40" offset="000000" />
+				<rom name="fantasy zone (japan).pce" size="262144" crc="72cb0f9d" sha1="9dfc979fdf65d6425504aff68dc80e83c69e7b40" />
 			</dataarea>
 		</part>
 	</software>
@@ -1159,7 +1159,7 @@ license:CC0
 		<info name="alt_title" value="ファイティングラン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="fighting run (japan).pce" size="524288" crc="1828d2e5" sha1="fdd2962412b401cd2d72a85ddb516071468bd9ff" offset="000000" />
+				<rom name="fighting run (japan).pce" size="524288" crc="1828d2e5" sha1="fdd2962412b401cd2d72a85ddb516071468bd9ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -1173,7 +1173,7 @@ license:CC0
 		<info name="alt_title" value="ファイナルブラスター"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="final blaster (japan).pce" size="393216" crc="c90971ba" sha1="4a013fde3938ceaacf38fcc4f56828d1292142d0" offset="000000" />
+				<rom name="final blaster (japan).pce" size="393216" crc="c90971ba" sha1="4a013fde3938ceaacf38fcc4f56828d1292142d0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1187,7 +1187,7 @@ license:CC0
 		<info name="alt_title" value="ファイナルラップ・ツイン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="final lap twin (japan).pce" size="393216" crc="c8c084e3" sha1="ad695b7d1fb8bac7d9e13045bf229dba98d56a71" offset="000000" />
+				<rom name="final lap twin (japan).pce" size="393216" crc="c8c084e3" sha1="ad695b7d1fb8bac7d9e13045bf229dba98d56a71" />
 			</dataarea>
 		</part>
 	</software>
@@ -1201,7 +1201,7 @@ license:CC0
 		<info name="alt_title" value="ファイナルマッチテニス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="final match tennis (japan).pce" size="262144" crc="560d2305" sha1="e3a97b468d0a6c94effde70bf331dc4b3d90b166" offset="000000" />
+				<rom name="final match tennis (japan).pce" size="262144" crc="560d2305" sha1="e3a97b468d0a6c94effde70bf331dc4b3d90b166" />
 			</dataarea>
 		</part>
 	</software>
@@ -1215,7 +1215,7 @@ license:CC0
 		<info name="alt_title" value="ファイナルソルジャー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="final soldier (japan).pce" size="524288" crc="af2dd2af" sha1="ce89c6ea5d9eb36a642742ecad9c35c16b761c49" offset="000000" />
+				<rom name="final soldier (japan).pce" size="524288" crc="af2dd2af" sha1="ce89c6ea5d9eb36a642742ecad9c35c16b761c49" />
 			</dataarea>
 		</part>
 	</software>
@@ -1226,7 +1226,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="final soldier (special version) (japan).pce" size="524288" crc="02a578c5" sha1="ba15992964c84d4c5998f5622ae78ad843cda5f0" offset="000000" />
+				<rom name="final soldier (special version) (japan).pce" size="524288" crc="02a578c5" sha1="ba15992964c84d4c5998f5622ae78ad843cda5f0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1240,7 +1240,7 @@ license:CC0
 		<info name="alt_title" value="ファイヤープロレスリング コンビネーションタッグ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="fire pro wrestling - combination tag (japan).pce" size="393216" crc="90ed6575" sha1="d149ca397c5a45367c32fb78210e6febf734d837" offset="000000" />
+				<rom name="fire pro wrestling - combination tag (japan).pce" size="393216" crc="90ed6575" sha1="d149ca397c5a45367c32fb78210e6febf734d837" />
 			</dataarea>
 		</part>
 	</software>
@@ -1254,7 +1254,7 @@ license:CC0
 		<info name="alt_title" value="ファイヤープロレスリング 2nd BOUT"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="fire pro wrestling 2 - 2nd bout (japan).pce" size="524288" crc="e88987bb" sha1="24977d50f4e8af3fff9e5775128d9c04585ab533" offset="000000" />
+				<rom name="fire pro wrestling 2 - 2nd bout (japan).pce" size="524288" crc="e88987bb" sha1="24977d50f4e8af3fff9e5775128d9c04585ab533" />
 			</dataarea>
 		</part>
 	</software>
@@ -1268,7 +1268,7 @@ license:CC0
 		<info name="alt_title" value="ファイヤープロレスリング3 Legend Bout"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="fire pro wrestling 3 - legend bout (japan).pce" size="1048576" crc="534e8808" sha1="77a3a3a69ef847f4b84c1b510934fe73db9fa442" offset="000000" />
+				<rom name="fire pro wrestling 3 - legend bout (japan).pce" size="1048576" crc="534e8808" sha1="77a3a3a69ef847f4b84c1b510934fe73db9fa442" />
 			</dataarea>
 		</part>
 	</software>
@@ -1282,7 +1282,7 @@ license:CC0
 		<info name="alt_title" value="フォーメーション・サッカー ヒューマンカップ'90"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="formation soccer - human cup '90 (japan).pce" size="262144" crc="85a1e7b6" sha1="d53db608475ca26ff81837dc43b40726bd0440a5" offset="000000" />
+				<rom name="formation soccer - human cup '90 (japan).pce" size="262144" crc="85a1e7b6" sha1="d53db608475ca26ff81837dc43b40726bd0440a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -1296,7 +1296,7 @@ license:CC0
 		<info name="alt_title" value="フォーメーションサッカーオンJリーグ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="formation soccer - on j. league (japan).pce" size="524288" crc="7146027c" sha1="301d3e8aaa4c7f3f1c37838e3677d97e51319540" offset="000000" />
+				<rom name="formation soccer - on j. league (japan).pce" size="524288" crc="7146027c" sha1="301d3e8aaa4c7f3f1c37838e3677d97e51319540" />
 			</dataarea>
 		</part>
 	</software>
@@ -1310,7 +1310,7 @@ license:CC0
 		<info name="alt_title" value="不思議の夢のアリス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="fushigi no yume no alice (japan).pce" size="393216" crc="12c4e6fd" sha1="c266b05dd367b2973399b8daff7c4dc33bebedd9" offset="000000" />
+				<rom name="fushigi no yume no alice (japan).pce" size="393216" crc="12c4e6fd" sha1="c266b05dd367b2973399b8daff7c4dc33bebedd9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1324,7 +1324,7 @@ license:CC0
 		<info name="alt_title" value="ガイフレーム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="gai flame (japan).pce" size="393216" crc="95f90dec" sha1="e86749fff3a09e48056ca66ce4bae3ba1adc8e18" offset="000000" />
+				<rom name="gai flame (japan).pce" size="393216" crc="95f90dec" sha1="e86749fff3a09e48056ca66ce4bae3ba1adc8e18" />
 			</dataarea>
 		</part>
 	</software>
@@ -1338,7 +1338,7 @@ license:CC0
 		<info name="alt_title" value="ガイアの紋章"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="gaia no monshou (japan).pce" size="262144" crc="6fd6827c" sha1="597174ebf0c39e95635cd15a8f6ad52634a05a18" offset="000000" />
+				<rom name="gaia no monshou (japan).pce" size="262144" crc="6fd6827c" sha1="597174ebf0c39e95635cd15a8f6ad52634a05a18" />
 			</dataarea>
 		</part>
 	</software>
@@ -1352,7 +1352,7 @@ license:CC0
 		<info name="alt_title" value="ギャラガ'88"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="galaga '88 (japan).pce" size="262144" crc="1a8393c6" sha1="246079bbf7c8aca0ca66a381986785a39f39ed06" offset="000000" />
+				<rom name="galaga '88 (japan).pce" size="262144" crc="1a8393c6" sha1="246079bbf7c8aca0ca66a381986785a39f39ed06" />
 			</dataarea>
 		</part>
 	</software>
@@ -1366,7 +1366,7 @@ license:CC0
 		<info name="alt_title" value="がんばれ!ゴルフボーイズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="ganbare golf boys (japan).pce" size="262144" crc="27a4d11a" sha1="69794e5af0d2ec1a5bf6122c64fd5bc43092ae04" offset="000000" />
+				<rom name="ganbare golf boys (japan).pce" size="262144" crc="27a4d11a" sha1="69794e5af0d2ec1a5bf6122c64fd5bc43092ae04" />
 			</dataarea>
 		</part>
 	</software>
@@ -1380,7 +1380,7 @@ license:CC0
 		<info name="alt_title" value="激写ボーイ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="gekisha boy (japan).pce" size="524288" crc="e8702d51" sha1="ee2665acb440d8b01da0d14feb51d4e0bb50c400" offset="000000" />
+				<rom name="gekisha boy (japan).pce" size="524288" crc="e8702d51" sha1="ee2665acb440d8b01da0d14feb51d4e0bb50c400" />
 			</dataarea>
 		</part>
 	</software>
@@ -1394,7 +1394,7 @@ license:CC0
 		<info name="alt_title" value="ゲンジ通信 あげだま"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="genji tsuushin agedama (japan).pce" size="524288" crc="ad450dfc" sha1="25c35dae21e032fe8cd38d6e54a3330434e02adc" offset="000000" />
+				<rom name="genji tsuushin agedama (japan).pce" size="524288" crc="ad450dfc" sha1="25c35dae21e032fe8cd38d6e54a3330434e02adc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1408,7 +1408,7 @@ license:CC0
 		<info name="alt_title" value="源平討魔伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="genpei toumaden (japan).pce" size="524288" crc="b926c682" sha1="c9ac518e9541c204d532fd531aaad5cd06763986" offset="000000" />
+				<rom name="genpei toumaden (japan).pce" size="524288" crc="b926c682" sha1="c9ac518e9541c204d532fd531aaad5cd06763986" />
 			</dataarea>
 		</part>
 	</software>
@@ -1422,7 +1422,7 @@ license:CC0
 		<info name="alt_title" value="源平討魔伝 巻ノ弐"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="genpei toumaden ni no maki (japan).pce" size="524288" crc="8793758c" sha1="fc712391b09c3ff2d6c894260f4b4c10b77219af" offset="000000" />
+				<rom name="genpei toumaden ni no maki (japan).pce" size="524288" crc="8793758c" sha1="fc712391b09c3ff2d6c894260f4b4c10b77219af" />
 			</dataarea>
 		</part>
 	</software>
@@ -1436,7 +1436,7 @@ license:CC0
 		<info name="alt_title" value="極楽!中華大仙"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="gokuraku chuuka taisen (japan).pce" size="393216" crc="e749a22c" sha1="b58e94e3e0c778e678c5d08c708ac4e37bedbbe3" offset="000000" />
+				<rom name="gokuraku chuuka taisen (japan).pce" size="393216" crc="e749a22c" sha1="b58e94e3e0c778e678c5d08c708ac4e37bedbbe3" />
 			</dataarea>
 		</part>
 	</software>
@@ -1450,7 +1450,7 @@ license:CC0
 		<info name="alt_title" value="ゴモラスピード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="gomola speed (japan).pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" offset="000000" />
+				<rom name="gomola speed (japan).pce" size="393216" crc="4bd38f17" sha1="fe4b08fb0cd9d0a53726c2709db3e31fbeae1213" />
 			</dataarea>
 		</part>
 	</software>
@@ -1464,7 +1464,7 @@ license:CC0
 		<info name="alt_title" value="グラディウス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="gradius (japan).pce" size="262144" crc="0517da65" sha1="338f62b6d57f30b1850c32f5ae0d8c26c761974b" offset="000000" />
+				<rom name="gradius (japan).pce" size="262144" crc="0517da65" sha1="338f62b6d57f30b1850c32f5ae0d8c26c761974b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1478,7 +1478,7 @@ license:CC0
 		<info name="alt_title" value="ガンヘッド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="gunhed (japan).pce" size="393216" crc="a17d4d7e" sha1="0107d93ff5d10325092d45e6bfd21e8130efeed7" offset="000000" />
+				<rom name="gunhed (japan).pce" size="393216" crc="a17d4d7e" sha1="0107d93ff5d10325092d45e6bfd21e8130efeed7" />
 			</dataarea>
 		</part>
 	</software>
@@ -1489,7 +1489,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="gunhed - hudson gunhed taikai (japan).pce" size="262144" crc="57f183ae" sha1="f21597e7d04506c515b156acea7fdb4c70a5c1c8" offset="000000" />
+				<rom name="gunhed - hudson gunhed taikai (japan).pce" size="262144" crc="57f183ae" sha1="f21597e7d04506c515b156acea7fdb4c70a5c1c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -1503,7 +1503,7 @@ license:CC0
 		<info name="alt_title" value="はなたーかだか!?"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="hana taaka daka (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" offset="000000" />
+				<rom name="hana taaka daka (japan).pce" size="524288" crc="ba4d0dd4" sha1="664ccd11372b04739e388fb921ac507eb71986cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1517,7 +1517,7 @@ license:CC0
 		<info name="alt_title" value="はにい いんざ すかい"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="hanii in the sky (japan).pce" size="262144" crc="bf3e2cc7" sha1="49b1c5d889002bf52be65114d7f0646493500170" offset="000000" />
+				<rom name="hanii in the sky (japan).pce" size="262144" crc="bf3e2cc7" sha1="49b1c5d889002bf52be65114d7f0646493500170" />
 			</dataarea>
 		</part>
 	</software>
@@ -1531,7 +1531,7 @@ license:CC0
 		<info name="alt_title" value="はにい・おんざ・ろおど"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="hanii on the road (japan).pce" size="393216" crc="9897fa86" sha1="67e7fd05e40c08a7e353501e1940ef1ec5ae8b05" offset="000000" />
+				<rom name="hanii on the road (japan).pce" size="393216" crc="9897fa86" sha1="67e7fd05e40c08a7e353501e1940ef1ec5ae8b05" />
 			</dataarea>
 		</part>
 	</software>
@@ -1545,7 +1545,7 @@ license:CC0
 		<info name="alt_title" value="ハットリス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="hatris (japan).pce" size="131072" crc="44e7df53" sha1="1e2475ae58f1e612591aca44d742cc6558d75e15" offset="000000" />
+				<rom name="hatris (japan).pce" size="131072" crc="44e7df53" sha1="1e2475ae58f1e612591aca44d742cc6558d75e15" />
 			</dataarea>
 		</part>
 	</software>
@@ -1559,7 +1559,7 @@ license:CC0
 		<info name="alt_title" value="ヘビー・ユニット"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="heavy unit (japan).pce" size="393216" crc="eb923de5" sha1="d55b3f1bf4f26e37be745e8bfade4384912eb647" offset="000000" />
+				<rom name="heavy unit (japan).pce" size="393216" crc="eb923de5" sha1="d55b3f1bf4f26e37be745e8bfade4384912eb647" />
 			</dataarea>
 		</part>
 	</software>
@@ -1573,7 +1573,7 @@ license:CC0
 		<info name="alt_title" value="飛装騎兵カイザード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="hisou kihei - xserd (japan).pce" size="393216" crc="1cab1ee6" sha1="769acdd5a5642d17429a27d817d549c121687b01" offset="000000" />
+				<rom name="hisou kihei - xserd (japan).pce" size="393216" crc="1cab1ee6" sha1="769acdd5a5642d17429a27d817d549c121687b01" />
 			</dataarea>
 		</part>
 	</software>
@@ -1587,7 +1587,7 @@ license:CC0
 		<info name="alt_title" value="ヒット ジ アイス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="hit the ice - vhl the official video hockey league (japan).pce" size="393216" crc="7acb60c8" sha1="1452d2161d1da401f05c36a0a50492a6df9dc010" offset="000000" />
+				<rom name="hit the ice - vhl the official video hockey league (japan).pce" size="393216" crc="7acb60c8" sha1="1452d2161d1da401f05c36a0a50492a6df9dc010" />
 			</dataarea>
 		</part>
 	</software>
@@ -1601,7 +1601,7 @@ license:CC0
 		<info name="alt_title" value="炎の闘球児 ドッジ弾平"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="honoo no toukyuuji dodge danpei (japan).pce" size="524288" crc="b01ee703" sha1="76f8a7bb0c4854576a38a0b87fa923625ce1bc3e" offset="000000" />
+				<rom name="honoo no toukyuuji dodge danpei (japan).pce" size="524288" crc="b01ee703" sha1="76f8a7bb0c4854576a38a0b87fa923625ce1bc3e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1612,7 +1612,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="idol hanafuda fan club (japan).pce" size="524288" crc="9ec6fc6c" sha1="55ccdf9f02339f02a2f62c61a10180ea8a24817d" offset="000000" />
+				<rom name="idol hanafuda fan club (japan).pce" size="524288" crc="9ec6fc6c" sha1="55ccdf9f02339f02a2f62c61a10180ea8a24817d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1626,7 +1626,7 @@ license:CC0
 		<info name="alt_title" value="イメージファイト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="image fight (japan).pce" size="524288" crc="a80c565f" sha1="4f2256e49cc71613a6b35d224be706ee95df17b9" offset="000000" />
+				<rom name="image fight (japan).pce" size="524288" crc="a80c565f" sha1="4f2256e49cc71613a6b35d224be706ee95df17b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -1640,7 +1640,7 @@ license:CC0
 		<info name="alt_title" value="Jリーグ・グレイテストイレブン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="j. league greatest eleven (japan).pce" size="524288" crc="0ad97b04" sha1="092ac9337c5b63f2ace2141e976444501dda0e6e" offset="000000" />
+				<rom name="j. league greatest eleven (japan).pce" size="524288" crc="0ad97b04" sha1="092ac9337c5b63f2ace2141e976444501dda0e6e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1654,7 +1654,7 @@ license:CC0
 		<info name="alt_title" value="ジャック・ニクラウス チャンピオンシップ・ゴルフ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="jack nicklaus' greatest 18 holes of major championship golf (japan).pce" size="262144" crc="ea751e82" sha1="3806f0509288f76393a35f395c34a4e9e979e51f" offset="000000" />
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf (japan).pce" size="262144" crc="ea751e82" sha1="3806f0509288f76393a35f395c34a4e9e979e51f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1668,7 +1668,7 @@ license:CC0
 		<info name="alt_title" value="ジャッキーチェン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="jackie chan (japan).pce" size="524288" crc="c6fa6373" sha1="44c9ce3b37ca9c5edfe840f78485048e2bd1bf41" offset="000000" />
+				<rom name="jackie chan (japan).pce" size="524288" crc="c6fa6373" sha1="44c9ce3b37ca9c5edfe840f78485048e2bd1bf41" />
 			</dataarea>
 		</part>
 	</software>
@@ -1682,7 +1682,7 @@ license:CC0
 		<info name="alt_title" value="地獄めぐり"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="jigoku meguri (japan).pce" size="393216" crc="cc7d3eeb" sha1="1ac58fcd36ba6f757a927d1bfcf28added00111b" offset="000000" />
+				<rom name="jigoku meguri (japan).pce" size="393216" crc="cc7d3eeb" sha1="1ac58fcd36ba6f757a927d1bfcf28added00111b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1696,7 +1696,7 @@ license:CC0
 		<info name="alt_title" value="神武伝承"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="jinmu denshou (japan).pce" size="524288" crc="c150637a" sha1="e38d6d83120301a7befa7f496f1a93768060032d" offset="000000" />
+				<rom name="jinmu denshou (japan).pce" size="524288" crc="c150637a" sha1="e38d6d83120301a7befa7f496f1a93768060032d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1710,7 +1710,7 @@ license:CC0
 		<info name="alt_title" value="神武伝承"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="jinmu denshou (japan) [a].pce" size="524288" crc="84240ef9" sha1="735ba5d77f49288e360b2908d989efbdc8b7adf4" offset="000000" />
+				<rom name="jinmu denshou (japan) [a].pce" size="524288" crc="84240ef9" sha1="735ba5d77f49288e360b2908d989efbdc8b7adf4" />
 			</dataarea>
 		</part>
 	</software>
@@ -1724,7 +1724,7 @@ license:CC0
 		<info name="alt_title" value="獣王記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="juuouki (japan).pce" size="524288" crc="c8c7d63e" sha1="8b274906e2488fa3a6be467c5bd8a2ac150d5801" offset="000000" />
+				<rom name="juuouki (japan).pce" size="524288" crc="c8c7d63e" sha1="8b274906e2488fa3a6be467c5bd8a2ac150d5801" />
 			</dataarea>
 		</part>
 	</software>
@@ -1738,7 +1738,7 @@ license:CC0
 		<info name="alt_title" value="獣王記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="juuouki (japan) [a].pce" size="524288" crc="6a628982" sha1="20a413b8c5ae86502fc21f55096b89b2d7350dc2" offset="000000" />
+				<rom name="juuouki (japan) [a].pce" size="524288" crc="6a628982" sha1="20a413b8c5ae86502fc21f55096b89b2d7350dc2" />
 			</dataarea>
 		</part>
 	</software>
@@ -1752,7 +1752,7 @@ license:CC0
 		<info name="alt_title" value="改造町人 シュビビンマン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kaizou choujin shubibinman (japan).pce" size="262144" crc="a9084d6e" sha1="4db72b3a934e6255135ebc0533f900e1d5d828c8" offset="000000" />
+				<rom name="kaizou choujin shubibinman (japan).pce" size="262144" crc="a9084d6e" sha1="4db72b3a934e6255135ebc0533f900e1d5d828c8" />
 			</dataarea>
 		</part>
 	</software>
@@ -1766,7 +1766,7 @@ license:CC0
 		<info name="alt_title" value="改造町人 シュビビンマン2 ―新たなる敵―"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="kaizou choujin shubibinman 2 - aratanaru teki (japan).pce" size="524288" crc="109ba474" sha1="9c6fc53a92adead994d9b44afa92f34eebee05bb" offset="000000" />
+				<rom name="kaizou choujin shubibinman 2 - aratanaru teki (japan).pce" size="524288" crc="109ba474" sha1="9c6fc53a92adead994d9b44afa92f34eebee05bb" />
 			</dataarea>
 		</part>
 	</software>
@@ -1780,7 +1780,7 @@ license:CC0
 		<info name="alt_title" value="カトちゃんケンちゃん"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kato chan &amp; ken chan (japan).pce" size="262144" crc="6069c5e7" sha1="1381c15587891083f7cde3b1224fcc6df45bc914" offset="000000" />
+				<rom name="kato chan &amp; ken chan (japan).pce" size="262144" crc="6069c5e7" sha1="1381c15587891083f7cde3b1224fcc6df45bc914" />
 			</dataarea>
 		</part>
 	</software>
@@ -1794,7 +1794,7 @@ license:CC0
 		<info name="alt_title" value="TON90004"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="kattobi takuhai kun (japan).pce" size="393216" crc="4f2844b0" sha1="00e33d4f55c4dbe0ac493053bfebc9d6dbd469ea" offset="000000" />
+				<rom name="kattobi takuhai kun (japan).pce" size="393216" crc="4f2844b0" sha1="00e33d4f55c4dbe0ac493053bfebc9d6dbd469ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -1808,7 +1808,7 @@ license:CC0
 		<info name="alt_title" value="キックボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="kickball (japan).pce" size="393216" crc="7e3c367b" sha1="f2e59db46aa6bd70f0eec64566e113b53d56eb58" offset="000000" />
+				<rom name="kickball (japan).pce" size="393216" crc="7e3c367b" sha1="f2e59db46aa6bd70f0eec64566e113b53d56eb58" />
 			</dataarea>
 		</part>
 	</software>
@@ -1822,7 +1822,7 @@ license:CC0
 		<info name="alt_title" value="奇々怪界"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="kiki kaikai (japan).pce" size="393216" crc="c0cb5add" sha1="8dc4fce4beca91f51f123acf8f1cc659ed58d312" offset="000000" />
+				<rom name="kiki kaikai (japan).pce" size="393216" crc="c0cb5add" sha1="8dc4fce4beca91f51f123acf8f1cc659ed58d312" />
 			</dataarea>
 		</part>
 	</software>
@@ -1836,7 +1836,7 @@ license:CC0
 		<info name="alt_title" value="キング オブ カジノ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="king of casino (japan).pce" size="262144" crc="bf52788e" sha1="2f635986a785f7b00954236e3ec5fece6fedec23" offset="000000" />
+				<rom name="king of casino (japan).pce" size="262144" crc="bf52788e" sha1="2f635986a785f7b00954236e3ec5fece6fedec23" />
 			</dataarea>
 		</part>
 	</software>
@@ -1850,7 +1850,7 @@ license:CC0
 		<info name="alt_title" value="クラックス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="klax (japan).pce" size="262144" crc="c74ffbc9" sha1="cf952c23dfd771bfba50df645ba27782d3c44c16" offset="000000" />
+				<rom name="klax (japan).pce" size="262144" crc="c74ffbc9" sha1="cf952c23dfd771bfba50df645ba27782d3c44c16" />
 			</dataarea>
 		</part>
 	</software>
@@ -1864,7 +1864,7 @@ license:CC0
 		<info name="alt_title" value="ナイトライダースペシャル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="knight rider special (japan).pce" size="262144" crc="c614116c" sha1="d2dbbd8b55b80d41e32a3907fcdafa985b60abe4" offset="000000" />
+				<rom name="knight rider special (japan).pce" size="262144" crc="c614116c" sha1="d2dbbd8b55b80d41e32a3907fcdafa985b60abe4" />
 			</dataarea>
 		</part>
 	</software>
@@ -1878,7 +1878,7 @@ license:CC0
 		<info name="alt_title" value="これがプロ野球'89"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kore ga pro yakyuu '89 (japan).pce" size="262144" crc="44f60137" sha1="4f506b4aac531bfdec9a7b7736efa2656be06f62" offset="000000" />
+				<rom name="kore ga pro yakyuu '89 (japan).pce" size="262144" crc="44f60137" sha1="4f506b4aac531bfdec9a7b7736efa2656be06f62" />
 			</dataarea>
 		</part>
 	</software>
@@ -1892,7 +1892,7 @@ license:CC0
 		<info name="alt_title" value="これがプロ野球'90"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kore ga pro yakyuu '90 (japan).pce" size="262144" crc="1772b229" sha1="a55d38119e533c035077e49947fce7c0b9f10882" offset="000000" />
+				<rom name="kore ga pro yakyuu '90 (japan).pce" size="262144" crc="1772b229" sha1="a55d38119e533c035077e49947fce7c0b9f10882" />
 			</dataarea>
 		</part>
 	</software>
@@ -1906,7 +1906,7 @@ license:CC0
 		<info name="alt_title" value="THE 功夫"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kung fu, the (japan).pce" size="262144" crc="b552c906" sha1="dabdb21bef771282461f7bfee390a622217159ac" offset="000000" />
+				<rom name="kung fu, the (japan).pce" size="262144" crc="b552c906" sha1="dabdb21bef771282461f7bfee390a622217159ac" />
 			</dataarea>
 		</part>
 	</software>
@@ -1917,7 +1917,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="kyuukyoku mahjong - idol graphics (japan).pce" size="524288" crc="02dde03e" sha1="7fd4d9e028bd589b9315f81b1d27049b7541212b" offset="000000" />
+				<rom name="kyuukyoku mahjong - idol graphics (japan).pce" size="524288" crc="02dde03e" sha1="7fd4d9e028bd589b9315f81b1d27049b7541212b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1928,7 +1928,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="kyuukyoku mahjong ii (japan).pce" size="524288" crc="e5b6b3e5" sha1="1c3dfe795b84969e5c5acdece652f228fad6b163" offset="000000" />
+				<rom name="kyuukyoku mahjong ii (japan).pce" size="524288" crc="e5b6b3e5" sha1="1c3dfe795b84969e5c5acdece652f228fad6b163" />
 			</dataarea>
 		</part>
 	</software>
@@ -1942,7 +1942,7 @@ license:CC0
 		<info name="alt_title" value="究極タイガー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="kyuukyoku tiger (japan).pce" size="262144" crc="09509315" sha1="e062b7e1fe9fe04f9c29df38165e3a4eb867fe2d" offset="000000" />
+				<rom name="kyuukyoku tiger (japan).pce" size="262144" crc="09509315" sha1="e062b7e1fe9fe04f9c29df38165e3a4eb867fe2d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1953,7 +1953,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="lady sword (japan).pce" size="1048576" crc="c6f764ec" sha1="7384d0d863da43c64d704f4f36ce55502e3b6159" offset="000000" />
+				<rom name="lady sword (japan).pce" size="1048576" crc="c6f764ec" sha1="7384d0d863da43c64d704f4f36ce55502e3b6159" />
 			</dataarea>
 		</part>
 	</software>
@@ -1964,7 +1964,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="lady sword (japan) [a].pce" size="1048576" crc="eb833d15" sha1="1badb6f4f4d23ebf7caf11cc8c93403111ad9f82" offset="000000" />
+				<rom name="lady sword (japan) [a].pce" size="1048576" crc="eb833d15" sha1="1badb6f4f4d23ebf7caf11cc8c93403111ad9f82" />
 			</dataarea>
 		</part>
 	</software>
@@ -1978,7 +1978,7 @@ license:CC0
 		<info name="alt_title" value="レジェンド・オブ・ヒーロー・トンマ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="legend of hero tonma (japan).pce" size="524288" crc="c28b0d8a" sha1="352e91337db64bc7edd788e4ccb9c240c7040898" offset="000000" />
+				<rom name="legend of hero tonma (japan).pce" size="524288" crc="c28b0d8a" sha1="352e91337db64bc7edd788e4ccb9c240c7040898" />
 			</dataarea>
 		</part>
 	</software>
@@ -1992,7 +1992,7 @@ license:CC0
 		<info name="alt_title" value="ロードランナー 失われた迷宮"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="lode runner - lost labyrinth (japan).pce" size="262144" crc="e6ee1468" sha1="7d019ff2e86b3af48b4c969c8339a124b7c803b6" offset="000000" />
+				<rom name="lode runner - lost labyrinth (japan).pce" size="262144" crc="e6ee1468" sha1="7d019ff2e86b3af48b4c969c8339a124b7c803b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -2006,7 +2006,7 @@ license:CC0
 		<info name="alt_title" value="メルヘンメイズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="maerchen maze (japan).pce" size="262144" crc="a15a1f37" sha1="04175b93e52653fa61111210538a5582ba152180" offset="000000" />
+				<rom name="maerchen maze (japan).pce" size="262144" crc="a15a1f37" sha1="04175b93e52653fa61111210538a5582ba152180" />
 			</dataarea>
 		</part>
 	</software>
@@ -2020,7 +2020,7 @@ license:CC0
 		<info name="alt_title" value="マジカルチェイス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="magical chase (japan).pce" size="524288" crc="dd0ebf8c" sha1="9e15320bea2fe067ad46a34f602905b9f8962d27" offset="000000" />
+				<rom name="magical chase (japan).pce" size="524288" crc="dd0ebf8c" sha1="9e15320bea2fe067ad46a34f602905b9f8962d27" />
 			</dataarea>
 		</part>
 	</software>
@@ -2034,7 +2034,7 @@ license:CC0
 		<info name="alt_title" value="麻雀学園 東間宗四郎登場"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong gakuen - touma soushirou toujou (japan).pce" size="524288" crc="f5b90d55" sha1="ce7f528302d77fd2c1cfa1a22cdfd4e399b57c87" offset="000000" />
+				<rom name="mahjong gakuen - touma soushirou toujou (japan).pce" size="524288" crc="f5b90d55" sha1="ce7f528302d77fd2c1cfa1a22cdfd4e399b57c87" />
 			</dataarea>
 		</part>
 	</software>
@@ -2048,7 +2048,7 @@ license:CC0
 		<info name="alt_title" value="麻雀学園 MILD 東間宗四郎登場"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong gakuen mild - touma soushirou toujou (japan).pce" size="524288" crc="f4148600" sha1="66d9a1b80cdbf88d7f8be4c2c37901e9df4195dc" offset="000000" />
+				<rom name="mahjong gakuen mild - touma soushirou toujou (japan).pce" size="524288" crc="f4148600" sha1="66d9a1b80cdbf88d7f8be4c2c37901e9df4195dc" />
 			</dataarea>
 		</part>
 	</software>
@@ -2062,7 +2062,7 @@ license:CC0
 		<info name="alt_title" value="麻雀学園 MILD 東間宗四郎登場"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong gakuen mild - touma soushirou toujou (japan) [a].pce" size="524288" crc="3e4d432a" sha1="0c613a18559f7c11ff50b181ee2e68a8fe0bb587" offset="000000" />
+				<rom name="mahjong gakuen mild - touma soushirou toujou (japan) [a].pce" size="524288" crc="3e4d432a" sha1="0c613a18559f7c11ff50b181ee2e68a8fe0bb587" />
 			</dataarea>
 		</part>
 	</software>
@@ -2076,7 +2076,7 @@ license:CC0
 		<info name="alt_title" value="麻雀悟空スペシャル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="mahjong gokuu special (japan).pce" size="393216" crc="f8861456" sha1="8cd848c675c50f72589170f973b5eab869173a03" offset="000000" />
+				<rom name="mahjong gokuu special (japan).pce" size="393216" crc="f8861456" sha1="8cd848c675c50f72589170f973b5eab869173a03" />
 			</dataarea>
 		</part>
 	</software>
@@ -2090,7 +2090,7 @@ license:CC0
 		<info name="alt_title" value="麻雀覇王伝 カイザーズクエスト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mahjong haou den - kaiser's quest (japan).pce" size="524288" crc="df10c895" sha1="e539de46a672e7ec3eecca58adb924d622a78c98" offset="000000" />
+				<rom name="mahjong haou den - kaiser's quest (japan).pce" size="524288" crc="df10c895" sha1="e539de46a672e7ec3eecca58adb924d622a78c98" />
 			</dataarea>
 		</part>
 	</software>
@@ -2104,7 +2104,7 @@ license:CC0
 		<info name="alt_title" value="麻雀刺客列伝 麻雀ウォーズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="mahjong shikyaku retsuden - mahjong wars (japan).pce" size="262144" crc="6c34aaea" sha1="75dd345155ffc062553eb3fe6cac3596e1ab8edd" offset="000000" />
+				<rom name="mahjong shikyaku retsuden - mahjong wars (japan).pce" size="262144" crc="6c34aaea" sha1="75dd345155ffc062553eb3fe6cac3596e1ab8edd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2118,7 +2118,7 @@ license:CC0
 		<info name="alt_title" value="めぞん一刻"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="maison ikkoku (japan).pce" size="262144" crc="5c78fee1" sha1="ce73c12393c6ce61401a9bf94a733b4dbc17ed78" offset="000000" />
+				<rom name="maison ikkoku (japan).pce" size="262144" crc="5c78fee1" sha1="ce73c12393c6ce61401a9bf94a733b4dbc17ed78" />
 			</dataarea>
 		</part>
 	</software>
@@ -2132,7 +2132,7 @@ license:CC0
 		<info name="alt_title" value="魔神英雄伝ワタル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="majin eiyuu den wataru (japan).pce" size="262144" crc="2f8935aa" sha1="59db3e9d69cf34f76b6cb599d6c4fe6999162532" offset="000000" />
+				<rom name="majin eiyuu den wataru (japan).pce" size="262144" crc="2f8935aa" sha1="59db3e9d69cf34f76b6cb599d6c4fe6999162532" />
 			</dataarea>
 		</part>
 	</software>
@@ -2146,7 +2146,7 @@ license:CC0
 		<info name="alt_title" value="魔界八犬伝 シャダ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="makai hakken den shada (japan).pce" size="262144" crc="be62eef5" sha1="3ca3057045a9f116aea655f6965e882991e021f7" offset="000000" />
+				<rom name="makai hakken den shada (japan).pce" size="262144" crc="be62eef5" sha1="3ca3057045a9f116aea655f6965e882991e021f7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2160,7 +2160,7 @@ license:CC0
 		<info name="alt_title" value="魔界プリンス どらぼっちゃん"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="makai prince dorabocchan (japan).pce" size="393216" crc="b101b333" sha1="66cf002a82828596ed4dbd8a7b998526a624c7c5" offset="000000" />
+				<rom name="makai prince dorabocchan (japan).pce" size="393216" crc="b101b333" sha1="66cf002a82828596ed4dbd8a7b998526a624c7c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -2174,7 +2174,7 @@ license:CC0
 		<info name="alt_title" value="魔境伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="makyou densetsu (japan).pce" size="262144" crc="d4c5af46" sha1="7e1b1f52222663e9e98973fdb3cf67879122b617" offset="000000" />
+				<rom name="makyou densetsu (japan).pce" size="262144" crc="d4c5af46" sha1="7e1b1f52222663e9e98973fdb3cf67879122b617" />
 			</dataarea>
 		</part>
 	</software>
@@ -2188,7 +2188,7 @@ license:CC0
 		<info name="alt_title" value="マニアック プロレス 明日への闘い"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="maniac puroresu - asu e no tatakai (japan).pce" size="524288" crc="99f2865c" sha1="d02b38ec1b516f1324dab3499523a306f574f957" offset="000000" />
+				<rom name="maniac puroresu - asu e no tatakai (japan).pce" size="524288" crc="99f2865c" sha1="d02b38ec1b516f1324dab3499523a306f574f957" />
 			</dataarea>
 		</part>
 	</software>
@@ -2202,7 +2202,7 @@ license:CC0
 		<info name="alt_title" value="メソポタミア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mesopotamia (japan).pce" size="524288" crc="e87190f1" sha1="70186b4d823a48aae09ed7e2bc8e16edfcaf4335" offset="000000" />
+				<rom name="mesopotamia (japan).pce" size="524288" crc="e87190f1" sha1="70186b4d823a48aae09ed7e2bc8e16edfcaf4335" />
 			</dataarea>
 		</part>
 	</software>
@@ -2216,7 +2216,7 @@ license:CC0
 		<info name="alt_title" value="メタルストーカー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="metal stoker (japan).pce" size="524288" crc="25a02bee" sha1="06ae3e73fe8a83aac0159995e6db1c087799a9c5" offset="000000" />
+				<rom name="metal stoker (japan).pce" size="524288" crc="25a02bee" sha1="06ae3e73fe8a83aac0159995e6db1c087799a9c5" />
 			</dataarea>
 		</part>
 	</software>
@@ -2230,7 +2230,7 @@ license:CC0
 		<info name="alt_title" value="ミズバク大冒険"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mizubaku dai bouken (japan).pce" size="524288" crc="b2ef558d" sha1="6e99a1982b6e2b0b9fb82f1d30270620917e1b92" offset="000000" />
+				<rom name="mizubaku dai bouken (japan).pce" size="524288" crc="b2ef558d" sha1="6e99a1982b6e2b0b9fb82f1d30270620917e1b92" />
 			</dataarea>
 		</part>
 	</software>
@@ -2244,7 +2244,7 @@ license:CC0
 		<info name="alt_title" value="桃太郎伝説外伝 第1集"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="momotarou densetsu gaiden dai 1 shuu (japan).pce" size="524288" crc="f860455c" sha1="da89f567e5b96469073a53095a25cb8971260dc6" offset="000000" />
+				<rom name="momotarou densetsu gaiden dai 1 shuu (japan).pce" size="524288" crc="f860455c" sha1="da89f567e5b96469073a53095a25cb8971260dc6" />
 			</dataarea>
 		</part>
 	</software>
@@ -2258,7 +2258,7 @@ license:CC0
 		<info name="alt_title" value="桃太郎伝説II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="momotarou densetsu ii (japan).pce" size="786432" crc="d9e1549a" sha1="bc891a5703895551c8b8618b176065918317dee9" offset="000000" />
+				<rom name="momotarou densetsu ii (japan).pce" size="786432" crc="d9e1549a" sha1="bc891a5703895551c8b8618b176065918317dee9" />
 			</dataarea>
 		</part>
 	</software>
@@ -2272,7 +2272,7 @@ license:CC0
 		<info name="alt_title" value="桃太郎伝説ターボ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="momotarou densetsu turbo (japan).pce" size="393216" crc="625221a6" sha1="e6c5bd57f34d3c6b07818e351086cf63cd338f26" offset="000000" />
+				<rom name="momotarou densetsu turbo (japan).pce" size="393216" crc="625221a6" sha1="e6c5bd57f34d3c6b07818e351086cf63cd338f26" />
 			</dataarea>
 		</part>
 	</software>
@@ -2286,7 +2286,7 @@ license:CC0
 		<info name="alt_title" value="桃太郎活劇"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="momotarou katsugeki (japan).pce" size="524288" crc="345f43e9" sha1="b63aa8ae29b4d06dea7f5b795c4192285fc3c43b" offset="000000" />
+				<rom name="momotarou katsugeki (japan).pce" size="524288" crc="345f43e9" sha1="b63aa8ae29b4d06dea7f5b795c4192285fc3c43b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2300,7 +2300,7 @@ license:CC0
 		<info name="alt_title" value="モンスタープロレス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="monster puroresu (japan).pce" size="524288" crc="f2e46d25" sha1="b782344fad0efd1bcf6d3863e5f3ac9de45eee39" offset="000000" />
+				<rom name="monster puroresu (japan).pce" size="524288" crc="f2e46d25" sha1="b782344fad0efd1bcf6d3863e5f3ac9de45eee39" />
 			</dataarea>
 		</part>
 	</software>
@@ -2314,7 +2314,7 @@ license:CC0
 		<info name="alt_title" value="森田将棋PC"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="morita shougi pc (japan).pce" size="524288" crc="2546efe0" sha1="77490668bd4beea8e46e1f2676095d8d6ef1c3cd" offset="000000" />
+				<rom name="morita shougi pc (japan).pce" size="524288" crc="2546efe0" sha1="77490668bd4beea8e46e1f2676095d8d6ef1c3cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2328,7 +2328,7 @@ license:CC0
 		<info name="alt_title" value="モトローダー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="moto roader (japan).pce" size="262144" crc="428f36cd" sha1="9737bd5a9d4f28544ad1cb25592e428bea98aa27" offset="000000" />
+				<rom name="moto roader (japan).pce" size="262144" crc="428f36cd" sha1="9737bd5a9d4f28544ad1cb25592e428bea98aa27" />
 			</dataarea>
 		</part>
 	</software>
@@ -2342,7 +2342,7 @@ license:CC0
 		<info name="alt_title" value="モトローダーII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="moto roader ii (japan).pce" size="393216" crc="0b7f6e5f" sha1="101f6e3c90b314496b73ee9feab9a98f8d9b7821" offset="000000" />
+				<rom name="moto roader ii (japan).pce" size="393216" crc="0b7f6e5f" sha1="101f6e3c90b314496b73ee9feab9a98f8d9b7821" />
 			</dataarea>
 		</part>
 	</software>
@@ -2356,7 +2356,7 @@ license:CC0
 		<info name="alt_title" value="モトローダーII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="moto roader ii (japan) [a].pce" size="393216" crc="4ba525ba" sha1="e1288b2ba9875be14cd16ad7e590fc002a42290e" offset="000000" />
+				<rom name="moto roader ii (japan) [a].pce" size="393216" crc="4ba525ba" sha1="e1288b2ba9875be14cd16ad7e590fc002a42290e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2370,7 +2370,7 @@ license:CC0
 		<info name="alt_title" value="ミスターヘリの大冒険"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mr. heli no daibouken (japan).pce" size="524288" crc="2cb92290" sha1="df6346583d7169ffdec03925c9b15d3e4f066079" offset="000000" />
+				<rom name="mr. heli no daibouken (japan).pce" size="524288" crc="2cb92290" sha1="df6346583d7169ffdec03925c9b15d3e4f066079" />
 			</dataarea>
 		</part>
 	</software>
@@ -2384,7 +2384,7 @@ license:CC0
 		<info name="alt_title" value="ミスターヘリの大冒険"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="mr. heli no daibouken (japan) [a].pce" size="524288" crc="ac0cd796" sha1="fbbda31dc3a240b348d2f9ef34eff70f2adcc191" offset="000000" />
+				<rom name="mr. heli no daibouken (japan) [a].pce" size="524288" crc="ac0cd796" sha1="fbbda31dc3a240b348d2f9ef34eff70f2adcc191" />
 			</dataarea>
 		</part>
 	</software>
@@ -2398,7 +2398,7 @@ license:CC0
 		<info name="alt_title" value="ならずもの戦闘部隊ブラッディウルフ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="narazumono sentai butai - bloody wolf (japan).pce" size="524288" crc="b01f70c2" sha1="5c897decf660a41e4136f364a085e634d1fdc9a0" offset="000000" />
+				<rom name="narazumono sentai butai - bloody wolf (japan).pce" size="524288" crc="b01f70c2" sha1="5c897decf660a41e4136f364a085e634d1fdc9a0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2412,7 +2412,7 @@ license:CC0
 		<info name="alt_title" value="ナグザット オープン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="naxat open (japan).pce" size="393216" crc="60ecae22" sha1="65eb861b8f63a131ad9de611ae5f432b02c1a283" offset="000000" />
+				<rom name="naxat open (japan).pce" size="393216" crc="60ecae22" sha1="65eb861b8f63a131ad9de611ae5f432b02c1a283" />
 			</dataarea>
 		</part>
 	</software>
@@ -2426,7 +2426,7 @@ license:CC0
 		<info name="alt_title" value="ナグザットスタジアム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="naxat stadium (japan).pce" size="524288" crc="20a7d128" sha1="203338d5535457df7504b0fc0cc61e2940ef2127" offset="000000" />
+				<rom name="naxat stadium (japan).pce" size="524288" crc="20a7d128" sha1="203338d5535457df7504b0fc0cc61e2940ef2127" />
 			</dataarea>
 		</part>
 	</software>
@@ -2440,7 +2440,7 @@ license:CC0
 		<info name="alt_title" value="謎のマスカレード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="nazo no mascarade (japan).pce" size="393216" crc="0441d85a" sha1="a449aee2f786f981539315565fe1cf4daab6eef9" offset="000000" />
+				<rom name="nazo no mascarade (japan).pce" size="393216" crc="0441d85a" sha1="a449aee2f786f981539315565fe1cf4daab6eef9" />
 			</dataarea>
 		</part>
 	</software>
@@ -2454,7 +2454,7 @@ license:CC0
 		<info name="alt_title" value="邪聖剣ネクロマンサー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="necromancer (japan).pce" size="262144" crc="53109ae6" sha1="49b4122ea576a7c1c8d1ae2c5bf627e550367246" offset="000000" />
+				<rom name="necromancer (japan).pce" size="262144" crc="53109ae6" sha1="49b4122ea576a7c1c8d1ae2c5bf627e550367246" />
 			</dataarea>
 		</part>
 	</software>
@@ -2468,7 +2468,7 @@ license:CC0
 		<info name="alt_title" value="ネクロスの要塞"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="necros no yousai (japan).pce" size="524288" crc="fb0fdcfe" sha1="151336738bc339bb46c8bc9c59f1066f7ed28f8b" offset="000000" />
+				<rom name="necros no yousai (japan).pce" size="524288" crc="fb0fdcfe" sha1="151336738bc339bb46c8bc9c59f1066f7ed28f8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2482,7 +2482,7 @@ license:CC0
 		<info name="alt_title" value="ネクタリス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="nectaris (japan).pce" size="393216" crc="0243453b" sha1="e87e25f73908161a8c7b4cb1f20708cb5f8aab3b" offset="000000" />
+				<rom name="nectaris (japan).pce" size="393216" crc="0243453b" sha1="e87e25f73908161a8c7b4cb1f20708cb5f8aab3b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2496,7 +2496,7 @@ license:CC0
 		<info name="alt_title" value="熱血高校ドッジボール部 PC番外編"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="nekketsu koukou dodgeball bu - pc bangai hen (japan).pce" size="262144" crc="65fdb863" sha1="582121ade819254da31fd8867c30e60195589a9a" offset="000000" />
+				<rom name="nekketsu koukou dodgeball bu - pc bangai hen (japan).pce" size="262144" crc="65fdb863" sha1="582121ade819254da31fd8867c30e60195589a9a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2510,7 +2510,7 @@ license:CC0
 		<info name="alt_title" value="熱血高校ドッジボール部 PCサッカー編"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nekketsu koukou dodgeball bu - soccer pc hen (japan).pce" size="524288" crc="f2285c6d" sha1="208296977d5f9d3c811ed6b10bc0e982a772ff48" offset="000000" />
+				<rom name="nekketsu koukou dodgeball bu - soccer pc hen (japan).pce" size="524288" crc="f2285c6d" sha1="208296977d5f9d3c811ed6b10bc0e982a772ff48" />
 			</dataarea>
 		</part>
 	</software>
@@ -2524,7 +2524,7 @@ license:CC0
 		<info name="alt_title" value="ニュートピア フレイの章"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="neutopia (japan).pce" size="393216" crc="9c49ef11" sha1="338e0fa3da1df9cc2f3ac30faa67467c74b6cb07" offset="000000" />
+				<rom name="neutopia (japan).pce" size="393216" crc="9c49ef11" sha1="338e0fa3da1df9cc2f3ac30faa67467c74b6cb07" />
 			</dataarea>
 		</part>
 	</software>
@@ -2538,7 +2538,7 @@ license:CC0
 		<info name="alt_title" value="ニュートピアII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="neutopia ii (japan).pce" size="786432" crc="2b94aedc" sha1="d0ac1550b271eaa1d475d2e3829b4b2df0ac9f16" offset="000000" />
+				<rom name="neutopia ii (japan).pce" size="786432" crc="2b94aedc" sha1="d0ac1550b271eaa1d475d2e3829b4b2df0ac9f16" />
 			</dataarea>
 		</part>
 	</software>
@@ -2552,7 +2552,7 @@ license:CC0
 		<info name="alt_title" value="ニュージーランドストーリー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="new zealand story, the (japan).pce" size="393216" crc="8e4d75a8" sha1="cda9acea9cae4899af35b6c49b9ed449c240af16" offset="000000" />
+				<rom name="new zealand story, the (japan).pce" size="393216" crc="8e4d75a8" sha1="cda9acea9cae4899af35b6c49b9ed449c240af16" />
 			</dataarea>
 		</part>
 	</software>
@@ -2566,7 +2566,7 @@ license:CC0
 		<info name="alt_title" value="NHK大河ドラマ 太平記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nhk taiga drama - taiheiki (japan).pce" size="524288" crc="a32430d5" sha1="b7f407dc377a32f8b0d22dd3444405bc2e674741" offset="000000" />
+				<rom name="nhk taiga drama - taiheiki (japan).pce" size="524288" crc="a32430d5" sha1="b7f407dc377a32f8b0d22dd3444405bc2e674741" />
 			</dataarea>
 		</part>
 	</software>
@@ -2580,7 +2580,7 @@ license:CC0
 		<info name="alt_title" value="にこにこ、ぷん"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="niko niko pun (japan).pce" size="524288" crc="82def9ee" sha1="75226e0baa8df8179e40c3e5c398a42650506a12" offset="000000" />
+				<rom name="niko niko pun (japan).pce" size="524288" crc="82def9ee" sha1="75226e0baa8df8179e40c3e5c398a42650506a12" />
 			</dataarea>
 		</part>
 	</software>
@@ -2594,7 +2594,7 @@ license:CC0
 		<info name="alt_title" value="忍者龍剣伝"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ninja ryuuken den (japan).pce" size="524288" crc="67573bac" sha1="7f6a088424f849fc80f883d19533c031305d9616" offset="000000" />
+				<rom name="ninja ryuuken den (japan).pce" size="524288" crc="67573bac" sha1="7f6a088424f849fc80f883d19533c031305d9616" />
 			</dataarea>
 		</part>
 	</software>
@@ -2608,7 +2608,7 @@ license:CC0
 		<info name="alt_title" value="ニンジャウォーリアーズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="ninja warriors, the (japan).pce" size="393216" crc="96e0cd9d" sha1="27f30fa4eb12856bd21279e96d1764bba531432f" offset="000000" />
+				<rom name="ninja warriors, the (japan).pce" size="393216" crc="96e0cd9d" sha1="27f30fa4eb12856bd21279e96d1764bba531432f" />
 			</dataarea>
 		</part>
 	</software>
@@ -2622,7 +2622,7 @@ license:CC0
 		<info name="alt_title" value="おぼっちゃまくん"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="obocchama kun (japan).pce" size="524288" crc="4d3b0bc9" sha1="f505c31aab43ac6fd4d88fd14ae03a9c418e7357" offset="000000" />
+				<rom name="obocchama kun (japan).pce" size="524288" crc="4d3b0bc9" sha1="f505c31aab43ac6fd4d88fd14ae03a9c418e7357" />
 			</dataarea>
 		</part>
 	</software>
@@ -2633,7 +2633,7 @@ license:CC0
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="off the wall [proto 1].pce" size="524288" crc="8621ae02" sha1="eaf6083667104b427c2dc928a3aeae6edfc0005b" offset="000000" />
+				<rom name="off the wall [proto 1].pce" size="524288" crc="8621ae02" sha1="eaf6083667104b427c2dc928a3aeae6edfc0005b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2647,7 +2647,7 @@ license:CC0
 		<info name="alt_title" value="オペレーション ウルフ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="operation wolf (japan).pce" size="524288" crc="ff898f87" sha1="da2a28e2961fa295c4b8f55bd5a6ce6f1c58beb7" offset="000000" />
+				<rom name="operation wolf (japan).pce" size="524288" crc="ff898f87" sha1="da2a28e2961fa295c4b8f55bd5a6ce6f1c58beb7" />
 			</dataarea>
 		</part>
 	</software>
@@ -2661,7 +2661,7 @@ license:CC0
 		<info name="alt_title" value="オーダイン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="ordyne (japan).pce" size="524288" crc="8c565cb6" sha1="6b1e419c77f72d3588b52343989727b5a069df3a" offset="000000" />
+				<rom name="ordyne (japan).pce" size="524288" crc="8c565cb6" sha1="6b1e419c77f72d3588b52343989727b5a069df3a" />
 			</dataarea>
 		</part>
 	</software>
@@ -2675,7 +2675,7 @@ license:CC0
 		<info name="alt_title" value="アウトライブ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="out live (japan).pce" size="262144" crc="5cdb3f5b" sha1="985222734388586a6b8530846fc9e4701c1ccd0b" offset="000000" />
+				<rom name="out live (japan).pce" size="262144" crc="5cdb3f5b" sha1="985222734388586a6b8530846fc9e4701c1ccd0b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2689,7 +2689,7 @@ license:CC0
 		<info name="alt_title" value="アウトラン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="out run (japan).pce" size="524288" crc="e203f223" sha1="4db6d354171a6e5f81d17d11e1aca7278a1fa95e" offset="000000" />
+				<rom name="out run (japan).pce" size="524288" crc="e203f223" sha1="4db6d354171a6e5f81d17d11e1aca7278a1fa95e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2703,7 +2703,7 @@ license:CC0
 		<info name="alt_title" value="オーバーライド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="override (japan).pce" size="262144" crc="b74ec562" sha1="9da08c896e02b67257521b948c2fa5bc55724c0d" offset="000000" />
+				<rom name="override (japan).pce" size="262144" crc="b74ec562" sha1="9da08c896e02b67257521b948c2fa5bc55724c0d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2716,7 +2716,7 @@ license:CC0
 		<info name="release" value="19890320"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="p-47 - the freedom fighter (japan).pce" size="262144" crc="7632db90" sha1="54face25e1bdd6c1b842b957bcce272797ba7f1c" offset="000000" />
+				<rom name="p-47 - the freedom fighter (japan).pce" size="262144" crc="7632db90" sha1="54face25e1bdd6c1b842b957bcce272797ba7f1c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2730,7 +2730,7 @@ license:CC0
 		<info name="alt_title" value="パックランド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="pac-land (japan).pce" size="262144" crc="14fad3ba" sha1="fc0166da82ed3cf4a4e06fc6c73fd3184ba8bb3b" offset="000000" />
+				<rom name="pac-land (japan).pce" size="262144" crc="14fad3ba" sha1="fc0166da82ed3cf4a4e06fc6c73fd3184ba8bb3b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2744,7 +2744,7 @@ license:CC0
 		<info name="alt_title" value="パチ夫くん 十番勝負"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pachio kun - juuban shoubu (japan).pce" size="524288" crc="4148fd7c" sha1="67749fc1c067c16000223fd3b7555fd85c9f9ebd" offset="000000" />
+				<rom name="pachio kun - juuban shoubu (japan).pce" size="524288" crc="4148fd7c" sha1="67749fc1c067c16000223fd3b7555fd85c9f9ebd" />
 			</dataarea>
 		</part>
 	</software>
@@ -2758,7 +2758,7 @@ license:CC0
 		<info name="alt_title" value="パラノイア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="paranoia (japan).pce" size="262144" crc="9893e0e6" sha1="b3097e7f163e4a067cf32f290e59657a8b5e271b" offset="000000" />
+				<rom name="paranoia (japan).pce" size="262144" crc="9893e0e6" sha1="b3097e7f163e4a067cf32f290e59657a8b5e271b" />
 			</dataarea>
 		</part>
 	</software>
@@ -2772,7 +2772,7 @@ license:CC0
 		<info name="alt_title" value="パラソルスター"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="parasol stars - the story of bubble bobble iii (japan).pce" size="393216" crc="51e86451" sha1="94a4c4b16435b043b0b985af446d8767602f5041" offset="000000" />
+				<rom name="parasol stars - the story of bubble bobble iii (japan).pce" size="393216" crc="51e86451" sha1="94a4c4b16435b043b0b985af446d8767602f5041" />
 			</dataarea>
 		</part>
 	</software>
@@ -2786,7 +2786,7 @@ license:CC0
 		<info name="alt_title" value="パロディウスだ! -神話からお笑いへ-"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="parodius da - shinwa kara owarai he (japan).pce" size="1048576" crc="647718f9" sha1="5110dcc06efd1daaeb98305378d818519da88d28" offset="000000" />
+				<rom name="parodius da - shinwa kara owarai he (japan).pce" size="1048576" crc="647718f9" sha1="5110dcc06efd1daaeb98305378d818519da88d28" />
 			</dataarea>
 		</part>
 	</software>
@@ -2800,7 +2800,7 @@ license:CC0
 		<info name="alt_title" value="PC電人 PUNKIC CYBORGS"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pc denjin - punkic cyborgs (japan).pce" size="524288" crc="740491c2" sha1="7713236070c2d5252faa651b6a8b7726cadb9bf4" offset="000000" />
+				<rom name="pc denjin - punkic cyborgs (japan).pce" size="524288" crc="740491c2" sha1="7713236070c2d5252faa651b6a8b7726cadb9bf4" />
 			</dataarea>
 		</part>
 	</software>
@@ -2814,7 +2814,7 @@ license:CC0
 		<info name="alt_title" value="PC電人 PUNKIC CYBORGS"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pc denjin - punkic cyborgs (japan) [a].pce" size="524288" crc="8fb4f228" sha1="f3fb61cf86a87c0f99ef05926cd835c2fe305c45" offset="000000" />
+				<rom name="pc denjin - punkic cyborgs (japan) [a].pce" size="524288" crc="8fb4f228" sha1="f3fb61cf86a87c0f99ef05926cd835c2fe305c45" />
 			</dataarea>
 		</part>
 	</software>
@@ -2828,7 +2828,7 @@ license:CC0
 		<info name="alt_title" value="PC原人"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="pc genjin - pithecanthropus computerurus (japan).pce" size="393216" crc="2cb5cd55" sha1="40fab9ea76d94d5569a977b1eb5a1dfb54978485" offset="000000" />
+				<rom name="pc genjin - pithecanthropus computerurus (japan).pce" size="393216" crc="2cb5cd55" sha1="40fab9ea76d94d5569a977b1eb5a1dfb54978485" />
 			</dataarea>
 		</part>
 	</software>
@@ -2842,7 +2842,7 @@ license:CC0
 		<info name="alt_title" value="PC原人"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="pc genjin - pithecanthropus computerurus (japan) [a].pce" size="393216" crc="67b35e6e" sha1="2c36256e77e74d5528366d35f0a55c45bc37d5a5" offset="000000" />
+				<rom name="pc genjin - pithecanthropus computerurus (japan) [a].pce" size="393216" crc="67b35e6e" sha1="2c36256e77e74d5528366d35f0a55c45bc37d5a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -2856,7 +2856,7 @@ license:CC0
 		<info name="alt_title" value="PC原人2"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pc genjin 2 - pithecanthropus computerurus (japan).pce" size="524288" crc="3028f7ca" sha1="ef2b10e9bd35428bff3d67b9f77dd3ff50d91f2e" offset="000000" />
+				<rom name="pc genjin 2 - pithecanthropus computerurus (japan).pce" size="524288" crc="3028f7ca" sha1="ef2b10e9bd35428bff3d67b9f77dd3ff50d91f2e" />
 			</dataarea>
 		</part>
 	</software>
@@ -2870,7 +2870,7 @@ license:CC0
 		<info name="alt_title" value="PC原人3"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="pc genjin 3 - pithecanthropus computerurus (japan).pce" size="1048576" crc="a170b60e" sha1="201aaeafccc9247cf25fd6661c5798aabcc7b329" offset="000000" />
+				<rom name="pc genjin 3 - pithecanthropus computerurus (japan).pce" size="1048576" crc="a170b60e" sha1="201aaeafccc9247cf25fd6661c5798aabcc7b329" />
 			</dataarea>
 		</part>
 	</software>
@@ -2881,7 +2881,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="pc genjin 3 - pithecanthropus computerurus (taikenban) (japan).pce" size="786432" crc="6f6ed301" sha1="55515655a818c0f2e1aa3b76b87022f125b915db" offset="000000" />
+				<rom name="pc genjin 3 - pithecanthropus computerurus (taikenban) (japan).pce" size="786432" crc="6f6ed301" sha1="55515655a818c0f2e1aa3b76b87022f125b915db" />
 			</dataarea>
 		</part>
 	</software>
@@ -2893,7 +2893,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="pc pachi-slot (japan).pce" size="524288" crc="0aa88f33" sha1="6d0c8ffc7071d5a25ed6f3ee1325fe021ead6f89" offset="000000" />
+				<rom name="pc pachi-slot (japan).pce" size="524288" crc="0aa88f33" sha1="6d0c8ffc7071d5a25ed6f3ee1325fe021ead6f89" />
 			</dataarea>
 		</part>
 	</software>
@@ -2908,7 +2908,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="populous" />
 			<dataarea name="rom" size="524288">
-				<rom name="populous (japan).pce" size="524288" crc="083c956a" sha1="4912ccc31bdd45ef9483ea345bbe4c4ff2d70779" offset="000000" />
+				<rom name="populous (japan).pce" size="524288" crc="083c956a" sha1="4912ccc31bdd45ef9483ea345bbe4c4ff2d70779" />
 			</dataarea>
 		</part>
 	</software>
@@ -2923,7 +2923,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="populous" />
 			<dataarea name="rom" size="524288">
-				<rom name="populous (japan) [a].pce" size="524288" crc="0a9ade99" sha1="8e021703241c20ebd2a40ee55788c3a5fc4b8592" offset="000000" />
+				<rom name="populous (japan) [a].pce" size="524288" crc="0a9ade99" sha1="8e021703241c20ebd2a40ee55788c3a5fc4b8592" />
 			</dataarea>
 		</part>
 	</software>
@@ -2937,7 +2937,7 @@ license:CC0
 		<info name="alt_title" value="パワードリフト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power drift (japan).pce" size="524288" crc="25e0f6e9" sha1="1ffe1111a570b0cca256a356965fd6cdf7bcf2e9" offset="000000" />
+				<rom name="power drift (japan).pce" size="524288" crc="25e0f6e9" sha1="1ffe1111a570b0cca256a356965fd6cdf7bcf2e9" />
 			</dataarea>
 		</part>
 	</software>
@@ -2951,7 +2951,7 @@ license:CC0
 		<info name="alt_title" value="パワードリフト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power drift (japan) [a].pce" size="524288" crc="99e6d988" sha1="d5277a014b98d93abd29b35eafdf1a8ee28a1ff8" offset="000000" />
+				<rom name="power drift (japan) [a].pce" size="524288" crc="99e6d988" sha1="d5277a014b98d93abd29b35eafdf1a8ee28a1ff8" />
 			</dataarea>
 		</part>
 	</software>
@@ -2965,7 +2965,7 @@ license:CC0
 		<info name="alt_title" value="パワーイレブン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="power eleven (japan).pce" size="393216" crc="3e647d8b" sha1="f132948117d3135ec8d5d74eaac8d965e6676fb4" offset="000000" />
+				<rom name="power eleven (japan).pce" size="393216" crc="3e647d8b" sha1="f132948117d3135ec8d5d74eaac8d965e6676fb4" />
 			</dataarea>
 		</part>
 	</software>
@@ -2979,7 +2979,7 @@ license:CC0
 		<info name="alt_title" value="パワーゲイト"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="power gate (japan).pce" size="262144" crc="be8b6e3b" sha1="ba5b53a1561a2ecf6bd6aec18a9db34c211c05ea" offset="000000" />
+				<rom name="power gate (japan).pce" size="262144" crc="be8b6e3b" sha1="ba5b53a1561a2ecf6bd6aec18a9db34c211c05ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -2993,7 +2993,7 @@ license:CC0
 		<info name="alt_title" value="パワーゴルフ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="power golf (japan).pce" size="393216" crc="ea324f07" sha1="ff0a18094daecd56091f04f76b35551c303520b9" offset="000000" />
+				<rom name="power golf (japan).pce" size="393216" crc="ea324f07" sha1="ff0a18094daecd56091f04f76b35551c303520b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -3007,7 +3007,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグ'93"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="power league '93 (japan).pce" size="786432" crc="7d3e6f33" sha1="0e710ee789206baceec43df7f24a8e80bdbc7154" offset="000000" />
+				<rom name="power league '93 (japan).pce" size="786432" crc="7d3e6f33" sha1="0e710ee789206baceec43df7f24a8e80bdbc7154" />
 			</dataarea>
 		</part>
 	</software>
@@ -3018,7 +3018,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="power league (all star version) (japan).pce" size="262144" crc="04a85769" sha1="3b66b7273e7b04cdb16d6e333e764f9462dd8f26" offset="000000" />
+				<rom name="power league (all star version) (japan).pce" size="262144" crc="04a85769" sha1="3b66b7273e7b04cdb16d6e333e764f9462dd8f26" />
 			</dataarea>
 		</part>
 	</software>
@@ -3032,7 +3032,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="power league (japan).pce" size="262144" crc="69180984" sha1="4e50a6c422b4d8c8ea0cce64e5acca7bf13adaf6" offset="000000" />
+				<rom name="power league (japan).pce" size="262144" crc="69180984" sha1="4e50a6c422b4d8c8ea0cce64e5acca7bf13adaf6" />
 			</dataarea>
 		</part>
 	</software>
@@ -3046,7 +3046,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="power league ii (japan).pce" size="393216" crc="c5fdfa89" sha1="2d176bd9efcf1576646e8889768ef8c6662ee216" offset="000000" />
+				<rom name="power league ii (japan).pce" size="393216" crc="c5fdfa89" sha1="2d176bd9efcf1576646e8889768ef8c6662ee216" />
 			</dataarea>
 		</part>
 	</software>
@@ -3060,7 +3060,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグIII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="power league iii (japan).pce" size="393216" crc="8aa4b220" sha1="e6526db07c2de857ccf9b997e18ccfab73087133" offset="000000" />
+				<rom name="power league iii (japan).pce" size="393216" crc="8aa4b220" sha1="e6526db07c2de857ccf9b997e18ccfab73087133" />
 			</dataarea>
 		</part>
 	</software>
@@ -3074,7 +3074,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグ4"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power league iv (japan).pce" size="524288" crc="30cc3563" sha1="a21825a19bef0a4d7847f72b4a00acd74a53ebb8" offset="000000" />
+				<rom name="power league iv (japan).pce" size="524288" crc="30cc3563" sha1="a21825a19bef0a4d7847f72b4a00acd74a53ebb8" />
 			</dataarea>
 		</part>
 	</software>
@@ -3088,7 +3088,7 @@ license:CC0
 		<info name="alt_title" value="パワーリーグ5"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="power league v (japan).pce" size="786432" crc="8b61e029" sha1="6e94fa53d715d7c7ee26d49ea9a6b70005894e03" offset="000000" />
+				<rom name="power league v (japan).pce" size="786432" crc="8b61e029" sha1="6e94fa53d715d7c7ee26d49ea9a6b70005894e03" />
 			</dataarea>
 		</part>
 	</software>
@@ -3102,7 +3102,7 @@ license:CC0
 		<info name="alt_title" value="パワースポーツ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power sports (japan).pce" size="524288" crc="29eec024" sha1="dfb30bc069e97c72f051fc0ab237607187d4a52e" offset="000000" />
+				<rom name="power sports (japan).pce" size="524288" crc="29eec024" sha1="dfb30bc069e97c72f051fc0ab237607187d4a52e" />
 			</dataarea>
 		</part>
 	</software>
@@ -3116,7 +3116,7 @@ license:CC0
 		<info name="alt_title" value="パワーテニス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="power tennis (japan).pce" size="524288" crc="8def5aa1" sha1="eef562022a9399586dd4278d7877e408c19b47dd" offset="000000" />
+				<rom name="power tennis (japan).pce" size="524288" crc="8def5aa1" sha1="eef562022a9399586dd4278d7877e408c19b47dd" />
 			</dataarea>
 		</part>
 	</software>
@@ -3130,7 +3130,7 @@ license:CC0
 		<info name="alt_title" value="プロテニス ワールドコート"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="pro tennis world court (japan).pce" size="262144" crc="11a36745" sha1="1330fe108135e63acf8ff8938b38ca7b2b5f6af0" offset="000000" />
+				<rom name="pro tennis world court (japan).pce" size="262144" crc="11a36745" sha1="1330fe108135e63acf8ff8938b38ca7b2b5f6af0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3144,7 +3144,7 @@ license:CC0
 		<info name="alt_title" value="プロ野球 ワールドスタジアム'91"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="pro yakyuu world stadium '91 (japan).pce" size="262144" crc="66b167a9" sha1="6b76e9cc10a812c15631450b617ea3719fdcdc16" offset="000000" />
+				<rom name="pro yakyuu world stadium '91 (japan).pce" size="262144" crc="66b167a9" sha1="6b76e9cc10a812c15631450b617ea3719fdcdc16" />
 			</dataarea>
 		</part>
 	</software>
@@ -3158,7 +3158,7 @@ license:CC0
 		<info name="alt_title" value="プロ野球 ワールドスタジアム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="pro yakyuu world stadium (japan).pce" size="262144" crc="34e089a9" sha1="0309ba1acc4955e582457fd3fcc4ea8e0abf1264" offset="000000" />
+				<rom name="pro yakyuu world stadium (japan).pce" size="262144" crc="34e089a9" sha1="0309ba1acc4955e582457fd3fcc4ea8e0abf1264" />
 			</dataarea>
 		</part>
 	</software>
@@ -3172,7 +3172,7 @@ license:CC0
 		<info name="alt_title" value="サイコチェイサー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="psycho chaser (japan).pce" size="262144" crc="03883ee8" sha1="753fc6f1aa16770c87cc12967a43e951a7b1ec83" offset="000000" />
+				<rom name="psycho chaser (japan).pce" size="262144" crc="03883ee8" sha1="753fc6f1aa16770c87cc12967a43e951a7b1ec83" />
 			</dataarea>
 		</part>
 	</software>
@@ -3186,7 +3186,7 @@ license:CC0
 		<info name="alt_title" value="パズルボーイ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="puzzle boy (japan).pce" size="262144" crc="faa6e187" sha1="f3d87e780683cd1873287069f4758581bb848935" offset="000000" />
+				<rom name="puzzle boy (japan).pce" size="262144" crc="faa6e187" sha1="f3d87e780683cd1873287069f4758581bb848935" />
 			</dataarea>
 		</part>
 	</software>
@@ -3200,7 +3200,7 @@ license:CC0
 		<info name="alt_title" value="パズニック"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="puzznic (japan).pce" size="262144" crc="965c95b3" sha1="3906d644f5901e6d2e732cbd0a6dd0d38a29486b" offset="000000" />
+				<rom name="puzznic (japan).pce" size="262144" crc="965c95b3" sha1="3906d644f5901e6d2e732cbd0a6dd0d38a29486b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3211,7 +3211,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="quiz toukou shashin (japan).pce" size="1048576" crc="f2e6856d" sha1="6b5d8e4b007de8a9b59d6a87802874f515cd1ae0" offset="000000" />
+				<rom name="quiz toukou shashin (japan).pce" size="1048576" crc="f2e6856d" sha1="6b5d8e4b007de8a9b59d6a87802874f515cd1ae0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3225,7 +3225,7 @@ license:CC0
 		<info name="alt_title" value="アールタイプ I"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="r-type part-1 (japan).pce" size="262144" crc="cec3d28a" sha1="1170c63839fb94c754d07c4f6f49ad2de6666668" offset="000000" />
+				<rom name="r-type part-1 (japan).pce" size="262144" crc="cec3d28a" sha1="1170c63839fb94c754d07c4f6f49ad2de6666668" />
 			</dataarea>
 		</part>
 	</software>
@@ -3239,7 +3239,7 @@ license:CC0
 		<info name="alt_title" value="アールタイプ II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="r-type part-2 (japan).pce" size="262144" crc="f207ecae" sha1="7667dce9f6a09f8197efe0718e476b48579760d6" offset="000000" />
+				<rom name="r-type part-2 (japan).pce" size="262144" crc="f207ecae" sha1="7667dce9f6a09f8197efe0718e476b48579760d6" />
 			</dataarea>
 		</part>
 	</software>
@@ -3254,7 +3254,7 @@ license:CC0
 		<info name="alt_title" value="アールタイプ II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="r-type part-2 (japan) [a].pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" offset="000000" />
+				<rom name="r-type part-2 (japan) [a].pce" size="262144" crc="417b961d" sha1="198eb4e62a1a0e591c1505ef188e74eff8415e0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3268,7 +3268,7 @@ license:CC0
 		<info name="alt_title" value="ラビオレプス スペシャル"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="rabio lepus special (japan).pce" size="393216" crc="d8373de6" sha1="ebd12a22e2d139a904b8aff535787abc128ad61a" offset="000000" />
+				<rom name="rabio lepus special (japan).pce" size="393216" crc="d8373de6" sha1="ebd12a22e2d139a904b8aff535787abc128ad61a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3282,7 +3282,7 @@ license:CC0
 		<info name="alt_title" value="レーシング魂"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="racing damashii (japan).pce" size="524288" crc="3e79734c" sha1="8e558b47599a36d78d319e0dcd2e5136564df074" offset="000000" />
+				<rom name="racing damashii (japan).pce" size="524288" crc="3e79734c" sha1="8e558b47599a36d78d319e0dcd2e5136564df074" />
 			</dataarea>
 		</part>
 	</software>
@@ -3296,7 +3296,7 @@ license:CC0
 		<info name="alt_title" value="雷電"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="raiden (japan).pce" size="786432" crc="850829f2" sha1="cef25446294884053442a4214434d7d97319ddca" offset="000000" />
+				<rom name="raiden (japan).pce" size="786432" crc="850829f2" sha1="cef25446294884053442a4214434d7d97319ddca" />
 			</dataarea>
 		</part>
 	</software>
@@ -3310,7 +3310,7 @@ license:CC0
 		<info name="alt_title" value="ラスタン・サーガII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="rastan saga ii (japan).pce" size="393216" crc="00c38e69" sha1="cf06ba4d1bd31ebd69f0415ae52848f752ec8f6b" offset="000000" />
+				<rom name="rastan saga ii (japan).pce" size="393216" crc="00c38e69" sha1="cf06ba4d1bd31ebd69f0415ae52848f752ec8f6b" />
 			</dataarea>
 		</part>
 	</software>
@@ -3324,7 +3324,7 @@ license:CC0
 		<info name="alt_title" value="ロック・オン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="rock-on (japan).pce" size="393216" crc="2fd65312" sha1="19a7744bc8355076f481446978f49175dbd132b9" offset="000000" />
+				<rom name="rock-on (japan).pce" size="393216" crc="2fd65312" sha1="19a7744bc8355076f481446978f49175dbd132b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -3338,7 +3338,7 @@ license:CC0
 		<info name="alt_title" value="琉球"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="ryukyu (japan).pce" size="262144" crc="91e6896f" sha1="2c9451619acb491eff2ed20bffe389b9261ba651" offset="000000" />
+				<rom name="ryukyu (japan).pce" size="262144" crc="91e6896f" sha1="2c9451619acb491eff2ed20bffe389b9261ba651" />
 			</dataarea>
 		</part>
 	</software>
@@ -3352,7 +3352,7 @@ license:CC0
 		<info name="alt_title" value="定吉七番 秀吉の黄金"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sadakichi 7 series - hideyoshi no ougon (japan).pce" size="262144" crc="f999356f" sha1="a629408efcc607a5385d81a8fe15f77e6a721ddd" offset="000000" />
+				<rom name="sadakichi 7 series - hideyoshi no ougon (japan).pce" size="262144" crc="f999356f" sha1="a629408efcc607a5385d81a8fe15f77e6a721ddd" />
 			</dataarea>
 		</part>
 	</software>
@@ -3366,7 +3366,7 @@ license:CC0
 		<info name="alt_title" value="最後の忍道 NINJA SPIRIT"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="saigo no nindou - ninja spirit (japan).pce" size="524288" crc="0590a156" sha1="14fc48758d658413f952a0b4f9465137164bdacc" offset="000000" />
+				<rom name="saigo no nindou - ninja spirit (japan).pce" size="524288" crc="0590a156" sha1="14fc48758d658413f952a0b4f9465137164bdacc" />
 			</dataarea>
 		</part>
 	</software>
@@ -3380,7 +3380,7 @@ license:CC0
 		<info name="alt_title" value="沙羅曼蛇"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="salamander (japan).pce" size="262144" crc="faecce20" sha1="a24e3a4ff36ec9fffd5ea1f4c6b526f61f842584" offset="000000" />
+				<rom name="salamander (japan).pce" size="262144" crc="faecce20" sha1="a24e3a4ff36ec9fffd5ea1f4c6b526f61f842584" />
 			</dataarea>
 		</part>
 	</software>
@@ -3394,7 +3394,7 @@ license:CC0
 		<info name="alt_title" value="関ヶ原"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sekigahara (japan).pce" size="524288" crc="2e955051" sha1="aefa660f6ff5845664b455e0c75e212733d45c06" offset="000000" />
+				<rom name="sekigahara (japan).pce" size="524288" crc="2e955051" sha1="aefa660f6ff5845664b455e0c75e212733d45c06" />
 			</dataarea>
 		</part>
 	</software>
@@ -3408,7 +3408,7 @@ license:CC0
 		<info name="alt_title" value="戦国麻雀"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sengoku mahjong (japan).pce" size="262144" crc="90e6bf49" sha1="b0be49af6275179ff0d5a44acbcdd4c6f2c55a07" offset="000000" />
+				<rom name="sengoku mahjong (japan).pce" size="262144" crc="90e6bf49" sha1="b0be49af6275179ff0d5a44acbcdd4c6f2c55a07" />
 			</dataarea>
 		</part>
 	</software>
@@ -3422,7 +3422,7 @@ license:CC0
 		<info name="alt_title" value="上海"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="shanghai (japan).pce" size="131072" crc="6923d736" sha1="11311390c11f4b72f5e07d2527039a7560405501" offset="000000" />
+				<rom name="shanghai (japan).pce" size="131072" crc="6923d736" sha1="11311390c11f4b72f5e07d2527039a7560405501" />
 			</dataarea>
 		</part>
 	</software>
@@ -3436,7 +3436,7 @@ license:CC0
 		<info name="alt_title" value="忍"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="shinobi (japan).pce" size="393216" crc="bc655cf3" sha1="c219f8477dc2b34b53c25a419332595835d1f5ec" offset="000000" />
+				<rom name="shinobi (japan).pce" size="393216" crc="bc655cf3" sha1="c219f8477dc2b34b53c25a419332595835d1f5ec" />
 			</dataarea>
 		</part>
 	</software>
@@ -3450,7 +3450,7 @@ license:CC0
 		<info name="alt_title" value="死霊戦線"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="shiryou sensen (japan).pce" size="262144" crc="469a0fdf" sha1="8e2510d9930d0e7d0a13bcc9d5ded32f6eed8617" offset="000000" />
+				<rom name="shiryou sensen (japan).pce" size="262144" crc="469a0fdf" sha1="8e2510d9930d0e7d0a13bcc9d5ded32f6eed8617" />
 			</dataarea>
 		</part>
 	</software>
@@ -3464,7 +3464,7 @@ license:CC0
 		<info name="alt_title" value="将棋 初段一直線"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="shougi shodan icchokusen (japan).pce" size="262144" crc="23ec8970" sha1="af992d6c74266366c4dacdde258f91cb0056d3b9" offset="000000" />
+				<rom name="shougi shodan icchokusen (japan).pce" size="262144" crc="23ec8970" sha1="af992d6c74266366c4dacdde258f91cb0056d3b9" />
 			</dataarea>
 		</part>
 	</software>
@@ -3478,7 +3478,7 @@ license:CC0
 		<info name="alt_title" value="将棋 初心者無用"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="shougi shoshinsha muyou (japan).pce" size="262144" crc="457f2bc4" sha1="cfeaf0af946b6f168a919687528264db7f448f3c" offset="000000" />
+				<rom name="shougi shoshinsha muyou (japan).pce" size="262144" crc="457f2bc4" sha1="cfeaf0af946b6f168a919687528264db7f448f3c" />
 			</dataarea>
 		</part>
 	</software>
@@ -3492,7 +3492,7 @@ license:CC0
 		<info name="alt_title" value="サイドアーム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="sidearms - hyper dyne (japan).pce" size="262144" crc="e5e7b8b7" sha1="b732b3485bd8841d3571221170b04b7f699e9109" offset="000000" />
+				<rom name="sidearms - hyper dyne (japan).pce" size="262144" crc="e5e7b8b7" sha1="b732b3485bd8841d3571221170b04b7f699e9109" />
 			</dataarea>
 		</part>
 	</software>
@@ -3506,7 +3506,7 @@ license:CC0
 		<info name="alt_title" value="サイレント デバッガーズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="silent debuggers (japan).pce" size="524288" crc="616ea179" sha1="9101f738a37c9fcbc69308449cdfb94c928f64c6" offset="000000" />
+				<rom name="silent debuggers (japan).pce" size="524288" crc="616ea179" sha1="9101f738a37c9fcbc69308449cdfb94c928f64c6" />
 			</dataarea>
 		</part>
 	</software>
@@ -3520,7 +3520,7 @@ license:CC0
 		<info name="alt_title" value="シンドバット 地底の大魔宮"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="sindibad chitei no dai makyuu (japan).pce" size="393216" crc="b5c4eebd" sha1="6d99d2e3acac7399afbeeb1acf108ff96703cc47" offset="000000" />
+				<rom name="sindibad chitei no dai makyuu (japan).pce" size="393216" crc="b5c4eebd" sha1="6d99d2e3acac7399afbeeb1acf108ff96703cc47" />
 			</dataarea>
 		</part>
 	</software>
@@ -3534,7 +3534,7 @@ license:CC0
 		<info name="alt_title" value="スクウィーク"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="skweek (japan).pce" size="262144" crc="4d539c9f" sha1="3436b48a9c748269f6ae65e40c9115a27321d440" offset="000000" />
+				<rom name="skweek (japan).pce" size="262144" crc="4d539c9f" sha1="3436b48a9c748269f6ae65e40c9115a27321d440" />
 			</dataarea>
 		</part>
 	</software>
@@ -3548,7 +3548,7 @@ license:CC0
 		<info name="alt_title" value="ソルジャーブレイド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="soldier blade (japan).pce" size="524288" crc="8420b12b" sha1="bb6259ecfee3cc28ddbf1b1c1416f281ecccbe31" offset="000000" />
+				<rom name="soldier blade (japan).pce" size="524288" crc="8420b12b" sha1="bb6259ecfee3cc28ddbf1b1c1416f281ecccbe31" />
 			</dataarea>
 		</part>
 	</software>
@@ -3559,7 +3559,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="soldier blade special - caravan stage (japan).pce" size="524288" crc="f39f38ed" sha1="328a85924778d742cc5b191ac60d79a7ed9b0620" offset="000000" />
+				<rom name="soldier blade special - caravan stage (japan).pce" size="524288" crc="f39f38ed" sha1="328a85924778d742cc5b191ac60d79a7ed9b0620" />
 			</dataarea>
 		</part>
 	</software>
@@ -3573,7 +3573,7 @@ license:CC0
 		<info name="alt_title" value="ソンソンII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="son son ii (japan).pce" size="262144" crc="d7921df2" sha1="51aa9b47aa5f68102989885a1b92bb6b563ffe3a" offset="000000" />
+				<rom name="son son ii (japan).pce" size="262144" crc="d7921df2" sha1="51aa9b47aa5f68102989885a1b92bb6b563ffe3a" />
 			</dataarea>
 		</part>
 	</software>
@@ -3587,7 +3587,7 @@ license:CC0
 		<info name="alt_title" value="倉庫番ワールド"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="soukoban world (japan).pce" size="131072" crc="fb37ddc4" sha1="89899202fe2a7607f9e5f2ab1b29280f3d7d5aef" offset="000000" />
+				<rom name="soukoban world (japan).pce" size="131072" crc="fb37ddc4" sha1="89899202fe2a7607f9e5f2ab1b29280f3d7d5aef" />
 			</dataarea>
 		</part>
 	</software>
@@ -3601,7 +3601,7 @@ license:CC0
 		<info name="alt_title" value="スペース ハリアー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="space harrier (japan).pce" size="524288" crc="64580427" sha1="b59ccab8f7e73d4a9b29ccd8befb78cbcd491fa4" offset="000000" />
+				<rom name="space harrier (japan).pce" size="524288" crc="64580427" sha1="b59ccab8f7e73d4a9b29ccd8befb78cbcd491fa4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3615,7 +3615,7 @@ license:CC0
 		<info name="alt_title" value="スペースインベーダーズ 復活の日"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="space invaders - fukkatsu no hi (japan).pce" size="262144" crc="99496db3" sha1="cf6a4ef91b3eebe81bb6af55ed9ef6dd816d1765" offset="000000" />
+				<rom name="space invaders - fukkatsu no hi (japan).pce" size="262144" crc="99496db3" sha1="cf6a4ef91b3eebe81bb6af55ed9ef6dd816d1765" />
 			</dataarea>
 		</part>
 	</software>
@@ -3628,7 +3628,7 @@ license:CC0
 		<info name="release" value="19910125"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="special criminal investigation (japan).pce" size="524288" crc="09a0bfcc" sha1="8d18aea811d752d24cc00f20d2c6ced67df1efa9" offset="000000" />
+				<rom name="special criminal investigation (japan).pce" size="524288" crc="09a0bfcc" sha1="8d18aea811d752d24cc00f20d2c6ced67df1efa9" />
 			</dataarea>
 		</part>
 	</software>
@@ -3642,7 +3642,7 @@ license:CC0
 		<info name="alt_title" value="スピンペア"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="spin pair (japan).pce" size="262144" crc="1c6ff459" sha1="a903a3e3a55b1fd9064efa668bcea53055c12682" offset="000000" />
+				<rom name="spin pair (japan).pce" size="262144" crc="1c6ff459" sha1="a903a3e3a55b1fd9064efa668bcea53055c12682" />
 			</dataarea>
 		</part>
 	</software>
@@ -3656,7 +3656,7 @@ license:CC0
 		<info name="alt_title" value="スパイラルウェーブ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="spiral wave (japan).pce" size="524288" crc="a5290dd0" sha1="83ad9abe6469fa1a298e5cc059914ac0e92be209" offset="000000" />
+				<rom name="spiral wave (japan).pce" size="524288" crc="a5290dd0" sha1="83ad9abe6469fa1a298e5cc059914ac0e92be209" />
 			</dataarea>
 		</part>
 	</software>
@@ -3670,7 +3670,7 @@ license:CC0
 		<info name="alt_title" value="スプラッターハウス"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="splatterhouse (japan).pce" size="524288" crc="6b319457" sha1="b0bdbb7729d775496581dc3141c4447614aaac46" offset="000000" />
+				<rom name="splatterhouse (japan).pce" size="524288" crc="6b319457" sha1="b0bdbb7729d775496581dc3141c4447614aaac46" />
 			</dataarea>
 		</part>
 	</software>
@@ -3684,7 +3684,7 @@ license:CC0
 		<info name="alt_title" value="ストラテゴ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="stratego (japan).pce" size="262144" crc="727f4656" sha1="cb67d9cf50cbef0e3b455409bc0a4f81ec57da99" offset="000000" />
+				<rom name="stratego (japan).pce" size="262144" crc="727f4656" sha1="cb67d9cf50cbef0e3b455409bc0a4f81ec57da99" />
 			</dataarea>
 		</part>
 	</software>
@@ -3699,7 +3699,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="sf2" />
 			<dataarea name="rom" size="2621440">
-				<rom name="street fighter ii' - champion edition (japan).pce" size="2621440" crc="d15cb6bb" sha1="e757ecdf857803cb46cdf37ecf4596f6eaccdd76" offset="000000" />
+				<rom name="street fighter ii' - champion edition (japan).pce" size="2621440" crc="d15cb6bb" sha1="e757ecdf857803cb46cdf37ecf4596f6eaccdd76" />
 			</dataarea>
 		</part>
 	</software>
@@ -3710,7 +3710,7 @@ license:CC0
 		<publisher>Game Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="strip fighter ii (japan).pce" size="1048576" crc="d6fc51ce" sha1="8dd63c3c499261af9ea43fcdd23066b0140e3ea1" offset="000000" />
+				<rom name="strip fighter ii (japan).pce" size="1048576" crc="d6fc51ce" sha1="8dd63c3c499261af9ea43fcdd23066b0140e3ea1" />
 			</dataarea>
 		</part>
 	</software>
@@ -3724,7 +3724,7 @@ license:CC0
 		<info name="alt_title" value="スーパーメタルクラッシャー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="super metal crusher (japan).pce" size="262144" crc="56488b36" sha1="6050eb365dcc42b90e8ddacf44685d72744ab4f0" offset="000000" />
+				<rom name="super metal crusher (japan).pce" size="262144" crc="56488b36" sha1="6050eb365dcc42b90e8ddacf44685d72744ab4f0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3738,7 +3738,7 @@ license:CC0
 		<info name="alt_title" value="スーパー桃太郎電鉄"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="super momotarou dentetsu (japan).pce" size="393216" crc="3eb5304a" sha1="353a1ff7997df5d7be6ee03f1157fd746939ed61" offset="000000" />
+				<rom name="super momotarou dentetsu (japan).pce" size="393216" crc="3eb5304a" sha1="353a1ff7997df5d7be6ee03f1157fd746939ed61" />
 			</dataarea>
 		</part>
 	</software>
@@ -3752,7 +3752,7 @@ license:CC0
 		<info name="alt_title" value="スーパー桃太郎電鉄II"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="786432">
-				<rom name="super momotarou dentetsu ii (japan).pce" size="786432" crc="2bc023fc" sha1="a9e874453d18738d63523ace2419b7cd95a381a7" offset="000000" />
+				<rom name="super momotarou dentetsu ii (japan).pce" size="786432" crc="2bc023fc" sha1="a9e874453d18738d63523ace2419b7cd95a381a7" />
 			</dataarea>
 		</part>
 	</software>
@@ -3766,7 +3766,7 @@ license:CC0
 		<info name="alt_title" value="スーパースターソルジャー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="super star soldier (japan).pce" size="524288" crc="5d0e3105" sha1="4220516a17bc32a3f68ed51ef2af63e496e79f7d" offset="000000" />
+				<rom name="super star soldier (japan).pce" size="524288" crc="5d0e3105" sha1="4220516a17bc32a3f68ed51ef2af63e496e79f7d" />
 			</dataarea>
 		</part>
 	</software>
@@ -3780,7 +3780,7 @@ license:CC0
 		<info name="alt_title" value="スーパーバレーボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="super volleyball (japan).pce" size="262144" crc="ce2e4f9f" sha1="46dd4acebe25de38f28e56cf149b24b42f3aef31" offset="000000" />
+				<rom name="super volleyball (japan).pce" size="262144" crc="ce2e4f9f" sha1="46dd4acebe25de38f28e56cf149b24b42f3aef31" />
 			</dataarea>
 		</part>
 	</software>
@@ -3794,7 +3794,7 @@ license:CC0
 		<info name="alt_title" value="凄ノ王伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="susanoo densetsu (japan).pce" size="524288" crc="cf73d8fc" sha1="43853c5622992dfdc6844376f61b8998e44e2eaf" offset="000000" />
+				<rom name="susanoo densetsu (japan).pce" size="524288" crc="cf73d8fc" sha1="43853c5622992dfdc6844376f61b8998e44e2eaf" />
 			</dataarea>
 		</part>
 	</software>
@@ -3808,7 +3808,7 @@ license:CC0
 		<info name="alt_title" value="タイトーチェイスH. Q. "/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="taito chase h.q. (japan).pce" size="393216" crc="6f4fd790" sha1="f4cd413a1f87027194b7cadfbaaa714c137e877f" offset="000000" />
+				<rom name="taito chase h.q. (japan).pce" size="393216" crc="6f4fd790" sha1="f4cd413a1f87027194b7cadfbaaa714c137e877f" />
 			</dataarea>
 		</part>
 	</software>
@@ -3822,7 +3822,7 @@ license:CC0
 		<info name="alt_title" value="高橋名人の新冒険島"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="takahashi meijin no shin boukenjima (japan).pce" size="524288" crc="e415ea19" sha1="ab179fc81694676f57d0ce2e0834c875f36271b0" offset="000000" />
+				<rom name="takahashi meijin no shin boukenjima (japan).pce" size="524288" crc="e415ea19" sha1="ab179fc81694676f57d0ce2e0834c875f36271b0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3836,7 +3836,7 @@ license:CC0
 		<info name="alt_title" value="武田信玄"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="takeda shingen (japan).pce" size="262144" crc="f022be13" sha1="902202b2990b1737db3ab4d7db801715d54eb814" offset="000000" />
+				<rom name="takeda shingen (japan).pce" size="262144" crc="f022be13" sha1="902202b2990b1737db3ab4d7db801715d54eb814" />
 			</dataarea>
 		</part>
 	</software>
@@ -3850,7 +3850,7 @@ license:CC0
 		<info name="alt_title" value="武田信玄"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="takeda shingen (japan) [a].pce" size="262144" crc="df7af71c" sha1="1d662df0936971e21b702633a8c75844753911c9" offset="000000" />
+				<rom name="takeda shingen (japan) [a].pce" size="262144" crc="df7af71c" sha1="1d662df0936971e21b702633a8c75844753911c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -3864,7 +3864,7 @@ license:CC0
 		<info name="alt_title" value="タツジン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tatsujin (japan).pce" size="524288" crc="a6088275" sha1="dda768075fbf8c0624e2c1f217b1092513b1c942" offset="000000" />
+				<rom name="tatsujin (japan).pce" size="524288" crc="a6088275" sha1="dda768075fbf8c0624e2c1f217b1092513b1c942" />
 			</dataarea>
 		</part>
 	</software>
@@ -3875,7 +3875,7 @@ license:CC0
 		<publisher>Taito</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tatsujin (japan) (proto).pce" size="524288" crc="c1b26659" sha1="c36fb68b7fda1e4e1d021f6ae00522c9832bd225" offset="000000" />
+				<rom name="tatsujin (japan) (proto).pce" size="524288" crc="c1b26659" sha1="c36fb68b7fda1e4e1d021f6ae00522c9832bd225" />
 			</dataarea>
 		</part>
 	</software>
@@ -3889,7 +3889,7 @@ license:CC0
 		<info name="alt_title" value="竜の子ファイター"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="tatsunoko fighter (japan).pce" size="262144" crc="eeb6dd43" sha1="f0de077362365d8216eeba0f89cec9cae4cdc132" offset="000000" />
+				<rom name="tatsunoko fighter (japan).pce" size="262144" crc="eeb6dd43" sha1="f0de077362365d8216eeba0f89cec9cae4cdc132" />
 			</dataarea>
 		</part>
 	</software>
@@ -3902,7 +3902,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="tennokoe" />
 			<dataarea name="rom" size="131072">
-				<rom name="tennokoe bank (japan).pce" size="131072" crc="3b3808bd" sha1="8ade1c698e0cb96ce3ed01986c7e5268aa5a1451" offset="000000" />
+				<rom name="tennokoe bank (japan).pce" size="131072" crc="3b3808bd" sha1="8ade1c698e0cb96ce3ed01986c7e5268aa5a1451" />
 			</dataarea>
 		</part>
 	</software>
@@ -3916,7 +3916,7 @@ license:CC0
 		<info name="alt_title" value="天聖龍"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="tenseiryuu - saint dragon (japan).pce" size="393216" crc="2e278ccb" sha1="a9637a5efeb555426a44ae1cc86ed25a9520759d" offset="000000" />
+				<rom name="tenseiryuu - saint dragon (japan).pce" size="393216" crc="2e278ccb" sha1="a9637a5efeb555426a44ae1cc86ed25a9520759d" />
 			</dataarea>
 		</part>
 	</software>
@@ -3930,7 +3930,7 @@ license:CC0
 		<info name="alt_title" value="テラクレスタII マンドラーの逆襲"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="terra cresta ii - mandoraa no gyakushuu (japan).pce" size="524288" crc="1b2d0077" sha1="c58d3ea8df6cb518349d431d6b3d6fd2c14898ec" offset="000000" />
+				<rom name="terra cresta ii - mandoraa no gyakushuu (japan).pce" size="524288" crc="1b2d0077" sha1="c58d3ea8df6cb518349d431d6b3d6fd2c14898ec" />
 			</dataarea>
 		</part>
 	</software>
@@ -3944,7 +3944,7 @@ license:CC0
 		<info name="alt_title" value="サンダーブレード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="thunder blade (japan).pce" size="524288" crc="ddc3e809" sha1="553f8026dd68e85cd17855adbf920b3971acfdc4" offset="000000" />
+				<rom name="thunder blade (japan).pce" size="524288" crc="ddc3e809" sha1="553f8026dd68e85cd17855adbf920b3971acfdc4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3958,7 +3958,7 @@ license:CC0
 		<info name="alt_title" value="タイムクルーズII"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="time cruise ii (japan).pce" size="524288" crc="cfec1d6a" sha1="84bf83124a77ff67aaa0ea3f34ad9edbb755454d" offset="000000" />
+				<rom name="time cruise ii (japan).pce" size="524288" crc="cfec1d6a" sha1="84bf83124a77ff67aaa0ea3f34ad9edbb755454d" />
 			</dataarea>
 		</part>
 	</software>
@@ -3972,7 +3972,7 @@ license:CC0
 		<info name="alt_title" value="タイタン"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="titan (japan).pce" size="262144" crc="d20f382f" sha1="7d12a65453c8d3d539104904a9a1eb9e429f9ab4" offset="000000" />
+				<rom name="titan (japan).pce" size="262144" crc="d20f382f" sha1="7d12a65453c8d3d539104904a9a1eb9e429f9ab4" />
 			</dataarea>
 		</part>
 	</software>
@@ -3986,7 +3986,7 @@ license:CC0
 		<info name="alt_title" value="トイレキッズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="toilet kids (japan).pce" size="524288" crc="53b7784b" sha1="1148ec489899928592212ceac61c83cbc67751cb" offset="000000" />
+				<rom name="toilet kids (japan).pce" size="524288" crc="53b7784b" sha1="1148ec489899928592212ceac61c83cbc67751cb" />
 			</dataarea>
 		</part>
 	</software>
@@ -4000,7 +4000,7 @@ license:CC0
 		<info name="alt_title" value="虎への道"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="tora e no michi (japan).pce" size="393216" crc="82ae3b16" sha1="ea66f8c1be62e853b72f93a3a1e3b597356ae62f" offset="000000" />
+				<rom name="tora e no michi (japan).pce" size="393216" crc="82ae3b16" sha1="ea66f8c1be62e853b72f93a3a1e3b597356ae62f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4014,7 +4014,7 @@ license:CC0
 		<info name="alt_title" value="都市転送計画 エターナルシティ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="toshi tensou keikaku - eternal city (japan).pce" size="393216" crc="b18d102d" sha1="61e9102c02f87af87bd2e0b75093c01e12cf4801" offset="000000" />
+				<rom name="toshi tensou keikaku - eternal city (japan).pce" size="393216" crc="b18d102d" sha1="61e9102c02f87af87bd2e0b75093c01e12cf4801" />
 			</dataarea>
 		</part>
 	</software>
@@ -4028,7 +4028,7 @@ license:CC0
 		<info name="alt_title" value="ドルアーガの塔"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tower of druaga, the (japan).pce" size="524288" crc="72e00bc4" sha1="1d34d947d9dfd4d7a3e1a0dda789645cd8c4ac29" offset="000000" />
+				<rom name="tower of druaga, the (japan).pce" size="524288" crc="72e00bc4" sha1="1d34d947d9dfd4d7a3e1a0dda789645cd8c4ac29" />
 			</dataarea>
 		</part>
 	</software>
@@ -4042,7 +4042,7 @@ license:CC0
 		<info name="alt_title" value="トイ・ショップ・ボーイズ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="toy shop boys (japan).pce" size="262144" crc="97c5ee9a" sha1="d552223399ff54c3664a5a06fc620ffb717cea57" offset="000000" />
+				<rom name="toy shop boys (japan).pce" size="262144" crc="97c5ee9a" sha1="d552223399ff54c3664a5a06fc620ffb717cea57" />
 			</dataarea>
 		</part>
 	</software>
@@ -4056,7 +4056,7 @@ license:CC0
 		<info name="alt_title" value="トリッキー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="tricky (japan).pce" size="262144" crc="3aea2f8f" sha1="009e0ea4203bab968cea3cd9428c633ce2c5c26e" offset="000000" />
+				<rom name="tricky (japan).pce" size="262144" crc="3aea2f8f" sha1="009e0ea4203bab968cea3cd9428c633ce2c5c26e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4070,7 +4070,7 @@ license:CC0
 		<info name="alt_title" value="つっぱり大相撲 平成版"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="tsuppari oozumou - heisei ban (japan).pce" size="262144" crc="61a6e210" sha1="24df2dfec320b5dd04cf3d01cc586954bd33f72d" offset="000000" />
+				<rom name="tsuppari oozumou - heisei ban (japan).pce" size="262144" crc="61a6e210" sha1="24df2dfec320b5dd04cf3d01cc586954bd33f72d" />
 			</dataarea>
 		</part>
 	</software>
@@ -4084,7 +4084,7 @@ license:CC0
 		<info name="alt_title" value="都留照人の実戦株式倍バイゲーム"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="tsuru teruhito no jissen kabushiki bai bai game (japan).pce" size="262144" crc="f70112e5" sha1="b07b7365f07607b5d528cd82bdcfeab40fb1afc4" offset="000000" />
+				<rom name="tsuru teruhito no jissen kabushiki bai bai game (japan).pce" size="262144" crc="f70112e5" sha1="b07b7365f07607b5d528cd82bdcfeab40fb1afc4" />
 			</dataarea>
 		</part>
 	</software>
@@ -4098,7 +4098,7 @@ license:CC0
 		<info name="alt_title" value="TVスポーツ・バスケットボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tv sports basketball (japan).pce" size="524288" crc="10b60601" sha1="a4b8766db8acc6e8f76772b278609f80e55af67f" offset="000000" />
+				<rom name="tv sports basketball (japan).pce" size="524288" crc="10b60601" sha1="a4b8766db8acc6e8f76772b278609f80e55af67f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4112,7 +4112,7 @@ license:CC0
 		<info name="alt_title" value="TVスポーツ・フットボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="tv sports football (japan).pce" size="393216" crc="968d908a" sha1="2ba8e2da6e2aa26722cdc5f1646163444b2bb98f" offset="000000" />
+				<rom name="tv sports football (japan).pce" size="393216" crc="968d908a" sha1="2ba8e2da6e2aa26722cdc5f1646163444b2bb98f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4126,7 +4126,7 @@ license:CC0
 		<info name="alt_title" value="TVスポーツ・アイスホッケー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="tv sports hockey (japan).pce" size="393216" crc="e7529890" sha1="7ef8bc6e42c4bf023802a659c7856670dae02449" offset="000000" />
+				<rom name="tv sports hockey (japan).pce" size="393216" crc="e7529890" sha1="7ef8bc6e42c4bf023802a659c7856670dae02449" />
 			</dataarea>
 		</part>
 	</software>
@@ -4140,7 +4140,7 @@ license:CC0
 		<info name="alt_title" value="USAプロバスケットボール"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="usa pro basketball (japan).pce" size="262144" crc="1cad4b7f" sha1="62f3e0c56d22c015bea15fe04cd16fae380fefcd" offset="000000" />
+				<rom name="usa pro basketball (japan).pce" size="262144" crc="1cad4b7f" sha1="62f3e0c56d22c015bea15fe04cd16fae380fefcd" />
 			</dataarea>
 		</part>
 	</software>
@@ -4154,7 +4154,7 @@ license:CC0
 		<info name="alt_title" value="ヴェイグスTACTICAL GLADIATOR"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="veigues - tactical gladiator (japan).pce" size="393216" crc="04188c5c" sha1="da66c085ecbb317cb160cb192142a3d2c044f26f" offset="000000" />
+				<rom name="veigues - tactical gladiator (japan).pce" size="393216" crc="04188c5c" sha1="da66c085ecbb317cb160cb192142a3d2c044f26f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4168,7 +4168,7 @@ license:CC0
 		<info name="alt_title" value="HC62003"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="victory run (japan).pce" size="262144" crc="03e28cff" sha1="68044c5fb23f27697ff88657a22ef60ff6d61396" offset="000000" />
+				<rom name="victory run (japan).pce" size="262144" crc="03e28cff" sha1="68044c5fb23f27697ff88657a22ef60ff6d61396" />
 			</dataarea>
 		</part>
 	</software>
@@ -4182,7 +4182,7 @@ license:CC0
 		<info name="alt_title" value="ビジランテ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="vigilante (japan).pce" size="393216" crc="e4124fe0" sha1="a43ddb6b9d70c7597788abd363b5df719b70bc46" offset="000000" />
+				<rom name="vigilante (japan).pce" size="393216" crc="e4124fe0" sha1="a43ddb6b9d70c7597788abd363b5df719b70bc46" />
 			</dataarea>
 		</part>
 	</software>
@@ -4196,7 +4196,7 @@ license:CC0
 		<info name="alt_title" value="バイオレント・ソルジャー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="violent soldier (japan).pce" size="393216" crc="1bc36b36" sha1="76581fe7acb707b1e5bab2ac27cd27e3ed06078a" offset="000000" />
+				<rom name="violent soldier (japan).pce" size="393216" crc="1bc36b36" sha1="76581fe7acb707b1e5bab2ac27cd27e3ed06078a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4210,7 +4210,7 @@ license:CC0
 		<info name="alt_title" value="ヴォルフィード"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="volfied (japan).pce" size="393216" crc="ad226f30" sha1="0ecee557815b93fc37f2f5675c2c01c77ef8569e" offset="000000" />
+				<rom name="volfied (japan).pce" size="393216" crc="ad226f30" sha1="0ecee557815b93fc37f2f5675c2c01c77ef8569e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4224,7 +4224,7 @@ license:CC0
 		<info name="alt_title" value="ダブルリング"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="w-ring - the double rings (japan).pce" size="393216" crc="be990010" sha1="95d0a95ce9f08da3f096cfdc654ba5dfeb794add" offset="000000" />
+				<rom name="w-ring - the double rings (japan).pce" size="393216" crc="be990010" sha1="95d0a95ce9f08da3f096cfdc654ba5dfeb794add" />
 			</dataarea>
 		</part>
 	</software>
@@ -4238,7 +4238,7 @@ license:CC0
 		<info name="alt_title" value="わいわい麻雀 ゆかいな雀友たち"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="wai wai mahjong - yukaina janyuu tachi (japan).pce" size="262144" crc="a2a0776e" sha1="8f478a023a97b0979232f1e296bbf0a6c0b2ef8b" offset="000000" />
+				<rom name="wai wai mahjong - yukaina janyuu tachi (japan).pce" size="262144" crc="a2a0776e" sha1="8f478a023a97b0979232f1e296bbf0a6c0b2ef8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -4252,7 +4252,7 @@ license:CC0
 		<info name="alt_title" value="ワルキューレの伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="walkuere no densetsu (japan).pce" size="524288" crc="a3303978" sha1="2054898ae28f962d2e20cdaca62e8b88e932f304" offset="000000" />
+				<rom name="walkuere no densetsu (japan).pce" size="524288" crc="a3303978" sha1="2054898ae28f962d2e20cdaca62e8b88e932f304" />
 			</dataarea>
 		</part>
 	</software>
@@ -4266,7 +4266,7 @@ license:CC0
 		<info name="alt_title" value="ワラビー!! ウサギの国のカンガルーレース"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="393216">
-				<rom name="wallaby - usagi no kuni no kangaroo race (japan).pce" size="393216" crc="0112d0c7" sha1="03ad5a8b2bb65eabebe73c1e2ca1e1846cc172bf" offset="000000" />
+				<rom name="wallaby - usagi no kuni no kangaroo race (japan).pce" size="393216" crc="0112d0c7" sha1="03ad5a8b2bb65eabebe73c1e2ca1e1846cc172bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -4280,7 +4280,7 @@ license:CC0
 		<info name="alt_title" value="ウィニングショット"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="winning shot (japan).pce" size="262144" crc="9b5ebc58" sha1="039ff38e6221b4b7722144e85dc7c84873d7efe6" offset="000000" />
+				<rom name="winning shot (japan).pce" size="262144" crc="9b5ebc58" sha1="039ff38e6221b4b7722144e85dc7c84873d7efe6" />
 			</dataarea>
 		</part>
 	</software>
@@ -4294,7 +4294,7 @@ license:CC0
 		<info name="alt_title" value="ワンダーモモ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="wonder momo (japan).pce" size="262144" crc="59d07314" sha1="5af6050a0a549e73f05a2d06fd2f55a93027be5f" offset="000000" />
+				<rom name="wonder momo (japan).pce" size="262144" crc="59d07314" sha1="5af6050a0a549e73f05a2d06fd2f55a93027be5f" />
 			</dataarea>
 		</part>
 	</software>
@@ -4308,7 +4308,7 @@ license:CC0
 		<info name="alt_title" value="ワールドビーチバレー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="world beach volley (japan).pce" size="262144" crc="be850530" sha1="8aa42b9024820e7e503e9b9e8ac05e424643ef81" offset="000000" />
+				<rom name="world beach volley (japan).pce" size="262144" crc="be850530" sha1="8aa42b9024820e7e503e9b9e8ac05e424643ef81" />
 			</dataarea>
 		</part>
 	</software>
@@ -4322,7 +4322,7 @@ license:CC0
 		<info name="alt_title" value="ワールドサーキット"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="world circuit (japan).pce" size="262144" crc="b3eeea2e" sha1="18909a1215da66f6d16eab4251b574b86d2b748e" offset="000000" />
+				<rom name="world circuit (japan).pce" size="262144" crc="b3eeea2e" sha1="18909a1215da66f6d16eab4251b574b86d2b748e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4336,7 +4336,7 @@ license:CC0
 		<info name="alt_title" value="ワールドジョッキー"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="world jockey (japan).pce" size="262144" crc="a9ab2954" sha1="9fdeb0c34ea8b8d2a09aeb476435ef9d92e75573" offset="000000" />
+				<rom name="world jockey (japan).pce" size="262144" crc="a9ab2954" sha1="9fdeb0c34ea8b8d2a09aeb476435ef9d92e75573" />
 			</dataarea>
 		</part>
 	</software>
@@ -4350,7 +4350,7 @@ license:CC0
 		<info name="alt_title" value="ゼビウスファードラウト伝説"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="xevious - fardraut densetsu (japan).pce" size="262144" crc="f8f85eec" sha1="13da0500ace1957d0748b11dfaae68e40e71230e" offset="000000" />
+				<rom name="xevious - fardraut densetsu (japan).pce" size="262144" crc="f8f85eec" sha1="13da0500ace1957d0748b11dfaae68e40e71230e" />
 			</dataarea>
 		</part>
 	</software>
@@ -4364,7 +4364,7 @@ license:CC0
 		<info name="alt_title" value="妖怪道中記"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="youkai douchuuki (japan).pce" size="262144" crc="80c3f824" sha1="a258201c6258c8e108c7ce80a39c456ef9116260" offset="000000" />
+				<rom name="youkai douchuuki (japan).pce" size="262144" crc="80c3f824" sha1="a258201c6258c8e108c7ce80a39c456ef9116260" />
 			</dataarea>
 		</part>
 	</software>
@@ -4378,7 +4378,7 @@ license:CC0
 		<info name="alt_title" value="遊々人生"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="yuu yuu jinsei - victory life (japan).pce" size="262144" crc="c0905ca9" sha1="c59f0d5248373bc00ea19a9e4f08e461c27e5fea" offset="000000" />
+				<rom name="yuu yuu jinsei - victory life (japan).pce" size="262144" crc="c0905ca9" sha1="c59f0d5248373bc00ea19a9e4f08e461c27e5fea" />
 			</dataarea>
 		</part>
 	</software>
@@ -4392,7 +4392,7 @@ license:CC0
 		<info name="alt_title" value="ゼロヨンチャンプ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="zero 4 champ (japan).pce" size="524288" crc="ee156721" sha1="79d9878e285e426b9ca58e15249a1bc98186d4e9" offset="000000" />
+				<rom name="zero 4 champ (japan).pce" size="524288" crc="ee156721" sha1="79d9878e285e426b9ca58e15249a1bc98186d4e9" />
 			</dataarea>
 		</part>
 	</software>
@@ -4406,7 +4406,7 @@ license:CC0
 		<info name="alt_title" value="ゼロヨンチャンプ"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="zero 4 champ (japan) (v1.5).pce" size="524288" crc="b77f2e2f" sha1="2b664760931cc6011d31cae310410dab7cba2067" offset="000000" />
+				<rom name="zero 4 champ (japan) (v1.5).pce" size="524288" crc="b77f2e2f" sha1="2b664760931cc6011d31cae310410dab7cba2067" />
 			</dataarea>
 		</part>
 	</software>
@@ -4420,7 +4420,7 @@ license:CC0
 		<info name="alt_title" value="ジパング"/>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="zipang (japan).pce" size="262144" crc="67aab7a1" sha1="7b6214df81a978ab8d73e437510f5230e83403bd" offset="000000" />
+				<rom name="zipang (japan).pce" size="262144" crc="67aab7a1" sha1="7b6214df81a978ab8d73e437510f5230e83403bd" />
 			</dataarea>
 		</part>
 	</software>
@@ -4432,7 +4432,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="[cd] cd-rom system (japan) (v1.0).pce" size="262144" crc="3f9f95a4" sha1="a39a66da7de6ba94ab84d04eef7afeec7d4ee66a" offset="000000" />
+				<rom name="[cd] cd-rom system (japan) (v1.0).pce" size="262144" crc="3f9f95a4" sha1="a39a66da7de6ba94ab84d04eef7afeec7d4ee66a" />
 			</dataarea>
 		</part>
 	</software>
@@ -4443,7 +4443,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="[cd] cd-rom system (japan) (v2.0).pce" size="262144" crc="52520bc6" sha1="f92ea593c8a935f58f8e1c3b2fc730951ec4fa71" offset="000000" />
+				<rom name="[cd] cd-rom system (japan) (v2.0).pce" size="262144" crc="52520bc6" sha1="f92ea593c8a935f58f8e1c3b2fc730951ec4fa71" />
 			</dataarea>
 		</part>
 	</software>
@@ -4454,7 +4454,7 @@ license:CC0
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="[cd] cd-rom system (japan) (v2.1).pce" size="262144" crc="283b74e0" sha1="88da02e2503f7c32810f5d93a34849d470742b6d" offset="000000" />
+				<rom name="[cd] cd-rom system (japan) (v2.1).pce" size="262144" crc="283b74e0" sha1="88da02e2503f7c32810f5d93a34849d470742b6d" />
 			</dataarea>
 		</part>
 	</software>
@@ -4465,7 +4465,7 @@ license:CC0
 		<publisher>Games Express</publisher>
 		<part name="cart" interface="pce_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="[cd] games express cd card (japan).pce" size="32768" crc="51a12d90" sha1="014881a959e045e00f4db8f52955200865d40280" offset="000000" />
+				<rom name="[cd] games express cd card (japan).pce" size="32768" crc="51a12d90" sha1="014881a959e045e00f4db8f52955200865d40280" />
 			</dataarea>
 		</part>
 	</software>
@@ -4477,7 +4477,7 @@ license:CC0
 		<part name="cart" interface="pce_cart">
 			<feature name="slot" value="cdsys3j" />
 			<dataarea name="rom" size="262144">
-				<rom name="[cd] super cd-rom system (japan) (v3.0).pce" size="262144" crc="6d9a73ef" sha1="79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c" offset="000000" />
+				<rom name="[cd] super cd-rom system (japan) (v3.0).pce" size="262144" crc="6d9a73ef" sha1="79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c" />
 			</dataarea>
 		</part>
 	</software>

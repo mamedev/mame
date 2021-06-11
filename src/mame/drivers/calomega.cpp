@@ -449,7 +449,7 @@
 
     Major improvements...
     - Worked the analogic color system, adding the three R-G-B presets.
-	- Added the PORT_ADJUST for RGB in all games, defining the default values.
+    - Added the PORT_ADJUST for RGB in all games, defining the default values.
     - Redumped the Cal Omega - Game 20.8 (Winner's Choice). Reworked proper inputs.
     - Inputs from the scratch for all the Pixels, Keno and Hotline games. Promoted to WORKING.
     - Specific inputs for games 12.8, 15.7, 15.9, 17.2, and 20.4. Promoted to WORKING.
@@ -770,7 +770,7 @@ void calomega_state::s903_mux_w(uint8_t data)
 
 uint8_t calomega_state::s905_mux_port_r()
 {
-	switch( m_s905_mux_data & 0x0f )	// bits 0-3
+	switch( m_s905_mux_data & 0x0f )    // bits 0-3
 	{
 		case 0x01: return m_in0_0->read();
 		case 0x02: return m_in0_1->read();
@@ -786,10 +786,10 @@ void calomega_state::s905_mux_w(uint8_t data)
 	m_s905_mux_data = data ^ 0x0f;    // inverted
 
 /*  Upper nibble
-	PIA_1_PB_4 - Hopper1.
-	PIA_1_PB_5 - Hopper2.
-	PIA_1_PB_6 - Not Connected.
-	PIA_1_PB_7 - Lockout.
+    PIA_1_PB_4 - Hopper1.
+    PIA_1_PB_5 - Hopper2.
+    PIA_1_PB_6 - Not Connected.
+    PIA_1_PB_7 - Lockout.
 */
 	m_hopper->motor_w(BIT(~data, 4) && BIT(~data, 5));
 	m_lockout = BIT(data, 7);
@@ -800,18 +800,18 @@ void calomega_state::s905_mux_w(uint8_t data)
 
 uint8_t calomega_state::pia0_bin_r()
 {
-    //logerror("PIA0: Port B in\n");
+	//logerror("PIA0: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia0_aout_w(uint8_t data)
 {
-    //logerror("PIA0: Port A out: %02X\n", data);
+	//logerror("PIA0: Port A out: %02X\n", data);
 }
 
 void calomega_state::pia0_bout_w(uint8_t data)
 {
-    // Meters???...M1-M5
+	// Meters???...M1-M5
 	m_diverter = BIT(data, 3);
 	m_lockout = BIT(data, 5);
 	m_hopper->motor_w(BIT(~data, 6) && BIT(~data, 7));
@@ -832,7 +832,7 @@ uint8_t calomega_state::pia1_ain_r()
 
 uint8_t calomega_state::pia1_bin_r()
 {
-    // logerror("PIA1: Port B in\n");
+	// logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
@@ -917,7 +917,7 @@ WRITE_LINE_MEMBER(calomega_state::vblank1_w)
 WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 {
 	m_vblank = state;
-	m_pia[1]->read(0); 
+	m_pia[1]->read(0);
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
 
@@ -980,7 +980,7 @@ WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
 */
 void calomega_state::lamps_903a_w(uint8_t data)
 {
-    // Whole 8 bits of PIA0 port B
+	// Whole 8 bits of PIA0 port B
 	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
 	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
 	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
@@ -993,7 +993,7 @@ void calomega_state::lamps_903a_w(uint8_t data)
 
 void calomega_state::lamps_903b_w(uint8_t data)
 {
-    // First 4 bits of PIA1 port A
+	// First 4 bits of PIA1 port A
 	m_lamps[5] = BIT(~data, 0);  // L6 (Cancel)
 	m_lamps[6] = BIT(~data, 1);  // L7 (Bet)
 	m_lamps[7] = BIT(~data, 2);  // L8 (Take)
@@ -1002,7 +1002,7 @@ void calomega_state::lamps_903b_w(uint8_t data)
 
 void calomega_state::lamps_905_w(uint8_t data)
 {
-    // Whole 8 bits of PIA0 port B
+	// Whole 8 bits of PIA0 port B
 	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
 	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
 	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
@@ -1484,8 +1484,8 @@ static INPUT_PORTS_START( keno_903 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("43")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KB_11") 
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Exit") PORT_CODE(KEYCODE_X)  // #84 0x54 TEST EXIT  
+	PORT_START("KB_11")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Exit") PORT_CODE(KEYCODE_X)  // #84 0x54 TEST EXIT
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                                  // #83 0x53 CANCEL "N"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("60")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("50")
@@ -1921,7 +1921,7 @@ static INPUT_PORTS_START( comg208 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")              PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Service/Clear")      PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Data / Audit")       PORT_CODE(KEYCODE_9) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Data / Audit")       PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2557,7 +2557,7 @@ static INPUT_PORTS_START( biggame )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( nudgensw )	// nudge bingo
+static INPUT_PORTS_START( nudgensw )    // nudge bingo
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Up") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Up") PORT_CODE(KEYCODE_S)
@@ -2706,7 +2706,7 @@ static INPUT_PORTS_START( nudgesw )
 	PORT_INCLUDE( nudgensw )
 
 	PORT_MODIFY("SW1")    // settings (PIA1), SW2 in schematics
-	PORT_DIPNAME( 0xc0, 0xc0, "Bet Options" )  			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Options" )           PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "Play 1" )
 	PORT_DIPSETTING(    0x40, "Play 1 to 3" )
 	PORT_DIPSETTING(    0x80, "Play 1 to 4" )
@@ -2714,7 +2714,7 @@ static INPUT_PORTS_START( nudgesw )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( hotline )	// nudge bingo
+static INPUT_PORTS_START( hotline ) // nudge bingo
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 1") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Move Up 2") PORT_CODE(KEYCODE_S)
@@ -3604,14 +3604,14 @@ static INPUT_PORTS_START( comg204 )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Hit (Pedir)") PORT_CODE(KEYCODE_V) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Hit (Pedir)") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double") 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )  
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
@@ -3619,7 +3619,7 @@ static INPUT_PORTS_START( comg204 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN0-2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -3629,7 +3629,7 @@ static INPUT_PORTS_START( comg204 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4572,7 +4572,7 @@ void calomega_state::sys903(machine_config &config)
 	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	// acia 0 
+	// acia 0
 	ACIA6850(config, m_acia6850[0], 0);
 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
@@ -4596,11 +4596,11 @@ void calomega_state::sys903kb(machine_config &config)
 	I8035(config, m_kstec, XTAL(5'185'000)); // from schematics
 	m_kstec->set_addrmap(AS_PROGRAM, &calomega_state::kstec_mem_map);
 	m_kstec->set_addrmap(AS_IO, &calomega_state::kstec_io_map);
-    m_kstec->p2_out_cb().set([this] (int data) { calomega_state::m_kbscan = (data & 0xf0) >> 4; });  // set keyboard scan lines
-    m_kstec->p1_in_cb().set(FUNC(calomega_state::keyb_903_r));                                       // get keyboard input lines
-    m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
-    m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
-    
+	m_kstec->p2_out_cb().set([this] (int data) { calomega_state::m_kbscan = (data & 0xf0) >> 4; });  // set keyboard scan lines
+	m_kstec->p1_in_cb().set(FUNC(calomega_state::keyb_903_r));                                       // get keyboard input lines
+	m_kstec->t0_in_cb().set("uart", FUNC(i8251_device::txrdy_r));                                    // uart tx handshake
+	m_kstec->t1_in_cb().set([this] () { return calomega_state::m_rxrdy; });                          // uart rx handshake
+
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
@@ -4645,14 +4645,14 @@ void calomega_state::sys903kb(machine_config &config)
 	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	// acia 0 
+	// acia 0
 	ACIA6850(config, m_acia6850[0], 0);
 	m_acia6850[0]->txd_handler().set("uart", FUNC(i8251_device::write_rxd));
- 	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE); 
+	m_acia6850[0]->irq_handler().set_inputline("maincpu", M6502_IRQ_LINE);
 
 	I8251(config, m_uart, 5'185'000);
-	m_uart->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd)); 
-    m_uart->rxrdy_handler().set([this] (int state) { calomega_state::m_rxrdy = state;});
+	m_uart->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
+	m_uart->rxrdy_handler().set([this] (int state) { calomega_state::m_rxrdy = state;});
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
 	aciabaud.signal_handler().set(FUNC(calomega_state::w_903kb_acia_clock));
@@ -4813,7 +4813,7 @@ ROM_END
 
 ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
 /*  The original code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
-	Also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
+    Also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
     Found damaged bits on this program ROM. Fix details on init().
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5851,126 +5851,126 @@ void calomega_state::init_comg079()
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x2ad2] = 0x00;  // checksum flag (0xe0)
-    PRGROM[0x2CD1] = 0x33;
-    PRGROM[0x2CD3] = 0x5A;
-    PRGROM[0x2CD5] = 0x76;
-    PRGROM[0x2CD9] = 0x13;
-    PRGROM[0x2CDB] = 0x30;
-    PRGROM[0x2CDD] = 0x06;
-    PRGROM[0x2D01] = 0x10;
-    PRGROM[0x2D06] = 0x36;
-    PRGROM[0x2D07] = 0x20;
-    PRGROM[0x2D08] = 0x7D;
-    PRGROM[0x2D09] = 0x3D;
-    PRGROM[0x2D0A] = 0x60;
-    PRGROM[0x2D30] = 0x26;
-    PRGROM[0x2D31] = 0x00;
-    PRGROM[0x2D33] = 0x00;
-    PRGROM[0x2D35] = 0x25;
-    PRGROM[0x2D36] = 0x00;
-    PRGROM[0x2D37] = 0x4C;
-    PRGROM[0x2D39] = 0x34;
-    PRGROM[0x2D3B] = 0x00;
-    PRGROM[0x2D3C] = 0x38;
-    PRGROM[0x2D3E] = 0x40;
-    PRGROM[0x2D3F] = 0x48;
-    PRGROM[0x2D41] = 0x01;
-    PRGROM[0x2D44] = 0x48;
-    PRGROM[0x2D46] = 0x02;
-    PRGROM[0x2D48] = 0x0F;
-    PRGROM[0x2D4A] = 0x0B;
-    PRGROM[0x2D4C] = 0x02;
-    PRGROM[0x2D4F] = 0x01;
-    PRGROM[0x2D50] = 0x68;
-    PRGROM[0x2D52] = 0x00;
-    PRGROM[0x2D53] = 0x4C;
-    PRGROM[0x2D54] = 0x3A;
-    PRGROM[0x2D55] = 0x2D;
-    PRGROM[0x2D56] = 0x68;
-    PRGROM[0x2D57] = 0x68;
-    PRGROM[0x2D58] = 0x60;
-    PRGROM[0x2D5A] = 0x00;
-    PRGROM[0x2D5C] = 0x06;
-    PRGROM[0x2D5E] = 0x01;
-    PRGROM[0x2D60] = 0x02;
-    PRGROM[0x2D62] = 0x02;
-    PRGROM[0x2D63] = 0x20;
-    PRGROM[0x2D64] = 0x3A;
-    PRGROM[0x2D65] = 0x2D;
-    PRGROM[0x2D66] = 0x60;
-    PRGROM[0x2D68] = 0x00;
-    PRGROM[0x2D6A] = 0x08;
-    PRGROM[0x2D6C] = 0x01;
-    PRGROM[0x2D6E] = 0x02;
-    PRGROM[0x2D79] = 0x0A;
-    PRGROM[0x2D7B] = 0x06;
-    PRGROM[0x2D80] = 0x78;
-    PRGROM[0x2D81] = 0x2D;
-    PRGROM[0x2D82] = 0x09;
-    PRGROM[0x2D84] = 0x60;
-    PRGROM[0x2D86] = 0x00;
-    PRGROM[0x2D87] = 0xBE;
-    PRGROM[0x2D88] = 0x97;
-    PRGROM[0x2D89] = 0x2D;
-    PRGROM[0x2D8C] = 0x97;
-    PRGROM[0x2D8F] = 0x9D;
-    PRGROM[0x2D90] = 0x00;
-    PRGROM[0x2D98] = 0x04;
-    PRGROM[0x2D9C] = 0x00;
-    PRGROM[0x2DAC] = 0x04;
-    PRGROM[0x2DB0] = 0x04;
-    PRGROM[0x2DB4] = 0x00;
-    PRGROM[0x2DB6] = 0x0F;
-    PRGROM[0x2DB8] = 0x04;
-    PRGROM[0x2DBC] = 0x04;
-    PRGROM[0x2DD1] = 0x20;
-    PRGROM[0x2DD3] = 0x00;
-    PRGROM[0x2DD5] = 0x00;
-    PRGROM[0x2DD6] = 0x10;
-    PRGROM[0x2DD7] = 0x99;
-    PRGROM[0x2DD9] = 0x11;
-    PRGROM[0x2DDB] = 0x00;
-    PRGROM[0x2DDD] = 0x99;
-    PRGROM[0x2DDE] = 0x00;
-    PRGROM[0x2DE3] = 0x8A;
-    PRGROM[0x2DE5] = 0x00;
-    PRGROM[0x2DE6] = 0x99;
-    PRGROM[0x2DE7] = 0x00;
-    PRGROM[0x2DE8] = 0x14;
-    PRGROM[0x2DE9] = 0x99;
-    PRGROM[0x2DEA] = 0x00;
-    PRGROM[0x2DEB] = 0x15;
-    PRGROM[0x2DED] = 0x00;
-    PRGROM[0x2DEE] = 0x16;
-    PRGROM[0x2DEF] = 0x99;
-    PRGROM[0x2E01] = 0x90;
-    PRGROM[0x2E03] = 0x45;
-    PRGROM[0x2E05] = 0x49;
-    PRGROM[0x2E06] = 0x01;
-    PRGROM[0x2E07] = 0x4A;
-    PRGROM[0x2E09] = 0x90;
-    PRGROM[0x2E0B] = 0x91;
-    PRGROM[0x2E0D] = 0x92;
-    PRGROM[0x2E0F] = 0x93;
-    PRGROM[0x2E30] = 0xE0;
-    PRGROM[0x2E31] = 0x12;
-    PRGROM[0x2E32] = 0x90;
-    PRGROM[0x2E34] = 0xAD;
-    PRGROM[0x2E35] = 0xC4;
-    PRGROM[0x2E36] = 0x08;
-    PRGROM[0x2E37] = 0x29;
-    PRGROM[0x2E38] = 0x80;
-    PRGROM[0x2E39] = 0xD0;
-    PRGROM[0x2E3A] = 0x13;
-    PRGROM[0x2E3B] = 0xA0;
-    PRGROM[0x2E3C] = 0x00;
-    PRGROM[0x2E3E] = 0x04;
-    PRGROM[0x2E67] = 0x2E;
-    PRGROM[0x2E68] = 0x8D;
-    PRGROM[0x2E69] = 0x08;
-    PRGROM[0x2E6A] = 0x00;
-    PRGROM[0x2E6E] = 0x8D;
-    PRGROM[0x2E6F] = 0x09;
+	PRGROM[0x2CD1] = 0x33;
+	PRGROM[0x2CD3] = 0x5A;
+	PRGROM[0x2CD5] = 0x76;
+	PRGROM[0x2CD9] = 0x13;
+	PRGROM[0x2CDB] = 0x30;
+	PRGROM[0x2CDD] = 0x06;
+	PRGROM[0x2D01] = 0x10;
+	PRGROM[0x2D06] = 0x36;
+	PRGROM[0x2D07] = 0x20;
+	PRGROM[0x2D08] = 0x7D;
+	PRGROM[0x2D09] = 0x3D;
+	PRGROM[0x2D0A] = 0x60;
+	PRGROM[0x2D30] = 0x26;
+	PRGROM[0x2D31] = 0x00;
+	PRGROM[0x2D33] = 0x00;
+	PRGROM[0x2D35] = 0x25;
+	PRGROM[0x2D36] = 0x00;
+	PRGROM[0x2D37] = 0x4C;
+	PRGROM[0x2D39] = 0x34;
+	PRGROM[0x2D3B] = 0x00;
+	PRGROM[0x2D3C] = 0x38;
+	PRGROM[0x2D3E] = 0x40;
+	PRGROM[0x2D3F] = 0x48;
+	PRGROM[0x2D41] = 0x01;
+	PRGROM[0x2D44] = 0x48;
+	PRGROM[0x2D46] = 0x02;
+	PRGROM[0x2D48] = 0x0F;
+	PRGROM[0x2D4A] = 0x0B;
+	PRGROM[0x2D4C] = 0x02;
+	PRGROM[0x2D4F] = 0x01;
+	PRGROM[0x2D50] = 0x68;
+	PRGROM[0x2D52] = 0x00;
+	PRGROM[0x2D53] = 0x4C;
+	PRGROM[0x2D54] = 0x3A;
+	PRGROM[0x2D55] = 0x2D;
+	PRGROM[0x2D56] = 0x68;
+	PRGROM[0x2D57] = 0x68;
+	PRGROM[0x2D58] = 0x60;
+	PRGROM[0x2D5A] = 0x00;
+	PRGROM[0x2D5C] = 0x06;
+	PRGROM[0x2D5E] = 0x01;
+	PRGROM[0x2D60] = 0x02;
+	PRGROM[0x2D62] = 0x02;
+	PRGROM[0x2D63] = 0x20;
+	PRGROM[0x2D64] = 0x3A;
+	PRGROM[0x2D65] = 0x2D;
+	PRGROM[0x2D66] = 0x60;
+	PRGROM[0x2D68] = 0x00;
+	PRGROM[0x2D6A] = 0x08;
+	PRGROM[0x2D6C] = 0x01;
+	PRGROM[0x2D6E] = 0x02;
+	PRGROM[0x2D79] = 0x0A;
+	PRGROM[0x2D7B] = 0x06;
+	PRGROM[0x2D80] = 0x78;
+	PRGROM[0x2D81] = 0x2D;
+	PRGROM[0x2D82] = 0x09;
+	PRGROM[0x2D84] = 0x60;
+	PRGROM[0x2D86] = 0x00;
+	PRGROM[0x2D87] = 0xBE;
+	PRGROM[0x2D88] = 0x97;
+	PRGROM[0x2D89] = 0x2D;
+	PRGROM[0x2D8C] = 0x97;
+	PRGROM[0x2D8F] = 0x9D;
+	PRGROM[0x2D90] = 0x00;
+	PRGROM[0x2D98] = 0x04;
+	PRGROM[0x2D9C] = 0x00;
+	PRGROM[0x2DAC] = 0x04;
+	PRGROM[0x2DB0] = 0x04;
+	PRGROM[0x2DB4] = 0x00;
+	PRGROM[0x2DB6] = 0x0F;
+	PRGROM[0x2DB8] = 0x04;
+	PRGROM[0x2DBC] = 0x04;
+	PRGROM[0x2DD1] = 0x20;
+	PRGROM[0x2DD3] = 0x00;
+	PRGROM[0x2DD5] = 0x00;
+	PRGROM[0x2DD6] = 0x10;
+	PRGROM[0x2DD7] = 0x99;
+	PRGROM[0x2DD9] = 0x11;
+	PRGROM[0x2DDB] = 0x00;
+	PRGROM[0x2DDD] = 0x99;
+	PRGROM[0x2DDE] = 0x00;
+	PRGROM[0x2DE3] = 0x8A;
+	PRGROM[0x2DE5] = 0x00;
+	PRGROM[0x2DE6] = 0x99;
+	PRGROM[0x2DE7] = 0x00;
+	PRGROM[0x2DE8] = 0x14;
+	PRGROM[0x2DE9] = 0x99;
+	PRGROM[0x2DEA] = 0x00;
+	PRGROM[0x2DEB] = 0x15;
+	PRGROM[0x2DED] = 0x00;
+	PRGROM[0x2DEE] = 0x16;
+	PRGROM[0x2DEF] = 0x99;
+	PRGROM[0x2E01] = 0x90;
+	PRGROM[0x2E03] = 0x45;
+	PRGROM[0x2E05] = 0x49;
+	PRGROM[0x2E06] = 0x01;
+	PRGROM[0x2E07] = 0x4A;
+	PRGROM[0x2E09] = 0x90;
+	PRGROM[0x2E0B] = 0x91;
+	PRGROM[0x2E0D] = 0x92;
+	PRGROM[0x2E0F] = 0x93;
+	PRGROM[0x2E30] = 0xE0;
+	PRGROM[0x2E31] = 0x12;
+	PRGROM[0x2E32] = 0x90;
+	PRGROM[0x2E34] = 0xAD;
+	PRGROM[0x2E35] = 0xC4;
+	PRGROM[0x2E36] = 0x08;
+	PRGROM[0x2E37] = 0x29;
+	PRGROM[0x2E38] = 0x80;
+	PRGROM[0x2E39] = 0xD0;
+	PRGROM[0x2E3A] = 0x13;
+	PRGROM[0x2E3B] = 0xA0;
+	PRGROM[0x2E3C] = 0x00;
+	PRGROM[0x2E3E] = 0x04;
+	PRGROM[0x2E67] = 0x2E;
+	PRGROM[0x2E68] = 0x8D;
+	PRGROM[0x2E69] = 0x08;
+	PRGROM[0x2E6A] = 0x00;
+	PRGROM[0x2E6E] = 0x8D;
+	PRGROM[0x2E6F] = 0x09;
 }
 
 void calomega_state::init_comg080()
@@ -6009,7 +6009,7 @@ void calomega_state::init_comg176()
 void calomega_state::init_any()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
- 	PRGROM[0x0000] = 0x00;
+	PRGROM[0x0000] = 0x00;
 
 }
 

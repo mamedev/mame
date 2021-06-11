@@ -234,7 +234,7 @@ uint32_t namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 		}
 		m_c169roz->draw(screen, bitmap, clip, pri);
-		m_ns2sprite->draw_sprites_metalhawk(screen, bitmap, clip, pri);
+		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, 0);
 	}
 	return 0;
 }

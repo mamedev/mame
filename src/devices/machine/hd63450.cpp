@@ -62,6 +62,7 @@ void hd63450_device::device_start()
 	save_item(STRUCT_MEMBER(m_reg, mar));
 	save_item(STRUCT_MEMBER(m_reg, dar));
 	save_item(STRUCT_MEMBER(m_reg, btc));
+	save_item(STRUCT_MEMBER(m_reg, bar));
 	save_item(STRUCT_MEMBER(m_reg, niv));
 	save_item(STRUCT_MEMBER(m_reg, eiv));
 	save_item(STRUCT_MEMBER(m_reg, mfc));
@@ -278,7 +279,7 @@ void hd63450_device::dma_transfer_start(int channel)
 	m_reg[channel].csr &= ~0xe0;
 	m_reg[channel].csr |= 0x08;  // Channel active
 	m_reg[channel].csr &= ~0x30;  // Reset Error and Normal termination bits
-	if ((m_reg[channel].ocr & 0x0c) != 0x00)  // Array chain or Link array chain
+	if ((m_reg[channel].ocr & 0x0c) == 0x08)  // Array chain
 	{
 		m_reg[channel].mar = space.read_word(m_reg[channel].bar) << 16;
 		m_reg[channel].mar |= space.read_word(m_reg[channel].bar+2);
@@ -286,9 +287,19 @@ void hd63450_device::dma_transfer_start(int channel)
 		if (m_reg[channel].btc > 0)
 			m_reg[channel].btc--;
 	}
+	else if ((m_reg[channel].ocr & 0x0c) == 0x0c) // Link array chain
+	{
+		u32 bar = m_reg[channel].bar;
+		m_reg[channel].mar = space.read_word(bar) << 16;
+		m_reg[channel].mar |= space.read_word(bar+2);
+		m_reg[channel].mtc = space.read_word(bar+4);
+		m_reg[channel].bar = space.read_word(bar+6) << 16;
+		m_reg[channel].bar |= space.read_word(bar+8);
+	}
 
 	// Burst transfers will halt the CPU until the transfer is complete
-	if ((m_reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
+	// max rate transfer hold the bus
+	if (((m_reg[channel].dcr & 0xc0) == 0x00) || ((m_reg[channel].ocr & 3) == 1))  // Burst transfer
 	{
 		m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
@@ -352,6 +363,8 @@ void hd63450_device::single_transfer(int x)
 
 	if (!dma_in_progress(x))  // DMA in progress in channel x
 		return;
+
+	m_bec = 0;
 
 	if (m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 	{
@@ -432,6 +445,11 @@ void hd63450_device::single_transfer(int x)
 //              LOG("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 	}
 
+	if (m_bec == ERR_BUS)
+	{
+		set_error(x, 9);  //assume error in mar, TODO: other errors
+		return;
+	}
 
 	// decrease memory transfer counter
 	if (m_reg[x].mtc > 0)
@@ -452,13 +470,23 @@ void hd63450_device::single_transfer(int x)
 	{
 		// End of transfer
 		LOG("DMA#%i: End of transfer\n",x);
-		if ((m_reg[x].ocr & 0x0c) != 0 && m_reg[x].btc > 0)
+		if ((m_reg[x].ocr & 0x0c) == 0x08 && m_reg[x].btc > 0)
 		{
 			m_reg[x].btc--;
 			m_reg[x].bar+=6;
 			m_reg[x].mar = space.read_word(m_reg[x].bar) << 16;
 			m_reg[x].mar |= space.read_word(m_reg[x].bar+2);
 			m_reg[x].mtc = space.read_word(m_reg[x].bar+4);
+			return;
+		}
+		else if ((m_reg[x].ocr & 0x0c) == 0x0c && m_reg[x].bar)
+		{
+			u32 bar = m_reg[x].bar;
+			m_reg[x].mar = space.read_word(bar) << 16;
+			m_reg[x].mar |= space.read_word(bar+2);
+			m_reg[x].mtc = space.read_word(bar+4);
+			m_reg[x].bar = space.read_word(bar+6) << 16;
+			m_reg[x].bar |= space.read_word(bar+8);
 			return;
 		}
 		else if (m_reg[x].ccr & 0x40)
@@ -474,8 +502,8 @@ void hd63450_device::single_transfer(int x)
 		m_reg[x].csr &= ~0x08;  // channel no longer active
 		m_reg[x].ccr &= ~0xc0;
 
-		// Burst transfer
-		if ((m_reg[x].dcr & 0xc0) == 0x00)
+		// Burst transfer or max rate transfer
+		if (((m_reg[x].dcr & 0xc0) == 0x00) || ((m_reg[x].ocr & 3) == 1))
 		{
 			m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		}
