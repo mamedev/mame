@@ -476,14 +476,12 @@ static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb
 
 static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, voodoo::fbz_colorpath const fbzcp)
 {
-	s32 result = iterz >> 12;
-
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
-		return std::clamp(result, 0, 0xffff);
+		return std::clamp(iterz >> 12, 0, 0xffff);
 
 	// non-clamped case has specific behaviors
-	result &= 0xfffff;
+	u32 result = u32(iterz) >> 12;
 	if (result == 0xfffff)
 		return 0;
 	if (result == 0x10000)
@@ -493,14 +491,12 @@ static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, voodoo::fbz_colorpath c
 
 static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, voodoo::fbz_colorpath const fbzcp)
 {
-	s32 result = iterw >> 32;
-
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
-		return std::clamp(result, 0, 0xff);
+		return std::clamp(s32(iterw >> 48), 0, 0xff);
 
 	// non-clamped case has specific behaviors
-	result &= 0xffff;
+	u32 result = u64(iterw) >> 48;
 	if (result == 0xffff)
 		return 0;
 	if (result == 0x100)
@@ -964,16 +960,25 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 
 inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
 {
-	/* compute "floating point" W value (used for depth and fog) */
-	if ((iterw & 0xffff00000000U) != 0)
+#if 1
+	int exp = count_leading_zeros_64(iterw) - 16;
+	if (exp < 0)
+		return 0x0000;
+	if (exp >= 16)
+		return 0xffff;
+	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
+#else
+	// compute "floating point" W value (used for depth and fog)
+	if ((iterw & 0xffff000000000000ull) != 0)
 		return 0x0000;
 
-	u32 temp = u32(iterw);
+	u32 temp = u32(iterw >> 16);
 	if ((temp & 0xffff0000) == 0)
 		return 0xffff;
 
 	int exp = count_leading_zeros(temp);
-	return ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;
+	return ((exp << 12) | ((temp >> (19 - exp)) ^ 0x1fff)) + 1;
+#endif
 }
 
 inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode const fbzmode, voodoo::fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
@@ -983,20 +988,14 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode co
 	{
 		if (!fbzmode.depth_float_select())
 			result = wfloat;
-
 		else if ((iterz & 0xf0000000) != 0)
 			result = 0x0000;
-
+		else if ((iterz & 0x0ffff000) == 0)
+			result = 0xffff;
 		else
 		{
-			u32 temp = iterz << 4;
-			if ((temp & 0xffff0000) == 0)
-				result = 0xffff;
-			else
-			{
-				int exp = count_leading_zeros(temp);
-				return ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;
-			}
+			int exp = count_leading_zeros(iterz) - 4;
+			return ((exp << 12) | ((iterz >> (15 - exp)) ^ 0x1fff)) + 1;
 		}
 	}
 	else
@@ -1762,7 +1761,8 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	iterargb_delta.set(extra.dadx, extra.drdx, extra.dgdx, extra.dbdx);
 	iterargb_delta.shl_imm(8);
 	s32 iterz = extra.startz + dy * extra.dzdy + dx * extra.dzdx;
-	s64 iterw = extra.startw + dy * extra.dwdy + dx * extra.dwdx;
+	s64 iterw = (extra.startw + dy * extra.dwdy + dx * extra.dwdx) << 16;
+	s64 iterw_delta = extra.dwdx << 16;
 	if (_TexMode0 != 0xffffffff)
 	{
 		iterstw0.set(
@@ -1853,7 +1853,7 @@ skipdrawdepth:
 		// update the iterated parameters
 		iterargb += iterargb_delta;
 		iterz += extra.dzdx;
-		iterw += extra.dwdx;
+		iterw += iterw_delta;
 		if (_TexMode0 != 0xffffffff)
 			iterstw0.add(deltastw0);
 		if (_TexMode1 != 0xffffffff)
