@@ -25,8 +25,6 @@
 
 #include "formats/coco_cas.h"
 
-#define CARTRIDGE_TAG	"ext"
-
 void mc10_cart(device_slot_interface &device);
 void alice_cart(device_slot_interface &device);
 
@@ -41,7 +39,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
-		, m_mc10cart(*this, CARTRIDGE_TAG)
+		, m_mc10cart(*this, "ext")
 		, m_mc6847(*this, "mc6847")
 		, m_dac(*this, "dac")
 		, m_cassette(*this, "cassette")
@@ -49,11 +47,14 @@ public:
 		, m_pb(*this, "pb%u", 0U)
 		{ }
 
+	void mc10_base(machine_config &config);
+	void mc10_video(machine_config &config);
 	void mc10(machine_config &config);
 	void alice(machine_config &config);
+	void mc10_bfff_w_dac(uint8_t data);
+	uint8_t mc10_bfff_r();
 
 protected:
-	uint8_t mc10_bfff_r();
 	void mc10_bfff_w(uint8_t data);
 
 	uint8_t mc10_port1_r();
@@ -69,7 +70,7 @@ protected:
 
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<mc10cart_slot_device> m_mc10cart;
+	optional_device<mc10cart_slot_device> m_mc10cart;
 
 	uint8_t m_keyboard_strobe;
 	uint8_t m_port2;
@@ -81,11 +82,33 @@ protected:
 private:
 	void mc10_mem(address_map &map);
 
-	required_device<mc6847_base_device> m_mc6847;
+	optional_device<mc6847_base_device> m_mc6847;
 	required_device<dac_bit_interface> m_dac;
 	required_device<cassette_image_device> m_cassette;
 	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<8> m_pb;
+};
+
+class alice32_state : public mc10_state
+{
+public:
+	alice32_state(const machine_config &mconfig, device_type type, const char *tag)
+	: mc10_state(mconfig, type, tag)
+	, m_ef9345(*this, "ef9345")
+	{}
+
+	void alice32(machine_config &config);
+
+protected:
+	// device-level overrides
+	virtual void driver_start() override;
+
+	void alice32_bfff_w(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+
+private:
+	void alice32_mem(address_map &map);
+	required_device<ef9345_device> m_ef9345;
 };
 
 /***************************************************************************
@@ -124,10 +147,19 @@ void mc10_state::mc10_bfff_w(uint8_t data)
 	m_mc6847->ag_w(BIT(data, 5));
 	m_mc6847->css_w(BIT(data, 6));
 
+	mc10_bfff_w_dac(data);
+}
+
+void mc10_state::mc10_bfff_w_dac(uint8_t data)
+{
 	// bit 7, dac output
 	m_dac->write(BIT(data, 7));
 }
 
+void alice32_state::alice32_bfff_w(uint8_t data)
+{
+	mc10_bfff_w_dac(data);
+}
 
 /***************************************************************************
     MC6803 I/O
@@ -190,6 +222,11 @@ uint8_t mc10_state::mc6847_videoram_r(offs_t offset)
 	return result;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(alice32_state::alice32_scanline)
+{
+	m_ef9345->update_scanline((uint16_t)param);
+}
+
 /***************************************************************************
     DRIVER INIT
 ***************************************************************************/
@@ -232,14 +269,38 @@ void mc10_state::driver_start()
 	space.install_ram(0x4000, 0x4000+ram_size-1, m_ram->pointer());
 }
 
+void alice32_state::driver_start()
+{
+	// call base device_start
+	driver_device::driver_start();
+
+	/* register for state saving */
+	save_item(NAME(m_keyboard_strobe));
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	u32 ram_size = m_ram->size();
+
+	space.install_ram(0x3000, 0x3000+ram_size-1, m_ram->pointer());
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
 void mc10_state::mc10_mem(address_map &map)
 {
+	// mc10 / alice: RAM start at 0x4000, installed in driver_start
+	// alice32 / 90: RAM start at 0x3000, installed in driver_start
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+}
+
+void alice32_state::alice32_mem(address_map &map)
+{
+	// alice32 / 90: RAM start at 0x3000, installed in driver_start
+	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
+	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(alice32_state::alice32_bfff_w));
+	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
 }
 
 /***************************************************************************
@@ -426,7 +487,7 @@ DEVICE_INPUT_DEFAULTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-void mc10_state::mc10(machine_config &config)
+void mc10_state::mc10_base(machine_config &config)
 {
 	/* basic machine hardware */
 	M6803(config, m_maincpu, XTAL(3'579'545));  /* 0,894886 MHz */
@@ -435,21 +496,6 @@ void mc10_state::mc10(machine_config &config)
 	m_maincpu->out_p1_cb().set(FUNC(mc10_state::mc10_port1_w));
 	m_maincpu->in_p2_cb().set(FUNC(mc10_state::mc10_port2_r));
 	m_maincpu->out_p2_cb().set(FUNC(mc10_state::mc10_port2_w));
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
-
-	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_raw(9.828_MHz_XTAL / 2, 320, 0, 320, 243, 0, 243);
-
-	/* expansion port hardware */
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), mc10_cart, "pak"));
-	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
-	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-
-	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
-	vdg.set_screen("screen");
-	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -469,12 +515,62 @@ void mc10_state::mc10(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("mc10");
 }
 
-void mc10_state::alice(machine_config &config)
+void mc10_state::mc10_video(machine_config &config)
 {
-	mc10(config);
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config.replace(), CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), alice_cart, "pak"));
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("4K").set_extra_options("8K,20K,32K");
+
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_raw(9.828_MHz_XTAL / 2, 320, 0, 320, 243, 0, 243);
+
+	mc6847_ntsc_device &vdg(MC6847_NTSC(config, "mc6847", XTAL(3'579'545)));
+	vdg.set_screen("screen");
+	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
+}
+void mc10_state::mc10(machine_config &config)
+{
+	mc10_base(config);
+	mc10_video(config);
+
+	/* expansion port hardware */
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), mc10_cart, "pak"));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void mc10_state::alice(machine_config &config)
+{
+	mc10_base(config);
+	mc10_video(config);
+
+	/* expansion port hardware */
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice_cart, "pak"));
+	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void alice32_state::alice32(machine_config &config)
+{
+	mc10_base(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &alice32_state::alice32_mem);
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
+	screen.set_size(336, 270);
+	screen.set_visarea(00, 336-1, 00, 270-1);
+	PALETTE(config, "palette").set_entries(8);
+
+	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_screen("screen");
+	m_ef9345->set_palette_tag("palette");
+	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);
+
+	/* internal ram */
+	RAM(config, m_ram).set_default_size("24K");
 }
 
 /***************************************************************************
@@ -491,10 +587,19 @@ ROM_START( alice )
 	ROM_LOAD("alice.rom", 0x0000, 0x2000, CRC(f876abe9) SHA1(c2166b91e6396a311f486832012aa43e0d2b19f8))
 ROM_END
 
+ROM_START( alice32 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("alice32.rom", 0x0000, 0x4000, CRC(c3854ddf) SHA1(f34e61c3cf711fb59ff4f1d4c0d2863dab0ab5d1))
+
+	ROM_REGION( 0x2000, "ef9345", 0 )
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
+ROM_END
+
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY              FULLNAME     FLAGS
-COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state,   empty_init, "Tandy Radio Shack",   "MC-10",     MACHINE_SUPPORTS_SAVE )
-COMP( 1983, alice,   mc10,    0,      alice,   alice, mc10_state,   empty_init, "Matra & Hachette",    "Alice",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT        COMPANY              FULLNAME     FLAGS
+COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state,    empty_init, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
+COMP( 1983, alice,   mc10,    0,      alice,   alice, mc10_state,    empty_init, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, alice32, 0,       0,      alice32, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
