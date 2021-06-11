@@ -219,7 +219,7 @@ void pce_joypad2_turbo_device::clr_w(int state)
 u8 pce_joypad2_turbo_device::buttons_r()
 {
 	u8 ret = m_buttons_io->read() & 0xf;
-	const u8 turbo = m_turbo_io->read() & 0xff;
+	const u8 turbo = m_turbo_io->read() & 0xf;
 	for (int i = 0; i < 2; i++)
 	{
 		const u8 enable_bit = 1 + (i << 1);
