@@ -510,7 +510,7 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle clip
 	*/
 	int ptr,pri;
 	int divisor = 1;
-	if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+	if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 		divisor = 2;
 
 	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites
@@ -550,7 +550,7 @@ void x68k_state::draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer,
 	tilemap_t* x68k_bg1;
 	tilemap_t* map;
 	int divisor = 1;
-	if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+	if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 		divisor = 2;
 
 	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
@@ -751,7 +751,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			rectangle pcgrect = rect;
 			int divisor = 1;
-			if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+			if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 			{
 				pcgrect.max_y >>= 1;
 				pcgrect.min_y >>= 1;
