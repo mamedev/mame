@@ -143,7 +143,7 @@ u8 cc1_state::ppi_porta_r()
 {
 	// 74148(priority encoder) I0-I7: inputs
 	// d0-d2: 74148 S0-S2, d3: 74148 GS
-	u8 data = count_leading_zeros(m_inputs[0]->read()) - 24;
+	u8 data = count_leading_zeros_32(m_inputs[0]->read()) - 24;
 	if (data == 8) data = 0xf;
 
 	// d5-d7: more inputs (direct)

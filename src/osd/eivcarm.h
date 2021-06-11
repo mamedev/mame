@@ -1,23 +1,24 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Vas Crabb
 //============================================================
 //
-//  eivc.h
+//  eivcarm.h
 //
-//  Inline implementations for MSVC compiler.
+//  ARM/AArch64 inline implementations for MSVC compiler.
 //
 //============================================================
 
-#ifndef MAME_OSD_EIVC_H
-#define MAME_OSD_EIVC_H
+#ifndef MAME_OSD_EIVCARM_H
+#define MAME_OSD_EIVCARM_H
 
 #pragma once
 
 #include <intrin.h>
-#pragma intrinsic(_BitScanReverse)
-#ifdef PTR64
-#pragma intrinsic(_BitScanReverse64)
-#endif
+
+#pragma intrinsic(_CountLeadingZeros)
+#pragma intrinsic(_CountLeadingZeros64)
+#pragma intrinsic(_CountLeadingOnes)
+#pragma intrinsic(_CountLeadingOnes64)
 
 
 /***************************************************************************
@@ -29,14 +30,11 @@
     leading zero bits in a 32-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_zeros_32
 #define count_leading_zeros_32 _count_leading_zeros_32
 __forceinline uint8_t _count_leading_zeros_32(uint32_t value)
 {
-	unsigned long index;
-	return _BitScanReverse(&index, value) ? (31U - index) : 32U;
+	return uint8_t(_CountLeadingZeros(value));
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -44,14 +42,11 @@ __forceinline uint8_t _count_leading_zeros_32(uint32_t value)
     leading one bits in a 32-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_ones_32
 #define count_leading_ones_32 _count_leading_ones_32
 __forceinline uint8_t _count_leading_ones_32(uint32_t value)
 {
-	unsigned long index;
-	return _BitScanReverse(&index, ~value) ? (31U - index) : 32U;
+	return uint8_t(_CountLeadingOnes(value));
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -59,18 +54,11 @@ __forceinline uint8_t _count_leading_ones_32(uint32_t value)
     leading zero bits in a 64-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_zeros_64
 #define count_leading_zeros_64 _count_leading_zeros_64
 __forceinline uint8_t _count_leading_zeros_64(uint64_t value)
 {
-	unsigned long index;
-#ifdef PTR64
-	return _BitScanReverse64(&index, value) ? (63U - index) : 64U;
-#else
-	return _BitScanReverse(&index, uint32_t(value >> 32)) ? (31U - index) : _BitScanReverse(&index, uint32_t(value)) ? (63U - index) : 64U;
-#endif
+	return uint8_t(_CountLeadingZeros64(value));
 }
-#endif
 
 
 /*-------------------------------------------------
@@ -78,17 +66,10 @@ __forceinline uint8_t _count_leading_zeros_64(uint64_t value)
     leading one bits in a 64-bit value
 -------------------------------------------------*/
 
-#ifndef count_leading_ones_64
 #define count_leading_ones_64 _count_leading_ones_64
 __forceinline uint8_t _count_leading_ones_64(uint64_t value)
 {
-	unsigned long index;
-#ifdef PTR64
-	return _BitScanReverse64(&index, ~value) ? (63U - index) : 64U;
-#else
-	return _BitScanReverse(&index, ~uint32_t(value >> 32)) ? (31U - index) : _BitScanReverse(&index, ~uint32_t(value)) ? (63U - index) : 64U;
-#endif
+	return uint8_t(_CountLeadingOnes64(value));
 }
-#endif
 
-#endif // MAME_OSD_EIVC_H
+#endif // MAME_OSD_EIVCARM_H

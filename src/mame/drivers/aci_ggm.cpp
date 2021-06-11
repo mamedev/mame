@@ -172,7 +172,7 @@ void ggm_state::update_reset(ioport_value state)
 DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 {
 	u32 size = m_cart->common_get_size("rom");
-	m_cart_mask = ((1 << (31 - count_leading_zeros(size))) - 1) & 0xffff;
+	m_cart_mask = ((1 << (31 - count_leading_zeros_32(size))) - 1) & 0xffff;
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");

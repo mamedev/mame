@@ -519,14 +519,14 @@ void validity_checker::validate_inlines()
 	for (int i = 0; i <= 32; i++)
 	{
 		u32 t = i < 32 ? (1 << (31 - i) | testu32a >> i) : 0;
-		u8 resultu8 = count_leading_zeros(t);
+		u8 resultu8 = count_leading_zeros_32(t);
 		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_zeros %08x=%02x (expected %02x)\n", t, resultu8, i);
+			osd_printf_error("Error testing count_leading_zeros_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
 
 		t ^= 0xffffffff;
-		resultu8 = count_leading_ones(t);
+		resultu8 = count_leading_ones_32(t);
 		if (resultu8 != i)
-			osd_printf_error("Error testing count_leading_ones %08x=%02x (expected %02x)\n", t, resultu8, i);
+			osd_printf_error("Error testing count_leading_ones_32 %08x=%02x (expected %02x)\n", t, resultu8, i);
 	}
 }
 

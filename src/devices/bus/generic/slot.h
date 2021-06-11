@@ -30,7 +30,7 @@ public:
 		assert(!(decode_limit & base));
 		for (offs_t remain = length, start = 0U; remain && (decode_limit >= start); )
 		{
-			unsigned const msb(31 - count_leading_zeros(u32(remain)));
+			unsigned const msb(31 - count_leading_zeros_32(u32(remain)));
 			offs_t const chunk(offs_t(1) << msb);
 			offs_t range((chunk - 1) & decode_limit);
 			offs_t mirror(decode_limit & ~decode_mask & ~range);

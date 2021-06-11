@@ -1396,7 +1396,7 @@ void am29000_cpu_device::CLZ()
 {
 	uint32_t b = INST_M_BIT ? I8: GET_RB_VAL;
 
-	m_r[RC] = count_leading_zeros(b);
+	m_r[RC] = count_leading_zeros_32(b);
 }
 
 void am29000_cpu_device::SETIP()
