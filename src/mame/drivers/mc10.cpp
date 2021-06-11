@@ -131,7 +131,6 @@ uint8_t mc10_state::read_keyboard_strobe(bool single_line)
 	return result;
 }
 
-
 uint8_t mc10_state::mc10_bfff_r()
 {
 	return read_keyboard_strobe(false);
@@ -510,9 +509,6 @@ void mc10_state::mc10_base(machine_config &config)
 	/* printer */
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "printer"));
 	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
-
-	/* Software lists */
-	SOFTWARE_LIST(config, "cass_list").set_original("mc10");
 }
 
 void mc10_state::mc10_video(machine_config &config)
@@ -536,6 +532,9 @@ void mc10_state::mc10(machine_config &config)
 	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), mc10_cart, "pak"));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("mc10");
 }
 
 void mc10_state::alice(machine_config &config)
@@ -547,6 +546,9 @@ void mc10_state::alice(machine_config &config)
 	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice_cart, "pak"));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("mc10");
 }
 
 void alice32_state::alice32(machine_config &config)
@@ -571,6 +573,10 @@ void alice32_state::alice32(machine_config &config)
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("24K");
+
+	/* Software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("alice32");
+	SOFTWARE_LIST(config, "mc10_cass").set_compatible("mc10");
 }
 
 /***************************************************************************
