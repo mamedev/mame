@@ -88,6 +88,8 @@ TODO:
 #include "tilemap.h"
 
 
+namespace {
+
 class inufuku_state : public driver_device
 {
 public:
@@ -645,6 +647,8 @@ ROM_START( 3on3dunk )
 	ROM_REGION( 0x0400000, "ymsnd:adpcmb", 0 ) // speech
 	ROM_LOAD( "lh536pkl.u51", 0x0000000, 0x300000, CRC(e4919abf) SHA1(d6af4b9c6ff62f92216c9927027d3b2376416bae) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /******************************************************************************
