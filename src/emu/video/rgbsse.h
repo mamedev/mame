@@ -271,6 +271,9 @@ public:
 	inline void min(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
+#ifdef __SSE4_1__
+		m_value = _mm_min_epi32(m_value, val);
+#else
 		__m128i is_greater_than = _mm_cmpgt_epi32(m_value, val);
 
 		__m128i val_to_set = _mm_and_si128(val, is_greater_than);
@@ -278,11 +281,15 @@ public:
 
 		m_value = _mm_and_si128(m_value, keep_mask);
 		m_value = _mm_or_si128(val_to_set, m_value);
+#endif
 	}
 
 	inline void max(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
+#ifdef __SSE4_1__
+		m_value = _mm_max_epi32(m_value, val);
+#else
 		__m128i is_less_than = _mm_cmplt_epi32(m_value, val);
 
 		__m128i val_to_set = _mm_and_si128(val, is_less_than);
@@ -290,6 +297,7 @@ public:
 
 		m_value = _mm_and_si128(m_value, keep_mask);
 		m_value = _mm_or_si128(val_to_set, m_value);
+#endif
 	}
 
 	void blend(const rgbaint_t& other, u8 factor);
