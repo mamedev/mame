@@ -2480,7 +2480,7 @@ galmedes                        // (c) 1992 Visco (Japan)
 jigkmgri                        // B41 (c) 1988 Taito Corporation (Japan)
 mofflott                        // C17 (c) 1989 Taito Corporation (Japan)
 
-@source:at.cpp                  
+@source:at.cpp
 asi100b0                        // ASI 100B0, identified as "HAM 12 TI 286 Motherboard ZERO WAIT" ab hier 286
 at                              // 1987 AMI Bios and Diagnostics
 ataripc4                        // Atari PC4 (286)
@@ -2780,7 +2780,7 @@ mb1433uiv                       // Biostar MB-1433UIV motherboard (486)
 mb4d33                          // Aquarius System (ASI) MB-4D33/50NR motherboard (486)
 mb8433uud                       // Biostar MB8433UUD-A
 md4duvc                         // Aquarius MD-4DUVC motherboard (486)
-megapcpl                        // Amstrad  Mega PC 
+megapcpl                        // Amstrad  Mega PC
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset, 486SLC
 ms4125                          // MSI MS-4125 motherboard (486)
 ms4134                          // MSI MS-4134 motherboard (486)

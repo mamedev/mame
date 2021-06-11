@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Miodrag Milanovic
 /***************************************************************************
+
     IBM AT Compatibles
 Commodore PC 30-III and PC 40-III
 =================================
@@ -90,6 +91,7 @@ Input: Trackball connected as a PS/2 mouse
 Options: 100 pin expansion port for 3305 Docking station (2xISA16 slots), external keypad
 Ports: External VGA, external keyboard, COM1, external keypad, COM2, LPT1, buzzer
 Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560T/C (486DX2-66), 3530T/C(486DX2-50), 3500T/C (486DX-33), 3500SXT/SXC(486SX-25)
+
 ***************************************************************************/
 
 #include "emu.h"
