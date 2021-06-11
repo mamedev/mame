@@ -139,7 +139,7 @@ inline uint8_t _count_leading_zeros_64(uint64_t val)
 
 #ifndef count_leading_ones_64
 #define count_leading_ones_64 _count_leading_ones_64
-inline uint8_t _count_leading_ones(uint64_t val)
+inline uint8_t _count_leading_ones_64(uint64_t val)
 {
 	return count_leading_zeros_64(~val);
 }
