@@ -5,15 +5,16 @@ license:CC0
 -->
 <softwarelist name="juicebox" description="Mattel Juice Box SmartMedia Flash ROM">
 
-<!-- The .smc files in this are the NAND dumps, but with a 0x400 byte custom header (with the first 2 bytes being the flash ident code, and rest unused)
+<!-- The .smc files in this are the raw dumps dumps, but with a 0x400 byte custom header (with the first 2 bytes being the flash ident code, and rest unused)
      This appears to be a custom standard, enforced by smartmed.cpp -->
 
 <!--
 
    Known Releases
 
-   (* = dumped and boots in MAME + = dumped, but doesn't boot properly, possibly bad or requires improved emulation
-    B = confirmed bad dump, V = validated with 2nd cartridge)
+   (* = dumped and boots in MAME
+    B = confirmed bad dump
+	V = validated with 2nd cartridge)
 
    The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
    the data.
@@ -23,14 +24,14 @@ license:CC0
 *V H2683 - Codename: Kids Next Door Volume 1
    H2684 - Ed, Edd n Eddy Volume 1
 *V H2685 - Yu-Gi-Oh! Volume 1
-+  H2686 - Winx Club Volume 1
+B  H2686 - Winx Club Volume 1
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
    H2688 - Vans Triple Crown Volume 1
-   H2689 - Vans Triple Crown vol.2
+   H2689 - Vans Triple Crown Volume 2
 *  H2690 - Vans Pipeline Masters Volume 1
 *  H2692 - Teenage Mutant Ninja Turtles Volume 1
    H2694 - Trading Spaces Volume 1
-   H2697 - Megas XLR Vol. 1
+   H2697 - Megas XLR Volume 1
    H2698 - WWE Rey Mysterio Volume 1
    H2699 - Motocycle Mania 1 Volume 1
    H2701 - Dexter's Laboratory Volume 1
@@ -40,9 +41,9 @@ license:CC0
    H2708 - WWE Eugene Volume 1
 *  H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
    H6225 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, Fan_3)
-+  H6226 - Juice Box Music Video (unknown)
+B  H6226 - Juice Box Music Video (unknown)
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
-+  H6230A- Juice Box Music Video (unknown)
+B  H6230A- Juice Box Music Video (unknown)
 *  H6232 - Juice Box Music Video (Zoegirl, Jumps, Baha Men, Atomic Kitten)
    H6248 - Codename: Kids Next Door - Episode #19
    H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
@@ -50,7 +51,8 @@ license:CC0
    H6259 - SonicX Episode 3: Missile Wrist Rampage
 *  H6260 - Teenage Mutant Ninja Turtles Episode 36
 
-   H7416 - Streetball Classics Volume 1
+*  H7416 - Streetball Classics Volume 1
+         - Streetball Classics Volume 2
 
 *  H8084 - Yu-Gi-Oh! Episode 175
    H8085 - Good Times with Carey Hart
@@ -242,7 +244,7 @@ license:CC0
 	</software>
 
 	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
-	<software name="plmv1" supported="no">
+	<software name="plmv1" supported="partial">
 		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
@@ -253,11 +255,21 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="sbcv1" supported="partial">
+		<description>Streetball Classics Volume 1 (H7416)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H7416" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_streetball-classics-vol1_h7416_matrix11247_9875.smc" size="0x2100400" crc="ada20763" sha1="b973e18d390a7d1a530e3737562722f96163d593" />
+			</dataarea>
+		</part>
+	</software>	
 
 	<!-- ==============================================================================
-	     Cartridges below don't boot properly
-	     - code seems to go off the rails in most cases compared to other sets
-	       so assume these are bad dumps even if they read consistently
+	     Cartridges below don't boot properly and are confirmed bad dumps
 	     ==============================================================================
 	-->
 
