@@ -185,7 +185,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		if(handler->is_view())
 			handler->init_handlers(start_entry, end_entry, LowBits, m_u_dispatch, m_u_ranges);
 		handler->ref(end_entry - start_entry);
@@ -319,7 +319,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
 			u8 rkey1 = rkey;
 			if(ent != start_entry)
@@ -333,7 +333,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	} else if(start_entry == end_entry) {
 		if(!(start & LOWMASK) && (end & LOWMASK) == LOWMASK) {
 			if(m_u_dispatch[start_entry]->is_dispatch())
-				m_u_dispatch[start_entry]->populate_mismatched_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, descriptor, rkey, mappings);
+				m_u_dispatch[start_entry]->populate_mismatched_nomirror(0, LOWMASK, ostart, oend, descriptor, rkey, mappings);
 			else {
 				mismatched_patch(descriptor, rkey, mappings, m_u_dispatch[start_entry]);
 				m_u_ranges[start_entry].intersect(ostart, oend);
@@ -353,19 +353,17 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 			rkey &= ~handler_entry::END;
 		}
 
-		if(start_entry <= end_entry) {
-			for(offs_t ent = start_entry; ent <= end_entry; ent++) {
-				u8 rkey1 = rkey;
-				if(ent != start_entry)
-					rkey1 &= ~handler_entry::START;
-				if(ent != end_entry)
-					rkey1 &= ~handler_entry::END;
-				if(m_u_dispatch[ent]->is_dispatch())
-					m_u_dispatch[ent]->populate_mismatched_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, descriptor, rkey1, mappings);
-				else {
-					mismatched_patch(descriptor, rkey1, mappings, m_u_dispatch[ent]);
-					m_u_ranges[ent].intersect(ostart, oend);
-				}
+		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
+			u8 rkey1 = rkey;
+			if(ent != start_entry)
+				rkey1 &= ~handler_entry::START;
+			if(ent != end_entry)
+				rkey1 &= ~handler_entry::END;
+			if(m_u_dispatch[ent]->is_dispatch())
+				m_u_dispatch[ent]->populate_mismatched_nomirror(0, LOWMASK, ostart, oend, descriptor, rkey1, mappings);
+			else {
+				mismatched_patch(descriptor, rkey1, mappings, m_u_dispatch[ent]);
+				m_u_ranges[ent].intersect(ostart, oend);
 			}
 		}
 	}
@@ -450,7 +448,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	range_cut_before(ostart-1, start_entry);
 	range_cut_after(oend+1, end_entry);
 
-	if(LowBits <= Width + AddrShift) {
+	if constexpr(LowBits <= Width + AddrShift) {
 		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
 			passthrough_patch(handler, mappings, m_u_dispatch[ent]);
 			m_u_ranges[ent].intersect(ostart, oend);
@@ -459,7 +457,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 	} else if(start_entry == end_entry) {
 		if(!(start & LOWMASK) && (end & LOWMASK) == LOWMASK) {
 			if(m_u_dispatch[start_entry]->is_dispatch())
-				m_u_dispatch[start_entry]->populate_passthrough_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, handler, mappings);
+				m_u_dispatch[start_entry]->populate_passthrough_nomirror(0, LOWMASK, ostart, oend, handler, mappings);
 			else {
 				passthrough_patch(handler, mappings, m_u_dispatch[start_entry]);
 				m_u_ranges[start_entry].intersect(ostart, oend);
@@ -477,14 +475,12 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 			end_entry--;
 		}
 
-		if(start_entry <= end_entry) {
-			for(offs_t ent = start_entry; ent <= end_entry; ent++) {
-				if(m_u_dispatch[ent]->is_dispatch())
-					m_u_dispatch[ent]->populate_passthrough_nomirror(start & LOWMASK, end & LOWMASK, ostart, oend, handler, mappings);
-				else {
-					passthrough_patch(handler, mappings, m_u_dispatch[ent]);
-					m_u_ranges[ent].intersect(ostart, oend);
-				}
+		for(offs_t ent = start_entry; ent <= end_entry; ent++) {
+			if(m_u_dispatch[ent]->is_dispatch())
+				m_u_dispatch[ent]->populate_passthrough_nomirror(0, LOWMASK, ostart, oend, handler, mappings);
+			else {
+				passthrough_patch(handler, mappings, m_u_dispatch[ent]);
+				m_u_ranges[ent].intersect(ostart, oend);
 			}
 		}
 	}

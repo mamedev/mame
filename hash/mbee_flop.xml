@@ -1435,7 +1435,7 @@ At the time of writing (2021-06-04) any floppy image will work in any emulated d
 	</software>
 
 	<software name="jandhb_01">
-		<description>JHBeesware1</description>
+		<description>JHBeesware 1</description>
 		<year>19??</year>
 		<publisher>J and H Beesware</publisher>
 		<sharedfeat name="compatibility" value="1,2,3" />
@@ -5629,7 +5629,7 @@ At the time of writing (2021-06-04) any floppy image will work in any emulated d
 		</part>
 	</software>
 
-	<software name="128pepsgmod" supported="no"><!-- need SN device added -->
+	<software name="128pepsgmod">
 		<description>EPSGmod Files</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

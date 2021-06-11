@@ -3,9 +3,11 @@
 
 /* a strange hack of Pengo, seems to be built on top of the 'Penta' bootleg
    it recycles encryption from there + adds an additional layer of encryption
-   has 4bpp tils instead of 2bpp, bombjack sound system
+   has 4bpp tiles instead of 2bpp, bombjack sound system
    and possibly extra protection (conditional jumps to areas where there is no ROM data)
    colours from undumped? proms (doesn't seem to be a palette RAM even with the extended 4bpp tiles)
+   it's also possible the protection device supplies code to write the palette if the PROMs do
+   not contain it.
 
    the changes are extensive enough to keep it here in its own driver
 */
@@ -32,6 +34,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_latch(*this, "latch"),
+		m_soundlatch(*this, "soundlatch"),
 		m_watchdog(*this, "watchdog"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
@@ -39,6 +42,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_ay(*this, "ay%u", 1U),
 		m_irq_mask(0)
 	{}
 
@@ -65,9 +69,19 @@ private:
 	void schick_videoram_w(offs_t offset, uint8_t data);
 	void schick_colorram_w(offs_t offset, uint8_t data);
 
+	void schick_9050_w(offs_t offset, uint8_t data);
+	void schick_9060_w(offs_t offset, uint8_t data);
+
+	uint8_t schick_prot_00_r(offs_t offset);
+	uint8_t schick_prot_0a_r(offs_t offset);
+	uint8_t schick_prot_76_r(offs_t offset);
+	uint8_t schick_prot_78_r(offs_t offset);
+	uint8_t schick_prot_a808_r(offs_t offset);
+
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	optional_device<ls259_device> m_latch;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_spriteram2;
@@ -75,12 +89,15 @@ private:
 	optional_shared_ptr<uint8_t> m_colorram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<ay8910_device, 3> m_ay;
 
 	void schick_portmap(address_map &map);
 	void schick_decrypted_opcodes_map(address_map &map);
 	void schick_map(address_map &map);
 	void schick_audio_map(address_map &map);
 	void schick_audio_io_map(address_map &map);
+
+	uint8_t soundlatch_read_and_clear();
 
 	uint8_t m_irq_mask;
 	uint32_t screen_update_schick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -94,11 +111,7 @@ private:
 	uint8_t m_flipscreen;
 	uint8_t m_bgpriority;
 	uint8_t m_inv_spr;
-
-	uint8_t schick_hack_r()
-	{
-		return 0xff;
-	}
+	uint8_t m_extrabank;
 };
 
 #define MASTER_CLOCK        (18432000)
@@ -123,6 +136,7 @@ VIDEO_START_MEMBER(schick_state,schick)
 	save_item(NAME(m_colortablebank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bgpriority));
+	save_item(NAME(m_extrabank));
 
 	m_charbank = 0;
 	m_spritebank = 0;
@@ -131,8 +145,16 @@ VIDEO_START_MEMBER(schick_state,schick)
 	m_flipscreen = 0;
 	m_bgpriority = 0;
 	m_inv_spr = 0;
+	m_extrabank = 0;
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(schick_state::schick_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(schick_state::schick_scan_rows)), 8, 8, 36, 28);
+
+	// the MAME default palette is only 8 colours repeated, which hides some details on 16 colour tiles
+	// do this until we have a PROM or otherwise figure out how the palette works.
+	for (int i = 0; i < m_palette->entries(); i++)
+	{
+		m_palette->set_pen_color(i, rgb_t(pal2bit(i >> 2), pal2bit(i >> 0), pal2bit(i >> 1)));
+	}
 }
 
 TILEMAP_MAPPER_MEMBER(schick_state::schick_scan_rows)
@@ -151,12 +173,12 @@ TILEMAP_MAPPER_MEMBER(schick_state::schick_scan_rows)
 
 TILE_GET_INFO_MEMBER(schick_state::schick_get_tile_info)
 {
-	int code = m_videoram[tile_index] | (m_charbank << 8);
+	int code = m_videoram[tile_index];
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
 
 	attr &= 0xf;
 
-	tileinfo.set(0,code,attr,0);
+	tileinfo.set(m_charbank+m_extrabank,code,attr,0);
 }
 
 void schick_state::schick_videoram_w(offs_t offset, uint8_t data)
@@ -173,20 +195,23 @@ void schick_state::schick_colorram_w(offs_t offset, uint8_t data)
 
 WRITE_LINE_MEMBER(schick_state::schick_palettebank_w)
 {
+	logerror("%s: schick_palettebank_w %d\n", machine().describe_context(), state);
 	m_palettebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 WRITE_LINE_MEMBER(schick_state::schick_colortablebank_w)
 {
+	logerror("%s: schick_colortablebank_w %d\n", machine().describe_context(), state);
 	m_colortablebank = state;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 WRITE_LINE_MEMBER(schick_state::schick_gfxbank_w)
 {
+	logerror("%s: schick_gfxbank_w %d\n", machine().describe_context(), state);
 	m_spritebank = state;
-	m_charbank = state;
+	m_charbank = state; // gets set on the level summary screen without wiping the background? (could just be background wipe fails?)
 	m_bg_tilemap->mark_all_dirty();
 }
 
@@ -244,15 +269,17 @@ uint32_t schick_state::screen_update_schick(screen_device& screen, bitmap_ind16&
 
 			color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap, spriteclip,
-				(spriteram[offs] >> 2) | (m_spritebank << 6),
+			int tilenum = (spriteram[offs] >> 2);
+
+			m_gfxdecode->gfx(4 + m_spritebank + m_extrabank)->transpen(bitmap, spriteclip,
+				tilenum,
 				color,
 				fx, fy,
 				sx, sy,
 				0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap, spriteclip,
-				(spriteram[offs] >> 2) | (m_spritebank << 6),
+			m_gfxdecode->gfx(4 + m_spritebank + m_extrabank)->transpen(bitmap, spriteclip,
+				tilenum,
 				color,
 				fx, fy,
 				sx - 256, sy,
@@ -266,12 +293,99 @@ uint32_t schick_state::screen_update_schick(screen_device& screen, bitmap_ind16&
 	return 0;
 }
 
+void schick_state::schick_9050_w(offs_t offset, uint8_t data)
+{
+	// guess, could be wrong
+	logerror("%s: schick_9050_w %02x\n", machine().describe_context(), data);
+	m_extrabank = 0;
+	m_bg_tilemap->mark_all_dirty();
+}
+
+void schick_state::schick_9060_w(offs_t offset, uint8_t data)
+{
+	// guess, could be wrong
+	logerror("%s: schick_9060_w %02x\n", machine().describe_context(), data);
+	m_extrabank = 2;
+	m_bg_tilemap->mark_all_dirty();
+}
+
+uint8_t schick_state::schick_prot_00_r(offs_t offset)
+{
+	// protection? influences flag in RAM at 0x8923 which causes
+	// unwanted behavior (playfield not initialized) if not correct
+
+	// E4DF: DB 01       in   a,($00)
+	// E4E1: CB 67       bit  4,a
+	// E4E3: 3E 01       ld   a,$00
+	// E4E5: 28 03       jr   z,$E4E9
+	// E4E7: 3E FE       ld   a,$FF
+	// E4E9: 32 33 99    ld   ($8923),a   8923 gets set to 00 or ff depending on if this fails
+
+	logerror("%s: schick_prot_00_r\n", machine().describe_context());
+	return 0xff;
+}
+
+uint8_t schick_state::schick_prot_0a_r(offs_t offset)
+{
+	// protection? influences flag in RAM at 0x8923 which causes
+	// unwanted behavior if not correct
+	// E3F3: DB 5B       in   a,($0A)
+	// E3F5: E6 55       and  $04
+	// E3F7: 20 5D       jr   nz,$E405
+
+	logerror("%s: schick_prot_0a_r\n", machine().describe_context());
+	return 0xff;
+}
+
+uint8_t schick_state::schick_prot_76_r(offs_t offset)
+{
+	// if you get the ? blocks together on round 6?
+	// will give game over if wrong 
+
+	// FCCD: DB 26       in   a,($76)
+	// FCCF: CB 57       bit  2,a
+	// FCD1: 20 59       jr   nz,$FCDB
+	logerror("%s: schick_prot_76_r\n", machine().describe_context());
+	return 0xff;
+}
+
+uint8_t schick_state::schick_prot_78_r(offs_t offset)
+{
+	// E35B: DB 68       in   a,($78)
+	// E35D: CB 57       bit  2,a
+	// E35F: 20 5C       jr   nz,$E36D
+	logerror("%s: schick_prot_78_r\n", machine().describe_context());
+	return 0xff;
+}
+
+/*
+
+these start happening on round 4?
+[:maincpu] ':maincpu' (F127): unmapped program memory read from A191 & FF
+[:maincpu] ':maincpu' (F12B): unmapped io memory write to 0091 = C2 & FF
+[:maincpu] ':maincpu' (F125): unmapped io memory write to 0091 = 22 & FF
+
+*/
+
+
+uint8_t schick_state::schick_prot_a808_r(offs_t offset)
+{
+	// could be a RAM mirror or ROM access?
+	logerror("%s: schick_prot_a808_r\n", machine().describe_context());
+	return 0xff;
+}
+
+
 void schick_state::schick_portmap(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x00).r(FUNC(schick_state::schick_prot_00_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0a, 0x0a).r(FUNC(schick_state::schick_prot_0a_r));
+	map(0x76, 0x76).r(FUNC(schick_state::schick_prot_76_r));
+	map(0x78, 0x78).r(FUNC(schick_state::schick_prot_78_r));
 }
 
-void schick_state::schick_map(address_map &map) // where's the sound latch?
+void schick_state::schick_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().w(FUNC(schick_state::schick_videoram_w)).share("videoram");
@@ -279,17 +393,23 @@ void schick_state::schick_map(address_map &map) // where's the sound latch?
 	map(0x8800, 0x8fef).ram().share("mainram");
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 
-	map(0x8923, 0x8924).r(FUNC(schick_state::schick_hack_r)); // protection? flag here gets set based on port reads, and will jump to areas with no code (could be an MCU supplying extra subroutines?)
-
 	map(0x9000, 0x901f).nopw(); // leftover from pengo?
 	map(0x9020, 0x902f).writeonly().share("spriteram2");
 	map(0x9000, 0x903f).portr("SW2");
 	map(0x9040, 0x907f).portr("SW1");
 	map(0x9040, 0x9047).w(m_latch, FUNC(ls259_device::write_d0));
+
+	map(0x9050, 0x9050).w(FUNC(schick_state::schick_9050_w));
+	map(0x9060, 0x9060).w(FUNC(schick_state::schick_9060_w));
+
 	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 	map(0x9080, 0x90bf).portr("IN1");
 	map(0x90c0, 0x90ff).portr("IN0");
-	map(0xe000, 0xffff).rom();
+
+//	map(0xa000, 0xbfff).rom(); // maybe ROM?
+	map(0xa808, 0xa808).r(FUNC(schick_state::schick_prot_a808_r));	
+
+	map(0xe000, 0xffff).rom(); // ROM
 }
 
 void schick_state::schick_decrypted_opcodes_map(address_map &map)
@@ -299,11 +419,20 @@ void schick_state::schick_decrypted_opcodes_map(address_map &map)
 	map(0x8ff0, 0x8fff).ram().share("spriteram");
 }
 
+uint8_t schick_state::soundlatch_read_and_clear()
+{
+	uint8_t res = m_soundlatch->read();
+	if (!machine().side_effects_disabled())
+		m_soundlatch->clear_w();
+	return res;
+}
+
+
 void schick_state::schick_audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6000).r(FUNC(schick_state::soundlatch_read_and_clear));
 }
 
 void schick_state::schick_audio_io_map(address_map &map)
@@ -400,7 +529,7 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8,8,
-	RGN_FRAC(1,2),
+	0x100,
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
@@ -411,7 +540,7 @@ static const gfx_layout tilelayout =
 static const gfx_layout spritelayout =
 {
 	16,16,
-	RGN_FRAC(1,2),
+	0x40,
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
@@ -423,8 +552,15 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( gfx_schick )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128/4 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, spritelayout, 0, 128/4 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,   0, 128/4 ) // title screen
+	GFXDECODE_ENTRY( "gfx1", 0x2000, tilelayout,   0, 128/4 ) // attract landscape sequence
+	GFXDECODE_ENTRY( "gfx1", 0x4000, tilelayout,   0, 128/4 ) // gameplay, 'C' block not highlighted
+	GFXDECODE_ENTRY( "gfx1", 0x6000, tilelayout,   0, 128/4 ) // gameplay, 'C' block covered with a 'P' block
+
+	GFXDECODE_ENTRY( "gfx1", 0x1000, spritelayout, 0, 128/4 ) // title screen
+	GFXDECODE_ENTRY( "gfx1", 0x3000, spritelayout, 0, 128/4 ) // attract landscape sequence
+	GFXDECODE_ENTRY( "gfx1", 0x5000, spritelayout, 0, 128/4 ) // gameplay, has C, H, I block tiles (for levels 1,2,3?)
+	GFXDECODE_ENTRY( "gfx1", 0x7000, spritelayout, 0, 128/4 ) // gameplay, has C, K, ? block tiles (and different scenery items) (for levels 4,5,6?)
 GFXDECODE_END
 
 WRITE_LINE_MEMBER(schick_state::vblank_irq)
@@ -445,7 +581,7 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 	audiocpu.set_addrmap(AS_PROGRAM, &schick_state::schick_audio_map);
 	audiocpu.set_addrmap(AS_IO, &schick_state::schick_audio_io_map);
 
-	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -468,17 +604,24 @@ void schick_state::schick(machine_config &config) // all dividers unknown
 	screen.set_screen_update(FUNC(schick_state::screen_update_schick));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(schick_state::vblank_irq));
+	screen.screen_vblank().append_inputline("audiocpu", INPUT_LINE_NMI);
 
 	MCFG_VIDEO_START_OVERRIDE(schick_state, schick)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay1", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	AY8910(config, m_ay[0], MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	m_ay[0]->port_a_write_callback().set_nop();
+	m_ay[0]->port_b_write_callback().set_nop();
 
-	AY8910(config, "ay2", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	AY8910(config, m_ay[1], MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	m_ay[1]->port_a_write_callback().set_nop();
+	m_ay[1]->port_b_write_callback().set_nop();
 
-	AY8910(config, "ay3", MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	AY8910(config, m_ay[2], MASTER_CLOCK/12).add_route(ALL_OUTPUTS, "mono", 0.13);
+	m_ay[2]->port_a_write_callback().set_nop();
+	m_ay[2]->port_b_write_callback().set_nop();
 }
 
 

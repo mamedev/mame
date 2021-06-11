@@ -26,14 +26,14 @@ STATUS:
 
     The driver is begging for a re-write or at least a split into video/supracan.c.  It will happen eventually.
 
-    Sound chip is completely unknown.
+    Sound chip is completely custom, and partially implemented.
 
     There are 6 interrupt sources on the 6502 side, all of which use the IRQ line.
     The register at 0x411 is bitmapped to indicate what source(s) are active.
     In priority order from most to least important, they are:
 
     411 value  How acked                     Notes
-    0x40       read reg 0x16 of sound chip   likely timer. snd regs 0x16/0x17 are time constant, write 0 to reg 0x9f to start
+    0x40       read reg 0x16 of sound chip   used for DMA-driven sample playback. Register 0x16 may contain which DMA-driven samples are active.
     0x04       read at 0x405                 latch 1?  0xcd is magic value
     0x08       read at 0x404                 latch 2?  0xcd is magic value
     0x10       read at 0x409                 unknown, dispatched but not used in startup 6502 code
@@ -261,6 +261,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 	void palette_init(palette_device &palette) const;
 	void sound_timer_irq(int state);
+	void sound_dma_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(hbl_callback);
 	TIMER_CALLBACK_MEMBER(line_on_callback);
@@ -1197,6 +1198,11 @@ void supracan_state::sound_timer_irq(int state)
 	set_sound_irq(7, state);
 }
 
+void supracan_state::sound_dma_irq(int state)
+{
+	set_sound_irq(6, state);
+}
+
 void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
@@ -1566,8 +1572,19 @@ uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 
 	switch (offset)
 	{
+	case 0x04/2:
+		data = (m_soundram[0x40c] << 8) | m_soundram[0x40d];
+		LOGMASKED(LOG_SOUND, "%s: sound_r: DMA Request address from 6502, %08x: %04x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), data, mem_mask);
+		break;
+
+	case 0x0c/2:
+		data = m_soundram[0x40a];
+		LOGMASKED(LOG_SOUND, "%s: sound_r: DMA Request flag from 6502, %08x: %04x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), data, mem_mask);
+		machine().debug_break();
+		break;
+
 	default:
-		LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: sound_r: Unknown register: (%08x) & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), mem_mask);
+		LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: sound_r: Unknown register: %08x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), mem_mask);
 		break;
 	}
 
@@ -2113,7 +2130,8 @@ void supracan_state::supracan(machine_config &config)
 
 	ACANSND(config, m_sound, XTAL(3'579'545));
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
-	m_sound->irq_handler().set(FUNC(supracan_state::sound_timer_irq));
+	m_sound->timer_irq_handler().set(FUNC(supracan_state::sound_timer_irq));
+	m_sound->dma_irq_handler().set(FUNC(supracan_state::sound_dma_irq));
 	m_sound->add_route(0, "lspeaker", 1.0);
 	m_sound->add_route(1, "rspeaker", 1.0);
 
