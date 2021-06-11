@@ -23,9 +23,6 @@ public:
 	{ }
 
 	void ojankohs(machine_config &config);
-	void ccasino(machine_config &config);
-	void ojankoc(machine_config &config);
-	void ojankoy(machine_config &config);
 
 protected:
 	ojankohs_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
@@ -33,107 +30,85 @@ protected:
 		m_videoram(*this, "videoram", vramsize, ENDIANNESS_LITTLE),
 		m_colorram(*this, "colorram", 0x1000, ENDIANNESS_LITTLE),
 		m_paletteram(*this, "paletteram", pramsize, ENDIANNESS_LITTLE),
+		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_coin(*this, "coin"),
-		m_inputs_p1(*this, {"p1_0", "p1_1", "p1_2", "p1_3"}),
-		m_inputs_p2(*this, {"p2_0", "p2_1", "p2_2", "p2_3"}),
+		m_inputs_p1(*this, "p1_%u", 0U),
+		m_inputs_p2(*this, "p2_%u", 0U),
 		m_inputs_p1_extra(*this, "p1_4"),
 		m_inputs_p2_extra(*this, "p2_4"),
-		m_dsw1(*this, "dsw1"), m_dsw2(*this, "dsw2"),
-		m_dsw3(*this, "dsw3"), m_dsw4(*this, "dsw4")
+		m_dsw(*this, "dsw%u", 1U)
 	{ }
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
-private:
-	/* memory pointers */
+	void common_state_saving();
+
+	// memory pointers
 	memory_share_creator<uint8_t> m_videoram;
 	memory_share_creator<uint8_t> m_colorram;
 	memory_share_creator<uint8_t> m_paletteram;
+	required_memory_bank m_mainbank;
 
-	/* video-related */
-	tilemap_t  *m_tilemap;
+	// video-related
+	tilemap_t *m_tilemap;
 	bitmap_ind16 m_tmpbitmap;
-	int       m_gfxreg;
-	int       m_flipscreen;
-	int       m_flipscreen_old;
-	int       m_scrollx;
-	int       m_scrolly;
-	int       m_screen_refresh;
+	uint8_t m_gfxreg;
+	uint8_t m_flipscreen;
+	uint8_t m_flipscreen_old;
+	int16_t m_scrollx;
+	int16_t m_scrolly;
+	uint8_t m_screen_refresh;
 
-	/* misc */
-	uint8_t   m_port_select;
-	int       m_adpcm_reset;
-	int       m_adpcm_data;
-	int       m_vclk_left;
+	// misc
+	uint8_t m_port_select;
+	uint8_t m_adpcm_reset;
+	int m_adpcm_data;
+	uint8_t m_vclk_left;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	// I/O ports
 	required_ioport m_coin;
 	required_ioport_array<4> m_inputs_p1;
 	required_ioport_array<4> m_inputs_p2;
 	optional_ioport m_inputs_p1_extra;
 	optional_ioport m_inputs_p2_extra;
-	required_ioport m_dsw1;
-	required_ioport m_dsw2;
-	optional_ioport m_dsw3;
-	optional_ioport m_dsw4;
+	required_ioport_array<2> m_dsw;
 
-	void ojankohs_rombank_w(uint8_t data);
-	void ojankoy_rombank_w(uint8_t data);
-	void ojankohs_msm5205_w(uint8_t data);
-	void ojankoc_ctrl_w(uint8_t data);
+
+	void rombank_w(uint8_t data);
+	void msm5205_w(uint8_t data);
 	void port_select_w(uint8_t data);
 	uint8_t keymatrix_p1_r();
 	uint8_t keymatrix_p2_r();
-	uint8_t ojankoc_keymatrix_p1_r();
-	uint8_t ojankoc_keymatrix_p2_r();
-	uint8_t ccasino_dipsw3_r();
-	uint8_t ccasino_dipsw4_r();
-	void ojankoy_coinctr_w(uint8_t data);
-	void ccasino_coinctr_w(uint8_t data);
-	void ojankohs_palette_w(offs_t offset, uint8_t data);
-	void ccasino_palette_w(offs_t offset, uint8_t data);
-	void ojankoc_palette_w(offs_t offset, uint8_t data);
-	void ojankohs_videoram_w(offs_t offset, uint8_t data);
-	void ojankohs_colorram_w(offs_t offset, uint8_t data);
-	void ojankohs_gfxreg_w(uint8_t data);
-	void ojankohs_flipscreen_w(uint8_t data);
-	void ojankoc_videoram_w(offs_t offset, uint8_t data);
-	void ojankohs_adpcm_reset_w(uint8_t data);
-	uint8_t ojankohs_dipsw1_r();
-	uint8_t ojankohs_dipsw2_r();
-	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
-	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
-	DECLARE_MACHINE_START(ojankohs);
-	DECLARE_VIDEO_START(ojankohs);
-	DECLARE_MACHINE_START(ojankoy);
-	DECLARE_VIDEO_START(ojankoy);
-	void ojankoy_palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(ccasino);
-	DECLARE_MACHINE_START(ojankoc);
-	DECLARE_VIDEO_START(ojankoc);
-	DECLARE_MACHINE_START(common);
-	uint32_t screen_update_ojankohs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ojankoc_flipscreen(int data);
-	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(uint8_t data);
+	void adpcm_reset_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	void ccasino_io_map(address_map &map);
-	void ojankoc_io_map(address_map &map);
-	void ojankoc_map(address_map &map);
-	void ojankohs_io_map(address_map &map);
-	void ojankohs_map(address_map &map);
-	void ojankoy_io_map(address_map &map);
-	void ojankoy_map(address_map &map);
+private:
+	void palette_w(offs_t offset, uint8_t data);
+	uint8_t dipsw1_r();
+	uint8_t dipsw2_r();
+	void gfxreg_w(uint8_t data);
+
+	void io_map(address_map &map);
+	void map(address_map &map);
 };
 
 class ojankoy_state : public ojankohs_state
@@ -142,14 +117,45 @@ public:
 	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
 	{ }
+
+	void ojankoy(machine_config &config);
+
+protected:
+	ojankoy_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t vramsize, uint32_t pramsize) :
+		ojankohs_state(mconfig, type, tag, vramsize, pramsize)
+	{ }
+
+	virtual void video_start() override;
+
+	void map(address_map &map);
+
+	void rombank_w(uint8_t data);
+
+private:
+	void coinctr_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	void io_map(address_map &map);
 };
 
-class ccasino_state : public ojankohs_state
+class ccasino_state : public ojankoy_state
 {
 public:
 	ccasino_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ojankohs_state(mconfig, type, tag, 0x2000, 0x800)
+		ojankoy_state(mconfig, type, tag, 0x2000, 0x800),
+		m_extra_dsw(*this, "dsw%u", 3U)
 	{ }
+
+	void ccasino(machine_config &config);
+
+private:
+	required_ioport_array<2> m_extra_dsw;
+
+	uint8_t dipsw3_r();
+	uint8_t dipsw4_r();
+	void coinctr_w(uint8_t data);
+	void palette_w(offs_t offset, uint8_t data);
+	void io_map(address_map &map);
 };
 
 class ojankoc_state : public ojankohs_state
@@ -158,6 +164,23 @@ public:
 	ojankoc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ojankohs_state(mconfig, type, tag, 0x8000, 0x20)
 	{ }
+
+	void ojankoc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	void ctrl_w(uint8_t data);
+	uint8_t keymatrix_p1_r();
+	uint8_t keymatrix_p2_r();
+	void palette_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void flipscreen(uint8_t data);
+	void io_map(address_map &map);
+	void map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_OJANKOHS_H
