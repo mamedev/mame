@@ -383,6 +383,37 @@ inline uint8_t count_leading_ones(uint32_t val)
 
 
 /*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+inline uint8_t count_leading_zeros_64(uint64_t val)
+{
+	if (!val) return 64U;
+	uint8_t count;
+	for (count = 0; int64_t(val) >= 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+inline uint8_t count_leading_ones_64(uint64_t val)
+{
+	uint8_t count;
+	for (count = 0; int64_t(val) < 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
     population_count_32 - return the number of
     one bits in a 32-bit value
 -------------------------------------------------*/

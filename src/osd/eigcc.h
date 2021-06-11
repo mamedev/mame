@@ -85,4 +85,64 @@ inline unsigned _population_count_64(uint64_t val)
 }
 #endif
 
+
+/*-------------------------------------------------
+    count_leading_zeros - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros
+#define count_leading_zeros _count_leading_zeros
+inline uint8_t _count_leading_zeros(uint32_t val)
+{
+	// uses CPU feature if available, otherwise falls back to implementation similar to eminline.h
+	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
+	return (val == 0) ? 32U : unsigned(__builtin_clz(static_cast<unsigned>(val)));
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones
+#define count_leading_ones _count_leading_ones
+inline uint8_t _count_leading_ones(uint32_t val)
+{
+	return count_leading_zeros(~val);
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t _count_leading_zeros_64(uint64_t val)
+{
+	// uses CPU feature if available, otherwise falls back to implementation similar to eminline.h
+	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned int");
+	return (val == 0) ? 64U : unsigned(__builtin_clzll(static_cast<unsigned long long>(val)));
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t _count_leading_ones(uint64_t val)
+{
+	return count_leading_zeros_64(~val);
+}
+#endif
+
 #endif // MAME_OSD_EIGCC_H
