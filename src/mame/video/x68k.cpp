@@ -148,15 +148,6 @@ void x68k_state::spritereg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 	case 0x408:  // BG H/V-Res
 		m_video.bg_hvres = data & 0x1f;
-		if(data != 0xff)
-		{  // Handle when the PCG is using 256 and the CRTC is using 512
-			if((m_video.bg_hvres & 0x0c) == 0x00 && m_crtc->vfactor() == 1)
-				m_video.bg_double = 2;
-			else
-				m_video.bg_double = 1;
-		}
-		else
-			m_video.bg_double = 1;
 		break;
 	}
 }
@@ -546,7 +537,7 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle clip
 			sx += m_video.bg_hshift;
 			sx += m_sprite_shift;
 
-			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_crtc->hbegin()+sx,(m_crtc->vbegin() / divisor)+(sy*m_video.bg_double),0x10000,0x10000*m_video.bg_double,0x00);
+			m_gfxdecode->gfx(1)->zoom_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_crtc->hbegin()+sx,(m_crtc->vbegin() / divisor)+sy,0x10000,0x10000,0x00);
 		}
 	}
 }
