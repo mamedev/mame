@@ -19,75 +19,91 @@
 //  CONSTANTS
 //**************************************************************************
 
-/* flags for LFB writes */
-#define LFB_RGB_PRESENT         1
-#define LFB_ALPHA_PRESENT       2
-#define LFB_DEPTH_PRESENT       4
-#define LFB_DEPTH_PRESENT_MSW   8
+// flags for LFB writes
+static constexpr u8 LFB_RGB_PRESENT       = 1;
+static constexpr u8 LFB_ALPHA_PRESENT     = 2;
+static constexpr u8 LFB_DEPTH_PRESENT     = 4;
+static constexpr u8 LFB_DEPTH_PRESENT_MSW = 8;
 
-/* flags for the register access array */
-#define REGISTER_READ           0x01        /* reads are allowed */
-#define REGISTER_WRITE          0x02        /* writes are allowed */
-#define REGISTER_PIPELINED      0x04        /* writes are pipelined */
-#define REGISTER_FIFO           0x08        /* writes go to FIFO */
-#define REGISTER_WRITETHRU      0x10        /* writes are valid even for CMDFIFO */
+// flags for the register access array
+static constexpr u8 REGISTER_READ         = 0x01; // reads are allowed
+static constexpr u8 REGISTER_WRITE        = 0x02; // writes are allowed
+static constexpr u8 REGISTER_PIPELINED    = 0x04; // writes are pipelined
+static constexpr u8 REGISTER_FIFO         = 0x08; // writes go to FIFO
+static constexpr u8 REGISTER_WRITETHRU    = 0x10; // writes are valid even for CMDFIFO
 
-/* shorter combinations to make the table smaller */
-#define REG_R                   (REGISTER_READ)
-#define REG_W                   (REGISTER_WRITE)
-#define REG_WT                  (REGISTER_WRITE | REGISTER_WRITETHRU)
-#define REG_RW                  (REGISTER_READ | REGISTER_WRITE)
-#define REG_RWT                 (REGISTER_READ | REGISTER_WRITE | REGISTER_WRITETHRU)
-#define REG_RP                  (REGISTER_READ | REGISTER_PIPELINED)
-#define REG_WP                  (REGISTER_WRITE | REGISTER_PIPELINED)
-#define REG_RWP                 (REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED)
-#define REG_RWPT                (REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_WRITETHRU)
-#define REG_RF                  (REGISTER_READ | REGISTER_FIFO)
-#define REG_WF                  (REGISTER_WRITE | REGISTER_FIFO)
-#define REG_RWF                 (REGISTER_READ | REGISTER_WRITE | REGISTER_FIFO)
-#define REG_RPF                 (REGISTER_READ | REGISTER_PIPELINED | REGISTER_FIFO)
-#define REG_WPF                 (REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO)
-#define REG_RWPF                (REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO)
+// shorter combinations to make the table smaller
+static constexpr u8 REG_R    = REGISTER_READ;
+static constexpr u8 REG_W    = REGISTER_WRITE;
+static constexpr u8 REG_WT   = REGISTER_WRITE | REGISTER_WRITETHRU;
+static constexpr u8 REG_RW   = REGISTER_READ | REGISTER_WRITE;
+static constexpr u8 REG_RWT  = REGISTER_READ | REGISTER_WRITE | REGISTER_WRITETHRU;
+static constexpr u8 REG_RP   = REGISTER_READ | REGISTER_PIPELINED;
+static constexpr u8 REG_WP   = REGISTER_WRITE | REGISTER_PIPELINED;
+static constexpr u8 REG_RWP  = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED;
+static constexpr u8 REG_RWPT = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_WRITETHRU;
+static constexpr u8 REG_RF   = REGISTER_READ | REGISTER_FIFO;
+static constexpr u8 REG_WF   = REGISTER_WRITE | REGISTER_FIFO;
+static constexpr u8 REG_RWF  = REGISTER_READ | REGISTER_WRITE | REGISTER_FIFO;
+static constexpr u8 REG_RPF  = REGISTER_READ | REGISTER_PIPELINED | REGISTER_FIFO;
+static constexpr u8 REG_WPF  = REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO;
+static constexpr u8 REG_RWPF = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO;
 
 
-/*************************************
- *
- *  Register constants
- *
- *************************************/
-
-struct rgba
-{
-#ifdef LSB_FIRST
-	u8               b, g, r, a;
-#else
-	u8               a, r, g, b;
-#endif
-};
-
-union voodoo_reg
-{
-	s32 i;
-	u32 u;
-	float f;
-	rgba rgb;
-};
+//**************************************************************************
+//  SPECIFIC REGISTER TYPES
+//**************************************************************************
 
 namespace voodoo
 {
 
-// ======================> fbz_colorpath
+// ======================> reg_color
 
-class fbz_colorpath
+class reg_color
+{
+public:
+	constexpr reg_color(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 blue() const            { return BIT(m_value, 0, 8); }
+	constexpr u32 green() const           { return BIT(m_value, 8, 8); }
+	constexpr u32 red() const             { return BIT(m_value, 16, 8); }
+	constexpr u32 alpha() const           { return BIT(m_value, 24, 8); }
+	constexpr rgb_t argb() const          { return m_value; }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_clip_minmax
+
+class reg_clip_minmax
+{
+public:
+	constexpr reg_clip_minmax(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 min() const { return BIT(m_value, 16, 10); }
+	constexpr u32 max() const { return BIT(m_value, 0, 10); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbz_colorpath
+
+class reg_fbz_colorpath
 {
 public:
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
-	constexpr fbz_colorpath(u32 value) :
+	constexpr reg_fbz_colorpath(u32 value) :
 		m_value(value) { }
 
-	constexpr fbz_colorpath(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
+	constexpr reg_fbz_colorpath(u32 normalized, reg_fbz_colorpath const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 cc_rgbselect() const            { return BIT(m_value, 0, 2); }
 	constexpr u32 cc_aselect() const              { return BIT(m_value, 2, 2); }
@@ -122,18 +138,18 @@ private:
 };
 
 
-// ======================> fbz_mode
+// ======================> reg_fbz_mode
 
-class fbz_mode
+class reg_fbz_mode
 {
 public:
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
-	constexpr fbz_mode(u32 value) :
+	constexpr reg_fbz_mode(u32 value) :
 		m_value(value) { }
 
-	constexpr fbz_mode(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
+	constexpr reg_fbz_mode(u32 normalized, reg_fbz_mode const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 enable_clipping() const       { return BIT(m_value, 0, 1); }
 	constexpr u32 enable_chromakey() const      { return BIT(m_value, 1, 1); }
@@ -166,18 +182,18 @@ private:
 };
 
 
-// ======================> alpha_mode
+// ======================> reg_alpha_mode
 
-class alpha_mode
+class reg_alpha_mode
 {
 public:
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
-	constexpr alpha_mode(u32 value) :
+	constexpr reg_alpha_mode(u32 value) :
 		m_value(value) { }
 
-	constexpr alpha_mode(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : ((normalized & 0x00ffffff) | (live & 0xff000000))) { }
+	constexpr reg_alpha_mode(u32 normalized, reg_alpha_mode const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : ((normalized & 0x00ffffff) | (live.m_value & 0xff000000))) { }
 
 	constexpr u32 alphatest() const     { return BIT(m_value, 0, 1); }
 	constexpr u32 alphafunction() const { return BIT(m_value, 1, 3); }
@@ -210,18 +226,18 @@ private:
 };
 
 
-// ======================> fog_mode
+// ======================> reg_fog_mode
 
-class fog_mode
+class reg_fog_mode
 {
 public:
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
-	constexpr fog_mode(u32 value) :
+	constexpr reg_fog_mode(u32 value) :
 		m_value(value) { }
 
-	constexpr fog_mode(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
+	constexpr reg_fog_mode(u32 normalized, reg_fog_mode const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 enable_fog() const   { return BIT(m_value, 0, 1); }
 	constexpr u32 fog_add() const      { return BIT(m_value, 1, 1); }
@@ -242,18 +258,18 @@ private:
 };
 
 
-// ======================> texture_mode
+// ======================> reg_texture_mode
 
-class texture_mode
+class reg_texture_mode
 {
 public:
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
 
-	constexpr texture_mode(u32 value) :
+	constexpr reg_texture_mode(u32 value) :
 		m_value(value) { }
 
-	constexpr texture_mode(u32 normalized, u32 live) :
-		m_value((normalized == DECODE_LIVE) ? live : normalized) { }
+	constexpr reg_texture_mode(u32 normalized, reg_texture_mode const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 enable_perspective() const   { return BIT(m_value, 0, 1); }
 	constexpr u32 minification_filter() const  { return BIT(m_value, 1, 1); }
@@ -300,12 +316,12 @@ private:
 };
 
 
-// ======================> texture_lod
+// ======================> reg_texture_lod
 
-class texture_lod
+class reg_texture_lod
 {
 public:
-	constexpr texture_lod(u32 value) :
+	constexpr reg_texture_lod(u32 value) :
 		m_value(value) { }
 
 	constexpr u32 lod_min() const        { return BIT(m_value, 0, 6); }
@@ -327,12 +343,12 @@ private:
 };
 
 
-// ======================> texture_detail
+// ======================> reg_texture_detail
 
-class texture_detail
+class reg_texture_detail
 {
 public:
-	constexpr texture_detail(u32 value) :
+	constexpr reg_texture_detail(u32 value) :
 		m_value(value) { }
 
 	constexpr u32 detail_max() const           { return BIT(m_value, 0, 8); }
@@ -349,12 +365,85 @@ private:
 };
 
 
-// ======================> init_en
+// ======================> reg_lfb_mode
 
-class init_en
+class reg_lfb_mode
 {
 public:
-	constexpr init_en(u32 value) :
+	constexpr reg_lfb_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 write_format() const          { return BIT(m_value, 0, 4); }
+	constexpr u32 write_buffer_select() const   { return BIT(m_value, 4, 2); }
+	constexpr u32 read_buffer_select() const    { return BIT(m_value, 6, 2); }
+	constexpr u32 enable_pixel_pipeline() const { return BIT(m_value, 8, 1); }
+	constexpr u32 rgba_lanes() const            { return BIT(m_value, 9, 2); }
+	constexpr u32 word_swap_writes() const      { return BIT(m_value, 11, 1); }
+	constexpr u32 byte_swizzle_writes() const   { return BIT(m_value, 12, 1); }
+	constexpr u32 y_origin() const              { return BIT(m_value, 13, 1); }
+	constexpr u32 write_w_select() const        { return BIT(m_value, 14, 1); }
+	constexpr u32 word_swap_reads() const       { return BIT(m_value, 15, 1); }
+	constexpr u32 byte_swizzle_reads() const    { return BIT(m_value, 16, 1); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_chroma_range
+
+class reg_chroma_range
+{
+public:
+	constexpr reg_chroma_range(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 blue() const            { return BIT(m_value, 0, 8); }
+	constexpr u32 green() const           { return BIT(m_value, 8, 8); }
+	constexpr u32 red() const             { return BIT(m_value, 16, 8); }
+	constexpr u32 blue_exclusive() const  { return BIT(m_value, 24, 1); }
+	constexpr u32 green_exclusive() const { return BIT(m_value, 25, 1); }
+	constexpr u32 red_exclusive() const   { return BIT(m_value, 26, 1); }
+	constexpr u32 union_mode() const      { return BIT(m_value, 27, 1); }
+	constexpr u32 enable() const          { return BIT(m_value, 28, 1); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_setup_mode
+
+class reg_setup_mode
+{
+public:
+	constexpr reg_setup_mode(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 setup_rgb() const                    { return BIT(m_value, 0, 1); }
+	constexpr u32 setup_alpha() const                  { return BIT(m_value, 1, 1); }
+	constexpr u32 setup_z() const                      { return BIT(m_value, 2, 1); }
+	constexpr u32 setup_wb() const                     { return BIT(m_value, 3, 1); }
+	constexpr u32 setup_w0() const                     { return BIT(m_value, 4, 1); }
+	constexpr u32 setup_st0() const                    { return BIT(m_value, 5, 1); }
+	constexpr u32 setup_w1() const                     { return BIT(m_value, 6, 1); }
+	constexpr u32 setup_st1() const                    { return BIT(m_value, 7, 1); }
+	constexpr u32 fan_mode() const                     { return BIT(m_value, 16, 1); }
+	constexpr u32 enable_culling() const               { return BIT(m_value, 17, 1); }
+	constexpr u32 culling_sign() const                 { return BIT(m_value, 18, 1); }
+	constexpr u32 disable_ping_pong_correction() const { return BIT(m_value, 19, 1); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_init_en
+
+class reg_init_en
+{
+public:
+	constexpr reg_init_en(u32 value) :
 		m_value(value) { }
 
 	constexpr u32 enable_hw_init() const           { return BIT(m_value, 0, 1); }
@@ -381,47 +470,329 @@ private:
 };
 
 
-// ======================> lfb_mode
+// ======================> reg_fbi_init0
 
-class lfb_mode
+class reg_fbi_init0
 {
 public:
-	constexpr lfb_mode(u32 value) :
+	constexpr reg_fbi_init0(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 write_format() const          { return BIT(m_value, 0, 4); }
-	constexpr u32 write_buffer_select() const   { return BIT(m_value, 4, 2); }
-	constexpr u32 read_buffer_select() const    { return BIT(m_value, 6, 2); }
-	constexpr u32 enable_pixel_pipeline() const { return BIT(m_value, 8, 1); }
-	constexpr u32 rgba_lanes() const            { return BIT(m_value, 9, 2); }
-	constexpr u32 word_swap_writes() const      { return BIT(m_value, 11, 1); }
-	constexpr u32 byte_swizzle_writes() const   { return BIT(m_value, 12, 1); }
-	constexpr u32 y_origin() const              { return BIT(m_value, 13, 1); }
-	constexpr u32 write_w_select() const        { return BIT(m_value, 14, 1); }
-	constexpr u32 word_swap_reads() const       { return BIT(m_value, 15, 1); }
-	constexpr u32 byte_swizzle_reads() const    { return BIT(m_value, 16, 1); }
+	constexpr u32 vga_passthru() const          { return BIT(m_value, 0, 1); }
+	constexpr u32 graphics_reset() const        { return BIT(m_value, 1, 1); }
+	constexpr u32 fifo_reset() const            { return BIT(m_value, 2, 1); }
+	constexpr u32 swizzle_reg_writes() const    { return BIT(m_value, 3, 1); }
+	constexpr u32 stall_pcie_for_hwm() const    { return BIT(m_value, 4, 1); }
+	constexpr u32 pci_fifo_lwm() const          { return BIT(m_value, 6, 5); }
+	constexpr u32 lfb_to_memory_fifo() const    { return BIT(m_value, 11, 1); }
+	constexpr u32 texmem_to_memory_fifo() const { return BIT(m_value, 12, 1); }
+	constexpr u32 enable_memory_fifo() const    { return BIT(m_value, 13, 1); }
+	constexpr u32 memory_fifo_hwm() const       { return BIT(m_value, 14, 11); }
+	constexpr u32 memory_fifo_burst() const     { return BIT(m_value, 25, 6); }
 
 private:
 	u32 m_value;
 };
 
 
-// ======================> chroma_range
+// ======================> reg_fbi_init1
 
-class chroma_range
+class reg_fbi_init1
 {
 public:
-	constexpr chroma_range(u32 value) :
+	constexpr reg_fbi_init1(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 blue() const            { return BIT(m_value, 0, 8); }
-	constexpr u32 green() const           { return BIT(m_value, 8, 8); }
-	constexpr u32 red() const             { return BIT(m_value, 16, 8); }
-	constexpr u32 blue_exclusive() const  { return BIT(m_value, 24, 1); }
-	constexpr u32 green_exclusive() const { return BIT(m_value, 25, 1); }
-	constexpr u32 red_exclusive() const   { return BIT(m_value, 26, 1); }
-	constexpr u32 union_mode() const      { return BIT(m_value, 27, 1); }
-	constexpr u32 enable() const          { return BIT(m_value, 28, 1); }
+	constexpr u32 pci_dev_function() const       { return BIT(m_value, 0, 1); }
+	constexpr u32 pci_write_wait_states() const  { return BIT(m_value, 1, 1); }
+	constexpr u32 multi_sst1() const             { return BIT(m_value, 2, 1); }	// not on voodoo 2
+	constexpr u32 enable_lfb() const             { return BIT(m_value, 3, 1); }
+	constexpr u32 x_video_tiles() const          { return BIT(m_value, 4, 4); }
+	constexpr u32 video_timing_reset() const     { return BIT(m_value, 8, 1); }
+	constexpr u32 software_override() const      { return BIT(m_value, 9, 1); }
+	constexpr u32 software_hsync() const         { return BIT(m_value, 10, 1); }
+	constexpr u32 software_vsync() const         { return BIT(m_value, 11, 1); }
+	constexpr u32 software_blank() const         { return BIT(m_value, 12, 1); }
+	constexpr u32 drive_video_timing() const     { return BIT(m_value, 13, 1); }
+	constexpr u32 drive_video_blank() const      { return BIT(m_value, 14, 1); }
+	constexpr u32 drive_video_sync() const       { return BIT(m_value, 15, 1); }
+	constexpr u32 drive_video_dclk() const       { return BIT(m_value, 16, 1); }
+	constexpr u32 video_timing_vclk() const      { return BIT(m_value, 17, 1); }
+	constexpr u32 video_clk_2x_delay() const     { return BIT(m_value, 18, 2); }
+	constexpr u32 video_timing_source() const    { return BIT(m_value, 20, 2); }
+	constexpr u32 enable_24bpp_output() const    { return BIT(m_value, 22, 1); }
+	constexpr u32 enable_sli() const             { return BIT(m_value, 23, 1); }
+	constexpr u32 x_video_tiles_bit5() const     { return BIT(m_value, 24, 1); }	// voodoo 2 only
+	constexpr u32 enable_edge_filter() const     { return BIT(m_value, 25, 1); }
+	constexpr u32 invert_vid_clk_2x() const      { return BIT(m_value, 26, 1); }
+	constexpr u32 vid_clk_2x_sel_delay() const   { return BIT(m_value, 27, 2); }
+	constexpr u32 vid_clk_delay() const          { return BIT(m_value, 29, 2); }
+	constexpr u32 disable_fast_readahead() const { return BIT(m_value, 31, 1); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init2
+
+class reg_fbi_init2
+{
+public:
+	constexpr reg_fbi_init2(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 disable_dither_sub() const     { return BIT(m_value, 0, 1); }
+	constexpr u32 dram_banking() const           { return BIT(m_value, 1, 1); }
+	constexpr u32 enable_triple_buf() const      { return BIT(m_value, 4, 1); }
+	constexpr u32 enable_fast_ras_read() const   { return BIT(m_value, 5, 1); }
+	constexpr u32 enable_get_dram_oe() const     { return BIT(m_value, 6, 1); }
+	constexpr u32 enable_fast_readwrite() const  { return BIT(m_value, 7, 1); }
+	constexpr u32 enable_passthru_dither() const { return BIT(m_value, 8, 1); }
+	constexpr u32 swap_buffer_algorithm() const  { return BIT(m_value, 9, 2); }
+	constexpr u32 video_buffer_offset() const    { return BIT(m_value, 11, 9); }
+	constexpr u32 enable_dram_banking() const    { return BIT(m_value, 20, 1); }
+	constexpr u32 enable_dram_read_fifo() const  { return BIT(m_value, 21, 1); }
+	constexpr u32 enable_dram_refresh() const    { return BIT(m_value, 22, 1); }
+	constexpr u32 refresh_load_value() const     { return BIT(m_value, 23, 9); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init3
+
+class reg_fbi_init3
+{
+public:
+	constexpr reg_fbi_init3(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 tri_register_remap() const { return BIT(m_value, 0, 1); }
+	constexpr u32 video_fifo_thresh() const  { return BIT(m_value, 1, 5); }
+	constexpr u32 disable_tmus() const       { return BIT(m_value, 6, 1); }
+	constexpr u32 fbi_memory_type() const    { return BIT(m_value, 8, 3); }
+	constexpr u32 vga_pass_reset_val() const { return BIT(m_value, 11, 1); }
+	constexpr u32 hardcode_pci_base() const  { return BIT(m_value, 12, 1); }
+	constexpr u32 fbi2trex_delay() const     { return BIT(m_value, 13, 4); }
+	constexpr u32 trex2fbi_delay() const     { return BIT(m_value, 17, 5); }
+	constexpr u32 yorigin_subtract() const   { return BIT(m_value, 22, 10); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init4
+
+class reg_fbi_init4
+{
+public:
+	constexpr reg_fbi_init4(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 pci_read_waits() const        { return BIT(m_value, 0, 1); }
+	constexpr u32 enable_lfb_readahead() const  { return BIT(m_value, 1, 1); }
+	constexpr u32 memory_fifo_lwm() const       { return BIT(m_value, 2, 6); }
+	constexpr u32 memory_fifo_start_row() const { return BIT(m_value, 8, 10); }
+	constexpr u32 memory_fifo_stop_row() const  { return BIT(m_value, 18, 10); }
+	constexpr u32 video_clocking_delay() const  { return BIT(m_value, 29, 7); }	// voodoo 2 only
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init5
+
+class reg_fbi_init5
+{
+public:
+	constexpr reg_fbi_init5(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 disable_pci_stop() const      { return BIT(m_value, 0, 1); }	// voodoo 2 only
+	constexpr u32 pci_slave_speed() const       { return BIT(m_value, 1, 1); }	// voodoo 2 only
+	constexpr u32 dac_data_output_width() const { return BIT(m_value, 2, 1); }	// voodoo 2 only
+	constexpr u32 dac_data_17_output() const    { return BIT(m_value, 3, 1); }	// voodoo 2 only
+	constexpr u32 dac_data_18_output() const    { return BIT(m_value, 4, 1); }	// voodoo 2 only
+	constexpr u32 generic_strapping() const     { return BIT(m_value, 5, 4); }	// voodoo 2 only
+	constexpr u32 buffer_allocation() const     { return BIT(m_value, 9, 2); }	// voodoo 2 only
+	constexpr u32 drive_vid_clk_slave() const   { return BIT(m_value, 11, 1); }	// voodoo 2 only
+	constexpr u32 drive_dac_data_16() const     { return BIT(m_value, 12, 1); }	// voodoo 2 only
+	constexpr u32 vclk_input_select() const     { return BIT(m_value, 13, 1); }	// voodoo 2 only
+	constexpr u32 multi_cvg_detect() const      { return BIT(m_value, 14, 1); }	// voodoo 2 only
+	constexpr u32 sync_retrace_reads() const    { return BIT(m_value, 15, 1); }	// voodoo 2 only
+	constexpr u32 enable_rhborder_color() const { return BIT(m_value, 16, 1); }	// voodoo 2 only
+	constexpr u32 enable_lhborder_color() const { return BIT(m_value, 17, 1); }	// voodoo 2 only
+	constexpr u32 enable_bvborder_color() const { return BIT(m_value, 18, 1); }	// voodoo 2 only
+	constexpr u32 enable_tvborder_color() const { return BIT(m_value, 19, 1); }	// voodoo 2 only
+	constexpr u32 double_horiz() const          { return BIT(m_value, 20, 1); }	// voodoo 2 only
+	constexpr u32 double_vert() const           { return BIT(m_value, 21, 1); }	// voodoo 2 only
+	constexpr u32 enable_16bit_gamma() const    { return BIT(m_value, 22, 1); }	// voodoo 2 only
+	constexpr u32 invert_dac_hsync() const      { return BIT(m_value, 23, 1); }	// voodoo 2 only
+	constexpr u32 invert_dac_vsync() const      { return BIT(m_value, 24, 1); }	// voodoo 2 only
+	constexpr u32 enable_24bit_dacdata() const  { return BIT(m_value, 25, 1); }	// voodoo 2 only
+	constexpr u32 enable_interlacing() const    { return BIT(m_value, 26, 1); }	// voodoo 2 only
+	constexpr u32 dac_data_18_control() const   { return BIT(m_value, 27, 1); }	// voodoo 2 only
+	constexpr u32 rasterizer_unit_mode() const  { return BIT(m_value, 30, 2); }	// voodoo 2 only
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init6
+
+class reg_fbi_init6
+{
+public:
+	constexpr reg_fbi_init6(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 window_active_counter() const { return BIT(m_value, 0, 3); }	// voodoo 2 only
+	constexpr u32 window_drag_counter() const   { return BIT(m_value, 3, 5); }	// voodoo 2 only
+	constexpr u32 sli_sync_master() const       { return BIT(m_value, 8, 1); }	// voodoo 2 only
+	constexpr u32 dac_data_22_output() const    { return BIT(m_value, 9, 2); }	// voodoo 2 only
+	constexpr u32 dac_data_23_output() const    { return BIT(m_value, 11, 2); }	// voodoo 2 only
+	constexpr u32 sli_syncin_output() const     { return BIT(m_value, 13, 2); }	// voodoo 2 only
+	constexpr u32 sli_syncout_output() const    { return BIT(m_value, 15, 2); }	// voodoo 2 only
+	constexpr u32 dac_rd_output() const         { return BIT(m_value, 17, 2); }	// voodoo 2 only
+	constexpr u32 dac_wr_output() const         { return BIT(m_value, 19, 2); }	// voodoo 2 only
+	constexpr u32 pci_fifo_lwm_rdy() const      { return BIT(m_value, 21, 7); }	// voodoo 2 only
+	constexpr u32 vga_pass_n_output() const     { return BIT(m_value, 28, 2); }	// voodoo 2 only
+	constexpr u32 x_video_tiles_bit0() const    { return BIT(m_value, 30, 1); }	// voodoo 2 only
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_fbi_init7
+
+class reg_fbi_init7
+{
+public:
+	constexpr reg_fbi_init7(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 generic_strapping() const     { return BIT(m_value, 0, 8); }	// voodoo 2 only
+	constexpr u32 cmdfifo_enable() const        { return BIT(m_value, 8, 1); }	// voodoo 2 only
+	constexpr u32 cmdfifo_memory_store() const  { return BIT(m_value, 9, 1); }	// voodoo 2 only
+	constexpr u32 disable_cmdfifo_holes() const { return BIT(m_value, 10, 1); }	// voodoo 2 only
+	constexpr u32 cmdfifo_read_thresh() const   { return BIT(m_value, 11, 5); }	// voodoo 2 only
+	constexpr u32 sync_cmdfifo_writes() const   { return BIT(m_value, 16, 1); }	// voodoo 2 only
+	constexpr u32 sync_cmdfifo_reads() const    { return BIT(m_value, 17, 1); }	// voodoo 2 only
+	constexpr u32 reset_pci_packer() const      { return BIT(m_value, 18, 1); }	// voodoo 2 only
+	constexpr u32 enable_chroma_stuff() const   { return BIT(m_value, 19, 1); }	// voodoo 2 only
+	constexpr u32 cmdfifo_pci_timeout() const   { return BIT(m_value, 20, 7); }	// voodoo 2 only
+	constexpr u32 enable_texture_burst() const  { return BIT(m_value, 27, 1); }	// voodoo 2 only
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_intr_ctrl
+
+class reg_intr_ctrl
+{
+public:
+	static constexpr u32 HSYNC_RISING_GENERATED = 1 << 6;
+	static constexpr u32 HSYNC_FALLING_GENERATED = 1 << 7;
+	static constexpr u32 VSYNC_RISING_GENERATED = 1 << 8;
+	static constexpr u32 VSYNC_FALLING_GENERATED = 1 << 9;
+	static constexpr u32 PCI_FIFO_FULL_GENERATED = 1 << 10;
+	static constexpr u32 USER_INTERRUPT_GENERATED = 1 << 11;
+	static constexpr u32 USER_INTERRUPT_TAG_MASK = 0xff << 12;
+	static constexpr u32 EXTERNAL_PIN_ACTIVE = 1 << 31;
+
+	constexpr reg_intr_ctrl(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 hsync_rising_enable() const        { return BIT(m_value, 0, 1); }
+	constexpr u32 hsync_falling_enable() const       { return BIT(m_value, 1, 1); }
+	constexpr u32 vsync_rising_enable() const        { return BIT(m_value, 2, 1); }
+	constexpr u32 vsync_falling_enable() const       { return BIT(m_value, 3, 1); }
+	constexpr u32 pci_fifo_full_enable() const       { return BIT(m_value, 4, 1); }
+	constexpr u32 user_interrupt_enable() const      { return BIT(m_value, 5, 1); }
+	constexpr u32 hsync_rising_generated() const     { return BIT(m_value, 6, 1); }
+	constexpr u32 hsync_falling_generated() const    { return BIT(m_value, 7, 1); }
+	constexpr u32 vsync_rising_generated() const     { return BIT(m_value, 8, 1); }
+	constexpr u32 vsync_falling_generated() const    { return BIT(m_value, 9, 1); }
+	constexpr u32 pci_fifo_full_generated() const    { return BIT(m_value, 10, 1); }
+	constexpr u32 user_interrupt_generated() const   { return BIT(m_value, 11, 1); }
+	constexpr u32 user_interrupt_command_tag() const { return BIT(m_value, 12, 8); }
+	constexpr u32 external_pin_active() const        { return BIT(m_value, 31, 1); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_hsync
+
+class reg_hsync
+{
+public:
+	constexpr reg_hsync(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 raw() const               { return m_value; }
+	constexpr u32 hsync_on(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 8 : 9); }
+	constexpr u32 hsync_off(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 10 : 11); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_vsync
+
+class reg_vsync
+{
+public:
+	constexpr reg_vsync(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 raw() const               { return m_value; }
+	constexpr u32 vsync_on(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 12 : 13); }
+	constexpr u32 vsync_off(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 12 : 13); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_video_dimensions
+
+class reg_video_dimensions
+{
+public:
+	constexpr reg_video_dimensions(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 raw() const             { return m_value; }
+	constexpr u32 xwidth(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 10 : 11); }
+	constexpr u32 yheight(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 10 : 11); }
+
+private:
+	u32 m_value;
+};
+
+
+// ======================> reg_back_porch
+
+class reg_back_porch
+{
+public:
+	constexpr reg_back_porch(u32 value) :
+		m_value(value) { }
+
+	constexpr u32 raw() const                { return m_value; }
+	constexpr u32 horizontal(u32 type) const { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 8 : 9); }
+	constexpr u32 vertical(u32 type) const   { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 8 : 9); }
 
 private:
 	u32 m_value;
@@ -433,12 +804,269 @@ private:
 class voodoo_regs
 {
 public:
-	voodoo_regs();
+	/* 0x000 */
+	static constexpr u32 reg_vdstatus =        0x000/4;   // R  P
+	static constexpr u32 reg_intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
+	static constexpr u32 reg_vertexAx =        0x008/4;   //  W PF
+	static constexpr u32 reg_vertexAy =        0x00c/4;   //  W PF
+	static constexpr u32 reg_vertexBx =        0x010/4;   //  W PF
+	static constexpr u32 reg_vertexBy =        0x014/4;   //  W PF
+	static constexpr u32 reg_vertexCx =        0x018/4;   //  W PF
+	static constexpr u32 reg_vertexCy =        0x01c/4;   //  W PF
+	static constexpr u32 reg_startR =          0x020/4;   //  W PF
+	static constexpr u32 reg_startG =          0x024/4;   //  W PF
+	static constexpr u32 reg_startB =          0x028/4;   //  W PF
+	static constexpr u32 reg_startZ =          0x02c/4;   //  W PF
+	static constexpr u32 reg_startA =          0x030/4;   //  W PF
+	static constexpr u32 reg_startS =          0x034/4;   //  W PF
+	static constexpr u32 reg_startT =          0x038/4;   //  W PF
+	static constexpr u32 reg_startW =          0x03c/4;   //  W PF
 
-	voodoo_reg &operator[](int index) { return m_regs[index]; }
+	/* 0x040 */
+	static constexpr u32 reg_dRdX =            0x040/4;   //  W PF
+	static constexpr u32 reg_dGdX =            0x044/4;   //  W PF
+	static constexpr u32 reg_dBdX =            0x048/4;   //  W PF
+	static constexpr u32 reg_dZdX =            0x04c/4;   //  W PF
+	static constexpr u32 reg_dAdX =            0x050/4;   //  W PF
+	static constexpr u32 reg_dSdX =            0x054/4;   //  W PF
+	static constexpr u32 reg_dTdX =            0x058/4;   //  W PF
+	static constexpr u32 reg_dWdX =            0x05c/4;   //  W PF
+	static constexpr u32 reg_dRdY =            0x060/4;   //  W PF
+	static constexpr u32 reg_dGdY =            0x064/4;   //  W PF
+	static constexpr u32 reg_dBdY =            0x068/4;   //  W PF
+	static constexpr u32 reg_dZdY =            0x06c/4;   //  W PF
+	static constexpr u32 reg_dAdY =            0x070/4;   //  W PF
+	static constexpr u32 reg_dSdY =            0x074/4;   //  W PF
+	static constexpr u32 reg_dTdY =            0x078/4;   //  W PF
+	static constexpr u32 reg_dWdY =            0x07c/4;   //  W PF
 
-private:
-	voodoo_reg m_regs[0x400];
+	/* 0x080 */
+	static constexpr u32 reg_triangleCMD =     0x080/4;   //  W PF
+	static constexpr u32 reg_fvertexAx =       0x088/4;   //  W PF
+	static constexpr u32 reg_fvertexAy =       0x08c/4;   //  W PF
+	static constexpr u32 reg_fvertexBx =       0x090/4;   //  W PF
+	static constexpr u32 reg_fvertexBy =       0x094/4;   //  W PF
+	static constexpr u32 reg_fvertexCx =       0x098/4;   //  W PF
+	static constexpr u32 reg_fvertexCy =       0x09c/4;   //  W PF
+	static constexpr u32 reg_fstartR =         0x0a0/4;   //  W PF
+	static constexpr u32 reg_fstartG =         0x0a4/4;   //  W PF
+	static constexpr u32 reg_fstartB =         0x0a8/4;   //  W PF
+	static constexpr u32 reg_fstartZ =         0x0ac/4;   //  W PF
+	static constexpr u32 reg_fstartA =         0x0b0/4;   //  W PF
+	static constexpr u32 reg_fstartS =         0x0b4/4;   //  W PF
+	static constexpr u32 reg_fstartT =         0x0b8/4;   //  W PF
+	static constexpr u32 reg_fstartW =         0x0bc/4;   //  W PF
+
+	/* 0x0c0 */
+	static constexpr u32 reg_fdRdX =           0x0c0/4;   //  W PF
+	static constexpr u32 reg_fdGdX =           0x0c4/4;   //  W PF
+	static constexpr u32 reg_fdBdX =           0x0c8/4;   //  W PF
+	static constexpr u32 reg_fdZdX =           0x0cc/4;   //  W PF
+	static constexpr u32 reg_fdAdX =           0x0d0/4;   //  W PF
+	static constexpr u32 reg_fdSdX =           0x0d4/4;   //  W PF
+	static constexpr u32 reg_fdTdX =           0x0d8/4;   //  W PF
+	static constexpr u32 reg_fdWdX =           0x0dc/4;   //  W PF
+	static constexpr u32 reg_fdRdY =           0x0e0/4;   //  W PF
+	static constexpr u32 reg_fdGdY =           0x0e4/4;   //  W PF
+	static constexpr u32 reg_fdBdY =           0x0e8/4;   //  W PF
+	static constexpr u32 reg_fdZdY =           0x0ec/4;   //  W PF
+	static constexpr u32 reg_fdAdY =           0x0f0/4;   //  W PF
+	static constexpr u32 reg_fdSdY =           0x0f4/4;   //  W PF
+	static constexpr u32 reg_fdTdY =           0x0f8/4;   //  W PF
+	static constexpr u32 reg_fdWdY =           0x0fc/4;   //  W PF
+
+	/* 0x100 */
+	static constexpr u32 reg_ftriangleCMD =    0x100/4;   //  W PF
+	static constexpr u32 reg_fbzColorPath =    0x104/4;   // RW PF
+	static constexpr u32 reg_fogMode =         0x108/4;   // RW PF
+	static constexpr u32 reg_alphaMode =       0x10c/4;   // RW PF
+	static constexpr u32 reg_fbzMode =         0x110/4;   // RW  F
+	static constexpr u32 reg_lfbMode =         0x114/4;   // RW  F
+	static constexpr u32 reg_clipLeftRight =   0x118/4;   // RW  F
+	static constexpr u32 reg_clipLowYHighY =   0x11c/4;   // RW  F
+	static constexpr u32 reg_nopCMD =          0x120/4;   //  W  F
+	static constexpr u32 reg_fastfillCMD =     0x124/4;   //  W  F
+	static constexpr u32 reg_swapbufferCMD =   0x128/4;   //  W  F
+	static constexpr u32 reg_fogColor =        0x12c/4;   //  W  F
+	static constexpr u32 reg_zaColor =         0x130/4;   //  W  F
+	static constexpr u32 reg_chromaKey =       0x134/4;   //  W  F
+	static constexpr u32 reg_chromaRange =     0x138/4;   //  W  F  -- Voodoo2/Banshee only
+	static constexpr u32 reg_userIntrCMD =     0x13c/4;   //  W  F  -- Voodoo2/Banshee only
+
+	/* 0x140 */
+	static constexpr u32 reg_stipple =         0x140/4;   // RW  F
+	static constexpr u32 reg_color0 =          0x144/4;   // RW  F
+	static constexpr u32 reg_color1 =          0x148/4;   // RW  F
+	static constexpr u32 reg_fbiPixelsIn =     0x14c/4;   // R
+	static constexpr u32 reg_fbiChromaFail =   0x150/4;   // R
+	static constexpr u32 reg_fbiZfuncFail =    0x154/4;   // R
+	static constexpr u32 reg_fbiAfuncFail =    0x158/4;   // R
+	static constexpr u32 reg_fbiPixelsOut =    0x15c/4;   // R
+	static constexpr u32 reg_fogTable =        0x160/4;   //  W  F
+
+	/* 0x1c0 */
+	static constexpr u32 reg_cmdFifoBaseAddr = 0x1e0/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_cmdFifoBump =     0x1e4/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_cmdFifoRdPtr =    0x1e8/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_cmdFifoAMin =     0x1ec/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_colBufferAddr =   0x1ec/4;   // RW     -- Banshee only
+	static constexpr u32 reg_cmdFifoAMax =     0x1f0/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_colBufferStride = 0x1f0/4;   // RW     -- Banshee only
+	static constexpr u32 reg_cmdFifoDepth =    0x1f4/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_auxBufferAddr =   0x1f4/4;   // RW     -- Banshee only
+	static constexpr u32 reg_cmdFifoHoles =    0x1f8/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_auxBufferStride = 0x1f8/4;   // RW     -- Banshee only
+
+	/* 0x200 */
+	static constexpr u32 reg_fbiInit4 =        0x200/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_clipLeftRight1 =  0x200/4;   // RW     -- Banshee only
+	static constexpr u32 reg_vRetrace =        0x204/4;   // R      -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_clipTopBottom1 =  0x204/4;   // RW     -- Banshee only
+	static constexpr u32 reg_backPorch =       0x208/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_videoDimensions = 0x20c/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_fbiInit0 =        0x210/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_fbiInit1 =        0x214/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_fbiInit2 =        0x218/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_fbiInit3 =        0x21c/4;   // RW     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_hSync =           0x220/4;   //  W     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_vSync =           0x224/4;   //  W     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_clutData =        0x228/4;   //  W  F  -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_dacData =         0x22c/4;   //  W     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_maxRgbDelta =     0x230/4;   //  W     -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_hBorder =         0x234/4;   //  W     -- Voodoo2 only
+	static constexpr u32 reg_vBorder =         0x238/4;   //  W     -- Voodoo2 only
+	static constexpr u32 reg_borderColor =     0x23c/4;   //  W     -- Voodoo2 only
+
+	/* 0x240 */
+	static constexpr u32 reg_hvRetrace =       0x240/4;   // R      -- Voodoo2 only
+	static constexpr u32 reg_fbiInit5 =        0x244/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_fbiInit6 =        0x248/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_fbiInit7 =        0x24c/4;   // RW     -- Voodoo2 only
+	static constexpr u32 reg_swapPending =     0x24c/4;   //  W     -- Banshee only
+	static constexpr u32 reg_leftOverlayBuf =  0x250/4;   //  W     -- Banshee only
+	static constexpr u32 reg_rightOverlayBuf = 0x254/4;   //  W     -- Banshee only
+	static constexpr u32 reg_fbiSwapHistory =  0x258/4;   // R      -- Voodoo2/Banshee only
+	static constexpr u32 reg_fbiTrianglesOut = 0x25c/4;   // R      -- Voodoo2/Banshee only
+	static constexpr u32 reg_sSetupMode =      0x260/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sVx =             0x264/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sVy =             0x268/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sARGB =           0x26c/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sRed =            0x270/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sGreen =          0x274/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sBlue =           0x278/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sAlpha =          0x27c/4;   //  W PF  -- Voodoo2/Banshee only
+
+	/* 0x280 */
+	static constexpr u32 reg_sVz =             0x280/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sWb =             0x284/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sWtmu0 =          0x288/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sS_W0 =           0x28c/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sT_W0 =           0x290/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sWtmu1 =          0x294/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sS_Wtmu1 =        0x298/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sT_Wtmu1 =        0x29c/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sDrawTriCMD =     0x2a0/4;   //  W PF  -- Voodoo2/Banshee only
+	static constexpr u32 reg_sBeginTriCMD =    0x2a4/4;   //  W PF  -- Voodoo2/Banshee only
+
+	/* 0x2c0 */
+	static constexpr u32 reg_bltSrcBaseAddr =  0x2c0/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltDstBaseAddr =  0x2c4/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltXYStrides =    0x2c8/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltSrcChromaRange = 0x2cc/4; // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltDstChromaRange = 0x2d0/4; // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltClipX =        0x2d4/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltClipY =        0x2d8/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltSrcXY =        0x2e0/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltDstXY =        0x2e4/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltSize =         0x2e8/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltRop =          0x2ec/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltColor =        0x2f0/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltCommand =      0x2f8/4;   // RW PF  -- Voodoo2 only
+	static constexpr u32 reg_bltData =         0x2fc/4;   //  W PF  -- Voodoo2 only
+
+	/* 0x300 */
+	static constexpr u32 reg_textureMode =     0x300/4;   //  W PF
+	static constexpr u32 reg_tLOD =            0x304/4;   //  W PF
+	static constexpr u32 reg_tDetail =         0x308/4;   //  W PF
+	static constexpr u32 reg_texBaseAddr =     0x30c/4;   //  W PF
+	static constexpr u32 reg_texBaseAddr_1 =   0x310/4;   //  W PF
+	static constexpr u32 reg_texBaseAddr_2 =   0x314/4;   //  W PF
+	static constexpr u32 reg_texBaseAddr_3_8 = 0x318/4;   //  W PF
+	static constexpr u32 reg_trexInit0 =       0x31c/4;   //  W  F  -- Voodoo/Voodoo2 only
+	static constexpr u32 reg_trexInit1 =       0x320/4;   //  W  F
+	static constexpr u32 reg_nccTable =        0x324/4;   //  W  F
+
+	// constructor
+	voodoo_regs() { for (int index = 0; index < std::size(m_regs); index++) m_regs[index].u = 0; }
+
+	// simple readers
+	u32 read(u32 index) const { return m_regs[index].u; }
+	float read_float(u32 index) const { return m_regs[index].f; }
+	reg_fbz_colorpath fbz_colorpath() const { return reg_fbz_colorpath(m_regs[reg_fbzColorPath].u); }
+	reg_fog_mode fog_mode() const { return reg_fog_mode(m_regs[reg_fogMode].u); }
+	reg_alpha_mode alpha_mode() const { return reg_alpha_mode(m_regs[reg_alphaMode].u); }
+	reg_fbz_mode fbz_mode() const { return reg_fbz_mode(m_regs[reg_fbzMode].u); }
+	reg_lfb_mode lfb_mode() const { return reg_lfb_mode(m_regs[reg_lfbMode].u); }
+	reg_color fog_color() const { return m_regs[reg_fogColor].u; }
+	u32 za_color() const { return m_regs[reg_zaColor].u; }
+	reg_color chroma_key() const { return reg_color(m_regs[reg_chromaKey].u); }
+	reg_color color0() const { return reg_color(m_regs[reg_color0].u); }
+	reg_color color1() const { return reg_color(m_regs[reg_color1].u); }
+	reg_chroma_range chroma_range() const { return m_regs[reg_chromaRange].u; }
+	u32 stipple() const { return m_regs[reg_stipple].u; }
+	reg_fbi_init0 fbi_init0() const { return reg_fbi_init0(m_regs[reg_fbiInit0].u); }
+	reg_fbi_init1 fbi_init1() const { return reg_fbi_init1(m_regs[reg_fbiInit1].u); }
+	reg_fbi_init2 fbi_init2() const { return reg_fbi_init2(m_regs[reg_fbiInit2].u); }
+	reg_fbi_init3 fbi_init3() const { return reg_fbi_init3(m_regs[reg_fbiInit3].u); }
+	reg_fbi_init4 fbi_init4() const { return reg_fbi_init4(m_regs[reg_fbiInit4].u); }
+	reg_fbi_init5 fbi_init5() const { return reg_fbi_init5(m_regs[reg_fbiInit5].u); }
+	reg_fbi_init6 fbi_init6() const { return reg_fbi_init6(m_regs[reg_fbiInit6].u); }
+	reg_fbi_init7 fbi_init7() const { return reg_fbi_init7(m_regs[reg_fbiInit7].u); }
+	reg_texture_mode texture_mode() const { return reg_texture_mode(m_regs[reg_textureMode].u); }
+	reg_texture_lod texture_lod() const { return reg_texture_lod(m_regs[reg_tLOD].u); }
+	reg_texture_detail texture_detail() const { return reg_texture_detail(m_regs[reg_tDetail].u); }
+	u32 texture_baseaddr() const { return m_regs[reg_texBaseAddr].u; }
+	u32 texture_baseaddr_1() const { return m_regs[reg_texBaseAddr_1].u; }
+	u32 texture_baseaddr_2() const { return m_regs[reg_texBaseAddr_2].u; }
+	u32 texture_baseaddr_3_8() const { return m_regs[reg_texBaseAddr_3_8].u; }
+	reg_clip_minmax clip_left_right() const { return reg_clip_minmax(m_regs[reg_clipLeftRight].u); }
+	reg_clip_minmax clip_lowy_highy() const { return reg_clip_minmax(m_regs[reg_clipLowYHighY].u); }
+	u32 swap_history() const { return m_regs[reg_fbiSwapHistory].u; }
+	reg_intr_ctrl intr_ctrl() const { return reg_intr_ctrl(m_regs[reg_intrCtrl].u); }
+	reg_hsync hsync() const { return reg_hsync(m_regs[reg_hSync].u); }
+	reg_vsync vsync() const { return reg_vsync(m_regs[reg_vSync].u); }
+	reg_video_dimensions video_dimensions() const { return reg_video_dimensions(m_regs[reg_videoDimensions].u); }
+	reg_back_porch back_porch() const { return reg_back_porch(m_regs[reg_backPorch].u); }
+	reg_setup_mode setup_mode() const { return reg_setup_mode(m_regs[reg_sSetupMode].u); }
+
+	// easier clip accessors
+	s32 clip_left() const { return clip_left_right().min(); }
+	s32 clip_right() const { return clip_left_right().max(); }
+	s32 clip_top() const { return clip_lowy_highy().min(); }
+	s32 clip_bottom() const { return clip_lowy_highy().max(); }
+
+	// write access
+	void write(u32 index, u32 data) { m_regs[index].u = data; }
+	void add(u32 index, u32 data) { m_regs[index].u += data; }
+	void clear_set(u32 index, u32 clear, u32 set) { m_regs[index].u &= ~clear; m_regs[index].u |= set; }
+	void write_float(u32 index, float data) { m_regs[index].f = data; }
+
+	// special stipple helper which writes back a rotated value
+	u32 stipple_rotated() { return m_regs[reg_stipple].u = (m_regs[reg_stipple].u << 1) | (m_regs[reg_stipple].u >> 31); }
+
+	// special swap history helper
+	void update_swap_history(u32 count) { m_regs[reg_fbiSwapHistory].u = (m_regs[reg_fbiSwapHistory].u << 4) | count; }
+
+	// access to a chunk of registers
+	u32 *subset(u32 index) { return reinterpret_cast<u32 *>(&m_regs[index]); }
+
+//private:
+	union register_data
+	{
+		u32 u;
+		float f;
+	};
+	register_data m_regs[0x100];
 };
 
 /* Codes to the right:
@@ -448,197 +1076,6 @@ private:
     F = goes to FIFO
 */
 
-/* 0x000 */
-static constexpr u32 vdstatus =        0x000/4;   // R  P
-static constexpr u32 intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
-static constexpr u32 vertexAx =        0x008/4;   //  W PF
-static constexpr u32 vertexAy =        0x00c/4;   //  W PF
-static constexpr u32 vertexBx =        0x010/4;   //  W PF
-static constexpr u32 vertexBy =        0x014/4;   //  W PF
-static constexpr u32 vertexCx =        0x018/4;   //  W PF
-static constexpr u32 vertexCy =        0x01c/4;   //  W PF
-static constexpr u32 startR =          0x020/4;   //  W PF
-static constexpr u32 startG =          0x024/4;   //  W PF
-static constexpr u32 startB =          0x028/4;   //  W PF
-static constexpr u32 startZ =          0x02c/4;   //  W PF
-static constexpr u32 startA =          0x030/4;   //  W PF
-static constexpr u32 startS =          0x034/4;   //  W PF
-static constexpr u32 startT =          0x038/4;   //  W PF
-static constexpr u32 startW =          0x03c/4;   //  W PF
-
-/* 0x040 */
-static constexpr u32 dRdX =            0x040/4;   //  W PF
-static constexpr u32 dGdX =            0x044/4;   //  W PF
-static constexpr u32 dBdX =            0x048/4;   //  W PF
-static constexpr u32 dZdX =            0x04c/4;   //  W PF
-static constexpr u32 dAdX =            0x050/4;   //  W PF
-static constexpr u32 dSdX =            0x054/4;   //  W PF
-static constexpr u32 dTdX =            0x058/4;   //  W PF
-static constexpr u32 dWdX =            0x05c/4;   //  W PF
-static constexpr u32 dRdY =            0x060/4;   //  W PF
-static constexpr u32 dGdY =            0x064/4;   //  W PF
-static constexpr u32 dBdY =            0x068/4;   //  W PF
-static constexpr u32 dZdY =            0x06c/4;   //  W PF
-static constexpr u32 dAdY =            0x070/4;   //  W PF
-static constexpr u32 dSdY =            0x074/4;   //  W PF
-static constexpr u32 dTdY =            0x078/4;   //  W PF
-static constexpr u32 dWdY =            0x07c/4;   //  W PF
-
-/* 0x080 */
-static constexpr u32 triangleCMD =     0x080/4;   //  W PF
-static constexpr u32 fvertexAx =       0x088/4;   //  W PF
-static constexpr u32 fvertexAy =       0x08c/4;   //  W PF
-static constexpr u32 fvertexBx =       0x090/4;   //  W PF
-static constexpr u32 fvertexBy =       0x094/4;   //  W PF
-static constexpr u32 fvertexCx =       0x098/4;   //  W PF
-static constexpr u32 fvertexCy =       0x09c/4;   //  W PF
-static constexpr u32 fstartR =         0x0a0/4;   //  W PF
-static constexpr u32 fstartG =         0x0a4/4;   //  W PF
-static constexpr u32 fstartB =         0x0a8/4;   //  W PF
-static constexpr u32 fstartZ =         0x0ac/4;   //  W PF
-static constexpr u32 fstartA =         0x0b0/4;   //  W PF
-static constexpr u32 fstartS =         0x0b4/4;   //  W PF
-static constexpr u32 fstartT =         0x0b8/4;   //  W PF
-static constexpr u32 fstartW =         0x0bc/4;   //  W PF
-
-/* 0x0c0 */
-static constexpr u32 fdRdX =           0x0c0/4;   //  W PF
-static constexpr u32 fdGdX =           0x0c4/4;   //  W PF
-static constexpr u32 fdBdX =           0x0c8/4;   //  W PF
-static constexpr u32 fdZdX =           0x0cc/4;   //  W PF
-static constexpr u32 fdAdX =           0x0d0/4;   //  W PF
-static constexpr u32 fdSdX =           0x0d4/4;   //  W PF
-static constexpr u32 fdTdX =           0x0d8/4;   //  W PF
-static constexpr u32 fdWdX =           0x0dc/4;   //  W PF
-static constexpr u32 fdRdY =           0x0e0/4;   //  W PF
-static constexpr u32 fdGdY =           0x0e4/4;   //  W PF
-static constexpr u32 fdBdY =           0x0e8/4;   //  W PF
-static constexpr u32 fdZdY =           0x0ec/4;   //  W PF
-static constexpr u32 fdAdY =           0x0f0/4;   //  W PF
-static constexpr u32 fdSdY =           0x0f4/4;   //  W PF
-static constexpr u32 fdTdY =           0x0f8/4;   //  W PF
-static constexpr u32 fdWdY =           0x0fc/4;   //  W PF
-
-/* 0x100 */
-static constexpr u32 ftriangleCMD =    0x100/4;   //  W PF
-static constexpr u32 fbzColorPath =    0x104/4;   // RW PF
-static constexpr u32 fogMode =         0x108/4;   // RW PF
-static constexpr u32 alphaMode =       0x10c/4;   // RW PF
-static constexpr u32 fbzMode =         0x110/4;   // RW  F
-static constexpr u32 lfbMode =         0x114/4;   // RW  F
-static constexpr u32 clipLeftRight =   0x118/4;   // RW  F
-static constexpr u32 clipLowYHighY =   0x11c/4;   // RW  F
-static constexpr u32 nopCMD =          0x120/4;   //  W  F
-static constexpr u32 fastfillCMD =     0x124/4;   //  W  F
-static constexpr u32 swapbufferCMD =   0x128/4;   //  W  F
-static constexpr u32 fogColor =        0x12c/4;   //  W  F
-static constexpr u32 zaColor =         0x130/4;   //  W  F
-static constexpr u32 chromaKey =       0x134/4;   //  W  F
-static constexpr u32 chromaRange =     0x138/4;   //  W  F  -- Voodoo2/Banshee only
-static constexpr u32 userIntrCMD =     0x13c/4;   //  W  F  -- Voodoo2/Banshee only
-
-/* 0x140 */
-static constexpr u32 stipple =         0x140/4;   // RW  F
-static constexpr u32 color0 =          0x144/4;   // RW  F
-static constexpr u32 color1 =          0x148/4;   // RW  F
-static constexpr u32 fbiPixelsIn =     0x14c/4;   // R
-static constexpr u32 fbiChromaFail =   0x150/4;   // R
-static constexpr u32 fbiZfuncFail =    0x154/4;   // R
-static constexpr u32 fbiAfuncFail =    0x158/4;   // R
-static constexpr u32 fbiPixelsOut =    0x15c/4;   // R
-static constexpr u32 fogTable =        0x160/4;   //  W  F
-
-/* 0x1c0 */
-static constexpr u32 cmdFifoBaseAddr = 0x1e0/4;   // RW     -- Voodoo2 only
-static constexpr u32 cmdFifoBump =     0x1e4/4;   // RW     -- Voodoo2 only
-static constexpr u32 cmdFifoRdPtr =    0x1e8/4;   // RW     -- Voodoo2 only
-static constexpr u32 cmdFifoAMin =     0x1ec/4;   // RW     -- Voodoo2 only
-static constexpr u32 colBufferAddr =   0x1ec/4;   // RW     -- Banshee only
-static constexpr u32 cmdFifoAMax =     0x1f0/4;   // RW     -- Voodoo2 only
-static constexpr u32 colBufferStride = 0x1f0/4;   // RW     -- Banshee only
-static constexpr u32 cmdFifoDepth =    0x1f4/4;   // RW     -- Voodoo2 only
-static constexpr u32 auxBufferAddr =   0x1f4/4;   // RW     -- Banshee only
-static constexpr u32 cmdFifoHoles =    0x1f8/4;   // RW     -- Voodoo2 only
-static constexpr u32 auxBufferStride = 0x1f8/4;   // RW     -- Banshee only
-
-/* 0x200 */
-static constexpr u32 fbiInit4 =        0x200/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 clipLeftRight1 =  0x200/4;   // RW     -- Banshee only
-static constexpr u32 vRetrace =        0x204/4;   // R      -- Voodoo/Voodoo2 only
-static constexpr u32 clipTopBottom1 =  0x204/4;   // RW     -- Banshee only
-static constexpr u32 backPorch =       0x208/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 videoDimensions = 0x20c/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 fbiInit0 =        0x210/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 fbiInit1 =        0x214/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 fbiInit2 =        0x218/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 fbiInit3 =        0x21c/4;   // RW     -- Voodoo/Voodoo2 only
-static constexpr u32 hSync =           0x220/4;   //  W     -- Voodoo/Voodoo2 only
-static constexpr u32 vSync =           0x224/4;   //  W     -- Voodoo/Voodoo2 only
-static constexpr u32 clutData =        0x228/4;   //  W  F  -- Voodoo/Voodoo2 only
-static constexpr u32 dacData =         0x22c/4;   //  W     -- Voodoo/Voodoo2 only
-static constexpr u32 maxRgbDelta =     0x230/4;   //  W     -- Voodoo/Voodoo2 only
-static constexpr u32 hBorder =         0x234/4;   //  W     -- Voodoo2 only
-static constexpr u32 vBorder =         0x238/4;   //  W     -- Voodoo2 only
-static constexpr u32 borderColor =     0x23c/4;   //  W     -- Voodoo2 only
-
-/* 0x240 */
-static constexpr u32 hvRetrace =       0x240/4;   // R      -- Voodoo2 only
-static constexpr u32 fbiInit5 =        0x244/4;   // RW     -- Voodoo2 only
-static constexpr u32 fbiInit6 =        0x248/4;   // RW     -- Voodoo2 only
-static constexpr u32 fbiInit7 =        0x24c/4;   // RW     -- Voodoo2 only
-static constexpr u32 swapPending =     0x24c/4;   //  W     -- Banshee only
-static constexpr u32 leftOverlayBuf =  0x250/4;   //  W     -- Banshee only
-static constexpr u32 rightOverlayBuf = 0x254/4;   //  W     -- Banshee only
-static constexpr u32 fbiSwapHistory =  0x258/4;   // R      -- Voodoo2/Banshee only
-static constexpr u32 fbiTrianglesOut = 0x25c/4;   // R      -- Voodoo2/Banshee only
-static constexpr u32 sSetupMode =      0x260/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sVx =             0x264/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sVy =             0x268/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sARGB =           0x26c/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sRed =            0x270/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sGreen =          0x274/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sBlue =           0x278/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sAlpha =          0x27c/4;   //  W PF  -- Voodoo2/Banshee only
-
-/* 0x280 */
-static constexpr u32 sVz =             0x280/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sWb =             0x284/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sWtmu0 =          0x288/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sS_W0 =           0x28c/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sT_W0 =           0x290/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sWtmu1 =          0x294/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sS_Wtmu1 =        0x298/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sT_Wtmu1 =        0x29c/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sDrawTriCMD =     0x2a0/4;   //  W PF  -- Voodoo2/Banshee only
-static constexpr u32 sBeginTriCMD =    0x2a4/4;   //  W PF  -- Voodoo2/Banshee only
-
-/* 0x2c0 */
-static constexpr u32 bltSrcBaseAddr =  0x2c0/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltDstBaseAddr =  0x2c4/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltXYStrides =    0x2c8/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltSrcChromaRange = 0x2cc/4; // RW PF  -- Voodoo2 only
-static constexpr u32 bltDstChromaRange = 0x2d0/4; // RW PF  -- Voodoo2 only
-static constexpr u32 bltClipX =        0x2d4/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltClipY =        0x2d8/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltSrcXY =        0x2e0/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltDstXY =        0x2e4/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltSize =         0x2e8/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltRop =          0x2ec/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltColor =        0x2f0/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltCommand =      0x2f8/4;   // RW PF  -- Voodoo2 only
-static constexpr u32 bltData =         0x2fc/4;   //  W PF  -- Voodoo2 only
-
-/* 0x300 */
-static constexpr u32 textureMode =     0x300/4;   //  W PF
-static constexpr u32 tLOD =            0x304/4;   //  W PF
-static constexpr u32 tDetail =         0x308/4;   //  W PF
-static constexpr u32 texBaseAddr =     0x30c/4;   //  W PF
-static constexpr u32 texBaseAddr_1 =   0x310/4;   //  W PF
-static constexpr u32 texBaseAddr_2 =   0x314/4;   //  W PF
-static constexpr u32 texBaseAddr_3_8 = 0x318/4;   //  W PF
-static constexpr u32 trexInit0 =       0x31c/4;   //  W  F  -- Voodoo/Voodoo2 only
-static constexpr u32 trexInit1 =       0x320/4;   //  W  F
-static constexpr u32 nccTable =        0x324/4;   //  W  F
 
 
 
@@ -802,125 +1239,6 @@ static constexpr u32 crc2 =                    0x130/4;
  *
  *************************************/
 
-#define FBIINIT0_VGA_PASSTHRU(val)          (((val) >> 0) & 1)
-#define FBIINIT0_GRAPHICS_RESET(val)        (((val) >> 1) & 1)
-#define FBIINIT0_FIFO_RESET(val)            (((val) >> 2) & 1)
-#define FBIINIT0_SWIZZLE_REG_WRITES(val)    (((val) >> 3) & 1)
-#define FBIINIT0_STALL_PCIE_FOR_HWM(val)    (((val) >> 4) & 1)
-#define FBIINIT0_PCI_FIFO_LWM(val)          (((val) >> 6) & 0x1f)
-#define FBIINIT0_LFB_TO_MEMORY_FIFO(val)    (((val) >> 11) & 1)
-#define FBIINIT0_TEXMEM_TO_MEMORY_FIFO(val) (((val) >> 12) & 1)
-#define FBIINIT0_ENABLE_MEMORY_FIFO(val)    (((val) >> 13) & 1)
-#define FBIINIT0_MEMORY_FIFO_HWM(val)       (((val) >> 14) & 0x7ff)
-#define FBIINIT0_MEMORY_FIFO_BURST(val)     (((val) >> 25) & 0x3f)
-
-#define FBIINIT1_PCI_DEV_FUNCTION(val)      (((val) >> 0) & 1)
-#define FBIINIT1_PCI_WRITE_WAIT_STATES(val) (((val) >> 1) & 1)
-#define FBIINIT1_MULTI_SST1(val)            (((val) >> 2) & 1)      /* not on voodoo 2 */
-#define FBIINIT1_ENABLE_LFB(val)            (((val) >> 3) & 1)
-#define FBIINIT1_X_VIDEO_TILES(val)         (((val) >> 4) & 0xf)
-#define FBIINIT1_VIDEO_TIMING_RESET(val)    (((val) >> 8) & 1)
-#define FBIINIT1_SOFTWARE_OVERRIDE(val)     (((val) >> 9) & 1)
-#define FBIINIT1_SOFTWARE_HSYNC(val)        (((val) >> 10) & 1)
-#define FBIINIT1_SOFTWARE_VSYNC(val)        (((val) >> 11) & 1)
-#define FBIINIT1_SOFTWARE_BLANK(val)        (((val) >> 12) & 1)
-#define FBIINIT1_DRIVE_VIDEO_TIMING(val)    (((val) >> 13) & 1)
-#define FBIINIT1_DRIVE_VIDEO_BLANK(val)     (((val) >> 14) & 1)
-#define FBIINIT1_DRIVE_VIDEO_SYNC(val)      (((val) >> 15) & 1)
-#define FBIINIT1_DRIVE_VIDEO_DCLK(val)      (((val) >> 16) & 1)
-#define FBIINIT1_VIDEO_TIMING_VCLK(val)     (((val) >> 17) & 1)
-#define FBIINIT1_VIDEO_CLK_2X_DELAY(val)    (((val) >> 18) & 3)
-#define FBIINIT1_VIDEO_TIMING_SOURCE(val)   (((val) >> 20) & 3)
-#define FBIINIT1_ENABLE_24BPP_OUTPUT(val)   (((val) >> 22) & 1)
-#define FBIINIT1_ENABLE_SLI(val)            (((val) >> 23) & 1)
-#define FBIINIT1_X_VIDEO_TILES_BIT5(val)    (((val) >> 24) & 1)     /* voodoo 2 only */
-#define FBIINIT1_ENABLE_EDGE_FILTER(val)    (((val) >> 25) & 1)
-#define FBIINIT1_INVERT_VID_CLK_2X(val)     (((val) >> 26) & 1)
-#define FBIINIT1_VID_CLK_2X_SEL_DELAY(val)  (((val) >> 27) & 3)
-#define FBIINIT1_VID_CLK_DELAY(val)         (((val) >> 29) & 3)
-#define FBIINIT1_DISABLE_FAST_READAHEAD(val) (((val) >> 31) & 1)
-
-#define FBIINIT2_DISABLE_DITHER_SUB(val)    (((val) >> 0) & 1)
-#define FBIINIT2_DRAM_BANKING(val)          (((val) >> 1) & 1)
-#define FBIINIT2_ENABLE_TRIPLE_BUF(val)     (((val) >> 4) & 1)
-#define FBIINIT2_ENABLE_FAST_RAS_READ(val)  (((val) >> 5) & 1)
-#define FBIINIT2_ENABLE_GEN_DRAM_OE(val)    (((val) >> 6) & 1)
-#define FBIINIT2_ENABLE_FAST_READWRITE(val) (((val) >> 7) & 1)
-#define FBIINIT2_ENABLE_PASSTHRU_DITHER(val) (((val) >> 8) & 1)
-#define FBIINIT2_SWAP_BUFFER_ALGORITHM(val) (((val) >> 9) & 3)
-#define FBIINIT2_VIDEO_BUFFER_OFFSET(val)   (((val) >> 11) & 0x1ff)
-#define FBIINIT2_ENABLE_DRAM_BANKING(val)   (((val) >> 20) & 1)
-#define FBIINIT2_ENABLE_DRAM_READ_FIFO(val) (((val) >> 21) & 1)
-#define FBIINIT2_ENABLE_DRAM_REFRESH(val)   (((val) >> 22) & 1)
-#define FBIINIT2_REFRESH_LOAD_VALUE(val)    (((val) >> 23) & 0x1ff)
-
-#define FBIINIT3_TRI_REGISTER_REMAP(val)    (((val) >> 0) & 1)
-#define FBIINIT3_VIDEO_FIFO_THRESH(val)     (((val) >> 1) & 0x1f)
-#define FBIINIT3_DISABLE_TMUS(val)          (((val) >> 6) & 1)
-#define FBIINIT3_FBI_MEMORY_TYPE(val)       (((val) >> 8) & 7)
-#define FBIINIT3_VGA_PASS_RESET_VAL(val)    (((val) >> 11) & 1)
-#define FBIINIT3_HARDCODE_PCI_BASE(val)     (((val) >> 12) & 1)
-#define FBIINIT3_FBI2TREX_DELAY(val)        (((val) >> 13) & 0xf)
-#define FBIINIT3_TREX2FBI_DELAY(val)        (((val) >> 17) & 0x1f)
-#define FBIINIT3_YORIGIN_SUBTRACT(val)      (((val) >> 22) & 0x3ff)
-
-#define FBIINIT4_PCI_READ_WAITS(val)        (((val) >> 0) & 1)
-#define FBIINIT4_ENABLE_LFB_READAHEAD(val)  (((val) >> 1) & 1)
-#define FBIINIT4_MEMORY_FIFO_LWM(val)       (((val) >> 2) & 0x3f)
-#define FBIINIT4_MEMORY_FIFO_START_ROW(val) (((val) >> 8) & 0x3ff)
-#define FBIINIT4_MEMORY_FIFO_STOP_ROW(val)  (((val) >> 18) & 0x3ff)
-#define FBIINIT4_VIDEO_CLOCKING_DELAY(val)  (((val) >> 29) & 7)     /* voodoo 2 only */
-
-#define FBIINIT5_DISABLE_PCI_STOP(val)      (((val) >> 0) & 1)      /* voodoo 2 only */
-#define FBIINIT5_PCI_SLAVE_SPEED(val)       (((val) >> 1) & 1)      /* voodoo 2 only */
-#define FBIINIT5_DAC_DATA_OUTPUT_WIDTH(val) (((val) >> 2) & 1)      /* voodoo 2 only */
-#define FBIINIT5_DAC_DATA_17_OUTPUT(val)    (((val) >> 3) & 1)      /* voodoo 2 only */
-#define FBIINIT5_DAC_DATA_18_OUTPUT(val)    (((val) >> 4) & 1)      /* voodoo 2 only */
-#define FBIINIT5_GENERIC_STRAPPING(val)     (((val) >> 5) & 0xf)    /* voodoo 2 only */
-#define FBIINIT5_BUFFER_ALLOCATION(val)     (((val) >> 9) & 3)      /* voodoo 2 only */
-#define FBIINIT5_DRIVE_VID_CLK_SLAVE(val)   (((val) >> 11) & 1)     /* voodoo 2 only */
-#define FBIINIT5_DRIVE_DAC_DATA_16(val)     (((val) >> 12) & 1)     /* voodoo 2 only */
-#define FBIINIT5_VCLK_INPUT_SELECT(val)     (((val) >> 13) & 1)     /* voodoo 2 only */
-#define FBIINIT5_MULTI_CVG_DETECT(val)      (((val) >> 14) & 1)     /* voodoo 2 only */
-#define FBIINIT5_SYNC_RETRACE_READS(val)    (((val) >> 15) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_RHBORDER_COLOR(val) (((val) >> 16) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_LHBORDER_COLOR(val) (((val) >> 17) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_BVBORDER_COLOR(val) (((val) >> 18) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_TVBORDER_COLOR(val) (((val) >> 19) & 1)     /* voodoo 2 only */
-#define FBIINIT5_DOUBLE_HORIZ(val)          (((val) >> 20) & 1)     /* voodoo 2 only */
-#define FBIINIT5_DOUBLE_VERT(val)           (((val) >> 21) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_16BIT_GAMMA(val)    (((val) >> 22) & 1)     /* voodoo 2 only */
-#define FBIINIT5_INVERT_DAC_HSYNC(val)      (((val) >> 23) & 1)     /* voodoo 2 only */
-#define FBIINIT5_INVERT_DAC_VSYNC(val)      (((val) >> 24) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_24BIT_DACDATA(val)  (((val) >> 25) & 1)     /* voodoo 2 only */
-#define FBIINIT5_ENABLE_INTERLACING(val)    (((val) >> 26) & 1)     /* voodoo 2 only */
-#define FBIINIT5_DAC_DATA_18_CONTROL(val)   (((val) >> 27) & 1)     /* voodoo 2 only */
-#define FBIINIT5_RASTERIZER_UNIT_MODE(val)  (((val) >> 30) & 3)     /* voodoo 2 only */
-
-#define FBIINIT6_WINDOW_ACTIVE_COUNTER(val) (((val) >> 0) & 7)      /* voodoo 2 only */
-#define FBIINIT6_WINDOW_DRAG_COUNTER(val)   (((val) >> 3) & 0x1f)   /* voodoo 2 only */
-#define FBIINIT6_SLI_SYNC_MASTER(val)       (((val) >> 8) & 1)      /* voodoo 2 only */
-#define FBIINIT6_DAC_DATA_22_OUTPUT(val)    (((val) >> 9) & 3)      /* voodoo 2 only */
-#define FBIINIT6_DAC_DATA_23_OUTPUT(val)    (((val) >> 11) & 3)     /* voodoo 2 only */
-#define FBIINIT6_SLI_SYNCIN_OUTPUT(val)     (((val) >> 13) & 3)     /* voodoo 2 only */
-#define FBIINIT6_SLI_SYNCOUT_OUTPUT(val)    (((val) >> 15) & 3)     /* voodoo 2 only */
-#define FBIINIT6_DAC_RD_OUTPUT(val)         (((val) >> 17) & 3)     /* voodoo 2 only */
-#define FBIINIT6_DAC_WR_OUTPUT(val)         (((val) >> 19) & 3)     /* voodoo 2 only */
-#define FBIINIT6_PCI_FIFO_LWM_RDY(val)      (((val) >> 21) & 0x7f)  /* voodoo 2 only */
-#define FBIINIT6_VGA_PASS_N_OUTPUT(val)     (((val) >> 28) & 3)     /* voodoo 2 only */
-#define FBIINIT6_X_VIDEO_TILES_BIT0(val)    (((val) >> 30) & 1)     /* voodoo 2 only */
-
-#define FBIINIT7_GENERIC_STRAPPING(val)     (((val) >> 0) & 0xff)   /* voodoo 2 only */
-#define FBIINIT7_CMDFIFO_ENABLE(val)        (((val) >> 8) & 1)      /* voodoo 2 only */
-#define FBIINIT7_CMDFIFO_MEMORY_STORE(val)  (((val) >> 9) & 1)      /* voodoo 2 only */
-#define FBIINIT7_DISABLE_CMDFIFO_HOLES(val) (((val) >> 10) & 1)     /* voodoo 2 only */
-#define FBIINIT7_CMDFIFO_READ_THRESH(val)   (((val) >> 11) & 0x1f)  /* voodoo 2 only */
-#define FBIINIT7_SYNC_CMDFIFO_WRITES(val)   (((val) >> 16) & 1)     /* voodoo 2 only */
-#define FBIINIT7_SYNC_CMDFIFO_READS(val)    (((val) >> 17) & 1)     /* voodoo 2 only */
-#define FBIINIT7_RESET_PCI_PACKER(val)      (((val) >> 18) & 1)     /* voodoo 2 only */
-#define FBIINIT7_ENABLE_CHROMA_STUFF(val)   (((val) >> 19) & 1)     /* voodoo 2 only */
-#define FBIINIT7_CMDFIFO_PCI_TIMEOUT(val)   (((val) >> 20) & 0x7f)  /* voodoo 2 only */
-#define FBIINIT7_ENABLE_TEXTURE_BURST(val)  (((val) >> 27) & 1)     /* voodoo 2 only */
 
 #define TREXINIT_SEND_TMU_CONFIG(val)       (((val) >> 18) & 1)
 

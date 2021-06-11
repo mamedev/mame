@@ -16,7 +16,6 @@
 #include "video/poly.h"
 #include "video/rgbutil.h"
 #include "screen.h"
-#include "voodoo_regs.h"
 
 
 //**************************************************************************
@@ -47,6 +46,7 @@ static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
 static constexpr u32 STD_VOODOO_BANSHEE_CLOCK = 90000000;
 static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 
+#include "voodoo_regs.h"
 
 
 /***************************************************************************
@@ -195,7 +195,7 @@ protected:
 	struct pci_state
 	{
 		voodoo::fifo_state fifo;                   // PCI FIFO
-		voodoo::init_en init_enable = 0;        // initEnable value
+		voodoo::reg_init_en init_enable = 0;        // initEnable value
 		u8 stall_state = 0;        // state of the system if we're stalled
 		u8 op_pending = 0;         // true if an operation is pending
 		attotime op_end_time = attotime::zero; // time when the pending operation ends
@@ -207,11 +207,11 @@ protected:
 	struct tmu_state
 	{
 		void recompute_texture_params();
-		void init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem);
+		void init(u8 vdt, tmu_shared_state &share, void *memory, int tmem);
 		s32 prepare();
-		rgb_t lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t);
-		rgbaint_t fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
-		rgbaint_t combine_texture(voodoo::texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
+		rgb_t lookup_single_texel(voodoo::reg_texture_mode const texmode, u32 texbase, s32 s, s32 t);
+		rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
+		rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
 
 		struct ncc_table
 		{
@@ -219,7 +219,7 @@ protected:
 			void update();
 
 			u8 dirty = 0;              // is the texel lookup dirty?
-			voodoo_reg *m_reg = nullptr;          // pointer to our registers
+			u32 *m_reg = nullptr;          // pointer to our registers
 			s32 ir[4], ig[4], ib[4];    // I values for R,G,B
 			s32 qr[4], qg[4], qb[4];    // Q values for R,G,B
 			s32 y[16];                  // Y values
@@ -230,7 +230,7 @@ protected:
 
 		u8 *m_ram = nullptr;          // pointer to our RAM
 		u32 m_mask = 0;               // mask to apply to pointers
-		voodoo_reg *m_reg = nullptr;          // pointer to our register base
+		voodoo::voodoo_regs m_reg;          // pointer to our register base
 		u32 m_regdirty = 0;           // true if the LOD/mode/base registers have changed
 
 		u32 m_texaddr_mask = 0;       // mask for texture address
@@ -518,23 +518,23 @@ protected:
 	template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
 	void rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid);
 
-	bool stipple_test(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, s32 x, s32 y);
+	bool stipple_test(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, s32 x, s32 y);
 	s32 compute_wfloat(s64 iterw);
-	s32 compute_depthval(voodoo::fbz_mode const fbzmode, voodoo::fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
-	bool depth_test(thread_stats_block &stats, voodoo::fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
+	s32 compute_depthval(voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
+	bool depth_test(thread_stats_block &stats, voodoo::reg_fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
 	bool alpha_mask_test(thread_stats_block &stats, u8 alpha);
 	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &rgaIntColor);
-	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, voodoo::fbz_colorpath const fbzcp, voodoo::fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
-	bool alpha_test(thread_stats_block &stats, voodoo::alpha_mode const alphamode, u8 alpha);
-	void apply_fogging(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::fog_mode const fogmode, voodoo::fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
-	void alpha_blend(rgbaint_t &color, voodoo::fbz_mode const fbzmode, voodoo::alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
-	void write_pixel(thread_stats_block &threadstats, voodoo::fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);
+	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, voodoo::reg_fbz_colorpath const fbzcp, voodoo::reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
+	bool alpha_test(thread_stats_block &stats, voodoo::reg_alpha_mode const alphamode, u8 alpha);
+	void apply_fogging(rgbaint_t &color, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void alpha_blend(rgbaint_t &color, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
+	void write_pixel(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);
 
 	void banshee_blit_2d(u32 data);
 
 // FIXME: this stuff should not be public
 public:
-	voodoo_reg m_reg[0x400];             // raw registers
+	voodoo::voodoo_regs m_reg;             // raw registers
 	const u8 m_type;                // type of system
 	u8 m_alt_regmap;             // enable alternate register map?
 	u8 m_chipmask;               // mask for which chips are available

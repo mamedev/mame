@@ -189,23 +189,23 @@ namespace {
 
 const u8 register_alias_map[0x40] =
 {
-	vdstatus,     0x004/4,    vertexAx,   vertexAy,
-	vertexBx,   vertexBy,   vertexCx,   vertexCy,
-	startR,     dRdX,       dRdY,       startG,
-	dGdX,       dGdY,       startB,     dBdX,
-	dBdY,       startZ,     dZdX,       dZdY,
-	startA,     dAdX,       dAdY,       startS,
-	dSdX,       dSdY,       startT,     dTdX,
-	dTdY,       startW,     dWdX,       dWdY,
+	voodoo_regs::reg_vdstatus,   0x004/4,                     voodoo_regs::reg_vertexAx,   voodoo_regs::reg_vertexAy,
+	voodoo_regs::reg_vertexBx,   voodoo_regs::reg_vertexBy,   voodoo_regs::reg_vertexCx,   voodoo_regs::reg_vertexCy,
+	voodoo_regs::reg_startR,     voodoo_regs::reg_dRdX,       voodoo_regs::reg_dRdY,       voodoo_regs::reg_startG,
+	voodoo_regs::reg_dGdX,       voodoo_regs::reg_dGdY,       voodoo_regs::reg_startB,     voodoo_regs::reg_dBdX,
+	voodoo_regs::reg_dBdY,       voodoo_regs::reg_startZ,     voodoo_regs::reg_dZdX,       voodoo_regs::reg_dZdY,
+	voodoo_regs::reg_startA,     voodoo_regs::reg_dAdX,       voodoo_regs::reg_dAdY,       voodoo_regs::reg_startS,
+	voodoo_regs::reg_dSdX,       voodoo_regs::reg_dSdY,       voodoo_regs::reg_startT,     voodoo_regs::reg_dTdX,
+	voodoo_regs::reg_dTdY,       voodoo_regs::reg_startW,     voodoo_regs::reg_dWdX,       voodoo_regs::reg_dWdY,
 
-	triangleCMD,0x084/4,    fvertexAx,  fvertexAy,
-	fvertexBx,  fvertexBy,  fvertexCx,  fvertexCy,
-	fstartR,    fdRdX,      fdRdY,      fstartG,
-	fdGdX,      fdGdY,      fstartB,    fdBdX,
-	fdBdY,      fstartZ,    fdZdX,      fdZdY,
-	fstartA,    fdAdX,      fdAdY,      fstartS,
-	fdSdX,      fdSdY,      fstartT,    fdTdX,
-	fdTdY,      fstartW,    fdWdX,      fdWdY
+	voodoo_regs::reg_triangleCMD,0x084/4,                     voodoo_regs::reg_fvertexAx,  voodoo_regs::reg_fvertexAy,
+	voodoo_regs::reg_fvertexBx,  voodoo_regs::reg_fvertexBy,  voodoo_regs::reg_fvertexCx,  voodoo_regs::reg_fvertexCy,
+	voodoo_regs::reg_fstartR,    voodoo_regs::reg_fdRdX,      voodoo_regs::reg_fdRdY,      voodoo_regs::reg_fstartG,
+	voodoo_regs::reg_fdGdX,      voodoo_regs::reg_fdGdY,      voodoo_regs::reg_fstartB,    voodoo_regs::reg_fdBdX,
+	voodoo_regs::reg_fdBdY,      voodoo_regs::reg_fstartZ,    voodoo_regs::reg_fdZdX,      voodoo_regs::reg_fdZdY,
+	voodoo_regs::reg_fstartA,    voodoo_regs::reg_fdAdX,      voodoo_regs::reg_fdAdY,      voodoo_regs::reg_fstartS,
+	voodoo_regs::reg_fdSdX,      voodoo_regs::reg_fdSdY,      voodoo_regs::reg_fstartT,    voodoo_regs::reg_fdTdX,
+	voodoo_regs::reg_fdTdY,      voodoo_regs::reg_fstartW,    voodoo_regs::reg_fdWdX,      voodoo_regs::reg_fdWdY
 };
 
 
@@ -786,9 +786,9 @@ voodoo_device::static_raster_info voodoo_device::predef_raster_table[] =
 
 voodoo_device::static_raster_info voodoo_device::generic_raster_table[3] =
 {
-	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, texture_mode::DECODE_LIVE, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
-	{ &voodoo_device::rasterizer<fbz_colorpath::DECODE_LIVE, fbz_mode::DECODE_LIVE, alpha_mode::DECODE_LIVE, fog_mode::DECODE_LIVE, texture_mode::DECODE_LIVE, texture_mode::DECODE_LIVE>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, 0xffffffff>, 0, 0, 0, 0, 0, 0 },
+	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE>, 0, 0, 0, 0, 0, 0 },
 };
 
 
@@ -813,7 +813,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	m_fbi.video_changed = false;
 
 	/* if we are blank, just fill with black */
-	if (m_type <= TYPE_VOODOO_2 && FBIINIT1_SOFTWARE_BLANK(m_reg[fbiInit1].u))
+	if (m_type <= TYPE_VOODOO_2 && m_reg.fbi_init1().software_blank())
 	{
 		bitmap.fill(0, cliprect);
 		return changed;
@@ -946,7 +946,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 void voodoo_device::voodoo_set_init_enable(u32 newval)
 {
-	m_pci.init_enable = voodoo::init_en(newval);
+	m_pci.init_enable = voodoo::reg_init_en(newval);
 	if (LOG_REGISTERS)
 		logerror("VOODOO.REG:initEnable write = %08X\n", newval);
 }
@@ -1039,19 +1039,18 @@ void voodoo_device::tmu_shared_state::init()
 }
 
 
-void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, voodoo_reg *r, void *memory, int tmem)
+void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memory, int tmem)
 {
 	/* allocate texture RAM */
 	m_ram = reinterpret_cast<u8 *>(memory);
 	m_mask = tmem - 1;
-	m_reg = r;
 	m_regdirty = false;
 	m_bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
 	m_ncc[0].dirty = m_ncc[1].dirty = true;
-	m_ncc[0].m_reg = &m_reg[nccTable+0];
-	m_ncc[1].m_reg = &m_reg[nccTable+12];
+	m_ncc[0].m_reg = m_reg.subset(voodoo_regs::reg_nccTable + 0);
+	m_ncc[1].m_reg = m_reg.subset(voodoo_regs::reg_nccTable + 12);
 
 	/* create pointers to all the tables */
 	m_texel[0] = share.rgb332;
@@ -1107,14 +1106,15 @@ void voodoo_device::voodoo_postload()
 }
 
 
-ALLOW_SAVE_TYPE(voodoo::init_en);
+ALLOW_SAVE_TYPE(voodoo::reg_init_en);
+ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
 
 void voodoo_device::init_save_state()
 {
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_device::voodoo_postload), this));
 
 	/* register states: core */
-	save_pointer(NAME(&m_reg[0].u), std::size(m_reg));
+	save_item(NAME(m_reg.m_regs));
 	save_item(NAME(m_alt_regmap));
 
 	/* register states: pci */
@@ -1222,6 +1222,7 @@ void voodoo_device::init_save_state()
 		tmu_state *tmu = &m_tmu[index];
 		if (tmu->m_ram == nullptr)
 			continue;
+		save_item(NAME(tmu->m_reg.m_regs), index);
 		if (tmu->m_ram != m_fbi.ram)
 			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
 		save_item(NAME(tmu->m_starts), index);
@@ -1267,11 +1268,11 @@ void voodoo_device::init_save_state()
 void voodoo_device::accumulate_statistics(const thread_stats_block &block)
 {
 	/* apply internal voodoo statistics */
-	m_reg[fbiPixelsIn].u += block.pixels_in;
-	m_reg[fbiPixelsOut].u += block.pixels_out;
-	m_reg[fbiChromaFail].u += block.chroma_fail;
-	m_reg[fbiZfuncFail].u += block.zfunc_fail;
-	m_reg[fbiAfuncFail].u += block.afunc_fail;
+	m_reg.add(voodoo_regs::reg_fbiPixelsIn, block.pixels_in);
+	m_reg.add(voodoo_regs::reg_fbiPixelsOut, block.pixels_out);
+	m_reg.add(voodoo_regs::reg_fbiChromaFail, block.chroma_fail);
+	m_reg.add(voodoo_regs::reg_fbiZfuncFail, block.zfunc_fail);
+	m_reg.add(voodoo_regs::reg_fbiAfuncFail, block.afunc_fail);
 
 	/* apply emulation statistics */
 	m_stats.total_pixels_in += block.pixels_in;
@@ -1310,8 +1311,6 @@ void voodoo_device::update_statistics(bool accumulate)
 
 void voodoo_device::swap_buffers()
 {
-	int count;
-
 	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", m_screen->vpos());
 
 	/* force a partial update */
@@ -1319,10 +1318,7 @@ void voodoo_device::swap_buffers()
 	m_fbi.video_changed = true;
 
 	/* keep a history of swap intervals */
-	count = m_fbi.vblank_count;
-	if (count > 15)
-		count = 15;
-	m_reg[fbiSwapHistory].u = (m_reg[fbiSwapHistory].u << 4) | count;
+	m_reg.update_swap_history(std::min<u8>(m_fbi.vblank_count, 15));
 
 	/* rotate the buffers */
 	if (m_type <= TYPE_VOODOO_2)
@@ -1342,7 +1338,7 @@ void voodoo_device::swap_buffers()
 		}
 	}
 	else
-		m_fbi.rgboffs[0] = m_reg[leftOverlayBuf].u & m_fbi.mask & ~0x0f;
+		m_fbi.rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbi.mask & ~0x0f;
 
 	/* decrement the pending count and reset our state */
 	if (m_fbi.swaps_pending)
@@ -1381,7 +1377,7 @@ void voodoo_device::swap_buffers()
 		pixelcount = m_stats.total_pixels_out;
 
 		statsptr += sprintf(statsptr, "Swap:%6d\n", m_stats.swaps);
-		statsptr += sprintf(statsptr, "Hist:%08X\n", m_reg[fbiSwapHistory].u);
+		statsptr += sprintf(statsptr, "Hist:%08X\n", m_reg.swap_history());
 		statsptr += sprintf(statsptr, "Stal:%6d\n", m_stats.stalls);
 		statsptr += sprintf(statsptr, "Rend:%6d%%\n", pixelcount * 100 / screen_area);
 		statsptr += sprintf(statsptr, "Poly:%6d\n", m_stats.total_triangles);
@@ -1444,15 +1440,14 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 	// PCI Vblank IRQ enable is VOODOO2 and up
 	if (m_type >= TYPE_VOODOO_2)
 	{
-		if (m_reg[intrCtrl].u & 0x8)       // call IRQ handler if VSYNC interrupt (falling) is enabled
+		if (m_reg.intr_ctrl().vsync_falling_enable())
 		{
-			m_reg[intrCtrl].u |= 0x200;        // VSYNC int (falling) active
-			m_reg[intrCtrl].u &= ~0x80000000;
+			m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
 			if (!m_pciint.isnull())
 				m_pciint(true);
-
 		}
 	}
+
 	// External vblank handler
 	if (!m_vblank.isnull())
 		m_vblank(false);
@@ -1490,18 +1485,15 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 	/* set a timer for the next off state */
 	m_fbi.vsync_stop_timer->adjust(m_screen->time_until_pos(m_fbi.vsyncstop));
 
-
-
 	/* set internal state and call the client */
 	m_fbi.vblank = true;
 
 	// PCI Vblank IRQ enable is VOODOO2 and up
 	if (m_type >= TYPE_VOODOO_2)
 	{
-		if (m_reg[intrCtrl].u & 0x4)       // call IRQ handler if VSYNC interrupt (rising) is enabled
+		if (m_reg.intr_ctrl().vsync_rising_enable())
 		{
-			m_reg[intrCtrl].u |= 0x100;        // VSYNC int (rising) active
-			m_reg[intrCtrl].u &= ~0x80000000;
+			m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
 			if (!m_pciint.isnull())
 				m_pciint(true);
 		}
@@ -1522,18 +1514,18 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 void voodoo_device::reset_counters()
 {
 	update_statistics(false);
-	m_reg[fbiPixelsIn].u = 0;
-	m_reg[fbiChromaFail].u = 0;
-	m_reg[fbiZfuncFail].u = 0;
-	m_reg[fbiAfuncFail].u = 0;
-	m_reg[fbiPixelsOut].u = 0;
+	m_reg.write(voodoo_regs::reg_fbiPixelsIn, 0);
+	m_reg.write(voodoo_regs::reg_fbiChromaFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiZfuncFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiAfuncFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiPixelsOut, 0);
 }
 
 
 void voodoo_device::soft_reset()
 {
 	reset_counters();
-	m_reg[fbiTrianglesOut].u = 0;
+	m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
 	m_fbi.fifo.reset();
 	m_pci.fifo.reset();
 }
@@ -1548,25 +1540,25 @@ void voodoo_device::soft_reset()
 
 void voodoo_device::recompute_video_memory()
 {
-	u32 const buffer_pages = FBIINIT2_VIDEO_BUFFER_OFFSET(m_reg[fbiInit2].u);
-	u32 const fifo_start_page = FBIINIT4_MEMORY_FIFO_START_ROW(m_reg[fbiInit4].u);
-	u32 fifo_last_page = FBIINIT4_MEMORY_FIFO_STOP_ROW(m_reg[fbiInit4].u);
+	u32 const buffer_pages = m_reg.fbi_init2().video_buffer_offset();
+	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
+	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
 	u32 memory_config;
 
 	/* memory config is determined differently between V1 and V2 */
-	memory_config = FBIINIT2_ENABLE_TRIPLE_BUF(m_reg[fbiInit2].u);
+	memory_config = m_reg.fbi_init2().enable_triple_buf();
 	if (m_type == TYPE_VOODOO_2 && memory_config == 0)
-		memory_config = FBIINIT5_BUFFER_ALLOCATION(m_reg[fbiInit5].u);
+		memory_config = m_reg.fbi_init5().buffer_allocation();
 
 	/* tiles are 64x16/32; x_tiles specifies how many half-tiles */
 	m_fbi.tile_width = (m_type == TYPE_VOODOO_1) ? 64 : 32;
 	m_fbi.tile_height = (m_type == TYPE_VOODOO_1) ? 16 : 32;
-	m_fbi.x_tiles = FBIINIT1_X_VIDEO_TILES(m_reg[fbiInit1].u);
+	m_fbi.x_tiles = m_reg.fbi_init1().x_video_tiles();
 	if (m_type == TYPE_VOODOO_2)
 	{
 		m_fbi.x_tiles = (m_fbi.x_tiles << 1) |
-						(FBIINIT1_X_VIDEO_TILES_BIT5(m_reg[fbiInit1].u) << 5) |
-						(FBIINIT6_X_VIDEO_TILES_BIT0(m_reg[fbiInit6].u));
+						(m_reg.fbi_init1().x_video_tiles_bit5() << 5) |
+						(m_reg.fbi_init6().x_video_tiles_bit0());
 	}
 	m_fbi.rowpixels = m_fbi.tile_width * m_fbi.x_tiles;
 
@@ -1617,7 +1609,7 @@ void voodoo_device::recompute_video_memory()
 		fifo_last_page = m_fbi.mask / 0x1000;
 
 	/* is it valid and enabled? */
-	if (fifo_start_page <= fifo_last_page && FBIINIT0_ENABLE_MEMORY_FIFO(m_reg[fbiInit0].u))
+	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
 	{
 		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
 		m_fbi.fifo.configure((u32 *)(m_fbi.ram + fifo_start_page * 0x1000), size);
@@ -1673,9 +1665,9 @@ void voodoo_device::tmu_state::ncc_table::write(offs_t regnum, u32 data)
 	}
 
 	/* if the register matches, don't update */
-	if (data == m_reg[regnum].u)
+	if (data == m_reg[regnum])
 		return;
-	m_reg[regnum].u = data;
+	m_reg[regnum] = data;
 
 	/* first four entries are packed Y values */
 	if (regnum < 4)
@@ -1786,7 +1778,7 @@ void voodoo_device::dac_state::data_r(u8 regnum)
 void voodoo_device::tmu_state::recompute_texture_params()
 {
 	// extract LOD parameters
-	texture_lod const texlod(m_reg[tLOD].u);
+	auto const texlod = m_reg.texture_lod();
 	m_lodmin = texlod.lod_min() << 6;
 	m_lodmax = texlod.lod_max() << 6;
 	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
@@ -1804,13 +1796,14 @@ void voodoo_device::tmu_state::recompute_texture_params()
 		m_wmask >>= texlod.lod_aspect();
 
 	// determine the bpp of the texture
-	voodoo::texture_mode const texmode(m_reg[textureMode].u);
+	auto const texmode = m_reg.texture_mode();
 	int bppscale = texmode.format() >> 3;
 
 	// start with the base of LOD 0
-	if (m_texaddr_shift == 0 && (m_reg[texBaseAddr].u & 1))
+	u32 base = m_reg.texture_baseaddr();
+	if (m_texaddr_shift == 0 && BIT(base, 0) != 0)
 		osd_printf_debug("Tiled texture\n");
-	u32 base = (m_reg[texBaseAddr].u & m_texaddr_mask) << m_texaddr_shift;
+	base = (base & m_texaddr_mask) << m_texaddr_shift;
 	m_lodoffset[0] = base & m_mask;
 
 	// LODs 1-3 are different depending on whether we are in multitex mode
@@ -1820,11 +1813,11 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
 	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
-		base = (m_reg[texBaseAddr_1].u & m_texaddr_mask) << m_texaddr_shift;
+		base = (m_reg.texture_baseaddr_1() & m_texaddr_mask) << m_texaddr_shift;
 		m_lodoffset[1] = base & m_mask;
-		base = (m_reg[texBaseAddr_2].u & m_texaddr_mask) << m_texaddr_shift;
+		base = (m_reg.texture_baseaddr_2() & m_texaddr_mask) << m_texaddr_shift;
 		m_lodoffset[2] = base & m_mask;
-		base = (m_reg[texBaseAddr_3_8].u & m_texaddr_mask) << m_texaddr_shift;
+		base = (m_reg.texture_baseaddr_3_8() & m_texaddr_mask) << m_texaddr_shift;
 		m_lodoffset[3] = base & m_mask;
 	}
 	else
@@ -1859,7 +1852,7 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	m_lookup = m_texel[texmode.format()];
 
 	// compute the detail parameters
-	texture_detail const texdetail(m_reg[tDetail].u);
+	auto const texdetail = m_reg.texture_detail();
 	m_detailmax = texdetail.detail_max();
 	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
 	m_detailscale = texdetail.detail_scale();
@@ -2206,7 +2199,7 @@ u32 voodoo_device::cmdfifo_execute(cmdfifo_info *f)
 			if (LOG_CMDFIFO) logerror("  PACKET TYPE 3: count=%d code=%d mask=%03X smode=%02X pc=%d\n", count, code, (command >> 10) & 0xfff, (command >> 22) & 0x3f, (command >> 28) & 1);
 
 			/* copy relevant bits into the setup mode register */
-			m_reg[sSetupMode].u = ((command >> 10) & 0xff) | ((command >> 6) & 0xf0000);
+			m_reg.write(voodoo_regs::reg_sSetupMode, ((command >> 10) & 0xff) | ((command >> 6) & 0xf0000));
 
 			/* loop over triangles */
 			for (i = 0; i < count; i++)
@@ -2566,19 +2559,19 @@ void voodoo_device::check_stalled_cpu(attotime current_time)
 	if (m_pci.stall_state == STALLED_UNTIL_FIFO_LWM)
 	{
 		/* if there's room in the memory FIFO now, we can proceed */
-		if (FBIINIT0_ENABLE_MEMORY_FIFO(m_reg[fbiInit0].u))
+		if (m_reg.fbi_init0().enable_memory_fifo())
 		{
-			if (m_fbi.fifo.items() < 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(m_reg[fbiInit0].u))
+			if (m_fbi.fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
 				resume = true;
 		}
-		else if (m_pci.fifo.space() > 2 * FBIINIT0_PCI_FIFO_LWM(m_reg[fbiInit0].u))
+		else if (m_pci.fifo.space() > 2 * m_reg.fbi_init0().pci_fifo_lwm())
 			resume = true;
 	}
 
 	/* if we're stalled until the FIFOs are empty, check now */
 	else if (m_pci.stall_state == STALLED_UNTIL_FIFO_EMPTY)
 	{
-		if (FBIINIT0_ENABLE_MEMORY_FIFO(m_reg[fbiInit0].u))
+		if (m_reg.fbi_init0().enable_memory_fifo())
 		{
 			if (m_fbi.fifo.empty() && m_pci.fifo.empty())
 				resume = true;
@@ -2668,8 +2661,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 	/* switch off the register */
 	switch (regnum)
 	{
-		case intrCtrl:
-			m_reg[regnum].u = data;
+		case voodoo_regs::reg_intrCtrl:
+			m_reg.write(regnum, data);
 			// Setting bit 31 clears the PCI interrupts
 			if (data & 0x80000000) {
 				// Clear pci interrupt
@@ -2678,331 +2671,334 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			}
 			break;
 		/* Vertex data is 12.4 formatted fixed point */
-		case fvertexAx:
+		case voodoo_regs::reg_fvertexAx:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexAx:
+		case voodoo_regs::reg_vertexAx:
 			if (chips & 1) m_fbi.ax = (s16)data;
 			break;
 
-		case fvertexAy:
+		case voodoo_regs::reg_fvertexAy:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexAy:
+		case voodoo_regs::reg_vertexAy:
 			if (chips & 1) m_fbi.ay = (s16)data;
 			break;
 
-		case fvertexBx:
+		case voodoo_regs::reg_fvertexBx:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexBx:
+		case voodoo_regs::reg_vertexBx:
 			if (chips & 1) m_fbi.bx = (s16)data;
 			break;
 
-		case fvertexBy:
+		case voodoo_regs::reg_fvertexBy:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexBy:
+		case voodoo_regs::reg_vertexBy:
 			if (chips & 1) m_fbi.by = (s16)data;
 			break;
 
-		case fvertexCx:
+		case voodoo_regs::reg_fvertexCx:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexCx:
+		case voodoo_regs::reg_vertexCx:
 			if (chips & 1) m_fbi.cx = (s16)data;
 			break;
 
-		case fvertexCy:
+		case voodoo_regs::reg_fvertexCy:
 			data = float_to_int32(data, 4);
 			[[fallthrough]];
-		case vertexCy:
+		case voodoo_regs::reg_vertexCy:
 			if (chips & 1) m_fbi.cy = (s16)data;
 			break;
 
 		/* RGB data is 12.12 formatted fixed point */
-		case fstartR:
+		case voodoo_regs::reg_fstartR:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case startR:
+		case voodoo_regs::reg_startR:
 			if (chips & 1) m_fbi.startr = (s32)(data << 8) >> 8;
 			break;
 
-		case fstartG:
+		case voodoo_regs::reg_fstartG:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case startG:
+		case voodoo_regs::reg_startG:
 			if (chips & 1) m_fbi.startg = (s32)(data << 8) >> 8;
 			break;
 
-		case fstartB:
+		case voodoo_regs::reg_fstartB:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case startB:
+		case voodoo_regs::reg_startB:
 			if (chips & 1) m_fbi.startb = (s32)(data << 8) >> 8;
 			break;
 
-		case fstartA:
+		case voodoo_regs::reg_fstartA:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case startA:
+		case voodoo_regs::reg_startA:
 			if (chips & 1) m_fbi.starta = (s32)(data << 8) >> 8;
 			break;
 
-		case fdRdX:
+		case voodoo_regs::reg_fdRdX:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dRdX:
+		case voodoo_regs::reg_dRdX:
 			if (chips & 1) m_fbi.drdx = (s32)(data << 8) >> 8;
 			break;
 
-		case fdGdX:
+		case voodoo_regs::reg_fdGdX:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dGdX:
+		case voodoo_regs::reg_dGdX:
 			if (chips & 1) m_fbi.dgdx = (s32)(data << 8) >> 8;
 			break;
 
-		case fdBdX:
+		case voodoo_regs::reg_fdBdX:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dBdX:
+		case voodoo_regs::reg_dBdX:
 			if (chips & 1) m_fbi.dbdx = (s32)(data << 8) >> 8;
 			break;
 
-		case fdAdX:
+		case voodoo_regs::reg_fdAdX:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dAdX:
+		case voodoo_regs::reg_dAdX:
 			if (chips & 1) m_fbi.dadx = (s32)(data << 8) >> 8;
 			break;
 
-		case fdRdY:
+		case voodoo_regs::reg_fdRdY:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dRdY:
+		case voodoo_regs::reg_dRdY:
 			if (chips & 1) m_fbi.drdy = (s32)(data << 8) >> 8;
 			break;
 
-		case fdGdY:
+		case voodoo_regs::reg_fdGdY:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dGdY:
+		case voodoo_regs::reg_dGdY:
 			if (chips & 1) m_fbi.dgdy = (s32)(data << 8) >> 8;
 			break;
 
-		case fdBdY:
+		case voodoo_regs::reg_fdBdY:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dBdY:
+		case voodoo_regs::reg_dBdY:
 			if (chips & 1) m_fbi.dbdy = (s32)(data << 8) >> 8;
 			break;
 
-		case fdAdY:
+		case voodoo_regs::reg_fdAdY:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dAdY:
+		case voodoo_regs::reg_dAdY:
 			if (chips & 1) m_fbi.dady = (s32)(data << 8) >> 8;
 			break;
 
 		/* Z data is 20.12 formatted fixed point */
-		case fstartZ:
+		case voodoo_regs::reg_fstartZ:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case startZ:
+		case voodoo_regs::reg_startZ:
 			if (chips & 1) m_fbi.startz = (s32)data;
 			break;
 
-		case fdZdX:
+		case voodoo_regs::reg_fdZdX:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dZdX:
+		case voodoo_regs::reg_dZdX:
 			if (chips & 1) m_fbi.dzdx = (s32)data;
 			break;
 
-		case fdZdY:
+		case voodoo_regs::reg_fdZdY:
 			data = float_to_int32(data, 12);
 			[[fallthrough]];
-		case dZdY:
+		case voodoo_regs::reg_dZdY:
 			if (chips & 1) m_fbi.dzdy = (s32)data;
 			break;
 
 		/* S,T data is 14.18 formatted fixed point, converted to 16.32 internally */
-		case fstartS:
+		case voodoo_regs::reg_fstartS:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_starts = data64;
 			if (chips & 4) m_tmu[1].m_starts = data64;
 			break;
-		case startS:
+		case voodoo_regs::reg_startS:
 			if (chips & 2) m_tmu[0].m_starts = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_starts = (s64)(s32)data << 14;
 			break;
 
-		case fstartT:
+		case voodoo_regs::reg_fstartT:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_startt = data64;
 			if (chips & 4) m_tmu[1].m_startt = data64;
 			break;
-		case startT:
+		case voodoo_regs::reg_startT:
 			if (chips & 2) m_tmu[0].m_startt = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_startt = (s64)(s32)data << 14;
 			break;
 
-		case fdSdX:
+		case voodoo_regs::reg_fdSdX:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_dsdx = data64;
 			if (chips & 4) m_tmu[1].m_dsdx = data64;
 			break;
-		case dSdX:
+		case voodoo_regs::reg_dSdX:
 			if (chips & 2) m_tmu[0].m_dsdx = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_dsdx = (s64)(s32)data << 14;
 			break;
 
-		case fdTdX:
+		case voodoo_regs::reg_fdTdX:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_dtdx = data64;
 			if (chips & 4) m_tmu[1].m_dtdx = data64;
 			break;
-		case dTdX:
+		case voodoo_regs::reg_dTdX:
 			if (chips & 2) m_tmu[0].m_dtdx = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_dtdx = (s64)(s32)data << 14;
 			break;
 
-		case fdSdY:
+		case voodoo_regs::reg_fdSdY:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_dsdy = data64;
 			if (chips & 4) m_tmu[1].m_dsdy = data64;
 			break;
-		case dSdY:
+		case voodoo_regs::reg_dSdY:
 			if (chips & 2) m_tmu[0].m_dsdy = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_dsdy = (s64)(s32)data << 14;
 			break;
 
-		case fdTdY:
+		case voodoo_regs::reg_fdTdY:
 			data64 = float_to_int64(data, 32);
 			if (chips & 2) m_tmu[0].m_dtdy = data64;
 			if (chips & 4) m_tmu[1].m_dtdy = data64;
 			break;
-		case dTdY:
+		case voodoo_regs::reg_dTdY:
 			if (chips & 2) m_tmu[0].m_dtdy = (s64)(s32)data << 14;
 			if (chips & 4) m_tmu[1].m_dtdy = (s64)(s32)data << 14;
 			break;
 
 		/* W data is 2.30 formatted fixed point, converted to 16.32 internally */
-		case fstartW:
+		case voodoo_regs::reg_fstartW:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.startw = data64;
 			if (chips & 2) m_tmu[0].m_startw = data64;
 			if (chips & 4) m_tmu[1].m_startw = data64;
 			break;
-		case startW:
+		case voodoo_regs::reg_startW:
 			if (chips & 1) m_fbi.startw = (s64)(s32)data << 2;
 			if (chips & 2) m_tmu[0].m_startw = (s64)(s32)data << 2;
 			if (chips & 4) m_tmu[1].m_startw = (s64)(s32)data << 2;
 			break;
 
-		case fdWdX:
+		case voodoo_regs::reg_fdWdX:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.dwdx = data64;
 			if (chips & 2) m_tmu[0].m_dwdx = data64;
 			if (chips & 4) m_tmu[1].m_dwdx = data64;
 			break;
-		case dWdX:
+		case voodoo_regs::reg_dWdX:
 			if (chips & 1) m_fbi.dwdx = (s64)(s32)data << 2;
 			if (chips & 2) m_tmu[0].m_dwdx = (s64)(s32)data << 2;
 			if (chips & 4) m_tmu[1].m_dwdx = (s64)(s32)data << 2;
 			break;
 
-		case fdWdY:
+		case voodoo_regs::reg_fdWdY:
 			data64 = float_to_int64(data, 32);
 			if (chips & 1) m_fbi.dwdy = data64;
 			if (chips & 2) m_tmu[0].m_dwdy = data64;
 			if (chips & 4) m_tmu[1].m_dwdy = data64;
 			break;
-		case dWdY:
+		case voodoo_regs::reg_dWdY:
 			if (chips & 1) m_fbi.dwdy = (s64)(s32)data << 2;
 			if (chips & 2) m_tmu[0].m_dwdy = (s64)(s32)data << 2;
 			if (chips & 4) m_tmu[1].m_dwdy = (s64)(s32)data << 2;
 			break;
 
 		/* setup bits */
-		case sARGB:
+		case voodoo_regs::reg_sARGB:
 			if (chips & 1)
 			{
 				rgb_t rgbdata(data);
-				m_reg[sAlpha].f = rgbdata.a();
-				m_reg[sRed].f = rgbdata.r();
-				m_reg[sGreen].f = rgbdata.g();
-				m_reg[sBlue].f = rgbdata.b();
+				m_reg.write_float(voodoo_regs::reg_sAlpha, rgbdata.a());
+				m_reg.write_float(voodoo_regs::reg_sRed, rgbdata.r());
+				m_reg.write_float(voodoo_regs::reg_sGreen, rgbdata.g());
+				m_reg.write_float(voodoo_regs::reg_sBlue, rgbdata.b());
 			}
 			break;
 
 		/* mask off invalid bits for different cards */
-		case fbzColorPath:
+		case voodoo_regs::reg_fbzColorPath:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type < TYPE_VOODOO_2)
 				data &= 0x0fffffff;
-			if (chips & 1) m_reg[fbzColorPath].u = data;
+			if (chips & 1) m_reg.write(regnum, data);
 			break;
 
-		case fbzMode:
+		case voodoo_regs::reg_fbzMode:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type < TYPE_VOODOO_2)
 				data &= 0x001fffff;
-			if (chips & 1) m_reg[fbzMode].u = data;
+			if (chips & 1) m_reg.write(regnum, data);
 			break;
 
-		case fogMode:
+		case voodoo_regs::reg_fogMode:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type < TYPE_VOODOO_2)
 				data &= 0x0000003f;
-			if (chips & 1) m_reg[fogMode].u = data;
+			if (chips & 1) m_reg.write(regnum, data);
 			break;
 
 		/* triangle drawing */
-		case triangleCMD:
+		case voodoo_regs::reg_triangleCMD:
 			m_fbi.sign = data;
 			cycles = triangle();
 			break;
 
-		case ftriangleCMD:
+		case voodoo_regs::reg_ftriangleCMD:
 			m_fbi.sign = data;
 			cycles = triangle();
 			break;
 
-		case sBeginTriCMD:
+		case voodoo_regs::reg_sBeginTriCMD:
 			cycles = begin_triangle();
 			break;
 
-		case sDrawTriCMD:
+		case voodoo_regs::reg_sDrawTriCMD:
 			cycles = draw_triangle();
 			break;
 
 		/* other commands */
-		case nopCMD:
+		case voodoo_regs::reg_nopCMD:
 			m_poly->wait(m_regnames[regnum]);
 			if (data & 1)
 				reset_counters();
 			if (data & 2)
-				m_reg[fbiTrianglesOut].u = 0;
+				m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
 			break;
 
-		case fastfillCMD:
+		case voodoo_regs::reg_fastfillCMD:
 			cycles = fastfill();
 			break;
 
-		case swapbufferCMD:
+		case voodoo_regs::reg_swapbufferCMD:
 			m_poly->wait(m_regnames[regnum]);
 			cycles = swapbuffer(data);
 			break;
 
-		case userIntrCMD:
+		case voodoo_regs::reg_userIntrCMD:
 			m_poly->wait(m_regnames[regnum]);
+
 			// Bit 5 of intrCtrl enables user interrupts
-			if (m_reg[intrCtrl].u & 0x20) {
+			if (m_reg.intr_ctrl().user_interrupt_enable())
+			{
 				// Bits 19:12 are set to cmd 9:2, bit 11 is user interrupt flag
-				m_reg[intrCtrl].u |= ((data << 10) & 0x000ff000) | 0x800;
-				m_reg[intrCtrl].u &= ~0x80000000;
+				m_reg.clear_set(voodoo_regs::reg_intrCtrl,
+					reg_intr_ctrl::EXTERNAL_PIN_ACTIVE | reg_intr_ctrl::USER_INTERRUPT_TAG_MASK,
+					((data << 10) & reg_intr_ctrl::USER_INTERRUPT_TAG_MASK) | reg_intr_ctrl::USER_INTERRUPT_GENERATED);
 
 				// Signal pci interrupt handler
 				if (!m_pciint.isnull())
@@ -3011,11 +3007,11 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			break;
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
-		case clutData:
+		case voodoo_regs::reg_clutData:
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				m_poly->wait(m_regnames[regnum]);
-				if (!FBIINIT1_VIDEO_TIMING_RESET(m_reg[fbiInit1].u))
+				if (m_reg.fbi_init1().video_timing_reset() == 0)
 				{
 					int index = data >> 24;
 					if (index <= 32)
@@ -3030,7 +3026,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			break;
 
 		/* external DAC access -- Voodoo/Voodoo2 only */
-		case dacData:
+		case voodoo_regs::reg_dacData:
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				m_poly->wait(m_regnames[regnum]);
@@ -3042,63 +3038,48 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			break;
 
 		/* vertical sync rate -- Voodoo/Voodoo2 only */
-		case hSync:
-		case vSync:
-		case backPorch:
-		case videoDimensions:
+		case voodoo_regs::reg_hSync:
+		case voodoo_regs::reg_vSync:
+		case voodoo_regs::reg_backPorch:
+		case voodoo_regs::reg_videoDimensions:
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1))
 			{
 				m_poly->wait(m_regnames[regnum]);
-				m_reg[regnum].u = data;
-				if (m_reg[hSync].u != 0 && m_reg[vSync].u != 0 && m_reg[videoDimensions].u != 0)
-				{
-					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = m_screen->frame_period().attoseconds();
-					attoseconds_t stdperiod, medperiod, vgaperiod;
-					attoseconds_t stddiff, meddiff, vgadiff;
-					rectangle visarea;					
+				m_reg.write(regnum, data);
 
-					if (m_type == TYPE_VOODOO_2)
-					{
-						htotal = ((m_reg[hSync].u >> 16) & 0x7ff) + 1 + (m_reg[hSync].u & 0x1ff) + 1;
-						vtotal = ((m_reg[vSync].u >> 16) & 0x1fff) + (m_reg[vSync].u & 0x1fff);
-						hvis = m_reg[videoDimensions].u & 0x7ff;
-						vvis = (m_reg[videoDimensions].u >> 16) & 0x7ff;
-						hbp = (m_reg[backPorch].u & 0x1ff) + 2;
-						vbp = (m_reg[backPorch].u >> 16) & 0x1ff;
-					}
-					else
-					{
-						htotal = ((m_reg[hSync].u >> 16) & 0x3ff) + 1 + (m_reg[hSync].u & 0xff) + 1;
-						vtotal = ((m_reg[vSync].u >> 16) & 0xfff) + (m_reg[vSync].u & 0xfff);
-						hvis = m_reg[videoDimensions].u & 0x3ff;
-						vvis = (m_reg[videoDimensions].u >> 16) & 0x3ff;
-						hbp = (m_reg[backPorch].u & 0xff) + 2;
-						vbp = (m_reg[backPorch].u >> 16) & 0xff;
-					}
+				auto const hsync = m_reg.hsync();
+				auto const vsync = m_reg.vsync();
+				auto const back_porch = m_reg.back_porch();
+				auto const video_dimensions = m_reg.video_dimensions();
+				if (hsync.raw() != 0 && vsync.raw() != 0 && video_dimensions.raw() != 0 && back_porch.raw() != 0)
+				{
+					u32 htotal = hsync.hsync_off(m_type) + 1 + hsync.hsync_on(m_type) + 1;
+					u32 vtotal = vsync.vsync_off(m_type) + vsync.vsync_on(m_type);
+					u32 hvis = video_dimensions.xwidth(m_type);
+					u32 vvis = video_dimensions.yheight(m_type);
+					u32 hbp = back_porch.horizontal(m_type) + 2;
+					u32 vbp = back_porch.vertical(m_type);
 
 					/* create a new visarea */
-					visarea.set(hbp, hbp + std::max(hvis - 1, 0), vbp, vbp + std::max(vvis - 1, 0));
+					rectangle visarea(hbp, hbp + std::max(hvis - 1, 0), vbp, vbp + std::max(vvis - 1, 0));
 
 					/* keep within bounds */
-					visarea.max_x = (std::min)(visarea.max_x, htotal - 1);
-					visarea.max_y = (std::min)(visarea.max_y, vtotal - 1);
+					visarea.max_x = std::min<s32>(visarea.max_x, htotal - 1);
+					visarea.max_y = std::min<s32>(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
-					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
-					medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
-					vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
+					attoseconds_t stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
+					attoseconds_t medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
+					attoseconds_t vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
 
 					/* compute a diff against the current refresh period */
-					stddiff = stdperiod - refresh;
-					if (stddiff < 0) stddiff = -stddiff;
-					meddiff = medperiod - refresh;
-					if (meddiff < 0) meddiff = -meddiff;
-					vgadiff = vgaperiod - refresh;
-					if (vgadiff < 0) vgadiff = -vgadiff;
+					attoseconds_t refresh = m_screen->frame_period().attoseconds();
+					attoseconds_t stddiff = std::abs(stdperiod - refresh);
+					attoseconds_t meddiff = std::abs(medperiod - refresh);
+					attoseconds_t vgadiff = std::abs(vgaperiod - refresh);
 
 					osd_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
-						m_reg[hSync].u, m_reg[vSync].u, m_reg[backPorch].u, m_reg[videoDimensions].u);
+						hsync.raw(), vsync.raw(), back_porch.raw(), video_dimensions.raw());
 					osd_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
 
 					/* configure the screen based on which one matches the closest */
@@ -3123,109 +3104,109 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 					m_fbi.height = vvis;
 					m_fbi.xoffs = hbp;
 					m_fbi.yoffs = vbp;
-					m_fbi.vsyncstart = (m_reg[vSync].u >> 16) & 0xfff;
-					m_fbi.vsyncstop = (m_reg[vSync].u >> 0) & 0xfff;
+					m_fbi.vsyncstart = vsync.vsync_off(m_type);
+					m_fbi.vsyncstop = vsync.vsync_on(m_type);
 					osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_fbi.vsyncstart, m_fbi.vsyncstop);
 					/* recompute the time of VBLANK */
 					adjust_vblank_timer();
 
 					/* if changing dimensions, update video memory layout */
-					if (regnum == videoDimensions)
+					if (regnum == voodoo_regs::reg_videoDimensions)
 						recompute_video_memory();
 				}
 			}
 			break;
 
 		/* fbiInit0 can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
-		case fbiInit0:
+		case voodoo_regs::reg_fbiInit0:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1) && m_pci.init_enable.enable_hw_init())
 			{
-				m_reg[fbiInit0].u = data;
-				if (FBIINIT0_GRAPHICS_RESET(data))
+				m_reg.write(regnum, data);
+				if (m_reg.fbi_init0().graphics_reset())
 					soft_reset();
-				if (FBIINIT0_FIFO_RESET(data))
+				if (m_reg.fbi_init0().fifo_reset())
 					m_pci.fifo.reset();
 				recompute_video_memory();
 			}
 			break;
 
 		/* fbiInit5-7 are Voodoo 2-only; ignore them on anything else */
-		case fbiInit5:
-		case fbiInit6:
+		case voodoo_regs::reg_fbiInit5:
+		case voodoo_regs::reg_fbiInit6:
 			if (m_type < TYPE_VOODOO_2)
 				break;
 			[[fallthrough]];
 
 		/* fbiInitX can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		/* most of these affect memory layout, so always recompute that when done */
-		case fbiInit1:
-		case fbiInit2:
-		case fbiInit4:
+		case voodoo_regs::reg_fbiInit1:
+		case voodoo_regs::reg_fbiInit2:
+		case voodoo_regs::reg_fbiInit4:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1) && m_pci.init_enable.enable_hw_init())
 			{
-				m_reg[regnum].u = data;
+				m_reg.write(regnum, data);
 				recompute_video_memory();
 				m_fbi.video_changed = true;
 			}
 			break;
 
-		case fbiInit3:
+		case voodoo_regs::reg_fbiInit3:
 			m_poly->wait(m_regnames[regnum]);
 			if (m_type <= TYPE_VOODOO_2 && (chips & 1) && m_pci.init_enable.enable_hw_init())
 			{
-				m_reg[regnum].u = data;
-				m_alt_regmap = FBIINIT3_TRI_REGISTER_REMAP(data);
-				m_fbi.yorigin = FBIINIT3_YORIGIN_SUBTRACT(m_reg[fbiInit3].u);
+				m_reg.write(regnum, data);
+				m_alt_regmap = m_reg.fbi_init3().tri_register_remap();
+				m_fbi.yorigin = m_reg.fbi_init3().yorigin_subtract();
 				recompute_video_memory();
 			}
 			break;
 
-		case fbiInit7:
-/*      case swapPending: -- Banshee */
+		case voodoo_regs::reg_fbiInit7:
+/*      case voodoo_regs::reg_swapPending: -- Banshee */
 			if (m_type == TYPE_VOODOO_2 && (chips & 1) && m_pci.init_enable.enable_hw_init())
 			{
 				m_poly->wait(m_regnames[regnum]);
-				m_reg[regnum].u = data;
-				m_fbi.cmdfifo[0].enable = FBIINIT7_CMDFIFO_ENABLE(data);
-				m_fbi.cmdfifo[0].count_holes = !FBIINIT7_DISABLE_CMDFIFO_HOLES(data);
+				m_reg.write(regnum, data);
+				m_fbi.cmdfifo[0].enable = m_reg.fbi_init7().cmdfifo_enable();
+				m_fbi.cmdfifo[0].count_holes = !m_reg.fbi_init7().disable_cmdfifo_holes();
 			}
 			else if (m_type >= TYPE_VOODOO_BANSHEE)
 				m_fbi.swaps_pending++;
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
-		case cmdFifoBaseAddr:
+		case voodoo_regs::reg_cmdFifoBaseAddr:
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 			{
 				m_poly->wait(m_regnames[regnum]);
-				m_reg[regnum].u = data;
+				m_reg.write(regnum, data);
 				m_fbi.cmdfifo[0].base = (data & 0x3ff) << 12;
 				m_fbi.cmdfifo[0].end = (((data >> 16) & 0x3ff) + 1) << 12;
 			}
 			break;
 
-		case cmdFifoBump:
+		case voodoo_regs::reg_cmdFifoBump:
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				fatalerror("cmdFifoBump\n");
 			break;
 
-		case cmdFifoRdPtr:
+		case voodoo_regs::reg_cmdFifoRdPtr:
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				m_fbi.cmdfifo[0].rdptr = data;
 			break;
 
-		case cmdFifoAMin:
-/*      case colBufferAddr: -- Banshee */
+		case voodoo_regs::reg_cmdFifoAMin:
+/*      case voodoo_regs::reg_colBufferAddr: -- Banshee */
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				m_fbi.cmdfifo[0].amin = data;
 			else if (m_type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 				m_fbi.rgboffs[1] = data & m_fbi.mask & ~0x0f;
 			break;
 
-		case cmdFifoAMax:
-/*      case colBufferStride: -- Banshee */
+		case voodoo_regs::reg_cmdFifoAMax:
+/*      case voodoo_regs::reg_colBufferStride: -- Banshee */
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				m_fbi.cmdfifo[0].amax = data;
 			else if (m_type >= TYPE_VOODOO_BANSHEE && (chips & 1))
@@ -3237,16 +3218,16 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			}
 			break;
 
-		case cmdFifoDepth:
-/*      case auxBufferAddr: -- Banshee */
+		case voodoo_regs::reg_cmdFifoDepth:
+/*      case voodoo_regs::reg_auxBufferAddr: -- Banshee */
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				m_fbi.cmdfifo[0].depth = data;
 			else if (m_type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 				m_fbi.auxoffs = data & m_fbi.mask & ~0x0f;
 			break;
 
-		case cmdFifoHoles:
-/*      case auxBufferStride: -- Banshee */
+		case voodoo_regs::reg_cmdFifoHoles:
+/*      case voodoo_regs::reg_auxBufferStride: -- Banshee */
 			if (m_type == TYPE_VOODOO_2 && (chips & 1))
 				m_fbi.cmdfifo[0].holes = data;
 			else if (m_type >= TYPE_VOODOO_BANSHEE && (chips & 1))
@@ -3263,77 +3244,77 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			break;
 
 		/* nccTable entries are processed and expanded immediately */
-		case nccTable+0:
-		case nccTable+1:
-		case nccTable+2:
-		case nccTable+3:
-		case nccTable+4:
-		case nccTable+5:
-		case nccTable+6:
-		case nccTable+7:
-		case nccTable+8:
-		case nccTable+9:
-		case nccTable+10:
-		case nccTable+11:
+		case voodoo_regs::reg_nccTable + 0:
+		case voodoo_regs::reg_nccTable + 1:
+		case voodoo_regs::reg_nccTable + 2:
+		case voodoo_regs::reg_nccTable + 3:
+		case voodoo_regs::reg_nccTable + 4:
+		case voodoo_regs::reg_nccTable + 5:
+		case voodoo_regs::reg_nccTable + 6:
+		case voodoo_regs::reg_nccTable + 7:
+		case voodoo_regs::reg_nccTable + 8:
+		case voodoo_regs::reg_nccTable + 9:
+		case voodoo_regs::reg_nccTable + 10:
+		case voodoo_regs::reg_nccTable + 11:
 			m_poly->wait(m_regnames[regnum]);
-			if (chips & 2) m_tmu[0].m_ncc[0].write(regnum - nccTable, data);
-			if (chips & 4) m_tmu[1].m_ncc[0].write(regnum - nccTable, data);
+			if (chips & 2) m_tmu[0].m_ncc[0].write(regnum - voodoo_regs::reg_nccTable, data);
+			if (chips & 4) m_tmu[1].m_ncc[0].write(regnum - voodoo_regs::reg_nccTable, data);
 			break;
 
-		case nccTable+12:
-		case nccTable+13:
-		case nccTable+14:
-		case nccTable+15:
-		case nccTable+16:
-		case nccTable+17:
-		case nccTable+18:
-		case nccTable+19:
-		case nccTable+20:
-		case nccTable+21:
-		case nccTable+22:
-		case nccTable+23:
+		case voodoo_regs::reg_nccTable + 12:
+		case voodoo_regs::reg_nccTable + 13:
+		case voodoo_regs::reg_nccTable + 14:
+		case voodoo_regs::reg_nccTable + 15:
+		case voodoo_regs::reg_nccTable + 16:
+		case voodoo_regs::reg_nccTable + 17:
+		case voodoo_regs::reg_nccTable + 18:
+		case voodoo_regs::reg_nccTable + 19:
+		case voodoo_regs::reg_nccTable + 20:
+		case voodoo_regs::reg_nccTable + 21:
+		case voodoo_regs::reg_nccTable + 22:
+		case voodoo_regs::reg_nccTable + 23:
 			m_poly->wait(m_regnames[regnum]);
-			if (chips & 2) m_tmu[0].m_ncc[1].write(regnum - (nccTable+12), data);
-			if (chips & 4) m_tmu[1].m_ncc[1].write(regnum - (nccTable+12), data);
+			if (chips & 2) m_tmu[0].m_ncc[1].write(regnum - (voodoo_regs::reg_nccTable + 12), data);
+			if (chips & 4) m_tmu[1].m_ncc[1].write(regnum - (voodoo_regs::reg_nccTable + 12), data);
 			break;
 
 		/* fogTable entries are processed and expanded immediately */
-		case fogTable+0:
-		case fogTable+1:
-		case fogTable+2:
-		case fogTable+3:
-		case fogTable+4:
-		case fogTable+5:
-		case fogTable+6:
-		case fogTable+7:
-		case fogTable+8:
-		case fogTable+9:
-		case fogTable+10:
-		case fogTable+11:
-		case fogTable+12:
-		case fogTable+13:
-		case fogTable+14:
-		case fogTable+15:
-		case fogTable+16:
-		case fogTable+17:
-		case fogTable+18:
-		case fogTable+19:
-		case fogTable+20:
-		case fogTable+21:
-		case fogTable+22:
-		case fogTable+23:
-		case fogTable+24:
-		case fogTable+25:
-		case fogTable+26:
-		case fogTable+27:
-		case fogTable+28:
-		case fogTable+29:
-		case fogTable+30:
-		case fogTable+31:
+		case voodoo_regs::reg_fogTable + 0:
+		case voodoo_regs::reg_fogTable + 1:
+		case voodoo_regs::reg_fogTable + 2:
+		case voodoo_regs::reg_fogTable + 3:
+		case voodoo_regs::reg_fogTable + 4:
+		case voodoo_regs::reg_fogTable + 5:
+		case voodoo_regs::reg_fogTable + 6:
+		case voodoo_regs::reg_fogTable + 7:
+		case voodoo_regs::reg_fogTable + 8:
+		case voodoo_regs::reg_fogTable + 9:
+		case voodoo_regs::reg_fogTable + 10:
+		case voodoo_regs::reg_fogTable + 11:
+		case voodoo_regs::reg_fogTable + 12:
+		case voodoo_regs::reg_fogTable + 13:
+		case voodoo_regs::reg_fogTable + 14:
+		case voodoo_regs::reg_fogTable + 15:
+		case voodoo_regs::reg_fogTable + 16:
+		case voodoo_regs::reg_fogTable + 17:
+		case voodoo_regs::reg_fogTable + 18:
+		case voodoo_regs::reg_fogTable + 19:
+		case voodoo_regs::reg_fogTable + 20:
+		case voodoo_regs::reg_fogTable + 21:
+		case voodoo_regs::reg_fogTable + 22:
+		case voodoo_regs::reg_fogTable + 23:
+		case voodoo_regs::reg_fogTable + 24:
+		case voodoo_regs::reg_fogTable + 25:
+		case voodoo_regs::reg_fogTable + 26:
+		case voodoo_regs::reg_fogTable + 27:
+		case voodoo_regs::reg_fogTable + 28:
+		case voodoo_regs::reg_fogTable + 29:
+		case voodoo_regs::reg_fogTable + 30:
+		case voodoo_regs::reg_fogTable + 31:
 			m_poly->wait(m_regnames[regnum]);
 			if (chips & 1)
 			{
-				int base = 2 * (regnum - fogTable);
+				int base = 2 * (regnum - voodoo_regs::reg_fogTable);
 				m_fbi.fogdelta[base + 0] = (data >> 0) & 0xff;
 				m_fbi.fogblend[base + 0] = (data >> 8) & 0xff;
 				m_fbi.fogdelta[base + 1] = (data >> 16) & 0xff;
@@ -3342,65 +3323,64 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			break;
 
 		/* texture modifications cause us to recompute everything */
-		case textureMode:
-		case tLOD:
-		case tDetail:
-		case texBaseAddr:
-		case texBaseAddr_1:
-		case texBaseAddr_2:
-		case texBaseAddr_3_8:
+		case voodoo_regs::reg_textureMode:
+		case voodoo_regs::reg_tLOD:
+		case voodoo_regs::reg_tDetail:
+		case voodoo_regs::reg_texBaseAddr:
+		case voodoo_regs::reg_texBaseAddr_1:
+		case voodoo_regs::reg_texBaseAddr_2:
+		case voodoo_regs::reg_texBaseAddr_3_8:
 			if (chips & 2)
 			{
-				if (m_tmu[0].m_reg[regnum].u != data)
+				if (m_tmu[0].m_reg.read(regnum) != data)
 				{
 					m_poly->wait(m_regnames[regnum]);
 					m_tmu[0].m_regdirty = true;
-					m_tmu[0].m_reg[regnum].u = data;
+					m_tmu[0].m_reg.write(regnum, data);
 				}
 			}
 			if (chips & 4)
 			{
-				if (m_tmu[1].m_reg[regnum].u != data)
+				if (m_tmu[1].m_reg.read(regnum) != data)
 				{
 					m_poly->wait(m_regnames[regnum]);
 					m_tmu[1].m_regdirty = true;
-					m_tmu[1].m_reg[regnum].u = data;
+					m_tmu[1].m_reg.write(regnum, data);
 				}
 			}
 			break;
 
-		case trexInit1:
+		case voodoo_regs::reg_trexInit1:
 			logerror("VOODOO.REG:%s(%d) write = %08X\n", (regnum < 0x384 / 4) ? m_regnames[regnum] : "oob", chips, data);
 			/* send tmu config data to the frame buffer */
 			m_send_config = (TREXINIT_SEND_TMU_CONFIG(data) > 0);
 			goto default_case;
 
 		/* these registers are referenced in the renderer; we must wait for pending work before changing */
-		case chromaRange:
-		case chromaKey:
-		case alphaMode:
-		case fogColor:
-		case stipple:
-		case zaColor:
-		case color1:
-		case color0:
-		case clipLowYHighY:
-		case clipLeftRight:
+		case voodoo_regs::reg_chromaRange:
+		case voodoo_regs::reg_chromaKey:
+		case voodoo_regs::reg_alphaMode:
+		case voodoo_regs::reg_fogColor:
+		case voodoo_regs::reg_stipple:
+		case voodoo_regs::reg_zaColor:
+		case voodoo_regs::reg_color1:
+		case voodoo_regs::reg_color0:
+		case voodoo_regs::reg_clipLowYHighY:
+		case voodoo_regs::reg_clipLeftRight:
 			m_poly->wait(m_regnames[regnum]);
 			[[fallthrough]];
 		/* by default, just feed the data to the chips */
 		default:
 default_case:
-			if (chips & 1) m_reg[0x000 + regnum].u = data;
-			if (chips & 2) m_reg[0x100 + regnum].u = data;
-			if (chips & 4) m_reg[0x200 + regnum].u = data;
-			if (chips & 8) m_reg[0x300 + regnum].u = data;
+			if (chips & 1) m_reg.write(regnum, data);
+			if (chips & 2) m_tmu[0].m_reg.write(regnum, data);
+			if (chips & 4) m_tmu[1].m_reg.write(regnum, data);
 			break;
 	}
 
 	if (LOG_REGISTERS)
 	{
-		if (regnum < fvertexAx || regnum > fdWdY)
+		if (regnum < voodoo_regs::reg_fvertexAx || regnum > voodoo_regs::reg_fdWdY)
 			logerror("VOODOO.REG:%s(%d) write = %08X\n", (regnum < 0x384/4) ? m_regnames[regnum] : "oob", chips, origdata);
 		else
 			logerror("VOODOO.REG:%s(%d) write = %f\n", (regnum < 0x384/4) ? m_regnames[regnum] : "oob", chips, (double) u2f(origdata));
@@ -3422,7 +3402,7 @@ s32 voodoo_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 	m_stats.lfb_writes++;
 
 	/* byte swizzling */
-	voodoo::lfb_mode const lfbmode(m_reg[lfbMode].u);
+	auto const lfbmode = m_reg.lfb_mode();
 	if (lfbmode.byte_swizzle_writes())
 	{
 		data = swapendian_int32(data);
@@ -3465,7 +3445,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	m_stats.lfb_writes++;
 
 	// byte swizzling
-	voodoo::lfb_mode const lfbmode(m_reg[lfbMode].u);
+	auto const lfbmode = m_reg.lfb_mode();
 	if (lfbmode.byte_swizzle_writes())
 	{
 		data = swapendian_int32(data);
@@ -3481,10 +3461,10 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// extract default depth value from low bits of zaColor
 	u16 sz[2];
-	sz[0] = sz[1] = m_reg[zaColor].u & 0xffff;
+	sz[0] = sz[1] = m_reg.za_color() & 0xffff;
 
 	// if not otherwise specified, alpha defaults to the upper bits of zaColor
-	u32 src_alpha = m_reg[zaColor].u >> 24;
+	u32 src_alpha = m_reg.za_color() >> 24;
 
 	// extract color information from the data
 	rgb_t src_color[2];
@@ -3713,7 +3693,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	u32 depthmax = (m_fbi.mask + 1 - m_fbi.auxoffs) / 2;
 
 	// simple case: no pipeline
-	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
+	auto const fbzmode = m_reg.fbz_mode();
 	if (!lfbmode.enable_pixel_pipeline())
 	{
 		if (LOG_LFB) logerror("VOODOO.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
@@ -3754,7 +3734,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				}
 
 				// track pixel writes to the frame buffer regardless of mask
-				m_reg[fbiPixelsOut].u++;
+				m_reg.add(voodoo_regs::reg_fbiPixelsOut, 1);
 			}
 
 			// advance our pointers
@@ -3780,9 +3760,9 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_fbi.rowpixels;
 
 		// loop over up to two pixels
-		voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
-		voodoo::alpha_mode const alphamode(m_reg[alphaMode].u);
-		voodoo::fog_mode const fogmode(m_reg[fogMode].u);
+		auto const fbzcp = m_reg.fbz_colorpath();
+		auto const alphamode = m_reg.alpha_mode();
+		auto const fogmode = m_reg.fog_mode();
 		voodoo::dither_helper dither(scry, fbzmode, fogmode);
 		thread_stats_block &threadstats = m_fbi.lfb_stats;
 		rgbaint_t iterargb(0);
@@ -3796,8 +3776,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				// apply clipping
 				if (fbzmode.enable_clipping())
 				{
-					if (x < ((m_reg[clipLeftRight].u >> 16) & 0x3ff) || x >= (m_reg[clipLeftRight].u & 0x3ff) ||
-						scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) || scry >= (m_reg[clipLowYHighY].u & 0x3ff))
+					if (x < m_reg.clip_left() || x >= m_reg.clip_right() || scry < m_reg.clip_top() || scry >= m_reg.clip_bottom())
 					{
 						threadstats.clip_fail++;
 						break;
@@ -3835,7 +3814,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				if (fogmode.enable_fog())
 				{
 					s32 iterz = sz[pix] << 12;
-					s64 iterw = lfbmode.write_w_select() ? u32(m_reg[zaColor].u << 16) : u32(sz[pix] << 16);
+					s64 iterw = lfbmode.write_w_select() ? u32(m_reg.za_color() << 16) : u32(sz[pix] << 16);
 					apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
 				}
 
@@ -3879,7 +3858,7 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		return 0;
 	t = &m_tmu[tmunum];
 
-	texture_lod const texlod(t->m_reg[tLOD].u);
+	auto const texlod = t->m_reg.texture_lod();
 	if (texlod.tdirect_write())
 		fatalerror("Texture direct write!\n");
 
@@ -3897,7 +3876,7 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		data = (data >> 16) | (data << 16);
 
 	/* 8-bit texture case */
-	voodoo::texture_mode const texmode(t->m_reg[textureMode].u);
+	auto const texmode = t->m_reg.texture_mode();
 	if (texmode.format() < 8)
 	{
 		int lod, tt, ts;
@@ -3911,12 +3890,11 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 			tt = (offset >> 7) & 0xff;
 
 			/* old code has a bit about how this is broken in gauntleg unless we always look at TMU0 */
-			if (voodoo::texture_mode(m_tmu[0].m_reg/*t->m_reg*/[textureMode].u).seq_8_downld()) {
+			if (m_tmu[0].m_reg.texture_mode().seq_8_downld())
 				ts = (offset << 2) & 0xfc;
-			}
-			else {
+			else
 				ts = (offset << 1) & 0xfc;
-			}
+
 			/* validate parameters */
 			if (lod > 8)
 				return 0;
@@ -4141,7 +4119,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_type >= TYPE_VOODOO_2)
 		{
 			/* we might be in CMDFIFO mode */
-			if (FBIINIT7_CMDFIFO_ENABLE(m_reg[fbiInit7].u))
+			if (m_reg.fbi_init7().cmdfifo_enable())
 			{
 				/* if bit 21 is set, we're writing to the FIFO */
 				if (offset & 0x200000/4)
@@ -4159,7 +4137,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 				if (!(access & REGISTER_WRITETHRU))
 				{
 					/* track swap buffers regardless */
-					if ((offset & 0xff) == swapbufferCMD)
+					if ((offset & 0xff) == voodoo_regs::reg_swapbufferCMD)
 						m_fbi.swaps_pending++;
 
 					logerror("Ignoring write to %s in CMDFIFO mode\n", m_regnames[offset & 0xff]);
@@ -4192,7 +4170,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 
 		/* track swap buffers */
-		if ((offset & 0xff) == swapbufferCMD)
+		if ((offset & 0xff) == voodoo_regs::reg_swapbufferCMD)
 			m_fbi.swaps_pending++;
 	}
 
@@ -4246,15 +4224,14 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		fatalerror("PCI FIFO full\n");
 
 	/* handle flushing to the memory FIFO */
-	if (FBIINIT0_ENABLE_MEMORY_FIFO(m_reg[fbiInit0].u) &&
-		m_pci.fifo.space() <= 2 * FBIINIT4_MEMORY_FIFO_LWM(m_reg[fbiInit4].u))
+	if (m_reg.fbi_init0().enable_memory_fifo() && m_pci.fifo.space() <= 2 * m_reg.fbi_init4().memory_fifo_lwm())
 	{
 		u8 valid[4];
 
 		/* determine which types of data can go to the memory FIFO */
 		valid[0] = true;
-		valid[1] = FBIINIT0_LFB_TO_MEMORY_FIFO(m_reg[fbiInit0].u);
-		valid[2] = valid[3] = FBIINIT0_TEXMEM_TO_MEMORY_FIFO(m_reg[fbiInit0].u);
+		valid[1] = m_reg.fbi_init0().lfb_to_memory_fifo();
+		valid[2] = valid[3] = m_reg.fbi_init0().texmem_to_memory_fifo();
 
 		/* flush everything we can */
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:voodoo_w moving PCI FIFO to memory FIFO\n");
@@ -4265,8 +4242,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		}
 
 		/* if we're above the HWM as a result, stall */
-		if (FBIINIT0_STALL_PCIE_FOR_HWM(m_reg[fbiInit0].u) &&
-			m_fbi.fifo.items() >= 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(m_reg[fbiInit0].u))
+		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbi.fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
 		{
 			if (LOG_FIFO) logerror("VOODOO.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n");
 			stall_cpu(STALLED_UNTIL_FIFO_LWM, machine().time());
@@ -4274,8 +4250,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	/* if we're at the LWM for the PCI FIFO, stall */
-	if (FBIINIT0_STALL_PCIE_FOR_HWM(m_reg[fbiInit0].u) &&
-		m_pci.fifo.space() <= 2 * FBIINIT0_PCI_FIFO_LWM(m_reg[fbiInit0].u))
+	if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_pci.fifo.space() <= 2 * m_reg.fbi_init0().pci_fifo_lwm())
 	{
 		if (LOG_FIFO) logerror("VOODOO.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n");
 		stall_cpu(STALLED_UNTIL_FIFO_LWM, machine().time());
@@ -4315,12 +4290,12 @@ u32 voodoo_device::register_r(offs_t offset)
 	}
 
 	/* default result is the FBI register value */
-	result = m_reg[regnum].u;
+	result = m_reg.read(regnum);
 
 	/* some registers are dynamic; compute them */
 	switch (regnum)
 	{
-		case vdstatus:
+		case voodoo_regs::reg_vdstatus:
 
 			/* start with a blank slate */
 			result = 0;
@@ -4358,7 +4333,7 @@ u32 voodoo_device::register_r(offs_t offset)
 				result |= m_fbi.frontbuf << 10;
 
 				/* bits 27:12 indicate memory FIFO freespace */
-				if (!FBIINIT0_ENABLE_MEMORY_FIFO(m_reg[fbiInit0].u) || m_fbi.fifo.empty())
+				if (m_reg.fbi_init0().enable_memory_fifo() == 0 || m_fbi.fifo.empty())
 					result |= 0xffff << 12;
 				else
 				{
@@ -4394,13 +4369,13 @@ u32 voodoo_device::register_r(offs_t offset)
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
-		case fbiInit2:
+		case voodoo_regs::reg_fbiInit2:
 			if (m_pci.init_enable.remap_init_to_dac())
 				result = m_dac.read_result;
 			break;
 
 		/* return the current visible scanline */
-		case vRetrace:
+		case voodoo_regs::reg_vRetrace:
 			/* eat some cycles since people like polling here */
 			if (EAT_CYCLES) m_cpu->eat_cycles(10);
 			// Return 0 if vblank is active
@@ -4414,7 +4389,7 @@ u32 voodoo_device::register_r(offs_t offset)
 			break;
 
 		/* return visible horizontal and vertical positions. Read by the Vegas startup sequence */
-		case hvRetrace:
+		case voodoo_regs::reg_hvRetrace:
 			/* eat some cycles since people like polling here */
 			if (EAT_CYCLES) m_cpu->eat_cycles(10);
 			//result = 0x200 << 16;   /* should be between 0x7b and 0x267 */
@@ -4432,39 +4407,39 @@ u32 voodoo_device::register_r(offs_t offset)
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
-		case cmdFifoRdPtr:
+		case voodoo_regs::reg_cmdFifoRdPtr:
 			result = m_fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
 			if (EAT_CYCLES) m_cpu->eat_cycles(1000);
 			break;
 
-		case cmdFifoAMin:
+		case voodoo_regs::reg_cmdFifoAMin:
 			result = m_fbi.cmdfifo[0].amin;
 			break;
 
-		case cmdFifoAMax:
+		case voodoo_regs::reg_cmdFifoAMax:
 			result = m_fbi.cmdfifo[0].amax;
 			break;
 
-		case cmdFifoDepth:
+		case voodoo_regs::reg_cmdFifoDepth:
 			result = m_fbi.cmdfifo[0].depth;
 			break;
 
-		case cmdFifoHoles:
+		case voodoo_regs::reg_cmdFifoHoles:
 			result = m_fbi.cmdfifo[0].holes;
 			break;
 
 		/* all counters are 24-bit only */
-		case fbiPixelsIn:
-		case fbiChromaFail:
-		case fbiZfuncFail:
-		case fbiAfuncFail:
-		case fbiPixelsOut:
+		case voodoo_regs::reg_fbiPixelsIn:
+		case voodoo_regs::reg_fbiChromaFail:
+		case voodoo_regs::reg_fbiZfuncFail:
+		case voodoo_regs::reg_fbiAfuncFail:
+		case voodoo_regs::reg_fbiPixelsOut:
 			update_statistics(true);
 			[[fallthrough]];
-		case fbiTrianglesOut:
-			result = m_reg[regnum].u & 0xffffff;
+		case voodoo_regs::reg_fbiTrianglesOut:
+			result = m_reg.read(regnum) & 0xffffff;
 			break;
 	}
 
@@ -4473,7 +4448,7 @@ u32 voodoo_device::register_r(offs_t offset)
 		int logit = true;
 
 		/* don't log multiple identical status reads from the same address */
-		if (regnum == vdstatus)
+		if (regnum == voodoo_regs::reg_vdstatus)
 		{
 			offs_t pc = m_cpu->pc();
 			if (pc == m_last_status_pc && result == m_last_status_value)
@@ -4481,7 +4456,7 @@ u32 voodoo_device::register_r(offs_t offset)
 			m_last_status_pc = pc;
 			m_last_status_value = result;
 		}
-		if (regnum == cmdFifoRdPtr)
+		if (regnum == voodoo_regs::reg_cmdFifoRdPtr)
 			logit = false;
 
 		if (logit)
@@ -4516,8 +4491,9 @@ u32 voodoo_device::lfb_r(offs_t offset, bool lfb_3d)
 	y = (offset >> m_fbi.lfb_stride);
 
 	/* select the target buffer */
-	voodoo::lfb_mode const lfbmode(m_reg[lfbMode].u);
-	if (lfb_3d) {
+	auto const lfbmode = m_reg.lfb_mode();
+	if (lfb_3d)
+	{
 		y &= 0x3ff;
 		destbuf = (m_type >= TYPE_VOODOO_BANSHEE) ? 1 : lfbmode.read_buffer_select();
 		switch (destbuf)
@@ -5626,24 +5602,22 @@ void voodoo_device::device_start()
 	m_tmushare.rgb565 = m_fbi.rgb565;
 
 	/* set up the TMUs */
-	m_tmu[0].init(m_type, m_tmushare, &m_reg[0x100], tmumem[0], tmumem0 << 20);
+	m_tmu[0].init(m_type, m_tmushare, tmumem[0], tmumem0 << 20);
 	m_chipmask |= 0x02;
 	if (tmumem1 != 0)
 	{
-		m_tmu[1].init(m_type, m_tmushare, &m_reg[0x200], tmumem[1], tmumem1 << 20);
+		m_tmu[1].init(m_type, m_tmushare, tmumem[1], tmumem1 << 20);
 		m_chipmask |= 0x04;
 		m_tmu_config |= 0x40;
 	}
 
 	/* initialize some registers */
-	for (voodoo_reg &r : m_reg)
-		r.u = 0;
 	m_pci.init_enable = 0;
-	m_reg[fbiInit0].u = (1 << 4) | (0x10 << 6);
-	m_reg[fbiInit1].u = (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20);
-	m_reg[fbiInit2].u = (1 << 6) | (0x100 << 23);
-	m_reg[fbiInit3].u = (2 << 13) | (0xf << 17);
-	m_reg[fbiInit4].u = (1 << 0);
+	m_reg.write(voodoo_regs::reg_fbiInit0, (1 << 4) | (0x10 << 6));
+	m_reg.write(voodoo_regs::reg_fbiInit1, (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20));
+	m_reg.write(voodoo_regs::reg_fbiInit2, (1 << 6) | (0x100 << 23));
+	m_reg.write(voodoo_regs::reg_fbiInit3, (2 << 13) | (0xf << 17));
+	m_reg.write(voodoo_regs::reg_fbiInit4, (1 << 0));
 
 	/* initialize banshee registers */
 	memset(m_banshee.io, 0, sizeof(m_banshee.io));
@@ -5678,21 +5652,14 @@ void voodoo_device::device_start()
 
 s32 voodoo_device::fastfill()
 {
-	int sx = (m_reg[clipLeftRight].u >> 16) & 0x3ff;
-	int ex = (m_reg[clipLeftRight].u >> 0) & 0x3ff;
-	int sy = (m_reg[clipLowYHighY].u >> 16) & 0x3ff;
-	int ey = (m_reg[clipLowYHighY].u >> 0) & 0x3ff;
-	voodoo_renderer::extent_t extents[64];
-	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
-	u16 dithermatrix[16];
-	u16 *drawbuf = nullptr;
-	u32 pixels = 0;
-
 	/* if we're not clearing either, take no time */
+	auto const fbzmode = m_reg.fbz_mode();
 	if (!fbzmode.rgb_buffer_mask() && !fbzmode.aux_buffer_mask())
 		return 0;
 
 	/* are we clearing the RGB buffer? */
+	u16 dithermatrix[16];
+	u16 *drawbuf = nullptr;
 	if (fbzmode.rgb_buffer_mask())
 	{
 		/* determine the draw buffer */
@@ -5716,26 +5683,24 @@ s32 voodoo_device::fastfill()
 		{
 			voodoo::dither_helper dither(y, fbzmode);
 			for (int x = 0; x < 4; x++)
-			{
-				int r = m_reg[color1].rgb.r;
-				int g = m_reg[color1].rgb.g;
-				int b = m_reg[color1].rgb.b;
-				dithermatrix[y*4 + x] = dither.pixel(x, r, g, b);
-			}
+				dithermatrix[y * 4 + x] = dither.pixel(x, m_reg.color1().argb());
 		}
 	}
 
 	/* fill in a block of extents */
-	extents[0].startx = sx;
-	extents[0].stopx = ex;
+	voodoo_renderer::extent_t extents[64];
+	extents[0].startx = m_reg.clip_left();
+	extents[0].stopx = m_reg.clip_right();
 	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	/* iterate over blocks of extents */
 	voodoo_renderer::render_delegate fastfill_cb(&voodoo_device::raster_fastfill, this);
-	for (int y = sy; y < ey; y += std::size(extents))
+	int ey = m_reg.clip_bottom();
+	u32 pixels = 0;
+	for (int y = m_reg.clip_top(); y < ey; y += std::size(extents))
 	{
 		poly_extra_data &extra = m_poly->object_data_alloc();
-		int count = (std::min)(ey - y, int(std::size(extents)));
+		int count = std::min(ey - y, int(std::size(extents)));
 
 		extra.destbase = drawbuf;
 		memcpy(extra.dither, dithermatrix, sizeof(extra.dither));
@@ -5789,9 +5754,9 @@ s32 voodoo_device::triangle()
 
 	/* determine the number of TMUs involved */
 	texcount = 0;
-	voodoo::fbz_colorpath const fbzcp(m_reg[fbzColorPath].u);
-	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
-	if (!FBIINIT3_DISABLE_TMUS(m_reg[fbiInit3].u) && fbzcp.texture_enable())
+	auto const fbzcp = m_reg.fbz_colorpath();
+	auto const fbzmode = m_reg.fbz_mode();
+	if (m_reg.fbi_init3().disable_tmus() == 0 && fbzcp.texture_enable())
 	{
 		texcount = 1;
 		if (m_chipmask & 0x04)
@@ -5853,7 +5818,7 @@ s32 voodoo_device::triangle()
 	pixels = triangle_create_work_item(drawbuf, texcount);
 
 	/* update stats */
-	m_reg[fbiTrianglesOut].u++;
+	m_reg.add(voodoo_regs::reg_fbiTrianglesOut, 1);
 
 	/* update stats */
 	m_stats.total_triangles++;
@@ -5876,19 +5841,19 @@ s32 voodoo_device::begin_triangle()
 	fbi_state::setup_vertex *sv = &m_fbi.svert[2];
 
 	/* extract all the data from registers */
-	sv->x = m_reg[sVx].f;
-	sv->y = m_reg[sVy].f;
-	sv->wb = m_reg[sWb].f;
-	sv->w0 = m_reg[sWtmu0].f;
-	sv->s0 = m_reg[sS_W0].f;
-	sv->t0 = m_reg[sT_W0].f;
-	sv->w1 = m_reg[sWtmu1].f;
-	sv->s1 = m_reg[sS_Wtmu1].f;
-	sv->t1 = m_reg[sT_Wtmu1].f;
-	sv->a = m_reg[sAlpha].f;
-	sv->r = m_reg[sRed].f;
-	sv->g = m_reg[sGreen].f;
-	sv->b = m_reg[sBlue].f;
+	sv->x  = m_reg.read_float(voodoo_regs::reg_sVx);
+	sv->y  = m_reg.read_float(voodoo_regs::reg_sVy);
+	sv->wb = m_reg.read_float(voodoo_regs::reg_sWb);
+	sv->w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
+	sv->s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
+	sv->t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
+	sv->w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
+	sv->s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
+	sv->t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
+	sv->a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
+	sv->r  = m_reg.read_float(voodoo_regs::reg_sRed);
+	sv->g  = m_reg.read_float(voodoo_regs::reg_sGreen);
+	sv->b  = m_reg.read_float(voodoo_regs::reg_sBlue);
 
 	/* spread it across all three verts and reset the count */
 	m_fbi.svert[0] = m_fbi.svert[1] = m_fbi.svert[2];
@@ -5909,26 +5874,26 @@ s32 voodoo_device::draw_triangle()
 	int cycles = 0;
 
 	/* for strip mode, shuffle vertex 1 down to 0 */
-	if (!(m_reg[sSetupMode].u & (1 << 16)))
+	if (!m_reg.setup_mode().fan_mode())
 		m_fbi.svert[0] = m_fbi.svert[1];
 
 	/* copy 2 down to 1 regardless */
 	m_fbi.svert[1] = m_fbi.svert[2];
 
 	/* extract all the data from registers */
-	sv->x = m_reg[sVx].f;
-	sv->y = m_reg[sVy].f;
-	sv->wb = m_reg[sWb].f;
-	sv->w0 = m_reg[sWtmu0].f;
-	sv->s0 = m_reg[sS_W0].f;
-	sv->t0 = m_reg[sT_W0].f;
-	sv->w1 = m_reg[sWtmu1].f;
-	sv->s1 = m_reg[sS_Wtmu1].f;
-	sv->t1 = m_reg[sT_Wtmu1].f;
-	sv->a = m_reg[sAlpha].f;
-	sv->r = m_reg[sRed].f;
-	sv->g = m_reg[sGreen].f;
-	sv->b = m_reg[sBlue].f;
+	sv->x  = m_reg.read_float(voodoo_regs::reg_sVx);
+	sv->y  = m_reg.read_float(voodoo_regs::reg_sVy);
+	sv->wb = m_reg.read_float(voodoo_regs::reg_sWb);
+	sv->w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
+	sv->s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
+	sv->t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
+	sv->w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
+	sv->s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
+	sv->t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
+	sv->a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
+	sv->r  = m_reg.read_float(voodoo_regs::reg_sRed);
+	sv->g  = m_reg.read_float(voodoo_regs::reg_sGreen);
+	sv->b  = m_reg.read_float(voodoo_regs::reg_sBlue);
 
 	/* if we have enough verts, go ahead and draw */
 	if (++m_fbi.sverts >= 3)
@@ -5956,16 +5921,17 @@ s32 voodoo_device::setup_and_draw_triangle()
 	/* compute the divisor */
 	// Just need sign for now
 	divisor = ((m_fbi.svert[0].x - m_fbi.svert[1].x) * (m_fbi.svert[0].y - m_fbi.svert[2].y) -
-						(m_fbi.svert[0].x - m_fbi.svert[2].x) * (m_fbi.svert[0].y - m_fbi.svert[1].y));
+				(m_fbi.svert[0].x - m_fbi.svert[2].x) * (m_fbi.svert[0].y - m_fbi.svert[1].y));
 
 	/* backface culling */
-	if (m_reg[sSetupMode].u & 0x20000)
+	auto const setup_mode = m_reg.setup_mode();
+	if (setup_mode.enable_culling() & 0x20000)
 	{
-		int culling_sign = (m_reg[sSetupMode].u >> 18) & 1;
+		int culling_sign = setup_mode.culling_sign();
 		int divisor_sign = (divisor < 0);
 
 		/* if doing strips and ping pong is enabled, apply the ping pong */
-		if ((m_reg[sSetupMode].u & 0x90000) == 0x00000)
+		if (!setup_mode.fan_mode() && !setup_mode.disable_ping_pong_correction())
 			culling_sign ^= (m_fbi.sverts - 3) & 1;
 
 		/* if our sign matches the culling sign, we're done for */
@@ -5977,12 +5943,12 @@ s32 voodoo_device::setup_and_draw_triangle()
 	divisor = 1.0f / divisor;
 
 	/* grab the X/Ys at least */
-	m_fbi.ax = (s16)(m_fbi.svert[0].x * 16.0f);
-	m_fbi.ay = (s16)(m_fbi.svert[0].y * 16.0f);
-	m_fbi.bx = (s16)(m_fbi.svert[1].x * 16.0f);
-	m_fbi.by = (s16)(m_fbi.svert[1].y * 16.0f);
-	m_fbi.cx = (s16)(m_fbi.svert[2].x * 16.0f);
-	m_fbi.cy = (s16)(m_fbi.svert[2].y * 16.0f);
+	m_fbi.ax = s16(m_fbi.svert[0].x * 16.0f);
+	m_fbi.ay = s16(m_fbi.svert[0].y * 16.0f);
+	m_fbi.bx = s16(m_fbi.svert[1].x * 16.0f);
+	m_fbi.by = s16(m_fbi.svert[1].y * 16.0f);
+	m_fbi.cx = s16(m_fbi.svert[2].x * 16.0f);
+	m_fbi.cy = s16(m_fbi.svert[2].y * 16.0f);
 
 	/* compute the dx/dy values */
 	dx1 = m_fbi.svert[0].y - m_fbi.svert[2].y;
@@ -5992,7 +5958,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 
 	/* set up R,G,B */
 	tdiv = divisor * 4096.0f;
-	if (m_reg[sSetupMode].u & (1 << 0))
+	if (setup_mode.setup_rgb())
 	{
 		m_fbi.startr = (s32)(m_fbi.svert[0].r * 4096.0f);
 		m_fbi.drdx = (s32)(((m_fbi.svert[0].r - m_fbi.svert[1].r) * dx1 - (m_fbi.svert[0].r - m_fbi.svert[2].r) * dx2) * tdiv);
@@ -6006,7 +5972,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up alpha */
-	if (m_reg[sSetupMode].u & (1 << 1))
+	if (setup_mode.setup_alpha())
 	{
 		m_fbi.starta = (s32)(m_fbi.svert[0].a * 4096.0f);
 		m_fbi.dadx = (s32)(((m_fbi.svert[0].a - m_fbi.svert[1].a) * dx1 - (m_fbi.svert[0].a - m_fbi.svert[2].a) * dx2) * tdiv);
@@ -6014,7 +5980,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up Z */
-	if (m_reg[sSetupMode].u & (1 << 2))
+	if (setup_mode.setup_z())
 	{
 		m_fbi.startz = (s32)(m_fbi.svert[0].z * 4096.0f);
 		m_fbi.dzdx = (s32)(((m_fbi.svert[0].z - m_fbi.svert[1].z) * dx1 - (m_fbi.svert[0].z - m_fbi.svert[2].z) * dx2) * tdiv);
@@ -6023,7 +5989,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 
 	/* set up Wb */
 	tdiv = divisor * 65536.0f * 65536.0f;
-	if (m_reg[sSetupMode].u & (1 << 3))
+	if (setup_mode.setup_wb())
 	{
 		m_fbi.startw = m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.svert[0].wb * 65536.0f * 65536.0f);
 		m_fbi.dwdx = m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.svert[0].wb - m_fbi.svert[1].wb) * dx1 - (m_fbi.svert[0].wb - m_fbi.svert[2].wb) * dx2) * tdiv;
@@ -6031,7 +5997,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up W0 */
-	if (m_reg[sSetupMode].u & (1 << 4))
+	if (setup_mode.setup_w0())
 	{
 		m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.svert[0].w0 * 65536.0f * 65536.0f);
 		m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.svert[0].w0 - m_fbi.svert[1].w0) * dx1 - (m_fbi.svert[0].w0 - m_fbi.svert[2].w0) * dx2) * tdiv;
@@ -6039,7 +6005,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up S0,T0 */
-	if (m_reg[sSetupMode].u & (1 << 5))
+	if (setup_mode.setup_st0())
 	{
 		m_tmu[0].m_starts = m_tmu[1].m_starts = (s64)(m_fbi.svert[0].s0 * 65536.0f * 65536.0f);
 		m_tmu[0].m_dsdx = m_tmu[1].m_dsdx = ((m_fbi.svert[0].s0 - m_fbi.svert[1].s0) * dx1 - (m_fbi.svert[0].s0 - m_fbi.svert[2].s0) * dx2) * tdiv;
@@ -6050,7 +6016,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up W1 */
-	if (m_reg[sSetupMode].u & (1 << 6))
+	if (setup_mode.setup_w1())
 	{
 		m_tmu[1].m_startw = (s64)(m_fbi.svert[0].w1 * 65536.0f * 65536.0f);
 		m_tmu[1].m_dwdx = ((m_fbi.svert[0].w1 - m_fbi.svert[1].w1) * dx1 - (m_fbi.svert[0].w1 - m_fbi.svert[2].w1) * dx2) * tdiv;
@@ -6058,7 +6024,7 @@ s32 voodoo_device::setup_and_draw_triangle()
 	}
 
 	/* set up S1,T1 */
-	if (m_reg[sSetupMode].u & (1 << 7))
+	if (setup_mode.setup_st1())
 	{
 		m_tmu[1].m_starts = (s64)(m_fbi.svert[0].s1 * 65536.0f * 65536.0f);
 		m_tmu[1].m_dsdx = ((m_fbi.svert[0].s1 - m_fbi.svert[1].s1) * dx1 - (m_fbi.svert[0].s1 - m_fbi.svert[2].s1) * dx2) * tdiv;
@@ -6132,7 +6098,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 		extra.dt0dy = m_tmu[0].m_dtdy;
 		extra.dw0dy = m_tmu[0].m_dwdy;
 		extra.lodbase0 = m_tmu[0].prepare();
-		m_stats.texture_mode[voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).format()]++;
+		m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
 
 		/* fill in texture 1 parameters */
 		if (texcount > 1)
@@ -6147,7 +6113,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 			extra.dt1dy = m_tmu[1].m_dtdy;
 			extra.dw1dy = m_tmu[1].m_dwdy;
 			extra.lodbase1 = m_tmu[1].prepare();
-			m_stats.texture_mode[voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).format()]++;
+			m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
 		}
 	}
 
@@ -6212,12 +6178,12 @@ voodoo_device::raster_info *voodoo_device::find_rasterizer(int texcount)
 	int hash;
 
 	/* build an info struct with all the parameters */
-	curinfo.eff_color_path = voodoo::fbz_colorpath(m_reg[fbzColorPath].u).normalize();
-	curinfo.eff_alpha_mode = voodoo::alpha_mode(m_reg[alphaMode].u).normalize();
-	curinfo.eff_fog_mode = voodoo::fog_mode(m_reg[fogMode].u).normalize();
-	curinfo.eff_fbz_mode = voodoo::fbz_mode(m_reg[fbzMode].u).normalize();
-	curinfo.eff_tex_mode_0 = (texcount >= 1 && m_tmu[0].m_lodmin < (8 << 8)) ? voodoo::texture_mode(m_tmu[0].m_reg[textureMode].u).normalize() : 0xffffffff;
-	curinfo.eff_tex_mode_1 = (texcount >= 2 && m_tmu[1].m_lodmin < (8 << 8)) ? voodoo::texture_mode(m_tmu[1].m_reg[textureMode].u).normalize() : 0xffffffff;
+	curinfo.eff_color_path = m_reg.fbz_colorpath().normalize();
+	curinfo.eff_alpha_mode = m_reg.alpha_mode().normalize();
+	curinfo.eff_fog_mode = m_reg.fog_mode().normalize();
+	curinfo.eff_fbz_mode = m_reg.fbz_mode().normalize();
+	curinfo.eff_tex_mode_0 = (texcount >= 1 && m_tmu[0].m_lodmin < (8 << 8)) ? m_tmu[0].m_reg.texture_mode().normalize() : 0xffffffff;
+	curinfo.eff_tex_mode_1 = (texcount >= 2 && m_tmu[1].m_lodmin < (8 << 8)) ? m_tmu[1].m_reg.texture_mode().normalize() : 0xffffffff;
 
 	/* compute the hash */
 	hash = curinfo.compute_hash();
@@ -6300,32 +6266,32 @@ void voodoo_device::dump_rasterizer_stats()
 	}
 }
 
-voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_type(vdt)
-	, m_alt_regmap(0)
-	, m_chipmask(0)
-	, m_index(0)
-	, m_screen(nullptr)
-	, m_cpu(nullptr)
-	, m_freq(0)
-	, m_attoseconds_per_cycle(0)
-	, m_trigger(0)
-	, m_regaccess(nullptr)
-	, m_regnames(nullptr)
-	, m_last_status_pc(0)
-	, m_last_status_value(0)
-	, m_next_rasterizer(0)
-	, m_send_config(false)
-	, m_tmu_config(0)
-	, m_fbmem(0)
-	, m_tmumem0(0)
-	, m_tmumem1(0)
-	, m_vblank(*this)
-	, m_stall(*this)
-	, m_pciint(*this)
-	, m_screen_finder(*this, finder_base::DUMMY_TAG)
-	, m_cpu_finder(*this, finder_base::DUMMY_TAG)
+voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_type(vdt),
+	m_alt_regmap(0),
+	m_chipmask(0),
+	m_index(0),
+	m_screen(nullptr),
+	m_cpu(nullptr),
+	m_freq(0),
+	m_attoseconds_per_cycle(0),
+	m_trigger(0),
+	m_regaccess(nullptr),
+	m_regnames(nullptr),
+	m_last_status_pc(0),
+	m_last_status_value(0),
+	m_next_rasterizer(0),
+	m_send_config(false),
+	m_tmu_config(0),
+	m_fbmem(0),
+	m_tmumem0(0),
+	m_tmumem1(0),
+	m_vblank(*this),
+	m_stall(*this),
+	m_pciint(*this),
+	m_screen_finder(*this, finder_base::DUMMY_TAG),
+	m_cpu_finder(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -6400,16 +6366,16 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 
 void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
-	thread_stats_block &stats = m_thread_stats[threadid];
-	voodoo::fbz_mode const fbzmode(m_reg[fbzMode].u);
+	thread_stats_block &threadstats = m_thread_stats[threadid];
+	auto const fbzmode = m_reg.fbz_mode();
 	s32 startx = extent.startx;
 	s32 stopx = extent.stopx;
-	int scry, x;
+	int x;
 
 	/* determine the screen Y */
-	scry = y;
+	s32 scry = y;
 	if (fbzmode.y_origin())
-		scry = (m_fbi.yorigin - y);
+		scry = m_fbi.yorigin - y;
 
 	/* fill this RGB row */
 	if (fbzmode.rgb_buffer_mask())
@@ -6424,14 +6390,14 @@ void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &exte
 			*(u64 *)&dest[x] = expanded;
 		for ( ; x < stopx; x++)
 			dest[x] = ditherow[x & 3];
-		stats.pixels_out += stopx - startx;
+		threadstats.pixels_out += stopx - startx;
 	}
 
 	/* fill this dest buffer row */
 	if (fbzmode.aux_buffer_mask() && m_fbi.auxoffs != ~0)
 	{
-		u16 depth = m_reg[zaColor].u;
-		u64 expanded = ((u64)depth << 48) | ((u64)depth << 32) | ((u64)depth << 16) | (u64)depth;
+		u16 depth = m_reg.za_color();
+		u64 expanded = (u64(depth) << 48) | (u64(depth) << 32) | (u64(depth) << 16) | u64(depth);
 		u16 *dest = (u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels;
 
 		for (x = startx; x < stopx && (x & 3) != 0; x++)

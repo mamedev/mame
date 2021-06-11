@@ -60,7 +60,7 @@ static inline s32 fast_log2(double value, int offset)
 	// the maximum error using a 4 bit lookup from the mantissa is 0.0875, which is
 	// less than 1/2 lsb (0.125) for 2 bits of fraction
 	static u8 const s_log2_table[16] = { 0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244 };
-	return (exp << 8) + s_log2_table[ival & 15];
+	return (exp << 8) | s_log2_table[ival & 15];
 }
 
 
@@ -231,7 +231,7 @@ class dither_helper
 {
 public:
 	// constructor to pre-cache based on mode and Y coordinate
-	dither_helper(int y, fbz_mode const fbzmode, fog_mode const fogmode = fog_mode(0)) :
+	dither_helper(int y, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode = reg_fog_mode(0)) :
 		m_dither_lookup(nullptr),
 		m_dither_raw_4x4(&s_dither_matrix_4x4[(y & 3) * 4]),
 		m_dither_subtract(nullptr)
@@ -251,6 +251,13 @@ public:
 	{
 		u8 const *table = &m_dither_lookup[(x & 3) << 9];
 		return (table[r] << 11) | (table[g + 256] << 5) | table[b];
+	}
+
+	// apply dithering to a pixel in separate R/G/B format and assemble as 5-6-5
+	u16 pixel(s32 x, rgb_t color) const
+	{
+		u8 const *table = &m_dither_lookup[(x & 3) << 9];
+		return (table[color.r()] << 11) | (table[color.g() + 256] << 5) | table[color.b()];
 	}
 
 	// apply dithering to an rgbint_t pixel and assemble as 5-6-5
@@ -464,7 +471,7 @@ private:
  *
  *************************************/
 
-static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, voodoo::fbz_colorpath const fbzcp)
+static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, reg_fbz_colorpath const fbzcp)
 {
 	rgbaint_t result(iterargb);
 	result.shr_imm(20);
@@ -492,7 +499,7 @@ static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb
 	return result;
 }
 
-static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, voodoo::fbz_colorpath const fbzcp)
+static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const fbzcp)
 {
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
@@ -507,7 +514,7 @@ static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, voodoo::fbz_colorpath c
 	return result & 0xffff;
 }
 
-static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, voodoo::fbz_colorpath const fbzcp)
+static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const fbzcp)
 {
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
@@ -534,14 +541,14 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
 	thread_stats_block &threadstats,
 	rgbaint_t const &colorin)
 {
-	voodoo_reg color;
-	color.u = colorin.to_rgba();
+	rgb_t color = colorin.to_rgba();
 
 	// non-range version
-	voodoo::chroma_range chromarange(m_reg[chromaRange].u);
+	auto const chromakey = m_reg.chroma_key();
+	auto const chromarange = m_reg.chroma_range();
 	if (!chromarange.enable())
 	{
-		if (((color.u ^ m_reg[chromaKey].u) & 0xffffff) == 0)
+		if (((color ^ chromakey.argb()) & 0xffffff) == 0)
 		{
 			threadstats.chroma_fail++;
 			return false;
@@ -555,25 +562,25 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
 		int results;
 
 		// check blue
-		low = m_reg[chromaKey].rgb.b;
+		low = chromakey.blue();
 		high = chromarange.blue();
-		test = color.rgb.b;
+		test = color.b();
 		results = (test >= low && test <= high);
 		results ^= chromarange.blue_exclusive();
 		results <<= 1;
 
 		// check green
-		low = m_reg[chromaKey].rgb.g;
+		low = chromakey.green();
 		high = chromarange.green();
-		test = color.rgb.g;
+		test = color.g();
 		results |= (test >= low && test <= high);
 		results ^= chromarange.green_exclusive();
 		results <<= 1;
 
 		// check red
-		low = m_reg[chromaKey].rgb.r;
+		low = chromakey.red();
 		high = chromarange.red();
-		test = color.rgb.r;
+		test = color.r();
 		results |= (test >= low && test <= high);
 		results ^= chromarange.red_exclusive();
 
@@ -627,7 +634,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_mask_test(
 
 inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(
 	thread_stats_block &threadstats,
-	voodoo::alpha_mode const alphamode,
+	reg_alpha_mode const alphamode,
 	u8 alpha)
 {
 	switch (alphamode.alphafunction())
@@ -699,10 +706,10 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(
 
 inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
 	rgbaint_t &color,
-	voodoo::fbz_mode const fbzmode,
-	voodoo::alpha_mode const alphamode,
+	reg_fbz_mode const fbzmode,
+	reg_alpha_mode const alphamode,
 	s32 x,
-	voodoo::dither_helper const &dither,
+	dither_helper const &dither,
 	int dpix,
 	u16 *depth,
 	rgbaint_t const &prefog)
@@ -844,18 +851,18 @@ inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
 
 inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 	rgbaint_t &color,
-	voodoo::fbz_mode const fbzmode,
-	voodoo::fog_mode const fogmode,
-	voodoo::fbz_colorpath const fbzcp,
+	reg_fbz_mode const fbzmode,
+	reg_fog_mode const fogmode,
+	reg_fbz_colorpath const fbzcp,
 	s32 x,
-	voodoo::dither_helper const &dither,
+	dither_helper const &dither,
 	s32 wfloat,
 	s32 iterz,
 	s64 iterw,
 	rgbaint_t const &iterargb)
 {
 	// constant fog bypasses everything else
-	rgbaint_t fog_color_local(m_reg[fogColor].u);
+	rgbaint_t fog_color_local(m_reg.fog_color().argb());
 	if (fogmode.fog_constant())
 	{
 		// if fog_mult is 0, we add this to the original color
@@ -889,7 +896,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 
 				// add the bias for fog selection
 				if (fbzmode.enable_depth_bias())
-					fog_depth = std::clamp(fog_depth + s16(m_reg[zaColor].u), 0, 0xffff);
+					fog_depth = std::clamp(fog_depth + s16(m_reg.za_color()), 0, 0xffff);
 
 				// perform the multiply against lower 8 bits of wfloat
 				s32 delta = m_fbi.fogdelta[fog_depth >> 10];
@@ -948,15 +955,14 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 
 inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 	thread_stats_block &threadstats,
-	voodoo::fbz_mode const fbzmode,
+	reg_fbz_mode const fbzmode,
 	s32 x,
 	s32 scry)
 {
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
 	{
-		m_reg[stipple].u = (m_reg[stipple].u << 1) | (m_reg[stipple].u >> 31);
-		if (s32(m_reg[stipple].u) >= 0)
+		if (s32(m_reg.stipple_rotated()) >= 0)
 		{
 			threadstats.stipple_count++;
 			return false;
@@ -967,7 +973,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 	else
 	{
 		int stipple_index = ((scry & 3) << 3) | (~x & 7);
-		if (((m_reg[stipple].u >> stipple_index) & 1) == 0)
+		if (BIT(m_reg.stipple(), stipple_index) == 0)
 		{
 			threadstats.stipple_count++;
 			return false;
@@ -986,7 +992,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
 	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
 }
 
-inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode const fbzmode, voodoo::fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
+inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(reg_fbz_mode const fbzmode, reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
 {
 	s32 result;
 	if (fbzmode.wbuffer_select())
@@ -1007,7 +1013,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode co
 		result = clamped_z(iterz, fbzcp);
 
 	if (fbzmode.enable_depth_bias())
-		result = std::clamp(result + s16(m_reg[zaColor].u), 0, 0xffff);
+		result = std::clamp(result + s16(m_reg.za_color()), 0, 0xffff);
 
 	return result;
 }
@@ -1015,12 +1021,12 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(voodoo::fbz_mode co
 
 inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
 	thread_stats_block &threadstats,
-	voodoo::fbz_mode const fbzmode,
+	reg_fbz_mode const fbzmode,
 	s32 depthdest,
 	s32 depthval)
 {
 	// the source depth is either the iterated W/Z+bias or a constant value
-	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(m_reg[zaColor].u);
+	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(m_reg.za_color());
 
 	/* test against the depth buffer */
 	switch (fbzmode.depth_function())
@@ -1086,8 +1092,8 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
 
 inline void ATTR_FORCE_INLINE voodoo_device::write_pixel(
 	thread_stats_block &threadstats,
-	voodoo::fbz_mode const fbzmode,
-	voodoo::dither_helper const &dither,
+	reg_fbz_mode const fbzmode,
+	dither_helper const &dither,
 	u16 *destbase,
 	u16 *depthbase,
 	s32 x,
@@ -1155,8 +1161,8 @@ inline void ATTR_FORCE_INLINE voodoo_device::write_pixel(
 inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 	rgbaint_t &color,
 	thread_stats_block &threadstats,
-	voodoo::fbz_colorpath const fbzcp,
-	voodoo::fbz_mode const fbzmode,
+	reg_fbz_colorpath const fbzcp,
+	reg_fbz_mode const fbzmode,
 	rgbaint_t texel,
 	s32 iterz,
 	s64 iterw)
@@ -1174,7 +1180,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 2:     // color1 RGB
-			c_other.set(m_reg[color1].u);
+			c_other.set(m_reg.color1().argb());
 			break;
 
 		default:    // reserved - voodoo3 LFB RGB
@@ -1199,7 +1205,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 2:     // color1 alpha
-			c_other.set_a16(m_reg[color1].rgb.a);
+			c_other.set_a16(m_reg.color1().alpha());
 			break;
 
 		default:    // reserved - voodoo3  LFB Alpha
@@ -1219,14 +1225,14 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 		if (fbzcp.cc_localselect() == 0)    // iterated RGB
 			c_local.set(color);
 		else                                // color0 RGB
-			c_local.set(m_reg[color0].u);
+			c_local.set(m_reg.color0().argb());
 	}
 	else
 	{
 		if (!(texel.get_a() & 0x80))        // iterated RGB
 			c_local.set(color);
 		else                                // color0 RGB
-			c_local.set(m_reg[color0].u);
+			c_local.set(m_reg.color0().argb());
 	}
 
 	// compute a_local
@@ -1238,7 +1244,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 1:     // color0 alpha
-			c_local.set_a16(m_reg[color0].rgb.a);
+			c_local.set_a16(m_reg.color0().alpha());
 			break;
 
 		case 2:     // clamped iterated Z[27:20]
@@ -1381,7 +1387,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 
 
 
-inline rgb_t voodoo_device::tmu_state::lookup_single_texel(voodoo::texture_mode const texmode, u32 texbase, s32 s, s32 t)
+inline rgb_t voodoo_device::tmu_state::lookup_single_texel(reg_texture_mode const texmode, u32 texbase, s32 s, s32 t)
 {
 	if (texmode.format() < 8)
 		return m_lookup[*(u8 *)&m_ram[(texbase + t + s) & m_mask]];
@@ -1394,7 +1400,7 @@ inline rgb_t voodoo_device::tmu_state::lookup_single_texel(voodoo::texture_mode 
 	}
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo::texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
 {
 	lod = lodbase;
 
@@ -1506,7 +1512,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(voodoo:
 }
 
 inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
-	voodoo::texture_mode const texmode,
+	reg_texture_mode const texmode,
 	rgbaint_t const &c_local,
 	rgbaint_t const &c_other,
 	s32 lod)
@@ -1676,14 +1682,14 @@ template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, 
 void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	voodoo::texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : m_tmu[0].m_reg[textureMode].u);
-	voodoo::texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : m_tmu[1].m_reg[textureMode].u);
-	voodoo::fbz_colorpath const fbzcp(_FbzCp, m_reg[fbzColorPath].u);
-	voodoo::alpha_mode const alphamode(_AlphaMode, m_reg[alphaMode].u);
-	voodoo::fbz_mode const fbzmode(_FbzMode, m_reg[fbzMode].u);
-	voodoo::fog_mode const fogmode(_FogMode, m_reg[fogMode].u);
-	voodoo::stw_helper iterstw0, iterstw1;
-	voodoo::stw_helper deltastw0, deltastw1;
+	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : m_tmu[0].m_reg.texture_mode());
+	reg_texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : m_tmu[1].m_reg.texture_mode());
+	reg_fbz_colorpath const fbzcp(_FbzCp, m_reg.fbz_colorpath());
+	reg_alpha_mode const alphamode(_AlphaMode, m_reg.alpha_mode());
+	reg_fbz_mode const fbzmode(_FbzMode, m_reg.fbz_mode());
+	reg_fog_mode const fogmode(_FogMode, m_reg.fog_mode());
+	stw_helper iterstw0, iterstw1;
+	stw_helper deltastw0, deltastw1;
 
 	// determine the screen Y
 	s32 scry = y;
@@ -1699,14 +1705,14 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	if (fbzmode.enable_clipping())
 	{
 		// Y clipping buys us the whole scanline
-		if (scry < ((m_reg[clipLowYHighY].u >> 16) & 0x3ff) || scry >= (m_reg[clipLowYHighY].u & 0x3ff))
+		if (scry < m_reg.clip_top() || scry >= m_reg.clip_bottom())
 		{
 			threadstats.clip_fail += stopx - startx;
 			return;
 		}
 
 		// X clipping
-		s32 tempclip = m_reg[clipLeftRight].u & 0x3ff;
+		s32 tempclip = m_reg.clip_right();
 
 		// check for start outsize of clipping boundary
 		if (startx >= tempclip)
@@ -1723,7 +1729,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 		}
 
 		// clip the left side
-		tempclip = (m_reg[clipLeftRight].u >> 16) & 0x3ff;
+		tempclip = m_reg.clip_left();
 		if (startx < tempclip)
 		{
 			threadstats.clip_fail += tempclip - startx;
@@ -1769,7 +1775,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	extra.info->hits++;
 
 	// loop in X
-	voodoo::dither_helper dither(scry, fbzmode, fogmode);
+	dither_helper dither(scry, fbzmode, fogmode);
 	for (s32 x = startx; x < stopx; x++)
 	{
 		do
