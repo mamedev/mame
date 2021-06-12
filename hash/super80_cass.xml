@@ -174,13 +174,14 @@ X-3607 : Horse Race
 		<publisher>Bemak</publisher>
 		<info name="serial" value="403" />
 		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D,M" />
+		<sharedfeat name="compatibility" value="D" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15616026">
-				<rom name="zipzap.wav" size="15616026" crc="7bf30894" sha1="50fe59484b5eb39f37933f23754e7f1c2c0f322b"/>
+			<dataarea name="cass" size="0xfb7438">
+				<rom name="zipzap.wav" size="0xfb7438" crc="e57ca5d5" sha1="520753d06f6bd931ea4ea40c0929fa66ca8f41a6"/>
 			</dataarea>
 		</part>
 	</software>
+
 <!--
      Various homebrew programs for use with super80, super80d and super80e, recorded at 300 baud.
      Some are ok, some are junk.
@@ -534,32 +535,6 @@ X-3607 : Horse Race
 			</dataarea>
 		</part>
 	</software>
-	<software name="zipzapa" cloneof="zipzap">
-		<description>Zip Zap (sound fixed)</description>
-		<year>198?</year>
-		<publisher>Bemak</publisher>
-		<info name="serial" value="403a" />
-		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15618506">
-				<rom name="zipzapa.wav" size="15618506" crc="bb16ab34" sha1="6dc6209af690ccad61eb8aef0bb0509ab9743813"/>
-			</dataarea>
-		</part>
-	</software>
-	<software name="zipzap1" cloneof="zipzap">
-		<description>Zip Zap (R1)</description>
-		<year>198?</year>
-		<publisher>Bemak</publisher>
-		<info name="serial" value="403R1" />
-		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D,M" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15618496">
-				<rom name="zipzap1.wav" size="15618496" crc="5b98c625" sha1="871e278c0da48c236689fa7d20017d6f2ceb9c9b"/>
-			</dataarea>
-		</part>
-	</software>
 	<software name="zipzap2j" cloneof="zipzap">
 		<description>Zip Zap (R2)(with arrows)</description>
 		<year>198?</year>
@@ -568,8 +543,8 @@ X-3607 : Horse Race
 		<info name="usage" value="super80d only. L to load, G100 to run" />
 		<sharedfeat name="compatibility" value="D,M" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15621606">
-				<rom name="zipzap2j.wav" size="15621606" crc="89258a7f" sha1="c1e8eeed52ce98e65c35a12e65207aef681b2ac4"/>
+			<dataarea name="cass" size="0xfb8046">
+				<rom name="zipzap2j.wav" size="0xfb8046" crc="734039d9" sha1="7c936325937877582dd40098dcf20df3fbf46aae"/>
 			</dataarea>
 		</part>
 	</software>
