@@ -2513,8 +2513,11 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs just after starting a fight -->
-	<software name="asu120ex" supported="no">
+	<!-- 
+		Hangs just after starting a fight if there isn't a controller on port 2. This happens on real hardware
+		when there's a mouse on port 2, but it shouldn't happen if there's nothing connected.
+	-->
+	<software name="asu120ex" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Asuka 120% Excellent - Burning Fest. Excellent (Japan) (Track 01).bin" size="11830560" crc="2d5ade87" sha1="99314bca20b659f8fa0491db172a3a5a69dcda91"/>
