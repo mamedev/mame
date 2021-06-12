@@ -2513,11 +2513,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- 
-		Hangs just after starting a fight if there isn't a controller on port 2. This happens on real hardware
-		when there's a mouse on port 2, but it shouldn't happen if there's nothing connected.
-	-->
-	<software name="asu120ex" supported="partial">
+	<software name="asu120ex">
 		<!--
 		Origin: redump.org
 		<rom name="Asuka 120% Excellent - Burning Fest. Excellent (Japan) (Track 01).bin" size="11830560" crc="2d5ade87" sha1="99314bca20b659f8fa0491db172a3a5a69dcda91"/>
@@ -2545,7 +2541,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="MTC-1114"/>
 		<info name="alt_title" value="あすか 120% BURNING Fest. エクセレント" />
 		<info name="release" value="199412xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
@@ -21413,7 +21409,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing CDDA music during gameplay -->
+	<!-- Missing dialogue boxes -->
 	<software name="beast2" supported="partial">
 		<!--
 		Origin: redump.org
