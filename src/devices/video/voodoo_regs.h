@@ -125,7 +125,7 @@ public:
 	constexpr u32 cca_subpixel_adjust() const     { return BIT(m_value, 26, 1); }
 	constexpr u32 texture_enable() const          { return BIT(m_value, 27, 1); }
 	constexpr u32 rgbzw_clamp() const             { return BIT(m_value, 28, 1); }
-	constexpr u32 anti_alias() const              { return BIT(m_value, 29, 1); }
+	constexpr u32 antialias() const               { return BIT(m_value, 29, 1); }	// not implemented
 
 	constexpr u32 normalize()
 	{
@@ -193,12 +193,12 @@ public:
 		m_value(value) { }
 
 	constexpr reg_alpha_mode(u32 normalized, reg_alpha_mode const live) :
-		m_value((normalized == DECODE_LIVE) ? live.m_value : ((normalized & 0x00ffffff) | (live.m_value & 0xff000000))) { }
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 alphatest() const     { return BIT(m_value, 0, 1); }
 	constexpr u32 alphafunction() const { return BIT(m_value, 1, 3); }
 	constexpr u32 alphablend() const    { return BIT(m_value, 4, 1); }
-	constexpr u32 antialias() const     { return BIT(m_value, 5, 1); }
+	constexpr u32 antialias() const     { return BIT(m_value, 5, 1); }	// not implemented
 	constexpr u32 srcrgbblend() const   { return BIT(m_value, 8, 4); }
 	constexpr u32 dstrgbblend() const   { return BIT(m_value, 12, 4); }
 	constexpr u32 srcalphablend() const { return BIT(m_value, 16, 4); }
@@ -207,12 +207,11 @@ public:
 
 	constexpr u32 normalize()
 	{
-		// always ignore alpha ref value
-		u32 result = m_value & ~(0xff << 24);
+		u32 result = m_value;
 
-		// if not doing alpha testing, ignore the alpha function
+		// if not doing alpha testing, ignore the alpha function and referencevalue
 		if (!alphatest())
-			result &= ~(7 << 1);
+			result &= ~((7 << 1) | (0xff << 24));
 
 		// if not doing alpha blending, ignore the source and dest blending factors
 		if (!alphablend())
@@ -292,8 +291,8 @@ public:
 	constexpr u32 tca_reverse_blend() const    { return BIT(m_value, 26, 1); }
 	constexpr u32 tca_add_aclocal() const      { return BIT(m_value, 27, 2); }
 	constexpr u32 tca_invert_output() const    { return BIT(m_value, 29, 1); }
-	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }
-	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }
+	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }	// not implemented
+	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }	// repurposed as Voodoo 2 flag in rasterizers
 
 	constexpr u32 normalize()
 	{
@@ -321,8 +320,13 @@ private:
 class reg_texture_lod
 {
 public:
+	static constexpr u32 DECODE_LIVE = 0xfffffffe;
+
 	constexpr reg_texture_lod(u32 value) :
 		m_value(value) { }
+
+	constexpr reg_texture_lod(u32 normalized, reg_texture_lod const live) :
+		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
 	constexpr u32 lod_min() const        { return BIT(m_value, 0, 6); }
 	constexpr u32 lod_max() const        { return BIT(m_value, 6, 6); }
@@ -337,6 +341,12 @@ public:
 	constexpr u32 tdata_swap() const     { return BIT(m_value, 26, 1); }
 	constexpr u32 tdirect_write() const  { return BIT(m_value, 27, 1); }  // Voodoo 2 only
 	constexpr u32 magic() const          { return BIT(m_value, 28, 4); }
+
+	constexpr u32 normalize()
+	{
+		// always normalize to 0 for now
+		return 0;
+	}
 
 private:
 	u32 m_value;

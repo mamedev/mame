@@ -196,30 +196,6 @@ inline u32 voodoo::fifo_state::remove()
 
 
 
-/*************************************
- *
- *  Rasterizer inlines
- *
- *************************************/
-
-constexpr u32 voodoo_device::static_raster_info::compute_hash() const
-{
-	u32 result = eff_color_path;
-	result = (result << 1) | (result >> 31);
-	result ^= eff_fbz_mode;
-	result = (result << 1) | (result >> 31);
-	result ^= eff_alpha_mode;
-	result = (result << 1) | (result >> 31);
-	result ^= eff_fog_mode;
-	result = (result << 1) | (result >> 31);
-	result ^= eff_tex_mode_0;
-	result = (result << 1) | (result >> 31);
-	result ^= eff_tex_mode_1;
-	return result % RASTER_HASH_SIZE;
-}
-
-
-
 //**************************************************************************
 //  DITHER HELPER
 //**************************************************************************
@@ -851,6 +827,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
 
 inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 	rgbaint_t &color,
+	poly_extra_data const &extra,
 	reg_fbz_mode const fbzmode,
 	reg_fog_mode const fogmode,
 	reg_fbz_colorpath const fbzcp,
@@ -896,7 +873,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 
 				// add the bias for fog selection
 				if (fbzmode.enable_depth_bias())
-					fog_depth = std::clamp(fog_depth + s16(m_reg.za_color()), 0, 0xffff);
+					fog_depth = std::clamp(fog_depth + s16(extra.zacolor), 0, 0xffff);
 
 				// perform the multiply against lower 8 bits of wfloat
 				s32 delta = m_fbi.fogdelta[fog_depth >> 10];
@@ -992,7 +969,12 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
 	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
 }
 
-inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(reg_fbz_mode const fbzmode, reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
+inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(
+	poly_extra_data const &extra,
+	reg_fbz_mode const fbzmode,
+	reg_fbz_colorpath const fbzcp,
+	s32 wfloat,
+	s32 iterz)
 {
 	s32 result;
 	if (fbzmode.wbuffer_select())
@@ -1013,7 +995,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(reg_fbz_mode const 
 		result = clamped_z(iterz, fbzcp);
 
 	if (fbzmode.enable_depth_bias())
-		result = std::clamp(result + s16(m_reg.za_color()), 0, 0xffff);
+		result = std::clamp(result + s16(extra.zacolor), 0, 0xffff);
 
 	return result;
 }
@@ -1021,12 +1003,13 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(reg_fbz_mode const 
 
 inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
 	thread_stats_block &threadstats,
+	poly_extra_data const &extra,
 	reg_fbz_mode const fbzmode,
 	s32 depthdest,
 	s32 depthval)
 {
 	// the source depth is either the iterated W/Z+bias or a constant value
-	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(m_reg.za_color());
+	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(extra.zacolor);
 
 	/* test against the depth buffer */
 	switch (fbzmode.depth_function())
@@ -1161,6 +1144,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::write_pixel(
 inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 	rgbaint_t &color,
 	thread_stats_block &threadstats,
+	poly_extra_data const &extra,
 	reg_fbz_colorpath const fbzcp,
 	reg_fbz_mode const fbzmode,
 	rgbaint_t texel,
@@ -1180,7 +1164,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 2:     // color1 RGB
-			c_other.set(m_reg.color1().argb());
+			c_other.set(extra.color1);
 			break;
 
 		default:    // reserved - voodoo3 LFB RGB
@@ -1205,7 +1189,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 2:     // color1 alpha
-			c_other.set_a16(m_reg.color1().alpha());
+			c_other.set_a16(extra.color1.a());
 			break;
 
 		default:    // reserved - voodoo3  LFB Alpha
@@ -1225,14 +1209,14 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 		if (fbzcp.cc_localselect() == 0)    // iterated RGB
 			c_local.set(color);
 		else                                // color0 RGB
-			c_local.set(m_reg.color0().argb());
+			c_local.set(extra.color0);
 	}
 	else
 	{
 		if (!(texel.get_a() & 0x80))        // iterated RGB
 			c_local.set(color);
 		else                                // color0 RGB
-			c_local.set(m_reg.color0().argb());
+			c_local.set(extra.color0);
 	}
 
 	// compute a_local
@@ -1244,7 +1228,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 			break;
 
 		case 1:     // color0 alpha
-			c_local.set_a16(m_reg.color0().alpha());
+			c_local.set_a16(extra.color0.a());
 			break;
 
 		case 2:     // clamped iterated Z[27:20]
@@ -1682,12 +1666,12 @@ template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, 
 void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : m_tmu[0].m_reg.texture_mode());
-	reg_texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : m_tmu[1].m_reg.texture_mode());
-	reg_fbz_colorpath const fbzcp(_FbzCp, m_reg.fbz_colorpath());
-	reg_alpha_mode const alphamode(_AlphaMode, m_reg.alpha_mode());
-	reg_fbz_mode const fbzmode(_FbzMode, m_reg.fbz_mode());
-	reg_fog_mode const fogmode(_FogMode, m_reg.fog_mode());
+	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : reg_texture_mode(extra.u.raster.m_texmode0));
+	reg_texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : reg_texture_mode(extra.u.raster.m_texmode1));
+	reg_fbz_colorpath const fbzcp(_FbzCp, reg_fbz_colorpath(extra.u.raster.m_fbzcp));
+	reg_alpha_mode const alphamode(_AlphaMode, reg_alpha_mode(extra.u.raster.m_alphamode));
+	reg_fbz_mode const fbzmode(_FbzMode, reg_fbz_mode(extra.u.raster.m_fbzmode));
+	reg_fog_mode const fogmode(_FogMode, reg_fog_mode(extra.u.raster.m_fogmode));
 	stw_helper iterstw0, iterstw1;
 	stw_helper deltastw0, deltastw1;
 
@@ -1788,10 +1772,10 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 			s32 wfloat = compute_wfloat(iterw);
 
 			// compute depth value (W or Z) for this pixel
-			s32 depthval = compute_depthval(fbzmode, fbzcp, wfloat, iterz);
+			s32 depthval = compute_depthval(extra, fbzmode, fbzcp, wfloat, iterz);
 
 			// depth testing
-			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], depthval))
+			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, extra, fbzmode, depth[x], depthval))
 				break;
 
 			// run the texture pipeline on TMU1 to produce a value in texel
@@ -1820,7 +1804,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 
 			// colorpath pipeline selects source colors and does blending
 			rgbaint_t color = clamped_argb(iterargb, fbzcp);
-			if (!combine_color(color, threadstats, fbzcp, fbzmode, texel, iterz, iterw))
+			if (!combine_color(color, threadstats, extra, fbzcp, fbzmode, texel, iterz, iterw))
 				break;
 
 			// handle alpha test
@@ -1830,7 +1814,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 			// perform fogging
 			rgbaint_t prefog(color);
 			if (fogmode.enable_fog())
-				apply_fogging(color, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
+				apply_fogging(color, extra, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
 
 			// perform alpha blending
 			if (alphamode.alphablend())
