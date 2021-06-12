@@ -440,7 +440,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 			{
 				// cursor off, character blink
 				if (!cursor)
-					pixel = m_cursor ? pixel : 0;
+					pixel = m_cursor ? 1 : pixel;
 
 				// cursor blink
 				if (cursor && (cl == m_cp))
