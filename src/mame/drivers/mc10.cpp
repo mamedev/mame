@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
 
 #include "cpu/m6800/m6801.h"
@@ -27,6 +26,7 @@
 
 void mc10_cart(device_slot_interface &device);
 void alice_cart(device_slot_interface &device);
+void alice32_cart(device_slot_interface &device);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -98,6 +98,7 @@ public:
 	{}
 
 	void alice32(machine_config &config);
+	void alice90(machine_config &config);
 
 protected:
 	// device-level overrides
@@ -244,6 +245,11 @@ void alice_cart(device_slot_interface &device)
 	alice_cart_add_basic_devices(device);
 }
 
+void alice32_cart(device_slot_interface &device)
+{
+	alice32_cart_add_basic_devices(device);
+}
+
 void mc10_state::driver_reset()
 {
 	/* initialize keyboard strobe */
@@ -263,7 +269,7 @@ void mc10_state::driver_start()
 
 	// don't step on hardware page at 0xbf00
 	if (ram_size == 0x8000)
-		ram_size -= 0xff;
+		ram_size -= 0x100;
 
 	space.install_ram(0x4000, 0x4000+ram_size-1, m_ram->pointer());
 }
@@ -289,9 +295,8 @@ void alice32_state::driver_start()
 void mc10_state::mc10_mem(address_map &map)
 {
 	// mc10 / alice: RAM start at 0x4000, installed in driver_start
-	// alice32 / 90: RAM start at 0x3000, installed in driver_start
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(mc10_state::mc10_bfff_w));
-	map(0xe000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
 void alice32_state::alice32_mem(address_map &map)
@@ -299,7 +304,7 @@ void alice32_state::alice32_mem(address_map &map)
 	// alice32 / 90: RAM start at 0x3000, installed in driver_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(alice32_state::alice32_bfff_w));
-	map(0xc000, 0xffff).rom().region("maincpu", 0x0000); /* ROM */
+	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
 /***************************************************************************
@@ -501,7 +506,7 @@ void mc10_state::mc10_base(machine_config &config)
 	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.0625);
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(coco_cassette_formats);
+	m_cassette->set_formats(alice32_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
 	m_cassette->set_interface("mc10_cass");
@@ -571,12 +576,28 @@ void alice32_state::alice32(machine_config &config)
 	m_ef9345->set_palette_tag("palette");
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);
 
+	/* expansion port hardware */
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice32_cart, "pak"));
+	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
+	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("24K");
+	RAM(config, m_ram).set_default_size("8K").set_extra_options("24K");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("alice32");
 	SOFTWARE_LIST(config, "mc10_cass").set_compatible("mc10");
+}
+
+void alice32_state::alice90(machine_config &config)
+{
+	alice32(config);
+
+	m_ram->set_default_size("32K");
+
+	/* Software lists */
+	subdevice<software_list_device>("cass_list")->set_original("alice90");
+	SOFTWARE_LIST(config, "alice32_cass").set_compatible("alice32");
+	config.device_remove("mc10_cass");
 }
 
 /***************************************************************************
@@ -601,6 +622,14 @@ ROM_START( alice32 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
 
+ROM_START( alice90 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("alice90.rom", 0x0000, 0x4000, CRC(d0a874bb) SHA1(a65c7be2d516bed2584c51c1ef78b045b91faef6))
+
+	ROM_REGION( 0x2000, "ef9345", 0 )
+	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
+ROM_END
+
 /***************************************************************************
     GAME DRIVERS
 ***************************************************************************/
@@ -609,3 +638,4 @@ ROM_END
 COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state,    empty_init, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
 COMP( 1983, alice,   mc10,    0,      alice,   alice, mc10_state,    empty_init, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
 COMP( 1984, alice32, 0,       0,      alice32, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

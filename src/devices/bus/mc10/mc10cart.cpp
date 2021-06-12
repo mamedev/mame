@@ -216,13 +216,24 @@ void mc10_cart_add_basic_devices(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  mc10_cart_add_basic_devices
+//  alice_cart_add_basic_devices
 //-------------------------------------------------
 
 void alice_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices
 	device.option_add("alice128", ALICE_PAK_MCX128);
+	device.option_add("pak", MC10_PAK);
+	device.option_add("ram", MC10_PAK_RAM);
+}
+
+//-------------------------------------------------
+//  alice32_cart_add_basic_devices
+//-------------------------------------------------
+
+void alice32_cart_add_basic_devices(device_slot_interface &device)
+{
+	// basic devices
 	device.option_add("pak", MC10_PAK);
 	device.option_add("ram", MC10_PAK_RAM);
 }

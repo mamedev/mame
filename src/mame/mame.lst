@@ -22414,7 +22414,7 @@ mbeett                          // Microbee Teleterm
 @source:mc10.cpp
 alice                           // Matra & Hachette Ordinateur Alice
 alice32                         // Matra & Hachette Alice 32
-// alice90                         // Matra & Hachette Alice 90
+alice90                         // Matra & Hachette Alice 90
 mc10                            // MC-10
 
 @source:mc1000.cpp
