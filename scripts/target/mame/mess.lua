@@ -814,6 +814,7 @@ MACHINES["CXD1185"] = true
 MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
+MACHINES["NS32082"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1569,6 +1570,8 @@ files {
 	MAME_DIR .. "src/mame/machine/315-5881_crypt.h",
 	MAME_DIR .. "src/mame/machine/315-6154.cpp",
 	MAME_DIR .. "src/mame/machine/315-6154.h",
+	MAME_DIR .. "src/mame/machine/segashiobd.cpp",
+	MAME_DIR .. "src/mame/machine/segashiobd.h",
 	MAME_DIR .. "src/mame/video/powervr2.cpp",
 	MAME_DIR .. "src/mame/video/powervr2.h",
 	MAME_DIR .. "src/mame/drivers/neogeo.cpp",
@@ -2489,6 +2492,8 @@ files {
 createMESSProjects(_target, _subtarget, "funtech")
 files {
 	MAME_DIR .. "src/mame/drivers/supracan.cpp",
+	MAME_DIR .. "src/mame/audio/acan.cpp",
+	MAME_DIR .. "src/mame/audio/acan.h",
 }
 
 createMESSProjects(_target, _subtarget, "galaxy")

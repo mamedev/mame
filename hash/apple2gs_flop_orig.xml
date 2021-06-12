@@ -1,0 +1,2077 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="apple2gs_flop_orig" description="Apple IIgs 3.5&quot; original disks">
+
+	<software name="rastan">
+		<description>Rastan</description>
+		<year>1990</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2021-05-01"/>
+		<info name="programmer" value="John Brooks"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. (Music requires 1.25MB.) -->
+		<!--"Rastan" is a 1990 action game developed by John Brooks and distributed by Taito. It requires a 1MB Apple IIgs. (Music requires 1.25MB.)-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296132">
+				<rom name="rastan - disk 1.woz" size="1296132" crc="9759082b" sha1="3b7ddc2326d351f7de2f018229db5a49f1090b52"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296132">
+				<rom name="rastan - disk 2.woz" size="1296132" crc="a567351e" sha1="c50fa172350be0c154182b1b86b65b210ff452af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanygolf">
+		<description>Zany Golf</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-05-02"/>
+		<info name="programmer" value="Will Harvey, Jim Nitchals, Ian Gooding, and Doug Fulton"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Zany Golf" is a 1988 sports game developed by Will Harvey, Jim Nitchals, Ian Gooding, and Doug Fulton, and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296664">
+				<rom name="zany golf.woz" size="1296664" crc="eac4563c" sha1="4eae45a425ec065a35fca3955ce3d7be1da6082f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marble">
+		<description>Marble Madness</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-05-02"/>
+		<info name="programmer" value="Will Harvey"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Marble Madness" is a 1986 action game developed by Will Harvey and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296646">
+				<rom name="marble madness.woz" size="1296646" crc="84fe02b8" sha1="af8014fdb42321f0d75f4bea1e69cf0923904b05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qix">
+		<description>Qix</description>
+		<year>1990</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2021-05-02"/>
+		<info name="programmer" value="Ryan Ridges and John Lund"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- Redumped on May 3rd 2021. -->
+		<!--"Qix" is a 1990 action game developed by Ryan Ridges and John Lund, and distributed by Taito. It requires a 512K Apple IIgs.-->
+
+		<part name="flop0" interface="floppy_3_5">
+			<dataarea name="flop" size="1296123">
+				<rom name="qix iigs.woz" size="1296123" crc="6955cd6b" sha1="fb20f487be264892bf3828ec8a5c8cabb57f751c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tasstime">
+		<description>Tass Times in Tonetown</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-05-02"/>
+		<info name="programmer" value="Rebecca Heineman, Todd Camasta, Russell Lieblich, Brian Fargo, and Steve Nielsen"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Tass Times in Tonetown" is a 1986 adventure game developed by Rebecca Heineman, Todd Camasta, Russell Lieblich, Brian Fargo, and Steve Nielsen, and distributed by Activision. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296183">
+				<rom name="tass times in tonetown iigs.woz" size="1296183" crc="2b497d3e" sha1="d87988fa71bbe2f8b65f69af2eab6ed38da3952c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wldgames">
+		<description>World Games</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-02"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"World Games" is a 1987 sports game developed by Westwood and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296615">
+				<rom name="world games iigs.woz" size="1296615" crc="b8e2d858" sha1="42dade566f712f07d2cb30d03256943fe42fd1a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntlet">
+		<description>Gauntlet</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-02"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Gauntlet" is a 1988 action game distributed by Mindscape. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1317604">
+				<rom name="gauntlet iigs.woz" size="1317604" crc="fbeb429a" sha1="4df82855dd2924509681ea5a9a138aa7edce8b53"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btlchess">
+		<description>Battle Chess</description>
+		<year>1989</year>
+		<publisher>Interplay</publisher>
+		<info name="release" value="2021-05-03"/>
+		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Battle Chess" is a 1989 board game developed by Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish, and distributed by Interplay. It requires a 512K Apple IIgs. The manual at https://archive.org/details/Battle_Chess_Manual contains the information you need for the copy protection questions -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345420">
+				<rom name="battle chess iigs.woz" size="1345420" crc="9e5f4c69" sha1="2b2e8bb5c8dea141b1ec956719646e612cf89451"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bjacadmy">
+		<description>Blackjack Academy</description>
+		<year>1987</year>
+		<publisher>MicroIllusions</publisher>
+		<info name="release" value="2021-05-03"/>
+		<info name="programmer" value="Dennis Saunders, PhD., Al Cheser, Allen Doum, Bob Green, Kevin Hammel, Jim Lawton, and Sandy Wardak"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Blackjack Academy" is a 1987 card game developed by Dennis Saunders, PhD., Al Cheser, Allen Doum, Bob Green, Kevin Hammel, Jim Lawton, and Sandy Wardak, and distributed by MicroIllusions. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296198">
+				<rom name="blackjack academy iigs.woz" size="1296198" crc="339444f3" sha1="4665623a012536cb00e29f3c9ea1e8e3d73433f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockout">
+		<description>Block Out</description>
+		<year>1989</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-05-03"/>
+		<info name="programmer" value="Alexander Ustaszewski, Marek Jackiewicz, Adam Skorupinski, Marcin Szostakowski, and Marcin Grzegorzewski"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Block Out" is a 1989 action game developed by Alexander Ustaszewski, Marek Jackiewicz, Adam Skorupinski, Marcin Szostakowski, and Marcin Grzegorzewski, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345334">
+				<rom name="block out iigs.woz" size="1345334" crc="1fb55ba8" sha1="e7a299effa226f97a5563e604da6b1c20ddcc203"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenocide">
+		<description>Xenocide</description>
+		<year>1989</year>
+		<publisher>Micro Revelations</publisher>
+		<info name="release" value="2021-05-03"/>
+		<info name="programmer" value="Brian Greenstone and Dave Triplett"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Xenocide" is a 1989 action game developed by Brian Greenstone and Dave Triplett, and distributed by Micro Revelations. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296149">
+				<rom name="xenocide iigs.woz" size="1296149" crc="1fae49eb" sha1="b7105d6896f5ce270a72249cfaaa6509c60b8910"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienmnd">
+		<description>Alien Mind</description>
+		<year>1988</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-05-04"/>
+		<info name="programmer" value="Rob Karr and Matt Crysdale"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Alien Mind" is a 1988 action game developed by Rob Karr and Matt Crysdale, and distributed by PBI Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1312512">
+				<rom name="alien mind iigs - disk 1.woz" size="1312512" crc="b82a889f" sha1="5b8c9377ee4f0d35d879ac063f0a02ca82d4fe4d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1312512">
+				<rom name="alien mind iigs - disk 2.woz" size="1312512" crc="ee584aad" sha1="e32a4e473d3af9a80e6c2e0b20bf747bcd99ee7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldrush">
+		<description>Gold Rush!</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-04"/>
+		<info name="programmer" value="Ken MacNeill, Doug MacNeill, Jeff Stephenson, Chris Iden, Robert Heitman, and Anita Scott"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Gold Rush!" is a 1988 adventure game developed by Ken MacNeill, Doug MacNeill, Jeff Stephenson, Chris Iden, Robert Heitman, and Anita Scott, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296214">
+				<rom name="gold rush iigs - disk 1.woz" size="1296214" crc="0cc92f73" sha1="68975f2ed33b8a430f7612c54bb307c5d05b9178"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296214">
+				<rom name="gold rush iigs - disk 2.woz" size="1296214" crc="b69bd9ee" sha1="af68d86f926c04cd1bdc9fb9adb05fb974f929f2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1296214">
+				<rom name="gold rush iigs - disk 3.woz" size="1296214" crc="ce77925c" sha1="2c41022d0dcdfca9349e8ed3cc805d38ca329ab4"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1296214">
+				<rom name="gold rush iigs - disk 4.woz" size="1296214" crc="5a7a5ddc" sha1="6ae6d46904c3fd555bb85a612cdf2afbf2a58f5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvite">
+		<description>Uninvited</description>
+		<year>1988</year>
+		<publisher>ICOM Simulations</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Craig Erickson, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldemar Horwat, Mark Waterman, Tod Zipnick, and Billy Wolf"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Uninvited" is a 1988 adventure game developed by Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Craig Erickson, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldemar Horwat, Mark Waterman, Tod Zipnick, and Billy Wolf, and distributed by ICOM Simulations. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1361814">
+				<rom name="uninvited iigs - disk 1.woz" size="1361814" crc="07605702" sha1="ca2345614a6f90d77545eeae08b154849b4a30fb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1361814">
+				<rom name="uninvited iigs - disk 2.woz" size="1361814" crc="eee5e464" sha1="25166f40af6859bb835f63f79f61ee431e1a638e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavcobra">
+		<description>Cavern Cobra</description>
+		<year>1987</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Greg Hale and Richard L. Seaborne"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Cavern Cobra" is a 1987 action game developed by Greg Hale and Richard L. Seaborne, and distributed by PBI Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296147">
+				<rom name="cavern cobra iigs.woz" size="1296147" crc="f2ba82bb" sha1="bbca27646cf2fb2fdb72a8500ef204f8ca2afa31"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardball">
+		<description>Hardball!</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Dan Thompson, Ed Bogas, John Boechler, and Mike Benna"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Hardball!" is a 1987 sports game developed by Dan Thompson, Ed Bogas, John Boechler, and Mike Benna, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296700">
+				<rom name="hardball iigs.woz" size="1296700" crc="a9e23a1c" sha1="8849b47b90a09cdb9fc2daf419d06bcf9ac0253f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taskfrce">
+		<description>Task Force</description>
+		<year>1990</year>
+		<publisher>Britannica Software</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Scott L. Patterson, Matthew Crysdale, and Gregory A. Thomas"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Task Force" is a 1990 action game developed by Scott L. Patterson, Matthew Crysdale, and Gregory A. Thomas, and distributed by Britannica Software. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296174">
+				<rom name="task force iigs - disk 1.woz" size="1296174" crc="ccd9125c" sha1="567c8645dc377965fcddc1a3ab077fc82986a760"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296174">
+				<rom name="task force iigs - disk 2.woz" size="1296174" crc="26a2e3a7" sha1="21aa9f4fdae6b06a2a9cdffa3b0e2138a78a4b9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shdwgate">
+		<description>Shadowgate</description>
+		<year>1988</year>
+		<publisher>ICOM Simulations</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldemar Horwat, Tod Zipnick, and David Feldman"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Shadowgate" is a 1988 adventure game developed by Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldemar Horwat, Tod Zipnick, and David Feldman, and distributed by ICOM Simulations. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1361803">
+				<rom name="shadowgate iigs - disk 1.woz" size="1361803" crc="c1fedf06" sha1="da9a08f82c3fadbf27f9635d8d92488597635ab3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1361803">
+				<rom name="shadowgate iigs - disk 2.woz" size="1361803" crc="f2107036" sha1="ec055731dc9a699b1334b57a02341198826e8527"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="srvvly">
+		<description>Serve and Volley</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Rick Banks, Paul Butler, Ken Shimizu, Danny Chin, Paul Battersby, Jeffrey J. Sigler, Grant Campbell, and Jay Stevens"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Serve and Volley" is a 1988 sports game developed by Rick Banks, Paul Butler, Ken Shimizu, Danny Chin, Paul Battersby, Jeffrey J. Sigler, Grant Campbell, and Jay Stevens, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296733">
+				<rom name="serve and volley iigs.woz" size="1296733" crc="76ec3fda" sha1="f53a7e722df11e8ad5103f9da3c9f45a9848844e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calgames">
+		<description>California Games</description>
+		<year>1988</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-07"/>
+		<info name="programmer" value="Jimmy Huey, Dan Chang, Jenny Martin, Sheryl Knowles, Bill Bogenreif, Matt Householder, and Ron Fortier"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"California Games" is a 1988 sports game developed by Jimmy Huey, Dan Chang, Jenny Martin, Sheryl Knowles, Bill Bogenreif, Matt Householder, and Ron Fortier, and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296704">
+				<rom name="california games iigs.woz" size="1296704" crc="4f648119" sha1="a4ea74ff59efe247e2ec14efe229bf61a41e6444"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seastrke">
+		<description>Sea Strike</description>
+		<year>1987</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-05-09"/>
+		<info name="programmer" value="Richard L. Seaborne, Jeff A. Lefferts, and Mei-Ying Dell'Aquila"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Sea Strike" is a 1987 action game developed by Richard L. Seaborne, Jeff A. Lefferts, and Mei-Ying Dell'Aquila, and distributed by PBI Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296185">
+				<rom name="sea strike iigs.woz" size="1296185" crc="1b1e0b06" sha1="e5401ccf01ad10fc18e771c1c7c02db23c485151"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="td2">
+		<description>The Duel: Test Drive II</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-10"/>
+		<info name="programmer" value="Allan Johnson, Erik Kiss, Amory Wong, Don Mattrick, Rick Friesen, Bruce Dawson, Randy Dillon, Brad Gour, Kris Hatlelid, Chris Taylor, John Boechler, Tony Lee, and Theresa Henry"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Duel: Test Drive II" is a 1989 racing simulation game developed by Allan Johnson, Erik Kiss, Amory Wong, Don Mattrick, Rick Friesen, Bruce Dawson, Randy Dillon, Brad Gour, Kris Hatlelid, Chris Taylor, John Boechler, Tony Lee, and Theresa Henry, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program disk"/>
+			<dataarea name="flop" size="1296794">
+				<rom name="the duel - test drive ii iigs.woz" size="1296794" crc="614012e4" sha1="bb4bad896deed98d3e9b36519b392761ab96a37d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="California challenge disk"/>
+			<dataarea name="flop" size="1296814">
+				<rom name="the duel - test drive ii iigs - california challenge.woz" size="1296814" crc="2847a06b" sha1="c78e98465fb704d6a7f5bc3cde19d00525e10fda"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Muscle cars disk"/>
+			<dataarea name="flop" size="1296827">
+				<rom name="the duel - test drive ii iigs - the muscle cars.woz" size="1296827" crc="ca2bcddf" sha1="546bd8f31e0cd5b2dc15d2e817fc755229fb18e7"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Supercars disk"/>
+			<dataarea name="flop" size="1296807">
+				<rom name="the duel - test drive ii iigs - the supercars.woz" size="1296807" crc="f950b388" sha1="b8fe02167c33821d8a19badf157df95e639f0232"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keef">
+		<description>Keef the Thief</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-05-10"/>
+		<info name="programmer" value="Andy Gavin and Jason Rubin"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Keef the Thief" is a 1989 roleplaying game developed by Andy Gavin and Jason Rubin, and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1312659">
+				<rom name="keef the thief iigs - disk 1 - program disk.woz" size="1312659" crc="9ebed3ef" sha1="856928857d778dace377a99a86657cf1a87b4064"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Art disk"/>
+			<dataarea name="flop" size="1312605">
+				<rom name="keef the thief iigs - disk 2 - art disk.woz" size="1312605" crc="561496ac" sha1="78d9793b3fb4b536d4d5411315e3cc144e492472"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gpcirc">
+		<description>Grand Prix Circuit</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-11"/>
+		<info name="programmer" value="Don Mattrick, Brad Gour, Allan Johanson, Erik Kiss, Amory Wong, Rick Friesen, and Kris Hatlelid"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Grand Prix Circuit" is a 1989 racing simulation game developed by Don Mattrick, Brad Gour, Allan Johanson, Erik Kiss, Amory Wong, Rick Friesen, and Kris Hatlelid, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296752">
+				<rom name="grand prix circuit iigs.woz" size="1296752" crc="a895e303" sha1="18237633ba940ffea726867aba4b3a53445b7ea7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crstlqst">
+		<description>Crystal Quest</description>
+		<year>1989</year>
+		<publisher>Cassidy and Greene</publisher>
+		<info name="release" value="2021-05-11"/>
+		<info name="programmer" value="Patrick Buckland, Rebecca Heineman, Mike 'Jed' Patrick, and Scott Everts"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Crystal Quest" is a 1989 action game developed by Patrick Buckland, Rebecca Heineman, Mike 'Jed' Patrick, and Scott Everts, and distributed by Cassidy and Greene. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296189">
+				<rom name="crystal quest iigs.woz" size="1296189" crc="3b20d9f8" sha1="a386037d68945ac452fd1a6403276531f33672fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss2">
+		<description>Impossible Mission II</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-11"/>
+		<info name="programmer" value="Istvan Cseri, Gyula Horvath, Pal Komondi, and Sultan"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Impossible Mission II" is a 1989 action game developed by Istvan Cseri, Gyula Horvath, Pal Komondi, and Sultan, and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296662">
+				<rom name="impossible mission ii iigs.woz" size="1296662" crc="fdc001f2" sha1="db6c4c217013a1a4c1b89c87d0956c7a8b21df7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lstninja">
+		<description>The Last Ninja</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-05-11"/>
+		<info name="programmer" value="Jeff Silverman, John Kroeckel, J. David Koch, Erol Otus, Doug Barnett, Russell Lieblich, and Nicky Robinson"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Last Ninja" is a 1988 action game developed by Jeff Silverman, John Kroeckel, J. David Koch, Erol Otus, Doug Barnett, Russell Lieblich, and Nicky Robinson, and distributed by Activision. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312599">
+				<rom name="the last ninja iigs.woz" size="1312599" crc="ed5aaf38" sha1="15500a6600c806a683148297a32314b1d63116e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redoctbr">
+		<description>The Hunt for Red October</description>
+		<year>1989</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-05-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"The Hunt for Red October" is a 1989 simulation game developed by John Brooks, Todd Daugherty, and Alex Villagran, and distributed by The Software Toolworks. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1343773">
+				<rom name="the hunt for red october iigs.woz" size="1343773" crc="60d2cfa9" sha1="5a80858e78527d2fe19c8e7c94785d2ecbc39a4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finalass">
+		<description>Final Assault</description>
+		<year>1988</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Final Assault" is a 1988 sports game developed by Infogrames and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296633">
+				<rom name="final assault iigs.woz" size="1296633" crc="968a15df" sha1="214b086187df5d1122bbe84b557bb83d09546e49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkcstl">
+		<description>Dark Castle</description>
+		<year>1989</year>
+		<publisher>Three Sixty</publisher>
+		<info name="release" value="2021-05-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Dark Castle" is a 1989 action game developed by Lane Roathe and distributed by Three Sixty. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="1296175">
+				<rom name="dark castle iigs - disk a.woz" size="1296175" crc="930aae1a" sha1="22338f47ccb798018cbf70d2b8f4fa93ba4273ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="1296175">
+				<rom name="dark castle iigs - disk b.woz" size="1296175" crc="3b075e18" sha1="336fe7b7bfa5acb39abb4b3fe803938557f244e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slntsvce">
+		<description>Silent Service</description>
+		<year>1987</year>
+		<publisher>Microprose</publisher>
+		<info name="release" value="2021-05-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Silent Service" is a 1987 simulation game developed by Sid Meier, Ed Magnin, Jim Synoski, Michael Haire, Michele Mahan, Silas Warner, Al Roireau, Larry Martin, and Edward Bever, and distributed by Microprose. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296228">
+				<rom name="silent service iigs.woz" size="1296228" crc="37087af8" sha1="587219bfd6f4ada98b6e0805998d74b5436c27c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gate">
+		<description>GATE</description>
+		<year>1992</year>
+		<publisher>Seven Hills Software</publisher>
+		<info name="release" value="2021-05-18"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"GATE" is a 1992 action game developed by Henrik Gudat, Jörg Kienzle, and Yann Le Tensorer, and distributed by Seven Hills Software. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296141">
+				<rom name="gate iigs - disk 1.woz" size="1296141" crc="aaaabead" sha1="e2aab50a1b9290f34dd75ea0fd86d59eca3f46ca"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296141">
+				<rom name="gate iigs - disk 2.woz" size="1296141" crc="66696c57" sha1="f4b5d21a8da6c52a3dc330c0d67c7df0c3a3b0c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bop90s">
+		<description>Balance of Power: The 1990 Edition</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM01 or later. -->
+		<!--"Balance of Power: The 1990 Edition" is a 1989 board game developed by Chris Crawford, Ian Hadley, and Caroline Hadley, and distributed by Mindscape. It requires a 1MB Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1347407">
+				<rom name="balance of power- the 1990 edition iigs.woz" size="1347407" crc="f473b2aa" sha1="aab87027f1c52cf11d53e54e78635f4d16b22cda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bridge6">
+		<description>Bridge 6.0 (Version 2.49B)</description>
+		<year>1989</year>
+		<publisher>Artworx</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Bridge 6.0" is a 1989 board game developed by Robert Harnish and Arthur Walsh, and distributed by Artworx. This is version 2.49B. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296167">
+				<rom name="bridge 6.0 iigs.woz" size="1296167" crc="a6b03015" sha1="1cdb48c2a7407c5bca4832e3ae6fdd976cab78e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qustron2">
+		<description>Questron II (Version 1.1)</description>
+		<year>1988</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Questron II" is a 1988 roleplaying game developed by Westwood Associates and distributed by Strategic Simulations, Inc. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296163">
+				<rom name="questron ii iigs.woz" size="1296163" crc="4deb4862" sha1="f7e1ce6cf67e0e061ffbb7e96b222861d5dda756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rchstars">
+		<description>Reach for the Stars</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Reach for the Stars" is a 1988 simulation game developed by Roger Keating, Ian Trout, and Allan Bell, and distributed by Strategic Studies Group. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328945">
+				<rom name="reach for the stars iigs.woz" size="1328945" crc="7c9f6de5" sha1="81cbc69e0cf005aa05de2898603a4c526116ff79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadwr2k">
+		<description>Roadwar 2000</description>
+		<year>1987</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Roadwar 2000" is a 1987 simulation game developed by Westwood Associates and distributed by Strategic Simulations, Inc. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296159">
+				<rom name="roadwar 2000 iigs.woz" size="1296159" crc="84f0f97c" sha1="697791039e6ae0077feaa26e6032c5c9c3bd7930"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshockey">
+		<description>Superstar Ice Hockey</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Superstar Ice Hockey" is a 1988 sports game developed by Ed Ringler, Andrew Caldwell, Clayton Wishoff, Simon Ffinch, Ed Ringler Sr., and Chris Oke, and distributed by Mindscape. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297288">
+				<rom name="superstar ice hockey iigs.woz" size="1297288" crc="e93a7c38" sha1="64a91083feca13cc2d709b235b0370d8a6afbbc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lifendth">
+		<description>Life and Death</description>
+		<year>1989</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-05-24"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Life and Death" is a 1989 simulation game developed by Mark Manyen and Jacob P. Smith, and distributed by The Software Toolworks. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296138">
+				<rom name="life and death iigs - disk 1.woz" size="1296138" crc="a90e885a" sha1="6d4b97e8be6441c9a2f792fa09206a84b5e07952"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296138">
+				<rom name="life and death iigs - disk 2.woz" size="1296138" crc="3a780754" sha1="d73e62dc6c27b3d441dfbc5626dfe3bbb133d3b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>Spectrum HoloByte</publisher>
+		<info name="release" value="2021-05-29"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Tetris" is a 1988 action game developed by Roland Gustafsson, Sean B. Barger, Dan Geisler, Daniel L. Guerra, Jody Sather, Ed Bogas, Neil Cormia, Ty Roberts, and Gary Clayton, and distributed by Spectrum HoloByte. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296252">
+				<rom name="tetris iigs.woz" size="1296252" crc="41451ff2" sha1="0ee2c36d73f575124f28defb9ec50645fb3c2902"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasrforc">
+		<description>LaserForce</description>
+		<year>1989</year>
+		<publisher>Fanfare</publisher>
+		<info name="release" value="2021-05-24"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs.-->
+		<!--"LaserForce" is a 1989 action game developed by Javier Rullan, Huibert Aalbers, Thierry Méchain, Stéphane Renaudin, J-C. Doré, and Olivier Guichaoua, and distributed by Fanfare. It requires a 1.25MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296206">
+				<rom name="laserforce iigs - disk 1.woz" size="1296206" crc="03943e06" sha1="8efcc99202e3f9fae8058d8cc7f0c66902c52ae6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296206">
+				<rom name="laserforce iigs - disk 2.woz" size="1296206" crc="4eb5535b" sha1="1a53e508eab191f92835990f3195498da8c615a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arknoid2">
+		<description>Arkanoid II: Revenge of Doh</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2021-05-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM01 or later. -->
+		<!--"Arkanoid II" is a 1989 action game developed by Ryan Ridges and John Lund, and distributed by Taito America. It requires a 512K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296700">
+				<rom name="arkanoid ii - revenge of doh iigs.woz" size="1296700" crc="0529637a" sha1="26f22571afb2a3f51258bf22e7910f02745098a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bghost">
+		<description>Bubble Ghost</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Bubble Ghost" is a 1988 action game developed by Infogrames and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312525">
+				<rom name="bubble ghost iigs.woz" size="1312525" crc="e4b9eda7" sha1="6a7eb6c3dcaf5927fb0248ff1064414fdefff5a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dejavu">
+		<description>Déjà Vu</description>
+		<year>1988</year>
+		<publisher>ICOM Simulations</publisher>
+		<info name="release" value="2021-05-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"Deja Vu" is a 1988 adventure game developed by Fred Allen, David Marsh, Karl Roelofs, Todd Squires, Craig Erickson, Kurt Nelson, Steven Hays, Terry Schulenburg, Darin Adler, Jay Zipnick, Waldermar Horwat, Mark Waterman, and Tod Zipnick, and distributed by ICOM Simulations. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="1361855">
+				<rom name="deja vu iigs - disk 1 - system disk.woz" size="1361855" crc="45bf7709" sha1="02c3735f579b259c0f005f20d6c13a79ad9733fc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1361855">
+				<rom name="deja vu iigs - disk 2 - program disk.woz" size="1361855" crc="88fcacca" sha1="4d1adbb4f4b351657fbe3d874d3d8bdf40ad2e42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker2">
+		<description>Hacker II</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-05-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Hacker II: The Doomsday Papers" is a 1987 simulation game developed by Steve Cartwright and distributed by Activision. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296186">
+				<rom name="hacker ii- the doomsday papers iigs.woz" size="1296186" crc="5601d8b7" sha1="7d542579d2a127adefca5d10cb996e5a69fdb2cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destryr">
+		<description>Destroyer</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Destroyer" is a 1987 simulation game developed by Michael Kosaka and Chuck Sommerville, and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296658">
+				<rom name="destroyer iigs.woz" size="1296658" crc="401a544a" sha1="83004334a12e4e7b36baa132b14333741cb38d67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbabsktb">
+		<description>GBA Championship Basketball</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"GBA Championship Basketball" is a 1987 sports game developed by Paul Terry, Jack Thornton, Scott Orr, John Cutter, Troy Lyndon, and Russell Lieblich, and distributed by Activision. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329513">
+				<rom name="gba championship basketball iigs.woz" size="1329513" crc="affed43a" sha1="615e8fe867a969216381d2d3ec656d973b6a3b55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jigsaw">
+		<description>Jigsaw</description>
+		<year>1988</year>
+		<publisher>Britannica Software</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"Jigsaw" is a 1988 board game developed by Javier Rullan Ruano and Huibert Aalbers, and distributed by Britannica Software. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296764">
+				<rom name="jigsaw iigs - disk 1 - program disk.woz" size="1296764" crc="1b4cac90" sha1="e429fe5e5149e7b5c5a812b74de6a7da3a9237cc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Picture library"/>
+			<dataarea name="flop" size="1296255">
+				<rom name="jigsaw iigs - disk 2 - picture library.woz" size="1296255" crc="522b9621" sha1="646e277b6c8d32b5f4e96a6387341405b9db4951"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miniputt">
+		<description>Mini-Putt</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mini-Putt" is a 1988 sports game developed by Ross Salas and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296636">
+				<rom name="mini-putt iigs.woz" size="1296636" crc="043ffe92" sha1="cace02db6788d3142d4704264422289beb2a8bbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omega">
+		<description>Omega</description>
+		<year>1988</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"Omega" is a 1988 simulation game developed by Stuart B. Marks and distributed by Origin Systems. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296155">
+				<rom name="omega iigs.woz" size="1296155" crc="1451e0d5" sha1="d9de13700b35c3ca651883b9c5224dbd8e43cf0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="photonix">
+		<description>Photonix (Version 1.46)</description>
+		<year>1989</year>
+		<publisher>Free Tools Association</publisher>
+		<info name="release" value="2021-05-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25M Apple IIgs ROM 00 or ROM 01. -->
+		<!--"Photonix" is a 1989 disk utility developed by El Mathos, Pad, and ACS, and distributed by Free Tools Association. It requires a 1.25M Apple IIgs ROM 00 or ROM 01. This is version 1.46.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345319">
+				<rom name="photonix iigs.woz" size="1345319" crc="29368542" sha1="0504af1ada3e3cc9fc00d35096c1c92f93acefb5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheed">
+		<description>Silpheed</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Silpheed" is a 1987 action game developed by John Rettig, Stuart Goldstein, Mark Seibert, Satoshi Uesaki, Nobuyuki Ogawa, Akira Eye, Fumihito Kasatani, Nobuyuki Aoshima, Hiromi Ohba, Takeshi Miyaji, Osamu Harada, and Youichi Miyaji, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296337">
+				<rom name="silpheed iigs - disk 1.woz" size="1296337" crc="6e23bfc4" sha1="aab31b270ac2d0be19a63aeebb58cf63f8d664be"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296337">
+				<rom name="silpheed iigs - disk 2.woz" size="1296337" crc="2464d39c" sha1="3a4f6e18d97f5bdc40b988e6a44dedc2d5b62fb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spquest">
+		<description>Space Quest</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Space Quest: The Sarien Encounter" is a 1987 adventure game developed by Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296257">
+				<rom name="space quest iigs - disk 1.woz" size="1296257" crc="c635790a" sha1="9bc6db1793f379838e90e0d5ab4b325e7658fb79"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296257">
+				<rom name="space quest iigs - disk 2.woz" size="1296257" crc="dc9f2e0d" sha1="49714165313ee908fc309970544659322dca1bd0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thrdcrir">
+		<description>The Third Courier</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"The Third Courier" is a 1989 adventure game developed by Carol Manley, Ivan Manley, Mike Branham, Robert Clardy, Chris Barker, Scott Wallin, Miik Nichols, Sheldon Safir, and Mark Wallace, and distributed by Accolade. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296289">
+				<rom name="the third courier iigs - disk 1.woz" size="1296289" crc="517a7892" sha1="df7f0eb0c4985fb756701e5263c16938e8ceb55c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296289">
+				<rom name="the third courier iigs - disk 2.woz" size="1296289" crc="6f6cbd12" sha1="e4f765378433c72f922403a9953b9e70f6b065e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warmidle">
+		<description>War in Middle Earth</description>
+		<year>1989</year>
+		<publisher>Melbourne House</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"War in Middle Earth" is a 1989 adventure game developed by Ron Harris, Robert Clardy, Alan B. Clark, Graeme Devine, Mike Branham, Lloyd Ollmann, Jr., John Conley, Jim McBride, Michael Park, David Schroeder, Michael Ormsby, Mike Christy, Ann Dickens Clardy, Marcus Streets, Mark Riley, and Mike Singleton, and distributed by Melbourne House. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1312766">
+				<rom name="war in middle earth iigs - disk 1.woz" size="1312766" crc="8fd4dacd" sha1="cdf81e6137abfd07fa5b1be89f372784730e409f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1312766">
+				<rom name="war in middle earth iigs - disk 2.woz" size="1312766" crc="a6800d26" sha1="733114ea587392bd01b7641ccc91a03ec85cc243"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnwld">
+		<description>Where in the World is Carmen Sandiego?</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Where in the World is Carmen Sandiego?" is a 1989 educational game developed by Gene Portwood, Lauren Elliott, Loring Vogel, Leila Bronstein, Don Albrecht, and Michelle McBride, and distributed by Broderbund Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296279">
+				<rom name="where in the world is carmen sandiego iigs - disk 1.woz" size="1296279" crc="7c2cd2eb" sha1="0e6ea59c5974c37ee88e22d8cbdfc3a46567d921"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296791">
+				<rom name="where in the world is carmen sandiego iigs - disk 2.woz" size="1296791" crc="ade1e7f6" sha1="4933ac927a966edde20cac34fa5374a2a163889c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="windwlkr">
+		<description>Windwalker</description>
+		<year>1990</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"Windwalker" is a 1990 roleplaying game developed by Greg Malone, Dallas Snell, Jeff Hillhouse, Dave Eresian, Richard Filoramo, Lester Humphreys, Jason Linhart, Stephen Linhart, Kiri Naiman, Keith Winston, Jeff Dee, Glen Johnson, Denis Loubet, Keith Berdak, Bill Clarke, and Doug Hewitt, and distributed by Origin Systems. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1329100">
+				<rom name="windwalker iigs - disk 1.woz" size="1329100" crc="e8d218f5" sha1="682fac9a00d71b0ebf5f5f75e47bd872b71cd724"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1329100">
+				<rom name="windwalker iigs - disk 2.woz" size="1329100" crc="10702583" sha1="0cbbb26fd78220570cc3fdb5a48c4ccac9eaa1ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlock">
+		<description>Warlock</description>
+		<year>1988</year>
+		<publisher>Three-Sixty Pacific</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Warlock" is a 1988 action game developed by Infogrames and distributed by Three-Sixty Pacific. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296172">
+				<rom name="warlock iigs.woz" size="1296172" crc="b7fa22d5" sha1="79c3c37ed3f33defee66f6f757a4574302a405c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wingames">
+		<description>Winter Games</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Winter Games" is a 1987 sports game developed by Westwood Studios and distributed by Epyx. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296641">
+				<rom name="winter games iigs.woz" size="1296641" crc="8f9c392c" sha1="79150a262cec508f188f67cc9b7e45ee1dc52405"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shanghai">
+		<description>Shanghai</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Shanghai" is a 1987 board game developed by Brodie Lockard and Ivan Manley, and distributed by Activision. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296154">
+				<rom name="shanghai iigs.woz" size="1296154" crc="7155a611" sha1="6aac8d0a393c37a9b30f249d21bcfae2ba38f727"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pquest">
+		<description>Police Quest</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Police Quest" is a 1987 adventure game developed by Jim Walls, Greg Rowland, Al Lowe, Scott Murphy, Ken Williams, Mark Crowe, Jerry Moore, Margaret Lowe, Jeff Stephenson, Chris Iden, Bob Heitman, and Carlos Escobar, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296347">
+				<rom name="police quest iigs - disk 1.woz" size="1296347" crc="777c23e5" sha1="d75bd3b9d9a2a686c6cc2872b30a162b6aa176a8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1298395">
+				<rom name="police quest iigs - disk 2.woz" size="1298395" crc="942f2197" sha1="b245b1a25e2cfbcfe8c75b4de33a089410ce7dad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgnwars">
+		<description>Dragon Wars</description>
+		<year>1990</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2021-05-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Dragon Wars" is a 1990 roleplaying game developed by Rebecca Heineman, Todd Camasta, Charles Deenan, Brian Fargo, and Paul O'Connor, and distributed by Interplay Productions. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296196">
+				<rom name="dragon wars iigs.woz" size="1296196" crc="331a8128" sha1="551d0e2fd5a4a33c41a7ba3f9b381bd41a8a7e9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monte">
+		<description>Monte Carlo</description>
+		<year>1987</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Monte Carlo" is a 1987 simulation game developed by Jeff Lefferts and Richard L. Seaborne, and distributed by PBI Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296169">
+				<rom name="monte carlo iigs.woz" size="1296169" crc="c89c7237" sha1="eae72c1446f10e585cb732359bf22a96122c2ede"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subbatl">
+		<description>Sub Battle Simulator</description>
+		<year>1987</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Sub Battle Simulator" is a 1987 simulation game developed by Rob Brannon, Kelly Fergason, and Steve Snyder, and distributed by Epyx. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296676">
+				<rom name="sub battle simulator iigs.woz" size="1296676" crc="aa01105f" sha1="81a3029ef72d3dde59c385a2383c545021509734"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jelwayqb">
+		<description>John Elway's Quarterback</description>
+		<year>1989</year>
+		<publisher>Melbourne House</publisher>
+		<info name="release" value="2021-05-27"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"John Elway's Quarterback" is a 1989 sports game developed by William Denham, Gotham Graphics, and Raymond Genovese, and distributed by Melbourne House. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312567">
+				<rom name="john elway's quarterback iigs.woz" size="1312567" crc="f730957b" sha1="8484a0b8380a46a07ca3674507fcd857c385947e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spquest2">
+		<description>Space Quest II</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Space Quest II" is a 1988 adventure game developed by Mark Crowe, Scott Murphy, Jeff Stephenson, Chris Iden, Robert Heitman, and Carlos Escobar, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296282">
+				<rom name="space quest ii iigs - disk 1.woz" size="1296282" crc="34a62868" sha1="53340223e323e9b1e56e3c82b100cfd2869799bf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296282">
+				<rom name="space quest ii iigs - disk 2.woz" size="1296282" crc="f5cce30c" sha1="6684e98df5c3d88f44099abaeabe4b8396e0c7f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst3">
+		<description>King's Quest III</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"King's Quest III" is a 1988 adventure game developed by Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296426">
+				<rom name="king's quest iii iigs - disk 1.woz" size="1296426" crc="cf25ed37" sha1="0dd9185c47c0607f5342c01b3cf0ca42d6b5a187"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296426">
+				<rom name="king's quest iii iigs - disk 2.woz" size="1296426" crc="738e9164" sha1="ef78a433efc4b54aa3014facb3bc4fdb0e3446cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gwshoot">
+		<description>Great Western Shootout</description>
+		<year>1989</year>
+		<publisher>Britannica Software</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Great Western Shootout" is a 1989 action game developed by Scott Patterson and Matt Crysdale, and distributed by Britannica Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296194">
+				<rom name="great western shootout iigs - disk 1.woz" size="1296194" crc="65d9538c" sha1="c41a1a7796c4d67432b546cebc7997d9a5cfb22d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296194">
+				<rom name="great western shootout iigs - disk 2.woz" size="1296194" crc="8e664521" sha1="aa738a532332574481bcadb9c071e0dfe0730e24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lslarry">
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Leisure Suit Larry in the Land of the Lounge Lizards" is a 1987 adventure game developed by Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1312662">
+				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 1.woz" size="1312662" crc="31bf3aad" sha1="f1daad9a5a04cd2ae82c5fa3a315741a66a64126"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1312662">
+				<rom name="leisure suit larry in the land of the lounge lizards iigs - disk 2.woz" size="1312662" crc="b990e5bd" sha1="022bc36381aaa325153139cbc04da276fb8e1fbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcauldrn">
+		<description>The Black Cauldron</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Black Cauldron" is a 1987 adventure game developed by Al Lowe, Roberta Williams, Elaine Boulay, Nancy Casolaro, Melissa Haldeman, Scott Murphy, Sol Ackerman, Ken Williams, Jeff Stephenson, Chris Iden, and Bob Heitman, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296327">
+				<rom name="the black cauldron iigs - disk 1.woz" size="1296327" crc="def8c641" sha1="951544d592da8c0203ceec45f3f6e45ec44b98e9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296327">
+				<rom name="the black cauldron iigs - disk 2.woz" size="1296327" crc="f66ab4ff" sha1="32f51302f4c3458f2134dea823d30f411a8f250e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingchgo">
+		<description>The King of Chicago</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM01 or later. -->
+		<!--"The King of Chicago" is a 1988 adventure game developed by Doug Sharp and distributed by Cinemaware. It requires a 768K Apple IIgs ROM01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296682">
+				<rom name="the king of chicago iigs - reel 1.woz" size="1296682" crc="41530912" sha1="85fb08f8da981e9cc87edf8446e722ab7eefae91"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1296170">
+				<rom name="the king of chicago iigs - reel 2.woz" size="1296170" crc="a53c37c0" sha1="ff0519cf1b17e77587d82a41c12c836f44e21ab5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst4">
+		<description>King's Quest IV: The Perils of Rosella</description>
+		<year>1989</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"King's Quest IV: The Perils of Rosella" is a 1989 adventure game developed by Ken Williams, Roberta Williams, William Goldstein, Chris Hoyt, John Hamilton, Teresa Baker, Jerry Moore, Carolly Hauksdottir, William Skirvin, Jeff Stephenson, Robert Heitman, Chris Iden, and Paul Krasno, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296374">
+				<rom name="king's quest iv iigs - disk 1.woz" size="1296374" crc="ff747ad4" sha1="6a216fc73cf146418bcc4cb2a0b159e1d96d367b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296374">
+				<rom name="king's quest iv iigs - disk 2.woz" size="1296374" crc="f209e379" sha1="5b0a275432a495b86eb325a65558e340f15bcea4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1296374">
+				<rom name="king's quest iv iigs - disk 3.woz" size="1296374" crc="65f8435a" sha1="e20ba8c160e6609efa9d3576bef83c798dd2c436"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="starsg1">
+		<description>Star Saga: One - Beyond The Boundary (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>Masterplay Publishing Corporation</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Star Saga: One - Beyond The Boundary" is a 1987 roleplaying game developed by Richard Dutton, Walter Freitag, Andrew C. Greenberg, and Michael Massimilla, and distributed by Masterplay Publishing Corporation. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296274">
+				<rom name="star saga one iigs.woz" size="1296274" crc="e96de728" sha1="d00257002b10a75f5418e53bf96aa33df914cd2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="dejavu2">
+		<description>Déjà Vu II: Lost in Las Vegas</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Déjà Vu II: Lost in Las Vegas" is a 1989 adventure game developed by Fred Allen, David Marsh, Michael Manning, Todd Squires, David Feldman, Paul Snively, Brian Baker, Karl Roelofs, Ed Dluzen, Darin Adler, Jay Zipnick, Waldemar Horwat, Julia Ulano, Tod Zipnick, and Mitch Adler, and distributed by Mindscape. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361905">
+				<rom name="deja vu ii lost in last vegas iigs.woz" size="1361905" crc="55d9e932" sha1="9a82f93d0a200435f05d0b1a0a9d37d4c1978c20"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="twrmyrgl">
+		<description>The Tower of Myraglen</description>
+		<year>1987</year>
+		<publisher>PBI Software</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"The Tower of Myraglen" is a 1987 roleplaying game developed by Richard L. Seaborne and Jeff A. Lamberts, and distributed by PBI Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Start-up disk"/>
+			<dataarea name="flop" size="1296187">
+				<rom name="the tower of myraglen iigs - disk 1 - start-up disk.woz" size="1296187" crc="9a571c95" sha1="359abb5dfd1150d129e90c95e501f2c89c17b62e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1345338">
+				<rom name="the tower of myraglen iigs - disk 2 - program disk.woz" size="1345338" crc="1e3a010b" sha1="a264a9be38d8ea804beea4d6b547ee25304af9df"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="dhilchl">
+		<description>Downhill Challenge</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Downhill Challenge" is a 1989 sports game designed by Christian Bertrand, ported to the Apple IIgs by Jean Claude Levy, and distributed by Broderbund Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="1296205">
+				<rom name="downhill challenge iigs - disk 1 - system disk.woz" size="1296205" crc="ddcad7bf" sha1="6f56149da5cd8ca3f7a3ec7032a5278311e4d1ed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Game disk"/>
+			<dataarea name="flop" size="1296203">
+				<rom name="downhill challenge iigs - disk 2 - game disk.woz" size="1296203" crc="ffa192ba" sha1="3fef37aa6d9aa8fdba0df6e6cb5b2a8668eca0bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="wltrgolf">
+		<description>World Tour Golf</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"World Tour Golf" is a 1987 sports game developed by Evan and Nicky Robinson and Paul Reiche III, ported to the Apple IIgs by John Selhorst, and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296185">
+				<rom name="world tour golf iigs.woz" size="1296185" crc="b3f3f81d" sha1="1b5b86f72a9219c07c6a421450e1bb900c81ca55"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="vegasgmb">
+		<description>Vegas Gambler</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Vegas Gambler" is a 1988 simulation game developed by Marek Jackiewicz, Andrzej Miciłkiewicz, Marcin Szostakowski, Maciej Markuszewski, and Dorota Błaszczak, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345393">
+				<rom name="vegas gambler iigs.woz" size="1345393" crc="22e59934" sha1="be3ebd77211d45f6169e21e09c26ee4359ca0398"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="chsm2100">
+		<description>The Fidelity Chessmaster 2100</description>
+		<year>1988</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Fidelity Chessmaster 2100" is a 1988 board game developed by Troy Heere and Mark Manyen, and distributed by The Software Toolworks. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296183">
+				<rom name="the fidelity chessmaster 2100 iigs - disk 1.woz" size="1296183" crc="281e93dc" sha1="2246f45d7deb3414c1bdcbad5d0b4f77a9db52d3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296183">
+				<rom name="the fidelity chessmaster 2100 iigs - disk 2.woz" size="1296183" crc="0c4704bc" sha1="d2ea3f4fbb3cf1127c23bb1ebd32fd3adef049f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="spaceace">
+		<description>Space Ace</description>
+		<year>1990</year>
+		<publisher>ReadySoft</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Space Ace" is a 1990 action game developed by David Foster, Simon Douglas, Jorge Freitas, Hugh MacLeod, Murray Foster, Laurie Williams, Adam Wolk, Michael Griffith, Peter Bayes, David Dimatteo, Sue McComb, and Joanne Ashdown, and distributed by ReadySoft. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 1.woz" size="1296303" crc="c9b1d81c" sha1="01d0768fea8f9f2f6fb198ec75cf64382eaaeed7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 2.woz" size="1296303" crc="213c7969" sha1="4f8c5a803705aa0a8856bd73295357d33277518b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 3.woz" size="1296303" crc="5846b4eb" sha1="2556bdf9afbf627c71c589dea05030e22bb6d736"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 4.woz" size="1296303" crc="852b6729" sha1="cfd808927c36559ba0f30780dacc040c2533e656"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 5.woz" size="1296303" crc="776d76db" sha1="d1979794cbf43d6df3b8ee19abd48af229d52d17"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 6.woz" size="1296303" crc="0ad79c66" sha1="dfe7a77e8bac698f5b582940d5e88c55484e8934"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 7.woz" size="1296303" crc="7a881dee" sha1="ac37a58f8a51482480cfe8f42ec57a0393f50c31"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 8.woz" size="1296303" crc="7eb87bb0" sha1="daa9af77d0e162ba55f3d76d326582d172a135ad"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="1296303">
+				<rom name="space ace iigs - disk 9.woz" size="1296303" crc="8f9cbeed" sha1="f478b959ba865feead8d73220805ccfdf7b930e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>1988</year>
+		<publisher>Taito</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 01. -->
+		<!--"Arkanoid" is a 1988 action game developed by Ryan Ridges and John Lund, and distributed by Taito America. It requires a 512K Apple IIgs ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296671">
+				<rom name="arkanoid iigs.woz" size="1296671" crc="d82eee53" sha1="52914d5c1c05617eac17173de671f09ba7ef3c3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="nicklaus">
+		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Jack Nicklaus' Greatest 18 Holes of Major Championship Golf" is a 1989 sports game developed by Tony Manso and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk ~ - Program disk"/>
+			<dataarea name="flop" size="1296252">
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf iigs - disk 1 - program disk.woz" size="1296252" crc="42a132b9" sha1="ba9a7d0f8865b990b4c01d9b44fa82fe067f275e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Course disk"/>
+			<dataarea name="flop" size="1296251">
+				<rom name="jack nicklaus' greatest 18 holes of major championship golf iigs - disk 2 - course disk.woz" size="1296251" crc="668bfa15" sha1="1b50bcfd3eeee7a0730f789bcda75530941c3770"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hostage">
+		<description>Hostage: Rescue Mission</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Hostage: Rescue Mission" is a 1990 simulation game developed by Infogrames and distributed by Mindscape. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361742">
+				<rom name="hostage- rescue mission iigs.woz" size="1361742" crc="e094007a" sha1="14ee3d0863bcb7170ba1bdab21876687f4ce619a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="captbld">
+		<description>Captain Blood</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Captain Blood" is a 1989 simulation game developed by Philippe Ulrich, Didier Bouchon, Jean-Michel Jarre, Alexis Martial, and Michael Rho, and distributed by Mindscape. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361758">
+				<rom name="captain blood iigs.woz" size="1361758" crc="45d2ab10" sha1="7f968e1704c2a969a33cf7a07c81629c12c7577d"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="carmnusa">
+		<description>Where in the U.S.A. is Carmen Sandiego?</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Where in the U.S.A. is Carmen Sandiego?" is a 1989 educational game developed by Gene Portwood, Lauren Elliot, Peter Adams, Leila Bronstein, Julie Glavin, Michelle McBride, Dan Guerra, Les Pardue, Bevan Hulfenstein, Louis Evans, and Tom Rettig, and distributed by Broderbund Software. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296338">
+				<rom name="where in the u.s.a. is carmen sandiego iigs - disk 1.woz" size="1296338" crc="ca473b90" sha1="a48d9112106def7b6deed7146522152fb483bad0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296369">
+				<rom name="where in the u.s.a. is carmen sandiego iigs - disk 2.woz" size="1296369" crc="d150ccbb" sha1="3dbbfd2a1b14ded3bc6f307a32d9a003882305b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="brdtale">
+		<description>The Bard's Tale: Tales of the Unknown</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Bard's Tale: Tales of the Unknown" is a 1987 roleplaying game developed by Rebecca Heineman and distributed by Electronic Arts. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296709">
+				<rom name="the bard's tale iigs.woz" size="1296709" crc="1b451e17" sha1="d41c827b989d73f32615e49904ecf93638e81625"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="neuromnc">
+		<description>Neuromancer</description>
+		<year>1989</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Neuromancer" is a 1989 adventure game developed by Rebecca Heineman and distributed by Interplay Productions. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345288">
+				<rom name="neuromancer iigs.woz" size="1345288" crc="6d21fbf3" sha1="2f461215cd9331a0a87a61b1497b92d08f64589d"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="dreamzne">
+		<description>Dream Zone</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Dream Zone" is a 1987 adventure game developed by Andy Gavin, Jason Rubin, and Sarah Sidman, and distributed by Baudville. This is version 3.2. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296189">
+				<rom name="dream zone iigs - disk 1.woz" size="1296189" crc="05e8fc0d" sha1="17e950d8bb6c7f2119c0c6f41d17f4287056180e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296189">
+				<rom name="dream zone iigs - disk 2.woz" size="1296189" crc="73d7952e" sha1="379575a78e2ae4594793738c9b71b250ba67cf17"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="manhuntr">
+		<description>Manhunter: New York</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-05-31"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Manhunter: New York" is a 1987 adventure game developed by Dave Murry, Barry Murry, Dee Dee Murry, Jeff Stephenson, Chris Iden, Bob Heitman, Carlos Escobar, and Dr. Gary and Julie Stonedahl, and distributed by Sierra On-Line. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 1.woz" size="1345384" crc="8862c002" sha1="064b29d944f02fce20e407c451d435365a8fe0fb"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 2.woz" size="1345384" crc="f17f2cfa" sha1="0d915aec7f33375d8ba46c1c4419d8986a6360b0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 3.woz" size="1345384" crc="bd448818" sha1="dcc058c912d3a291ede35a2b99ca59519f47d0c9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1345384">
+				<rom name="manhunter- new york iigs - disk 4.woz" size="1345384" crc="660c6483" sha1="21aca32e5fb3fa843ca660de8c6a3354df99106a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="mean18">
+		<description>Mean 18</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-06-03"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mean 18" is a 1987 sports game developed by Rex Bradford, George Karalias, and Mark Lesser, and distributed by Accolade. It requires a 512K Apple IIgs. This archive includes the three add-on disks that were available separately (Famous Courses Volume II, III, and IV).-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk ~ - Program disk"/>
+			<dataarea name="flop" size="1329494">
+				<rom name="mean 18 iigs - disk 1 - program disk.woz" size="1329494" crc="0bff6131" sha1="a4f312c1e20e1f6f56aa7a150b1e3c2a055a659b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Famous courses volume II"/>
+			<dataarea name="flop" size="1296258">
+				<rom name="mean 18 iigs - disk 2 - famous courses volume ii.woz" size="1296258" crc="13d63de6" sha1="1e2415846c7dc1c7ef213965c039fa2ae1cf07f9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Famous courses volume III"/>
+			<dataarea name="flop" size="1297284">
+				<rom name="mean 18 iigs - disk 3 - famous courses volume iii.woz" size="1297284" crc="57051e09" sha1="1f077302afab70811c901eb6f40d4e4b3d48a997"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 - Famous courses volume IV"/>
+			<dataarea name="flop" size="1297250">
+				<rom name="mean 18 iigs - disk 4 - famous courses volume iv.woz" size="1297250" crc="f9e50694" sha1="75871ecc202b0535e45253c5c28ef8447853389f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hvrblade">
+		<description>Hover Blade</description>
+		<year>1991</year>
+		<publisher>MCX</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value=",A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later -->
+		<!--"Hover Blade" is a 1991 action game developed by Shiraz Akmal and Eric Boden, and distributed by MCX. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1345297">
+				<rom name="hover blade iigs - disk 1.woz" size="1345297" crc="dea1f1bf" sha1="f15fa4a7894908b48fa7038521e0ca37cada2656"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1345297">
+				<rom name="hover blade iigs - disk 2.woz" size="1345297" crc="c63ec5d5" sha1="bb90b71a84b5f9d3809342e27a303638208194bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="fastbrk">
+		<description>Fast Break</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Fast Break" is a 1989 sports game developed by Steve Cartwright, Greg Hospelhorn, George Wong, Pam Levins, and Roseann Mitchell, and distributed by Accolade. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296720">
+				<rom name="fast break iigs.woz" size="1296720" crc="56b4f173" sha1="18e1ba72192ce9e059633a62be6aae0c8b92c686"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="hallsmzm">
+		<description>Halls of Montezuma</description>
+		<year>1990</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Halls of Montezuma" is a 1990 simulation game developed by Roger Keating, Ian Trout, Allan Bell, Sue Bell, and Steven Hart, and distributed by Strategic Simulations Group. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296238">
+				<rom name="halls of montezuma iigs - disk 1.woz" size="1296238" crc="e9e5007e" sha1="d562bcf62a8b5dfab0d991279b9372ae0af55e35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296238">
+				<rom name="halls of montezuma iigs - disk 2.woz" size="1296238" crc="390131dd" sha1="0d75cf473647631351edb2871710cdd684094e7b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="starsg2">
+		<description>Star Saga: Two - The Clathran Menace</description>
+		<year>1988</year>
+		<publisher>MasterPlay Publishing Corporation</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Star Saga: Two - The Clathran Menace" is a 1988 roleplaying game developed by Richard Dutton, Walter Freitag, Andrew C. Greenberg, Sheila M. Greenberg, Michael Massimilla, and Gerald M. Seixas, and distributed by MasterPlay Publishing Corporation. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296296">
+				<rom name="star saga two iigs.woz" size="1296296" crc="39e1e6ee" sha1="b712121eb0a254f6ef51010371e308f11ed931b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="clbbgmn">
+		<description>Club Backgammon</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Club Backgammon" is a 1988 board game developed by Staszek Bartkowski, Jarek Olszewski, Dorota B&#x142;aszczak, Maciej Markuszewski, and Marcin Szostakowski, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344899">
+				<rom name="club backgammon iigs.woz" size="1344899" crc="02fd734a" sha1="c62ad7673353aa21ccb1fab56e1df9b4e2a7a57e"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="byondzrk">
+		<description>Beyond Zork: The Coconut of Quendor (Revision 57 / 871221)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 00 or ROM 01. -->
+		<!--"Beyond Zork: The Coconut of Quendor" is a 1987 adventure game developed by Brian Moriarty and distributed by Infocom. This is revision 57 / 871221. It requires a 512K Apple IIgs ROM 00 or ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312556">
+				<rom name="beyond zork iigs.woz" size="1312556" crc="b312178d" sha1="e08df0adda743ee92f6716fbaaa2ddd3ba2c3a05"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="crylmsn2">
+		<description>2088: The Cryllan Mission - The Second Scenario</description>
+		<year>1990</year>
+		<publisher>Victory Software</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs ROM 01 or later. -->
+		<!--"2088: The Cryllan Mission - The Second Scenario" is a 1990 roleplaying game developed by Vinay Pai, Vivek Pai, and Vijay Pai, and distributed by Victory Software. It requires a 1.25MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System"/>
+			<dataarea name="flop" size="1345398">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 1 - system.woz" size="1345398" crc="389a2d46" sha1="d1132ba890573390db3906742ecc517a068a36cc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program"/>
+			<dataarea name="flop" size="1345399">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 2 - program.woz" size="1345399" crc="b500b6bb" sha1="fd86fd3aa3c8da2ff8b11189107786925eb2011e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Outdoors"/>
+			<dataarea name="flop" size="1345400">
+				<rom name="2088 - the cryllan mission - the second scenario iigs - disk 3 - outdoors.woz" size="1345400" crc="9dda11aa" sha1="d387c50de2c3591a48b2b4ee9a03558178b028c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="defcrown">
+		<description>Defender of the Crown</description>
+		<year>1988</year>
+		<publisher>Cinemaware</publisher>
+		<info name="release" value="2021-06-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Defender of the Crown" is a 1988 adventure game developed by Kellyn Beeck, James Sachs, Ivan Manley, Robert Jacob, Phyllis Jacob, Pat Cook, Jim Cuomo, Tom Warner, Jeff Hilbers, Steve Quinn, Richard La Barre, John Cutter, Rob Landeros, Doug Smith, Betsy Scafati, and Wayne Brockman, and distributed by Cinemaware Corporation. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Reel 1"/>
+			<dataarea name="flop" size="1296886">
+				<rom name="defender of the crown iigs - reel 1.woz" size="1296886" crc="73c57ecb" sha1="bfb82cc4c817ada07bff9e1dd06a84a2522af05a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Reel 2"/>
+			<dataarea name="flop" size="1296374">
+				<rom name="defender of the crown iigs - reel 2.woz" size="1296374" crc="5a8945a3" sha1="fac77abad75d71c2f05a31ce609a944a6dc0f46f"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="skatedie">
+		<description>Skate or Die</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 01. Music requires 768K. -->
+		<!--"Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. It requires a 512K Apple IIgs ROM 01. Music requires 768K.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296713">
+				<rom name="skate or die iigs.woz" size="1296713" crc="300af7ee" sha1="7ef79447b14b2268bdbd6489188f951c995e9b7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="strsoccr">
+		<description>Street Sports Soccer</description>
+		<year>1988</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 00 or ROM 01. -->
+		<!--"Street Sports Soccer" is a 1988 sports game developed by Designer Software and distributed by Epyx. It requires a 512K Apple IIgs ROM 00 or ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296697">
+				<rom name="street sports soccer iigs.woz" size="1296697" crc="25b2491e" sha1="fd7231ff1fbba463fa6a0ae068b9ef37a284b64b"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="ootw">
+		<description>Out of this World</description>
+		<year>1992</year>
+		<publisher>Interplay Productions</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Out of this World" is a 1992 action game developed by Rebecca Heineman and distributed by Interplay Productions. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296230">
+				<rom name="out of this world iigs - disk 1 - program disk.woz" size="1296230" crc="114a8c7f" sha1="5821227cf3e7dc6b07d2255f63c77a66f355cc93"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Sounds disk"/>
+			<dataarea name="flop" size="1296229">
+				<rom name="out of this world iigs - disk 2 - sounds disk.woz" size="1296229" crc="df8eccc2" sha1="e8bf12708fd810db0ef8ec803df338c2a747781a"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="thexder">
+		<description>Thexder (Version 2.7)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-06-01"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Thexder" is a 1987 action game developed by H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby, and distributed by Sierra On-Line. This is version 2.7. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296260">
+				<rom name="thexder iigs.woz" size="1296260" crc="98a49554" sha1="6c1389e558151f08234f25f6c0e04337e6290297"/>
+			</dataarea>
+		</part>
+	</software>
+
+<software name="tunarmg">
+		<description>Tunnels of Armageddon (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-03"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Tunnels of Armageddon" is a 1989 action game developed by Adam Skorupiński, Mirek Zabłocki, Krzysiek Koziarski, Zbych Dąbrowski, Dorota Błaszczak, Marcin Grzegorzewski, Dick Vohlers, Tomek Meuś, and distributed by California Dreams. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1344940">
+				<rom name="tunnels of armageddon iigs.woz" size="1344940" crc="5fbeadc3" sha1="3c3d99d4aea530e2eb529e085d31984e0d11dd28"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

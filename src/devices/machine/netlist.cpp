@@ -828,7 +828,8 @@ void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &tar
 	int sampindex;
 	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
 		target.put(sampindex, m_buffer[sampindex]);
-	target.fill(m_cur, sampindex);
+	if (sampindex < target.samples())
+		target.fill(m_cur, sampindex);
 }
 
 

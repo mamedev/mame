@@ -18,7 +18,6 @@
 
     TODO:
 
-    - cursor is missing
     - where do CDET and NMD1 connect to ??
     - i/o port 8051
     - screen contrast

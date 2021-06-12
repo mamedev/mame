@@ -19,18 +19,17 @@
 
 ******************************************************************************/
 
-void ojankohs_state::ojankoy_palette(palette_device &palette) const
+void ojankoy_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2, bit3, bit4;
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		bit0 = BIT(color_prom[0], 2);
-		bit1 = BIT(color_prom[0], 3);
-		bit2 = BIT(color_prom[0], 4);
-		bit3 = BIT(color_prom[0], 5);
-		bit4 = BIT(color_prom[0], 6);
+		int bit0 = BIT(color_prom[0], 2);
+		int bit1 = BIT(color_prom[0], 3);
+		int bit2 = BIT(color_prom[0], 4);
+		int bit3 = BIT(color_prom[0], 5);
+		int bit4 = BIT(color_prom[0], 6);
 		int const r = 0x08 * bit0 + 0x11 * bit1 + 0x21 * bit2 + 0x43 * bit3 + 0x82 * bit4;
 
 		bit0 = BIT(color_prom[palette.entries()], 5);
@@ -52,7 +51,7 @@ void ojankohs_state::ojankoy_palette(palette_device &palette) const
 	}
 }
 
-void ojankohs_state::ojankohs_palette_w(offs_t offset, uint8_t data)
+void ojankohs_state::palette_w(offs_t offset, uint8_t data)
 {
 	m_paletteram[offset] = data;
 
@@ -65,7 +64,7 @@ void ojankohs_state::ojankohs_palette_w(offs_t offset, uint8_t data)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-void ojankohs_state::ccasino_palette_w(offs_t offset, uint8_t data)
+void ccasino_state::palette_w(offs_t offset, uint8_t data)
 {
 	offset = bitswap<11>(offset, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 
@@ -80,7 +79,7 @@ void ojankohs_state::ccasino_palette_w(offs_t offset, uint8_t data)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-void ojankohs_state::ojankoc_palette_w(offs_t offset, uint8_t data)
+void ojankoc_state::palette_w(offs_t offset, uint8_t data)
 {
 	if (m_paletteram[offset] != data)
 	{
@@ -104,19 +103,19 @@ void ojankohs_state::ojankoc_palette_w(offs_t offset, uint8_t data)
 
 ******************************************************************************/
 
-void ojankohs_state::ojankohs_videoram_w(offs_t offset, uint8_t data)
+void ojankohs_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void ojankohs_state::ojankohs_colorram_w(offs_t offset, uint8_t data)
+void ojankohs_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void ojankohs_state::ojankohs_gfxreg_w(uint8_t data)
+void ojankohs_state::gfxreg_w(uint8_t data)
 {
 	if (m_gfxreg != data)
 	{
@@ -125,7 +124,7 @@ void ojankohs_state::ojankohs_gfxreg_w(uint8_t data)
 	}
 }
 
-void ojankohs_state::ojankohs_flipscreen_w(uint8_t data)
+void ojankohs_state::flipscreen_w(uint8_t data)
 {
 	if (m_flipscreen != BIT(data, 0))
 	{
@@ -146,7 +145,7 @@ void ojankohs_state::ojankohs_flipscreen_w(uint8_t data)
 	}
 }
 
-TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
+TILE_GET_INFO_MEMBER(ojankohs_state::get_tile_info)
 {
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
 	int color = (m_colorram[tile_index] & 0xe0) >> 5;
@@ -160,7 +159,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 	tileinfo.set(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
+TILE_GET_INFO_MEMBER(ojankoy_state::get_tile_info)
 {
 	int tile = m_videoram[tile_index] | (m_videoram[tile_index + 0x1000] << 8);
 	int color = m_colorram[tile_index] & 0x3f;
@@ -177,36 +176,33 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 
 ******************************************************************************/
 
-void ojankohs_state::ojankoc_flipscreen(int data)
+void ojankoc_state::flipscreen(uint8_t data)
 {
-	int x, y;
-	uint8_t color1, color2;
-
 	m_flipscreen = BIT(data, 7);
 
 	if (m_flipscreen == m_flipscreen_old)
 		return;
 
-	for (y = 0; y < 0x40; y++)
+	for (int y = 0; y < 0x40; y++)
 	{
-		for (x = 0; x < 0x100; x++)
+		for (int x = 0; x < 0x100; x++)
 		{
-			color1 = m_videoram[0x0000 + ((y * 256) + x)];
-			color2 = m_videoram[0x3fff - ((y * 256) + x)];
-			ojankoc_videoram_w(0x0000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(0x3fff - ((y * 256) + x), color1);
+			uint8_t color1 = m_videoram[0x0000 + ((y * 256) + x)];
+			uint8_t color2 = m_videoram[0x3fff - ((y * 256) + x)];
+			videoram_w(0x0000 + ((y * 256) + x), color2);
+			videoram_w(0x3fff - ((y * 256) + x), color1);
 
 			color1 = m_videoram[0x4000 + ((y * 256) + x)];
 			color2 = m_videoram[0x7fff - ((y * 256) + x)];
-			ojankoc_videoram_w(0x4000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(0x7fff - ((y * 256) + x), color1);
+			videoram_w(0x4000 + ((y * 256) + x), color2);
+			videoram_w(0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
 	m_flipscreen_old = m_flipscreen;
 }
 
-void ojankohs_state::ojankoc_videoram_w(offs_t offset, uint8_t data)
+void ojankoc_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 
@@ -245,22 +241,17 @@ void ojankohs_state::ojankoc_videoram_w(offs_t offset, uint8_t data)
 
 ******************************************************************************/
 
-VIDEO_START_MEMBER(ojankohs_state,ojankohs)
+void ojankohs_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::ojankohs_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 }
 
-VIDEO_START_MEMBER(ojankohs_state,ojankoy)
+void ojankoy_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankohs_state::ojankoy_get_tile_info)), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ojankoy_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 }
 
-VIDEO_START_MEMBER(ojankohs_state,ccasino)
-{
-	VIDEO_START_CALL_MEMBER(ojankoy);
-}
-
-VIDEO_START_MEMBER(ojankohs_state,ojankoc)
+void ojankoc_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 
@@ -274,7 +265,7 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 
 ******************************************************************************/
 
-uint32_t ojankohs_state::screen_update_ojankohs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ojankohs_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->set_scrollx(0, m_scrollx);
 	m_tilemap->set_scrolly(0, m_scrolly);
@@ -283,16 +274,14 @@ uint32_t ojankohs_state::screen_update_ojankohs(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t ojankohs_state::screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ojankoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
 	if (m_screen_refresh)
 	{
-		/* redraw bitmap */
-		for (offs = 0; offs < 0x8000; offs++)
+		// redraw bitmap
+		for (int offs = 0; offs < 0x8000; offs++)
 		{
-			ojankoc_videoram_w(offs, m_videoram[offs]);
+			videoram_w(offs, m_videoram[offs]);
 		}
 		m_screen_refresh = 0;
 	}

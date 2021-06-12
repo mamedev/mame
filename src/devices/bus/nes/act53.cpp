@@ -32,7 +32,7 @@
 DEFINE_DEVICE_TYPE(NES_ACTION53, nes_action53_device, "nes_action53", "NES Cart Action 53 PCB")
 
 
-nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_action53_device::nes_action53_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_ACTION53, tag, owner, clock)
 	, m_sel(0)
 {
@@ -45,17 +45,21 @@ void nes_action53_device::device_start()
 	common_start();
 	save_item(NAME(m_sel));
 	save_item(NAME(m_reg));
-	m_reg[0] = 0x00;
-	m_reg[1] = 0x0f;
-	m_reg[2] = 0x00;
-	m_reg[3] = 0x3f;
+}
+
+void nes_action53_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
+{
+	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
+	// at power on last 16K of ROM is mapped to $C000-$FFFF
+	m_reg[0] = m_reg[1] = m_reg[2] = 0;
+	m_reg[3] = (m_prg_chunks - 1) >> 1;
+	update_prg();
 }
 
 void nes_action53_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	// register content is not touched by reset
-	update_prg();
 }
 
 
@@ -79,7 +83,7 @@ void nes_action53_device::pcb_reset()
          R:$80 is clear
 
  R:$01:  [...M PPPP]
-     P = PRG Reg
+     P = Inner PRG Reg
      M = Mirroring
          This bit overwrites bit 0 of R:$80, but only if bit 1 of
          R:$80 is clear
@@ -97,7 +101,7 @@ void nes_action53_device::pcb_reset()
          %10 = Vert
          %11 = Horz
 
- R:$81:  [..BB BBBB]
+ R:$81:  [BBBB BBBB]
      Outer PRG Reg
 
 
@@ -105,34 +109,20 @@ void nes_action53_device::pcb_reset()
 
 void nes_action53_device::update_prg()
 {
-	uint8_t prg_lo, prg_hi, helper;
-	uint8_t out = (m_reg[3] & 0x3f) << 1;     // Outer PRG reg
-	uint8_t size = (m_reg[2] & 0x30) >> 4;    // Game size
-	uint8_t mask = (1 << (size + 1)) - 1;     // Bits to be taken from PRG reg
+	u16 prg_lo, prg_hi;
+	u8 size = (m_reg[2] & 0x30) >> 4;         // Game size
+	u16 mask = ~0 << (size + 1);              // Bits to be taken from PRG regs
+	u8 b32k = !BIT(m_reg[2], 3);              // 32K mode bit
+	u16 outer = m_reg[3] << 1;                // Outer PRG reg bits
+	u8 inner = (m_reg[1] << b32k) & ~mask;    // Inner PRG reg bits
 
-	if (!BIT(m_reg[2], 3))
-	{
-		helper = (out & ~mask) | ((m_reg[1] << 1) & mask);
-		//32K mode
-		prg_lo = (helper & 0xfe);
-		prg_hi = (helper | 0x01);
-	}
-	else
-	{
-		helper = (out & ~mask) | (m_reg[1] & mask);
-		if (BIT(m_reg[2], 2))
-		{
-			//16K mode with fixed HI
-			prg_lo = helper;
-			prg_hi = (out | 0x01);
-		}
-		else
-		{
-			//16K mode with fixed LO
-			prg_lo = (out & 0xfe);
-			prg_hi = helper;
-		}
-	}
+	prg_hi = prg_lo = (outer & mask) | inner;
+	if (b32k)                     // 32K mode
+		prg_hi++;
+	else if (BIT(m_reg[2], 2))    // 16K mode with fixed HI
+		prg_hi = ++outer;
+	else                          // 16K mode with fixed LO
+		prg_lo = outer;
 
 //  printf("banks : 0x%2X - 0x%2X\n", prg_lo, prg_hi);
 	prg16_89ab(prg_lo);
@@ -158,7 +148,7 @@ void nes_action53_device::update_mirr()
 	}
 }
 
-void nes_action53_device::write_l(offs_t offset, uint8_t data)
+void nes_action53_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("action 53 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -167,7 +157,7 @@ void nes_action53_device::write_l(offs_t offset, uint8_t data)
 }
 
 
-void nes_action53_device::write_h(offs_t offset, uint8_t data)
+void nes_action53_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("action 53 write_h, offset: %04x, data: %02x\n", offset, data));
 

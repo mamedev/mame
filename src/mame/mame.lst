@@ -1203,6 +1203,7 @@ alphatpc16
 
 @source:alphatro.cpp
 alphatro                        //
+alphatrob                       //
 alphatron                       //
 
 @source:altair.cpp
@@ -10106,6 +10107,7 @@ ckongpt2b                       // bootleg
 ckongpt2b2                      // bootleg
 ckongpt2j                       // (c) 1981 Falcon
 ckongpt2jeu                     // bootleg (Jeutel)
+ckongpt2ss                      // bootleg (SegaSA / Sonic)
 dking                           // Crazy Kong Bootleg
 guzzler                         // (c) 1983 Tehkan
 guzzlers                        // (c) 1983 Tehkan (Swimmer Conversion)
@@ -14395,6 +14397,7 @@ gteikoku                        // (c) Irem
 gteikokub                       // bootleg
 gteikokub2                      // bootleg
 gteikokub3                      // bootleg (Honly Enterprises)
+guttangt                        //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
@@ -14566,7 +14569,6 @@ drivfrcsg                       // [1984] Seatongrove
 drivfrcsga                      // [1984] Seatongrove
 drivfrct                        // bootleg
 froggerv                        // bootleg
-guttangt                        //
 hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
 hunchbgb                        // bootleg
@@ -31655,6 +31657,7 @@ driveyes                        // (c) 1992?
 @source:namcos22.cpp
 acedrvrw                        // (c) 1994
 adillor                         // (c) 1997
+adillorj                        // (c) 1997
 airco22b                        // (c) 1995
 alpinerc                        // (c) 1994
 alpinerd                        // (c) 1994
@@ -33200,6 +33203,7 @@ ccasino                         // [1987] V-System Co. (Japan)
 ojanko2                         // [1987] V-System Co. (Japan)
 ojankoc                         // [1986] V-System Co. (Japan)
 ojankoca                        // [1986] V-System Co. (Japan)
+ojankocb                        // [1986] V-System Co. (Japan)
 ojankohs                        // [1988] V-System Co. (Japan)
 ojankoy                         // [1986] V-System Co. (Japan)
 
@@ -33433,6 +33437,7 @@ pacmanvg                        // bootleg (Video Game SA)
 pacmod                          // (c) 1981 Midway
 pacplus                         // (c) 1982 Namco (Midway license)
 pacuman                         // bootleg
+painter                         // hack
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
@@ -39596,6 +39601,7 @@ galpanisa                       // 1997.04 (c) 1997 Kaneko (Asia)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk                       // 1997.04 (c) 1997 Kaneko (Korea)
+galpaniska                      // 1997.04 (c) 1997 Kaneko (Korea)
 galpans2                        // 1999.?? (c) 1999 Kaneko (Europe)
 galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
 galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
@@ -41816,6 +41822,7 @@ headons                         // Sidam bootleg
 headonsa                        // Sidam bootleg
 heiankyo                        // (c) [1979?] Denki Onkyo
 hocrash                         // bootleg
+invcarht                        // 411-426 (c) 1979 Sega
 invds                           // 367-382 (c) 1979 Sega
 invho2                          // 271-286 (c) 1979 Sega
 invho2a                         // 326-341 (c) 1979 Sega

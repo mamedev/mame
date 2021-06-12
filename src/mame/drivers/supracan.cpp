@@ -26,14 +26,14 @@ STATUS:
 
     The driver is begging for a re-write or at least a split into video/supracan.c.  It will happen eventually.
 
-    Sound chip is completely unknown.
+    Sound chip is completely custom, and partially implemented.
 
     There are 6 interrupt sources on the 6502 side, all of which use the IRQ line.
     The register at 0x411 is bitmapped to indicate what source(s) are active.
     In priority order from most to least important, they are:
 
     411 value  How acked                     Notes
-    0x40       read reg 0x16 of sound chip   likely timer. snd regs 0x16/0x17 are time constant, write 0 to reg 0x9f to start
+    0x40       read reg 0x16 of sound chip   used for DMA-driven sample playback. Register 0x16 may contain which DMA-driven samples are active.
     0x04       read at 0x405                 latch 1?  0xcd is magic value
     0x08       read at 0x404                 latch 2?  0xcd is magic value
     0x10       read at 0x409                 unknown, dispatched but not used in startup 6502 code
@@ -80,9 +80,11 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "audio/acan.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "tilemap.h"
 
 
@@ -113,7 +115,7 @@ namespace {
 #define LOG_ALL         (LOG_UNKNOWNS | LOG_HFUNKNOWNS | LOG_DMA | LOG_VIDEO | LOG_HFVIDEO | LOG_IRQS | LOG_SOUND | LOG_68K_SOUND | LOG_CONTROLS)
 #define LOG_DEFAULT     (LOG_ALL & ~(LOG_HFVIDEO | LOG_HFUNKNOWNS))
 
-#define VERBOSE         (0)
+#define VERBOSE         (LOG_UNKNOWNS | LOG_SOUND | LOG_DMA)
 #include "logmacro.h"
 
 class supracan_state : public driver_device
@@ -126,6 +128,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_vram(*this, "vram")
 		, m_soundram(*this, "soundram")
+		, m_sound(*this, "acansnd")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_pads(*this, "P%u", 1U)
@@ -158,6 +161,8 @@ private:
 	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	uint8_t sound_ram_read(offs_t offset);
+
 	struct dma_regs_t
 	{
 		uint32_t source[2];
@@ -182,6 +187,7 @@ private:
 
 	required_shared_ptr<uint16_t> m_vram;
 	required_shared_ptr<uint8_t> m_soundram;
+	required_device<acan_sound_device> m_sound;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -199,7 +205,6 @@ private:
 	uint16_t m_latched_controls[2];
 	uint8_t m_sound_status;
 	uint8_t m_sound_reg_addr;
-	uint8_t m_sound_regs[0x100];
 
 	emu_timer *m_video_timer;
 	emu_timer *m_hbl_timer;
@@ -255,8 +260,9 @@ private:
 	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
 	TILE_GET_INFO_MEMBER(get_roz_tile_info);
 	void palette_init(palette_device &palette) const;
+	void sound_timer_irq(int state);
+	void sound_dma_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
 	TIMER_CALLBACK_MEMBER(hbl_callback);
 	TIMER_CALLBACK_MEMBER(line_on_callback);
 	TIMER_CALLBACK_MEMBER(line_off_callback);
@@ -273,7 +279,7 @@ private:
 	void mark_active_tilemap_all_dirty(int layer);
 	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 
-	void set_sound_irq(uint8_t mask);
+	void set_sound_irq(uint8_t bit, uint8_t state);
 };
 
 
@@ -1187,6 +1193,15 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+void supracan_state::sound_timer_irq(int state)
+{
+	set_sound_irq(7, state);
+}
+
+void supracan_state::sound_dma_irq(int state)
+{
+	set_sound_irq(6, state);
+}
 
 void supracan_state::dma_w(int offset, uint16_t data, uint16_t mem_mask, int ch)
 {
@@ -1315,10 +1330,18 @@ void supracan_state::supracan_mem(address_map &map)
 	map(0xfc0000, 0xfcffff).mirror(0x30000).ram(); /* System work ram */
 }
 
-void supracan_state::set_sound_irq(uint8_t mask)
+uint8_t supracan_state::sound_ram_read(offs_t offset)
+{
+	return m_soundram[offset];
+}
+
+void supracan_state::set_sound_irq(uint8_t bit, uint8_t state)
 {
 	const uint8_t old = m_soundcpu_irq_source;
-	m_soundcpu_irq_source |= mask;
+	if (state)
+		m_soundcpu_irq_source |= 1 << bit;
+	else
+		m_soundcpu_irq_source &= ~(1 << bit);
 	const uint8_t changed = old ^ m_soundcpu_irq_source;
 	if (changed)
 	{
@@ -1357,7 +1380,7 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 		m_soundcpu_irq_source = 0;
 		if (!machine().side_effects_disabled())
 		{
-			LOGMASKED(LOG_SOUND, "%s: 6502_soundmem_r: Sound IRQ source read + clear: %02x\n", machine().describe_context(), data);
+			LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_r: Sound IRQ source read + clear: %02x\n", machine().describe_context(), machine().time().to_string(), data);
 			m_soundcpu->set_input_line(0, CLEAR_LINE);
 		}
 		break;
@@ -1365,14 +1388,14 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 		if (!machine().side_effects_disabled())
 		{
 			data = m_sound_status;
-			LOGMASKED(LOG_SOUND, "%s: 6502_soundmem_r: Sound hardware status read:       0420 = %02x\n", machine().describe_context(), m_sound_status);
+			LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_r: Sound hardware status read:       0420 = %02x\n", machine().describe_context(), machine().time().to_string(), m_sound_status);
 		}
 		break;
 	case 0x422:
 		if (!machine().side_effects_disabled())
 		{
-			data = m_sound_regs[m_sound_reg_addr];
-			LOGMASKED(LOG_SOUND, "%s: 6502_soundmem_r: Sound hardware reg data read:     0422 = %02x\n", machine().describe_context(), data);
+			data = m_sound->read(m_sound_reg_addr);
+			LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_r: Sound hardware reg data read:     0422 = %02x\n", machine().describe_context(), machine().time().to_string(), data);
 		}
 		break;
 	case 0x404:
@@ -1382,7 +1405,7 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 	case 0x416:
 		// Intentional fall-through
 	default:
-		if (offset >= 0x300 && offset < 0x500)
+		if (offset >= 0x400 && offset < 0x500)
 		{
 			if (!machine().side_effects_disabled())
 			{
@@ -1397,6 +1420,9 @@ uint8_t supracan_state::_6502_soundmem_r(offs_t offset)
 
 void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 {
+	static attotime s_curr_time = attotime::zero;
+	attotime now = machine().time();
+
 	switch (offset)
 	{
 	case 0x407:
@@ -1429,15 +1455,19 @@ void supracan_state::_6502_soundmem_w(offs_t offset, uint8_t data)
 		LOGMASKED(LOG_SOUND | LOG_IRQS, "%s: 6502_soundmem_w: IRQ enable: %02x\n", machine().describe_context(), data);
 		break;
 	case 0x420:
-		LOGMASKED(LOG_SOUND, "%s: 6502_soundmem_w: Sound hardware reg addr write:    0420 = %02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_w: Sound addr write:                 0420 = %02x\n", machine().describe_context(), now.to_string(), data);
 		m_sound_reg_addr = data;
 		break;
 	case 0x422:
-		LOGMASKED(LOG_SOUND, "%s: 6502_soundmem_w: Sound hardware reg data write:    0422 = %02x\n", machine().describe_context(), data);
-		m_sound_regs[m_sound_reg_addr] = data;
+	{
+		attotime delta = (s_curr_time == attotime::zero ? attotime::zero : (now - s_curr_time));
+		s_curr_time = now;
+		LOGMASKED(LOG_SOUND, "%s: %s: 6502_soundmem_w: Sound data write:                 0422 = %02x (delta %0.3f)\n", machine().describe_context(), now.to_string(), data, (float)delta.as_double());
+		m_sound->write(m_sound_reg_addr, data);
 		break;
+	}
 	default:
-		if (offset >= 0x300 && offset < 0x500)
+		if (offset >= 0x400 && offset < 0x500)
 		{
 			LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: 6502_soundmem_w: Unknown register %04x = %02x\n", machine().describe_context(), offset, data);
 		}
@@ -1500,7 +1530,7 @@ void supracan_state::_68k_soundram_w(offs_t offset, uint16_t data, uint16_t mem_
 	m_soundram[offset * 2 + 1] = data & 0xff;
 	m_soundram[offset * 2] = data >> 8;
 
-	if (offset * 2 < 0x500 && offset * 2 >= 0x300)
+	if (offset * 2 < 0x500 && offset * 2 >= 0x400)
 	{
 		if (ACCESSING_BITS_8_15)
 		{
@@ -1519,7 +1549,7 @@ uint16_t supracan_state::_68k_soundram_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = m_soundram[offset * 2] << 8;
 	data |= m_soundram[offset * 2 + 1];
 
-	if (offset * 2 >= 0x300 && offset * 2 < 0x500)
+	if (offset * 2 >= 0x400 && offset * 2 < 0x500)
 	{
 		data = 0;
 		if (ACCESSING_BITS_8_15)
@@ -1542,8 +1572,19 @@ uint16_t supracan_state::sound_r(offs_t offset, uint16_t mem_mask)
 
 	switch (offset)
 	{
+	case 0x04/2:
+		data = (m_soundram[0x40c] << 8) | m_soundram[0x40d];
+		LOGMASKED(LOG_SOUND, "%s: sound_r: DMA Request address from 6502, %08x: %04x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), data, mem_mask);
+		break;
+
+	case 0x0c/2:
+		data = m_soundram[0x40a];
+		LOGMASKED(LOG_SOUND, "%s: sound_r: DMA Request flag from 6502, %08x: %04x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), data, mem_mask);
+		machine().debug_break();
+		break;
+
 	default:
-		LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "sound_r: Unknown register: (%08x) & %04x\n", 0xe90000 + (offset << 1), mem_mask);
+		LOGMASKED(LOG_SOUND | LOG_UNKNOWNS, "%s: sound_r: Unknown register: %08x & %04x\n", machine().describe_context(), 0xe90000 + (offset << 1), mem_mask);
 		break;
 	}
 
@@ -1556,7 +1597,7 @@ void supracan_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 	case 0x000a/2:  /* Sound cpu IRQ request. */
 		LOGMASKED(LOG_SOUND, "%s: Sound CPU IRQ request: %04x\n", machine().describe_context(), data);
-		set_sound_irq(0x20);
+		set_sound_irq(5, 1);
 		//m_soundcpu->set_input_line(0, ASSERT_LINE);
 		break;
 	case 0x001c/2:  /* Sound cpu control. Bit 0 tied to sound cpu RESET line */
@@ -1914,7 +1955,6 @@ void supracan_state::machine_start()
 	save_item(NAME(m_latched_controls));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sound_reg_addr));
-	save_item(NAME(m_sound_regs));
 
 	save_item(NAME(m_sprite_count));
 	save_item(NAME(m_sprite_base_addr));
@@ -1972,7 +2012,6 @@ void supracan_state::machine_reset()
 	std::fill(std::begin(m_latched_controls), std::end(m_latched_controls), 0);
 	m_sound_status = 0;
 	m_sound_reg_addr = 0;
-	std::fill(std::begin(m_sound_regs), std::end(m_sound_regs), 0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -2066,11 +2105,6 @@ static GFXDECODE_START( gfx_supracan )
 	GFXDECODE_RAM( "vram", 0, supracan_gfx1bpp_alt, 0, 0x80 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(supracan_state::sound_irq)
-{
-	set_sound_irq(0x80);
-}
-
 void supracan_state::supracan(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(10'738'635));        /* Correct frequency unknown */
@@ -2078,7 +2112,6 @@ void supracan_state::supracan(machine_config &config)
 
 	M6502(config, m_soundcpu, XTAL(3'579'545));     /* TODO: Verify actual clock */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
-	m_soundcpu->set_vblank_int("screen", FUNC(supracan_state::sound_irq));
 
 	config.set_perfect_quantum(m_soundcpu);
 
@@ -2086,10 +2119,21 @@ void supracan_state::supracan(machine_config &config)
 	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */
 	m_screen->set_screen_update(FUNC(supracan_state::screen_update));
 	m_screen->set_palette("palette");
+	//m_screen->screen_vblank().set(FUNC(supracan_state::screen_vblank));
 
 	PALETTE(config, "palette", FUNC(supracan_state::palette_init)).set_format(palette_device::xBGR_555, 32768);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	ACANSND(config, m_sound, XTAL(3'579'545));
+	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
+	m_sound->timer_irq_handler().set(FUNC(supracan_state::sound_timer_irq));
+	m_sound->dma_irq_handler().set(FUNC(supracan_state::sound_dma_irq));
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "supracan_cart"));
 	cartslot.set_width(GENERIC_ROM16_WIDTH);

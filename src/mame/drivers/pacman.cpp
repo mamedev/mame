@@ -6550,6 +6550,30 @@ ROM_START( paintrlr )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
+// PCB is marked: "CRUSH ROLLER" on component side
+// PCB is labelled: "PENNELLO 2" on component side ("pennello" is the Italian word for "brush")
+// Bootleg of a hack? Shows Painter (c) 1984 Monshine Ent. Co. before coining up, Painter (c) 1984 Elsys Software after coining up.
+// Interesting hack: it mixes Crush Roller elements with Pacman elements
+ROM_START( painter )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pain1.6e",           0x0000, 0x1000, CRC(fb2eb6dc) SHA1(377075cb64c7ccc0bd2b0185848d4798428bceb2) )
+	ROM_LOAD( "pain2.6f",           0x1000, 0x1000, CRC(39f92fb0) SHA1(2b58429664eadb8bb5100289182b274cc7e4688c) )
+	ROM_LOAD( "pain3.6h",           0x2000, 0x1000, CRC(f80435b1) SHA1(7f41ecc2a91f8bdf0969f4f3fe96b48adb1010ba) )
+	ROM_LOAD( "pain4-pennello2.6j", 0x3000, 0x1000, CRC(0cb678dc) SHA1(b1b9eadf22dc7985b39d414438092a7fc6c58955) ) // has strange strings in the second half, but seems to work fine
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pain5.5e", 0x0000, 0x1000, CRC(bd819afc) SHA1(2e8762c3c480aa669f7e87651ddfdbb965ea4211) )
+	ROM_LOAD( "pain6.5f", 0x1000, 0x1000, BAD_DUMP CRC(014e5ed3) SHA1(8e01c640457515da89723215b19684ceb4556997) ) // BADADDR            xx-xxxxxxxxx, dumped with 2 different programmers with same result, but probably damaged ROM
+
+	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "2s140.4a",  0x0020, 0x0100, BAD_DUMP CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // not dumped for this set
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
+ROM_END
+
 /*
 
 Crush Roller (Sidam PCB)
@@ -8293,6 +8317,7 @@ GAME( 1981, crushbl3, crush,    korosuke, mbrush,   pacman_state,  init_maketrax
 GAME( 1981, crushs,   crush,    crushs,   crushs,   pacman_state,  empty_init,    ROT90,  "bootleg (Sidam)",                               "Crush Roller (bootleg set 4)",           MACHINE_SUPPORTS_SAVE ) // Sidam PCB, no Sidam text
 GAME( 1981, mbrush,   crush,    korosuke, mbrush,   pacman_state,  init_mbrush,   ROT90,  "bootleg (Olympia)",                             "Magic Brush (bootleg of Crush Roller)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, paintrlr, crush,    crush2,   paintrlr, pacman_state,  empty_init,    ROT90,  "bootleg",                                       "Paint Roller (bootleg of Crush Roller)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, painter,  crush,    crush2,   paintrlr, pacman_state,  empty_init,    ROT90,  "hack (Monshine Ent. Co.)",                      "Painter (hack of Crush Roller)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // currently shows Paintei due to bad sprite ROM
 
 GAME( 1982, eyes,     0,        pacman,   eyes,     pacman_state,  init_eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 1)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1982, eyes2,    eyes,     pacman,   eyes,     pacman_state,  init_eyes,     ROT90,  "Techstar (Rock-Ola license)", "Eyes (US set 2)",                 MACHINE_SUPPORTS_SAVE )

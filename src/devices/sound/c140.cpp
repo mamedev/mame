@@ -467,19 +467,21 @@ inline u8 c140_device::keyon_status_read(u16 offset)
 {
 	m_stream->update();
 	C140_VOICE const &v = m_voi[offset >> 4];
-	// suzuka 8 hours and final lap games reads from here,
-	// expecting bit 6 to be an inprogress sample flag.
+
+	// suzuka 8 hours and final lap games read from here, expecting bit 6 to be an in-progress sample flag.
 	// four trax also expects bit 4 high for some specific channels to make engine noises to work properly
 	// (sounds kinda bogus when player crashes in an object and jump spin, needs real HW verification)
-	return (v.key ? 0x40 : 0x00) | (v.mode & 0x3f);
+	return (v.key ? 0x40 : 0x00) | (m_REG[offset] & 0x3f);
 }
 
 
 u8 c140_device::c140_r(offs_t offset)
 {
 	offset &= 0x1ff;
-	if ((offset & 0xf) == 0x5)
+
+	if ((offset & 0xf) == 0x5 && offset < 0x180)
 		return keyon_status_read(offset);
+
 	return m_REG[offset];
 }
 
@@ -553,9 +555,10 @@ void c140_device::c140_w(offs_t offset, u8 data)
 u8 c219_device::c219_r(offs_t offset)
 {
 	offset &= 0x1ff;
+
 	// assume same as c140
 	// TODO: what happens here on reading unmapped voice regs?
-	if ((offset & 0xf) == 0x5)
+	if ((offset & 0xf) == 0x5 && offset < 0x100)
 		return keyon_status_read(offset);
 
 	return m_REG[offset];

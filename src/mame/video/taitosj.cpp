@@ -294,7 +294,7 @@ int taitosj_state::check_sprite_sprite_bitpattern(int sx1, int sy1, int which1, 
 	}
 
 	// draw the sprites into separate bitmaps and check overlapping region
-	m_sprite_layer_collbitmap1.fill(TRANSPARENT_PEN);
+	m_sprite_sprite_collbitmap1.fill(TRANSPARENT_PEN);
 		get_sprite_gfx_element(which1)->transpen(m_sprite_sprite_collbitmap1, m_sprite_sprite_collbitmap1.cliprect(),
 			m_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,

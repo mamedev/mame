@@ -279,7 +279,7 @@ protected:
 	u8 m_twineagl_xram[8];
 	u8 m_twineagl_tilebank[4];
 
-	std::unique_ptr<u16[]> m_downtown_protection;
+	std::unique_ptr<u8[]> m_downtown_protection;
 
 	u16 metafox_protection_r(offs_t offset);
 	void twineagl_tilebank_w(offs_t offset, u8 data);

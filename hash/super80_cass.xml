@@ -1647,6 +1647,31 @@ X-3607 : Horse Race
 			</dataarea>
 		</part>
 	</software>
+	<software name="crazym">
+		<description>Crazy Maze</description>
+		<year>1983</year>
+		<publisher>Matrix Software</publisher>
+		<info name="usage" value="L to load, G0 to run" />
+		<sharedfeat name="compatibility" value="D" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="0x1bfd222">
+				<rom name="crazym.wav" size="0x1bfd222" crc="094412f9" sha1="a32f716313745bbd8b14cb54a0f8f3817fe059f7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="crazymj">
+		<description>Crazy Maze (with arrows)</description>
+		<year>1983</year>
+		<publisher>Matrix Software</publisher>
+		<info name="usage" value="T3 then, L to load, G0 to run" />
+		<sharedfeat name="compatibility" value="D,M" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="0x1bfd20e">
+				<rom name="crazymj.wav" size="0x1bfd20e" crc="f723e58d" sha1="213a9dca5f58206cd415aa34eb4f0a70eb785c7b"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!--
      Various homebrew programs for use with super80v (80 column display), recorded at 600 baud.
      Most of these have been partially rewritten by myself to take advantage of the features of the super80v.

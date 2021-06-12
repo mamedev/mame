@@ -156,7 +156,7 @@ void gameplan_state::leprechn_video_command_w(uint8_t data)
 
 uint8_t gameplan_state::leprechn_videoram_r()
 {
-	return m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
+	return m_video_previous;
 }
 
 
@@ -193,6 +193,7 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 					m_video_y = m_video_y + 1;
 			}
 
+			m_video_previous = m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x];
 			m_videoram[m_video_y * (HBSTART - HBEND) + m_video_x] = m_video_data & 0x0f;
 
 			break;

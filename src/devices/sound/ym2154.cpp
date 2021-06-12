@@ -284,13 +284,21 @@ void ym2154_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				rvol += 4 * (7 - channel.m_panpot);
 			rvol = voltable[rvol & 7] >> (rvol >> 3);
 
+			auto &source = space(chan / 6);
 			for (int sampindex = 0; sampindex < outl.samples() && (channel.m_pos >> ADDR_SHIFT) <= channel.m_end; sampindex++)
 			{
-				// unsure what the real data is; for now guessing 8-bit PCM but could
-				// be ADPCM-A or some other format
-				int8_t data = space(chan / 6).read_byte(channel.m_pos++);
-				outl.add_int(sampindex, data * lvol, 0x80 * 0x800);
-				outr.add_int(sampindex, data * rvol, 0x80 * 0x800);
+				uint8_t raw = source.read_byte(channel.m_pos++);
+
+				// seems to be ulaw encoded (but with no inversion); this might
+				// also be able to be folded into the volume calculations but
+				// since it's all guesswork leave them separate for now
+				int16_t sample = 0x21 | ((raw & 0x0f) << 1);
+				sample <<= (raw >> 4) & 7;
+				if (BIT(raw, 7))
+					sample = -sample;
+
+				outl.add_int(sampindex, sample * lvol, 0x2000 * 0x800);
+				outr.add_int(sampindex, sample * rvol, 0x2000 * 0x800);
 			}
 		}
 	}
