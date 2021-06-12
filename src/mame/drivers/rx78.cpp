@@ -10,11 +10,8 @@ TODO:
 - implement printer;
 - Implement 2nd cart slot
 - Keyboard works in all scenarios, but it is a guess.
-- Colours are incorrect. Need more carts to help construct a proper solution.
- -- m_pal_reg and m_pri_mask can have unemulated bits used by games, what are these bits for?
- -- the colours are verified correct for all games in the software lists, except:
-   -- chlgolf - it's almost correct, just a few minor things in the background. Perfectly playable.
-   -- cracer - this game has a lot of issues, including incorrect behaviour. It's still playable though.
+- cracer - this game has issues, including incorrect behaviour. It's still playable though.
+- exbaseb - the game skips the intro screen, as if a key had been pressed.
 - RAM handling can't be right: PCB has 30KB shared RAM (manual also says this in the technical specs),
   but MAME allocates much more
 
@@ -60,10 +57,9 @@ Summary of Monitor commands.
 ==============================================================================================================
 
 Known issues:
-- Excite baseball: Graphics issues, unplayable
 - Sekigahara: Joystick problem
 - Mobile Gundam: Bad sound at the intro screen
-- Champion Racer: Graphics and Colour.
+- Champion Racer: The countdown traffic lights don't work
 
 *************************************************************************************************************/
 
@@ -106,6 +102,7 @@ private:
 	void vdp_reg_w(offs_t offset, u8 data);
 	void vdp_bg_reg_w(u8 data);
 	void vdp_pri_mask_w(u8 data);
+	void create_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -119,6 +116,7 @@ private:
 	u8 m_pal_reg[7];
 	u8 m_pri_mask;
 	u8 m_key_mux;
+	u8 m_bgr;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -144,17 +142,13 @@ u8 rx78_state::cass_r()
 
 uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 color[2];
-	bool pen[3];
+	u8 layers;
+	u8 laycol[2];
 	const u8 borderx = 32, bordery = 20;
 
-	bitmap.fill(16, cliprect);
+	bitmap.fill(64, cliprect); // set the border
 
 	u16 count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
-
-	u8 pri_mask = m_pri_mask;
-	if (BIT(m_pri_mask, 7))
-		pri_mask &= m_pal_reg[6]; // this gives blue sky in Challenge Golf - colours to be checked on carts as they are dumped
 
 	for(u8 y=0; y<184; y++)
 	{
@@ -162,24 +156,21 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		{
 			for (u8 i = 0; i < 8; i++)
 			{
-				/* bg color */
-				pen[0] = BIT(m_pri_mask, 3) ? BIT(m_vram[count + 0x6000], i) : 0;
-				pen[1] = BIT(m_pri_mask, 4) ? BIT(m_vram[count + 0x8000], i) : 0;
-				pen[2] = BIT(m_pri_mask, 5) ? BIT(m_vram[count + 0xa000], i) : 0;
+				layers = 0;
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(m_pri_mask, j))
+						layers |= (BIT(m_vram[count + j*0x2000], i))<<j;
 
-				color[1] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
-
-				/* fg color */
-				pen[0] = BIT(pri_mask, 0) ? BIT(m_vram[count + 0x0000], i) : 0;
-				pen[1] = BIT(pri_mask, 1) ? BIT(m_vram[count + 0x2000], i) : 0;
-				pen[2] = BIT(pri_mask, 2) ? BIT(m_vram[count + 0x4000], i) : 0;
-
-				color[0] = pen[0] | (pen[1] << 1) | (pen[2] << 2);
-
-				if (color[1])
-					bitmap.pix(y+bordery, x+i+borderx) = color[1] | 8;
-				if (color[0])
-					bitmap.pix(y+bordery, x+i+borderx) = color[0];
+				laycol[0] = 0;
+				laycol[1] = 0;
+				for (u8 j = 0; j < 6; j++)
+				{
+					bool bit = BIT(m_pal_reg[6], j);
+					if (BIT(layers, j))
+						laycol[bit] |= m_pal_reg[j];
+				}
+				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_bgr);
+				bitmap.pix(y+bordery, x+i+borderx) = color;
 			}
 			count++;
 		}
@@ -238,31 +229,18 @@ void rx78_state::vram_write_bank_w(u8 data)
 
 void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
-	m_pal_reg[offset] = data;
-
 	if (offset < 6)
 	{
-		for(u8 i = 0; i < 16; i++)
-		{
-			data =   (BIT(i, 0) ? m_pal_reg[0 + (BIT(i, 3) ? 3 : 0)] : 0)
-					|(BIT(i, 1) ? m_pal_reg[1 + (BIT(i, 3) ? 3 : 0)] : 0)
-					|(BIT(i, 2) ? m_pal_reg[2 + (BIT(i, 3) ? 3 : 0)] : 0);
-
-			u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
-			u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
-			u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
-
-			m_palette->set_pen_color(i, rgb_t(r,g,b));
-		}
+		//u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
+		//u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
+		//u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
+		//m_palette->set_pen_color(66+offset, rgb_t(r,g,b));
+		m_pal_reg[offset] = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 	}
-
-	if (m_pal_reg[6] == 3)  // seki
-		for (u8 i = 5; i <8; i++)
-			m_palette->set_pen_color(i, m_palette->pen_color(i-4));
 	else
-	if (m_pal_reg[6] == 15)  // theprowr
-		for (u8 i = 11; i <16; i+=2)
-			m_palette->set_pen_color(i, m_palette->pen_color(9));
+	{
+		m_pal_reg[offset] = data & 0x3f;
+	}
 }
 
 void rx78_state::vdp_bg_reg_w(u8 data)
@@ -270,13 +248,25 @@ void rx78_state::vdp_bg_reg_w(u8 data)
 	u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
 	u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
 	u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
-
-	m_palette->set_pen_color(16, rgb_t(r,g,b));
+	m_palette->set_pen_color(64, rgb_t(r,g,b));   // use this as the border colour
+	m_bgr = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 }
 
 void rx78_state::vdp_pri_mask_w(u8 data)
 {
 	m_pri_mask = data;
+}
+
+void rx78_state::create_palette(palette_device &palette) const
+{
+	constexpr u8 level[] = { 0, 0x7f, 0, 0xff };
+	for (u8 i = 0; i < 64; i++)
+	{
+		u8 r = level[BIT(i, 0, 2)];
+		u8 g = level[BIT(i, 2, 2)];
+		u8 b = level[BIT(i, 4, 2)];
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -456,6 +446,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_pal_reg), 7);
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
+	save_item(NAME(m_bgr));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
@@ -492,7 +483,6 @@ static GFXDECODE_START( gfx_rx78 )
 	GFXDECODE_ENTRY( "roms", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
-
 void rx78_state::rx78(machine_config &config)
 {
 	/* basic machine hardware */
@@ -512,7 +502,7 @@ void rx78_state::rx78(machine_config &config)
 	screen.set_screen_update(FUNC(rx78_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
+	PALETTE(config, m_palette, FUNC(rx78_state::create_palette), 72);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load));
