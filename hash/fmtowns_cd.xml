@@ -21410,7 +21410,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="beast2">
+	<!-- Missing CDDA music during gameplay -->
+	<software name="beast2" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 01).bin" size="73735200" crc="153631da" sha1="f3f3109f0c5e95d549de3c63efe9e21baff638cb"/>
