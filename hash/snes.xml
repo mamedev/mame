@@ -1088,7 +1088,6 @@ Beyond that last category are the roms waiting to be classified.
 		<description>EarthBound (USA, prototype 19950327)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-8PV5B-01" />
 			<feature name="u1" value="U1 4/8M EPROM(J)" />
@@ -1121,7 +1120,7 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="" sha1="" offset="0x280000" />
 -->
 			</dataarea>
-			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="65536">
 			</dataarea>
 		</part>
 	</software>
