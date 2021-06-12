@@ -1043,10 +1043,11 @@ void voodoo_device::tmu_shared_state::init()
 void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memory, int tmem)
 {
 	/* allocate texture RAM */
+	m_type = vdt;
 	m_ram = reinterpret_cast<u8 *>(memory);
 	m_mask = tmem - 1;
 	m_regdirty = false;
-	m_bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
+	m_raster.m_bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
 	m_ncc[0].dirty = m_ncc[1].dirty = true;
@@ -1070,24 +1071,12 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 	m_texel[13] = share.int8;
 	m_texel[14] = m_palette;
 	m_texel[15] = nullptr;
-	m_lookup = m_texel[0];
+	m_raster.m_lookup = m_texel[0];
 
 	/* attach the palette to NCC table 0 */
 	m_ncc[0].palette = m_palette;
 	if (vdt >= TYPE_VOODOO_2)
 		m_ncc[0].palettea = m_palettea;
-
-	/* set up texture address calculations */
-	if (vdt <= TYPE_VOODOO_2)
-	{
-		m_texaddr_mask = 0x0fffff;
-		m_texaddr_shift = 3;
-	}
-	else
-	{
-		m_texaddr_mask = 0xfffff0;
-		m_texaddr_shift = 0;
-	}
 }
 
 
@@ -1776,10 +1765,17 @@ void voodoo_device::dac_state::data_r(u8 regnum)
  *
  *************************************/
 
-void voodoo_device::tmu_state::recompute_texture_params()
+void voodoo::raster_texture::recompute(u32 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
 {
+	u32 const addrmask = (type <= TYPE_VOODOO_2) ? 0x0fffff : 0xfffff0;
+	u32 const addrshift = (type <= TYPE_VOODOO_2) ? 3 : 0;
+
+	m_ram = ram;
+	m_mask = mask;
+	m_lookup = lookup;
+
 	// extract LOD parameters
-	auto const texlod = m_reg.texture_lod();
+	auto const texlod = regs.texture_lod();
 	m_lodmin = texlod.lod_min() << 6;
 	m_lodmax = texlod.lod_max() << 6;
 	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
@@ -1797,15 +1793,15 @@ void voodoo_device::tmu_state::recompute_texture_params()
 		m_wmask >>= texlod.lod_aspect();
 
 	// determine the bpp of the texture
-	auto const texmode = m_reg.texture_mode();
+	auto const texmode = regs.texture_mode();
 	int bppscale = texmode.format() >> 3;
 
 	// start with the base of LOD 0
-	u32 base = m_reg.texture_baseaddr();
-	if (m_texaddr_shift == 0 && BIT(base, 0) != 0)
+	u32 base = regs.texture_baseaddr();
+	if (addrshift == 0 && BIT(base, 0) != 0)
 		osd_printf_debug("Tiled texture\n");
-	base = (base & m_texaddr_mask) << m_texaddr_shift;
-	m_lodoffset[0] = base & m_mask;
+	base = (base & addrmask) << addrshift;
+	m_lodoffset[0] = base & mask;
 
 	// LODs 1-3 are different depending on whether we are in multitex mode
 	// Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think
@@ -1814,24 +1810,24 @@ void voodoo_device::tmu_state::recompute_texture_params()
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
 	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
-		base = (m_reg.texture_baseaddr_1() & m_texaddr_mask) << m_texaddr_shift;
-		m_lodoffset[1] = base & m_mask;
-		base = (m_reg.texture_baseaddr_2() & m_texaddr_mask) << m_texaddr_shift;
-		m_lodoffset[2] = base & m_mask;
-		base = (m_reg.texture_baseaddr_3_8() & m_texaddr_mask) << m_texaddr_shift;
-		m_lodoffset[3] = base & m_mask;
+		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
+		m_lodoffset[1] = base & mask;
+		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;
+		m_lodoffset[2] = base & mask;
+		base = (regs.texture_baseaddr_3_8() & addrmask) << addrshift;
+		m_lodoffset[3] = base & mask;
 	}
 	else
 	{
 		if (m_lodmask & (1 << 0))
 			base += (((m_wmask >> 0) + 1) * ((m_hmask >> 0) + 1)) << bppscale;
-		m_lodoffset[1] = base & m_mask;
+		m_lodoffset[1] = base & mask;
 		if (m_lodmask & (1 << 1))
 			base += (((m_wmask >> 1) + 1) * ((m_hmask >> 1) + 1)) << bppscale;
-		m_lodoffset[2] = base & m_mask;
+		m_lodoffset[2] = base & mask;
 		if (m_lodmask & (1 << 2))
 			base += (((m_wmask >> 2) + 1) * ((m_hmask >> 2) + 1)) << bppscale;
-		m_lodoffset[3] = base & m_mask;
+		m_lodoffset[3] = base & mask;
 	}
 
 	// remaining LODs make sense
@@ -1843,32 +1839,14 @@ void voodoo_device::tmu_state::recompute_texture_params()
 			if (size < 4) size = 4;
 			base += size << bppscale;
 		}
-		m_lodoffset[lod] = base & m_mask;
+		m_lodoffset[lod] = base & mask;
 	}
 
-	// set the NCC lookup appropriately
-	m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
-
-	// pick the lookup table
-	m_lookup = m_texel[texmode.format()];
-
 	// compute the detail parameters
-	auto const texdetail = m_reg.texture_detail();
+	auto const texdetail = regs.texture_detail();
 	m_detailmax = texdetail.detail_max();
 	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
 	m_detailscale = texdetail.detail_scale();
-
-	// ensure that the NCC tables are up to date
-	if ((texmode.format() & 7) == 1)
-	{
-		ncc_table &n = m_ncc[texmode.ncc_table_select()];
-		m_texel[1] = m_texel[9] = n.texel;
-		if (n.dirty)
-			n.update();
-	}
-
-	// no longer dirty
-	m_regdirty = false;
 
 	// check for separate RGBA filtering
 	if (texdetail.separate_rgba_filter())
@@ -1876,11 +1854,27 @@ void voodoo_device::tmu_state::recompute_texture_params()
 }
 
 
-inline s32 voodoo_device::tmu_state::prepare()
+inline raster_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
 {
 	// if the texture parameters are dirty, update them
 	if (m_regdirty)
-		recompute_texture_params();
+	{
+		// ensure that the NCC tables are up to date if they are being referenced
+		auto const texmode = m_reg.texture_mode();
+		if ((texmode.format() & 7) == 1)
+		{
+			ncc_table &ncc = m_ncc[texmode.ncc_table_select()];
+			if (ncc.dirty)
+				ncc.update();
+		}
+
+		// set the NCC lookup appropriately
+		m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
+
+		// recompute the rasterization parameters
+		m_raster.recompute(m_type, m_reg, m_ram, m_mask, m_texel[texmode.format()]);
+		m_regdirty = false;
+	}
 
 	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
 	s64 texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
@@ -1896,9 +1890,9 @@ inline s32 voodoo_device::tmu_state::prepare()
 	// adjust the result: negative to get the log of the original value
 	// plus 12 to account for the extra exponent, and divided by 2 to
 	// get the log of the square root of texdx
-	double texdx_fp = texdx;
-	s32 lodbase = fast_log2(texdx_fp, 0);
-	return (lodbase + (12 << 8)) / 2;
+	lodbase = (fast_log2(double(texdx), 0) + (12 << 8)) / 2;
+
+	return m_raster;
 }
 
 
@@ -3866,8 +3860,12 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 	m_poly->wait("Texture write");
 
 	/* update texture info if dirty */
+	auto const texmode = t->m_reg.texture_mode();
 	if (t->m_regdirty)
-		t->recompute_texture_params();
+	{
+		t->m_raster.recompute(t->m_type, t->m_reg, t->m_ram, t->m_mask, t->m_texel[texmode.format()]);
+		t->m_regdirty = false;
+	}
 
 	/* swizzle the data */
 	if (texlod.tdata_swizzle())
@@ -3876,7 +3874,6 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 		data = (data >> 16) | (data << 16);
 
 	/* 8-bit texture case */
-	auto const texmode = t->m_reg.texture_mode();
 	if (texmode.format() < 8)
 	{
 		int lod, tt, ts;
@@ -3900,14 +3897,14 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 				return 0;
 
 			/* compute the base address */
-			tbaseaddr = t->m_lodoffset[lod];
-			tbaseaddr += tt * ((t->m_wmask >> lod) + 1) + ts;
+			tbaseaddr = t->m_raster.m_lodoffset[lod];
+			tbaseaddr += tt * ((t->m_raster.m_wmask >> lod) + 1) + ts;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
-			tbaseaddr = t->m_lodoffset[0] + offset*4;
+			tbaseaddr = t->m_raster.m_lodoffset[0] + offset*4;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
@@ -3940,14 +3937,14 @@ s32 voodoo_device::texture_w(offs_t offset, u32 data)
 				return 0;
 
 			/* compute the base address */
-			tbaseaddr = t->m_lodoffset[lod];
-			tbaseaddr += 2 * (tt * ((t->m_wmask >> lod) + 1) + ts);
+			tbaseaddr = t->m_raster.m_lodoffset[lod];
+			tbaseaddr += 2 * (tt * ((t->m_raster.m_wmask >> lod) + 1) + ts);
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
 		}
 		else
 		{
-			tbaseaddr = t->m_lodoffset[0] + offset*4;
+			tbaseaddr = t->m_raster.m_lodoffset[0] + offset*4;
 
 			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
 		}
@@ -6095,7 +6092,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 		extra.ds0dy = m_tmu[0].m_dsdy;
 		extra.dt0dy = m_tmu[0].m_dtdy;
 		extra.dw0dy = m_tmu[0].m_dwdy;
-		extra.lodbase0 = m_tmu[0].prepare();
+		extra.tex0 = &m_tmu[0].prepare(extra.lodbase0);
 		m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
 
 		/* fill in texture 1 parameters */
@@ -6110,7 +6107,7 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 			extra.ds1dy = m_tmu[1].m_dsdy;
 			extra.dt1dy = m_tmu[1].m_dtdy;
 			extra.dw1dy = m_tmu[1].m_dwdy;
-			extra.lodbase1 = m_tmu[1].prepare();
+			extra.tex1 = &m_tmu[1].prepare(extra.lodbase1);
 			m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
 		}
 	}

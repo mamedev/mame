@@ -138,11 +138,39 @@ struct raster_params
 	u32 m_texmode1;		// 31 bits
 };
 
+class raster_texture
+{
+public:
+	void recompute(u32 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
+
+	rgb_t lookup_single_texel(voodoo::reg_texture_mode const texmode, u32 texbase, s32 s, s32 t);
+	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
+	rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
+
+	u8 *m_ram = nullptr;          // pointer to our RAM
+	u32 m_mask = 0;               // mask to apply to pointers
+	s32 m_lodmin = 0, m_lodmax = 0; // min, max LOD values
+	s32 m_lodbias = 0;            // LOD bias
+	u32 m_lodmask = 0;            // mask of available LODs
+	u32 m_lodoffset[9];           // offset of texture base for each LOD
+	s32 m_detailmax = 0;          // detail clamp
+	s32 m_detailbias = 0;         // detail bias
+	u8 m_detailscale = 0;        // detail scale
+
+	u32 m_wmask = 0;              // mask for the current texture width
+	u32 m_hmask = 0;              // mask for the current texture height
+
+	u32 m_bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
+	rgb_t const *m_lookup = nullptr;       // currently selected lookup
+};
+
 struct raster_info;
 struct poly_extra_data
 {
 	raster_info *info;          // pointer to rasterizer information
 	u16 *destbase;              // destination to write
+	raster_texture *tex0;
+	raster_texture *tex1;
 
 	s16 ax, ay;                 // vertex A x,y (12.4)
 	s32 startr, startg, startb, starta; // starting R,G,B,A (12.12)
@@ -325,12 +353,8 @@ protected:
 
 	struct tmu_state
 	{
-		void recompute_texture_params();
 		void init(u8 vdt, tmu_shared_state &share, void *memory, int tmem);
-		s32 prepare();
-		rgb_t lookup_single_texel(voodoo::reg_texture_mode const texmode, u32 texbase, s32 s, s32 t);
-		rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
-		rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
+		voodoo::raster_texture &prepare(s32 &lodbase);
 
 		struct ncc_table
 		{
@@ -347,13 +371,12 @@ protected:
 			rgb_t texel[256];             // texel lookup
 		};
 
+		int m_type;
 		u8 *m_ram = nullptr;          // pointer to our RAM
 		u32 m_mask = 0;               // mask to apply to pointers
+
 		voodoo::voodoo_regs m_reg;          // pointer to our register base
 		u32 m_regdirty = 0;           // true if the LOD/mode/base registers have changed
-
-		u32 m_texaddr_mask = 0;       // mask for texture address
-		u8 m_texaddr_shift = 0;      // shift for texture address
 
 		s64 m_starts = 0, m_startt = 0; // starting S,T (14.18)
 		s64 m_startw = 0;             // starting W (2.30)
@@ -362,22 +385,10 @@ protected:
 		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
 		s64 m_dwdy = 0;               // delta W per Y
 
-		s32 m_lodmin = 0, m_lodmax = 0; // min, max LOD values
-		s32 m_lodbias = 0;            // LOD bias
-		u32 m_lodmask = 0;            // mask of available LODs
-		u32 m_lodoffset[9];           // offset of texture base for each LOD
-		s32 m_detailmax = 0;          // detail clamp
-		s32 m_detailbias = 0;         // detail bias
-		u8 m_detailscale = 0;        // detail scale
-
-		u32 m_wmask = 0;              // mask for the current texture width
-		u32 m_hmask = 0;              // mask for the current texture height
-
-		u32 m_bilinear_mask = 0;      // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
+		voodoo::raster_texture m_raster;
 
 		ncc_table m_ncc[2];                 // two NCC tables
 
-		rgb_t *m_lookup = nullptr;       // currently selected lookup
 		rgb_t *m_texel[16];              // texel lookups for each format
 
 		rgb_t m_palette[256];           // palette lookup table

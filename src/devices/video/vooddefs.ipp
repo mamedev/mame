@@ -390,7 +390,7 @@ private:
 
 #else
 
-class voodoo_device::tmu_state::stw_helper
+class stw_helper
 {
 public:
 	stw_helper() {}
@@ -1371,7 +1371,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
 
 
 
-inline rgb_t voodoo_device::tmu_state::lookup_single_texel(reg_texture_mode const texmode, u32 texbase, s32 s, s32 t)
+inline rgb_t voodoo::raster_texture::lookup_single_texel(reg_texture_mode const texmode, u32 texbase, s32 s, s32 t)
 {
 	if (texmode.format() < 8)
 		return m_lookup[*(u8 *)&m_ram[(texbase + t + s) & m_mask]];
@@ -1384,7 +1384,7 @@ inline rgb_t voodoo_device::tmu_state::lookup_single_texel(reg_texture_mode cons
 	}
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE voodoo::raster_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
 {
 	lod = lodbase;
 
@@ -1495,7 +1495,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::fetch_texel(reg_tex
 	return result;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo_device::tmu_state::combine_texture(
+inline rgbaint_t ATTR_FORCE_INLINE voodoo::raster_texture::combine_texture(
 	reg_texture_mode const texmode,
 	rgbaint_t const &c_local,
 	rgbaint_t const &c_other,
@@ -1781,22 +1781,22 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 			// run the texture pipeline on TMU1 to produce a value in texel
 			// note that they set LOD min to 8 to "disable" a TMU
 			rgbaint_t texel(0);
-			if (_TexMode1 != 0xffffffff && m_tmu[1].m_lodmin < (8 << 8))
+			if (_TexMode1 != 0xffffffff && extra.tex1->m_lodmin < (8 << 8))
 			{
 				s32 lod1;
-				rgbaint_t texel_t1 = m_tmu[1].fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, lod1);
-				texel = m_tmu[1].combine_texture(texmode1, texel_t1, texel, lod1);
+				rgbaint_t texel_t1 = extra.tex1->fetch_texel(texmode1, dither, x, iterstw1, extra.lodbase1, lod1);
+				texel = extra.tex1->combine_texture(texmode1, texel_t1, texel, lod1);
 			}
 
 			// run the texture pipeline on TMU0 to produce a final result in texel
 			// note that they set LOD min to 8 to "disable" a TMU
-			if (_TexMode0 != 0xffffffff && m_tmu[0].m_lodmin < (8 << 8))
+			if (_TexMode0 != 0xffffffff && extra.tex0->m_lodmin < (8 << 8))
 			{
 				if (!m_send_config)
 				{
 					s32 lod0;
-					rgbaint_t texel_t0 = m_tmu[0].fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
-					texel = m_tmu[0].combine_texture(texmode0, texel_t0, texel, lod0);
+					rgbaint_t texel_t0 = extra.tex0->fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
+					texel = extra.tex0->combine_texture(texmode0, texel_t0, texel, lod0);
 				}
 				else
 					texel.set(m_tmu_config);
