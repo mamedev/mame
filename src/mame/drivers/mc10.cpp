@@ -41,7 +41,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_rs232(*this, "rs232")
 		, m_pb(*this, "pb%u", 0U)
-		{ }
+		{}
 
 	void mc10_base(machine_config &config);
 	void mc10_video(machine_config &config);
@@ -139,6 +139,7 @@ uint8_t mc10_state::read_keyboard_strobe(bool single_line)
 			read = true;
 		}
 	}
+
 	return result;
 }
 
@@ -290,7 +291,7 @@ void mc10_state::mc10_mem(address_map &map)
 
 void alice32_state::alice32_mem(address_map &map)
 {
-	// alice32 / 90: RAM start at 0x3000, installed in driver_start
+	// alice32: RAM start at 0x3000, installed in driver_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
@@ -298,7 +299,7 @@ void alice32_state::alice32_mem(address_map &map)
 
 void alice90_state::alice90_mem(address_map &map)
 {
-	// alice32 / 90: RAM start at 0x3000, installed in driver_start
+	// alice90: RAM start at 0x3000, installed in driver_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
 	map(0xbfff, 0xbfff).rw(FUNC(alice90_state::alice90_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
