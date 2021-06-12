@@ -46,7 +46,6 @@ public:
 		, m_spriteram2(*this,"spriteram2")
 		, m_attributesram(*this,"attributesram")
 		, m_bulletsram(*this,"bulletsram")
-		, m_rockclim_videoram(*this,"rockclim_vram")
 		, m_racknrol_tiles_bank(*this,"racknrol_tbank")
 		, m_leds(*this, "led%u", 0U)
 		, m_leftclip(2)
@@ -67,14 +66,12 @@ public:
 	optional_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_attributesram;
 	optional_shared_ptr<uint8_t> m_bulletsram;
-	optional_shared_ptr<uint8_t> m_rockclim_videoram;
 	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
 	output_finder<2> m_leds;
 
 	int m_irq_line;
 	uint8_t m__4in1_bank;
 	tilemap_t *m_bg_tilemap;
-	tilemap_t *m_rockclim_tilemap;
 	int m_spriteram2_present;
 	uint8_t m_gfxbank[5];
 	uint8_t m_flipscreen_x;
@@ -98,8 +95,6 @@ public:
 	uint8_t m_background_green;
 	uint8_t m_background_blue;
 	void (galaxold_state::*m_draw_background)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);   /* function to call to draw the background */
-	uint16_t m_rockclim_v;
-	uint16_t m_rockclim_h;
 	int m_dambustr_bg_split_line;
 	int m_dambustr_bg_color_1;
 	int m_dambustr_bg_color_2;
@@ -147,9 +142,6 @@ public:
 	void galaxold_stars_enable_w(uint8_t data);
 	void darkplnt_bullet_color_w(uint8_t data);
 	void galaxold_gfxbank_w(offs_t offset, uint8_t data);
-	void rockclim_videoram_w(offs_t offset, uint8_t data);
-	void rockclim_scroll_w(offs_t offset, uint8_t data);
-	uint8_t rockclim_videoram_r(offs_t offset);
 	void dambustr_bg_split_line_w(uint8_t data);
 	void dambustr_bg_color_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
@@ -167,14 +159,13 @@ public:
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
 	TILE_GET_INFO_MEMBER(harem_get_tile_info);
 
 	DECLARE_MACHINE_RESET(galaxold);
 	DECLARE_MACHINE_RESET(hunchbkg);
 
 	void galaxold_palette(palette_device &palette);
-	void rockclim_palette(palette_device &palette) const;
+	void s2650_palette(palette_device &palette) const;
 	void scrambold_palette(palette_device &palette);
 	void stratgyx_palette(palette_device &palette);
 	void darkplnt_palette(palette_device &palette) const;
@@ -193,7 +184,6 @@ public:
 	DECLARE_VIDEO_START(pisces);
 	DECLARE_VIDEO_START(dkongjrm);
 	DECLARE_VIDEO_START(dkongjrmc);
-	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
 	DECLARE_VIDEO_START(ckongs);
 	DECLARE_VIDEO_START(darkplnt);
@@ -219,8 +209,6 @@ public:
 	void video_start_common();
 	void pisces_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void mooncrst_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void harem_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void mooncrst_modify_charcode(uint16_t *code, uint8_t x);
 	void pisces_modify_charcode(uint16_t *code, uint8_t x);
@@ -275,7 +263,6 @@ public:
 	void dkongjrmc(machine_config &config);
 	void bullsdrtg(machine_config &config);
 	void drivfrcg(machine_config &config);
-	void rockclim(machine_config &config);
 	void scramblb(machine_config &config);
 	void scramb2(machine_config &config);
 	void scramb3(machine_config &config);
@@ -297,7 +284,6 @@ public:
 	void mooncrst_map(address_map &map);
 	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
-	void rockclim_map(address_map &map);
 	void scramb_common_map(address_map &map);
 	void scramb2_map(address_map &map);
 	void scramb3_map(address_map &map);
