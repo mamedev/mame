@@ -94,18 +94,32 @@ public:
 	{}
 
 	void alice32(machine_config &config);
-	void alice90(machine_config &config);
+	void alice32_bfff_w(uint8_t data);
 
 protected:
 	// device-level overrides
 	virtual void driver_start() override;
 
-	void alice32_bfff_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+	required_device<ef9345_device> m_ef9345;
 
 private:
 	void alice32_mem(address_map &map);
-	required_device<ef9345_device> m_ef9345;
+};
+
+
+class alice90_state : public alice32_state
+{
+public:
+	alice90_state(const machine_config &mconfig, device_type type, const char *tag)
+	: alice32_state(mconfig, type, tag)
+	{}
+
+	void alice90(machine_config &config);
+	uint8_t alice90_bfff_r();
+
+private:
+	void alice90_mem(address_map &map);
 };
 
 /***************************************************************************
@@ -131,6 +145,11 @@ uint8_t mc10_state::read_keyboard_strobe(bool single_line)
 uint8_t mc10_state::mc10_bfff_r()
 {
 	return read_keyboard_strobe(false);
+}
+
+uint8_t alice90_state::alice90_bfff_r()
+{
+	return read_keyboard_strobe(true);
 }
 
 void mc10_state::mc10_bfff_w(uint8_t data)
@@ -161,13 +180,11 @@ void alice32_state::alice32_bfff_w(uint8_t data)
     MC6803 I/O
 ***************************************************************************/
 
-/* keyboard strobe */
 uint8_t mc10_state::mc10_port1_r()
 {
 	return m_keyboard_strobe;
 }
 
-/* keyboard strobe */
 void mc10_state::mc10_port1_w(uint8_t data)
 {
 	m_keyboard_strobe = data;
@@ -229,16 +246,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(alice32_state::alice32_scanline)
 
 void mc10_state::driver_reset()
 {
-	/* initialize keyboard strobe */
 	m_keyboard_strobe = 0x00;
 }
 
 void mc10_state::driver_start()
 {
-	// call base device_start
 	driver_device::driver_start();
 
-	/* register for state saving */
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -253,10 +267,8 @@ void mc10_state::driver_start()
 
 void alice32_state::driver_start()
 {
-	// call base device_start
 	driver_device::driver_start();
 
-	/* register for state saving */
 	save_item(NAME(m_keyboard_strobe));
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -283,6 +295,16 @@ void alice32_state::alice32_mem(address_map &map)
 	map(0xbfff, 0xbfff).rw(FUNC(mc10_state::mc10_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
 }
+
+void alice90_state::alice90_mem(address_map &map)
+{
+	// alice32 / 90: RAM start at 0x3000, installed in driver_start
+	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
+	map(0xbfff, 0xbfff).rw(FUNC(alice90_state::alice90_bfff_r), FUNC(alice32_state::alice32_bfff_w));
+	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
+}
+
+
 
 /***************************************************************************
     INPUT PORTS
@@ -565,10 +587,14 @@ void alice32_state::alice32(machine_config &config)
 	SOFTWARE_LIST(config, "mc10_cass").set_compatible("mc10");
 }
 
-void alice32_state::alice90(machine_config &config)
+void alice90_state::alice90(machine_config &config)
 {
 	alice32(config);
 
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &alice90_state::alice90_mem);
+
+	/* internal ram */
 	m_ram->set_default_size("32K");
 
 	/* Software lists */
@@ -615,4 +641,4 @@ ROM_END
 COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state,    empty_init, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
 COMP( 1983, alice,   mc10,    0,      alice,   alice, mc10_state,    empty_init, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
 COMP( 1984, alice32, 0,       0,      alice32, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,      alice90, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, alice90_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
