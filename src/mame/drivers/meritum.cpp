@@ -360,7 +360,7 @@ void meritum_state::meritum1(machine_config &config)
 	mainppi.out_pc_callback().set(FUNC(meritum_state::mainppi_portc_w));
 	mainppi.out_pb_callback().set(FUNC(meritum_state::mainppi_portb_w));
 
-/* parallel printer */
+	// printer
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->ack_handler().set("mainppi", FUNC(i8255_device::pc2_w));

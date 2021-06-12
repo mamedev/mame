@@ -121,7 +121,7 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="cracer" supported="partial"><!-- various bugs -->
+	<software name="cracer" supported="partial"><!-- traffic lights at start are skipped -->
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
@@ -133,10 +133,11 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="exbaseb" supported="no"><!-- gfx issues -->
+	<software name="exbaseb">
 		<description>Excite Baseball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="usage" value="Blue player uses arrows; Red player uses R,D,F,G" /><!-- difficult to hit the ball -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="exbaseb1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />

@@ -116,7 +116,7 @@ private:
 	u8 m_pal_reg[7];
 	u8 m_pri_mask;
 	u8 m_key_mux;
-	u8 m_bgr;
+	u8 m_background;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -164,12 +164,10 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				laycol[0] = 0;
 				laycol[1] = 0;
 				for (u8 j = 0; j < 6; j++)
-				{
-					bool bit = BIT(m_pal_reg[6], j);
 					if (BIT(layers, j))
-						laycol[bit] |= m_pal_reg[j];
-				}
-				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_bgr);
+						laycol[BIT(m_pal_reg[6], j)] |= m_pal_reg[j];
+
+				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_background);
 				bitmap.pix(y+bordery, x+i+borderx) = color;
 			}
 			count++;
@@ -230,17 +228,9 @@ void rx78_state::vram_write_bank_w(u8 data)
 void rx78_state::vdp_reg_w(offs_t offset, u8 data)
 {
 	if (offset < 6)
-	{
-		//u8 r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0);
-		//u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
-		//u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
-		//m_palette->set_pen_color(66+offset, rgb_t(r,g,b));
 		m_pal_reg[offset] = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
-	}
 	else
-	{
 		m_pal_reg[offset] = data & 0x3f;
-	}
 }
 
 void rx78_state::vdp_bg_reg_w(u8 data)
@@ -249,7 +239,7 @@ void rx78_state::vdp_bg_reg_w(u8 data)
 	u8 g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0);
 	u8 b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0);
 	m_palette->set_pen_color(64, rgb_t(r,g,b));   // use this as the border colour
-	m_bgr = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
+	m_background = bitswap<8>(data, 7, 3, 6, 2, 5, 1, 4, 0) & 0x3f;
 }
 
 void rx78_state::vdp_pri_mask_w(u8 data)
@@ -446,7 +436,7 @@ void rx78_state::machine_start()
 	save_pointer(NAME(m_pal_reg), 7);
 	save_item(NAME(m_pri_mask));
 	save_item(NAME(m_key_mux));
-	save_item(NAME(m_bgr));
+	save_item(NAME(m_background));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )

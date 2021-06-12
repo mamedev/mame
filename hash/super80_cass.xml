@@ -1649,7 +1649,7 @@ X-3607 : Horse Race
 	</software>
 	<software name="crazym">
 		<description>Crazy Maze</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Matrix Software</publisher>
 		<info name="usage" value="L to load, G0 to run" />
 		<sharedfeat name="compatibility" value="D" />
@@ -1660,11 +1660,11 @@ X-3607 : Horse Race
 		</part>
 	</software>
 	<software name="crazymj">
-		<description>Crazy Maze (L4) (with arrows)</description>
-		<year>198?</year>
+		<description>Crazy Maze (with arrows)</description>
+		<year>1983</year>
 		<publisher>Matrix Software</publisher>
 		<info name="usage" value="T3 then, L to load, G0 to run" />
-		<sharedfeat name="compatibility" value="M" />
+		<sharedfeat name="compatibility" value="D,M" />
 		<part name="cass" interface="super80_cass">
 			<dataarea name="cass" size="0x1bfd20e">
 				<rom name="crazymj.wav" size="0x1bfd20e" crc="f723e58d" sha1="213a9dca5f58206cd415aa34eb4f0a70eb785c7b"/>
