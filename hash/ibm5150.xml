@@ -7498,6 +7498,50 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (5.25", v1.00)</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Death Knights of Krynn [SSI] [1991] [5.25DD] [Disk 1 of 2].img" size="368640" crc="c5d6230b" sha1="dfc457652f605f179685bc661d3c7b4c356feeed"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Death Knights of Krynn [SSI] [1991] [5.25DD] [Disk 2 of 2].img" size="368640" crc="48e723c8" sha1="4b3b94e32015746dc3a763cbd47615dd181de306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkkrynn35" cloneof="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.00)</description>
+		<year>1991</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Death Knights of Krynn [SSI] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="27fd9b4e" sha1="43431e5ede6a402e4756ff6a447a324171c09b14"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkkrynn35a" cloneof="dkkrynn">
+		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.10)</description>
+		<year>1992</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Death Knights of Krynn [SSI] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="17d70b72" sha1="05f3442254e1c750549d23fb191fbe48142efb08"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkmoon">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Advanced Dungeons &amp; Dragons - Eye of the Beholder II: The Legend of Darkmoon</description>
@@ -7602,6 +7646,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Secret of the Silver Blades (USA).img" size="737280" crc="64b5ce63" sha1="66f92af0f871081d3c1ff7554ab8b6b1c3402344"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlance">
+		<description>Advanced Dungeons &amp; Dragons - War of the Lance</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="War of the Lance [SSI] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="afec175a" sha1="0f9b04ef50127328c053d0cacb53625b3cb22db0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="War of the Lance [SSI] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="53c950fa" sha1="e25796b64dc77bb4af361292fd05573d3f57db3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9120,6 +9182,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="d-generation disk 2.img" size="737280" crc="9edd6f84" sha1="9ad37d011d01d050fe6aa1acebf380f209b6c75d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathtrk">
+		<description>DeathTrack</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Dynamix" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DeathTrack [Activision] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="370950be" sha1="52834383e9ae7de19613170af6d27ada3894c7d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="DeathTrack [Activision] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="fb1cba9f" sha1="0640f77598a5fe3ddb8506817a19de1b27e9dcfb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13555,12 +13634,12 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Binary Systems" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 1 of 2].img" size="368640" crc="9e50175b" sha1="496bea78bb92544882f4f3df2404482929f14d0d"/>
+				<rom name="Starflight [Electronic Arts] [1986] [5.25DD] [Disk 1 of 2].img" size="368640" crc="cea623ec" sha1="87acb730fd73e01d7f8ef3df4d6c041531d0dd75"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 2 of 2].img" size="368640" crc="a0d1c41d" sha1="7a2c8628736d376543c3ac12959050f3ae03c791"/>
+				<rom name="Starflight [Electronic Arts] [1986] [5.25DD] [Disk 2 of 2].img" size="368640" crc="5da2fc6a" sha1="36a678d5c6040e4d8d2e1e6bb5459056bcdf4580"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13585,7 +13664,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="starflg2a" cloneof="starflg2">
-		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25", Alt)</description>
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25", alt)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Binary Systems" />
@@ -13601,6 +13680,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- this could be the USA release -->
 	<software name="starflg2_35" cloneof="starflg2">
 		<description>Starflight 2: Trade Routes of the Cloud Nebula (3.5")</description>
 		<year>1989</year>
@@ -13609,6 +13689,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Starflight 2 - Trade Routes of the Cloud Nebula [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ca96256f" sha1="a56171d525026459734fdaa77a246a6b7b0da52d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflg2a_35" cloneof="starflg2">
+		<description>Starflight 2: Trade Routes of the Cloud Nebula (3.5", alt)</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Starflight 2 (alt) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="14a815e7" sha1="03e343efbced4c31454e348f1364dc6e68307629"/>
 			</dataarea>
 		</part>
 	</software>
