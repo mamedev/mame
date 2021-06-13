@@ -14,7 +14,7 @@ Konami 037122
     ---------------- -----xxxxx------ Red
     ---------------- ----------xxxxxx Green
 
-    Tilemap is can be rotated, zoomed, similar as K053936 "simple mode"    
+    Tilemap can be rotated, zoomed, similar to K053936 "simple mode"
 	Tilemap can be configured either as 256x64 tiles (2048x512 pixels) or 128x128 tiles (1024x1024 pixels), Each tile is 8bpp 8x8.
 
     Tile format (4 byte (1x32bit word) per each tile)
@@ -45,7 +45,7 @@ Konami 037122
     20     sxxxxxxxxxxxxxxx ---------------- X counter starting value (12.4 fixed point)
            ---------------- sxxxxxxxxxxxxxxx Y counter starting value (12.4 fixed point)
     24     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each line (4.12 fixed point)
-	       ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)	       
+	       ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
     28     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each horizontal pixel (4.12 fixed point)
 	       ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each horizontal pixel (4.12 fixed point)
     30     ---------------x ---------------- Tilemap size
@@ -59,7 +59,7 @@ Konami 037122
     Other bits/registers unknown, some registers are used
 
 TODO:
-    - verify and implement scroll, ROZ, display timing registers
+    - verify and implement display timing registers
     - verify other unknown but used registers
 */
 
@@ -145,7 +145,7 @@ void k037122_device::device_reset()
 *****************************************************************************/
 
 TILE_GET_INFO_MEMBER(k037122_device::tile_info)
-{	
+{
 	uint32_t val = m_tile_ram[tile_index + (m_tilemap_base / 4)];
 	int color = (val >> 17) & 0x1f;
 	int tile = val & 0x3fff;
@@ -164,7 +164,7 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int16_t scrollx = m_reg[0x8] >> 16;	
+	int16_t scrollx = m_reg[0x8] >> 16;
 	int16_t scrolly = m_reg[0x8] & 0xffff;
 
 	int16_t incxx = m_reg[0xa] >> 16;
@@ -176,7 +176,7 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 	int16_t scrolly_256 = scrolly;
 	if (scrolly_256 & 0x800)
 		scrolly_256 |= 0xf000;
-	
+
 	if (m_reg[0xc] & 0x10000)
 	{
 		m_tilemap_128->set_scrolldx(visarea.min_x, visarea.min_x);
@@ -195,7 +195,7 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 			(int32_t)(incxx) << 4, (int32_t)(incxy) << 4, (int32_t)(incyx) << 4, (int32_t)(incyy) << 4,
 			false, 0, 0);
 	}
-	
+
 }
 
 uint32_t k037122_device::sram_r(offs_t offset)
@@ -214,7 +214,7 @@ void k037122_device::sram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		int color = (address - m_palette_base) / 4;
 		palette().set_pen_color(color, pal5bit(data >> 6), pal6bit(data >> 0), pal5bit(data >> 11));
 	}
-	
+
 	if (address >= m_tilemap_base && address < m_tilemap_base + 0x10000)
 	{
 		m_tilemap_128->mark_tile_dirty((address - m_tilemap_base) / 4);
@@ -258,7 +258,7 @@ void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		uint32_t palette_base = (data & 0x4) ? 0x18000 : 0x00000;
 
 		// tilemap is at 0x00000 unless CLUT is there
-		uint32_t tilemap_base = (data & 0x4) ? 0x00000 : 0x08000;				
+		uint32_t tilemap_base = (data & 0x4) ? 0x00000 : 0x08000;
 
 		if (palette_base != m_palette_base)
 		{
@@ -266,10 +266,10 @@ void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			// update all colors since palette moved
 			for (auto p = 0; p < 8192; p++)
-			{				
+			{
 				uint32_t color = m_tile_ram[(m_palette_base / 4) + p];
 				palette().set_pen_color(p, pal5bit(color >> 6), pal6bit(color >> 0), pal5bit(color >> 11));
-			}			
+			}
 		}
 
 		if (tilemap_base != m_tilemap_base)
