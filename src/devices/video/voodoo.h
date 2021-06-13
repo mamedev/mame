@@ -23,12 +23,6 @@
 // maximum number of TMUs
 static constexpr int MAX_TMU = 2;
 
-/* maximum number of rasterizers */
-#define MAX_RASTERIZERS         1024
-
-/* size of the rasterizer hash table */
-#define RASTER_HASH_SIZE        97
-
 // enumeration specifying which model of Voodoo we are emulating
 enum
 {
@@ -359,9 +353,6 @@ protected:
 		u32 blt_src_bpp = 0;
 	};
 
-	static voodoo::static_raster_info predef_raster_table[];
-	static voodoo::static_raster_info generic_raster_table[3];
-
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);
 	void init_fbi(fbi_state *f, void *memory, int fbmem);
@@ -381,10 +372,6 @@ protected:
 	s32 begin_triangle();
 	s32 draw_triangle();
 	s32 setup_and_draw_triangle();
-	s32 triangle_create_work_item(u16 *drawbuf, int texcount);
-	voodoo::raster_info *add_rasterizer(voodoo::raster_params const &params, voodoo::voodoo_renderer::mfp rasterizer, bool is_generic);
-	voodoo::raster_info *find_rasterizer(int texcount, voodoo::raster_params const &params);
-	void dump_rasterizer_stats();
 
 	void accumulate_statistics(const voodoo::thread_stats_block &block);
 	void update_statistics(bool accumulate);
@@ -401,6 +388,13 @@ protected:
 	void init_save_state();
 
 	void banshee_blit_2d(u32 data);
+
+private:
+	// internal helpers
+	u16 *draw_buffer(int index) const { return (u16 *)(m_fbi.ram + m_fbi.rgboffs[index]); }
+	u16 *front_buffer() const { return draw_buffer(m_fbi.frontbuf); }
+	u16 *back_buffer() const { return draw_buffer(m_fbi.backbuf); }
+	u16 *aux_buffer() const { return (m_fbi.auxoffs != ~0) ? (u16 *)(m_fbi.ram + m_fbi.auxoffs) : nullptr; }
 
 // FIXME: this stuff should not be public
 public:
@@ -419,17 +413,12 @@ public:
 	const u8 *m_regaccess;              // register access array
 	const char *const *m_regnames;               // register names array
 
-	std::unique_ptr<voodoo::voodoo_renderer> m_poly;              // polygon manager
+	std::unique_ptr<voodoo::voodoo_renderer> m_renderer;              // polygon manager
 
 	voodoo_stats m_stats;                  // internal statistics
 
 	offs_t m_last_status_pc;         // PC of last status description (for logging)
 	u32 m_last_status_value;      // value of last status read (for logging)
-
-	int m_next_rasterizer;        // next rasterizer index
-	voodoo::raster_info m_rasterizer[MAX_RASTERIZERS]; // array of rasterizers
-	voodoo::raster_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
-	voodoo::raster_info *m_generic_rasterizer[3];
 
 	bool m_send_config;
 	u32 m_tmu_config;

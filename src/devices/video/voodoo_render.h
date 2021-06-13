@@ -17,16 +17,11 @@
 #include "video/rgbutil.h"
 
 
+//
+// To do:
+//   - incorporate type and send_config flags into constant flags
+//   - use type for: fog delta mask, bilinear mask, texture mask/shift
 
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-/* maximum number of rasterizers */
-#define MAX_RASTERIZERS         1024
-
-/* size of the rasterizer hash table */
-#define RASTER_HASH_SIZE        97
 
 
 /***************************************************************************
@@ -35,6 +30,10 @@
 
 namespace voodoo
 {
+
+struct poly_data;
+using voodoo_poly_manager = poly_manager<float, poly_data, 1, 10000>;
+
 
 class dither_helper;
 class stw_helper;
@@ -46,14 +45,22 @@ struct raster_params
 		return (value << count) | (value >> (32 - count));
 	}
 
-	void compute(u8 type, int texcount, voodoo_regs &regs, voodoo_regs &tmu0regs, voodoo_regs &tmu1regs)
+	void compute(u8 type, voodoo_regs &regs, voodoo_regs *tmu0regs = nullptr, voodoo_regs *tmu1regs = nullptr)
 	{
+		// these values are normalized to ignore irrelevant bits
 		m_fbzcp = regs.fbz_colorpath().normalize();
 		m_fbzmode = regs.fbz_mode().normalize();
 		m_alphamode = regs.alpha_mode().normalize();
-		m_fogmode = regs.fog_mode().normalize() | (int(type >= TYPE_VOODOO_2) << 31);
-		m_texmode0 = (texcount >= 1 && tmu0regs.texture_lod().lod_min() < 32) ? tmu0regs.texture_mode().normalize() : 0xffffffff;
-		m_texmode1 = (texcount >= 2 && tmu1regs.texture_lod().lod_min() < 32) ? tmu1regs.texture_mode().normalize() : 0xffffffff;
+		m_fogmode = regs.fog_mode().normalize();
+
+		// if the TMUs are disabled or no textures are enabled, the texture modes are invalid
+		if (regs.fbi_init3().disable_tmus() || !regs.fbz_colorpath().texture_enable())
+			m_texmode0 = m_texmode1 = 0xffffffff;
+		else
+		{
+			m_texmode0 = (tmu0regs != nullptr && tmu0regs->texture_lod().lod_min() < 32) ? tmu0regs->texture_mode().normalize() : 0xffffffff;
+			m_texmode1 = (tmu1regs != nullptr && tmu1regs->texture_lod().lod_min() < 32) ? tmu1regs->texture_mode().normalize() : 0xffffffff;
+		}
 	}
 
 	u32 hash() const
@@ -64,7 +71,7 @@ struct raster_params
 					 (m_fogmode << 24) ^
 					 rotate(m_texmode0, 8) ^
 					 rotate(m_texmode1, 16);
-		return result % RASTER_HASH_SIZE;
+		return result;
 	}
 
 	bool operator==(raster_params const &rhs) const
@@ -88,7 +95,7 @@ struct raster_params
 class raster_texture
 {
 public:
-	void recompute(u32 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
+	void recompute(u8 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
 
 	rgb_t lookup_single_texel(voodoo::reg_texture_mode const texmode, u32 texbase, s32 s, s32 t);
 	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
@@ -129,10 +136,11 @@ struct thread_stats_block
 	s32 filler[64/4 - 7];       // pad this structure to 64 bytes
 };
 
-struct raster_info;
-struct poly_extra_data
+struct rasterizer_info;
+struct poly_data
 {
-	raster_info *info;          // pointer to rasterizer information
+	raster_params raster;   // normalized rasterizer parameters, for triangles
+	rasterizer_info *info;          // pointer to rasterizer information
 	u16 *destbase;              // destination to write
 	u16 *depthbase;             // destination to write
 	raster_texture *tex0;
@@ -168,43 +176,47 @@ struct poly_extra_data
 	rgb_t color0, color1;       // colors consumed by the rasterizer
 	u32 zacolor;                // depth/alpha value consumed by the rasterizer
 
-	union
-	{
-		raster_params raster;   // normalized rasterizer parameters, for triangles
-		u16 dither[16];         // dither matrix, for fastfill
-	} u;
+	u16 dither[16];         // dither matrix, for fastfill
 };
 
-class voodoo_renderer : public poly_manager<float, poly_extra_data, 1, 10000>
+struct rasterizer_info
 {
+	rasterizer_info *next = nullptr;         // pointer to next entry with the same hash
+	voodoo_poly_manager::render_delegate callback; // callback pointer
+	u8 display;                // display index
+	u8 is_generic;                // display index
+	u32 scanlines;                   // how many scanlines we've used this for
+	u32 polys;                  // how many polys we've used this for
+	u32 fullhash;
+	raster_params params;
+};
+
+class voodoo_renderer : public voodoo_poly_manager
+{
+	static constexpr u32 RASTER_HASH_SIZE = 97;	// size of the rasterizer hash table
+
 public:
-	voodoo_renderer(running_machine &machine, u8 type, voodoo_regs &regs, const rgb_t *rgb565) :
-		poly_manager(machine),
-		m_reg(regs),
-		m_type(type),
-		m_rowpixels(0),
-		m_yorigin(0),
-		m_rgb565(rgb565),
-		m_fogdelta_mask((type < TYPE_VOODOO_2) ? 0xff : 0xfc),
-		m_thread_stats(WORK_MAX_THREADS) { }
+	// construction
+	voodoo_renderer(running_machine &machine, u8 type, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
 
-	using mfp = void (voodoo_renderer::*)(s32, const extent_t &, const poly_extra_data &, int);
+	poly_data &alloc_poly();
+	u32 enqueue_fastfill(poly_data &poly);
+	u32 enqueue_triangle(poly_data &poly, vertex_t const *vert);
+	void pixel_pipeline(thread_stats_block &threadstats, voodoo::poly_data const &extra, voodoo::reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t color, u16 sz);
 
-	void pixel_pipeline(thread_stats_block &threadstats, voodoo::poly_extra_data const &extra, voodoo::reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t color, u16 sz);
-
-	void raster_fastfill(s32 scanline, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_extra_data &extradata, int threadid);
+	void raster_fastfill(s32 scanline, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_data &extradata, int threadid);
 	template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
-	void rasterizer(s32 y, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_extra_data &extra, int threadid);
+	void rasterizer(s32 y, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_data &extra, int threadid);
 
 	bool stipple_test(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, s32 x, s32 y);
 	s32 compute_wfloat(s64 iterw);
-	s32 compute_depthval(voodoo::poly_extra_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
-	bool depth_test(thread_stats_block &stats, voodoo::poly_extra_data const &extra, voodoo::reg_fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
+	s32 compute_depthval(voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
+	bool depth_test(thread_stats_block &stats, voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
 	bool alpha_mask_test(thread_stats_block &stats, u8 alpha);
 	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &rgaIntColor);
-	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, const voodoo::poly_extra_data &extradata, voodoo::reg_fbz_colorpath const fbzcp, voodoo::reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
+	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, const voodoo::poly_data &extradata, voodoo::reg_fbz_colorpath const fbzcp, voodoo::reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw);
 	bool alpha_test(thread_stats_block &stats, voodoo::reg_alpha_mode const alphamode, u8 alpha);
-	void apply_fogging(rgbaint_t &color, voodoo::poly_extra_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void apply_fogging(rgbaint_t &color, voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 	void alpha_blend(rgbaint_t &color, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
 	void write_pixel(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);
 
@@ -231,34 +243,29 @@ public:
 
 	std::vector<thread_stats_block> &thread_stats() { return m_thread_stats; }
 
-//private:
-	voodoo_regs &m_reg;
+	using rasterizer_mfp = void (voodoo_renderer::*)(int32_t, const extent_t &, const poly_data &, int);
+
+	static rasterizer_mfp generic_rasterizer(u8 texmask);
+	voodoo::rasterizer_info *add_rasterizer(voodoo::raster_params const &params, rasterizer_mfp rasterizer, bool is_generic);
+	voodoo::rasterizer_info *find_rasterizer(voodoo::raster_params const &params);
+	void dump_rasterizer_stats();
+
+	//private:
 	u8 m_type;
 	u32 m_rowpixels;
 	s32 m_yorigin;
+	voodoo_regs &m_fbi_reg;
+	voodoo_regs *m_tmu0_reg;
+	voodoo_regs *m_tmu1_reg;
 	rgb_t const *m_rgb565;
 	u8 m_fogblend[64];           // 64-entry fog table */
 	u8 m_fogdelta[64];           // 64-entry fog table */
 	u8 m_fogdelta_mask;          // mask for for delta (0xff for V1, 0xfc for V2) */
+
+	voodoo::rasterizer_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
+	voodoo::rasterizer_info *m_generic_rasterizer[4];
+	std::list<voodoo::rasterizer_info> m_rasterizer_list; // list of rasterizers
 	std::vector<thread_stats_block> m_thread_stats;
-};
-
-struct static_raster_info
-{
-	voodoo_renderer::mfp callback_mfp;
-	raster_params params;
-};
-
-struct raster_info
-{
-	raster_info *next = nullptr;         // pointer to next entry with the same hash
-	voodoo_renderer::render_delegate callback; // callback pointer
-	u8 display;                // display index
-	u8 is_generic;                // display index
-	u32 hits;                   // how many hits (pixels) we've used this for
-	u32 polys;                  // how many polys we've used this for
-	u32 hash = 0U;
-	raster_params params;
 };
 
 
