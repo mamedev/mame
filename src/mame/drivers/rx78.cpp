@@ -10,10 +10,9 @@ TODO:
 - implement printer;
 - Implement 2nd cart slot
 - Keyboard works in all scenarios, but it is a guess.
-- cracer - this game has issues, including incorrect behaviour. It's still playable though.
-- exbaseb - the game skips the intro screen, as if a key had been pressed.
 - RAM handling can't be right: PCB has 30KB shared RAM (manual also says this in the technical specs),
   but MAME allocates much more
+- Find out what port F3 does - read and write
 
 Notes:
 - BS-BASIC v1.0 notes:
@@ -57,9 +56,11 @@ Summary of Monitor commands.
 ==============================================================================================================
 
 Known issues:
-- Sekigahara: Joystick problem
-- Mobile Gundam: Bad sound at the intro screen
-- Champion Racer: The countdown traffic lights don't work
+- Sekigahara: Joystick problem (need to be checked again)
+- Space Enemy: When the yellow blind closes at the start, text should appear on it.
+- Need more software to test with.
+BTANB:
+- ProWrestling: When player 1 jumps at player 2 and misses, he always lands behind player 2.
 
 *************************************************************************************************************/
 
@@ -102,7 +103,9 @@ private:
 	void vdp_reg_w(offs_t offset, u8 data);
 	void vdp_bg_reg_w(u8 data);
 	void vdp_pri_mask_w(u8 data);
+	void portf3_w(u8 data);
 	void create_palette(palette_device &palette) const;
+	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -117,6 +120,9 @@ private:
 	u8 m_pri_mask;
 	u8 m_key_mux;
 	u8 m_background;
+	bool m_irq_en = 1;
+	u8 m_irq_slow = 0;
+	u8 m_irq_count = 0;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -197,7 +203,23 @@ u8 rx78_state::key_r()
 
 void rx78_state::key_w(u8 data)
 {
+	// special codes: 10 (disable irq?) used by gundam and exbaseb; 30 (no idea) used by basic
 	m_key_mux = data;
+	m_irq_en = !BIT(data, 4);
+	m_maincpu->set_input_line(0, CLEAR_LINE);    // fixes exbaseb opening screen
+}
+
+// guess
+void rx78_state::portf3_w(u8 data)
+{
+	data &= 3;
+	if (data == 3)
+		m_irq_slow = 64;    // fixes cracer traffic light
+	else
+	if (data == 2)
+		m_irq_slow = 8;     // fixes seki flash rate of sight
+	else
+		m_irq_slow = 0;
 }
 
 u8 rx78_state::vram_r(offs_t offset)
@@ -279,7 +301,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
-	map(0xf3, 0xf3).nopw();    // Basic constantly writes 0x82 and 0xC2 here
+	map(0xf3, 0xf3).w(FUNC(rx78_state::portf3_w));
 	map(0xf4, 0xf4).rw(FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
@@ -439,6 +461,25 @@ void rx78_state::machine_start()
 	save_item(NAME(m_background));
 }
 
+INTERRUPT_GEN_MEMBER(rx78_state::interrupt)
+{
+	if (m_irq_en)
+	{
+		m_irq_count++;
+		if (m_irq_count > m_irq_slow)
+		{
+			m_irq_count = 0;
+			irq0_line_hold(device);
+		}
+	}
+	else
+	// wait for a keypress
+	if (key_r())
+	{
+		irq0_line_hold(device);
+	}
+}
+
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 {
 	u32 size = m_cart->common_get_size("rom");
@@ -479,7 +520,7 @@ void rx78_state::rx78(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
 	m_maincpu->set_addrmap(AS_IO, &rx78_state::rx78_io);
-	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::irq0_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::interrupt));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
