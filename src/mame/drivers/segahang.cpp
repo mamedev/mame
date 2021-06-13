@@ -1387,6 +1387,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hang On Beta bootleg
 //  Has Beta 1987 copyright but is otherwise identical to the bootleg above
+//  Has a custom Philkp chip marked "Philko PK8706"
 //
 ROM_START( shangonrb2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
