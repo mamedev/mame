@@ -11,6 +11,8 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
+// TODO: check sound in Tetris!
+
 // fixed quite a few DMA related bugs in z180 core!
 
 // if updating project, c:\msys64\win32env.bat
@@ -136,27 +138,27 @@ public:
 	lw30_floppy_image_device *get_device();
 
 protected:
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
+	void device_start() override;
+	void device_config_complete() override;
 };
 
-class lw30_floppy_image_device : public device_t, public device_image_interface, public device_slot_card_interface
+class lw30_floppy_image_device : public device_t, public device_image_interface
 {
 public:
 	lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~lw30_floppy_image_device();
 
 public:
-	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return true; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
-	virtual const char *file_extensions() const override { return "img"; }
-	virtual const char *image_interface() const override { return "floppy_35"; }
-	virtual image_init_result call_load() override;
-	virtual void call_unload() override;
+	iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
+	bool is_readable() const noexcept override { return true; }
+	bool is_writeable() const noexcept override { return true; }
+	bool is_creatable() const noexcept override { return true; }
+	bool must_be_loaded() const noexcept override { return false; }
+	bool is_reset_on_load() const noexcept override { return false; }
+	const char *file_extensions() const noexcept override { return "img"; }
+	const char *image_interface() const noexcept override { return "floppy_35"; }
+	image_init_result call_load() override;
+	void call_unload() override;
 
 	bool loaded = false;
 	bool dirty = false;
@@ -168,7 +170,7 @@ public:
 	std::array<std::array<uint8_t, track_length + 1024/*safety, temporary*/>, 78> tracks;
 
 protected:
-	virtual void device_start() override { }
+	void device_start() override { }
 };
 
 DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
@@ -199,8 +201,7 @@ lw30_floppy_image_device *lw30_floppy_connector::get_device()
 
 lw30_floppy_image_device::lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LW30_FLOPPY, tag, owner, clock),
-	device_image_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this)
+	device_image_interface(mconfig, *this)
 {
 }
 
@@ -375,10 +376,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start() override;
+	void device_start() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 public:
 	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
@@ -418,9 +419,9 @@ void brother_beep_device::device_start()
 	save_item(NAME(m_signal));
 }
 
-void brother_beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void brother_beep_device::sound_stream_update(sound_stream& stream, std::vector<read_stream_view> const& inputs, std::vector<write_stream_view>& outputs)
 {
-	stream_sample_t *buffer = outputs[0];
+	auto& buffer = outputs[0];
 	auto signal = m_signal;
 	int clock = 0, rate = BROTHER_BEEP_RATE / 2;
 
@@ -433,17 +434,17 @@ void brother_beep_device::sound_stream_update(sound_stream &stream, stream_sampl
 	/* if we're not enabled, just fill with 0 */
 	if(m_state == 0xff || clock == 0)
 	{
-		memset(buffer, 0, samples * sizeof(*buffer));
+		buffer.fill(0);
 		return;
 	}
 
 	/* fill in the sample */
-	while(samples-- > 0)
+	for(int sampindex = 0; sampindex < buffer.samples(); sampindex++)
 	{
 		if(BIT(m_state, 7) != 0)
-			*buffer++ = signal > 0 ? 0x7fff : -0x8000;
+			buffer.put(sampindex, signal > 0 ? 1.f : -1.f);
 		else
-			*buffer++ = 0;
+			buffer.put(sampindex, 0.f);
 
 		incr -= clock;
 		while(incr < 0)
@@ -509,7 +510,7 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<z180_device> maincpu;
+	required_device<hd64180rp_device> maincpu;
 	required_device<screen_device> screen;
 
 	required_device<lw30_floppy_connector> floppy;
@@ -519,36 +520,70 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
+	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		return 0;
+	}
+	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+	}
 
 	// ROM
-	DECLARE_READ8_MEMBER(rom42000_r);
+	uint8_t rom42000_r(offs_t offset, uint8_t mem_mask = ~0) {
+		return rom[0x02000 + offset] & mem_mask;
+	}
 
 	// IO
-	DECLARE_WRITE8_MEMBER(video_cursor_x_w) { // 70
+	void video_cursor_x_w(uint8_t data) { // 70
 		video_cursor_x = data;
 	}
-	DECLARE_WRITE8_MEMBER(video_cursor_y_w) { // 71
+	void video_cursor_y_w(uint8_t data) { // 71
 		video_cursor_y = data;
 	}
-	DECLARE_WRITE8_MEMBER(video_pos_x_w) { // 72
+	void video_pos_x_w(uint8_t data) { // 72
 		video_pos_x = data;
 	}
-	DECLARE_WRITE8_MEMBER(video_pos_y_w) { // 73
+	void video_pos_y_w(uint8_t data) { // 73
 		video_pos_y = data;
 	}
-	DECLARE_READ8_MEMBER(video_data_r); DECLARE_WRITE8_MEMBER(video_data_w); // 74
-	DECLARE_READ8_MEMBER(video_control_r) { // 75 
+	uint8_t video_data_r() { // 74
+		uint8_t data = 0x00;
+		if(video_pos_y < 0x20)
+			data = videoram[video_pos_y * 256 + video_pos_x];
+		else
+			logerror("%s: video_data_r out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+
+		return data;
+	}
+
+	void video_data_w(uint8_t data) { // 74
+		if(video_pos_y < 0x20)
+			videoram[video_pos_y * 256 + video_pos_x] = data;
+		else
+			logerror("%s: video_data_w out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+
+		video_pos_x++;
+		if(video_pos_x == 0)
+			video_pos_y++;
+	}
+
+	uint8_t video_control_r() { // 75 
 		return video_control; 
 	}
-	DECLARE_WRITE8_MEMBER(video_control_w) { 
+	void video_control_w(uint8_t data) { 
 		video_control = data; // | 0b00000010; // TEST LW-10 screen height
 	} 
 	// 76
-	DECLARE_READ8_MEMBER(io_77_r); // config
+	uint8_t io_77_r() { // config
+		uint8_t out = 0x20; // 14 lines
+		out |= 0x00; // german
+		//out |= 0x01; // french
+		//out |= 0x02; // german
+		return ~out;
+	}
 
 	// Floppy
-	DECLARE_READ8_MEMBER(io_80_r) {
+	uint8_t io_80_r() {
 		auto fd = floppy->get_device();
 		if(!fd->loaded)
 			return 0;
@@ -564,12 +599,12 @@ public:
 		floppy_track_offset++;
 		return ret;
 	}
-	DECLARE_READ8_MEMBER(io_90_r) {
+	uint8_t io_90_r() {
 		// bit 7 set; data ready from floppy
 		// bit 6 clear; unknown meaning
 		return 0b10000000;
 	}
-	DECLARE_WRITE8_MEMBER(io_90_w) {
+	void io_90_w(uint8_t data) {
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
 		// a rotation to the right means increase quarter-track
@@ -598,14 +633,62 @@ public:
 	uint8_t floppy_steps{}; // quarter track
 	uint16_t floppy_track_offset{}; // current offset within track data
 
-	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
-	DECLARE_READ8_MEMBER(io_b0_r) {
+	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped IO read from %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, mem_mask);
+		return 0;
+	}
+	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped IO write to %0*X = %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, data, 2, mem_mask);
+	}
+
+	uint8_t io_b0_r() {
 		// Tetris reads bit 3, needed for correct keyboard layout
 		return 0b1000;
 	}
-	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w); // B8 (keyboard)
-	DECLARE_WRITE8_MEMBER(beeper_w); // F0
-	DECLARE_WRITE8_MEMBER(irqack_w); // F8
+	uint8_t lw30_state::io_b8_r() { // B8 (keyboard)
+		// keyboard matrix
+		if(io_b8 <= 8) {
+			if(m_io_kbrow[io_b8].found()) {
+				return m_io_kbrow[io_b8].read_safe(0);
+			}
+		}
+		return 0x00;
+	}
+	void io_b8_w(uint8_t data) {
+		io_b8 = data;
+	}
+
+	// Tetris Game Over Melody:
+	// according to oscilloscope:
+	// - total length 2.630s, wavosaur shows 2.043s
+	// - last note: 600µs on, 600µs off, on-to-on: 1260µs, wavosaur shows 1083µs
+	// according to MAME
+	// - 11µs between writes to beeper
+	// - 476µs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
+	// - 713µs
+	// - 724µs
+	// - last note: 543µs (value=0x2ba=698) => 0.7779x
+
+	void beeper_w(uint8_t data) { // F0
+		#if 0
+			static uint8_t lastData{};
+			static attotime last{};
+			static attotime lastDifferent{};
+			attotime cur{ maincpu->local_time() };
+
+			logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
+			if(data != lastData)
+				lastDifferent = cur;
+			last = cur;
+			lastData = data;
+		#endif
+
+		beeper->set_state(data);
+	}
+
+	void lw30_state::irqack_w(uint8_t) { // F8
+		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	}
 
 	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
 	uint8_t video_cursor_x, video_cursor_y, video_pos_x, video_pos_y, video_control, io_b8;
@@ -1111,7 +1194,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix32(y);
+				uint32_t* p = &bitmap.pix(y);
 				for(auto x = 0; x < 480; x += 8) {
 					auto gfx = pixmap[y * 60 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
@@ -1126,7 +1209,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 			}
 		} else if(video_control & bitmap_mode) {
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix32(y);
+				uint32_t* p = &bitmap.pix(y);
 				for(auto x = 0; x < 480; x += 8) {
 					auto gfx = videoram[y * 64 + x / 8];
 					*p++ = palette[BIT(gfx, 7)];
@@ -1197,7 +1280,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				}
 			}
 			for(auto y = 0; y < 128; y++) {
-				uint32_t* p = &bitmap.pix32(y);
+				uint32_t* p = &bitmap.pix(y);
 				for(auto x = 0; x < 640; x += 8) {
 					auto gfx = pixmap[y * 80 + x / 8];
 					//*p++ = palette[BIT(gfx, 7)];
@@ -1214,7 +1297,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	} else { 
 		// display off
 		for(auto y = 0; y < 128; y++) {
-			uint32_t* p = &bitmap.pix32(y);
+			uint32_t* p = &bitmap.pix(y);
 			for(auto x = 0; x < 480; x++) {
 				*p++ = palette[0];
 			}
@@ -1224,122 +1307,14 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(lw30_state::rom42000_r)
-{
-	return rom[0x02000 + offset] & mem_mask;
-}
-
-READ8_MEMBER(lw30_state::illegal_r)
-{
-	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
-	return 0;
-}
-
-WRITE8_MEMBER(lw30_state::illegal_w)
-{
-	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
-}
-
-READ8_MEMBER(lw30_state::illegal_io_r)
-{
-	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
-	return 0;
-}
-
-WRITE8_MEMBER(lw30_state::illegal_io_w)
-{
-	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
 {
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
-// Tetris Game Over Melody:
-// according to oscilloscope:
-// - total length 2.630s, wavosaur shows 2.043s
-// - last note: 600µs on, 600µs off, on-to-on: 1260µs, wavosaur shows 1083µs
-// according to MAME
-// - 11µs between writes to beeper
-// - 476µs (value=0x310=784) => 0.6071x between writes of 01 and 81 to beeper
-// - 713µs
-// - 724µs
-// - last note: 543µs (value=0x2ba=698) => 0.7779x
-
-WRITE8_MEMBER(lw30_state::beeper_w)
-{
-#if 0
-	static uint8_t lastData{};
-	static attotime last{};
-	static attotime lastDifferent{};
-	attotime cur{ maincpu->local_time() };
-
-	logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
-	if(data != lastData)
-		lastDifferent = cur;
-	last = cur;
-	lastData = data;
-#endif
-
-	beeper->set_state(data);
-}
-
-WRITE8_MEMBER(lw30_state::irqack_w)
-{
-	maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-}
-
-WRITE8_MEMBER(lw30_state::video_data_w)
-{
-	if(video_pos_y < 0x20)
-		videoram[video_pos_y * 256 + video_pos_x] = data;
-	else
-		logerror("%s: video_data_w out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
-
-	video_pos_x++;
-	if(video_pos_x == 0)
-		video_pos_y++;
-}
-
-READ8_MEMBER(lw30_state::video_data_r)
-{
-	uint8_t data = 0x00;
-	if(video_pos_y < 0x20)
-		data = videoram[video_pos_y * 256 + video_pos_x];
-	else
-		logerror("%s: video_data_r out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
-
-	return data;
-}
-
-READ8_MEMBER(lw30_state::io_77_r)
-{
-	uint8_t out = 0x20; // 14 lines
-	out |= 0x00; // german
-	//out |= 0x01; // french
-	//out |= 0x02; // german
-	return ~out;
-}
 
 // Keyboard
 //////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(lw30_state::io_b8_w)
-{
-	io_b8 = data;
-}
-
-READ8_MEMBER(lw30_state::io_b8_r)
-{
-	// keyboard matrix
-	if(io_b8 <= 8) {
-		if(m_io_kbrow[io_b8].found()) {
-			return m_io_kbrow[io_b8].read_safe(0);
-		}
-	}
-	return 0x00;
-}
 
 void lw30_state::machine_start()
 {
@@ -1435,7 +1410,7 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ß
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -1446,9 +1421,9 @@ static INPUT_PORTS_START(lw30)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // ö Ö
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // ü Ü
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -1465,13 +1440,13 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // ´ `
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // ä Ä
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -1479,7 +1454,7 @@ INPUT_PORTS_END
 
 void lw30_state::lw30(machine_config& config) {
 	// basic machine hardware
-	Z180(config, maincpu, 12'000'000 / 2);
+	HD64180RP(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw30_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw30_state::map_io);
 	TIMER(config, "1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
