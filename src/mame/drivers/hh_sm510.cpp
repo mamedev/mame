@@ -9240,6 +9240,74 @@ ROM_END
 
 /***************************************************************************
 
+  Tronica Space Mission (model SM-11)
+  * PCB label SM-11 250582
+  * Sharp SM5A label 0126 228B TRONICA (no decap)
+  * lcd screen with custom segments, 1-bit sound
+
+***************************************************************************/
+
+class trspacmis_state : public hh_sm510_state
+{
+public:
+	trspacmis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trspacmis(machine_config &config);
+};
+
+// config
+
+static INPUT_PORTS_START( trspacmis )
+	PORT_START("IN.0") // R2
+	PORT_CONFNAME( 0x01, 0x00, "Invincibility (Cheat)") // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as 0x01?
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // display test?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // alarm test?
+
+	PORT_START("IN.1") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("BA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+void trspacmis_state::trspacmis(machine_config &config)
+{
+	sm5a_common(config, 1601, 1080); // R mask option confirmed
+}
+
+// roms
+
+ROM_START( trspacmis )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0126_228b", 0x0000, 0x0740, CRC(3d319537) SHA1(007d376cfd29574554caa59ed9163178179ae9c5) )
+
+	ROM_REGION( 106675, "screen", 0)
+	ROM_LOAD( "trspacmis.svg", 0, 106675, CRC(45d7b798) SHA1(db08fef21462507a115547ecf8eac38260a0c868) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Elektronika Автослалом (Autoslalom) (model IM-23)
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
@@ -9548,6 +9616,7 @@ CONS( 1992, tbatmana,     0,           0, tbatmana,     tbatmana,     tbatmana_s
 CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Shuttle Voyage", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
