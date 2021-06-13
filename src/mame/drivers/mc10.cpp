@@ -11,7 +11,7 @@
 #include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
-#include "bus/mc10/mc10cart.h"
+#include "bus/mc10/cart.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -28,7 +28,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class mc10_state : public driver_device, public device_mc10cart_host_interface
+namespace
+{
+
+class mc10_state : public driver_device
 {
 public:
 	mc10_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -41,7 +44,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_rs232(*this, "rs232")
 		, m_pb(*this, "pb%u", 0U)
-		{}
+	{}
 
 	void mc10_base(machine_config &config);
 	void mc10_video(machine_config &config);
@@ -89,8 +92,8 @@ class alice32_state : public mc10_state
 {
 public:
 	alice32_state(const machine_config &mconfig, device_type type, const char *tag)
-	: mc10_state(mconfig, type, tag)
-	, m_ef9345(*this, "ef9345")
+		: mc10_state(mconfig, type, tag)
+		, m_ef9345(*this, "ef9345")
 	{}
 
 	void alice32(machine_config &config);
@@ -112,7 +115,7 @@ class alice90_state : public alice32_state
 {
 public:
 	alice90_state(const machine_config &mconfig, device_type type, const char *tag)
-	: alice32_state(mconfig, type, tag)
+		: alice32_state(mconfig, type, tag)
 	{}
 
 	void alice90(machine_config &config);
@@ -633,6 +636,8 @@ ROM_START( alice90 )
 	ROM_REGION( 0x2000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
 ROM_END
+
+}
 
 /***************************************************************************
     GAME DRIVERS

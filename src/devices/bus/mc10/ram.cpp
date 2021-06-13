@@ -2,14 +2,14 @@
 // copyright-holders:tim lindner
 /***************************************************************************
 
-    mc10_ram.cpp
+    ram.cpp
 
     Code for emulating the Radio Shack 16K RAM Cartridge
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "mc10_ram.h"
+#include "ram.h"
 
 // #include "machine/ram.h"
 
@@ -74,5 +74,5 @@ mc10_pak_ram_device::mc10_pak_ram_device(const machine_config &mconfig, const ch
 
 void mc10_pak_ram_device::device_start()
 {
-	owning_slot().install_bank(0x5000, 0x8fff, &m_share[0]);
+	owning_slot().memspace().install_ram(0x5000, 0x8fff, &m_share[0]);
 }

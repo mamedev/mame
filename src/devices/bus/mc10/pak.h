@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "mc10cart.h"
+#include "cart.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,19 +21,14 @@ public:
 	// construction/destruction
 	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	virtual memory_region *get_cart_memregion() override;
+	virtual int max_rom_length() override;
+	virtual image_init_result load() override;
 
 protected:
 	mc10_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
-
-	// internal state
-	required_memory_region m_eprom;
 };
 
 // device type definitions

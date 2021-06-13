@@ -2,7 +2,7 @@
 // copyright-holders:tim lindner
 /***************************************************************************
 
-    mc10_mcx128.cpp
+    mcx128.cpp
 
     Code for emulating Darren Atkinson's MCX-128 cartridge
 
@@ -38,11 +38,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "mc10_mcx128.h"
+#include "mcx128.h"
 
-// #include "machine/ram.h"
-
-//#define VERBOSE (LOG_GENERAL )
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 
@@ -100,7 +98,7 @@ protected:
 private:
 	memory_share_creator<u8> m_share;
 	memory_view m_view;
-	memory_bank_creator m_bank0, m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7;
+	memory_bank_array_creator<8> m_bank;
 	uint8_t ram_bank_cr;
 	uint8_t rom_map_cr;
 
@@ -124,14 +122,7 @@ mc10_pak_mcx128_device::mc10_pak_mcx128_device(const machine_config &mconfig, de
 	, device_mc10cart_interface(mconfig, *this)
 	, m_share(*this, "ext_ram", 1024*128, ENDIANNESS_BIG)
 	, m_view(*this, "mcx_view")
-	, m_bank0(*this, "bank0")
-	, m_bank1(*this, "bank1")
-	, m_bank2(*this, "bank2")
-	, m_bank3(*this, "bank3")
-	, m_bank4(*this, "bank4")
-	, m_bank5(*this, "bank5")
-	, m_bank6(*this, "bank6")
-	, m_bank7(*this, "bank7")
+	, m_bank(*this, "bank%u", 0U)
 {
 }
 
@@ -243,36 +234,36 @@ void mc10_pak_mcx128_device::device_start()
 	save_item(NAME(rom_map_cr));
 
 	// 0x0004 - 0x0007
-	m_bank0->configure_entry(0, &m_share[0x00004]);
-	m_bank0->configure_entry(1, &m_share[0x10004]);
+	m_bank[0]->configure_entry(0, &m_share[0x00004]);
+	m_bank[0]->configure_entry(1, &m_share[0x10004]);
 
 	// 0x000f - 0x000f
-	m_bank1->configure_entry(0, &m_share[0x0000f]);
-	m_bank1->configure_entry(1, &m_share[0x1000f]);
+	m_bank[1]->configure_entry(0, &m_share[0x0000f]);
+	m_bank[1]->configure_entry(1, &m_share[0x1000f]);
 
 	// 0x0000 - 0x3fff
-	m_bank2->configure_entry(0, &m_share[0x00020]);
-	m_bank2->configure_entry(1, &m_share[0x10020]);
+	m_bank[2]->configure_entry(0, &m_share[0x00020]);
+	m_bank[2]->configure_entry(1, &m_share[0x10020]);
 
 	// 0x4000 - 0x5fff
-	m_bank3->configure_entry(0, &m_share[0x08000]);
-	m_bank3->configure_entry(1, &m_share[0x18000]);
+	m_bank[3]->configure_entry(0, &m_share[0x08000]);
+	m_bank[3]->configure_entry(1, &m_share[0x18000]);
 
 	// 0x6000 - 0xbeff
-	m_bank4->configure_entry(0, &m_share[0x0a000]);
-	m_bank4->configure_entry(1, &m_share[0x1a000]);
+	m_bank[4]->configure_entry(0, &m_share[0x0a000]);
+	m_bank[4]->configure_entry(1, &m_share[0x1a000]);
 
 	// 0xc000 - 0xdfff
-	m_bank5->configure_entry(0, &m_share[0x04000]);
-	m_bank5->configure_entry(1, &m_share[0x14000]);
+	m_bank[5]->configure_entry(0, &m_share[0x04000]);
+	m_bank[5]->configure_entry(1, &m_share[0x14000]);
 
 	// 0xe000 - 0xffff
-	m_bank6->configure_entry(0, &m_share[0x06000]);
-	m_bank6->configure_entry(1, &m_share[0x16000]);
+	m_bank[6]->configure_entry(0, &m_share[0x06000]);
+	m_bank[6]->configure_entry(1, &m_share[0x16000]);
 
 	// 0xff00 - 0xffff
-	m_bank7->configure_entry(0, &m_share[0x07f00]);
-	m_bank7->configure_entry(1, &m_share[0x07f00]);
+	m_bank[7]->configure_entry(0, &m_share[0x07f00]);
+	m_bank[7]->configure_entry(1, &m_share[0x07f00]);
 
  	owning_slot().memspace().install_view(0x0000, 0xffff, m_view);
 
@@ -307,7 +298,7 @@ void mc10_pak_mcx128_device::write_ram_mirror(address_space &space, offs_t offse
 	std::optional<int> cur_slot = m_view.entry();
 	m_share[0x08000+offset] = data;
 
-	if(cur_slot.has_value())
+	if (cur_slot.has_value())
 	{
 		int cur_slot_int = *cur_slot;
 		m_view.disable();
@@ -339,14 +330,14 @@ void mc10_pak_mcx128_device::update_banks()
 	int bank0 = ram_bank_cr & 0x01;
 	int bank1 = (ram_bank_cr & 0x02) >> 1;
 
-	m_bank0->set_entry(bank0);
-	m_bank0->set_entry(bank0);
-	m_bank2->set_entry(bank0);
-	m_bank3->set_entry(bank1);
-	m_bank4->set_entry(bank1);
-	m_bank5->set_entry(bank0);
-	m_bank6->set_entry(bank0);
-	m_bank7->set_entry(bank0);
+	m_bank[0]->set_entry(bank0);
+	m_bank[1]->set_entry(bank0);
+	m_bank[2]->set_entry(bank0);
+	m_bank[3]->set_entry(bank1);
+	m_bank[4]->set_entry(bank1);
+	m_bank[5]->set_entry(bank0);
+	m_bank[6]->set_entry(bank0);
+	m_bank[7]->set_entry(bank0);
 
 	m_view.select((bank1 << 2) | (rom_map_cr & 0x03));
 
@@ -356,8 +347,8 @@ void mc10_pak_mcx128_device::update_banks()
 class alice_pak_mcx128_device : public mc10_pak_mcx128_device
 {
 public:
-		// construction/destruction
-		alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	// construction/destruction
+	alice_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides

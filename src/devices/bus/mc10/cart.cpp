@@ -33,11 +33,14 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "mc10cart.h"
+#include "cart.h"
 
-#include "mc10_mcx128.h"
-#include "mc10_pak.h"
-#include "mc10_ram.h"
+#include "mcx128.h"
+#include "pak.h"
+#include "ram.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -68,26 +71,8 @@ mc10cart_slot_device::mc10cart_slot_device(const machine_config &mconfig, const 
 
 void mc10cart_slot_device::device_start()
 {
-	m_nmi_callback.resolve();
+	m_nmi_callback.resolve_safe();
 	m_cart = get_card_device();
-}
-
-//-------------------------------------------------
-//  install_bank - install RAM in host computer
-//-------------------------------------------------
-
-void mc10cart_slot_device::install_bank(offs_t start, offs_t end, uint8_t *data)
-{
-	m_memspace->install_ram(start, end, data);
-}
-
-//-------------------------------------------------
-//  install_bank - install ROM in host computer
-//-------------------------------------------------
-
-void mc10cart_slot_device::install_rom(offs_t start, offs_t end, uint8_t *data)
-{
-	m_memspace->install_rom(start, end, data);
 }
 
 //-------------------------------------------------
@@ -96,8 +81,7 @@ void mc10cart_slot_device::install_rom(offs_t start, offs_t end, uint8_t *data)
 
 void mc10cart_slot_device::set_nmi_line(int state)
 {
-		if (!(m_nmi_callback).isnull())
-			(m_nmi_callback)(state);
+	m_nmi_callback(state);
 }
 
 //-------------------------------------------------
@@ -106,33 +90,37 @@ void mc10cart_slot_device::set_nmi_line(int state)
 
 image_init_result mc10cart_slot_device::call_load()
 {
-	if (m_cart)
+	if (!m_cart)
+		return image_init_result::PASS;
+
+	memory_region *romregion(loaded_through_softlist() ? memregion("rom") : nullptr);
+	if (loaded_through_softlist() && !romregion)
 	{
-		memory_region *cart_mem = m_cart->get_cart_memregion();
-		u8 *base = cart_mem->base();
-		offs_t read_length, cart_length = cart_mem->bytes();
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Software list item has no 'rom' data area");
+		return image_init_result::FAIL;
+	}
 
-		if (!loaded_through_softlist())
-		{
-			read_length = fread(base, cart_length);
-		}
-		else
-		{
-			read_length = get_software_region_length("rom");
-			memcpy(base, get_software_region("rom"), read_length);
-		}
+	u32 const len(loaded_through_softlist() ? romregion->bytes() : length());
+	if (len > m_cart->max_rom_length())
+	{
+		seterror(IMAGE_ERROR_UNSUPPORTED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
 
-		while (read_length < cart_length)
+	if (!loaded_through_softlist())
+	{
+		LOG("Allocating %u byte cartridge ROM region\n", len);
+		romregion = machine().memory().region_alloc(subtag("rom").c_str(), len, 1, ENDIANNESS_BIG);
+		u32 const cnt(fread(romregion->base(), len));
+		if (cnt != len)
 		{
-			offs_t len = std::min(read_length, cart_length - read_length);
-			memcpy(base + read_length, base, len);
-			read_length += len;
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Error reading cartridge file");
+			return image_init_result::FAIL;
 		}
 	}
 
-	return image_init_result::PASS;
+	return m_cart->load();
 }
-
 
 //-------------------------------------------------
 //  get_default_card_software
@@ -158,7 +146,6 @@ template class device_finder<device_mc10cart_interface, true>;
 device_mc10cart_interface::device_mc10cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "mc10cart")
 	, m_owning_slot(nullptr)
-	, m_host(nullptr)
 {
 }
 
@@ -177,9 +164,6 @@ device_mc10cart_interface::~device_mc10cart_interface()
 void device_mc10cart_interface::interface_config_complete()
 {
 	m_owning_slot = dynamic_cast<mc10cart_slot_device *>(device().owner());
-	m_host = m_owning_slot
-			? dynamic_cast<device_mc10cart_host_interface *>(m_owning_slot->owner())
-			: nullptr;
 }
 
 //-------------------------------------------------
@@ -190,17 +174,24 @@ void device_mc10cart_interface::interface_pre_start()
 {
 	if (!m_owning_slot)
 		throw emu_fatalerror("Expected device().owner() to be of type mc10cart_slot_device");
-	if (!m_host)
-		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_mc10cart_host_interface");
 }
 
 /*-------------------------------------------------
-    get_cart_memregion
+    max_rom_length
 -------------------------------------------------*/
 
-memory_region *device_mc10cart_interface::get_cart_memregion()
+int device_mc10cart_interface::max_rom_length()
 {
 	return 0;
+}
+
+/*-------------------------------------------------
+    load
+-------------------------------------------------*/
+
+image_init_result device_mc10cart_interface::load()
+{
+	return image_init_result::FAIL;
 }
 
 //-------------------------------------------------

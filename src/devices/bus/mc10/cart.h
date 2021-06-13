@@ -2,7 +2,7 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-    mc10cart.h
+    cart.h
 
     MC-10 / Alice cartridge management
 
@@ -48,8 +48,6 @@ public:
 
 	// address map manipulations
 	address_space &memspace() const { return *m_memspace; };
-	void install_bank(offs_t start, offs_t end, uint8_t *data);
-	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -87,25 +85,14 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MC10CART_SLOT, mc10cart_slot_device)
 
-
-// ======================> device_mc10cart_host_interface
-
-// this is implemented by the MC-10 root device itself
-class device_mc10cart_host_interface
-{
-public:
-};
-
-
-// ======================> device_mc10cart_interface
-
 class device_mc10cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_mc10cart_interface();
 
-	virtual memory_region *get_cart_memregion();
+	virtual int max_rom_length();
+	virtual image_init_result load();
 
 	void raise_cart_nmi() { m_owning_slot->set_nmi_line(ASSERT_LINE); }
 	void lower_cart_nmi() { m_owning_slot->set_nmi_line(CLEAR_LINE); }
@@ -118,11 +105,9 @@ protected:
 
 	// accessors for containers
 	mc10cart_slot_device &owning_slot() const { assert(m_owning_slot); return *m_owning_slot; }
-	device_mc10cart_host_interface &host() const { assert(m_host); return *m_host; }
 
 private:
 	mc10cart_slot_device * m_owning_slot;
-	device_mc10cart_host_interface * m_host;
 };
 
 // methods for configuring MC-10 slot devices
