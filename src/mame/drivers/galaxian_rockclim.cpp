@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:Tomasz Slanina, David Haywood
 
 #include "emu.h"
 #include "includes/galaxian.h"
+
+namespace {
 
 class galaxian_rockclim_state : public galaxian_state
 {
@@ -18,28 +20,27 @@ public:
 
 	void init_rockclim();
 
-private:
+protected:
 	virtual void video_start() override;
 
+private:
 	void rockclim_map(address_map &map);
 
+	void rockclim_palette(palette_device &palette) const;
+	void rockclim_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rockclim_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void rockclim_videoram_w(offs_t offset, uint8_t data);
 	void rockclim_scroll_w(offs_t offset, uint8_t data);
 	uint8_t rockclim_videoram_r(offs_t offset);
-	optional_shared_ptr<uint8_t> m_rockclim_videoram;
-
-	void rockclim_palette(palette_device &palette) const;
-
-	required_device<gfxdecode_device> m_gfxdecode2;
-	required_device<palette_device> m_palette2;
-
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
-	tilemap_t *m_rockclim_tilemap;
+
 	uint16_t m_rockclim_v;
 	uint16_t m_rockclim_h;
 
-	void rockclim_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	tilemap_t *m_rockclim_tilemap;
+	required_shared_ptr<uint8_t> m_rockclim_videoram;
+	required_device<gfxdecode_device> m_gfxdecode2;
+	required_device<palette_device> m_palette2;
 };
 
 void galaxian_rockclim_state::rockclim_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -74,8 +75,8 @@ void galaxian_rockclim_state::rockclim_scroll_w(offs_t offset, uint8_t data)
 {
 	switch (offset & 3)
 	{
-	case 0: m_rockclim_h = (m_rockclim_h & 0xff00) | data; m_rockclim_tilemap->set_scrollx(0, m_rockclim_h * GALAXIAN_XSCALE); break;
-	case 1: m_rockclim_h = (m_rockclim_h & 0x00ff) | (data << 8); m_rockclim_tilemap->set_scrollx(0, m_rockclim_h * GALAXIAN_XSCALE); break;
+	case 0: m_rockclim_h = (m_rockclim_h & 0xff00) | data; m_rockclim_tilemap->set_scrollx(0, m_rockclim_h * m_x_scale); break;
+	case 1: m_rockclim_h = (m_rockclim_h & 0x00ff) | (data << 8); m_rockclim_tilemap->set_scrollx(0, m_rockclim_h * m_x_scale); break;
 	case 2: m_rockclim_v = (m_rockclim_v & 0xff00) | data; m_rockclim_tilemap->set_scrolly(0, m_rockclim_v); break;
 	case 3: m_rockclim_v = (m_rockclim_v & 0x00ff) | (data << 8); m_rockclim_tilemap->set_scrolly(0, m_rockclim_v); break;
 	}
@@ -85,7 +86,7 @@ void galaxian_rockclim_state::video_start()
 {
 	galaxian_state::video_start();
 	
-	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(*this, FUNC(galaxian_rockclim_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8 * GALAXIAN_XSCALE,8,64,32);
+	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(*this, FUNC(galaxian_rockclim_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8 * m_x_scale,8,64,32);
 	m_rockclim_v = m_rockclim_h = 0;
 	save_item(NAME(m_rockclim_v));
 	save_item(NAME(m_rockclim_h));
@@ -198,9 +199,9 @@ INPUT_PORTS_END
 static const gfx_layout rockclim_charlayout =
 {
 	8,8,
-	256,
-	4,//?
-	{ 4, 0,4096*8+4,4096*8 },
+	RGN_FRAC(1,2),
+	4,
+	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2) },
 	{ 3, 2, 1, 0,11 ,10, 9, 8 },
 	{ 0*8*2, 1*8*2, 2*8*2, 3*8*2, 4*8*2, 5*8*2, 6*8*2, 7*8*2 },
 	8*8*2
@@ -285,10 +286,8 @@ void galaxian_rockclim_state::init_rockclim()
 
 	m_extend_sprite_info_ptr = extend_sprite_info_delegate(&galaxian_rockclim_state::rockclim_extend_sprite_info, this);
 	m_draw_background_ptr = draw_background_delegate(&galaxian_rockclim_state::rockclim_draw_background, this);
-
 }
 
+} // Anonymous namespace
 
-GAME( 1981, rockclim,  0,        rockclim,  rockclim,  galaxian_rockclim_state, init_rockclim,     ROT180, "Taito",                         "Rock Climber",                                             MACHINE_SUPPORTS_SAVE )
-
-
+GAME( 1981, rockclim, 0, rockclim,  rockclim,  galaxian_rockclim_state, init_rockclim, ROT180, "Taito", "Rock Climber", MACHINE_SUPPORTS_SAVE )
