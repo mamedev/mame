@@ -245,7 +245,6 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
 	REGISTER_MODULE(m_mod_man, DEBUG_GDBSTUB);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
-	REGISTER_MODULE(m_mod_man, DEBUG_GDB);
 #endif
 
 	REGISTER_MODULE(m_mod_man, NETDEV_TAPTUN);

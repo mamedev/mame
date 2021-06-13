@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
 #include "emu.h"
@@ -17,7 +17,7 @@
 
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
-// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2017
+// make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
 
 // command line parameters:
 // -window -debug -log lw840 -flop "c:\schreibmaschine\Brother LW-840ic\LW840-ic_V1.0_Disk1_Graphic_Art_Print_Program, etc..img"

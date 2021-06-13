@@ -31,7 +31,7 @@ function createProjects_mame_schreibmaschine(_target, _subtarget)
 	kind (LIBTYPE)
 	uuid (os.uuid("drv-mame_schreibmaschine"))
 	addprojectflags()
-	precompiledheaders()
+	precompiledheaders_novs()
 
 	includedirs {
 		MAME_DIR .. "src/osd",
