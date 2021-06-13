@@ -512,8 +512,8 @@ void mc10_state::mc10_base(machine_config &config)
 	m_cassette->set_interface("mc10_cass");
 
 	/* printer */
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "printer"));
-	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "rs_printer"));
+	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
 }
 
 void mc10_state::mc10_video(machine_config &config)
