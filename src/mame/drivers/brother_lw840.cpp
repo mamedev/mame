@@ -136,8 +136,15 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
-	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
-	DECLARE_READ16_MEMBER(port7_r) {
+	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		return 0;
+	}
+	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+	}
+
+	uint16_t port7_r(offs_t, uint16_t mem_mask = ~0) {
 		auto row = keyboard & 0x0f;
 		if(row <= 8) {
 			if(io_kbrow[row].found())
@@ -147,10 +154,10 @@ public:
 		// seems to be able to control power-on self test if not 0xff
 		return 0xffff & mem_mask;
 	}
-	DECLARE_READ16_MEMBER(keyboard_r) { 
+	uint16_t keyboard_r(offs_t, uint16_t mem_mask = ~0) {
 		return (keyboard << 8) & mem_mask; 
 	}
-	DECLARE_WRITE16_MEMBER(keyboard_w) { 
+	void keyboard_w(uint16_t data) { 
 		keyboard = data >> 8; 
 	}
 	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
@@ -158,14 +165,17 @@ public:
 		maincpu->set_input_line(INPUT_LINE_IRQ2, irq_toggle ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration& fr) {
+		fr.add(FLOPPY_PC_FORMAT);
+	}
+
 	DECLARE_WRITE_LINE_MEMBER(fdc_interrupt) {
 		maincpu->set_input_line(INPUT_LINE_IRQ4, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq) {
 		maincpu->set_input_line(H8_INPUT_LINE_DREQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
-	DECLARE_READ16_MEMBER(disk_inserted_r) {
+	uint16_t disk_inserted_r(offs_t, uint16_t mem_mask = ~0) {
 		// bit#6: disk inserted
 		// bit#7: ??1.44mb
 		// bit#1: ???
@@ -188,7 +198,7 @@ protected:
 		map(0x600000, 0x67ffff).ram(); // DRAM
 		map(0xe00000, 0xe00007).m(fdc, FUNC(gm82c765b_device::map));
 		map(0xe00030, 0xe00041).noprw(); // just to shut up the error.log
-		map(0xec0000, 0xec0001).rw(FUNC(lw840_state::keyboard_r), FUNC(lw840_state::keyboard_w));
+		map(0xec0000, 0xec0001).r(FUNC(lw840_state::keyboard_r)).w(FUNC(lw840_state::keyboard_w));
 		map(0xec0004, 0xec0005).r(FUNC(lw840_state::disk_inserted_r));
 	}
 
@@ -238,7 +248,7 @@ uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 	};
 
 	for(auto y = 0; y < 400; y++) {
-		uint32_t* p = &bitmap.pix32(y);
+		uint32_t* p = &bitmap.pix(y);
 		for(auto x = 0; x < 640; x += 16) {
 			auto gfx = vram[(y * 640 + x) / 16];
 			for(int i = 15; i >= 0; i--)
@@ -246,17 +256,6 @@ uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 		}
 	}
 	return 0;
-}
-
-READ8_MEMBER(lw840_state::illegal_r)
-{
-	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
-	return 0;
-}
-
-WRITE8_MEMBER(lw840_state::illegal_w)
-{
-	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
 }
 
 void lw840_state::machine_start()
@@ -349,7 +348,7 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) //works
 
 	PORT_START("kbrow.5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(L'ß') PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?') // ß
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_P)          PORT_CHAR('p')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_O)          PORT_CHAR('o')
@@ -360,9 +359,9 @@ static INPUT_PORTS_START(lw840)
 
 	PORT_START("kbrow.6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Inhalt")                PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME)) //works
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(L'ö') PORT_CHAR(L'Ö') //works
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6) // ö Ö //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*') //works
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(L'ü') PORT_CHAR(L'Ü') //works
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc) // ü Ü //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LEFT)       PORT_CHAR(UCHAR_MAMEKEY(LEFT)) //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_DOWN)       PORT_CHAR(UCHAR_MAMEKEY(DOWN)) //works
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
@@ -379,19 +378,15 @@ static INPUT_PORTS_START(lw840)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(LSHIFT)) //works
 
 	PORT_START("kbrow.8")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'´') PORT_CHAR('`') //works
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00b4) PORT_CHAR(0x02cb) // ´ ` //works
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_L)          PORT_CHAR('l') //works
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('\'')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_K)          PORT_CHAR('k') //works
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':') //works
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_') //works
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(L'ä') PORT_CHAR(L'Ä')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4) // ä Ä
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
-
-FLOPPY_FORMATS_MEMBER(lw840_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 static void lw840_floppies(device_slot_interface& device) {
 	device.option_add("35hd", FLOPPY_35_HD);
