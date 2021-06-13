@@ -1077,6 +1077,15 @@ public:
 		float f;
 	};
 	register_data m_regs[0x100];
+
+	static u8 const s_register_alias_map[0x40];
+	static u8 const s_register_access[0x100];
+	static u8 const s_voodoo2_register_access[0x100];
+	static u8 const s_banshee_register_access[0x100];
+	static char const *const s_register_name[0x100];
+	static char const *const s_banshee_register_name[0x100];
+	static char const *const s_banshee_io_reg_name[0x40];
+	static char const *const s_banshee_agp_reg_name[0x50];
 };
 
 /* Codes to the right:

@@ -144,7 +144,6 @@ bits(7:4) and bit(24)), X, and Y:
 
 #include "emu.h"
 #include "voodoo.h"
-#include "vooddefs.ipp"
 
 #include "screen.h"
 
@@ -179,547 +178,20 @@ using namespace voodoo;
 #define EAT_CYCLES          (1)
 
 
-namespace {
 
-/*************************************
- *
- *  Alias map of the first 64
- *  registers when remapped
- *
- *************************************/
 
-const u8 register_alias_map[0x40] =
+// enumeration describing reasons we might be stalled
+enum
 {
-	voodoo_regs::reg_vdstatus,   0x004/4,                     voodoo_regs::reg_vertexAx,   voodoo_regs::reg_vertexAy,
-	voodoo_regs::reg_vertexBx,   voodoo_regs::reg_vertexBy,   voodoo_regs::reg_vertexCx,   voodoo_regs::reg_vertexCy,
-	voodoo_regs::reg_startR,     voodoo_regs::reg_dRdX,       voodoo_regs::reg_dRdY,       voodoo_regs::reg_startG,
-	voodoo_regs::reg_dGdX,       voodoo_regs::reg_dGdY,       voodoo_regs::reg_startB,     voodoo_regs::reg_dBdX,
-	voodoo_regs::reg_dBdY,       voodoo_regs::reg_startZ,     voodoo_regs::reg_dZdX,       voodoo_regs::reg_dZdY,
-	voodoo_regs::reg_startA,     voodoo_regs::reg_dAdX,       voodoo_regs::reg_dAdY,       voodoo_regs::reg_startS,
-	voodoo_regs::reg_dSdX,       voodoo_regs::reg_dSdY,       voodoo_regs::reg_startT,     voodoo_regs::reg_dTdX,
-	voodoo_regs::reg_dTdY,       voodoo_regs::reg_startW,     voodoo_regs::reg_dWdX,       voodoo_regs::reg_dWdY,
-
-	voodoo_regs::reg_triangleCMD,0x084/4,                     voodoo_regs::reg_fvertexAx,  voodoo_regs::reg_fvertexAy,
-	voodoo_regs::reg_fvertexBx,  voodoo_regs::reg_fvertexBy,  voodoo_regs::reg_fvertexCx,  voodoo_regs::reg_fvertexCy,
-	voodoo_regs::reg_fstartR,    voodoo_regs::reg_fdRdX,      voodoo_regs::reg_fdRdY,      voodoo_regs::reg_fstartG,
-	voodoo_regs::reg_fdGdX,      voodoo_regs::reg_fdGdY,      voodoo_regs::reg_fstartB,    voodoo_regs::reg_fdBdX,
-	voodoo_regs::reg_fdBdY,      voodoo_regs::reg_fstartZ,    voodoo_regs::reg_fdZdX,      voodoo_regs::reg_fdZdY,
-	voodoo_regs::reg_fstartA,    voodoo_regs::reg_fdAdX,      voodoo_regs::reg_fdAdY,      voodoo_regs::reg_fstartS,
-	voodoo_regs::reg_fdSdX,      voodoo_regs::reg_fdSdY,      voodoo_regs::reg_fstartT,    voodoo_regs::reg_fdTdX,
-	voodoo_regs::reg_fdTdY,      voodoo_regs::reg_fstartW,    voodoo_regs::reg_fdWdX,      voodoo_regs::reg_fdWdY
+	NOT_STALLED = 0,
+	STALLED_UNTIL_FIFO_LWM,
+	STALLED_UNTIL_FIFO_EMPTY
 };
 
+// number of clocks to set up a triangle (just a guess)
+static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
 
-/*************************************
- *
- *  Table of per-register access rights
- *
- *************************************/
 
-const u8 voodoo_register_access[0x100] =
-{
-	/* 0x000 */
-	REG_RP,     0,          REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x040 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x080 */
-	REG_WPF,    0,          REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x0c0 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x100 */
-	REG_WPF,    REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_RWF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     0,          0,
-
-	/* 0x140 */
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_R,
-	REG_R,      REG_R,      REG_R,      REG_R,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x180 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x1c0 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x200 */
-	REG_RW,     REG_R,      REG_RW,     REG_RW,
-	REG_RW,     REG_RW,     REG_RW,     REG_RW,
-	REG_W,      REG_W,      REG_W,      REG_W,
-	REG_W,      0,          0,          0,
-
-	/* 0x240 */
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x280 */
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x2c0 */
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x300 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x340 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x380 */
-	REG_WF
-};
-
-const u8 voodoo2_register_access[0x100] =
-{
-	/* 0x000 */
-	REG_RP,     REG_RWPT,   REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x040 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x080 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x0c0 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x100 */
-	REG_WPF,    REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_RWF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x140 */
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_R,
-	REG_R,      REG_R,      REG_R,      REG_R,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x180 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x1c0 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_RWT,    REG_RWT,    REG_RWT,    REG_RWT,
-	REG_RWT,    REG_RWT,    REG_RWT,    REG_RW,
-
-	/* 0x200 */
-	REG_RWT,    REG_R,      REG_RWT,    REG_RWT,
-	REG_RWT,    REG_RWT,    REG_RWT,    REG_RWT,
-	REG_WT,     REG_WT,     REG_WF,     REG_WT,
-	REG_WT,     REG_WT,     REG_WT,     REG_WT,
-
-	/* 0x240 */
-	REG_R,      REG_RWT,    REG_RWT,    REG_RWT,
-	0,          0,          REG_R,      REG_R,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x280 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    0,          0,
-	0,          0,          0,          0,
-
-	/* 0x2c0 */
-	REG_RWPF,   REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWPF,   REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWPF,   REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWPF,   REG_RWPF,   REG_RWPF,   REG_WPF,
-
-	/* 0x300 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x340 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x380 */
-	REG_WF
-};
-
-const u8 banshee_register_access[0x100] =
-{
-	/* 0x000 */
-	REG_RP,     REG_RWPT,   REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x040 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x080 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x0c0 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x100 */
-	REG_WPF,    REG_RWPF,   REG_RWPF,   REG_RWPF,
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_RWF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x140 */
-	REG_RWF,    REG_RWF,    REG_RWF,    REG_R,
-	REG_R,      REG_R,      REG_R,      REG_R,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x180 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x1c0 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	0,          0,          0,          REG_RWF,
-	REG_RWF,    REG_RWF,    REG_RWF,    0,
-
-	/* 0x200 */
-	REG_RWF,    REG_RWF,    0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x240 */
-	0,          0,          0,          REG_WT,
-	REG_RWF,    REG_RWF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_R,      REG_R,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-
-	/* 0x280 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    0,          0,
-	0,          0,          0,          0,
-
-	/* 0x2c0 */
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-	0,          0,          0,          0,
-
-	/* 0x300 */
-	REG_WPF,    REG_WPF,    REG_WPF,    REG_WPF,
-	REG_WPF,    REG_WPF,    REG_WPF,    0,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x340 */
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-	REG_WF,     REG_WF,     REG_WF,     REG_WF,
-
-	/* 0x380 */
-	REG_WF
-};
-
-
-/*************************************
- *
- *  Register string table for debug
- *
- *************************************/
-
-const char *const voodoo_reg_name[] =
-{
-	/* 0x000 */
-	"status",       "{intrCtrl}",   "vertexAx",     "vertexAy",
-	"vertexBx",     "vertexBy",     "vertexCx",     "vertexCy",
-	"startR",       "startG",       "startB",       "startZ",
-	"startA",       "startS",       "startT",       "startW",
-	/* 0x040 */
-	"dRdX",         "dGdX",         "dBdX",         "dZdX",
-	"dAdX",         "dSdX",         "dTdX",         "dWdX",
-	"dRdY",         "dGdY",         "dBdY",         "dZdY",
-	"dAdY",         "dSdY",         "dTdY",         "dWdY",
-	/* 0x080 */
-	"triangleCMD",  "reserved084",  "fvertexAx",    "fvertexAy",
-	"fvertexBx",    "fvertexBy",    "fvertexCx",    "fvertexCy",
-	"fstartR",      "fstartG",      "fstartB",      "fstartZ",
-	"fstartA",      "fstartS",      "fstartT",      "fstartW",
-	/* 0x0c0 */
-	"fdRdX",        "fdGdX",        "fdBdX",        "fdZdX",
-	"fdAdX",        "fdSdX",        "fdTdX",        "fdWdX",
-	"fdRdY",        "fdGdY",        "fdBdY",        "fdZdY",
-	"fdAdY",        "fdSdY",        "fdTdY",        "fdWdY",
-	/* 0x100 */
-	"ftriangleCMD", "fbzColorPath", "fogMode",      "alphaMode",
-	"fbzMode",      "lfbMode",      "clipLeftRight","clipLowYHighY",
-	"nopCMD",       "fastfillCMD",  "swapbufferCMD","fogColor",
-	"zaColor",      "chromaKey",    "{chromaRange}","{userIntrCMD}",
-	/* 0x140 */
-	"stipple",      "color0",       "color1",       "fbiPixelsIn",
-	"fbiChromaFail","fbiZfuncFail", "fbiAfuncFail", "fbiPixelsOut",
-	"fogTable160",  "fogTable164",  "fogTable168",  "fogTable16c",
-	"fogTable170",  "fogTable174",  "fogTable178",  "fogTable17c",
-	/* 0x180 */
-	"fogTable180",  "fogTable184",  "fogTable188",  "fogTable18c",
-	"fogTable190",  "fogTable194",  "fogTable198",  "fogTable19c",
-	"fogTable1a0",  "fogTable1a4",  "fogTable1a8",  "fogTable1ac",
-	"fogTable1b0",  "fogTable1b4",  "fogTable1b8",  "fogTable1bc",
-	/* 0x1c0 */
-	"fogTable1c0",  "fogTable1c4",  "fogTable1c8",  "fogTable1cc",
-	"fogTable1d0",  "fogTable1d4",  "fogTable1d8",  "fogTable1dc",
-	"{cmdFifoBaseAddr}","{cmdFifoBump}","{cmdFifoRdPtr}","{cmdFifoAMin}",
-	"{cmdFifoAMax}","{cmdFifoDepth}","{cmdFifoHoles}","reserved1fc",
-	/* 0x200 */
-	"fbiInit4",     "vRetrace",     "backPorch",    "videoDimensions",
-	"fbiInit0",     "fbiInit1",     "fbiInit2",     "fbiInit3",
-	"hSync",        "vSync",        "clutData",     "dacData",
-	"maxRgbDelta",  "{hBorder}",    "{vBorder}",    "{borderColor}",
-	/* 0x240 */
-	"{hvRetrace}",  "{fbiInit5}",   "{fbiInit6}",   "{fbiInit7}",
-	"reserved250",  "reserved254",  "{fbiSwapHistory}","{fbiTrianglesOut}",
-	"{sSetupMode}", "{sVx}",        "{sVy}",        "{sARGB}",
-	"{sRed}",       "{sGreen}",     "{sBlue}",      "{sAlpha}",
-	/* 0x280 */
-	"{sVz}",        "{sWb}",        "{sWtmu0}",     "{sS/Wtmu0}",
-	"{sT/Wtmu0}",   "{sWtmu1}",     "{sS/Wtmu1}",   "{sT/Wtmu1}",
-	"{sDrawTriCMD}","{sBeginTriCMD}","reserved2a8", "reserved2ac",
-	"reserved2b0",  "reserved2b4",  "reserved2b8",  "reserved2bc",
-	/* 0x2c0 */
-	"{bltSrcBaseAddr}","{bltDstBaseAddr}","{bltXYStrides}","{bltSrcChromaRange}",
-	"{bltDstChromaRange}","{bltClipX}","{bltClipY}","reserved2dc",
-	"{bltSrcXY}",   "{bltDstXY}",   "{bltSize}",    "{bltRop}",
-	"{bltColor}",   "reserved2f4",  "{bltCommand}", "{bltData}",
-	/* 0x300 */
-	"textureMode",  "tLOD",         "tDetail",      "texBaseAddr",
-	"texBaseAddr_1","texBaseAddr_2","texBaseAddr_3_8","trexInit0",
-	"trexInit1",    "nccTable0.0",  "nccTable0.1",  "nccTable0.2",
-	"nccTable0.3",  "nccTable0.4",  "nccTable0.5",  "nccTable0.6",
-	/* 0x340 */
-	"nccTable0.7",  "nccTable0.8",  "nccTable0.9",  "nccTable0.A",
-	"nccTable0.B",  "nccTable1.0",  "nccTable1.1",  "nccTable1.2",
-	"nccTable1.3",  "nccTable1.4",  "nccTable1.5",  "nccTable1.6",
-	"nccTable1.7",  "nccTable1.8",  "nccTable1.9",  "nccTable1.A",
-	/* 0x380 */
-	"nccTable1.B"
-};
-
-const char *const banshee_reg_name[] =
-{
-	/* 0x000 */
-	"status",       "intrCtrl",     "vertexAx",     "vertexAy",
-	"vertexBx",     "vertexBy",     "vertexCx",     "vertexCy",
-	"startR",       "startG",       "startB",       "startZ",
-	"startA",       "startS",       "startT",       "startW",
-	/* 0x040 */
-	"dRdX",         "dGdX",         "dBdX",         "dZdX",
-	"dAdX",         "dSdX",         "dTdX",         "dWdX",
-	"dRdY",         "dGdY",         "dBdY",         "dZdY",
-	"dAdY",         "dSdY",         "dTdY",         "dWdY",
-	/* 0x080 */
-	"triangleCMD",  "reserved084",  "fvertexAx",    "fvertexAy",
-	"fvertexBx",    "fvertexBy",    "fvertexCx",    "fvertexCy",
-	"fstartR",      "fstartG",      "fstartB",      "fstartZ",
-	"fstartA",      "fstartS",      "fstartT",      "fstartW",
-	/* 0x0c0 */
-	"fdRdX",        "fdGdX",        "fdBdX",        "fdZdX",
-	"fdAdX",        "fdSdX",        "fdTdX",        "fdWdX",
-	"fdRdY",        "fdGdY",        "fdBdY",        "fdZdY",
-	"fdAdY",        "fdSdY",        "fdTdY",        "fdWdY",
-	/* 0x100 */
-	"ftriangleCMD", "fbzColorPath", "fogMode",      "alphaMode",
-	"fbzMode",      "lfbMode",      "clipLeftRight","clipLowYHighY",
-	"nopCMD",       "fastfillCMD",  "swapbufferCMD","fogColor",
-	"zaColor",      "chromaKey",    "chromaRange",  "userIntrCMD",
-	/* 0x140 */
-	"stipple",      "color0",       "color1",       "fbiPixelsIn",
-	"fbiChromaFail","fbiZfuncFail", "fbiAfuncFail", "fbiPixelsOut",
-	"fogTable160",  "fogTable164",  "fogTable168",  "fogTable16c",
-	"fogTable170",  "fogTable174",  "fogTable178",  "fogTable17c",
-	/* 0x180 */
-	"fogTable180",  "fogTable184",  "fogTable188",  "fogTable18c",
-	"fogTable190",  "fogTable194",  "fogTable198",  "fogTable19c",
-	"fogTable1a0",  "fogTable1a4",  "fogTable1a8",  "fogTable1ac",
-	"fogTable1b0",  "fogTable1b4",  "fogTable1b8",  "fogTable1bc",
-	/* 0x1c0 */
-	"fogTable1c0",  "fogTable1c4",  "fogTable1c8",  "fogTable1cc",
-	"fogTable1d0",  "fogTable1d4",  "fogTable1d8",  "fogTable1dc",
-	"reserved1e0",  "reserved1e4",  "reserved1e8",  "colBufferAddr",
-	"colBufferStride","auxBufferAddr","auxBufferStride","reserved1fc",
-	/* 0x200 */
-	"clipLeftRight1","clipTopBottom1","reserved208","reserved20c",
-	"reserved210",  "reserved214",  "reserved218",  "reserved21c",
-	"reserved220",  "reserved224",  "reserved228",  "reserved22c",
-	"reserved230",  "reserved234",  "reserved238",  "reserved23c",
-	/* 0x240 */
-	"reserved240",  "reserved244",  "reserved248",  "swapPending",
-	"leftOverlayBuf","rightOverlayBuf","fbiSwapHistory","fbiTrianglesOut",
-	"sSetupMode",   "sVx",          "sVy",          "sARGB",
-	"sRed",         "sGreen",       "sBlue",        "sAlpha",
-	/* 0x280 */
-	"sVz",          "sWb",          "sWtmu0",       "sS/Wtmu0",
-	"sT/Wtmu0",     "sWtmu1",       "sS/Wtmu1",     "sT/Wtmu1",
-	"sDrawTriCMD",  "sBeginTriCMD", "reserved2a8",  "reserved2ac",
-	"reserved2b0",  "reserved2b4",  "reserved2b8",  "reserved2bc",
-	/* 0x2c0 */
-	"reserved2c0",  "reserved2c4",  "reserved2c8",  "reserved2cc",
-	"reserved2d0",  "reserved2d4",  "reserved2d8",  "reserved2dc",
-	"reserved2e0",  "reserved2e4",  "reserved2e8",  "reserved2ec",
-	"reserved2f0",  "reserved2f4",  "reserved2f8",  "reserved2fc",
-	/* 0x300 */
-	"textureMode",  "tLOD",         "tDetail",      "texBaseAddr",
-	"texBaseAddr_1","texBaseAddr_2","texBaseAddr_3_8","reserved31c",
-	"trexInit1",    "nccTable0.0",  "nccTable0.1",  "nccTable0.2",
-	"nccTable0.3",  "nccTable0.4",  "nccTable0.5",  "nccTable0.6",
-	/* 0x340 */
-	"nccTable0.7",  "nccTable0.8",  "nccTable0.9",  "nccTable0.A",
-	"nccTable0.B",  "nccTable1.0",  "nccTable1.1",  "nccTable1.2",
-	"nccTable1.3",  "nccTable1.4",  "nccTable1.5",  "nccTable1.6",
-	"nccTable1.7",  "nccTable1.8",  "nccTable1.9",  "nccTable1.A",
-	/* 0x380 */
-	"nccTable1.B"
-};
-
-
-/*************************************
- *
- *  Register string table for debug
- *
- *************************************/
-
-const char *const banshee_io_reg_name[] =
-{
-	/* 0x000 */
-	"status",       "pciInit0",     "sipMonitor",   "lfbMemoryConfig",
-	"miscInit0",    "miscInit1",    "dramInit0",    "dramInit1",
-	"agpInit",      "tmuGbeInit",   "vgaInit0",     "vgaInit1",
-	"dramCommand",  "dramData",     "reserved38",   "reserved3c",
-
-	/* 0x040 */
-	"pllCtrl0",     "pllCtrl1",     "pllCtrl2",     "dacMode",
-	"dacAddr",      "dacData",      "rgbMaxDelta",  "vidProcCfg",
-	"hwCurPatAddr", "hwCurLoc",     "hwCurC0",      "hwCurC1",
-	"vidInFormat",  "vidInStatus",  "vidSerialParallelPort","vidInXDecimDeltas",
-
-	/* 0x080 */
-	"vidInDecimInitErrs","vidInYDecimDeltas","vidPixelBufThold","vidChromaMin",
-	"vidChromaMax", "vidCurrentLine","vidScreenSize","vidOverlayStartCoords",
-	"vidOverlayEndScreenCoord","vidOverlayDudx","vidOverlayDudxOffsetSrcWidth","vidOverlayDvdy",
-	"vga[b0]",      "vga[b4]",      "vga[b8]",      "vga[bc]",
-
-	/* 0x0c0 */
-	"vga[c0]",      "vga[c4]",      "vga[c8]",      "vga[cc]",
-	"vga[d0]",      "vga[d4]",      "vga[d8]",      "vga[dc]",
-	"vidOverlayDvdyOffset","vidDesktopStartAddr","vidDesktopOverlayStride","vidInAddr0",
-	"vidInAddr1",   "vidInAddr2",   "vidInStride",  "vidCurrOverlayStartAddr"
-};
-
-
-/*************************************
- *
- *  Register string table for debug
- *
- *************************************/
-
-const char *const banshee_agp_reg_name[] =
-{
-	/* 0x000 */
-	"agpReqSize",   "agpHostAddressLow","agpHostAddressHigh","agpGraphicsAddress",
-	"agpGraphicsStride","agpMoveCMD","reserved18",  "reserved1c",
-	"cmdBaseAddr0", "cmdBaseSize0", "cmdBump0",     "cmdRdPtrL0",
-	"cmdRdPtrH0",   "cmdAMin0",     "reserved38",   "cmdAMax0",
-
-	/* 0x040 */
-	"reserved40",   "cmdFifoDepth0","cmdHoleCnt0",  "reserved4c",
-	"cmdBaseAddr1", "cmdBaseSize1", "cmdBump1",     "cmdRdPtrL1",
-	"cmdRdPtrH1",   "cmdAMin1",     "reserved68",   "cmdAMax1",
-	"reserved70",   "cmdFifoDepth1","cmdHoleCnt1",  "reserved7c",
-
-	/* 0x080 */
-	"cmdFifoThresh","cmdHoleInt",   "reserved88",   "reserved8c",
-	"reserved90",   "reserved94",   "reserved98",   "reserved9c",
-	"reserveda0",   "reserveda4",   "reserveda8",   "reservedac",
-	"reservedb0",   "reservedb4",   "reservedb8",   "reservedbc",
-
-	/* 0x0c0 */
-	"reservedc0",   "reservedc4",   "reservedc8",   "reservedcc",
-	"reservedd0",   "reservedd4",   "reservedd8",   "reserveddc",
-	"reservede0",   "reservede4",   "reservede8",   "reservedec",
-	"reservedf0",   "reservedf4",   "reservedf8",   "reservedfc",
-
-	/* 0x100 */
-	"yuvBaseAddress","yuvStride",   "reserved108",  "reserved10c",
-	"reserved110",  "reserved114",  "reserved118",  "reserved11c",
-	"crc1",         "reserved124",  "reserved128",  "reserved12c",
-	"crc2",         "reserved134",  "reserved138",  "reserved13c"
-};
-
-} // anonymous namespace
 
 
 /*************************************
@@ -730,67 +202,136 @@ const char *const banshee_agp_reg_name[] =
 
 static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
 
-/* fast dither lookup */
-std::unique_ptr<u8[]> voodoo::dither_helper::s_dither4_lookup;
-std::unique_ptr<u8[]> voodoo::dither_helper::s_dither2_lookup;
-std::unique_ptr<u8[]> voodoo::dither_helper::s_nodither_lookup;
 
-u8 const voodoo::dither_helper::s_dither_matrix_4x4[16] =
+
+//-------------------------------------------------
+//  float_to_int32 - convert a floating-point
+//  value in raw IEEE format into an integer with
+//  the given number of fractional bits
+//-------------------------------------------------
+
+static inline s32 float_to_int32(u32 data, int fixedbits)
 {
-	 0,  8,  2, 10,
-	12,  4, 14,  6,
-	 3, 11,  1,  9,
-	15,  7, 13,  5
-};
-// Using this matrix allows iteagle video memory tests to pass
-u8 const voodoo::dither_helper::s_dither_matrix_2x2[16] =
+	// compute the effective exponent
+	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
+
+	// extract the mantissa and return the implied leading 1 bit
+	s32 result = (data & 0x7fffff) | 0x800000;
+
+	// shift by the exponent, handling minimum/maximum
+	if (exponent < 0)
+	{
+		if (exponent > -32)
+			result >>= -exponent;
+		else
+			result = 0;
+	}
+	else
+	{
+		if (exponent < 32)
+			result <<= exponent;
+		else
+			result = 0x7fffffff;
+	}
+
+	// negate based on the sign
+	return (data & 0x80000000) ? -result : result;
+}
+
+
+//-------------------------------------------------
+//  float_to_int64 - convert a floating-point
+//  value in raw IEEE format into an integer with
+//  the given number of fractional bits
+//-------------------------------------------------
+
+static inline s64 float_to_int64(u32 data, int fixedbits)
 {
-	 8, 10,  8, 10,
-	11,  9, 11,  9,
-	 8, 10,  8, 10,
-	11,  9, 11,  9
-};
+	// compute the effective exponent
+	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
 
-u8 const voodoo::dither_helper::s_dither_matrix_4x4_subtract[16] =
+	// extract the mantissa and return the implied leading 1 bit
+	s64 result = (data & 0x7fffff) | 0x800000;
+
+	// shift by the exponent, handling minimum/maximum
+	if (exponent < 0)
+	{
+		if (exponent > -64)
+			result >>= -exponent;
+		else
+			result = 0;
+	}
+	else
+	{
+		if (exponent < 64)
+			result <<= exponent;
+		else
+			result = 0x7fffffffffffffffull;
+	}
+
+	// negate based on the sign
+	return (data & 0x80000000) ? -result : result;
+}
+
+
+
+//**************************************************************************
+//  FIFO MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  fifo_state - constructor
+//-------------------------------------------------
+
+voodoo::fifo_state::fifo_state() :
+	m_base(nullptr),
+	m_size(0),
+	m_in(0),
+	m_out(0)
 {
-	(15 -  0) >> 1, (15 -  8) >> 1, (15 -  2) >> 1, (15 - 10) >> 1,
-	(15 - 12) >> 1, (15 -  4) >> 1, (15 - 14) >> 1, (15 -  6) >> 1,
-	(15 -  3) >> 1, (15 - 11) >> 1, (15 -  1) >> 1, (15 -  9) >> 1,
-	(15 - 15) >> 1, (15 -  7) >> 1, (15 - 13) >> 1, (15 -  5) >> 1
-};
-u8 const voodoo::dither_helper::s_dither_matrix_2x2_subtract[16] =
+}
+
+
+//-------------------------------------------------
+//  add - append an item to the fifo
+//-------------------------------------------------
+
+inline void voodoo::fifo_state::add(u32 data)
 {
-	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1,
-	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1
-};
+	// compute the value of 'in' after we add this item
+	s32 next_in = m_in + 1;
+	if (next_in >= m_size)
+		next_in = 0;
+
+	// as long as it's not equal to the output pointer, we can do it
+	if (next_in != m_out)
+	{
+		m_base[m_in] = data;
+		m_in = next_in;
+	}
+}
 
 
+//-------------------------------------------------
+//  remove - remove the next item from the fifo
+//-------------------------------------------------
 
-/*************************************
- *
- *  Rasterizer table
- *
- *************************************/
-
-#define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ &voodoo_renderer::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, { fbzcp, alpha, fog, fbz, tex0, tex1 } },
-
-voodoo::static_raster_info voodoo_device::predef_raster_table[] =
+inline u32 voodoo::fifo_state::remove()
 {
-#include "voodoo_rast.ipp"
-	{ nullptr, { 0xffffffff } }
-};
+	// return invalid data if empty
+	if (m_out == m_in)
+		return 0xffffffff;
 
-#undef RASTERIZER_ENTRY
+	// determine next output
+	s32 next_out = m_out + 1;
+	if (next_out >= m_size)
+		next_out = 0;
 
-voodoo::static_raster_info voodoo_device::generic_raster_table[3] =
-{
-	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, { 0 } },
-	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, 0xffffffff>, { 0 } },
-	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE>, { 0 } },
-};
+	// fetch current and advance
+	u32 data = m_base[m_out];
+	m_out = next_out;
+	return data;
+}
 
 
 
@@ -2642,7 +2183,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 
 	/* the first 64 registers can be aliased differently */
 	if ((offset & 0x800c0) == 0x80000 && m_alt_regmap)
-		regnum = register_alias_map[offset & 0x3f];
+		regnum = voodoo_regs::s_register_alias_map[offset & 0x3f];
 	else
 		regnum = offset & 0xff;
 
@@ -3744,79 +3285,21 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 		// make a dummy poly_extra_data structure with some cached values
 		poly_extra_data extra;
+		extra.u.raster.compute(m_type, 0, m_reg, m_tmu[0].m_reg, m_tmu[1].m_reg);
+		extra.destbase = dest;
+		extra.depthbase = depth;
 		extra.color0 = m_reg.color0().argb();
 		extra.color1 = m_reg.color1().argb();
 		extra.zacolor = m_reg.za_color();
 
 		// loop over up to two pixels
-		auto const fbzcp = m_reg.fbz_colorpath();
-		auto const alphamode = m_reg.alpha_mode();
-		auto const fogmode = m_reg.fog_mode();
-		voodoo::dither_helper dither(scry, fbzmode, fogmode);
 		thread_stats_block &threadstats = m_fbi.lfb_stats;
 		rgbaint_t iterargb(0);
 		for (int pix = 0; mask != 0; pix++)
 		{
 			// make sure we care about this pixel
-			if ((mask & 0x0f) != 0) do
-			{
-				threadstats.pixels_in++;
-
-				// apply clipping
-				if (fbzmode.enable_clipping())
-				{
-					if (x < m_reg.clip_left() || x >= m_reg.clip_right() || scry < m_reg.clip_top() || scry >= m_reg.clip_bottom())
-					{
-						threadstats.clip_fail++;
-						break;
-					}
-				}
-
-				// handle stippling
-				if (fbzmode.enable_stipple() && !m_poly->stipple_test(threadstats, fbzmode, x, scry))
-					break;
-
-				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-				s32 depthval = u32(sz[pix]);
-
-				// Perform depth testing
-				if (fbzmode.enable_depthbuf() && !m_poly->depth_test(threadstats, extra, fbzmode, depth[x], depthval))
-					break;
-
-				// use the RGBA we stashed above
-				rgbaint_t color(src_color[pix]);
-
-				// handle chroma key
-				if (fbzmode.enable_chromakey() && !m_poly->chroma_key_test(threadstats, color))
-					break;
-
-				// handle alpha mask
-				if (fbzmode.enable_alpha_mask() && !m_poly->alpha_mask_test(threadstats, color.get_a()))
-					break;
-
-				// handle alpha test
-				if (alphamode.alphatest() && !m_poly->alpha_test(threadstats, alphamode, color.get_a()))
-					break;
-
-				// perform fogging
-				rgbaint_t prefog(color);
-				if (fogmode.enable_fog())
-				{
-					s32 iterz = sz[pix] << 12;
-					s64 iterw = lfbmode.write_w_select() ? u32(m_reg.za_color() << 16) : u32(sz[pix] << 16);
-					m_poly->apply_fogging(color, extra, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
-				}
-
-				// wait for any outstanding work to finish
-				m_poly->wait("LFB Write");
-
-				// perform alpha blending
-				if (alphamode.alphablend())
-					m_poly->alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
-
-				// pixel pipeline part 2 handles final output
-				m_poly->write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
-			} while (0);
+			if ((mask & 0x0f) != 0)
+				m_poly->pixel_pipeline(threadstats, extra, lfbmode, x, y, src_color[pix], sz[pix]);
 
 			// advance our pointers
 			x++;
@@ -4635,7 +4118,7 @@ u32 voodoo_banshee_device::banshee_agp_r(offs_t offset)
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:banshee_r(AGP:%s)\n", machine().describe_context(), banshee_agp_reg_name[offset]);
+		logerror("%s:banshee_r(AGP:%s)\n", machine().describe_context(), voodoo_regs::s_banshee_agp_reg_name[offset]);
 	return result;
 }
 
@@ -4832,7 +4315,7 @@ u32 voodoo_banshee_device::banshee_io_r(offs_t offset, u32 mem_mask)
 		default:
 			result = m_banshee.io[offset];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_r(%s)\n", machine().describe_context(), banshee_io_reg_name[offset]);
+				logerror("%s:banshee_io_r(%s)\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset]);
 			break;
 	}
 
@@ -5197,7 +4680,7 @@ void voodoo_banshee_device::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:banshee_w(AGP:%s) = %08X & %08X\n", machine().describe_context(), banshee_agp_reg_name[offset], data, mem_mask);
+		logerror("%s:banshee_w(AGP:%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_agp_reg_name[offset], data, mem_mask);
 }
 
 
@@ -5336,7 +4819,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 			if ((m_banshee.io[offset] ^ old) & 0x2800)
 				m_fbi.clut_dirty = true;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_dacData:
@@ -5354,7 +4837,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 			COMBINE_DATA(&m_banshee.io[offset]);
 			m_poly->set_yorigin(m_fbi.yorigin = (data >> 18) & 0xfff);
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vidScreenSize:
@@ -5416,7 +4899,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 				adjust_vblank_timer();
 			}
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 		}
 
@@ -5424,7 +4907,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 			m_fbi.lfb_base = (data & 0x1fff) << (12-2);
 			m_fbi.lfb_stride = ((data >> 13) & 7) + 9;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
@@ -5439,13 +4922,13 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 			if (ACCESSING_BITS_24_31)
 				banshee_vga_w(offset*4+3, data >> 24);
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		default:
 			COMBINE_DATA(&m_banshee.io[offset]);
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 	}
 }
@@ -5499,30 +4982,30 @@ void voodoo_device::device_start()
 	switch (m_type)
 	{
 		case TYPE_VOODOO_1:
-			m_regaccess = voodoo_register_access;
-			m_regnames = voodoo_reg_name;
+			m_regaccess = voodoo_regs::s_register_access;
+			m_regnames = voodoo_regs::s_register_name;
 			m_alt_regmap = 0;
 			m_fbi.lfb_stride = 10;
 			break;
 
 		case TYPE_VOODOO_2:
-			m_regaccess = voodoo2_register_access;
-			m_regnames = voodoo_reg_name;
+			m_regaccess = voodoo_regs::s_voodoo2_register_access;
+			m_regnames = voodoo_regs::s_register_name;
 			m_alt_regmap = 0;
 			m_fbi.lfb_stride = 10;
 			m_tmu_config |= 0x800;
 			break;
 
 		case TYPE_VOODOO_BANSHEE:
-			m_regaccess = banshee_register_access;
-			m_regnames = banshee_reg_name;
+			m_regaccess = voodoo_regs::s_banshee_register_access;
+			m_regnames = voodoo_regs::s_banshee_register_name;
 			m_alt_regmap = 1;
 			m_fbi.lfb_stride = 11;
 			break;
 
 		case TYPE_VOODOO_3:
-			m_regaccess = banshee_register_access;
-			m_regnames = banshee_reg_name;
+			m_regaccess = voodoo_regs::s_banshee_register_access;
+			m_regnames = voodoo_regs::s_banshee_register_name;
 			m_alt_regmap = 1;
 			m_fbi.lfb_stride = 11;
 			break;
