@@ -775,7 +775,7 @@ u8 const voodoo::dither_helper::s_dither_matrix_2x2_subtract[16] =
  *************************************/
 
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ &voodoo_device::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, { fbzcp, alpha, fog, fbz, tex0, tex1 } },
+	{ &voodoo_renderer::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, { fbzcp, alpha, fog, fbz, tex0, tex1 } },
 
 voodoo::static_raster_info voodoo_device::predef_raster_table[] =
 {
@@ -787,9 +787,9 @@ voodoo::static_raster_info voodoo_device::predef_raster_table[] =
 
 voodoo::static_raster_info voodoo_device::generic_raster_table[3] =
 {
-	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, { 0 } },
-	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, 0xffffffff>, { 0 } },
-	{ &voodoo_device::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE>, { 0 } },
+	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, { 0 } },
+	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, 0xffffffff>, { 0 } },
+	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE, reg_texture_mode::DECODE_LIVE>, { 0 } },
 };
 
 
@@ -999,9 +999,6 @@ void voodoo_device::init_fbi(fbi_state *f, void *memory, int fbmem)
 
 	/* initialize the memory FIFO */
 	f->fifo.configure(nullptr, 0);
-
-	/* set the fog delta mask */
-	f->fogdelta_mask = (m_type < TYPE_VOODOO_2) ? 0xff : 0xfc;
 }
 
 
@@ -1202,9 +1199,12 @@ void voodoo_device::init_save_state()
 	save_item(STRUCT_MEMBER(m_fbi.cmdfifo, amax));
 	save_item(STRUCT_MEMBER(m_fbi.cmdfifo, depth));
 	save_item(STRUCT_MEMBER(m_fbi.cmdfifo, holes));
-	save_item(NAME(m_fbi.fogblend));
-	save_item(NAME(m_fbi.fogdelta));
+
 	save_item(NAME(m_fbi.clut));
+
+	// renderer states
+	save_item(NAME(m_poly->m_fogblend));
+	save_item(NAME(m_poly->m_fogdelta));
 
 	/* register states: tmu */
 	for (int index = 0; index < std::size(m_tmu); index++)
@@ -1278,17 +1278,17 @@ void voodoo_device::accumulate_statistics(const thread_stats_block &block)
 void voodoo_device::update_statistics(bool accumulate)
 {
 	/* accumulate/reset statistics from all units */
-	for (int threadnum = 0; threadnum < WORK_MAX_THREADS; threadnum++)
+	for (auto &stats : m_poly->thread_stats())
 	{
 		if (accumulate)
-			accumulate_statistics(m_thread_stats[threadnum]);
-		memset(&m_thread_stats[threadnum], 0, sizeof(m_thread_stats[threadnum]));
+			accumulate_statistics(stats);
+		stats.reset();
 	}
 
 	/* accumulate/reset statistics from the LFB */
 	if (accumulate)
 		accumulate_statistics(m_fbi.lfb_stats);
-	memset(&m_fbi.lfb_stats, 0, sizeof(m_fbi.lfb_stats));
+	m_fbi.lfb_stats.reset();
 }
 
 
@@ -1550,7 +1550,7 @@ void voodoo_device::recompute_video_memory()
 						(m_reg.fbi_init1().x_video_tiles_bit5() << 5) |
 						(m_reg.fbi_init6().x_video_tiles_bit0());
 	}
-	m_fbi.rowpixels = m_fbi.tile_width * m_fbi.x_tiles;
+	m_poly->set_rowpixels(m_fbi.rowpixels = m_fbi.tile_width * m_fbi.x_tiles);
 
 //  logerror("VOODOO.VIDMEM: buffer_pages=%X  fifo=%X-%X  tiles=%X  rowpix=%d\n", buffer_pages, fifo_start_page, fifo_last_page, m_fbi.x_tiles, m_fbi.rowpixels);
 
@@ -3150,7 +3150,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			{
 				m_reg.write(regnum, data);
 				m_alt_regmap = m_reg.fbi_init3().tri_register_remap();
-				m_fbi.yorigin = m_reg.fbi_init3().yorigin_subtract();
+				m_poly->set_yorigin(m_fbi.yorigin = m_reg.fbi_init3().yorigin_subtract());
 				recompute_video_memory();
 			}
 			break;
@@ -3204,9 +3204,9 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			else if (m_type >= TYPE_VOODOO_BANSHEE && (chips & 1))
 			{
 				if (data & 0x8000)
-					m_fbi.rowpixels = (data & 0x7f) << 6;
+					m_poly->set_rowpixels(m_fbi.rowpixels = (data & 0x7f) << 6);
 				else
-					m_fbi.rowpixels = (data & 0x3fff) >> 1;
+					m_poly->set_rowpixels(m_fbi.rowpixels = (data & 0x3fff) >> 1);
 			}
 			break;
 
@@ -3303,15 +3303,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case voodoo_regs::reg_fogTable + 29:
 		case voodoo_regs::reg_fogTable + 30:
 		case voodoo_regs::reg_fogTable + 31:
-			m_poly->wait(m_regnames[regnum]);
 			if (chips & 1)
-			{
-				int base = 2 * (regnum - voodoo_regs::reg_fogTable);
-				m_fbi.fogdelta[base + 0] = (data >> 0) & 0xff;
-				m_fbi.fogblend[base + 0] = (data >> 8) & 0xff;
-				m_fbi.fogdelta[base + 1] = (data >> 16) & 0xff;
-				m_fbi.fogblend[base + 1] = (data >> 24) & 0xff;
-			}
+				m_poly->write_fog(2 * (regnum - voodoo_regs::reg_fogTable), data);
 			break;
 
 		/* texture modifications cause us to recompute everything */
@@ -3326,7 +3319,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			{
 				if (m_tmu[0].m_reg.read(regnum) != data)
 				{
-					m_poly->wait(m_regnames[regnum]);
+// Why is uncommenting this better for performance??
+//			m_poly->wait(m_regnames[regnum]);
 					m_tmu[0].m_regdirty = true;
 					m_tmu[0].m_reg.write(regnum, data);
 				}
@@ -3335,7 +3329,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			{
 				if (m_tmu[1].m_reg.read(regnum) != data)
 				{
-					m_poly->wait(m_regnames[regnum]);
+// Why is uncommenting this better for performance??
+//			m_poly->wait(m_regnames[regnum]);
 					m_tmu[1].m_regdirty = true;
 					m_tmu[1].m_reg.write(regnum, data);
 				}
@@ -3778,29 +3773,29 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				}
 
 				// handle stippling
-				if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+				if (fbzmode.enable_stipple() && !m_poly->stipple_test(threadstats, fbzmode, x, scry))
 					break;
 
 				// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 				s32 depthval = u32(sz[pix]);
 
 				// Perform depth testing
-				if (fbzmode.enable_depthbuf() && !depth_test(threadstats, extra, fbzmode, depth[x], depthval))
+				if (fbzmode.enable_depthbuf() && !m_poly->depth_test(threadstats, extra, fbzmode, depth[x], depthval))
 					break;
 
 				// use the RGBA we stashed above
 				rgbaint_t color(src_color[pix]);
 
 				// handle chroma key
-				if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
+				if (fbzmode.enable_chromakey() && !m_poly->chroma_key_test(threadstats, color))
 					break;
 
 				// handle alpha mask
-				if (fbzmode.enable_alpha_mask() && !alpha_mask_test(threadstats, color.get_a()))
+				if (fbzmode.enable_alpha_mask() && !m_poly->alpha_mask_test(threadstats, color.get_a()))
 					break;
 
 				// handle alpha test
-				if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
+				if (alphamode.alphatest() && !m_poly->alpha_test(threadstats, alphamode, color.get_a()))
 					break;
 
 				// perform fogging
@@ -3809,7 +3804,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 				{
 					s32 iterz = sz[pix] << 12;
 					s64 iterw = lfbmode.write_w_select() ? u32(m_reg.za_color() << 16) : u32(sz[pix] << 16);
-					apply_fogging(color, extra, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
+					m_poly->apply_fogging(color, extra, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, iterargb);
 				}
 
 				// wait for any outstanding work to finish
@@ -3817,10 +3812,10 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 				// perform alpha blending
 				if (alphamode.alphablend())
-					alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
+					m_poly->alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
 
 				// pixel pipeline part 2 handles final output
-				write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+				m_poly->write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
 			} while (0);
 
 			// advance our pointers
@@ -4519,7 +4514,7 @@ u32 voodoo_device::lfb_r(offs_t offset, bool lfb_3d)
 		/* determine the screen Y */
 		scry = y;
 		if (lfbmode.y_origin())
-			scry = (m_fbi.yorigin - y);
+			scry = m_fbi.yorigin - y;
 	} else {
 		// Direct lfb access
 		buffer = (u16 *)(m_fbi.ram + m_fbi.lfb_base*4);
@@ -5357,7 +5352,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 
 		case io_miscInit0:
 			COMBINE_DATA(&m_banshee.io[offset]);
-			m_fbi.yorigin = (data >> 18) & 0xfff;
+			m_poly->set_yorigin(m_fbi.yorigin = (data >> 18) & 0xfff);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -5487,8 +5482,6 @@ void voodoo_device::device_start()
 	if (!m_screen || !m_cpu)
 		throw device_missing_dependencies();
 
-	m_poly = std::make_unique<voodoo_renderer>(machine());
-
 	/* validate configuration */
 	assert(m_fbmem > 0);
 
@@ -5497,9 +5490,6 @@ void voodoo_device::device_start()
 	m_vblank.resolve();
 	m_stall.resolve();
 	m_pciint.resolve();
-
-	/* create a multiprocessor work queue */
-	m_thread_stats = std::make_unique<thread_stats_block[]>(WORK_MAX_THREADS);
 
 	voodoo::dither_helper::init_static();
 
@@ -5558,13 +5548,6 @@ void voodoo_device::device_start()
 	m_attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / m_freq;
 	m_trigger = 51324 + m_index;
 
-	/* build the rasterizer table */
-	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
-	for (const static_raster_info *info = predef_raster_table; info->params.m_fbzcp != 0xffffffff; info++)
-		add_rasterizer(info->params, info->callback_mfp, false);
-	for (int index = 0; index < std::size(generic_raster_table); index++)
-		m_generic_rasterizer[index] = add_rasterizer(generic_raster_table[index].params, generic_raster_table[index].callback_mfp, true);
-
 	/* set up the PCI FIFO */
 	m_pci.fifo.configure(m_pci.fifo_mem, 64*2);
 	m_pci.stall_state = NOT_STALLED;
@@ -5597,6 +5580,14 @@ void voodoo_device::device_start()
 	m_tmushare.init();
 	// Point the rgb565 table to the frame buffer table
 	m_tmushare.rgb565 = m_fbi.rgb565;
+
+	m_poly = std::make_unique<voodoo_renderer>(machine(), m_type, m_reg, m_fbi.rgb565);
+	/* build the rasterizer table */
+	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
+	for (const static_raster_info *info = predef_raster_table; info->params.m_fbzcp != 0xffffffff; info++)
+		add_rasterizer(info->params, info->callback_mfp, false);
+	for (int index = 0; index < std::size(generic_raster_table); index++)
+		m_generic_rasterizer[index] = add_rasterizer(generic_raster_table[index].params, generic_raster_table[index].callback_mfp, true);
 
 	/* set up the TMUs */
 	m_tmu[0].init(m_type, m_tmushare, tmumem[0], tmumem0 << 20);
@@ -5683,6 +5674,7 @@ s32 voodoo_device::fastfill()
 				dithermatrix[y * 4 + x] = dither.pixel(x, m_reg.color1().argb());
 		}
 	}
+	u16 *depthbuf = (m_fbi.auxoffs != ~0) ? (u16 *)(m_fbi.ram + m_fbi.auxoffs) : nullptr;
 
 	/* fill in a block of extents */
 	voodoo_renderer::extent_t extents[64];
@@ -5691,7 +5683,7 @@ s32 voodoo_device::fastfill()
 	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	/* iterate over blocks of extents */
-	voodoo_renderer::render_delegate fastfill_cb(&voodoo_device::raster_fastfill, this);
+	voodoo_renderer::render_delegate fastfill_cb(&voodoo_renderer::raster_fastfill, m_poly.get());
 	int ey = m_reg.clip_bottom();
 	u32 pixels = 0;
 	for (int y = m_reg.clip_top(); y < ey; y += std::size(extents))
@@ -5700,6 +5692,7 @@ s32 voodoo_device::fastfill()
 		int count = std::min(ey - y, int(std::size(extents)));
 
 		extra.destbase = drawbuf;
+		extra.depthbase = depthbuf;
 		memcpy(extra.u.dither, dithermatrix, sizeof(extra.u.dither));
 
 		pixels += m_poly->render_triangle_custom(global_cliprect, fastfill_cb, y, count, extents);
@@ -6040,6 +6033,9 @@ s32 voodoo_device::setup_and_draw_triangle()
 
 s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 {
+	if ((texcount > 0 && m_tmu[0].m_regdirty) || (texcount > 1 && m_tmu[1].m_regdirty))
+		m_poly->wait("Texture recompute");
+
 	poly_extra_data &extra = m_poly->object_data_alloc();
 
 	extra.u.raster.compute(m_type, texcount, m_reg, m_tmu[0].m_reg, m_tmu[1].m_reg);
@@ -6047,16 +6043,17 @@ s32 voodoo_device::triangle_create_work_item(u16 *drawbuf, int texcount)
 	voodoo_renderer::vertex_t vert[3];
 
 	/* fill in the vertex data */
-	vert[0].x = (float)m_fbi.ax * (1.0f / 16.0f);
-	vert[0].y = (float)m_fbi.ay * (1.0f / 16.0f);
-	vert[1].x = (float)m_fbi.bx * (1.0f / 16.0f);
-	vert[1].y = (float)m_fbi.by * (1.0f / 16.0f);
-	vert[2].x = (float)m_fbi.cx * (1.0f / 16.0f);
-	vert[2].y = (float)m_fbi.cy * (1.0f / 16.0f);
+	vert[0].x = float(m_fbi.ax) * (1.0f / 16.0f);
+	vert[0].y = float(m_fbi.ay) * (1.0f / 16.0f);
+	vert[1].x = float(m_fbi.bx) * (1.0f / 16.0f);
+	vert[1].y = float(m_fbi.by) * (1.0f / 16.0f);
+	vert[2].x = float(m_fbi.cx) * (1.0f / 16.0f);
+	vert[2].y = float(m_fbi.cy) * (1.0f / 16.0f);
 
 	/* fill in the extra data */
 	extra.info = info;
 	extra.destbase = drawbuf;
+	extra.depthbase = (m_fbi.auxoffs != ~0) ? (u16 *)(m_fbi.ram + m_fbi.auxoffs) : nullptr;
 
 	/* fill in triangle parameters */
 	extra.ax = m_fbi.ax;
@@ -6142,7 +6139,7 @@ raster_info *voodoo_device::add_rasterizer(raster_params const &params, voodoo_r
 
 	// fill in the data
 	info.next = nullptr;
-	info.callback = voodoo_renderer::render_delegate(rasterizer, this);
+	info.callback = voodoo_renderer::render_delegate(rasterizer, m_poly.get());
 	info.display = 0;
 	info.is_generic = is_generic;
 	info.hits = 0;
@@ -6337,56 +6334,3 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 
 
 
-/***************************************************************************
-    GENERIC RASTERIZERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    raster_fastfill - per-scanline
-    implementation of the 'fastfill' command
--------------------------------------------------*/
-
-void voodoo_device::raster_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
-{
-	thread_stats_block &threadstats = m_thread_stats[threadid];
-	auto const fbzmode = m_reg.fbz_mode();
-	s32 startx = extent.startx;
-	s32 stopx = extent.stopx;
-	int x;
-
-	/* determine the screen Y */
-	s32 scry = y;
-	if (fbzmode.y_origin())
-		scry = m_fbi.yorigin - y;
-
-	/* fill this RGB row */
-	if (fbzmode.rgb_buffer_mask())
-	{
-		const u16 *ditherow = &extra.u.dither[(y & 3) * 4];
-		u64 expanded = *(u64 *)ditherow;
-		u16 *dest = extra.destbase + scry * m_fbi.rowpixels;
-
-		for (x = startx; x < stopx && (x & 3) != 0; x++)
-			dest[x] = ditherow[x & 3];
-		for ( ; x < (stopx & ~3); x += 4)
-			*(u64 *)&dest[x] = expanded;
-		for ( ; x < stopx; x++)
-			dest[x] = ditherow[x & 3];
-		threadstats.pixels_out += stopx - startx;
-	}
-
-	/* fill this dest buffer row */
-	if (fbzmode.aux_buffer_mask() && m_fbi.auxoffs != ~0)
-	{
-		u16 depth = m_reg.za_color();
-		u64 expanded = (u64(depth) << 48) | (u64(depth) << 32) | (u64(depth) << 16) | u64(depth);
-		u16 *dest = (u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels;
-
-		for (x = startx; x < stopx && (x & 3) != 0; x++)
-			dest[x] = depth;
-		for ( ; x < (stopx & ~3); x += 4)
-			*(u64 *)&dest[x] = expanded;
-		for ( ; x < stopx; x++)
-			dest[x] = depth;
-	}
-}

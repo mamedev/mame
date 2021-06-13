@@ -8,6 +8,9 @@
 
 ***************************************************************************/
 
+
+//fixme: m_send_config
+
 #ifndef MAME_VIDEO_VOODDEFS_IPP
 #define MAME_VIDEO_VOODDEFS_IPP
 
@@ -513,7 +516,7 @@ static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const
  *
  *************************************/
 
-inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::chroma_key_test(
 	thread_stats_block &threadstats,
 	rgbaint_t const &colorin)
 {
@@ -589,7 +592,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::chroma_key_test(
  *
  *************************************/
 
-inline bool ATTR_FORCE_INLINE voodoo_device::alpha_mask_test(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_mask_test(
 	thread_stats_block &threadstats,
 	u8 alpha)
 {
@@ -608,7 +611,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_mask_test(
  *
  *************************************/
 
-inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_test(
 	thread_stats_block &threadstats,
 	reg_alpha_mode const alphamode,
 	u8 alpha)
@@ -680,7 +683,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::alpha_test(
  *
  *************************************/
 
-inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
+inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_blend(
 	rgbaint_t &color,
 	reg_fbz_mode const fbzmode,
 	reg_alpha_mode const alphamode,
@@ -691,7 +694,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
 	rgbaint_t const &prefog)
 {
 	// extract destination pixel
-	rgbaint_t dst_color(m_fbi.rgb565[dpix]);
+	rgbaint_t dst_color(m_rgb565[dpix]);
 	int da = 0xff;
 	if (fbzmode.enable_alpha_planes())
 		dst_color.set_a16(da = depth[x]);
@@ -825,7 +828,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::alpha_blend(
  *
  *************************************/
 
-inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
+inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::apply_fogging(
 	rgbaint_t &color,
 	poly_extra_data const &extra,
 	reg_fbz_mode const fbzmode,
@@ -876,8 +879,8 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 					fog_depth = std::clamp(fog_depth + s16(extra.zacolor), 0, 0xffff);
 
 				// perform the multiply against lower 8 bits of wfloat
-				s32 delta = m_fbi.fogdelta[fog_depth >> 10];
-				s32 deltaval = (delta & m_fbi.fogdelta_mask) * ((fog_depth >> 2) & 0xff);
+				s32 delta = m_fogdelta[fog_depth >> 10];
+				s32 deltaval = (delta & m_fogdelta_mask) * ((fog_depth >> 2) & 0xff);
 
 				// fog zones allow for negating this value
 				if (fogmode.fog_zones() && (delta & 2))
@@ -890,7 +893,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
 				deltaval >>= 4;
 
 				// add to the blending factor
-				fogblend = m_fbi.fogblend[fog_depth >> 10] + deltaval;
+				fogblend = m_fogblend[fog_depth >> 10] + deltaval;
 				break;
 			}
 
@@ -930,7 +933,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::apply_fogging(
  *
  *************************************/
 
-inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::stipple_test(
 	thread_stats_block &threadstats,
 	reg_fbz_mode const fbzmode,
 	s32 x,
@@ -959,7 +962,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::stipple_test(
 	return true;
 }
 
-inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
+inline s32 ATTR_FORCE_INLINE voodoo::voodoo_renderer::compute_wfloat(s64 iterw)
 {
 	int exp = count_leading_zeros_64(iterw) - 16;
 	if (exp < 0)
@@ -969,7 +972,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_wfloat(s64 iterw)
 	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
 }
 
-inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(
+inline s32 ATTR_FORCE_INLINE voodoo::voodoo_renderer::compute_depthval(
 	poly_extra_data const &extra,
 	reg_fbz_mode const fbzmode,
 	reg_fbz_colorpath const fbzcp,
@@ -1001,7 +1004,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_device::compute_depthval(
 }
 
 
-inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 	thread_stats_block &threadstats,
 	poly_extra_data const &extra,
 	reg_fbz_mode const fbzmode,
@@ -1073,7 +1076,7 @@ inline bool ATTR_FORCE_INLINE voodoo_device::depth_test(
 }
 
 
-inline void ATTR_FORCE_INLINE voodoo_device::write_pixel(
+inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::write_pixel(
 	thread_stats_block &threadstats,
 	reg_fbz_mode const fbzmode,
 	dither_helper const &dither,
@@ -1141,7 +1144,7 @@ inline void ATTR_FORCE_INLINE voodoo_device::write_pixel(
 
 */
 
-inline bool ATTR_FORCE_INLINE voodoo_device::combine_color(
+inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::combine_color(
 	rgbaint_t &color,
 	thread_stats_block &threadstats,
 	poly_extra_data const &extra,
@@ -1663,7 +1666,7 @@ inline rgbaint_t ATTR_FORCE_INLINE voodoo::raster_texture::combine_texture(
  *************************************/
 
 template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
-void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
+void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
 	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : reg_texture_mode(extra.u.raster.m_texmode0));
@@ -1678,7 +1681,7 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	// determine the screen Y
 	s32 scry = y;
 	if (fbzmode.y_origin())
-		scry = m_fbi.yorigin - y;
+		scry = m_yorigin - y;
 
 	// pre-increment the pixels_in unconditionally
 	s32 startx = extent.startx;
@@ -1722,8 +1725,8 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	}
 
 	// get pointers to the target buffer and depth buffer
-	u16 *dest = extra.destbase + scry * m_fbi.rowpixels;
-	u16 *depth = (m_fbi.auxoffs != ~0) ? ((u16 *)(m_fbi.ram + m_fbi.auxoffs) + scry * m_fbi.rowpixels) : nullptr;
+	u16 *dest = extra.destbase + scry * m_rowpixels;
+	u16 *depth = extra.depthbase + scry * m_rowpixels;
 
 	// compute the starting parameters
 	s32 dx = startx - (extra.ax >> 4);
@@ -1792,14 +1795,14 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 			// note that they set LOD min to 8 to "disable" a TMU
 			if (_TexMode0 != 0xffffffff && extra.tex0->m_lodmin < (8 << 8))
 			{
-				if (!m_send_config)
+//				if (!m_send_config)
 				{
 					s32 lod0;
 					rgbaint_t texel_t0 = extra.tex0->fetch_texel(texmode0, dither, x, iterstw0, extra.lodbase0, lod0);
 					texel = extra.tex0->combine_texture(texmode0, texel_t0, texel, lod0);
 				}
-				else
-					texel.set(m_tmu_config);
+//				else
+//					texel.set(m_tmu_config);
 			}
 
 			// colorpath pipeline selects source colors and does blending
@@ -1835,5 +1838,58 @@ void voodoo_device::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, c
 	}
 }
 
+/***************************************************************************
+    GENERIC RASTERIZERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    raster_fastfill - per-scanline
+    implementation of the 'fastfill' command
+-------------------------------------------------*/
+
+void voodoo::voodoo_renderer::raster_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_extra_data &extra, int threadid)
+{
+	thread_stats_block &threadstats = m_thread_stats[threadid];
+	auto const fbzmode = m_reg.fbz_mode();
+	s32 startx = extent.startx;
+	s32 stopx = extent.stopx;
+	int x;
+
+	/* determine the screen Y */
+	s32 scry = y;
+	if (fbzmode.y_origin())
+		scry = m_yorigin - y;
+
+	/* fill this RGB row */
+	if (fbzmode.rgb_buffer_mask())
+	{
+		const u16 *ditherow = &extra.u.dither[(y & 3) * 4];
+		u64 expanded = *(u64 *)ditherow;
+		u16 *dest = extra.destbase + scry * m_rowpixels;
+
+		for (x = startx; x < stopx && (x & 3) != 0; x++)
+			dest[x] = ditherow[x & 3];
+		for ( ; x < (stopx & ~3); x += 4)
+			*(u64 *)&dest[x] = expanded;
+		for ( ; x < stopx; x++)
+			dest[x] = ditherow[x & 3];
+		threadstats.pixels_out += stopx - startx;
+	}
+
+	/* fill this dest buffer row */
+	if (fbzmode.aux_buffer_mask() && extra.depthbase != nullptr)
+	{
+		u16 depth = m_reg.za_color();
+		u64 expanded = (u64(depth) << 48) | (u64(depth) << 32) | (u64(depth) << 16) | u64(depth);
+		u16 *dest = extra.depthbase + scry * m_rowpixels;
+
+		for (x = startx; x < stopx && (x & 3) != 0; x++)
+			dest[x] = depth;
+		for ( ; x < (stopx & ~3); x += 4)
+			*(u64 *)&dest[x] = expanded;
+		for ( ; x < stopx; x++)
+			dest[x] = depth;
+	}
+}
 
 #endif // MAME_VIDEO_VOODDEFS_IPP
