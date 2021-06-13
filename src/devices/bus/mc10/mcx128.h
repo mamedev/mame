@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cart.h"
+#include "mc10_cart.h"
 
 // device type definition
 DECLARE_DEVICE_TYPE(MC10_PAK_MCX128, device_mc10cart_interface)

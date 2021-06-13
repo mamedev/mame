@@ -11,7 +11,7 @@
 #include "cpu/m6800/m6801.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
-#include "bus/mc10/cart.h"
+#include "bus/mc10/mc10_cart.h"
 #include "bus/rs232/rs232.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

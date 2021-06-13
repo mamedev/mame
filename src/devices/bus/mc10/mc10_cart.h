@@ -2,7 +2,7 @@
 // copyright-holders:tim lindner
 /*********************************************************************
 
-    cart.h
+    mc10_cart.h
 
     MC-10 / Alice cartridge management
 

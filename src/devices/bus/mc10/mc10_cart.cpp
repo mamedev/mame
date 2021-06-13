@@ -33,7 +33,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cart.h"
+#include "mc10_cart.h"
 
 #include "mcx128.h"
 #include "pak.h"
