@@ -448,6 +448,8 @@ private:
 	uint16_t m_gn680_ret0;
 	uint16_t m_gn680_ret1;
 
+	bool m_sndres;
+
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -562,24 +564,35 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 4: // System Register 1
+		{
 			/*
-			    0x80 = SNDRES (sound reset)
-			    0x40 = COMRES (COM reset)
-			    0x20 = COINRQ2 (EEPROM SCL?)
-			    0x10 = COINRQ1 (EEPROM data)
-			    0x08 = ADCS (ADC CS)
-			    0x04 = ADCONV (ADC CONV)
-			    0x02 = ADDI (ADC DI)
-			    0x01 = ADDSCLK (ADC SCLK)
+				0x80 = SNDRES (sound reset)
+				0x40 = COMRES (COM reset)
+				0x20 = COINRQ2 (EEPROM SCL?)
+				0x10 = COINRQ1 (EEPROM data)
+				0x08 = ADCS (ADC CS)
+				0x04 = ADCONV (ADC CONV)
+				0x02 = ADDI (ADC DI)
+				0x01 = ADDSCLK (ADC SCLK)
 			*/
 			m_adc12138->cs_w((data >> 3) & 0x1);
 			m_adc12138->conv_w((data >> 2) & 0x1);
 			m_adc12138->di_w((data >> 1) & 0x1);
 			m_adc12138->sclk_w(data & 0x1);
 
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			bool sndres = (data & 0x80) ? true : false;
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (sndres) ? CLEAR_LINE : ASSERT_LINE);
+			if (sndres != m_sndres)
+			{
+				// clear interrupts when reset line is triggered
+				m_audiocpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			}
+
+			m_sndres = sndres;
+
 			osd_printf_debug("System register 1 = %02X\n", data);
 			break;
+		}
 
 		case 5: // Sound Control Register
 			/*
@@ -615,6 +628,7 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+
 			m_konppc->set_cgboard_id((data >> 4) & 3);
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
