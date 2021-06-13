@@ -39,7 +39,7 @@ LM393P
 Dual differential comparator, commercial grade
 
 #5 not populated
-µPD23C2001
+ÂµPD23C2001
 
 #2 NEC
 D43256AC-10L
@@ -108,28 +108,25 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<z180_device> maincpu;
+	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
 
-	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
-	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
-
-	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
+	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehÃ¤usedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;
 
 	// config switch
 	uint8_t io_3000{};
-	DECLARE_WRITE8_MEMBER(io_3000_w) { io_3000 = data; }
+	void io_3000_w(uint8_t data) { io_3000 = data; }
 
 	// should probably return something different depending on io_3000
 	// 0x0014a9 also reads but io_3000=0xfe,0xff...
-	DECLARE_READ8_MEMBER(io_3800_r) { 
+	uint8_t io_3800_r() { 
 		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
 
 		// config lower 4 bits
 		return (~id) & 0x0f; 
 	}
-	DECLARE_READ8_MEMBER(io_4000_r) {
+	uint8_t io_4000_r() {
 		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
 
 		// config upper 4 bits
@@ -141,32 +138,32 @@ public:
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
 
-	DECLARE_WRITE8_MEMBER(lcd_signal_w) {
+	void lcd_signal_w(uint8_t data) {
 		lcd_signal = data;
 	}
-	DECLARE_READ8_MEMBER(lcd_data_r) {
+	uint8_t lcd_data_r() {
 		if(BIT(lcd_signal, 1)) // RS
-			return lcdc->data_read();
+			return lcdc->data_r();
 		else
-			return lcdc->control_read();
+			return lcdc->control_r();
 	}
-	DECLARE_WRITE8_MEMBER(lcd_data_w) {
+	void lcd_data_w(uint8_t data) {
 		if(BIT(lcd_signal, 0)) { // E
 			if(BIT(lcd_signal, 1)) // RS
-				lcdc->data_write(data << 4);
+				lcdc->data_w(data << 4);
 			else
-				lcdc->control_write(data << 4);
+				lcdc->control_w(data << 4);
 		}
 	}
 
 	// dictionary ROM banking
 	uint8_t dict_bank{};
-	DECLARE_WRITE8_MEMBER(io_5000_w) {
+	void io_5000_w(uint8_t data) {
 		dict_bank = data;
 	}
-	DECLARE_READ8_MEMBER(dict_r) {
+	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
 		if(dict_bank >= 4) {
-			space.device().logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, space.byte_to_address(offset));
+			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, offset);
 			return 0x00;
 		}
 		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
@@ -176,7 +173,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
 		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
-	DECLARE_READ8_MEMBER(irq_ack_r) {
+	uint8_t irq_ack_r() {
 		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
 	}
@@ -263,7 +260,7 @@ std::string ax145_state::callstack()
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
 
-	int depth = 0;
+	//int depth = 0;
 	std::string output;
 	output += symbolize(pc) + " >> ";
 
@@ -271,28 +268,6 @@ std::string ax145_state::callstack()
 //		__debugbreak();
 
 	return output;
-}
-
-READ8_MEMBER(ax145_state::illegal_r)
-{
-	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
-	return 0;
-}
-
-WRITE8_MEMBER(ax145_state::illegal_w)
-{
-	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
-}
-
-READ8_MEMBER(ax145_state::illegal_io_r)
-{
-	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
-	return 0;
-}
-
-WRITE8_MEMBER(ax145_state::illegal_io_w)
-{
-	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
 }
 
 void ax145_state::machine_start()
@@ -325,7 +300,7 @@ void ax145_state::machine_reset()
 
 void ax145_state::ax145(machine_config& config) {
 	// basic machine hardware
-	Z180(config, maincpu, 12'000'000 / 2);
+	HD64180RP(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &ax145_state::map_program);
 	maincpu->set_addrmap(AS_IO, &ax145_state::map_io);
 	TIMER(config, "1khz").configure_periodic(FUNC(ax145_state::int2_timer_callback), attotime::from_hz(1000)); // just guessing frequency, based on LW-30, 350, 450
