@@ -163,6 +163,7 @@ public:
 	uint8_t bg_bank_r();
 	void bg_bank_w(uint8_t data);
 private:
+	required_region_ptr<uint8_t> m_bg;
 	uint8_t m_bg_bank;
 };
 
@@ -175,7 +176,8 @@ DEFINE_DEVICE_TYPE(ISA8_CGA_TETRISKR, isa8_cga_tetriskr_device, "tetriskr_cga", 
 //-------------------------------------------------
 
 isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	isa8_cga_superimpose_device(mconfig, ISA8_CGA_TETRISKR, tag, owner, clock)
+	isa8_cga_superimpose_device(mconfig, ISA8_CGA_TETRISKR, tag, owner, clock),
+	m_bg(*this, "gfx2")
 {
 }
 
@@ -200,29 +202,24 @@ uint8_t isa8_cga_tetriskr_device::bg_bank_r()
 
 uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *const bg_rom = memregion("gfx2")->base();
-
 	//popmessage("%04x",m_start_offs);
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	for(int y=0;y<200/8;y++)
+	for(int y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
-		for(int yi=0;yi<8;yi++)
+		int yi = y % 8;
+		int yj = y / 8;
+		for(int x=cliprect.min_x;x<=cliprect.max_x;x++)
 		{
-			for(int x=0;x<320/8;x++)
-			{
-				for(int xi=0;xi<8;xi++)
-				{
-					uint8_t color = 0;
-					/* TODO: first byte seems bogus? */
-					for(int pen_i = 0;pen_i<4;pen_i++)
-						color |= ((bg_rom[y*320/8+x+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
+			int xi = x % 8;
+			int xj = x / 8;
+			uint8_t color = 0;
+			/* TODO: first byte seems bogus? */
+			for(int pen_i = 0;pen_i<4;pen_i++)
+				color |= ((m_bg[yj*320/8+xj+(pen_i*0x20000)+yi*0x400+m_bg_bank*0x2000+1] >> (7-xi)) & 1) << pen_i;
 
-					if(cliprect.contains(x*8+xi, y*8+yi))
-						bitmap.pix(y*8+yi, x*8+xi) = m_palette->pen(color);
-				}
-			}
+			bitmap.pix(y, x) = m_palette->pen(color);
 		}
 	}
 
@@ -420,6 +417,9 @@ void pcxt_state::tetriskr_io(address_map &map)
 {
 	map.global_mask(0x3ff);
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0060).r(FUNC(pcxt_state::port_a_r));  //not a real 8255
+	map(0x0061, 0x0061).rw(FUNC(pcxt_state::port_b_r), FUNC(pcxt_state::port_b_w));
+	map(0x0062, 0x0062).r(FUNC(pcxt_state::port_c_r));
 	map(0x03c8, 0x03c8).portr("IN0");
 	map(0x03c9, 0x03c9).portr("IN1");
 //  map(0x03ce, 0x03ce).portr("IN1"); //read then discarded?
