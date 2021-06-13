@@ -530,6 +530,7 @@ private:
 					// variable found
 					if (start == 0)
 						m_buffer.seekp(0);
+					assert(start < str.length());
 					m_buffer.write(&str[start], pos - start);
 					m_buffer.write(text.first.data(), text.first.length());
 					start = term - str.begin() + 1;
@@ -550,7 +551,8 @@ private:
 		}
 		else
 		{
-			m_buffer.write(&str[start], str.length() - start);
+			if (start < str.length())
+				m_buffer.write(&str[start], str.length() - start);
 			return util::buf_to_string_view(m_buffer);
 		}
 	}
