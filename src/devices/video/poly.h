@@ -65,6 +65,10 @@ public:
 	static constexpr uint8_t FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
 	static constexpr uint8_t FLAG_NO_WORK_QUEUE       = 0x04;
 
+	// this is really architecture-specific, but 64 is a reasonable
+	// value for most modern x64/ARM architectures
+	static constexpr int CACHE_LINE_SIZE              = 64;
+
 	// each vertex has an X/Y coordinate and a set of parameters
 	struct vertex_t
 	{
@@ -101,7 +105,7 @@ public:
 	uint32_t triangles_drawn() const { return m_triangles; }
 
 	// synchronization
-	void wait(const char *debug_reason = "general");
+	void wait(const char *debug_reason = "general", bool reset = true);
 
 	// object data allocators
 	ObjectData &object_data_alloc();
@@ -133,7 +137,6 @@ private:
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
 
 	static constexpr int SCANLINES_PER_BUCKET = 32;
-	static constexpr int CACHE_LINE_SIZE      = 64;          // this is a general guess
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
 	static constexpr int UNITS_PER_POLY       = (100 / SCANLINES_PER_BUCKET);
 
@@ -435,7 +438,7 @@ void *poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::work_item_callbac
 //-------------------------------------------------
 
 template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
-void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *debug_reason)
+void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *debug_reason, bool reset)
 {
 	osd_ticks_t time;
 
@@ -461,19 +464,22 @@ void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *d
 	}
 
 	// reset the state
-	m_polygon.reset();
-	m_unit.reset();
-	memset(m_unit_bucket, 0xff, sizeof(m_unit_bucket));
-
-	// we need to preserve the last object data that was supplied
-	if (m_object.count() > 0)
+	if (reset)
 	{
-		ObjectData temp = object_data_last();
-		m_object.reset();
-		m_object.next() = temp;
+		m_polygon.reset();
+		m_unit.reset();
+		memset(m_unit_bucket, 0xff, sizeof(m_unit_bucket));
+
+		// we need to preserve the last object data that was supplied
+		if (m_object.count() > 0)
+		{
+			ObjectData temp = object_data_last();
+			m_object.reset();
+			m_object.next() = temp;
+		}
+		else
+			m_object.reset();
 	}
-	else
-		m_object.reset();
 }
 
 
