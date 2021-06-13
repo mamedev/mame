@@ -39,7 +39,7 @@ LM393P
 Dual differential comparator, commercial grade
 
 #5 not populated
-µPD23C2001
+�PD23C2001
 
 #2 NEC
 D43256AC-10L
@@ -80,10 +80,6 @@ LCD Driver with 80-Channel Outputs
 
 LCD: 40 characters x 2 lines
 
-// Status:
-// doesn't go further than "SCHREIBWERK ÜBERPRÜFEN" (check printer)
-// needs european font for HD44780
-
 ***************************************************************************/
 
 // hw_config:
@@ -101,8 +97,7 @@ public:
 	ax145_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		lcdc(*this, "hd44780"),
-		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE)
+		lcdc(*this, "hd44780")
 	{ }
 
 	void ax145(machine_config& config);
@@ -113,26 +108,28 @@ public:
 	std::string callstack();
 
 	// devices
-	required_device<hd64180rp_device> maincpu;
+	required_device<z180_device> maincpu;
 	required_device<hd44780_device> lcdc;
-	memory_share_creator<uint8_t> ram;
 
-	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
+	DECLARE_READ8_MEMBER(illegal_r); DECLARE_WRITE8_MEMBER(illegal_w);
+	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
+
+	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (geh�usedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;
 
 	// config switch
 	uint8_t io_3000{};
-	void io_3000_w(uint8_t data) { io_3000 = data; }
+	DECLARE_WRITE8_MEMBER(io_3000_w) { io_3000 = data; }
 
 	// should probably return something different depending on io_3000
 	// 0x0014a9 also reads but io_3000=0xfe,0xff...
-	uint8_t io_3800_r() { 
+	DECLARE_READ8_MEMBER(io_3800_r) { 
 		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
 
 		// config lower 4 bits
 		return (~id) & 0x0f; 
 	}
-	uint8_t io_4000_r() {
+	DECLARE_READ8_MEMBER(io_4000_r) {
 		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
 
 		// config upper 4 bits
@@ -144,32 +141,32 @@ public:
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
 
-	void lcd_signal_w(uint8_t data) {
+	DECLARE_WRITE8_MEMBER(lcd_signal_w) {
 		lcd_signal = data;
 	}
-	uint8_t lcd_data_r() {
+	DECLARE_READ8_MEMBER(lcd_data_r) {
 		if(BIT(lcd_signal, 1)) // RS
-			return lcdc->data_r();
+			return lcdc->data_read();
 		else
-			return lcdc->control_r();
+			return lcdc->control_read();
 	}
-	void lcd_data_w(uint8_t data) {
+	DECLARE_WRITE8_MEMBER(lcd_data_w) {
 		if(BIT(lcd_signal, 0)) { // E
 			if(BIT(lcd_signal, 1)) // RS
-				lcdc->data_w(data << 4);
+				lcdc->data_write(data << 4);
 			else
-				lcdc->control_w(data << 4);
+				lcdc->control_write(data << 4);
 		}
 	}
 
 	// dictionary ROM banking
 	uint8_t dict_bank{};
-	void io_5000_w(uint8_t data) {
+	DECLARE_WRITE8_MEMBER(io_5000_w) {
 		dict_bank = data;
 	}
-	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
+	DECLARE_READ8_MEMBER(dict_r) {
 		if(dict_bank >= 4) {
-			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, offset);
+			space.device().logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, space.byte_to_address(offset));
 			return 0x00;
 		}
 		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
@@ -179,29 +176,30 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
 		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 	}
-	uint8_t irq_ack_r() {
+	DECLARE_READ8_MEMBER(irq_ack_r) {
 		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
 	}
 
 protected:
 	// driver_device overrides
-	void machine_start() override;
-	void machine_reset() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	void video_start() override;
+	virtual void video_start() override;
 
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
+		map(0x02000, 0x03fff).ram().region("ram", 0); //    first 0x2000 bytes of RAM
 		map(0x04000, 0x1ffff).rom();
 		map(0x40000, 0x5ffff).r(FUNC(ax145_state::dict_r));
-		// RAM is installed in machine_start()
+		map(0x62000, 0x69fff).ram().region("ram", 0); // complete 0x8000 bytes of RAM
 	}
 
 	void map_io(address_map& map) {
 		map.global_mask(0xffff);
 		map(0x0000, 0x003f).noprw(); // Z180 internal registers
-		//map(0x0040, 0x00ff).rw(FUNC(ax145_state::illegal_io_r), FUNC(ax145_state::illegal_io_w));
+			//map(0x0040, 0x00ff).rw(FUNC(ax145_state::illegal_io_r), FUNC(ax145_state::illegal_io_w));
 		//map(0x2000, 0x2000).w(TODO);
 		//map(0x2800, 0x2800).w(TODO);
 		map(0x3000, 0x3000).w(FUNC(ax145_state::io_3000_w));
@@ -265,7 +263,7 @@ std::string ax145_state::callstack()
 	offs_t pc = cpu->pc();
 	cpu->memory_translate(AS_PROGRAM, 0, pc);
 
-	//int depth = 0;
+	int depth = 0;
 	std::string output;
 	output += symbolize(pc) + " >> ";
 
@@ -275,9 +273,31 @@ std::string ax145_state::callstack()
 	return output;
 }
 
+READ8_MEMBER(ax145_state::illegal_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(ax145_state::illegal_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset), 2, data, 2, mem_mask);
+}
+
+READ8_MEMBER(ax145_state::illegal_io_r)
+{
+	space.device().logerror("%s: unmapped %s memory read from %0*X & %0*X\n", callstack(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, mem_mask);
+	return 0;
+}
+
+WRITE8_MEMBER(ax145_state::illegal_io_w)
+{
+	space.device().logerror("%s: unmapped %s memory write to %0*X = %0*X & %0*X\n", pc(), space.name(), space.addrchars(), space.byte_to_address(offset + 0x40), 2, data, 2, mem_mask);
+}
+
 void ax145_state::machine_start()
 {
-/*	// try to load map file
+	// try to load map file
 	FILE* f;
 	if(fopen_s(&f, "ax145.map", "rt") == 0) {
 		char line[512];
@@ -294,15 +314,9 @@ void ax145_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
-*/
-
-	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
-	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
 
 	rom = memregion("maincpu")->base();
 	dict_rom = memregion("dictionary")->base();
-
-	// ROM patch
 }
 
 void ax145_state::machine_reset()
@@ -311,7 +325,7 @@ void ax145_state::machine_reset()
 
 void ax145_state::ax145(machine_config& config) {
 	// basic machine hardware
-	HD64180RP(config, maincpu, 12'000'000 / 2);
+	Z180(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &ax145_state::map_program);
 	maincpu->set_addrmap(AS_IO, &ax145_state::map_io);
 	TIMER(config, "1khz").configure_periodic(FUNC(ax145_state::int2_timer_callback), attotime::from_hz(1000)); // just guessing frequency, based on LW-30, 350, 450
@@ -346,6 +360,7 @@ ROM_START( ax145 )
 	ROM_LOAD("ua4774-c", 0x00000, 0x20000, CRC(82E0F117) SHA1(2bb2883feb73c7c20e2e3004b3588ba354e52b3a)) // german/french/dutch/spanish
 	ROM_REGION(0x80000, "dictionary", 0)
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe)) // german dictionary
+	ROM_REGION(0x8000, "ram", ROMREGION_ERASE00)
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME           FLAGS

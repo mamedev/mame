@@ -19,6 +19,7 @@
 
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
+// -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img 
 
 
 // **TIMING**
@@ -61,7 +62,7 @@ UA5445-B LC-1
 NEC
 D23C4001EC-172
 UA2849-A
-4MBit Mask ROM
+4MBit Mask ROM for Dictionary
 
 #5
 LH532H07
@@ -115,7 +116,6 @@ Printer not working
 Floppy Disk writing not working
 Floppy Disk Sync not implemented (reading works)
 Dictionary ROM not working
-Different beeper frequencies not working (Tetris)
 Cursor shapes not implemented except block cursor
 
 TODO: find self-test; verify RAM address map
@@ -302,7 +302,7 @@ namespace {
 			e ^= input[i++];
 		}
 
-		return{ c, d, e };
+		return { c, d, e };
 	}
 
 	std::array<uint8_t, 416> gcr_encode_and_checksum(const uint8_t* input /* 256 bytes */) {
@@ -497,7 +497,9 @@ public:
 		floppy(*this, "floppy"),
 		beeper(*this, "beeper"),
 		m_io_kbrow(*this, "kbrow.%u", 0)
-	{ }
+	{ 
+		//video_control = 0b00000010; // TEST LW-10 screen height
+	}
 
 	void lw30(machine_config& config);
 
@@ -536,9 +538,13 @@ public:
 		video_pos_y = data;
 	}
 	DECLARE_READ8_MEMBER(video_data_r); DECLARE_WRITE8_MEMBER(video_data_w); // 74
-	DECLARE_WRITE8_MEMBER(video_control_w) { // 75
-		video_control = data;
+	DECLARE_READ8_MEMBER(video_control_r) { // 75 
+		return video_control; 
 	}
+	DECLARE_WRITE8_MEMBER(video_control_w) { 
+		video_control = data; // | 0b00000010; // TEST LW-10 screen height
+	} 
+	// 76
 	DECLARE_READ8_MEMBER(io_77_r); // config
 
 	// Floppy
@@ -593,7 +599,11 @@ public:
 	uint16_t floppy_track_offset{}; // current offset within track data
 
 	DECLARE_READ8_MEMBER(illegal_io_r); DECLARE_WRITE8_MEMBER(illegal_io_w);
-	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w);
+	DECLARE_READ8_MEMBER(io_b0_r) {
+		// Tetris reads bit 3, needed for correct keyboard layout
+		return 0b1000;
+	}
+	DECLARE_READ8_MEMBER(io_b8_r); DECLARE_WRITE8_MEMBER(io_b8_w); // B8 (keyboard)
 	DECLARE_WRITE8_MEMBER(beeper_w); // F0
 	DECLARE_WRITE8_MEMBER(irqack_w); // F8
 
@@ -625,12 +635,13 @@ protected:
 		map.global_mask(0xff);
 		map(0x00, 0x3f).noprw(); // Z180 internal registers
 
+		// video
 		map(0x70, 0x70).w(FUNC(lw30_state::video_cursor_x_w));
 		map(0x71, 0x71).w(FUNC(lw30_state::video_cursor_y_w));
 		map(0x72, 0x72).w(FUNC(lw30_state::video_pos_x_w));
 		map(0x73, 0x73).w(FUNC(lw30_state::video_pos_y_w));
 		map(0x74, 0x74).rw(FUNC(lw30_state::video_data_r), FUNC(lw30_state::video_data_w));
-		map(0x75, 0x75).w(FUNC(lw30_state::video_control_w));
+		map(0x75, 0x75).rw(FUNC(lw30_state::video_control_r), FUNC(lw30_state::video_control_w));
 		map(0x76, 0x76).noprw(); // NOP just to shut up the log
 		map(0x77, 0x77).r(FUNC(lw30_state::io_77_r)).nopw(); // NOP just to shut up the log
 
@@ -641,7 +652,7 @@ protected:
 		map(0x98, 0x98).noprw(); // NOP just to shut up the log
 
 		map(0xa8, 0xa8).noprw(); // NOP just to shut up the log
-		map(0xb0, 0xb0).noprw(); // NOP just to shut up the log
+		map(0xb0, 0xb0).r(FUNC(lw30_state::io_b0_r));
 		map(0xb8, 0xb8).rw(FUNC(lw30_state::io_b8_r), FUNC(lw30_state::io_b8_w));
 		map(0xd8, 0xd8).noprw(); // NOP just to shut up the log
 		map(0xf0, 0xf0).w(FUNC(lw30_state::beeper_w));
@@ -1068,7 +1079,7 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 
 	enum control : uint8_t {
 		display_on          = 0b00000001,
-		full_height         = 0b00000010, // 128px height (LW-30) instead of 64px height (LW-10)
+		half_height         = 0b00000010, // 64px height (LW-10/20) instead of 128px height (LW-30)
 		bitmap_mode         = 0b00001000,
 		tile_mode           = 0b00100000, // 8x8 tiles at videoram[0x1000]
 	};
@@ -1258,7 +1269,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
 
 WRITE8_MEMBER(lw30_state::beeper_w)
 {
-#if 1
+#if 0
 	static uint8_t lastData{};
 	static attotime last{};
 	static attotime lastDifferent{};
