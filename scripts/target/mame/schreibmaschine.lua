@@ -5,6 +5,7 @@
 --
 --   schreibmaschine.lua
 --
+--   Brother AX-145
 --   Brother LW-30
 --   Brother LW-450
 --   Brother LW-350
@@ -15,6 +16,7 @@
 CPUS["Z180"] = true
 CPUS["H8"] = true
 VIDEOS["MC6845"] = true
+VIDEOS["HD44780"] = true
 SOUNDS["BEEP"] = true
 MACHINES["Z80DAISY"] = true
 MACHINES["UPD765"] = true
@@ -43,6 +45,7 @@ function createProjects_mame_schreibmaschine(_target, _subtarget)
 	}
 
 files {
+	MAME_DIR .. "src/mame/drivers/brother_ax145.cpp",
 	MAME_DIR .. "src/mame/drivers/brother_lw30.cpp",
 	MAME_DIR .. "src/mame/drivers/brother_lw350.cpp",
 	MAME_DIR .. "src/mame/drivers/brother_lw840.cpp",
