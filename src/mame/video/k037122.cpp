@@ -257,8 +257,6 @@ uint32_t k037122_device::reg_r(offs_t offset)
 
 void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset != 4)
-	printf("reg_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (offset == 0x34/4 && ACCESSING_BITS_0_15)
 	{
 		uint32_t palette_base = (data & 0x4) ? 0x18000 : 0x00000;
