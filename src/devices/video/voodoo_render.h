@@ -174,12 +174,12 @@ private:
 	static constexpr u32 rotate(u32 value, int count) { return (value << count) | (value >> (32 - count)); }
 
 	// internal state
-	u32 m_fbzcp;		// 30 bits
-	u32 m_alphamode;	// 32 bits
-	u32 m_fogmode;		// 8 bits
-	u32 m_fbzmode;		// 22 bits
-	u32 m_texmode0;		// 31 bits
-	u32 m_texmode1;		// 31 bits
+	u32 m_fbzcp;        // 30 bits
+	u32 m_alphamode;    // 32 bits
+	u32 m_fogmode;      // 8 bits
+	u32 m_fbzmode;      // 22 bits
+	u32 m_texmode0;     // 31 bits
+	u32 m_texmode1;     // 31 bits
 };
 
 
@@ -330,7 +330,7 @@ public:
 	using rasterizer_mfp = void (voodoo_renderer::*)(int32_t, const extent_t &, const poly_data &, int);
 
 	// construction
-	voodoo_renderer(running_machine &machine, u8 type, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
+	voodoo_renderer(running_machine &machine, u8 type, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
 
 	// simple getters
 	std::vector<thread_stats_block> &thread_stats() { return m_thread_stats; }
@@ -398,6 +398,7 @@ private:
 
 	// internal state
 	u8 m_type;                  // type of chip
+	u16 m_tmu_config;           // TMU configuration
 	u32 m_rowpixels;            // current pixels per row
 	s32 m_yorigin;              // current Y origin
 	voodoo_regs &m_fbi_reg;     // FBI registers

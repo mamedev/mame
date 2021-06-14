@@ -2770,12 +2770,6 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			}
 			break;
 
-		case voodoo_regs::reg_trexInit1:
-			logerror("VOODOO.REG:%s(%d) write = %08X\n", (regnum < 0x384 / 4) ? m_regnames[regnum] : "oob", chips, data);
-			/* send tmu config data to the frame buffer */
-			m_send_config = (TREXINIT_SEND_TMU_CONFIG(data) > 0);
-			goto default_case;
-
 		/* these registers are referenced in the renderer; we must wait for pending work before changing */
 		case voodoo_regs::reg_chromaRange:
 		case voodoo_regs::reg_chromaKey:
@@ -2787,7 +2781,6 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			[[fallthrough]];
 		/* by default, just feed the data to the chips */
 		default:
-default_case:
 			if (chips & 1) m_reg.write(regnum, data);
 			if (chips & 2) m_tmu[0].m_reg.write(regnum, data);
 			if (chips & 4) m_tmu[1].m_reg.write(regnum, data);
@@ -4821,7 +4814,7 @@ void voodoo_device::device_start()
 
 	voodoo::dither_helper::init_static();
 
-	m_tmu_config = 0x11;   // revision 1
+	u16 tmu_config = 0x11;   // revision 1
 
 	/* configure type-specific values */
 	switch (m_type)
@@ -4838,7 +4831,7 @@ void voodoo_device::device_start()
 			m_regnames = voodoo_regs::s_register_name;
 			m_alt_regmap = 0;
 			m_fbi.lfb_stride = 10;
-			m_tmu_config |= 0x800;
+			tmu_config |= 0x800;
 			break;
 
 		case TYPE_VOODOO_BANSHEE:
@@ -4870,7 +4863,7 @@ void voodoo_device::device_start()
 		}
 
 	if (m_tmumem1 != 0)
-		m_tmu_config |= 0xc0;  // two TMUs
+		tmu_config |= 0xc0;  // two TMUs
 
 	m_chipmask = 0x01;
 	m_attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / m_freq;
@@ -4909,8 +4902,6 @@ void voodoo_device::device_start()
 	// Point the rgb565 table to the frame buffer table
 	m_tmushare.rgb565 = m_fbi.rgb565;
 
-	m_renderer = std::make_unique<voodoo_renderer>(machine(), m_type, m_fbi.rgb565, m_reg, &m_tmu[0].m_reg, (tmumem1 != 0) ? &m_tmu[1].m_reg : nullptr);
-
 	/* set up the TMUs */
 	m_tmu[0].init(m_type, m_tmushare, tmumem[0], tmumem0 << 20);
 	m_chipmask |= 0x02;
@@ -4918,8 +4909,10 @@ void voodoo_device::device_start()
 	{
 		m_tmu[1].init(m_type, m_tmushare, tmumem[1], tmumem1 << 20);
 		m_chipmask |= 0x04;
-		m_tmu_config |= 0x40;
+		tmu_config |= 0x40;
 	}
+
+	m_renderer = std::make_unique<voodoo_renderer>(machine(), m_type, tmu_config, m_fbi.rgb565, m_reg, &m_tmu[0].m_reg, (tmumem1 != 0) ? &m_tmu[1].m_reg : nullptr);
 
 	/* initialize some registers */
 	m_pci.init_enable = 0;
@@ -5367,7 +5360,6 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_last_status_pc(0),
 	m_last_status_value(0),
 	m_send_config(false),
-	m_tmu_config(0),
 	m_fbmem(0),
 	m_tmumem0(0),
 	m_tmumem1(0),

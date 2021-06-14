@@ -191,6 +191,10 @@ void rasterizer_params::compute(u8 type, voodoo_regs &regs, voodoo_regs *tmu0reg
 	{
 		m_texmode0 = (tmu0regs != nullptr && tmu0regs->texture_lod().lod_min() < 32) ? tmu0regs->texture_mode().normalize() : 0xffffffff;
 		m_texmode1 = (tmu1regs != nullptr && tmu1regs->texture_lod().lod_min() < 32) ? tmu1regs->texture_mode().normalize() : 0xffffffff;
+
+		// repurpose the top bit of texmode for the send TMU config
+		if (m_texmode0 != 0xffffffff && tmu0regs->trexinit_send_tmu_config())
+			m_texmode0 |= 1 << 31;
 	}
 }
 
@@ -776,9 +780,10 @@ inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::combine_texture(reg_textu
 //  voodoo_renderer - constructor
 //-------------------------------------------------
 
-voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
+voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
 	poly_manager(machine),
 	m_type(type),
+	m_tmu_config(tmu_config),
 	m_rowpixels(0),
 	m_yorigin(0),
 	m_fbi_reg(fbi_regs),
@@ -1894,14 +1899,16 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			// run the texture pipeline on TMU0 to produce a final result in texel
 			if (_TexMode0 != 0xffffffff)
 			{
-//				if (!m_send_config)
+				// the seq_8_downld flag is repurposed in the rasterizer to indicate
+				// we should send the configuration byte
+				if (!texmode0.seq_8_downld())
 				{
 					s32 lod0;
 					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, poly.lodbase0, lod0);
 					texel = poly.tex0->combine_texture(texmode0, texel_t0, texel, lod0);
 				}
-//				else
-//					texel.set(m_tmu_config);
+				else
+					texel.set(m_tmu_config);
 			}
 
 			// colorpath pipeline selects source colors and does blending

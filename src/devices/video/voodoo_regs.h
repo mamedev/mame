@@ -297,7 +297,7 @@ public:
 	constexpr u32 tca_add_aclocal() const      { return BIT(m_value, 27, 2); }
 	constexpr u32 tca_invert_output() const    { return BIT(m_value, 29, 1); }
 	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }	// not implemented
-	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }	// repurposed as Voodoo 2 flag in rasterizers
+	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }	// repurposed as send_config
 
 	constexpr u32 normalize()
 	{
@@ -819,7 +819,13 @@ private:
 class voodoo_regs
 {
 public:
-	/* 0x000 */
+	// Codes to the right
+    //	R = readable
+    //	W = writeable
+    //	P = pipelined
+    //	F = goes to FIFO
+
+	// 0x000
 	static constexpr u32 reg_vdstatus =        0x000/4;   // R  P
 	static constexpr u32 reg_intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
 	static constexpr u32 reg_vertexAx =        0x008/4;   //  W PF
@@ -837,7 +843,7 @@ public:
 	static constexpr u32 reg_startT =          0x038/4;   //  W PF
 	static constexpr u32 reg_startW =          0x03c/4;   //  W PF
 
-	/* 0x040 */
+	// 0x040
 	static constexpr u32 reg_dRdX =            0x040/4;   //  W PF
 	static constexpr u32 reg_dGdX =            0x044/4;   //  W PF
 	static constexpr u32 reg_dBdX =            0x048/4;   //  W PF
@@ -855,7 +861,7 @@ public:
 	static constexpr u32 reg_dTdY =            0x078/4;   //  W PF
 	static constexpr u32 reg_dWdY =            0x07c/4;   //  W PF
 
-	/* 0x080 */
+	// 0x080
 	static constexpr u32 reg_triangleCMD =     0x080/4;   //  W PF
 	static constexpr u32 reg_fvertexAx =       0x088/4;   //  W PF
 	static constexpr u32 reg_fvertexAy =       0x08c/4;   //  W PF
@@ -872,7 +878,7 @@ public:
 	static constexpr u32 reg_fstartT =         0x0b8/4;   //  W PF
 	static constexpr u32 reg_fstartW =         0x0bc/4;   //  W PF
 
-	/* 0x0c0 */
+	// 0x0c0
 	static constexpr u32 reg_fdRdX =           0x0c0/4;   //  W PF
 	static constexpr u32 reg_fdGdX =           0x0c4/4;   //  W PF
 	static constexpr u32 reg_fdBdX =           0x0c8/4;   //  W PF
@@ -890,7 +896,7 @@ public:
 	static constexpr u32 reg_fdTdY =           0x0f8/4;   //  W PF
 	static constexpr u32 reg_fdWdY =           0x0fc/4;   //  W PF
 
-	/* 0x100 */
+	// 0x100
 	static constexpr u32 reg_ftriangleCMD =    0x100/4;   //  W PF
 	static constexpr u32 reg_fbzColorPath =    0x104/4;   // RW PF
 	static constexpr u32 reg_fogMode =         0x108/4;   // RW PF
@@ -908,7 +914,7 @@ public:
 	static constexpr u32 reg_chromaRange =     0x138/4;   //  W  F  -- Voodoo2/Banshee only
 	static constexpr u32 reg_userIntrCMD =     0x13c/4;   //  W  F  -- Voodoo2/Banshee only
 
-	/* 0x140 */
+	// 0x140
 	static constexpr u32 reg_stipple =         0x140/4;   // RW  F
 	static constexpr u32 reg_color0 =          0x144/4;   // RW  F
 	static constexpr u32 reg_color1 =          0x148/4;   // RW  F
@@ -919,7 +925,7 @@ public:
 	static constexpr u32 reg_fbiPixelsOut =    0x15c/4;   // R
 	static constexpr u32 reg_fogTable =        0x160/4;   //  W  F
 
-	/* 0x1c0 */
+	// 0x1c0
 	static constexpr u32 reg_cmdFifoBaseAddr = 0x1e0/4;   // RW     -- Voodoo2 only
 	static constexpr u32 reg_cmdFifoBump =     0x1e4/4;   // RW     -- Voodoo2 only
 	static constexpr u32 reg_cmdFifoRdPtr =    0x1e8/4;   // RW     -- Voodoo2 only
@@ -932,7 +938,7 @@ public:
 	static constexpr u32 reg_cmdFifoHoles =    0x1f8/4;   // RW     -- Voodoo2 only
 	static constexpr u32 reg_auxBufferStride = 0x1f8/4;   // RW     -- Banshee only
 
-	/* 0x200 */
+	// 0x200
 	static constexpr u32 reg_fbiInit4 =        0x200/4;   // RW     -- Voodoo/Voodoo2 only
 	static constexpr u32 reg_clipLeftRight1 =  0x200/4;   // RW     -- Banshee only
 	static constexpr u32 reg_vRetrace =        0x204/4;   // R      -- Voodoo/Voodoo2 only
@@ -952,7 +958,7 @@ public:
 	static constexpr u32 reg_vBorder =         0x238/4;   //  W     -- Voodoo2 only
 	static constexpr u32 reg_borderColor =     0x23c/4;   //  W     -- Voodoo2 only
 
-	/* 0x240 */
+	// 0x240
 	static constexpr u32 reg_hvRetrace =       0x240/4;   // R      -- Voodoo2 only
 	static constexpr u32 reg_fbiInit5 =        0x244/4;   // RW     -- Voodoo2 only
 	static constexpr u32 reg_fbiInit6 =        0x248/4;   // RW     -- Voodoo2 only
@@ -971,7 +977,7 @@ public:
 	static constexpr u32 reg_sBlue =           0x278/4;   //  W PF  -- Voodoo2/Banshee only
 	static constexpr u32 reg_sAlpha =          0x27c/4;   //  W PF  -- Voodoo2/Banshee only
 
-	/* 0x280 */
+	// 0x280
 	static constexpr u32 reg_sVz =             0x280/4;   //  W PF  -- Voodoo2/Banshee only
 	static constexpr u32 reg_sWb =             0x284/4;   //  W PF  -- Voodoo2/Banshee only
 	static constexpr u32 reg_sWtmu0 =          0x288/4;   //  W PF  -- Voodoo2/Banshee only
@@ -983,7 +989,7 @@ public:
 	static constexpr u32 reg_sDrawTriCMD =     0x2a0/4;   //  W PF  -- Voodoo2/Banshee only
 	static constexpr u32 reg_sBeginTriCMD =    0x2a4/4;   //  W PF  -- Voodoo2/Banshee only
 
-	/* 0x2c0 */
+	// 0x2c0
 	static constexpr u32 reg_bltSrcBaseAddr =  0x2c0/4;   // RW PF  -- Voodoo2 only
 	static constexpr u32 reg_bltDstBaseAddr =  0x2c4/4;   // RW PF  -- Voodoo2 only
 	static constexpr u32 reg_bltXYStrides =    0x2c8/4;   // RW PF  -- Voodoo2 only
@@ -999,7 +1005,7 @@ public:
 	static constexpr u32 reg_bltCommand =      0x2f8/4;   // RW PF  -- Voodoo2 only
 	static constexpr u32 reg_bltData =         0x2fc/4;   //  W PF  -- Voodoo2 only
 
-	/* 0x300 */
+	// 0x300
 	static constexpr u32 reg_textureMode =     0x300/4;   //  W PF
 	static constexpr u32 reg_tLOD =            0x304/4;   //  W PF
 	static constexpr u32 reg_tDetail =         0x308/4;   //  W PF
@@ -1054,6 +1060,9 @@ public:
 	reg_back_porch back_porch() const { return reg_back_porch(m_regs[reg_backPorch].u); }
 	reg_setup_mode setup_mode() const { return reg_setup_mode(m_regs[reg_sSetupMode].u); }
 
+	// special case for the TMU configuration register, which is otherwise undocumented
+	u32 trexinit_send_tmu_config() const { return (m_regs[reg_trexInit1].u >> 18) & 1; }
+
 	// easier clip accessors
 	s32 clip_left() const { return clip_left_right().min(); }
 	s32 clip_right() const { return clip_left_right().max(); }
@@ -1093,12 +1102,6 @@ public:
 	static char const *const s_banshee_agp_reg_name[0x50];
 };
 
-/* Codes to the right:
-    R = readable
-    W = writeable
-    P = pipelined
-    F = goes to FIFO
-*/
 
 
 
@@ -1139,7 +1142,7 @@ static constexpr u32 banshee2D_command =        0x070/4;
  *
  *************************************/
 
-/* 0x000 */
+// 0x000
 static constexpr u32 io_status =                       0x000/4;
 static constexpr u32 io_pciInit0 =                     0x004/4;
 static constexpr u32 io_sipMonitor =                   0x008/4;
@@ -1155,7 +1158,7 @@ static constexpr u32 io_vgaInit1 =                     0x02c/4;
 static constexpr u32 io_dramCommand =                  0x030/4;
 static constexpr u32 io_dramData =                     0x034/4;
 
-/* 0x040 */
+// 0x040
 static constexpr u32 io_pllCtrl0 =                     0x040/4;
 static constexpr u32 io_pllCtrl1 =                     0x044/4;
 static constexpr u32 io_pllCtrl2 =                     0x048/4;
@@ -1173,7 +1176,7 @@ static constexpr u32 io_vidInStatus =                  0x074/4;
 static constexpr u32 io_vidSerialParallelPort =        0x078/4;
 static constexpr u32 io_vidInXDecimDeltas =            0x07c/4;
 
-/* 0x080 */
+// 0x080
 static constexpr u32 io_vidInDecimInitErrs =           0x080/4;
 static constexpr u32 io_vidInYDecimDeltas =            0x084/4;
 static constexpr u32 io_vidPixelBufThold =             0x088/4;
@@ -1191,7 +1194,7 @@ static constexpr u32 io_vgab4 =                        0x0b4/4;
 static constexpr u32 io_vgab8 =                        0x0b8/4;
 static constexpr u32 io_vgabc =                        0x0bc/4;
 
-/* 0x0c0 */
+// 0x0c0
 static constexpr u32 io_vgac0 =                        0x0c0/4;
 static constexpr u32 io_vgac4 =                        0x0c4/4;
 static constexpr u32 io_vgac8 =                        0x0c8/4;
@@ -1217,7 +1220,7 @@ static constexpr u32 io_vidCurrOverlayStartAddr =      0x0fc/4;
  *
  *************************************/
 
-/* 0x000 */
+// 0x000
 static constexpr u32 agpReqSize =              0x000/4;
 static constexpr u32 agpHostAddressLow =       0x004/4;
 static constexpr u32 agpHostAddressHigh =      0x008/4;
@@ -1232,7 +1235,7 @@ static constexpr u32 cmdRdPtrH0 =              0x030/4;
 static constexpr u32 cmdAMin0 =                0x034/4;
 static constexpr u32 cmdAMax0 =                0x03c/4;
 
-/* 0x040 */
+// 0x040
 static constexpr u32 cmdFifoDepth0 =           0x044/4;
 static constexpr u32 cmdHoleCnt0 =             0x048/4;
 static constexpr u32 cmdBaseAddr1 =            0x050/4;
@@ -1245,26 +1248,15 @@ static constexpr u32 cmdAMax1 =                0x06c/4;
 static constexpr u32 cmdFifoDepth1 =           0x074/4;
 static constexpr u32 cmdHoleCnt1 =             0x078/4;
 
-/* 0x080 */
+// 0x080
 static constexpr u32 cmdFifoThresh =           0x080/4;
 static constexpr u32 cmdHoleInt =              0x084/4;
 
-/* 0x100 */
+// 0x100
 static constexpr u32 yuvBaseAddress =          0x100/4;
 static constexpr u32 yuvStride =               0x104/4;
 static constexpr u32 crc1 =                    0x120/4;
 static constexpr u32 crc2 =                    0x130/4;
-
-
-
-/*************************************
- *
- *  Macros for extracting bitfields
- *
- *************************************/
-
-
-#define TREXINIT_SEND_TMU_CONFIG(val)       (((val) >> 18) & 1)
 
 
 }
