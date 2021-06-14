@@ -16,6 +16,8 @@ Notes:
 TODO:
 - 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
   reading of the i/o $3c8 bit 1. (seems fixed?)
+- tetriskr can store inputs read during the timer irq.  If ds is 0x40 when the irq is taken
+  it will corrupt the BIOS data area which can lead to corrupt graphics
 - Add a proper FDC device.
 - buzzer sound has issues in both games
 
@@ -576,7 +578,7 @@ void pcxt_state::tetriskr(machine_config &config)
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 
-	RAM(config, RAM_TAG).set_default_size("640K");
+	RAM(config, RAM_TAG).set_default_size("64K");
 }
 
 ROM_START( filetto )
@@ -604,6 +606,11 @@ ROM_END
 ROM_START( tetriskr )
 	ROM_REGION( 0x10000, "bios", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0x0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
+	ROM_FILL( 0x1bdb, 1, 0xba ) // patch to work around input bug mentioned above
+	ROM_FILL( 0x1bdc, 1, 0x00 )
+	ROM_FILL( 0x1bdd, 1, 0x01 )
+	ROM_FILL( 0x1bde, 1, 0x8e )
+	ROM_FILL( 0x1bdf, 1, 0xda )
 ROM_END
 
 GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state, empty_init, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
