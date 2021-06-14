@@ -20,18 +20,18 @@ static constexpr bool LOG_RASTERIZERS = false;
 struct static_rasterizer_info
 {
 	voodoo_renderer::rasterizer_mfp mfp;
-	raster_params params;
+	rasterizer_params params;
 };
 
 extern static_rasterizer_info s_predef_raster_table[];
 
 
-/* fast dither lookup */
-std::unique_ptr<u8[]> voodoo::dither_helper::s_dither4_lookup;
-std::unique_ptr<u8[]> voodoo::dither_helper::s_dither2_lookup;
-std::unique_ptr<u8[]> voodoo::dither_helper::s_nodither_lookup;
+// fast dither lookup
+std::unique_ptr<u8[]> dither_helper::s_dither4_lookup;
+std::unique_ptr<u8[]> dither_helper::s_dither2_lookup;
+std::unique_ptr<u8[]> dither_helper::s_nodither_lookup;
 
-u8 const voodoo::dither_helper::s_dither_matrix_4x4[16] =
+u8 const dither_helper::s_dither_matrix_4x4[16] =
 {
 	 0,  8,  2, 10,
 	12,  4, 14,  6,
@@ -39,7 +39,7 @@ u8 const voodoo::dither_helper::s_dither_matrix_4x4[16] =
 	15,  7, 13,  5
 };
 // Using this matrix allows iteagle video memory tests to pass
-u8 const voodoo::dither_helper::s_dither_matrix_2x2[16] =
+u8 const dither_helper::s_dither_matrix_2x2[16] =
 {
 	 8, 10,  8, 10,
 	11,  9, 11,  9,
@@ -47,22 +47,213 @@ u8 const voodoo::dither_helper::s_dither_matrix_2x2[16] =
 	11,  9, 11,  9
 };
 
-u8 const voodoo::dither_helper::s_dither_matrix_4x4_subtract[16] =
-{
-	(15 -  0) >> 1, (15 -  8) >> 1, (15 -  2) >> 1, (15 - 10) >> 1,
-	(15 - 12) >> 1, (15 -  4) >> 1, (15 - 14) >> 1, (15 -  6) >> 1,
-	(15 -  3) >> 1, (15 - 11) >> 1, (15 -  1) >> 1, (15 -  9) >> 1,
-	(15 - 15) >> 1, (15 -  7) >> 1, (15 - 13) >> 1, (15 -  5) >> 1
-};
-u8 const voodoo::dither_helper::s_dither_matrix_2x2_subtract[16] =
-{
-	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1,
-	(15 -  8) >> 1, (15 - 10) >> 1, (15 -  8) >> 1, (15 - 10) >> 1,
-	(15 - 11) >> 1, (15 -  9) >> 1, (15 - 11) >> 1, (15 -  9) >> 1
-};
-
 static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
+
+
+
+//**************************************************************************
+//  STATIC HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  compute_wfloat - compute the pseudo-floating
+//  point version of the iterated W value
+//-------------------------------------------------
+
+static inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
+{
+	int exp = count_leading_zeros_64(iterw) - 16;
+	if (exp < 0)
+		return 0x0000;
+	if (exp >= 16)
+		return 0xffff;
+	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
+}
+
+
+//-------------------------------------------------
+//  clamped_argb - clamp the incoming ARGB color
+//  according to the clamping settings, or do the
+//  fake pseudo-clamp described in the Voodoo
+//  manual
+//-------------------------------------------------
+
+static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, reg_fbz_colorpath const fbzcp)
+{
+	rgbaint_t result(iterargb);
+	result.shr_imm(20);
+
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
+	{
+		result.clamp_to_uint8();
+		return result;
+	}
+
+	// for each component:
+	//    result = val & 0xfff;
+	//    if (result == 0xfff) result = 0;
+	//    if (result == 0x100) result = 0xff;
+
+	// check against 0xfff and force to 0
+	rgbaint_t temp1(result);
+	rgbaint_t temp2(result);
+	temp1.cmpeq_imm(0xfff);
+	temp2.cmpeq_imm(0x100);
+	result.andnot_reg(temp1);
+	result.or_reg(temp2);
+	result.and_imm(0xff);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  clamped_z - clamp the Z value according to the
+//  clamping settings, or do the fake pseudo-clamp
+//  described in the Voodoo manual
+//-------------------------------------------------
+
+static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const fbzcp)
+{
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
+		return std::clamp(iterz >> 12, 0, 0xffff);
+
+	// non-clamped case has specific behaviors
+	u32 result = u32(iterz) >> 12;
+	if (result == 0xfffff)
+		return 0;
+	if (result == 0x10000)
+		return 0xffff;
+	return result & 0xffff;
+}
+
+
+//-------------------------------------------------
+//  clamped_w - clamp the W value according to the
+//  clamping settings, or do the fake pseudo-clamp
+//  described in the Voodoo manual
+//-------------------------------------------------
+
+static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const fbzcp)
+{
+	// clamped case is easy
+	if (fbzcp.rgbzw_clamp() != 0)
+		return std::clamp(s32(iterw >> 48), 0, 0xff);
+
+	// non-clamped case has specific behaviors
+	u32 result = u64(iterw) >> 48;
+	if (result == 0xffff)
+		return 0;
+	if (result == 0x100)
+		return 0xff;
+	return result & 0xff;
+}
+
+
+
+//**************************************************************************
+//  RASTERIZER PARAMS
+//**************************************************************************
+
+//-------------------------------------------------
+//  operator== - compare all values
+//-------------------------------------------------
+
+bool rasterizer_params::operator==(rasterizer_params const &rhs) const
+{
+	return (m_fbzcp == rhs.m_fbzcp &&
+			m_fbzmode == rhs.m_fbzmode &&
+			m_alphamode == rhs.m_alphamode &&
+			m_fogmode == rhs.m_fogmode &&
+			m_texmode0 == rhs.m_texmode0 &&
+			m_texmode1 == rhs.m_texmode1);
+}
+
+
+//-------------------------------------------------
+//  compute - compute the normalized rasterizer
+//  parameters based on the current register state
+//-------------------------------------------------
+
+void rasterizer_params::compute(u8 type, voodoo_regs &regs, voodoo_regs *tmu0regs, voodoo_regs *tmu1regs)
+{
+	// these values are normalized to ignore irrelevant bits
+	m_fbzcp = regs.fbz_colorpath().normalize();
+	m_fbzmode = regs.fbz_mode().normalize();
+	m_alphamode = regs.alpha_mode().normalize();
+	m_fogmode = regs.fog_mode().normalize();
+
+	// if the TMUs are disabled or no textures are enabled, the texture modes are invalid
+	if (regs.fbi_init3().disable_tmus() || !regs.fbz_colorpath().texture_enable())
+		m_texmode0 = m_texmode1 = 0xffffffff;
+	else
+	{
+		m_texmode0 = (tmu0regs != nullptr && tmu0regs->texture_lod().lod_min() < 32) ? tmu0regs->texture_mode().normalize() : 0xffffffff;
+		m_texmode1 = (tmu1regs != nullptr && tmu1regs->texture_lod().lod_min() < 32) ? tmu1regs->texture_mode().normalize() : 0xffffffff;
+	}
+}
+
+
+//-------------------------------------------------
+//  hash - return a hash of the current values
+//-------------------------------------------------
+
+u32 rasterizer_params::hash() const
+{
+	return rotate(m_alphamode, 0) ^
+			rotate(m_fbzmode, 6) ^
+			rotate(m_fbzcp, 12) ^
+			rotate(m_fogmode, 18) ^
+			rotate(m_texmode0, 24) ^
+			rotate(m_texmode1, 30);
+}
+
+
+
+//**************************************************************************
+//  DITHER HELPER
+//**************************************************************************
+
+//-------------------------------------------------
+//  init_static - initialize static tables
+//-------------------------------------------------
+
+void dither_helper::init_static()
+{
+	// create static dithering tables
+	s_dither4_lookup = std::make_unique<u8[]>(256*4*4*2);
+	s_dither2_lookup = std::make_unique<u8[]>(256*4*4*2);
+	s_nodither_lookup = std::make_unique<u8[]>(256*4*2);
+	for (int val = 0; val < 256*4*4*2; val++)
+	{
+		int color = (val >> 0) & 0xff;
+		int g = (val >> 8) & 1;
+		int x = (val >> 9) & 3;
+		int y = (val >> 11) & 3;
+
+		if (!g)
+		{
+			s_dither4_lookup[val] = dither_rb(color, s_dither_matrix_4x4[y * 4 + x]);
+			s_dither2_lookup[val] = dither_rb(color, s_dither_matrix_2x2[y * 4 + x]);
+		}
+		else
+		{
+			s_dither4_lookup[val] = dither_g(color, s_dither_matrix_4x4[y * 4 + x]);
+			s_dither2_lookup[val] = dither_g(color, s_dither_matrix_2x2[y * 4 + x]);
+		}
+	}
+	for (int val = 0; val < 256*4*2; val++)
+	{
+		int color = (val >> 0) & 0xff;
+		int g = (val >> 8) & 1;
+
+		if (!g)
+			s_nodither_lookup[val] = color >> 3;
+		else
+			s_nodither_lookup[val] = color >> 2;
+	}
+}
 
 
 
@@ -179,501 +370,553 @@ private:
 #endif
 
 
+//**************************************************************************
+//  RASTER TEXTURE
+//**************************************************************************
 
-/*************************************
- *
- *  Clamping macros
- *
- *************************************/
+//-------------------------------------------------
+//  recompute - recompute state based on parameters
+//-------------------------------------------------
 
-static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, reg_fbz_colorpath const fbzcp)
+void rasterizer_texture::recompute(u8 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
 {
-	rgbaint_t result(iterargb);
-	result.shr_imm(20);
+	u32 const addrmask = (type <= TYPE_VOODOO_2) ? 0x0fffff : 0xfffff0;
+	u32 const addrshift = (type <= TYPE_VOODOO_2) ? 3 : 0;
 
-	// clamped case is easy
-	if (fbzcp.rgbzw_clamp() != 0)
+	m_ram = ram;
+	m_mask = mask;
+	m_lookup = lookup;
+
+	// extract LOD parameters
+	auto const texlod = regs.texture_lod();
+	m_lodmin = texlod.lod_min() << 6;
+	m_lodmax = texlod.lod_max() << 6;
+	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
+
+	// determine which LODs are present
+	m_lodmask = 0x1ff;
+	if (texlod.lod_tsplit())
+		m_lodmask = texlod.lod_odd() ? 0x0aa : 0x155;
+
+	// determine base texture width/height
+	m_wmask = m_hmask = 0xff;
+	if (texlod.lod_s_is_wider())
+		m_hmask >>= texlod.lod_aspect();
+	else
+		m_wmask >>= texlod.lod_aspect();
+
+	// determine the bpp of the texture
+	auto const texmode = regs.texture_mode();
+	int bppscale = texmode.format() >> 3;
+
+	// start with the base of LOD 0
+	u32 base = regs.texture_baseaddr();
+	if (addrshift == 0 && BIT(base, 0) != 0)
+		osd_printf_debug("Tiled texture\n");
+	base = (base & addrmask) << addrshift;
+	m_lodoffset[0] = base & mask;
+
+	// LODs 1-3 are different depending on whether we are in multitex mode
+	// Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think
+	// they want multitex mode when they really don't -- disable for now
+	// Enable for Voodoo 3 or Viper breaks - VL.
+	// Add check for upper nibble not equal to zero to fix funkball -- TG
+	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
-		result.clamp_to_uint8();
-		return result;
+		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
+		m_lodoffset[1] = base & mask;
+		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;
+		m_lodoffset[2] = base & mask;
+		base = (regs.texture_baseaddr_3_8() & addrmask) << addrshift;
+		m_lodoffset[3] = base & mask;
+	}
+	else
+	{
+		if (m_lodmask & (1 << 0))
+			base += (((m_wmask >> 0) + 1) * ((m_hmask >> 0) + 1)) << bppscale;
+		m_lodoffset[1] = base & mask;
+		if (m_lodmask & (1 << 1))
+			base += (((m_wmask >> 1) + 1) * ((m_hmask >> 1) + 1)) << bppscale;
+		m_lodoffset[2] = base & mask;
+		if (m_lodmask & (1 << 2))
+			base += (((m_wmask >> 2) + 1) * ((m_hmask >> 2) + 1)) << bppscale;
+		m_lodoffset[3] = base & mask;
 	}
 
-	// for each component:
-	//    result = val & 0xfff;
-	//    if (result == 0xfff) result = 0;
-	//    if (result == 0x100) result = 0xff;
+	// remaining LODs make sense
+	for (int lod = 4; lod <= 8; lod++)
+	{
+		if (m_lodmask & (1 << (lod - 1)))
+		{
+			u32 size = ((m_wmask >> (lod - 1)) + 1) * ((m_hmask >> (lod - 1)) + 1);
+			if (size < 4) size = 4;
+			base += size << bppscale;
+		}
+		m_lodoffset[lod] = base & mask;
+	}
 
-	// check against 0xfff and force to 0
-	rgbaint_t temp1(result);
-	rgbaint_t temp2(result);
-	temp1.cmpeq_imm(0xfff);
-	temp2.cmpeq_imm(0x100);
-	result.andnot_reg(temp1);
-	result.or_reg(temp2);
-	result.and_imm(0xff);
+	// compute the detail parameters
+	auto const texdetail = regs.texture_detail();
+	m_detailmax = texdetail.detail_max();
+	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
+	m_detailscale = texdetail.detail_scale();
+
+	// check for separate RGBA filtering
+	if (texdetail.separate_rgba_filter())
+		fatalerror("Separate RGBA filters!\n");
+
+	m_bilinear_mask = (type >= TYPE_VOODOO_2) ? 0xff : 0xf0;
+}
+
+
+//-------------------------------------------------
+//  lookup_single_texel - look up the texel at the
+//  given S,T coordinate based on the format and
+//  return a decoded RGB value
+//-------------------------------------------------
+
+inline rgb_t rasterizer_texture::lookup_single_texel(u32 format, u32 texbase, s32 s, s32 t)
+{
+	if (format < 8)
+		return m_lookup[*(u8 *)&m_ram[(texbase + t + s) & m_mask]];
+	else if (format >= 10 && format <= 12)
+		return m_lookup[*(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask]];
+	else
+	{
+		u32 texel = *(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask];
+		return (m_lookup[texel & 0xff] & 0xffffff) | ((texel & 0xff00) << 16);
+	}
+}
+
+
+//-------------------------------------------------
+//  fetch_texel - fetch the texel value based on
+//  the S,T coordinates and LOD
+//-------------------------------------------------
+
+inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
+{
+	lod = lodbase;
+
+	// determine the S/T/LOD values for this texture
+	s32 s, t;
+	if (texmode.enable_perspective())
+	{
+		s32 wlog;
+		iterstw.calc_stow(s, t, wlog);
+		lod += wlog;
+	}
+	else
+		iterstw.get_st_shiftr(s, t, 14 + 10);
+
+	// clamp W
+	if (texmode.clamp_neg_w() && iterstw.is_w_neg())
+		s = t = 0;
+
+	// clamp the LOD
+	lod += m_lodbias;
+	if (texmode.enable_lod_dither())
+		lod += dither.raw_4x4(x) << 4;
+	lod = std::clamp<s32>(lod, m_lodmin, m_lodmax);
+
+	// now the LOD is in range; if we don't own this LOD, take the next one
+	s32 ilod = lod >> 8;
+	ilod += (~m_lodmask >> ilod) & 1;
+
+	// fetch the texture base
+	u32 texbase = m_lodoffset[ilod];
+
+	// compute the maximum s and t values at this LOD
+	s32 smax = m_wmask >> ilod;
+	s32 tmax = m_hmask >> ilod;
+
+	// determine whether we are point-sampled or bilinear
+	rgbaint_t result;
+	if ((lod == m_lodmin && !texmode.magnification_filter()) || (lod != m_lodmin && !texmode.minification_filter()))
+	{
+		// adjust S/T for the LOD and strip off the fractions
+		ilod += 18 - 10;
+		s >>= ilod;
+		t >>= ilod;
+
+		// clamp/wrap S/T if necessary
+		if (texmode.clamp_s())
+			s = std::clamp(s, 0, smax);
+		if (texmode.clamp_t())
+			t = std::clamp(t, 0, tmax);
+		s &= smax;
+		t &= tmax;
+		t *= smax + 1;
+
+		// fetch texel data
+		result.set(lookup_single_texel(texmode.format(), texbase, s, t));
+	}
+	else
+	{
+		// adjust S/T for the LOD and strip off all but the low 8 bits of the fraction
+		s >>= ilod;
+		t >>= ilod;
+
+		// also subtract 1/2 texel so that (0.5,0.5) = a full (0,0) texel
+		s -= 0x80;
+		t -= 0x80;
+
+		// extract the fractions
+		u32 sfrac = s & m_bilinear_mask;
+		u32 tfrac = t & m_bilinear_mask;
+
+		// now toss the rest
+		s >>= 8;
+		t >>= 8;
+		s32 s1 = s + 1;
+		s32 t1 = t + 1;
+
+		// clamp/wrap S/T if necessary
+		if (texmode.clamp_s())
+		{
+			if (s < 0)
+				s = s1 = 0;
+			else if (s >= smax)
+				s = s1 = smax;
+		}
+		s &= smax;
+		s1 &= smax;
+
+		if (texmode.clamp_t())
+		{
+			if (t < 0)
+				t = t1 = 0;
+			else if (t >= tmax)
+				t = t1 = tmax;
+		}
+		t &= tmax;
+		t1 &= tmax;
+		t *= smax + 1;
+		t1 *= smax + 1;
+
+		// fetch texel data
+		u32 texel0 = lookup_single_texel(texmode.format(), texbase, s, t);
+		u32 texel1 = lookup_single_texel(texmode.format(), texbase, s1, t);
+		u32 texel2 = lookup_single_texel(texmode.format(), texbase, s, t1);
+		u32 texel3 = lookup_single_texel(texmode.format(), texbase, s1, t1);
+		result.bilinear_filter_rgbaint(texel0, texel1, texel2, texel3, sfrac, tfrac);
+	}
 	return result;
 }
 
-static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const fbzcp)
+
+//-------------------------------------------------
+//  combine_texture - color combine unit for
+//  texture pixels
+//-------------------------------------------------
+
+inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::combine_texture(reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod)
 {
-	// clamped case is easy
-	if (fbzcp.rgbzw_clamp() != 0)
-		return std::clamp(iterz >> 12, 0, 0xffff);
-
-	// non-clamped case has specific behaviors
-	u32 result = u32(iterz) >> 12;
-	if (result == 0xfffff)
-		return 0;
-	if (result == 0x10000)
-		return 0xffff;
-	return result & 0xffff;
-}
-
-static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const fbzcp)
-{
-	// clamped case is easy
-	if (fbzcp.rgbzw_clamp() != 0)
-		return std::clamp(s32(iterw >> 48), 0, 0xff);
-
-	// non-clamped case has specific behaviors
-	u32 result = u64(iterw) >> 48;
-	if (result == 0xffff)
-		return 0;
-	if (result == 0x100)
-		return 0xff;
-	return result & 0xff;
-}
-
-
-
-/*************************************
- *
- *  Chroma keying
- *
- *************************************/
-
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::chroma_key_test(
-	thread_stats_block &threadstats,
-	rgbaint_t const &colorin)
-{
-	rgb_t color = colorin.to_rgba();
-
-	// non-range version
-	auto const chromakey = m_fbi_reg.chroma_key();
-	auto const chromarange = m_fbi_reg.chroma_range();
-	if (!chromarange.enable())
-	{
-		if (((color ^ chromakey.argb()) & 0xffffff) == 0)
-		{
-			threadstats.chroma_fail++;
-			return false;
-		}
-	}
-
-	// tricky range version
+	// select zero/other for RGB
+	rgbaint_t blend_color;
+	if (texmode.tc_zero_other())
+		blend_color.zero();
 	else
+		blend_color.set(c_other);
+
+	// select zero/other for alpha
+	if (texmode.tca_zero_other())
+		blend_color.zero_alpha();
+	else
+		blend_color.merge_alpha16(c_other);
+
+	// subtract local color
+	if (texmode.tc_sub_clocal() || texmode.tca_sub_clocal())
 	{
-		s32 low, high, test;
-		int results;
+		rgbaint_t sub_val;
 
-		// check blue
-		low = chromakey.blue();
-		high = chromarange.blue();
-		test = color.b();
-		results = (test >= low && test <= high);
-		results ^= chromarange.blue_exclusive();
-		results <<= 1;
-
-		// check green
-		low = chromakey.green();
-		high = chromarange.green();
-		test = color.g();
-		results |= (test >= low && test <= high);
-		results ^= chromarange.green_exclusive();
-		results <<= 1;
-
-		// check red
-		low = chromakey.red();
-		high = chromarange.red();
-		test = color.r();
-		results |= (test >= low && test <= high);
-		results ^= chromarange.red_exclusive();
-
-		// final result
-		if (chromarange.union_mode())
-		{
-			if (results != 0)
-			{
-				threadstats.chroma_fail++;
-				return false;
-			}
-		}
+		// potentially subtract c_local
+		if (!texmode.tc_sub_clocal())
+			sub_val.zero();
 		else
-		{
-			if (results == 7)
-			{
-				threadstats.chroma_fail++;
-				return false;
-			}
-		}
-	}
-	return true;
-}
+			sub_val.set(c_local);
 
+		if (!texmode.tca_sub_clocal())
+			sub_val.zero_alpha();
+		else
+			sub_val.merge_alpha16(c_local);
 
-
-/*************************************
- *
- *  Alpha masking
- *
- *************************************/
-
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_mask_test(
-	thread_stats_block &threadstats,
-	u8 alpha)
-{
-	if ((alpha & 1) == 0)
-	{
-		threadstats.afunc_fail++;
-		return false;
-	}
-	return true;
-}
-
-
-/*************************************
- *
- *  Alpha testing macro
- *
- *************************************/
-
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_test(
-	thread_stats_block &threadstats,
-	reg_alpha_mode const alphamode,
-	u8 alpha)
-{
-	switch (alphamode.alphafunction())
-	{
-		case 0:     // alphaOP = never
-			threadstats.afunc_fail++;
-			return false;
-
-		case 1:     // alphaOP = less than
-			if (alpha >= alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 2:     // alphaOP = equal
-			if (alpha != alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 3:     // alphaOP = less than or equal
-			if (alpha > alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 4:     // alphaOP = greater than
-			if (alpha <= alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 5:     // alphaOP = not equal
-			if (alpha == alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 6:     // alphaOP = greater than or equal
-			if (alpha < alphamode.alpharef())
-			{
-				threadstats.afunc_fail++;
-				return false;
-			}
-			break;
-
-		case 7:     // alphaOP = always
-			break;
-	}
-	return true;
-}
-
-
-/*************************************
- *
- *  Alpha blending macro
- *
- *************************************/
-
-inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::alpha_blend(
-	rgbaint_t &color,
-	reg_fbz_mode const fbzmode,
-	reg_alpha_mode const alphamode,
-	s32 x,
-	dither_helper const &dither,
-	int dpix,
-	u16 *depth,
-	rgbaint_t const &prefog)
-{
-	// extract destination pixel
-	rgbaint_t dst_color(m_rgb565[dpix]);
-	int da = 0xff;
-	if (fbzmode.enable_alpha_planes())
-		dst_color.set_a16(da = depth[x]);
-
-	// apply dither subtraction
-	if (fbzmode.alpha_dither_subtract())
-	{
-		int dith = dither.subtract(x);
-		dst_color.add_imm_rgba(0, dith, dith >> 1, dith);
+		blend_color.sub(sub_val);
 	}
 
-	// compute source portion
-	int sa = color.get_a();
-	int ta;
-	rgbaint_t src_scale;
-	switch (alphamode.srcrgbblend())
+	// blend RGB
+	rgbaint_t blend_factor;
+	switch (texmode.tc_mselect())
 	{
 		default:    // reserved
-		case 0:     // AZERO
-			src_scale.zero();
+		case 0:     // zero
+			blend_factor.zero();
 			break;
 
-		case 1:     // ASRC_ALPHA
-			ta = sa + 1;
-			src_scale.set_all(ta);
+		case 1:     // c_local
+			blend_factor.set(c_local);
 			break;
 
-		case 2:     // A_COLOR
-			src_scale = dst_color;
-			src_scale.add_imm(1);
+		case 2:     // a_other
+			blend_factor.set(c_other.select_alpha32());
 			break;
 
-		case 3:     // ADST_ALPHA
-			ta = da + 1;
-			src_scale.set_all(ta);
+		case 3:     // a_local
+			blend_factor.set(c_local.select_alpha32());
 			break;
 
-		case 4:     // AONE
-			src_scale.set_all(256);
+		case 4:     // LOD (detail factor)
+			if (m_detailbias <= lod)
+				blend_factor.zero();
+			else
+			{
+				u8 tmp;
+				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
+				if (tmp > m_detailmax)
+					tmp = m_detailmax;
+				blend_factor.set_all(tmp);
+			}
 			break;
 
-		case 5:     // AOMSRC_ALPHA
-			ta = 0x100 - sa;
-			src_scale.set_all(ta);
-			break;
-
-		case 6:     // AOM_COLOR
-			src_scale.set_all(0x100);
-			src_scale.sub(dst_color);
-			break;
-
-		case 7:     // AOMDST_ALPHA
-			ta = 0x100 - da;
-			src_scale.set_all(ta);
-			break;
-
-		case 15:    // ASATURATE
-			ta = 0x100 - da;
-			if (sa < ta)
-				ta = sa;
-			ta++;
-			src_scale.set_all(ta);
+		case 5:     // LOD fraction
+			blend_factor.set_all(lod & 0xff);
 			break;
 	}
 
-	// set src_scale alpha
-	int src_alpha_scale = (alphamode.srcalphablend() == 4) ? 256 : 0;
-	src_scale.set_a16(src_alpha_scale);
-
-	// add in dest portion
-	rgbaint_t dst_scale;
-	switch (alphamode.dstrgbblend())
+	// blend alpha
+	switch (texmode.tca_mselect())
 	{
 		default:    // reserved
-		case 0:     // AZERO
-			dst_scale.zero();
+		case 0:     // zero
+			blend_factor.zero_alpha();
 			break;
 
-		case 1:     // ASRC_ALPHA
-			ta = sa + 1;
-			dst_scale.set_all(ta);
+		case 1:     // c_local
+			blend_factor.merge_alpha16(c_local);
 			break;
 
-		case 2:     // A_COLOR
-			dst_scale.set(color);
-			dst_scale.add_imm(1);
+		case 2:     // a_other
+			blend_factor.merge_alpha16(c_other);
 			break;
 
-		case 3:     // ADST_ALPHA
-			ta = da + 1;
-			dst_scale.set_all(ta);
+		case 3:     // a_local
+			blend_factor.merge_alpha16(c_local);
 			break;
 
-		case 4:     // AONE
-			dst_scale.set_all(256);
+		case 4:     // LOD (detail factor)
+			if (m_detailbias <= lod)
+				blend_factor.zero_alpha();
+			else
+			{
+				u8 tmp;
+				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
+				if (tmp > m_detailmax)
+					tmp = m_detailmax;
+				blend_factor.set_a16(tmp);
+			}
 			break;
 
-		case 5:     // AOMSRC_ALPHA
-			ta = 0x100 - sa;
-			dst_scale.set_all(ta);
-			break;
-
-		case 6:     // AOM_COLOR
-			dst_scale.set_all(0x100);
-			dst_scale.sub(color);
-			break;
-
-		case 7:     // AOMDST_ALPHA
-			ta = 0x100 - da;
-			dst_scale.set_all(ta);
-			break;
-
-		case 15:    // A_COLORBEFOREFOG
-			dst_scale.set(prefog);
-			dst_scale.add_imm(1);
+		case 5:     // LOD fraction
+			blend_factor.set_a16(lod & 0xff);
 			break;
 	}
 
-	// set dst_scale alpha
-	int dest_alpha_scale = (alphamode.dstalphablend() == 4) ? 256 : 0;
-	dst_scale.set_a16(dest_alpha_scale);
+	// reverse the RGB blend
+	if (!texmode.tc_reverse_blend())
+		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
 
-	// main blend
-	color.scale2_add_and_clamp(src_scale, dst_color, dst_scale);
-}
+	// reverse the alpha blend
+	if (!texmode.tca_reverse_blend())
+		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
 
+	blend_factor.add_imm(1);
 
-/*************************************
- *
- *  Fogging macro
- *
- *************************************/
-
-inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::apply_fogging(
-	rgbaint_t &color,
-	poly_data const &poly,
-	reg_fbz_mode const fbzmode,
-	reg_fog_mode const fogmode,
-	reg_fbz_colorpath const fbzcp,
-	s32 x,
-	dither_helper const &dither,
-	s32 wfloat,
-	s32 iterz,
-	s64 iterw,
-	rgbaint_t const &iterargb)
-{
-	// constant fog bypasses everything else
-	rgbaint_t fog_color_local(m_fbi_reg.fog_color().argb());
-	if (fogmode.fog_constant())
+	// add clocal or alocal to RGB
+	rgbaint_t add_val;
+	switch (texmode.tc_add_aclocal())
 	{
-		// if fog_mult is 0, we add this to the original color
-		if (fogmode.fog_mult() == 0)
-		{
-			fog_color_local.add(color);
-			fog_color_local.clamp_to_uint8();
-		}
+		case 3:     // reserved
+		case 0:     // nothing
+			add_val.zero();
+			break;
+
+		case 1:     // add c_local
+			add_val.set(c_local);
+			break;
+
+		case 2:     // add_alocal
+			add_val.set(c_local.select_alpha32());
+			break;
 	}
 
-	// non-constant fog comes from several sources
+	// add clocal or alocal to alpha
+	if (!texmode.tca_add_aclocal())
+		add_val.zero_alpha();
 	else
-	{
-		s32 fogblend = 0;
+		add_val.merge_alpha16(c_local);
 
-		// if fog_add is zero, we start with the fog color
-		if (fogmode.fog_add())
-			fog_color_local.zero();
+	// scale add and clamp
+	blend_color.scale_add_and_clamp(blend_factor, add_val);
 
-		// if fog_mult is zero, we subtract the incoming color
-		// Need to check this, manual states 9 bits
-		if (!fogmode.fog_mult())
-			fog_color_local.sub(color);
-
-		// fog blending mode
-		switch (fogmode.fog_zalpha())
-		{
-			case 0:     // fog table
-			{
-				s32 fog_depth = wfloat;
-
-				// add the bias for fog selection
-				if (fbzmode.enable_depth_bias())
-					fog_depth = std::clamp(fog_depth + s16(poly.zacolor), 0, 0xffff);
-
-				// perform the multiply against lower 8 bits of wfloat
-				s32 delta = m_fogdelta[fog_depth >> 10];
-				s32 deltaval = (delta & m_fogdelta_mask) * ((fog_depth >> 2) & 0xff);
-
-				// fog zones allow for negating this value
-				if (fogmode.fog_zones() && (delta & 2))
-					deltaval = -deltaval;
-				deltaval >>= 6;
-
-				// apply dither
-				if (fogmode.fog_dither())
-					deltaval += dither.raw_4x4(x);
-				deltaval >>= 4;
-
-				// add to the blending factor
-				fogblend = m_fogblend[fog_depth >> 10] + deltaval;
-				break;
-			}
-
-			case 1:     // iterated A
-				fogblend = iterargb.get_a();
-				break;
-
-			case 2:     // iterated Z
-				fogblend = clamped_z(iterz, fbzcp) >> 8;
-				break;
-
-			case 3:     // iterated W - Voodoo 2 only
-				fogblend = clamped_w(iterw, fbzcp);
-				break;
-		}
-
-		// perform the blend
-		fogblend++;
-
-		// if fog_mult is 0, we add this to the original color
-		fog_color_local.scale_imm_and_clamp(s16(fogblend));
-		if (fogmode.fog_mult() == 0)
-		{
-			fog_color_local.add(color);
-			fog_color_local.clamp_to_uint8();
-		}
-	}
-
-	fog_color_local.merge_alpha16(color);
-	color.set(fog_color_local);
+	// invert
+	if (texmode.tc_invert_output())
+		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
+	if (texmode.tca_invert_output())
+		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
+	return blend_color;
 }
 
 
-/*************************************
- *
- *  Pixel pipeline macros
- *
- *************************************/
 
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::stipple_test(
-	thread_stats_block &threadstats,
-	reg_fbz_mode const fbzmode,
-	s32 x,
-	s32 scry)
+//**************************************************************************
+//  VOODOO RENDERER
+//**************************************************************************
+
+//-------------------------------------------------
+//  voodoo_renderer - constructor
+//-------------------------------------------------
+
+voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
+	poly_manager(machine),
+	m_type(type),
+	m_rowpixels(0),
+	m_yorigin(0),
+	m_fbi_reg(fbi_regs),
+	m_tmu0_reg(tmu0_regs),
+	m_tmu1_reg(tmu1_regs),
+	m_rgb565(rgb565),
+	m_fogdelta_mask((type < TYPE_VOODOO_2) ? 0xff : 0xfc),
+	m_thread_stats(WORK_MAX_THREADS)
+{
+	// empty the hash table
+	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
+
+	// add all predefined rasterizers
+	for (const static_rasterizer_info *info = s_predef_raster_table; info->params.fbzcp().raw() != 0xffffffff; info++)
+		add_rasterizer(info->params, info->mfp, false);
+
+	// create entries for the generic rasterizers as well
+	rasterizer_params dummy_params = { 0 };
+	for (int index = 0; index < 4; index++)
+		m_generic_rasterizer[index] = add_rasterizer(dummy_params, generic_rasterizer(index), true);
+}
+
+
+//-------------------------------------------------
+//  alloc_poly - allocate a new poly_data object
+//  and compute the raster parameters
+//-------------------------------------------------
+
+poly_data &voodoo_renderer::alloc_poly()
+{
+	// allocate poly data and compute the rasterization parameters
+	poly_data &poly = object_data_alloc();
+	poly.raster.compute(m_type, m_fbi_reg, m_tmu0_reg, m_tmu1_reg);
+	return poly;
+}
+
+
+//-------------------------------------------------
+//  enqueue_fastfill - enqueue a fastfill operation
+//  using a custom renderer
+//-------------------------------------------------
+
+u32 voodoo_renderer::enqueue_fastfill(poly_data &poly)
+{
+	// if we're not clearing anything, take no time
+	auto const fbzmode = poly.raster.fbzmode();
+	if (!fbzmode.rgb_buffer_mask() && !fbzmode.aux_buffer_mask())
+		return 0;
+
+	// fill in remaining relevant data
+	poly.zacolor = m_fbi_reg.za_color();
+
+	// generate a dither pattern if clearing the RGB buffer
+	if (fbzmode.rgb_buffer_mask())
+	{
+		auto const color = m_fbi_reg.color1().argb();
+		for (int y = 0; y < 4; y++)
+		{
+			dither_helper dither(y, fbzmode);
+			for (int x = 0; x < 4; x++)
+				poly.dither[y * 4 + x] = dither.pixel(x, color);
+		}
+	}
+
+	// create a block of 64 identical extents
+	voodoo_renderer::extent_t extents[64];
+	extents[0].startx = m_fbi_reg.clip_left();
+	extents[0].stopx = m_fbi_reg.clip_right();
+	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
+
+	// iterate over the full area
+	voodoo_renderer::render_delegate fastfill_cb(&voodoo_renderer::rasterizer_fastfill, this);
+	int ey = m_fbi_reg.clip_bottom();
+	u32 pixels = 0;
+	for (int y = m_fbi_reg.clip_top(); y < ey; y += std::size(extents))
+	{
+		int numextents = std::min(ey - y, int(std::size(extents)));
+		pixels += render_triangle_custom(global_cliprect, fastfill_cb, y, numextents, extents);
+	}
+	return pixels;
+}
+
+
+//-------------------------------------------------
+//  enqueue_triangle - enqueue a triangle
+//-------------------------------------------------
+
+u32 voodoo_renderer::enqueue_triangle(poly_data &poly, vertex_t const *vert)
+{
+	// compute the hash of the raster parameters
+	u32 fullhash = poly.raster.hash();
+	u32 hash = fullhash % RASTER_HASH_SIZE;
+
+	// find the appropriate hash entry
+	rasterizer_info *prev = nullptr;
+	rasterizer_info *info;
+	for (info = m_raster_hash[hash]; info != nullptr; prev = info, info = info->next)
+		if (info->fullhash == fullhash && info->params == poly.raster)
+		{
+			// got it, move us to the head of the list
+			if (prev != nullptr)
+			{
+				prev->next = info->next;
+				info->next = m_raster_hash[hash];
+				m_raster_hash[hash] = info;
+			}
+			break;
+		}
+
+	// determine the index of the generic rasterizer
+	if (info == nullptr)
+	{
+		u32 index = 0;
+		if (poly.raster.texmode0().raw() != 0xffffffff)
+			index |= 1;
+		if (poly.raster.texmode1().raw() != 0xffffffff)
+			index |= 2;
+
+		// add a new one if we're logging usage
+		if (LOG_RASTERIZERS)
+			info = add_rasterizer(poly.raster, generic_rasterizer(index), true);
+		else
+			info = m_generic_rasterizer[index];
+	}
+
+	// set the info and render the triangle
+	poly.info = info;
+	return render_triangle(global_cliprect, poly.info->callback, 0, vert[0], vert[1], vert[2]);
+}
+
+
+//-------------------------------------------------
+//  stipple_test - test against the stipple
+//  pattern; the enable flag is not checked here,
+//  so must be checked by the caller
+//-------------------------------------------------
+
+inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, s32 x, s32 scry)
 {
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
@@ -698,22 +941,13 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::stipple_test(
 	return true;
 }
 
-inline s32 ATTR_FORCE_INLINE voodoo::voodoo_renderer::compute_wfloat(s64 iterw)
-{
-	int exp = count_leading_zeros_64(iterw) - 16;
-	if (exp < 0)
-		return 0x0000;
-	if (exp >= 16)
-		return 0xffff;
-	return ((exp << 12) | ((iterw >> (35 - exp)) ^ 0x1fff)) + 1;
-}
 
-inline s32 ATTR_FORCE_INLINE voodoo::voodoo_renderer::compute_depthval(
-	poly_data const &poly,
-	reg_fbz_mode const fbzmode,
-	reg_fbz_colorpath const fbzcp,
-	s32 wfloat,
-	s32 iterz)
+//-------------------------------------------------
+//  compute_depthval - compute the value for depth
+//  according to the configured flags
+//-------------------------------------------------
+
+inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &poly, reg_fbz_mode const fbzmode, reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz)
 {
 	s32 result;
 	if (fbzmode.wbuffer_select())
@@ -740,24 +974,25 @@ inline s32 ATTR_FORCE_INLINE voodoo::voodoo_renderer::compute_depthval(
 }
 
 
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
-	thread_stats_block &threadstats,
-	poly_data const &poly,
-	reg_fbz_mode const fbzmode,
-	s32 depthdest,
-	s32 depthval)
+//-------------------------------------------------
+//  depth_test - perform depth testing; the enable
+//  flag is not checked here, so must be checked by
+//  the caller
+//-------------------------------------------------
+
+inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &threadstats, poly_data const &poly, reg_fbz_mode const fbzmode, s32 depthdest, s32 depthval)
 {
 	// the source depth is either the iterated W/Z+bias or a constant value
 	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(poly.zacolor);
 
-	/* test against the depth buffer */
+	// test against the depth buffer
 	switch (fbzmode.depth_function())
 	{
-		case 0:     /* depthOP = never */
+		case 0:     // depthOP = never
 			threadstats.zfunc_fail++;
 			return false;
 
-		case 1:     /* depthOP = less than */
+		case 1:     // depthOP = less than
 			if (depthsource >= depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -765,7 +1000,7 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 2:     /* depthOP = equal */
+		case 2:     // depthOP = equal
 			if (depthsource != depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -773,7 +1008,7 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 3:     /* depthOP = less than or equal */
+		case 3:     // depthOP = less than or equal
 			if (depthsource > depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -781,7 +1016,7 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 4:     /* depthOP = greater than */
+		case 4:     // depthOP = greater than
 			if (depthsource <= depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -789,7 +1024,7 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 5:     /* depthOP = not equal */
+		case 5:     // depthOP = not equal
 			if (depthsource == depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -797,7 +1032,7 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 6:     /* depthOP = greater than or equal */
+		case 6:     // depthOP = greater than or equal
 			if (depthsource < depthdest)
 			{
 				threadstats.zfunc_fail++;
@@ -805,90 +1040,18 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::depth_test(
 			}
 			break;
 
-		case 7:     /* depthOP = always */
+		case 7:     // depthOP = always
 			break;
 	}
 	return true;
 }
 
 
-inline void ATTR_FORCE_INLINE voodoo::voodoo_renderer::write_pixel(
-	thread_stats_block &threadstats,
-	reg_fbz_mode const fbzmode,
-	dither_helper const &dither,
-	u16 *destbase,
-	u16 *depthbase,
-	s32 x,
-	rgbaint_t const &color,
-	s32 depthval)
-{
-	/* write to framebuffer */
-	if (fbzmode.rgb_buffer_mask())
-		destbase[x] = dither.pixel(x, color);
+//-------------------------------------------------
+//  combine_color - core color combining logic
+//-------------------------------------------------
 
-	/* write to aux buffer */
-	/*if (depth && FBZMODE_AUX_BUFFER_MASK(FBZMODE))*/
-	if (fbzmode.aux_buffer_mask())
-	{
-		if (fbzmode.enable_alpha_planes() == 0)
-			depthbase[x] = depthval;
-		else
-			depthbase[x] = color.get_a();
-	}
-
-	/* track pixel writes to the frame buffer regardless of mask */
-	threadstats.pixels_out++;
-}
-
-
-
-/*************************************
- *
- *  Colorpath pipeline macro
- *
- *************************************/
-
-/*
-
-    c_other_is_used:
-
-        if (fbzmode.enable_chromakey() ||
-            fbzcp.cc_zero_other() == 0)
-
-    c_local_is_used:
-
-        if (fbzcp.cc_sub_clocal() ||
-            fbzcp.cc_mselect() == 1 ||
-            fbzcp.cc_add_aclocal() == 1)
-
-    NEEDS_ITER_RGB:
-
-        if ((c_other_is_used && fbzcp.cc_rgbselect() == 0) ||
-            (c_local_is_used && (fbzcp.cc_localselect_override() != 0 || fbzcp.cc_localselect() == 0))
-
-    NEEDS_ITER_A:
-
-        if ((a_other_is_used && fbzcp.cc_aselect() == 0) ||
-            (a_local_is_used && fbzcp.cca_localselect() == 0))
-
-    NEEDS_ITER_Z:
-
-        if (fbzmode.wbuffer_select() == 0 ||
-            fbzmode.depth_float_select() != 0 ||
-            fbzcp.cca_localselect() == 2)
-
-
-*/
-
-inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::combine_color(
-	rgbaint_t &color,
-	thread_stats_block &threadstats,
-	poly_data const &poly,
-	reg_fbz_colorpath const fbzcp,
-	reg_fbz_mode const fbzmode,
-	rgbaint_t texel,
-	s32 iterz,
-	s64 iterw)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::combine_color(rgbaint_t &color, thread_stats_block &threadstats, poly_data const &poly, reg_fbz_colorpath const fbzcp, reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw)
 {
 	// compute c_other
 	rgbaint_t c_other;
@@ -1109,308 +1272,510 @@ inline bool ATTR_FORCE_INLINE voodoo::voodoo_renderer::combine_color(
 }
 
 
+//-------------------------------------------------
+//  alpha_mask_test - perform alpha mask testing;
+//  the enable flag is not checked here, so must
+//  be checked by the caller
+//-------------------------------------------------
 
-inline rgb_t voodoo::raster_texture::lookup_single_texel(reg_texture_mode const texmode, u32 texbase, s32 s, s32 t)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::alpha_mask_test(thread_stats_block &threadstats, u32 alpha)
 {
-	if (texmode.format() < 8)
-		return m_lookup[*(u8 *)&m_ram[(texbase + t + s) & m_mask]];
-	else if (texmode.format() >= 10 && texmode.format() <= 12)
-		return m_lookup[*(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask]];
-	else
+	if ((alpha & 1) == 0)
 	{
-		u32 texel = *(u16 *)&m_ram[(texbase + 2*(t + s)) & m_mask];
-		return (m_lookup[texel & 0xff] & 0xffffff) | ((texel & 0xff00) << 16);
+		threadstats.afunc_fail++;
+		return false;
 	}
+	return true;
 }
 
-inline rgbaint_t ATTR_FORCE_INLINE voodoo::raster_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
+
+//-------------------------------------------------
+//  alpha_test - perform alpha testing; the enable
+//  flag is not checked here, so must be checked
+//  by the caller
+//-------------------------------------------------
+
+inline bool ATTR_FORCE_INLINE voodoo_renderer::alpha_test(thread_stats_block &threadstats, reg_alpha_mode const alphamode, u32 alpha, u32 alpharef)
 {
-	lod = lodbase;
-
-	// determine the S/T/LOD values for this texture
-	s32 s, t;
-	if (texmode.enable_perspective())
+	switch (alphamode.alphafunction())
 	{
-		s32 wlog;
-		iterstw.calc_stow(s, t, wlog);
-		lod += wlog;
-	}
-	else
-		iterstw.get_st_shiftr(s, t, 14 + 10);
+		case 0:     // alphaOP = never
+			threadstats.afunc_fail++;
+			return false;
 
-	// clamp W
-	if (texmode.clamp_neg_w() && iterstw.is_w_neg())
-		s = t = 0;
-
-	// clamp the LOD
-	lod += m_lodbias;
-	if (texmode.enable_lod_dither())
-		lod += dither.raw_4x4(x) << 4;
-	lod = std::clamp(lod, m_lodmin, m_lodmax);
-
-	// now the LOD is in range; if we don't own this LOD, take the next one
-	s32 ilod = lod >> 8;
-	if (((m_lodmask >> ilod) & 1) == 0)
-		ilod++;
-
-	// fetch the texture base
-	u32 texbase = m_lodoffset[ilod];
-
-	// compute the maximum s and t values at this LOD
-	s32 smax = m_wmask >> ilod;
-	s32 tmax = m_hmask >> ilod;
-
-	// determine whether we are point-sampled or bilinear
-	rgbaint_t result;
-	if ((lod == m_lodmin && !texmode.magnification_filter()) || (lod != m_lodmin && !texmode.minification_filter()))
-	{
-		// adjust S/T for the LOD and strip off the fractions
-		ilod += 18 - 10;
-		s >>= ilod;
-		t >>= ilod;
-
-		// clamp/wrap S/T if necessary
-		if (texmode.clamp_s())
-			s = std::clamp(s, 0, smax);
-		if (texmode.clamp_t())
-			t = std::clamp(t, 0, tmax);
-		s &= smax;
-		t &= tmax;
-		t *= smax + 1;
-
-		// fetch texel data
-		result.set(lookup_single_texel(texmode, texbase, s, t));
-	}
-	else
-	{
-		// adjust S/T for the LOD and strip off all but the low 8 bits of the fraction
-		s >>= ilod;
-		t >>= ilod;
-
-		// also subtract 1/2 texel so that (0.5,0.5) = a full (0,0) texel
-		s -= 0x80;
-		t -= 0x80;
-
-		// extract the fractions
-		u32 sfrac = s & m_bilinear_mask;
-		u32 tfrac = t & m_bilinear_mask;
-
-		// now toss the rest
-		s >>= 8;
-		t >>= 8;
-		s32 s1 = s + 1;
-		s32 t1 = t + 1;
-
-		// clamp/wrap S/T if necessary
-		if (texmode.clamp_s())
-		{
-			if (s < 0)
-				s = s1 = 0;
-			else if (s >= smax)
-				s = s1 = smax;
-		}
-		s &= smax;
-		s1 &= smax;
-
-		if (texmode.clamp_t())
-		{
-			if (t < 0)
-				t = t1 = 0;
-			else if (t >= tmax)
-				t = t1 = tmax;
-		}
-		t &= tmax;
-		t1 &= tmax;
-		t *= smax + 1;
-		t1 *= smax + 1;
-
-		// fetch texel data
-		u32 texel0 = lookup_single_texel(texmode, texbase, s, t);
-		u32 texel1 = lookup_single_texel(texmode, texbase, s1, t);
-		u32 texel2 = lookup_single_texel(texmode, texbase, s, t1);
-		u32 texel3 = lookup_single_texel(texmode, texbase, s1, t1);
-		result.bilinear_filter_rgbaint(texel0, texel1, texel2, texel3, sfrac, tfrac);
-	}
-	return result;
-}
-
-inline rgbaint_t ATTR_FORCE_INLINE voodoo::raster_texture::combine_texture(
-	reg_texture_mode const texmode,
-	rgbaint_t const &c_local,
-	rgbaint_t const &c_other,
-	s32 lod)
-{
-	// select zero/other for RGB
-	rgbaint_t blend_color;
-	if (texmode.tc_zero_other())
-		blend_color.zero();
-	else
-		blend_color.set(c_other);
-
-	// select zero/other for alpha
-	if (texmode.tca_zero_other())
-		blend_color.zero_alpha();
-	else
-		blend_color.merge_alpha16(c_other);
-
-	// subtract local color
-	if (texmode.tc_sub_clocal() || texmode.tca_sub_clocal())
-	{
-		rgbaint_t sub_val;
-
-		// potentially subtract c_local
-		if (!texmode.tc_sub_clocal())
-			sub_val.zero();
-		else
-			sub_val.set(c_local);
-
-		if (!texmode.tca_sub_clocal())
-			sub_val.zero_alpha();
-		else
-			sub_val.merge_alpha16(c_local);
-
-		blend_color.sub(sub_val);
-	}
-
-	// blend RGB
-	rgbaint_t blend_factor;
-	switch (texmode.tc_mselect())
-	{
-		default:    // reserved
-		case 0:     // zero
-			blend_factor.zero();
-			break;
-
-		case 1:     // c_local
-			blend_factor.set(c_local);
-			break;
-
-		case 2:     // a_other
-			blend_factor.set(c_other.select_alpha32());
-			break;
-
-		case 3:     // a_local
-			blend_factor.set(c_local.select_alpha32());
-			break;
-
-		case 4:     // LOD (detail factor)
-			if (m_detailbias <= lod)
-				blend_factor.zero();
-			else
+		case 1:     // alphaOP = less than
+			if (alpha >= alpharef)
 			{
-				u8 tmp;
-				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
-				if (tmp > m_detailmax)
-					tmp = m_detailmax;
-				blend_factor.set_all(tmp);
+				threadstats.afunc_fail++;
+				return false;
 			}
 			break;
 
-		case 5:     // LOD fraction
-			blend_factor.set_all(lod & 0xff);
-			break;
-	}
-
-	// blend alpha
-	switch (texmode.tca_mselect())
-	{
-		default:    // reserved
-		case 0:     // zero
-			blend_factor.zero_alpha();
-			break;
-
-		case 1:     // c_local
-			blend_factor.merge_alpha16(c_local);
-			break;
-
-		case 2:     // a_other
-			blend_factor.merge_alpha16(c_other);
-			break;
-
-		case 3:     // a_local
-			blend_factor.merge_alpha16(c_local);
-			break;
-
-		case 4:     // LOD (detail factor)
-			if (m_detailbias <= lod)
-				blend_factor.zero_alpha();
-			else
+		case 2:     // alphaOP = equal
+			if (alpha != alpharef)
 			{
-				u8 tmp;
-				tmp = (((m_detailbias - lod) << m_detailscale) >> 8);
-				if (tmp > m_detailmax)
-					tmp = m_detailmax;
-				blend_factor.set_a16(tmp);
+				threadstats.afunc_fail++;
+				return false;
 			}
 			break;
 
-		case 5:     // LOD fraction
-			blend_factor.set_a16(lod & 0xff);
+		case 3:     // alphaOP = less than or equal
+			if (alpha > alpharef)
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
+
+		case 4:     // alphaOP = greater than
+			if (alpha <= alpharef)
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
+
+		case 5:     // alphaOP = not equal
+			if (alpha == alpharef)
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
+
+		case 6:     // alphaOP = greater than or equal
+			if (alpha < alpharef)
+			{
+				threadstats.afunc_fail++;
+				return false;
+			}
+			break;
+
+		case 7:     // alphaOP = always
 			break;
 	}
-
-	// reverse the RGB blend
-	if (!texmode.tc_reverse_blend())
-		blend_factor.xor_imm_rgba(0, 0xff, 0xff, 0xff);
-
-	// reverse the alpha blend
-	if (!texmode.tca_reverse_blend())
-		blend_factor.xor_imm_rgba(0xff, 0, 0, 0);
-
-	blend_factor.add_imm(1);
-
-	// add clocal or alocal to RGB
-	rgbaint_t add_val;
-	switch (texmode.tc_add_aclocal())
-	{
-		case 3:     // reserved
-		case 0:     // nothing
-			add_val.zero();
-			break;
-
-		case 1:     // add c_local
-			add_val.set(c_local);
-			break;
-
-		case 2:     // add_alocal
-			add_val.set(c_local.select_alpha32());
-			break;
-	}
-
-	// add clocal or alocal to alpha
-	if (!texmode.tca_add_aclocal())
-		add_val.zero_alpha();
-	else
-		add_val.merge_alpha16(c_local);
-
-	// scale add and clamp
-	blend_color.scale_add_and_clamp(blend_factor, add_val);
-
-	// invert
-	if (texmode.tc_invert_output())
-		blend_color.xor_imm_rgba(0, 0xff, 0xff, 0xff);
-	if (texmode.tca_invert_output())
-		blend_color.xor_imm_rgba(0xff, 0, 0, 0);
-	return blend_color;
+	return true;
 }
 
 
-/*************************************
- *
- *  Rasterizer generator macro
- *
- *************************************/
+//-------------------------------------------------
+//  chroma_key_test - perform chroma key testing;
+//  the enable flag is not checked here, so must
+//  be checked by the caller
+//-------------------------------------------------
+
+inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin)
+{
+	rgb_t color = colorin.to_rgba();
+
+	// non-range version
+	auto const chromakey = m_fbi_reg.chroma_key();
+	auto const chromarange = m_fbi_reg.chroma_range();
+	if (!chromarange.enable())
+	{
+		if (((color ^ chromakey.argb()) & 0xffffff) == 0)
+		{
+			threadstats.chroma_fail++;
+			return false;
+		}
+	}
+
+	// tricky range version
+	else
+	{
+		s32 low, high, test;
+		int results;
+
+		// check blue
+		low = chromakey.blue();
+		high = chromarange.blue();
+		test = color.b();
+		results = (test >= low && test <= high);
+		results ^= chromarange.blue_exclusive();
+		results <<= 1;
+
+		// check green
+		low = chromakey.green();
+		high = chromarange.green();
+		test = color.g();
+		results |= (test >= low && test <= high);
+		results ^= chromarange.green_exclusive();
+		results <<= 1;
+
+		// check red
+		low = chromakey.red();
+		high = chromarange.red();
+		test = color.r();
+		results |= (test >= low && test <= high);
+		results ^= chromarange.red_exclusive();
+
+		// final result
+		if (chromarange.union_mode())
+		{
+			if (results != 0)
+			{
+				threadstats.chroma_fail++;
+				return false;
+			}
+		}
+		else
+		{
+			if (results == 7)
+			{
+				threadstats.chroma_fail++;
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  apply_fogging - perform fogging; the enable
+//  flag is not checked here, so must be checked by
+//  the caller
+//-------------------------------------------------
+
+inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, poly_data const &poly, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
+{
+	// constant fog bypasses everything else
+	rgbaint_t fog_color_local(m_fbi_reg.fog_color().argb());
+	if (fogmode.fog_constant())
+	{
+		// if fog_mult is 0, we add this to the original color
+		if (fogmode.fog_mult() == 0)
+		{
+			fog_color_local.add(color);
+			fog_color_local.clamp_to_uint8();
+		}
+	}
+
+	// non-constant fog comes from several sources
+	else
+	{
+		s32 fogblend = 0;
+
+		// if fog_add is zero, we start with the fog color
+		if (fogmode.fog_add())
+			fog_color_local.zero();
+
+		// if fog_mult is zero, we subtract the incoming color
+		// Need to check this, manual states 9 bits
+		if (!fogmode.fog_mult())
+			fog_color_local.sub(color);
+
+		// fog blending mode
+		switch (fogmode.fog_zalpha())
+		{
+			case 0:     // fog table
+			{
+				s32 fog_depth = wfloat;
+
+				// add the bias for fog selection
+				if (fbzmode.enable_depth_bias())
+					fog_depth = std::clamp(fog_depth + s16(poly.zacolor), 0, 0xffff);
+
+				// perform the multiply against lower 8 bits of wfloat
+				s32 delta = m_fogdelta[fog_depth >> 10];
+				s32 deltaval = (delta & m_fogdelta_mask) * ((fog_depth >> 2) & 0xff);
+
+				// fog zones allow for negating this value
+				if (fogmode.fog_zones() && (delta & 2))
+					deltaval = -deltaval;
+				deltaval >>= 6;
+
+				// apply dither
+				if (fogmode.fog_dither())
+					deltaval += dither.raw_4x4(x);
+				deltaval >>= 4;
+
+				// add to the blending factor
+				fogblend = m_fogblend[fog_depth >> 10] + deltaval;
+				break;
+			}
+
+			case 1:     // iterated A
+				fogblend = iterargb.get_a();
+				break;
+
+			case 2:     // iterated Z
+				fogblend = clamped_z(iterz, fbzcp) >> 8;
+				break;
+
+			case 3:     // iterated W - Voodoo 2 only
+				fogblend = clamped_w(iterw, fbzcp);
+				break;
+		}
+
+		// perform the blend
+		fogblend++;
+
+		// if fog_mult is 0, we add this to the original color
+		fog_color_local.scale_imm_and_clamp(s16(fogblend));
+		if (fogmode.fog_mult() == 0)
+		{
+			fog_color_local.add(color);
+			fog_color_local.clamp_to_uint8();
+		}
+	}
+
+	fog_color_local.merge_alpha16(color);
+	color.set(fog_color_local);
+}
+
+
+//-------------------------------------------------
+//  alpha_blend - perform alpha blending; the
+//  enable flag is not checked here, so must be
+//  checked by the caller
+//-------------------------------------------------
+
+inline void ATTR_FORCE_INLINE voodoo_renderer::alpha_blend(rgbaint_t &color, reg_fbz_mode const fbzmode, reg_alpha_mode const alphamode, s32 x, dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog)
+{
+	// extract destination pixel
+	rgbaint_t dst_color(m_rgb565[dpix]);
+	int da = 0xff;
+	if (fbzmode.enable_alpha_planes())
+		dst_color.set_a16(da = depth[x]);
+
+	// apply dither subtraction
+	if (fbzmode.alpha_dither_subtract())
+	{
+		int dith = dither.subtract(x);
+		dst_color.add_imm_rgba(0, dith, dith >> 1, dith);
+	}
+
+	// compute source portion
+	int sa = color.get_a();
+	int ta;
+	rgbaint_t src_scale;
+	switch (alphamode.srcrgbblend())
+	{
+		default:    // reserved
+		case 0:     // AZERO
+			src_scale.zero();
+			break;
+
+		case 1:     // ASRC_ALPHA
+			ta = sa + 1;
+			src_scale.set_all(ta);
+			break;
+
+		case 2:     // A_COLOR
+			src_scale = dst_color;
+			src_scale.add_imm(1);
+			break;
+
+		case 3:     // ADST_ALPHA
+			ta = da + 1;
+			src_scale.set_all(ta);
+			break;
+
+		case 4:     // AONE
+			src_scale.set_all(256);
+			break;
+
+		case 5:     // AOMSRC_ALPHA
+			ta = 0x100 - sa;
+			src_scale.set_all(ta);
+			break;
+
+		case 6:     // AOM_COLOR
+			src_scale.set_all(0x100);
+			src_scale.sub(dst_color);
+			break;
+
+		case 7:     // AOMDST_ALPHA
+			ta = 0x100 - da;
+			src_scale.set_all(ta);
+			break;
+
+		case 15:    // ASATURATE
+			ta = 0x100 - da;
+			if (sa < ta)
+				ta = sa;
+			ta++;
+			src_scale.set_all(ta);
+			break;
+	}
+
+	// set src_scale alpha
+	int src_alpha_scale = (alphamode.srcalphablend() == 4) ? 256 : 0;
+	src_scale.set_a16(src_alpha_scale);
+
+	// add in dest portion
+	rgbaint_t dst_scale;
+	switch (alphamode.dstrgbblend())
+	{
+		default:    // reserved
+		case 0:     // AZERO
+			dst_scale.zero();
+			break;
+
+		case 1:     // ASRC_ALPHA
+			ta = sa + 1;
+			dst_scale.set_all(ta);
+			break;
+
+		case 2:     // A_COLOR
+			dst_scale.set(color);
+			dst_scale.add_imm(1);
+			break;
+
+		case 3:     // ADST_ALPHA
+			ta = da + 1;
+			dst_scale.set_all(ta);
+			break;
+
+		case 4:     // AONE
+			dst_scale.set_all(256);
+			break;
+
+		case 5:     // AOMSRC_ALPHA
+			ta = 0x100 - sa;
+			dst_scale.set_all(ta);
+			break;
+
+		case 6:     // AOM_COLOR
+			dst_scale.set_all(0x100);
+			dst_scale.sub(color);
+			break;
+
+		case 7:     // AOMDST_ALPHA
+			ta = 0x100 - da;
+			dst_scale.set_all(ta);
+			break;
+
+		case 15:    // A_COLORBEFOREFOG
+			dst_scale.set(prefog);
+			dst_scale.add_imm(1);
+			break;
+	}
+
+	// set dst_scale alpha
+	int dest_alpha_scale = (alphamode.dstalphablend() == 4) ? 256 : 0;
+	dst_scale.set_a16(dest_alpha_scale);
+
+	// main blend
+	color.scale2_add_and_clamp(src_scale, dst_color, dst_scale);
+}
+
+
+//-------------------------------------------------
+//  write_pixel - write the pixel to the
+//  destination buffer, and the depth to the depth
+//  buffer
+//-------------------------------------------------
+
+inline void ATTR_FORCE_INLINE voodoo_renderer::write_pixel(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval)
+{
+	// write to framebuffer
+	if (fbzmode.rgb_buffer_mask())
+		destbase[x] = dither.pixel(x, color);
+
+	// write to aux buffer
+	if (fbzmode.aux_buffer_mask())
+	{
+		if (fbzmode.enable_alpha_planes() == 0)
+			depthbase[x] = depthval;
+		else
+			depthbase[x] = color.get_a();
+	}
+
+	// track pixel writes to the frame buffer regardless of mask
+	threadstats.pixels_out++;
+}
+
+
+//-------------------------------------------------
+//  pixel_pipeline - run a pixel through the
+//  pipeline
+//-------------------------------------------------
+
+void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data const &poly, reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t src_color, u16 sz)
+{
+	auto const fbzcp = poly.raster.fbzcp();
+	auto const alphamode = poly.raster.alphamode();
+	auto const fbzmode = poly.raster.fbzmode();
+	auto const fogmode = poly.raster.fogmode();
+	dither_helper dither(scry, fbzmode, fogmode);
+	u16 *depth = poly.depthbase;
+	u16 *dest = poly.destbase;
+
+	threadstats.pixels_in++;
+
+	// apply clipping
+	if (fbzmode.enable_clipping())
+	{
+		if (x < m_fbi_reg.clip_left() || x >= m_fbi_reg.clip_right() || scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
+		{
+			threadstats.clip_fail++;
+			return;
+		}
+	}
+
+	// handle stippling
+	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+		return;
+
+	// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
+	s32 depthval = u32(sz);
+
+	// Perform depth testing
+	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
+		return;
+
+	// use the RGBA we stashed above
+	rgbaint_t color(src_color);
+
+	// handle chroma key
+	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
+		return;
+
+	// handle alpha mask
+	if (fbzmode.enable_alpha_mask() && !alpha_mask_test(threadstats, color.get_a()))
+		return;
+
+	// handle alpha test
+	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), alphamode.alpharef()))
+		return;
+
+	// perform fogging
+	rgbaint_t prefog(color);
+	if (fogmode.enable_fog())
+	{
+		s32 iterz = sz << 12;
+		s64 iterw = lfbmode.write_w_select() ? u32(poly.zacolor << 16) : u32(sz << 16);
+		apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, rgbaint_t(0));
+	}
+
+	// wait for any outstanding work to finish
+	wait("LFB Write");
+
+	// perform alpha blending
+	if (alphamode.alphablend())
+		alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
+
+	// pixel pipeline part 2 handles final output
+	write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
+}
+
+
+//-------------------------------------------------
+//  rasterizer - core scanline rasterizer
+//-------------------------------------------------
 
 template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
-void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_data &poly, int threadid)
+void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_data &poly, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : reg_texture_mode(poly.raster.m_texmode0));
-	reg_texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : reg_texture_mode(poly.raster.m_texmode1));
-	reg_fbz_colorpath const fbzcp(_FbzCp, reg_fbz_colorpath(poly.raster.m_fbzcp));
-	reg_alpha_mode const alphamode(_AlphaMode, reg_alpha_mode(poly.raster.m_alphamode));
-	reg_fbz_mode const fbzmode(_FbzMode, reg_fbz_mode(poly.raster.m_fbzmode));
-	reg_fog_mode const fogmode(_FogMode, reg_fog_mode(poly.raster.m_fogmode));
+	reg_texture_mode const texmode0(_TexMode0, (_TexMode0 == 0xffffffff) ? 0 : poly.raster.texmode0());
+	reg_texture_mode const texmode1(_TexMode1, (_TexMode1 == 0xffffffff) ? 0 : poly.raster.texmode1());
+	reg_fbz_colorpath const fbzcp(_FbzCp, poly.raster.fbzcp());
+	reg_alpha_mode const alphamode(_AlphaMode, poly.raster.alphamode());
+	reg_fbz_mode const fbzmode(_FbzMode, poly.raster.fbzmode());
+	reg_fog_mode const fogmode(_FogMode, poly.raster.fogmode());
 	stw_helper iterstw0, iterstw1;
 	stw_helper deltastw0, deltastw1;
 
@@ -1518,9 +1883,8 @@ void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t 
 				break;
 
 			// run the texture pipeline on TMU1 to produce a value in texel
-			// note that they set LOD min to 8 to "disable" a TMU
 			rgbaint_t texel(0);
-			if (_TexMode1 != 0xffffffff && poly.tex1->m_lodmin < (8 << 8))
+			if (_TexMode1 != 0xffffffff)
 			{
 				s32 lod1;
 				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, poly.lodbase1, lod1);
@@ -1528,8 +1892,7 @@ void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t 
 			}
 
 			// run the texture pipeline on TMU0 to produce a final result in texel
-			// note that they set LOD min to 8 to "disable" a TMU
-			if (_TexMode0 != 0xffffffff && poly.tex0->m_lodmin < (8 << 8))
+			if (_TexMode0 != 0xffffffff)
 			{
 //				if (!m_send_config)
 				{
@@ -1547,7 +1910,7 @@ void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t 
 				break;
 
 			// handle alpha test
-			if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
+			if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), alphamode.alpharef()))
 				break;
 
 			// perform fogging
@@ -1574,29 +1937,26 @@ void voodoo::voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t 
 	}
 }
 
-/***************************************************************************
-    GENERIC RASTERIZERS
-***************************************************************************/
 
-/*-------------------------------------------------
-    raster_fastfill - per-scanline
-    implementation of the 'fastfill' command
--------------------------------------------------*/
+//-------------------------------------------------
+//  rasterizer_fastfill - custom scanline
+//  rasterizer for fastfill operations
+//-------------------------------------------------
 
-void voodoo::voodoo_renderer::raster_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_data &poly, int threadid)
+void voodoo_renderer::rasterizer_fastfill(s32 y, const voodoo_renderer::extent_t &extent, const poly_data &poly, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	auto const fbzmode = reg_fbz_mode(poly.raster.m_fbzmode);
+	auto const fbzmode = poly.raster.fbzmode();
 	s32 startx = extent.startx;
 	s32 stopx = extent.stopx;
 	int x;
 
-	/* determine the screen Y */
+	// determine the screen Y
 	s32 scry = y;
 	if (fbzmode.y_origin())
 		scry = m_yorigin - y;
 
-	/* fill this RGB row */
+	// fill this RGB row
 	if (fbzmode.rgb_buffer_mask())
 	{
 		const u16 *ditherow = &poly.dither[(y & 3) * 4];
@@ -1612,7 +1972,7 @@ void voodoo::voodoo_renderer::raster_fastfill(s32 y, const voodoo_renderer::exte
 		threadstats.pixels_out += stopx - startx;
 	}
 
-	/* fill this dest buffer row */
+	// fill this dest buffer row
 	if (fbzmode.aux_buffer_mask() && poly.depthbase != nullptr)
 	{
 		u16 depth = poly.zacolor;
@@ -1629,162 +1989,11 @@ void voodoo::voodoo_renderer::raster_fastfill(s32 y, const voodoo_renderer::exte
 }
 
 
-poly_data &voodoo_renderer::alloc_poly()
-{
-	// allocate poly data and compute the rasterization parameters
-	poly_data &poly = object_data_alloc();
-	poly.raster.compute(m_type, m_fbi_reg, m_tmu0_reg, m_tmu1_reg);
-	return poly;
-}
-
-
-u32 voodoo_renderer::enqueue_fastfill(poly_data &poly)
-{
-	// if we're not clearing anything, take no time
-	auto const fbzmode = reg_fbz_mode(poly.raster.m_fbzmode);
-	if (!fbzmode.rgb_buffer_mask() && !fbzmode.aux_buffer_mask())
-		return 0;
-
-	// fill in remaining relevant data
-	poly.zacolor = m_fbi_reg.za_color();
-
-	// generate a dither pattern if clearing the RGB buffer
-	if (fbzmode.rgb_buffer_mask())
-	{
-		auto const color = m_fbi_reg.color1().argb();
-		for (int y = 0; y < 4; y++)
-		{
-			dither_helper dither(y, fbzmode);
-			for (int x = 0; x < 4; x++)
-				poly.dither[y * 4 + x] = dither.pixel(x, color);
-		}
-	}
-
-	// create a block of 64 identical extents
-	voodoo_renderer::extent_t extents[64];
-	extents[0].startx = m_fbi_reg.clip_left();
-	extents[0].stopx = m_fbi_reg.clip_right();
-	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
-
-	// iterate over the full area
-	voodoo_renderer::render_delegate fastfill_cb(&voodoo_renderer::raster_fastfill, this);
-	int ey = m_fbi_reg.clip_bottom();
-	u32 pixels = 0;
-	for (int y = m_fbi_reg.clip_top(); y < ey; y += std::size(extents))
-	{
-		int numextents = std::min(ey - y, int(std::size(extents)));
-		pixels += render_triangle_custom(global_cliprect, fastfill_cb, y, numextents, extents);
-	}
-	return pixels;
-}
-
-
-u32 voodoo_renderer::enqueue_triangle(poly_data &poly, vertex_t const *vert)
-{
-	poly.info = find_rasterizer(poly.raster);
-
-	return render_triangle(global_cliprect, poly.info->callback, 0, vert[0], vert[1], vert[2]);
-}
-
-
-void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data const &poly, voodoo::reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t src_color, u16 sz)
-{
-	reg_fbz_colorpath const fbzcp(poly.raster.m_fbzcp);
-	reg_alpha_mode const alphamode(poly.raster.m_alphamode);
-	reg_fbz_mode const fbzmode(poly.raster.m_fbzmode);
-	reg_fog_mode const fogmode(poly.raster.m_fogmode);
-	dither_helper dither(scry, fbzmode, fogmode);
-	u16 *depth = poly.depthbase;
-	u16 *dest = poly.destbase;
-
-	threadstats.pixels_in++;
-
-	// apply clipping
-	if (fbzmode.enable_clipping())
-	{
-		if (x < m_fbi_reg.clip_left() || x >= m_fbi_reg.clip_right() || scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
-		{
-			threadstats.clip_fail++;
-			return;
-		}
-	}
-
-	// handle stippling
-	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
-		return;
-
-	// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
-	s32 depthval = u32(sz);
-
-	// Perform depth testing
-	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
-		return;
-
-	// use the RGBA we stashed above
-	rgbaint_t color(src_color);
-
-	// handle chroma key
-	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
-		return;
-
-	// handle alpha mask
-	if (fbzmode.enable_alpha_mask() && !alpha_mask_test(threadstats, color.get_a()))
-		return;
-
-	// handle alpha test
-	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a()))
-		return;
-
-	// perform fogging
-	rgbaint_t prefog(color);
-	if (fogmode.enable_fog())
-	{
-		s32 iterz = sz << 12;
-		s64 iterw = lfbmode.write_w_select() ? u32(poly.zacolor << 16) : u32(sz << 16);
-		apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, rgbaint_t(0));
-	}
-
-	// wait for any outstanding work to finish
-	wait("LFB Write");
-
-	// perform alpha blending
-	if (alphamode.alphablend())
-		alpha_blend(color, fbzmode, alphamode, x, dither, dest[x], depth, prefog);
-
-	// pixel pipeline part 2 handles final output
-	write_pixel(threadstats, fbzmode, dither, dest, depth, x, color, depthval);
-}
-
-
 //-------------------------------------------------
-//  voodoo_renderer - constructor
+//  generic_rasterizer - return a pointer to a
+//  generic rasterizer based on a texture enable
+//  mask
 //-------------------------------------------------
-
-voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
-	poly_manager(machine),
-	m_type(type),
-	m_rowpixels(0),
-	m_yorigin(0),
-	m_fbi_reg(fbi_regs),
-	m_tmu0_reg(tmu0_regs),
-	m_tmu1_reg(tmu1_regs),
-	m_rgb565(rgb565),
-	m_fogdelta_mask((type < TYPE_VOODOO_2) ? 0xff : 0xfc),
-	m_thread_stats(WORK_MAX_THREADS)
-{
-	// empty the hash table
-	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
-
-	// add all predefined rasterizers
-	for (const static_rasterizer_info *info = s_predef_raster_table; info->params.m_fbzcp != 0xffffffff; info++)
-		add_rasterizer(info->params, info->mfp, false);
-
-	// create entries for the generic rasterizers as well
-	raster_params dummy_params = { 0 };
-	for (int index = 0; index < 4; index++)
-		m_generic_rasterizer[index] = add_rasterizer(dummy_params, generic_rasterizer(index), true);
-}
-
 
 voodoo_renderer::rasterizer_mfp voodoo_renderer::generic_rasterizer(u8 texmask)
 {
@@ -1808,7 +2017,7 @@ voodoo_renderer::rasterizer_mfp voodoo_renderer::generic_rasterizer(u8 texmask)
 //  hash table
 //-------------------------------------------------
 
-rasterizer_info *voodoo_renderer::add_rasterizer(raster_params const &params, rasterizer_mfp rasterizer, bool is_generic)
+rasterizer_info *voodoo_renderer::add_rasterizer(rasterizer_params const &params, rasterizer_mfp rasterizer, bool is_generic)
 {
 	rasterizer_info &info = m_rasterizer_list.emplace_back();
 
@@ -1832,60 +2041,17 @@ rasterizer_info *voodoo_renderer::add_rasterizer(raster_params const &params, ra
 
 	if (LOG_RASTERIZERS)
 		printf("Adding rasterizer : cp=%08X am=%08X fog=%08X fbz=%08X tm0=%08X tm1=%08X (hash=%d)\n",
-				params.m_fbzcp, params.m_alphamode, params.m_fogmode, params.m_fbzmode,
-				params.m_texmode0, params.m_texmode1, hash);
+				params.fbzcp().raw(), params.alphamode().raw(), params.fogmode().raw(), params.fbzmode().raw(),
+				params.texmode0().raw(), params.texmode1().raw(), hash);
 
 	return &info;
 }
 
 
 //-------------------------------------------------
-//  find_rasterizer - find a rasterizer that
-//  matches our current parameters and return
-//  it, creating a new one if necessary
+//  dump_rasterizer_stats - dump statistics on
+//  the current rasterizer usage patterns
 //-------------------------------------------------
-
-voodoo::rasterizer_info *voodoo_renderer::find_rasterizer(raster_params const &params)
-{
-	// compute the hash
-	u32 fullhash = params.hash();
-	u32 hash = fullhash % RASTER_HASH_SIZE;
-
-	// find the appropriate hash entry
-	rasterizer_info *prev = nullptr;
-	for (rasterizer_info *info = m_raster_hash[hash]; info != nullptr; prev = info, info = info->next)
-		if (info->fullhash == fullhash && info->params == params)
-		{
-			// got it, move us to the head of the list
-			if (prev != nullptr)
-			{
-				prev->next = info->next;
-				info->next = m_raster_hash[hash];
-				m_raster_hash[hash] = info;
-			}
-			return info;
-		}
-
-	// determine the index of the generic rasterizer
-	u32 index = 0;
-	if (params.m_texmode0 != 0xffffffff)
-		index |= 1;
-	if (params.m_texmode1 != 0xffffffff)
-		index |= 2;
-
-	// add a new one if we're logging usage
-	if (LOG_RASTERIZERS)
-		return add_rasterizer(params, generic_rasterizer(index), true);
-
-	// otherwise just return the generic one directly
-	return m_generic_rasterizer[index];
-}
-
-
-/*-------------------------------------------------
-    dump_rasterizer_stats - dump statistics on
-    the current rasterizer usage patterns
--------------------------------------------------*/
 
 void voodoo_renderer::dump_rasterizer_stats()
 {
@@ -1915,14 +2081,14 @@ void voodoo_renderer::dump_rasterizer_stats()
 			break;
 
 		// print it
-		printf("%s RASTERIZER( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) /* %2d %8d %10d */\n",
+		printf("%s RASTERIZER( 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) // %2d %8d %10d\n",
 			best->is_generic ? "   " : "// ",
-			best->params.m_fbzcp,
-			best->params.m_alphamode,
-			best->params.m_fogmode,
-			best->params.m_fbzmode,
-			best->params.m_texmode0,
-			best->params.m_texmode1,
+			best->params.fbzcp().raw(),
+			best->params.alphamode().raw(),
+			best->params.fogmode().raw(),
+			best->params.fbzmode().raw(),
+			best->params.texmode0().raw(),
+			best->params.texmode1().raw(),
 			best->fullhash % RASTER_HASH_SIZE,
 			best->polys,
 			best->scanlines);
@@ -1932,19 +2098,13 @@ void voodoo_renderer::dump_rasterizer_stats()
 	}
 }
 
-/*************************************
-*
-*  Rasterizer table
-*
-*************************************/
-
 
 //**************************************************************************
 //  GAME-SPECIFIC RASTERIZERS
 //**************************************************************************
 
 #define RASTERIZER(fbzcp, alpha, fog, fbz, tex0, tex1) \
-	{ &voodoo_renderer::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, { fbzcp, alpha, fog, fbz, tex0, tex1 } },
+	{ &voodoo_renderer::rasterizer<fbzcp, fbz, alpha, fog, tex0, tex1>, rasterizer_params(fbzcp, alpha, fog, fbz, tex0, tex1) },
 
 static_rasterizer_info s_predef_raster_table[] =
 {
@@ -2556,7 +2716,7 @@ static_rasterizer_info s_predef_raster_table[] =
 	RASTERIZER(0x00482405, 0x00045119, 0x000000C1, 0x000B0379, 0x0C26100F, 0x0000080F) /* * 14   462528    5358791 */
 	RASTERIZER(0x00602409, 0x00045119, 0x000000C1, 0x000B0779, 0x0C26188F, 0x0000000F) /* * 57    98945    5300544 */
 	RASTERIZER(0x00482405, 0x00045119, 0x00000000, 0x000B0379, 0x0C26180F, 0x0000080F) /* * 77   232584    4197249 */
-	{ nullptr, { 0xffffffff } }
+	{ &voodoo_renderer::rasterizer<reg_fbz_colorpath::DECODE_LIVE, reg_fbz_mode::DECODE_LIVE, reg_alpha_mode::DECODE_LIVE, reg_fog_mode::DECODE_LIVE, 0xffffffff, 0xffffffff>, { 0xffffffff } }
 };
 
 }

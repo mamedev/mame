@@ -573,7 +573,6 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 	m_ram = reinterpret_cast<u8 *>(memory);
 	m_mask = tmem - 1;
 	m_regdirty = false;
-	m_raster.m_bilinear_mask = (vdt >= TYPE_VOODOO_2) ? 0xff : 0xf0;
 
 	/* mark the NCC tables dirty and configure their registers */
 	m_ncc[0].dirty = m_ncc[1].dirty = true;
@@ -597,7 +596,6 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 	m_texel[13] = share.int8;
 	m_texel[14] = m_palette;
 	m_texel[15] = nullptr;
-	m_raster.m_lookup = m_texel[0];
 
 	/* attach the palette to NCC table 0 */
 	m_ncc[0].palette = m_palette;
@@ -732,8 +730,8 @@ void voodoo_device::init_save_state()
 	save_item(NAME(m_fbi.clut));
 
 	// renderer states
-	save_item(NAME(m_renderer->m_fogblend));
-	save_item(NAME(m_renderer->m_fogdelta));
+//	save_item(NAME(m_renderer->m_fogblend));
+//	save_item(NAME(m_renderer->m_fogdelta));
 
 	/* register states: tmu */
 	for (int index = 0; index < std::size(m_tmu); index++)
@@ -1288,101 +1286,8 @@ void voodoo_device::dac_state::data_r(u8 regnum)
 
 
 
-/*************************************
- *
- *  Texuture parameter computation
- *
- *************************************/
-void voodoo::raster_texture::recompute(u8 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
-{
-	u32 const addrmask = (type <= TYPE_VOODOO_2) ? 0x0fffff : 0xfffff0;
-	u32 const addrshift = (type <= TYPE_VOODOO_2) ? 3 : 0;
 
-	m_ram = ram;
-	m_mask = mask;
-	m_lookup = lookup;
-
-	// extract LOD parameters
-	auto const texlod = regs.texture_lod();
-	m_lodmin = texlod.lod_min() << 6;
-	m_lodmax = texlod.lod_max() << 6;
-	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
-
-	// determine which LODs are present
-	m_lodmask = 0x1ff;
-	if (texlod.lod_tsplit())
-		m_lodmask = texlod.lod_odd() ? 0x0aa : 0x155;
-
-	// determine base texture width/height
-	m_wmask = m_hmask = 0xff;
-	if (texlod.lod_s_is_wider())
-		m_hmask >>= texlod.lod_aspect();
-	else
-		m_wmask >>= texlod.lod_aspect();
-
-	// determine the bpp of the texture
-	auto const texmode = regs.texture_mode();
-	int bppscale = texmode.format() >> 3;
-
-	// start with the base of LOD 0
-	u32 base = regs.texture_baseaddr();
-	if (addrshift == 0 && BIT(base, 0) != 0)
-		osd_printf_debug("Tiled texture\n");
-	base = (base & addrmask) << addrshift;
-	m_lodoffset[0] = base & mask;
-
-	// LODs 1-3 are different depending on whether we are in multitex mode
-	// Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think
-	// they want multitex mode when they really don't -- disable for now
-	// Enable for Voodoo 3 or Viper breaks - VL.
-	// Add check for upper nibble not equal to zero to fix funkball -- TG
-	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
-	{
-		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
-		m_lodoffset[1] = base & mask;
-		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;
-		m_lodoffset[2] = base & mask;
-		base = (regs.texture_baseaddr_3_8() & addrmask) << addrshift;
-		m_lodoffset[3] = base & mask;
-	}
-	else
-	{
-		if (m_lodmask & (1 << 0))
-			base += (((m_wmask >> 0) + 1) * ((m_hmask >> 0) + 1)) << bppscale;
-		m_lodoffset[1] = base & mask;
-		if (m_lodmask & (1 << 1))
-			base += (((m_wmask >> 1) + 1) * ((m_hmask >> 1) + 1)) << bppscale;
-		m_lodoffset[2] = base & mask;
-		if (m_lodmask & (1 << 2))
-			base += (((m_wmask >> 2) + 1) * ((m_hmask >> 2) + 1)) << bppscale;
-		m_lodoffset[3] = base & mask;
-	}
-
-	// remaining LODs make sense
-	for (int lod = 4; lod <= 8; lod++)
-	{
-		if (m_lodmask & (1 << (lod - 1)))
-		{
-			u32 size = ((m_wmask >> (lod - 1)) + 1) * ((m_hmask >> (lod - 1)) + 1);
-			if (size < 4) size = 4;
-			base += size << bppscale;
-		}
-		m_lodoffset[lod] = base & mask;
-	}
-
-	// compute the detail parameters
-	auto const texdetail = regs.texture_detail();
-	m_detailmax = texdetail.detail_max();
-	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
-	m_detailscale = texdetail.detail_scale();
-
-	// check for separate RGBA filtering
-	if (texdetail.separate_rgba_filter())
-		fatalerror("Separate RGBA filters!\n");
-}
-
-
-inline raster_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
+inline rasterizer_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
 {
 	// if the texture parameters are dirty, update them
 	if (m_regdirty)
@@ -3306,123 +3211,76 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 s32 voodoo_device::texture_w(offs_t offset, u32 data)
 {
-	int tmunum = (offset >> 19) & 0x03;
-	tmu_state *t;
-
 	/* statistics */
 	m_stats.tex_writes++;
 
 	/* point to the right TMU */
+	int tmunum = (offset >> 19) & 0x03;
 	if (!(m_chipmask & (2 << tmunum)))
 		return 0;
-	t = &m_tmu[tmunum];
-
-	auto const texlod = t->m_reg.texture_lod();
-	if (texlod.tdirect_write())
-		fatalerror("Texture direct write!\n");
 
 	/* wait for any outstanding work to finish */
 	m_renderer->wait("Texture write");
 
-	/* update texture info if dirty */
-	auto const texmode = t->m_reg.texture_mode();
-	if (t->m_regdirty)
-	{
-		t->m_raster.recompute(t->m_type, t->m_reg, t->m_ram, t->m_mask, t->m_texel[texmode.format()]);
-		t->m_regdirty = false;
-	}
+	m_tmu[tmunum].texture_w(offset, data, m_tmu[0].m_reg.texture_mode().seq_8_downld());
+	return 0;
+}
 
-	/* swizzle the data */
+void voodoo_device::tmu_state::texture_w(offs_t offset, u32 data, bool seq_8_downld)
+{
+	auto const texlod = m_reg.texture_lod();
+
+	// texture direct not handled (but never seen so far)
+	if (texlod.tdirect_write())
+		fatalerror("Texture direct write!\n");
+
+	// swizzle the data
 	if (texlod.tdata_swizzle())
 		data = swapendian_int32(data);
 	if (texlod.tdata_swap())
 		data = (data >> 16) | (data << 16);
 
-	/* 8-bit texture case */
-	if (texmode.format() < 8)
+	// update texture info if dirty
+	auto const texmode = m_reg.texture_mode();
+	if (m_regdirty)
 	{
-		int lod, tt, ts;
-		u32 tbaseaddr;
-		u8 *dest;
-
-		/* extract info */
-		if (m_type <= TYPE_VOODOO_2)
-		{
-			lod = (offset >> 15) & 0x0f;
-			tt = (offset >> 7) & 0xff;
-
-			/* old code has a bit about how this is broken in gauntleg unless we always look at TMU0 */
-			if (m_tmu[0].m_reg.texture_mode().seq_8_downld())
-				ts = (offset << 2) & 0xfc;
-			else
-				ts = (offset << 1) & 0xfc;
-
-			/* validate parameters */
-			if (lod > 8)
-				return 0;
-
-			/* compute the base address */
-			tbaseaddr = t->m_raster.m_lodoffset[lod];
-			tbaseaddr += tt * ((t->m_raster.m_wmask >> lod) + 1) + ts;
-
-			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
-		}
-		else
-		{
-			tbaseaddr = t->m_raster.m_lodoffset[0] + offset*4;
-
-			if (LOG_TEXTURE_RAM) logerror("Texture 8-bit w: offset=%X data=%08X\n", offset*4, data);
-		}
-
-		/* write the four bytes in little-endian order */
-		dest = t->m_ram;
-		tbaseaddr &= t->m_mask;
-		dest[BYTE4_XOR_LE(tbaseaddr + 0)] = (data >> 0) & 0xff;
-		dest[BYTE4_XOR_LE(tbaseaddr + 1)] = (data >> 8) & 0xff;
-		dest[BYTE4_XOR_LE(tbaseaddr + 2)] = (data >> 16) & 0xff;
-		dest[BYTE4_XOR_LE(tbaseaddr + 3)] = (data >> 24) & 0xff;
+		m_raster.recompute(m_type, m_reg, m_ram, m_mask, m_texel[texmode.format()]);
+		m_regdirty = false;
 	}
 
-	/* 16-bit texture case */
+	// determine destination pointer
+	u32 scale = (texmode.format() < 8) ? 1 : 2;
+	u8 *dest;
+	if (m_type <= TYPE_VOODOO_2)
+	{
+		u32 lod = (offset >> 15) & 0x0f;
+		u32 ts = (offset << ((seq_8_downld && scale == 1) ? 2 : 1)) & 0xff;
+		u32 tt = (offset >> 7) & 0xff;
+
+		// validate parameters
+		if (lod > 8)
+			return;
+
+		dest = m_raster.write_ptr(lod, ts, tt, scale);
+	}
+	else
+		dest = m_raster.write_ptr(0, offset * 4, 0, 0);
+
+	// write the four bytes in little-endian order
+	if (scale == 1)
+	{
+		dest[BYTE4_XOR_LE(0)] = (data >> 0) & 0xff;
+		dest[BYTE4_XOR_LE(1)] = (data >> 8) & 0xff;
+		dest[BYTE4_XOR_LE(2)] = (data >> 16) & 0xff;
+		dest[BYTE4_XOR_LE(3)] = (data >> 24) & 0xff;
+	}
 	else
 	{
-		int lod, tt, ts;
-		u32 tbaseaddr;
-		u16 *dest;
-
-		/* extract info */
-		if (m_type <= TYPE_VOODOO_2)
-		{
-			lod = (offset >> 15) & 0x0f;
-			tt = (offset >> 7) & 0xff;
-			ts = (offset << 1) & 0xfe;
-
-			/* validate parameters */
-			if (lod > 8)
-				return 0;
-
-			/* compute the base address */
-			tbaseaddr = t->m_raster.m_lodoffset[lod];
-			tbaseaddr += 2 * (tt * ((t->m_raster.m_wmask >> lod) + 1) + ts);
-
-			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: lod=%d s=%d t=%d data=%08X\n", lod, ts, tt, data);
-		}
-		else
-		{
-			tbaseaddr = t->m_raster.m_lodoffset[0] + offset*4;
-
-			if (LOG_TEXTURE_RAM) logerror("Texture 16-bit w: offset=%X data=%08X\n", offset*4, data);
-		}
-
-		/* write the two words in little-endian order */
-		dest = (u16 *)t->m_ram;
-		tbaseaddr &= t->m_mask;
-		tbaseaddr >>= 1;
-		dest[BYTE_XOR_LE(tbaseaddr + 0)] = (data >> 0) & 0xffff;
-		dest[BYTE_XOR_LE(tbaseaddr + 1)] = (data >> 16) & 0xffff;
+		u16 *dest16 = reinterpret_cast<u16 *>(dest);
+		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
+		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
 	}
 
-	return 0;
 }
 
 
@@ -5168,7 +5026,7 @@ s32 voodoo_device::triangle()
 		m_fbi.startz += mul_32x32_shift(dy, m_fbi.dzdy, 4) + mul_32x32_shift(dx, m_fbi.dzdx, 4);
 
 		// adjust iterated W/S/T for TMU 0
-		if (poly.raster.m_texmode0 != 0xffffffff)
+		if (poly.raster.texmode0().raw() != 0xffffffff)
 		{
 			m_tmu[0].m_startw += (dy * m_tmu[0].m_dwdy + dx * m_tmu[0].m_dwdx) >> 4;
 			m_tmu[0].m_starts += (dy * m_tmu[0].m_dsdy + dx * m_tmu[0].m_dsdx) >> 4;
@@ -5176,7 +5034,7 @@ s32 voodoo_device::triangle()
 		}
 
 		// adjust iterated W/S/T for TMU 1
-		if (poly.raster.m_texmode1 != 0xffffffff)
+		if (poly.raster.texmode1().raw() != 0xffffffff)
 		{
 			m_tmu[1].m_startw += (dy * m_tmu[1].m_dwdy + dx * m_tmu[1].m_dwdx) >> 4;
 			m_tmu[1].m_starts += (dy * m_tmu[1].m_dsdy + dx * m_tmu[1].m_dsdx) >> 4;
@@ -5212,11 +5070,8 @@ s32 voodoo_device::triangle()
 
 	// fill in texture 0 parameters
 	poly.tex0 = nullptr;
-	if (poly.raster.m_texmode0 != 0xffffffff)
+	if (poly.raster.texmode0().raw() != 0xffffffff)
 	{
-		if (m_tmu[0].m_regdirty)
-			m_renderer->wait("Texture 0 recompute", false);
-
 		poly.starts0 = m_tmu[0].m_starts;
 		poly.startt0 = m_tmu[0].m_startt;
 		poly.startw0 = m_tmu[0].m_startw;
@@ -5226,17 +5081,21 @@ s32 voodoo_device::triangle()
 		poly.ds0dy = m_tmu[0].m_dsdy;
 		poly.dt0dy = m_tmu[0].m_dtdy;
 		poly.dw0dy = m_tmu[0].m_dwdy;
+#if COPY_TEXTURE_DATA
+		poly.tex0copy = m_tmu[0].prepare(poly.lodbase0);
+		poly.tex0 = &poly.tex0copy;
+#else
+		if (m_tmu[0].m_regdirty)
+			m_renderer->wait("Texture 0 recompute", false);
 		poly.tex0 = &m_tmu[0].prepare(poly.lodbase0);
+#endif
 		m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
 	}
 
 	// fill in texture 1 parameters
 	poly.tex1 = nullptr;
-	if (poly.raster.m_texmode1 != 0xffffffff)
+	if (poly.raster.texmode1().raw() != 0xffffffff)
 	{
-		if (m_tmu[1].m_regdirty)
-			m_renderer->wait("Texture 1 recompute", false);
-
 		poly.starts1 = m_tmu[1].m_starts;
 		poly.startt1 = m_tmu[1].m_startt;
 		poly.startw1 = m_tmu[1].m_startw;
@@ -5246,7 +5105,14 @@ s32 voodoo_device::triangle()
 		poly.ds1dy = m_tmu[1].m_dsdy;
 		poly.dt1dy = m_tmu[1].m_dtdy;
 		poly.dw1dy = m_tmu[1].m_dwdy;
+#if COPY_TEXTURE_DATA
+		poly.tex1copy = m_tmu[1].prepare(poly.lodbase1);
+		poly.tex1 = &poly.tex1copy;
+#else
+		if (m_tmu[1].m_regdirty)
+			m_renderer->wait("Texture 1 recompute", false);
 		poly.tex1 = &m_tmu[1].prepare(poly.lodbase1);
+#endif
 		m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
 	}
 

@@ -105,6 +105,7 @@ public:
 	constexpr reg_fbz_colorpath(u32 normalized, reg_fbz_colorpath const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
+	constexpr u32 raw() const                     { return m_value; }
 	constexpr u32 cc_rgbselect() const            { return BIT(m_value, 0, 2); }
 	constexpr u32 cc_aselect() const              { return BIT(m_value, 2, 2); }
 	constexpr u32 cc_localselect() const          { return BIT(m_value, 4, 1); }
@@ -151,6 +152,7 @@ public:
 	constexpr reg_fbz_mode(u32 normalized, reg_fbz_mode const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
+	constexpr u32 raw() const                   { return m_value; }
 	constexpr u32 enable_clipping() const       { return BIT(m_value, 0, 1); }
 	constexpr u32 enable_chromakey() const      { return BIT(m_value, 1, 1); }
 	constexpr u32 enable_stipple() const        { return BIT(m_value, 2, 1); }
@@ -195,6 +197,7 @@ public:
 	constexpr reg_alpha_mode(u32 normalized, reg_alpha_mode const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
+	constexpr u32 raw() const           { return m_value; }
 	constexpr u32 alphatest() const     { return BIT(m_value, 0, 1); }
 	constexpr u32 alphafunction() const { return BIT(m_value, 1, 3); }
 	constexpr u32 alphablend() const    { return BIT(m_value, 4, 1); }
@@ -238,6 +241,7 @@ public:
 	constexpr reg_fog_mode(u32 normalized, reg_fog_mode const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
+	constexpr u32 raw() const          { return m_value; }
 	constexpr u32 enable_fog() const   { return BIT(m_value, 0, 1); }
 	constexpr u32 fog_add() const      { return BIT(m_value, 1, 1); }
 	constexpr u32 fog_mult() const     { return BIT(m_value, 2, 1); }
@@ -270,6 +274,7 @@ public:
 	constexpr reg_texture_mode(u32 normalized, reg_texture_mode const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
 
+	constexpr u32 raw() const                  { return m_value; }
 	constexpr u32 enable_perspective() const   { return BIT(m_value, 0, 1); }
 	constexpr u32 minification_filter() const  { return BIT(m_value, 1, 1); }
 	constexpr u32 magnification_filter() const { return BIT(m_value, 2, 1); }

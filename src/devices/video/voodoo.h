@@ -183,7 +183,8 @@ protected:
 	struct tmu_state
 	{
 		void init(u8 vdt, tmu_shared_state &share, void *memory, int tmem);
-		voodoo::raster_texture &prepare(s32 &lodbase);
+		voodoo::rasterizer_texture &prepare(s32 &lodbase);
+		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
 
 		struct ncc_table
 		{
@@ -214,7 +215,7 @@ protected:
 		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
 		s64 m_dwdy = 0;               // delta W per Y
 
-		voodoo::raster_texture m_raster;
+		voodoo::rasterizer_texture m_raster;
 
 		ncc_table m_ncc[2];                 // two NCC tables
 
