@@ -285,6 +285,23 @@ B  H6230A- Juice Box Music Video (unknown)
 		</part>
 	</software>	
 	
+	<!--
+	contains:
+	It Feels Like Magic
+	More Than High School
+	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
+	<software name="wmxv1" supported="partial">
+		<description>Winx Club Volume 1 (H2686)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2686" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_wmxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="0d8e6f6d" sha1="f45cd8cdbd7b0d28a2bd5a2503bae52190112db6" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- ==============================================================================
 	     Cartridges below don't boot properly and are confirmed bad dumps
@@ -318,19 +335,5 @@ B  H6230A- Juice Box Music Video (unknown)
 			</dataarea>
 		</part>
 	</software>
-
-	<!-- shows garbage, code crashes, fails to boot -->
-	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
-	<software name="winxv1" supported="no">
-		<description>Winx Club Volume 1 (H2686)</description>
-		<year>2004</year>
-		<publisher>4Kids Entertainment</publisher>
-		<info name="serial" value="H2686" />
-		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_wmxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="2ceb0119" sha1="98509595b2b3088725d2e826f5e657de455fe328" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
+	
 </softwarelist>
