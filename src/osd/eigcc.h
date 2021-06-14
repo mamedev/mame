@@ -60,7 +60,8 @@ inline bool _addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 -------------------------------------------------*/
 
 #ifndef count_leading_zeros_32
-inline uint8_t count_leading_zeros_32(uint32_t val)
+#define count_leading_zeros_32 _count_leading_zeros_32
+inline uint8_t _count_leading_zeros_32(uint32_t val)
 {
 	// uses CPU feature if available, otherwise falls back to runtime library call
 	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
@@ -75,7 +76,8 @@ inline uint8_t count_leading_zeros_32(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef count_leading_ones_32
-inline uint8_t count_leading_ones_32(uint32_t val)
+#define count_leading_ones_32 _count_leading_ones_32
+inline uint8_t _count_leading_ones_32(uint32_t val)
 {
 	return count_leading_zeros_32(~val);
 }
@@ -88,7 +90,8 @@ inline uint8_t count_leading_ones_32(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef count_leading_zeros_64
-inline uint8_t count_leading_zeros_64(uint64_t val)
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t _count_leading_zeros_64(uint64_t val)
 {
 	// uses CPU feature if available, otherwise falls back to runtime library call
 	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
@@ -103,7 +106,8 @@ inline uint8_t count_leading_zeros_64(uint64_t val)
 -------------------------------------------------*/
 
 #ifndef count_leading_ones_64
-inline uint8_t count_leading_ones_64(uint64_t val)
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t _count_leading_ones_64(uint64_t val)
 {
 	return count_leading_zeros_64(~val);
 }
