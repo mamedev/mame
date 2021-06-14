@@ -267,6 +267,24 @@ B  H6230A- Juice Box Music Video (unknown)
 			</dataarea>
 		</part>
 	</software>	
+	
+	<!--
+	contains:
+	Test Drive
+	All I Wanted Was A Slushie
+	-->	
+	<software name="megasv1" supported="partial">
+		<description>Megas XLR Volume 1 (H2697)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2697" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_megas-xlr_vol1_h2697_matrix11247_9875.smc" size="0x2100400" crc="385b0402" sha1="fd761af3c8eaa522db0b4c224d37440d47c26c8a" />
+			</dataarea>
+		</part>
+	</software>	
+	
 
 	<!-- ==============================================================================
 	     Cartridges below don't boot properly and are confirmed bad dumps
