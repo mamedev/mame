@@ -1015,6 +1015,7 @@ void hd6120_device::execute_run()
 			break;
 
 		case minor_state::PEX_1:
+			m_temp = m_ac;
 			m_state = minor_state::PEX_2;
 			break;
 
