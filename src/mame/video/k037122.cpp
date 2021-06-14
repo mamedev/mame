@@ -55,6 +55,9 @@ Konami 037122
 	34     ---------------- -------------x-- CLUT location
 		   ---------------- -------------0-- CLUT at 0x00000-0x08000
 		   ---------------- -------------1-- CLUT at 0x18000-0x20000
+		   ---------------x ---------------- Tilemap Y origin
+		   ---------------0 ---------------- Origin at tilemap center
+		   ---------------1 ---------------- Origin at 0
 
     Other bits/registers unknown, some registers are used
 
@@ -170,15 +173,13 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 	int16_t incxx = m_reg[0xa] >> 16;
 	int16_t incxy = m_reg[0xa] & 0xffff;
 	int16_t incyx = m_reg[0x9] >> 16;
-	int16_t incyy = m_reg[0x9] & 0xffff;
-
-	// on 256x64 tilemap y-scroll seems to be 8.4 fixed point instead
-	int16_t scrolly_256 = scrolly;
-	if (scrolly_256 & 0x800)
-		scrolly_256 |= 0xf000;
+	int16_t incyy = m_reg[0x9] & 0xffff;	
 
 	if (m_reg[0xc] & 0x10000)
 	{
+		if ((m_reg[0xd] & 0x10000) == 0)
+			scrolly -= 0x2000;
+
 		m_tilemap_128->set_scrolldx(visarea.min_x, visarea.min_x);
 		m_tilemap_128->set_scrolldy(visarea.min_y, visarea.min_y);
 
@@ -188,10 +189,13 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 	}
 	else
 	{
+		if ((m_reg[0xd] & 0x10000) == 0)
+			scrolly -= 0x1000;
+
 		m_tilemap_256->set_scrolldx(visarea.min_x, visarea.min_x);
 		m_tilemap_256->set_scrolldy(visarea.min_y, visarea.min_y);
 
-		m_tilemap_256->draw_roz(screen, bitmap, cliprect, (int32_t)(scrollx) << 12, (int32_t)(scrolly_256) << 12,
+		m_tilemap_256->draw_roz(screen, bitmap, cliprect, (int32_t)(scrollx) << 12, (int32_t)(scrolly) << 12,
 			(int32_t)(incxx) << 4, (int32_t)(incxy) << 4, (int32_t)(incyx) << 4, (int32_t)(incyy) << 4,
 			false, 0, 0);
 	}
@@ -253,6 +257,8 @@ uint32_t k037122_device::reg_r(offs_t offset)
 
 void k037122_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	if (offset != 4)
+	printf("reg_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (offset == 0x34/4 && ACCESSING_BITS_0_15)
 	{
 		uint32_t palette_base = (data & 0x4) ? 0x18000 : 0x00000;
