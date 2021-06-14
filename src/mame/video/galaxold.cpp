@@ -111,7 +111,7 @@ void galaxold_state::stratgyx_palette(palette_device &palette)
 	}
 }
 
-void galaxold_state::rockclim_palette(palette_device &palette) const
+void galaxold_state::s2650_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -568,36 +568,8 @@ VIDEO_START_MEMBER(galaxold_state,mooncrst)
 	m_modify_spritecode = &galaxold_state::mooncrst_modify_spritecode;
 }
 
-void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_rockclim_tilemap->draw(screen, bitmap, cliprect, 0,0);
-}
 
-void galaxold_state::rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	if ((*code & 0x30) == 0x20)
-	{
-		if (m_gfxbank[2] & 1)
-		{
-			int bank = (((m_gfxbank[0] & 1) << 5) | ((m_gfxbank[1] & 1) << 4));
-			*code = (0x40 + bank) | (*code & 0x0f);
-		}
-	}
-}
 
-VIDEO_START_MEMBER(galaxold_state,rockclim)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,64,32);
-
-	m_draw_background = &galaxold_state::rockclim_draw_background;
-	m_modify_charcode = &galaxold_state::mooncrst_modify_charcode;
-	m_modify_spritecode = &galaxold_state::rockclim_modify_spritecode;
-
-	m_rockclim_v = m_rockclim_h = 0;
-	save_item(NAME(m_rockclim_v));
-	save_item(NAME(m_rockclim_h));
-}
 
 TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 {
@@ -883,31 +855,6 @@ void galaxold_state::galaxold_gfxbank_w(offs_t offset, uint8_t data)
 		m_bg_tilemap->mark_all_dirty();
 	}
 }
-
-void galaxold_state::rockclim_videoram_w(offs_t offset, uint8_t data)
-{
-	m_rockclim_videoram[offset] = data;
-	m_rockclim_tilemap->mark_tile_dirty(offset);
-}
-
-void galaxold_state::rockclim_scroll_w(offs_t offset, uint8_t data)
-{
-	switch(offset&3)
-	{
-		case 0: m_rockclim_h=(m_rockclim_h&0xff00)|data;m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 1: m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
-		case 2: m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
-		case 3: m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
-	}
-
-}
-
-
-uint8_t galaxold_state::rockclim_videoram_r(offs_t offset)
-{
-	return m_rockclim_videoram[offset];
-}
-
 
 void galaxold_state::dambustr_bg_split_line_w(uint8_t data)
 {
@@ -1567,11 +1514,6 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 	tileinfo.set(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
-{
-	uint16_t code = m_rockclim_videoram[tile_index];
-	tileinfo.set(2, code, 0, 0);
-}
 
 void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

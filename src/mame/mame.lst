@@ -14558,6 +14558,9 @@ zerotimeu                       // hack
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
+@source:galaxian_rockclim.cpp
+rockclim                        // (c)1981 Taito
+
 @source:galaxold.cpp
 4in1                            // (c) 1981 Armenia / Food and Fun
 bullsdrtg                       // 1985 Senko
@@ -14575,7 +14578,6 @@ hunchbgb                        // bootleg
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
-rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
 scramb3                         // bootleg
 scramblb                        // bootleg

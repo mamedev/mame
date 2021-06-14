@@ -2943,6 +2943,7 @@ files {
 	MAME_DIR .. "src/mame/video/xevious.cpp",
 	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
 	MAME_DIR .. "src/mame/includes/galaxian.h",
+	MAME_DIR .. "src/mame/drivers/galaxian_rockclim.cpp",
 	MAME_DIR .. "src/mame/audio/galaxian.cpp",
 	MAME_DIR .. "src/mame/audio/galaxian.h",
 	MAME_DIR .. "src/mame/video/galaxian.cpp",
