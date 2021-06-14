@@ -32,7 +32,7 @@ ROM_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(COCO_WPK, coco_wpk_device, "coco_wpk", "CoCo WordPak")
-DEFINE_DEVICE_TYPE(COCO_WPK2, coco_wpk2_device, "coco_wpk", "CoCo WordPak II")
+DEFINE_DEVICE_TYPE(COCO_WPK2, coco_wpk2_device, "coco_wpk2", "CoCo WordPak II")
 DEFINE_DEVICE_TYPE(COCO_WPKRS, coco_wpkrs_device, "coco_wpkrs", "CoCo WordPak RS")
 
 
