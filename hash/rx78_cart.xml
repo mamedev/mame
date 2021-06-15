@@ -112,7 +112,7 @@ The monitor will expect you to load a program from cassette.
 		<description>Challenge Golf</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to rotate view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
+		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to adjust view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="ChallengeGolf.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
@@ -121,7 +121,7 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="cracer" supported="partial"><!-- traffic lights at start are skipped -->
+	<software name="cracer">
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>

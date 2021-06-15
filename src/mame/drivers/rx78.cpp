@@ -56,8 +56,7 @@ Summary of Monitor commands.
 ==============================================================================================================
 
 Known issues:
-- Sekigahara: Joystick problem (need to be checked again)
-- Space Enemy: When the yellow blind closes at the start, text should appear on it.
+- Sekigahara: Possible joystick problem (need to be checked again)
 - Need more software to test with.
 BTANB:
 - ProWrestling: When player 1 jumps at player 2 and misses, he always lands behind player 2.
@@ -104,7 +103,7 @@ private:
 	void vdp_bg_reg_w(u8 data);
 	void vdp_pri_mask_w(u8 data);
 	void portf3_w(u8 data);
-	void create_palette(palette_device &palette) const;
+	void create_palette(palette_device &palette);
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -172,6 +171,11 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 				for (u8 j = 0; j < 6; j++)
 					if (BIT(layers, j))
 						laycol[BIT(m_pal_reg[6], j)] |= m_pal_reg[j];
+
+				// This fixes text in Space Enemy
+				for (u8 j = 0; j < 6; j++)
+					if (BIT(layers, j))
+						if (!m_pal_reg[j]) laycol[0] = 0;
 
 				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_background);
 				bitmap.pix(y+bordery, x+i+borderx) = color;
@@ -269,7 +273,7 @@ void rx78_state::vdp_pri_mask_w(u8 data)
 	m_pri_mask = data;
 }
 
-void rx78_state::create_palette(palette_device &palette) const
+void rx78_state::create_palette(palette_device &palette)
 {
 	constexpr u8 level[] = { 0, 0x7f, 0, 0xff };
 	for (u8 i = 0; i < 64; i++)
@@ -279,6 +283,7 @@ void rx78_state::create_palette(palette_device &palette) const
 		u8 b = level[BIT(i, 4, 2)];
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
+	vdp_bg_reg_w(0);
 }
 
 
@@ -533,7 +538,7 @@ void rx78_state::rx78(machine_config &config)
 	screen.set_screen_update(FUNC(rx78_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, m_palette, FUNC(rx78_state::create_palette), 72);
+	PALETTE(config, m_palette, FUNC(rx78_state::create_palette), 64+1);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load));
