@@ -115,10 +115,10 @@ private:
 
 	enum
 	{
-		ROM_APP,
-		CCM_A,
-		CCM_B,
-		ROM_EXT
+		ROM_APP = 0b000, // 0
+		CCM_A   = 0b011, // 3
+		CCM_B   = 0b111, // 7
+		ROM_EXT = 0b010, // 2
 	};
 
 	uint8_t mem_r(offs_t offset);
@@ -440,10 +440,10 @@ uint8_t portfolio_state::battery_r()
 
 	    bit     signal      description
 
-	    0       ?           1=boots from B:
-	    1       ?           1=boots from external ROM
-	    2       ?           1=boots from B:
-	    3       ?           1=boots from ???
+	    0       ?           bit 0 from bus select (m_rom_b)
+	    1       ?
+	    2       ?           bit 2 from bus select (m_rom_b)
+	    3       ?
 	    4       ?
 	    5       PDET        1=peripheral connected
 	    6       LOWB        0=battery low
@@ -452,6 +452,14 @@ uint8_t portfolio_state::battery_r()
 	*/
 
 	uint8_t data = 0;
+
+	/*
+		Partially stores what has been written into this port.
+		Used by interrupt 61h service 24h (Get ROM/CCM state).
+		Setting bit 1 here causes the BIOS to permanently wedge the external ROM
+		select on, so mask it out as a workaround.
+	*/
+	data |= (m_rom_b & 0b101);
 
 	// peripheral detect
 	data |= m_exp->pdet_r() << 5;
@@ -486,13 +494,7 @@ void portfolio_state::select_w(uint8_t data)
 
 	if (LOG) logerror("%s %s SELECT %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
-	switch (data & 0x0f)
-	{
-	case 3: m_rom_b = CCM_A; break;
-	case 7: m_rom_b = CCM_B; break;
-	case 0: m_rom_b = ROM_APP; break;
-	case 2: m_rom_b = ROM_EXT; break;
-	}
+	m_rom_b = data & 0x0f;
 }
 
 
@@ -609,6 +611,10 @@ uint8_t portfolio_state::mem_r(offs_t offset)
 		case ROM_EXT:
 			// TODO
 			break;
+
+		default:
+			if (LOG) logerror("%s %s Invalid bus read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+			break;
 		}
 	}
 	else if (offset >= 0xe0000)
@@ -652,6 +658,14 @@ void portfolio_state::mem_w(offs_t offset, uint8_t data)
 
 		case CCM_B:
 			ncc1 = 0;
+			break;
+
+		case ROM_EXT:
+		case ROM_APP:
+			break;
+
+		default:
+			if (LOG) logerror("%s %s Invalid bus write %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 			break;
 		}
 	}
