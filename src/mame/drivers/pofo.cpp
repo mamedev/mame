@@ -230,9 +230,17 @@ WRITE_LINE_MEMBER( portfolio_state::wake_w )
 
 uint8_t portfolio_state::irq_status_r()
 {
-	return m_ip;
-}
+	uint8_t data = m_ip;
+	/*
+		The BIOS interrupt 11h (Equipment list) reports that the second floppy drive (B:) is
+		installed if the 3rd bit is set (which is also the external interrupt line).
+		It is not clear if the ~NMD1 line is OR or XORed or muxed with the interrupt line,
+		but this way seems to work.
+	*/
+	data |= !m_exp->nmd1_r() << 3;
 
+	return data;
+}
 
 //-------------------------------------------------
 //  irq_mask_w - interrupt enable mask
