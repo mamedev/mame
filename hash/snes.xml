@@ -573,9 +573,9 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="nightmare 0 12-7-94.u1" size="524288" crc="4610b75e" sha1="19fa46e612016e019d6b636c821013a8c6a92c0e" offset="0x000000" />
-				<rom name="nightmare 1 12-7-94.u1" size="524288" crc="1f929836" sha1="6be6880e7171ab9c9c4254883205f64f2d76e5d8" offset="0x080000" />
-				<rom name="nightmare 2 12-7-94.u1" size="524288" crc="efdf563e" sha1="9c09a4a26b849dd3f4bfd6a73bf4588b8091fff3" offset="0x100000" />
-				<rom name="nightmare 3 12-7-94.u1" size="524288" crc="1ebc5c31" sha1="71284cf5a66e2601c942c0cfc8fa0a4df3f8fec8" offset="0x180000" />
+				<rom name="nightmare 1 12-7-94.u2" size="524288" crc="1f929836" sha1="6be6880e7171ab9c9c4254883205f64f2d76e5d8" offset="0x080000" />
+				<rom name="nightmare 2 12-7-94.u3" size="524288" crc="efdf563e" sha1="9c09a4a26b849dd3f4bfd6a73bf4588b8091fff3" offset="0x100000" />
+				<rom name="nightmare 3 12-7-94.u4" size="524288" crc="1ebc5c31" sha1="71284cf5a66e2601c942c0cfc8fa0a4df3f8fec8" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
