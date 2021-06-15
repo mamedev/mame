@@ -67,9 +67,11 @@ class mc10_pak_mcx128_device :
 public:
 	// construction/destruction
 	mc10_pak_mcx128_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// construction/destruction
+	mc10_pak_mcx128_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -340,7 +342,6 @@ void mc10_pak_mcx128_device::update_banks()
 	m_bank[7]->set_entry(bank0);
 
 	m_view.select((bank1 << 2) | (rom_map_cr & 0x03));
-
 	LOG("view select: %d, bank cr: %d\n", (bank1 << 2) | (rom_map_cr & 0x03), ram_bank_cr & 0x03 );
 }
 

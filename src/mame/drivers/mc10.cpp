@@ -24,12 +24,12 @@
 
 #include "formats/coco_cas.h"
 
+namespace
+{
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-namespace
-{
 
 class mc10_state : public driver_device
 {
@@ -97,7 +97,9 @@ public:
 	{}
 
 	void alice32(machine_config &config);
+	void alice90(machine_config &config);
 	void alice32_bfff_w(uint8_t data);
+	uint8_t alice90_bfff_r();
 
 protected:
 	// device-level overrides
@@ -108,20 +110,6 @@ protected:
 
 private:
 	void alice32_mem(address_map &map);
-};
-
-
-class alice90_state : public alice32_state
-{
-public:
-	alice90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: alice32_state(mconfig, type, tag)
-	{}
-
-	void alice90(machine_config &config);
-	uint8_t alice90_bfff_r();
-
-private:
 	void alice90_mem(address_map &map);
 };
 
@@ -151,7 +139,7 @@ uint8_t mc10_state::mc10_bfff_r()
 	return read_keyboard_strobe(false);
 }
 
-uint8_t alice90_state::alice90_bfff_r()
+uint8_t alice32_state::alice90_bfff_r()
 {
 	return read_keyboard_strobe(true);
 }
@@ -300,11 +288,11 @@ void alice32_state::alice32_mem(address_map &map)
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
-void alice90_state::alice90_mem(address_map &map)
+void alice32_state::alice90_mem(address_map &map)
 {
 	// alice90: RAM start at 0x3000, installed in driver_start
 	map(0xbf20, 0xbf29).rw(m_ef9345, FUNC(ef9345_device::data_r), FUNC(ef9345_device::data_w));
-	map(0xbfff, 0xbfff).rw(FUNC(alice90_state::alice90_bfff_r), FUNC(alice32_state::alice32_bfff_w));
+	map(0xbfff, 0xbfff).rw(FUNC(alice32_state::alice90_bfff_r), FUNC(alice32_state::alice32_bfff_w));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
@@ -531,6 +519,7 @@ void mc10_state::mc10_video(machine_config &config)
 	vdg.set_screen("screen");
 	vdg.input_callback().set(FUNC(mc10_state::mc6847_videoram_r));
 }
+
 void mc10_state::mc10(machine_config &config)
 {
 	mc10_base(config);
@@ -591,12 +580,12 @@ void alice32_state::alice32(machine_config &config)
 	SOFTWARE_LIST(config, "mc10_cass").set_compatible("mc10");
 }
 
-void alice90_state::alice90(machine_config &config)
+void alice32_state::alice90(machine_config &config)
 {
 	alice32(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &alice90_state::alice90_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &alice32_state::alice90_mem);
 
 	/* internal ram */
 	m_ram->set_default_size("32K");
@@ -647,4 +636,4 @@ ROM_END
 COMP( 1983, mc10,    0,       0,      mc10,    mc10,  mc10_state,    empty_init, "Tandy Radio Shack", "MC-10",     MACHINE_SUPPORTS_SAVE )
 COMP( 1983, alice,   mc10,    0,      alice,   alice, mc10_state,    empty_init, "Matra & Hachette",  "Alice",     MACHINE_SUPPORTS_SAVE )
 COMP( 1984, alice32, 0,       0,      alice32, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 32",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, alice90, alice32, 0,      alice90, alice, alice90_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, alice90, alice32, 0,      alice90, alice, alice32_state, empty_init, "Matra & Hachette",  "Alice 90",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

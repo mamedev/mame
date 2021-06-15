@@ -91,13 +91,13 @@ public:
 	// construction/destruction
 	virtual ~device_mc10cart_interface();
 
-	virtual int max_rom_length();
+	virtual const int max_rom_length();
 	virtual image_init_result load();
 
+protected:
 	void raise_cart_nmi() { m_owning_slot->set_nmi_line(ASSERT_LINE); }
 	void lower_cart_nmi() { m_owning_slot->set_nmi_line(CLEAR_LINE); }
 
-protected:
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;
 

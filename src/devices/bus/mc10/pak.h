@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	mc10_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual int max_rom_length() override;
+	virtual const int max_rom_length() override;
 	virtual image_init_result load() override;
 
 protected:
