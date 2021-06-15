@@ -613,7 +613,7 @@ uint8_t portfolio_state::mem_r(offs_t offset)
 			break;
 
 		default:
-			if (LOG) logerror("%s %s Invalid bus read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+			logerror("%s %s Invalid bus read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 			break;
 		}
 	}
@@ -665,7 +665,7 @@ void portfolio_state::mem_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			if (LOG) logerror("%s %s Invalid bus write %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+			logerror("%s %s Invalid bus write %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
 			break;
 		}
 	}
