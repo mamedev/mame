@@ -94,7 +94,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void portfolio_io(address_map &map);
@@ -843,21 +842,6 @@ void portfolio_state::machine_start()
 
 	m_ip = 0;
 }
-
-
-//-------------------------------------------------
-//  machine_reset
-//-------------------------------------------------
-
-void portfolio_state::machine_reset()
-{
-	m_lcdc->reset();
-	m_keyboard->reset();
-
-	m_exp->reset();
-}
-
-
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
