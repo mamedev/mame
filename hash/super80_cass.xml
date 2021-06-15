@@ -28,13 +28,56 @@ M-2325 : Power transformer
 H-3200 : Metal Case
 H-8402 : Bare main PCB (included in K-3600)
 P-2670 : S100 socket (included in K-3606)
+X-1186 : 16k of 4116 RAM
 X-3790 : Debug/Disassembler
 X-3791 : Editor-Assembler
+B-3600 : Construction Manual
+B-3602 : Basic Manual
+B-3606 : Dick Smith's First Book of Super-80 Programs
 
 These 2 games were never advertised, but since the details are available...
 
 X-3792 : Dungeon Dilemma
-X-3607 : Horse Race
+X-3793 : Horse Race
+
+
+List of known lost commercial games:
+Name                        Publisher or Author                           Notes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PACKMEN                     Microcomputer Engineering (MCE)               VDUEB only
+Super-80 Invaders           Microcomputer Engineering (MCE)               VDUEB only
+Martian Attack              Microcomputer Engineering (MCE)               VDUEB only
+Othello                     Microcomputer Engineering (MCE)               VDUEB only
+Adventure                   Microcomputer Engineering (MCE)               VDUEB only
+Super-80 Chess              Microcomputer Engineering (MCE)               VDUEB only
+ZIP ZAP                     Bemak
+Laser Raider                Bemak
+Mini Typewriter             Bemak
+Super-80 Tables             Bemak
+Supermind Challender        Bemak
+Keeper                      Matrix Software (George Georgiou)
+Black Jack                  Matrix Software
+Simon                       Matrix Software
+Simon II                    Matrix Software
+Space Rescue                Matrix Software
+Froggy                      Matrix Software
+Yahtzee                     Matrix Software
+Poker                       Matrix Software
+Vegas Black Jack            Matrix Software
+Keeper                      Matrix Software
+Adventure                   Matrix Software
+Dungeon Dilemma (improved)  Matrix Software
+Star Trek                   Matrix Software
+Sargon Chess                Matrix Software
+Breakout                    Matrix Software
+Scrambler                   Matrix Software
+Rally X                     Matrix Software
+Super Invaders              Megasoft
+Sea Wars                    Megasoft
+Chess Chasers               Megasoft
+Hangman                     Megasoft
+Life                        Megasoft
+Macro/Z80 + D/BUG           Tawarri (Scott MacDonald)
 
 -->
 
@@ -47,7 +90,7 @@ X-3607 : Horse Race
 		<description>Horse Race</description>
 		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="serial" value="X-3607" /><!-- 012L1 -->
+		<info name="serial" value="X-3793" /><!-- 012L1 -->
 		<info name="developer" value="George Georgiou"/>
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<sharedfeat name="compatibility" value="DEF,D,E,M" />
@@ -113,7 +156,6 @@ X-3607 : Horse Race
 <!--
      Various commercial releases for use with super80, super80d and super80e, recorded at 300 baud.
      Mini Typewriter has bugs.
-     There was quite a lot of commercially-available software available, however 99 percent of it has been lost forever.
  -->
 	<software name="eldraw">
 		<description>El Draw 3.6.3</description>
