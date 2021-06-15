@@ -703,6 +703,11 @@ uint8_t portfolio_state::io_r(offs_t offset)
 			break;
 		}
 	}
+	else if (offset == 0x61)
+	{
+		// Magic port to detect the Pofo
+		data = 0x61;
+	}
 
 	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
 
