@@ -91,7 +91,7 @@ public:
 	// construction/destruction
 	virtual ~device_mc10cart_interface();
 
-	virtual const int max_rom_length();
+	virtual int max_rom_length() const;
 	virtual image_init_result load();
 
 protected:

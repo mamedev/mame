@@ -180,7 +180,7 @@ void device_mc10cart_interface::interface_pre_start()
     max_rom_length
 -------------------------------------------------*/
 
-const int device_mc10cart_interface::max_rom_length()
+int device_mc10cart_interface::max_rom_length() const
 {
 	return 0;
 }
