@@ -10550,7 +10550,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="cap-dw-0 prg" size="131072" crc="eddcc468" sha1="9e94ea7d2fa790a61c064a4d31c89603aa1c9e49" offset="00000" />
 			</dataarea>
