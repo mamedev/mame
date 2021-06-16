@@ -454,6 +454,7 @@ galastrm.cpp
 galaxi.cpp
 galaxia.cpp
 galaxian.cpp
+galaxian_rockclim.cpp
 galaxold.cpp
 galgame.cpp
 galgames.cpp
