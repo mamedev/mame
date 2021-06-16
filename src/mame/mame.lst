@@ -2663,6 +2663,8 @@ isa386c                         // Asus ISA-386C motherboard (386)
 kma300g                         // Arche Technologies Inc. KMA-300G-25
 mb133340                        // Biostar MB-1333/40PMB-CH, rev B.3
 mba032q                         // DTK MBA-032Q TK83305-4N-D-03
+megapcpl                        // Amstrad  Mega PC
+megapcpla                       // AMI BIOS version with Winbond WINBUS chipset, 486SLC
 mokp386                         // Morse KP920121523 V2.20 (386)
 mom3v3                          // Morse M3 V3.00
 mx83c305                        // motherboards using the MX83C305(A)(FC), MX83C05(A)(FC) chipset
@@ -2703,15 +2705,18 @@ xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386)
 486apio                         // EFA 486 APIO motherboard
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 486igb21                        // 486IG-B-2-1 motherboard (486)
+486wb6a3                        // Silicon Valley Computer, Inc. 486WB6A3.B1
 4dmshl3g                        // EFA 4DMS HL3G-L4-VI motherboard (486)
 4dmuhl3s                        // EFA 4DMU HL3S motherboard (486)
 a433cc                          // J-Bond A433C-C/A450C-C
 a486ap4                         // ASUS PVI-486AP4
+a486isa                         // ASUS ISA-486
+a486sio                         // ASUS ISA-486SIO rev. 1.2
+a486sp3                         // ASUS PVI-486SP3
+a486sp3g                        // ASUS PCI/I-486SP3G
 a486sv1                         // ASUS VL/EISA-486SV1
 a486sv2                         // ASUS ISA-486SV2 motherboard (486)
 a486sv2g                        // ASUS VL/I-486SV2G
-a486sp3                         // ASUS PVI-486SP3
-a486sp3g                        // ASUS PCI/I-486SP3G
 aa486s                          // ASUS PCI/I-A486S
 abae4                           // Abit 486 EISA-AE4 motherboard (486)
 abah4                           // Abit AH4(T) motherboard (486)
@@ -2755,8 +2760,10 @@ ec4915aio                       // Elitegroup ECS UC4915 A AIO motherboard (486)
 ed486vl3h                       // Edom 486VL3H motherboard (486)
 edmv035f                        // Edom MV035F motherboard (486)
 exp4044                         // ExpertChip EXP4044 motherboard (486)
-ficgiovt2                       // FIC 486-GIO-VT2
+f4dxluc4                        // ADI F4DXL-UC4
+fic486gvt                       // FIC 486-GVT
 fic486kvd                       // FIC 486 KVD motherboard (486)
+ficgiovt2                       // FIC 486-GIO-VT2
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
@@ -2780,9 +2787,9 @@ mb1433uiv                       // Biostar MB-1433UIV motherboard (486)
 mb4d33                          // Aquarius System (ASI) MB-4D33/50NR motherboard (486)
 mb8433uud                       // Biostar MB8433UUD-A
 md4duvc                         // Aquarius MD-4DUVC motherboard (486)
-megapcpl                        // Amstrad  Mega PC
-megapcpla                       // AMI BIOS version with Winbond WINBUS chipset, 486SLC
+mijx30gp                        // Micronics JX30GP - Motherboard P/N: 09-00189-10 REV B1
 ms4125                          // MSI MS-4125 motherboard (486)
+ms4132                          // MSI MS-4132 G VER:1 motherboard (486)
 ms4134                          // MSI MS-4134 motherboard (486)
 ms4138                          // MSI MS-4138 motherboard (486)
 ms4144                          // MSI MS-4144 motherboard (486)
@@ -2795,6 +2802,7 @@ ochipcom                        // Octek Hippo COM motherboard (486)
 ochipvlp                        // Octek Hippo VL+ motherboard (486)
 op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
 pc70iii                         // Commodore PC 70-III
+pc9486                          // Amstrad PC9486
 pccm912                         // PC-Chips M912 motherboard (486)
 pccm915i                        // PC-Chips M915i motherboard (486)
 pccm919                         // PC-Chips M919 motherboard (486)
