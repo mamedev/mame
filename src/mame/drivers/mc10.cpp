@@ -526,7 +526,7 @@ void mc10_state::mc10(machine_config &config)
 	mc10_video(config);
 
 	/* expansion port hardware */
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), mc10_cart_add_basic_devices, "pak"));
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), mc10_cart_add_basic_devices, nullptr));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -540,7 +540,7 @@ void mc10_state::alice(machine_config &config)
 	mc10_video(config);
 
 	/* expansion port hardware */
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice_cart_add_basic_devices, "pak"));
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice_cart_add_basic_devices, nullptr));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
@@ -569,7 +569,7 @@ void alice32_state::alice32(machine_config &config)
 	TIMER(config, "alice32_sl").configure_scanline(FUNC(alice32_state::alice32_scanline), "screen", 0, 10);
 
 	/* expansion port hardware */
-	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice32_cart_add_basic_devices, "pak"));
+	mc10cart_slot_device &cartslot(MC10CART_SLOT(config, "ext", DERIVED_CLOCK(1, 1), alice32_cart_add_basic_devices, nullptr));
 	cartslot.set_memspace(m_maincpu, AS_PROGRAM);
 	cartslot.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	/* internal ram */
