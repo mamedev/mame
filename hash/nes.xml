@@ -21616,7 +21616,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="dbf-ly-0 prg" size="131072" crc="ea31ccd3" sha1="38cbb1a505fbcb02a1220471b7831f68c1261f1b" offset="00000" />
 			</dataarea>
