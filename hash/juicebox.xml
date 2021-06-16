@@ -24,7 +24,7 @@ license:CC0
 *V H2683 - Codename: Kids Next Door Volume 1
    H2684 - Ed, Edd n Eddy Volume 1
 *V H2685 - Yu-Gi-Oh! Volume 1
-B  H2686 - Winx Club Volume 1
+*  H2686 - Winx Club Volume 1
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
    H2688 - Vans Triple Crown Volume 1
    H2689 - Vans Triple Crown Volume 2
@@ -40,10 +40,9 @@ B  H2686 - Winx Club Volume 1
    H2707 - MyScene Masquerade Madness
    H2708 - WWE Eugene Volume 1
 *  H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
-   H6225 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, Fan_3)
-B  H6226 - Juice Box Music Video (unknown)
+*  H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
-B  H6230A- Juice Box Music Video (unknown)
+*  H6230A- Juice Box Music Video (Baha Men, Jump 5, Jump 5, Beu Sisters, ZOEgirl)
 *  H6232 - Juice Box Music Video (Zoegirl, Jumps, Baha Men, Atomic Kitten)
    H6248 - Codename: Kids Next Door - Episode #19
    H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
@@ -303,35 +302,45 @@ B  H6230A- Juice Box Music Video (unknown)
 		</part>
 	</software>
 
-	<!-- ==============================================================================
-	     Cartridges below don't boot properly and are confirmed bad dumps
-	     ==============================================================================
+	<!--
+	contains:
+	Baha Men - Move It Like This
+	Jump 5 - Do Ya
+	Jump 5 - Spinnin' Around
+	Beu Sisters - I Was Only (Seventeen)
+	ZOEgirl - Dismissed
 	-->
-
-	<!-- shows logo, but bad sound and commandline printf spam -->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="jbm_6230a" supported="no">
-		<description>Juicebox Music Video (H6230A)</description>
+	<software name="jbm_6230a" supported="partial">
+		<description>Juicebox Music Video - Baha Men, Jump 5, Jump 5, Beu Sisters, ZOEgirl (H6230A)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6230A" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="9e8eb81a" sha1="1c794df474352f7a9c15680ad073545ff92b7d1b" status="baddump" />
+				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="d8ce26c4" sha1="02b3bdec5ba1002264663e79ecbe2444a92efdfc" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- shows logo, but bad sound and commandline printf spam -->
+	<!--
+	contains:
+	Ashlee Simpson - Shadow
+	The Cure - The End Of The World
+	Vanessa Carlton - White Houses
+	fan_3 - Geek Love
+	Ashlee Simpson - Pieces of Me
+	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
-	<software name="jb_6226" supported="no">
-		<description>Juicebox Music Video (H6226)</description>
+	<software name="jbm_6226" supported="partial">
+		<description>Juicebox Music Video - Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson (H6226)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6226" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c13e7784" sha1="08d3791977715abc17c89fb3bc457d5ba45725de" status="baddump" />
+				<!-- start of The Cure song has corrupt video, so might still be bad -->
+				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c53ed7ac" sha1="c91eaaf3bdfba2badf4498d419dbc0bca8c89bac" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
