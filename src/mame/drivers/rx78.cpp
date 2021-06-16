@@ -173,9 +173,11 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 						laycol[BIT(m_pal_reg[6], j)] |= m_pal_reg[j];
 
 				// This fixes text in Space Enemy
-				for (u8 j = 0; j < 6; j++)
-					if (BIT(layers, j))
-						if (!m_pal_reg[j]) laycol[0] = 0;
+				if (m_pal_reg[6])
+					for (u8 j = 0; j < 6; j++)
+						if (BIT(layers, j))
+							if (!m_pal_reg[j])
+								laycol[0] = 0;
 
 				u8 color = laycol[1] ? laycol[1] : (laycol[0] ? laycol[0] : m_background);
 				bitmap.pix(y+bordery, x+i+borderx) = color;
