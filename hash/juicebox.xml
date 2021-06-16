@@ -41,11 +41,11 @@ license:CC0
    H2707 - MyScene Masquerade Madness
    H2708 - WWE Eugene Volume 1
 *  H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
-*  H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
+*B H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
-*  H6230A- Juice Box Music Video (Baha Men, Jump 5, Jump 5, Beu Sisters, ZOEgirl)
+*  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
-*  H6232 - Juice Box Music Video (Zoegirl, Jumps, Baha Men, Atomic Kitten)
+*  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
    H6248 - Codename: Kids Next Door - Episode #19
    H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
 *  H6258 - Winx Club Episode 103
@@ -319,7 +319,7 @@ license:CC0
 	-->
 	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
 	<software name="jbm_6230a" supported="partial">
-		<description>Juicebox Music Video - Baha Men, Jump 5, Jump 5, Beu Sisters, ZOEgirl (H6230A)</description>
+		<description>Juicebox Music Video - Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl (H6230A)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H6230A" />
