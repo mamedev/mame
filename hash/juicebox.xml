@@ -26,8 +26,8 @@ license:CC0
 *V H2685 - Yu-Gi-Oh! Volume 1
 *  H2686 - Winx Club Volume 1
    H2687 - The Grim Adventures of Billy and Mandy Volume 1
-   H2688 - Vans Triple Crown Volume 1
-   H2689 - Vans Triple Crown Volume 2
+   H2688 - Vans Triple Crown Volume 1 (BMX)
+   H2689 - Vans Triple Crown Volume 2 (Skateboarding)
 *  H2690 - Vans Pipeline Masters Volume 1
 *  H2692 - Teenage Mutant Ninja Turtles Volume 1
    H2694 - Trading Spaces Volume 1
@@ -44,10 +44,11 @@ license:CC0
 *B H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
 *  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
+   H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'  
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
 *  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
    H6248 - Codename: Kids Next Door - Episode #19
-   H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
+   H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
 *  H6258 - Winx Club Episode 103
    H6259 - SonicX Episode 3: Missile Wrist Rampage
 *  H6260 - Teenage Mutant Ninja Turtles Episode 36
@@ -210,7 +211,7 @@ license:CC0
 		<info name="serial" value="H6258" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_wmxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" />
+				<rom name="jb_winxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" />
 			</dataarea>
 		</part>
 	</software>
@@ -304,7 +305,7 @@ license:CC0
 		<info name="serial" value="H2686" />
 		<part name="memc" interface="sm_memc">
 			<dataarea name="rom" size="0x2100400">
-				<rom name="jb_wmxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="0d8e6f6d" sha1="f45cd8cdbd7b0d28a2bd5a2503bae52190112db6" />
+				<rom name="jb_winxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="0d8e6f6d" sha1="f45cd8cdbd7b0d28a2bd5a2503bae52190112db6" />
 			</dataarea>
 		</part>
 	</software>
