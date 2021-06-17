@@ -131,7 +131,7 @@ private:
 	poly_manager(running_machine &machine, screen_device *screen, uint8_t flags);
 
 	// turn this on to log the reasons for any long waits
-	static constexpr bool POLY_LOG_WAITS = true;
+	static constexpr bool POLY_LOG_WAITS = false;
 
 	// number of profiling ticks before we consider a wait "long"
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
