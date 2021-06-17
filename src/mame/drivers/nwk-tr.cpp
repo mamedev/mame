@@ -404,7 +404,7 @@ uint8_t nwktr_state::sysreg_r(offs_t offset)
 		case 4:
 			r = m_dsw->read();
 			break;
-		default:
+		default:		
 			break;
 	}
 
@@ -548,7 +548,7 @@ void nwktr_state::sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r), FUNC(konppc_device::nwk_voodoo_0_w));
+	map(0x2400000, 0x27fffff).rw(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r), FUNC(konppc_device::nwk_voodoo_1_w));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
@@ -675,6 +675,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[0]->set_screen_tag("lscreen");
 	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
@@ -682,6 +683,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_voodoo[1]->set_screen_tag("rscreen");
 	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	// default 24KHz parameter in both 001604 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)

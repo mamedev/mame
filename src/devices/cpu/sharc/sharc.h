@@ -103,6 +103,8 @@ public:
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
 
+	WRITE_LINE_MEMBER(write_stall);
+
 	void sharc_cfunc_unimplemented();
 	void sharc_cfunc_read_iop();
 	void sharc_cfunc_write_iop();
@@ -270,6 +272,7 @@ private:
 		int32_t chained_direction;
 		emu_timer *timer;
 		bool active;
+		bool chained;
 	};
 
 
@@ -379,6 +382,7 @@ private:
 
 		SHARC_DMA_OP dma_op[12];
 		uint32_t dma_status;
+		bool write_stalled;
 
 		int32_t interrupt_active;
 
@@ -475,6 +479,7 @@ private:
 	void schedule_dma_op(int channel, uint32_t src, uint32_t dst, int src_modifier, int dst_modifier, int src_count, int dst_count, int pmode);
 	void dma_op(int channel);
 	void sharc_dma_exec(int channel);
+	void dma_run_cycle(int channel);
 	void add_systemreg_write_latency_effect(int sysreg, uint32_t data, uint32_t prev_data);
 	inline void swap_register(uint32_t *a, uint32_t *b);
 	void systemreg_write_latency_effect();

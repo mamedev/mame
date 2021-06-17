@@ -1122,6 +1122,7 @@ void hornet_state::hornet(machine_config &config)
 	m_voodoo[0]->set_screen_tag("screen");
 	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, "k033906_1", 0, m_voodoo[0]);
 
@@ -1201,6 +1202,7 @@ void hornet_state::sscope(machine_config &config)
 	m_voodoo[1]->set_screen_tag("rscreen");
 	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
@@ -1235,6 +1237,7 @@ void hornet_state::sscope2(machine_config &config)
 	m_voodoo[0]->set_screen_tag("lscreen");
 	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
 	VOODOO_2(config.replace(), m_voodoo[1], STD_VOODOO_2_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
@@ -1242,6 +1245,7 @@ void hornet_state::sscope2(machine_config &config)
 	m_voodoo[1]->set_screen_tag("rscreen");
 	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
+	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 
 	DS2401(config, "lan_serial_id");
 	EEPROM_93C46_16BIT(config, "lan_eeprom");
@@ -1394,7 +1398,7 @@ void hornet_state::init_hornet()
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 
-	m_dsp[0]->enable_recompiler();
+	//m_dsp[0]->enable_recompiler();
 }
 
 void hornet_state::init_sscope()
