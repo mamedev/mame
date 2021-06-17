@@ -176,7 +176,7 @@ bool rasterizer_params::operator==(rasterizer_params const &rhs) const
 //  parameters based on the current register state
 //-------------------------------------------------
 
-void rasterizer_params::compute(u8 type, voodoo_regs &regs, voodoo_regs *tmu0regs, voodoo_regs *tmu1regs)
+void rasterizer_params::compute(voodoo_regs &regs, voodoo_regs *tmu0regs, voodoo_regs *tmu1regs)
 {
 	// these values are normalized to ignore irrelevant bits
 	m_fbzcp = regs.fbz_colorpath().normalize();
@@ -382,10 +382,10 @@ private:
 //  recompute - recompute state based on parameters
 //-------------------------------------------------
 
-void rasterizer_texture::recompute(u8 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
+void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
 {
-	u32 const addrmask = (type <= TYPE_VOODOO_2) ? 0x0fffff : 0xfffff0;
-	u32 const addrshift = (type <= TYPE_VOODOO_2) ? 3 : 0;
+	u32 const addrmask = regs.rev1_or_2() ? 0x0fffff : 0xfffff0;
+	u32 const addrshift = regs.rev1_or_2() ? 3 : 0;
 
 	m_ram = ram;
 	m_mask = mask;
@@ -469,7 +469,7 @@ void rasterizer_texture::recompute(u8 type, voodoo_regs const &regs, u8 *ram, u3
 	if (texdetail.separate_rgba_filter())
 		fatalerror("Separate RGBA filters!\n");
 
-	m_bilinear_mask = (type >= TYPE_VOODOO_2) ? 0xff : 0xf0;
+	m_bilinear_mask = regs.rev2_or_3() ? 0xff : 0xf0;
 }
 
 
@@ -797,11 +797,11 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, u16 tmu_conf
 	std::fill(std::begin(m_raster_hash), std::end(m_raster_hash), nullptr);
 
 	// add all predefined rasterizers
-	for (const static_rasterizer_info *info = s_predef_raster_table; info->params.fbzcp().raw() != 0xffffffff; info++)
+	for (static_rasterizer_info const *info = s_predef_raster_table; info->params.fbzcp().raw() != 0xffffffff; info++)
 		add_rasterizer(info->params, info->mfp, false);
 
 	// create entries for the generic rasterizers as well
-	rasterizer_params dummy_params = { 0 };
+	rasterizer_params dummy_params;
 	for (int index = 0; index < 4; index++)
 		m_generic_rasterizer[index] = add_rasterizer(dummy_params, generic_rasterizer(index), true);
 }
@@ -816,7 +816,7 @@ poly_data &voodoo_renderer::alloc_poly()
 {
 	// allocate poly data and compute the rasterization parameters
 	poly_data &poly = object_data_alloc();
-	poly.raster.compute(m_type, m_fbi_reg, m_tmu0_reg, m_tmu1_reg);
+	poly.raster.compute(m_fbi_reg, m_tmu0_reg, m_tmu1_reg);
 	return poly;
 }
 

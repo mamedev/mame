@@ -185,6 +185,8 @@ protected:
 
 	struct tmu_state
 	{
+		tmu_state(u8 vdt) : m_reg(vdt) { }
+
 		void init(u8 vdt, tmu_shared_state &share, void *memory, int tmem);
 		voodoo::rasterizer_texture &prepare(s32 &lodbase);
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
@@ -246,6 +248,8 @@ protected:
 
 	struct fbi_state
 	{
+		void init(u8 type, void *memory, u32 fbmem);
+
 		struct setup_vertex
 		{
 			float x, y;                   // X, Y coordinates
@@ -255,66 +259,81 @@ protected:
 			float s1, t1, w1;             // W, S, T for TMU 1
 		};
 
-		u8 *ram = nullptr;          // pointer to frame buffer RAM
-		u32 mask = 0;               // mask to apply to pointers
-		u32 rgboffs[3] = { 0, 0, 0 }; // word offset to 3 RGB buffers
-		u32 auxoffs = 0;            // word offset to 1 aux buffer
+		u8 *m_ram;          // pointer to frame buffer RAM
+		u32 m_mask;               // mask to apply to pointers
+		u32 m_rgboffs[3]; // word offset to 3 RGB buffers
+		u32 m_auxoffs;            // word offset to 1 aux buffer
 
-		u8 frontbuf = 0;           // front buffer index
-		u8 backbuf = 0;            // back buffer index
-		u8 swaps_pending = 0;      // number of pending swaps
-		u8 video_changed = 0;      // did the frontbuffer video change?
+		u8 m_frontbuf;           // front buffer index
+		u8 m_backbuf;            // back buffer index
+		u8 m_swaps_pending;      // number of pending swaps
+		bool m_video_changed;      // did the frontbuffer video change?
 
-		u32 yorigin = 0;            // Y origin subtract value
-		u32 lfb_base = 0;           // base of LFB in memory
-		u8  lfb_stride = 0;         // stride of LFB accesses in bits
+		u32 m_yorigin = 0;            // Y origin subtract value
+		u32 m_lfb_base = 0;           // base of LFB in memory
+		u8  m_lfb_stride = 0;         // stride of LFB accesses in bits
 
-		u32 width = 0;              // width of current frame buffer
-		u32 height = 0;             // height of current frame buffer
-		u32 xoffs = 0;              // horizontal offset (back porch)
-		u32 yoffs = 0;              // vertical offset (back porch)
-		u32 vsyncstart = 0;         // vertical sync start scanline
-		u32 vsyncstop = 0;          // vertical sync stop
-		u32 rowpixels = 0;          // pixels per row
-		u32 tile_width = 0;         // width of video tiles
-		u32 tile_height = 0;        // height of video tiles
-		u32 x_tiles = 0;            // number of tiles in the X direction
+		u32 m_width = 0;              // width of current frame buffer
+		u32 m_height = 0;             // height of current frame buffer
+		u32 m_xoffs = 0;              // horizontal offset (back porch)
+		u32 m_yoffs = 0;              // vertical offset (back porch)
+		u32 m_vsyncstart = 0;         // vertical sync start scanline
+		u32 m_vsyncstop = 0;          // vertical sync stop
+		u32 m_rowpixels = 0;          // pixels per row
 
-		emu_timer *vsync_stop_timer = nullptr; // VBLANK End timer
-		emu_timer *vsync_start_timer = nullptr; // VBLANK timer
-		u8 vblank = 0;             // VBLANK state
-		u8 vblank_count = 0;       // number of VBLANKs since last swap
-		u8 vblank_swap_pending = 0;// a swap is pending, waiting for a vblank
-		u8 vblank_swap = 0;        // swap when we hit this count
-		u8 vblank_dont_swap = 0;   // don't actually swap when we hit this point
+		u8 m_vblank = 0;             // VBLANK state
+		u8 m_vblank_count = 0;       // number of VBLANKs since last swap
+		u8 m_vblank_swap_pending = 0;// a swap is pending, waiting for a vblank
+		u8 m_vblank_swap = 0;        // swap when we hit this count
+		u8 m_vblank_dont_swap = 0;   // don't actually swap when we hit this point
 
 		/* triangle setup info */
-		s32 sign;                   // triangle sign
-		s16 ax, ay;                 // vertex A x,y (12.4)
-		s16 bx, by;                 // vertex B x,y (12.4)
-		s16 cx, cy;                 // vertex C x,y (12.4)
-		s32 startr, startg, startb, starta; // starting R,G,B,A (12.12)
-		s32 startz;                 // starting Z (20.12)
-		s64 startw;                 // starting W (16.32)
-		s32 drdx, dgdx, dbdx, dadx; // delta R,G,B,A per X
-		s32 dzdx;                   // delta Z per X
-		s64 dwdx;                   // delta W per X
-		s32 drdy, dgdy, dbdy, dady; // delta R,G,B,A per Y
-		s32 dzdy;                   // delta Z per Y
-		s64 dwdy;                   // delta W per Y
+		s32 m_sign;                   // triangle sign
+		s16 m_ax, m_ay;                 // vertex A x,y (12.4)
+		s16 m_bx, m_by;                 // vertex B x,y (12.4)
+		s16 m_cx, m_cy;                 // vertex C x,y (12.4)
+		s32 m_startr, m_startg, m_startb, m_starta; // starting R,G,B,A (12.12)
+		s32 m_startz;                 // starting Z (20.12)
+		s64 m_startw;                 // starting W (16.32)
+		s32 m_drdx, m_dgdx, m_dbdx, m_dadx; // delta R,G,B,A per X
+		s32 m_dzdx;                   // delta Z per X
+		s64 m_dwdx;                   // delta W per X
+		s32 m_drdy, m_dgdy, m_dbdy, m_dady; // delta R,G,B,A per Y
+		s32 m_dzdy;                   // delta Z per Y
+		s64 m_dwdy;                   // delta W per Y
 
-		voodoo::thread_stats_block lfb_stats;              // LFB-access statistics
+		voodoo::thread_stats_block m_lfb_stats;              // LFB-access statistics
 
-		u8 sverts = 0;             // number of vertices ready */
-		setup_vertex svert[3];               // 3 setup vertices */
+		u8 m_sverts = 0;             // number of vertices ready */
+		setup_vertex m_svert[3];               // 3 setup vertices */
 
-		voodoo::fifo_state fifo;                   // framebuffer memory fifo */
-		cmdfifo_info cmdfifo[2];             // command FIFOs */
+		voodoo::fifo_state m_fifo;                   // framebuffer memory fifo */
+		cmdfifo_info m_cmdfifo[2];             // command FIFOs */
 
-		rgb_t pen[65536];             // mapping from pixels to pens */
-		rgb_t clut[512];              // clut gamma data */
-		u8 clut_dirty = 1;         // do we need to recompute? */
-		rgb_t rgb565[65536];          // RGB 5-6-5 lookup table */
+		rgb_t m_pen[65536];             // mapping from pixels to pens */
+		rgb_t m_clut[512];              // clut gamma data */
+		u8 m_clut_dirty = 1;         // do we need to recompute? */
+		rgb_t m_rgb565[65536];          // RGB 5-6-5 lookup table */
+
+		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
+		void recompute_video_memory(voodoo::voodoo_regs &regs);
+		void recompute_fifo_layout(voodoo::voodoo_regs &regs);
+		bool copy_scanline(u32 *dst, int drawbuf, s32 y, s32 xstart, s32 xstop)
+		{
+			if (y < m_yoffs)
+				return false;
+			u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * m_rowpixels - m_xoffs;
+			for (s32 x = xstart; x < xstop; x++)
+				dst[x] = m_pen[src[x]];
+			return true;
+		}
+
+		// internal helpers
+		u16 *draw_buffer(int index) const { return (u16 *)(m_ram + m_rgboffs[index]); }
+		u16 *front_buffer() const { return draw_buffer(m_frontbuf); }
+		u16 *back_buffer() const { return draw_buffer(m_backbuf); }
+		u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_ram + m_auxoffs) : nullptr; }
+		u16 *ram_end() const { return (u16 *)(m_ram + m_mask + 1); }
 	};
 
 
@@ -369,7 +388,6 @@ protected:
 	s32 banshee_2d_w(offs_t offset, u32 data);
 	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
-	void recompute_video_memory();
 	void adjust_vblank_timer();
 	s32 fastfill();
 	s32 triangle();
@@ -393,18 +411,10 @@ protected:
 
 	void banshee_blit_2d(u32 data);
 
-private:
-	// internal helpers
-	u16 *draw_buffer(int index) const { return (u16 *)(m_fbi.ram + m_fbi.rgboffs[index]); }
-	u16 *front_buffer() const { return draw_buffer(m_fbi.frontbuf); }
-	u16 *back_buffer() const { return draw_buffer(m_fbi.backbuf); }
-	u16 *aux_buffer() const { return (m_fbi.auxoffs != ~0) ? (u16 *)(m_fbi.ram + m_fbi.auxoffs) : nullptr; }
-
 // FIXME: this stuff should not be public
 public:
 	voodoo::voodoo_regs m_reg;             // raw registers
 	const u8 m_type;                // type of system
-	u8 m_alt_regmap;             // enable alternate register map?
 	u8 m_chipmask;               // mask for which chips are available
 	u8 m_index;                  // index of board
 
@@ -413,9 +423,6 @@ public:
 	u32 m_freq;                   // operating frequency
 	attoseconds_t m_attoseconds_per_cycle;  // attoseconds per cycle
 	int m_trigger;                // trigger used for stalling
-
-	const u8 *m_regaccess;              // register access array
-	const char *const *m_regnames;               // register names array
 
 	std::unique_ptr<voodoo::voodoo_renderer> m_renderer;              // polygon manager
 
@@ -434,6 +441,9 @@ public:
 	devcb_write_line m_stall;
 	// This is for internally generated PCI interrupts in Voodoo3
 	devcb_write_line m_pciint;
+
+	emu_timer *m_vsync_stop_timer = nullptr; // VBLANK End timer
+	emu_timer *m_vsync_start_timer = nullptr; // VBLANK timer
 
 	pci_state m_pci;                    // PCI state
 	dac_state m_dac;                    // DAC state

@@ -14,6 +14,8 @@
 #pragma once
 
 
+namespace voodoo
+{
 
 //**************************************************************************
 //  CONSTANTS
@@ -53,9 +55,6 @@ static constexpr u8 REG_RWPF = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELIN
 //**************************************************************************
 //  SPECIFIC REGISTER TYPES
 //**************************************************************************
-
-namespace voodoo
-{
 
 // ======================> reg_color
 
@@ -754,9 +753,9 @@ public:
 	constexpr reg_hsync(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const               { return m_value; }
-	constexpr u32 hsync_on(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 8 : 9); }
-	constexpr u32 hsync_off(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 10 : 11); }
+	constexpr u32 raw() const                { return m_value; }
+	constexpr u32 hsync_on(bool rev1) const  { return BIT(m_value, 0, rev1 ? 8 : 9); }
+	constexpr u32 hsync_off(bool rev1) const { return BIT(m_value, 16, rev1 ? 10 : 11); }
 
 private:
 	u32 m_value;
@@ -771,9 +770,9 @@ public:
 	constexpr reg_vsync(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const               { return m_value; }
-	constexpr u32 vsync_on(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 12 : 13); }
-	constexpr u32 vsync_off(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 12 : 13); }
+	constexpr u32 raw() const                { return m_value; }
+	constexpr u32 vsync_on(bool rev1) const  { return BIT(m_value, 0, rev1 ? 12 : 13); }
+	constexpr u32 vsync_off(bool rev1) const { return BIT(m_value, 16, rev1 ? 12 : 13); }
 
 private:
 	u32 m_value;
@@ -788,9 +787,9 @@ public:
 	constexpr reg_video_dimensions(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const             { return m_value; }
-	constexpr u32 xwidth(u32 type) const  { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 10 : 11); }
-	constexpr u32 yheight(u32 type) const { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 10 : 11); }
+	constexpr u32 raw() const              { return m_value; }
+	constexpr u32 xwidth(bool rev1) const  { return BIT(m_value, 0, rev1 ? 10 : 11); }
+	constexpr u32 yheight(bool rev1) const { return BIT(m_value, 16, rev1 ? 10 : 11); }
 
 private:
 	u32 m_value;
@@ -805,9 +804,9 @@ public:
 	constexpr reg_back_porch(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const                { return m_value; }
-	constexpr u32 horizontal(u32 type) const { return BIT(m_value, 0, (type < TYPE_VOODOO_2) ? 8 : 9); }
-	constexpr u32 vertical(u32 type) const   { return BIT(m_value, 16, (type < TYPE_VOODOO_2) ? 8 : 9); }
+	constexpr u32 raw() const                 { return m_value; }
+	constexpr u32 horizontal(bool rev1) const { return BIT(m_value, 0, rev1 ? 8 : 9); }
+	constexpr u32 vertical(bool rev1) const   { return BIT(m_value, 16, rev1 ? 8 : 9); }
 
 private:
 	u32 m_value;
@@ -819,12 +818,6 @@ private:
 class voodoo_regs
 {
 public:
-	// Codes to the right
-    //	R = readable
-    //	W = writeable
-    //	P = pipelined
-    //	F = goes to FIFO
-
 	// 0x000
 	static constexpr u32 reg_vdstatus =        0x000/4;   // R  P
 	static constexpr u32 reg_intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
@@ -1018,7 +1011,42 @@ public:
 	static constexpr u32 reg_nccTable =        0x324/4;   //  W  F
 
 	// constructor
-	voodoo_regs() { for (int index = 0; index < std::size(m_regs); index++) m_regs[index].u = 0; }
+	voodoo_regs(u8 type) :
+		m_revision((type == TYPE_VOODOO_1) ? 1 : (type == TYPE_VOODOO_2) ? 2 : 3),
+		m_names(s_names[m_revision - 1]),
+		m_access(s_access[m_revision - 1])
+	{
+		for (int index = 0; index < std::size(m_regs); index++)
+			m_regs[index].u = 0;
+	}
+
+	// revisions:
+	//   1 = original Voodoo
+	//   2 = Voodoo 2
+	//   3 = Banshee/Voodoo 3
+
+	bool rev1() const { return (m_revision == 1); }
+	bool rev2() const { return (m_revision == 2); }
+	bool rev3() const { return (m_revision == 3); }
+
+	bool rev1_or_2() const { return (m_revision <= 2); }
+	bool rev2_or_3() const { return (m_revision >= 2); }
+
+	// helpers
+	bool is_readable(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_READ) != 0); }
+	bool is_writable(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_WRITE) != 0); }
+	bool is_writethru(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_WRITETHRU) != 0); }
+	bool is_fifo(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_FIFO) != 0); }
+	char const *name(u32 regnum) { return m_names[regnum & 0xff]; }
+
+	// register aliasing
+	u32 alias(u32 regnum) const
+	{
+		regnum &= 0xff;
+		if (regnum < 0x40 && (m_revision == 3 || fbi_init3().tri_register_remap()))
+			return s_alias_map[regnum];
+		return regnum;
+	}
 
 	// simple readers
 	u32 read(u32 index) const { return m_regs[index].u; }
@@ -1091,13 +1119,23 @@ public:
 		float f;
 	};
 	register_data m_regs[0x100];
+private:
+	u8 m_revision;
+	char const *const *const m_names;
+	u8 const *const m_access;
 
-	static u8 const s_register_alias_map[0x40];
-	static u8 const s_register_access[0x100];
-	static u8 const s_voodoo2_register_access[0x100];
-	static u8 const s_banshee_register_access[0x100];
-	static char const *const s_register_name[0x100];
-	static char const *const s_banshee_register_name[0x100];
+	static u8 const s_alias_map[0x40];
+
+	static u8 const *const s_access[3];
+	static u8 const s_access_rev1[0x100];
+	static u8 const s_access_rev2[0x100];
+	static u8 const s_access_rev3[0x100];
+
+	static char const *const *const s_names[3];
+	static char const *const s_names_rev1[0x100];
+	static char const *const s_names_rev3[0x100];
+
+public:
 	static char const *const s_banshee_io_reg_name[0x40];
 	static char const *const s_banshee_agp_reg_name[0x50];
 };

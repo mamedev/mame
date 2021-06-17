@@ -20,7 +20,10 @@
 
 //
 // To do:
-//   - incorporate type and send_config flags into constant flags
+//   - split rasterizer into setup (clip/flip) and inner part
+//   - templatize texture pipeline helpers
+//   - determine color scale factors up front as start/delta values and use those
+//   - incorporate type/memory? into constant flags
 //   - use type for: fog delta mask, bilinear mask
 //   - multiple rasterizer_textures to save stalls
 //   - leverage poly clipping?
@@ -156,7 +159,7 @@ public:
 	bool operator==(rasterizer_params const &rhs) const;
 
 	// compute the parameters given a set of registers
-	void compute(u8 type, voodoo_regs &regs, voodoo_regs *tmu0regs = nullptr, voodoo_regs *tmu1regs = nullptr);
+	void compute(voodoo_regs &regs, voodoo_regs *tmu0regs = nullptr, voodoo_regs *tmu1regs = nullptr);
 
 	// compute the hash of the settings
 	u32 hash() const;
@@ -192,7 +195,7 @@ class rasterizer_texture
 {
 public:
 	// recompute internal values based on parameters
-	void recompute(u8 type, voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
+	void recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
 
 	// look up a texel at the given coordinate
 	rgb_t lookup_single_texel(u32 format, u32 texbase, s32 s, s32 t);
