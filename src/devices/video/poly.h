@@ -131,7 +131,7 @@ private:
 	poly_manager(running_machine &machine, screen_device *screen, uint8_t flags);
 
 	// turn this on to log the reasons for any long waits
-	static constexpr bool POLY_LOG_WAITS = false;
+	static constexpr bool POLY_LOG_WAITS = true;
 
 	// number of profiling ticks before we consider a wait "long"
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
@@ -184,13 +184,13 @@ private:
 	class poly_array
 	{
 		// size of an item, rounded up to the cache line size
-		static const int k_itemsize = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
+		static constexpr int ITEM_SIZE = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
 
 	public:
 		// construction
 		poly_array(running_machine &machine, poly_manager &manager)
 			: m_manager(manager),
-				m_base(make_unique_clear<uint8_t[]>(k_itemsize * _Count)),
+				m_base(make_unique_clear<uint8_t[]>(ITEM_SIZE * _Count)),
 				m_next(0),
 				m_max(0),
 				m_waits(0) { }
@@ -199,19 +199,19 @@ private:
 		~poly_array() { m_base = nullptr; }
 
 		// operators
-		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * k_itemsize); }
+		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * ITEM_SIZE); }
 
 		// getters
 		int count() const { return m_next; }
 		int max() const { return m_max; }
 		int waits() const { return m_waits; }
-		int itemsize() const { return k_itemsize; }
+		int itemsize() const { return ITEM_SIZE; }
 		int allocated() const { return _Count; }
-		int indexof(_Type &item) const { int result = (reinterpret_cast<uint8_t *>(&item) - m_base.get()) / k_itemsize; assert(result >= 0 && result < _Count); return result; }
+		int indexof(_Type &item) const { int result = (reinterpret_cast<uint8_t *>(&item) - m_base.get()) / ITEM_SIZE; assert(result >= 0 && result < _Count); return result; }
 
 		// operations
 		void reset() { m_next = 0; }
-		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * k_itemsize) _Type; }
+		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * ITEM_SIZE) _Type; }
 		_Type &last() const { return (*this)[m_next - 1]; }
 		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
 
