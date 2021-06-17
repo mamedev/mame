@@ -65618,7 +65618,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="nryukendc" cloneof="shadwarr" supported="no">
+	<software name="nryukendc" cloneof="shadwarr">
 		<description>Ninja Ryukenden (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

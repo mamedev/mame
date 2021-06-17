@@ -142,7 +142,8 @@ static const nes_mmc mmc_list[] =
 	{ 108, UNL_LH28_LH54 }, // 108 has 4 variant boards
 	// 109 Unused
 	// 110 Unused
-	// 111 Ninja Ryuukenden Chinese? - Unsupported
+	// 111 GTROM 512 + Flash, currently unsupported
+	// Old mapper 111: Ninja Ryukenden Chinese - currently supported in software list only
 	{ 112, NTDEC_ASDER },
 	{ 113, HES_BOARD },
 	{ 114, SUPERGAME_LIONKING },
