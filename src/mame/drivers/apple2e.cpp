@@ -3380,8 +3380,8 @@ void apple2e_state::r4000bank_map(address_map &map)
 void apple2e_state::c100bank_map(address_map &map)
 {
 	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	map(0x0200, 0x03ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
-	map(0x0400, 0x05ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
+	map(0x0200, 0x03ff).rw(FUNC(apple2e_state::c100_int_r), FUNC(apple2e_state::c100_w));
+	map(0x0400, 0x05ff).rw(FUNC(apple2e_state::c100_int_bank_r), FUNC(apple2e_state::c100_w));
 	map(0x0600, 0x07ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
 	map(0x0800, 0x09ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
@@ -3390,8 +3390,8 @@ void apple2e_state::c100bank_map(address_map &map)
 void apple2e_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2e_state::c300_int_r)).nopw();
-	map(0x0200, 0x02ff).r(FUNC(apple2e_state::c300_int_bank_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_w));
+	map(0x0200, 0x02ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_w));
 	map(0x0300, 0x03ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
 	map(0x0400, 0x04ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
 }
