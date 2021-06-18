@@ -5,68 +5,352 @@ license:CC0
 -->
 <softwarelist name="juicebox" description="Mattel Juice Box SmartMedia Flash ROM">
 
-<!-- known items (* = dumped)
-     (many still missing from this list)
+<!-- The .smc files in this are the raw dumps dumps, but with a 0x400 byte custom header (with the first 2 bytes being the flash ident code, and rest unused)
+     This appears to be a custom standard, enforced by smartmed.cpp -->
 
-  H2679 - Ed, Edd n Eddy Episode #39
-  H2682 - Juiceware Animated Assortment
-* H2683 - Codename: Kids Next Door vol.1
-  H2684 - Ed, Edd n Eddy vol.1
-* H2685 - Yu-Gi-Oh! vol.1
-  H2686 - Winx Club
-  H2687 - The Grim Adventures of Billy and Mandy vol.1
-  H2688 - Vans Triple Crown vol.1
-  H2689 - Vans Triple Crown vol.2
-  H2690 - Vans Pipeline Masters
-  H2692 - Teenage Mutant Ninja Turtles vol.1
-  H2694 - Trading Spaces vol.1
-  H2697 - Megas XLR Vol. 1
-  H2698 - WWE Rey Mysterio vol.1
-  H2699 - Motocycle Mania 1 vol.1
-  H2701 - Dexter's Laboratory vol.1
-  H2702 - WWE Chris Benoit vol.1
-  H2706 - MyScene Jammin in Jamaica vol.1
-  H2707 - MyScene Masquerade Madness
-  H2708 - WWE Eugene vol.1
-  H2709 - Music Video Liz Phair Skye Bnip Stacie
+<!--
 
-  H6225 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, Fan_3)
-  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
-  H6232 - Juice Box Music Video (Zoegirl, Jumps, Baha Men, Atomic Kitten)
-  H6248 - Codename: Kids Next Door - Episode #19
-  H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1)
-  H6259 - SonicX Episode 3: Missile Wrist Rampage
-  H6260 - Teenage Mutant Ninja Turtles Episode 36
+   Known Releases
 
-  H7416 - Streetball Classics Vol.1
+   (* = dumped and boots in MAME
+    B = confirmed bad dump
+	V = validated with 2nd cartridge)
 
-  H8084 - Yu-Gi-Oh! Episode 175
-  H8085 - Good Times with Carey Hart
-  H8143 - Yu-Gi-Oh! Episode 176
+   The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
+   the data.
+
+   H2679 - Ed, Edd n Eddy Episode #39
+   H2682 - Juiceware Animated Assortment
+*V H2683 - Codename: Kids Next Door Volume 1
+   H2684 - Ed, Edd n Eddy Volume 1
+*V H2685 - Yu-Gi-Oh! Volume 1
+*  H2686 - Winx Club Volume 1
+   H2687 - The Grim Adventures of Billy and Mandy Volume 1
+   H2688 - Vans Triple Crown Volume 1 (BMX)
+   H2689 - Vans Triple Crown Volume 2 (Skateboarding)
+*  H2690 - Vans Pipeline Masters Volume 1
+*  H2692 - Teenage Mutant Ninja Turtles Volume 1
+   H2694 - Trading Spaces Volume 1
+*  H2697 - Megas XLR Volume 1
+   H2698 - WWE Rey Mysterio Volume 1
+   H2699 - Motocycle Mania 1 Volume 1
+   H2700 - Powerpuff Girls Volume 1
+   H2701 - Dexter's Laboratory Volume 1
+   H2702 - WWE Chris Benoit Volume 1
+   H2706 - MyScene Jammin in Jamaica Volume 1
+   H2707 - MyScene Masquerade Madness
+   H2708 - WWE Eugene Volume 1
+*  H2709 - Juice Box Music Video (Liz Phair, Stacie Orrico, Skye Sweetnam)
+*B H6226 - Juice Box Music Video (Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson)
+*  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
+*  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
+*  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
+   H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'  
+   H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
+   H6248 - Codename: Kids Next Door - Episode #19
+   H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
+*  H6258 - Winx Club Episode 103
+   H6259 - SonicX Episode 3: Missile Wrist Rampage
+*  H6260 - Teenage Mutant Ninja Turtles Episode 36
+
+*  H7416 - Streetball Classics Volume 1
+   H7417 - Streetball Classics Volume 2
+
+*  H8084 - Yu-Gi-Oh! Episode 175
+   H8085 - Good Times with Carey Hart
+*  H8143 - Yu-Gi-Oh! Episode 176
+
+         - Johnny Bravo Vol 1
+         - Brett Favre - The Field General
+   H269x - Courage - The Cowardly Dog Volume 1
+         - Dexter's Laboratory Episode 51
+		 
+  (many still missing from this list)
 
 -->
 
-	<software name="kidsnedo">
-		<description>Codename: Kids Next Door</description>
+	<!--
+	contains:
+	The Shredder Strikes Part I
+	The Shredder Strikes Part II
+	-->
+	<!-- PVPlayer Build of Aug 07 2004 at 14:25:28 -->
+	<software name="tmnt1" supported="partial">
+		<description>Teenage Mustant Ninja Turtles Volume 1 (H2692)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2692" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_tmnt_vol1_h2692_matrix11247_9875.smc" size="0x2100400" crc="dccdff36" sha1="57332cd1fc90cdb6433af79f1f27863e3f68cdf2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Operation: B.E.A.C.H / Operation: U.N.D.E.R.C.O.V.E.R
+	Operation: F.U.T.U.R.E
+	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
+	<software name="knd1" supported="partial">
+		<description>Codename: Kids Next Door Volume 1 (H2683)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2683" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="34604032">
-				<rom name="kidsnedo.smc" size="34604032" crc="e917e1f2" sha1="42c56a8b9a2ae076956b98e8bd71e1dfd841d002" offset="0x00000" />
+			<dataarea name="rom" size="0x2100400">
+				<rom name="kidsnedo.smc" size="0x2100400" crc="e917e1f2" sha1="42c56a8b9a2ae076956b98e8bd71e1dfd841d002"  />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="yugioh">
-		<description>Yu-Gi-Oh!</description>
+	<!--
+	contains:
+	Friends Till The End - Part III
+	Friends Till The End - Part IV
+	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
+	<software name="yugiv1" supported="partial">
+		<description>Yu-Gi-Oh! Volume 1 (H2685)</description>
 		<year>2004</year>
 		<publisher>4Kids Entertainment</publisher>
 		<info name="serial" value="H2685" />
 		<part name="memc" interface="sm_memc">
-			<dataarea name="rom" size="34604032">
-				<rom name="yugioh.smc" size="34604032" crc="0a97c7d6" sha1="1b2375c9ef1bbd5cae0c3f0ac20511a36523e86a" offset="0x00000"/>
+			<dataarea name="rom" size="0x2100400">
+				<rom name="yugioh.smc" size="0x2100400" crc="0a97c7d6" sha1="1b2375c9ef1bbd5cae0c3f0ac20511a36523e86a" />
 			</dataarea>
 		</part>
 	</software>
+
+
+
+	<!-- contains:
+	The Ultimate Ninja
+	Crash Dummies: Ruff Driving (bonus)
+	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
+	<software name="tmnte36" supported="partial">
+		<description>Teenage Mustant Ninja Turtles Episode 36 (H6260)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6260" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_tmnt_ep36_h6260_matrix11247_9875.smc" size="0x2100400" crc="a494fe28" sha1="5c64f229979823276ca5da95e4c4c395b85242b9" offset="0x00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Avril Lavigne - Don't Tell Me
+	The Calling - Our Lives
+	Avril Lavigne - My Happy Ending
+	Clay Aiken - The Way
+	Ruben Studdard - Superstar
+	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
+	<software name="jbm_6228" supported="partial">
+		<description>Juicebox Music Video - Avril Lavigne, The Calling, Avril Lavigne, Clay Aiken, Ruben Studdard (H6228)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6228" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_musicvideo_h6228_matrix11247_9875.smc" size="0x2100400" crc="0bd04da3" sha1="8a05663e0d3c40ac963ca1b1a41339cfa5142694" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Liz Phair - Extraordinary
+	Stacie Orrico - Stuck
+	Skye Sweetnam - Tangled Up In Me
+	-->
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
+	<software name="jbm_2709" supported="partial">
+		<description>Juicebox Music Video - Liz Phair, Stacie Orrico, Skye Sweetnam (H2709)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2709" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_musicvideo_h2709_matrix11252_9873.smc" size="0x1080400" crc="d9ff5ee4" sha1="fdcb32a7ff8534357521f340ec16b01ec887de5c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	ZOEgirl - You Get Me
+	Jump5 - All I Can Do
+	Jump5 - Spinnin' Around
+	Baha Men - Who Let The Dogs Out
+	Atomic Kitten - Eternal Flame
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="jbm_6232" supported="partial">
+		<description>Juicebox Music Video - ZOEgirl, Jump5, Jump5, Baha Men, Atomic Kitten (H6232)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6232" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_musicvideo_h6232_matrix11247_9875.smc" size="0x2100400" crc="27b85bb6" sha1="673937106788dd6c4a3647454f4583e97eb2d1a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="winxe103" supported="partial">
+		<description>Winx Club Episode 103 (H6258)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6258" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_winxclub_ep103_h6258_matrix11252_9873.smc" size="0x1080400" crc="d7e370ba" sha1="b24a9e1b1a7c3a830976cc6c28451cec9eefa31d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Friends 'Til The End - Part I
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="yugie175" supported="partial">
+		<description>Yu-Gi-Oh! Episode 175 (H8084)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H8084" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_yugioh_ep175_h8084_matrix11252_9873.smc" size="0x1080400" crc="04b2c825" sha1="977e9c20384bdbc65c2b90ed32d09624e95a0e0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Friends 'Til The End - Part II
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="yugie176" supported="partial">
+		<description>Yu-Gi-Oh! Episode 176 (H8143)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H8143" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_yugioh_ep176_h8143_matrix11252_9873.smc" size="0x1080400" crc="f1a0edd4" sha1="553e74100f9969117f0240f98e84515823cce108" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PVPlayer Build of Aug 25 2004 at 19:30:38 -->
+	<software name="plmv1" supported="partial">
+		<description>Vans Pipeline Masters Volume 1 (H2690)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2690" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_pipelinemasters_vol1_h2690_matrix11247_9875.smc" size="0x2100400" crc="e8cca1d4" sha1="5cd2b29bc28d20d9c9b455edb750fbbb530b8e5b" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="sbcv1" supported="partial">
+		<description>Streetball Classics Volume 1 (H7416)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H7416" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_streetball-classics-vol1_h7416_matrix11247_9875.smc" size="0x2100400" crc="ada20763" sha1="b973e18d390a7d1a530e3737562722f96163d593" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<!--
+	contains:
+	Test Drive
+	All I Wanted Was A Slushie
+	-->	
+	<software name="megasv1" supported="partial">
+		<description>Megas XLR Volume 1 (H2697)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2697" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_megas-xlr_vol1_h2697_matrix11247_9875.smc" size="0x2100400" crc="385b0402" sha1="fd761af3c8eaa522db0b4c224d37440d47c26c8a" />
+			</dataarea>
+		</part>
+	</software>	
+	
+	<!--
+	contains:
+	It Feels Like Magic
+	More Than High School
+	-->
+	<!-- PVPlayer Build of Aug 11 2004 at 15:14:03 -->
+	<software name="winxv1" supported="partial">
+		<description>Winx Club Volume 1 (H2686)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H2686" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_winxclub_vol1_h2686_matrix11247_9875.smc" size="0x2100400" crc="0d8e6f6d" sha1="f45cd8cdbd7b0d28a2bd5a2503bae52190112db6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Baha Men - Move It Like This
+	Jump 5 - Do Ya
+	Jump 5 - Spinnin' Around
+	Beu Sisters - I Was Only (Seventeen)
+	ZOEgirl - Dismissed
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="jbm_6230a" supported="partial">
+		<description>Juicebox Music Video - Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl (H6230A)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6230A" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<rom name="jb_musicvideo_h6230a_matrix11247_9875.smc" size="0x2100400" crc="d8ce26c4" sha1="02b3bdec5ba1002264663e79ecbe2444a92efdfc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	contains:
+	Ashlee Simpson - Shadow
+	The Cure - The End Of The World
+	Vanessa Carlton - White Houses
+	fan_3 - Geek Love
+	Ashlee Simpson - Pieces of Me
+	-->
+	<!-- PVPlayer Build of Sep 17 2004 at 16:30:38 -->
+	<software name="jbm_6226" supported="partial">
+		<description>Juicebox Music Video - Ashlee Simpson, The Cure, Vanessa Carlton, fan_3, Ashlee Simpson (H6226)</description>
+		<year>2004</year>
+		<publisher>4Kids Entertainment</publisher>
+		<info name="serial" value="H6226" />
+		<part name="memc" interface="sm_memc">
+			<dataarea name="rom" size="0x2100400">
+				<!-- start of The Cure song has corrupt video, so might still be bad -->
+				<rom name="jb_musicvideo_h6226_matrix11247_9875.smc" size="0x2100400" crc="c53ed7ac" sha1="c91eaaf3bdfba2badf4498d419dbc0bca8c89bac" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>
