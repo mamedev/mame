@@ -791,7 +791,6 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, u16 tmu_conf
 	m_tmu1_reg(tmu1_regs),
 	m_rgb565(rgb565),
 	m_fogdelta_mask((type < TYPE_VOODOO_2) ? 0xff : 0xfc),
-	m_last_texture{ nullptr, nullptr },
 	m_thread_stats(WORK_MAX_THREADS)
 {
 	// empty the hash table
@@ -2122,10 +2121,6 @@ static int maxtex = 0;
 		printf("Used %d textures\n", maxtex);
 	}
 	m_textures.reset();
-	if (m_last_texture[0] != nullptr)
-		m_last_texture[0] = &(m_textures.next() = *m_last_texture[0]);
-	if (m_last_texture[1] != nullptr)
-		m_last_texture[1] = &(m_textures.next() = *m_last_texture[1]);
 }
 
 

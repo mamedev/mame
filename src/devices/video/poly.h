@@ -43,12 +43,7 @@
 #include <atomic>
 
 
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-// keep statistics
-#define KEEP_POLY_STATISTICS            0
+#define KEEP_POLY_STATISTICS 0
 
 
 
@@ -57,50 +52,181 @@
 //**************************************************************************
 
 // class for managing an array of items
-template<class _Type, int _Count>
+template<class _Type, int _TrackingCount>
 class poly_array
 {
 public:
 	// this is really architecture-specific, but 64 is a reasonable
 	// value for most modern x64/ARM architectures
-	static constexpr int CACHE_LINE_SIZE = 64;
+	static constexpr size_t CACHE_LINE_SHIFT = 6;
+	static constexpr size_t CACHE_LINE_SIZE = 1 << CACHE_LINE_SHIFT;
+	static constexpr uintptr_t CACHE_LINE_MASK = ~uintptr_t(0) << CACHE_LINE_SHIFT;
 
 	// size of an item, rounded up to the cache line size
-	static constexpr int ITEM_SIZE = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
+	static constexpr size_t ITEM_SIZE = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
+
+	// items are allocated in a 64k chunks
+	static constexpr size_t CHUNK_GRANULARITY = 65536;
+
+	// number of items in a chunk
+	static constexpr u32 ITEMS_PER_CHUNK = CHUNK_GRANULARITY / ITEM_SIZE;
 
 	// construction
 	poly_array() :
-		m_base(make_unique_clear<uint8_t[]>(ITEM_SIZE * _Count)),
+		m_base(nullptr),
 		m_next(0),
 		m_max(0),
-		m_waits(0) { }
+		m_allocated(0)
+	{
+		for (int index = 0; index < _TrackingCount; index++)
+			m_last[index] = nullptr;
+
+		// allocate one chunk to start with
+		realloc(ITEMS_PER_CHUNK);
+	}
 
 	// destruction
 	~poly_array() { m_base = nullptr; }
 
-	// operators
-	_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * ITEM_SIZE); }
-
 	// getters
-	int count() const { return m_next; }
-	int max() const { return m_max; }
-	int waits() const { return m_waits; }
-	int itemsize() const { return ITEM_SIZE; }
-	int allocated() const { return _Count; }
-	int indexof(_Type &item) const { int result = (reinterpret_cast<uint8_t *>(&item) - m_base.get()) / ITEM_SIZE; assert(result >= 0 && result < _Count); return result; }
+	u32 count() const { return m_next; }
+	u32 max() const { return m_max; }
+	size_t itemsize() const { return ITEM_SIZE; }
+	u32 allocated() const { return m_allocated; }
+
+	// return an item by index
+	_Type &byindex(u32 index)
+	{
+		if (index < m_allocated)
+			return *item_ptr(index);
+		assert(m_chain);
+		return m_chain->byindex(index - m_allocated);
+	}
+
+	// return a contiguous chunk of items
+	_Type *contiguous(u32 index, u32 count, u32 &chunk)
+	{
+		if (index < m_allocated)
+		{
+			chunk = std::min(count, m_allocated - index);
+			return item_ptr(index);
+		}
+		assert(m_chain);
+		return m_chain->contiguous(index - m_allocated, count, chunk);
+	}
+
+	// compute the index
+	int indexof(_Type &item) const
+	{
+		u32 result = (reinterpret_cast<u8 *>(&item) - m_base) / ITEM_SIZE;
+		if (result < m_allocated)
+			return result;
+		assert(m_chain);
+		return m_allocated + m_chain->indexof(item);
+	}
 
 	// operations
-	void reset() { m_next = 0; }
-	_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * ITEM_SIZE) _Type; }
-	_Type &last() const { return (*this)[m_next - 1]; }
-	template<typename T> void wait_for_space(T &manager, int count = 1);
+	void reset()
+	{
+		m_next = 0;
+
+		// if we didn't have a chain, just repopulate
+		if (!m_chain)
+			repopulate();
+		else
+		{
+			// otherwise, reallocate and get rid of the chain
+			realloc(m_max);
+			m_chain.reset();
+		}
+	}
+
+	// allocate a return a new item
+	_Type &next(int index = 0)
+	{
+		assert(index < _TrackingCount);
+
+		// track the maximum
+		if (m_next > m_max)
+			m_max = m_next;
+
+		// fast case: fits within our array
+		_Type *item;
+		if (m_next < m_allocated)
+			item = new(item_ptr(m_next)) _Type;
+
+		// otherwise, allocate from the chain
+		else
+		{
+			if (!m_chain)
+				m_chain = std::make_unique<poly_array<_Type, 0>>();
+			item = &m_chain->next();
+		}
+
+		// set the last item
+		m_next++;
+		if (_TrackingCount > 0)
+			m_last[index] = item;
+		return *item;
+	}
+
+	// return the last
+	_Type &last(int index = 0) const
+	{
+		assert(index < _TrackingCount);
+		assert(m_last[index] != nullptr);
+		return *m_last[index];
+	}
 
 private:
+	// internal helper to make size pointers
+	_Type *item_ptr(u32 index)
+	{
+		return reinterpret_cast<_Type *>(m_base + index * ITEM_SIZE);
+	}
+
+	// reallocate to the given size
+	void realloc(u32 count)
+	{
+		// round the count up to a chunk size
+		count = ((count + ITEMS_PER_CHUNK - 1) / ITEMS_PER_CHUNK) * ITEMS_PER_CHUNK;
+
+		// allocate a fresh new array
+		std::unique_ptr<u8[]> new_alloc = std::make_unique<u8[]>(ITEM_SIZE * count + CACHE_LINE_SIZE);
+		std::fill_n(&new_alloc[0], ITEM_SIZE * count + CACHE_LINE_SIZE, 0);
+
+		// align the base to a cache line
+		m_base = reinterpret_cast<u8 *>((uintptr_t(new_alloc.get()) + CACHE_LINE_SIZE - 1) & CACHE_LINE_MASK);
+
+		// repopulate last items into the base of the new array
+		repopulate();
+
+		// replace the old allocation with the new one
+		m_alloc = std::move(new_alloc);
+		m_allocated = count;
+	}
+
+	// repopulate items
+	void repopulate()
+	{
+		for (int index = 0; index < _TrackingCount; index++)
+			if (m_last[index] != nullptr)
+			{
+				if (m_last[index] == item_ptr(m_next))
+					m_next++;
+				else
+					next(index) = *m_last[index];
+			}
+	}
+
 	// internal state
-	std::unique_ptr<uint8_t[]> m_base;
-	int m_next;
-	int m_max;
-	int m_waits;
+	u8 *m_base;
+	u32 m_next;
+	u32 m_max;
+	u32 m_allocated;
+	std::unique_ptr<u8[]> m_alloc;
+	std::unique_ptr<poly_array<_Type, 0>> m_chain;
+	_Type *m_last[std::max(1, _TrackingCount)];
 };
 
 
@@ -108,10 +234,13 @@ private:
 template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 class poly_manager
 {
+	// turn this on to log the reasons for any long waits
+	static constexpr bool POLY_LOG_WAITS = false;
+
 public:
-	static constexpr uint8_t FLAG_INCLUDE_BOTTOM_EDGE = 0x01;
-	static constexpr uint8_t FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
-	static constexpr uint8_t FLAG_NO_WORK_QUEUE       = 0x04;
+	static constexpr u8 FLAG_INCLUDE_BOTTOM_EDGE = 0x01;
+	static constexpr u8 FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
+	static constexpr u8 FLAG_NO_WORK_QUEUE       = 0x04;
 
 	// each vertex has an X/Y coordinate and a set of parameters
 	struct vertex_t
@@ -178,9 +307,6 @@ protected:
 private:
 	poly_manager(running_machine &machine, screen_device *screen, uint8_t flags);
 
-	// turn this on to log the reasons for any long waits
-	static constexpr bool POLY_LOG_WAITS = false;
-
 	// number of profiling ticks before we consider a wait "long"
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
 
@@ -199,6 +325,12 @@ private:
 	// internal unit of work
 	struct work_unit
 	{
+		work_unit &operator=(work_unit const &rhs)
+		{
+			// this is just to satisfy the compiler; we don't actually copy
+			fatalerror("Attempt to copy work_unit");
+		}
+
 		std::atomic<uint32_t> count_next;             // number of scanlines and index of next item to process
 		polygon_info *      polygon;                // pointer to polygon
 		int16_t               scanline;               // starting scanline
@@ -228,9 +360,9 @@ private:
 
 
 	// internal array types
-	using polygon_array = poly_array<polygon_info, MaxPolys>;
-	using objectdata_array = poly_array<ObjectData, MaxPolys + 1>;
-	using unit_array = poly_array<work_unit, std::min(MaxPolys * UNITS_PER_POLY, 65535)>;
+	using polygon_array = poly_array<polygon_info, 0>;
+	using objectdata_array = poly_array<ObjectData, 1>;
+	using unit_array = poly_array<work_unit, 0>;
 
 	// round in a cross-platform consistent manner
 	inline int32_t round_coordinate(BaseType value)
@@ -245,16 +377,29 @@ private:
 	// internal helpers
 	polygon_info &polygon_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
 	{
-		// wait for space in the polygon and unit arrays
-		m_polygon.wait_for_space(*this);
-		m_unit.wait_for_space(*this, (maxy - miny) / SCANLINES_PER_BUCKET + 2);
-
 		// return and initialize the next one
 		polygon_info &polygon = m_polygon.next();
 		polygon.m_owner = this;
 		polygon.m_object = &object_data_last();
 		polygon.m_callback = callback;
 		return polygon;
+	}
+
+	// enqueue work items in contiguous chunks
+	void queue_items(u32 start)
+	{
+		// do nothing if no queue
+		if (m_queue == nullptr)
+			return;
+
+		// enqueue the items in contiguous chunks
+		while (start < m_unit.count())
+		{
+			u32 chunk;
+			work_unit *base = m_unit.contiguous(start, m_unit.count() - start, chunk);
+			osd_work_item_queue_multiple(m_queue, work_item_callback, chunk, base, m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
+			start += chunk;
+		}
 	}
 
 	static void *work_item_callback(void *param, int threadid);
@@ -286,22 +431,6 @@ private:
 	uint32_t              m_resolved[WORK_MAX_THREADS];   // number of conflicts resolved, per thread
 #endif
 };
-
-
-//-------------------------------------------------
-//  wait_for_space
-//-------------------------------------------------
-
-template<class _Type, int _Count>
-template<typename T>
-void poly_array<_Type, _Count>::wait_for_space(T &manager, int count)
-{
-	while ((m_next + count) >= _Count)
-	{
-		m_waits++;
-		manager.wait("");
-	}
-}
 
 
 //-------------------------------------------------
@@ -375,9 +504,9 @@ poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::~poly_manager()
 		printf("Total pixels   = %d\n", (uint32_t)m_pixels);
 
 	printf("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
-	printf("Units:       %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), m_unit.waits(), m_unit.itemsize(), m_unit.allocated() * m_unit.itemsize());
-	printf("Polygons:    %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", m_polygon.max(), m_polygon.allocated(), m_polygon.waits(), m_polygon.itemsize(), m_polygon.allocated() * m_polygon.itemsize());
-	printf("Object data: %5d used, %5d allocated, %5d waits, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), m_object.waits(), m_object.itemsize(), m_object.allocated() * m_object.itemsize());
+	printf("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
+	printf("Polygons:    %5d used, %5d allocated, %4d bytes each, %7d total\n", m_polygon.max(), m_polygon.allocated(), int(m_polygon.itemsize()), int(m_polygon.allocated() * m_polygon.itemsize()));
+	printf("Object data: %5d used, %5d allocated, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), int(m_object.itemsize()), int(m_object.allocated() * m_object.itemsize()));
 }
 #endif
 
@@ -404,7 +533,7 @@ void *poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::work_item_callbac
 		// if our previous item isn't done yet, enqueue this item to the end and proceed
 		if (unit.previtem != 0xffff)
 		{
-			work_unit &prevunit = polygon.m_owner->m_unit[unit.previtem];
+			work_unit &prevunit = polygon.m_owner->m_unit.byindex(unit.previtem);
 			if (prevunit.count_next != 0)
 			{
 				uint32_t unitnum = polygon.m_owner->m_unit.indexof(unit);
@@ -443,7 +572,7 @@ void *poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::work_item_callbac
 		orig_count_next >>= 16;
 		if (orig_count_next == 0)
 			break;
-		param = &polygon.m_owner->m_unit[orig_count_next];
+		param = &polygon.m_owner->m_unit.byindex(orig_count_next);
 	}
 	return nullptr;
 }
@@ -469,7 +598,7 @@ void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *d
 	// if we don't have a queue, just run the whole list now
 	else
 		for (int unitnum = 0; unitnum < m_unit.count(); unitnum++)
-			work_item_callback(&m_unit[unitnum], 0);
+			work_item_callback(&m_unit.byindex(unitnum), 0);
 
 	// log any long waits
 	if (POLY_LOG_WAITS)
@@ -482,19 +611,13 @@ void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *d
 	// reset the state
 	if (reset)
 	{
+		// reset all the poly arrays
 		m_polygon.reset();
 		m_unit.reset();
-		memset(m_unit_bucket, 0xff, sizeof(m_unit_bucket));
+		m_object.reset();
 
-		// we need to preserve the last object data that was supplied
-		if (m_object.count() > 0)
-		{
-			ObjectData temp = object_data_last();
-			m_object.reset();
-			m_object.next() = temp;
-		}
-		else
-			m_object.reset();
+		// clear the buckets
+		memset(m_unit_bucket, 0xff, sizeof(m_unit_bucket));
 
 		// allow derived classes to do additional cleanup
 		reset_after_wait();
@@ -509,8 +632,6 @@ void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *d
 template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 ObjectData &poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::object_data_alloc()
 {
-	// wait for a work item if we have to, then return the next item
-	m_object.wait_for_space(*this);
 	return m_object.next();
 }
 
@@ -636,8 +757,7 @@ uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_tile(co
 	}
 
 	// enqueue the work items
-	if (m_queue != nullptr)
-		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
+	queue_items(startunit);
 
 	// return the total number of pixels in the triangle
 	m_tiles++;
@@ -824,8 +944,7 @@ uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangl
 	}
 
 	// enqueue the work items
-	if (m_queue != nullptr)
-		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
+	queue_items(startunit);
 
 	// return the total number of pixels in the triangle
 	m_triangles++;
@@ -940,8 +1059,7 @@ uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_triangl
 	}
 
 	// enqueue the work items
-	if (m_queue != nullptr)
-		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
+	queue_items(startunit);
 
 	// return the total number of pixels in the object
 	m_triangles++;
@@ -1139,8 +1257,7 @@ uint32_t poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::render_polygon
 	}
 
 	// enqueue the work items
-	if (m_queue != nullptr)
-		osd_work_item_queue_multiple(m_queue, work_item_callback, m_unit.count() - startunit, &m_unit[startunit], m_unit.itemsize(), WORK_ITEM_FLAG_AUTO_RELEASE);
+	queue_items(startunit);
 
 	// return the total number of pixels in the triangle
 	m_quads++;

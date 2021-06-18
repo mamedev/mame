@@ -372,14 +372,13 @@ public:
 	// allocate a new texture instance
 	rasterizer_texture &alloc_texture(int tmu)
 	{
-		m_textures.wait_for_space(*this);
-		return *(m_last_texture[tmu] = &m_textures.next());
+		return m_textures.next(tmu);
 	}
 
 	// return the most recently allocated texture instance
 	rasterizer_texture &last_texture(int tmu)
 	{
-		return *m_last_texture[tmu];
+		return m_textures.last(tmu);
 	}
 
 	// dump rasterizer statistics if enabled
@@ -421,8 +420,7 @@ private:
 	u8 m_fogblend[64];          // 64-entry fog table
 	u8 m_fogdelta[64];          // 64-entry fog table
 	u8 m_fogdelta_mask;         // mask for for delta (0xff for V1, 0xfc for V2)
-	voodoo::rasterizer_texture *m_last_texture[2]; // last allocated texture for each TMU
-	poly_array<voodoo::rasterizer_texture, 1000> m_textures;
+	poly_array<voodoo::rasterizer_texture, 2> m_textures;
 	voodoo::rasterizer_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
 	voodoo::rasterizer_info *m_generic_rasterizer[4];
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;
