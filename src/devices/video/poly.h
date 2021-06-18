@@ -56,6 +56,54 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// class for managing an array of items
+template<class _Type, int _Count>
+class poly_array
+{
+public:
+	// this is really architecture-specific, but 64 is a reasonable
+	// value for most modern x64/ARM architectures
+	static constexpr int CACHE_LINE_SIZE = 64;
+
+	// size of an item, rounded up to the cache line size
+	static constexpr int ITEM_SIZE = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
+
+	// construction
+	poly_array() :
+		m_base(make_unique_clear<uint8_t[]>(ITEM_SIZE * _Count)),
+		m_next(0),
+		m_max(0),
+		m_waits(0) { }
+
+	// destruction
+	~poly_array() { m_base = nullptr; }
+
+	// operators
+	_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * ITEM_SIZE); }
+
+	// getters
+	int count() const { return m_next; }
+	int max() const { return m_max; }
+	int waits() const { return m_waits; }
+	int itemsize() const { return ITEM_SIZE; }
+	int allocated() const { return _Count; }
+	int indexof(_Type &item) const { int result = (reinterpret_cast<uint8_t *>(&item) - m_base.get()) / ITEM_SIZE; assert(result >= 0 && result < _Count); return result; }
+
+	// operations
+	void reset() { m_next = 0; }
+	_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * ITEM_SIZE) _Type; }
+	_Type &last() const { return (*this)[m_next - 1]; }
+	template<typename T> void wait_for_space(T &manager, int count = 1);
+
+private:
+	// internal state
+	std::unique_ptr<uint8_t[]> m_base;
+	int m_next;
+	int m_max;
+	int m_waits;
+};
+
+
 // poly_manager is a template class
 template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 class poly_manager
@@ -64,10 +112,6 @@ public:
 	static constexpr uint8_t FLAG_INCLUDE_BOTTOM_EDGE = 0x01;
 	static constexpr uint8_t FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
 	static constexpr uint8_t FLAG_NO_WORK_QUEUE       = 0x04;
-
-	// this is really architecture-specific, but 64 is a reasonable
-	// value for most modern x64/ARM architectures
-	static constexpr int CACHE_LINE_SIZE              = 64;
 
 	// each vertex has an X/Y coordinate and a set of parameters
 	struct vertex_t
@@ -127,6 +171,10 @@ public:
 	// public helpers
 	int zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, int paramcount, BaseType clipval);
 
+protected:
+	// optional overrides
+	virtual void reset_after_wait() { }
+
 private:
 	poly_manager(running_machine &machine, screen_device *screen, uint8_t flags);
 
@@ -179,55 +227,10 @@ private:
 	static double poly_recip(double x) { return 1.0 / x; }
 
 
-	// class for managing an array of items
-	template<class _Type, int _Count>
-	class poly_array
-	{
-		// size of an item, rounded up to the cache line size
-		static constexpr int ITEM_SIZE = ((sizeof(_Type) + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
-
-	public:
-		// construction
-		poly_array(running_machine &machine, poly_manager &manager)
-			: m_manager(manager),
-				m_base(make_unique_clear<uint8_t[]>(ITEM_SIZE * _Count)),
-				m_next(0),
-				m_max(0),
-				m_waits(0) { }
-
-		// destruction
-		~poly_array() { m_base = nullptr; }
-
-		// operators
-		_Type &operator[](int index) const { assert(index >= 0 && index < _Count); return *reinterpret_cast<_Type *>(m_base.get() + index * ITEM_SIZE); }
-
-		// getters
-		int count() const { return m_next; }
-		int max() const { return m_max; }
-		int waits() const { return m_waits; }
-		int itemsize() const { return ITEM_SIZE; }
-		int allocated() const { return _Count; }
-		int indexof(_Type &item) const { int result = (reinterpret_cast<uint8_t *>(&item) - m_base.get()) / ITEM_SIZE; assert(result >= 0 && result < _Count); return result; }
-
-		// operations
-		void reset() { m_next = 0; }
-		_Type &next() { if (m_next > m_max) m_max = m_next; assert(m_next < _Count); return *new(m_base.get() + m_next++ * ITEM_SIZE) _Type; }
-		_Type &last() const { return (*this)[m_next - 1]; }
-		void wait_for_space(int count = 1) { while ((m_next + count) >= _Count) { m_waits++; m_manager.wait(""); }  }
-
-	private:
-		// internal state
-		poly_manager &      m_manager;
-		std::unique_ptr<uint8_t[]>             m_base;
-		int                 m_next;
-		int                 m_max;
-		int                 m_waits;
-	};
-
 	// internal array types
-	typedef poly_array<polygon_info, MaxPolys> polygon_array;
-	typedef poly_array<ObjectData, MaxPolys + 1> objectdata_array;
-	typedef poly_array<work_unit, std::min(MaxPolys * UNITS_PER_POLY, 65535)> unit_array;
+	using polygon_array = poly_array<polygon_info, MaxPolys>;
+	using objectdata_array = poly_array<ObjectData, MaxPolys + 1>;
+	using unit_array = poly_array<work_unit, std::min(MaxPolys * UNITS_PER_POLY, 65535)>;
 
 	// round in a cross-platform consistent manner
 	inline int32_t round_coordinate(BaseType value)
@@ -243,8 +246,8 @@ private:
 	polygon_info &polygon_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
 	{
 		// wait for space in the polygon and unit arrays
-		m_polygon.wait_for_space();
-		m_unit.wait_for_space((maxy - miny) / SCANLINES_PER_BUCKET + 2);
+		m_polygon.wait_for_space(*this);
+		m_unit.wait_for_space(*this, (maxy - miny) / SCANLINES_PER_BUCKET + 2);
 
 		// return and initialize the next one
 		polygon_info &polygon = m_polygon.next();
@@ -286,6 +289,22 @@ private:
 
 
 //-------------------------------------------------
+//  wait_for_space
+//-------------------------------------------------
+
+template<class _Type, int _Count>
+template<typename T>
+void poly_array<_Type, _Count>::wait_for_space(T &manager, int count)
+{
+	while ((m_next + count) >= _Count)
+	{
+		m_waits++;
+		manager.wait("");
+	}
+}
+
+
+//-------------------------------------------------
 //  poly_manager - constructor
 //-------------------------------------------------
 
@@ -308,9 +327,6 @@ poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::poly_manager(running_ma
 	: m_machine(machine)
 	, m_screen(screen)
 	, m_queue(nullptr)
-	, m_polygon(machine, *this)
-	, m_object(machine, *this)
-	, m_unit(machine, *this)
 	, m_flags(flags)
 	, m_tiles(0)
 	, m_triangles(0)
@@ -479,6 +495,9 @@ void poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::wait(const char *d
 		}
 		else
 			m_object.reset();
+
+		// allow derived classes to do additional cleanup
+		reset_after_wait();
 	}
 }
 
@@ -491,7 +510,7 @@ template<typename BaseType, class ObjectData, int MaxParams, int MaxPolys>
 ObjectData &poly_manager<BaseType, ObjectData, MaxParams, MaxPolys>::object_data_alloc()
 {
 	// wait for a work item if we have to, then return the next item
-	m_object.wait_for_space();
+	m_object.wait_for_space(*this);
 	return m_object.next();
 }
 
