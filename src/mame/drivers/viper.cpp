@@ -582,7 +582,7 @@ private:
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2459,8 +2459,8 @@ void viper_state::viper(machine_config &config)
 
 	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
 	m_voodoo->set_fbmem(8);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag("maincpu");
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu("maincpu");
 	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 

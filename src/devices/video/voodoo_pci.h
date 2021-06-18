@@ -13,8 +13,8 @@
 class voodoo_pci_device : public pci_device
 {
 public:
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	void set_fbmem(int fbmem) { m_fbmem = fbmem; }
 	void set_tmumem(int tmumem0, int tmumem1) { m_tmumem0 = tmumem0; m_tmumem1 = tmumem1; }
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -58,8 +58,8 @@ public:
 	voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag, U &&screen_tag)
 		: voodoo_1_pci_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_screen_tag(std::forward<U>(screen_tag));
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
 	}
 
 	voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -76,8 +76,8 @@ public:
 	voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag, U &&screen_tag)
 		: voodoo_2_pci_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_screen_tag(std::forward<U>(screen_tag));
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
 	}
 
 	voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -94,8 +94,8 @@ public:
 	voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag, U &&screen_tag)
 		: voodoo_banshee_pci_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_screen_tag(std::forward<U>(screen_tag));
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
 	}
 
 	voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -115,8 +115,8 @@ public:
 	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag, U &&screen_tag)
 		: voodoo_3_pci_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_screen_tag(std::forward<U>(screen_tag));
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
 	}
 
 	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

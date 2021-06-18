@@ -11,6 +11,8 @@ void voodoo_1_pci_device::device_add_mconfig(machine_config &config)
 	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
+	m_voodoo->set_cpu(m_cpu);
+	m_voodoo->set_screen(m_screen);
 }
 
 void voodoo_2_pci_device::device_add_mconfig(machine_config &config)
@@ -18,18 +20,24 @@ void voodoo_2_pci_device::device_add_mconfig(machine_config &config)
 	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
+	m_voodoo->set_cpu(m_cpu);
+	m_voodoo->set_screen(m_screen);
 }
 
 void voodoo_banshee_pci_device::device_add_mconfig(machine_config &config)
 {
 	VOODOO_BANSHEE(config, m_voodoo, STD_VOODOO_BANSHEE_CLOCK);
 	m_voodoo->set_fbmem(16);
+	m_voodoo->set_cpu(m_cpu);
+	m_voodoo->set_screen(m_screen);
 }
 
 void voodoo_3_pci_device::device_add_mconfig(machine_config &config)
 {
 	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
 	m_voodoo->set_fbmem(16);
+	m_voodoo->set_cpu(m_cpu);
+	m_voodoo->set_screen(m_screen);
 }
 
 DEFINE_DEVICE_TYPE(VOODOO_1_PCI, voodoo_1_pci_device, "voodoo_1_pci", "Voodoo 1 PCI")
@@ -46,7 +54,7 @@ void voodoo_pci_device::config_map(address_map &map)
 // VOODOO_1 & VOODOO_2 map
 void voodoo_pci_device::voodoo_reg_map(address_map &map)
 {
-	map(0x0, 0x00ffffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0, 0x00ffffff).rw(m_voodoo, FUNC(voodoo_device::read), FUNC(voodoo_device::write));
 }
 // VOODOO_BANSHEE and VOODOO_3 maps
 void voodoo_pci_device::banshee_reg_map(address_map &map)
@@ -92,10 +100,6 @@ voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const ch
 
 void voodoo_pci_device::device_start()
 {
-	if (m_cpu)
-		m_voodoo->set_cpu(*m_cpu);
-	if (m_screen)
-		m_voodoo->set_screen(*m_screen);
 	m_voodoo->set_fbmem(m_fbmem);
 	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
 	pci_device::device_start();
@@ -197,7 +201,7 @@ void voodoo_3_pci_device::map_extra(u64 memory_window_start, u64 memory_window_e
 
 u32 voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 // PCI bus control
@@ -234,7 +238,7 @@ void voodoo_pci_device::pcictrl_w(offs_t offset, u32 data, u32 mem_mask)
 	switch (offset + 0x40 / 4) {
 		case 0x40/4:
 			// HW initEnable
-			m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo->set_init_enable(data);
 			logerror("%s:voodoo_pci_device pcictrl_w (initEnable) offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4 + 0x40, data, mem_mask);
 			break;
 		default:

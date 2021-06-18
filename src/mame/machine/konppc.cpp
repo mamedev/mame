@@ -420,7 +420,7 @@ void konppc_device::nwk_fifo_0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->write(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -437,7 +437,7 @@ void konppc_device::nwk_fifo_1_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->write(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -449,7 +449,7 @@ uint32_t konppc_device::nwk_voodoo_0_r(offs_t offset)
 	}
 	else
 	{
-		return m_voodoo[0]->voodoo_r(offset);
+		return m_voodoo[0]->read(offset);
 	}
 }
 
@@ -461,7 +461,7 @@ uint32_t konppc_device::nwk_voodoo_1_r(offs_t offset)
 	}
 	else
 	{
-		return m_voodoo[1]->voodoo_r(offset);
+		return m_voodoo[1]->read(offset);
 	}
 }
 
@@ -478,7 +478,7 @@ void konppc_device::nwk_voodoo_0_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(offset, data, mem_mask);
+		m_voodoo[0]->write(offset, data, mem_mask);
 	}
 }
 
@@ -495,6 +495,6 @@ void konppc_device::nwk_voodoo_1_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(offset, data, mem_mask);
+		m_voodoo[1]->write(offset, data, mem_mask);
 	}
 }

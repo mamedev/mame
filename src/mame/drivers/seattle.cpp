@@ -1992,7 +1992,6 @@ INPUT_PORTS_END
  *************************************/
 void seattle_state::seattle_common(machine_config &config)
 {
-
 	// basic machine hardware
 	R5000LE(config, m_maincpu, SYSTEM_CLOCK * 3);
 	m_maincpu->set_icache_size(16384);

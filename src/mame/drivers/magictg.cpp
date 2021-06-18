@@ -301,7 +301,7 @@ void magictg_state::video_start()
 
 uint32_t magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo[0]->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo[0]->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 
@@ -358,7 +358,7 @@ void magictg_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 		case 0x40:
 			m_voodoo_pci_regs[0].init_enable = data;
-			m_voodoo[0]->voodoo_set_init_enable(data);
+			m_voodoo[0]->set_init_enable(data);
 			break;
 
 		default:
@@ -403,7 +403,7 @@ void magictg_state::voodoo_1_pci_w(int function, int reg, uint32_t data, uint32_
 			break;
 		case 0x40:
 			m_voodoo_pci_regs[1].init_enable = data;
-			voodoo_set_init_enable(state->m_voodoo[1], data);
+			set_init_enable(state->m_voodoo[1], data);
 			break;
 
 		default:
@@ -852,9 +852,9 @@ void magictg_state::magictg_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
 	map(0x00800000, 0x0081003f).ram(); // ?
-	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::read), FUNC(voodoo_device::write));
 #if defined(USE_TWO_3DFX)
-	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::read), FUNC(voodoo_device::write));
 	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
 	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
@@ -943,14 +943,14 @@ void magictg_state::magictg(machine_config &config)
 	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
-	m_voodoo[0]->set_screen_tag("screen");
-	m_voodoo[0]->set_cpu_tag(m_mips);
+	m_voodoo[0]->set_screen("screen");
+	m_voodoo[0]->set_cpu(m_mips);
 
 	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
-	m_voodoo[1]->set_screen_tag("screen");
-	m_voodoo[1]->set_cpu_tag(m_mips);
+	m_voodoo[1]->set_screen("screen");
+	m_voodoo[1]->set_cpu(m_mips);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

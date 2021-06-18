@@ -90,39 +90,37 @@ public:
 class voodoo_device : public device_t
 {
 public:
-	~voodoo_device();
+	// destruction
+	virtual ~voodoo_device();
 
+	// configuration
 	void set_fbmem(int value) { m_fbmem = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
-	template <typename T> void set_screen_tag(T &&tag) { m_screen_finder.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu_finder.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto vblank_callback() { return m_vblank.bind(); }
 	auto stall_callback() { return m_stall.bind(); }
 	auto pciint_callback() { return m_pciint.bind(); }
 
-	void set_screen(screen_device &screen) { assert(!m_screen); m_screen = &screen; }
-	void set_cpu(cpu_device &cpu) { assert(!m_cpu); m_cpu = &cpu; }
-
-	u32 voodoo_r(offs_t offset);
-	void voodoo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 read(offs_t offset);
+	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
-	void voodoo_postload();
-
-	int voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void voodoo_set_init_enable(u32 newval);
+	int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void set_init_enable(u32 newval);
 
 protected:
+	// construction
 	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
 
 	// device-level overrides
-	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	struct tmu_shared_state;
 
@@ -418,8 +416,6 @@ public:
 	u8 m_chipmask;               // mask for which chips are available
 	u8 m_index;                  // index of board
 
-	screen_device *m_screen;               // the screen we are acting on
-	cpu_device *m_cpu;                  // the CPU we interact with
 	u32 m_freq;                   // operating frequency
 	attoseconds_t m_attoseconds_per_cycle;  // attoseconds per cycle
 	int m_trigger;                // trigger used for stalling
@@ -452,8 +448,8 @@ public:
 	tmu_shared_state m_tmushare;               // TMU shared state
 	banshee_info m_banshee;                // Banshee state
 
-	optional_device<screen_device> m_screen_finder; // the screen we are acting on
-	optional_device<cpu_device> m_cpu_finder;   // the CPU we interact with
+	required_device<screen_device> m_screen; // the screen we are acting on
+	required_device<cpu_device> m_cpu;   // the CPU we interact with
 
 	std::unique_ptr<u8[]> m_fbmem_alloc;
 	std::unique_ptr<u8[]> m_tmumem_alloc[2];

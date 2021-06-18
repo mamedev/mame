@@ -333,7 +333,7 @@ inline u32 voodoo::fifo_state::remove()
  *
  *************************************/
 
-int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int voodoo_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int changed = m_fbi.m_video_changed;
 	int drawbuf = m_fbi.m_frontbuf;
@@ -468,7 +468,7 @@ int voodoo_device::voodoo_update(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-void voodoo_device::voodoo_set_init_enable(u32 newval)
+void voodoo_device::set_init_enable(u32 newval)
 {
 	m_pci.init_enable = voodoo::reg_init_en(newval);
 	if (LOG_REGISTERS)
@@ -614,7 +614,7 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 }
 
 
-void voodoo_device::voodoo_postload()
+void voodoo_device::device_post_load()
 {
 	m_fbi.m_clut_dirty = true;
 	for (tmu_state &tm : m_tmu)
@@ -638,8 +638,6 @@ ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
 
 void voodoo_device::init_save_state()
 {
-	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_device::voodoo_postload), this));
-
 	/* register states: core */
 	save_item(NAME(m_reg.m_regs));
 
@@ -3472,7 +3470,7 @@ void voodoo_device::flush_fifos(attotime current_time)
  *
  *************************************/
 
-void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_device::write(offs_t offset, u32 data, u32 mem_mask)
 {
 	int stall = false;
 
@@ -3480,7 +3478,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 
 	/* should not be getting accesses while stalled */
 	if (m_pci.stall_state != NOT_STALLED)
-		logerror("voodoo_w while stalled!\n");
+		logerror("voodoo_device::write while stalled!\n");
 
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (m_pci.op_pending)
@@ -3584,7 +3582,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	/* if there's room in the PCI FIFO, add there */
-	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:voodoo_w adding to PCI FIFO @ %08X=%08X\n", this, offset, data);
+	if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:adding to PCI FIFO @ %08X=%08X\n", this, offset, data);
 	if (!m_pci.fifo.full())
 	{
 		m_pci.fifo.add(offset);
@@ -3604,7 +3602,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		valid[2] = valid[3] = m_reg.fbi_init0().texmem_to_memory_fifo();
 
 		/* flush everything we can */
-		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:voodoo_w moving PCI FIFO to memory FIFO\n");
+		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:moving PCI FIFO to memory FIFO\n");
 		while (!m_pci.fifo.empty() && valid[(m_pci.fifo.peek() >> 22) & 3])
 		{
 			m_fbi.m_fifo.add(m_pci.fifo.remove());
@@ -3614,7 +3612,7 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		/* if we're above the HWM as a result, stall */
 		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbi.m_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
 		{
-			if (LOG_FIFO) logerror("VOODOO.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n");
+			if (LOG_FIFO) logerror("VOODOO.FIFO:hit memory FIFO HWM -- stalling\n");
 			stall_cpu(STALLED_UNTIL_FIFO_LWM, machine().time());
 		}
 	}
@@ -3622,14 +3620,14 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 	/* if we're at the LWM for the PCI FIFO, stall */
 	if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_pci.fifo.space() <= 2 * m_reg.fbi_init0().pci_fifo_lwm())
 	{
-		if (LOG_FIFO) logerror("VOODOO.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n");
+		if (LOG_FIFO) logerror("VOODOO.FIFO:hit PCI FIFO free LWM -- stalling\n");
 		stall_cpu(STALLED_UNTIL_FIFO_LWM, machine().time());
 	}
 
 	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
 	if (stall)
 	{
-		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:voodoo_w wrote non-FIFO register -- stalling until clear\n");
+		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:wrote non-FIFO register -- stalling until clear\n");
 		stall_cpu(STALLED_UNTIL_FIFO_EMPTY, machine().time());
 	}
 
@@ -3934,7 +3932,7 @@ u32 voodoo_device::lfb_r(offs_t offset, bool lfb_3d)
  *
  *************************************/
 
-u32 voodoo_device::voodoo_r(offs_t offset)
+u32 voodoo_device::read(offs_t offset)
 {
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (m_pci.op_pending)
@@ -4839,26 +4837,9 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
     device start callback
 -------------------------------------------------*/
 
-void voodoo_device::device_resolve_objects()
-{
-	if (!m_screen)
-		m_screen = m_screen_finder;
-	else if (m_screen_finder)
-		throw emu_fatalerror("%s: screen set by both configuration and direct reference (%s and %s)\n", tag(), m_screen_finder->tag(), m_screen->tag());
-	else if (m_screen_finder.finder_tag() != finder_base::DUMMY_TAG)
-		throw emu_fatalerror("%s: configured screen %s not found\n", tag(), m_screen_finder.finder_tag());
-
-	if (!m_cpu)
-		m_cpu = m_cpu_finder;
-	else if (m_cpu_finder)
-		throw emu_fatalerror("%s: CPU set by both configuration and direct reference (%s and %s)\n", tag(), m_cpu_finder->tag(), m_cpu->tag());
-	else if (m_cpu_finder.finder_tag() != finder_base::DUMMY_TAG)
-		throw emu_fatalerror("%s: configured CPU %s not found\n", tag(), m_cpu_finder.finder_tag());
-}
-
 void voodoo_device::device_start()
 {
-	if (!m_screen || !m_cpu)
+	if (!m_screen->started() || !m_cpu->started())
 		throw device_missing_dependencies();
 
 	/* validate configuration */
@@ -5377,8 +5358,6 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_type(vdt),
 	m_chipmask(0),
 	m_index(0),
-	m_screen(nullptr),
-	m_cpu(nullptr),
 	m_freq(0),
 	m_attoseconds_per_cycle(0),
 	m_trigger(0),
@@ -5392,8 +5371,8 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_stall(*this),
 	m_pciint(*this),
 	m_tmu{ vdt, vdt },
-	m_screen_finder(*this, finder_base::DUMMY_TAG),
-	m_cpu_finder(*this, finder_base::DUMMY_TAG)
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
 
