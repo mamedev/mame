@@ -452,6 +452,9 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
 
+			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
+			// This could mean broadcast to both CG boards?
+
 			m_exrgb = data & 0x1;		// Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);

@@ -980,7 +980,15 @@ void adsp21062_device::set_flag_input(int flag_num, int state)
 
 WRITE_LINE_MEMBER(adsp21062_device::write_stall)
 {
-	m_core->write_stalled = (state == 0) ? false : true;		
+	m_core->write_stalled = (state == 0) ? false : true;
+
+	if (m_enable_drc)
+	{
+		if (m_core->write_stalled)
+			spin_until_trigger(45757);
+		else
+			machine().scheduler().trigger(45757);
+	}
 }
 
 void adsp21062_device::check_interrupts()

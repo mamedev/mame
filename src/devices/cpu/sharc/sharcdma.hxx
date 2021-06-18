@@ -335,7 +335,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_dma_callback)
 	}
 
 	dma_op(channel);
-	if (m_core->dma_op[channel].chain_ptr != 0)
+	if ((m_core->dma_op[channel].chain_ptr & 0x1ffff) != 0)
 	{
 		schedule_chained_dma_op(channel, m_core->dma_op[channel].chain_ptr, m_core->dma_op[channel].chained_direction);
 	}
