@@ -112,6 +112,8 @@ public:
 	int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_init_enable(u32 newval);
 
+	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
+
 protected:
 	// construction
 	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
@@ -183,10 +185,11 @@ protected:
 
 	struct tmu_state
 	{
-		tmu_state(u8 vdt) : m_reg(vdt) { }
+		tmu_state(voodoo_device &device) : m_device(device), m_reg(device.m_type) { }
 
-		void init(u8 vdt, tmu_shared_state &share, void *memory, int tmem);
-		voodoo::rasterizer_texture &prepare(s32 &lodbase);
+		void init(int index, tmu_shared_state &share, void *memory, int tmem);
+		voodoo::rasterizer_texture &prepare_texture();
+		s32 compute_lodbase();
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
 
 		struct ncc_table
@@ -204,7 +207,8 @@ protected:
 			rgb_t texel[256];             // texel lookup
 		};
 
-		int m_type;
+		voodoo_device &m_device;
+		int m_index;
 		u8 *m_ram = nullptr;          // pointer to our RAM
 		u32 m_mask = 0;               // mask to apply to pointers
 
@@ -217,8 +221,6 @@ protected:
 		s64 m_dwdx = 0;               // delta W per X
 		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
 		s64 m_dwdy = 0;               // delta W per Y
-
-		voodoo::rasterizer_texture m_raster;
 
 		ncc_table m_ncc[2];                 // two NCC tables
 

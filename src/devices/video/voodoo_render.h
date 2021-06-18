@@ -16,8 +16,6 @@
 #include "video/poly.h"
 #include "video/rgbutil.h"
 
-#define COPY_TEXTURE_DATA (0)
-
 //
 // To do:
 //   - split rasterizer into setup (clip/flip) and inner part
@@ -277,11 +275,6 @@ struct poly_data
 	u32 zacolor;                // depth/alpha value consumed by the rasterizer
 
 	u16 dither[16];             // dither matrix, for fastfill
-
-#if COPY_TEXTURE_DATA
-	rasterizer_texture tex0copy;// texture 0 information
-	rasterizer_texture tex1copy;// texture 1 information
-#endif
 };
 
 
@@ -319,7 +312,7 @@ struct thread_stats_block
 	s32 afunc_fail = 0;         // alpha function test fail statistic
 	s32 clip_fail = 0;          // clipping fail statistic
 	s32 stipple_count = 0;      // stipple statistic
-	s32 filler[voodoo_poly_manager::CACHE_LINE_SIZE/4 - 7]; // pad this structure to cache line size
+	s32 filler[poly_array<int,1>::CACHE_LINE_SIZE/4 - 7]; // pad this structure to cache line size
 };
 
 
@@ -376,8 +369,25 @@ public:
 		m_rowpixels = rowpixels;
 	}
 
+	// allocate a new texture instance
+	rasterizer_texture &alloc_texture(int tmu)
+	{
+		m_textures.wait_for_space(*this);
+		return *(m_last_texture[tmu] = &m_textures.next());
+	}
+
+	// return the most recently allocated texture instance
+	rasterizer_texture &last_texture(int tmu)
+	{
+		return *m_last_texture[tmu];
+	}
+
 	// dump rasterizer statistics if enabled
 	void dump_rasterizer_stats();
+
+protected:
+	// overrides
+	virtual void reset_after_wait() override;
 
 private:
 	// pipeline stages, in order
@@ -411,6 +421,8 @@ private:
 	u8 m_fogblend[64];          // 64-entry fog table
 	u8 m_fogdelta[64];          // 64-entry fog table
 	u8 m_fogdelta_mask;         // mask for for delta (0xff for V1, 0xfc for V2)
+	voodoo::rasterizer_texture *m_last_texture[2]; // last allocated texture for each TMU
+	poly_array<voodoo::rasterizer_texture, 1000> m_textures;
 	voodoo::rasterizer_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
 	voodoo::rasterizer_info *m_generic_rasterizer[4];
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;

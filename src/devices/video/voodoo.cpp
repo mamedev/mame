@@ -576,10 +576,10 @@ void voodoo_device::tmu_shared_state::init()
 }
 
 
-void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memory, int tmem)
+void voodoo_device::tmu_state::init(int index, tmu_shared_state &share, void *memory, int tmem)
 {
 	/* allocate texture RAM */
-	m_type = vdt;
+	m_index = index;
 	m_ram = reinterpret_cast<u8 *>(memory);
 	m_mask = tmem - 1;
 	m_regdirty = false;
@@ -596,7 +596,7 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 	m_texel[3] = share.int8;
 	m_texel[4] = share.ai44;
 	m_texel[5] = m_palette;
-	m_texel[6] = (vdt >= TYPE_VOODOO_2) ? m_palettea : nullptr;
+	m_texel[6] = m_reg.rev2_or_3() ? m_palettea : nullptr;
 	m_texel[7] = nullptr;
 	m_texel[8] = share.rgb332;
 	m_texel[9] = m_ncc[0].texel;
@@ -609,7 +609,7 @@ void voodoo_device::tmu_state::init(u8 vdt, tmu_shared_state &share, void *memor
 
 	/* attach the palette to NCC table 0 */
 	m_ncc[0].palette = m_palette;
-	if (vdt >= TYPE_VOODOO_2)
+	if (m_reg.rev2_or_3())
 		m_ncc[0].palettea = m_palettea;
 }
 
@@ -1300,8 +1300,10 @@ void voodoo_device::dac_state::data_r(u8 regnum)
 
 
 
-inline rasterizer_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
+inline rasterizer_texture &voodoo_device::tmu_state::prepare_texture()
 {
+	auto &renderer = m_device.renderer();
+
 	// if the texture parameters are dirty, update them
 	if (m_regdirty)
 	{
@@ -1318,10 +1320,15 @@ inline rasterizer_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
 		m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
 
 		// recompute the rasterization parameters
-		m_raster.recompute(m_reg, m_ram, m_mask, m_texel[texmode.format()]);
+		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, m_texel[texmode.format()]);
 		m_regdirty = false;
 	}
+	return renderer.last_texture(m_index);
+}
 
+
+inline s32 voodoo_device::tmu_state::compute_lodbase()
+{
 	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
 	s64 texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
 	s64 texdy = s64(m_dsdy >> 14) * s64(m_dsdy >> 14) + s64(m_dtdy >> 14) * s64(m_dtdy >> 14);
@@ -1336,9 +1343,7 @@ inline rasterizer_texture &voodoo_device::tmu_state::prepare(s32 &lodbase)
 	// adjust the result: negative to get the log of the original value
 	// plus 12 to account for the extra exponent, and divided by 2 to
 	// get the log of the square root of texdx
-	lodbase = (fast_log2(double(texdx), 0) + (12 << 8)) / 2;
-
-	return m_raster;
+	return (fast_log2(double(texdx), 0) + (12 << 8)) / 2;
 }
 
 
@@ -3296,11 +3301,7 @@ void voodoo_device::tmu_state::texture_w(offs_t offset, u32 data, bool seq_8_dow
 
 	// update texture info if dirty
 	auto const texmode = m_reg.texture_mode();
-	if (m_regdirty)
-	{
-		m_raster.recompute(m_reg, m_ram, m_mask, m_texel[texmode.format()]);
-		m_regdirty = false;
-	}
+	auto &texture = prepare_texture();
 
 	// determine destination pointer
 	u32 scale = (texmode.format() < 8) ? 1 : 2;
@@ -3315,10 +3316,10 @@ void voodoo_device::tmu_state::texture_w(offs_t offset, u32 data, bool seq_8_dow
 		if (lod > 8)
 			return;
 
-		dest = m_raster.write_ptr(lod, ts, tt, scale);
+		dest = texture.write_ptr(lod, ts, tt, scale);
 	}
 	else
-		dest = m_raster.write_ptr(0, offset * 4, 0, 0);
+		dest = texture.write_ptr(0, offset * 4, 0, 0);
 
 	// write the four bytes in little-endian order
 	if (scale == 1)
@@ -4911,11 +4912,11 @@ void voodoo_device::device_start()
 	if (m_tmumem1 != 0)
 		tmu_config |= 0xc0;  // two TMUs
 
-	m_tmu[0].init(m_type, m_tmushare, tmumem[0], tmumem0 << 20);
+	m_tmu[0].init(0, m_tmushare, tmumem[0], tmumem0 << 20);
 	m_chipmask |= 0x02;
 	if (tmumem1 != 0)
 	{
-		m_tmu[1].init(m_type, m_tmushare, tmumem[1], tmumem1 << 20);
+		m_tmu[1].init(1, m_tmushare, tmumem[1], tmumem1 << 20);
 		m_chipmask |= 0x04;
 		tmu_config |= 0x40;
 	}
@@ -5082,14 +5083,8 @@ s32 voodoo_device::triangle()
 		poly.ds0dy = m_tmu[0].m_dsdy;
 		poly.dt0dy = m_tmu[0].m_dtdy;
 		poly.dw0dy = m_tmu[0].m_dwdy;
-#if COPY_TEXTURE_DATA
-		poly.tex0copy = m_tmu[0].prepare(poly.lodbase0);
-		poly.tex0 = &poly.tex0copy;
-#else
-		if (m_tmu[0].m_regdirty)
-			m_renderer->wait("Texture 0 recompute", false);
-		poly.tex0 = &m_tmu[0].prepare(poly.lodbase0);
-#endif
+		poly.lodbase0 = m_tmu[0].compute_lodbase();
+		poly.tex0 = &m_tmu[0].prepare_texture();
 		m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
 	}
 
@@ -5106,14 +5101,8 @@ s32 voodoo_device::triangle()
 		poly.ds1dy = m_tmu[1].m_dsdy;
 		poly.dt1dy = m_tmu[1].m_dtdy;
 		poly.dw1dy = m_tmu[1].m_dwdy;
-#if COPY_TEXTURE_DATA
-		poly.tex1copy = m_tmu[1].prepare(poly.lodbase1);
-		poly.tex1 = &poly.tex1copy;
-#else
-		if (m_tmu[1].m_regdirty)
-			m_renderer->wait("Texture 1 recompute", false);
-		poly.tex1 = &m_tmu[1].prepare(poly.lodbase1);
-#endif
+		poly.lodbase1 = m_tmu[1].compute_lodbase();
+		poly.tex1 = &m_tmu[1].prepare_texture();
 		m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
 	}
 
@@ -5370,7 +5359,7 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_vblank(*this),
 	m_stall(*this),
 	m_pciint(*this),
-	m_tmu{ vdt, vdt },
+	m_tmu{ *this, *this },
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG)
 {
