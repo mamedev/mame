@@ -62148,9 +62148,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="drmario2" supported="no">
+	<software name="drmario2">
 		<description>Dr. Mario II</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_eh8813a" />
@@ -62934,9 +62934,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro & cah4e3 -->
-	<software name="koreaigo" supported="no">
+	<software name="koreaigo">
 		<description>Korean Igo (Kor)</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>DreamTech</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="dreamtech01" />

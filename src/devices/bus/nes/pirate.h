@@ -372,6 +372,28 @@ private:
 };
 
 
+// ======================> nes_eh8813a_device
+
+class nes_eh8813a_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	uint8_t m_dip_mode, m_latch;
+};
+
+
 
 #ifdef UNUSED_FUNCTION
 // ======================> nes_fujiya_device
@@ -414,6 +436,7 @@ DECLARE_DEVICE_TYPE(NES_43272,       nes_43272_device)
 DECLARE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device)
 DECLARE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device)
 DECLARE_DEVICE_TYPE(NES_NINJARYU,    nes_ninjaryu_device)
+DECLARE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device)
 //DECLARE_DEVICE_TYPE(NES_FUJIYA,      nes_fujiya_device)
 
 #endif // MAME_BUS_NES_PIRATE_H

@@ -287,6 +287,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("tf1201",           NES_TF1201);
 	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); // used by City Fighter IV
 	device.option_add_internal("ninjaryu",         NES_NINJARYU);  // used by Ninja Ryukenden Chinese
+	device.option_add_internal("unl_eh8813a",      NES_EH8813A);   // used by Dr. Mario II
 	device.option_add_internal("zemina",           NES_ZEMINA);    // mapper 190 - Magic Kid GooGoo
 // misc bootleg boards
 	device.option_add_internal("ax5705",           NES_AX5705);
@@ -418,7 +419,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_f15",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_hp898f",       NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_8in1",         NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("unl_eh8813a",      NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_158b",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?

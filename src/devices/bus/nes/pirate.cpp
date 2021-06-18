@@ -50,6 +50,7 @@ DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_NINJARYU,    nes_ninjaryu_device,    "nes_ninjaryu",    "NES Cart Ninja Ryukenden Chinese PCB")
+DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",    "NES Cart UNL-EH8813A PCB")
 
 
 nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -129,6 +130,11 @@ nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const 
 
 nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_NINJARYU, tag, owner, clock)
+{
+}
+
+nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+     : nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dip_mode(0), m_latch(0)
 {
 }
 
@@ -428,6 +434,25 @@ void nes_ninjaryu_device::pcb_reset()
 	update_chr();
 }
 
+void nes_eh8813a_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_dip_mode));
+	save_item(NAME(m_latch));
+}
+
+void nes_eh8813a_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	prg16_89ab(0);
+	prg16_89ab(m_prg_chunks - 1);
+	chr8(0, m_chr_source);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+
+	m_dip_mode = (m_dip_mode + 1) & 0x0f; // does PCB have dipswitches?
+	m_latch = 0;
+}
+
 
 
 /*-------------------------------------------------
@@ -594,7 +619,7 @@ void nes_futuremedia_device::write_h(offs_t offset, uint8_t data)
 			break;
 
 		case 0x5000:
-			set_nt_mirroring(BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4001:
@@ -926,7 +951,7 @@ void nes_mk2_device::write_m(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- UNL-WOLRDHERO board emulation
+ UNL-WORLDHERO board emulation
 
 
  iNES:
@@ -1092,7 +1117,7 @@ void nes_tf1201_device::write_h(offs_t offset, uint8_t data)
 			update_prg();
 			break;
 		case 0x1000:
-			set_nt_mirroring(BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x1001:
 			m_swap = data & 0x03;
@@ -1312,6 +1337,53 @@ void nes_ninjaryu_device::write_h(offs_t offset, uint8_t data)
 			update_prg();
 			break;
 	}
+}
+
+
+/*-------------------------------------------------
+
+ UNL-EH8813A
+
+ Games: Dr. Mario II
+
+ Board is used in multicarts other than this? The
+ implementation here cycles through dipswitch modes
+ when reset as other emus do, needs investigation.
+
+ NES 2.0: mapper 519
+
+ In MAME: Preliminary Supported
+
+ -------------------------------------------------*/
+
+void nes_eh8813a_device::write_h(offs_t offset, uint8_t data)
+{
+	LOG_MMC(("unl_eh8813a write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 8))
+		return;
+
+	chr8(data & 0x7f, m_chr_source);
+	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+
+	uint8_t prg = offset & 0x3f;
+	if (BIT(offset, 7))
+	{
+		prg16_89ab(prg);
+		prg16_cdef(prg);
+	}
+	else
+		prg32(prg >> 1);
+
+	m_latch = BIT(offset, 6);
+}
+
+uint8_t nes_eh8813a_device::read_h(offs_t offset)
+{
+	LOG_MMC(("unl_eh8813a read_h, offset: %04x\n", offset));
+	if (m_latch)
+	     offset = (offset & 0xfff0) | m_dip_mode;
+	return hi_access_rom(offset);
 }
 
 
