@@ -161,7 +161,7 @@ void taitosj_state::compute_draw_order()
 	}
 }
 
-void taitosj_state::postload()
+void taitosj_state::device_post_load()
 {
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 	m_gfxdecode->gfx(1)->mark_all_dirty();
@@ -186,8 +186,6 @@ void taitosj_state::video_start()
 	m_gfxdecode->gfx(1)->set_source(m_characterram);
 	m_gfxdecode->gfx(2)->set_source(m_characterram + 0x1800);
 	m_gfxdecode->gfx(3)->set_source(m_characterram + 0x1800);
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(taitosj_state::postload), this));
 
 	compute_draw_order();
 }

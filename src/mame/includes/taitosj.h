@@ -62,6 +62,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	virtual void device_post_load() override;
 
 private:
 	required_shared_ptr_array<uint8_t, 3> m_videoram;
@@ -162,7 +163,6 @@ private:
 	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func, int which, int *sprites_on, rectangle *sprite_areas);
 	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
-	void postload();
 
 	void kikstart_main_map(address_map &map);
 	void taitosj_audio_map(address_map &map);
