@@ -1248,6 +1248,12 @@ void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
 
  Games: Ninja Ryukenden Chinese
 
+ This board is mentioned on the NesDev page describing
+ mapper 111, which used to be assigned to this. It has
+ registers similar to MMC1 but without the need to write to
+ them serially. The one existing game has 256K CHR, so this
+ must have at least 1 more bit for CHR banking. Other differences?
+
  In MAME: Preliminary Supported
 
  -------------------------------------------------*/
