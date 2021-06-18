@@ -134,7 +134,7 @@ nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const ch
 }
 
 nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-     : nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dip_mode(0), m_latch(0)
+	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dip_mode(0), m_latch(0)
 {
 }
 
@@ -1382,7 +1382,7 @@ uint8_t nes_eh8813a_device::read_h(offs_t offset)
 {
 	LOG_MMC(("unl_eh8813a read_h, offset: %04x\n", offset));
 	if (m_latch)
-	     offset = (offset & 0xfff0) | m_dip_mode;
+		offset = (offset & 0xfff0) | m_dip_mode;
 	return hi_access_rom(offset);
 }
 
