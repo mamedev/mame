@@ -50,7 +50,7 @@ DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_NINJARYU,    nes_ninjaryu_device,    "nes_ninjaryu",    "NES Cart Ninja Ryukenden Chinese PCB")
-DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",    "NES Cart UNL-EH8813A PCB")
+DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
 nes_agci_device::nes_agci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
