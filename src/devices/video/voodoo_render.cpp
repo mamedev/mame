@@ -2652,19 +2652,7 @@ void voodoo_renderer::dump_rasterizer_stats()
 
 void voodoo_renderer::reset_after_wait()
 {
-static int maxtex = 0;
-	if (m_textures.count() > maxtex)
-	{
-		maxtex = m_textures.count();
-		printf("Used %d textures\n", maxtex);
-	}
 	m_textures.reset();
-static int maxpal = 0;
-	if (m_palettes.count() > maxpal)
-	{
-		maxpal = m_palettes.count();
-		printf("Used %d palettes\n", maxpal);
-	}
 	m_palettes.reset();
 }
 
