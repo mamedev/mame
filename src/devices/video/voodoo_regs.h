@@ -209,11 +209,12 @@ public:
 
 	constexpr u32 normalize()
 	{
-		u32 result = m_value;
+		// always ignore the alpha ref; it is stashed in the poly data
+		u32 result = m_value & ~(0xff << 24);
 
-		// if not doing alpha testing, ignore the alpha function and referencevalue
+		// if not doing alpha testing, ignore the alpha function
 		if (!alphatest())
-			result &= ~((7 << 1) | (0xff << 24));
+			result &= ~(7 << 1);
 
 		// if not doing alpha blending, ignore the source and dest blending factors
 		if (!alphablend())
@@ -265,13 +266,24 @@ private:
 class reg_texture_mode
 {
 public:
+	static constexpr u32 NONE = 0xffffffff;
 	static constexpr u32 DECODE_LIVE = 0xfffffffe;
+
+	// these bits are set for special cases in the rasterizer
+	// (normally they are masked out)
+	static constexpr u32 TMU_CONFIG_MASK = 0x80000000;
+
+	// mask of equation bits
+	static constexpr u32 EQUATION_MASK = 0x3ffff000;
 
 	constexpr reg_texture_mode(u32 value) :
 		m_value(value) { }
 
 	constexpr reg_texture_mode(u32 normalized, reg_texture_mode const live) :
 		m_value((normalized == DECODE_LIVE) ? live.m_value : normalized) { }
+
+	constexpr bool is_none() const { return (m_value == NONE); }
+	constexpr bool is_live() const { return (m_value == DECODE_LIVE); }
 
 	constexpr u32 raw() const                  { return m_value; }
 	constexpr u32 enable_perspective() const   { return BIT(m_value, 0, 1); }

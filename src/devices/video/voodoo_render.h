@@ -137,6 +137,154 @@ private:
 };
 
 
+// ======================> color_source
+
+// color_source describes the alpha+RGB components of a color in an
+// abstract way
+class color_source
+{
+public:
+	// flags
+	static constexpr u8 FLAG_INVERTED = 0x80;
+	static constexpr u8 FLAG_ALPHA_EXPANDED = 0x40;
+
+	// constant values (0-3)
+	static constexpr u8 ZERO = 0;
+	static constexpr u8 ONE = 1;
+	static constexpr u8 COLOR0 = 2;
+	static constexpr u8 COLOR1 = 3;
+
+	// iterated values (4-7)
+	static constexpr u8 ITERATED_ARGB = 4;
+	static constexpr u8 CLAMPZ = 5;
+	static constexpr u8 CLAMPW = 6;
+
+	// dynamic values (8+)
+	static constexpr u8 TEXEL0 = 8;
+	static constexpr u8 TEXEL1 = 9;
+	static constexpr u8 DETAIL_FACTOR = 10;
+	static constexpr u8 LOD_FRACTION = 11;
+	static constexpr u8 COLOR0_OR_ITERATED_VIA_TEXEL_ALPHA = 12;
+
+	// constructor
+	constexpr color_source(u8 alpha = ZERO, u8 rgb = ZERO) : m_alpha(alpha), m_rgb(rgb) { }
+
+	// exact comparisons
+	bool operator==(color_source const &rhs) const { return m_rgb == rhs.m_rgb && m_alpha == rhs.m_alpha; }
+	bool operator!=(color_source const &rhs) const { return m_rgb != rhs.m_rgb || m_alpha != rhs.m_alpha; }
+
+	// return the full alpha/RGB value
+	u8 alpha() const { return m_alpha; }
+	u8 rgb() const { return m_rgb; }
+
+	// return the base (flag-free) alpha/RGB value
+	u8 alpha_base() const { return m_alpha & 15; }
+	u8 rgb_base() const { return m_rgb & 15; }
+
+	// return the alpha/RGB value flags
+	u8 alpha_flags() const { return m_alpha >> 6; }
+	u8 rgb_flags() const { return m_rgb >> 6; }
+
+	// helpers
+	bool is_rgb_zero() const { return m_rgb == ZERO; }
+	bool is_alpha_zero() const { return m_alpha == ZERO; }
+	bool is_zero() const { return is_rgb_zero() && is_alpha_zero(); }
+	bool is_rgb_one() const { return m_rgb == ONE; }
+	bool is_alpha_one() const { return m_alpha == ONE; }
+	bool is_one() const { return is_rgb_one() && is_alpha_one(); }
+
+	// uniform is true if RGB and alpha come from the same source
+	bool is_uniform() const { return (m_alpha == m_rgb); }
+
+	// uniform_alpha is true if RGB and alpha are replication of the same alpha value
+	bool is_uniform_alpha() const { return ((m_alpha | FLAG_ALPHA_EXPANDED) == m_rgb); }
+
+	// constant is true if both values are constant across a scanline
+	bool is_rgb_constant() const { return ((m_rgb & 0x0c) == 0x00); }
+	bool is_alpha_constant() const { return ((m_alpha & 0x0c) == 0x00); }
+	bool is_constant() const { return is_rgb_constant() && is_alpha_constant(); }
+
+	// partial_constant is true if at least one value is constant across a scanline
+	bool is_partial_constant() const { return is_rgb_constant() || is_alpha_constant(); }
+
+	// constant_or_iterated is true if values are constant or simply iterated across a scanline
+	bool is_rgb_constant_or_iterated() const { return ((m_rgb & 0x08) == 0x00); }
+	bool is_alpha_constant_or_iterated() const { return ((m_alpha & 0x08) == 0x00); }
+	bool is_constant_or_iterated() const { return is_rgb_constant_or_iterated() && is_alpha_constant_or_iterated(); }
+
+	// uses_any is true if either the RGB or alpha referenecs the given source
+	bool uses_any(color_source const &src) const { return rgb_base() == src.rgb_base() || alpha_base() == src.alpha_base(); }
+
+	// directly set the alpha/RGB component
+	void set_alpha(u8 alpha) { m_alpha = alpha; }
+	void set_rgb(u8 rgb) { m_rgb = rgb; }
+
+	// set the RGB as an expanded single component
+	void set_rgb_from_alpha(u8 rgb) { m_rgb = rgb | FLAG_ALPHA_EXPANDED; }
+
+	// mark the RGB/alpha component as inverted
+	void invert_rgb() { m_rgb ^= FLAG_INVERTED; }
+	void invert_alpha() { m_alpha ^= FLAG_INVERTED; }
+
+	// perform internal simplification
+	void simplify();
+
+	// return a string version of the component
+	std::string as_string() const;
+
+	// constants
+	static color_source const zero;
+	static color_source const one;
+	static color_source const iterated_argb;
+	static color_source const color0;
+	static color_source const color1;
+	static color_source const texel0;
+	static color_source const texel1;
+
+private:
+	// internal state
+	u8 m_alpha, m_rgb;
+};
+
+
+// ======================> color_equation
+
+// color_equation describes a set of 4 color sources, intended to be computed
+// as clamp((color - sub) * multiply + add)
+class color_equation
+{
+public:
+	// construction
+	constexpr color_equation() { }
+
+	// simple getters
+	color_source &color() { return m_color; }
+	color_source &subtract() { return m_subtract; }
+	color_source &multiply() { return m_multiply; }
+	color_source &add() { return m_add; }
+
+	// helpers
+	bool uses_any(color_source color) const { return m_color.uses_any(color) || m_subtract.uses_any(color) || m_multiply.uses_any(color) || m_add.uses_any(color); }
+	bool is_identity(color_source color) const { return (m_multiply.is_zero() && m_add == color); }
+	bool is_zero() const { return m_multiply.is_zero() && m_add.is_zero(); }
+
+	// operations
+	void simplify();
+	std::string as_string() const;
+
+	// computation
+	static color_equation from_fbzcp(reg_fbz_colorpath const fbzcp);
+	static color_equation from_texmode(reg_texture_mode const texmode, color_source texel_color, color_source input_color);
+
+private:
+	// internal state
+	color_source m_color;
+	color_source m_subtract;
+	color_source m_multiply;
+	color_source m_add;
+};
+
+
 // ======================> rasterizer_params
 
 // this class holds the representative parameters that characterize a
@@ -145,8 +293,15 @@ private:
 class rasterizer_params
 {
 public:
+	// generic flags
+	static constexpr u32 GENERIC_TEX0 = 0x01;
+	static constexpr u32 GENERIC_TEX1 = 0x02;
+	static constexpr u32 GENERIC_TEX0_IDENTITY = 0x04;
+	static constexpr u32 GENERIC_TEX1_IDENTITY = 0x08;
+
 	// construction
-	constexpr rasterizer_params(u32 fbzcp = 0, u32 alphamode = 0, u32 fogmode = 0, u32 fbzmode = 0, u32 texmode0 = 0, u32 texmode1 = 0) :
+	constexpr rasterizer_params(u32 generic = 0, u32 fbzcp = 0, u32 alphamode = 0, u32 fogmode = 0, u32 fbzmode = 0, u32 texmode0 = 0, u32 texmode1 = 0) :
+		m_generic(generic),
 		m_fbzcp(fbzcp),
 		m_alphamode(alphamode),
 		m_fogmode(fogmode),
@@ -159,29 +314,38 @@ public:
 
 	// compute the parameters given a set of registers
 	void compute(voodoo_regs &regs, voodoo_regs *tmu0regs = nullptr, voodoo_regs *tmu1regs = nullptr);
+	void compute_equations();
 
 	// compute the hash of the settings
 	u32 hash() const;
 
 	// getters
+	u32 generic() const { return m_generic; }
 	reg_fbz_colorpath fbzcp() const { return reg_fbz_colorpath(m_fbzcp); }
 	reg_alpha_mode alphamode() const { return reg_alpha_mode(m_alphamode); }
 	reg_fog_mode fogmode() const { return reg_fog_mode(m_fogmode); }
 	reg_fbz_mode fbzmode() const { return reg_fbz_mode(m_fbzmode); }
 	reg_texture_mode texmode0() const { return reg_texture_mode(m_texmode0); }
 	reg_texture_mode texmode1() const { return reg_texture_mode(m_texmode1); }
+	color_equation const &colorpath_equation() const { return m_color_equation; }
+	color_equation const &tex0_equation() const { return m_tex0_equation; }
+	color_equation const &tex1_equation() const { return m_tex1_equation; }
 
 private:
 	// internal helpers
 	static constexpr u32 rotate(u32 value, int count) { return (value << count) | (value >> (32 - count)); }
 
 	// internal state
+	u32 m_generic;      // 4 bits
 	u32 m_fbzcp;        // 30 bits
 	u32 m_alphamode;    // 32 bits
 	u32 m_fogmode;      // 8 bits
 	u32 m_fbzmode;      // 22 bits
 	u32 m_texmode0;     // 31 bits
 	u32 m_texmode1;     // 31 bits
+	color_equation m_color_equation;
+	color_equation m_tex0_equation;
+	color_equation m_tex1_equation;
 };
 
 
@@ -299,6 +463,7 @@ struct poly_data
 	rgb_t fogcolor;             // fogcolor
 	u32 zacolor;                // depth/alpha value consumed by the rasterizer
 	u32 stipple;                // stipple pattern
+	u32 alpharef;               // reference alpha value
 
 	u16 dither[16];             // dither matrix, for fastfill
 };
@@ -365,7 +530,7 @@ public:
 	u32 enqueue_triangle(poly_data &poly, vertex_t const *vert);
 
 	// core triangle rasterizer
-	template<u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+	template<u32 _Generic, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
 	void rasterizer(s32 y, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_data &extra, int threadid);
 
 	// run the pixel pipeline for LFB writes
@@ -445,7 +610,7 @@ private:
 	poly_array<voodoo::rasterizer_texture, 2> m_textures;
 	poly_array<voodoo::rasterizer_palette, 8> m_palettes;
 	voodoo::rasterizer_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
-	voodoo::rasterizer_info *m_generic_rasterizer[4];
+	voodoo::rasterizer_info *m_generic_rasterizer[16];
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;
 	std::vector<thread_stats_block> m_thread_stats;
 };

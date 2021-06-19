@@ -3193,6 +3193,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		poly.fogcolor = m_reg.fog_color().argb();
 		poly.zacolor = m_reg.za_color();
 		poly.stipple = m_reg.stipple();
+		poly.alpharef = m_reg.alpha_mode().alpharef();
 		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
 			printf("Warning: rotated stipple pattern\n");
 
@@ -5076,6 +5077,7 @@ s32 voodoo_device::triangle()
 	poly.fogcolor = m_reg.fog_color().argb();
 	poly.zacolor = m_reg.za_color();
 	poly.stipple = m_reg.stipple();
+	poly.alpharef = m_reg.alpha_mode().alpharef();
 
 	// fill in the vertex data
 	voodoo_renderer::vertex_t vert[3];
