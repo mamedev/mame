@@ -134,7 +134,7 @@ nes_ninjaryu_device::nes_ninjaryu_device(const machine_config &mconfig, const ch
 }
 
 nes_eh8813a_device::nes_eh8813a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dip_mode(0), m_latch(0)
+	: nes_nrom_device(mconfig, NES_EH8813A, tag, owner, clock), m_dipsetting(0), m_latch(0)
 {
 }
 
@@ -437,7 +437,7 @@ void nes_ninjaryu_device::pcb_reset()
 void nes_eh8813a_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_dip_mode));
+	save_item(NAME(m_dipsetting));
 	save_item(NAME(m_latch));
 }
 
@@ -449,7 +449,7 @@ void nes_eh8813a_device::pcb_reset()
 	chr8(0, m_chr_source);
 	set_nt_mirroring(PPU_MIRROR_VERT);
 
-	m_dip_mode = (m_dip_mode + 1) & 0x0f; // does PCB have dipswitches?
+	m_dipsetting = 0; // no means to adjust cart DIPs - unimplemented
 	m_latch = 0;
 }
 
@@ -1346,9 +1346,10 @@ void nes_ninjaryu_device::write_h(offs_t offset, uint8_t data)
 
  Games: Dr. Mario II
 
- Board is used in multicarts other than this? The
- implementation here cycles through dipswitch modes
- when reset as other emus do, needs investigation.
+ Board is used in multicarts other than this? "BY ES"
+ in pause menu suggests this may be by Waixing. Title
+ menus change with DIP settings (currently unimplemented),
+ but it is unclear if PCB has switch or solder pads or...?
 
  NES 2.0: mapper 519
 
@@ -1382,7 +1383,7 @@ uint8_t nes_eh8813a_device::read_h(offs_t offset)
 {
 	LOG_MMC(("unl_eh8813a read_h, offset: %04x\n", offset));
 	if (m_latch)
-		offset = (offset & 0xfff0) | m_dip_mode;
+		offset = (offset & 0xfff0) | m_dipsetting;
 	return hi_access_rom(offset);
 }
 

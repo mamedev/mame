@@ -390,7 +390,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_dip_mode, m_latch;
+	uint8_t m_dipsetting, m_latch;
 };
 
 
