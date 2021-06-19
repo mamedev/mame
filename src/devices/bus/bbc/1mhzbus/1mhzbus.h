@@ -112,6 +112,7 @@ public:
 	virtual uint8_t jim_r(offs_t offset);
 	virtual void jim_w(offs_t offset, uint8_t data);
 
+	DECLARE_WRITE_LINE_MEMBER( rst_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
@@ -136,6 +137,8 @@ public:
 	virtual void fred_w(offs_t offset, uint8_t data) { }
 	virtual uint8_t jim_r(offs_t offset) { return 0xff; }
 	virtual void jim_w(offs_t offset, uint8_t data) { }
+
+	virtual DECLARE_WRITE_LINE_MEMBER(rst_w) { }
 
 protected:
 	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);

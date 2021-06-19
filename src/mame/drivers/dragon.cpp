@@ -25,6 +25,11 @@
 #include "bus/rs232/rs232.h"
 
 
+#include "bus/coco/dragon_fdc.h"
+#include "bus/coco/dragon_jcbsnd.h"
+#include "bus/coco/coco_pak.h"
+#include "bus/coco/coco_ssc.h"
+
 
 //**************************************************************************
 //  ADDRESS MAPS

@@ -50,3 +50,18 @@ u8 deco_cpu6_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) co
 {
 	return opcode && (pc & 1) ? bitswap<8>(value,6,4,7,5,3,2,1,0) : value;
 }
+
+util::disasm_interface *deco_cpu6_device::create_disassembler()
+{
+	return new disassembler;
+}
+
+u32 deco_cpu6_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 deco_cpu6_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode && (pc & 1) ? BITSWAP8(value,6,4,7,5,3,2,1,0) : value;
+}

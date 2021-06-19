@@ -28,6 +28,9 @@
 // 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
 static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
 
+// 7M = XTAL_14_31818MHz / 2 or XTAL_28_63636MHz / 4 (for IIgs)
+static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

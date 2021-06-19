@@ -79,6 +79,9 @@ public:
 	// called from host
 	DECLARE_WRITE_LINE_MEMBER( host_int_w );
 
+	// called from host
+	DECLARE_WRITE_LINE_MEMBER( host_int_w );
+
 	// called from card device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
