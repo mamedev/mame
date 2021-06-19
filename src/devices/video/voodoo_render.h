@@ -40,6 +40,7 @@ class stw_helper;
 using voodoo_poly_manager = poly_manager<float, poly_data, 1, 10000>;
 
 
+
 //**************************************************************************
 //  DITHER HELPER
 //**************************************************************************
@@ -230,6 +231,26 @@ private:
 };
 
 
+// ======================> rasterizer_palette
+
+class rasterizer_palette
+{
+public:
+	// compute from an NCC table
+	void compute_ncc(u32 const *regs);
+
+	// copy from a table
+	void copy(rgb_t *texels) { memcpy(&m_texel, texels, sizeof(m_texel)); }
+
+	// simple getters
+	rgb_t const *texels() const { return &m_texel[0]; }
+
+private:
+	// internal state
+	rgb_t m_texel[256];
+};
+
+
 // ======================> poly_data
 
 // this struct contains the polygon-wide shared data used during rendering;
@@ -369,17 +390,13 @@ public:
 		m_rowpixels = rowpixels;
 	}
 
-	// allocate a new texture instance
-	rasterizer_texture &alloc_texture(int tmu)
-	{
-		return m_textures.next(tmu);
-	}
+	// manage texture instances
+	rasterizer_texture &alloc_texture(int tmu) { return m_textures.next(tmu); }
+	rasterizer_texture &last_texture(int tmu) { return m_textures.last(tmu); }
 
-	// return the most recently allocated texture instance
-	rasterizer_texture &last_texture(int tmu)
-	{
-		return m_textures.last(tmu);
-	}
+	// manage ncc texel instnaces
+	rasterizer_palette &alloc_palette(int which) { return m_palettes.next(which); }
+	rasterizer_palette &last_palette(int which) { return m_palettes.last(which); }
 
 	// dump rasterizer statistics if enabled
 	void dump_rasterizer_stats();
@@ -421,6 +438,7 @@ private:
 	u8 m_fogdelta[64];          // 64-entry fog table
 	u8 m_fogdelta_mask;         // mask for for delta (0xff for V1, 0xfc for V2)
 	poly_array<voodoo::rasterizer_texture, 2> m_textures;
+	poly_array<voodoo::rasterizer_palette, 8> m_palettes;
 	voodoo::rasterizer_info *m_raster_hash[RASTER_HASH_SIZE]; // hash table of rasterizers
 	voodoo::rasterizer_info *m_generic_rasterizer[4];
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;

@@ -191,43 +191,27 @@ protected:
 		voodoo::rasterizer_texture &prepare_texture();
 		s32 compute_lodbase();
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
+		void ncc_w(offs_t offset, u32 data);
 
-		struct ncc_table
-		{
-			void write(offs_t regnum, u32 data);
-			void update();
+		voodoo_device &m_device;        // reference back to our owner
+		int m_index;                    // index of ourself
+		u8 *m_ram = nullptr;            // pointer to our RAM
+		u32 m_mask = 0;                 // mask to apply to pointers
 
-			u8 dirty = 0;              // is the texel lookup dirty?
-			u32 *m_reg = nullptr;          // pointer to our registers
-			s32 ir[4], ig[4], ib[4];    // I values for R,G,B
-			s32 qr[4], qg[4], qb[4];    // Q values for R,G,B
-			s32 y[16];                  // Y values
-			rgb_t *palette = nullptr;      // pointer to associated RGB palette
-			rgb_t *palettea = nullptr;     // pointer to associated ARGB palette
-			rgb_t texel[256];             // texel lookup
-		};
-
-		voodoo_device &m_device;
-		int m_index;
-		u8 *m_ram = nullptr;          // pointer to our RAM
-		u32 m_mask = 0;               // mask to apply to pointers
-
-		voodoo::voodoo_regs m_reg;          // pointer to our register base
-		u32 m_regdirty = 0;           // true if the LOD/mode/base registers have changed
+		voodoo::voodoo_regs m_reg;      // TMU registers
+		bool m_regdirty;                // true if the LOD/mode/base registers have changed
 
 		s64 m_starts = 0, m_startt = 0; // starting S,T (14.18)
-		s64 m_startw = 0;             // starting W (2.30)
+		s64 m_startw = 0;               // starting W (2.30)
 		s64 m_dsdx = 0, m_dtdx = 0;     // delta S,T per X
-		s64 m_dwdx = 0;               // delta W per X
+		s64 m_dwdx = 0;                 // delta W per X
 		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
-		s64 m_dwdy = 0;               // delta W per Y
+		s64 m_dwdy = 0;                 // delta W per Y
 
-		ncc_table m_ncc[2];                 // two NCC tables
+		rgb_t *m_texel[16];             // texel lookups for each format
 
-		rgb_t *m_texel[16];              // texel lookups for each format
-
-		rgb_t m_palette[256];           // palette lookup table
-		rgb_t m_palettea[256];          // palette+alpha lookup table
+		bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
+		rgb_t m_palette[2][256];        // 2 versions of the palette
 	};
 
 

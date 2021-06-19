@@ -578,39 +578,30 @@ void voodoo_device::tmu_shared_state::init()
 
 void voodoo_device::tmu_state::init(int index, tmu_shared_state &share, void *memory, int tmem)
 {
-	/* allocate texture RAM */
+	// configure texture RAM
 	m_index = index;
 	m_ram = reinterpret_cast<u8 *>(memory);
 	m_mask = tmem - 1;
-	m_regdirty = false;
+	m_regdirty = true;
+	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
 
-	/* mark the NCC tables dirty and configure their registers */
-	m_ncc[0].dirty = m_ncc[1].dirty = true;
-	m_ncc[0].m_reg = m_reg.subset(voodoo_regs::reg_nccTable + 0);
-	m_ncc[1].m_reg = m_reg.subset(voodoo_regs::reg_nccTable + 12);
-
-	/* create pointers to all the tables */
+	// create pointers to the static lookups
 	m_texel[0] = share.rgb332;
-	m_texel[1] = m_ncc[0].texel;
+	m_texel[1] = nullptr;
 	m_texel[2] = share.alpha8;
 	m_texel[3] = share.int8;
 	m_texel[4] = share.ai44;
-	m_texel[5] = m_palette;
-	m_texel[6] = m_reg.rev2_or_3() ? m_palettea : nullptr;
+	m_texel[5] = nullptr;
+	m_texel[6] = nullptr;
 	m_texel[7] = nullptr;
 	m_texel[8] = share.rgb332;
-	m_texel[9] = m_ncc[0].texel;
+	m_texel[9] = nullptr;
 	m_texel[10] = share.rgb565;
 	m_texel[11] = share.argb1555;
 	m_texel[12] = share.argb4444;
 	m_texel[13] = share.int8;
-	m_texel[14] = m_palette;
+	m_texel[14] = nullptr;
 	m_texel[15] = nullptr;
-
-	/* attach the palette to NCC table 0 */
-	m_ncc[0].palette = m_palette;
-	if (m_reg.rev2_or_3())
-		m_ncc[0].palettea = m_palettea;
 }
 
 
@@ -620,8 +611,7 @@ void voodoo_device::device_post_load()
 	for (tmu_state &tm : m_tmu)
 	{
 		tm.m_regdirty = true;
-		for (tmu_state::ncc_table &ncc : tm.m_ncc)
-			ncc.dirty = true;
+		tm.m_palette_dirty[0] = tm.m_palette_dirty[1] = tm.m_palette_dirty[2] = tm.m_palette_dirty[3] = true;
 	}
 
 	/* recompute video memory to get the FBI FIFO base recomputed */
@@ -761,13 +751,7 @@ void voodoo_device::init_save_state()
 		save_item(NAME(tmu->m_dsdy), index);
 		save_item(NAME(tmu->m_dtdy), index);
 		save_item(NAME(tmu->m_dwdy), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, ir), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, ig), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, ib), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, qr), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, qg), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, qb), index);
-		save_item(STRUCT_MEMBER(tmu->m_ncc, y), index);
+		save_item(NAME(tmu->m_palette), index);
 	}
 
 	/* register states: banshee */
@@ -1170,91 +1154,40 @@ void voodoo_device::fbi_state::recompute_fifo_layout(voodoo_regs &regs)
  *
  *************************************/
 
-void voodoo_device::tmu_state::ncc_table::write(offs_t regnum, u32 data)
+void voodoo_device::tmu_state::ncc_w(offs_t regnum, u32 data)
 {
-	/* I/Q entries reference the plaette if the high bit is set */
-	if (regnum >= 4 && (data & 0x80000000) && palette)
+	u32 regindex = regnum - voodoo_regs::reg_nccTable;
+
+	// I/Q entries in NCC 0 reference the palette if the high bit is set
+	if (BIT(data, 31) && regindex >= 4 && regindex < 12)
 	{
-		int const index = ((data >> 23) & 0xfe) | (regnum & 1);
+		// extract the palette index
+		int const index = (BIT(data, 24, 7) << 1) | BIT(regindex, 0);
 
-		/* set the ARGB for this palette index */
-		palette[index] = 0xff000000 | data;
+		// compute RGB and ARGB values
+		rgb_t rgb = 0xff000000 | data;
+		rgb_t argb = argbexpand<6,6,6,6>(data, 18, 12, 6, 0);
 
-		/* if we have an ARGB palette as well, compute its value */
-		if (palettea)
+		// set and mark dirty
+		if (m_palette[0][index] != rgb)
 		{
-			int a = ((data >> 16) & 0xfc) | ((data >> 22) & 0x03);
-			int r = ((data >> 10) & 0xfc) | ((data >> 16) & 0x03);
-			int g = ((data >>  4) & 0xfc) | ((data >> 10) & 0x03);
-			int b = ((data <<  2) & 0xfc) | ((data >>  4) & 0x03);
-			palettea[index] = rgb_t(a, r, g, b);
+			m_palette[0][index] = rgb;
+			m_palette_dirty[0] = true;
 		}
+		if (m_palette[1][index] != argb)
+		{
+			m_palette[1][index] = argb;
+			m_palette_dirty[1] = true;
+		}
+	}
 
-		/* this doesn't dirty the table or go to the registers, so bail */
+	// if no delta, don't mark dirty
+	if (m_reg.read(regnum) == data)
 		return;
-	}
 
-	/* if the register matches, don't update */
-	if (data == m_reg[regnum])
-		return;
-	m_reg[regnum] = data;
-
-	/* first four entries are packed Y values */
-	if (regnum < 4)
-	{
-		regnum *= 4;
-		y[regnum+0] = (data >>  0) & 0xff;
-		y[regnum+1] = (data >>  8) & 0xff;
-		y[regnum+2] = (data >> 16) & 0xff;
-		y[regnum+3] = (data >> 24) & 0xff;
-	}
-
-	/* the second four entries are the I RGB values */
-	else if (regnum < 8)
-	{
-		regnum &= 3;
-		ir[regnum] = (s32)(data <<  5) >> 23;
-		ig[regnum] = (s32)(data << 14) >> 23;
-		ib[regnum] = (s32)(data << 23) >> 23;
-	}
-
-	/* the final four entries are the Q RGB values */
-	else
-	{
-		regnum &= 3;
-		qr[regnum] = (s32)(data <<  5) >> 23;
-		qg[regnum] = (s32)(data << 14) >> 23;
-		qb[regnum] = (s32)(data << 23) >> 23;
-	}
-
-	/* mark the table dirty */
-	dirty = true;
-}
-
-
-void voodoo_device::tmu_state::ncc_table::update()
-{
-	/* generte all 256 possibilities */
-	for (int i = 0; i < 256; i++)
-	{
-		int vi = (i >> 2) & 0x03;
-		int vq = (i >> 0) & 0x03;
-
-		/* start with the intensity */
-		int r, g, b;
-		r = g = b = y[(i >> 4) & 0x0f];
-
-		/* add the coloring */
-		r = std::clamp(r + ir[vi] + qr[vq], 0, 255);
-		g = std::clamp(g + ig[vi] + qg[vq], 0, 255);
-		b = std::clamp(b + ib[vi] + qb[vq], 0, 255);
-
-		/* fill in the table */
-		texel[i] = rgb_t(0xff, r, g, b);
-	}
-
-	/* no longer dirty */
-	dirty = false;
+	// write the updated data and mark dirty
+	m_reg.write(regnum, data);
+	m_palette_dirty[2 + regindex / 12] = true;
 }
 
 
@@ -1307,20 +1240,41 @@ inline rasterizer_texture &voodoo_device::tmu_state::prepare_texture()
 	// if the texture parameters are dirty, update them
 	if (m_regdirty)
 	{
-		// ensure that the NCC tables are up to date if they are being referenced
+		// determine the lookup
 		auto const texmode = m_reg.texture_mode();
-		if ((texmode.format() & 7) == 1)
+		u32 const texformat = texmode.format();
+		rgb_t const *lookup = m_texel[texformat];
+
+		// if null lookup, then we need something dynamic
+		if (lookup == nullptr)
 		{
-			ncc_table &ncc = m_ncc[texmode.ncc_table_select()];
-			if (ncc.dirty)
-				ncc.update();
+			// could be either straight palette or NCC table
+			int palindex;
+			if ((texformat & 7) == 1)
+			{
+				// NCC case: palindex = 2 or 3 based on table select
+				palindex = 2 + texmode.ncc_table_select();
+				if (m_palette_dirty[palindex])
+				{
+					u32 const *regs = m_reg.subset(voodoo_regs::reg_nccTable + 12 * (palindex & 1));
+					renderer.alloc_palette(m_index * 4 + palindex).compute_ncc(regs);
+				}
+			}
+			else
+			{
+				// palette case: palindex = 0 or 1 based on RGB vs RGBA
+				palindex = (texformat == 6) ? 1 : 0;
+				if (m_palette_dirty[palindex])
+					renderer.alloc_palette(m_index * 4 + palindex).copy(&m_palette[palindex & 1][0]);
+			}
+
+			// clear the dirty flag and fetch the texels
+			m_palette_dirty[palindex] = false;
+			lookup = renderer.last_palette(m_index * 4 + palindex).texels();
 		}
 
-		// set the NCC lookup appropriately
-		m_texel[1] = m_texel[9] = m_ncc[texmode.ncc_table_select()].texel;
-
 		// recompute the rasterization parameters
-		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, m_texel[texmode.format()]);
+		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, lookup);
 		m_regdirty = false;
 	}
 	return renderer.last_texture(m_index);
@@ -2687,11 +2641,6 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case voodoo_regs::reg_nccTable + 9:
 		case voodoo_regs::reg_nccTable + 10:
 		case voodoo_regs::reg_nccTable + 11:
-			m_renderer->wait(m_reg.name(regnum));
-			if (BIT(chips, 1)) m_tmu[0].m_ncc[0].write(regnum - voodoo_regs::reg_nccTable, data);
-			if (BIT(chips, 2)) m_tmu[1].m_ncc[0].write(regnum - voodoo_regs::reg_nccTable, data);
-			break;
-
 		case voodoo_regs::reg_nccTable + 12:
 		case voodoo_regs::reg_nccTable + 13:
 		case voodoo_regs::reg_nccTable + 14:
@@ -2704,9 +2653,9 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case voodoo_regs::reg_nccTable + 21:
 		case voodoo_regs::reg_nccTable + 22:
 		case voodoo_regs::reg_nccTable + 23:
-			m_renderer->wait(m_reg.name(regnum));
-			if (BIT(chips, 1)) m_tmu[0].m_ncc[1].write(regnum - (voodoo_regs::reg_nccTable + 12), data);
-			if (BIT(chips, 2)) m_tmu[1].m_ncc[1].write(regnum - (voodoo_regs::reg_nccTable + 12), data);
+//			m_renderer->wait(m_reg.name(regnum));
+			if (BIT(chips, 1)) m_tmu[0].ncc_w(regnum, data);
+			if (BIT(chips, 2)) m_tmu[1].ncc_w(regnum, data);
 			break;
 
 		// fogTable entries are processed and expanded immediately

@@ -773,6 +773,39 @@ inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::combine_texture(reg_textu
 
 
 //**************************************************************************
+//  RASTERIZER NCC TEXELS
+//**************************************************************************
+
+//-------------------------------------------------
+//  recompute - constructor
+//-------------------------------------------------
+
+void rasterizer_palette::compute_ncc(u32 const *regs)
+{
+	// generate all 256 possibilities
+	u8 const *ybase = reinterpret_cast<u8 const *>(regs);
+	for (int index = 0; index < 256; index++)
+	{
+		// start with the intensity
+		s32 y = ybase[BYTE4_XOR_LE(BIT(index, 4, 4))];
+
+		// look up the I/Q values
+		s32 i = regs[4 + BIT(index, 2, 2)];
+		s32 q = regs[8 + BIT(index, 0, 2)];
+
+		// add the coloring
+		s32 r = std::clamp(y + (s32(i <<  5) >> 23) + (s32(q <<  5) >> 23), 0, 255);
+		s32 g = std::clamp(y + (s32(i << 14) >> 23) + (s32(q << 14) >> 23), 0, 255);
+		s32 b = std::clamp(y + (s32(i << 23) >> 23) + (s32(q << 23) >> 23), 0, 255);
+
+		// fill in the table
+		m_texel[index] = rgb_t(0xff, r, g, b);
+	}
+}
+
+
+
+//**************************************************************************
 //  VOODOO RENDERER
 //**************************************************************************
 
@@ -2121,6 +2154,13 @@ static int maxtex = 0;
 		printf("Used %d textures\n", maxtex);
 	}
 	m_textures.reset();
+static int maxpal = 0;
+	if (m_palettes.count() > maxpal)
+	{
+		maxpal = m_palettes.count();
+		printf("Used %d palettes\n", maxpal);
+	}
+	m_palettes.reset();
 }
 
 
