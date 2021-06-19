@@ -1327,7 +1327,7 @@ struct namcos23_render_data
 
 class namcos23_state;
 
-class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>
+class namcos23_renderer : public poly_manager<float, namcos23_render_data, 4>
 {
 public:
 	namcos23_renderer(namcos23_state &state);
@@ -1652,7 +1652,7 @@ uint16_t namcos23_state::nthword(const uint32_t *pSource, int offs)
 ***************************************************************************/
 
 namcos23_renderer::namcos23_renderer(namcos23_state &state)
-	: poly_manager<float, namcos23_render_data, 4, POLY_MAX_ENTRIES>(state.machine()),
+	: poly_manager<float, namcos23_render_data, 4>(state.machine()),
 		m_state(state)
 {
 }

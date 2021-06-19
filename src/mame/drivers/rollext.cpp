@@ -82,11 +82,11 @@ struct rollext_polydata
 	uint32_t pal;
 };
 
-class rollext_renderer : public poly_manager<float, rollext_polydata, 4, 10000>
+class rollext_renderer : public poly_manager<float, rollext_polydata, 4>
 {
 public:
 	rollext_renderer(screen_device &screen)
-		: poly_manager<float, rollext_polydata, 4, 10000>(screen)
+		: poly_manager<float, rollext_polydata, 4>(screen)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(1024, 1024);
 	}

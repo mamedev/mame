@@ -7,7 +7,7 @@
 
 // Polygon rasterizer interface
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
-	: poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>(state.machine())
+	: poly_manager<float, hng64_poly_data, 7>(state.machine())
 	, m_state(state)
 	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {

@@ -11,7 +11,7 @@
 
 
 tc0780fpa_renderer::tc0780fpa_renderer(device_t &parent, screen_device &screen, const uint8_t *texture_ram)
-	: poly_manager<float, tc0780fpa_polydata, 6, 10000>(screen)
+	: poly_manager<float, tc0780fpa_polydata, 6>(screen)
 {
 	int width = screen.width();
 	int height = screen.height();

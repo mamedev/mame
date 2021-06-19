@@ -137,7 +137,7 @@ struct namcos22_object_data
 
 class namcos22_state;
 
-class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4, 8000>
+class namcos22_renderer : public poly_manager<float, namcos22_object_data, 4>
 {
 public:
 	namcos22_renderer(namcos22_state &state);

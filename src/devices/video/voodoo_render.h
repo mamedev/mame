@@ -37,7 +37,7 @@ class dither_helper;
 class stw_helper;
 
 // base class for our renderer
-using voodoo_poly_manager = poly_manager<float, poly_data, 1, 10000>;
+using voodoo_poly_manager = poly_manager<float, poly_data, 0, POLY_FLAG_NO_CLIPPING>;
 
 
 

@@ -26,7 +26,7 @@
 
 
 midvunit_renderer::midvunit_renderer(midvunit_state &state)
-	: poly_manager<float, midvunit_object_data, 2, 4000>(state.machine()),
+	: poly_manager<float, midvunit_object_data, 2>(state.machine()),
 		m_state(state) { }
 
 

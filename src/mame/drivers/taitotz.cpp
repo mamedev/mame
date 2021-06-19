@@ -638,11 +638,11 @@ private:
 	void tlcs900h_mem(address_map &map);
 };
 
-class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
+class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6>
 {
 public:
 	taitotz_renderer(taitotz_state &state, int width, int height, uint32_t *scrram, uint32_t *texram)
-		: poly_manager<float, taitotz_polydata, 6, 50000>(state.machine()),
+		: poly_manager<float, taitotz_polydata, 6>(state.machine()),
 			m_state(state)
 	{
 		m_fb = std::make_unique<bitmap_rgb32>(width, height);

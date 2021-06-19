@@ -200,7 +200,7 @@ static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int wid
  *************************************/
 
 midzeus_renderer::midzeus_renderer(midzeus_state &state)
-	: poly_manager<float, mz_poly_extra_data, 4, 10000>(state.machine()),
+	: poly_manager<float, mz_poly_extra_data, 4>(state.machine()),
 		m_state(state)
 {}
 

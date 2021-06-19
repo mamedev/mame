@@ -26,7 +26,7 @@
 
 
 gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
-	: poly_manager<float, gaelco3d_object_data, 1, 2000>(state.machine()),
+	: poly_manager<float, gaelco3d_object_data, 1>(state.machine()),
 		m_state(state),
 		m_screenbits(state.m_screen->width(), state.m_screen->height()),
 		m_zbuffer(state.m_screen->width(), state.m_screen->height()),

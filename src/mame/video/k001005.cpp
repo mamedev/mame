@@ -24,7 +24,7 @@
 
 
 k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006)
-	: poly_manager<float, k001005_polydata, 8, 50000>(screen)
+	: poly_manager<float, k001005_polydata, 8>(screen)
 {
 	m_k001006 = k001006;
 

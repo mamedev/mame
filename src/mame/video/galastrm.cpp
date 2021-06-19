@@ -8,7 +8,7 @@
 
 
 galastrm_renderer::galastrm_renderer(galastrm_state& state)
-	: poly_manager<float, gs_poly_data, 2, 10000>(state.machine())
+	: poly_manager<float, gs_poly_data, 2>(state.machine())
 	, m_state(state)
 	, m_screenbits(state.m_screen->width(), state.m_screen->height())
 {

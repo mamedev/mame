@@ -355,11 +355,11 @@ struct cobra_polydata
 	uint32_t tex_address;
 };
 
-class cobra_renderer : public poly_manager<float, cobra_polydata, 8, 10000>
+class cobra_renderer : public poly_manager<float, cobra_polydata, 8>
 {
 public:
 	cobra_renderer(screen_device &screen)
-		: poly_manager<float, cobra_polydata, 8, 10000>(screen)
+		: poly_manager<float, cobra_polydata, 8>(screen)
 	{
 		m_texture_ram = std::make_unique<uint32_t[]>(0x100000);
 

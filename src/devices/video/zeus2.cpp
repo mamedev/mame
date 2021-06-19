@@ -19,7 +19,7 @@
 *  Constructor
 *************************************/
 zeus2_renderer::zeus2_renderer(zeus2_device *state)
-	: poly_manager<float, zeus2_poly_extra_data, 4, 10000>(state->machine())
+	: poly_manager<float, zeus2_poly_extra_data, 4>(state->machine())
 	, m_state(state)
 {
 }

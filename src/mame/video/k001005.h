@@ -42,7 +42,7 @@ enum k001005_param
 };
 
 
-class k001005_renderer : public poly_manager<float, k001005_polydata, 8, 50000>
+class k001005_renderer : public poly_manager<float, k001005_polydata, 8>
 {
 public:
 	k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006);
