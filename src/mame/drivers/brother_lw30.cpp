@@ -612,7 +612,7 @@ public:
 		// Tetris reads bit 3, needed for correct keyboard layout
 		return 0b1000;
 	}
-	uint8_t lw30_state::io_b8_r() { // B8 (keyboard)
+	uint8_t io_b8_r() { // B8 (keyboard)
 		// keyboard matrix
 		if(io_b8 <= 8) {
 			if(m_io_kbrow[io_b8].found()) {
@@ -653,7 +653,7 @@ public:
 		beeper->set_state(data);
 	}
 
-	void lw30_state::irqack_w(uint8_t) { // F8
+	void irqack_w(uint8_t) { // F8
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 
