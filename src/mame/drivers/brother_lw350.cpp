@@ -1027,7 +1027,7 @@ protected:
 
 		// floppy
 		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-		map(0x79, 0x79).rw("fdc", FUNC(hd63266f_t::data_r), FUNC(lw350_state::fdc_dtr_w));
+		map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
 		map(0x7a, 0x7a).r(FUNC(lw350_state::io_7a_r));
 		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
 		map(0x90, 0x90).r(FUNC(lw350_state::io_90_r));
