@@ -51,7 +51,7 @@ protected:
 		uint16_t *screen_ram;
 	};
 
-	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2>
+	class atarisy4_renderer : public poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>
 	{
 	public:
 		atarisy4_renderer(atarisy4_state &state, screen_device &screen);
