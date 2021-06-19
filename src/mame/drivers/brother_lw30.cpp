@@ -19,8 +19,6 @@
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
 // -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img 
 
-#pragma region(LW-30)
-
 //////////////////////////////////////////////////////////////////////////
 // LW-30
 //////////////////////////////////////////////////////////////////////////
@@ -109,8 +107,6 @@ TODO: find self-test; verify RAM address map
 // 8kb SRAM, 64kb DRAM <- where?
 
 ***************************************************************************/
-
-#pragma region(Floppy)
 
 class lw30_floppy_image_device;
 
@@ -333,9 +329,6 @@ void lw30_floppy_image_device::call_unload()
 	loaded = false;
 }
 
-#pragma endregion
-
-#pragma region(Sound)
 class brother_beep_device : public device_t, public device_sound_interface
 {
 public:
@@ -453,8 +446,6 @@ void brother_beep_device::set_clock(uint32_t frequency)
 	m_incr = 0;
 }
 
-#pragma endregion
-
 class lw30_state : public driver_device
 {
 public:
@@ -464,18 +455,17 @@ public:
 		screen(*this, "screen"),
 		floppy(*this, "floppy"),
 		beeper(*this, "beeper"),
-		m_io_kbrow(*this, "kbrow.%u", 0)
+		m_io_kbrow(*this, "kbrow.%u", 0),
+		rom(*this, "maincpu"),
+		font_normal(*this, "font_normal"),
+		font_bold(*this, "font_bold")
 	{ 
 		//video_control = 0b00000010; // TEST LW-10 screen height
 	}
 
 	void lw30(machine_config& config);
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
-
+private:
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<screen_device> screen;
@@ -483,6 +473,19 @@ public:
 	required_device<lw30_floppy_connector> floppy;
 	required_device<brother_beep_device> beeper;
 	optional_ioport_array<9> m_io_kbrow;
+	required_region_ptr<uint8_t> rom, font_normal, font_bold;
+
+	std::map<uint32_t, std::string> symbols;
+
+	// floppy
+	uint8_t io_90{}; // stepper motor control
+	uint8_t floppy_steps{}; // quarter track
+	uint16_t floppy_track_offset{}; // current offset within track data
+
+	// video
+	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
+	uint8_t video_cursor_x, video_cursor_y, video_pos_x, video_pos_y, video_control, io_b8;
+	uint8_t cursor_state;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -596,9 +599,6 @@ public:
 		logerror("%s: floppy_steps=%3d => track=%2d\n", callstack(), floppy_steps, floppy_steps / 4);
 		io_90 = data;
 	}
-	uint8_t io_90{}; // stepper motor control
-	uint8_t floppy_steps{}; // quarter track
-	uint16_t floppy_track_offset{}; // current offset within track data
 
 	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
 		logerror("%s: unmapped IO read from %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, mem_mask);
@@ -657,14 +657,9 @@ public:
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 
-	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
-	uint8_t video_cursor_x, video_cursor_y, video_pos_x, video_pos_y, video_control, io_b8;
-	uint8_t cursor_state;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cursor_timer_callback);
 
-protected:
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
@@ -711,10 +706,10 @@ protected:
 		//map(0x40, 0xff).rw(FUNC(lw30_state::illegal_io_r), FUNC(lw30_state::illegal_io_w));
 	}
 
-	uint8_t* rom{};
-	uint8_t* font_normal{};
-	uint8_t* font_bold{};
-	std::map<uint32_t, std::string> symbols;
+	// helpers
+	std::string pc();
+	std::string symbolize(uint32_t adr);
+	std::string callstack();
 };
 
 void lw30_state::video_start()
@@ -979,10 +974,6 @@ void lw30_state::machine_start()
 		fclose(f);
 	}*/
 
-	rom = memregion("maincpu")->base();
-	font_normal = memregion("font_normal")->base();
-	font_bold = memregion("font_bold")->base();
-
 	// patch out printer init
 	rom[0x280f4] = 0x00;
 	// patch out autosave load
@@ -998,8 +989,6 @@ void lw30_state::machine_reset()
 
 	memcpy(&videoram[0x1000], font_normal, 0x800);
 }
-
-#pragma region(LW-350 Keyboard)
 
 static INPUT_PORTS_START(lw30)
 	PORT_START("kbrow.0")
@@ -1093,8 +1082,6 @@ static INPUT_PORTS_START(lw30)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-#pragma endregion
-
 void lw30_state::lw30(machine_config& config) {
 	// basic machine hardware
 	HD64180RP(config, maincpu, 12'000'000 / 2);
@@ -1121,8 +1108,6 @@ void lw30_state::lw30(machine_config& config) {
 	SPEAKER(config, "mono").front_center();
 	BROTHER_BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
 }
-
-#pragma endregion
 
 /***************************************************************************
   Machine driver(s)

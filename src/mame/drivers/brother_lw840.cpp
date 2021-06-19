@@ -78,7 +78,6 @@ Emulation Status:
 
 ***************************************************************************/
 
-#pragma region(Floppy)
 class gm82c765b_device : public upd765_family_device {
 public:
 	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -101,8 +100,6 @@ gm82c765b_device::gm82c765b_device(const machine_config &mconfig, const char *ta
 	select_connected = true;
 }
 
-#pragma endregion
-
 class lw840_state : public driver_device
 {
 public:
@@ -112,22 +109,26 @@ public:
 		screen(*this, "screen"),
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		io_kbrow(*this, "kbrow.%u", 0),
+		rom(*this, "maincpu")
 	{ }
 
 	void lw840(machine_config& config);
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
-
+private:
 	// devices
 	required_device<h83002_device> maincpu;
 	required_device<screen_device> screen;
 	required_device<gm82c765b_device> fdc;
 	required_device<beep_device> beeper;
 	optional_ioport_array<9> io_kbrow;
+	required_region_ptr<uint16_t> rom;
+
+	uint8_t keyboard{};
+	uint8_t irq_toggle{};
+
+	uint16_t* vram{};
+	std::map<uint32_t, std::string> symbols;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -181,11 +182,9 @@ public:
 		return (0b01000000 << 8) & mem_mask;
 	}
 
-protected:
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
-
 	void video_start() override;
 
 	void map_program(address_map& map) {
@@ -202,12 +201,10 @@ protected:
 		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
 	}
 
-	uint8_t keyboard{};
-	uint8_t irq_toggle{};
-
-	uint8_t* rom{};
-	uint16_t* vram{};
-	std::map<uint32_t, std::string> symbols;
+	// helpers
+	std::string pc();
+	std::string symbolize(uint32_t adr);
+	std::string callstack();
 };
 
 void lw840_state::video_start()
@@ -282,10 +279,10 @@ void lw840_state::machine_start()
 	fdc->set_rate(500000);
 
 	// patches here; byte-swapped!!
-	rom = memregion("maincpu")->base();
-	//rom[0x34a+1] = 0x47; // always branch to mem_test_error
-	rom[0x102] = rom[0x102 + 1] = 0xff; // skip printer check
-	//rom[0xa380] = rom[0xa380 + 1] = 0; // skip FDC init
+	auto rom8 = reinterpret_cast<uint8_t*>(rom.target());
+	//rom8[0x34a+1] = 0x47; // always branch to mem_test_error
+	rom8[0x102] = rom8[0x102 + 1] = 0xff; // skip printer check
+	//rom8[0xa380] = rom8[0xa380 + 1] = 0; // skip FDC init
 }
 
 void lw840_state::machine_reset()

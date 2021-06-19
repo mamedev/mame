@@ -18,8 +18,6 @@
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw350 -resolution 960x256 -flop roms\lw350\Brother_LW-200-300_GW-24-45_Ver1.0_SpreadsheetProgramAndDataStorageDisk.img
 
-#pragma region(LW-350)
-
 /***************************************************************************
 
 Brother LW-350
@@ -77,8 +75,6 @@ Emulation Status:
 - Printer not working
 
 ***************************************************************************/
-
-#pragma region(Floppy)
 
 class lw350_floppy_image_device;
 
@@ -162,10 +158,6 @@ void lw350_floppy_image_device::call_unload()
 
 	loaded = false;
 }
-
-#pragma endregion
-
-#pragma region(HD63266F)
 
 // FDC high-level emulation (not timing accurate) based on "Hitachi 8-Bit Microcomputer HD63265 FDC Floppy Disk Controller User's Manual"
 // https://archive.org/details/bitsavers_hitachidatDiskControllerUsersManual2edMar89_3858532
@@ -837,8 +829,6 @@ void hd63266f_t::abort()
 	logerror("fdc:abort STR=%02x => %02x %s\n", oldSTR, STR, callstack());
 }
 
-#pragma endregion
-
 class lw350_state : public driver_device
 {
 public:
@@ -849,14 +839,13 @@ public:
 		floppy(*this, "floppy"),
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		io_kbrow(*this, "kbrow.%u", 0),
+		rom(*this, "maincpu")
 	{ }
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
+	void lw350(machine_config& config);
 
+private:
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<screen_device> screen;
@@ -864,6 +853,13 @@ public:
 	required_device<hd63266f_t> fdc;
 	required_device<beep_device> beeper;
 	optional_ioport_array<9> io_kbrow;
+	required_region_ptr<uint8_t> rom;
+
+	std::map<uint32_t, std::string> symbols;
+
+	uint8_t vram[80 * 128];
+	uint8_t io_70, io_7a, io_b8, io_90;
+	uint8_t rombank;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -971,19 +967,11 @@ public:
 		vram[offset] = (vram[offset] & ~mem_mask) | data;
 	}
 
-	uint8_t vram[80*128];
-	uint8_t io_70, io_7a, io_b8, io_90;
-	uint8_t rombank;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-	void lw350(machine_config& config);
-
-protected:
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
-
 	void video_start() override;
 
 	void map_program(address_map& map) {
@@ -1022,8 +1010,10 @@ protected:
 		//map(0x40, 0xff).rw(FUNC(lw350_state::illegal_io_r), FUNC(lw350_state::illegal_io_w));
 	}
 
-	uint8_t* rom{};
-	std::map<uint32_t, std::string> symbols;
+	// helpers
+	std::string pc();
+	std::string symbolize(uint32_t adr);
+	std::string callstack();
 };
 
 void lw350_state::video_start()
@@ -1119,8 +1109,6 @@ uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 	return 0;
 }
 
-#pragma region(LW-350 Keyboard)
-
 static INPUT_PORTS_START(lw350)
 	PORT_START("kbrow.0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_4)      PORT_CHAR('4')
@@ -1213,8 +1201,6 @@ static INPUT_PORTS_START(lw350)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-#pragma endregion
-
 TIMER_DEVICE_CALLBACK_MEMBER(lw350_state::int1_timer_callback)
 {
 	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
@@ -1250,8 +1236,6 @@ void lw350_state::machine_start()
 		fclose(f);
 	}
 */
-
-	rom = memregion("maincpu")->base();
 
 	// ROM patches
 
@@ -1332,10 +1316,6 @@ void lw350_state::lw350(machine_config& config) {
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
 }
-
-#pragma endregion
-
-#pragma region(LW-450)
 
 //////////////////////////////////////////////////////////////////////////
 // LW-450
@@ -1453,18 +1433,14 @@ public:
 		m_crtc(*this, "hd6445"),
 		vram(*this, "vram"),
 		speaker(*this, "beeper"),
-		io_kbrow(*this, "kbrow.%u", 0)
+		io_kbrow(*this, "kbrow.%u", 0),
+		rom(*this, "maincpu"),
+		dict_rom(*this, "dictionary")
 	{ }
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
-
 	void lw450(machine_config& config);
-	void map_program(address_map& map);
-	void map_io(address_map& map);
 
+private:
 	// devices
 	required_device<z80180_device> maincpu; // use z80180 instead of hd64180rp, because hd64180rf doesn't have hd64180rp's 19-bit address width
 	required_device<screen_device> screen;
@@ -1475,6 +1451,14 @@ public:
 	required_shared_ptr<uint8_t> vram;
 	required_device<beep_device> speaker;
 	optional_ioport_array<9> io_kbrow;
+	required_region_ptr<uint8_t> rom, dict_rom;
+
+	uint8_t io_72, io_73, io_74, io_75; // gfx
+	uint8_t io_7a, io_b8, rombank;
+	uint32_t framecnt;
+
+	uint8_t framebuffer[720 * 350]; // pixel data
+	std::map<uint32_t, std::string> symbols;
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
 		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
@@ -1529,9 +1513,6 @@ public:
 	}
 
 	// Floppy
-	//////////////////////////////////////////////////////////////////////////
-
-	// Floppy
 	void fdc_dtr_w(uint8_t data) { // 79
 		fdc->set_floppy(floppy->get_device());
 		fdc->write(data);
@@ -1552,23 +1533,20 @@ public:
 	void io_74_w(uint8_t data);
 	void io_75_w(uint8_t data) { io_75 = data; }
 
-	uint8_t io_72, io_73, io_74, io_75; // gfx
-	uint8_t io_7a, io_b8, rombank;
-	uint32_t framecnt;
-
 	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
 
-protected:
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
-
 	void video_start() override;
 
-	uint8_t* rom{};
-	uint8_t* dict_rom{};
-	uint8_t framebuffer[720 * 350]; // pixel data
-	std::map<uint32_t, std::string> symbols;
+	// helpers
+	std::string pc();
+	std::string symbolize(uint32_t adr);
+	std::string callstack();
+
+	void map_program(address_map& map);
+	void map_io(address_map& map);
 };
 
 void lw450_state::video_start()
@@ -1825,8 +1803,6 @@ void lw450_state::machine_start()
 			fclose(f);
 		}
 	*/
-	rom = memregion("maincpu")->base();
-	dict_rom = memregion("dictionary")->base();
 
 	palette->set_pen_color(0, rgb_t(0, 0, 0));
 	palette->set_pen_color(1, rgb_t(0xaa, 0xaa, 0xaa));
@@ -1895,8 +1871,6 @@ void lw450_state::lw450(machine_config& config) {
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
 }
-
-#pragma endregion
 
 /***************************************************************************
   Machine driver(s)

@@ -11,8 +11,6 @@
 #include "sound/beep.h"
 #include "video/hd44780.h"
 
-#pragma region(AX-145)
-
 // 240x18x4 = 960x72
 // -log -debug -window -intscalex 4 -intscaley 4 -resolution 960x72 ax145
 
@@ -94,7 +92,6 @@ LCD: 40 characters x 2 lines
 //    16, 17       => francais/deutsch
 //    8, 9, 14, 21 => espanol
 
-
 class ax145_state : public driver_device
 {
 public:
@@ -102,93 +99,39 @@ public:
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
 		lcdc(*this, "hd44780"),
-		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE)
+		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
+		rom(*this, "maincpu"),
+		dict_rom(*this, "dictionary")
 	{ }
 
 	void ax145(machine_config& config);
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
-
+private:
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
 	memory_share_creator<uint8_t> ram;
+
+	required_region_ptr<uint8_t> rom, dict_rom;
+	std::map<uint32_t, std::string> symbols;
 
 	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;
 
 	// config switch
 	uint8_t io_3000{};
-	void io_3000_w(uint8_t data) { io_3000 = data; }
-
-	// should probably return something different depending on io_3000
-	// 0x0014a9 also reads but io_3000=0xfe,0xff...
-	uint8_t io_3800_r() { 
-		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
-
-		// config lower 4 bits
-		return (~id) & 0x0f; 
-	}
-	uint8_t io_4000_r() {
-		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
-
-		// config upper 4 bits
-		return (~id) >> 4; 
-	}
 
 	// bit 2: R/~W (Read / Not Write)
 	// bit 1: RS (Register Select)
 	// bit 0: E (Enable)
 	uint8_t lcd_signal{};
 
-	void lcd_signal_w(uint8_t data) {
-		lcd_signal = data;
-	}
-	uint8_t lcd_data_r() {
-		if(BIT(lcd_signal, 1)) // RS
-			return lcdc->data_r();
-		else
-			return lcdc->control_r();
-	}
-	void lcd_data_w(uint8_t data) {
-		if(BIT(lcd_signal, 0)) { // E
-			if(BIT(lcd_signal, 1)) // RS
-				lcdc->data_w(data << 4);
-			else
-				lcdc->control_w(data << 4);
-		}
-	}
-
 	// dictionary ROM banking
 	uint8_t dict_bank{};
-	void io_5000_w(uint8_t data) {
-		dict_bank = data;
-	}
-	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
-		if(dict_bank >= 4) {
-			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, offset);
-			return 0x00;
-		}
-		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
-	}
 
-	// int2
-	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
-		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
-	}
-	uint8_t irq_ack_r() {
-		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-		return 0;
-	}
-
-protected:
 	// driver_device overrides
 	void machine_start() override;
 	void machine_reset() override;
-
 	void video_start() override;
 
 	void map_program(address_map& map) {
@@ -225,9 +168,70 @@ protected:
 		palette.set_pen_color(1, rgb_t(92, 83, 88));
 	}
 
-	uint8_t* rom{};
-	uint8_t* dict_rom{};
-	std::map<uint32_t, std::string> symbols;
+	// IO
+	void io_3000_w(uint8_t data) { io_3000 = data; }
+
+	// should probably return something different depending on io_3000
+	// 0x0014a9 also reads but io_3000=0xfe,0xff...
+	uint8_t io_3800_r() {
+		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
+
+		// config lower 4 bits
+		return (~id) & 0x0f;
+	}
+
+	uint8_t io_4000_r() {
+		//space.device().logerror("%s: IO 3000=%02x\n", pc(), io_3000);
+
+		// config upper 4 bits
+		return (~id) >> 4;
+	}
+
+	void lcd_signal_w(uint8_t data) {
+		lcd_signal = data;
+	}
+
+	uint8_t lcd_data_r() {
+		if(BIT(lcd_signal, 1)) // RS
+			return lcdc->data_r();
+		else
+			return lcdc->control_r();
+	}
+	void lcd_data_w(uint8_t data) {
+		if(BIT(lcd_signal, 0)) { // E
+			if(BIT(lcd_signal, 1)) // RS
+				lcdc->data_w(data << 4);
+			else
+				lcdc->control_w(data << 4);
+		}
+	}
+
+	void io_5000_w(uint8_t data) {
+		dict_bank = data;
+	}
+
+	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
+		if(dict_bank >= 4) {
+			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, offset);
+			return 0x00;
+		}
+		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
+	}
+
+	// int2
+	TIMER_DEVICE_CALLBACK_MEMBER(int2_timer_callback) {
+		maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+	}
+
+	uint8_t irq_ack_r() {
+		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+		return 0;
+	}
+
+	// helpers
+	std::string pc();
+	std::string symbolize(uint32_t adr);
+	std::string callstack();
 };
 
 void ax145_state::video_start()
@@ -299,9 +303,6 @@ void ax145_state::machine_start()
 	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
 	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
 
-	rom = memregion("maincpu")->base();
-	dict_rom = memregion("dictionary")->base();
-
 	// ROM patch
 }
 
@@ -332,9 +333,8 @@ void ax145_state::ax145(machine_config& config) {
 	lcdc->set_lcd_size(2, 40);
 }
 
-#pragma endregion
-
 static INPUT_PORTS_START(ax145)
+	// TODO
 INPUT_PORTS_END
 
 /***************************************************************************
