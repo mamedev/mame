@@ -464,6 +464,9 @@ void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_CDDA:
 		towns_delay_cdda((cdrom_image_device*)ptr);
 		break;
+	case TIMER_SPRITES:
+		draw_sprites();
+		break;
 	}
 }
 void towns_state::freerun_inc()
