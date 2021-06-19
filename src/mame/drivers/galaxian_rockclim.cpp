@@ -85,7 +85,7 @@ void galaxian_rockclim_state::rockclim_scroll_w(offs_t offset, uint8_t data)
 void galaxian_rockclim_state::video_start()
 {
 	galaxian_state::video_start();
-	
+
 	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode2, tilemap_get_info_delegate(*this, FUNC(galaxian_rockclim_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8 * m_x_scale,8,64,32);
 	m_rockclim_v = m_rockclim_h = 0;
 	save_item(NAME(m_rockclim_v));
@@ -263,6 +263,9 @@ ROM_START( rockclim )
 	ROM_LOAD( "lc05.a5",   0x6000, 0x1000, CRC(5e542149) SHA1(425a5a8769c3fa0887db8ff04e2a4f32f18d2679) )
 	ROM_LOAD( "lc06.a6",   0x7000, 0x1000, CRC(b2bdca64) SHA1(e72e63725164c922816dda90ac964a94062eab1b) )
 
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910C Multi-Melody IC
+	ROM_LOAD( "7910c 537 104", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "lc08.a9",   0x0000, 0x800, CRC(7f18e1ef) SHA1(2a160b994708ec0f06774dde3ec613af7e3f32c6) )
 	ROM_LOAD( "lc07.a7",   0x0800, 0x800, CRC(f18b50ac) SHA1(a2328eb55882a09403cae1a497c611b494649cac) )
@@ -290,4 +293,4 @@ void galaxian_rockclim_state::init_rockclim()
 
 } // Anonymous namespace
 
-GAME( 1981, rockclim, 0, rockclim,  rockclim,  galaxian_rockclim_state, init_rockclim, ROT180, "Taito", "Rock Climber", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rockclim, 0, rockclim,  rockclim,  galaxian_rockclim_state, init_rockclim, ROT180, "Taito", "Rock Climber", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // misses melody
