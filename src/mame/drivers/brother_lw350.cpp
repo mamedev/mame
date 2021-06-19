@@ -86,20 +86,18 @@ class lw350_floppy_connector : public device_t, public device_slot_interface
 {
 public:
 	lw350_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~lw350_floppy_connector();
 
 	lw350_floppy_image_device *get_device();
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	void device_start() override {}
+	void device_config_complete() override {}
 };
 
 class lw350_floppy_image_device : public device_t, public device_image_interface
 {
 public:
 	lw350_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~lw350_floppy_image_device();
 
 public:
 	iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
@@ -119,8 +117,7 @@ public:
 	uint32_t image_length{};
 
 protected:
-	void device_start() override { }
-	//virtual void device_config_complete() override { update_names(); } // needed; otherwise infinite loop during startup
+	void device_start() override {}
 };
 
 DEFINE_DEVICE_TYPE(LW350_FLOPPY_CONNECTOR, lw350_floppy_connector, "lw350_floppy_connector", "LW350 Floppy drive connector abstraction")
@@ -132,18 +129,6 @@ lw350_floppy_connector::lw350_floppy_connector(const machine_config &mconfig, co
 {
 }
 
-lw350_floppy_connector::~lw350_floppy_connector()
-{
-}
-
-void lw350_floppy_connector::device_start()
-{
-}
-
-void lw350_floppy_connector::device_config_complete()
-{
-}
-
 lw350_floppy_image_device *lw350_floppy_connector::get_device()
 {
 	return dynamic_cast<lw350_floppy_image_device *>(get_card_device());
@@ -152,10 +137,6 @@ lw350_floppy_image_device *lw350_floppy_connector::get_device()
 lw350_floppy_image_device::lw350_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LW350_FLOPPY, tag, owner, clock),
 	device_image_interface(mconfig, *this)
-{
-}
-
-lw350_floppy_image_device::~lw350_floppy_image_device()
 {
 }
 

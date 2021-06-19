@@ -13,8 +13,6 @@
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
-// fixed eepmov.b instruction in h8.lst
-
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
 // make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
@@ -85,7 +83,7 @@ class gm82c765b_device : public upd765_family_device {
 public:
 	gm82c765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map(address_map& map) override {
+	void map(address_map& map) override {
 		map(0x0, 0x0).r(FUNC(gm82c765b_device::msr_r));
 		map(0x1, 0x1).rw(FUNC(gm82c765b_device::fifo_r), FUNC(gm82c765b_device::fifo_w));
 		map(0x2, 0x2).w(FUNC(gm82c765b_device::dor_w));
@@ -185,10 +183,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
 
-	virtual void video_start() override;
+	void video_start() override;
 
 	void map_program(address_map& map) {
 		map(0x000000, 0x3fffff).rom();
@@ -261,7 +259,7 @@ void lw840_state::machine_start()
 	screen->set_visible_area(0, 640 - 1, 0, 400 - 1);
 
 	// try to load map file
-	FILE* f;
+/*	FILE* f;
 	if(fopen_s(&f, "lw840.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -277,11 +275,11 @@ void lw840_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
+*/
 
 	vram = reinterpret_cast<uint16_t *>(reinterpret_cast<uintptr_t>(memshare("sram")->ptr()) + 0x300);
 
 	fdc->set_rate(500000);
-
 
 	// patches here; byte-swapped!!
 	rom = memregion("maincpu")->base();
