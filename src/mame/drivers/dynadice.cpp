@@ -154,7 +154,7 @@ void dynadice_state::dynadice_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x01, 0x01).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x01, 0x01).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0x02, 0x02).w(FUNC(dynadice_state::sound_data_w));
 	map(0x03, 0x03).w(FUNC(dynadice_state::sound_control_w));
 }

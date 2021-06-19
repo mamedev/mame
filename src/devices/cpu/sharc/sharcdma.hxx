@@ -10,7 +10,7 @@
 
 void adsp21062_device::schedule_chained_dma_op(int channel, uint32_t dma_chain_ptr, int chained_direction)
 {
-	uint32_t op_ptr = 0x20000 + dma_chain_ptr;
+	uint32_t op_ptr = 0x20000 + (dma_chain_ptr & 0x1ffff);
 
 	uint32_t int_index        = dm_read32(op_ptr - 0);
 	uint32_t int_modifier     = dm_read32(op_ptr - 1);
@@ -49,10 +49,14 @@ void adsp21062_device::schedule_chained_dma_op(int channel, uint32_t dma_chain_p
 	m_core->dma_op[channel].chain_ptr = chain_ptr;
 	m_core->dma_op[channel].chained_direction = chained_direction;
 
+	m_core->dma_op[channel].chained = true;
 	m_core->dma_op[channel].active = true;
 
-	int cycles = m_core->dma_op[channel].src_count / 4;
-	m_core->dma_op[channel].timer->adjust(cycles_to_attotime(cycles), channel);
+	if (m_enable_drc)
+	{
+		int cycles = m_core->dma_op[channel].src_count / 4;
+		m_core->dma_op[channel].timer->adjust(cycles_to_attotime(cycles), channel);
+	}
 
 	// enable busy flag
 	m_core->dma_status |= (1 << channel);
@@ -74,13 +78,105 @@ void adsp21062_device::schedule_dma_op(int channel, uint32_t src, uint32_t dst, 
 	m_core->dma_op[channel].pmode = pmode;
 	m_core->dma_op[channel].chain_ptr = 0;
 
+	m_core->dma_op[channel].chained = false;
 	m_core->dma_op[channel].active = true;
 
-	int cycles = src_count / 4;
-	m_core->dma_op[channel].timer->adjust(cycles_to_attotime(cycles), channel);
+	if (m_enable_drc)
+	{
+		int cycles = src_count / 4;
+		m_core->dma_op[channel].timer->adjust(cycles_to_attotime(cycles), channel);
+	}
 
 	// enable busy flag
 	m_core->dma_status |= (1 << channel);
+}
+
+void adsp21062_device::dma_run_cycle(int channel)
+{
+	if (m_core->dma_status & (1 << channel))
+	{
+		uint32_t src = m_core->dma_op[channel].src;
+		uint32_t dst = m_core->dma_op[channel].dst;
+		int src_modifier = m_core->dma_op[channel].src_modifier;
+		int dst_modifier = m_core->dma_op[channel].dst_modifier;
+		int src_count = m_core->dma_op[channel].src_count;
+		//int dst_count     = m_core->dma_op[channel].dst_count;
+		int pmode = m_core->dma_op[channel].pmode;
+
+		switch (pmode)
+		{
+			case DMA_PMODE_NO_PACKING:
+			{
+				uint32_t data = dm_read32(src);
+				dm_write32(dst, data);
+				src += src_modifier;
+				dst += dst_modifier;
+				src_count--;
+				break;
+			}
+			case DMA_PMODE_16_32:
+			{			
+				uint32_t data = ((dm_read32(src + 0) & 0xffff) << 16) | (dm_read32(src + 1) & 0xffff);
+
+				dm_write32(dst, data);
+				src += src_modifier * 2;
+				dst += dst_modifier;
+				src_count -= 2;
+				break;
+			}
+			case DMA_PMODE_8_48:
+			{				
+				uint64_t data = ((uint64_t)(dm_read32(src + 0) & 0xff) << 0) |
+					((uint64_t)(dm_read32(src + 1) & 0xff) << 8) |
+					((uint64_t)(dm_read32(src + 2) & 0xff) << 16) |
+					((uint64_t)(dm_read32(src + 3) & 0xff) << 24) |
+					((uint64_t)(dm_read32(src + 4) & 0xff) << 32) |
+					((uint64_t)(dm_read32(src + 5) & 0xff) << 40);
+
+				pm_write48(dst, data);
+				src += src_modifier * 6;
+				dst += dst_modifier;
+				src_count -= 6;				
+				break;
+			}
+			default:
+			{
+				fatalerror("SHARC: dma_op: unimplemented packing mode %d\n", pmode);
+			}
+		}
+
+		m_core->dma_op[channel].src_count = src_count;
+		m_core->dma_op[channel].src = src;
+		m_core->dma_op[channel].dst = dst;
+
+		if (src_count <= 0)
+		{
+			// clear busy flag
+			m_core->dma_status &= ~(1 << channel);
+
+			m_core->dma_op[channel].active = false;
+
+			// raise interrupt if
+			//  * non-chained DMA
+			//  * chained-DMA with PCI set in the next chain pointer
+			if (!m_core->dma_op[channel].chained || (m_core->dma_op[channel].chained && (m_core->dma_op[channel].chain_ptr & 0x20000)))
+			{
+				m_core->irptl |= (1 << (channel + 10));
+
+				// DMA interrupt
+				if (m_core->imask & (1 << (channel + 10)))
+				{
+					m_core->irq_pending |= 1 << (channel + 10);
+				}
+			}
+
+			// schedule chained op if chaining
+			if ((m_core->dma_op[channel].chain_ptr & 0x1ffff) != 0)
+			{
+				schedule_chained_dma_op(channel, m_core->dma_op[channel].chain_ptr, m_core->dma_op[channel].chained_direction);
+			}
+		}
+	}
 }
 
 void adsp21062_device::dma_op(int channel)
@@ -94,7 +190,7 @@ void adsp21062_device::dma_op(int channel)
 	//int dst_count     = m_core->dma_op[channel].dst_count;
 	int pmode           = m_core->dma_op[channel].pmode;
 
-	//printf("dma_op: %08X, %08X, %08X, %08X, %08X, %d\n", src, dst, src_modifier, dst_modifier, src_count, pmode);
+	//printf("dma_op: ch %d: %08X, %08X, %08X, %08X, %08X, %d at %08X\n", channel, src, dst, src_modifier, dst_modifier, src_count, pmode, m_core->pc);
 
 	switch (pmode)
 	{
@@ -191,36 +287,36 @@ void adsp21062_device::sharc_dma_exec(int channel)
 	{
 		uint32_t dma_chain_ptr = m_core->dma[channel].chain_ptr & 0x1ffff;
 
-		schedule_chained_dma_op(channel, dma_chain_ptr, tran);
+		schedule_chained_dma_op(channel, dma_chain_ptr, tran);		
 	}
 	else
 	{
 		if (tran)       // Transmit to external
 		{
-			dst             = m_core->dma[channel].ext_index;
-			dst_modifier    = m_core->dma[channel].ext_modifier;
-			dst_count       = m_core->dma[channel].ext_count;
-			src             = (m_core->dma[channel].int_index & 0x1ffff) | 0x20000;
-			src_modifier    = m_core->dma[channel].int_modifier;
-			src_count       = m_core->dma[channel].int_count;
+			dst = m_core->dma[channel].ext_index;
+			dst_modifier = m_core->dma[channel].ext_modifier;
+			dst_count = m_core->dma[channel].ext_count;
+			src = (m_core->dma[channel].int_index & 0x1ffff) | 0x20000;
+			src_modifier = m_core->dma[channel].int_modifier;
+			src_count = m_core->dma[channel].int_count;
 		}
 		else            // Receive from external
 		{
-			src             = m_core->dma[channel].ext_index;
-			src_modifier    = m_core->dma[channel].ext_modifier;
-			src_count       = m_core->dma[channel].ext_count;
-			dst             = (m_core->dma[channel].int_index & 0x1ffff) | 0x20000;
-			dst_modifier    = m_core->dma[channel].int_modifier;
-			dst_count       = m_core->dma[channel].int_count;
+			src = m_core->dma[channel].ext_index;
+			src_modifier = m_core->dma[channel].ext_modifier;
+			src_count = m_core->dma[channel].ext_count;
+			dst = (m_core->dma[channel].int_index & 0x1ffff) | 0x20000;
+			dst_modifier = m_core->dma[channel].int_modifier;
+			dst_count = m_core->dma[channel].int_count;
 		}
 
 		if (dtype)
-		//if (src_count != dst_count)
+			//if (src_count != dst_count)
 		{
 			pmode = DMA_PMODE_8_48;
 		}
 
-		schedule_dma_op(channel, src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);
+		schedule_dma_op(channel, src, dst, src_modifier, dst_modifier, src_count, dst_count, pmode);	
 	}
 }
 
@@ -239,7 +335,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_dma_callback)
 	}
 
 	dma_op(channel);
-	if (m_core->dma_op[channel].chain_ptr != 0)
+	if ((m_core->dma_op[channel].chain_ptr & 0x1ffff) != 0)
 	{
 		schedule_chained_dma_op(channel, m_core->dma_op[channel].chain_ptr, m_core->dma_op[channel].chained_direction);
 	}

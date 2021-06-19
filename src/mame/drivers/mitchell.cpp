@@ -376,7 +376,7 @@ void mitchell_state::spangbl_io_map(address_map &map)
 	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));
 	map(0x00, 0x00).w(FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
 	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
-	map(0x03, 0x03).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).portr("SYS0");
 	map(0x06, 0x06).nopw();    /* watchdog? irq ack? */
 	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
@@ -871,14 +871,69 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pangdsw )
+	PORT_INCLUDE( pang )
+
+// the settings are shown if entering test mode. The game always respects the dip setting, changing the values in test mode has no effect
+// it appears the bootleggers didn't care to add dips for flipscreen, free play and extend values (or at least they haven't been found yet)
+	PORT_START("DSW1") 
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( spangbl )
 	PORT_INCLUDE( pang )
 
 	PORT_MODIFY("SYS0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // this bootleg doesn't seem to allow entering test mode. It has a dip bank for settings, instead.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be high for game to boot..
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:6,7,8")
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x18, "4" )
+	PORT_DIPNAME( 0x60, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW1:2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Very_Difficult ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mstworld )
@@ -2265,33 +2320,6 @@ ROM_START( spangbl )
 	ROM_LOAD( "ic125.14",  0x030000, 0x10000, CRC(bd5c2f4b) SHA1(3c71d63637633a98ab513e4336e2954af3f964f4) )
 ROM_END
 
-// "spangbl2"
-// TODO: There is a bank of 8 dipswitches that needs to be hooked up with this set up:
-// ______________________________________________________
-// |                    | 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | 1 Coin - 1 Credit  | ON| ON| ON|   |   |   |   |   |
-// | 1 Coin - 2 Credits |OFF| ON| ON|   |   |   |   |   |
-// | 1 Coin - 3 Credits | ON|OFF| ON|   |   |   |   |   |
-// | 1 Coin - 4 Credits |OFF|OFF| ON|   |   |   |   |   |
-// | 1 Coin - 6 Credits | ON| ON|OFF|   |   |   |   |   |
-// | 2 Coin - 1 Credit  |OFF| ON|OFF|   |   |   |   |   |
-// | 3 Coin - 1 Credit  | ON|OFF|OFF|   |   |   |   |   |
-// | 4 Coin - 1 Credit  |OFF|OFF|OFF|   |   |   |   |   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | 1 Player           |   |   |   | ON| ON|   |   |   |
-// | 2 Players          |   |   |   |OFF| ON|   |   |   |
-// | 3 Players          |   |   |   | ON|OFF|   |   |   |
-// | 4 Players          |   |   |   |OFF|OFF|   |   |   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | Easy               |   |   |   |   |   | ON| ON|   |
-// | Normal             |   |   |   |   |   |OFF| ON|   |
-// | Dificult           |   |   |   |   |   | ON|OFF|   |
-// | Very dificult      |   |   |   |   |   |OFF|OFF|   |
-// |--------------------|---|---|---|---|---|---|---|---|
-// | No demo sounds     |   |   |   |   |   |   |   | ON|
-// | Demo sounds        |   |   |   |   |   |   |   |OFF|
-// |____________________________________________________|
 ROM_START( spangbl2 )
 	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
 	// IC2 can be found as 27C512 with 1st and 2nd half identical or as 27C256
@@ -2763,11 +2791,11 @@ GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state, init_
 GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb,       pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbold,    pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,      pang,     pangba,     pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
-GAME( 1989, pangbc,      pang,     spangbl,    pang,       mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbc,      pang,     spangbl,    pangdsw,    mitchell_state, init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state, init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
 

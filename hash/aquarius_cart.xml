@@ -347,6 +347,18 @@ X-6203 : Chess
 
 	<!--Hardware -->
 
+	<software name="c1541os" supported="no">
+		<description>C1541 DOS V3.0</description>
+		<year>1988</year>
+		<publisher>Ron Koenig</publisher>
+		<part name="cart" interface="aquarius_cart">
+			<!--<feature name="slot" value="c1541" />-->
+			<dataarea name="rom" size="0x8000">
+				<rom name="1541os.bin" size="0x4000" crc="6cd611e8" sha1="b2c3eabaadf21b463653f0e2bcf7b70c4a13fc39"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="modem" supported="no">
 		<description>Modem Terminal Software</description>
 		<year>1983</year>

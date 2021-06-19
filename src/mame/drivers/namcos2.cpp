@@ -24,6 +24,9 @@ known issues:
     - sprite/tilemap orthogonality needed
     - bad road colors in Final Lap and Suzuka series
 
+    Final Lap & Final Lap 2:
+    - by default, the graphics are way too bright if compared to original PCB/monitor output
+
     Finest Hour:
     - roz plane colors are bad in-game
 

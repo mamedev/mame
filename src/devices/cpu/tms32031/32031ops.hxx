@@ -393,7 +393,7 @@ void tms3203x_device::int2float(tmsreg &srcdst)
 	// positive values; count leading zeros and shift
 	else if ((int32_t)man > 0)
 	{
-		cnt = count_leading_zeros(man);
+		cnt = count_leading_zeros_32(man);
 		man <<= cnt;
 		exp = 31 - cnt;
 	}
@@ -401,7 +401,7 @@ void tms3203x_device::int2float(tmsreg &srcdst)
 	// negative values; count leading ones and shift
 	else
 	{
-		cnt = count_leading_ones(man);
+		cnt = count_leading_ones_32(man);
 		man <<= cnt;
 		exp = 31 - cnt;
 	}
@@ -585,13 +585,13 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	{
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((uint32_t)man);
+			cnt = count_leading_zeros_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((uint32_t)man);
+			cnt = count_leading_ones_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -698,13 +698,13 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	{
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((uint32_t)man);
+			cnt = count_leading_zeros_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((uint32_t)man);
+			cnt = count_leading_ones_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
@@ -847,13 +847,13 @@ void tms3203x_device::norm(tmsreg &dst, tmsreg &src)
 		int cnt;
 		if (man > 0)
 		{
-			cnt = count_leading_zeros((uint32_t)man);
+			cnt = count_leading_zeros_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}
 		else
 		{
-			cnt = count_leading_ones((uint32_t)man);
+			cnt = count_leading_ones_32((uint32_t)man);
 			man <<= cnt;
 			exp -= cnt;
 		}

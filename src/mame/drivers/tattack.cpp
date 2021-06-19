@@ -447,6 +447,9 @@ ROM_START( tattack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.9a",     0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
 
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910CQ Multi-Melody IC
+	ROM_LOAD( "7910cq", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "rom.6c",     0x0000, 0x1000, CRC(88ce45cf) SHA1(c7a43bfc9e9c2aeb75a98f723558bc88e53401a7) )
 ROM_END

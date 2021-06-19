@@ -169,7 +169,7 @@ uint8_t pofo_hpc104_device::nrdi_r(offs_t offset, uint8_t data, bool iom, bool b
 		{
 			if (offset >= 0x1f000 && offset < 0x5f000)
 			{
-				data = m_nvram[offset - 0x1f000] = data;
+				data = m_nvram[offset - 0x1f000];
 			}
 		}
 	}

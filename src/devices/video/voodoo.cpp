@@ -3129,7 +3129,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					attoseconds_t refresh = vd->m_screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
-					rectangle visarea;
+					rectangle visarea;					
 
 					if (vd->vd_type == TYPE_VOODOO_2)
 					{
@@ -3151,7 +3151,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					}
 
 					/* create a new visarea */
-					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
+					visarea.set(hbp, hbp + std::max(hvis - 1, 0), vbp, vbp + std::max(vvis - 1, 0));
 
 					/* keep within bounds */
 					visarea.max_x = (std::min)(visarea.max_x, htotal - 1);
