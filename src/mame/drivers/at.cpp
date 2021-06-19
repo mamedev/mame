@@ -5680,6 +5680,24 @@ ROM_END
 //  80486 Desktop
 //**************************************************************************
 
+// NEC APC IV aka - available in three different packages: Wide desktop: Year: 1986 / Chipset: CHIPS P82C201, P82A204 and P82A205
+// Portable: white/blue LCD
+ROM_START( necapciv )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	// 0: Phoenix 80286 ROM BIOS Version 1.57 / APC IV / NEC Corporation
+	// on board: 2xser, par, Floppy - see https://stason.org/TULARC/pc/motherboards/N/NEC-TECHNOLOGIES-INC-286-APC-IV-SERIES-G9YAN.html for settings
+	ROM_SYSTEM_BIOS(0, "wide157", "Wide desktop V1.57")
+	ROMX_LOAD( "yan7m06.bin", 0x10000, 0x8000, CRC(21deafcb) SHA1(477fb36d64a9a60f6dc572fef1095391f6da73b3), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "yan7k06.bin", 0x10001, 0x8000, CRC(97563bae) SHA1(81ea93e1cd55e284609fdff6574aa49b06cd8a7f), ROM_SKIP(1) | ROM_BIOS(0))
+	// 1: Phoenix 80286 ROM BIOS Version 3.07 03 / NEC Corporation
+	// Narrow desktop (APC IV Powermate 1): Available with EGA (LIAI852/EVC215-001 chip) or VGA and 8Mhz/640k version and a 10Mhz/1MB version. [Ctrl]+[Alt]+[-]
+	// is the speed switch on the 10MHz version.
+	// on board: ser, par, Floppy - see http://www.uncreativelabs.de/th99/m/M-O/31487.htm for settings
+	ROM_SYSTEM_BIOS(1, "narrow", "Narrow desktop V3.07 03")
+	ROMX_LOAD( "bbx10j02.bin", 0x10000, 0x8000, CRC(5bb8c773) SHA1(21df040a92b2ee17e83955776af4ab14350d5ffd), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "bbx10g02.bin", 0x10001, 0x8000, CRC(050159ef) SHA1(b1e627f5d5ef749c51597b7be75f56bb8ff4d8af), ROM_SKIP(1) | ROM_BIOS(1))
+ROM_END
+
 // NCR Class 3433 - CPU: 486SX/DX 25/33, coprocessor socket provided - Chipset: NCR WPD CLEMSON 006-2001325 CQO1842 9209N
 // LSI LOGIC L1A5840 006-2000654B NAR 9212Delta WG35494 GERMANY, NCR 006-2001895 WPD FALCON E CQO 2291 9218N,
 // WD58C65JM, VLSI 9210AV 211411 VGA8203C4570 NCR PB 006-2001329, Dallas DS1387
@@ -5821,14 +5839,15 @@ COMP( 199?, mba009,    ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )
 COMP( 199?, minisys2k, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "SIIG", "MiniSys 2000", MACHINE_NOT_WORKING )
 COMP( 198?, mkp286,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Morse", "KP-286", MACHINE_NOT_WORKING )
-COMP( 199?, ncr3302,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "NCR", "Class 3302 Model 0110", MACHINE_NOT_WORKING )
-COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
-COMP( 1989, neat,      ibm5170, 0,       neat,      0,     at_state,     init_at,        "<generic>",   "NEAT (12 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16v, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
+COMP( 199?, ncr3302,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "NCR", "Class 3302 Model 0110", MACHINE_NOT_WORKING )
+COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
+COMP( 1989, neat,      ibm5170, 0,       neat,      0,     at_state,     init_at,        "<generic>",   "NEAT (12 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 1986, necapciv,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NEC", "APC IV", MACHINE_NOT_WORKING )
 //COMP( 1988, nws286,    ibm5170,  0,      ews286,    0,     at_state,     at,        "Nokia Data",  "Nokia Data WS286", MACHINE_NOT_WORKING )
 COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 COMP( 1990, ocfoxm,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek", "Fox M 286", MACHINE_NOT_WORKING )
