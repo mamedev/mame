@@ -14,7 +14,7 @@
 #include "emu.h"
 #include "video/hd44780.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
