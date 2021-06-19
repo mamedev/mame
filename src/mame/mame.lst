@@ -43680,3 +43680,16 @@ gs6809
 
 @source:ultim809.cpp
 ultim809
+
+@source:brother_ax145.cpp
+ax145		// Brother AX-145 (c) 198? Brother Industries, Ltd.
+
+@source:brother_lw30.cpp
+lw30		// Brother LW-30 (c) 1991 Brother Industries, Ltd.
+
+@source:brother_lw350.cpp
+lw350		// Brother LW-350 (c) 1995 Brother Industries, Ltd.
+lw450		// Brother LW-450 (c) 1992 Brother Industries, Ltd.
+
+@source:brother_lw840.cpp
+lw840		// Brother LW-840ic (c) 1997 Brother Industries, Ltd.
