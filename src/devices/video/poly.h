@@ -245,7 +245,7 @@ template<typename BaseType, class ObjectType, int MaxParams, u8 Flags = 0>
 class poly_manager
 {
 	// turn this on to log the reasons for any long waits
-	static constexpr bool POLY_LOG_WAITS = true;
+	static constexpr bool POLY_LOG_WAITS = false;
 
 public:
 	// each vertex has an X/Y coordinate and a set of parameters
