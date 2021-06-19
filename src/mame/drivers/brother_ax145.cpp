@@ -80,6 +80,10 @@ LCD Driver with 80-Channel Outputs
 
 LCD: 40 characters x 2 lines
 
+// Status:
+// doesn't go further than "SCHREIBWERK ÜBERPRÜFEN" (check printer)
+// needs european font for HD44780
+
 ***************************************************************************/
 
 // hw_config:
@@ -97,7 +101,8 @@ public:
 	ax145_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		maincpu(*this, "maincpu"),
-		lcdc(*this, "hd44780")
+		lcdc(*this, "hd44780"),
+		ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE)
 	{ }
 
 	void ax145(machine_config& config);
@@ -110,6 +115,7 @@ public:
 	// devices
 	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
+	memory_share_creator<uint8_t> ram;
 
 	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;
@@ -180,23 +186,22 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
 
-	virtual void video_start() override;
+	void video_start() override;
 
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
-		map(0x02000, 0x03fff).ram().region("ram", 0); //    first 0x2000 bytes of RAM
 		map(0x04000, 0x1ffff).rom();
 		map(0x40000, 0x5ffff).r(FUNC(ax145_state::dict_r));
-		map(0x62000, 0x69fff).ram().region("ram", 0); // complete 0x8000 bytes of RAM
+		// RAM is installed in machine_start()
 	}
 
 	void map_io(address_map& map) {
 		map.global_mask(0xffff);
 		map(0x0000, 0x003f).noprw(); // Z180 internal registers
-			//map(0x0040, 0x00ff).rw(FUNC(ax145_state::illegal_io_r), FUNC(ax145_state::illegal_io_w));
+		//map(0x0040, 0x00ff).rw(FUNC(ax145_state::illegal_io_r), FUNC(ax145_state::illegal_io_w));
 		//map(0x2000, 0x2000).w(TODO);
 		//map(0x2800, 0x2800).w(TODO);
 		map(0x3000, 0x3000).w(FUNC(ax145_state::io_3000_w));
@@ -272,7 +277,7 @@ std::string ax145_state::callstack()
 
 void ax145_state::machine_start()
 {
-	// try to load map file
+/*	// try to load map file
 	FILE* f;
 	if(fopen_s(&f, "ax145.map", "rt") == 0) {
 		char line[512];
@@ -289,9 +294,15 @@ void ax145_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
+*/
+
+	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
+	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
 
 	rom = memregion("maincpu")->base();
 	dict_rom = memregion("dictionary")->base();
+
+	// ROM patch
 }
 
 void ax145_state::machine_reset()
@@ -335,7 +346,6 @@ ROM_START( ax145 )
 	ROM_LOAD("ua4774-c", 0x00000, 0x20000, CRC(82E0F117) SHA1(2bb2883feb73c7c20e2e3004b3588ba354e52b3a)) // german/french/dutch/spanish
 	ROM_REGION(0x80000, "dictionary", 0)
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe)) // german dictionary
-	ROM_REGION(0x8000, "ram", ROMREGION_ERASE00)
 ROM_END
 
 //    YEAR  NAME  PARENT COMPAT   MACHINE INPUT   CLASS            INIT              COMPANY         FULLNAME           FLAGS
