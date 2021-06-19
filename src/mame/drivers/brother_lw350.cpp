@@ -64,6 +64,7 @@ fully compatible with Zilog Z80180 (Z180)
 Murata Ceralock CST-MXW 16.00 MHz Ceramic Resonator
 
 1.44MB Floppy Drive
+MS-DOS compatible FAT12 disk format
 
 Hidden Keys during "DECKEL OFFEN!" ("Case Open!")
 - Ctrl+Shift+Cursor Right: LCD Test Menu
@@ -1026,7 +1027,7 @@ protected:
 
 		// floppy
 		map(0x78, 0x78).rw("fdc", FUNC(hd63266f_t::status_r), FUNC(hd63266f_t::abort_w));
-		map(0x79, 0x79).r("fdc", FUNC(hd63266f_t::data_r)).w(FUNC(lw350_state::fdc_dtr_w));
+		map(0x79, 0x79).rw("fdc", FUNC(hd63266f_t::data_r), FUNC(lw350_state::fdc_dtr_w));
 		map(0x7a, 0x7a).r(FUNC(lw350_state::io_7a_r));
 		map(0x7e, 0x7e).rw(FUNC(lw350_state::io_7e_r), FUNC(lw350_state::io_7e_w));
 		map(0x90, 0x90).r(FUNC(lw350_state::io_90_r));
@@ -1253,7 +1254,7 @@ void lw350_state::machine_start()
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
 
 	// try to load map file
-	FILE* f;
+/*	FILE* f;
 	if(fopen_s(&f, "lw350.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -1269,8 +1270,11 @@ void lw350_state::machine_start()
 		} while(!feof(f));
 		fclose(f);
 	}
+*/
 
 	rom = memregion("maincpu")->base();
+
+	// ROM patches
 
 	// force jump to self-test menu
 //	rom[0x280f2] = 0x20;
@@ -1452,7 +1456,6 @@ Emulation Status:
 Printer not working
 Floppy Read has some problems (directory working, but LW-450 reports illegal file format when trying to load a .wpt file (content verified with LW-350), but writing seems fine)
 Dictionary ROM probably not correctly mapped
-Display goes haywire when typing letters in word processor mode (new - 2021-06-13?)
 
 ***************************************************************************/
 
@@ -1484,7 +1487,7 @@ public:
 	void map_io(address_map& map);
 
 	// devices
-	required_device<hd64180rp_device> maincpu;
+	required_device<z80180_device> maincpu; // use z80180 instead of hd64180rp, because hd64180rf doesn't have hd64180rp's 19-bit address width
 	required_device<screen_device> screen;
 	required_device<palette_device> palette;
 	required_device<lw350_floppy_connector> floppy;
@@ -1807,8 +1810,6 @@ MC6845_UPDATE_ROW(lw450_state::crtc_update_row)
 			*p++ = BIT(bit9, 7) ? palette[fg] : palette[bg];
 		}
 	}
-
-	// TODO: cursor
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED(lw450_state::crtc_addr)
@@ -1877,7 +1878,7 @@ GFXDECODE_END
 
 void lw450_state::lw450(machine_config& config) {
 	// basic machine hardware
-	HD64180RP(config, maincpu, 12'000'000 / 2);
+	Z80180(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw450_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw450_state::map_io);
 	TIMER(config, "1khz").configure_periodic(FUNC(lw450_state::int1_timer_callback), attotime::from_hz(1000));
