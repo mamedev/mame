@@ -115,7 +115,6 @@ public:
 		fdc(*this, "fdc"),
 		beeper(*this, "beeper"),
 		io_kbrow(*this, "kbrow.%u", 0)
-		//floppy(*this, "floppy"),
 	{ }
 
 	void lw840(machine_config& config);
@@ -128,7 +127,6 @@ public:
 	// devices
 	required_device<h83002_device> maincpu;
 	required_device<screen_device> screen;
-	//required_device<lw840_floppy_connector> floppy;
 	required_device<gm82c765b_device> fdc;
 	required_device<beep_device> beeper;
 	optional_ioport_array<9> io_kbrow;

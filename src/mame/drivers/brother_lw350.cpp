@@ -11,8 +11,6 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
-// fixed quite a few DMA related bugs in z180 core!
-
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
 // make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
@@ -111,7 +109,7 @@ public:
 	bool must_be_loaded() const noexcept override { return false; }
 	bool is_reset_on_load() const noexcept override { return false; }
 	const char *file_extensions() const noexcept override { return "img"; }
-	const char *image_interface() const noexcept override { return "floppy_35"; }
+	const char *image_interface() const noexcept override { return "lw350_floppy_35"; }
 	image_init_result call_load() override;
 	void call_unload() override;
 
@@ -125,8 +123,8 @@ protected:
 	//virtual void device_config_complete() override { update_names(); } // needed; otherwise infinite loop during startup
 };
 
-DEFINE_DEVICE_TYPE(LW350_FLOPPY_CONNECTOR, lw350_floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
-DEFINE_DEVICE_TYPE(LW350_FLOPPY, lw350_floppy_image_device, "floppy_35", "3.5\" floppy drive")
+DEFINE_DEVICE_TYPE(LW350_FLOPPY_CONNECTOR, lw350_floppy_connector, "lw350_floppy_connector", "LW350 Floppy drive connector abstraction")
+DEFINE_DEVICE_TYPE(LW350_FLOPPY, lw350_floppy_image_device, "lw350_floppy_35", "LW350 3.5\" floppy drive")
 
 lw350_floppy_connector::lw350_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LW350_FLOPPY_CONNECTOR, tag, owner, clock),
