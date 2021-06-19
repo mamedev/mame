@@ -866,34 +866,29 @@ u32 voodoo_renderer::enqueue_fastfill(poly_data &poly)
 	if (!fbzmode.rgb_buffer_mask() && !fbzmode.aux_buffer_mask())
 		return 0;
 
-	// fill in remaining relevant data
-	poly.zacolor = m_fbi_reg.za_color();
-
 	// generate a dither pattern if clearing the RGB buffer
 	if (fbzmode.rgb_buffer_mask())
 	{
-		auto const color = m_fbi_reg.color1().argb();
 		for (int y = 0; y < 4; y++)
 		{
 			dither_helper dither(y, fbzmode);
 			for (int x = 0; x < 4; x++)
-				poly.dither[y * 4 + x] = dither.pixel(x, color);
+				poly.dither[y * 4 + x] = dither.pixel(x, poly.color1);
 		}
 	}
 
 	// create a block of 64 identical extents
 	voodoo_renderer::extent_t extents[64];
-	extents[0].startx = m_fbi_reg.clip_left();
-	extents[0].stopx = m_fbi_reg.clip_right();
+	extents[0].startx = poly.clipleft;
+	extents[0].stopx = poly.clipright;
 	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	// iterate over the full area
 	voodoo_renderer::render_delegate fastfill_cb(&voodoo_renderer::rasterizer_fastfill, this);
-	int ey = m_fbi_reg.clip_bottom();
 	u32 pixels = 0;
-	for (int y = m_fbi_reg.clip_top(); y < ey; y += std::size(extents))
+	for (int y = poly.cliptop; y < poly.clipbottom; y += std::size(extents))
 	{
-		int numextents = std::min(ey - y, int(std::size(extents)));
+		int numextents = std::min(poly.clipbottom - y, int(std::size(extents)));
 		pixels += render_triangle_custom(global_cliprect, fastfill_cb, y, numextents, extents);
 	}
 	return pixels;
@@ -954,12 +949,13 @@ u32 voodoo_renderer::enqueue_triangle(poly_data &poly, vertex_t const *vert)
 //  so must be checked by the caller
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, s32 x, s32 scry)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, s32 x, s32 scry, u32 &stipple)
 {
 	// rotate mode
 	if (fbzmode.stipple_pattern() == 0)
 	{
-		if (s32(m_fbi_reg.stipple_rotated()) >= 0)
+		stipple = (stipple >> 1) | (stipple << 31);
+		if (s32(stipple) >= 0)
 		{
 			threadstats.stipple_count++;
 			return false;
@@ -970,7 +966,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::stipple_test(thread_stats_block &
 	else
 	{
 		int stipple_index = ((scry & 3) << 3) | (~x & 7);
-		if (BIT(m_fbi_reg.stipple(), stipple_index) == 0)
+		if (BIT(stipple, stipple_index) == 0)
 		{
 			threadstats.stipple_count++;
 			return false;
@@ -1089,7 +1085,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &th
 //  combine_color - core color combining logic
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::combine_color(rgbaint_t &color, thread_stats_block &threadstats, poly_data const &poly, reg_fbz_colorpath const fbzcp, reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::combine_color(rgbaint_t &color, thread_stats_block &threadstats, poly_data const &poly, reg_fbz_colorpath const fbzcp, reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw, rgb_t chromakey)
 {
 	// compute c_other
 	rgbaint_t c_other;
@@ -1114,7 +1110,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::combine_color(rgbaint_t &color, t
 
 	// handle chroma key
 	if (fbzmode.enable_chromakey())
-		if (!chroma_key_test(threadstats, c_other))
+		if (!chroma_key_test(threadstats, c_other, chromakey))
 			return false;
 
 	// compute a_other
@@ -1402,16 +1398,15 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::alpha_test(thread_stats_block &th
 //  be checked by the caller
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin, rgb_t chromakey)
 {
 	rgb_t color = colorin.to_rgba();
 
 	// non-range version
-	auto const chromakey = m_fbi_reg.chroma_key();
 	auto const chromarange = m_fbi_reg.chroma_range();
 	if (!chromarange.enable())
 	{
-		if (((color ^ chromakey.argb()) & 0xffffff) == 0)
+		if (((color ^ chromakey) & 0xffffff) == 0)
 		{
 			threadstats.chroma_fail++;
 			return false;
@@ -1425,7 +1420,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 		int results;
 
 		// check blue
-		low = chromakey.blue();
+		low = chromakey.b();
 		high = chromarange.blue();
 		test = color.b();
 		results = (test >= low && test <= high);
@@ -1433,7 +1428,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 		results <<= 1;
 
 		// check green
-		low = chromakey.green();
+		low = chromakey.g();
 		high = chromarange.green();
 		test = color.g();
 		results |= (test >= low && test <= high);
@@ -1441,7 +1436,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 		results <<= 1;
 
 		// check red
-		low = chromakey.red();
+		low = chromakey.r();
 		high = chromarange.red();
 		test = color.r();
 		results |= (test >= low && test <= high);
@@ -1478,7 +1473,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, poly_data const &poly, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
 {
 	// constant fog bypasses everything else
-	rgbaint_t fog_color_local(m_fbi_reg.fog_color().argb());
+	rgbaint_t fog_color_local(poly.fogcolor);
 	if (fogmode.fog_constant())
 	{
 		// if fog_mult is 0, we add this to the original color
@@ -1740,13 +1735,14 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 	dither_helper dither(scry, fbzmode, fogmode);
 	u16 *depth = poly.depthbase;
 	u16 *dest = poly.destbase;
+	u32 stipple = poly.stipple;
 
 	threadstats.pixels_in++;
 
 	// apply clipping
 	if (fbzmode.enable_clipping())
 	{
-		if (x < m_fbi_reg.clip_left() || x >= m_fbi_reg.clip_right() || scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
+		if (x < poly.clipleft || x >= poly.clipright || scry < poly.cliptop || scry >= poly.clipbottom)
 		{
 			threadstats.clip_fail++;
 			return;
@@ -1754,7 +1750,7 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 	}
 
 	// handle stippling
-	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry, stipple))
 		return;
 
 	// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
@@ -1768,7 +1764,7 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 	rgbaint_t color(src_color);
 
 	// handle chroma key
-	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color))
+	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, poly.chromakey))
 		return;
 
 	// handle alpha mask
@@ -1816,6 +1812,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	reg_fog_mode const fogmode(_FogMode, poly.raster.fogmode());
 	stw_helper iterstw0, iterstw1;
 	stw_helper deltastw0, deltastw1;
+	u32 stipple = poly.stipple;
 
 	// determine the screen Y
 	s32 scry = y;
@@ -1831,14 +1828,14 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	if (fbzmode.enable_clipping())
 	{
 		// Y clipping buys us the whole scanline
-		if (scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
+		if (scry < poly.cliptop || scry >= poly.clipbottom)
 		{
 			threadstats.clip_fail += stopx - startx;
 			return;
 		}
 
 		// X clipping
-		s32 tempclip = m_fbi_reg.clip_right();
+		s32 tempclip = poly.clipright;
 
 		// check for start outsize of clipping boundary
 		if (startx >= tempclip)
@@ -1855,7 +1852,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 		}
 
 		// clip the left side
-		tempclip = m_fbi_reg.clip_left();
+		tempclip = poly.clipleft;
 		if (startx < tempclip)
 		{
 			threadstats.clip_fail += tempclip - startx;
@@ -1907,7 +1904,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 		do
 		{
 			// handle stippling
-			if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry))
+			if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry, stipple))
 				break;
 
 			// compute "floating point" W value (used for depth and fog)
@@ -1946,7 +1943,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 
 			// colorpath pipeline selects source colors and does blending
 			rgbaint_t color = clamped_argb(iterargb, fbzcp);
-			if (!combine_color(color, threadstats, poly, fbzcp, fbzmode, texel, iterz, iterw))
+			if (!combine_color(color, threadstats, poly, fbzcp, fbzmode, texel, iterz, iterw, poly.chromakey))
 				break;
 
 			// handle alpha test

@@ -2723,11 +2723,6 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 
 		// these registers are referenced in the renderer; we must wait for pending work before changing
 		case voodoo_regs::reg_chromaRange:
-		case voodoo_regs::reg_chromaKey:
-		case voodoo_regs::reg_fogColor:
-		case voodoo_regs::reg_stipple:
-		case voodoo_regs::reg_clipLowYHighY:
-		case voodoo_regs::reg_clipLeftRight:
 			m_renderer->wait(m_reg.name(regnum));
 			[[fallthrough]];
 		// by default, just feed the data to the chips
@@ -3188,9 +3183,18 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		poly.raster.compute(m_reg, nullptr, nullptr);
 		poly.destbase = dest;
 		poly.depthbase = depth;
+		poly.clipleft = m_reg.clip_left();
+		poly.clipright = m_reg.clip_right();
+		poly.cliptop = m_reg.clip_top();
+		poly.clipbottom = m_reg.clip_bottom();
 		poly.color0 = m_reg.color0().argb();
 		poly.color1 = m_reg.color1().argb();
+		poly.chromakey = m_reg.chroma_key().argb();
+		poly.fogcolor = m_reg.fog_color().argb();
 		poly.zacolor = m_reg.za_color();
+		poly.stipple = m_reg.stipple();
+		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
+			printf("Warning: rotated stipple pattern\n");
 
 		// loop over up to two pixels
 		thread_stats_block &threadstats = m_fbi.m_lfb_stats;
@@ -4918,6 +4922,12 @@ s32 voodoo_device::fastfill()
 	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
 	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? m_fbi.back_buffer() : m_fbi.front_buffer();
 	poly.depthbase = m_fbi.aux_buffer();
+	poly.clipleft = m_reg.clip_left();
+	poly.clipright = m_reg.clip_right();
+	poly.cliptop = m_reg.clip_top();
+	poly.clipbottom = m_reg.clip_bottom();
+	poly.color1 = m_reg.color1().argb();
+	poly.zacolor = m_reg.za_color();
 
 	// 2 pixels per clock
 	return m_renderer->enqueue_fastfill(poly) / 2;
@@ -4996,6 +5006,10 @@ s32 voodoo_device::triangle()
 	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
 	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? m_fbi.back_buffer() : m_fbi.front_buffer();
 	poly.depthbase = m_fbi.aux_buffer();
+	poly.clipleft = m_reg.clip_left();
+	poly.clipright = m_reg.clip_right();
+	poly.cliptop = m_reg.clip_top();
+	poly.clipbottom = m_reg.clip_bottom();
 
 	// fill in triangle parameters
 	poly.ax = m_fbi.m_ax;
@@ -5058,7 +5072,10 @@ s32 voodoo_device::triangle()
 	// fill in color parameters
 	poly.color0 = m_reg.color0().argb();
 	poly.color1 = m_reg.color1().argb();
+	poly.chromakey = m_reg.chroma_key().argb();
+	poly.fogcolor = m_reg.fog_color().argb();
 	poly.zacolor = m_reg.za_color();
+	poly.stipple = m_reg.stipple();
 
 	// fill in the vertex data
 	voodoo_renderer::vertex_t vert[3];

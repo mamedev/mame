@@ -1103,9 +1103,6 @@ public:
 	void clear_set(u32 index, u32 clear, u32 set) { m_regs[index].u &= ~clear; m_regs[index].u |= set; }
 	void write_float(u32 index, float data) { m_regs[index].f = data; }
 
-	// special stipple helper which writes back a rotated value
-	u32 stipple_rotated() { return m_regs[reg_stipple].u = (m_regs[reg_stipple].u << 1) | (m_regs[reg_stipple].u >> 31); }
-
 	// special swap history helper
 	void update_swap_history(u32 count) { m_regs[reg_fbiSwapHistory].u = (m_regs[reg_fbiSwapHistory].u << 4) | count; }
 
