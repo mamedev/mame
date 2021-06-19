@@ -62158,8 +62158,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="chr" size="131072">
 				<rom name="dr. mario ii (unl)[u].chr" size="131072" crc="6b10fa72" sha1="d0b498e61ce66ee9584567c3e3dcdf7c00c2f3ae" offset="00000" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="dr. mario ii (unl)[u].prg" size="262144" crc="6be58daa" sha1="c4b9ee3dfe756f73e70d6d8e9197cebc0bda0698" offset="00000" status="baddump" />
+			<dataarea name="prg" size="131072">
+				<rom name="dr. mario ii (unl)[u].prg" size="131072" crc="2df21b64" sha1="4c2bbeafcc1c4e684a7820a3d575a6d7a3e3d9b6" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
