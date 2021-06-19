@@ -11,10 +11,6 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
-// TODO: check sound in Tetris!
-
-// fixed quite a few DMA related bugs in z180 core!
-
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
 // make SUBTARGET=schreibmaschine NO_USE_MIDI=1 NO_USE_PORTAUDIO=1 vs2019
@@ -22,17 +18,6 @@
 // command line parameters:
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
 // -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img 
-
-
-// **TIMING**
-// timing: Tetris Copyright screen
-// hardware: 23:19 - 38:43 = 15.40 s
-// mame:           - 35:15 = 11.93 s
-
-// Z180 datasheet, pg. 86ff "Dynamic RAM Refresh Control"; LW-30 sets RCR to 0xFF
-// doesn't seem to be implemented in Z180 core; however this would only account for about 2.5% time difference
-// Z180 datasheet, pg. 27ff "Wait State Generator"; LW-30 sets DCNTL to 0x40; insert 1 wait state for memory access; external I/O 1 wait state
-// **fixed in Z180 core*** timing now works
 
 #pragma region(LW-30)
 
@@ -107,7 +92,7 @@ Floppy - custom single sided 3.5" DD
 custom 5-to-8 GCR encoding (very similar to Apple II's 5-and-3 encoding)
 300 rpm
 FF FF FF used as sync-start, AB sync-mark for sector header, DE sync-mark for sector data
-FAT File System
+FAT12 File System
 
 ROHM
 BA6580DK
@@ -156,7 +141,7 @@ public:
 	bool must_be_loaded() const noexcept override { return false; }
 	bool is_reset_on_load() const noexcept override { return false; }
 	const char *file_extensions() const noexcept override { return "img"; }
-	const char *image_interface() const noexcept override { return "floppy_35"; }
+	const char *image_interface() const noexcept override { return "lw30_floppy_35"; }
 	image_init_result call_load() override;
 	void call_unload() override;
 
@@ -173,8 +158,8 @@ protected:
 	void device_start() override { }
 };
 
-DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
-DEFINE_DEVICE_TYPE(LW30_FLOPPY, lw30_floppy_image_device, "floppy_35", "3.5\" floppy drive")
+DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "lw30_floppy_connector", "LW-30 Floppy drive connector abstraction")
+DEFINE_DEVICE_TYPE(LW30_FLOPPY, lw30_floppy_image_device, "lw30_floppy_35", "LW-30 3.5\" floppy drive")
 
 lw30_floppy_connector::lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LW30_FLOPPY_CONNECTOR, tag, owner, clock),
@@ -699,10 +684,10 @@ public:
 
 protected:
 	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
 
-	virtual void video_start() override;
+	void video_start() override;
 
 	void map_program(address_map& map) {
 		map(0x00000, 0x01fff).rom();
