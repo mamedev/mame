@@ -118,20 +118,18 @@ class lw30_floppy_connector : public device_t, public device_slot_interface
 {
 public:
 	lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~lw30_floppy_connector();
 
 	lw30_floppy_image_device *get_device();
 
 protected:
-	void device_start() override;
-	void device_config_complete() override;
+	void device_start() override {}
+	void device_config_complete() override {}
 };
 
 class lw30_floppy_image_device : public device_t, public device_image_interface
 {
 public:
 	lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~lw30_floppy_image_device();
 
 public:
 	iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
@@ -167,18 +165,6 @@ lw30_floppy_connector::lw30_floppy_connector(const machine_config &mconfig, cons
 {
 }
 
-lw30_floppy_connector::~lw30_floppy_connector()
-{
-}
-
-void lw30_floppy_connector::device_start()
-{
-}
-
-void lw30_floppy_connector::device_config_complete()
-{
-}
-
 lw30_floppy_image_device *lw30_floppy_connector::get_device()
 {
 	return dynamic_cast<lw30_floppy_image_device *>(get_card_device());
@@ -187,10 +173,6 @@ lw30_floppy_image_device *lw30_floppy_connector::get_device()
 lw30_floppy_image_device::lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LW30_FLOPPY, tag, owner, clock),
 	device_image_interface(mconfig, *this)
-{
-}
-
-lw30_floppy_image_device::~lw30_floppy_image_device()
 {
 }
 
@@ -1306,7 +1288,7 @@ void lw30_state::machine_start()
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
 
 	// try to load map file
-	FILE* f;
+/*	FILE* f;
 	if(fopen_s(&f, "lw30.map", "rt") == 0) {
 		char line[512];
 		do {
@@ -1321,7 +1303,7 @@ void lw30_state::machine_start()
 			}
 		} while(!feof(f));
 		fclose(f);
-	}
+	}*/
 
 	rom = memregion("maincpu")->base();
 
