@@ -79,15 +79,6 @@ void vic10_expansion_slot_device::device_start()
 	m_write_res.resolve_safe();
 	m_write_cnt.resolve_safe();
 	m_write_sp.resolve_safe();
-
-	// inherit bus clock
-	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
-	if (clock() == 0)
-	{
-		vic10_expansion_slot_device *root = machine().device<vic10_expansion_slot_device>(VIC10_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 

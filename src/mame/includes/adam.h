@@ -35,9 +35,7 @@ public:
 		m_psg(*this, SN76489A_TAG),
 		m_ram(*this, RAM_TAG),
 		m_adamnet(*this, "adamnet"),
-		m_slot1(*this, ADAM_LEFT_EXPANSION_SLOT_TAG),
-		m_slot2(*this, ADAM_CENTER_EXPANSION_SLOT_TAG),
-		m_slot3(*this, ADAM_RIGHT_EXPANSION_SLOT_TAG),
+		m_slot(*this, "slot%u", 1U),
 		m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG),
@@ -57,9 +55,7 @@ public:
 	required_device<sn76489a_device> m_psg;
 	required_device<ram_device> m_ram;
 	required_device<adamnet_device> m_adamnet;
-	required_device<adam_expansion_slot_device> m_slot1;
-	required_device<adam_expansion_slot_device> m_slot2;
-	required_device<adam_expansion_slot_device> m_slot3;
+	required_device_array<adam_expansion_slot_device, 3> m_slot;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 	required_device<colecovision_control_port_device> m_joy1;
 	required_device<colecovision_control_port_device> m_joy2;
