@@ -43268,6 +43268,12 @@ yes                             //
 yiear                           // GX407 (c) 1985
 yiear2                          // GX407 (c) 1985
 
+@source:yman1x.cpp
+an1x                            //
+
+@source:ymdx100.cpp
+dx100                           //
+
 @source:ymdx11.cpp
 dx11                            //
 
