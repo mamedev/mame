@@ -24,12 +24,12 @@
 static constexpr int MAX_TMU = 2;
 
 // enumeration specifying which model of Voodoo we are emulating
-enum
+enum voodoo_model : u8
 {
-	TYPE_VOODOO_1,
-	TYPE_VOODOO_2,
-	TYPE_VOODOO_BANSHEE,
-	TYPE_VOODOO_3
+	MODEL_VOODOO_1,
+	MODEL_VOODOO_2,
+	MODEL_VOODOO_BANSHEE,
+	MODEL_VOODOO_3
 };
 
 // nominal clock values
@@ -80,6 +80,54 @@ public:
 	s32 m_out;     // output pointer
 };
 
+struct shared_tables
+{
+	// constructor
+	shared_tables();
+
+	// 8-bit lookups
+	rgb_t rgb332[256];      // RGB 3-3-2 lookup table
+	rgb_t alpha8[256];      // alpha 8-bit lookup table
+	rgb_t int8[256];        // intensity 8-bit lookup table
+	rgb_t ai44[256];        // alpha, intensity 4-4 lookup table
+
+	// 16-bit lookups
+	rgb_t rgb565[65536];    // RGB 5-6-5 lookup table
+	rgb_t argb1555[65536];  // ARGB 1-5-5-5 lookup table
+	rgb_t argb4444[65536];  // ARGB 4-4-4-4 lookup table
+};
+
+class debug_stats
+{
+public:
+	debug_stats()
+	{
+		std::fill(std::begin(texture_mode), std::end(texture_mode), 0);
+		buffer[0] = 0;
+	}
+
+	u8 lastkey = 0;            // last key state
+	u8 display = 0;            // display stats?
+	s32 swaps = 0;              // total swaps
+	s32 stalls = 0;             // total stalls
+	s32 total_triangles = 0;    // total triangles
+	s32 total_pixels_in = 0;    // total pixels in
+	s32 total_pixels_out = 0;   // total pixels out
+	s32 total_chroma_fail = 0;  // total chroma fail
+	s32 total_zfunc_fail = 0;   // total z func fail
+	s32 total_afunc_fail = 0;   // total a func fail
+	s32 total_clipped = 0;      // total clipped
+	s32 total_stippled = 0;     // total stippled
+	s32 lfb_writes = 0;         // LFB writes
+	s32 lfb_reads = 0;          // LFB reads
+	s32 reg_writes = 0;         // register writes
+	s32 reg_reads = 0;          // register reads
+	s32 tex_writes = 0;         // texture writes
+	s32 texture_mode[16];       // 16 different texture modes
+	u8 render_override = 0;    // render override
+	char buffer[1024];           // string
+};
+
 }
 
 
@@ -94,13 +142,16 @@ public:
 	virtual ~voodoo_device();
 
 	// configuration
-	void set_fbmem(int value) { m_fbmem = value; }
-	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
+	void set_fbmem(int value) { m_fbmem_in_mb = value; }
+	void set_tmumem(int value1, int value2) { m_tmumem0_in_mb = value1; m_tmumem1_in_mb = value2; }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto vblank_callback() { return m_vblank.bind(); }
 	auto stall_callback() { return m_stall.bind(); }
 	auto pciint_callback() { return m_pciint.bind(); }
+
+	// getters
+	voodoo_model model() const { return m_model; }
 
 	u32 read(offs_t offset);
 	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -109,53 +160,19 @@ public:
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
-	int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_init_enable(u32 newval);
 
 	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
 
 protected:
 	// construction
-	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
+	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
-
-	struct tmu_shared_state;
-
-	struct voodoo_stats
-	{
-		voodoo_stats()
-		{
-			std::fill(std::begin(texture_mode), std::end(texture_mode), 0);
-			buffer[0] = 0;
-		}
-
-		u8 lastkey = 0;            // last key state
-		u8 display = 0;            // display stats?
-		s32 swaps = 0;              // total swaps
-		s32 stalls = 0;             // total stalls
-		s32 total_triangles = 0;    // total triangles
-		s32 total_pixels_in = 0;    // total pixels in
-		s32 total_pixels_out = 0;   // total pixels out
-		s32 total_chroma_fail = 0;  // total chroma fail
-		s32 total_zfunc_fail = 0;   // total z func fail
-		s32 total_afunc_fail = 0;   // total a func fail
-		s32 total_clipped = 0;      // total clipped
-		s32 total_stippled = 0;     // total stippled
-		s32 lfb_writes = 0;         // LFB writes
-		s32 lfb_reads = 0;          // LFB reads
-		s32 reg_writes = 0;         // register writes
-		s32 reg_reads = 0;          // register reads
-		s32 tex_writes = 0;         // texture writes
-		s32 texture_mode[16];       // 16 different texture modes
-		u8 render_override = 0;    // render override
-		char buffer[1024];           // string
-	};
-
 
 	struct cmdfifo_info
 	{
@@ -185,9 +202,9 @@ protected:
 
 	struct tmu_state
 	{
-		tmu_state(voodoo_device &device) : m_device(device), m_reg(device.m_type) { }
+		tmu_state(voodoo_device &device) : m_device(device), m_reg(device.model()) { }
 
-		void init(int index, tmu_shared_state &share, void *memory, int tmem);
+		void init(int index, voodoo::shared_tables &share, std::vector<u8> &memory);
 		voodoo::rasterizer_texture &prepare_texture();
 		s32 compute_lodbase();
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
@@ -215,24 +232,9 @@ protected:
 	};
 
 
-	struct tmu_shared_state
-	{
-		void init();
-
-		rgb_t rgb332[256];            // RGB 3-3-2 lookup table
-		rgb_t alpha8[256];            // alpha 8-bit lookup table
-		rgb_t int8[256];              // intensity 8-bit lookup table
-		rgb_t ai44[256];              // alpha, intensity 4-4 lookup table
-
-		rgb_t * rgb565;                 // RGB 5-6-5 lookup table
-		rgb_t argb1555[65536];        // ARGB 1-5-5-5 lookup table
-		rgb_t argb4444[65536];        // ARGB 4-4-4-4 lookup table
-	};
-
-
 	struct fbi_state
 	{
-		void init(u8 type, void *memory, u32 fbmem);
+		void init(voodoo_model model, std::vector<u8> &memory);
 
 		struct setup_vertex
 		{
@@ -297,7 +299,6 @@ protected:
 		rgb_t m_pen[65536];             // mapping from pixels to pens */
 		rgb_t m_clut[512];              // clut gamma data */
 		u8 m_clut_dirty = 1;         // do we need to recompute? */
-		rgb_t m_rgb565[65536];          // RGB 5-6-5 lookup table */
 
 		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
 		void recompute_video_memory(voodoo::voodoo_regs &regs);
@@ -369,7 +370,6 @@ protected:
 	u32 lfb_r(offs_t offset, bool lfb_3d);
 	s32 texture_w(offs_t offset, u32 data);
 	s32 lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
-	s32 banshee_2d_w(offs_t offset, u32 data);
 	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
 	void adjust_vblank_timer();
@@ -391,54 +391,46 @@ protected:
 	s32 cmdfifo_execute_if_ready(cmdfifo_info &f);
 	void cmdfifo_w(cmdfifo_info *f, offs_t offset, u32 data);
 
-	void init_save_state();
+protected:
+	// internal helpers
+	void register_save();
+	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 
-	void banshee_blit_2d(u32 data);
+	// internal state
+	const voodoo_model m_model;              // which voodoo model
+	u8 m_chipmask;                           // mask for which chips are available
+	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
+	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
+	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
 
-// FIXME: this stuff should not be public
-public:
-	voodoo::voodoo_regs m_reg;             // raw registers
-	const u8 m_type;                // type of system
-	u8 m_chipmask;               // mask for which chips are available
-	u8 m_index;                  // index of board
+	std::unique_ptr<voodoo::voodoo_renderer> m_renderer; // rendering class
+	voodoo::voodoo_regs m_reg;               // raw registers
 
-	u32 m_freq;                   // operating frequency
-	attoseconds_t m_attoseconds_per_cycle;  // attoseconds per cycle
-	int m_trigger;                // trigger used for stalling
+	int m_trigger;                           // trigger used for stalling
 
-	std::unique_ptr<voodoo::voodoo_renderer> m_renderer;              // polygon manager
+	offs_t m_last_status_pc;                 // PC of last status description (for logging)
+	u32 m_last_status_value;                 // value of last status read (for logging)
 
-	voodoo_stats m_stats;                  // internal statistics
+	devcb_write_line m_vblank;               // VBLANK callback
+	devcb_write_line m_stall;                // stalling callback
+	devcb_write_line m_pciint;               // PCI interrupt callback
 
-	offs_t m_last_status_pc;         // PC of last status description (for logging)
-	u32 m_last_status_value;      // value of last status read (for logging)
-
-	bool m_send_config;
-	u32 m_tmu_config;
-
-	u8 m_fbmem;
-	u8 m_tmumem0;
-	u8 m_tmumem1;
-	devcb_write_line m_vblank;
-	devcb_write_line m_stall;
-	// This is for internally generated PCI interrupts in Voodoo3
-	devcb_write_line m_pciint;
-
-	emu_timer *m_vsync_stop_timer = nullptr; // VBLANK End timer
-	emu_timer *m_vsync_start_timer = nullptr; // VBLANK timer
-
-	pci_state m_pci;                    // PCI state
-	dac_state m_dac;                    // DAC state
-	fbi_state m_fbi;                    // FBI states
-	tmu_state m_tmu[MAX_TMU];           // TMU states
-	tmu_shared_state m_tmushare;               // TMU shared state
-	banshee_info m_banshee;                // Banshee state
+	pci_state m_pci;                         // PCI state
+	dac_state m_dac;                         // DAC state
+	fbi_state m_fbi;                         // FBI states
+	tmu_state m_tmu[MAX_TMU];                // TMU states
 
 	required_device<screen_device> m_screen; // the screen we are acting on
-	required_device<cpu_device> m_cpu;   // the CPU we interact with
+	required_device<cpu_device> m_cpu;       // the CPU we interact with
 
-	std::unique_ptr<u8[]> m_fbmem_alloc;
-	std::unique_ptr<u8[]> m_tmumem_alloc[2];
+	emu_timer *m_vsync_stop_timer = nullptr; // VBLANK end timer
+	emu_timer *m_vsync_start_timer = nullptr;// VBLANK timer
+
+	voodoo::debug_stats m_stats;             // internal statistics
+
+	std::vector<u8> m_fbmem;                 // allocated framebuffer
+	std::vector<u8> m_tmumem[2];             // allocated texture memory
+	std::unique_ptr<voodoo::shared_tables> m_shared; // shared tables
 };
 
 class voodoo_1_device : public voodoo_device
@@ -470,12 +462,23 @@ public:
 	u8 banshee_vga_r(offs_t offset);
 	void banshee_vga_w(offs_t offset, u8 data);
 
+	virtual s32 banshee_2d_w(offs_t offset, u32 data) override;
+	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 vdt);
+	// construction
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	// device-level overrides
 	u32 banshee_agp_r(offs_t offset);
 	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	void banshee_blit_2d(u32 data);
+
+	// internal state
+	banshee_info m_banshee;                  // Banshee state
 };
 
 

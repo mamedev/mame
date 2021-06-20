@@ -214,9 +214,9 @@ u32 voodoo_pci_device::pcictrl_r(offs_t offset, u32 mem_mask)
 		// V1: initEnable: 11:0
 		// V2: initEnable: Fab ID=19:16, Graphics Rev=15:12
 		// Banshee/V3: fabID: ScratchPad=31:4 fabID=3:0
-		if (m_voodoo->m_type== TYPE_VOODOO_2)
+		if (m_voodoo->model() == MODEL_VOODOO_2)
 			result = (result & ~0xff000) | 0x00044000; // Vegas driver needs this value
-		else if (m_voodoo->m_type >= TYPE_VOODOO_BANSHEE)
+		else if (m_voodoo->model() >= MODEL_VOODOO_BANSHEE)
 			result = (result & ~0xf) | 0x1;
 		break;
 	case 0x54/4:

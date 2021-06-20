@@ -1023,8 +1023,8 @@ public:
 	static constexpr u32 reg_nccTable =        0x324/4;   //  W  F
 
 	// constructor
-	voodoo_regs(u8 type) :
-		m_revision((type == TYPE_VOODOO_1) ? 1 : (type == TYPE_VOODOO_2) ? 2 : 3),
+	voodoo_regs(voodoo_model model) :
+		m_revision((model == MODEL_VOODOO_1) ? 1 : (model == MODEL_VOODOO_2) ? 2 : 3),
 		m_names(s_names[m_revision - 1]),
 		m_access(s_access[m_revision - 1])
 	{

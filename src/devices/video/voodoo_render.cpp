@@ -1276,9 +1276,8 @@ void rasterizer_palette::compute_ncc(u32 const *regs)
 //  voodoo_renderer - constructor
 //-------------------------------------------------
 
-voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
+voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
 	poly_manager(machine),
-	m_type(type),
 	m_tmu_config(tmu_config),
 	m_rowpixels(0),
 	m_yorigin(0),
@@ -1286,7 +1285,7 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u8 type, u16 tmu_conf
 	m_tmu0_reg(tmu0_regs),
 	m_tmu1_reg(tmu1_regs),
 	m_rgb565(rgb565),
-	m_fogdelta_mask((type < TYPE_VOODOO_2) ? 0xff : 0xfc),
+	m_fogdelta_mask(fbi_regs.rev1() ? 0xff : 0xfc),
 	m_thread_stats(WORK_MAX_THREADS)
 {
 	// empty the hash table

@@ -517,7 +517,7 @@ public:
 	using rasterizer_mfp = void (voodoo_renderer::*)(int32_t, const extent_t &, const poly_data &, int);
 
 	// construction
-	voodoo_renderer(running_machine &machine, u8 type, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
+	voodoo_renderer(running_machine &machine, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
 
 	// simple getters
 	std::vector<thread_stats_block> &thread_stats() { return m_thread_stats; }
@@ -596,7 +596,6 @@ private:
 	voodoo::rasterizer_info *add_rasterizer(voodoo::rasterizer_params const &params, rasterizer_mfp rasterizer, bool is_generic);
 
 	// internal state
-	u8 m_type;                  // type of chip
 	u16 m_tmu_config;           // TMU configuration
 	u32 m_rowpixels;            // current pixels per row
 	s32 m_yorigin;              // current Y origin
