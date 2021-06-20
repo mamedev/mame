@@ -37370,6 +37370,10 @@ wwallyja                        // 1992.06 Wally wo Sagase! (Japan, FD1094)
 wwallyjad                       //
 wwallyjd                        //
 
+@source:segas18_astormbl.cpp
+astormbl
+astormb2
+
 @source:segas24.cpp
 bnzabros                        // 1990.08 Bonanza Bros. (US)
 bnzabrosj                       // 1990.06 Bonanza Bros. (Japan)
@@ -39794,8 +39798,6 @@ wmatch                          // (c) 1984 (S1)
 @source:system16.cpp
 altbeastbl                      //
 altbeastbl2                     //
-astormb2                        // BOOTLEG
-astormbl                        // BOOTLEG
 bayrouteb1                      // (c) 1989 (protected) (bootleg)
 bayrouteb2                      // (c) 1989 (protected) (bootleg)
 beautyb                         // (c) 1991 AMT
