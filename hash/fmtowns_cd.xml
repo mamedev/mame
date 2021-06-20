@@ -1631,8 +1631,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="aburner" supported="partial">
+	<software name="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Rev 1) (Track 1).bin" size="6985440" crc="e43d4e88" sha1="fcfba206bc0996baae9de2c3781124399824bbf5"/>
@@ -1658,7 +1657,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburnera" cloneof="aburner" supported="partial">
+	<software name="aburnera" cloneof="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Rev 1) (Alt) (Track 1).bin" size="6985440" crc="e43d4e88" sha1="fcfba206bc0996baae9de2c3781124399824bbf5"/>
@@ -1684,7 +1683,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburnero" cloneof="aburner" supported="partial">
+	<software name="aburnero" cloneof="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Track 1).bin" size="7126560" crc="789fc2c6" sha1="0604f645a7777df34006b93baa1c2f68d3379dad"/>
@@ -7028,8 +7027,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="excel10" supported="partial">
+	<software name="excel10">
 		<!--
 		Origin: redump.org
 		<rom name="Excellent 10 (Japan) (Track 01).bin" size="29639904" crc="9a05c578" sha1="3d79f05f83d2b259e7dcb79ecd08f7578c3f97cc"/>
@@ -7747,8 +7745,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Severe graphics issues -->
-	<software name="frogfstd" supported="no">
+	<software name="frogfstd">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Frog Feast Demo.iso" size="952320" crc="ed3e8b42" sha1="82b60aefb5061bc7d1761183fe77548d1a23b4a3"/>
@@ -12945,8 +12942,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast? -->
-	<software name="lastsurv" supported="partial">
+	<software name="lastsurv">
 		<!--
 		Origin: redump.org
 		<rom name="Last Survivor (Japan) (Track 1).bin" size="13759200" crc="8655d470" sha1="e57e9280e729ae54ffda5bbe0b87879b45907d81"/>
@@ -13749,8 +13745,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="madstalk" supported="no">
+	<software name="madstalk">
 		<!--
 		Origin: redump.org
 		<rom name="Mad Stalker - FullMetalForce (Japan) (Track 01).bin" size="6091680" crc="48fa8e70" sha1="52285cb2a977e67a540f75585d0887c50b633dc6"/>
@@ -13775,6 +13770,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="MTC-1092"/>
 		<info name="alt_title" value="マッドストーカー" />
 		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - fullmetalforce (Japan)" sha1="8132a52178a6c5c692a34cde37d6863b75e4e671" />
@@ -15318,8 +15314,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Fails to play the intro, otherwise works -->
-	<software name="mspectre" supported="partial">
+	<software name="mspectre">
 		<!--
 		Origin: redump.org
 		<rom name="Megaspectre (Japan) (Track 1).bin" size="20462400" crc="7090f37e" sha1="8287b38c8908b10d4b26bd35d05a80fe047b379b"/>
@@ -21409,8 +21404,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing dialogue boxes -->
-	<software name="beast2" supported="partial">
+	<software name="beast2">
 		<!--
 		Origin: redump.org
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 01).bin" size="73735200" crc="153631da" sha1="f3f3109f0c5e95d549de3c63efe9e21baff638cb"/>
@@ -22965,7 +22959,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- This revision seems to be quite different from the original, internally. It works mostly fine and doesn't require a floppy disk. -->
+	<!-- This revision seems to be quite different from the original, internally. It doesn't require a floppy disk and doesn't freak out if a mouse is connected to port 2. -->
 	<software name="tqod">
 		<!--
 		Origin: redump.org
@@ -22995,8 +22989,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Graphics/sound issues; hangs when starting a fight -->
-	<software name="tqodo" cloneof="tqod" supported="no">
+	<software name="tqodo" cloneof="tqod">
 		<!--
 		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
 		<rom name="Queen of Duelist, The (Japan) (Track 01).bin" size="15523200" crc="e54628d2" sha1="4a96e0328f960ad6581a834252a38f8db427b11f"/>
@@ -23017,7 +23010,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HME-166"/>
 		<info name="alt_title" value="クイーン・オブ・デュエリスト" />
 		<info name="release" value="199306xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
