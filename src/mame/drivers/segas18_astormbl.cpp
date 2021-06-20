@@ -18,6 +18,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_sprites(*this, "sprites")
 	{ }
 
 	void astormbl(machine_config &config);
@@ -35,6 +36,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<sega_sys16b_sprite_device> m_sprites;
 
 	void astormbl_map(address_map &map);
 };
@@ -132,6 +134,53 @@ INPUT_PORTS_END
 
 uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// if no drawing is happening, fill with black and get out
+	//if (!m_segaic16vid->m_display_enable)
+	//{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+	//	return 0;
+	//}
+
+	// start the sprites drawing
+	if (m_sprites.found())
+		m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// mix in sprites
+	if (!m_sprites.found()) return 0;
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+	{
+		for (int y = rect->min_y; y <= rect->max_y; y++)
+		{
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+			uint8_t *pri = &screen.priority().pix(y);
+			for (int x = rect->min_x; x <= rect->max_x; x++)
+			{
+				// only process written pixels
+				uint16_t pix = src[x];
+				if (pix != 0xffff)
+				{
+					// compare sprite priority against tilemap priority
+					int priority = (pix >> 10) & 3;
+					if ((1 << priority) > pri[x])
+					{
+						// if the color is set to maximum, shadow pixels underneath us
+						if ((pix & 0x03f0) == 0x03f0)
+							dest[x] += m_palette_entries;
+
+						// otherwise, just add in sprite palette base
+						else
+							dest[x] = 0x400 | (pix & 0x3ff);
+					}
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -143,20 +192,28 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
+	map(0x100000, 0x10ffff).ram();
+	map(0x110000, 0x110fff).ram();
+
 	map(0x140000, 0x140fff).ram().w(FUNC(segas18_astormbl_state::paletteram_w)).share("paletteram");
 
-/*
-	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0x110000, 0x110fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 	map(0x200000, 0x200fff).ram().share("sprites");
+
 	map(0xa00000, 0xa00001).portr("COINAGE");
 	map(0xa00002, 0xa00003).portr("DSW1");
-	map(0xa00006, 0xa00007).w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
-	map(0xa0000e, 0xa0000f).w(FUNC(segas1x_bootleg_state::sys18_tilebank_w));
+
 	map(0xa01000, 0xa01001).portr("SERVICE");
 	map(0xa01002, 0xa01003).portr("P1");
 	map(0xa01004, 0xa01005).portr("P2");
 	map(0xa01006, 0xa01007).portr("P3");
+
+	map(0xffc000, 0xffffff).ram();
+
+/*
+	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
+	map(0x110000, 0x110fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
+	map(0xa00006, 0xa00007).w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
+	map(0xa0000e, 0xa0000f).w(FUNC(segas1x_bootleg_state::sys18_tilebank_w));
 	map(0xa02100, 0xa02101).noprw();
 	map(0xa03000, 0xa03001).noprw();
 	map(0xa03034, 0xa03035).noprw();
@@ -173,7 +230,6 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 
 	map(0xc46600, 0xc46601).w(FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
 	map(0xfe0020, 0xfe003f).nopw();
-	map(0xffc000, 0xffffff).ram();
 */
 }
 
@@ -194,6 +250,10 @@ void segas18_astormbl_state::astormbl(machine_config &config)
 	m_screen->set_palette(m_palette);
 	// see note in segas16a.cpp, also used here for consistency
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(64);
+
 
 #if 0
 
@@ -257,6 +317,10 @@ void segas18_astormbl_state::astormb2(machine_config &config)
 	m_screen->set_palette(m_palette);
 	// see note in segas16a.cpp, also used here for consistency
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	m_sprites->set_local_originx(64);
+
 
 #if 0
 	/* video hardware */
