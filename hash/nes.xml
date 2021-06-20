@@ -66531,10 +66531,11 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="metroidk" supported="partial">
+	<software name="metroidk">
 		<description>Metroid - Jin Ji Zhi Ling (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
+		<info name="alt_title" value="緊急指令"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7037" />
 			<feature name="pcb" value="UNL-KS7037" />
