@@ -475,8 +475,6 @@ private:
 	optional_ioport_array<9> m_io_kbrow;
 	required_region_ptr<uint8_t> rom, font_normal, font_bold;
 
-	std::map<uint32_t, std::string> symbols;
-
 	// floppy
 	uint8_t io_90{}; // stepper motor control
 	uint8_t floppy_steps{}; // quarter track

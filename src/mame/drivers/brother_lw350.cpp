@@ -851,8 +851,6 @@ private:
 	optional_ioport_array<9> io_kbrow;
 	required_region_ptr<uint8_t> rom;
 
-	std::map<uint32_t, std::string> symbols;
-
 	uint8_t vram[80 * 128];
 	uint8_t io_70, io_7a, io_b8, io_90;
 	uint8_t rombank;
@@ -1149,25 +1147,6 @@ void lw350_state::machine_start()
 {
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
 
-	// try to load map file
-/*	FILE* f;
-	if(fopen_s(&f, "lw350.map", "rt") == 0) {
-		char line[512];
-		do {
-			if(fgets(line, sizeof(line), f)) {
-				int segment, offset;
-				char symbol[512];
-				if(sscanf(line, "%x:%x %512s", &segment, &offset, symbol) == 3) {
-					uint32_t phys = (segment << 4) + offset;
-					//TRACE(_T("%04x:%04x => %02x:%04x\n"), segment, offset, bank, offset);
-					symbols[phys] = symbol;
-				}
-			}
-		} while(!feof(f));
-		fclose(f);
-	}
-*/
-
 	// ROM patches
 
 	// force jump to self-test menu
@@ -1387,9 +1366,6 @@ private:
 	uint8_t io_72, io_73, io_74, io_75; // gfx
 	uint8_t io_7a, io_b8, rombank;
 	uint32_t framecnt;
-
-	uint8_t framebuffer[720 * 350]; // pixel data
-	std::map<uint32_t, std::string> symbols;
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
 		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
@@ -1652,26 +1628,6 @@ MC6845_ON_UPDATE_ADDR_CHANGED(lw450_state::crtc_addr)
 void lw450_state::machine_start()
 {
 	screen->set_visible_area(0, 720 - 1, 0, 320 - 1);
-
-	/*
-		// try to load map file
-		FILE* f;
-		if(fopen_s(&f, "rom.map", "rt") == 0) {
-			char line[512];
-			do {
-				if(fgets(line, sizeof(line), f)) {
-					int segment, offset;
-					char symbol[512];
-					if(sscanf(line, "%x:%x %512s", &segment, &offset, symbol) == 3) {
-						uint32_t phys = (segment << 4) + offset;
-						//TRACE(_T("%04x:%04x => %02x:%04x\n"), segment, offset, bank, offset);
-						symbols[phys] = symbol;
-					}
-				}
-			} while(!feof(f));
-			fclose(f);
-		}
-	*/
 
 	palette->set_pen_color(0, rgb_t(0, 0, 0));
 	palette->set_pen_color(1, rgb_t(0xaa, 0xaa, 0xaa));

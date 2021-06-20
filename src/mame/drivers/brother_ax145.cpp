@@ -111,9 +111,7 @@ private:
 	required_device<hd64180rp_device> maincpu;
 	required_device<hd44780_device> lcdc;
 	memory_share_creator<uint8_t> ram;
-
 	required_region_ptr<uint8_t> rom, dict_rom;
-	std::map<uint32_t, std::string> symbols;
 
 	// valid values (bei IO3000=0x0b,0x07) (read_config @ 0x14c87): 0 = german => 0, 1 = german => 1, 2 = espanol => 2, 4 (gehäusedeckel offen) => 3, 8 = francais => 4, 16 = german => 5
 	static constexpr uint8_t id = 1;

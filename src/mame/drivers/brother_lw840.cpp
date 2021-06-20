@@ -128,7 +128,6 @@ private:
 	uint8_t irq_toggle{};
 
 	uint16_t* vram{};
-	std::map<uint32_t, std::string> symbols;
 
 	// screen updates
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -227,25 +226,6 @@ uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap,
 void lw840_state::machine_start()
 {
 	screen->set_visible_area(0, 640 - 1, 0, 400 - 1);
-
-	// try to load map file
-/*	FILE* f;
-	if(fopen_s(&f, "lw840.map", "rt") == 0) {
-		char line[512];
-		do {
-			if(fgets(line, sizeof(line), f)) {
-				int segment, offset;
-				char symbol[512];
-				if(sscanf(line, "%x:%x %512s", &segment, &offset, symbol) == 3) {
-					uint32_t phys = (segment << 4) + offset;
-					//TRACE(_T("%04x:%04x => %02x:%04x\n"), segment, offset, bank, offset);
-					symbols[phys] = symbol;
-				}
-			}
-		} while(!feof(f));
-		fclose(f);
-	}
-*/
 
 	vram = reinterpret_cast<uint16_t *>(reinterpret_cast<uintptr_t>(memshare("sram")->ptr()) + 0x300);
 
