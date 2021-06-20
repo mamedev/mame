@@ -1185,6 +1185,8 @@ Options: 8087 FPU
 OSC: 24MHz, 1843.200KHz
 
 Two blocks of dip switches, 8 switches each
+The same BIOS version is found in a Multitech Popular 500 PC
+
 ******************************************************************************/
 
 static DEVICE_INPUT_DEFAULTS_START( siemens )
