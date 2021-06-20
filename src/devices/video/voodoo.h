@@ -303,13 +303,13 @@ protected:
 		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
 		void recompute_video_memory(voodoo::voodoo_regs &regs);
 		void recompute_fifo_layout(voodoo::voodoo_regs &regs);
-		bool copy_scanline(u32 *dst, int drawbuf, s32 y, s32 xstart, s32 xstop)
+		bool copy_scanline(u32 *dst, int drawbuf, s32 y, s32 xstart, s32 xstop, rgb_t const *pens)
 		{
 			if (y < m_yoffs)
 				return false;
 			u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * m_rowpixels - m_xoffs;
 			for (s32 x = xstart; x < xstop; x++)
-				dst[x] = m_pen[src[x]];
+				dst[x] = pens[src[x]];
 			return true;
 		}
 
@@ -331,35 +331,6 @@ protected:
 		u8 read_result;            // pending read result
 	};
 
-
-	struct banshee_info
-	{
-		u32 io[0x40];               // I/O registers
-		u32 agp[0x80];              // AGP registers
-		u8  vga[0x20];              // VGA registers
-		u8  crtc[0x27];             // VGA CRTC registers
-		u8  seq[0x05];              // VGA sequencer registers
-		u8  gc[0x05];               // VGA graphics controller registers
-		u8  att[0x15];              // VGA attribute registers
-		u8  attff;                  // VGA attribute flip-flop
-
-		u32 blt_regs[0x20];         // 2D Blitter registers
-		u32 blt_dst_base = 0;
-		u32 blt_dst_x = 0;
-		u32 blt_dst_y = 0;
-		u32 blt_dst_width = 0;
-		u32 blt_dst_height = 0;
-		u32 blt_dst_stride = 0;
-		u32 blt_dst_bpp = 0;
-		u32 blt_cmd = 0;
-		u32 blt_src_base = 0;
-		u32 blt_src_x = 0;
-		u32 blt_src_y = 0;
-		u32 blt_src_width = 0;
-		u32 blt_src_height = 0;
-		u32 blt_src_stride = 0;
-		u32 blt_src_bpp = 0;
-	};
 
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);
@@ -395,6 +366,7 @@ protected:
 	// internal helpers
 	void register_save();
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
+	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
 
 	// internal state
 	const voodoo_model m_model;              // which voodoo model
@@ -464,6 +436,7 @@ public:
 
 	virtual s32 banshee_2d_w(offs_t offset, u32 data) override;
 	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
 protected:
 	// construction
 	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
@@ -478,6 +451,34 @@ protected:
 	void banshee_blit_2d(u32 data);
 
 	// internal state
+	struct banshee_info
+	{
+		u32 io[0x40];               // I/O registers
+		u32 agp[0x80];              // AGP registers
+		u8  vga[0x20];              // VGA registers
+		u8  crtc[0x27];             // VGA CRTC registers
+		u8  seq[0x05];              // VGA sequencer registers
+		u8  gc[0x05];               // VGA graphics controller registers
+		u8  att[0x15];              // VGA attribute registers
+		u8  attff;                  // VGA attribute flip-flop
+
+		u32 blt_regs[0x20];         // 2D Blitter registers
+		u32 blt_dst_base = 0;
+		u32 blt_dst_x = 0;
+		u32 blt_dst_y = 0;
+		u32 blt_dst_width = 0;
+		u32 blt_dst_height = 0;
+		u32 blt_dst_stride = 0;
+		u32 blt_dst_bpp = 0;
+		u32 blt_cmd = 0;
+		u32 blt_src_base = 0;
+		u32 blt_src_x = 0;
+		u32 blt_src_y = 0;
+		u32 blt_src_width = 0;
+		u32 blt_src_height = 0;
+		u32 blt_src_stride = 0;
+		u32 blt_src_bpp = 0;
+	};
 	banshee_info m_banshee;                  // Banshee state
 };
 

@@ -333,73 +333,23 @@ inline u32 voodoo::fifo_state::remove()
     INLINE FUNCTIONS
 ***************************************************************************/
 
-int voodoo_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int voodoo_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
 {
-	int changed = m_fbi.m_video_changed;
-	int drawbuf = m_fbi.m_frontbuf;
-	int x, y;
-
-	/* reset the video changed flag */
+	// reset the video changed flag
+	bool changed = m_fbi.m_video_changed;
 	m_fbi.m_video_changed = false;
 
-	/* if we are blank, just fill with black */
-	if (m_reg.fbi_init1().software_blank())
-	{
-		bitmap.fill(0, cliprect);
-		return changed;
-	}
-
-	/* if the CLUT is dirty, recompute the pens array */
-	if (m_fbi.m_clut_dirty)
-	{
-		u8 rtable[32], gtable[64], btable[32];
-
-		/* kludge: some of the Midway games write 0 to the last entry when they obviously mean FF */
-		if ((m_fbi.m_clut[32] & 0xffffff) == 0 && (m_fbi.m_clut[31] & 0xffffff) != 0)
-			m_fbi.m_clut[32] = 0x20ffffff;
-
-		/* compute the R/G/B pens first */
-		for (x = 0; x < 32; x++)
-		{
-			/* treat X as a 5-bit value, scale up to 8 bits, and linear interpolate for red/blue */
-			y = (x << 3) | (x >> 2);
-			rtable[x] = (m_fbi.m_clut[y >> 3].r() * (8 - (y & 7)) + m_fbi.m_clut[(y >> 3) + 1].r() * (y & 7)) >> 3;
-			btable[x] = (m_fbi.m_clut[y >> 3].b() * (8 - (y & 7)) + m_fbi.m_clut[(y >> 3) + 1].b() * (y & 7)) >> 3;
-
-			/* treat X as a 6-bit value with LSB=0, scale up to 8 bits, and linear interpolate */
-			y = (x * 2) + 0;
-			y = (y << 2) | (y >> 4);
-			gtable[x*2+0] = (m_fbi.m_clut[y >> 3].g() * (8 - (y & 7)) + m_fbi.m_clut[(y >> 3) + 1].g() * (y & 7)) >> 3;
-
-			/* treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate */
-			y = (x * 2) + 1;
-			y = (y << 2) | (y >> 4);
-			gtable[x*2+1] = (m_fbi.m_clut[y >> 3].g() * (8 - (y & 7)) + m_fbi.m_clut[(y >> 3) + 1].g() * (y & 7)) >> 3;
-		}
-
-		/* now compute the actual pens array */
-		for (x = 0; x < 65536; x++)
-		{
-			int r = rtable[(x >> 11) & 0x1f];
-			int g = gtable[(x >> 5) & 0x3f];
-			int b = btable[x & 0x1f];
-			m_fbi.m_pen[x] = rgb_t(r, g, b);
-		}
-
-		/* no longer dirty */
-		m_fbi.m_clut_dirty = false;
-		changed = true;
-	}
-
-	/* debugging! */
+	// select the buffer to draw
+	int drawbuf = m_fbi.m_frontbuf;
 	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
 		drawbuf = m_fbi.m_backbuf;
 
-	/* copy from the current front buffer */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		m_fbi.copy_scanline(&bitmap.pix(y), drawbuf, y, cliprect.min_x, cliprect.max_x + 1);
+	// copy from the current front buffer
+	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", m_screen->vpos(), m_fbi.m_rgboffs[m_fbi.m_frontbuf]);
+	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
+		m_fbi.copy_scanline(&bitmap.pix(y), drawbuf, y, cliprect.min_x, cliprect.max_x + 1, pens);
 
-	/* update stats display */
+	// update stats display
 	if (DEBUG_STATS)
 	{
 		int statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH));
@@ -412,17 +362,17 @@ int voodoo_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			popmessage(m_stats.buffer, 0, 0);
 	}
 
-	/* update render override */
+	// update render override
 	if (DEBUG_DEPTH)
 	{
 		m_stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
 		if (m_stats.render_override)
 		{
-			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				u16 const *const src = m_fbi.aux_buffer() + (y - m_fbi.m_yoffs) * m_fbi.m_rowpixels - m_fbi.m_xoffs;
 				u32 *const dst = &bitmap.pix(y);
-				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+				for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
 					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
 			}
 		}
@@ -430,94 +380,94 @@ int voodoo_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	return changed;
 }
 
+int voodoo_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// if we are blank, just fill with black
+	if (m_reg.fbi_init1().software_blank())
+	{
+		bitmap.fill(0, cliprect);
+		int changed = m_fbi.m_video_changed;
+		m_fbi.m_video_changed = false;
+		return changed;
+	}
+
+	// if the CLUT is dirty, recompute the pens array
+	if (m_fbi.m_clut_dirty)
+	{
+		rgb_t const *clutbase = &m_fbi.m_clut[0];
+
+		// kludge: some of the Midway games write 0 to the last entry when they obviously mean FF
+		if ((m_fbi.m_clut[32] & 0xffffff) == 0 && (m_fbi.m_clut[31] & 0xffffff) != 0)
+			m_fbi.m_clut[32] = 0x20ffffff;
+
+		// compute the R/G/B pens first
+		u8 rtable[32], gtable[64], btable[32];
+		for (u32 rawcolor = 0; rawcolor < 32; rawcolor++)
+		{
+			// treat X as a 5-bit value, scale up to 8 bits, and linear interpolate for red/blue
+			u32 color = pal5bit(rawcolor);
+			rtable[rawcolor] = (clutbase[color >> 3].r() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].r() * (color & 7)) >> 3;
+			btable[rawcolor] = (clutbase[color >> 3].b() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].b() * (color & 7)) >> 3;
+
+			// treat X as a 6-bit value with LSB=0, scale up to 8 bits, and linear interpolate
+			color = pal6bit(rawcolor * 2 + 0);
+			gtable[rawcolor * 2 + 0] = (clutbase[color >> 3].g() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].g() * (color & 7)) >> 3;
+
+			// treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate
+			color = pal6bit(rawcolor * 2 + 1);
+			gtable[rawcolor * 2 + 1] = (clutbase[color >> 3].g() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].g() * (color & 7)) >> 3;
+		}
+
+		// now compute the actual pens array
+		for (u32 pen = 0; pen < 65536; pen++)
+			m_fbi.m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
+
+		// no longer dirty
+		m_fbi.m_clut_dirty = false;
+		m_fbi.m_video_changed = true;
+	}
+	return update_common(bitmap, cliprect, &m_fbi.m_pen[0]);
+}
+
 
 int voodoo_banshee_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int changed = m_fbi.m_video_changed;
-	int drawbuf = m_fbi.m_frontbuf;
-	int x, y;
+	// if bypassing the clut, don't worry about the rest
+	if (BIT(m_banshee.io[io_vidProcCfg], 11))
+		return update_common(bitmap, cliprect, m_shared->rgb565);
 
-	/* reset the video changed flag */
-	m_fbi.m_video_changed = false;
-
-	/* if the CLUT is dirty, recompute the pens array */
+	// if the CLUT is dirty, recompute the pens array
 	if (m_fbi.m_clut_dirty)
 	{
+		rgb_t const *clutbase = &m_fbi.m_clut[256 * BIT(m_banshee.io[io_vidProcCfg], 13)];
+
+		// compute R/G/B pens first
 		u8 rtable[32], gtable[64], btable[32];
-
-		int which = (m_banshee.io[io_vidProcCfg] >> 13) & 1;
-		int bypass = (m_banshee.io[io_vidProcCfg] >> 11) & 1;
-
-		/* compute R/G/B pens first */
-		for (x = 0; x < 32; x++)
+		for (u32 rawcolor = 0; rawcolor < 32; rawcolor++)
 		{
-			/* treat X as a 5-bit value, scale up to 8 bits */
-			y = (x << 3) | (x >> 2);
-			rtable[x] = bypass ? y : m_fbi.m_clut[which * 256 + y].r();
-			btable[x] = bypass ? y : m_fbi.m_clut[which * 256 + y].b();
+			// treat X as a 5-bit value, scale up to 8 bits
+			u32 color = pal5bit(rawcolor);
+			rtable[rawcolor] = clutbase[color].r();
+			btable[rawcolor] = clutbase[color].b();
 
-			/* treat X as a 6-bit value with LSB=0, scale up to 8 bits */
-			y = (x * 2) + 0;
-			y = (y << 2) | (y >> 4);
-			gtable[x*2+0] = bypass ? y : m_fbi.m_clut[which * 256 + y].g();
+			// treat X as a 6-bit value with LSB=0, scale up to 8 bits, and linear interpolate
+			color = pal6bit(rawcolor * 2 + 0);
+			gtable[rawcolor * 2 + 0] = clutbase[color].g();
 
-			/* treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate */
-			y = (x * 2) + 1;
-			y = (y << 2) | (y >> 4);
-			gtable[x*2+1] = bypass ? y : m_fbi.m_clut[which * 256 + y].g();
+			// treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate
+			color = pal6bit(rawcolor * 2 + 1);
+			gtable[rawcolor * 2 + 1] = clutbase[color].g();
 		}
 
-		/* now compute the actual pens array */
-		for (x = 0; x < 65536; x++)
-		{
-			int r = rtable[(x >> 11) & 0x1f];
-			int g = gtable[(x >> 5) & 0x3f];
-			int b = btable[x & 0x1f];
-			m_fbi.m_pen[x] = rgb_t(r, g, b);
-		}
+		// now compute the actual pens array
+		for (u32 pen = 0; pen < 65536; pen++)
+			m_fbi.m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
 
-		/* no longer dirty */
+		// no longer dirty
 		m_fbi.m_clut_dirty = false;
-		changed = true;
+		m_fbi.m_video_changed = true;
 	}
-
-	/* debugging! */
-	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
-		drawbuf = m_fbi.m_backbuf;
-
-	/* copy from the current front buffer */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-		m_fbi.copy_scanline(&bitmap.pix(y), drawbuf, y, cliprect.min_x, cliprect.max_x + 1);
-
-	/* update stats display */
-	if (DEBUG_STATS)
-	{
-		int statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH));
-		if (statskey && statskey != m_stats.lastkey)
-			m_stats.display = !m_stats.display;
-		m_stats.lastkey = statskey;
-
-		/* display stats */
-		if (m_stats.display)
-			popmessage(m_stats.buffer, 0, 0);
-	}
-
-	/* update render override */
-	if (DEBUG_DEPTH)
-	{
-		m_stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
-		if (m_stats.render_override)
-		{
-			for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-			{
-				u16 const *const src = m_fbi.aux_buffer() + (y - m_fbi.m_yoffs) * m_fbi.m_rowpixels - m_fbi.m_xoffs;
-				u32 *const dst = &bitmap.pix(y);
-				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
-					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
-			}
-		}
-	}
-	return changed;
+	return update_common(bitmap, cliprect, &m_fbi.m_pen[0]);
 }
 
 
@@ -808,13 +758,16 @@ void voodoo_device::accumulate_statistics(const thread_stats_block &block)
 	m_reg.add(voodoo_regs::reg_fbiAfuncFail, block.afunc_fail);
 
 	/* apply emulation statistics */
-	m_stats.total_pixels_in += block.pixels_in;
-	m_stats.total_pixels_out += block.pixels_out;
-	m_stats.total_chroma_fail += block.chroma_fail;
-	m_stats.total_zfunc_fail += block.zfunc_fail;
-	m_stats.total_afunc_fail += block.afunc_fail;
-	m_stats.total_clipped += block.clip_fail;
-	m_stats.total_stippled += block.stipple_count;
+	if (DEBUG_STATS)
+	{
+		m_stats.total_pixels_in += block.pixels_in;
+		m_stats.total_pixels_out += block.pixels_out;
+		m_stats.total_chroma_fail += block.chroma_fail;
+		m_stats.total_zfunc_fail += block.zfunc_fail;
+		m_stats.total_afunc_fail += block.afunc_fail;
+		m_stats.total_clipped += block.clip_fail;
+		m_stats.total_stippled += block.stipple_count;
+	}
 }
 
 
@@ -898,7 +851,7 @@ void voodoo_device::swap_buffers()
 		m_renderer->dump_rasterizer_stats();
 
 	/* update the statistics (debug) */
-	if (m_stats.display)
+	if (DEBUG_STATS && m_stats.display)
 	{
 		const rectangle &visible_area = m_screen->visible_area();
 		int screen_area = visible_area.width() * visible_area.height();
@@ -934,21 +887,24 @@ void voodoo_device::swap_buffers()
 	}
 
 	/* update statistics */
-	m_stats.stalls = 0;
-	m_stats.total_triangles = 0;
-	m_stats.total_pixels_in = 0;
-	m_stats.total_pixels_out = 0;
-	m_stats.total_chroma_fail = 0;
-	m_stats.total_zfunc_fail = 0;
-	m_stats.total_afunc_fail = 0;
-	m_stats.total_clipped = 0;
-	m_stats.total_stippled = 0;
-	m_stats.reg_writes = 0;
-	m_stats.reg_reads = 0;
-	m_stats.lfb_writes = 0;
-	m_stats.lfb_reads = 0;
-	m_stats.tex_writes = 0;
-	memset(m_stats.texture_mode, 0, sizeof(m_stats.texture_mode));
+	if (DEBUG_STATS)
+	{
+		m_stats.stalls = 0;
+		m_stats.total_triangles = 0;
+		m_stats.total_pixels_in = 0;
+		m_stats.total_pixels_out = 0;
+		m_stats.total_chroma_fail = 0;
+		m_stats.total_zfunc_fail = 0;
+		m_stats.total_afunc_fail = 0;
+		m_stats.total_clipped = 0;
+		m_stats.total_stippled = 0;
+		m_stats.reg_writes = 0;
+		m_stats.reg_reads = 0;
+		m_stats.lfb_writes = 0;
+		m_stats.lfb_reads = 0;
+		m_stats.tex_writes = 0;
+		memset(m_stats.texture_mode, 0, sizeof(m_stats.texture_mode));
+	}
 }
 
 
@@ -1031,6 +987,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 				m_pciint(true);
 		}
 	}
+
 	// External vblank handler
 	if (!m_vblank.isnull())
 		m_vblank(true);
@@ -2030,7 +1987,8 @@ void voodoo_device::stall_cpu(int state, attotime current_time)
 
 	/* set the state and update statistics */
 	m_pci.stall_state = state;
-	m_stats.stalls++;
+	if (DEBUG_STATS)
+		m_stats.stalls++;
 
 	/* either call the callback, or spin the CPU */
 	if (!m_stall.isnull())
@@ -2057,7 +2015,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 	s64 data64;
 
 	// statistics
-	m_stats.reg_writes++;
+	if (DEBUG_STATS)
+		m_stats.reg_writes++;
 
 	// determine which chips we are addressing
 	u32 chips = BIT(offset, 8, 4);
@@ -2675,7 +2634,6 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		case voodoo_regs::reg_nccTable + 21:
 		case voodoo_regs::reg_nccTable + 22:
 		case voodoo_regs::reg_nccTable + 23:
-//			m_renderer->wait(m_reg.name(regnum));
 			if (BIT(chips, 1)) m_tmu[0].ncc_w(regnum, data);
 			if (BIT(chips, 2)) m_tmu[1].ncc_w(regnum, data);
 			break;
@@ -2760,9 +2718,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 		if (regnum < voodoo_regs::reg_fvertexAx || regnum > voodoo_regs::reg_fdWdY)
 			logerror("VOODOO.REG:%s(%d) write = %08X\n", (regnum < 0x384/4) ? m_reg.name(regnum) : "oob", chips, origdata);
 		else
-			logerror("VOODOO.REG:%s(%d) write = %f\n", (regnum < 0x384/4) ? m_reg.name(regnum) : "oob", chips, (double) u2f(origdata));
+			logerror("VOODOO.REG:%s(%d) write = %f\n", (regnum < 0x384/4) ? m_reg.name(regnum) : "oob", chips, double(u2f(origdata)));
 	}
-
 	return cycles;
 }
 
@@ -2840,7 +2797,8 @@ void voodoo_device::fbi_state::recompute_screen_params(voodoo_regs &regs, screen
 s32 voodoo_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	/* statistics */
-	m_stats.lfb_writes++;
+	if (DEBUG_STATS)
+		m_stats.lfb_writes++;
 
 	/* byte swizzling */
 	auto const lfbmode = m_reg.lfb_mode();
@@ -2884,7 +2842,8 @@ s32 voodoo_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
-	m_stats.lfb_writes++;
+	if (DEBUG_STATS)
+		m_stats.lfb_writes++;
 
 	// byte swizzling
 	auto const lfbmode = m_reg.lfb_mode();
@@ -3113,7 +3072,7 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
 
 	// select the target buffer
-	int destbuf = (m_reg.rev3()) ? 1 : lfbmode.write_buffer_select();
+	int destbuf = m_reg.rev3() ? 1 : lfbmode.write_buffer_select();
 	u16 *dest;
 	switch (destbuf)
 	{
@@ -3247,7 +3206,8 @@ s32 voodoo_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 s32 voodoo_device::texture_w(offs_t offset, u32 data)
 {
 	/* statistics */
-	m_stats.tex_writes++;
+	if (DEBUG_STATS)
+		m_stats.tex_writes++;
 
 	/* point to the right TMU */
 	int tmunum = (offset >> 19) & 0x03;
@@ -3295,7 +3255,7 @@ void voodoo_device::tmu_state::texture_w(offs_t offset, u32 data, bool seq_8_dow
 		dest = texture.write_ptr(lod, ts, tt, scale);
 	}
 	else
-		dest = texture.write_ptr(0, offset * 4, 0, 0);
+		dest = texture.write_ptr(0, offset * 4, 0, 1);
 
 	// write the four bytes in little-endian order
 	if (scale == 1)
@@ -3625,7 +3585,8 @@ u32 voodoo_device::register_r(offs_t offset)
 	u32 result;
 
 	/* statistics */
-	m_stats.reg_reads++;
+	if (DEBUG_STATS)
+		m_stats.reg_reads++;
 
 	/* first make sure this register is readable */
 	if (!m_reg.is_readable(offset))
@@ -3828,7 +3789,8 @@ u32 voodoo_device::lfb_r(offs_t offset, bool lfb_3d)
 	int x, y, scry, destbuf;
 
 	/* statistics */
-	m_stats.lfb_reads++;
+	if (DEBUG_STATS)
+		m_stats.lfb_reads++;
 
 	/* compute X,Y */
 	offset <<= 1;
@@ -4672,7 +4634,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		case io_vidProcCfg:
 			COMBINE_DATA(&m_banshee.io[offset]);
-			if ((m_banshee.io[offset] ^ old) & 0x2800)
+			if ((m_banshee.io[offset] ^ old) & 0x2000)
 				m_fbi.m_clut_dirty = true;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
@@ -4792,19 +4754,9 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
-
-
-/***************************************************************************
-    COMMAND HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    fastfill - execute the 'fastfill'
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  fastfill - execute the 'fastfill' command
+//-------------------------------------------------
 
 s32 voodoo_device::fastfill()
 {
@@ -4825,35 +4777,33 @@ s32 voodoo_device::fastfill()
 }
 
 
-/*-------------------------------------------------
-    swapbuffer - execute the 'swapbuffer'
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  swapbuffer - execute the 'swapbuffer' command
+//-------------------------------------------------
 
 s32 voodoo_device::swapbuffer(u32 data)
 {
-	/* set the don't swap value for Voodoo 2 */
+	// set the don't swap value for Voodoo 2
 	m_fbi.m_vblank_swap_pending = true;
-	m_fbi.m_vblank_swap = (data >> 1) & 0xff;
-	m_fbi.m_vblank_dont_swap = (data >> 9) & 1;
+	m_fbi.m_vblank_swap = BIT(data, 1, 8);
+	m_fbi.m_vblank_dont_swap = BIT(data, 9);
 
-	/* if we're not syncing to the retrace, process the command immediately */
-	if (!(data & 1))
+	// if we're not syncing to the retrace, process the command immediately
+	if (!BIT(data, 0))
 	{
 		swap_buffers();
 		return 0;
 	}
 
-	/* determine how many cycles to wait; we deliberately overshoot here because */
-	/* the final count gets updated on the VBLANK */
+	// determine how many cycles to wait; we deliberately overshoot here because
+	// the final count gets updated on the VBLANK
 	return (m_fbi.m_vblank_swap + 1) * clock() / 10;
 }
 
 
-/*-------------------------------------------------
-    triangle - execute the 'triangle'
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  triangle - execute the 'triangle' command
+//-------------------------------------------------
 
 s32 voodoo_device::triangle()
 {
@@ -4878,15 +4828,12 @@ s32 voodoo_device::triangle()
 		m_fbi.m_startz += mul_32x32_shift(dy, m_fbi.m_dzdy, 4) + mul_32x32_shift(dx, m_fbi.m_dzdx, 4);
 
 		// adjust iterated W/S/T for TMU 0
-		if (poly.raster.texmode0().raw() != 0xffffffff)
-		{
-			m_tmu[0].m_startw += (dy * m_tmu[0].m_dwdy + dx * m_tmu[0].m_dwdx) >> 4;
-			m_tmu[0].m_starts += (dy * m_tmu[0].m_dsdy + dx * m_tmu[0].m_dsdx) >> 4;
-			m_tmu[0].m_startt += (dy * m_tmu[0].m_dtdy + dx * m_tmu[0].m_dtdx) >> 4;
-		}
+		m_tmu[0].m_startw += (dy * m_tmu[0].m_dwdy + dx * m_tmu[0].m_dwdx) >> 4;
+		m_tmu[0].m_starts += (dy * m_tmu[0].m_dsdy + dx * m_tmu[0].m_dsdx) >> 4;
+		m_tmu[0].m_startt += (dy * m_tmu[0].m_dtdy + dx * m_tmu[0].m_dtdx) >> 4;
 
 		// adjust iterated W/S/T for TMU 1
-		if (poly.raster.texmode1().raw() != 0xffffffff)
+		if (BIT(m_chipmask, 2))
 		{
 			m_tmu[1].m_startw += (dy * m_tmu[1].m_dwdy + dx * m_tmu[1].m_dwdx) >> 4;
 			m_tmu[1].m_starts += (dy * m_tmu[1].m_dsdy + dx * m_tmu[1].m_dsdx) >> 4;
@@ -4939,7 +4886,8 @@ s32 voodoo_device::triangle()
 		poly.dw0dy = m_tmu[0].m_dwdy;
 		poly.lodbase0 = m_tmu[0].compute_lodbase();
 		poly.tex0 = &m_tmu[0].prepare_texture();
-		m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
+		if (DEBUG_STATS)
+			m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
 	}
 
 	// fill in texture 1 parameters
@@ -4957,7 +4905,8 @@ s32 voodoo_device::triangle()
 		poly.dw1dy = m_tmu[1].m_dwdy;
 		poly.lodbase1 = m_tmu[1].compute_lodbase();
 		poly.tex1 = &m_tmu[1].prepare_texture();
-		m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
+		if (DEBUG_STATS)
+			m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
 	}
 
 	// fill in color parameters
@@ -4983,84 +4932,83 @@ s32 voodoo_device::triangle()
 
 	// update stats
 	m_reg.add(voodoo_regs::reg_fbiTrianglesOut, 1);
-	m_stats.total_triangles++;
+	if (DEBUG_STATS)
+		m_stats.total_triangles++;
 
 	g_profiler.stop();
 
+	if (LOG_REGISTERS)
+		logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);
+
 	// 1 pixel per clock, plus some setup time
-	if (LOG_REGISTERS) logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);
 	return TRIANGLE_SETUP_CLOCKS + pixels;
 }
 
 
-/*-------------------------------------------------
-    begin_triangle - execute the 'beginTri'
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  begin_triangle - execute the 'beginTri'
+//  command
+//-------------------------------------------------
 
 s32 voodoo_device::begin_triangle()
 {
-	fbi_state::setup_vertex *sv = &m_fbi.m_svert[2];
+	// extract all the data from registers
+	auto &sv = m_fbi.m_svert[2];
+	sv.x  = m_reg.read_float(voodoo_regs::reg_sVx);
+	sv.y  = m_reg.read_float(voodoo_regs::reg_sVy);
+	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
+	sv.w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
+	sv.s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
+	sv.t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
+	sv.w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
+	sv.s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
+	sv.t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
+	sv.a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
+	sv.r  = m_reg.read_float(voodoo_regs::reg_sRed);
+	sv.g  = m_reg.read_float(voodoo_regs::reg_sGreen);
+	sv.b  = m_reg.read_float(voodoo_regs::reg_sBlue);
 
-	/* extract all the data from registers */
-	sv->x  = m_reg.read_float(voodoo_regs::reg_sVx);
-	sv->y  = m_reg.read_float(voodoo_regs::reg_sVy);
-	sv->wb = m_reg.read_float(voodoo_regs::reg_sWb);
-	sv->w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
-	sv->s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
-	sv->t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
-	sv->w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
-	sv->s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
-	sv->t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
-	sv->a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
-	sv->r  = m_reg.read_float(voodoo_regs::reg_sRed);
-	sv->g  = m_reg.read_float(voodoo_regs::reg_sGreen);
-	sv->b  = m_reg.read_float(voodoo_regs::reg_sBlue);
-
-	/* spread it across all three verts and reset the count */
+	// spread it across all three verts and reset the count
 	m_fbi.m_svert[0] = m_fbi.m_svert[1] = m_fbi.m_svert[2];
 	m_fbi.m_sverts = 1;
-
 	return 0;
 }
 
 
-/*-------------------------------------------------
-    draw_triangle - execute the 'DrawTri'
-    command
--------------------------------------------------*/
+//-------------------------------------------------
+//  draw_triangle - execute the 'DrawTri'
+//  command
+//-------------------------------------------------
 
 s32 voodoo_device::draw_triangle()
 {
-	fbi_state::setup_vertex *sv = &m_fbi.m_svert[2];
-	int cycles = 0;
-
-	/* for strip mode, shuffle vertex 1 down to 0 */
+	// for strip mode, shuffle vertex 1 down to 0
 	if (!m_reg.setup_mode().fan_mode())
 		m_fbi.m_svert[0] = m_fbi.m_svert[1];
 
-	/* copy 2 down to 1 regardless */
+	// copy 2 down to 1 regardless
 	m_fbi.m_svert[1] = m_fbi.m_svert[2];
 
-	/* extract all the data from registers */
-	sv->x  = m_reg.read_float(voodoo_regs::reg_sVx);
-	sv->y  = m_reg.read_float(voodoo_regs::reg_sVy);
-	sv->wb = m_reg.read_float(voodoo_regs::reg_sWb);
-	sv->w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
-	sv->s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
-	sv->t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
-	sv->w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
-	sv->s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
-	sv->t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
-	sv->a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
-	sv->r  = m_reg.read_float(voodoo_regs::reg_sRed);
-	sv->g  = m_reg.read_float(voodoo_regs::reg_sGreen);
-	sv->b  = m_reg.read_float(voodoo_regs::reg_sBlue);
+	// extract all the data from registers
+	auto &sv = m_fbi.m_svert[2];
+	sv.x  = m_reg.read_float(voodoo_regs::reg_sVx);
+	sv.y  = m_reg.read_float(voodoo_regs::reg_sVy);
+	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
+	sv.w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
+	sv.s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
+	sv.t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
+	sv.w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
+	sv.s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
+	sv.t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
+	sv.a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
+	sv.r  = m_reg.read_float(voodoo_regs::reg_sRed);
+	sv.g  = m_reg.read_float(voodoo_regs::reg_sGreen);
+	sv.b  = m_reg.read_float(voodoo_regs::reg_sBlue);
 
-	/* if we have enough verts, go ahead and draw */
+	// if we have enough verts, go ahead and draw
+	int cycles = 0;
 	if (++m_fbi.m_sverts >= 3)
 		cycles = setup_and_draw_triangle();
-
 	return cycles;
 }
 
@@ -5425,6 +5373,3 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 	: voodoo_banshee_device(mconfig, VOODOO_3, tag, owner, clock, MODEL_VOODOO_3)
 {
 }
-
-
-
