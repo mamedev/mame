@@ -7,7 +7,7 @@
  * 4-Digit 16-Segment Alphanumeric Intelligent Display
  * with Memory/Decoder/Driver
  *
- * See video/dl1416.c for more info
+ * See video/dl1416.cpp for more info
  *
  ****************************************************************************/
 

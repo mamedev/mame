@@ -19869,6 +19869,9 @@ macxl                           // 1985 Apple Macintosh XL
 @source:littlerb.cpp
 littlerb                        // (c) 1993 TCH
 
+@source:lk3000.cpp
+lk3000
+
 @source:lkage.cpp
 bygone                          // A53 (c) 1985 Taito Corporation - prototype ?
 lkage                           // A54 (c) 1984 Taito Corporation
