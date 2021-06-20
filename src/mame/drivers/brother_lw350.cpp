@@ -879,9 +879,6 @@ private:
 			return 0x00;
 		}
 	}
-	uint8_t rom72000_r(offs_t offset, uint8_t mem_mask = ~0) {
-		return rom[0x02000 + offset] & mem_mask;
-	}
 
 	// IO
 	void io_70_w(uint8_t data) {
@@ -978,7 +975,7 @@ private:
 		map(0x60000, 0x617ff).ram();
 		map(0x61800, 0x63fff).rw(FUNC(lw350_state::vram_r), FUNC(lw350_state::vram_w));
 		map(0x64000, 0x71fff).ram();
-		map(0x72000, 0x75fff).r(FUNC(lw350_state::rom72000_r)); // => ROM 0x02000-0x05fff
+		map(0x72000, 0x75fff).rom().region("maincpu", 0x2000); // => ROM 0x02000-0x05fff
 		map(0x76000, 0x7ffff).ram();
 	}
 
