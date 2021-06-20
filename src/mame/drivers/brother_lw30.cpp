@@ -491,11 +491,11 @@ private:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
 		return 0;
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
 	}
 
 	// ROM
@@ -521,7 +521,7 @@ private:
 		if(video_pos_y < 0x20)
 			data = videoram[video_pos_y * 256 + video_pos_x];
 		else
-			logerror("%s: video_data_r out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+			logerror("%s: video_data_r out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
 
 		return data;
 	}
@@ -530,7 +530,7 @@ private:
 		if(video_pos_y < 0x20)
 			videoram[video_pos_y * 256 + video_pos_x] = data;
 		else
-			logerror("%s: video_data_w out of range: x=%u, y=%u\n", callstack(), video_pos_x, video_pos_y);
+			logerror("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
 
 		video_pos_x++;
 		if(video_pos_x == 0)
@@ -590,22 +590,22 @@ private:
 			else if(data == ror4(io_90))
 				floppy_steps++;
 			else
-				logerror("%s: illegal step %02x=>%02x\n", callstack(), io_90, data);
+				logerror("%s: illegal step %02x=>%02x\n", machine().describe_context(), io_90, data);
 			break;
 		default:
-			logerror("%s: initial step %02x=>%02x\n", callstack(), io_90, data);
+			logerror("%s: initial step %02x=>%02x\n", machine().describe_context(), io_90, data);
 			break;
 		}
-		logerror("%s: floppy_steps=%3d => track=%2d\n", callstack(), floppy_steps, floppy_steps / 4);
+		logerror("%s: floppy_steps=%3d => track=%2d\n", machine().describe_context(), floppy_steps, floppy_steps / 4);
 		io_90 = data;
 	}
 
 	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO read from %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, mem_mask);
+		logerror("%s: unmapped IO read from %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, mem_mask);
 		return 0;
 	}
 	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO write to %0*X = %0*X & %0*X\n", pc(), 4, offset + 0x40, 2, data, 2, mem_mask);
+		logerror("%s: unmapped IO write to %0*X = %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, data, 2, mem_mask);
 	}
 
 	uint8_t io_b0_r() {
@@ -706,71 +706,10 @@ private:
 		//map(0x40, 0xff).rw(FUNC(lw30_state::illegal_io_r), FUNC(lw30_state::illegal_io_w));
 	}
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
 };
 
 void lw30_state::video_start()
 {
-}
-
-std::string lw30_state::pc()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t phys = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, phys);
-
-	return symbolize(phys);
-}
-
-std::string lw30_state::symbolize(uint32_t adr)
-{
-	if(symbols.empty())
-		return string_format("%06x", adr);
-
-	auto floor_it = symbols.lower_bound(adr);
-	if((floor_it == symbols.end() && !symbols.empty()) || floor_it->first != adr)
-		--floor_it;
-	if(floor_it != symbols.end())
-		return string_format("%s+%x (%06x)", floor_it->second, adr - floor_it->first, adr);
-	else
-		return string_format("%06x", adr);
-}
-
-std::string lw30_state::callstack()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t pc = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, pc);
-
-	int depth = 0;
-	std::string output;
-	output += symbolize(pc) + " >> ";
-
-//	if(output.find("abort") != std::string::npos)
-//		__debugbreak();
-
-	// floppy routines
-	if(pc >= 0x44000 && pc <= 0x46000) {
-		offs_t sp = cpu->sp();
-		for(int i = 0; i < 4; i++) {
-			offs_t back = cpu->space(AS_PROGRAM).read_word_unaligned(sp);
-			cpu->memory_translate(AS_PROGRAM, 0, back);
-			if(back >= 0x44000 && back <= 0x46000) {
-				output += symbolize(back) + " >> ";
-				depth++;
-				if(depth < 8)
-					i = 0;
-			}
-			sp += 2;
-		}
-	}
-
-	return output;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::cursor_timer_callback)
@@ -955,24 +894,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
 void lw30_state::machine_start()
 {
 	screen->set_visible_area(0, 480 - 1, 0, 128 - 1);
-
-	// try to load map file
-/*	FILE* f;
-	if(fopen_s(&f, "lw30.map", "rt") == 0) {
-		char line[512];
-		do {
-			if(fgets(line, sizeof(line), f)) {
-				int segment, offset;
-				char symbol[512];
-				if(sscanf(line, "%x:%x %512s", &segment, &offset, symbol) == 3) {
-					uint32_t phys = (segment << 4) + offset;
-					//TRACE(_T("%04x:%04x => %02x:%04x\n"), segment, offset, bank, offset);
-					symbols[phys] = symbol;
-				}
-			}
-		} while(!feof(f));
-		fclose(f);
-	}*/
 
 	// patch out printer init
 	rom[0x280f4] = 0x00;

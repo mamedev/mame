@@ -134,11 +134,11 @@ private:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
 		return 0;
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
 	}
 
 	uint16_t port7_r(offs_t, uint16_t mem_mask = ~0) {
@@ -200,37 +200,10 @@ private:
 	void map_io(address_map& map) {
 		map(h8_device::PORT_7, h8_device::PORT_7).r(FUNC(lw840_state::port7_r));
 	}
-
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
 };
 
 void lw840_state::video_start()
 {
-}
-
-std::string lw840_state::pc()
-{
-	auto pc = machine().device<cpu_device>("maincpu")->pc();
- 	return symbolize(pc);
-}
-
-std::string lw840_state::symbolize(uint32_t adr)
-{
-	auto floor_it = symbols.lower_bound(adr);
-	if((floor_it == symbols.end() && !symbols.empty()) || floor_it->first != adr)
-		--floor_it;
-	if(floor_it != symbols.end())
-		return string_format("%s+%x (%06x)", floor_it->second, adr - floor_it->first, adr);
-	else
-		return string_format("%06x", adr);
-}
-
-std::string lw840_state::callstack()
-{
-	return "";
 }
 
 uint32_t lw840_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)

@@ -212,7 +212,7 @@ private:
 
 	uint8_t dict_r(offs_t offset, uint8_t mem_mask = ~0) {
 		if(dict_bank >= 4) {
-			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", pc(), dict_bank, offset);
+			logerror("%s: illegal rombank (IO 5000=%02x) read offset %06x\n", machine().describe_context(), dict_bank, offset);
 			return 0x00;
 		}
 		return dict_rom[offset + dict_bank * 0x20000] & mem_mask;
@@ -227,79 +227,14 @@ private:
 		maincpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
 		return 0;
 	}
-
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
 };
 
 void ax145_state::video_start()
 {
 }
 
-std::string ax145_state::pc()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class ax145_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t phys = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, phys);
-
-	return symbolize(phys);
-}
-
-std::string ax145_state::symbolize(uint32_t adr)
-{
-	if(symbols.empty())
-		return string_format("%06x", adr);
-
-	auto floor_it = symbols.lower_bound(adr);
-	if((floor_it == symbols.end() && !symbols.empty()) || floor_it->first != adr)
-		--floor_it;
-	if(floor_it != symbols.end())
-		return string_format("%s+%x (%06x)", floor_it->second, adr - floor_it->first, adr);
-	else
-		return string_format("%06x", adr);
-}
-
-std::string ax145_state::callstack()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class ax145_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t pc = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, pc);
-
-	//int depth = 0;
-	std::string output;
-	output += symbolize(pc) + " >> ";
-
-//	if(output.find("abort") != std::string::npos)
-//		__debugbreak();
-
-	return output;
-}
-
 void ax145_state::machine_start()
 {
-/*	// try to load map file
-	FILE* f;
-	if(fopen_s(&f, "ax145.map", "rt") == 0) {
-		char line[512];
-		do {
-			if(fgets(line, sizeof(line), f)) {
-				int segment, offset;
-				char symbol[512];
-				if(sscanf(line, "%x:%x %512s", &segment, &offset, symbol) == 3) {
-					uint32_t phys = (segment << 4) + offset;
-					//TRACE(_T("%04x:%04x => %02x:%04x\n"), segment, offset, bank, offset);
-					symbols[phys] = symbol;
-				}
-			}
-		} while(!feof(f));
-		fclose(f);
-	}
-*/
-
 	maincpu->space(AS_PROGRAM).install_ram(0x02000, 0x03fff, ram); // first 0x2000 bytes of RAM
 	maincpu->space(AS_PROGRAM).install_ram(0x62000, 0x69fff, ram); // complete 0x8000 bytes of RAM
 

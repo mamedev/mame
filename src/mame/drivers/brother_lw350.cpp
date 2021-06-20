@@ -179,7 +179,7 @@ public:
 	void abort();
 
 	uint8_t status_r() { return STR; }
-	void abort_w(uint8_t data) { if(data == 0xff) abort(); else logerror("fdc:abort_w %02x is ignored %s\n", data, callstack()); }
+	void abort_w(uint8_t data) { if(data == 0xff) abort(); else logerror("fdc:abort_w %02x is ignored %s\n", data, machine().describe_context()); }
 	void data_w(uint8_t data) { write(data); }
 	uint8_t data_r() { return read(); }
 
@@ -231,10 +231,6 @@ protected:
 	void device_start() override;
 
 	lw350_floppy_image_device *floppy;
-
-	// TODO
-	std::string pc() { return ""; }
-	std::string callstack() { return ""; }
 };
 
 DEFINE_DEVICE_TYPE(HD63266F, hd63266f_t, "hd63266f", "HD63266F")
@@ -407,10 +403,10 @@ void hd63266f_t::write(uint8_t data)
 			case FDC_COMMAND_WRITE_DELETED_DATA:
 				DMA_cnt--;
 				if(dend_cb()) {
-					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, callstack());
+					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, machine().describe_context());
 					DMA_cnt = 0;
 				}
-				logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, callstack());
+				logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, machine().describe_context());
 				if(DMA_cnt == 0) {
 					// indicate result is ready
 					STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
@@ -423,11 +419,11 @@ void hd63266f_t::write(uint8_t data)
 				floppy->dirty = true;
 				break;
 			default:
-				logerror("fdc: DMA active for unknown command %s\n", callstack());
+				logerror("fdc: DMA active for unknown command %s\n", machine().describe_context());
 				break;
 			}
 		} else {
-			logerror("fdc: DMA out of range of floppy image %s\n", callstack());
+			logerror("fdc: DMA out of range of floppy image %s\n", machine().describe_context());
 			return;
 		}
 	} else {
@@ -449,7 +445,7 @@ void hd63266f_t::write(uint8_t data)
 				STR |= FDC_STATUSM_TXR;
 				break;
 			}
-			logerror("fdc:write_cmd(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, callstack());
+			logerror("fdc:write_cmd(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, machine().describe_context());
 		} else {
 			// write command parameter
 			switch(CMD & 0x1f) {
@@ -469,7 +465,7 @@ void hd63266f_t::write(uint8_t data)
 				case 5: ESN = data; break;
 				case 6: GSL = data; break;
 				case 7: MNL = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_READ_ID:
@@ -477,7 +473,7 @@ void hd63266f_t::write(uint8_t data)
 			case FDC_COMMAND_CHECK_DEVICE_STATUS:
 				switch(parameter_cnt) {
 				case 0: HSL_US = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_WRITE_FORMAT:
@@ -487,14 +483,14 @@ void hd63266f_t::write(uint8_t data)
 				case 2: SCNT = data; break;
 				case 3: GP3L = data; break;
 				case 4: DUD = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_SEEK:
 				switch(parameter_cnt) {
 				case 0: HSL_US = data; break;
 				case 1: NCN = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_COMPARE_EQUAL:
@@ -509,20 +505,20 @@ void hd63266f_t::write(uint8_t data)
 				case 5: ESN = data; break;
 				case 6: GSL = data; break;
 				case 7: STEP = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 			case FDC_COMMAND_SLEEP:
 			case FDC_COMMAND_ABORT:
 			default: // INVALID
-				logerror("%s: no more parameters\n", callstack());
+				logerror("%s: no more parameters\n", machine().describe_context());
 				break;
 			case FDC_COMMAND_SPECIFY_1:
 				switch(parameter_cnt) {
 				case 0: STR_HDUT = data; break;
 				case 1: HDLT_NDM = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_SPECIFY_2:
@@ -532,7 +528,7 @@ void hd63266f_t::write(uint8_t data)
 				case 2: LCTK = data; break;
 				case 3: PC1_PC0 = data; break;
 				case 4: PCDCT = data; input_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			}
@@ -542,7 +538,7 @@ void hd63266f_t::write(uint8_t data)
 			if(!input_done)
 				STR |= FDC_STATUSM_TXR;
 
-			logerror("fdc:write_param(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, callstack());
+			logerror("fdc:write_param(%02x) STR=%02x => %02x %s\n", data, oldSTR, STR, machine().describe_context());
 		}
 		if(input_done)
 			execute();
@@ -566,10 +562,10 @@ uint8_t hd63266f_t::read()
 			case FDC_COMMAND_READ_ERRONEOUS_DATA:
 				DMA_cnt--;
 				if(dend_cb()) {
-					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, callstack());
+					logerror("fdc: ~TEND0 asserted; stopping DMA; DMA_cnt=%04x %s\n", DMA_cnt, machine().describe_context());
 					DMA_cnt = 0;
 				}
-				//logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, callstack());
+				//logerror("fdc: read DMA; DMA_cnt=%04x DMA_src=%08x %s\n", DMA_cnt, DMA_src, machine().describe_context());
 				if(DMA_cnt == 0) {
 					// indicate result is ready
 					STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
@@ -581,11 +577,11 @@ uint8_t hd63266f_t::read()
 				return buffer[DMA_src++];
 				break;
 			default:
-				logerror("fdc: DMA active for unknown command %s\n", callstack());
+				logerror("fdc: DMA active for unknown command %s\n", machine().describe_context());
 				break;
 			}
 		} else {
-			logerror("fdc: DMA out of range of floppy image %s\n", callstack());
+			logerror("fdc: DMA out of range of floppy image %s\n", machine().describe_context());
 			return 0;
 		}
 	} else {
@@ -612,7 +608,7 @@ uint8_t hd63266f_t::read()
 				case 4: DTR = HA; break;
 				case 5: DTR = SA; break;
 				case 6: DTR = RL; output_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_SEEK:
@@ -621,20 +617,20 @@ uint8_t hd63266f_t::read()
 			case FDC_COMMAND_SPECIFY_2:
 			case FDC_COMMAND_SLEEP:
 			case FDC_COMMAND_ABORT:
-				logerror("%s: no more parameters\n", callstack());
+				logerror("%s: no more parameters\n", machine().describe_context());
 				break;
 			case FDC_COMMAND_CHECK_DEVICE_STATUS:
 			default: // INVALID
 				switch(parameter_cnt) {
 				case 0: DTR = SSB3; output_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
 				switch(parameter_cnt) {
 				case 0: DTR = SSB0; break;
 				case 1: DTR = PCN; output_done = true; break;
-				default: logerror("%s: no more parameters\n", callstack());
+				default: logerror("%s: no more parameters\n", machine().describe_context());
 				}
 				break;
 			}
@@ -656,7 +652,7 @@ uint8_t hd63266f_t::read()
 		}
 	}
 
-	logerror("fdc:read STR=%02x => %02x %s\n", oldSTR, STR, callstack());
+	logerror("fdc:read STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
 
 	return DTR;
 }
@@ -685,17 +681,17 @@ void hd63266f_t::execute()
 		DMA_cnt = (ESN - SA - 1 + 1) * sector_length;
 		STR = FDC_STATUSM_TXR | FDC_STATUSM_DIR | FDC_STATUSM_BSY;
 		dreq_cb(true);
-		logerror("%s: fdc: execute: READ DATA; %s DMA_cnt=%04x DMC_src=%08x\n", pc(), readwrite_params(), DMA_cnt, DMA_src);
+		logerror("%s: fdc: execute: READ DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), DMA_cnt, DMA_src);
 		break;
 	}
 	case FDC_COMMAND_READ_DELETED_DATA:
-		logerror("%s: fdc: execute: READ DELETED DATA; %s\n", pc(), readwrite_params());
+		logerror("%s: fdc: execute: READ DELETED DATA; %s\n", machine().describe_context(), readwrite_params());
 		break;
 	case FDC_COMMAND_READ_ERRONEOUS_DATA:
-		logerror("%s: fdc: execute: READ ERRONEOUS DATA; %s\n", pc(), readwrite_params());
+		logerror("%s: fdc: execute: READ ERRONEOUS DATA; %s\n", machine().describe_context(), readwrite_params());
 		break;
 	case FDC_COMMAND_READ_ID:
-		logerror("%s: fdc: execute: READ ID\n", pc());
+		logerror("%s: fdc: execute: READ ID\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_WRITE_DATA: {
 		auto sector_length = 128 << (RL & 0b111);
@@ -704,18 +700,18 @@ void hd63266f_t::execute()
 		DMA_cnt = (ESN - SA - 1 + 1) * sector_length;
 		STR = FDC_STATUSM_TXR | FDC_STATUSM_BSY;
 		dreq_cb(true);
-		logerror("%s: fdc: execute: WRITE DATA; %s DMA_cnt=%04x DMC_src=%08x\n", pc(), readwrite_params(), DMA_cnt, DMA_src);
+		logerror("%s: fdc: execute: WRITE DATA; %s DMA_cnt=%04x DMC_src=%08x\n", machine().describe_context(), readwrite_params(), DMA_cnt, DMA_src);
 		break;
 	}
 	case FDC_COMMAND_WRITE_DELETED_DATA:
-		logerror("%s: fdc: execute: WRITE DELETED DATA; %s\n", pc(), readwrite_params());
+		logerror("%s: fdc: execute: WRITE DELETED DATA; %s\n", machine().describe_context(), readwrite_params());
 		break;
 	case FDC_COMMAND_WRITE_FORMAT: {
 		auto sector_length = 128 << (RL & 0b111);
 		auto sectors_per_track = (STR_HDUT >> 4) == 0xa ? 18 : 9; // detect 1.44mb/720kb mode; based on LW-350 code
 		auto dst = ((PCN << 1) | ((HSL_US & 0b100) >> 2)) * sectors_per_track * sector_length;
 		auto cnt = SCNT * sector_length >> 1; // not sure why >> 1, but matches how it's called
-		logerror("%s: fdc: execute: WRITE FORMAT; HSL_US=%02x PCN=%02x SCNT=%02x RL=%02x DUD=%02x cnt=%04x ofs=%08x\n", pc(), HSL_US, PCN, SCNT, RL, DUD, cnt, dst);
+		logerror("%s: fdc: execute: WRITE FORMAT; HSL_US=%02x PCN=%02x SCNT=%02x RL=%02x DUD=%02x cnt=%04x ofs=%08x\n", machine().describe_context(), HSL_US, PCN, SCNT, RL, DUD, cnt, dst);
 		while(cnt--) {
 			if(dst < length)
 				buffer[dst++] = DUD;
@@ -723,7 +719,7 @@ void hd63266f_t::execute()
 		break;
 	}
 	case FDC_COMMAND_SEEK:
-		logerror("%s: fdc: execute: SEEK NCN=%d\n", pc(), NCN);
+		logerror("%s: fdc: execute: SEEK NCN=%d\n", machine().describe_context(), NCN);
 		SSB0 |= FDC_SSB0M_SED;
 		PCN = NCN;
 		if(NCN == 0)
@@ -732,44 +728,44 @@ void hd63266f_t::execute()
 			SSB3 &= ~FDC_SSB3M_TRZ;
 		break;
 	case FDC_COMMAND_RECALIBRATE:
-		logerror("%s: fdc: execute: RECALIBRATE\n", pc());
+		logerror("%s: fdc: execute: RECALIBRATE\n", machine().describe_context());
 		SSB0 |= FDC_SSB0M_SED;
 		SSB3 |= FDC_SSB3M_TRZ;
 		PCN = 0;
 		break;
 	case FDC_COMMAND_COMPARE_EQUAL:
-		logerror("%s: fdc: execute: COMPARE EQUAL\n", pc());
+		logerror("%s: fdc: execute: COMPARE EQUAL\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_COMPARE_LOW_OR_EQUAL:
-		logerror("%s: fdc: execute: COMPARE LOW OR EQUAL\n", pc());
+		logerror("%s: fdc: execute: COMPARE LOW OR EQUAL\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_COMPARE_HIGH_OR_EQUAL:
-		logerror("%s: fdc: execute: COMPARE HIGH OR EQUAL\n", pc());
+		logerror("%s: fdc: execute: COMPARE HIGH OR EQUAL\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_CHECK_DEVICE_STATUS:
-		logerror("%s: fdc: execute: CHECK DEVICE STATUS\n", pc());
+		logerror("%s: fdc: execute: CHECK DEVICE STATUS\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_CHECK_INTERRUPT_STATUS:
-		logerror("%s: fdc: execute: CHECK INTERRUPT STATUS\n", pc());
+		logerror("%s: fdc: execute: CHECK INTERRUPT STATUS\n", machine().describe_context());
 		SSB0 &= ~FDC_SSB0M_HSL;
 		break;
 	case FDC_COMMAND_SPECIFY_1:
-		logerror("%s: fdc: execute: SPECIFY 1\n", pc());
+		logerror("%s: fdc: execute: SPECIFY 1\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_SPECIFY_2:
-		logerror("%s: fdc: execute: SPECIFY 2\n", pc());
+		logerror("%s: fdc: execute: SPECIFY 2\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_SLEEP:
-		logerror("%s: fdc: execute: SLEEP\n", pc());
+		logerror("%s: fdc: execute: SLEEP\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_ABORT:
-		logerror("%s: fdc: execute: ABORT\n", pc());
+		logerror("%s: fdc: execute: ABORT\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_READ_LONG:
-		logerror("%s: fdc: execute: READ LONG\n", pc());
+		logerror("%s: fdc: execute: READ LONG\n", machine().describe_context());
 		break;
 	case FDC_COMMAND_WRITE_LONG:
-		logerror("%s: fdc: execute: WRITE LONG\n", pc());
+		logerror("%s: fdc: execute: WRITE LONG\n", machine().describe_context());
 		break;
 	}
 
@@ -818,7 +814,7 @@ void hd63266f_t::execute()
 		}
 	}
 
-	logerror("fdc:execute STR=%02x => %02x %s\n", oldSTR, STR, callstack());
+	logerror("fdc:execute STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
 }
 
 void hd63266f_t::abort()
@@ -826,7 +822,7 @@ void hd63266f_t::abort()
 	auto oldSTR = STR;
 	reset();
 
-	logerror("fdc:abort STR=%02x => %02x %s\n", oldSTR, STR, callstack());
+	logerror("fdc:abort STR=%02x => %02x %s\n", oldSTR, STR, machine().describe_context());
 }
 
 class lw350_state : public driver_device
@@ -865,11 +861,11 @@ private:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
 		return 0;
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
 	}
 
 	// ROM
@@ -879,7 +875,7 @@ private:
 		else if(rombank == 0x03)
 			return rom[0x60000 + offset] & mem_mask;
 		else {
-			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, offset);
+			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", machine().describe_context(), rombank, offset);
 			return 0x00;
 		}
 	}
@@ -1009,72 +1005,10 @@ private:
 
 		//map(0x40, 0xff).rw(FUNC(lw350_state::illegal_io_r), FUNC(lw350_state::illegal_io_w));
 	}
-
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
 };
 
 void lw350_state::video_start()
 {
-}
-
-std::string lw350_state::pc()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t phys = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, phys);
-
-	return symbolize(phys);
-}
-
-std::string lw350_state::symbolize(uint32_t adr)
-{
-	if(symbols.empty())
-		return string_format("%06x", adr);
-
-	auto floor_it = symbols.lower_bound(adr);
-	if((floor_it == symbols.end() && !symbols.empty()) || floor_it->first != adr)
-		--floor_it;
-	if(floor_it != symbols.end())
-		return string_format("%s+%x (%06x)", floor_it->second, adr - floor_it->first, adr);
-	else
-		return string_format("%06x", adr);
-}
-
-std::string lw350_state::callstack()
-{
-	class z180_friend : public z180_device { public: using z180_device::memory_translate; friend class lw350_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t pc = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, pc);
-
-	int depth = 0;
-	std::string output;
-	output += symbolize(pc) + " >> ";
-
-//	if(output.find("abort") != std::string::npos)
-//		__debugbreak();
-
-	// floppy routines
-	if(pc >= 0x73000 && pc <= 0x75000) {
-		offs_t sp = cpu->sp();
-		for(int i = 0; i < 4; i++) {
-			offs_t back = cpu->space(AS_PROGRAM).read_word_unaligned(sp);
-			cpu->memory_translate(AS_PROGRAM, 0, back);
-			if(back >= 0x73000 && back <= 0x75000) {
-				output += symbolize(back) + " >> ";
-				depth++;
-				if(depth < 8)
-					i = 0;
-			}
-			sp += 2;
-		}
-	}
-
-	return output;
 }
 
 uint32_t lw350_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
@@ -1461,11 +1395,11 @@ private:
 	std::map<uint32_t, std::string> symbols;
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", pc(), 6, offset, 2, mem_mask);
+		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
 		return 0;
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", pc(), 6, offset, 2, data, 2, mem_mask);
+		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
 	}
 
 	// ROM
@@ -1479,7 +1413,7 @@ private:
 		else if(rombank == 0x07)
 			return dict_rom[0x60000 + offset] & mem_mask;
 		else {
-			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", pc(), rombank, offset);
+			logerror("%s: illegal rombank (IO E0=%02x) read offset %06x \n", machine().describe_context(), rombank, offset);
 			return 0x00;
 		}
 	}
@@ -1540,74 +1474,12 @@ private:
 	void machine_reset() override;
 	void video_start() override;
 
-	// helpers
-	std::string pc();
-	std::string symbolize(uint32_t adr);
-	std::string callstack();
-
 	void map_program(address_map& map);
 	void map_io(address_map& map);
 };
 
 void lw450_state::video_start()
 {
-}
-
-std::string lw450_state::pc()
-{
-	class z180_friend : z180_device { friend class lw450_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t phys = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, phys);
-
-	return symbolize(phys);
-}
-
-std::string lw450_state::symbolize(uint32_t adr)
-{
-	if(symbols.empty())
-		return string_format("%06x", adr);
-
-	auto floor_it = symbols.lower_bound(adr);
-	if((floor_it == symbols.end() && !symbols.empty()) || floor_it->first != adr)
-		--floor_it;
-	if(floor_it != symbols.end())
-		return string_format("%s+%x (%06x)", floor_it->second, adr - floor_it->first, adr);
-	else
-		return string_format("%06x", adr);
-}
-
-std::string lw450_state::callstack()
-{
-	class z180_friend : z180_device { friend class lw450_state; };
-	auto cpu = static_cast<z180_friend*>(dynamic_cast<z180_device*>(&machine().scheduler().currently_executing()->device()));
-	offs_t pc = cpu->pc();
-	cpu->memory_translate(AS_PROGRAM, 0, pc);
-
-	//int depth = 0;
-	std::string output;
-	output += symbolize(pc) + " >> ";
-
-//	if(output.find("abort") != std::string::npos)
-//		__debugbreak();
-/*
-	// floppy routines
-	if(pc >= 0x73000 && pc <= 0x75000) {
-		offs_t sp = cpu->sp();
-		for(int i = 0; i < 4; i++) {
-			offs_t back = cpu->space(AS_PROGRAM).read_word_unaligned(sp);
-			cpu->memory_translate(AS_PROGRAM, 0, back);
-			if(back >= 0x73000 && back <= 0x75000) {
-				output += symbolize(back) + " >> ";
-				depth++;
-				if(depth < 8)
-					i = 0;
-			}
-			sp += 2;
-		}
-	}
-*/
-	return output;
 }
 
 void lw450_state::map_program(address_map& map)
