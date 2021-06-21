@@ -20,6 +20,8 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_sprites(*this, "sprites")
 		, m_textram(*this, "textram")
+		, m_tileram(*this, "tileram")
+		, m_tilestripconfig(*this, "tilestripconfig")
 	{ }
 
 	void astormbl(machine_config &config);
@@ -40,6 +42,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<sega_sys16b_sprite_device> m_sprites;
 	required_shared_ptr<uint16_t> m_textram;
+	required_shared_ptr<uint16_t> m_tileram;
+	required_shared_ptr<uint16_t> m_tilestripconfig;
 
 	void astormbl_map(address_map &map);
 
@@ -194,6 +198,45 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 	// reset priorities
 	screen.priority().fill(0, cliprect);
 
+	//for (int quadrant = 0; quadrant < 2; quadrant++)
+	{
+		int quadrant = 0;
+
+		int xbase = 0, ybase = 0;
+
+	//	if (quadrant & 1)
+	//		xbase += 512;
+
+	//	if (quadrant & 2)
+	//		ybase += 256;
+
+		int y = 0;
+		gfx_element* gfx = m_gfxdecode->gfx(0);
+
+
+		for (int i = 0; i < 0x20; i++)
+		{
+			const uint16_t rowconf = m_tilestripconfig[quadrant * 0x20 + i];
+
+			uint8_t pagesource = (rowconf & 0xf000) >> 12;
+			uint8_t rowtilebank = (rowconf & 0x0e00) >> 9;
+			uint16_t rowscroll = (rowconf & 0x01ff);
+			rowscroll = 0;
+			//rowtilebank = 0;
+			pagesource = 0;
+
+			for (int x = 0; x < 0x40; x++)
+			{
+				uint16_t tiledat = m_tileram[(pagesource * 0x800) + x + (y * 0x40)];
+
+				gfx->transpen(bitmap, cliprect, (tiledat & 0xfff) | (rowtilebank * 0x1000), (tiledat & 0x1fc0) >> 6, 0, 0, ((x * 8) - rowscroll) + xbase, (y * 8) + ybase, 0);
+
+			}
+
+			y++;
+		}
+
+	}
 
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -240,7 +283,7 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x10ffff).ram();
+	map(0x100000, 0x10ffff).ram().share("tileram");
 	map(0x110000, 0x110fff).ram().w(FUNC(segas18_astormbl_state::sys16_textram_w)).share("textram");
 
 	map(0x140000, 0x140fff).ram().w(FUNC(segas18_astormbl_state::paletteram_w)).share("paletteram");
@@ -250,33 +293,33 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("COINAGE");
 	map(0xa00002, 0xa00003).portr("DSW1");
 
+	map(0xa00006, 0xa00007).nopw();// w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
+	map(0xa0000e, 0xa0000f).nopw();// was tilebank, unused here?
+
 	map(0xa01000, 0xa01001).portr("SERVICE");
 	map(0xa01002, 0xa01003).portr("P1");
 	map(0xa01004, 0xa01005).portr("P2");
 	map(0xa01006, 0xa01007).portr("P3");
 
+	map(0xa02100, 0xa02101).noprw();
+	map(0xa03000, 0xa03001).noprw();
+
+	map(0xc00000, 0xc00003).noprw(); // leftover reads/writes from the Genesis VDP - bootlegs don't have this
+	map(0xc00004, 0xc00007).ram();
+
+	map(0xc44000, 0xc44001).ram();
+
+	map(0xc46000, 0xc46001).ram(); // y scroll?
+	map(0xc46200, 0xc46201).ram();
+	map(0xc46400, 0xc465ff).ram().share("tilestripconfig"); // per row page select, xscroll, tilebank
+	map(0xc46600, 0xc46601).ram();
+
+	map(0xfe0020, 0xfe003f).nopw(); // leftover writes from memory mapped config registers - bootlegs don't have this
+
 	map(0xffc000, 0xffffff).ram();
 
 /*
-	map(0x100000, 0x10ffff).ram().w(FUNC(segas1x_bootleg_state::sys16_tileram_w)).share("tileram");
-	map(0xa00006, 0xa00007).w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
-	map(0xa0000e, 0xa0000f).w(FUNC(segas1x_bootleg_state::sys18_tilebank_w));
-	map(0xa02100, 0xa02101).noprw();
-	map(0xa03000, 0xa03001).noprw();
 	map(0xa03034, 0xa03035).noprw();
-
-	map(0xc00000, 0xc00001).noprw();
-	map(0xc00002, 0xc00003).noprw();
-	map(0xc00004, 0xc00005).noprw(); // tile bank?
-	map(0xc00006, 0xc00007).noprw();
-	map(0xc44000, 0xc44001).noprw();
-	map(0xc46000, 0xc46001).noprw();
-	map(0xc46200, 0xc46201).noprw();
-	map(0xc46400, 0xc464ff).noprw(); // scroll?
-	map(0xc46500, 0xc465ff).noprw(); // scroll?
-
-	map(0xc46600, 0xc46601).w(FUNC(segas1x_bootleg_state::sys18_refreshenable_w));
-	map(0xfe0020, 0xfe003f).nopw();
 */
 }
 
