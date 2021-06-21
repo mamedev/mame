@@ -1408,7 +1408,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="starsg1">
+	<software name="starsg1">
 		<description>Star Saga: One - Beyond The Boundary (Version 1.1)</description>
 		<year>1987</year>
 		<publisher>Masterplay Publishing Corporation</publisher>
@@ -1424,7 +1424,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="dejavu2">
+	<software name="dejavu2">
 		<description>Déjà Vu II: Lost in Las Vegas</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
@@ -1440,7 +1440,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="twrmyrgl">
+	<software name="twrmyrgl">
 		<description>The Tower of Myraglen</description>
 		<year>1987</year>
 		<publisher>PBI Software</publisher>
@@ -1463,7 +1463,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="dhilchl">
+	<software name="dhilchl">
 		<description>Downhill Challenge</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -1486,7 +1486,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="wltrgolf">
+	<software name="wltrgolf">
 		<description>World Tour Golf</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
@@ -1502,7 +1502,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="vegasgmb">
+	<software name="vegasgmb">
 		<description>Vegas Gambler</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
@@ -1518,7 +1518,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="chsm2100">
+	<software name="chsm2100">
 		<description>The Fidelity Chessmaster 2100</description>
 		<year>1988</year>
 		<publisher>The Software Toolworks</publisher>
@@ -1541,7 +1541,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="spaceace">
+	<software name="spaceace">
 		<description>Space Ace</description>
 		<year>1990</year>
 		<publisher>ReadySoft</publisher>
@@ -1606,7 +1606,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="arkanoid">
+	<software name="arkanoid">
 		<description>Arkanoid</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
@@ -1622,7 +1622,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="nicklaus">
+	<software name="nicklaus">
 		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -1645,7 +1645,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hostage">
+	<software name="hostage">
 		<description>Hostage: Rescue Mission</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
@@ -1661,7 +1661,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="captbld">
+	<software name="captbld">
 		<description>Captain Blood</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
@@ -1677,7 +1677,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="carmnusa">
+	<software name="carmnusa">
 		<description>Where in the U.S.A. is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -1700,7 +1700,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="brdtale">
+	<software name="brdtale">
 		<description>The Bard's Tale: Tales of the Unknown</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
@@ -1716,7 +1716,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="neuromnc">
+	<software name="neuromnc">
 		<description>Neuromancer</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
@@ -1732,7 +1732,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="dreamzne">
+	<software name="dreamzne">
 		<description>Dream Zone</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
@@ -1755,7 +1755,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="manhuntr">
+	<software name="manhuntr">
 		<description>Manhunter: New York</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -1790,7 +1790,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="mean18">
+	<software name="mean18">
 		<description>Mean 18</description>
 		<year>1987</year>
 		<publisher>Accolade</publisher>
@@ -1825,7 +1825,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hvrblade">
+	<software name="hvrblade">
 		<description>Hover Blade</description>
 		<year>1991</year>
 		<publisher>MCX</publisher>
@@ -1848,7 +1848,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="fastbrk">
+	<software name="fastbrk">
 		<description>Fast Break</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
@@ -1864,7 +1864,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="hallsmzm">
+	<software name="hallsmzm">
 		<description>Halls of Montezuma</description>
 		<year>1990</year>
 		<publisher>Strategic Simulations</publisher>
@@ -1887,7 +1887,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="starsg2">
+	<software name="starsg2">
 		<description>Star Saga: Two - The Clathran Menace</description>
 		<year>1988</year>
 		<publisher>MasterPlay Publishing Corporation</publisher>
@@ -1903,7 +1903,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="clbbgmn">
+	<software name="clbbgmn">
 		<description>Club Backgammon</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
@@ -1919,7 +1919,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="byondzrk">
+	<software name="byondzrk">
 		<description>Beyond Zork: The Coconut of Quendor (Revision 57 / 871221)</description>
 		<year>1987</year>
 		<publisher>Infocom</publisher>
@@ -1935,7 +1935,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="crylmsn2">
+	<software name="crylmsn2">
 		<description>2088: The Cryllan Mission - The Second Scenario</description>
 		<year>1990</year>
 		<publisher>Victory Software</publisher>
@@ -1964,7 +1964,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="defcrown">
+	<software name="defcrown">
 		<description>Defender of the Crown</description>
 		<year>1988</year>
 		<publisher>Cinemaware</publisher>
@@ -1987,7 +1987,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="skatedie">
+	<software name="skatedie">
 		<description>Skate or Die</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
@@ -2003,7 +2003,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="strsoccr">
+	<software name="strsoccr">
 		<description>Street Sports Soccer</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -2019,7 +2019,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="ootw">
+	<software name="ootw">
 		<description>Out of this World</description>
 		<year>1992</year>
 		<publisher>Interplay Productions</publisher>
@@ -2042,7 +2042,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="thexder">
+	<software name="thexder">
 		<description>Thexder (Version 2.7)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
@@ -2058,7 +2058,7 @@ license:CC0
 		</part>
 	</software>
 
-<software name="tunarmg">
+	<software name="tunarmg">
 		<description>Tunnels of Armageddon (Version 1.0)</description>
 		<year>1989</year>
 		<publisher>California Dreams</publisher>
@@ -2070,6 +2070,973 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1344940">
 				<rom name="tunnels of armageddon iigs.woz" size="1344940" crc="5fbeadc3" sha1="3c3d99d4aea530e2eb529e085d31984e0d11dd28"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cribgin">
+		<description>Gin King / Cribbage King</description>
+		<year>1989</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-06-05"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"Gin King / Cribbage King" is a 1989 board game developed by Mark Manyen, Don Laabs, David M. Linnehan, and Elizabeth Scafati, and distributed by The Software Toolworks. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296245">
+				<rom name="gin king - cribbage king iigs - disk 1.woz" size="1296245" crc="976a71a5" sha1="3319d52f509cd072aa74cf804b206e3b14c8f348"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1345397">
+				<rom name="gin king - cribbage king iigs - disk 2.woz" size="1345397" crc="f38659d9" sha1="fd11f19bb38faf58e270ae07f042f259106390ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revo76">
+		<description>Revolution '76 (Version June 27, 1989)</description>
+		<year>1989</year>
+		<publisher>Britannica Software</publisher>
+		<info name="release" value="2021-06-07"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs ROM 01 or later. -->
+		<!--"Revolution '76" is a 1988 strategy game developed by Edward Bever, Patricia Bever, Susan Barr, Sandra Lakin, David Craft, Andy Kanakares, and Ezra Sidran, and distributed by Britannica Software. This version is dated June 27, 1989 according to a printed stamp on the disk label. It requires a 1.25MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296267">
+				<rom name="revolution '76 iigs - disk 1.woz" size="1296267" crc="e112814c" sha1="3c713d5c14d0e182256120ff7623a064b2a6b812"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296267">
+				<rom name="revolution '76 iigs - disk 2.woz" size="1296267" crc="1dbedb8e" sha1="9d489ffab3e025586e702d72387641ffe4fb7d55"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1296267">
+				<rom name="revolution '76 iigs - disk 3.woz" size="1296267" crc="7fee9792" sha1="41082c8b9546d12e9a73824a3f2ce2be4dd0823b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="printshp">
+		<description>The Print Shop (Version 1.0)</description>
+		<year>1987</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-07"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Print Shop IIgs" is a 1987 graphics program developed by David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein, and distributed by Broderbund Software. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296808">
+				<rom name="the print shop iigs.woz" size="1296808" crc="5e6c4c53" sha1="3bea5c841e8459cab65d1b6382f66d15ee0b61e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prntshcm">
+		<description>The Print Shop Companion</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-07"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Print Shop Companion IIgs" is a 1990 graphics program developed by Roland Gustafsson, Leslie Wilson, Michelle Bushneff, Barbara Lawrence, and Leila Bronstein, and distributed by Broderbund Software. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296229">
+				<rom name="the print shop companion iigs.woz" size="1296229" crc="9a1893da" sha1="bb43dbf428eb45b147a9726b71ff2d38a5f48b87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantavsn">
+		<description>Fantavision</description>
+		<year>1987</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-07"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Fantavision IIgs" is a 1987 graphics program developed by Scott Anderson and Ken Rosen, and distributed by Broderbund Software. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296691">
+				<rom name="fantavision iigs.woz" size="1296691" crc="4c7648fd" sha1="ece3cc2473fedfaa497dea84e01f1b07b43bdeb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crtoonrs">
+		<description>Cartooners</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-07"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Cartooners" is a 1988 graphics program developed by Randy McLaughlin, Al Borchers, Mike Johnston, Tony Hertzel, Thomas Hertzel, Paul Hertzel, Neal Vaughn, and Dan Klassen, and distributed by Electronic Arts. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296281">
+				<rom name="cartooners iigs - disk 1 - program.woz" size="1296281" crc="1ad490c0" sha1="8e64c731fc8f449c0c6c6b1ef39586bc8254b035"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Art disk"/>
+			<dataarea name="flop" size="1296277">
+				<rom name="cartooners iigs - disk 2 - art.woz" size="1296277" crc="9406f975" sha1="3a286df8f20643b488fa9277bd0364459ab0503f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artfilm">
+		<description>Art and Film Director</description>
+		<year>1989</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2021-06-08"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Art and Film Director" is a 1989 graphics program developed by Novotrade, Caesar Studio, Amanda Dee, Jeff Dee, Sheryl Knowles, Janet Kramer, and Matthew Sarconi, and distributed by Epyx. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Art director"/>
+			<dataarea name="flop" size="1296249">
+				<rom name="art and film director iigs - disk 1 - art director.woz" size="1296249" crc="9cf7534c" sha1="64d760d5f90b3b3bd6d4c0051599a24af9ca144f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Film director"/>
+			<dataarea name="flop" size="1296250">
+				<rom name="art and film director iigs - disk 2 - film director.woz" size="1296250" crc="191e6975" sha1="44c74d30795d351415c828604b8aa258d3ba8a7b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Graphics disk"/>
+			<dataarea name="flop" size="1296762">
+				<rom name="art and film director iigs - disk 3 - graphics disk.woz" size="1296762" crc="c69d302f" sha1="5d8a514f4fa284473d930468f814ca89d76b7042"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drawplus">
+		<description>Draw Plus (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-06-08"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Draw Plus" is a 1987 graphics program developed by H. Lamiraux and distributed by Activision. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296171">
+				<rom name="draw plus iigs.woz" size="1296171" crc="60ae386e" sha1="e31e826e10ead9211e4e9f28ce51398786efedec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grphstd">
+		<description>The Graphics Studio</description>
+		<year>1987</year>
+		<publisher>Accolade</publisher>
+		<info name="release" value="2021-06-08"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"The Graphics Studio" is a 1987 graphics program developed by Greg Hospelhorn, Peter Wickman, Richard Antaki, and distributed by Accolade. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296696">
+				<rom name="the graphics studio iigs.woz" size="1296696" crc="19c9e6bf" sha1="97e5f4a0a05c818862a580b7bcb5663241d72e78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="immortal">
+		<description>The Immortal</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-05"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"The Immortal" is a 1990 roleplaying game developed by Will Harvey, Ian Gooding, Michael Marcanted, Brett G. Durrett, and Douglas Fulton, and distributed by Electronic Arts. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Play disk"/>
+			<dataarea name="flop" size="1296229">
+				<rom name="the immortal iigs - disk 1 - play.woz" size="1296229" crc="b804341e" sha1="72322fd7d8e5d3904bd89796725fb106d3cca5a5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Graphics disk"/>
+			<dataarea name="flop" size="1296226">
+				<rom name="the immortal iigs - disk 2 - graphics.woz" size="1296226" crc="bf428297" sha1="cdf5ea12029204a4a8dfed975d2c917406e3a7d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triango">
+		<description>TrianGo</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="release" value="2021-06-05"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"TrianGo" is a 1988 board game developed by Staszek Bartkowski, Marcin Szostakowski, Maciej Markuszewski, Dorota Błaszczak, and distributed by California Dreams. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296250">
+				<rom name="triango iigs.woz" size="1296250" crc="0bd18998" sha1="36f0a842875632f25bb8acd60bf807862a4397b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="816paint">
+		<description>816/Paint (Version 3.1)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="release" value="2021-06-08"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"816/Paint" is a 1987 graphics program developed by Michael Darooge, Robert Barris, and Gregory C. Miller, and distributed by Baudville. This is vesion 3.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1319212">
+				<rom name="816-paint iigs.woz" size="1319212" crc="03cde91c" sha1="7f3de5c008fd9bb77cdd2cdb4dc2524cb77be6ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="begldraw">
+		<description>BeagleDraw (Version 1.3)</description>
+		<year>1987</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2021-06-09"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"BeagleDraw" is a 1987 graphics program developed by Robert Hearn and Jeff Erickson, and distributed by Beagle Bros. This is version 1.3. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296153">
+				<rom name="beagledraw iigs.woz" size="1296153" crc="66e80d46" sha1="e1fd5c85d666fec1cc03f7bab728d11c9bcf3c3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmgrafx">
+		<description>DreamGrafix</description>
+		<year>1992</year>
+		<publisher>DreamWorld Software</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs. -->
+		<!--"DreamGrafix" is a 1992 graphics program developed by Jason Anderson, Steve Chiang, Shawn Martin, and Yong Su Kim, and distributed by DreamWorld Software. This is version 1.06. It requires a 1.25MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328942">
+				<rom name="dreamgrafix iigs.woz" size="1328942" crc="1179d76c" sha1="699f5f4adac2043ff2f71619e4c6f3d2f54d7acb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="platpnt">
+		<description>Platinum Paint (Version 2.01)</description>
+		<year>1992</year>
+		<publisher>Beagle Bros.</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs. -->
+		<!--"Platinum Paint" is a 1992 graphics program developed by Matthew Reimer and distributed by Beagle Bros. This is version 2.01. It requires a 1.25MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="1296170">
+				<rom name="platinum paint iigs - disk 1 - system disk.woz" size="1296170" crc="6ccb4390" sha1="12e9e8da24881506302e19cd9110e831564dd211"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1296171">
+				<rom name="platinum paint iigs - disk 2 - program disk.woz" size="1296171" crc="b778a68c" sha1="a66e372e59945f3ec18491c7df5be01e076411cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwplus">
+		<description>Paintworks Plus (Version 1.2)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Paintworks Plus" is a 1986 graphics program developed by Henri Lamiraux, B. Gallet, L. Barthelet, R. Danais, and S. Cavril, and distributed by Activision. This is version 1.2. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296206">
+				<rom name="paintworks plus iigs.woz" size="1296206" crc="c557968f" sha1="c5c44af96b91aa1550cc0fdabd67434fd72a4e51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwksgold">
+		<description>Paintworks Gold (Version 1.5)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.25MB Apple IIgs. -->
+		<!--"Paintworks Gold" is a 1987 graphics program developed by Luc Barthelet, Henri Lamiraux, Paul Zuzelo, and Sydney Williams, and distributed by Activision. This is version 1.5. It requires a 1.25MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296195">
+				<rom name="paintworks gold iigs - disk 1 - program disk.woz" size="1296195" crc="727db105" sha1="e2b1759d4f41068346fd0d5485afa262ec4a6718"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Art disk"/>
+			<dataarea name="flop" size="1296191">
+				<rom name="paintworks gold iigs - disk 2 - art disk.woz" size="1296191" crc="5eaa9d86" sha1="dccd17f662a69e5c64f90ae4c93272c988402547"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imgmst12">
+		<description>ImageMaster: Basic Paint (Version 1.2)</description>
+		<year>1992</year>
+		<publisher>JADA Graphics</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"ImageMaster: Basic Paint" is a 1992 graphics program developed by Larry Jackson and distributed by JADA Graphics. This is version 1.2. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296161">
+				<rom name="imagemaster- basic paint iigs.woz" size="1296161" crc="5daefc49" sha1="f2eec1054c8bcdd0fd94951be018873a0c1d991a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grphsmkt">
+		<description>Graphics Supermarket (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>Abracadata</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Graphics Supermarket" is a 1987 graphics program developed by Rodger Smith, Joe Hebling, Mary Carol Smith, and Connie Holvey, and distributed by Abracadata. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328978">
+				<rom name="graphics supermarket iigs.woz" size="1328978" crc="b34c7131" sha1="dec9c9c89d6d5219ed28e7a56e7cef1683970394"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gwrit310">
+		<description>GraphicWriter III (Version 1.0)</description>
+		<year>1990</year>
+		<publisher>Seven Hills Software</publisher>
+		<info name="release" value="2021-06-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"GraphicWriter III" is a 1990 graphics program developed by Gary Crandall and Richard Bennett, and distributed by Seven Hills Software. This is version 1.0. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1360720">
+				<rom name="graphicwriter iii iigs - disk 1.woz" size="1360720" crc="20234e53" sha1="de039d332924765b21e90296020d1d34bc53ac35"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296208">
+				<rom name="graphicwriter iii iigs - disk 2.woz" size="1296208" crc="0b82c50b" sha1="f9eddd4ab85144b608b72e486484ead4f8c5bb11"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1360720">
+				<rom name="graphicwriter iii iigs - disk 3.woz" size="1360720" crc="a62a325f" sha1="c2499046e52c002bcd48352535633bd6eb577152"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dpaint2">
+		<description>DeluxePaint II (Version 2.01)</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-08"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"DeluxePaint II" is a 1987 graphics program developed by Daniel Silva, Brent Iverson, David Grady, Greg Riker, Shelley Day, Jeff Johnnigman, Happy Keller, Nicholas Lavroff, Carolyn McFarlane, Richard Antaki, Paul Reiche III, Stu Roberson, Avril Harrison, Judy Campbell, and Frank Wing, and distributed by Electronic Arts. This is vesion 2.01. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296391">
+				<rom name="deluxepaint ii iigs - disk 1 - program.woz" size="1296391" crc="b0028911" sha1="bbddbd2078877b4a2526da3cc5da856e444a1322"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Bonus art disk"/>
+			<dataarea name="flop" size="1296398">
+				<rom name="deluxepaint ii iigs - disk 2 - bonus art disk.woz" size="1296398" crc="b499dc9b" sha1="9da9d0446400ba0a14955a70c7969ae1200810a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspln">
+		<description>Stars and Planets</description>
+		<year>1989</year>
+		<publisher>Advanced Ideas</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM 01 or later. -->
+		<!--"Stars and Planets" is a 1989 educational program developed by Julie Anderson and distributed by Advanced Ideas. It requires a 512K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345319">
+				<rom name="stars and planets iigs.woz" size="1345319" crc="19b5c12b" sha1="213b4477085f32423c69da5adc4d692b837a54c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mavisbcn">
+		<description>Mavis Beacon Teaches Typing (Version 1.8)</description>
+		<year>1987</year>
+		<publisher>The Software Toolworks</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Mavis Beacon Teaches Typing" is a 1987 educational program developed and distributed by The Software Toolworks. This is version 1.8. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1289492">
+				<rom name="mavis beacon teaches typing iigs - disk 1.woz" size="1289492" crc="aca9e637" sha1="d2c04b96e16d17a10a47f2422e9a14547957a67e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296148">
+				<rom name="mavis beacon teaches typing iigs - disk 2.woz" size="1296148" crc="6c39595e" sha1="40461f3e81396be49bcb8af1d95de4f3fc1e4a3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathnme">
+		<description>Math and Me (Version 1.0 08/01/88)</description>
+		<year>1988</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Math and Me" is a 1988 educational program developed by C.K. Haun and distributed by Davidson &amp;amp; Associates. This is version 1.0, dated 08/01/88. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328947">
+				<rom name="math and me iigs.woz" size="1328947" crc="b732477d" sha1="d9270d665cd209b85eb9c3bb6df4a37468150ebe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smthtlkr">
+		<description>SmoothTalker</description>
+		<year>1987</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 00 or ROM 01. -->
+		<!--"SmoothTalker" is a 1987 productivity program developed and distributed by First Byte. It requires a 768K Apple IIgs ROM 00 or ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312507">
+				<rom name="smoothtalker iigs.woz" size="1312507" crc="19b0ec7f" sha1="89d332155d9bd9c02e6254f4379c15eb6bb19376"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stckybsh">
+		<description>Stickybear Shapes</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Stickybear Shapes" is a 1988 educational program developed by Richard Hefter, David Cunningham, and Susan Dubicki, and distributed by Optimum Resource. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1286466">
+				<rom name="stickybear shapes iigs.woz" size="1286466" crc="1d44fbc7" sha1="8b1c33ed774c590557bc2eff7f5758819b33092c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbtarot">
+		<description>Tarot</description>
+		<year>1990</year>
+		<publisher>Toolbox</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Tarot" is a 1990 French language card game developed by François Uhrich and Jean-François Sauvage, and distributed by Toolbox. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345329">
+				<rom name="tarot iigs.woz" size="1345329" crc="14cd98c9" sha1="41efccb0166e1891b068f1ad9a072d0fb805ef7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmplanet">
+		<description>Full Metal Planete</description>
+		<year>1990</year>
+		<publisher>Infogrames</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Full Metal Planete" is a 1990 French language board game developed by François Uhrich, Nicolas Bergeret, Louis van Proosdij Duport, Etienne Petitjean, and Pascal Wassong, and distributed by Infogrames. This is version 1.0. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345399">
+				<rom name="full metal planete iigs.woz" size="1345399" crc="7f957af7" sha1="e727b67b1905956a2a9b99d8715b8291e30c391d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shangha2">
+		<description>Shanghai II: Dragon's Eye</description>
+		<year>1993</year>
+		<publisher>Big Red Computer Club</publisher>
+		<info name="release" value="2021-06-16"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Shanghai II: Dragon's Eye" is a 1993 board game developed by Brodie Lockard, Don Harlow, John Wrenholt, and Steve Luellman, and distributed by Big Red Computer Club. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296206">
+				<rom name="shanghai ii iigs - disk 1 - program.woz" size="1296206" crc="ddda4a20" sha1="22cb6182462e3869797c4a2a46565761a8b00874"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Sounds disk"/>
+			<dataarea name="flop" size="1296206">
+				<rom name="shanghai ii iigs - disk 2 - sounds.woz" size="1296206" crc="0a58a12d" sha1="bc42f224a719594df64c0098c60fe7d9af185bc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcs">
+		<description>Music Construction Set (Version 1.0)</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs. -->
+		<!--"Music Construction Set" is a 1986 audio program developed by Will Harvey, Jim Nitchals, and Doug Fulton, and distributed by Electronic Arts. This is version 1.0. It requires a 256K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296714">
+				<rom name="music construction set iigs.woz" size="1296714" crc="c61bf3cc" sha1="8bb33e8b4cab20effb6e7522e3eb01f382e53a7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="instsynt">
+		<description>Instant Synthesizer</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"Instant Synthesizer" is a 1988 audio program developed by Larry Reed and distributed by Electronic Arts. This is version 1.0. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296230">
+				<rom name="instant synthesizer iigs - disk 1 - program.woz" size="1296230" crc="d4e982f6" sha1="25eecac855d0784ba5df1125cecde22977d1474c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="1296227">
+				<rom name="instant synthesizer iigs - disk 2 - data.woz" size="1296227" crc="b3f3db36" sha1="278993013a1eb963e06f78af6d5f58d48cd86fc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrkspro">
+		<description>Master Tracks Pro (Version 1.04)</description>
+		<year>1989</year>
+		<publisher>Passport Designs</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Master Tracks Pro" is a 1989 audio program developed by Dave Kusek, Don Williams, and Dave Howell, and distributed by Passport Designs. This is version 1.04. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345349">
+				<rom name="master tracks pro iigs.woz" size="1345349" crc="4c8cb4f7" sha1="fb5db1100b1512186113fa9d8396b649ab1db9c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musstdio">
+		<description>The Music Studio (Version 2.0)</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"The Music Studio" is a 1988 audio program developed by Ric Forrester, Rick Parfitt, Peter Wickman, Paul Zuzelo, Sally Froud, Jeff Cable, Carl Bacani, Jim Inscore, Sydney Williams Lewis, Nancy Waisanen, Steve Young, and Laura E. Singer, and distributed by Activision. This is version 2.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296337">
+				<rom name="the music studio iigs - disk 1 - program.woz" size="1296337" crc="a4f7f392" sha1="eb2e0e72cdceb392c3f2ef73ff5c576a8c0c2ca8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Additional songs and instruments disk"/>
+			<dataarea name="flop" size="1296362">
+				<rom name="the music studio iigs - disk 2 - additional songs and instruments.woz" size="1296362" crc="a834a4c6" sha1="e5b2a5dcd6642725d82c45617a4c2dadea5febd1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jamsessn">
+		<description>Jam Session (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"Jam Session" is a 1989 audio program developed by Steve Capps, Neil Cormia, Ty Roberts, Ed Bogas, Edward Badasov, Latricia Turner, and Avril Harrison, and distributed by Broderbund Software. This is version 1.0. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296761">
+				<rom name="jam session iigs - disk 1.woz" size="1296761" crc="b145977d" sha1="5d5e075af05dcb8eed20453e42b6654835aece3e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296249">
+				<rom name="jam session iigs - disk 2.woz" size="1296249" crc="58e8e887" sha1="e2c8115252a4729ae1dcd8e47a6ca9efc1857384"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muswrv23">
+		<description>Pyware Music Writer (Version 2.03)</description>
+		<year>1990</year>
+		<publisher>Pyware</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"Pyware Music Writer" is a 1990 audio program developed by Pygraphics and distributed by Pyware. This is version 2.03. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Boot disk 5.0.4"/>
+			<dataarea name="flop" size="1296179">
+				<rom name="pyware music writer iigs - disk 1 - boot disk 5.0.4.woz" size="1296179" crc="cdb27c84" sha1="de3d1476fe9dfb7c3761f74c51dc38e78537cab5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1345341">
+				<rom name="pyware music writer iigs - disk 2 - program disk.woz" size="1345341" crc="ee9edef7" sha1="fa177e0d55f757140bf1fc96614225b995924d67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtrksjr">
+		<description>Master Tracks Jr. (Version 1.03)</description>
+		<year>1988</year>
+		<publisher>Passport Designs</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"Master Tracks Jr." is a 1988 audio program developed by Dave Kusek, Don Williams, and Dave Howell, and distributed by Passport Designs. This is version 1.03. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1329990">
+				<rom name="master tracks jr. iigs.woz" size="1329990" crc="763ca9f0" sha1="2daa4d51640810c823b852720d89a5aeda615522"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="salvatns">
+		<description>Salvation Supreme (Version 2.0)</description>
+		<year>1993</year>
+		<publisher>Vitesse Software</publisher>
+		<info name="release" value="2021-06-17"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"Salvation Supreme" is a 1993 set of disk utilities developed by Christopher Warner, Robert Morgan, Joe Jaworski, and Jonah Stich, and distributed by Vitesse Software. This is version 2.0. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296208">
+				<rom name="salvation supreme iigs - disk 1.woz" size="1296208" crc="d33c159f" sha1="a20776f1b58647ec57526b72ebe02f22567a383d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296208">
+				<rom name="salvation supreme iigs - disk 2.woz" size="1296208" crc="75578373" sha1="aeaa51b3b44f9f0e20e86d0581d9de7fd9f8753d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ntgs">
+		<description>NoiseTracker (Version 1.0)</description>
+		<year>1992</year>
+		<publisher>FTA</publisher>
+		<info name="release" value="2021-06-14"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
+		<!--"NoiseTracker" is a 1992 audio program developed by Olivier Goguel, Olivier Bailly-Maitre, Pascal Watel, Lionel Picanelot, and Michael Guitton, and distributed by FTA. This is version 1.00. It requires a 1MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1345387">
+				<rom name="noisetracker iigs.woz" size="1345387" crc="b3ffe621" sha1="cd086b0770b4a29e46d174923dec08880c3972f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hypst31c">
+		<description>HyperStudio (Version 3.1c)</description>
+		<year>1989</year>
+		<publisher>Roger Wagner Publishing</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1.5MB Apple IIgs ROM 01 or later. -->
+		<!--"HyperStudio" is a 1989 multimedia program developed by Michael O'Keefe, Dave Klimas, Eric Mueller, Roy Bannon, Ken Kashmarek, and Garrick Toubassi, and distributed by Roger Wagner Publishing. This is version 3.1c. It requires a 1.5MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="1296332">
+				<rom name="hyperstudio iigs - disk 1 - hs.system.woz" size="1296332" crc="105cd440" sha1="6eb1490032644870e3d7b2198307f92b9f4c9726"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Hyperstudio disk"/>
+			<dataarea name="flop" size="1296334">
+				<rom name="hyperstudio iigs - disk 2 - hyperstudio.woz" size="1296334" crc="dddc1718" sha1="c79d9ae79e9b3b05d404b6fcfc860c2032610749"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Combo disk"/>
+			<dataarea name="flop" size="1296331">
+				<rom name="hyperstudio iigs - disk 3 - combo.hs.woz" size="1296331" crc="72d2c492" sha1="cb36c4183aea90fc4e31136ea3b23c78e628f5f5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 - Art disk"/>
+			<dataarea name="flop" size="1296329">
+				<rom name="hyperstudio iigs - disk 4 - hs.art.woz" size="1296329" crc="a58110b6" sha1="7574471d6720393fbbdc59a177f6d6540b7fc659"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5 - Sounds disk"/>
+			<dataarea name="flop" size="1296332">
+				<rom name="hyperstudio iigs - disk 5 - hs.sounds.woz" size="1296332" crc="59075668" sha1="42c47278b34b37054980255a136447e603bc6a62"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6 - Samples 1 disk"/>
+			<dataarea name="flop" size="1296332">
+				<rom name="hyperstudio iigs - disk 6 - samples.1.woz" size="1296332" crc="9b75ac57" sha1="60ca027728e1c4252cc1ea1d3b62f7c2260ffc46"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7 - Samples 2 disk"/>
+			<dataarea name="flop" size="1296332">
+				<rom name="hyperstudio iigs - disk 7 - samples.2.woz" size="1296332" crc="4ec61e88" sha1="8aeb610008ba430aa78cf59f2565b14f4d666e11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcelite">
+		<description>Writer's Choice Elite</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Writer's Choice Elite" is a 1987 productivity program developed by Richard Danais, Nancy Philippine, Bernard Gallet, and Luc Barthelet, and distributed by Activision. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296190">
+				<rom name="writer's choice elite iigs.woz" size="1296190" crc="79eb00fe" sha1="0f38257b5012c5b07546e1484213b4246c1e434a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordpfct">
+		<description>WordPerfect (Version 2.1e)</description>
+		<year>1987</year>
+		<publisher>WordPerfect Corporation</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"WordPerfect" is a 1987 productivity program developed by Dale T. Taylor, Daniel P. Burton, Barry Watts, Todd J. Wood, Scott B. Mitchell, Brent D. Hauvel, David Woodbury, Douglas L. Davies, and Kyle W. Erickson, and distributed by WordPerfect Corporation. This is version 2.1e. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296311">
+				<rom name="wordperfect iigs - disk 1 - program.woz" size="1296311" crc="2650d9d0" sha1="a6e08cd2ac88548ee788c618f033e4ac719173bd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Word lists disk"/>
+			<dataarea name="flop" size="1296311">
+				<rom name="wordperfect iigs - disk 2 - word lists.woz" size="1296311" crc="9b42af92" sha1="28fb7ef3146168e1870ed4539ed4e58ab45d0559"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Utilities disk"/>
+			<dataarea name="flop" size="1296311">
+				<rom name="wordperfect iigs - disk 3 - utilities.woz" size="1296311" crc="47dc3811" sha1="b613067de9e13f84042f5a736fe020a24da61a90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wndanimk">
+		<description>The Wonders of the Animal Kingdom</description>
+		<year>1989</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"The Wonders of the Animal Kingdom" is a 1989 educational program developed by Stan Brewster, Joseph Hewitt, and June Stark, and distributed by Unicorn Software. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296707">
+				<rom name="the wonders of the animal kingdom iigs - disk 1.woz" size="1296707" crc="db85592f" sha1="c613731a2e880d4b99cef0acb42eaace1039ba51"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296195">
+				<rom name="the wonders of the animal kingdom iigs - disk 2.woz" size="1296195" crc="fbf4f128" sha1="383b93a32b223399e77724e08631d4c256eb4cc8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordmstr">
+		<description>The Word Master</description>
+		<year>1989</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1MB Apple IIgs. -->
+		<!--"The Word Master" is a 1989 educational program developed by William Demas and Joseph Hewitt, and distributed by Unicorn Software. It requires a 1MB Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296684">
+				<rom name="the word master iigs.woz" size="1296684" crc="a3d0b0ff" sha1="b78e70ec3d35dea4bf06819c0940fa4e2c6736e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="readrhym">
+		<description>Read and Rhyme</description>
+		<year>1988</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Read and Rhyme" is a 1988 educational program developed by William Demas and distributed by Unicorn Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296669">
+				<rom name="read and rhyme iigs - disk 1.woz" size="1296669" crc="2011af62" sha1="e399fff6bd60b964ce68cb3d36ca33a77f1483f6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296157">
+				<rom name="read and rhyme iigs - disk 2.woz" size="1296157" crc="3e060399" sha1="f0ed2208dc2447734e22acb1c5d943cbe55ac9c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aesopfbl">
+		<description>Aesop's Fables</description>
+		<year>1988</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"Aesop's Fables" is a 1988 educational program developed by William Demas, Joseph Hewitt IV, and June Stark, and distributed by Unicorn Software. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296699">
+				<rom name="aesop's fables iigs - disk 1.woz" size="1296699" crc="7534b2f6" sha1="b20944b409de700f1df32e9faf8c9e4e162f7a9c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296187">
+				<rom name="aesop's fables iigs - disk 2.woz" size="1296187" crc="b43ff258" sha1="925944a9ac634ed2b6a009a0d6e0015f8a896d1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awagrizz">
+		<description>Audubon Wildlife Adventures: Grizzly Bears</description>
+		<year>1988</year>
+		<publisher>Advanced Ideas</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Audubon Wildlife Adventures: Grizzly Bears" is a 1988 educational program developed by Deborah Kovacs, Pat Relf, Drew Ruscil, Dennis Sullivan, Doreen Curtin, Andy Henriquez, Christopher Palmer, Gerri Brioso, Cynthia Vansant, Richard Frietas, Paul Frietas, Roger DiSilvestro, Richard Chevat, Sandy Damashek, Susan Greer, and Jeffrey Siegel, and distributed by Advanced Ideas. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296396">
+				<rom name="audubon wildlife adventures- grizzly bears iigs - disk 1.woz" size="1296396" crc="c2590677" sha1="0cb36870f69aadb3c8c895d19214e327b16583b0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296396">
+				<rom name="audubon wildlife adventures- grizzly bears iigs - disk 2.woz" size="1296396" crc="79ae82cc" sha1="e2feb4106181279f061a05bbdbe3add69c65a2a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awawhale">
+		<description>Audubon Wildlife Adventures: Whales</description>
+		<year>1989</year>
+		<publisher>Advanced Ideas</publisher>
+		<info name="release" value="2021-06-15"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Audubon Wildlife Adventures: Whales" is a 1989 educational program developed by Deborah Kovacs, Pat Relf, Drew Ruscil, Dennis Sullivan, Doreen Curtin, Donna Curtin, Jennifer Crouser, Candace Maher, Carol Felice, Roger DiSilvestro, Susan Greer, Lee Berman, and Christopher Palmer, and distributed by Advanced Ideas. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1296364">
+				<rom name="audubon wildlife adventures- whales iigs - disk 1.woz" size="1296364" crc="e5cd5217" sha1="161168122ad2c805edf856f0ca97d79f89ec2df9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1296364">
+				<rom name="audubon wildlife adventures- whales iigs - disk 2.woz" size="1296364" crc="4b787b04" sha1="9b13466551b1c895853d4ccefb6725a34648a79b"/>
 			</dataarea>
 		</part>
 	</software>
