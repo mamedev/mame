@@ -26,8 +26,10 @@ Language:
 
 +========+===================+===========================================================================================+
 |   XX   | 80-084000(US)     | Action Mania                                                                              |
-|   XX   | 80-084000(US)     | Action Mania (Rev, 4?)                                                                    |
-|   XX   | 80-084000(US)     | Action Mania (Rev, 6?)                                                                    |
+|   XX   | 80-084000(US)     | Action Mania (rev. 4?)                                                                    |
+|   XX   | 80-084000(US)     | Action Mania (rev. 6?)                                                                    |
+|   XX   | 80-084000(US)     | Action Mania (alt 1)                                                                      |
+|   XX   | 80-084000(US)     | Action Mania (alt 2)                                                                      |
 |        |          (IT)     | ?????                                                                                     |
 |   XX   | 80-084002(NL)     | Sports Games                                                                              |
 |        | 80-084003(UK)     | Action Mania                                                                              |
@@ -38,16 +40,17 @@ Language:
 |   XX   | 80-084008(CN)     | 英语运动园                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure                                                |
+|   XX   | 80-084020(US)     | Dora the Explorer: Dora's Fix It Adventure (rev. 3?)                                      |
 |   **   | 80-084021(US)     | Dora the Explorer: Dora's Fix It Adventure (pocket version, same ROM as 80-084020(US))    |
 |   XX   | 80-084022(NL)     | Dora: Dora's Reparatie Avontuur                                                           |
 |        | 80-084023(UK)     | Dora the Explorer: Dora's Fix It Adventure                                                |
 |   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer                                                           |
-|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (Rev. 2)                                                  |
+|   XX   | 80-084024(GE)     | Dora: Doras Reparatur-Abenteuer (rev. 2)                                                  |
 |   XX   | 80-084025(FR)     | Dora L'Exploratrice : Les Adventures De Dora Apprentie Mécano                             |
 |        | 80-084026(PT)     | Dora : em busca das pecas perdidas                                                        |
-|        | 80-084027(SP)     | Dora : La Aventura arregla-todo de Dora                                                   |
+|   XX   | 80-084027(SP)     | Dora La Exploradora: La Aventura arregla-todo de Dora                                     |
 +========+===================+===========================================================================================+
-|        | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                                              |
+|   XX   | 80-084040(US)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084043(UK)     | Scooby-Doo! - Funland Frenzy                                                              |
 |        | 80-084044(GE)     | Scooby-Doo! - Im Lernpark                                                                 |
 |   XX   | 80-084045(FR)     | Scooby-Doo! - Panique à Funland                                                            |
@@ -66,7 +69,7 @@ Language:
 |        | 80-084100(US)     | Wonder Pets - Save the Animals!                                                           |
 |   XX   | 80-084103(UK)     | Wonder Pets - Save the Animals!                                                           |
 +========+===================+===========================================================================================+
-|        | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
+|   XX   | 80-084120(US)     | Kung Fu Panda - Path of the Panda                                                         |
 |        | 80-084123(UK)     | Kung Fu Panda - Path of the Panda                                                         |
 |   XX   | 80-084124(GE)     | Kung Fu Panda - Der Weg des Panda                                                         |
 |   XX   | 80-084125(FR)     | Kung Fu Panda - La mission de Po                                                          |
@@ -77,11 +80,11 @@ Language:
 |   XX   | 80-084145(FR)     | Spider-Man & ses amis - Missions Secrètes                                                 |
 |        | 80-084147(SP)     | Spider-Man y Amigos: Misiones Secretas (no # on label)                                    |
 +========+===================+===========================================================================================+
-|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 2?)                               |
-|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (Rev. 5?)                               |
+|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (rev. 2?)                               |
+|   XX   | 80-084160(US)     | Disney's Little Einsteins: The Glass Slipper Ball (rev. 5?)                               |
 |        | 80-084163(UK)     | Disney's Little Einsteins: The Glass Slipper Ball                                         |
 |   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball                                         |
-|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball (Rev. 2?)                               |
+|   XX   | 80-084164(GE)     | Disney's Kleine Einsteins: Der Glaspantoffel-Ball (rev. 2?)                               |
 |        | 80-084167(SP)     | Little Einsteins de Disney: El Baile del Zapatito de Cristal                              |
 +========+===================+===========================================================================================+
 |   XX   | 80-084180(US)     | Mickey Mouse Clubhouse                                                                    |
@@ -95,6 +98,7 @@ Language:
 |        | 80-084188(CN)     | 米奇妙妙屋                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar                                                       |
+|   XX   | 80-084200(US)     | Nascar Academy - Race Car Superstar (alt)                                                 |
 +========+===================+===========================================================================================+
 |        | 80-084220(US)     | Snow Park Challenge                                                                       |
 |        | 80-084222(NL)     | Wintersport Games                                                                         |
@@ -158,13 +162,13 @@ Language:
 |        | 80-084386(PT)     | Winnie - Em Busca do Mel (84396 on cart)                                                  |
 |   XX   | 80-084387(SP)     | Winnie the Pooh - En Busca de la Miel                                                     |
 +========+===================+===========================================================================================+
-|        | 80-084400(US)     | Cars - Rev It Up in Radiator Springs                                                       |
-|        | 80-084402(NL)     | Cars - Spektakel in Radiator Springs                                                       |
-|        | 80-084403(UK)     | Cars - Rev it up in Radiator Springs                                                       |
-|   XX   | 80-084404(GE)     | Cars - Vollgas in Radiator Springs                                                         |
-|   XX   | 80-084405(FR)     | Cars - Quatre Roues                                                                        |
-|        | 80-084406(PT)     | Cars - Aventura Em Radiator Springs (84416 on cart)                                        |
-|   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                                |
+|   XX   | 80-084400(US)     | Cars - Rev It Up in Radiator Springs                                                      |
+|        | 80-084402(NL)     | Cars - Spektakel in Radiator Springs                                                      |
+|        | 80-084403(UK)     | Cars - Rev it up in Radiator Springs                                                      |
+|   XX   | 80-084404(GE)     | Cars - Vollgas in Radiator Springs                                                        |
+|   XX   | 80-084405(FR)     | Cars - Quatre Roues                                                                       |
+|        | 80-084406(PT)     | Cars - Aventura Em Radiator Springs (84416 on cart)                                       |
+|   XX   | 80-084407(SP)     | Cars - Acelera el Motor en Radiador Springs                                               |
 +========+===================+===========================================================================================+
 |   XX   | 80-084420(US)     | Toy Story 3                                                                               |
 |        | 80-084421(US)     | Toy Story 3 (pocket version)                                                              |
@@ -209,8 +213,8 @@ Language:
 +========+===================+===========================================================================================+
 |        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
-|        | 80-084580(US)     | Cars 2  (motion version)                                                                  |
-|        | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
+|   XX   | 80-084580(US)     | Cars 2  (motion version)                                                                  |
+|   XX   | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
 |        | 80-084583(UK)     | Cars 2                                                                                    |
 |   XX   | 80-084584(GE)     | Cars 2                                                                                    |
 |   XX   | 80-084585(FR)     | Cars 2                                                                                    |
@@ -219,7 +223,7 @@ Language:
 |        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)               |
 |        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                                    |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                                       |
-|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (Rev. 2?)                                             |
+|   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (rev. 2?)                                             |
 |   XX   | 80-084605(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                               |
 +========+===================+===========================================================================================+
 |        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
@@ -237,7 +241,7 @@ Language:
 <softwarelist name="vsmilem_cart" description="VTech V.Smile Motion cartridges">
 
 	<software name="actnmniam6">
-		<description>Action Mania (USA, Rev. 6?)</description>
+		<description>Action Mania (USA, rev. 6?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084000(US)" />
@@ -250,7 +254,7 @@ Language:
 	</software>
 
 	<software name="actnmniam4" cloneof="actnmniam6">
-		<description>Action Mania (USA, Rev. 4?)</description>
+		<description>Action Mania (USA, rev. 4?)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084000(US)" />
@@ -276,6 +280,29 @@ Language:
 		</part>
 	</software>
 
+	<software name="actnmniama1" cloneof="actnmniam6">
+		<description>Action Mania (USA, alt 1)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="ACTION Mania 80-084000(US) (Motion) [ALT1].bin" size="0x0800000" crc="790f097f" sha1="d1ff028837b4190173a0823ac518a58deee171b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnmniama2" cloneof="actnmniam6">
+		<description>Action Mania (USA, alt 2)</description>
+		<year>201?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<dataarea name="rom" size="0x0800000">
+				<rom name="ACTION Mania 80-084000(US) (Motion) [ALT2].bin" size="0x0800000" crc="65b5a102" sha1="336bab256596756931d7821244d9d659e55992e8" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="actnmniamnl" cloneof="actnmniam6">
 		<description>Sport Games (Netherlands)</description>
@@ -347,7 +374,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="carsmge">
+	<software name="carsm">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA)</description>
+		<year>2009</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084400(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev It Up in Radiator Springs 80-084400(US) (Motion).bin" size="8388608" crc="1e6363ef" sha1="5db9fe5626ebae102ee0ec8e6b42c7987c7df686" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsmge" cloneof="carsm">
 		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -362,7 +402,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="carsmfr" cloneof="carsmge">
+	<software name="carsmfr" cloneof="carsm">
 		<description>Disney/Pixar Cars - Quatre Roues (France)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -375,7 +415,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="carsmsp" cloneof="carsmge">
+	<software name="carsmsp" cloneof="carsm">
 		<description>Disney/Pixar Cars - Acelera el Motor en Radiador Springs (Spain)</description>
 		<year>20??</year>
 		<publisher>VTech</publisher>
@@ -390,7 +430,35 @@ Language:
 		</part>
 	</software>
 
-	<software name="cars2mge">
+	<software name="cars2m">
+		<description>Disney/Pixar Cars 2 (USA)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084580(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Cars 2 80-084580(US) (Motion) LOW.bin" size="0x0800000" crc="6d78ae05" sha1="cdb2656be1d6e4fd24f2dd443680152fdeeab2a2" offset="0x0000000" />
+				<rom name="Cars 2 80-084580(US) (Motion) HIGH.bin" size="0x0800000" crc="05c42207" sha1="89b89f312477fc56ff53c8ba7ce89ace7671e2cd" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2mp" cloneof="cars2m">
+		<description>Disney/Pixar Cars 2 (Pocket version, USA)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084581(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x1000000">
+				<rom name="Cars 2 80-084581(US) (Motion) (Pocket) LOW.bin" size="0x0800000" crc="3947439a" sha1="0d3ac108a48c64ec456145e7ddb31448425d27f5" offset="0x0000000" />
+				<rom name="Cars 2 80-084581(US) (Motion) (Pocket) HIGH.bin" size="0x0800000" crc="7eb714a4" sha1="dd03301ec4b74706d3ffa64b51bef33b7bd56ba9" offset="0x0800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars2mge" cloneof="cars2m">
 		<description>Disney/Pixar Cars 2 (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -406,7 +474,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="cars2mfr" cloneof="cars2mge">
+	<software name="cars2mfr" cloneof="cars2m">
 		<description>Disney/Pixar Cars 2 (France)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -420,7 +488,7 @@ Language:
 	</software>
 
 	<software name="cinderlamge2">
-		<description>Disneys Princess Cinderella - Lernen im Märchenland (Germany, Rev. 2?)</description>
+		<description>Disneys Princess Cinderella - Lernen im Märchenland (Germany, rev. 2?)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084604(GE)" />
@@ -458,8 +526,8 @@ Language:
 		</part>
 	</software>
 
-	<software name="doram">
-		<description>Nickelodeon Dora the Explorer - Dora's Fix It Adventure (USA, Rev. 3?)</description>
+	<software name="doram3">
+		<description>Nickelodeon Dora the Explorer - Dora's Fix It Adventure (USA, rev. 3?)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084020(US)" /> <!-- Same ROM as 084021(US) -->
@@ -471,7 +539,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="doramnl" cloneof="doram">
+	<software name="doram" cloneof="doram3">
+		<description>Nickelodeon Dora the Explorer - Dora's Fix It Adventure (USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084020(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Dora the Explorer - Dora's Fix-it Adventure 80-084020(US) (Motion).bin" size="8388608" crc="04d168f0" sha1="1ffb35bf7a1884c9ae3be1ce0c9bb9472d889f10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doramnl" cloneof="doram3">
 		<description>Nick Jr Dora - Dora's Reparatie Avontuur (Netherlands)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -486,8 +567,8 @@ Language:
 		</part>
 	</software>
 
-	<software name="doramg2" cloneof="doram">
-		<description>Nick Dora - Doras Reparatur-Abenteuer (Germany, Rev. 2)</description>
+	<software name="doramg2" cloneof="doram3">
+		<description>Nick Dora - Doras Reparatur-Abenteuer (Germany, rev. 2)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084024(GE)" />
@@ -501,7 +582,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="doramge" cloneof="doram">
+	<software name="doramge" cloneof="doram3">
 		<description>Nick Dora - Doras Reparatur-Abenteuer (Germany)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
@@ -516,7 +597,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="doramfr" cloneof="doram">
+	<software name="doramfr" cloneof="doram3">
 		<description>Nickelodeon Dora L'Exploratrice - Les adventures de Dora Apprentie Mécano (France)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -525,6 +606,19 @@ Language:
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="8388608">
 				<rom name="084025 - Dora (MOTION) (FR).bin" size="8388608" crc="f8b731f2" sha1="1deaff6b5b7c6bea2e627015f875ef60e3b09d38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doramsp" cloneof="doram3">
+		<description>Nickelodeon Dora La Exploradora - La Aventura Arregla-Todo de Dora (Spain)</description>
+		<year>2010</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084027(SP)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="80-084027 - Dora La Exploradora - La Aventura Arregla-Todo De Dora (Spain).bin" size="8388608" crc="6394e5c0" sha1="a1df78187d167cf4bf15322cc4fa6b5a669217c2" />
 			</dataarea>
 		</part>
 	</software>
@@ -543,7 +637,7 @@ Language:
 	</software>
 
 	<software name="hmannym">
-		<description>Disney Handy Manny (USA, Rev. 2?)</description>
+		<description>Disney Handy Manny (USA, rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084360(US)" />
@@ -582,7 +676,20 @@ Language:
 		</part>
 	</software>
 
-	<software name="kfpandamge">
+	<software name="kfpandam">
+		<description>DreamWorks Kung Fu Panda - Path of the Panda (USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084120(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Kung Fu Panda - Path of the Panda 80-084120(US) (Motion).bin" size="8388608" crc="bcfdfdf6" sha1="759645680e63624b773c569f15b360c0079db839" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kfpandamge" cloneof="kfpandam">
 		<description>DreamWorks Kung Fu Panda - Der Weg des Panda (Germany)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -597,7 +704,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="kfpandamfr" cloneof="kfpandamge">
+	<software name="kfpandamfr" cloneof="kfpandam">
 		<description>DreamWorks Kung Fu Panda - La mission de Po (France)</description>
 		<year>2008?</year>
 		<publisher>VTech</publisher>
@@ -611,7 +718,7 @@ Language:
 	</software>
 
 	<software name="ltleinstnm5">
-		<description>Disney's Little Einsteins (USA, Rev. 5?)</description>
+		<description>Disney's Little Einsteins (USA, rev. 5?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084160(US)" />
@@ -623,7 +730,7 @@ Language:
 	</software>
 
 	<software name="ltleinstnm2" cloneof="ltleinstnm5">
-		<description>Disney's Little Einsteins (USA, Rev. 2?)</description>
+		<description>Disney's Little Einsteins (USA, rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084160(US)" />
@@ -635,7 +742,7 @@ Language:
 	</software>
 
 	<software name="ltleinstnmg2" cloneof="ltleinstnm5">
-		<description>Disney's Kleine Einsteins (Germany, Rev. 2?)</description>
+		<description>Disney's Kleine Einsteins (Germany, rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084164(GE)" />
@@ -671,6 +778,19 @@ Language:
 		</part>
 	</software>
 
+	<software name="mickeychma" cloneof="mickeychm">
+		<description>Disney Mickey Mouse Clubhouse (alt, USA)</description>
+		<year>2008</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084180(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Mickey Mouse Clubhouse 80-084180(US) (Motion) [ALT].bin" size="8388608" crc="2ac1da77" sha1="6f6cc0a67e0a0392658c5062bffa581ffe715c1c" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mickeychmge" cloneof="mickeychm">
 		<description>Disney Micky Maus Wunderhaus (Germany)</description>
 		<year>2009</year>
@@ -687,7 +807,7 @@ Language:
 	</software>
 
 	<software name="mickeychmf005" cloneof="mickeychm">
-		<description>Disney La Maison de Mickey (France, Rev. 005)</description>
+		<description>Disney La Maison de Mickey (France, rev. 005)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="084185-005(FR)" />
@@ -715,7 +835,7 @@ Language:
 	</software>
 
 	<software name="monvsalienm">
-		<description>DreamWorks Monsters vs. Aliens (USA, Rev. 3?)</description>
+		<description>DreamWorks Monsters vs. Aliens (USA, rev. 3?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084440(US)" />
@@ -822,6 +942,19 @@ Language:
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile84200.bin" size="8388608" crc="55db5a32" sha1="8345985019ceaeb26bad1d0fa1236807ba054fac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nascarma" cloneof="nascarm">
+		<description>NASCAR Academy - Race Car Superstar (alt, USA)</description>
+		<year>2009?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084200(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="NASCAR Academy - Race Car Superstar 80-084200(US) (Motion).bin" size="8388608" crc="030e3f19" sha1="77ddb6463ade16975dd7780593677ca4b01cc93c" />
 			</dataarea>
 		</part>
 	</software>
@@ -947,7 +1080,33 @@ Language:
 		</part>
 	</software>
 
-	<software name="scoobyffmfr">
+	<software name="scoobyffm">
+		<description>Scooby-Doo! - Funland Frenzy (USA)</description>
+		<year>2008</year> <!-- (s08) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084040(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo - Funland Frenzy 80-084040(US) (Motion).bin" size="8388608" crc="aaa1293d" sha1="bef9409a1045c1a4367006b75c0dfc80da052372" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobyffma" cloneof="scoobyffm">
+		<description>Scooby-Doo! - Funland Frenzy (alt, USA)</description>
+		<year>2008</year> <!-- (s08 on screen, s09 on cart label) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-084040(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo - Funland Frenzy 80-084040(US) (Motion) [ALT].bin" size="8388608" crc="d7471a76" sha1="3621dcee24dc0ec3771e8e312673f192bbe3762b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobyffmfr" cloneof="scoobyffm">
 		<description>Scooby-Doo! - Panique à Funland (France)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
@@ -960,7 +1119,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="scoobyffmsp" cloneof="scoobyffmfr">
+	<software name="scoobyffmsp" cloneof="scoobyffm">
 		<description>¡¡Scooby-Doo!! - Misterio en el parque (Spain)</description>
 		<year>2009</year> <!-- (s09) -->
 		<publisher>VTech</publisher>
@@ -1128,7 +1287,7 @@ Language:
 	</software>
 
 	<software name="tinkerm">
-		<description>TinkerBell (USA, Rev. 2?)</description>
+		<description>TinkerBell (USA, rev. 2?)</description>
 		<year>2009</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084320(GE)" />
@@ -1256,7 +1415,7 @@ Language:
 	</software>
 
 	<software name="wallem">
-		<description>Disney/Pixar Wall-E (USA, Rev. 2?)</description>
+		<description>Disney/Pixar Wall-E (USA, rev. 2?)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-084080(US)" />
