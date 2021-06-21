@@ -1,6 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+/*
+
+	Alien Storm 'System 18' bootlegs
+
+	Noteworthy features
+	 - no VDP (so no backgrounds in gallary stages, some enemies removed from first stage)
+	 - reworked background tilemaps (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
+	 - less capable sound system (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
+
+*/
 
 #include "emu.h"
 
@@ -22,6 +32,7 @@ public:
 		, m_textram(*this, "textram")
 		, m_tileram(*this, "tileram")
 		, m_tilestripconfig(*this, "tilestripconfig")
+		, m_tileenable(*this, "tileenable")
 	{ }
 
 	void astormbl(machine_config &config);
@@ -36,6 +47,8 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
 
+	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -44,6 +57,7 @@ private:
 	required_shared_ptr<uint16_t> m_textram;
 	required_shared_ptr<uint16_t> m_tileram;
 	required_shared_ptr<uint16_t> m_tilestripconfig;
+	required_shared_ptr<uint16_t> m_tileenable;
 
 	void astormbl_map(address_map &map);
 
@@ -150,12 +164,13 @@ INPUT_PORTS_END
 TILE_GET_INFO_MEMBER(segas18_astormbl_state::get_text_tile_info)
 {
 	int tile_number = m_textram[tile_index];
-//	int pri = tile_number >> 8;
 
 	tileinfo.set(0,
 			(tile_number & 0x1ff),
 			(tile_number >> 9) % 8,
 			0);
+
+	tileinfo.category = (tile_number >> 15) & 1;
 }
 
 void segas18_astormbl_state::sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -182,26 +197,12 @@ void segas18_astormbl_state::video_start()
 	m_text_layer->set_transparent_pen(0);
 }
 
-
-uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1)
 {
-	// if no drawing is happening, fill with black and get out
-	//if (!m_segaic16vid->m_display_enable)
-	//{
-		bitmap.fill(m_palette->black_pen(), cliprect);
-	//	return 0;
-	//}
-
-	// start the sprites drawing
-	m_sprites->draw_async(cliprect);
-
-	// reset priorities
-	screen.priority().fill(0, cliprect);
-
 	for (int quadrant = 0; quadrant < 4; quadrant++)
 	{
 
-		int xbase = 0, ybase = 256;
+		int xbase = 0, ybase = 0;
 
 		if (quadrant & 2)
 			xbase = 0;
@@ -211,9 +212,7 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 		xbase += 0x140;
 
 		if (quadrant & 1)
-			ybase = 0;
-
-	//	int quadrant = 2;
+			ybase = 256;
 
 		int y = 0;
 		gfx_element* gfx = m_gfxdecode->gfx(0);
@@ -221,14 +220,11 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 
 		for (int i = 0; i < 0x20; i++)
 		{
-			const uint16_t rowconf = m_tilestripconfig[quadrant * 0x20 + i];
+			const uint16_t rowconf = m_tilestripconfig[(layer * 0x80) + (quadrant * 0x20) + i];
 
 			uint8_t pagesource = (rowconf & 0xf000) >> 12;
 			uint8_t rowtilebank = (rowconf & 0x0e00) >> 9;
 			uint16_t rowscroll = (rowconf & 0x01ff);
-			//rowscroll = 0;
-			//rowtilebank = 0;
-			//pagesource = 0;
 
 			for (int x = 0; x < 0x40; x++)
 			{
@@ -237,10 +233,26 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 				int tilenum = tiledat & 0x0fff;
 				if (tiledat & 0x1000) tilenum |= (rowtilebank * 0x1000);
 
-				int xposn = ((x * 8) - rowscroll) + xbase;
+				int xposn = ((x * 8) - rowscroll) + xbase + 8;
 				xposn &= 0x3ff;
+				if (xposn & 0x200) xposn -= 0x400;
 
-				gfx->transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, 0);
+				//int pri;
+				//if (tiledat & 0x8000)
+				//	pri = pri0;
+				//else
+				//	pri = pri1;
+
+	//			if (opaque)
+	//				gfx->prio_opaque(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, screen.priority(), pri);
+	//			else
+	//				gfx->prio_transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, screen.priority(), pri, 0);
+
+
+				if (opaque)
+					gfx->opaque(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase);
+				else
+					gfx->transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, 0);
 
 			}
 
@@ -248,8 +260,29 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 		}
 
 	}
+}
 
-	m_text_layer->draw(screen, bitmap, cliprect, 0, 0);
+uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_tileenable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	draw_layer(screen, bitmap, cliprect, 1, true, 0x0,0x0);
+	draw_layer(screen, bitmap, cliprect, 1, false, 0x01,0x02);
+	draw_layer(screen, bitmap, cliprect, 0, false, 0x02, 0x04);
+
+	m_text_layer->draw(screen, bitmap, cliprect, 0, 0x04);
+	m_text_layer->draw(screen, bitmap, cliprect, 1, 0x08);
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
@@ -323,7 +356,7 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 	map(0xc46000, 0xc46001).ram(); // y scroll?
 	map(0xc46200, 0xc46201).ram();
 	map(0xc46400, 0xc465ff).ram().share("tilestripconfig"); // per row page select, xscroll, tilebank
-	map(0xc46600, 0xc46601).ram();
+	map(0xc46600, 0xc46601).ram().share("tileenable");
 
 	map(0xfe0020, 0xfe003f).nopw(); // leftover writes from memory mapped config registers - bootlegs don't have this
 
