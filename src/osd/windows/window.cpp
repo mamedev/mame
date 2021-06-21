@@ -1236,7 +1236,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 	case WM_SIZING:
 		{
 			RECT *rect = (RECT *)lparam;
-			if (window->keepaspect() && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
+			if (window->keepaspect() && (window->target()->scale_mode() == SCALE_FRACTIONAL) && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
 			{
 				osd_rect r = window->constrain_to_aspect_ratio(RECT_to_osd_rect(*rect), wparam);
 				rect->top = r.top();
@@ -1420,10 +1420,6 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 	// Sometimes this gets called when monitors have already been torn down
 	// In that the case, just return the unmodified rect
 	if (monitor == nullptr)
-		return rect;
-
-	// do not constrain aspect ratio for integer scaled views
-	if (target()->scale_mode() != SCALE_FRACTIONAL)
 		return rect;
 
 	// get the pixel aspect ratio for the target monitor
