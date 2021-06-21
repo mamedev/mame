@@ -1337,7 +1337,7 @@ public:
 	tmu_shared_state    tmushare;               // TMU shared state
 	banshee_info        banshee;                // Banshee state
 
-	legacy_poly_manager * poly;                 // polygon manager
+	legacy_poly_manager_owner poly;              // polygon manager
 	std::unique_ptr<stats_block[]> thread_stats; // per-thread statistics
 
 	voodoo_stats        stats;                  // internal statistics

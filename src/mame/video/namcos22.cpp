@@ -530,7 +530,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 	}
 	else
 	{
-		node = auto_alloc(machine, struct namcos22_scenenode);
+		node = &m_scenenode_alloc.emplace_back();
 	}
 	memset(node, 0, sizeof(*node));
 	return node;
@@ -2580,5 +2580,5 @@ void namcos22_state::video_start()
 
 	m_gfxdecode->gfx(0)->set_source((u8 *)m_cgram.target());
 
-	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
+	m_poly = std::make_unique<namcos22_renderer>(*this);
 }

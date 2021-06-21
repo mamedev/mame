@@ -21,7 +21,6 @@
 
 
 /* internal caching */
-#define MAX_CACHE_ENTRIES       1024                /* maximum separate samples we expect to ever see */
 #define SAMPLE_BUFFER_LENGTH    1024                /* size of temporary decode buffer on the stack */
 
 /* FIR digital filter parameters */
@@ -74,9 +73,6 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		m_samples(*this, "samples"),
 		m_sound_command(0),
 		m_sound_command_ack(0),
-		m_sound_cache(nullptr),
-		m_sound_cache_end(nullptr),
-		m_sound_cache_max(nullptr),
 		m_m6844_priority(0x00),
 		m_m6844_interrupt(0x00),
 		m_m6844_chain(0x00),
@@ -116,7 +112,7 @@ void exidy440_sound_device::device_add_mconfig(machine_config &config)
 
 void exidy440_sound_device::device_start()
 {
-	int i, length;
+	int i;
 
 	/* reset the system */
 	m_sound_command = 0;
@@ -145,14 +141,6 @@ void exidy440_sound_device::device_start()
 
 	/* get stream channels */
 	m_stream = stream_alloc(0, 2, clock());
-
-	/* allocate the sample cache */
-	length = m_samples.bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
-	m_sound_cache = (sound_cache_entry *)auto_alloc_array_clear(machine(), uint8_t, length);
-
-	/* determine the hard end of the cache and reset */
-	m_sound_cache_max = (sound_cache_entry *)((uint8_t *)m_sound_cache + length);
-	reset_sound_cache();
 
 	/* allocate the mixer buffer */
 	m_mixer_buffer_left.resize(clock()/50);
@@ -545,46 +533,26 @@ void exidy440_sound_device::m6844_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void exidy440_sound_device::reset_sound_cache()
-{
-	m_sound_cache_end = m_sound_cache;
-}
-
-
 int16_t *exidy440_sound_device::add_to_sound_cache(uint8_t *input, int address, int length, int bits, int frequency)
 {
-	sound_cache_entry *current = m_sound_cache_end;
-
-	/* compute where the end will be once we add this entry */
-	m_sound_cache_end = (sound_cache_entry *)((uint8_t *)current + sizeof(sound_cache_entry) + length * 16);
-
-	/* if this will overflow the cache, reset and re-add */
-	if (m_sound_cache_end > m_sound_cache_max)
-	{
-		reset_sound_cache();
-		return add_to_sound_cache(input, address, length, bits, frequency);
-	}
-
 	/* fill in this entry */
-	current->next = m_sound_cache_end;
-	current->address = address;
-	current->length = length;
-	current->bits = bits;
-	current->frequency = frequency;
+	auto &current = m_sound_cache.emplace_back();
+	current.address = address;
+	current.length = length;
+	current.bits = bits;
+	current.frequency = frequency;
 
 	/* decode the data into the cache */
-	decode_and_filter_cvsd(input, length, bits, frequency, current->data);
-	return current->data;
+	decode_and_filter_cvsd(input, length, bits, frequency, current.data);
+	return &current.data[0];
 }
 
 
 int16_t *exidy440_sound_device::find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
 {
-	sound_cache_entry *current;
-
-	for (current = m_sound_cache; current < m_sound_cache_end; current = current->next)
-		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
-			return current->data;
+	for (auto &current : m_sound_cache)
+		if (current.address == address && current.length == length && current.bits == bits && current.frequency == frequency)
+			return &current.data[0];
 
 	return add_to_sound_cache(&m_samples[address], address, length, bits, frequency);
 }
@@ -698,7 +666,7 @@ void exidy440_sound_device::fir_filter(int32_t *input, int16_t *output, int coun
  *
  *************************************/
 
-void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, int maskbits, int frequency, int16_t *output)
+void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, int maskbits, int frequency, std::vector<int16_t> &output)
 {
 	int32_t buffer[SAMPLE_BUFFER_LENGTH + FIR_HISTORY_LENGTH];
 	int total_samples = bytes * 8;
@@ -725,6 +693,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 	integrator = 0.0;
 
 	/* loop over chunks */
+	output.resize(total_samples);
 	for (chunk_start = 0; chunk_start < total_samples; chunk_start += SAMPLE_BUFFER_LENGTH)
 	{
 		int32_t *bufptr = &buffer[FIR_HISTORY_LENGTH];
@@ -809,7 +778,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 		int16_t *data;
 
 		chunk_start = (total_samples > 512) ? total_samples - 512 : 0;
-		data = output + chunk_start;
+		data = &output[chunk_start];
 		for ( ; chunk_start < total_samples; chunk_start++)
 		{
 			*data = (*data * ((total_samples - chunk_start) >> 9));

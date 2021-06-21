@@ -186,7 +186,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_ram =  &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
+	m_video_base =  &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
 
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -622,7 +622,7 @@ void pc6001mk2_state::mk2_vram_bank_w(uint8_t data)
 
 //  popmessage("%02x",data);
 
-//  m_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
+//  m_video_base = work_ram + startaddr[(data >> 1) & 0x03];
 }
 
 void pc6001mk2_state::mk2_col_bank_w(uint8_t data)
@@ -1341,7 +1341,7 @@ void pc6001_state::machine_start()
 
 inline void pc6001_state::set_videoram_bank(uint32_t offs)
 {
-	m_video_ram = m_region_maincpu->base() + offs;
+	m_video_base = m_region_maincpu->base() + offs;
 }
 
 void pc6001_state::machine_reset()

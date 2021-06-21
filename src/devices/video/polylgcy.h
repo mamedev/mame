@@ -58,6 +58,16 @@ static constexpr uint8_t POLYLGCY_FLAG_ALLOW_QUADS         = 0x08;
 
 /* opaque reference to the poly manager */
 struct legacy_poly_manager;
+class legacy_poly_manager_owner
+{
+public:
+    legacy_poly_manager_owner();
+    ~legacy_poly_manager_owner();
+
+    operator legacy_poly_manager *() { return m_poly; }
+
+    legacy_poly_manager *m_poly;
+};
 
 
 /* input vertex data */
@@ -99,7 +109,7 @@ typedef void (*poly_draw_scanline_func)(void *dest, int32_t scanline, const poly
 /* ----- initialization/teardown ----- */
 
 /* allocate a new poly manager that can render triangles */
-legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, uint8_t flags);
+void poly_alloc(legacy_poly_manager_owner &owner, running_machine &machine, int max_polys, size_t extra_data_size, uint8_t flags);
 
 /* free a poly manager */
 void poly_free(legacy_poly_manager *poly);

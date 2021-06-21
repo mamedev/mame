@@ -3,7 +3,6 @@
 #ifndef _VIDEO_N64_H_
 #define _VIDEO_N64_H_
 
-#include "includes/n64.h"
 #include "video/poly.h"
 #include "pin64.h"
 
@@ -129,6 +128,8 @@ class n64_rdp;
 #include "video/rdptpipe.h"
 
 typedef void (*rdp_command_t)(uint64_t w1);
+
+class n64_state;
 
 class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8, 32000>
 {

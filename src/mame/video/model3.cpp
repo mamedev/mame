@@ -28,45 +28,6 @@
 #define TRI_BUFFER_SIZE                 50000
 #define TRI_ALPHA_BUFFER_SIZE           15000
 
-struct model3_polydata
-{
-	cached_texture *texture;
-	uint32_t color;
-	uint32_t texture_param;
-	int transparency;
-	int intensity;
-};
-
-class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
-{
-public:
-	model3_renderer(model3_state &state, int width, int height)
-		: poly_manager<float, model3_polydata, 6, 50000>(state.machine())
-	{
-		m_fb = std::make_unique<bitmap_rgb32>(width, height);
-		m_zb = std::make_unique<bitmap_ind32>(width, height);
-	}
-
-	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_opaque_triangles(const m3_triangle* tris, int num_tris);
-	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
-	void clear_fb();
-	void clear_zb();
-	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
-	void wait_for_polys();
-
-private:
-	std::unique_ptr<bitmap_rgb32> m_fb;
-	std::unique_ptr<bitmap_ind32> m_zb;
-};
-
-
 
 /*****************************************************************************/
 
@@ -141,8 +102,8 @@ void model3_state::model3_exit()
 	fclose(file);
 #endif
 
-//  invalidate_texture(0, 0, 0, 6, 5);
-//  invalidate_texture(1, 0, 0, 6, 5);
+	invalidate_texture(0, 0, 0, 6, 5);
+	invalidate_texture(1, 0, 0, 6, 5);
 }
 
 void model3_state::video_start()
@@ -172,10 +133,10 @@ void model3_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_renderer = auto_alloc(machine(), model3_renderer(*this, width, height));
+	m_renderer = std::make_unique<model3_renderer>(machine(), width, height);
 
-	m_tri_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_BUFFER_SIZE);
-	m_tri_alpha_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_ALPHA_BUFFER_SIZE);
+	m_tri_buffer = std::make_unique<m3_triangle[]>(TRI_BUFFER_SIZE);
+	m_tri_alpha_buffer = std::make_unique<m3_triangle[]>(TRI_ALPHA_BUFFER_SIZE);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&model3_state::model3_exit, this));
 
@@ -553,7 +514,7 @@ void model3_state::invalidate_texture(int page, int texx, int texy, int texwidth
 			{
 				cached_texture *freeme = m_texcache[page][texy + y][texx + x];
 				m_texcache[page][texy + y][texx + x] = freeme->next;
-				auto_free(machine(), freeme);
+				delete freeme;
 			}
 }
 
@@ -571,10 +532,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 			return tex;
 
 	/* create a new texture */
-	tex = (cached_texture *)auto_alloc_array(machine(), uint8_t, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
-	tex->width = texwidth;
-	tex->height = texheight;
-	tex->format = format;
+	tex = new cached_texture(texwidth, texheight, format);
 
 	/* set the new texture */
 	tex->next = m_texcache[page][texy][texx];
@@ -584,7 +542,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 	for (y = 0; y < pixheight; y++)
 	{
 		const uint16_t *texsrc = &m_texture_ram[page][(texy * 32 + y) * 2048 + texx * 32];
-		rgb_t *dest = tex->data + 2 * pixwidth * y;
+		rgb_t *dest = &tex->data[2 * pixwidth * y];
 
 		switch (format)
 		{
@@ -663,7 +621,7 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 
 	/* create the vertical mirror of the texture */
 	for (y = 0; y < pixheight; y++)
-		memcpy(tex->data + 2 * pixwidth * (pixheight * 2 - 1 - y), tex->data + 2 * pixwidth * y, sizeof(rgb_t) * pixwidth * 2);
+		memcpy(&tex->data[2 * pixwidth * (pixheight * 2 - 1 - y)], &tex->data[2 * pixwidth * y], sizeof(rgb_t) * pixwidth * 2);
 
 	/* remember the overall alpha */
 	tex->alpha = alpha >> 24;
@@ -1398,8 +1356,8 @@ static void matrix_multiply(MATRIX a, MATRIX b, MATRIX *out)
 
 void model3_state::init_matrix_stack()
 {
-	MATRIX *matrix_stack;
-	matrix_stack = m_matrix_stack = auto_alloc_array_clear(machine(), MATRIX, MATRIX_STACK_SIZE);
+	m_matrix_stack = std::make_unique<MATRIX[]>(MATRIX_STACK_SIZE);
+	MATRIX *matrix_stack = &m_matrix_stack[0];
 
 	/* initialize the first matrix as identity */
 	matrix_stack[0][0][0] = 1.0f;

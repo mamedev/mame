@@ -28,12 +28,19 @@ typedef float VECTOR3[3];
 
 struct cached_texture
 {
+	cached_texture(int texwidth, int texheight, int texformat) :
+		next(nullptr),
+		width(texwidth),
+		height(texheight),
+		format(texformat),
+		alpha(~0),
+		data(new rgb_t[(32 << texwidth) * (32 << texheight) * 4]) { }
 	cached_texture *next;
 	uint8_t       width;
 	uint8_t       height;
 	uint8_t       format;
 	uint8_t       alpha;
-	rgb_t       data[1];
+	std::unique_ptr<rgb_t[]> data;
 };
 
 struct m3_vertex
@@ -60,7 +67,45 @@ struct m3_triangle
 	int color;
 };
 
-class model3_renderer;
+struct model3_polydata
+{
+	cached_texture *texture;
+	uint32_t color;
+	uint32_t texture_param;
+	int transparency;
+	int intensity;
+};
+
+class model3_state;
+
+class model3_renderer : public poly_manager<float, model3_polydata, 6, 50000>
+{
+public:
+	model3_renderer(running_machine &machine, int width, int height)
+		: poly_manager<float, model3_polydata, 6, 50000>(machine)
+	{
+		m_fb = std::make_unique<bitmap_rgb32>(width, height);
+		m_zb = std::make_unique<bitmap_ind32>(width, height);
+	}
+
+	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_opaque_triangles(const m3_triangle* tris, int num_tris);
+	void draw_alpha_triangles(const m3_triangle* tris, int num_tris);
+	void clear_fb();
+	void clear_zb();
+	void draw_scanline_solid(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_solid_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_colormod(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_contour(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_trans(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void draw_scanline_tex_alpha(int32_t scanline, const extent_t &extent, const model3_polydata &extradata, int threadid);
+	void wait_for_polys();
+
+private:
+	std::unique_ptr<bitmap_rgb32> m_fb;
+	std::unique_ptr<bitmap_ind32> m_zb;
+};
 
 class model3_state : public driver_device
 {
@@ -241,7 +286,7 @@ private:
 	uint64_t m_vid_reg0;
 	int m_matrix_stack_ptr;
 	int m_list_depth;
-	MATRIX *m_matrix_stack;
+	std::unique_ptr<MATRIX[]> m_matrix_stack;
 	MATRIX m_coordinate_system;
 	MATRIX m_projection_matrix;
 	float m_viewport_x;
@@ -253,9 +298,9 @@ private:
 	uint32_t m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
-	model3_renderer *m_renderer;
-	m3_triangle* m_tri_buffer;
-	m3_triangle* m_tri_alpha_buffer;
+	std::unique_ptr<model3_renderer> m_renderer;
+	std::unique_ptr<m3_triangle[]> m_tri_buffer;
+	std::unique_ptr<m3_triangle[]> m_tri_alpha_buffer;
 	int m_tri_buffer_ptr;
 	int m_tri_alpha_buffer_ptr;
 	int m_viewport_tri_index[4];
