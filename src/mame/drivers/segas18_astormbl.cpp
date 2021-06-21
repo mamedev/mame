@@ -200,10 +200,30 @@ void segas18_astormbl_state::video_start()
 void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque)
 {
 	gfx_element* gfx = m_gfxdecode->gfx(0);
-	if (opaque)
-		gfx->opaque(bitmap, cliprect, tilenum, colour, 0, 0, xpos, ypos);
-	else
-		gfx->transpen(bitmap, cliprect, tilenum, colour, 0, 0, xpos, ypos,  0);
+
+	const uint8_t* gfxdat = gfx->get_data(tilenum);
+	int offs = 0;
+
+	for (int y = 0; y < 8; y++)
+	{
+		int realypos = ypos + y;
+
+		for (int x = 0; x < 8; x++)
+		{
+			int realxpos = xpos + x;
+
+			if ((realypos >= cliprect.min_y) && (realypos <= cliprect.max_y) && (realxpos >= cliprect.min_x) && (realxpos <= cliprect.max_x))
+			{
+				uint16* dst = &bitmap.pix(realypos);
+				uint8_t pix = gfxdat[offs];
+
+				if (pix || opaque)
+					dst[realxpos] = pix | (colour * 8);
+			}
+
+			offs++;
+		}
+	}
 }
 
 void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1)
