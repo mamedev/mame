@@ -483,8 +483,8 @@ void hd61830_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 			md1 = readbyte(rac2);
 			md2 = readbyte(rac2+1);
 
-			draw_char(bitmap, cliprect, ma, x, y + rows, md1);
-			draw_char(bitmap, cliprect, ma+1, x+1, y + rows, md2);
+			draw_char(bitmap, cliprect, ma + (rows * m_hn), x, y + rows, md1);
+			draw_char(bitmap, cliprect, ma+1 + (rows * m_hn), x+1, y + rows, md2);
 
 			ma+=2;
 			rac1+=2;
