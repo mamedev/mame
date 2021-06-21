@@ -198,17 +198,22 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 	// reset priorities
 	screen.priority().fill(0, cliprect);
 
-	//for (int quadrant = 0; quadrant < 2; quadrant++)
+	for (int quadrant = 0; quadrant < 4; quadrant++)
 	{
-		int quadrant = 0;
 
-		int xbase = 0, ybase = 0;
+		int xbase = 0, ybase = 256;
 
-	//	if (quadrant & 1)
-	//		xbase += 512;
+		if (quadrant & 2)
+			xbase = 0;
+		else
+			xbase = 512;
 
-	//	if (quadrant & 2)
-	//		ybase += 256;
+		xbase += 0x140;
+
+		if (quadrant & 1)
+			ybase = 0;
+
+	//	int quadrant = 2;
 
 		int y = 0;
 		gfx_element* gfx = m_gfxdecode->gfx(0);
@@ -221,15 +226,21 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 			uint8_t pagesource = (rowconf & 0xf000) >> 12;
 			uint8_t rowtilebank = (rowconf & 0x0e00) >> 9;
 			uint16_t rowscroll = (rowconf & 0x01ff);
-			rowscroll = 0;
+			//rowscroll = 0;
 			//rowtilebank = 0;
-			pagesource = 0;
+			//pagesource = 0;
 
 			for (int x = 0; x < 0x40; x++)
 			{
 				uint16_t tiledat = m_tileram[(pagesource * 0x800) + x + (y * 0x40)];
 
-				gfx->transpen(bitmap, cliprect, (tiledat & 0xfff) | (rowtilebank * 0x1000), (tiledat & 0x1fc0) >> 6, 0, 0, ((x * 8) - rowscroll) + xbase, (y * 8) + ybase, 0);
+				int tilenum = tiledat & 0x0fff;
+				if (tiledat & 0x1000) tilenum |= (rowtilebank * 0x1000);
+
+				int xposn = ((x * 8) - rowscroll) + xbase;
+				xposn &= 0x3ff;
+
+				gfx->transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, 0);
 
 			}
 
