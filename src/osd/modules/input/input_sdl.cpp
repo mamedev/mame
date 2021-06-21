@@ -845,7 +845,7 @@ public:
 	}
 
 private:
-	static keyboard_trans_table* sdlinput_read_keymap(running_machine &machine)
+	keyboard_trans_table* sdlinput_read_keymap(running_machine &machine)
 	{
 		char *keymap_filename;
 		FILE *keymap_file;
