@@ -856,7 +856,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="icepalac">
 		<description>Beyond the Ice Palace</description>
 		<year>1988</year>
-		<publisher>Elite</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="721721">
@@ -5112,7 +5112,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="opthunder">
 		<description>Operation Thunderbolt</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -7161,7 +7161,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="spoker">
 		<description>Strip Poker</description>
 		<year>1984</year>
-		<publisher>Artworx/U.S. Gold</publisher>
+		<publisher>U.S. Gold</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Suzi"/>
