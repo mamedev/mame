@@ -186,7 +186,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="ace2088">
 		<description>Ace 2088</description>
 		<year>1991</year>
-		<publisher>Cascade (Summit Re-release)</publisher>
+		<publisher>Summit</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="598999">
@@ -261,7 +261,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="airborne">
 		<description>Airborne Ranger</description>
 		<year>1992</year>
-		<publisher>Microprose (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -299,7 +299,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="airwolf2">
 		<description>Airwolf 2</description>
 		<year>1989</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="738734">
@@ -684,7 +684,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="batman">
 		<description>Batman</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -736,7 +736,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="bships">
 		<description>Battle Ships</description>
 		<year>1988</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="622665">
@@ -766,7 +766,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="bazbill">
 		<description>Bazooka Bill</description>
 		<year>1988</year>
-		<publisher>Melbourne House (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="493122">
@@ -1060,7 +1060,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="bombjack">
 		<description>Bomb Jack</description>
 		<year>1988</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="565967">
@@ -1078,7 +1078,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="bombjack2">
 		<description>Bomb Jack II</description>
 		<year>1989</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="719393">
@@ -1216,7 +1216,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1991</year>
-		<publisher>Firebird (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="763836">
@@ -1356,7 +1356,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="cauldrn12">
 		<description>Cauldron I &amp; II</description>
 		<year>1987</year>
-		<publisher>Palace Software (HiTEC Software Re-release)</publisher>
+		<publisher>HiTEC Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Cauldron I"/>
@@ -1376,7 +1376,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="cauldrn2">
 		<description>Cauldron II: The Pumpkin Strikes Back</description>
 		<year>1988</year>
-		<publisher>Palace Software (Silverbird Re-release)</publisher>
+		<publisher>Silverbird</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="471222">
@@ -1496,7 +1496,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="chainreac">
 		<description>Chain Reaction</description>
 		<year>1989</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="579388">
@@ -1662,7 +1662,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="comblynx">
 		<description>Combat Lynx</description>
 		<year>1988</year>
-		<publisher>Durell (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="470687">
@@ -1692,7 +1692,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="commandoe" cloneof="commando">
 		<description>Commando (Encore)</description>
 		<year>1988</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="606572">
@@ -1743,7 +1743,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="corp">
 		<description>Corporation</description>
 		<year>1990</year>
-		<publisher>Activision (Summit Re-release)</publisher>
+		<publisher>Summit</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1083208">
@@ -1797,7 +1797,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="crazycar">
 		<description>Crazy Cars</description>
 		<year>1989</year>
-		<publisher>Titus (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="813145">
@@ -1833,7 +1833,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="critmass">
 		<description>Critical Mass</description>
 		<year>1990</year>
-		<publisher>Durell (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="623198">
@@ -1869,7 +1869,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="cybernoid">
 		<description>Cybernoid: The Fighting Machine</description>
 		<year>1989</year>
-		<publisher>Hewson Consultants (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="517183">
@@ -1953,7 +1953,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="daleydech" cloneof="daleydec">
 		<description>Daley Thompson's Decathlon (Hit Squad)</description>
 		<year>1989</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="582574">
@@ -1965,7 +1965,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="dandare">
 		<description>Dan Dare - Pilot of the Future</description>
 		<year>1988</year>
-		<publisher>Virgin (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="510098">
 				<rom name="dan dare pilot of the future.tap" size="510098" crc="3b41a86e" sha1="9684ce0c9c5d45ef4425364527382adf5a80bd41"/>
@@ -1976,7 +1976,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="dandare2">
 		<description>Dan Dare II - Mekon's Revenge</description>
 		<year>1989</year>
-		<publisher>Virgin (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="473770">
@@ -2174,7 +2174,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="enduro">
 		<description>Enduro Racer</description>
 		<year>1989</year>
-		<publisher>Activision (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="495807">
@@ -2204,7 +2204,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="erebus">
 		<description>Erebus</description>
 		<year>1988</year>
-		<publisher>Virgin (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="455594">
@@ -2386,7 +2386,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="fstrike">
 		<description>First Strike</description>
 		<year>1990</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="675937">
@@ -2448,7 +2448,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="foty">
 		<description>Footballer of the Year</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="608039">
@@ -2516,7 +2516,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="fbrunoe" cloneof="fbruno">
 		<description>Frank Bruno's Boxing (Encore)</description>
 		<year>1988</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -2536,7 +2536,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="fbrunow">
 		<description>Frank Bruno's World Championship Boxing</description>
 		<year>1988</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -2568,7 +2568,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="frightmare">
 		<description>Frightmare</description>
 		<year>1989</year>
-		<publisher>Cascade (Summit Re-release)</publisher>
+		<publisher>Summit</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="643137">
@@ -2610,7 +2610,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="fs2_6to8">
 		<description>Fun School 2 for 6-8 Year Olds</description>
 		<year>1992</year>
-		<publisher>Database Educational (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Train / Maze / Shopping / Treasure"/>
@@ -2686,7 +2686,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="glhotshot">
 		<description>Gary Lineker's Hot-Shot!</description>
 		<year>1991</year>
-		<publisher>Gremlin Graphics (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="569573">
@@ -2718,7 +2718,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="gauntletk" cloneof="gauntlet">
 		<description>Gauntlet (Kixx)</description>
 		<year>1988</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -2806,7 +2806,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="ghostbst">
 		<description>Ghostbusters</description>
 		<year>1988</year>
-		<publisher>Activision (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="491599">
@@ -3024,7 +3024,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="gpadrian">
 		<description>The Growing Pains of Adrian Mole</description>
 		<year>1989</year>
-		<publisher>Mosaic (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -3044,7 +3044,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="738562">
@@ -3155,7 +3155,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="hallthngs">
 		<description>The Halls of the Things</description>
 		<year>1988</year>
-		<publisher>Crystal Computing (Firebird Silver Re-release)</publisher>
+		<publisher>Firebird Silver</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="292247">
@@ -3191,7 +3191,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="headovrh">
 		<description>Head Over Heels</description>
 		<year>1990</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
@@ -3337,7 +3337,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="hoppinmad">
 		<description>Hoppingmad</description>
 		<year>1990</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="725833">
@@ -3499,7 +3499,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="ikari">
 		<description>Ikari Warriors</description>
 		<year>1990</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718171">
@@ -3899,7 +3899,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="jacknip2">
 		<description>Jack the Nipper II: In Coconut Capers</description>
 		<year>1990</year>
-		<publisher>Gremlin Graphics (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522098">
@@ -3911,7 +3911,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="liveldie">
 		<description>James Bond 007 in Live and Let Die - The Computer Game</description>
 		<year>1990</year>
-		<publisher>Domark (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="712270">
@@ -3929,7 +3929,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="lic2kill">
 		<description>James Bond 007: Licence To Kill</description>
 		<year>1991</year>
-		<publisher>Domark (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="514499">
@@ -4229,7 +4229,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="knightmr">
 		<description>Knightmare</description>
 		<year>1988</year>
-		<publisher>Activision (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="587259">
@@ -4349,7 +4349,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="lastninja">
 		<description>The Last Ninja</description>
 		<year>1991</year>
-		<publisher>System 3 (Summit Re-release)</publisher>
+		<publisher>Summit</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4465,7 +4465,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="lotus">
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>1992</year>
-		<publisher>Gremline Graphics (GBH Re-release)</publisher>
+		<publisher>GBH</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4566,7 +4566,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="matchpnt1" cloneof="matchpnt" >
 		<description>Match Point (set 2)</description>
 		<year>1986</year>
-		<publisher>Psion (The Hit Squad Re-release They Sold a Million II)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="412484">
 				<rom name="Match Point.tap" size="412484" crc="4fb72ed9" sha1="7bcc2d1c6dc9818b24236e1e8ef094e98111d623"/>
@@ -4588,7 +4588,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="metrox">
 		<description>Metro Cross</description>
 		<year>1988</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="462238">
@@ -4637,7 +4637,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="midnghth">
 		<description>Midnight Resistance</description>
 		<year>1992</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
@@ -4716,7 +4716,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="monkymagc">
 		<description>Monkey Magic</description>
 		<year>1985</year>
-		<publisher>Solar Software (Sparklers Re-release)</publisher>
+		<publisher>Sparklers</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="517489">
@@ -4939,7 +4939,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="tnzs">
 		<description>The Newzealand Story</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5175,7 +5175,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="outlaws">
 		<description>Outlaws</description>
 		<year>1987</year>
-		<publisher>Ultimate (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="663257">
 				<rom name="outlaws side a.tap" size="663257" crc="332f4483" sha1="f5752d3fad3971662c5b13f9570e5625821854a2"/>
@@ -5263,7 +5263,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="paperboy">
 		<description>Paperboy</description>
 		<year>1989</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718593">
@@ -5275,7 +5275,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="paperboya" cloneof="paperboy">
 		<description>Paperboy (alt)</description>
 		<year>1989</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718554">
@@ -5305,7 +5305,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="parallax">
 		<description>Parallax</description>
 		<year>1990</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="702891">
@@ -5317,7 +5317,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="parkptrl">
 		<description>Park Patrol</description>
 		<year>1986</year>
-		<publisher>Activision (Firebird Silver Re-release)</publisher>
+		<publisher>Firebird Silver</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="514430">
@@ -5419,7 +5419,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="platoon">
 		<description>Platoon</description>
 		<year>1990</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -5545,7 +5545,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="prodigy">
 		<description>Prodigy</description>
 		<year>1987</year>
-		<publisher>Electric Dreams (Firebird Silver Re-release)</publisher>
+		<publisher>Firebird Silver</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="690017">
@@ -5883,7 +5883,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rbisland">
 		<description>Rainbow Islands</description>
 		<year>1992</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5915,7 +5915,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rambo3">
 		<description>Rambo III</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -5935,7 +5935,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1989</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
@@ -5988,7 +5988,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="redheat">
 		<description>Red Heat</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="726358">
@@ -6012,7 +6012,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="renegade">
 		<description>Renegade</description>
 		<year>1989</year>
-		<publisher>Imagine (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="500294">
@@ -6066,7 +6066,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rivrresc">
 		<description>River Rescue</description>
 		<year>1986</year>
-		<publisher>Creative Sparks (Sparklers Re-release)</publisher>
+		<publisher>Sparklers</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="104924">
@@ -6078,7 +6078,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rivrresca" cloneof="rivrresc">
 		<description>River Rescue (Alternative)</description>
 		<year>1987</year>
-		<publisher>Creative Sparks (Alternative Software Re-release)</publisher>
+		<publisher>Alternative Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="113922">
@@ -6110,7 +6110,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="roadblstk" cloneof="roadblst">
 		<description>Road Blasters (Kixx)</description>
 		<year>1990</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -6130,7 +6130,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="roadrunn">
 		<description>Road Runner</description>
 		<year>1991</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -6186,7 +6186,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="robocodk">
 		<description>James Pond 2: RoboCod</description>
 		<year>1993</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass" interface="cbm_cass">
@@ -6200,7 +6200,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="robocoph">
 		<description>Robocop</description>
 		<year>1991</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
@@ -6322,7 +6322,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rthunder">
 		<description>Rolling Thunder</description>
 		<year>1988</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="569954">
@@ -6358,7 +6358,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="runtheg">
 		<description>Run the Gauntlet</description>
 		<year>1990</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2223542">
 				<rom name="run the gauntlet side a.tap" size="2223542" crc="d0e77cb1" sha1="8592b26a06bde96cdb6a0877ceda75e4ed8db256"/>
@@ -6374,7 +6374,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rygar">
 		<description>Rygar</description>
 		<year>1989</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="566034">
@@ -6481,7 +6481,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="shrtcirc">
 		<description>Short Circuit</description>
 		<year>1989</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522357">
 				<rom name="short circuit.tap" size="522357" crc="8f9cde33" sha1="534878fbe66ab1498f4393886de5bbec484179d0"/>
@@ -6504,7 +6504,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="skatrock">
 		<description>Skate Rock Simulator</description>
 		<year>1988</year>
-		<publisher>Bubble Bus (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="384129">
 				<rom name="skate rock simulator side a.tap" size="384129" crc="6206b92b" sha1="a41536410684885f1f3d32f0c0841cfc57503a36"/>
@@ -6688,7 +6688,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="sharrier">
 		<description>Space Harrier</description>
 		<year>1990</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="816560">
@@ -6805,7 +6805,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="spitfire">
 		<description>Spitfire</description>
 		<year>1989</year>
-		<publisher>Elite (Encore Release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="689246">
@@ -6919,7 +6919,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="cobra">
 		<description>Stallone: Cobra</description>
 		<year>1989</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="524590">
@@ -6931,7 +6931,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="rotj">
 		<description>Star Wars: Return of the Jedi</description>
 		<year>1991</year>
-		<publisher>Domark (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="622110">
@@ -7181,7 +7181,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="spokerc" cloneof="spoker">
 		<description>Strip Poker (CDS)</description>
 		<year>1985</year>
-		<publisher>Artworx (Blue Ribbon Re-release)</publisher>
+		<publisher>Blue Ribbon</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Suzi"/>
@@ -7281,7 +7281,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="summrck">
 		<description>Summer Camp</description>
 		<year>1992</year>
-		<publisher>Thalamus (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 		<!-- Dumped by @c64tapes -->
 
 		<part name="cass1" interface="cbm_cass">
@@ -7322,7 +7322,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="sumgamesk" cloneof="sumgames">
 		<description>Summer Games (Kixx)</description>
 		<year>1988</year>
-		<publisher>Epyx (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1463178">
@@ -7354,7 +7354,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="suprcycle">
 		<description>Super Cycle</description>
 		<year>1989</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -7386,7 +7386,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="shangon">
 		<description>Super Hang On</description>
 		<year>1990</year>
-		<publisher>Electric Dreams (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Africa and Asia"/>
@@ -7436,7 +7436,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="suprtrux">
 		<description>Super Trux</description>
 		<year>1990</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="688688">
@@ -7653,7 +7653,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="thndcats">
 		<description>Thundercats</description>
 		<year>1989</year>
-		<publisher>Elite Systems (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="674074">
@@ -7737,7 +7737,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="trailblz">
 		<description>Trailblazer</description>
 		<year>1988</year>
-		<publisher>Gremlin Graphics (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="264766">
@@ -7797,7 +7797,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="turboes">
 		<description>Turbo Esprit</description>
 		<year>1988</year>
-		<publisher>Durell (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="675956">
@@ -7943,7 +7943,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="thevindc">
 		<description>The Vindicator</description>
 		<year>1990</year>
-		<publisher>Imagine (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1508734">
@@ -7955,7 +7955,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="wander3d">
 		<description>Wanderer 3D</description>
 		<year>1990</year>
-		<publisher>Elite (Encore Re-release)</publisher>
+		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="732427">
@@ -8015,7 +8015,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="explfist">
 		<description>Way of the Exploding Fist</description>
 		<year>1988</year>
-		<publisher>Melbourne House (Ricochet Re-release)</publisher>
+		<publisher>Ricochet</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="479718">
@@ -8081,7 +8081,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="wingamesk" cloneof="wingames">
 		<description>Winter Games (Kixx)</description>
 		<year>1989</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2851760">
@@ -8105,7 +8105,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="wizball">
 		<description>Wizball</description>
 		<year>1989</year>
-		<publisher>Ocean (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="567846">
@@ -8129,7 +8129,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="wrldgames">
 		<description>World Games</description>
 		<year>1988</year>
-		<publisher>U.S. Gold (Kixx Re-release)</publisher>
+		<publisher>Kixx</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -8149,7 +8149,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="wsb">
 		<description>World Series Baseball</description>
 		<year>1989</year>
-		<publisher>Imagine (The Hit Squad Re-release)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="402702">
