@@ -46,7 +46,7 @@ public:
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
-
+	void draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque);
 	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
 
 private:
@@ -197,11 +197,19 @@ void segas18_astormbl_state::video_start()
 	m_text_layer->set_transparent_pen(0);
 }
 
+void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque)
+{
+	gfx_element* gfx = m_gfxdecode->gfx(0);
+	if (opaque)
+		gfx->opaque(bitmap, cliprect, tilenum, colour, 0, 0, xpos, ypos);
+	else
+		gfx->transpen(bitmap, cliprect, tilenum, colour, 0, 0, xpos, ypos,  0);
+}
+
 void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1)
 {
 	for (int quadrant = 0; quadrant < 4; quadrant++)
 	{
-
 		int xbase = 0, ybase = 0;
 
 		if (quadrant & 2)
@@ -215,8 +223,6 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 			ybase = 256;
 
 		int y = 0;
-		gfx_element* gfx = m_gfxdecode->gfx(0);
-
 
 		for (int i = 0; i < 0x20; i++)
 		{
@@ -237,23 +243,13 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 				xposn &= 0x3ff;
 				if (xposn & 0x200) xposn -= 0x400;
 
-				//int pri;
-				//if (tiledat & 0x8000)
-				//	pri = pri0;
-				//else
-				//	pri = pri1;
-
-	//			if (opaque)
-	//				gfx->prio_opaque(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, screen.priority(), pri);
-	//			else
-	//				gfx->prio_transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, screen.priority(), pri, 0);
-
-
-				if (opaque)
-					gfx->opaque(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase);
+				int pri;
+				if (tiledat & 0x8000)
+					pri = pri0;
 				else
-					gfx->transpen(bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, 0, 0, xposn, (y * 8) + ybase, 0);
+					pri = pri1;
 
+				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, (y * 8) + ybase, pri, 0, opaque);
 			}
 
 			y++;
