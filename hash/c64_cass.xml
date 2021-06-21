@@ -5132,7 +5132,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1990</year>
-		<publisher>Ocean (The Hit Squad)</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="720182">
