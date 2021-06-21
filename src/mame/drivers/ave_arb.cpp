@@ -38,6 +38,9 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "video/pwm.h"
@@ -45,8 +48,6 @@ TODO:
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "speaker.h"
 #include "softlist.h"
