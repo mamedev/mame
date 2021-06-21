@@ -50,6 +50,7 @@
 #include "tekram_dc820.h"
 #include "asc88.h"
 #include "omti8621.h"
+#include "lrk330.h"
 
 // sound
 #include "adlib.h"
@@ -230,4 +231,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dc820", TEKRAM_DC820); // actually an EISA card
 	device.option_add("dc820b", TEKRAM_DC820B); // actually an EISA card
 	device.option_add("omti8621", ISA16_OMTI8621);
+	device.option_add("lrk331", LRK331);
 }

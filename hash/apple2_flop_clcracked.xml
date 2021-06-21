@@ -42303,4 +42303,180 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bmblgm13">
+		<description>Bumble Games (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-03"/>
+		<!--"Bumble Games" is a 1982 educational program developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.3 (4am and san inc crack).dsk" size="143360" crc="6636a469" sha1="59badccd350a2c82d6a0140b628a042997b8c88e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrbit10">
+		<description>Reader Rabbit (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-03"/>
+		<!--"Reader Rabbit" is a 1984 educational program developed by Leslie Grimm, illustrated by Corinne and Cindy Grimm, and distributed by The Learning Company. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reader rabbit v1.0 (4am and san inc crack).dsk" size="143360" crc="9033d75d" sha1="fd19516c3a995ed96026e0463030ce6028c07d47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="projcirc">
+		<description>Projectile and Circular Motion (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-05"/>
+		<!--"Projectile and Circular Motion" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="projectile and circular motion (4am crack).dsk" size="143360" crc="4074b3dd" sha1="95e35ca175c0f02221a9f2a9d413bbcc40e11c42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bumblp11">
+		<description>Bumble Plot (Version 1.1) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Bumble Plot" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble plot v1.1 (4am and san inc crack).dsk" size="143360" crc="1a360981" sha1="7675056caea06ca067bb576d835207e1885d68fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudep82">
+		<description>Gertrude's Puzzles (1982 Version) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Gertrude's Puzzles" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1982 (4am and san inc crack).dsk" size="143360" crc="4584488c" sha1="3bb9f19e91b62935cf95c559fd683e08033dc532"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertrudesec82">
+		<description>Gertrude's Secrets 1982 (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Gertrude's Secrets" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1982 (4am and san inc crack).dsk" size="143360" crc="0d53b68c" sha1="1ae15f7b76b4324f979c533b67aa63ab9169b631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taldiscv">
+		<description>Tales of Discovery (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-06-06"/>
+		<!--"Tales of Discovery" is a 1984 pair of adventure games developed by Dan Klassen, David G. Olmon, Amy McKinley, Deborah Kovacs, Loretta Jones, Maryellen Kohn, Jeffrey Siegel, Andrew Ragan, and Susan Edwards, and distributed by Scholastic. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of discovery (4am and san inc crack) side a.dsk" size="143360" crc="a3feb079" sha1="e670a5ea6584e98cad5a56563aecb0f5d8fbe3e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tales of discovery (4am and san inc crack) side b.dsk" size="143360" crc="22a0b7c9" sha1="e840ad24ab23df0723ba2f409ec57b3bcf3cbae9"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="advelec">
+		<description>Advanced Electricity (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Advanced Electricity" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="advanced electricity (4am crack).dsk" size="143360" crc="dd8cc60f" sha1="e290354b903160b8aa8425f9aa95ec744043eb9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="compcirc">
+		<description>Complex Circuits (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Materials and Equipment</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Complex Circuits" is a 1984 educational program developed and distributed by Educational Materials and Equipment Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="complex circuits (4am crack).dsk" size="143360" crc="d39c85c2" sha1="9befb85556807a4734031b4854b4271d73beb79d"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="pforth30">
+		<description>PAI Forth (Version 3.0, 12-21-1985) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Prentice Associates Incorporated</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"PAI Forth" is a 1985 development program. This is version 3.0. It is preserved here for the first time.-->
+        <!-- It is uncertain as of now whether this was used internally or released. More research is required. - FH -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pai forth v3.0 (4am crack).dsk" size="143360" crc="5f1f43e9" sha1="7a10dd0964da0ba404b1ed0dcce8e7f806a8d6e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="rboots82">
+		<description>Rocky's Boots (Unknown 1982 version) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"Rocky's Boots" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots 1982 (4am and san inc crack).dsk" size="143360" crc="887947a7" sha1="4e3bdda73af0c1069a768a64f32754556c40d223"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="prsnr110s">
+		<description>The Prisoner (Version 1.10) (SoftSmith) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-06-10"/>
+		<!--"The Prisoner" is a 1980 adventure game developed by Edu-Ware. This is version 1.10, re-released by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the prisoner v1.10 (softsmith) (4am and san inc crack).dsk" size="143360" crc="cfb731df" sha1="16e9ff900df3bab5ab9c516325d2cd5729636698"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

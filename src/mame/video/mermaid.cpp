@@ -94,6 +94,19 @@ void mermaid_state::mermaid_fg_scroll_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->set_scrolly(offset, data);
 }
 
+WRITE_LINE_MEMBER(mermaid_state::bg_mask_w)
+{
+	m_bg_mask = state;
+	logerror("mask %d\n", state);
+}
+
+WRITE_LINE_MEMBER(mermaid_state::bg_bank_w)
+{
+	m_bg_bank = state ? 0x100 : 0;
+	m_bg_tilemap->mark_all_dirty();
+	logerror("bank %d\n", state);
+}
+
 WRITE_LINE_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
 {
 	m_rougien_gfxbank1 = state;
@@ -134,7 +147,7 @@ uint8_t mermaid_state::mermaid_collision_r()
 
 TILE_GET_INFO_MEMBER(mermaid_state::get_bg_tile_info)
 {
-	int code = m_videoram2[tile_index];
+	int code = m_videoram2[tile_index] | m_bg_bank;
 	int sx = tile_index % 32;
 	int color = (sx >= 26) ? 0 : 1;
 
@@ -165,12 +178,16 @@ void mermaid_state::video_start()
 
 	m_screen->register_screen_bitmap(m_helper);
 	m_screen->register_screen_bitmap(m_helper2);
+	m_screen->register_screen_bitmap(m_helper_mask);
 }
 
 void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const rectangle spritevisiblearea(0 * 8, 26 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	const rectangle flip_spritevisiblearea(6 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
+
+	rectangle clip = flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea;
+	clip &= cliprect;
 
 	uint8_t *spriteram = m_spriteram;
 	int offs;
@@ -204,15 +221,66 @@ void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,(flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea), code, color, flipx, flipy, sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, clip, code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
 uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	if (m_bg_split)
+	{
+		constexpr int split_y = 64;
+		constexpr rectangle rr(0, 32*8-1, 0, 32*8-1);
+		m_bg_tilemap->draw(screen, m_helper_mask, rr, 0, 0);
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			int sy = y >= split_y ? 32*8 - 2 - (y - split_y) : 32*8 - split_y + y;
+			const u16 *s = &m_helper_mask.pix(sy, cliprect.min_x);
+			u16 *p = &bitmap.pix(y, cliprect.min_x);
+			memcpy(p, s, 2*(cliprect.max_x - cliprect.min_x + 1));
+		}
+
+
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);		
+	}
+	else if (m_bg_mask)
+	{
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			u16 *p = &bitmap.pix(y, cliprect.min_x);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				*p++ = x < 26*8 ? 0x42 : 0x40;
+		}
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+
+		m_bg_tilemap->draw(screen, m_helper_mask, cliprect, 0, 0);
+		int max_x = cliprect.max_x;
+		if (max_x >= 26*8)
+			max_x = 26*8-1;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			const u16 *s = &m_helper_mask.pix(y, cliprect.min_x);
+			u16 *p = &bitmap.pix(y, cliprect.min_x);
+			bool on = false;
+			for (int x = cliprect.min_x; x <= max_x; x++)
+			{
+				if (*s++ & 1)
+					on = !on;
+				if (!on)
+					*p = 0x40;
+				p ++;
+			}
+		}
+
+	}
+	else
+	{
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(bitmap, cliprect);
+	}
 	return 0;
 }
 

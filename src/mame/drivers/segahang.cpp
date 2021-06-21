@@ -1387,6 +1387,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hang On Beta bootleg
 //  Has Beta 1987 copyright but is otherwise identical to the bootleg above
+//  Has a custom Philko chip marked "Philko PK8706"
 //
 ROM_START( shangonrb2 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -2280,7 +2281,6 @@ GAME( 1986, endurorb,   enduror,  enduror,  enduror,   segahang_state, init_endu
 GAME( 1986, enduror1,   enduror,  enduror1, enduror,   segahang_state, init_enduror,  ROT0,  "Sega",           "Enduro Racer (YM2203, FD1089B 317-0013A)",                            0 )
 GAME( 1986, endurobl,   enduror,  endurobl, enduror,   segahang_state, init_endurobl, ROT0,  "bootleg",        "Enduro Racer (bootleg set 1)",                                        0 )
 GAME( 1986, endurob2,   enduror,  endurob2, enduror,   segahang_state, init_endurob2, ROT0,  "bootleg",        "Enduro Racer (bootleg set 2)",                                        MACHINE_NOT_WORKING )
-
 
 GAME( 1986, endurord,   enduror,  endurord,  enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of Rev A, YM2151, FD1089B 317-0013A set)",      0 )
 GAME( 1986, enduror1d,  enduror,  enduror1d, enduror,  segahang_state, init_enduror,  ROT0,  "bootleg",        "Enduro Racer (bootleg of YM2203, FD1089B 317-0013A set)",             0 )

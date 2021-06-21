@@ -344,10 +344,9 @@ void mbee_state::standard_palette(palette_device &palette) const
 {
 	constexpr u8 bglevel[] = { 0, 0x54, 0xa0, 0xff };
 	constexpr u8 fglevel[] = { 0, 0xa0, 0xff, 0xff };
-	u8 i;
 
 	// set up background colours (00-63)
-	i = 0;
+	u8 i = 0;
 	for (u8 b : bglevel)
 	{
 		for (u8 g : bglevel)

@@ -86,20 +86,34 @@
     Register”), PC and the two stack pointers, include several which are
     only implicitly used in execution: a TEMP register that latches ALU
     outputs, the instruction register IR, and the output latch register OL
-    that holds all addresses and data to be output on the DX bus. HD-6120
-    also internally maintains a group of 3-bit registers whose path
-    connects to TEMP, each of which contains the current memory extension
-    fields, their mirrors or various flags. (This emulation extends the
-    field registers to 4 bits to include the CTRLFF, PDF and PEX flags,
-    which are neither readable nor output directly at any time.)
-    Particular flag registers are enabled on the C0, C1 and EMA2 lines
-    during the final writes of ISZ, DCA and JMS. The most important of
-    these flag registers includes LINK, the interrupt enable flip-flop and
-    the GT flag hitherto provided only on arithmetic extensions of some
-    previous PDP-8 CPUs, though like MQ it conveys no specific purpose
-    here. Another flag register contains the inverse of the active-low
-    INTREQ input, the PWRON flag (set if STRTUP = VSS at RESET time,
-    causing entry into panel mode) and 0 in its LSB.
+    that holds all addresses and data to be output on the DX bus.
+
+    HD-6120 also maintains a group of 3-bit internal registers whose data
+    path connects to TEMP. These are used to hold the current memory
+    extension fields, their mirrors and various flags. (This emulation
+    extends the field registers to 4 bits to include the CTRLFF, PDF and
+    PEX flags, which are neither readable nor output directly at any
+    time.) These 3-bit registers may be enabled on the C0, C1 and EMA2
+    lines at particular times, and the GTF, GCF, PRS, RDF, RIF and RIB
+    internal IOTs read various combinations of them into AC. They include:
+
+        MSB             LSB     Output conditions
+        -----------------------------------------
+        IF0     IF1     IF2     IFETCH, direct operands (except if FZ)    
+        IB0     IB1     IB2     None (until transferred to IF)
+        ISF0    ISF1    ISF2    None
+        DF0     DF1     DF2     Indirect operand addressing, IOTs, etc.
+        DSF0    DSF1    DSF2    None
+        LINK    GT      IEFF    DCA AC writes
+        INTREQ* PWRON   0       ISZ result writes
+        BTSTRAP PNLTRP  HLTFLG  JMS PC writes
+
+    The GT flag, like MQ, is not used for any specific purpose on the
+    HD-6120, unlike the arithmetic extensions of previous PDP-8 CPUs which
+    originally implemented them. The INTREQ flag is 1 when the input pin
+    is sampled active low and 0 when it is inactive. The PWRON flag is set
+    if STRTUP is sampled as VSS at RESET time; it causes the CPU to trap
+    into panel mode before executing its first instruction.
 
     Undefined Group 3 OPRs and internal IOTs have no effect on the
     HD-6120 except that both interrupts and panel requests are blocked
@@ -1001,6 +1015,7 @@ void hd6120_device::execute_run()
 			break;
 
 		case minor_state::PEX_1:
+			m_temp = m_ac;
 			m_state = minor_state::PEX_2;
 			break;
 

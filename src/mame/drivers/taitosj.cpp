@@ -1933,6 +1933,7 @@ ROM_START( spacecr )
 ROM_END
 
 
+// A bootleg with identical ROM contents has been seen, with handwritten labels going from j1 to j20.
 ROM_START( junglek )
 	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "kn21-1.bin",   0x00000, 0x1000, CRC(45f55d30) SHA1(bb9518d7728938f673a663801e47ae0438cdbea1) )

@@ -30,7 +30,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_beeper(*this, DISCRETE_TAG)
 		, m_byteio(*this, VIP_BYTEIO_PORT_TAG)
-		, m_exp(*this, VIP_EXPANSION_SLOT_TAG)
+		, m_exp(*this, "exp")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, CDP1802_TAG)
 		, m_chip8(*this, "chip8")

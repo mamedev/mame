@@ -343,7 +343,10 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 		case 0x1c:
 		{
 			m_core->dma[6].control = data;
-			sharc_iop_delayed_w(0x1c, data, 1);
+			if (data & 0x1)
+			{
+				sharc_iop_delayed_w(0x1c, data, 1);
+			}
 			break;
 		}
 
@@ -360,9 +363,12 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 
 		// DMA 7
 		case 0x1d:
-		{
+		{			
 			m_core->dma[7].control = data;
-			sharc_iop_delayed_w(0x1d, data, 30);
+			if (data & 0x1)			
+			{
+				sharc_iop_delayed_w(0x1d, data, 30);
+			}
 			break;
 		}
 
@@ -442,7 +448,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 	All addresses in the 17-bit index registers are offset by 0x0002 0000, the
 	first internal RAM location, before they are used by the DMA controller.
 	*/
-
+	
 	switch ((m_core->dma[6].control >> 6) & 0x3)
 	{
 		case 2:         // 16/48 packing
@@ -972,6 +978,19 @@ void adsp21062_device::set_flag_input(int flag_num, int state)
 	}
 }
 
+WRITE_LINE_MEMBER(adsp21062_device::write_stall)
+{
+	m_core->write_stalled = (state == 0) ? false : true;
+
+	if (m_enable_drc)
+	{
+		if (m_core->write_stalled)
+			spin_until_trigger(45757);
+		else
+			machine().scheduler().trigger(45757);
+	}
+}
+
 void adsp21062_device::check_interrupts()
 {
 	int i;
@@ -1028,8 +1047,24 @@ void adsp21062_device::execute_run()
 	}
 	else
 	{
+		if (m_core->write_stalled)
+			eat_cycles(m_core->icount);
+
 		if (m_core->idle && m_core->irq_pending == 0)
 		{
+			int dma_count = m_core->icount;
+
+			// run active DMAs even while idling
+			while (dma_count > 0 && m_core->dma_status & ((1 << 6) | (1 << 7)))
+			{
+				if (!m_core->write_stalled)
+				{
+					dma_run_cycle(6);
+					dma_run_cycle(7);
+				}
+				dma_count--;
+			}		
+
 			m_core->icount = 0;
 			debugger_instruction_hook(m_core->daddr);
 		}
@@ -1037,9 +1072,9 @@ void adsp21062_device::execute_run()
 		{
 			check_interrupts();
 			m_core->idle = 0;
-		}
+		}	
 
-		while (m_core->icount > 0 && !m_core->idle)
+		while (m_core->icount > 0 && !m_core->idle && !m_core->write_stalled)
 		{
 			m_core->pc = m_core->daddr;
 			m_core->daddr = m_core->faddr;
@@ -1124,6 +1159,12 @@ void adsp21062_device::execute_run()
 				{
 					systemreg_write_latency_effect();
 				}
+			}
+
+			if (!m_core->write_stalled)
+			{
+				dma_run_cycle(6);
+				dma_run_cycle(7);
 			}
 
 			--m_core->icount;

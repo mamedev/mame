@@ -124,9 +124,8 @@ void nand_device::device_start()
 image_init_result smartmedia_image_device::smartmedia_format_1()
 {
 	SM_disk_image_header custom_header;
-	int bytes_read;
 
-	bytes_read = fread(&custom_header, sizeof(custom_header));
+	const int bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
 		return image_init_result::FAIL;
@@ -207,6 +206,7 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 		{
 			switch (id2)
 			{
+				case 0x73 : m_page_data_size = 0x0200; m_num_pages = 0x08000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 				case 0x75 : m_page_data_size = 0x0200; m_num_pages = 0x10000; m_page_total_size = 0x0210; m_log2_pages_per_block = 5; result = true; break;
 			}
 		}
@@ -219,9 +219,8 @@ int smartmedia_image_device::detect_geometry( uint8_t id1, uint8_t id2)
 image_init_result smartmedia_image_device::smartmedia_format_2()
 {
 	disk_image_format_2_header custom_header;
-	int bytes_read, i, j;
 
-	bytes_read = fread(&custom_header, sizeof(custom_header));
+	const int bytes_read = fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
 		return image_init_result::FAIL;
@@ -250,18 +249,19 @@ image_init_result smartmedia_image_device::smartmedia_format_2()
 	m_accumulated_status = 0;
 	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
 	m_id_len = 3;
-	memcpy( m_id, custom_header.data1, m_id_len);
+	memcpy(m_id, custom_header.data1, m_id_len);
 	m_mp_opcode = 0;
 	m_col_address_cycles = 1;
 	m_row_address_cycles = (m_num_pages > 0x10000) ? 3 : 2;
 	m_sequential_row_read = 1;
 
-	for (i=0;i<8;i++)
+	for (int i = 0; i < 8; i++)
 	{
-		memcpy( m_data_uid_ptr.get() + i * 32, custom_header.data2, 16);
-		for (j=0;j<16;j++) m_data_uid_ptr[i*32+16+j] = custom_header.data2[j] ^ 0xFF;
+		memcpy(m_data_uid_ptr.get() + i * 32, custom_header.data2, 16);
+		for (int j = 0; j < 16; j++)
+			m_data_uid_ptr[i * 32 + 16 + j] = custom_header.data2[j] ^ 0xFF;
 	}
-	memcpy( m_data_uid_ptr.get() + 256, custom_header.data3, 16);
+	memcpy(m_data_uid_ptr.get() + 256, custom_header.data3, 16);
 
 	fread(m_feeprom_data, m_page_total_size*m_num_pages);
 
@@ -281,9 +281,9 @@ image_init_result smartmedia_image_device::call_load()
 	result = smartmedia_format_1();
 	if (result != image_init_result::PASS)
 	{
-			// try format 2
-			fseek( position, SEEK_SET);
-			result = smartmedia_format_2();
+		// try format 2
+		fseek(position, SEEK_SET);
+		result = smartmedia_format_2();
 	}
 	return result;
 }
@@ -299,10 +299,9 @@ void smartmedia_image_device::call_unload()
 		if (m_image_format == 1)
 		{
 			SM_disk_image_header custom_header;
-			int bytes_read;
-			fseek( 0, SEEK_SET);
-			bytes_read = fread( &custom_header, sizeof( custom_header));
-			if (bytes_read == sizeof( custom_header))
+			fseek(0, SEEK_SET);
+			const int bytes_read = fread(&custom_header, sizeof(custom_header));
+			if (bytes_read == sizeof(custom_header))
 			{
 				if (custom_header.version == 0)
 				{
@@ -337,7 +336,7 @@ void smartmedia_image_device::call_unload()
 	m_status = 0xC0;
 	m_accumulated_status = 0;
 	m_pagereg = std::make_unique<uint8_t[]>(m_page_total_size);
-	memset( m_id, 0, sizeof( m_id));
+	memset(m_id, 0, sizeof(m_id));
 	m_id_len = 0;
 	m_mp_opcode = 0;
 	m_mode_3065 = 0;
@@ -390,8 +389,8 @@ void nand_device::command_w(uint8_t data)
 		m_mode_3065 = 0;
 		if (!m_write_rnb.isnull())
 		{
-			m_write_rnb( 0);
-			m_write_rnb( 1);
+			m_write_rnb(0);
+			m_write_rnb(1);
 		}
 		break;
 	case 0x00: // Read (1st cycle)
@@ -422,10 +421,10 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-		m_mode = SM_M_READ;
-		m_pointer_mode = SM_PM_C;
-		m_page_addr = 0;
-		m_addr_load_ptr = 0;
+			m_mode = SM_M_READ;
+			m_pointer_mode = SM_PM_C;
+			m_page_addr = 0;
+			m_addr_load_ptr = 0;
 		}
 		break;
 	case 0x80: // Page Program (1st cycle)
@@ -444,11 +443,10 @@ void nand_device::command_w(uint8_t data)
 		}
 		else
 		{
-			int i;
 			m_status = (m_status & 0x80) | m_accumulated_status;
 			//logerror( "smartmedia: program, page_addr %08X\n", m_page_addr);
-			for (i=0; i<m_page_total_size; i++)
-				m_feeprom_data[m_page_addr*m_page_total_size + i] &= m_pagereg[i];
+			for (int i = 0; i < m_page_total_size; i++)
+				m_feeprom_data[m_page_addr * m_page_total_size + i] &= m_pagereg[i];
 			m_status |= 0x40;
 			if (data == 0x15)
 				m_accumulated_status = m_status & 0x1f;
@@ -457,13 +455,13 @@ void nand_device::command_w(uint8_t data)
 			m_mode = SM_M_INIT;
 			if (!m_write_rnb.isnull())
 			{
-				m_write_rnb( 0);
-				m_write_rnb( 1);
+				m_write_rnb(0);
+				m_write_rnb(1);
 			}
 		}
 		break;
-	/*case 0x11:
-	    break;*/
+	//case 0x11:
+	//	break;
 	case 0x60: // Block Erase (1st cycle)
 		m_mode = SM_M_ERASE;
 		m_page_addr = 0;
@@ -486,22 +484,22 @@ void nand_device::command_w(uint8_t data)
 				m_pointer_mode = SM_PM_A;
 			if (!m_write_rnb.isnull())
 			{
-				m_write_rnb( 0);
-				m_write_rnb( 1);
+				m_write_rnb(0);
+				m_write_rnb(1);
 			}
 		}
 		break;
 	case 0x70: // Read Status
 		m_mode = SM_M_READSTATUS;
 		break;
-	/*case 0x71:
-	    break;*/
+	//case 0x71:
+	//	break;
 	case 0x90: // Read ID
 		m_mode = SM_M_READID;
 		m_addr_load_ptr = 0;
 		break;
-	/*case 0x91:
-	    break;*/
+	//case 0x91:
+	//	break;
 	case 0x30: // Read (2nd cycle)
 		if (m_col_address_cycles == 1)
 		{
@@ -523,8 +521,8 @@ void nand_device::command_w(uint8_t data)
 			{
 				if (!m_write_rnb.isnull())
 				{
-					m_write_rnb( 0);
-					m_write_rnb( 1);
+					m_write_rnb(0);
+					m_write_rnb(1);
 				}
 			}
 		}
@@ -622,12 +620,12 @@ void nand_device::address_w(uint8_t data)
 			if (m_addr_load_ptr < m_col_address_cycles)
 			{
 				m_byte_addr &= ~(0xFF << (m_addr_load_ptr * 8));
-				m_byte_addr |=  (data << (m_addr_load_ptr * 8));
+				m_byte_addr |= (data << (m_addr_load_ptr * 8));
 			}
 			else if (m_addr_load_ptr < m_col_address_cycles + m_row_address_cycles)
 			{
 				m_page_addr &= ~(0xFF << ((m_addr_load_ptr - m_col_address_cycles) * 8));
-				m_page_addr |=  (data << ((m_addr_load_ptr - m_col_address_cycles) * 8));
+				m_page_addr |= (data << ((m_addr_load_ptr - m_col_address_cycles) * 8));
 			}
 		}
 		m_addr_load_ptr++;
@@ -636,7 +634,7 @@ void nand_device::address_w(uint8_t data)
 		if (m_addr_load_ptr < m_row_address_cycles)
 		{
 			m_page_addr &= ~(0xFF << (m_addr_load_ptr * 8));
-			m_page_addr |=  (data << (m_addr_load_ptr * 8));
+			m_page_addr |= (data << (m_addr_load_ptr * 8));
 		}
 		m_addr_load_ptr++;
 		break;
@@ -645,7 +643,7 @@ void nand_device::address_w(uint8_t data)
 		if (m_addr_load_ptr < m_col_address_cycles)
 		{
 			m_byte_addr &= ~(0xFF << (m_addr_load_ptr * 8));
-			m_byte_addr |=  (data << (m_addr_load_ptr * 8));
+			m_byte_addr |= (data << (m_addr_load_ptr * 8));
 		}
 		m_addr_load_ptr++;
 		break;
@@ -682,7 +680,10 @@ uint8_t nand_device::data_r()
 		{
 			if (m_byte_addr < m_page_total_size)
 			{
-				reply = m_feeprom_data[m_page_addr*m_page_total_size + m_byte_addr];
+				if (m_page_addr < m_num_pages)
+					reply = m_feeprom_data[m_page_addr * m_page_total_size + m_byte_addr];
+				else
+					reply = 0xff;
 			}
 			else
 			{
@@ -691,7 +692,11 @@ uint8_t nand_device::data_r()
 		}
 		else
 		{
-			reply = m_data_uid_ptr[m_page_addr*m_page_total_size + m_byte_addr];
+			// FIXME: this appears to be incorrect, m_data_uid_ptr is a smaller structure of 256*16
+			// this code would always result in reading past the buffer
+			uint32_t addr = m_page_addr * m_page_total_size + m_byte_addr;
+			if (addr < 256 + 16)
+				reply = m_data_uid_ptr[addr];
 		}
 		m_byte_addr++;
 		if ((m_byte_addr == m_page_total_size) && (m_sequential_row_read != 0))

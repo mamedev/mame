@@ -185,15 +185,12 @@ dl1414_device::dl1414_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_wr_in(true)
+	, m_addr_in(0x00)
+	, m_data_in(0x00)
 	, m_update_cb(*this)
 	, m_digit_ram{ 0x00, 0x00, 0x00, 0x00 }
 	, m_cursor_state{ false, false, false, false }
-	, m_wr_in(true)
-	, m_ce_in(true)
-	, m_ce_latch(true)
-	, m_addr_in(0x00)
-	, m_addr_latch(0x00)
-	, m_data_in(0x00)
 {
 }
 
@@ -204,7 +201,10 @@ dl1416_device::dl1416_device(
 		device_t *owner,
 		u32 clock)
 	: dl1414_device(mconfig, type, tag, owner, clock)
+	, m_ce_in(true)
+	, m_ce_latch(true)
 	, m_cu_in(true)
+	, m_addr_latch(0x00)
 {
 }
 
@@ -220,18 +220,12 @@ void dl1414_device::device_start()
 	save_item(NAME(m_digit_ram));
 	save_item(NAME(m_cursor_state));
 	save_item(NAME(m_wr_in));
-	save_item(NAME(m_ce_in));
-	save_item(NAME(m_ce_latch));
 	save_item(NAME(m_addr_in));
-	save_item(NAME(m_addr_latch));
 	save_item(NAME(m_data_in));
 
 	// set initial state for input lines
 	m_wr_in = true;
-	m_ce_in = true;
-	m_ce_latch = true;
 	m_addr_in = 0x00;
-	m_addr_latch = 0x00;
 	m_data_in = 0x00;
 
 	// randomise internal RAM
@@ -249,10 +243,16 @@ void dl1416_device::device_start()
 	dl1414_device::device_start();
 
 	// register for state saving
+	save_item(NAME(m_ce_in));
+	save_item(NAME(m_ce_latch));
 	save_item(NAME(m_cu_in));
+	save_item(NAME(m_addr_latch));
 
 	// set initial state for input lines
+	m_ce_in = true;
+	m_ce_latch = true;
 	m_cu_in = true;
+	m_addr_latch = 0x00;
 }
 
 //-------------------------------------------------
@@ -277,6 +277,16 @@ WRITE_LINE_MEMBER( dl1414_device::wr_w )
 	{
 		m_wr_in = bool(state);
 		if (m_wr_in)
+			bus_w(m_addr_in, m_data_in);
+	}
+}
+
+WRITE_LINE_MEMBER( dl1416_device::wr_w )
+{
+	if (bool(state) != m_wr_in)
+	{
+		m_wr_in = bool(state);
+		if (m_wr_in)
 		{
 			if (!m_ce_latch)
 				bus_w(m_addr_latch, m_data_in);
@@ -289,7 +299,7 @@ WRITE_LINE_MEMBER( dl1414_device::wr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( dl1414_device::ce_w )
+WRITE_LINE_MEMBER( dl1416_device::ce_w )
 {
 	m_ce_in = bool(state);
 }

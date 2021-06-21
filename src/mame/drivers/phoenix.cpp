@@ -1288,6 +1288,9 @@ ROM_START( nextfase )
 	ROM_LOAD( "nf07.bin",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
 	ROM_LOAD( "nf08.bin",   0x3800, 0x0800, CRC(04c2323f) SHA1(4d820464f57e4f59acc46ea3264dba3cb9c501a1) )
 
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910CG Multi-Melody IC
+	ROM_LOAD( "7910cg", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x1000, "bgtiles", 0 )
 	ROM_LOAD( "nf11.bin",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
 	ROM_LOAD( "nf12.bin",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
@@ -1497,6 +1500,7 @@ ROM_START( pleiadsn )
 	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
 ROM_END
 
+// Famaresa "580" PCB set (580-001 and 580-002).
 ROM_START( pleiadss )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pl45.bin",     0x0000, 0x0800, CRC(e2528599) SHA1(4647c62a2c6047238ad2855cf71b9e079ac4b4c7) )
@@ -1645,7 +1649,7 @@ GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init, 
 GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg? (Irecsa)",                      "Pleiads (Irecsa)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // possibly licensed, but some of the ROMs match the bootlegs
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "Niemer S.A.",                            "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // possibly licensed, but some of the ROMs match the bootlegs
-GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (Spanish bootleg)",                                  MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
+GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
   /*** Others ***/

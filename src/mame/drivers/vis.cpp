@@ -75,13 +75,13 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 {
 	m_sample[m_samples++] = data;
 	m_curcount++;
-	if(m_samples >= 2)
+	if((m_samples >= 2) || ((m_mode & 0x08) != 0x08))
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
 void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(m_samples < 2)
+	if(((m_samples < 2) && ((m_mode & 0x08) == 0x08)) || !m_samples)
 		return;
 	switch(m_mode & 0x88)
 	{
@@ -110,7 +110,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 	}
 
-	if(m_sample_byte >= 4)
+	if(m_sample_byte >= 2)
 	{
 		m_sample_byte = 0;
 		m_samples = 0;
@@ -200,9 +200,11 @@ void vis_audio_device::pcm_w(offs_t offset, uint8_t data)
 			return;
 		case 0x0c:
 			m_count = (m_count & 0xff00) | data;
+			m_curcount = 0;
 			break;
 		case 0x0e:
 			m_count = (m_count & 0xff) | (data << 8);
+			m_curcount = 0;
 			break;
 		case 0x0f:
 			//cdrom related?
@@ -856,6 +858,7 @@ void vis_state::io_map(address_map &map)
 	map(0x0026, 0x0027).rw(FUNC(vis_state::unk_r), FUNC(vis_state::unk_w));
 	map(0x0040, 0x005f).rw("mb:pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x0060, 0x0065).rw("kbdc", FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x0061, 0x0061).rw("mb", FUNC(at_mb_device::portb_r), FUNC(at_mb_device::portb_w));
 	map(0x006a, 0x006a).r(FUNC(vis_state::unk2_r));
 	map(0x0080, 0x009f).rw("mb", FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w));
 	map(0x0092, 0x0092).rw(FUNC(vis_state::sysctl_r), FUNC(vis_state::sysctl_w));

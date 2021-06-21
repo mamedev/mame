@@ -1203,6 +1203,7 @@ alphatpc16
 
 @source:alphatro.cpp
 alphatro                        //
+alphatrob                       //
 alphatron                       //
 
 @source:altair.cpp
@@ -10106,6 +10107,7 @@ ckongpt2b                       // bootleg
 ckongpt2b2                      // bootleg
 ckongpt2j                       // (c) 1981 Falcon
 ckongpt2jeu                     // bootleg (Jeutel)
+ckongpt2ss                      // bootleg (SegaSA / Sonic)
 dking                           // Crazy Kong Bootleg
 guzzler                         // (c) 1983 Tehkan
 guzzlers                        // (c) 1983 Tehkan (Swimmer Conversion)
@@ -14395,6 +14397,7 @@ gteikoku                        // (c) Irem
 gteikokub                       // bootleg
 gteikokub2                      // bootleg
 gteikokub3                      // bootleg (Honly Enterprises)
+guttangt                        //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
@@ -14555,6 +14558,9 @@ zerotimeu                       // hack
 zigzagb                         // (c) 1982 LAX (bootleg)
 zigzagb2                        // (c) 1982 LAX (bootleg)
 
+@source:galaxian_rockclim.cpp
+rockclim                        // (c)1981 Taito
+
 @source:galaxold.cpp
 4in1                            // (c) 1981 Armenia / Food and Fun
 bullsdrtg                       // 1985 Senko
@@ -14566,14 +14572,12 @@ drivfrcsg                       // [1984] Seatongrove
 drivfrcsga                      // [1984] Seatongrove
 drivfrct                        // bootleg
 froggerv                        // bootleg
-guttangt                        //
 hexpool                         // (c) 1986 Shinkia (Senko Kit)
 hexpoola                        // (c) 1986 Shinkia (Senko Kit)
 hunchbgb                        // bootleg
 hunchbkg                        // (c) 1983 Century
 hustlerb3                       // bootleg
 racknrol                        // (c) 1986 Status (Shinkia license) (Senko Kit)
-rockclim                        // (c)1981 Taito
 scramb2                         // bootleg
 scramb3                         // bootleg
 scramblb                        // bootleg
@@ -16349,6 +16353,7 @@ trobocop2                       // Tiger
 trobocop3                       // Tiger
 trockteer                       // Tiger
 trshutvoy                       // Tronica
+trspacmis                       // Tronica
 trsrescue                       // Tronica
 tsddragon                       // Tiger
 tsf2010                         // Tiger
@@ -19864,6 +19869,9 @@ macxl                           // 1985 Apple Macintosh XL
 @source:littlerb.cpp
 littlerb                        // (c) 1993 TCH
 
+@source:lk3000.cpp
+lk3000
+
 @source:lkage.cpp
 bygone                          // A53 (c) 1985 Taito Corporation - prototype ?
 lkage                           // A54 (c) 1984 Taito Corporation
@@ -22418,8 +22426,6 @@ alice                           // Matra & Hachette Ordinateur Alice
 alice32                         // Matra & Hachette Alice 32
 alice90                         // Matra & Hachette Alice 90
 mc10                            // MC-10
-mcx128                          // MCX-128
-alice128                        // Alice with a MCX-128
 
 @source:mc1000.cpp
 mc1000                          //
@@ -31655,6 +31661,7 @@ driveyes                        // (c) 1992?
 @source:namcos22.cpp
 acedrvrw                        // (c) 1994
 adillor                         // (c) 1997
+adillorj                        // (c) 1997
 airco22b                        // (c) 1995
 alpinerc                        // (c) 1994
 alpinerd                        // (c) 1994
@@ -33200,6 +33207,7 @@ ccasino                         // [1987] V-System Co. (Japan)
 ojanko2                         // [1987] V-System Co. (Japan)
 ojankoc                         // [1986] V-System Co. (Japan)
 ojankoca                        // [1986] V-System Co. (Japan)
+ojankocb                        // [1986] V-System Co. (Japan)
 ojankohs                        // [1988] V-System Co. (Japan)
 ojankoy                         // [1986] V-System Co. (Japan)
 
@@ -33433,6 +33441,7 @@ pacmanvg                        // bootleg (Video Game SA)
 pacmod                          // (c) 1981 Midway
 pacplus                         // (c) 1982 Namco (Midway license)
 pacuman                         // bootleg
+painter                         // hack
 paintrlr                        // 1981 bootleg
 pengojpm                        // bootleg
 pengopac                        // bootleg
@@ -38215,6 +38224,7 @@ sitcomtmr                       //
 @source:sk1.cpp
 sk1                             //
 sk2                             //
+sk5                             //
 sk10                            //
 
 @source:sk101bl.cpp
@@ -39596,6 +39606,7 @@ galpanisa                       // 1997.04 (c) 1997 Kaneko (Asia)
 galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk                       // 1997.04 (c) 1997 Kaneko (Korea)
+galpaniska                      // 1997.04 (c) 1997 Kaneko (Korea)
 galpans2                        // 1999.?? (c) 1999 Kaneko (Europe)
 galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
 galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
@@ -40428,6 +40439,7 @@ silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo
 silkwormb                       // bootleg
+silkwormb2                      // bootleg
 
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
@@ -43257,6 +43269,12 @@ yes                             //
 yiear                           // GX407 (c) 1985
 yiear2                          // GX407 (c) 1985
 
+@source:yman1x.cpp
+an1x                            //
+
+@source:ymdx100.cpp
+dx100                           //
+
 @source:ymdx11.cpp
 dx11                            //
 
@@ -43280,6 +43298,9 @@ psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
+
+@source:ymsy35.cpp
+sy35                            //
 
 @source:ymtx81z.cpp
 tx81z                           //

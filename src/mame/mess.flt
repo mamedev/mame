@@ -536,6 +536,7 @@ lft_phasor.cpp
 lg-dvd.cpp
 lilith.cpp
 lisa.cpp
+lk3000.cpp
 llc1.cpp
 llc2.cpp
 lms46.cpp
@@ -1178,6 +1179,8 @@ xbox.cpp
 xerox820.cpp
 xor100.cpp
 yes.cpp
+yman1x.cpp
+ymdx100.cpp
 ymdx11.cpp
 ymmu100.cpp
 ymmu5.cpp
@@ -1185,6 +1188,7 @@ ymmu50.cpp
 ymmu80.cpp
 ympsr60.cpp
 ympsr340.cpp
+ymsy35.cpp
 ymtx81z.cpp
 ymvl70.cpp
 z100.cpp

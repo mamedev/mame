@@ -921,6 +921,7 @@ function linkProjects_mame_arcade(_target, _subtarget)
 		"midcoin",
 		"midw8080",
 		"midway",
+		"mr",
 		"namco",
 		"nasco",
 		"neogeo",
@@ -2913,6 +2914,15 @@ files {
 	MAME_DIR .. "src/mame/audio/sente6vb.h",
 }
 
+createMAMEProjects(_target, _subtarget, "mr")
+files {
+	MAME_DIR .. "src/mame/drivers/dribling.cpp",
+	MAME_DIR .. "src/mame/includes/dribling.h",
+	MAME_DIR .. "src/mame/video/dribling.cpp",
+	MAME_DIR .. "src/mame/drivers/sshot.cpp",
+	MAME_DIR .. "src/mame/drivers/subhuntr.cpp",
+}
+
 createMAMEProjects(_target, _subtarget, "namco")
 files {
 	MAME_DIR .. "src/mame/drivers/20pacgal.cpp",
@@ -2943,6 +2953,7 @@ files {
 	MAME_DIR .. "src/mame/video/xevious.cpp",
 	MAME_DIR .. "src/mame/drivers/galaxian.cpp",
 	MAME_DIR .. "src/mame/includes/galaxian.h",
+	MAME_DIR .. "src/mame/drivers/galaxian_rockclim.cpp",
 	MAME_DIR .. "src/mame/audio/galaxian.cpp",
 	MAME_DIR .. "src/mame/audio/galaxian.h",
 	MAME_DIR .. "src/mame/video/galaxian.cpp",
@@ -3556,6 +3567,8 @@ files {
 	MAME_DIR .. "src/mame/machine/dc-ctrl.h",
 	MAME_DIR .. "src/mame/machine/jvs13551.cpp",
 	MAME_DIR .. "src/mame/machine/jvs13551.h",
+	MAME_DIR .. "src/mame/machine/segashiobd.cpp",
+	MAME_DIR .. "src/mame/machine/segashiobd.h",
 	MAME_DIR .. "src/mame/drivers/triforce.cpp",
 	MAME_DIR .. "src/mame/drivers/puckpkmn.cpp",
 	MAME_DIR .. "src/mame/drivers/segac2.cpp",
@@ -4561,8 +4574,6 @@ files {
 	MAME_DIR .. "src/mame/video/vs920a.cpp",
 	MAME_DIR .. "src/mame/video/vs920a.h",
 	MAME_DIR .. "src/mame/drivers/inufuku.cpp",
-	MAME_DIR .. "src/mame/includes/inufuku.h",
-	MAME_DIR .. "src/mame/video/inufuku.cpp",
 	MAME_DIR .. "src/mame/drivers/ojankohs.cpp",
 	MAME_DIR .. "src/mame/includes/ojankohs.h",
 	MAME_DIR .. "src/mame/video/ojankohs.cpp",
@@ -4884,9 +4895,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/dorachan.cpp",
 	MAME_DIR .. "src/mame/drivers/drdmania.cpp",
 	MAME_DIR .. "src/mame/drivers/dreamwld.cpp",
-	MAME_DIR .. "src/mame/drivers/dribling.cpp",
-	MAME_DIR .. "src/mame/includes/dribling.h",
-	MAME_DIR .. "src/mame/video/dribling.cpp",
 	MAME_DIR .. "src/mame/drivers/dwarfd.cpp",
 	MAME_DIR .. "src/mame/drivers/dynadice.cpp",
 	MAME_DIR .. "src/mame/drivers/dynamoah.cpp",
@@ -5114,7 +5122,6 @@ files {
 	MAME_DIR .. "src/mame/audio/special.h",
 	MAME_DIR .. "src/mame/drivers/spool99.cpp",
 	MAME_DIR .. "src/mame/drivers/sprcros2.cpp",
-	MAME_DIR .. "src/mame/drivers/sshot.cpp",
 	MAME_DIR .. "src/mame/drivers/ssingles.cpp",
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",
 	MAME_DIR .. "src/mame/drivers/startouch.cpp",
@@ -5122,7 +5129,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/strkzn.cpp",
 	MAME_DIR .. "src/mame/drivers/stuntair.cpp",
 	MAME_DIR .. "src/mame/drivers/su2000.cpp",
-	MAME_DIR .. "src/mame/drivers/subhuntr.cpp",
 	MAME_DIR .. "src/mame/drivers/summit.cpp",
 	MAME_DIR .. "src/mame/drivers/sumt8035.cpp",
 	MAME_DIR .. "src/mame/drivers/supercrd.cpp",
