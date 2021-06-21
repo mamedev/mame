@@ -2721,6 +2721,7 @@ a486sv2g                        // ASUS VL/I-486SV2G
 aa486s                          // ASUS PCI/I-A486S
 abae4                           // Abit 486 EISA-AE4 motherboard (486)
 abah4                           // Abit AH4(T) motherboard (486)
+abax4                           // Abit AB-AX4 motherboard (486)
 abpb4                           // Abit AB-PB4 motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
 abpm4                           // Abit AB-PM4 motherboard (486)
@@ -2776,10 +2777,13 @@ ga486vs                         // Gigabyte GA-486VS motherboard (486)
 ga486am                         // Gigabyte GA486AM/S motherboard (486)
 gc10a                           // Eagle EAGLEN486 GC10A motherboard (486)
 gete486vl                       // GENOA TurboExpress 486 VL motherboard (486)
+gmb486sg                        // Gemlight GMB-486SG rev 2.2
+gmb486unp                       // Gemlight GMB-486UNP v2.1
 hot409                          // Shuttle HOT-409
 hot419                          // Shuttle HOT-419 motherboard (486)
 hot433                          // Shuttle HOT-433 motherboard (486)
 ibm2133                         // IBM PS/1 2133
+jakms41                         // Jamicon KM-S4-1 VER 1.1
 jwj446a                         // Jetway J-446A motherboard (486)
 lion3500                        // 1993 Lion 3500C/T notebook
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
@@ -2822,6 +2826,7 @@ qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
 sis85c496                       // 486 motherboards using the SiS 85C496/85C497 chipset
 sm48650usc                      // Vintage Sprite SM 486-50USC motherboard (486)
+so025k2                         // SOYO 025K2 motherboard (486)
 so025r2                         // SOYO 025R2 motherboard (486)
 so30h                           // SOYO 30H motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
