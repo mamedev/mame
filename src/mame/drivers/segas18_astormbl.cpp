@@ -33,6 +33,8 @@ public:
 		, m_tileram(*this, "tileram")
 		, m_tilestripconfig(*this, "tilestripconfig")
 		, m_tileenable(*this, "tileenable")
+		, m_tileyscroll1(*this, "tileyscroll1")
+		, m_tileyscroll0(*this, "tileyscroll0")
 	{ }
 
 	void astormbl(machine_config &config);
@@ -58,6 +60,8 @@ private:
 	required_shared_ptr<uint16_t> m_tileram;
 	required_shared_ptr<uint16_t> m_tilestripconfig;
 	required_shared_ptr<uint16_t> m_tileenable;
+	required_shared_ptr<uint16_t> m_tileyscroll1;
+	required_shared_ptr<uint16_t> m_tileyscroll0;
 
 	void astormbl_map(address_map &map);
 
@@ -200,6 +204,7 @@ void segas18_astormbl_state::video_start()
 void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque)
 {
 	gfx_element* gfx = m_gfxdecode->gfx(0);
+	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	const uint8_t* gfxdat = gfx->get_data(tilenum);
 	int offs = 0;
@@ -214,11 +219,24 @@ void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitm
 
 			if ((realypos >= cliprect.min_y) && (realypos <= cliprect.max_y) && (realxpos >= cliprect.min_x) && (realxpos <= cliprect.max_x))
 			{
-				uint16* dst = &bitmap.pix(realypos);
+				uint16_t* dst = &bitmap.pix(realypos);
+				uint8_t* pridst = &priority_bitmap.pix(realypos);
 				uint8_t pix = gfxdat[offs];
 
 				if (pix || opaque)
+				{
 					dst[realxpos] = pix | (colour * 8);
+
+					if (opaque)
+					{
+						if (pix)
+							pridst[realxpos] = pri;
+						else
+							pridst[realxpos] = 0x00;
+					}
+					else
+						pridst[realxpos] = pri;
+				}
 			}
 
 			offs++;
@@ -244,6 +262,8 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 
 		int y = 0;
 
+		int yscroll = layer & 1 ? m_tileyscroll1[0] : m_tileyscroll0[0];
+
 		for (int i = 0; i < 0x20; i++)
 		{
 			const uint16_t rowconf = m_tilestripconfig[(layer * 0x80) + (quadrant * 0x20) + i];
@@ -265,11 +285,11 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 
 				int pri;
 				if (tiledat & 0x8000)
-					pri = pri0;
-				else
 					pri = pri1;
+				else
+					pri = pri0;
 
-				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, (y * 8) + ybase, pri, 0, opaque);
+				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, (y * 8) + ybase - yscroll, pri, 0, opaque);
 			}
 
 			y++;
@@ -293,8 +313,7 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 	// reset priorities
 	screen.priority().fill(0, cliprect);
 
-	draw_layer(screen, bitmap, cliprect, 1, true, 0x0,0x0);
-	draw_layer(screen, bitmap, cliprect, 1, false, 0x01,0x02);
+	draw_layer(screen, bitmap, cliprect, 1, true, 0x01,0x02);
 	draw_layer(screen, bitmap, cliprect, 0, false, 0x02, 0x04);
 
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0x04);
@@ -369,8 +388,8 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 
 	map(0xc44000, 0xc44001).ram();
 
-	map(0xc46000, 0xc46001).ram(); // y scroll?
-	map(0xc46200, 0xc46201).ram();
+	map(0xc46000, 0xc46001).ram().share("tileyscroll1"); // y scroll?
+	map(0xc46200, 0xc46201).ram().share("tileyscroll0");
 	map(0xc46400, 0xc465ff).ram().share("tilestripconfig"); // per row page select, xscroll, tilebank
 	map(0xc46600, 0xc46601).ram().share("tileenable");
 
