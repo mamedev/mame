@@ -81,7 +81,7 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 
 void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if((m_samples < 2) && ((m_mode & 0x08) == 0x08))
+	if(((m_samples < 2) && ((m_mode & 0x08) == 0x08)) || !m_samples)
 		return;
 	switch(m_mode & 0x88)
 	{
@@ -200,9 +200,11 @@ void vis_audio_device::pcm_w(offs_t offset, uint8_t data)
 			return;
 		case 0x0c:
 			m_count = (m_count & 0xff00) | data;
+			m_curcount = 0;
 			break;
 		case 0x0e:
 			m_count = (m_count & 0xff) | (data << 8);
+			m_curcount = 0;
 			break;
 		case 0x0f:
 			//cdrom related?
