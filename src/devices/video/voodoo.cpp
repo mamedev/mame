@@ -270,14 +270,14 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
 
 
 //**************************************************************************
-//  FIFO MANAGEMENT
+//  MEMORY FIFO
 //**************************************************************************
 
 //-------------------------------------------------
-//  fifo_state - constructor
+//  memory_fifo - constructor
 //-------------------------------------------------
 
-voodoo::fifo_state::fifo_state() :
+voodoo::memory_fifo::memory_fifo() :
 	m_base(nullptr),
 	m_size(0),
 	m_in(0),
@@ -290,7 +290,7 @@ voodoo::fifo_state::fifo_state() :
 //  add - append an item to the fifo
 //-------------------------------------------------
 
-inline void voodoo::fifo_state::add(u32 data)
+inline void voodoo::memory_fifo::add(u32 data)
 {
 	// compute the value of 'in' after we add this item
 	s32 next_in = m_in + 1;
@@ -310,7 +310,7 @@ inline void voodoo::fifo_state::add(u32 data)
 //  remove - remove the next item from the fifo
 //-------------------------------------------------
 
-inline u32 voodoo::fifo_state::remove()
+inline u32 voodoo::memory_fifo::remove()
 {
 	// return invalid data if empty
 	if (m_out == m_in)
@@ -530,6 +530,8 @@ void voodoo_device::fbi_state::init(voodoo_model model, std::vector<u8> &memory)
 
 	// initialize the memory FIFO
 	m_fifo.configure(nullptr, 0);
+	m_cmdfifo[0].init(memory);
+	m_cmdfifo[1].init(memory);
 
 	if (model <= MODEL_VOODOO_2)
 	{
@@ -617,8 +619,8 @@ void voodoo_device::register_save()
 	save_item(NAME(m_reg.m_regs));
 
 	/* register states: pci */
-	save_item(NAME(m_pci.fifo.m_in));
-	save_item(NAME(m_pci.fifo.m_out));
+//	save_item(NAME(m_pci.fifo.m_in));
+//	save_item(NAME(m_pci.fifo.m_out));
 	save_item(NAME(m_pci.init_enable));
 	save_item(NAME(m_pci.stall_state));
 	save_item(NAME(m_pci.op_pending));
@@ -699,9 +701,10 @@ void voodoo_device::register_save()
 	save_item(STRUCT_MEMBER(m_fbi.m_svert, w1));
 	save_item(STRUCT_MEMBER(m_fbi.m_svert, s1));
 	save_item(STRUCT_MEMBER(m_fbi.m_svert, t1));
-	save_item(NAME(m_fbi.m_fifo.m_size));
-	save_item(NAME(m_fbi.m_fifo.m_in));
-	save_item(NAME(m_fbi.m_fifo.m_out));
+//	save_item(NAME(m_fbi.m_fifo.m_size));
+//	save_item(NAME(m_fbi.m_fifo.m_in));
+//	save_item(NAME(m_fbi.m_fifo.m_out));
+/*
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, enable));
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, count_holes));
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, base));
@@ -711,7 +714,7 @@ void voodoo_device::register_save()
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, amax));
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, depth));
 	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, holes));
-
+*/
 	save_item(NAME(m_fbi.m_clut));
 
 	// renderer states
@@ -1281,137 +1284,220 @@ inline s32 voodoo_device::tmu_state::compute_lodbase()
 
 
 
-/*************************************
- *
- *  Command FIFO depth computation
- *
- *************************************/
+//-------------------------------------------------
+//  command_fifo - constructor
+//-------------------------------------------------
 
-int voodoo_device::cmdfifo_compute_expected_depth(cmdfifo_info &f)
+command_fifo::command_fifo(voodoo_device &device) :
+	m_device(device),
+	m_ram(nullptr),
+	m_mask(0),
+	m_enable(false),
+	m_count_holes(false),
+	m_ram_base(0),
+	m_ram_end(0),
+	m_read_index(0),
+	m_address_min(0),
+	m_address_max(0),
+	m_depth(0),
+	m_holes(0)
 {
-	u32 *fifobase = (u32 *)m_fbi.m_ram;
-	u32 readptr = f.rdptr;
-	u32 command = fifobase[readptr / 4];
-	int i, count = 0;
+}
 
-	/* low 3 bits specify the packet type */
-	switch (command & 7)
+
+//-------------------------------------------------
+//  execute_if_ready - if we have enough data to
+//  execute a command, do so; otherwise, return -1
+//-------------------------------------------------
+
+s32 command_fifo::execute_if_ready()
+{
+	// all CMDFIFO commands need at least one word
+	if (m_depth == 0)
+		return -1;
+
+	// see if we have enough for the current command
+	u32 const needed_depth = words_needed(peek_next());
+	if (m_depth < needed_depth)
+		return -1;
+
+	// read the next command and handle it based on the low 3 bits
+	u32 command = read_next();
+	return (this->*s_packet_handler[BIT(command, 0, 3)])(command);
+}
+
+
+//-------------------------------------------------
+//  write - handle a write to the FIFO
+//-------------------------------------------------
+
+void command_fifo::write(offs_t addr, u32 data)
+{
+	if (LOG_CMDFIFO_VERBOSE)
+		m_device.logerror("CMDFIFO_w(%04X) = %08X\n", addr, data);
+
+	// write the data if it's within range
+	if (addr < m_ram_end)
+		m_ram[(addr / 4) & m_mask] = data;
+
+	// count holes?
+	if (m_count_holes)
 	{
-		/*
-		    Packet type 0: 1 or 2 words
+		// in-order, no holes
+		if (m_holes == 0 && addr == m_address_min + 4)
+		{
+			m_address_min = m_address_max = addr;
+			m_depth++;
+		}
 
-		      Word  Bits
-		        0  31:29 = reserved
-		        0  28:6  = Address [24:2]
-		        0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
-		        0   2:0  = Packet type (0)
-		        1  31:11 = reserved (JMP AGP only)
-		        1  10:0  = Address [35:25]
-		*/
+		// out-of-order, below the minimum
+		else if (addr < m_address_min)
+		{
+			if (m_holes != 0)
+				m_device.logerror("Unexpected CMDFIFO: AMin=%08X AMax=%08X Holes=%d WroteTo:%08X\n", m_address_min, m_address_max, m_holes, addr);
+			m_holes += (addr - m_ram_base) / 4;
+			m_address_min = m_ram_base;
+			m_address_max = addr;
+			m_depth++;
+		}
+
+		// out-of-order, but within the min-max range
+		else if (addr < m_address_max)
+		{
+			m_holes--;
+			if (m_holes == 0)
+			{
+				m_depth += (m_address_max - m_address_min) / 4;
+				m_address_min = m_address_max;
+			}
+		}
+
+		// out-of-order, bumping max
+		else
+		{
+			m_holes += (addr - m_address_max) / 4 - 1;
+			m_address_max = addr;
+		}
+	}
+
+	// execute if we can
+	auto &pci = m_device.m_pci;
+	if (!pci.op_pending)
+	{
+		s32 cycles = execute_if_ready();
+		if (cycles > 0)
+		{
+			attotime curtime = m_device.machine().time();
+			pci.op_pending = true;
+			pci.op_end_time = curtime + m_device.clocks_to_attotime(cycles);
+
+			if (LOG_FIFO_VERBOSE)
+				m_device.logerror("VOODOO.FIFO:direct write start at %s end at %s\n", curtime.as_string(18), pci.op_end_time.as_string(18));
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  words_needed - return the total number of
+//  words needed for the given command and all its
+//  parameters
+//-------------------------------------------------
+
+u32 command_fifo::words_needed(u32 command)
+{
+	// low 3 bits specify the packet type
+	switch (BIT(command, 0, 3))
+	{
 		case 0:
-			if (((command >> 3) & 7) == 4)
-				return 2;
-			return 1;
+			// Packet type 0: 1 or 2 words
+			//
+			//   Word  Bits
+			//     0  31:29 = reserved
+			//     0  28:6  = Address [24:2]
+			//     0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
+			//     0   2:0  = Packet type (0)
+			return (BIT(command, 3, 3) == 4) ? 2 : 1;
 
-		/*
-		    Packet type 1: 1 + N words
-
-		      Word  Bits
-		        0  31:16 = Number of words
-		        0    15  = Increment?
-		        0  14:3  = Register base
-		        0   2:0  = Packet type (1)
-		        1  31:0  = Data word
-		*/
 		case 1:
-			return 1 + (command >> 16);
+			// Packet type 1: 1 + N words
+			//
+			//   Word  Bits
+			//     0  31:16 = Number of words
+			//     0    15  = Increment?
+			//     0  14:3  = Register base
+			//     0   2:0  = Packet type (1)
+			return 1 + BIT(command, 16, 16);
 
-		/*
-		    Packet type 2: 1 + N words
-
-		      Word  Bits
-		        0  31:3  = 2D Register mask
-		        0   2:0  = Packet type (2)
-		        1  31:0  = Data word
-		*/
 		case 2:
-			for (i = 3; i <= 31; i++)
-				if (command & (1 << i)) count++;
-			return 1 + count;
+			// Packet type 2: 1 + N words
+			//
+			//   Word  Bits
+			//     0  31:3  = 2D Register mask
+			//     0   2:0  = Packet type (2)
+			return 1 + population_count_32(BIT(command, 3, 29));
 
-		/*
-		    Packet type 3: 1 + N words
-
-		      Word  Bits
-		        0  31:29 = Number of dummy entries following the data
-		        0   28   = Packed color data?
-		        0   25   = Disable ping pong sign correction (0=normal, 1=disable)
-		        0   24   = Culling sign (0=positive, 1=negative)
-		        0   23   = Enable culling (0=disable, 1=enable)
-		        0   22   = Strip mode (0=strip, 1=fan)
-		        0   17   = Setup S1 and T1
-		        0   16   = Setup W1
-		        0   15   = Setup S0 and T0
-		        0   14   = Setup W0
-		        0   13   = Setup Wb
-		        0   12   = Setup Z
-		        0   11   = Setup Alpha
-		        0   10   = Setup RGB
-		        0   9:6  = Number of vertices
-		        0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
-		        0   2:0  = Packet type (3)
-		        1  31:0  = Data word
-		*/
 		case 3:
-			count = 2;      /* X/Y */
-			if (command & (1 << 28))
-			{
-				if (command & (3 << 10)) count++;       /* ARGB */
-			}
+		{
+			// Packet type 3: 1 + N words
+			//
+			//   Word  Bits
+			//     0  31:29 = Number of dummy entries following the data
+			//     0   28   = Packed color data?
+			//     0   25   = Disable ping pong sign correction (0=normal, 1=disable)
+			//     0   24   = Culling sign (0=positive, 1=negative)
+			//     0   23   = Enable culling (0=disable, 1=enable)
+			//     0   22   = Strip mode (0=strip, 1=fan)
+			//     0   17   = Setup S1 and T1
+			//     0   16   = Setup W1
+			//     0   15   = Setup S0 and T0
+			//     0   14   = Setup W0
+			//     0   13   = Setup Wb
+			//     0   12   = Setup Z
+			//     0   11   = Setup Alpha
+			//     0   10   = Setup RGB
+			//     0   9:6  = Number of vertices
+			//     0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
+			//     0   2:0  = Packet type (3)
+
+			// determine words per vertex
+			u32 count = 2;	// X/Y
+			if (BIT(command, 28))
+				count += (BIT(command, 10, 2) != 0) ? 1 : 0;       // ARGB in one word
 			else
-			{
-				if (command & (1 << 10)) count += 3;    /* RGB */
-				if (command & (1 << 11)) count++;       /* A */
-			}
-			if (command & (1 << 12)) count++;           /* Z */
-			if (command & (1 << 13)) count++;           /* Wb */
-			if (command & (1 << 14)) count++;           /* W0 */
-			if (command & (1 << 15)) count += 2;        /* S0/T0 */
-			if (command & (1 << 16)) count++;           /* W1 */
-			if (command & (1 << 17)) count += 2;        /* S1/T1 */
-			count *= (command >> 6) & 15;               /* numverts */
-			return 1 + count + (command >> 29);
+				count += 3 * BIT(command, 10) + BIT(command, 11);  // RGB + A
+			count += BIT(command, 12);     // Z
+			count += BIT(command, 13);     // Wb
+			count += BIT(command, 14);     // W0
+			count += 2 * BIT(command, 15); // S0/T0
+			count += BIT(command, 16);     // W1
+			count += 2 * BIT(command, 17); // S1/T1
 
-		/*
-		    Packet type 4: 1 + N words
+			// multiply by the number of verticies
+			count *= BIT(command, 6, 4);
+			return 1 + count + BIT(command, 29, 3);
+		}
 
-		      Word  Bits
-		        0  31:29 = Number of dummy entries following the data
-		        0  28:15 = General register mask
-		        0  14:3  = Register base
-		        0   2:0  = Packet type (4)
-		        1  31:0  = Data word
-		*/
 		case 4:
-			for (i = 15; i <= 28; i++)
-				if (command & (1 << i)) count++;
-			return 1 + count + (command >> 29);
+			// Packet type 4: 1 + N words
+			//
+			//   Word  Bits
+			//     0  31:29 = Number of dummy entries following the data
+			//     0  28:15 = General register mask
+			//     0  14:3  = Register base
+			//     0   2:0  = Packet type (4)
+			return 1 + population_count_32(BIT(command, 15, 14)) + BIT(command, 29, 3);
 
-		/*
-		    Packet type 5: 2 + N words
-
-		      Word  Bits
-		        0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
-		        0  29:26 = Byte disable W2
-		        0  25:22 = Byte disable WN
-		        0  21:3  = Num words
-		        0   2:0  = Packet type (5)
-		        1  31:30 = Reserved
-		        1  29:0  = Base address [24:0]
-		        2  31:0  = Data word
-		*/
 		case 5:
-			return 2 + ((command >> 3) & 0x7ffff);
+			// Packet type 5: 2 + N words
+			//
+			//	Word  Bits
+			//    0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
+			//    0  29:26 = Byte disable W2
+			//    0  25:22 = Byte disable WN
+			//    0  21:3  = Num words
+			//    0   2:0  = Packet type (5)
+			return 2 + BIT(command, 3, 19);
 
 		default:
 			osd_printf_debug("UNKNOWN PACKET TYPE %d\n", command & 7);
@@ -1420,497 +1506,391 @@ int voodoo_device::cmdfifo_compute_expected_depth(cmdfifo_info &f)
 }
 
 
+//-------------------------------------------------
+//  packet_type_0 - handle FIFO packet type 0
+//-------------------------------------------------
 
-/*************************************
- *
- *  Command FIFO execution
- *
- *************************************/
-
-u32 voodoo_device::cmdfifo_execute(cmdfifo_info *f)
+u32 command_fifo::packet_type_0(u32 command)
 {
-	u32 *fifobase = (u32 *)m_fbi.m_ram;
-	u32 readptr = f->rdptr;
-	u32 *src = &fifobase[readptr / 4];
-	u32 command = *src++;
-	int count, inc, code, i;
-	fbi_state::setup_vertex svert = {0};
-	offs_t target;
-	int cycles = 0;
+	// Packet type 0: 1 or 2 words
+	//
+	//   Word  Bits
+	//     0  31:29 = reserved
+	//     0  28:6  = Address [24:2]
+	//     0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
+	//     0   2:0  = Packet type (0)
+	//     1  31:11 = reserved (JMP AGP only)
+	//     1  10:0  = Address [35:25]
+	u32 target = BIT(command, 6, 23) << 2;
 
-	switch (command & 7)
+	// switch off of the specific command; many are unimplemented until we
+	// see them in real life
+	switch (BIT(command, 3, 3))
 	{
-		/*
-		    Packet type 0: 1 or 2 words
-
-		      Word  Bits
-		        0  31:29 = reserved
-		        0  28:6  = Address [24:2]
-		        0   5:3  = Function (0 = NOP, 1 = JSR, 2 = RET, 3 = JMP LOCAL, 4 = JMP AGP)
-		        0   2:0  = Packet type (0)
-		        1  31:11 = reserved (JMP AGP only)
-		        1  10:0  = Address [35:25]
-		*/
-		case 0:
-
-			/* extract parameters */
-			target = (command >> 4) & 0x1fffffc;
-
-			/* switch off of the specific command */
-			switch ((command >> 3) & 7)
-			{
-				case 0:     /* NOP */
-					if (LOG_CMDFIFO) logerror("  NOP\n");
-					break;
-
-				case 1:     /* JSR */
-					if (LOG_CMDFIFO) logerror("  JSR $%06X\n", target);
-					osd_printf_debug("JSR in CMDFIFO!\n");
-					src = &fifobase[target / 4];
-					break;
-
-				case 2:     /* RET */
-					if (LOG_CMDFIFO) logerror("  RET $%06X\n", target);
-					fatalerror("RET in CMDFIFO!\n");
-
-				case 3:     /* JMP LOCAL FRAME BUFFER */
-					if (LOG_CMDFIFO) logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
-					src = &fifobase[target / 4];
-					break;
-
-				case 4:     /* JMP AGP */
-					if (LOG_CMDFIFO) logerror("  JMP AGP $%06X\n", target);
-					fatalerror("JMP AGP in CMDFIFO!\n");
-					src = &fifobase[target / 4];
-					break;
-
-				default:
-					osd_printf_debug("INVALID JUMP COMMAND!\n");
-					fatalerror("  INVALID JUMP COMMAND\n");
-			}
+		case 0:     // NOP
+			if (LOG_CMDFIFO)
+				m_device.logerror("  NOP\n");
 			break;
 
-		/*
-		    Packet type 1: 1 + N words
-
-		      Word  Bits
-		        0  31:16 = Number of words
-		        0    15  = Increment?
-		        0  14:3  = Register base
-		        0   2:0  = Packet type (1)
-		        1  31:0  = Data word
-		*/
-		case 1:
-
-			/* extract parameters */
-			count = command >> 16;
-			inc = (command >> 15) & 1;
-			target = (command >> 3) & 0xfff;
-
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
-
-			if (m_reg.rev3() && (target & 0x800))
-			{
-				//  Banshee/Voodoo3 2D register writes
-
-				/* loop over all registers and write them one at a time */
-				for (i = 0; i < count; i++, target += inc)
-				{
-					cycles += banshee_2d_w(target & 0xff, *src);
-					//logerror("    2d reg: %03x = %08X\n", target & 0x7ff, *src);
-					src++;
-				}
-			}
-			else
-			{
-				/* loop over all registers and write them one at a time */
-				for (i = 0; i < count; i++, target += inc)
-					cycles += register_w(target, *src++);
-			}
+		case 1:     // JSR
+			if (LOG_CMDFIFO)
+				m_device.logerror("  JSR $%06X\n", target);
+			fatalerror("JSR in CMDFIFO!\n");
 			break;
 
-		/*
-		    Packet type 2: 1 + N words
-
-		      Word  Bits
-		        0  31:3  = 2D Register mask
-		        0   2:0  = Packet type (2)
-		        1  31:0  = Data word
-		*/
-		case 2:
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 2: mask=%X\n", (command >> 3) & 0x1ffffff);
-
-			/* loop over all registers and write them one at a time */
-			for (i = 3; i <= 31; i++)
-				if (command & (1 << i))
-					cycles += register_w(banshee2D_clip0Min + (i - 3), *src++);
+		case 2:     // RET
+			if (LOG_CMDFIFO)
+				m_device.logerror("  RET $%06X\n", target);
+			fatalerror("RET in CMDFIFO!\n");
 			break;
 
-		/*
-		    Packet type 3: 1 + N words
-
-		      Word  Bits
-		        0  31:29 = Number of dummy entries following the data
-		        0   28   = Packed color data?
-		        0   25   = Disable ping pong sign correction (0=normal, 1=disable)
-		        0   24   = Culling sign (0=positive, 1=negative)
-		        0   23   = Enable culling (0=disable, 1=enable)
-		        0   22   = Strip mode (0=strip, 1=fan)
-		        0   17   = Setup S1 and T1
-		        0   16   = Setup W1
-		        0   15   = Setup S0 and T0
-		        0   14   = Setup W0
-		        0   13   = Setup Wb
-		        0   12   = Setup Z
-		        0   11   = Setup Alpha
-		        0   10   = Setup RGB
-		        0   9:6  = Number of vertices
-		        0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
-		        0   2:0  = Packet type (3)
-		        1  31:0  = Data word
-		*/
-		case 3:
-
-			/* extract parameters */
-			count = (command >> 6) & 15;
-			code = (command >> 3) & 7;
-
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 3: count=%d code=%d mask=%03X smode=%02X pc=%d\n", count, code, (command >> 10) & 0xfff, (command >> 22) & 0x3f, (command >> 28) & 1);
-
-			/* copy relevant bits into the setup mode register */
-			m_reg.write(voodoo_regs::reg_sSetupMode, ((command >> 10) & 0xff) | ((command >> 6) & 0xf0000));
-
-			/* loop over triangles */
-			for (i = 0; i < count; i++)
-			{
-				/* always extract X/Y */
-				svert.x = *(float *)src++;
-				svert.y = *(float *)src++;
-
-				/* load ARGB values if packed */
-				if (command & (1 << 28))
-				{
-					if (command & (3 << 10))
-					{
-						rgb_t argb = *src++;
-						if (command & (1 << 10))
-						{
-							svert.r = argb.r();
-							svert.g = argb.g();
-							svert.b = argb.b();
-						}
-						if (command & (1 << 11))
-							svert.a = argb.a();
-					}
-				}
-
-				/* load ARGB values if not packed */
-				else
-				{
-					if (command & (1 << 10))
-					{
-						svert.r = *(float *)src++;
-						svert.g = *(float *)src++;
-						svert.b = *(float *)src++;
-					}
-					if (command & (1 << 11))
-						svert.a = *(float *)src++;
-				}
-
-				/* load Z and Wb values */
-				if (command & (1 << 12))
-					svert.z = *(float *)src++;
-				if (command & (1 << 13))
-					svert.wb = svert.w0 = svert.w1 = *(float *)src++;
-
-				/* load W0, S0, T0 values */
-				if (command & (1 << 14))
-					svert.w0 = svert.w1 = *(float *)src++;
-				if (command & (1 << 15))
-				{
-					svert.s0 = svert.s1 = *(float *)src++;
-					svert.t0 = svert.t1 = *(float *)src++;
-				}
-
-				/* load W1, S1, T1 values */
-				if (command & (1 << 16))
-					svert.w1 = *(float *)src++;
-				if (command & (1 << 17))
-				{
-					svert.s1 = *(float *)src++;
-					svert.t1 = *(float *)src++;
-				}
-
-				/* if we're starting a new strip, or if this is the first of a set of verts */
-				/* for a series of individual triangles, initialize all the verts */
-				if ((code == 1 && i == 0) || (code == 0 && i % 3 == 0))
-				{
-					m_fbi.m_sverts = 1;
-					m_fbi.m_svert[0] = m_fbi.m_svert[1] = m_fbi.m_svert[2] = svert;
-				}
-
-				/* otherwise, add this to the list */
-				else
-				{
-					/* for strip mode, shuffle vertex 1 down to 0 */
-					if (!(command & (1 << 22)))
-						m_fbi.m_svert[0] = m_fbi.m_svert[1];
-
-					/* copy 2 down to 1 and add our new one regardless */
-					m_fbi.m_svert[1] = m_fbi.m_svert[2];
-					m_fbi.m_svert[2] = svert;
-
-					/* if we have enough, draw */
-					if (++m_fbi.m_sverts >= 3)
-						cycles += setup_and_draw_triangle();
-				}
-			}
-
-			/* account for the extra dummy words */
-			src += command >> 29;
+		case 3:     // JMP LOCAL FRAME BUFFER
+			if (LOG_CMDFIFO)
+				m_device.logerror("  JMP LOCAL FRAMEBUF $%06X\n", target);
+			m_read_index = target / 4;
 			break;
 
-		/*
-		    Packet type 4: 1 + N words
-
-		      Word  Bits
-		        0  31:29 = Number of dummy entries following the data
-		        0  28:15 = General register mask
-		        0  14:3  = Register base
-		        0   2:0  = Packet type (4)
-		        1  31:0  = Data word
-		*/
-		case 4:
-
-			/* extract parameters */
-			target = (command >> 3) & 0xfff;
-
-			if (LOG_CMDFIFO) logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", (command >> 15) & 0x3fff, target, command >> 29);
-
-			if (m_reg.rev3() && (target & 0x800))
-			{
-				//  Banshee/Voodoo3 2D register writes
-
-				/* loop over all registers and write them one at a time */
-				target &= 0xff;
-				for (i = 15; i <= 28; i++)
-				{
-					if (command & (1 << i))
-					{
-						cycles += banshee_2d_w(target + (i - 15), *src);
-						//logerror("    2d reg: %03x = %08X\n", target & 0x7ff, *src);
-						src++;
-					}
-				}
-			}
-			else
-			{
-				/* loop over all registers and write them one at a time */
-				for (i = 15; i <= 28; i++)
-					if (command & (1 << i))
-						cycles += register_w(target + (i - 15), *src++);
-			}
-
-			/* account for the extra dummy words */
-			src += command >> 29;
-			break;
-
-		/*
-		    Packet type 5: 2 + N words
-
-		      Word  Bits
-		        0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
-		        0  29:26 = Byte disable W2
-		        0  25:22 = Byte disable WN
-		        0  21:3  = Num words
-		        0   2:0  = Packet type (5)
-		        1  31:30 = Reserved
-		        1  29:0  = Base address [24:0]
-		        2  31:0  = Data word
-		*/
-		case 5:
-
-			/* extract parameters */
-			count = (command >> 3) & 0x7ffff;
-			target = *src++ / 4;
-
-			/* handle LFB writes */
-			switch (command >> 30)
-			{
-				case 0:     // Linear FB
-				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
-
-					u32 addr = target * 4;
-					for (i=0; i < count; i++)
-					{
-						u32 data = *src++;
-
-						m_fbi.m_ram[BYTE_XOR_LE(addr + 0)] = (u8)(data);
-						m_fbi.m_ram[BYTE_XOR_LE(addr + 1)] = (u8)(data >> 8);
-						m_fbi.m_ram[BYTE_XOR_LE(addr + 2)] = (u8)(data >> 16);
-						m_fbi.m_ram[BYTE_XOR_LE(addr + 3)] = (u8)(data >> 24);
-
-						addr += 4;
-					}
-					break;
-				}
-				case 2:     // 3D LFB
-				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
-
-					/* loop over words */
-					for (i = 0; i < count; i++)
-						cycles += lfb_w(target++, *src++, 0xffffffff);
-
-					break;
-				}
-
-				case 1:     // Planar YUV
-				{
-					// TODO
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: Planar YUV count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
-
-					/* just update the pointers for now */
-					for (i = 0; i < count; i++)
-					{
-						target++;
-						src++;
-					}
-
-					break;
-				}
-
-				case 3:     // Texture Port
-				{
-					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
-
-					/* loop over words */
-					for (i = 0; i < count; i++)
-						cycles += texture_w(target++, *src++);
-
-					break;
-				}
-			}
-
+		case 4:     // JMP AGP
+			if (LOG_CMDFIFO)
+				m_device.logerror("  JMP AGP $%06X\n", target);
+			fatalerror("JMP AGP in CMDFIFO!\n");
 			break;
 
 		default:
-			fprintf(stderr, "PACKET TYPE %d\n", command & 7);
+			fatalerror("  INVALID JUMP COMMAND\n");
 			break;
 	}
-
-	/* by default just update the read pointer past all the data we consumed */
-	f->rdptr = 4 * (src - fifobase);
-	return cycles;
+	return 0;
 }
 
 
+//-------------------------------------------------
+//  packet_type_1 - handle FIFO packet type 1
+//-------------------------------------------------
 
-/*************************************
- *
- *  Handle execution if we're ready
- *
- *************************************/
-
-s32 voodoo_device::cmdfifo_execute_if_ready(cmdfifo_info &f)
+u32 command_fifo::packet_type_1(u32 command)
 {
-	/* all CMDFIFO commands need at least one word */
-	if (f.depth == 0)
-		return -1;
+	// Packet type 1: 1 + N words
+	//
+	//   Word  Bits
+	//     0  31:16 = Number of words
+	//     0    15  = Increment?
+	//     0  14:3  = Register base
+	//     0   2:0  = Packet type (1)
+	//     1  31:0  = Data word
+	u32 count = BIT(command, 16, 16);
+	u32 inc = BIT(command, 15);
+	u32 target = BIT(command, 3, 12);
 
-	/* see if we have enough for the current command */
-	int const needed_depth = cmdfifo_compute_expected_depth(f);
-	if (f.depth < needed_depth)
-		return -1;
+	if (LOG_CMDFIFO)
+		m_device.logerror("  PACKET TYPE 1: count=%d inc=%d reg=%04X\n", count, inc, target);
 
-	/* execute */
-	int const cycles = cmdfifo_execute(&f);
-	f.depth -= needed_depth;
-	return cycles;
-}
-
-
-
-/*************************************
- *
- *  Handle writes to the CMD FIFO
- *
- *************************************/
-
-void voodoo_device::cmdfifo_w(cmdfifo_info *f, offs_t offset, u32 data)
-{
-	u32 addr = f->base + offset * 4;
-	u32 *fifobase = (u32 *)m_fbi.m_ram;
-
-	if (LOG_CMDFIFO_VERBOSE) logerror("CMDFIFO_w(%04X) = %08X\n", offset, data);
-
-	/* write the data */
-	if (addr < f->end)
-		fifobase[addr / 4] = data;
-
-	/* count holes? */
-	if (f->count_holes)
+	// loop over all registers and write them one at a time
+	u32 cycles = 0;
+	if (m_device.model() >= MODEL_VOODOO_BANSHEE && BIT(target, 11))
 	{
-		/* in-order, no holes */
-		if (f->holes == 0 && addr == f->amin + 4)
-		{
-			f->amin = f->amax = addr;
-			f->depth++;
-		}
+		for (u32 regbit = 0; regbit < count; regbit++, target += inc)
+			cycles += m_device.banshee_2d_w(target & 0xff, read_next());
+	}
+	else
+	{
+		for (u32 regbit = 0; regbit < count; regbit++, target += inc)
+			cycles += m_device.register_w(target, read_next());
+	}
+	return cycles;
+}
 
-		/* out-of-order, below the minimum */
-		else if (addr < f->amin)
-		{
-			if (f->holes != 0)
-				logerror("Unexpected CMDFIFO: AMin=%08X AMax=%08X Holes=%d WroteTo:%08X\n",
-						f->amin, f->amax, f->holes, addr);
-			//f->amin = f->amax = addr;
-			f->holes += (addr - f->base) / 4;
-			f->amin = f->base;
-			f->amax = addr;
 
-			f->depth++;
-		}
+//-------------------------------------------------
+//  packet_type_2 - handle FIFO packet type 2
+//-------------------------------------------------
 
-		/* out-of-order, but within the min-max range */
-		else if (addr < f->amax)
+u32 command_fifo::packet_type_2(u32 command)
+{
+	// Packet type 2: 1 + N words
+	//
+	//   Word  Bits
+	//     0  31:3  = 2D Register mask
+	//     0   2:0  = Packet type (2)
+	//     1  31:0  = Data word
+	if (LOG_CMDFIFO)
+		m_device.logerror("  PACKET TYPE 2: mask=%X\n", BIT(command, 3, 29));
+
+	// loop over all registers and write them one at a time
+	u32 cycles = 0;
+	if (m_device.model() >= MODEL_VOODOO_BANSHEE)
+	{
+		for (u32 regbit = 3; regbit <= 31; regbit++)
+			if (BIT(command, regbit))
+				cycles += m_device.banshee_2d_w(banshee2D_clip0Min + (regbit - 3), read_next());
+	}
+	else
+	{
+		for (u32 regbit = 3; regbit <= 31; regbit++)
+			if (BIT(command, regbit))
+				cycles += m_device.register_w(voodoo_regs::reg_bltSrcBaseAddr + (regbit - 3), read_next());
+	}
+	return cycles;
+}
+
+
+//-------------------------------------------------
+//  packet_type_3 - handle FIFO packet type 3
+//-------------------------------------------------
+
+u32 command_fifo::packet_type_3(u32 command)
+{
+	// Packet type 3: 1 + N words
+	//
+	//   Word  Bits
+	//     0  31:29 = Number of dummy entries following the data
+	//     0   28   = Packed color data?
+	//     0   25   = Disable ping pong sign correction (0=normal, 1=disable)
+	//     0   24   = Culling sign (0=positive, 1=negative)
+	//     0   23   = Enable culling (0=disable, 1=enable)
+	//     0   22   = Strip mode (0=strip, 1=fan)
+	//     0   17   = Setup S1 and T1
+	//     0   16   = Setup W1
+	//     0   15   = Setup S0 and T0
+	//     0   14   = Setup W0
+	//     0   13   = Setup Wb
+	//     0   12   = Setup Z
+	//     0   11   = Setup Alpha
+	//     0   10   = Setup RGB
+	//     0   9:6  = Number of vertices
+	//     0   5:3  = Command (0=Independent tris, 1=Start new strip, 2=Continue strip)
+	//     0   2:0  = Packet type (3)
+	//     1  31:0  = Data word
+	u32 count = BIT(command, 6, 4);
+	u32 code = BIT(command, 3, 3);
+
+	if (LOG_CMDFIFO)
+		m_device.logerror("  PACKET TYPE 3: count=%d code=%d mask=%03X smode=%02X pc=%d\n", count, code, BIT(command, 10, 12), BIT(command, 22, 6), BIT(command, 28));
+
+	// copy relevant bits into the setup mode register
+	m_device.m_reg.write(voodoo_regs::reg_sSetupMode, BIT(command, 10, 8) | (BIT(command, 22, 4) << 16));
+
+	// loop over triangles
+	voodoo_device::fbi_state::setup_vertex svert = { 0 };
+	u32 cycles = 0;
+	for (u32 trinum = 0; trinum < count; trinum++)
+	{
+		// always extract X/Y
+		svert.x = read_next_float();
+		svert.y = read_next_float();
+
+		// load ARGB values
+		if (BIT(command, 28))
 		{
-			f->holes--;
-			if (f->holes == 0)
+			// packed form
+			if (BIT(command, 10, 2) != 0)
 			{
-				f->depth += (f->amax - f->amin) / 4;
-				f->amin = f->amax;
+				rgb_t argb = read_next();
+				if (BIT(command, 10))
+				{
+					svert.r = argb.r();
+					svert.g = argb.g();
+					svert.b = argb.b();
+				}
+				if (BIT(command, 11))
+					svert.a = argb.a();
 			}
 		}
-
-		/* out-of-order, bumping max */
 		else
 		{
-			f->holes += (addr - f->amax) / 4 - 1;
-			f->amax = addr;
-		}
-	}
-
-	/* execute if we can */
-	if (!m_pci.op_pending)
-	{
-		s32 cycles = cmdfifo_execute_if_ready(*f);
-		if (cycles > 0)
-		{
-			m_pci.op_pending = true;
-			m_pci.op_end_time = machine().time() + clocks_to_attotime(cycles);
-
-			if (LOG_FIFO_VERBOSE)
+			// unpacked form
+			if (BIT(command, 10))
 			{
-				logerror("VOODOO.FIFO:direct write start at %d.%018d end at %d.%018d\n",
-						machine().time().seconds(), machine().time().attoseconds(),
-						m_pci.op_end_time.seconds(), m_pci.op_end_time.attoseconds());
+				svert.r = read_next_float();
+				svert.g = read_next_float();
+				svert.b = read_next_float();
 			}
+			if (BIT(command, 11))
+				svert.a = read_next_float();
+		}
+
+		// load Z and Wb values
+		if (BIT(command, 12))
+			svert.z = read_next_float();
+		if (BIT(command, 13))
+			svert.wb = svert.w0 = svert.w1 = read_next_float();
+
+		// load W0, S0, T0 values
+		if (BIT(command, 14))
+			svert.w0 = svert.w1 = read_next_float();
+		if (BIT(command, 15))
+		{
+			svert.s0 = svert.s1 = read_next_float();
+			svert.t0 = svert.t1 = read_next_float();
+		}
+
+		// load W1, S1, T1 values
+		if (BIT(command, 16))
+			svert.w1 = read_next_float();
+		if (BIT(command, 17))
+		{
+			svert.s1 = read_next_float();
+			svert.t1 = read_next_float();
+		}
+
+		// if we're starting a new strip, or if this is the first of a set of verts
+		// for a series of individual triangles, initialize all the verts
+		auto &fbi = m_device.m_fbi;
+		if ((code == 1 && trinum == 0) || (code == 0 && trinum % 3 == 0))
+		{
+			fbi.m_sverts = 1;
+			fbi.m_svert[0] = fbi.m_svert[1] = fbi.m_svert[2] = svert;
+		}
+
+		// otherwise, add this to the list
+		else
+		{
+			// for strip mode, shuffle vertex 1 down to 0
+			if (!BIT(command, 22))
+				fbi.m_svert[0] = fbi.m_svert[1];
+
+			// copy 2 down to 1 and add our new one regardless
+			fbi.m_svert[1] = fbi.m_svert[2];
+			fbi.m_svert[2] = svert;
+
+			// if we have enough, draw
+			if (++fbi.m_sverts >= 3)
+				cycles += m_device.setup_and_draw_triangle();
 		}
 	}
+
+	// account for the extra dummy words
+	consume(BIT(command, 29, 3));
+	return cycles;
 }
 
+
+//-------------------------------------------------
+//  packet_type_4 - handle FIFO packet type 4
+//-------------------------------------------------
+
+u32 command_fifo::packet_type_4(u32 command)
+{
+	// Packet type 4: 1 + N words
+	//
+	//   Word  Bits
+	//     0  31:29 = Number of dummy entries following the data
+	//     0  28:15 = General register mask
+	//     0  14:3  = Register base
+	//     0   2:0  = Packet type (4)
+	//     1  31:0  = Data word
+	u32 target = BIT(command, 3, 12);
+
+	if (LOG_CMDFIFO)
+		m_device.logerror("  PACKET TYPE 4: mask=%X reg=%04X pad=%d\n", BIT(command, 15, 14), target, BIT(command, 29, 3));
+
+	// loop over all registers and write them one at a time
+	u32 cycles = 0;
+	if (m_device.model() >= MODEL_VOODOO_BANSHEE && BIT(target, 11))
+	{
+		for (u32 regbit = 15; regbit <= 28; regbit++, target++)
+			if (BIT(command, regbit))
+				cycles += m_device.banshee_2d_w(target & 0xff, read_next());
+	}
+	else
+	{
+		for (u32 regbit = 15; regbit <= 28; regbit++, target++)
+			if (BIT(command, regbit))
+				cycles += m_device.register_w(target, read_next());
+	}
+
+	// account for the extra dummy words
+	consume(BIT(command, 29, 3));
+	return cycles;
+}
+
+
+//-------------------------------------------------
+//  packet_type_5 - handle FIFO packet type 5
+//-------------------------------------------------
+
+u32 command_fifo::packet_type_5(u32 command)
+{
+	// Packet type 5: 2 + N words
+	//
+	//	Word  Bits
+	//    0  31:30 = Space (0,1=reserved, 2=LFB, 3=texture)
+	//    0  29:26 = Byte disable W2
+	//    0  25:22 = Byte disable WN
+	//    0  21:3  = Num words
+	//    0   2:0  = Packet type (5)
+	//    1  31:30 = Reserved
+	//    1  29:0  = Base address [24:0]
+	//    2  31:0  = Data word
+	u32 count = BIT(command, 3, 19);
+	u32 target = read_next() / 4;
+
+	// handle LFB writes
+	u32 cycles = 0;
+	switch (BIT(command, 30, 2))
+	{
+		// Linear FB
+		case 0:
+			if (LOG_CMDFIFO)
+				m_device.logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
+
+			for (u32 word = 0; word < count; word++)
+				m_ram[target++ & m_mask] = little_endianize_int32(read_next());
+			cycles = count;
+			break;
+
+		// 3D LFB
+		case 2:
+			if (LOG_CMDFIFO)
+				m_device.logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
+
+			for (u32 word = 0; word < count; word++)
+				cycles += m_device.lfb_w(target++, read_next(), 0xffffffff);
+			break;
+
+		// Planar YUV
+		case 1:
+			if (LOG_CMDFIFO)
+				m_device.logerror("  PACKET TYPE 5: Planar YUV count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
+
+			fatalerror("Unimplemented YUV update in Voodoo");
+			break;
+
+		// Texture port
+		case 3:
+			if (LOG_CMDFIFO)
+				m_device.logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
+
+			for (u32 word = 0; word < count; word++)
+				cycles += m_device.texture_w(target++, read_next());
+			break;
+	}
+	return cycles;
+}
+
+
+//-------------------------------------------------
+//  packet_type_unknown - error out on unhandled
+//  packets
+//-------------------------------------------------
+
+u32 command_fifo::packet_type_unknown(u32 command)
+{
+	fatalerror("Unhandled cmdFifo packet type %d\n", BIT(command, 0, 3));
+}
+
+
+command_fifo::packet_handler command_fifo::s_packet_handler[8] =
+{
+	&command_fifo::packet_type_0,
+	&command_fifo::packet_type_1,
+	&command_fifo::packet_type_2,
+	&command_fifo::packet_type_3,
+	&command_fifo::packet_type_4,
+	&command_fifo::packet_type_5,
+	&command_fifo::packet_type_unknown,
+	&command_fifo::packet_type_unknown
+};
 
 
 /*************************************
@@ -2511,8 +2491,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 				if (BIT(chips, 0) && m_pci.init_enable.enable_hw_init())
 				{
 					m_reg.write(regnum, data);
-					m_fbi.m_cmdfifo[0].enable = m_reg.fbi_init7().cmdfifo_enable();
-					m_fbi.m_cmdfifo[0].count_holes = !m_reg.fbi_init7().disable_cmdfifo_holes();
+					m_fbi.m_cmdfifo[0].set_enable(m_reg.fbi_init7().cmdfifo_enable());
+					m_fbi.m_cmdfifo[0].set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
 				}
 			}
 			else
@@ -2527,8 +2507,8 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			{
 				m_renderer->wait(m_reg.name(regnum));
 				m_reg.write(regnum, data);
-				m_fbi.m_cmdfifo[0].base = BIT(data, 0, 10) << 12;
-				m_fbi.m_cmdfifo[0].end = (BIT(data, 16, 10) + 1) << 12;
+				m_fbi.m_cmdfifo[0].set_base(BIT(data, 0, 10) << 12);
+				m_fbi.m_cmdfifo[0].set_end((BIT(data, 16, 10) + 1) << 12);
 			}
 			break;
 
@@ -2543,7 +2523,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			if (!m_reg.rev2())
 				break;
 			if (BIT(chips, 0))
-				m_fbi.m_cmdfifo[0].rdptr = data;
+				m_fbi.m_cmdfifo[0].set_read_pointer(data);
 			break;
 
 		// this register is repurposed as reg_colBufferAddr on Banshee
@@ -2553,7 +2533,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			if (BIT(chips, 0))
 			{
 				if (m_reg.rev2())
-					m_fbi.m_cmdfifo[0].amin = data;
+					m_fbi.m_cmdfifo[0].set_address_min(data);
 				else
 					m_fbi.m_rgboffs[1] = data & m_fbi.m_mask & ~0x0f;
 			}
@@ -2566,7 +2546,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			if (BIT(chips, 0))
 			{
 				if (m_reg.rev2())
-					m_fbi.m_cmdfifo[0].amax = data;
+					m_fbi.m_cmdfifo[0].set_address_max(data);
 				else
 				{
 					u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
@@ -2586,7 +2566,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			if (BIT(chips, 0))
 			{
 				if (m_reg.rev2())
-					m_fbi.m_cmdfifo[0].depth = data;
+					m_fbi.m_cmdfifo[0].set_depth(data);
 				else
 					m_fbi.m_auxoffs = data & m_fbi.m_mask & ~0x0f;
 			}
@@ -2599,7 +2579,7 @@ s32 voodoo_device::register_w(offs_t offset, u32 data)
 			if (BIT(chips, 0))
 			{
 				if (m_reg.rev2())
-					m_fbi.m_cmdfifo[0].holes = data;
+					m_fbi.m_cmdfifo[0].set_holes(data);
 				else
 				{
 					int rowpixels = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
@@ -3291,7 +3271,8 @@ void voodoo_device::flush_fifos(attotime current_time)
 		return;
 	in_flush = true;
 
-	if (!m_pci.op_pending) fatalerror("flush_fifos called with no pending operation\n");
+	if (!m_pci.op_pending)
+		fatalerror("flush_fifos called with no pending operation\n");
 
 	if (LOG_FIFO_VERBOSE)
 	{
@@ -3309,10 +3290,10 @@ void voodoo_device::flush_fifos(attotime current_time)
 		do
 		{
 			/* we might be in CMDFIFO mode */
-			if (m_fbi.m_cmdfifo[0].enable)
+			if (m_fbi.m_cmdfifo[0].enabled())
 			{
 				/* if we don't have anything to execute, we're done for now */
-				cycles = cmdfifo_execute_if_ready(m_fbi.m_cmdfifo[0]);
+				cycles = m_fbi.m_cmdfifo[0].execute_if_ready();
 				if (cycles == -1)
 				{
 					m_pci.op_pending = false;
@@ -3321,10 +3302,10 @@ void voodoo_device::flush_fifos(attotime current_time)
 					return;
 				}
 			}
-			else if (m_fbi.m_cmdfifo[1].enable)
+			else if (m_fbi.m_cmdfifo[1].enabled())
 			{
 				/* if we don't have anything to execute, we're done for now */
-				cycles = cmdfifo_execute_if_ready(m_fbi.m_cmdfifo[1]);
+				cycles = m_fbi.m_cmdfifo[1].execute_if_ready();
 				if (cycles == -1)
 				{
 					m_pci.op_pending = false;
@@ -3337,7 +3318,7 @@ void voodoo_device::flush_fifos(attotime current_time)
 			/* else we are in standard PCI/memory FIFO mode */
 			else
 			{
-				voodoo::fifo_state *fifo;
+				voodoo::memory_fifo *fifo;
 
 				/* choose which FIFO to read from */
 				if (!m_fbi.m_fifo.empty())
@@ -3409,15 +3390,13 @@ void voodoo_device::flush_fifos(attotime current_time)
 
 void voodoo_device::write(offs_t offset, u32 data, u32 mem_mask)
 {
-	int stall = false;
-
 	g_profiler.start(PROFILER_USER1);
 
-	/* should not be getting accesses while stalled */
+	// should not be getting accesses while stalled (but we do)
 	if (m_pci.stall_state != NOT_STALLED)
 		logerror("voodoo_device::write while stalled!\n");
 
-	/* if we have something pending, flush the FIFOs up to the current time */
+	// if we have something pending, flush the FIFOs up to the current time
 	if (m_pci.op_pending)
 		flush_fifos(machine().time());
 
@@ -3436,7 +3415,7 @@ void voodoo_device::write(offs_t offset, u32 data, u32 mem_mask)
 					/* check for byte swizzling (bit 18) */
 					if (offset & 0x40000/4)
 						data = swapendian_int32(data);
-					cmdfifo_w(&m_fbi.m_cmdfifo[0], offset & 0xffff, data);
+					m_fbi.m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
 					g_profiler.stop();
 					return;
 				}
@@ -3560,14 +3539,6 @@ void voodoo_device::write(offs_t offset, u32 data, u32 mem_mask)
 		if (LOG_FIFO) logerror("VOODOO.FIFO:hit PCI FIFO free LWM -- stalling\n");
 		stall_cpu(STALLED_UNTIL_FIFO_LWM, machine().time());
 	}
-
-	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
-	if (stall)
-	{
-		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:wrote non-FIFO register -- stalling until clear\n");
-		stall_cpu(STALLED_UNTIL_FIFO_EMPTY, machine().time());
-	}
-
 	g_profiler.stop();
 }
 
@@ -3654,11 +3625,11 @@ u32 voodoo_device::register_r(offs_t offset)
 				/* bit 10 is 2D busy */
 
 				/* bit 11 is cmd FIFO 0 busy */
-				if (m_fbi.m_cmdfifo[0].enable && m_fbi.m_cmdfifo[0].depth > 0)
+				if (m_fbi.m_cmdfifo[0].enabled() && m_fbi.m_cmdfifo[0].depth() > 0)
 					result |= 1 << 11;
 
 				/* bit 12 is cmd FIFO 1 busy */
-				if (m_fbi.m_cmdfifo[1].enable && m_fbi.m_cmdfifo[1].depth > 0)
+				if (m_fbi.m_cmdfifo[1].enabled() && m_fbi.m_cmdfifo[1].depth() > 0)
 					result |= 1 << 12;
 			}
 
@@ -3714,26 +3685,26 @@ u32 voodoo_device::register_r(offs_t offset)
 
 		/* cmdFifo -- Voodoo2 only */
 		case voodoo_regs::reg_cmdFifoRdPtr:
-			result = m_fbi.m_cmdfifo[0].rdptr;
+			result = m_fbi.m_cmdfifo[0].read_pointer();
 
 			/* eat some cycles since people like polling here */
 			if (EAT_CYCLES) m_cpu->eat_cycles(1000);
 			break;
 
 		case voodoo_regs::reg_cmdFifoAMin:
-			result = m_fbi.m_cmdfifo[0].amin;
+			result = m_fbi.m_cmdfifo[0].address_min();
 			break;
 
 		case voodoo_regs::reg_cmdFifoAMax:
-			result = m_fbi.m_cmdfifo[0].amax;
+			result = m_fbi.m_cmdfifo[0].address_max();
 			break;
 
 		case voodoo_regs::reg_cmdFifoDepth:
-			result = m_fbi.m_cmdfifo[0].depth;
+			result = m_fbi.m_cmdfifo[0].depth();
 			break;
 
 		case voodoo_regs::reg_cmdFifoHoles:
-			result = m_fbi.m_cmdfifo[0].holes;
+			result = m_fbi.m_cmdfifo[0].holes();
 			break;
 
 		/* all counters are 24-bit only */
@@ -3905,43 +3876,43 @@ u32 voodoo_banshee_device::banshee_agp_r(offs_t offset)
 	switch (offset)
 	{
 		case cmdRdPtrL0:
-			result = m_fbi.m_cmdfifo[0].rdptr;
+			result = m_fbi.m_cmdfifo[0].read_pointer();
 			break;
 
 		case cmdAMin0:
-			result = m_fbi.m_cmdfifo[0].amin;
+			result = m_fbi.m_cmdfifo[0].address_min();
 			break;
 
 		case cmdAMax0:
-			result = m_fbi.m_cmdfifo[0].amax;
+			result = m_fbi.m_cmdfifo[0].address_max();
 			break;
 
 		case cmdFifoDepth0:
-			result = m_fbi.m_cmdfifo[0].depth;
+			result = m_fbi.m_cmdfifo[0].depth();
 			break;
 
 		case cmdHoleCnt0:
-			result = m_fbi.m_cmdfifo[0].holes;
+			result = m_fbi.m_cmdfifo[0].holes();
 			break;
 
 		case cmdRdPtrL1:
-			result = m_fbi.m_cmdfifo[1].rdptr;
+			result = m_fbi.m_cmdfifo[1].read_pointer();
 			break;
 
 		case cmdAMin1:
-			result = m_fbi.m_cmdfifo[1].amin;
+			result = m_fbi.m_cmdfifo[1].address_min();
 			break;
 
 		case cmdAMax1:
-			result = m_fbi.m_cmdfifo[1].amax;
+			result = m_fbi.m_cmdfifo[1].address_max();
 			break;
 
 		case cmdFifoDepth1:
-			result = m_fbi.m_cmdfifo[1].depth;
+			result = m_fbi.m_cmdfifo[1].depth();
 			break;
 
 		case cmdHoleCnt1:
-			result = m_fbi.m_cmdfifo[1].holes;
+			result = m_fbi.m_cmdfifo[1].holes();
 			break;
 
 		default:
@@ -4423,74 +4394,74 @@ void voodoo_banshee_device::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		case cmdBaseAddr0:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[0].base = (data & 0xffffff) << 12;
-			m_fbi.m_cmdfifo[0].end = m_fbi.m_cmdfifo[0].base + (((m_banshee.agp[cmdBaseSize0] & 0xff) + 1) << 12);
+			m_fbi.m_cmdfifo[0].set_base(BIT(data, 0, 24) << 12);
+			m_fbi.m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize0:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[0].end = m_fbi.m_cmdfifo[0].base + (((m_banshee.agp[cmdBaseSize0] & 0xff) + 1) << 12);
-			m_fbi.m_cmdfifo[0].enable = (data >> 8) & 1;
-			m_fbi.m_cmdfifo[0].count_holes = (~data >> 10) & 1;
+			m_fbi.m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_fbi.m_cmdfifo[0].set_enable(BIT(data, 8));
+			m_fbi.m_cmdfifo[0].set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump0:
 			fatalerror("cmdBump0\n");
 
 		case cmdRdPtrL0:
-			m_fbi.m_cmdfifo[0].rdptr = data;
+			m_fbi.m_cmdfifo[0].set_read_pointer(data);
 			break;
 
 		case cmdAMin0:
-			m_fbi.m_cmdfifo[0].amin = data;
+			m_fbi.m_cmdfifo[0].set_address_min(data);
 			break;
 
 		case cmdAMax0:
-			m_fbi.m_cmdfifo[0].amax = data;
+			m_fbi.m_cmdfifo[0].set_address_max(data);
 			break;
 
 		case cmdFifoDepth0:
-			m_fbi.m_cmdfifo[0].depth = data;
+			m_fbi.m_cmdfifo[0].set_depth(data);
 			break;
 
 		case cmdHoleCnt0:
-			m_fbi.m_cmdfifo[0].holes = data;
+			m_fbi.m_cmdfifo[0].set_holes(data);
 			break;
 
 		case cmdBaseAddr1:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[1].base = (data & 0xffffff) << 12;
-			m_fbi.m_cmdfifo[1].end = m_fbi.m_cmdfifo[1].base + (((m_banshee.agp[cmdBaseSize1] & 0xff) + 1) << 12);
+			m_fbi.m_cmdfifo[1].set_base(BIT(data, 0, 24) << 12);
+			m_fbi.m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize1:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[1].end = m_fbi.m_cmdfifo[1].base + (((m_banshee.agp[cmdBaseSize1] & 0xff) + 1) << 12);
-			m_fbi.m_cmdfifo[1].enable = (data >> 8) & 1;
-			m_fbi.m_cmdfifo[1].count_holes = (~data >> 10) & 1;
+			m_fbi.m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_fbi.m_cmdfifo[1].set_enable(BIT(data, 8));
+			m_fbi.m_cmdfifo[1].set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump1:
 			fatalerror("cmdBump1\n");
 
 		case cmdRdPtrL1:
-			m_fbi.m_cmdfifo[1].rdptr = data;
+			m_fbi.m_cmdfifo[1].set_read_pointer(data);
 			break;
 
 		case cmdAMin1:
-			m_fbi.m_cmdfifo[1].amin = data;
+			m_fbi.m_cmdfifo[1].set_address_min(data);
 			break;
 
 		case cmdAMax1:
-			m_fbi.m_cmdfifo[1].amax = data;
+			m_fbi.m_cmdfifo[1].set_address_max(data);
 			break;
 
 		case cmdFifoDepth1:
-			m_fbi.m_cmdfifo[1].depth = data;
+			m_fbi.m_cmdfifo[1].set_depth(data);
 			break;
 
 		case cmdHoleCnt1:
-			m_fbi.m_cmdfifo[1].holes = data;
+			m_fbi.m_cmdfifo[1].set_holes(data);
 			break;
 
 		default:
@@ -4544,11 +4515,7 @@ void voodoo_banshee_device::banshee_fb_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (offset < m_fbi.m_lfb_base)
 	{
-		if (m_fbi.m_cmdfifo[0].enable && addr >= m_fbi.m_cmdfifo[0].base && addr < m_fbi.m_cmdfifo[0].end)
-			cmdfifo_w(&m_fbi.m_cmdfifo[0], (addr - m_fbi.m_cmdfifo[0].base) / 4, data);
-		else if (m_fbi.m_cmdfifo[1].enable && addr >= m_fbi.m_cmdfifo[1].base && addr < m_fbi.m_cmdfifo[1].end)
-			cmdfifo_w(&m_fbi.m_cmdfifo[1], (addr - m_fbi.m_cmdfifo[1].base) / 4, data);
-		else
+		if (!m_fbi.m_cmdfifo[0].write_if_in_range(addr, data) && !m_fbi.m_cmdfifo[1].write_if_in_range(addr, data))
 		{
 			if (offset*4 <= m_fbi.m_mask)
 				COMBINE_DATA(&((u32 *)m_fbi.m_ram)[offset]);
@@ -5165,6 +5132,7 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	m_vblank(*this),
 	m_stall(*this),
 	m_pciint(*this),
+	m_fbi(*this),
 	m_tmu{ *this, *this },
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG),

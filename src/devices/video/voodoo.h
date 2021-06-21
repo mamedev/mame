@@ -46,14 +46,20 @@ static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 //  INTERNAL CLASSES
 //**************************************************************************
 
+class voodoo_device;
+
 namespace voodoo
 {
 
-class fifo_state
+// ======================> memory_fifo
+
+// memory_fifo is a simple memory access FIFO that is used on the frontend
+// PCI bus (64 entries) or within the framebuffer (up to 64k)
+class memory_fifo
 {
 public:
 	// construction
-	fifo_state();
+	memory_fifo();
 
 	// configuration
 	void configure(u32 *base, u32 size) { m_base = base; m_size = size; reset(); }
@@ -72,13 +78,107 @@ public:
 	void add(u32 data);
 	u32 remove();
 
-//private:
+private:
 	// internal state
 	u32 *m_base;   // base of the FIFO
 	s32 m_size;    // size of the FIFO
 	s32 m_in;      // input pointer
 	s32 m_out;     // output pointer
 };
+
+
+// ======================> command_fifo
+
+// command_fifo is a more intelligent FIFO that was introduced with the
+// Voodoo-2
+class command_fifo
+{
+public:
+	// construction
+	command_fifo(voodoo_device &device);
+
+	// initialization
+	void init(std::vector<u8> &ram) { m_ram = reinterpret_cast<u32 *>(&ram[0]); m_mask = (ram.size() / 4) - 1; }
+
+	// getters
+	bool enabled() const { return m_enable; }
+	u32 address_min() const { return m_address_min; }
+	u32 address_max() const { return m_address_max; }
+	u32 read_pointer() const { return m_read_index * 4; }
+	u32 depth() const { return m_depth; }
+	u32 holes() const { return m_holes; }
+
+	// setters
+	void set_enable(bool enabled) { m_enable = enabled; }
+	void set_count_holes(bool count) { m_count_holes = count; }
+	void set_base(u32 base) { m_ram_base = base; }
+	void set_end(u32 end) { m_ram_end = end; }
+	void set_size(u32 size) { m_ram_end = m_ram_base + size; }
+	void set_read_pointer(u32 ptr) { m_read_index = ptr / 4; }
+	void set_address_min(u32 addr) { m_address_min = addr; }
+	void set_address_max(u32 addr) { m_address_max = addr; }
+	void set_depth(u32 depth) { m_depth = depth; }
+	void set_holes(u32 holes) { m_holes = holes; }
+
+	// operations
+	s32 execute_if_ready();
+
+	// write to the FIFO if within the address range
+	bool write_if_in_range(offs_t addr, u32 data)
+	{
+		if (m_enable && addr >= m_ram_base && addr < m_ram_end)
+		{
+			write(addr, data);
+			return true;
+		}
+		return false;
+	}
+
+	// write directly to the FIFO, relative to the base
+	void write_direct(offs_t offset, u32 data)
+	{
+		write(m_ram_base + offset * 4, data);
+	}
+
+private:
+	// internal helpers
+	void consume(u32 words) { m_read_index += words; m_depth -= words; }
+	u32 peek_next() { return m_ram[m_read_index & m_mask]; }
+	u32 read_next() { u32 result = peek_next(); consume(1); return result; }
+	float read_next_float() { float result = *(float *)&m_ram[m_read_index & m_mask]; consume(1); return result; }
+
+	// internal operations
+	u32 words_needed(u32 command);
+	void write(offs_t addr, u32 data);
+
+	// packet handlers
+	using packet_handler = u32 (command_fifo::*)(u32);
+	u32 packet_type_0(u32 command);
+	u32 packet_type_1(u32 command);
+	u32 packet_type_2(u32 command);
+	u32 packet_type_3(u32 command);
+	u32 packet_type_4(u32 command);
+	u32 packet_type_5(u32 command);
+	u32 packet_type_unknown(u32 command);
+
+	// internal state
+	voodoo_device &m_device;  // reference to our device
+	u32 *m_ram;               // base of RAM
+	u32 m_mask;               // mask for RAM accesses
+	bool m_enable;            // enabled?
+	bool m_count_holes;       // count holes?
+	u32 m_ram_base;           // base address in framebuffer RAM
+	u32 m_ram_end;            // end address in framebuffer RAM
+	u32 m_read_index;         // current read index into 32-bit RAM
+	u32 m_address_min;        // minimum address
+	u32 m_address_max;        // maximum address
+	u32 m_depth;              // current depth
+	u32 m_holes;              // number of holes
+
+	static packet_handler s_packet_handler[8];
+};
+
+
 
 struct shared_tables
 {
@@ -137,6 +237,8 @@ public:
 
 class voodoo_device : public device_t
 {
+	friend class voodoo::command_fifo;
+
 public:
 	// destruction
 	virtual ~voodoo_device();
@@ -174,23 +276,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
-	struct cmdfifo_info
-	{
-		u8 enable = 0;             // enabled?
-		u8 count_holes = 0;        // count holes?
-		u32 base = 0;               // base address in framebuffer RAM
-		u32 end = 0;                // end address in framebuffer RAM
-		u32 rdptr = 0;              // current read pointer
-		u32 amin = 0;               // minimum address
-		u32 amax = 0;               // maximum address
-		u32 depth = 0;              // current depth
-		u32 holes = 0;              // number of holes
-	};
-
-
 	struct pci_state
 	{
-		voodoo::fifo_state fifo;                   // PCI FIFO
+		voodoo::memory_fifo fifo;                   // PCI FIFO
 		voodoo::reg_init_en init_enable = 0;        // initEnable value
 		u8 stall_state = 0;        // state of the system if we're stalled
 		u8 op_pending = 0;         // true if an operation is pending
@@ -218,15 +306,14 @@ protected:
 		voodoo::voodoo_regs m_reg;      // TMU registers
 		bool m_regdirty;                // true if the LOD/mode/base registers have changed
 
-		s64 m_starts = 0, m_startt = 0; // starting S,T (14.18)
-		s64 m_startw = 0;               // starting W (2.30)
-		s64 m_dsdx = 0, m_dtdx = 0;     // delta S,T per X
-		s64 m_dwdx = 0;                 // delta W per X
-		s64 m_dsdy = 0, m_dtdy = 0;     // delta S,T per Y
-		s64 m_dwdy = 0;                 // delta W per Y
+		s64 m_starts, m_startt;         // starting S,T (14.18)
+		s64 m_startw;                   // starting W (2.30)
+		s64 m_dsdx, m_dtdx;             // delta S,T per X
+		s64 m_dwdx;                     // delta W per X
+		s64 m_dsdy, m_dtdy;             // delta S,T per Y
+		s64 m_dwdy;                     // delta W per Y
 
 		rgb_t *m_texel[16];             // texel lookups for each format
-
 		bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
 		rgb_t m_palette[2][256];        // 2 versions of the palette
 	};
@@ -234,71 +321,8 @@ protected:
 
 	struct fbi_state
 	{
+		fbi_state(voodoo_device &device) : m_cmdfifo{ device, device } { }
 		void init(voodoo_model model, std::vector<u8> &memory);
-
-		struct setup_vertex
-		{
-			float x, y;                   // X, Y coordinates
-			float z, wb;                  // Z and broadcast W values
-			float r, g, b, a;             // A, R, G, B values
-			float s0, t0, w0;             // W, S, T for TMU 0
-			float s1, t1, w1;             // W, S, T for TMU 1
-		};
-
-		u8 *m_ram;          // pointer to frame buffer RAM
-		u32 m_mask;               // mask to apply to pointers
-		u32 m_rgboffs[3]; // word offset to 3 RGB buffers
-		u32 m_auxoffs;            // word offset to 1 aux buffer
-
-		u8 m_frontbuf;           // front buffer index
-		u8 m_backbuf;            // back buffer index
-		u8 m_swaps_pending;      // number of pending swaps
-		bool m_video_changed;      // did the frontbuffer video change?
-
-		u32 m_yorigin = 0;            // Y origin subtract value
-		u32 m_lfb_base = 0;           // base of LFB in memory
-		u8  m_lfb_stride = 0;         // stride of LFB accesses in bits
-
-		u32 m_width = 0;              // width of current frame buffer
-		u32 m_height = 0;             // height of current frame buffer
-		u32 m_xoffs = 0;              // horizontal offset (back porch)
-		u32 m_yoffs = 0;              // vertical offset (back porch)
-		u32 m_vsyncstart = 0;         // vertical sync start scanline
-		u32 m_vsyncstop = 0;          // vertical sync stop
-		u32 m_rowpixels = 0;          // pixels per row
-
-		u8 m_vblank = 0;             // VBLANK state
-		u8 m_vblank_count = 0;       // number of VBLANKs since last swap
-		u8 m_vblank_swap_pending = 0;// a swap is pending, waiting for a vblank
-		u8 m_vblank_swap = 0;        // swap when we hit this count
-		u8 m_vblank_dont_swap = 0;   // don't actually swap when we hit this point
-
-		/* triangle setup info */
-		s32 m_sign;                   // triangle sign
-		s16 m_ax, m_ay;                 // vertex A x,y (12.4)
-		s16 m_bx, m_by;                 // vertex B x,y (12.4)
-		s16 m_cx, m_cy;                 // vertex C x,y (12.4)
-		s32 m_startr, m_startg, m_startb, m_starta; // starting R,G,B,A (12.12)
-		s32 m_startz;                 // starting Z (20.12)
-		s64 m_startw;                 // starting W (16.32)
-		s32 m_drdx, m_dgdx, m_dbdx, m_dadx; // delta R,G,B,A per X
-		s32 m_dzdx;                   // delta Z per X
-		s64 m_dwdx;                   // delta W per X
-		s32 m_drdy, m_dgdy, m_dbdy, m_dady; // delta R,G,B,A per Y
-		s32 m_dzdy;                   // delta Z per Y
-		s64 m_dwdy;                   // delta W per Y
-
-		voodoo::thread_stats_block m_lfb_stats;              // LFB-access statistics
-
-		u8 m_sverts = 0;             // number of vertices ready */
-		setup_vertex m_svert[3];               // 3 setup vertices */
-
-		voodoo::fifo_state m_fifo;                   // framebuffer memory fifo */
-		cmdfifo_info m_cmdfifo[2];             // command FIFOs */
-
-		rgb_t m_pen[65536];             // mapping from pixels to pens */
-		rgb_t m_clut[512];              // clut gamma data */
-		u8 m_clut_dirty = 1;         // do we need to recompute? */
 
 		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
 		void recompute_video_memory(voodoo::voodoo_regs &regs);
@@ -319,6 +343,70 @@ protected:
 		u16 *back_buffer() const { return draw_buffer(m_backbuf); }
 		u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_ram + m_auxoffs) : nullptr; }
 		u16 *ram_end() const { return (u16 *)(m_ram + m_mask + 1); }
+
+		struct setup_vertex
+		{
+			float x, y;               // X, Y coordinates
+			float z, wb;              // Z and broadcast W values
+			float r, g, b, a;         // A, R, G, B values
+			float s0, t0, w0;         // W, S, T for TMU 0
+			float s1, t1, w1;         // W, S, T for TMU 1
+		};
+
+		u8 *m_ram;                    // pointer to frame buffer RAM
+		u32 m_mask;                   // mask to apply to pointers
+		u32 m_rgboffs[3];             // word offset to 3 RGB buffers
+		u32 m_auxoffs;                // word offset to 1 aux buffer
+
+		u8 m_frontbuf;                // front buffer index
+		u8 m_backbuf;                 // back buffer index
+		u8 m_swaps_pending;           // number of pending swaps
+		bool m_video_changed;         // did the frontbuffer video change?
+
+		u32 m_yorigin;                // Y origin subtract value
+		u32 m_lfb_base;               // base of LFB in memory
+		u8 m_lfb_stride;              // stride of LFB accesses in bits
+
+		u32 m_width;                  // width of current frame buffer
+		u32 m_height;                 // height of current frame buffer
+		u32 m_xoffs;                  // horizontal offset (back porch)
+		u32 m_yoffs;                  // vertical offset (back porch)
+		u32 m_vsyncstart;             // vertical sync start scanline
+		u32 m_vsyncstop;              // vertical sync stop
+		u32 m_rowpixels;              // pixels per row
+
+		u8 m_vblank;                  // VBLANK state
+		u8 m_vblank_count;            // number of VBLANKs since last swap
+		u8 m_vblank_swap_pending;     // a swap is pending, waiting for a vblank
+		u8 m_vblank_swap;             // swap when we hit this count
+		u8 m_vblank_dont_swap;        // don't actually swap when we hit this point
+
+		// triangle setup info
+		s32 m_sign;                   // triangle sign
+		s16 m_ax, m_ay;               // vertex A x,y (12.4)
+		s16 m_bx, m_by;               // vertex B x,y (12.4)
+		s16 m_cx, m_cy;               // vertex C x,y (12.4)
+		s32 m_startr, m_startg, m_startb, m_starta; // starting R,G,B,A (12.12)
+		s32 m_startz;                 // starting Z (20.12)
+		s64 m_startw;                 // starting W (16.32)
+		s32 m_drdx, m_dgdx, m_dbdx, m_dadx; // delta R,G,B,A per X
+		s32 m_dzdx;                   // delta Z per X
+		s64 m_dwdx;                   // delta W per X
+		s32 m_drdy, m_dgdy, m_dbdy, m_dady; // delta R,G,B,A per Y
+		s32 m_dzdy;                   // delta Z per Y
+		s64 m_dwdy;                   // delta W per Y
+
+		voodoo::thread_stats_block m_lfb_stats; // LFB access statistics
+
+		u8 m_sverts = 0;              // number of vertices ready
+		setup_vertex m_svert[3];      // 3 setup vertices
+
+		voodoo::memory_fifo m_fifo;   // framebuffer memory fifo
+		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
+
+		rgb_t m_pen[65536];           // mapping from pixels to pens
+		rgb_t m_clut[512];            // clut gamma data
+		bool m_clut_dirty;            // do we need to recompute?
 	};
 
 
@@ -357,10 +445,6 @@ protected:
 	u32 register_r(offs_t offset);
 
 	void swap_buffers();
-	int cmdfifo_compute_expected_depth(cmdfifo_info &f);
-	u32 cmdfifo_execute(cmdfifo_info *f);
-	s32 cmdfifo_execute_if_ready(cmdfifo_info &f);
-	void cmdfifo_w(cmdfifo_info *f, offs_t offset, u32 data);
 
 protected:
 	// internal helpers
