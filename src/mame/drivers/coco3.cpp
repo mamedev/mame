@@ -290,6 +290,7 @@ void coco3_state::coco3(machine_config &config)
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
 	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
 	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
+	pia1.set_port_a_input_pull_up_mask(0xfc);
 
 	// Becker Port device
 	COCO_DWSOCK(config, DWSOCK_TAG, 0);

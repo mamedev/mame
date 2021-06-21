@@ -263,6 +263,7 @@ void dragon_state::dragon_base(machine_config &config)
 	pia1.cb2_handler().set(FUNC(coco_state::pia1_cb2_w));
 	pia1.irqa_handler().set(m_firqs, FUNC(input_merger_device::in_w<0>));
 	pia1.irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
+	pia1.set_port_a_input_pull_up_mask(0xfc);
 
 	SAM6883(config, m_sam, 14.218_MHz_XTAL, m_maincpu);
 	m_sam->set_addrmap(0, &dragon_state::coco_ram);

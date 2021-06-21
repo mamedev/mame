@@ -64,6 +64,7 @@ public:
 	void set_a_input(uint8_t data);
 	uint8_t a_output();
 	void set_port_a_input_overrides_output_mask(uint8_t mask) { m_a_input_overrides_output_mask = mask; }
+	void set_port_a_input_pull_up_mask(uint8_t mask) { m_a_input_pull_up_mask = mask; }
 
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { write_porta_line(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { write_porta_line(1, state); }
@@ -174,6 +175,7 @@ private:
 	uint8_t m_in_ca2;
 	uint8_t m_out_a;
 	uint8_t m_a_input_overrides_output_mask;
+	uint8_t m_a_input_pull_up_mask;
 	uint8_t m_out_ca2;
 	uint8_t m_ddr_a;
 	uint8_t m_ctl_a;

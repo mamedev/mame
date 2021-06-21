@@ -54,8 +54,8 @@ pia6821_device::pia6821_device(const machine_config &mconfig, const char *tag, d
 		m_cb2_handler(*this),
 		m_irqa_handler(*this),
 		m_irqb_handler(*this), m_in_a(0),
-		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_a_input_overrides_output_mask(0), m_out_ca2(0), m_ddr_a(0),
-		m_ctl_a(0), m_irq_a1(false), m_irq_a2(false),
+		m_in_ca1(0), m_in_ca2(0), m_out_a(0), m_a_input_overrides_output_mask(0), m_a_input_pull_up_mask(0),
+		m_out_ca2(0), m_ddr_a(0), m_ctl_a(0), m_irq_a1(false), m_irq_a2(false),
 		m_irq_a_state(0), m_in_b(0),
 		m_in_cb1(0), m_in_cb2(0), m_out_b(0), m_out_cb2(0), m_last_out_cb2_z(0), m_ddr_b(0),
 		m_ctl_b(0), m_irq_b1(false), m_irq_b2(false),
@@ -131,6 +131,8 @@ void pia6821_device::device_start()
 	save_item(NAME(m_irq_a1));
 	save_item(NAME(m_irq_a2));
 	save_item(NAME(m_irq_a_state));
+	save_item(NAME(m_a_input_overrides_output_mask));
+	save_item(NAME(m_a_input_pull_up_mask));
 	save_item(NAME(m_in_b));
 	save_item(NAME(m_in_cb1));
 	save_item(NAME(m_in_cb2));
@@ -264,7 +266,8 @@ uint8_t pia6821_device::get_in_a_value()
 	// the output register will show the external device value on the driven pins.
 	ret = (~m_ddr_a & port_a_data)  // input pins
 		| (m_ddr_a & m_out_a & ~m_a_input_overrides_output_mask)  // normal output pins
-		| (m_ddr_a & port_a_data & m_a_input_overrides_output_mask);  // overridden output pins
+		| (m_ddr_a & port_a_data & m_a_input_overrides_output_mask)  // overridden output pins
+		| (~m_ddr_a & m_a_input_pull_up_mask ); // pull up indicated input pins
 
 	return ret;
 }
