@@ -35,21 +35,45 @@ enum voodoo_model : u8
 // nominal clock values
 static constexpr u32 STD_VOODOO_1_CLOCK = 50000000;
 static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
-static constexpr u32 STD_VOODOO_BANSHEE_CLOCK = 90000000;
-static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 
 #include "voodoo_regs.h"
 #include "voodoo_render.h"
+
+
+namespace voodoo
+{
+	
+//**************************************************************************
+//  DEBUGGING
+//**************************************************************************
+
+// debug
+static constexpr bool DEBUG_DEPTH = false;		// ENTER key to view depthbuf
+static constexpr bool DEBUG_BACKBUF = false;	// L key to view backbuf
+static constexpr bool DEBUG_STATS = false;		// \ key to view stats
+
+												// logging
+static constexpr bool LOG_VBLANK_SWAP = false;
+static constexpr bool LOG_FIFO = false;
+static constexpr bool LOG_FIFO_VERBOSE = false;
+static constexpr bool LOG_REGISTERS = false;
+static constexpr bool LOG_WAITS = false;
+static constexpr bool LOG_LFB = false;
+static constexpr bool LOG_TEXTURE_RAM = false;
+static constexpr bool LOG_CMDFIFO = false;
+static constexpr bool LOG_CMDFIFO_VERBOSE = false;
+static constexpr bool LOG_BANSHEE_2D = false;
+
+// Need to turn off cycle eating when debugging MIPS drc
+// otherwise timer interrupts won't match nodrc debug mode.
+static constexpr bool EAT_CYCLES = true;
 
 
 //**************************************************************************
 //  INTERNAL CLASSES
 //**************************************************************************
 
-class voodoo_device;
-
-namespace voodoo
-{
+class voodoo_device_base;
 
 // ======================> memory_fifo
 
@@ -95,7 +119,7 @@ class command_fifo
 {
 public:
 	// construction
-	command_fifo(voodoo_device &device);
+	command_fifo(voodoo_device_base &device);
 
 	// initialization
 	void init(std::vector<u8> &ram) { m_ram = reinterpret_cast<u32 *>(&ram[0]); m_mask = (ram.size() / 4) - 1; }
@@ -162,22 +186,21 @@ private:
 	u32 packet_type_unknown(u32 command);
 
 	// internal state
-	voodoo_device &m_device;  // reference to our device
-	u32 *m_ram;               // base of RAM
-	u32 m_mask;               // mask for RAM accesses
-	bool m_enable;            // enabled?
-	bool m_count_holes;       // count holes?
-	u32 m_ram_base;           // base address in framebuffer RAM
-	u32 m_ram_end;            // end address in framebuffer RAM
-	u32 m_read_index;         // current read index into 32-bit RAM
-	u32 m_address_min;        // minimum address
-	u32 m_address_max;        // maximum address
-	u32 m_depth;              // current depth
-	u32 m_holes;              // number of holes
+	voodoo_device_base &m_device;  // reference to our device
+	u32 *m_ram;                    // base of RAM
+	u32 m_mask;                    // mask for RAM accesses
+	bool m_enable;                 // enabled?
+	bool m_count_holes;            // count holes?
+	u32 m_ram_base;                // base address in framebuffer RAM
+	u32 m_ram_end;                 // end address in framebuffer RAM
+	u32 m_read_index;              // current read index into 32-bit RAM
+	u32 m_address_min;             // minimum address
+	u32 m_address_max;             // maximum address
+	u32 m_depth;                   // current depth
+	u32 m_holes;                   // number of holes
 
 	static packet_handler s_packet_handler[8];
 };
-
 
 
 struct shared_tables
@@ -228,29 +251,35 @@ public:
 	char buffer[1024];           // string
 };
 
-}
-
 
 //**************************************************************************
 //  VOODOO DEVICES
 //**************************************************************************
 
-class voodoo_device : public device_t
+class voodoo_device_base : public device_t
 {
 	friend class voodoo::command_fifo;
 
+	// enumeration describing reasons we might be stalled
+	enum stall_state
+	{
+		NOT_STALLED = 0,
+		STALLED_UNTIL_FIFO_LWM,
+		STALLED_UNTIL_FIFO_EMPTY
+	};
+
 public:
 	// destruction
-	virtual ~voodoo_device();
+	virtual ~voodoo_device_base();
 
 	// configuration
 	void set_fbmem(int value) { m_fbmem_in_mb = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0_in_mb = value1; m_tmumem1_in_mb = value2; }
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	auto vblank_callback() { return m_vblank.bind(); }
-	auto stall_callback() { return m_stall.bind(); }
-	auto pciint_callback() { return m_pciint.bind(); }
+	auto vblank_callback() { return m_vblank_cb.bind(); }
+	auto stall_callback() { return m_stall_cb.bind(); }
+	auto pciint_callback() { return m_pciint_cb.bind(); }
 
 	// getters
 	voodoo_model model() const { return m_model; }
@@ -259,7 +288,7 @@ public:
 	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
-	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
+	TIMER_CALLBACK_MEMBER( stall_resume_callback );
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
 	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -269,28 +298,16 @@ public:
 
 protected:
 	// construction
-	voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
-	struct pci_state
-	{
-		voodoo::memory_fifo fifo;                   // PCI FIFO
-		voodoo::reg_init_en init_enable = 0;        // initEnable value
-		u8 stall_state = 0;        // state of the system if we're stalled
-		u8 op_pending = 0;         // true if an operation is pending
-		attotime op_end_time = attotime::zero; // time when the pending operation ends
-		emu_timer *continue_timer = nullptr; // timer to use to continue processing
-		u32 fifo_mem[64*2];         // memory backing the PCI FIFO
-	};
-
-
 	struct tmu_state
 	{
-		tmu_state(voodoo_device &device) : m_device(device), m_reg(device.model()) { }
+		tmu_state(voodoo_device_base &device) : m_device(device), m_reg(device.model()) { }
 
 		void init(int index, voodoo::shared_tables &share, std::vector<u8> &memory);
 		voodoo::rasterizer_texture &prepare_texture();
@@ -298,7 +315,7 @@ protected:
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
 		void ncc_w(offs_t offset, u32 data);
 
-		voodoo_device &m_device;        // reference back to our owner
+		voodoo_device_base &m_device;   // reference back to our owner
 		int m_index;                    // index of ourself
 		u8 *m_ram = nullptr;            // pointer to our RAM
 		u32 m_mask = 0;                 // mask to apply to pointers
@@ -321,7 +338,7 @@ protected:
 
 	struct fbi_state
 	{
-		fbi_state(voodoo_device &device) : m_cmdfifo{ device, device } { }
+		fbi_state(voodoo_device_base &device) : m_cmdfifo{ device, device } { }
 		void init(voodoo_model model, std::vector<u8> &memory);
 
 		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
@@ -421,15 +438,14 @@ protected:
 
 
 	void check_stalled_cpu(attotime current_time);
-	void flush_fifos(attotime current_time);
+	void flush_fifos(attotime const &current_time);
 	void init_fbi(fbi_state *f, void *memory, int fbmem);
 	s32 register_w(offs_t offset, u32 data);
 	s32 swapbuffer(u32 data);
 	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 lfb_r(offs_t offset, bool lfb_3d);
 	s32 texture_w(offs_t offset, u32 data);
-	s32 lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
-	void stall_cpu(int state, attotime current_time);
+	void stall_cpu(stall_state state);
 	void soft_reset();
 	void adjust_vblank_timer();
 	s32 fastfill();
@@ -448,135 +464,77 @@ protected:
 
 protected:
 	// internal helpers
+	bool operation_pending() const { return !m_operation_end.is_zero(); }
+	void clear_pending_operation() { m_operation_end = attotime::zero; }
 	void register_save();
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
 
-	// internal state
+	// configuration
 	const voodoo_model m_model;              // which voodoo model
 	u8 m_chipmask;                           // mask for which chips are available
 	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
 	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
 	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
+	required_device<screen_device> m_screen; // the screen we are acting on
+	required_device<cpu_device> m_cpu;       // the CPU we interact with
+	devcb_write_line m_vblank_cb;            // VBLANK callback
+	devcb_write_line m_stall_cb;             // stalling callback
+	devcb_write_line m_pciint_cb;            // PCI interrupt callback
 
-	std::unique_ptr<voodoo::voodoo_renderer> m_renderer; // rendering class
-	voodoo::voodoo_regs m_reg;               // raw registers
+	std::unique_ptr<voodoo::voodoo_renderer> m_renderer; // rendering helper
+	voodoo::voodoo_regs m_reg;               // FBI registers
 
 	int m_trigger;                           // trigger used for stalling
+	bool m_flush_flag;                       // true if we are currently flushing FIFOs
 
 	offs_t m_last_status_pc;                 // PC of last status description (for logging)
 	u32 m_last_status_value;                 // value of last status read (for logging)
 
-	devcb_write_line m_vblank;               // VBLANK callback
-	devcb_write_line m_stall;                // stalling callback
-	devcb_write_line m_pciint;               // PCI interrupt callback
+	// PCI interface
+	voodoo::reg_init_en m_init_enable;       // initEnable value (set externally)
+	stall_state m_stall_state;               // state of the system if we're stalled
+	attotime m_operation_end;                // time when the pending operation ends
+	voodoo::memory_fifo m_pci_fifo;          // PCI FIFO
+	u32 m_pci_fifo_mem[64*2];                // memory backing the PCI FIFO
 
-	pci_state m_pci;                         // PCI state
 	dac_state m_dac;                         // DAC state
 	fbi_state m_fbi;                         // FBI states
 	tmu_state m_tmu[MAX_TMU];                // TMU states
 
-	required_device<screen_device> m_screen; // the screen we are acting on
-	required_device<cpu_device> m_cpu;       // the CPU we interact with
-
-	emu_timer *m_vsync_stop_timer = nullptr; // VBLANK end timer
-	emu_timer *m_vsync_start_timer = nullptr;// VBLANK timer
+	emu_timer *m_vsync_stop_timer;           // VBLANK end timer
+	emu_timer *m_vsync_start_timer;          // VBLANK timer
+	emu_timer *m_stall_resume_timer;         // timer to resume processing after stall
 
 	voodoo::debug_stats m_stats;             // internal statistics
 
+	// allocated memory
 	std::vector<u8> m_fbmem;                 // allocated framebuffer
 	std::vector<u8> m_tmumem[2];             // allocated texture memory
 	std::unique_ptr<voodoo::shared_tables> m_shared; // shared tables
 };
 
-class voodoo_1_device : public voodoo_device
+}
+
+
+using voodoo::voodoo_device_base;
+
+class voodoo_1_device : public voodoo_device_base
 {
 public:
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
-class voodoo_2_device : public voodoo_device
+class voodoo_2_device : public voodoo_device_base
 {
 public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
-class voodoo_banshee_device : public voodoo_device
-{
-public:
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	u32 banshee_r(offs_t offset, u32 mem_mask = ~0);
-	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 banshee_fb_r(offs_t offset);
-	void banshee_fb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 banshee_io_r(offs_t offset, u32 mem_mask = ~0);
-	void banshee_io_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 banshee_rom_r(offs_t offset);
-	u8 banshee_vga_r(offs_t offset);
-	void banshee_vga_w(offs_t offset, u8 data);
-
-	virtual s32 banshee_2d_w(offs_t offset, u32 data) override;
-	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-
-protected:
-	// construction
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
-
-	// device-level overrides
-	virtual void device_start() override;
-
-	// device-level overrides
-	u32 banshee_agp_r(offs_t offset);
-	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	void banshee_blit_2d(u32 data);
-
-	// internal state
-	struct banshee_info
-	{
-		u32 io[0x40];               // I/O registers
-		u32 agp[0x80];              // AGP registers
-		u8  vga[0x20];              // VGA registers
-		u8  crtc[0x27];             // VGA CRTC registers
-		u8  seq[0x05];              // VGA sequencer registers
-		u8  gc[0x05];               // VGA graphics controller registers
-		u8  att[0x15];              // VGA attribute registers
-		u8  attff;                  // VGA attribute flip-flop
-
-		u32 blt_regs[0x20];         // 2D Blitter registers
-		u32 blt_dst_base = 0;
-		u32 blt_dst_x = 0;
-		u32 blt_dst_y = 0;
-		u32 blt_dst_width = 0;
-		u32 blt_dst_height = 0;
-		u32 blt_dst_stride = 0;
-		u32 blt_dst_bpp = 0;
-		u32 blt_cmd = 0;
-		u32 blt_src_base = 0;
-		u32 blt_src_x = 0;
-		u32 blt_src_y = 0;
-		u32 blt_src_width = 0;
-		u32 blt_src_height = 0;
-		u32 blt_src_stride = 0;
-		u32 blt_src_bpp = 0;
-	};
-	banshee_info m_banshee;                  // Banshee state
-};
-
-
-class voodoo_3_device : public voodoo_banshee_device
-{
-public:
-	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
 
 DECLARE_DEVICE_TYPE(VOODOO_1,       voodoo_1_device)
 DECLARE_DEVICE_TYPE(VOODOO_2,       voodoo_2_device)
-DECLARE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device)
-DECLARE_DEVICE_TYPE(VOODOO_3,       voodoo_3_device)
 
 #endif // MAME_VIDEO_VOODOO_H

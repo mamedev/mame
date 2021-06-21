@@ -194,7 +194,7 @@ private:
 
 
 	/* 3Dfx Voodoo */
-	required_device_array<voodoo_device, 2> m_voodoo;
+	required_device_array<voodoo_device_base, 2> m_voodoo;
 
 	struct
 	{
@@ -852,9 +852,9 @@ void magictg_state::magictg_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).ram(); // 8MB RAM
 	map(0x00800000, 0x0081003f).ram(); // ?
-	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0x0a000000, 0x0affffff).rw("voodoo_0", FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 #if defined(USE_TWO_3DFX)
-	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0x0b000000, 0x0bffffff).rw("voodoo_1", FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0x0c000000, 0x0c000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));
 #else
 	map(0x0b000000, 0x0b000fff).rw(FUNC(magictg_state::zr36120_r), FUNC(magictg_state::zr36120_w));

@@ -54,7 +54,7 @@ void voodoo_pci_device::config_map(address_map &map)
 // VOODOO_1 & VOODOO_2 map
 void voodoo_pci_device::voodoo_reg_map(address_map &map)
 {
-	map(0x0, 0x00ffffff).rw(m_voodoo, FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0x0, 0x00ffffff).rw(m_voodoo, FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 }
 // VOODOO_BANSHEE and VOODOO_3 maps
 void voodoo_pci_device::banshee_reg_map(address_map &map)

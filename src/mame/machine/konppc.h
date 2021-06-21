@@ -72,7 +72,7 @@ private:
 	// device finders
 	optional_device_array<adsp21062_device, 2> m_dsp;
 	optional_device_array<k033906_device, 2> m_k033906;
-	optional_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<voodoo_device_base, 2> m_voodoo;
 
 	// internal state
 	uint32_t dsp_comm_ppc[MAX_CG_BOARDS][2];

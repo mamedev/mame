@@ -430,7 +430,7 @@ private:
 	required_device<adc12138_device> m_adc12138;
 	required_device<konppc_device> m_konppc;
 	optional_device<eeprom_serial_93cxx_device> m_lan_eeprom;
-	optional_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<voodoo_device_base, 2> m_voodoo;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	optional_ioport m_eepromout;
@@ -830,7 +830,7 @@ void hornet_state::sharc0_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_voodoo[0], FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0x2400000, 0x27fffff).rw(m_voodoo[0], FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
 	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
@@ -841,7 +841,7 @@ void hornet_state::sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).rw(m_voodoo[1], FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0x2400000, 0x27fffff).rw(m_voodoo[1], FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3500000, 0x35000ff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
 	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");

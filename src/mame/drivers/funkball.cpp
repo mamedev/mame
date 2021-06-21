@@ -330,7 +330,7 @@ void funkball_state::funkball_map(address_map &map)
 //  map(0x08000000, 0x0fffffff).noprw();
 	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
 	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
-	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 

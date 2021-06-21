@@ -9,6 +9,7 @@
 
 #include "machine/pci.h"
 #include "voodoo.h"
+#include "voodoo_banshee.h"
 
 class voodoo_pci_device : public pci_device
 {
@@ -40,7 +41,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<voodoo_device> m_voodoo;
+	required_device<voodoo::voodoo_device_base> m_voodoo;
 	optional_device<cpu_device> m_cpu;
 	optional_device<screen_device> m_screen;
 	int m_fbmem, m_tmumem0, m_tmumem1;

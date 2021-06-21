@@ -754,7 +754,7 @@ void savquest_state::savquest_map(address_map &map)
 	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
 	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
-	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device::read), FUNC(voodoo_device::write));
+	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
