@@ -1199,7 +1199,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			if (m_scale_mode == SCALE_FRACTIONAL_AUTO)
 			{
 				bool is_rotated = (m_manager.machine().system().flags & ORIENTATION_SWAP_XY) ^ (target_orientation & ORIENTATION_SWAP_XY);
-				scale_mode = is_rotated? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
+				scale_mode = is_rotated ? SCALE_FRACTIONAL_Y : SCALE_FRACTIONAL_X;
 			}
 
 			// first compute scale factors to fit the screen
@@ -1219,11 +1219,8 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			bool y_fits = render_round_nearest(yscale) * src_height <= target_height;
 
 			// compute integer scale factors
-			float integer_x = std::max(1.0f, float(m_int_overscan || x_fits? render_round_nearest(xscale) : floor(xscale)));
-			float integer_y = std::max(1.0f, float(m_int_overscan || y_fits? render_round_nearest(yscale) : floor(yscale)));
-
-			//float integer_x = std::max(1.0f, float(m_int_overscan? render_round_nearest(xscale) : floor(xscale)));
-			//float integer_y = std::max(1.0f, float(m_int_overscan? render_round_nearest(yscale) : floor(yscale)));
+			float integer_x = std::max(1.0f, float(m_int_overscan || x_fits ? render_round_nearest(xscale) : floor(xscale)));
+			float integer_y = std::max(1.0f, float(m_int_overscan || y_fits ? render_round_nearest(yscale) : floor(yscale)));
 
 			// check if we have user defined scale factors, if so use them instead
 			integer_x = m_int_scale_x > 0 ? m_int_scale_x : integer_x;
