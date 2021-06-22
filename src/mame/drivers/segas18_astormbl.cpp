@@ -90,7 +90,6 @@ private:
 	void draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque);
 	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
 	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	TILEMAP_MAPPER_MEMBER(sys16_text_map);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
 	tilemap_t *m_text_layer;
@@ -273,22 +272,17 @@ void segas18_astormbl_state::sys16_textram_w(offs_t offset, uint16_t data, uint1
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-
-TILEMAP_MAPPER_MEMBER(segas18_astormbl_state::sys16_text_map)
-{
-	return row * 64 + col + (64 - 40);
-}
-
 void segas18_astormbl_state::video_start()
 {
 	m_text_layer = &machine().tilemap().create(
 		*m_gfxdecode,
 		tilemap_get_info_delegate(*this, FUNC(segas18_astormbl_state::get_text_tile_info)),
-		tilemap_mapper_delegate(*this, FUNC(segas18_astormbl_state::sys16_text_map)),
+		TILEMAP_SCAN_ROWS,
 		8, 8,
-		40, 28);
+		64, 28);
 
 	m_text_layer->set_transparent_pen(0);
+	m_text_layer->set_scrollx(512 - 320);
 }
 
 
