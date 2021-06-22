@@ -16,8 +16,8 @@
     no proms
 
     TODO:
-    - non-tilemap video offsets/sizes are guessworked;
-    - random brick flickering effect is guessworked too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
+    - non-tilemap video offsets/sizes are guessed;
+    - random brick flickering effect is guessed too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
     - outputs (coin counter port same as sound writes?);
     - some dipswitches;
     - sound (requires Epson 7910 Multi-Melody emulation?)
@@ -50,12 +50,14 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
-#include "sound/samples.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class tattack_state : public driver_device
 {
@@ -274,9 +276,9 @@ void tattack_state::tattack_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x4000).portr("AN_PADDLE"); // $315, checks again with same memory, loops if different (?)
 	map(0x5000, 0x53ff).ram().share("videoram");
-	map(0x6000, 0x6000).portr("DSW2");
+	map(0x6000, 0x6000).portr("DSW1");
 	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
-	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
+	map(0xa000, 0xa000).portr("DSW2");
 	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
 	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
@@ -287,13 +289,13 @@ void tattack_state::tattack_map(address_map &map)
 
 static INPUT_PORTS_START( tattack )
 	PORT_START("INPUTS")
-	PORT_DIPNAME( 0x01, 0x00, "1-01" ) // reset switch?
+	PORT_DIPNAME( 0x01, 0x00, "1-01" ) // freezes when off IF 1-02 is also off
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "1-02" )
+	PORT_DIPNAME( 0x02, 0x02, "1-02" ) // moves the bat (check PCB pinout above, maybe VR Center button 2?)
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "1-03" )
+	PORT_DIPNAME( 0x04, 0x04, "1-03" ) // flips screen and freezes IF 1-02 is on
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "1-04" )
@@ -305,54 +307,57 @@ static INPUT_PORTS_START( tattack )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Enable green square blocks" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x04, "Number of bricks to destroy" )
-	PORT_DIPSETTING(    0x04, "112" )
-	PORT_DIPSETTING(    0x00, "5" ) // testing option?
-	PORT_DIPNAME( 0x08, 0x00, "DSW1 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x00, "Paddle in middle of screen" )
-	PORT_DIPSETTING(    0x00, "Never on screen" )
-	PORT_DIPSETTING(    0x10, "Mode 1" ) // - appears after a set number of bricks destroyed, might be same setting
-	PORT_DIPSETTING(    0x20, "Mode 2" ) // /
-	PORT_DIPSETTING(    0x30, "Always on screen" )
-	PORT_DIPNAME( 0x40, 0x00, "DSW1 7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW1 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2 1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW2 2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW2 3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW2 4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW2 5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0f, 0x0f, "Game Time" )                PORT_DIPLOCATION( "SW1:1,2,3,4" )
+	PORT_DIPSETTING(    0x00, "2:00" )
+	PORT_DIPSETTING(    0x01, "2:05" )
+	PORT_DIPSETTING(    0x02, "2:10" )
+	PORT_DIPSETTING(    0x03, "2:15" )
+	PORT_DIPSETTING(    0x04, "2:20" )
+	PORT_DIPSETTING(    0x05, "2:25" )
+	PORT_DIPSETTING(    0x06, "2:30" )
+	PORT_DIPSETTING(    0x07, "2:35" )
+	PORT_DIPSETTING(    0x08, "2:40" )
+	PORT_DIPSETTING(    0x09, "2:45" )
+	PORT_DIPSETTING(    0x0a, "2:50" )
+	PORT_DIPSETTING(    0x0b, "2:55" )
+	PORT_DIPSETTING(    0x0c, "3:00" )
+	PORT_DIPSETTING(    0x0d, "3:05" )
+	PORT_DIPSETTING(    0x0e, "3:10" )
+	PORT_DIPSETTING(    0x0f, "3:15" )
+	PORT_DIPNAME( 0x10, 0x10, "Bonus Block" )              PORT_DIPLOCATION( "SW1:5" )
+	PORT_DIPSETTING(    0x00, "Once" ) // how is the 'bonus' achieved?
+	PORT_DIPSETTING(    0x10, "No Limit" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )         PORT_DIPLOCATION( "SW1:6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )           PORT_DIPLOCATION( "SW1:7,8" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x80, "7" )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Infinite ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Oil Zones" )                PORT_DIPLOCATION( "SW2:1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Coin_A ) )          PORT_DIPLOCATION( "SW2:2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x04, 0x04, "Game Mode" )                PORT_DIPLOCATION( "SW2:3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) ) // 112 bricks
+	PORT_DIPSETTING(    0x00, "Hit 5 Bricks Then Game Over" ) // for testing
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" ) // DIP switch sheet says 'no use'
+	PORT_DIPNAME( 0x30, 0x30, "Enemies" )                  PORT_DIPLOCATION( "SW2:5,6" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, "Show When 40 Bricks Remaining" )
+	PORT_DIPSETTING(    0x20, "Show When 20 Bricks Remaining" )
+	PORT_DIPSETTING(    0x30, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Enemy Delay" )              PORT_DIPLOCATION( "SW2:7" ) // works when enemies not equal to 0x30
+	PORT_DIPSETTING(    0x40, "Appear In Last 30 Seconds" ) // enemy blocks appear when 30 seconds game time remaining
+	PORT_DIPSETTING(    0x00, "Disable" )
+	PORT_DIPNAME( 0x80, 0x80, "Oil Zone Delay" )                PORT_DIPLOCATION( "SW2:8" ) // works when oil zones set to no
+	PORT_DIPSETTING(    0x80, "Appear In Last 30 Seconds" ) // oil zones appear when 30 seconds game time remaining
+	PORT_DIPSETTING(    0x00, "Disable" )
 
 	PORT_START("AN_PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -490,6 +495,8 @@ void tattack_state::init_tattack()
 */
 
 }
+
+} // Anonymous namespace
 
 GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
 // there is another undumped version with katakana Shonan logo and black background
