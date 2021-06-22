@@ -401,6 +401,7 @@ hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
 hk68v10.cpp
+hohnadam.cpp
 homelab.cpp
 homez80.cpp
 horizon.cpp

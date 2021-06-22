@@ -16575,6 +16575,9 @@ xrally                          // 003 1998/05/13 Xtreme Rally / Off Beat Racer!
 @source:hobbyplay.cpp
 unkhpslt                        //
 
+@source:hohnadam.cpp
+hohnadam                        //
+
 @source:holeland.cpp
 crzrally                        // (c) 1985 Tecfri
 crzrallya                       // (c) 1985 Tecfri
