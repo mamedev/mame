@@ -2,30 +2,49 @@
 // copyright-holders:David Haywood
 
 /*
-
 	Alien Storm 'System 18' bootlegs
 
 	these have extensively reworked 68000 code to handle the modified hardware
 
 	Noteworthy features
-	 - no VDP (so no backgrounds in gallary stages, some enemies removed from first stage)
-	 - reworked background tilemaps (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
-	 - less capable sound system (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
+	 - no VDP
+	   (so no backgrounds in gallary stages, some enemies removed from first stage)
+	 - completely reworked background 'tilemaps'
+	   (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
+	 - less capable sound system
+	   (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
 
 	Issues
 	 - title screen vanishes as soon as it appears (it's in the wrong half of 'tilemap' pages?)
-	   does this happen on hardware? swapping them causes issues ingame instead
+	   does this happen on hardware? swapping them causes issues ingame instead, currently a kludge is used to only swap one layer
+
 	 - some stuck parts in the gallery stages
-	   again, does this happen on hardware?
+	   again, does this happen on hardware? fixed with same kludge as above?
+
 	 - there are 'bad' pixels near the shadows on some player sprites, but these differences in the GFX ROMs have been found on
 	   more than 1 PCB, does the bootleg hardware need them for some purpose?
+
+	 - the 'Action' 'Destroy' and 'Run' screens don't display properly in attract, this also seems to be related to how
+	   the bootleg is remapping the tilemap pages and needs checking against the bootleg hardware.
+
+	 - "Press Start" doesn't flash after inserting a credit, nor does the number of credits display
+	   again this should be verified against the bootleg hardware
 
 	Currently the modified background tilemaps are not handled with the tilemap system, as some of the changes make them much more
 	difficult to fit into the tilemap system.  This might be reconsidered later.
 
+	TODO:
+
+	tidy up + optimized video code, decide if using tilemaps is cleaner or not
+	verify glitches etc. against bootleg hardware
+	convert system18 / bootleg OKI sound system to devices to share with other drivers
+
 */
 
 #include "emu.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -36,9 +55,8 @@
 
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
-#include "screen.h"
-#include "speaker.h"
 
+namespace {
 
 class segas18_astormbl_state : public sega_16bit_common_base
 {
@@ -57,16 +75,9 @@ public:
 		, m_tileyscroll0(*this, "tileyscroll0")
 	{ }
 
-	void init_common();
-	void init_astormbl();
-	void init_sys18bl_oki();
-	void init_astormb2();
-
 protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
-	void draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque);
-	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
 
 	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) = 0;
 
@@ -76,6 +87,13 @@ protected:
 	required_device<cpu_device> m_maincpu;
 
 private:
+	void draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque);
+	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
+	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	TILEMAP_MAPPER_MEMBER(sys16_text_map);
+	TILE_GET_INFO_MEMBER(get_text_tile_info);
+
+	tilemap_t *m_text_layer;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<sega_sys16b_sprite_device> m_sprites;
@@ -85,13 +103,6 @@ private:
 	required_shared_ptr<uint16_t> m_tileenable;
 	required_shared_ptr<uint16_t> m_tileyscroll1;
 	required_shared_ptr<uint16_t> m_tileyscroll0;
-
-
-	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	TILEMAP_MAPPER_MEMBER(sys16_text_map);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-
-	tilemap_t *m_text_layer;
 };
 
 class segas18_astormbl_s18snd_state : public segas18_astormbl_state
@@ -116,7 +127,6 @@ private:
 	void sound_portmap(address_map &map);
 	void pcm_map(address_map &map);
 	void soundbank_w(uint8_t data);
-
 	void astormbl_sound(machine_config &config);
 
 	required_device<cpu_device> m_soundcpu;
@@ -129,13 +139,28 @@ class segas18_astormbl_bootsnd_state : public segas18_astormbl_state
 public:
 	segas18_astormbl_bootsnd_state(const machine_config &mconfig, device_type type, const char *tag) 
 		: segas18_astormbl_state(mconfig, type, tag)
+		, m_soundcpu(*this, "soundcpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_okibank(*this, "okibank")
 	{ }
 
 	void astormb2(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
 	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
 
+private:
+	void sys18bl_okibank_w(uint8_t data);
+	void sys18bl_sound_map(address_map &map);
+	void sys18bl_oki_map(address_map &map);
+
+	void astormb2_sound(machine_config &config);
+
+	required_device<cpu_device> m_soundcpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_memory_bank m_okibank;
 };
 
 static INPUT_PORTS_START( astormbl )
@@ -265,6 +290,7 @@ void segas18_astormbl_state::video_start()
 
 	m_text_layer->set_transparent_pen(0);
 }
+
 
 void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque)
 {
@@ -449,7 +475,7 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 	map(0xc00000, 0xc00003).noprw(); // leftover reads/writes from the Genesis VDP - bootlegs don't have this
 	map(0xc00004, 0xc00007).ram();
 
-	map(0xc44000, 0xc44001).ram();
+	map(0xc44000, 0xc44001).ram(); // probably a new video register
 
 	map(0xc46000, 0xc46001).ram().share("tileyscroll1"); // y scroll?
 	map(0xc46200, 0xc46201).ram().share("tileyscroll0");
@@ -459,10 +485,6 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 	map(0xfe0020, 0xfe003f).nopw(); // leftover writes from memory mapped config registers - bootlegs don't have this
 
 	map(0xffc000, 0xffffff).ram();
-
-/*
-	map(0xa03034, 0xa03035).noprw();
-*/
 }
 
 void segas18_astormbl_state::astormbl_video(machine_config &config)
@@ -565,6 +587,48 @@ void segas18_astormbl_s18snd_state::astormbl(machine_config &config)
 
 void segas18_astormbl_bootsnd_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	m_soundlatch->write(data & 0xff);
+}
+
+void segas18_astormbl_bootsnd_state::sys18bl_okibank_w(uint8_t data) // TODO: verify correctness
+{
+	m_okibank->set_entry(data & 0x07);
+}
+
+void segas18_astormbl_bootsnd_state::machine_start()
+{
+	m_okibank->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
+}
+
+void segas18_astormbl_bootsnd_state::sys18bl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x9000, 0x9000).w(FUNC(segas18_astormbl_bootsnd_state::sys18bl_okibank_w));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x87ff).ram();
+}
+
+void segas18_astormbl_bootsnd_state::sys18bl_oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
+
+void segas18_astormbl_bootsnd_state::astormb2_sound(machine_config &config)
+{
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
+
+	Z80(config, m_soundcpu, XTAL(8'000'000)/2); /* 4MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_bootsnd_state::sys18bl_sound_map);
+
+	// 1 OKI M6295 instead of original sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz clock and pin verified
+	oki.set_addrmap(0, &segas18_astormbl_bootsnd_state::sys18bl_oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -576,22 +640,7 @@ void segas18_astormbl_bootsnd_state::astormb2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_bootsnd_state::irq4_line_hold));
 
 	astormbl_video(config);
-
-#if 0
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
-
-	Z80(config, m_soundcpu, XTAL(8'000'000)/2); /* 4MHz */
-	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_state::sys18bl_sound_map);
-
-	// 1 OKI M6295 instead of original sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz clock and pin verified
-	oki.set_addrmap(0, &segas18_astormbl_state::sys18bl_oki_map);
-	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
-#endif
+	astormb2_sound(config);
 }
 
 
@@ -618,7 +667,7 @@ ROM_START( astormbl )
 
 	// is this REALLY meant to be using the original system18 sound system?
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A ROM instead of EPR-13083
+	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) )
 	ROM_LOAD( "epr-13076.bin", 0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin", 0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin", 0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -710,71 +759,7 @@ ROM_START( astormb2 )
 	ROM_LOAD("pal3.bin", 0x400, 0x117, NO_DUMP ) // GAL16V8S-20HB1 on video PCB
 ROM_END
 
+} // anonymous namespace
 
-
-void segas18_astormbl_state::init_common()
-{
-#if 0
-
-	m_sample_buffer = 0;
-	m_sample_select = 0;
-
-	m_soundbank_ptr = nullptr;
-
-	if (m_soundbank.found())
-	{
-		m_soundbank->configure_entries(0, 8, m_soundcpu_region->base(), 0x4000);
-		m_soundbank->set_entry(0);
-	}
-#endif
-}
-
-void segas18_astormbl_state::init_astormbl()
-{
-#if 0
-	uint8_t *RAM =  m_soundcpu_region->base();
-	static const int astormbl_sound_info[]  =
-	{
-		0x0f, 0x00000, // ROM #1 = 128K
-		0x1f, 0x20000, // ROM #2 = 256K
-		0x1f, 0x60000, // ROM #3 = 256K
-		0x1f, 0xA0000  // ROM #4 = 256K
-	};
-
-	memcpy(m_sound_info, astormbl_sound_info, sizeof(m_sound_info));
-	memcpy(RAM, &RAM[0x10000], 0xa000);
-
-
-	m_spritebank_type = 1;
-	m_splittab_fg_x = &m_textram[0x0f80/2];
-	m_splittab_bg_x = &m_textram[0x0fc0/2];
-#endif
-}
-
-void segas18_astormbl_state::init_sys18bl_oki()
-{
-#if 0
-	init_common();
-
-	m_spritebank_type = 1;
-	m_splittab_fg_x = &m_textram[0x0f80/2];
-	m_splittab_bg_x = &m_textram[0x0fc0/2];
-
-	m_okibank->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
-#endif
-}
-
-void segas18_astormbl_state::init_astormb2()
-{
-#if 0
-	init_sys18bl_oki();
-
-	m_maincpu->space(AS_PROGRAM).unmap_write(0xa00006, 0xa00007);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00006, 0xa00007, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)), 0x00ff);
-#endif
-}
-
-
-
-GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas18_astormbl_s18snd_state,   init_astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas18_astormbl_bootsnd_state,  init_astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // sound verified on real hardware
+GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas18_astormbl_s18snd_state,   empty_init,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas18_astormbl_bootsnd_state,  empty_init,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS ) // sound verified on real hardware
