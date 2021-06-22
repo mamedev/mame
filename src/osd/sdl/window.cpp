@@ -1099,7 +1099,7 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 	maximum = maximum.resize(tempw, temph);
 
 	// constrain to fit
-	if (constrain && target()->scale_mode() == SCALE_FRACTIONAL)
+	if (constrain)
 		maximum = constrain_to_aspect_ratio(maximum, WMSZ_BOTTOMRIGHT);
 
 	// remove extra window stuff
