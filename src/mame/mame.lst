@@ -2755,6 +2755,7 @@ ch48633c                        // Chicony CH-486-33C motherboard (486)
 ch486spm                        // Chaintech 486SPM motherboard (486)
 ch491e                          // Chicony CH-491E motherboard (486)
 ch4slez1                        // Chaintech 486SLE M106 4SLE-Z1 motherboard (486)
+ch4spi                          // Chaintech 4SPI motherboard (486)
 comt486                         // Commodore Tower 486
 dt486                           // Commodore DT486
 ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
@@ -2765,6 +2766,8 @@ exp4044                         // ExpertChip EXP4044 motherboard (486)
 f4dxluc4                        // ADI F4DXL-UC4
 fic486gvt                       // FIC 486-GVT
 fic486kvd                       // FIC 486 KVD motherboard (486)
+fic486vchd                      // FIC 486-VC-HD motherboard (486)
+ficeli6ii                       // FIC ELI6-II motherboard (486)
 ficgiovt2                       // FIC 486-GIO-VT2
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
@@ -2787,10 +2790,12 @@ jakms41                         // Jamicon KM-S4-1 VER 1.1
 jwj446a                         // Jetway J-446A motherboard (486)
 lion3500                        // 1993 Lion 3500C/T notebook
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+mb1433aeap                      // BIOSTAR - MB-1433/50 AEA-P - V:1
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
 mb1433uiv                       // Biostar MB-1433UIV motherboard (486)
 mb4d33                          // Aquarius System (ASI) MB-4D33/50NR motherboard (486)
 mb8433uud                       // Biostar MB8433UUD-A
+mba029                          // Mitac MBA-029 (486)
 md4duvc                         // Aquarius MD-4DUVC motherboard (486)
 mijx30gp                        // Micronics JX30GP - Motherboard P/N: 09-00189-10 REV B1
 ms4125                          // MSI MS-4125 motherboard (486)
@@ -2821,6 +2826,8 @@ pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherbo
 pm486pu                         // PROTECH PM486PU-S7 motherboard (486)
 pt430                           // Pine Technology PT-430 motherboard (486)
 pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
+pwaih4077c                      // Mitac PWA-IH4077C
+pwaih4077d                      // Mitac PWA-IH4077D
 px486p3                         // QDI PX486P3 motherboard (486)
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
 sis85c471                       // 486 motherboards using the SiS 85C471/85C407 chipset
