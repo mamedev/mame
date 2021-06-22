@@ -1423,7 +1423,7 @@ private:
 	void load_config(config_type cfg_type, util::xml::data_node const *parentnode);
 	void load_remap_table(util::xml::data_node const *parentnode);
 	bool load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
-	bool load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
+	void load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
 
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
 	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
@@ -1431,19 +1431,19 @@ private:
 	void save_default_inputs(util::xml::data_node &parentnode);
 	void save_game_inputs(util::xml::data_node &parentnode);
 
-	template<typename _Type> _Type playback_read(_Type &result);
+	template<typename Type> Type playback_read(Type &result);
 	time_t playback_init();
 	void playback_end(const char *message = nullptr);
 	void playback_frame(const attotime &curtime);
 	void playback_port(ioport_port &port);
 
-	template<typename _Type> void record_write(_Type value);
+	template<typename Type> void record_write(Type value);
 	void record_init();
 	void record_end(const char *message = nullptr);
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
-	template<typename _Type> void timecode_write(_Type value);
+	template<typename Type> void timecode_write(Type value);
 	void timecode_init();
 	void timecode_end(const char *message = nullptr);
 
@@ -1471,6 +1471,9 @@ private:
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
 	int                     m_timecode_count;
 	attotime                m_timecode_last_time;
+
+	// storage for inactive configuration
+	util::xml::file *       m_deselected_card_config; // using smart pointer would pull xmlfile.h into emu.h
 };
 
 
