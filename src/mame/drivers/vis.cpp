@@ -6,6 +6,7 @@
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
 #include "machine/at.h"
+#include "machine/ds6417.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "video/pc_vga.h"
@@ -703,6 +704,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pic1(*this, "mb:pic8259_master"),
 		m_pic2(*this, "mb:pic8259_slave"),
+		m_card(*this, "card"),
 		m_pad(*this, "PAD")
 		{ }
 
@@ -714,6 +716,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<ds6417_device> m_card;
 	required_ioport m_pad;
 
 	uint8_t sysctl_r();
@@ -721,7 +724,8 @@ private:
 	uint8_t unk_r(offs_t offset);
 	void unk_w(offs_t offset, uint8_t data);
 	uint8_t unk2_r();
-	uint8_t unk3_r();
+	uint8_t memcard_r();
+	void memcard_w(offs_t offset, uint8_t data);
 	uint16_t pad_r(offs_t offset);
 	void pad_w(offs_t offset, uint16_t data);
 	uint8_t unk1_r(offs_t offset);
@@ -772,9 +776,16 @@ uint8_t vis_state::unk2_r()
 }
 
 //memory card reader?
-uint8_t vis_state::unk3_r()
+uint8_t vis_state::memcard_r()
 {
-	return 0x00;
+	return m_card->data_r() ? 0x20 : 0;
+}
+
+void vis_state::memcard_w(offs_t offset, uint8_t data)
+{
+	m_card->clock_w(BIT(data, 0));
+	m_card->data_w(BIT(data, 1));
+	m_card->reset_w(BIT(data, 2));
 }
 
 uint16_t vis_state::pad_r(offs_t offset)
@@ -867,7 +878,7 @@ void vis_state::io_map(address_map &map)
 	map(0x00e0, 0x00e1).noprw();
 	map(0x023c, 0x023f).rw(FUNC(vis_state::unk1_r), FUNC(vis_state::unk1_w));
 	map(0x0268, 0x026f).rw(FUNC(vis_state::pad_r), FUNC(vis_state::pad_w));
-	map(0x031a, 0x031a).r(FUNC(vis_state::unk3_r));
+	map(0x031a, 0x031a).rw(FUNC(vis_state::memcard_r), FUNC(vis_state::memcard_w)).umask16(0x00ff);
 }
 
 static void vis_cards(device_slot_interface &device)
@@ -920,6 +931,8 @@ void vis_state::vis(machine_config &config)
 	ISA16_SLOT(config, "mcd",      0, "mb:isabus", pc_isa16_cards, "mcd",      true);
 	ISA16_SLOT(config, "visaudio", 0, "mb:isabus", vis_cards,      "visaudio", true);
 	ISA16_SLOT(config, "visvga",   0, "mb:isabus", vis_cards,      "visvga",   true);
+
+	DS6417(config, m_card, 0);
 }
 
 ROM_START(vis)
