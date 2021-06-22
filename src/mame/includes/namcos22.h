@@ -152,6 +152,7 @@ private:
 
 	struct namcos22_scenenode m_scenenode_root;
 	struct namcos22_scenenode *m_scenenode_cur;
+	std::list<namcos22_scenenode> m_scenenode_alloc;
 
 	float m_clipx;
 	float m_clipy;
@@ -451,7 +452,7 @@ protected:
 	u16 m_keycus_rng;
 	int m_gametype;
 	int m_cz_adjust;
-	namcos22_renderer *m_poly;
+	std::unique_ptr<namcos22_renderer> m_poly;
 	u16 m_dspram_bank;
 	u16 m_dspram16_latch;
 	bool m_slave_simulation_active;

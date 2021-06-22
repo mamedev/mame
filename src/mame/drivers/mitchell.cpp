@@ -2616,11 +2616,11 @@ void mitchell_state::configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, 
 {
 	uint8_t *src = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	uint8_t *dst = auto_alloc_array(machine(), uint8_t, size);
-	decode(src, dst, size);
+	m_decoded = std::make_unique<uint8_t[]>(size);
+	decode(src, m_decoded.get(), size);
 	m_bank1->configure_entries(0, 16, src + 0x10000, 0x4000);
-	m_bank0d->set_base(dst);
-	m_bank1d->configure_entries(0, 16, dst + 0x10000, 0x4000);
+	m_bank0d->set_base(m_decoded.get());
+	m_bank1d->configure_entries(0, 16, &m_decoded[0x10000], 0x4000);
 }
 
 

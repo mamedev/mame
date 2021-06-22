@@ -326,7 +326,7 @@ ROM_START( aquariumj )
 	ROM_LOAD( "excellent_4.7d",  0x000000, 0x80000, CRC(9a4af531) SHA1(bb201b7a6c9fd5924a0d79090257efffd8d4aba1) )
 ROM_END
 
-void aquarium_state::expand_gfx(int low, int hi)
+std::unique_ptr<u8[]> aquarium_state::expand_gfx(int low, int hi)
 {
 	/* The BG tiles are 5bpp, this rearranges the data from
 	   the roms containing the 1bpp data so we can decode it
@@ -335,10 +335,10 @@ void aquarium_state::expand_gfx(int low, int hi)
 	gfx_element *gfx_h = m_gfxdecode->gfx(hi);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gfx_l->elements() * gfx_l->width() * gfx_l->height());
+	auto decoded = std::make_unique<u8[]>(gfx_l->elements() * gfx_l->width() * gfx_l->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = decoded.get();
 	for (int c = 0; c < gfx_l->elements(); c++)
 	{
 		const u8 *c0base = gfx_l->get_data(c);
@@ -360,15 +360,16 @@ void aquarium_state::expand_gfx(int low, int hi)
 		}
 	}
 
-	gfx_l->set_raw_layout(srcdata, gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
+	gfx_l->set_raw_layout(decoded.get(), gfx_l->width(), gfx_l->height(), gfx_l->elements(), 8 * gfx_l->width(), 8 * gfx_l->width() * gfx_l->height());
 	gfx_l->set_granularity(32);
 	m_gfxdecode->set_gfx(hi, nullptr);
+	return decoded;
 }
 
 void aquarium_state::init_aquarium()
 {
-	expand_gfx(1, 4);
-	expand_gfx(2, 3);
+	m_decoded_gfx[0] = expand_gfx(1, 4);
+	m_decoded_gfx[1] = expand_gfx(2, 3);
 
 	u8 *Z80 = memregion("audiocpu")->base();
 

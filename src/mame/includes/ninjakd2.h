@@ -95,7 +95,7 @@ private:
 
 	required_memory_bank m_mainbank;
 
-	const int16_t* m_sampledata;
+	std::unique_ptr<int16_t[]> m_sampledata;
 	int m_next_sprite_overdraw_enabled;
 	uint8_t m_rom_bank_mask;
 

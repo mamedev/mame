@@ -104,28 +104,17 @@ static void write_type_and_xor(void *base, int type, uint32_t addr, uint32_t dan
  * @param segments number of segments in one page of the result
  * @return pointer to the newly allocated memory filled with source bits
  */
-uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint8_t* src, int pages, int segments)
+std::unique_ptr<uint8_t[]> prom_load(running_machine& machine, const prom_load_t* prom, const uint8_t* src, int pages, int segments)
 {
-	void* array = nullptr;
 	size_t type = prom->type;
 	size_t size = prom->size;
 #if DEBUG_PROM_LOAD
 	uint8_t width = prom->width;
 #endif
 
-	switch (type) {
-	case sizeof(uint8_t):
-		array = auto_alloc_array(machine, uint8_t, pages * size);
-		break;
-	case sizeof(uint16_t):
-		array = auto_alloc_array(machine, uint16_t, pages * size);
-		break;
-	case sizeof(uint32_t):
-		array = auto_alloc_array(machine, uint32_t, pages * size);
-		break;
-	}
+	std::unique_ptr<uint8_t[]> array = std::make_unique<uint8_t[]>(pages * size * type);
 
-	uint8_t* base = reinterpret_cast<uint8_t*>(array);
+	uint8_t* base = array.get();
 	for (int page = 0; page < pages; page++)
 	{
 		uint8_t* dst = base + (prom->type * prom->size * page);
@@ -154,7 +143,7 @@ uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint
 	switch (type) {
 	case sizeof(uint8_t):
 		{
-			uint8_t* data = reinterpret_cast<uint8_t*>(array);
+			uint8_t* data = reinterpret_cast<uint8_t*>(array.get());
 			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 16))
 					printf("%04x:", addr);
@@ -169,7 +158,7 @@ uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint
 		break;
 	case sizeof(uint16_t):
 		{
-			uint16_t* data = reinterpret_cast<uint16_t*>(array);
+			uint16_t* data = reinterpret_cast<uint16_t*>(array.get());
 			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 8))
 					printf("%04x:", addr);
@@ -181,7 +170,7 @@ uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint
 		break;
 	case sizeof(uint32_t):
 		{
-			uint32_t* data = reinterpret_cast<uint32_t*>(array);
+			uint32_t* data = reinterpret_cast<uint32_t*>(array.get());
 			for (int addr = 0; addr < pages*size; addr++) {
 				if (0 == (addr % 4))
 					printf("%04x:", addr);
@@ -193,5 +182,5 @@ uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint
 		break;
 	}
 #endif
-	return reinterpret_cast<uint8_t *>(array);
+	return array;
 }

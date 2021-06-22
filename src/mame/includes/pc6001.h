@@ -117,7 +117,8 @@ protected:
 	void pc6001_screen_draw(bitmap_ind16 &bitmap,const rectangle &cliprect, int has_mc6847);
 
 	emu_timer *m_timer_irq_timer;
-	uint8_t *m_video_ram;
+	uint8_t *m_video_base;
+	std::unique_ptr<uint8_t[]> m_video_ram;
 	uint8_t m_irq_vector;
 	uint8_t m_cas_switch;
 	uint8_t m_sys_latch;

@@ -777,10 +777,10 @@ public:
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
-	cobra_fifo *m_gfxfifo_in;
-	cobra_fifo *m_gfxfifo_out;
-	cobra_fifo *m_m2sfifo;
-	cobra_fifo *m_s2mfifo;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_in;
+	std::unique_ptr<cobra_fifo> m_gfxfifo_out;
+	std::unique_ptr<cobra_fifo> m_m2sfifo;
+	std::unique_ptr<cobra_fifo> m_s2mfifo;
 
 	void gfxfifo_in_event_callback(cobra_fifo::EventType event);
 	void gfxfifo_out_event_callback(cobra_fifo::EventType event);
@@ -2234,8 +2234,8 @@ void cobra_renderer::gfx_fifo_exec()
 	const rectangle& visarea = screen().visible_area();
 	vertex_t vert[32];
 
-	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
-	cobra_fifo *fifo_out = cobra->m_gfxfifo_out;
+	cobra_fifo *fifo_in = cobra->m_gfxfifo_in.get();
+	cobra_fifo *fifo_out = cobra->m_gfxfifo_out.get();
 
 	while (fifo_in->current_num() >= 2)
 	{
@@ -3080,7 +3080,7 @@ void cobra_state::gfx_cpu_dc_store(offs_t offset, uint32_t data)
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
 	{
 		uint64_t i = (uint64_t)(m_gfx_fifo_cache_addr) << 32;
-		cobra_fifo *fifo_in = m_gfxfifo_in;
+		cobra_fifo *fifo_in = m_gfxfifo_in.get();
 
 		uint32_t a = (offset / 8) & 0xff;
 
@@ -3332,36 +3332,32 @@ void cobra_state::cobra(machine_config &config)
 
 void cobra_state::init_cobra()
 {
-	m_gfxfifo_in  = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_in  = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_IN",
 								GFXFIFO_IN_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this)
 								);
 
-	m_gfxfifo_out = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_gfxfifo_out = std::make_unique<cobra_fifo>(machine(),
 								8192,
 								"GFXFIFO_OUT",
 								GFXFIFO_OUT_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this)
 								);
 
-	m_m2sfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_m2sfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"M2SFIFO",
 								M2SFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this)
 								);
 
-	m_s2mfifo     = auto_alloc(machine(),
-								cobra_fifo(machine(),
+	m_s2mfifo     = std::make_unique<cobra_fifo>(machine(),
 								2048,
 								"S2MFIFO",
 								S2MFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
+								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this)
 								);
 
 	m_maincpu->ppc_set_dcstore_callback(write32sm_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));

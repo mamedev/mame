@@ -101,6 +101,8 @@ protected:
 	optional_memory_bank m_bank0;
 	optional_memory_bank m_bank1;
 	required_device<screen_device> m_screen;
+	std::unique_ptr<uint8_t[]> m_decrypted;
+	std::unique_ptr<uint8_t[]> m_decrypted2;
 
 	pen_t m_pens[0x400];
 	void qix_data_firq_w(uint8_t data);

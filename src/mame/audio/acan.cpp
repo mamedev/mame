@@ -34,6 +34,7 @@ acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *
 void acan_sound_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
+	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
 	m_timer = timer_alloc(0);
 
 	m_timer_irq_handler.resolve_safe();
@@ -84,16 +85,14 @@ void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int32_t mix[(clock() / 16 / 5) * 2];
-
-	std::fill_n(&mix[0], outputs[0].samples() * 2, 0);
+	std::fill_n(&m_mix[0], outputs[0].samples() * 2, 0);
 
 	for (int i = 0; i < 16 && m_active_channels != 0; i++)
 	{
 		if (BIT(m_active_channels, i))
 		{
 			acan_channel &channel = m_channels[i];
-			int32_t *mixp = &mix[0];
+			int32_t *mixp = &m_mix[0];
 
 			for (int s = 0; s < outputs[0].samples(); s++)
 			{
@@ -127,7 +126,7 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 		}
 	}
 
-	int32_t *mixp = &mix[0];
+	int32_t *mixp = &m_mix[0];
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		outputs[0].put_int(i, *mixp++, 32768 << 4);

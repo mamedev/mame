@@ -61,6 +61,7 @@ private:
 	uint16_t m_dma_channels;
 	acan_channel m_channels[16];
 	uint8_t m_regs[256];
+	std::unique_ptr<int32_t[]> m_mix;
 };
 
 DECLARE_DEVICE_TYPE(ACANSND, acan_sound_device)

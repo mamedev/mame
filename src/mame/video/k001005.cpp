@@ -1205,7 +1205,7 @@ void k001005_device::device_start()
 
 	m_fifo = std::make_unique<uint32_t[]>(0x800);
 
-	m_renderer = auto_alloc(machine(), k001005_renderer(*this, screen(), m_k001006));
+	m_renderer = std::make_unique<k001005_renderer>(*this, screen(), m_k001006);
 
 	save_pointer(NAME(m_ram[0]), 0x140000);
 	save_pointer(NAME(m_ram[1]), 0x140000);

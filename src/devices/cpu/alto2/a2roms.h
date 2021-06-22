@@ -38,5 +38,5 @@ typedef struct {
 #define DMAP_DEFAULT        {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 #define DMAP_REVERSE_0_3    {3,2,1,0,}
 
-extern uint8_t* prom_load(running_machine& machine, const prom_load_t* prom, const uint8_t* src, int pages = 1, int segments = 1);
+extern std::unique_ptr<uint8_t[]> prom_load(running_machine& machine, const prom_load_t* prom, const uint8_t* src, int pages = 1, int segments = 1);
 #endif // MAME_CPU_ALTO2_A2ROMS_H
