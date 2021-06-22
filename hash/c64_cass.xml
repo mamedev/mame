@@ -185,7 +185,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="ace2088">
 		<description>Ace 2088</description>
-		<year>1991</year>
+		<year>1989</year>
 		<publisher>Summit</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -855,7 +855,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 	<software name="icepalac">
 		<description>Beyond the Ice Palace</description>
-		<year>1988</year>
+		<year>1989</year>
 		<publisher>Encore</publisher>
 
 		<part name="cass1" interface="cbm_cass">
@@ -2150,7 +2150,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="eagleemp">
 		<description>Eagle Empire</description>
 		<year>1984</year>
-		<publisher>Alligata</publisher>
+		<publisher>Central Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1056466">
@@ -3056,7 +3056,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="guardian">
 		<description>Guardian</description>
 		<year>1984</year>
-		<publisher>Alligata</publisher>
+		<publisher>Central Software</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1076388">
@@ -6000,7 +6000,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="redmax">
 		<description>Red Max</description>
 		<year>1987</year>
-		<publisher>Codemasters</publisher>
+		<publisher>SERMA</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="956359">
