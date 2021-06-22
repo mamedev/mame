@@ -305,20 +305,20 @@ void smartmedia_image_device::call_unload()
 			{
 				if (custom_header.version == 0)
 				{
-					fseek( 2 + 1, SEEK_CUR);
-					fwrite( m_feeprom_data, m_page_total_size * m_num_pages);
+					fseek(2 + 1, SEEK_CUR);
+					fwrite(m_feeprom_data, m_page_total_size * m_num_pages);
 				}
 				else if (custom_header.version == 1)
 				{
-					fseek( 3 + 1 + 256 + 16, SEEK_CUR);
-					fwrite( m_feeprom_data, m_page_total_size * m_num_pages);
+					fseek(3 + 1 + 256 + 16, SEEK_CUR);
+					fwrite(m_feeprom_data, m_page_total_size * m_num_pages);
 				}
 			}
 		}
 		else if (m_image_format == 2)
 		{
-			fseek( sizeof( disk_image_format_2_header), SEEK_SET);
-			fwrite( m_feeprom_data, m_page_total_size * m_num_pages);
+			fseek(sizeof(disk_image_format_2_header), SEEK_SET);
+			fwrite(m_feeprom_data, m_page_total_size * m_num_pages);
 		}
 	}
 #endif

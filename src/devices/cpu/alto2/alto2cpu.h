@@ -251,9 +251,9 @@ private:
 	uint32_t m_ucode_size;                    //!< Size of both, CROM and CRAM together
 	uint32_t m_sreg_banks;                    //!< Number of S register banks; derived from m_cram_config
 
-	std::unique_ptr<uint8_t[]> m_ucode_crom;
-	std::unique_ptr<uint8_t[]> m_ucode_cram;
-	std::unique_ptr<uint8_t[]> m_const_data;
+	std::unique_ptr<uint32_t[]> m_ucode_crom;
+	std::unique_ptr<uint32_t[]> m_ucode_cram;
+	std::unique_ptr<uint16_t[]> m_const_data;
 
 	void ucode_map(address_map &map);
 	void const_map(address_map &map);

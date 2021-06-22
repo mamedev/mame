@@ -233,7 +233,7 @@ static const prom_load_t pl_madr_a32 =
 void alto2_cpu_device::init_mouse()
 {
 	memset(&m_mouse, 0, sizeof(m_mouse));
-	m_madr_a32 = prom_load(machine(), &pl_madr_a32, memregion("madr_a32")->base());
+	m_madr_a32 = prom_load<uint8_t>(machine(), &pl_madr_a32, memregion("madr_a32")->base());
 }
 
 void alto2_cpu_device::exit_mouse()
