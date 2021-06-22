@@ -909,7 +909,7 @@ private:
 					{
 						key_trans_entry &entry = (*m_custom_table)[index];
 						entry.sdl_scancode = sk;
-						entry.ui_name = m_ui_names.emplace_back(kns).c_str();
+						entry.ui_name = const_cast<char *>(m_ui_names.emplace_back(kns).c_str());
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 					}
 					else
@@ -921,7 +921,7 @@ private:
 		fclose(keymap_file);
 		osd_printf_verbose("Keymap: Processed %d lines\n", line);
 
-		return m_custom_table;
+		return m_custom_table.get();
 	}
 
 	std::unique_ptr<keyboard_trans_table> m_custom_table;
