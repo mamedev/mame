@@ -62428,7 +62428,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- from cah4e3 -->
 	<software name="drmario2">
-		<description>Fang Kuai Zong Dong Yuan (Chi)</description>
+		<description>Fāngkuài Zǒngdòngyuán (China)</description>
 		<year>1996</year>
 		<publisher>Waixing?</publisher>
 		<info name="serial" value="EH009"/>
@@ -62944,7 +62944,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro & cah4e3 -->
 	<software name="koreaigo">
-		<description>Korean Igo (Kor)</description>
+		<description>Korean Igo (Korea)</description>
 		<year>1993</year>
 		<publisher>DreamTech</publisher>
 		<part name="cart" interface="nes_cart">
@@ -65628,7 +65628,7 @@ All musics were removed in this game.
 	</software>
 
 	<software name="nryukendc" cloneof="shadwarr">
-		<description>Ninja Ryukenden (Chi)</description>
+		<description>Ninja Ryukenden (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
