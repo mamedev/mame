@@ -5,20 +5,40 @@
 
 	Alien Storm 'System 18' bootlegs
 
+	these have extensively reworked 68000 code to handle the modified hardware
+
 	Noteworthy features
 	 - no VDP (so no backgrounds in gallary stages, some enemies removed from first stage)
 	 - reworked background tilemaps (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
 	 - less capable sound system (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
+
+	Issues
+	 - title screen vanishes as soon as it appears (it's in the wrong half of 'tilemap' pages?)
+	   does this happen on hardware? swapping them causes issues ingame instead
+	 - some stuck parts in the gallery stages
+	   again, does this happen on hardware?
+	 - there are 'bad' pixels near the shadows on some player sprites, but these differences in the GFX ROMs have been found on
+	   more than 1 PCB, does the bootleg hardware need them for some purpose?
+
+	Currently the modified background tilemaps are not handled with the tilemap system, as some of the changes make them much more
+	difficult to fit into the tilemap system.  This might be reconsidered later.
 
 */
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "sound/rf5c68.h"
+#include "sound/ymopn.h"
+
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 #include "screen.h"
+#include "speaker.h"
+
 
 class segas18_astormbl_state : public sega_16bit_common_base
 {
@@ -37,9 +57,6 @@ public:
 		, m_tileyscroll0(*this, "tileyscroll0")
 	{ }
 
-	void astormbl(machine_config &config);
-	void astormb2(machine_config &config);
-
 	void init_common();
 	void init_astormbl();
 	void init_sys18bl_oki();
@@ -51,8 +68,14 @@ protected:
 	void draw_tile(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int tilenum, int colour, int xpos, int ypos, uint8_t pri, int transpen, bool opaque);
 	void draw_layer(screen_device& screen, bitmap_ind16& bitmap, const rectangle &cliprect, int layer, bool opaque, int pri0, int pri1);
 
-private:
+	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) = 0;
+
+	void astormbl_video(machine_config &config);
+	void astormbl_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
+
+private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<sega_sys16b_sprite_device> m_sprites;
@@ -63,7 +86,6 @@ private:
 	required_shared_ptr<uint16_t> m_tileyscroll1;
 	required_shared_ptr<uint16_t> m_tileyscroll0;
 
-	void astormbl_map(address_map &map);
 
 	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	TILEMAP_MAPPER_MEMBER(sys16_text_map);
@@ -72,6 +94,49 @@ private:
 	tilemap_t *m_text_layer;
 };
 
+class segas18_astormbl_s18snd_state : public segas18_astormbl_state
+{
+public:
+	segas18_astormbl_s18snd_state(const machine_config &mconfig, device_type type, const char *tag) 
+		: segas18_astormbl_state(mconfig, type, tag)
+		, m_soundcpu(*this, "soundcpu")
+		, m_soundbank(*this, "soundbank")
+		, m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void astormbl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
+
+private:
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void pcm_map(address_map &map);
+	void soundbank_w(uint8_t data);
+
+	void astormbl_sound(machine_config &config);
+
+	required_device<cpu_device> m_soundcpu;
+	required_memory_bank m_soundbank;
+	required_device<generic_latch_8_device> m_soundlatch;
+};
+
+class segas18_astormbl_bootsnd_state : public segas18_astormbl_state
+{
+public:
+	segas18_astormbl_bootsnd_state(const machine_config &mconfig, device_type type, const char *tag) 
+		: segas18_astormbl_state(mconfig, type, tag)
+	{ }
+
+	void astormb2(machine_config &config);
+
+protected:
+	virtual void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask) override;
+
+};
 
 static INPUT_PORTS_START( astormbl )
 	PORT_START("P1")
@@ -207,7 +272,6 @@ void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitm
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
 	const uint8_t* gfxdat = gfx->get_data(tilenum);
-	int offs = 0;
 
 	for (int y = 0; y < 8; y++)
 	{
@@ -221,25 +285,14 @@ void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitm
 			{
 				uint16_t* dst = &bitmap.pix(realypos);
 				uint8_t* pridst = &priority_bitmap.pix(realypos);
-				uint8_t pix = gfxdat[offs];
+				uint8_t pix = gfxdat[(y*8) + x];
 
 				if (pix || opaque)
 				{
 					dst[realxpos] = pix | (colour * 8);
-
-					if (opaque)
-					{
-						if (pix)
-							pridst[realxpos] = pri;
-						else
-							pridst[realxpos] = 0x00;
-					}
-					else
-						pridst[realxpos] = pri;
+					pridst[realxpos] = pri;
 				}
 			}
-
-			offs++;
 		}
 	}
 }
@@ -259,10 +312,15 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 
 		if (quadrant & 1)
 			ybase = 256;
+		else
+			ybase = 0;
+
+		if (layer == 0)
+			ybase ^= 256;
 
 		int y = 0;
 
-		int yscroll = layer & 1 ? m_tileyscroll1[0] : m_tileyscroll0[0];
+		int yscroll = layer & 1 ? m_tileyscroll0[0] : m_tileyscroll1[0];
 
 		for (int i = 0; i < 0x20; i++)
 		{
@@ -271,6 +329,10 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 			uint8_t pagesource = (rowconf & 0xf000) >> 12;
 			uint8_t rowtilebank = (rowconf & 0x0e00) >> 9;
 			uint16_t rowscroll = (rowconf & 0x01ff);
+			int yposn = (y * 8) + ybase - yscroll;
+
+			yposn &= 0x1ff;
+			if (yposn & 0x100) yposn -= 0x200;
 
 			for (int x = 0; x < 0x40; x++)
 			{
@@ -289,7 +351,7 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 				else
 					pri = pri0;
 
-				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, (y * 8) + ybase - yscroll, pri, 0, opaque);
+				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, yposn, pri, 0, opaque);
 			}
 
 			y++;
@@ -300,12 +362,13 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 
 uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+
 	// if no drawing is happening, fill with black and get out
+	bitmap.fill(m_palette->black_pen(), cliprect);
+
+	// whole video enable, or just tiles?
 	if (!m_tileenable[0])
-	{
-		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;
-	}
 
 	// start the sprites drawing
 	m_sprites->draw_async(cliprect);
@@ -313,7 +376,7 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 	// reset priorities
 	screen.priority().fill(0, cliprect);
 
-	draw_layer(screen, bitmap, cliprect, 1, true, 0x01,0x02);
+	draw_layer(screen, bitmap, cliprect, 1, true, 0x01, 0x02);
 	draw_layer(screen, bitmap, cliprect, 0, false, 0x02, 0x04);
 
 	m_text_layer->draw(screen, bitmap, cliprect, 0, 0x04);
@@ -372,8 +435,8 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("COINAGE");
 	map(0xa00002, 0xa00003).portr("DSW1");
 
-	map(0xa00006, 0xa00007).nopw();// w(FUNC(segas1x_bootleg_state::sound_command_nmi_w));
-	map(0xa0000e, 0xa0000f).nopw();// was tilebank, unused here?
+	map(0xa00006, 0xa00007).w(FUNC(segas18_astormbl_state::sound_w));
+	map(0xa0000e, 0xa0000f).nopw();// was tilebank, unused here? as tilebank is copied in the code per-row to the tilestripconfig area
 
 	map(0xa01000, 0xa01001).portr("SERVICE");
 	map(0xa01002, 0xa01003).portr("P1");
@@ -402,13 +465,8 @@ void segas18_astormbl_state::astormbl_map(address_map &map)
 */
 }
 
-void segas18_astormbl_state::astormbl(machine_config &config)
+void segas18_astormbl_state::astormbl_video(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_state::astormbl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_state::irq4_line_hold));
-
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
 	PALETTE(config, m_palette).set_entries(2048*2);
@@ -422,92 +480,104 @@ void segas18_astormbl_state::astormbl(machine_config &config)
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	m_sprites->set_local_originx(64);
+}
 
+void segas18_astormbl_s18snd_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
+	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
+	map(0xe000, 0xffff).ram();
+}
 
-#if 0
+void segas18_astormbl_s18snd_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xa0).mirror(0x1f).w(FUNC(segas18_astormbl_s18snd_state::soundbank_w));
+	//map(0xc0, 0xc0).mirror(0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::pread), FUNC(sega_315_5195_mapper_device::pwrite)); // no memory mapper on bootleg
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
+void segas18_astormbl_s18snd_state::pcm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram();
+}
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(40*8, 28*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(segas18_astormbl_state::screen_update_system18old));
-	m_screen->set_palette(m_palette);
+void segas18_astormbl_s18snd_state::machine_start()
+{
+	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
+}
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
-	PALETTE(config, m_palette).set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
+void segas18_astormbl_s18snd_state::soundbank_w(uint8_t data)
+{
+	m_soundbank->set_entry(data);
+}
 
-	MCFG_VIDEO_START_OVERRIDE(segas18_astormbl_state,system18old)
+void segas18_astormbl_s18snd_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_soundlatch->write(data & 0xff);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
+}
 
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	m_sprites->set_local_originx(64);
-
+void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
+{
 	Z80(config, m_soundcpu, 8000000);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_state::sound_18_map);
-	m_soundcpu->set_addrmap(AS_IO, &segas18_astormbl_state::sound_18_io_map);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas18_astormbl_s18snd_state::sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym3438_device &ym3438_0(YM3438(config, "3438.0", 8000000));
-	ym3438_0.add_route(0, "lspeaker", 0.40);
-	ym3438_0.add_route(1, "rspeaker", 0.40);
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym3438_1(YM3438(config, "3438.1", 8000000));
-	ym3438_1.add_route(0, "lspeaker", 0.40);
-	ym3438_1.add_route(1, "rspeaker", 0.40);
+	ym3438_device &ym1(YM3438(config, "ym1", 8000000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
+	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	rf5c68_device &rf5c68(RF5C68(config, "5c68", 8000000));
-	rf5c68.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	rf5c68.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	rf5c68.set_addrmap(0, &segas18_astormbl_state::pcm_map);
-#endif
+	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000)); // ASSP (RF)5C68A
+	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	rfsnd.set_addrmap(0, &segas18_astormbl_s18snd_state::pcm_map);
 }
 
-void segas18_astormbl_state::astormb2(machine_config &config)
+void segas18_astormbl_s18snd_state::astormbl(machine_config &config)
+{
+	/* basic machine hardware */
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::astormbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_s18snd_state::irq4_line_hold));
+
+	astormbl_video(config);
+	astormbl_sound(config);
+}
+
+// --------------------
+
+void segas18_astormbl_bootsnd_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+}
+
+
+void segas18_astormbl_bootsnd_state::astormb2(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(24'000'000)/2);  /* 12MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_state::astormbl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_state::irq4_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_bootsnd_state::astormbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_bootsnd_state::irq4_line_hold));
 
-	// video hardware
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas16b);
-	PALETTE(config, m_palette).set_entries(2048*2);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(25'174'800)/4, 400, 0, 320, 262, 0, 224);
-	m_screen->set_screen_update(FUNC(segas18_astormbl_state::screen_update));
-	m_screen->set_palette(m_palette);
-	// see note in segas16a.cpp, also used here for consistency
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	m_sprites->set_local_originx(64);
-
+	astormbl_video(config);
 
 #if 0
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(58.271); /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(40*8, 28*8);
-	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(segas18_astormbl_state::screen_update_system18old));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys16);
-	PALETTE(config, m_palette).set_entries((2048+2048)*SHADOW_COLORS_MULTIPLIER); // 64 extra colours for vdp (but we use 2048 so shadow mask works)
-
-	MCFG_VIDEO_START_OVERRIDE(segas18_astormbl_state,system18old)
-
-	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
-	m_sprites->set_local_originx(64);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
@@ -546,11 +616,12 @@ ROM_START( astormbl )
 	ROM_LOAD16_BYTE( "epr13079.bin", 0x180001, 0x40000, CRC(de9221ed) SHA1(5e2e434d1aa547be1e5652fc906d2e18c5122023) )
 	ROM_LOAD16_BYTE( "epr13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
-	ROM_REGION( 0x100000, "soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD( "epr13083.bin", 0x10000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) )
-	ROM_LOAD( "epr13076.bin", 0x30000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
-	ROM_LOAD( "epr13077.bin", 0x70000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
-	ROM_LOAD( "epr13078.bin", 0xb0000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
+	// is this REALLY meant to be using the original system18 sound system?
+	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
+	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A ROM instead of EPR-13083
+	ROM_LOAD( "epr-13076.bin", 0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
+	ROM_LOAD( "epr-13077.bin", 0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
+	ROM_LOAD( "epr-13078.bin", 0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
 ROM_END
 
 /*
@@ -644,23 +715,11 @@ ROM_END
 void segas18_astormbl_state::init_common()
 {
 #if 0
-	m_bg1_trans = 0;
-	m_splittab_bg_x = nullptr;
-	m_splittab_bg_y = nullptr;
-	m_splittab_fg_x = nullptr;
-	m_splittab_fg_y = nullptr;
-
-	m_spritebank_type = 0;
-	m_back_yscroll = 0;
-	m_fore_yscroll = 0;
-	m_text_yscroll = 0;
 
 	m_sample_buffer = 0;
 	m_sample_select = 0;
 
 	m_soundbank_ptr = nullptr;
-
-	m_beautyb_unkx = 0;
 
 	if (m_soundbank.found())
 	{
@@ -717,5 +776,5 @@ void segas18_astormbl_state::init_astormb2()
 
 
 
-GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas18_astormbl_state,  init_astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas18_astormbl_state,  init_astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // sound verified on real hardware
+GAME( 1990, astormbl,    astorm,    astormbl,      astormbl, segas18_astormbl_s18snd_state,   init_astormbl,   ROT0,   "bootleg", "Alien Storm (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1990, astormb2,    astorm,    astormb2,      astormbl, segas18_astormbl_bootsnd_state,  init_astormb2,   ROT0,   "bootleg", "Alien Storm (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND) // sound verified on real hardware
