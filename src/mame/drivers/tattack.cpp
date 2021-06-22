@@ -9,9 +9,15 @@
     Z80A,
     xtal 8MHz,
     dipsw 8-position x2,
-    volume pots x6,
+    volume pots x6: (descriptions from DIP switch sheet)
+                   VR1: Adjust Bat Position
+                   VR2: Sound Volume
+                   VR3: Screen Flip (?)
+                   VR4: Anti Short-Circuit Crimes (?)
+                   VR5: Screen Vertical Position
+                   VR6: Ball Shape
     2114 ram x5,
-    7910CQ + NE555P sound section,
+    7910CQ (EPSON melody IC) + NE555P sound section,
     SN74198N shifter
     no proms
 
@@ -19,8 +25,10 @@
     - non-tilemap video offsets/sizes are guessed;
     - random brick flickering effect is guessed too, leave MACHINE_IMPERFECT_COLORS in until is tested on HW.
     - outputs (coin counter port same as sound writes?);
-    - some dipswitches;
-    - sound (requires Epson 7910 Multi-Melody emulation?)
+    - hook up pots, some are useful for in-game adjustments such as paddle adjust and ball shape (ball is currently a rectangle).
+    - hook up background color jumper (can be changed to black or blue)
+    - player bat moves in steps. It this correct compared to real PCB?
+    - sound (Music requires Epson 7910CQ Multi-Melody ROM & emulation)
     \- victory BGM cuts off too late?
 
     Connector pinout from manual
@@ -69,7 +77,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_samples(*this,"samples")
+		m_samples(*this, "samples")
 	{ }
 
 	void tattack(machine_config &config);
@@ -86,10 +94,10 @@ private:
 	void sound_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	void tattack_palette(palette_device &palette) const;
+	void palette(palette_device &palette) const;
 
-	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tattack_map(address_map &map);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prg_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_ram;
@@ -100,7 +108,7 @@ private:
 	tilemap_t *m_tmap;
 	uint8_t m_ball_regs[2];
 	uint8_t m_paddle_reg;
-	int m_paddle_ysize;
+	uint8_t m_paddle_ysize;
 	bool m_bottom_edge_enable;
 	bool m_bricks_color_bank;
 
@@ -214,7 +222,7 @@ void tattack_state::draw_gameplay_bitmap(bitmap_ind16 &bitmap, const rectangle &
 		}
 }
 
-uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tattack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->mark_all_dirty();
 	m_tmap->draw(screen, bitmap, cliprect, 0,0);
@@ -231,6 +239,12 @@ uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind1
 void tattack_state::video_start()
 {
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tattack_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+
+	save_item(NAME(m_ball_regs));
+	save_item(NAME(m_paddle_reg));
+	save_item(NAME(m_paddle_ysize));
+	save_item(NAME(m_bottom_edge_enable));
+	save_item(NAME(m_bricks_color_bank));
 }
 
 void tattack_state::paddle_w(uint8_t data)
@@ -271,20 +285,20 @@ void tattack_state::sound_w(uint8_t data)
 	}
 }
 
-void tattack_state::tattack_map(address_map &map)
+void tattack_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x4000).portr("AN_PADDLE"); // $315, checks again with same memory, loops if different (?)
-	map(0x5000, 0x53ff).ram().share("videoram");
+	map(0x5000, 0x53ff).ram().share(m_videoram);
 	map(0x6000, 0x6000).portr("DSW1");
-	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
+	map(0x7000, 0x73ff).ram().share(m_colorram);    // color map ? something else .. only bits 1-3 are used
 	map(0xa000, 0xa000).portr("DSW2");
-	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w)); // sound
+	map(0xc000, 0xc000).portr("INPUTS").w(FUNC(tattack_state::sound_w));
 	map(0xc001, 0xc001).w(FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
 	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
 	map(0xc005, 0xc005).w(FUNC(tattack_state::paddle_w));
 	map(0xc006, 0xc007).w(FUNC(tattack_state::ball_w));
-	map(0xe000, 0xe3ff).ram().share("ram");
+	map(0xe000, 0xe3ff).ram().share(m_ram);
 }
 
 static INPUT_PORTS_START( tattack )
@@ -324,8 +338,8 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPSETTING(    0x0d, "3:05" )
 	PORT_DIPSETTING(    0x0e, "3:10" )
 	PORT_DIPSETTING(    0x0f, "3:15" )
-	PORT_DIPNAME( 0x10, 0x10, "Bonus Block" )              PORT_DIPLOCATION( "SW1:5" )
-	PORT_DIPSETTING(    0x00, "Once" ) // how is the 'bonus' achieved?
+	PORT_DIPNAME( 0x10, 0x10, "Blinking Brick Awards 30 Seconds" )   PORT_DIPLOCATION( "SW1:5" )
+	PORT_DIPSETTING(    0x00, "Once Only" ) // extra 30 seconds of time awarded if the blinking brick is hit
 	PORT_DIPSETTING(    0x10, "No Limit" )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )         PORT_DIPLOCATION( "SW1:6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -364,24 +378,12 @@ static INPUT_PORTS_START( tattack )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 
 static GFXDECODE_START( gfx_tattack )
-	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1, 0, 8 )
 GFXDECODE_END
 
-void tattack_state::tattack_palette(palette_device &palette) const
+void tattack_state::palette(palette_device &palette) const
 {
 	for (int i = 0; i < 8; i++)
 	{
@@ -414,7 +416,7 @@ void tattack_state::tattack(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8000000 / 2);   /* 4 MHz ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::tattack_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tattack_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tattack_state::irq0_line_hold));
 
 	/* video hardware */
@@ -423,11 +425,11 @@ void tattack_state::tattack(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(24, 256-32-1, 13, 256-11-1);
-	screen.set_screen_update(FUNC(tattack_state::screen_update_tattack));
+	screen.set_screen_update(FUNC(tattack_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_tattack);
-	PALETTE(config, "palette", FUNC(tattack_state::tattack_palette), 16);
+	PALETTE(config, "palette", FUNC(tattack_state::palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -498,5 +500,5 @@ void tattack_state::init_tattack()
 
 } // Anonymous namespace
 
-GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1983?, tattack, 0, tattack, tattack, tattack_state, init_tattack, ROT270, "Shonan", "Time Attacker", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // there is another undumped version with katakana Shonan logo and black background
