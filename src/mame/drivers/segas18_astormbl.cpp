@@ -260,7 +260,7 @@ TILE_GET_INFO_MEMBER(segas18_astormbl_state::get_text_tile_info)
 
 	tileinfo.set(0,
 			(tile_number & 0x1ff),
-			(tile_number >> 9) % 8,
+			(tile_number >> 9) & 7,
 			0);
 
 	tileinfo.category = (tile_number >> 15) & 1;
@@ -338,13 +338,11 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 		if (layer == 0)
 			ybase ^= 256;
 
-		int y = 0;
-
 		int yscroll = layer & 1 ? m_tileyscroll0[0] : m_tileyscroll1[0];
 
-		for (int i = 0; i < 0x20; i++)
+		for (int y = 0; y < 0x20; y++)
 		{
-			const uint16_t rowconf = m_tilestripconfig[(layer * 0x80) + (quadrant * 0x20) + i];
+			const uint16_t rowconf = m_tilestripconfig[(layer * 0x80) + (quadrant * 0x20) + y];
 
 			uint8_t pagesource = (rowconf & 0xf000) >> 12;
 			uint8_t rowtilebank = (rowconf & 0x0e00) >> 9;
@@ -373,8 +371,6 @@ void segas18_astormbl_state::draw_layer(screen_device& screen, bitmap_ind16& bit
 
 				draw_tile(screen, bitmap, cliprect, tilenum, (tiledat & 0x1fc0) >> 6, xposn, yposn, pri, 0, opaque);
 			}
-
-			y++;
 		}
 
 	}
