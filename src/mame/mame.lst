@@ -13703,7 +13703,8 @@ fgoal                           // TF  (c) 1979 Taito Corporation
 fgoala                          // MF  (c) 1979 Taito Corporation
 
 @source:fidel_as12.cpp
-feleg                           //
+feleg
+felega
 
 @source:fidel_card.cpp
 bridgec
