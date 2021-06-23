@@ -43,8 +43,8 @@
 
 #include "emu.h"
 
-#include "screen.h"
-#include "speaker.h"
+#include "video/segaic16.h"
+#include "video/sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -53,14 +53,15 @@
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
 
-#include "video/segaic16.h"
-#include "video/sega16sp.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 namespace {
 
 class segas18_astormbl_state : public sega_16bit_common_base
 {
-public:
+protected:
 	segas18_astormbl_state(const machine_config &mconfig, device_type type, const char *tag) 
 		: sega_16bit_common_base(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -75,7 +76,6 @@ public:
 		, m_tileyscroll0(*this, "tileyscroll0")
 	{ }
 
-protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;
 
@@ -92,7 +92,7 @@ private:
 	void sys16_textram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	tilemap_t *m_text_layer;
+	tilemap_t *m_text_layer = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<sega_sys16b_sprite_device> m_sprites;
@@ -161,6 +161,7 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_okibank;
 };
+
 
 static INPUT_PORTS_START( astormbl )
 	PORT_START("P1")
@@ -260,7 +261,7 @@ TILE_GET_INFO_MEMBER(segas18_astormbl_state::get_text_tile_info)
 
 	tileinfo.set(0,
 			(tile_number & 0x1ff),
-			(tile_number >> 9) & 7,
+			(tile_number >> 9) & 0x7,
 			0);
 
 	tileinfo.category = (tile_number >> 15) & 1;
@@ -522,6 +523,8 @@ void segas18_astormbl_s18snd_state::pcm_map(address_map &map)
 
 void segas18_astormbl_s18snd_state::machine_start()
 {
+	segas18_astormbl_state::machine_start();
+
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
 }
 
@@ -541,7 +544,7 @@ void segas18_astormbl_s18snd_state::sound_w(offs_t offset, uint16_t data, uint16
 
 void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
 {
-	Z80(config, m_soundcpu, 8000000);
+	Z80(config, m_soundcpu, 8'000'000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas18_astormbl_s18snd_state::sound_portmap);
 
@@ -550,21 +553,21 @@ void segas18_astormbl_s18snd_state::astormbl_sound(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3438_device &ym1(YM3438(config, "ym1", 8000000));
+	ym3438_device &ym1(YM3438(config, "ym1", 8'000'000));
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
+	ym3438_device &ym2(YM3438(config, "ym2", 8'000'000));
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000)); // ASSP (RF)5C68A
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10'000'000)); // ASSP (RF)5C68A
 	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 	rfsnd.set_addrmap(0, &segas18_astormbl_s18snd_state::pcm_map);
 }
 
 void segas18_astormbl_s18snd_state::astormbl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 10000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_s18snd_state::astormbl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_s18snd_state::irq4_line_hold));
@@ -587,6 +590,8 @@ void segas18_astormbl_bootsnd_state::sys18bl_okibank_w(uint8_t data) // TODO: ve
 
 void segas18_astormbl_bootsnd_state::machine_start()
 {
+	segas18_astormbl_state::machine_start();
+
 	m_okibank->configure_entries(0, 8, memregion("oki")->base() + 0x30000, 0x10000);
 }
 
@@ -610,7 +615,7 @@ void segas18_astormbl_bootsnd_state::astormb2_sound(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	Z80(config, m_soundcpu, XTAL(8'000'000)/2); /* 4MHz */
+	Z80(config, m_soundcpu, 8_MHz_XTAL/2); // 4MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_bootsnd_state::sys18bl_sound_map);
 
 	// 1 OKI M6295 instead of original sound hardware
@@ -624,8 +629,8 @@ void segas18_astormbl_bootsnd_state::astormb2_sound(machine_config &config)
 
 void segas18_astormbl_bootsnd_state::astormb2(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);  /* 12MHz */
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);  // 12MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_astormbl_bootsnd_state::astormbl_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segas18_astormbl_bootsnd_state::irq4_line_hold));
 
@@ -636,16 +641,16 @@ void segas18_astormbl_bootsnd_state::astormb2(machine_config &config)
 
 
 ROM_START( astormbl )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "astorm.a6", 0x000000, 0x40000, CRC(7682ed3e) SHA1(b857352ad9c66488e91f60989472638c483e4ae8) )
 	ROM_LOAD16_BYTE( "astorm.a5", 0x000001, 0x40000, CRC(efe9711e) SHA1(496fd9e30941fde1658fab7292a669ef7964cecb) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "epr13073.bin", 0x00000, 0x40000, CRC(df5d0a61) SHA1(79ad71de348f280bad847566c507b7a31f022292) )
 	ROM_LOAD( "epr13074.bin", 0x40000, 0x40000, CRC(787afab8) SHA1(a119042bb2dad54e9733bfba4eaab0ac5fc0f9e7) )
 	ROM_LOAD( "epr13075.bin", 0x80000, 0x40000, CRC(4e01b477) SHA1(4178ce4a87ea427c3b0195e64acef6cddfb3485f) )
 
-	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "mpr13082.bin", 0x000001, 0x40000, CRC(a782b704) SHA1(ba15bdfbc267b8d86f03e5310ce60846ff846de3) )
 	ROM_LOAD16_BYTE( "astorm.a11",   0x000000, 0x40000, CRC(7829c4f3) SHA1(3adb7aa7f70163d3848c98316e18b9783c41d663) )
 	ROM_LOAD16_BYTE( "mpr13081.bin", 0x080001, 0x40000, CRC(eb510228) SHA1(4cd387b160ec7050e1300ebe708853742169e643) )
@@ -690,7 +695,7 @@ on roms board:
 */
 
 ROM_START( astormb2 )
-	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "1.a4", 0x000000, 0x10000, CRC(cca0d0af) SHA1(26fdbbeb8444d05f0ca2056a7c7fb81b0f1f2b5a) )
 	ROM_LOAD16_BYTE( "2.a3", 0x020000, 0x10000, CRC(f95eb883) SHA1(b25d9c0fd46a534e7612f4a3ffa708b73654ae2b) )
 	ROM_LOAD16_BYTE( "3.a2", 0x040000, 0x10000, CRC(4206ecd4) SHA1(45c65d7727cfaf215a7081159f6931185e92b39a) ) // epr13182.bin [3/4]      IDENTICAL
@@ -700,7 +705,7 @@ ROM_START( astormb2 )
 	ROM_LOAD16_BYTE( "7.a7", 0x040001, 0x10000, CRC(c901e228) SHA1(f459ba819a4e5f5174ff1b3957fb648c93beed53) ) // epr13181.bin [3/4]      IDENTICAL
 	ROM_LOAD16_BYTE( "8.a6", 0x060001, 0x10000, CRC(bfb9d607) SHA1(8c3e10c1397fa0807d8df4715c9eb1945c774924) ) // epr13181.bin [4/4]      98.587036%
 
-	ROM_REGION( 0xc0000, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "32.01",  0x00000, 0x20000, CRC(d2aeb4ab) SHA1(9338ec5dc48f5d2b20511628a281236fe4646ef4) ) // epr13073.bin [1/2]      IDENTICAL
 	ROM_LOAD( "33.011", 0x20000, 0x20000, CRC(2193f0ae) SHA1(84070f74693699c1ffc1a47517a97b5d058d08ec) ) // epr13073.bin [2/2]      IDENTICAL
 	ROM_LOAD( "34.02",  0x40000, 0x20000, CRC(849aa725) SHA1(0f949dfe8a6c5796edc86a05339da80a158a95ae) ) // epr13074.bin [1/2]      IDENTICAL
@@ -708,7 +713,7 @@ ROM_START( astormb2 )
 	ROM_LOAD( "36.03",  0x80000, 0x20000, CRC(c0f9628d) SHA1(aeacf5e409adfa0b9c28c90d4e89eb1f56cd5f4d) ) // epr13075.bin [1/2]      IDENTICAL
 	ROM_LOAD( "37.031", 0xa0000, 0x20000, CRC(95af904e) SHA1(6574fa874c355c368109b417aab7d0b05c9d215d) ) // epr13075.bin [2/2]      IDENTICAL
 
-	ROM_REGION16_BE( 0x200000, "sprites", 0 ) /* sprites */
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
 	ROM_LOAD16_BYTE( "17.042", 0x000001, 0x20000, CRC(db08beb5) SHA1(c154d22c69b77637d6a9d0f2bffcfb47e6901ec8) ) // mpr13082.bin [1/2]      IDENTICAL
 	ROM_LOAD16_BYTE( "16.043", 0x040001, 0x20000, CRC(41f78977) SHA1(9cf9fcf96722d148c4b2cf7aa33425b6efcd0379) ) // mpr13082.bin [2/2]      IDENTICAL
 	ROM_LOAD16_BYTE( "29.012", 0x000000, 0x20000, CRC(22acf675) SHA1(80fd0d96017bf36d964a79f7e13e73fee7ed370a) ) // mpr13089.bin [1/2]      99.941254%
@@ -726,11 +731,11 @@ ROM_START( astormb2 )
 	ROM_LOAD16_BYTE( "27.020", 0x180000, 0x20000, CRC(6c5312aa) SHA1(94b74c78f318fcc1881a2926cebc98033a7e535d) ) // epr13086.bin [1/2]      IDENTICAL
 	ROM_LOAD16_BYTE( "26.021", 0x1c0000, 0x20000, CRC(c67fc986) SHA1(5fac826f9dde45201e3b93582dbe29c584a10229) ) // epr13086.bin [2/2]      99.987030%
 
-	/* Sound HW is very different to the originals */
-	ROM_REGION( 0x08000, "soundcpu", 0 ) /* Z80 sound CPU */
+	// Sound HW is very different to the originals
+	ROM_REGION( 0x08000, "soundcpu", 0 ) // Z80 sound CPU
 	ROM_LOAD( "9.a5", 0x00000, 0x08000, CRC(0a4638e9) SHA1(0470e03a194464ff53c7583637193b585f5fd79f) )
 
-	ROM_REGION( 0xb0000, "oki", 0 ) /* Oki6295 Samples */
+	ROM_REGION( 0xb0000, "oki", 0 ) // Oki6295 Samples
 	ROM_LOAD( "11.a10", 0x00000, 0x20000, CRC(7e0f752c) SHA1(a4070c3fa4848b5be223f9b927de4b6926dbb4e6) ) // contains sample table
 	ROM_LOAD( "10.a11", 0x20000, 0x10000, CRC(722e5969) SHA1(9cf891c6533b2e2a5c4741aa4e405038a7bf4e97) ) // sound effects
 	// BGM (banked 0x30000-0x3ffff)
