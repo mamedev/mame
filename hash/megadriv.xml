@@ -1801,7 +1801,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Japan prototype -->
 	<software name="crydragn">
-		<description>Crying Dragon (Jpn, prototype)</description>
+		<description>Crying Dragon (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -11170,7 +11170,7 @@ but dumps still have to be confirmed.
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="ballz 3d - fightilng at its ballziest (june prototype).bin" size="2097152" crc="c89ad87e" sha1="6cd87eb8b1b585778158c6ecf5faf16365924d33"/>
+				<rom name="ballz 3d - fighting at its ballziest (june prototype).bin" size="2097152" crc="c89ad87e" sha1="6cd87eb8b1b585778158c6ecf5faf16365924d33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16222,7 +16222,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="ggroundp" cloneof="gground">
-		<description>Gain Ground (Prototype 19900727)</description>
+		<description>Gain Ground (prototype 19900727)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -32694,7 +32694,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="legobatm">
-		<description>LEGO Batman (Rus)</description>
+		<description>LEGO Batman (Russia)</description>
 		<year>2014</year>
 		<publisher>KDS</publisher>
 		<part name="cart" interface="megadriv_cart">
