@@ -167,7 +167,6 @@ void library::add_class(const imgtool_class *imgclass)
 	// allocate the module and place it in the chain
 	m_modules.emplace_back(std::make_unique<imgtool_module>());
 	imgtool_module *module = m_modules.back().get();
-	memset(module, 0, sizeof(*module));
 
 	module->imgclass                    = *imgclass;
 	module->name                        = imgtool_get_info_string(imgclass, IMGTOOLINFO_STR_NAME);

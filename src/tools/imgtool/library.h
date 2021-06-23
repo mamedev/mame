@@ -458,39 +458,48 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_class imgclass;
+	imgtool_module()
+	{
+		initial_path_separator = 0;
+		open_is_strict = 0;
+		tracks_are_called_cylinders = 0;
+		writing_untested = 0;
+		creation_untested = 0;
+	}
+
+	imgtool_class imgclass = { 0 };
 
 	std::string name;
 	std::string description;
 	std::string extensions;
 	std::string eoln;
 
-	size_t image_extra_bytes;
+	size_t image_extra_bytes = 0;
 
 	/* flags */
 	unsigned int initial_path_separator : 1;
 	unsigned int open_is_strict : 1;
-	unsigned int tracks_are_called_cylinders : 1;   /* used for hard drivers */
-	unsigned int writing_untested : 1;              /* used when we support writing, but not in main build */
-	unsigned int creation_untested : 1;             /* used when we support creation, but not in main build */
+	unsigned int tracks_are_called_cylinders : 1;    /* used for hard drivers */
+	unsigned int writing_untested : 1;               /* used when we support writing, but not in main build */
+	unsigned int creation_untested : 1;              /* used when we support creation, but not in main build */
 
-	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream);
-	void            (*close)        (imgtool::image &image);
-	void            (*info)         (imgtool::image &image, std::ostream &stream);
-	imgtoolerr_t    (*create)       (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
-	imgtoolerr_t    (*get_geometry) (imgtool::image &image, uint32_t *track, uint32_t *heads, uint32_t *sectors);
-	imgtoolerr_t    (*read_sector)  (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer);
-	imgtoolerr_t    (*write_sector) (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len);
-	imgtoolerr_t    (*read_block)   (imgtool::image &image, void *buffer, uint64_t block);
-	imgtoolerr_t    (*write_block)  (imgtool::image &image, const void *buffer, uint64_t block);
-	imgtoolerr_t    (*list_partitions)(imgtool::image &image, std::vector<imgtool::partition_info> &partitions);
+	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream) = nullptr;
+	void            (*close)        (imgtool::image &image) = nullptr;
+	void            (*info)         (imgtool::image &image, std::ostream &stream) = nullptr;
+	imgtoolerr_t    (*create)       (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts) = nullptr;
+	imgtoolerr_t    (*get_geometry) (imgtool::image &image, uint32_t *track, uint32_t *heads, uint32_t *sectors) = nullptr;
+	imgtoolerr_t    (*read_sector)  (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer) = nullptr;
+	imgtoolerr_t    (*write_sector) (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len) = nullptr;
+	imgtoolerr_t    (*read_block)   (imgtool::image &image, void *buffer, uint64_t block) = nullptr;
+	imgtoolerr_t    (*write_block)  (imgtool::image &image, const void *buffer, uint64_t block) = nullptr;
+	imgtoolerr_t    (*list_partitions)(imgtool::image &image, std::vector<imgtool::partition_info> &partitions) = nullptr;
 
-	uint32_t block_size;
+	uint32_t block_size = 0;
 
-	const util::option_guide *createimage_optguide;
+	const util::option_guide *createimage_optguide = nullptr;
 	std::string createimage_optspec;
 
-	const void *extra;
+	const void *extra = nullptr;
 };
 
 namespace imgtool {
