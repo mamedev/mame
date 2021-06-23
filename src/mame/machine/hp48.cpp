@@ -934,6 +934,7 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP48_S_SERIES ?  (256 * 1024) : (512 * 1024);
 	m_allocated_rom = std::make_unique<uint8_t[]>(2 * rom_size);
 	decode_nibble(m_allocated_rom.get(), memregion("maincpu")->base(), rom_size);
+	m_rom = m_allocated_rom.get();
 
 	/* init state */
 	std::fill_n(&m_allocated_ram[0], 2 * ram_size, 0);
