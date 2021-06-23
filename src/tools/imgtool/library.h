@@ -458,15 +458,6 @@ char *imgtool_temp_str(void);
 
 struct imgtool_module
 {
-	imgtool_module()
-	{
-		initial_path_separator = 0;
-		open_is_strict = 0;
-		tracks_are_called_cylinders = 0;
-		writing_untested = 0;
-		creation_untested = 0;
-	}
-
 	imgtool_class imgclass = { 0 };
 
 	std::string name;
@@ -477,11 +468,11 @@ struct imgtool_module
 	size_t image_extra_bytes = 0;
 
 	/* flags */
-	unsigned int initial_path_separator : 1;
-	unsigned int open_is_strict : 1;
-	unsigned int tracks_are_called_cylinders : 1;    /* used for hard drivers */
-	unsigned int writing_untested : 1;               /* used when we support writing, but not in main build */
-	unsigned int creation_untested : 1;              /* used when we support creation, but not in main build */
+	bool initial_path_separator = false;
+	bool open_is_strict = false;
+	bool tracks_are_called_cylinders = false;    /* used for hard drivers */
+	bool writing_untested = false;               /* used when we support writing, but not in main build */
+	bool creation_untested = false;              /* used when we support creation, but not in main build */
 
 	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream) = nullptr;
 	void            (*close)        (imgtool::image &image) = nullptr;

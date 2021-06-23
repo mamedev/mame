@@ -841,17 +841,17 @@ bool imgtool_validitychecks(void)
 
 		if (module->name.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'name'\n", wstring_from_utf8(module->name.c_str()));
+			util::stream_format(std::wcerr, L"imgtool module has null 'name'\n");
 			error = true;
 		}
 		if (module->description.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'description'\n", wstring_from_utf8(module->name.c_str()));
+			util::stream_format(std::wcerr, L"imgtool module %s has null 'description'\n", wstring_from_utf8(module->name));
 			error = true;
 		}
 		if (module->extensions.empty())
 		{
-			util::stream_format(std::wcerr, L"imgtool module %s has null 'extensions'\n", wstring_from_utf8(module->extensions.c_str()));
+			util::stream_format(std::wcerr, L"imgtool module %s has null 'extensions'\n", wstring_from_utf8(module->extensions));
 			error = true;
 		}
 
