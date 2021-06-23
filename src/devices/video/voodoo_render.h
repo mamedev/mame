@@ -530,7 +530,7 @@ public:
 	u32 enqueue_triangle(poly_data &poly, vertex_t const *vert);
 
 	// core triangle rasterizer
-	template<u32 _Generic, u32 _FbzCp, u32 _FbzMode, u32 _AlphaMode, u32 _FogMode, u32 _TexMode0, u32 _TexMode1>
+	template<u32 GenericFlags, u32 FbzCp, u32 FbzMode, u32 AlphaMode, u32 FogMode, u32 TexMode0, u32 TexMode1>
 	void rasterizer(s32 y, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_data &extra, int threadid);
 
 	// run the pixel pipeline for LFB writes

@@ -2257,12 +2257,12 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 //  rasterizer - core scanline rasterizer
 //-------------------------------------------------
 
-template<u32 Generic, u32 FbzCp, u32 FbzMode, u32 AlphaMode, u32 FogMode, u32 TexMode0, u32 TexMode1>
+template<u32 GenericFlags, u32 FbzCp, u32 FbzMode, u32 AlphaMode, u32 FogMode, u32 TexMode0, u32 TexMode1>
 void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent, const poly_data &poly, int threadid)
 {
 	thread_stats_block &threadstats = m_thread_stats[threadid];
-	reg_texture_mode const texmode0(TexMode0, (Generic & rasterizer_params::GENERIC_TEX0) ? poly.raster.texmode0() : 0);
-	reg_texture_mode const texmode1(TexMode1, (Generic & rasterizer_params::GENERIC_TEX1) ? poly.raster.texmode1() : 0);
+	reg_texture_mode const texmode0(TexMode0, (GenericFlags & rasterizer_params::GENERIC_TEX0) ? poly.raster.texmode0() : 0);
+	reg_texture_mode const texmode1(TexMode1, (GenericFlags & rasterizer_params::GENERIC_TEX1) ? poly.raster.texmode1() : 0);
 	reg_fbz_colorpath const fbzcp(FbzCp, poly.raster.fbzcp());
 	reg_alpha_mode const alphamode(AlphaMode, poly.raster.alphamode());
 	reg_fbz_mode const fbzmode(FbzMode, poly.raster.fbzmode());
@@ -2336,7 +2336,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	s32 iterz = poly.startz + dy * poly.dzdy + dx * poly.dzdx;
 	s64 iterw = (poly.startw + dy * poly.dwdy + dx * poly.dwdx) << 16;
 	s64 iterw_delta = poly.dwdx << 16;
-	if (Generic & rasterizer_params::GENERIC_TEX0)
+	if (GenericFlags & rasterizer_params::GENERIC_TEX0)
 	{
 		iterstw0.set(
 			poly.starts0 + dy * poly.ds0dy + dx * poly.ds0dx,
@@ -2344,7 +2344,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			poly.startw0 + dy * poly.dw0dy + dx * poly.dw0dx);
 		deltastw0.set(poly.ds0dx, poly.dt0dx, poly.dw0dx);
 	}
-	if (Generic & rasterizer_params::GENERIC_TEX1)
+	if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 	{
 		iterstw1.set(
 			poly.starts1 + dy * poly.ds1dy + dx * poly.ds1dx,
@@ -2376,18 +2376,18 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 
 			// run the texture pipeline on TMU1 to produce a value in texel
 			rgbaint_t texel(0);
-			if (Generic & rasterizer_params::GENERIC_TEX1)
+			if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 			{
 				s32 lod1;
 				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, poly.lodbase1, lod1);
-				if (Generic & rasterizer_params::GENERIC_TEX1_IDENTITY)
+				if (GenericFlags & rasterizer_params::GENERIC_TEX1_IDENTITY)
 					texel = texel_t1;
 				else
 					texel = poly.tex1->combine_texture(texmode1, texel_t1, texel, lod1);
 			}
 
 			// run the texture pipeline on TMU0 to produce a final result in texel
-			if (Generic & rasterizer_params::GENERIC_TEX0)
+			if (GenericFlags & rasterizer_params::GENERIC_TEX0)
 			{
 				// the seq_8_downld flag is repurposed in the rasterizer to indicate
 				// we should send the configuration byte
@@ -2395,7 +2395,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 				{
 					s32 lod0;
 					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, poly.lodbase0, lod0);
-					if (Generic & rasterizer_params::GENERIC_TEX0_IDENTITY)
+					if (GenericFlags & rasterizer_params::GENERIC_TEX0_IDENTITY)
 						texel = texel_t0;
 					else
 						texel = poly.tex0->combine_texture(texmode0, texel_t0, texel, lod0);
@@ -2430,9 +2430,9 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 		iterargb += iterargb_delta;
 		iterz += poly.dzdx;
 		iterw += iterw_delta;
-		if (Generic & rasterizer_params::GENERIC_TEX0)
+		if (GenericFlags & rasterizer_params::GENERIC_TEX0)
 			iterstw0.add(deltastw0);
-		if (Generic & rasterizer_params::GENERIC_TEX1)
+		if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 			iterstw1.add(deltastw1);
 	}
 }
