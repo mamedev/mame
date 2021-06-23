@@ -115,7 +115,6 @@ namespace imgtool
 		imgtoolerr_t write_block(uint64_t block, const void *buffer);
 		imgtoolerr_t clear_block(uint64_t block, uint8_t data);
 		imgtoolerr_t list_partitions(std::vector<imgtool::partition_info> &partitions);
-//		void *malloc(size_t size);
 		const imgtool_module &module() { return m_module; }
 		void *extra_bytes() { return m_extra_bytes.get(); }
 
