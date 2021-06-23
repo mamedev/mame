@@ -1451,7 +1451,7 @@ inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &
 			result = 0xffff;
 		else
 		{
-			int exp = count_leading_zeros(iterz) - 4;
+			int exp = count_leading_zeros_32(iterz) - 4;
 			return ((exp << 12) | ((iterz >> (15 - exp)) ^ 0x1fff)) + 1;
 		}
 	}

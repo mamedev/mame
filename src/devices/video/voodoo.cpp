@@ -2641,7 +2641,7 @@ void voodoo_device_base::fbi_state::recompute_screen_params(voodoo_regs &regs, s
 		u32 vbp = back_porch.vertical(regs.rev1());
 
 		/* create a new visarea */
-		rectangle visarea(hbp, hbp + std::max(hvis - 1, 0), vbp, vbp + std::max(vvis - 1, 0));
+		rectangle visarea(hbp, hbp + std::max(s32(hvis) - 1, 0), vbp, vbp + std::max(s32(vvis) - 1, 0));
 
 		/* keep within bounds */
 		visarea.max_x = std::min<s32>(visarea.max_x, htotal - 1);
