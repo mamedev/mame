@@ -57,8 +57,6 @@ public:
 	void eswatbl2(machine_config &config);
 	void ddcrewbl(machine_config &config);
 	void shdancbla(machine_config &config);
-	void astormbl(machine_config &config);
-	void astormb2(machine_config &config);
 	void passsht4b(machine_config &config);
 	void wb3bb(machine_config &config);
 	void wb3bble(machine_config &config);
@@ -78,7 +76,6 @@ public:
 	void init_wb3bble();
 	void init_fpointbl();
 	void init_eswatbl();
-	void init_astormbl();
 	void init_sys18bl_oki();
 	void init_astormb2();
 	void init_shdancbl();
@@ -176,7 +173,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
 
-	void astormbl_map(address_map &map);
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
 	void beautyb_map(address_map &map);
