@@ -1801,30 +1801,32 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Japan prototype -->
 	<software name="crydragn">
-		<description>Crying Dragon (Jpn, Prototype)</description>
+		<description>Crying Dragon (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Treco</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="SEGA 1988/171-5663/M5 TEST 8MB"/>
-			<feature name="c3" value="CK2605"/>
-			<feature name="c4" value="HN27C301AG"/>
-			<feature name="c5" value="HN27C301AG"/>
-			<feature name="c6" value="HN27C301AG"/>
-			<feature name="c7" value="HN27C301AG"/>
-			<feature name="c8" value="HN27C301AG"/>
-			<feature name="c9" value="HN27C301AG"/>
-			<feature name="c10" value="HN27C301AG"/>
-			<feature name="c11" value="HN27C301AG"/>
-			<feature name="c12" value="MB8464A-10LL-SK"/>
+			<feature name="ic1" value="HN27C301AG-15"/>
+			<feature name="ic2" value="HN27C301AG-17"/>
+			<feature name="ic3" value="HN27C301AG-20"/>
+			<feature name="ic4" value="HN27C301AG-20"/>
+			<feature name="ic5" value="HN27C301AG-17"/>
+			<feature name="ic6" value="HN27C301AG-17"/>
+			<feature name="ic7" value="HN27C301AG-20"/>
+			<feature name="ic8" value="HN27C301AG-20"/>
+			<feature name="ic9" value="MB8464A-10LL-SK"/>
+			<feature name="ic10" value="CK2605"/>
+			<feature name="dipswitch" value="SW1"/> <!-- (....) -->
+			<feature name="batt?" value="(Lithium Cell)"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom loadflag="load16_byte" name="hn27c301ag.c4" offset="0x00001" size="131072" crc="cfcea09b" sha1="59be32d111315bf7d1f8221724f54a840dd2814f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c5" offset="0x00000" size="131072" crc="60829383" sha1="ade97f9046896dd59335eee272e6b3f84bb787e0"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c6" offset="0x40001" size="131072" crc="e8342dd7" sha1="dcd3f8bb8849d85d10f442ad84c34c7ebf2aa19f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c7" offset="0x40000" size="131072" crc="1fdb0ed2" sha1="0fb8446d21de80efc8ef6cef40df96c335a55a3b"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c8" offset="0x80001" size="131072" crc="a9a4704f" sha1="1bf0176b68269c21e48b75e244ec9b755f71f12f"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c9" offset="0x80000" size="131072" crc="76c96b1a" sha1="cda1ed7da5ef9835e6d20e90b844755288d44f84"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c10" offset="0xc0001" size="131072" crc="5864d4ba" sha1="ee8ad53e424b99cff525df8278ebd854d64c5bd9"/>
-				<rom loadflag="load16_byte" name="hn27c301ag.c11" offset="0xc0000" size="131072" crc="a6a02e5f" sha1="cc586e0dee3642e9d1f9e24cb1d5c4ca5bde4bfe"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic1" offset="0x00001" size="131072" crc="cfcea09b" sha1="59be32d111315bf7d1f8221724f54a840dd2814f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic2" offset="0x00000" size="131072" crc="60829383" sha1="ade97f9046896dd59335eee272e6b3f84bb787e0"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic3" offset="0x40001" size="131072" crc="e8342dd7" sha1="dcd3f8bb8849d85d10f442ad84c34c7ebf2aa19f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic4" offset="0x40000" size="131072" crc="1fdb0ed2" sha1="0fb8446d21de80efc8ef6cef40df96c335a55a3b"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic5" offset="0x80001" size="131072" crc="a9a4704f" sha1="1bf0176b68269c21e48b75e244ec9b755f71f12f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic6" offset="0x80000" size="131072" crc="76c96b1a" sha1="cda1ed7da5ef9835e6d20e90b844755288d44f84"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic7" offset="0xc0001" size="131072" crc="5864d4ba" sha1="ee8ad53e424b99cff525df8278ebd854d64c5bd9"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.ic8" offset="0xc0000" size="131072" crc="a6a02e5f" sha1="cc586e0dee3642e9d1f9e24cb1d5c4ca5bde4bfe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3158,18 +3160,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="MPR-13642 S87"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-13642 s87.ic1" size="524288" crc="8641a2ab" sha1="a5017e44b5f470e0499f4a9b494385c567632864"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="ggroundp" cloneof="gground">
-		<description>Gain Ground (Prototype 19900727)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="gain ground (jul 27, 1990 prototype).bin" size="524288" crc="f5c0b45f" sha1="a4d70df77ed08a9233076250c93c8d8a0c0ba715" />
 			</dataarea>
 		</part>
 	</software>
@@ -4533,18 +4523,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="TWI 1994 335095-1050"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="335095-1050.ic1" size="1048576" crc="a7cacd59" sha1="9e19ac92bc06954985dd97a9a7f55ef87e8c7364"/>
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="legobatm">
-		<description>LEGO Batman (Rus)</description>
-		<year>2014</year>
-		<publisher>KDS</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="lego batman (unl).bin" size="524288" crc="00da53a9" sha1="f65d7d21794c33fd69449bd3046656269aacadd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11186,6 +11164,28 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="ballz3dp2" cloneof="ballz3d">
+		<description>Ballz 3D (USA, prototype 199406xx)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="ballz 3d - fighting at its ballziest (june prototype).bin" size="2097152" crc="c89ad87e" sha1="6cd87eb8b1b585778158c6ecf5faf16365924d33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballz3dp1" cloneof="ballz3d">
+		<description>Ballz 3D (prototype 199409xx)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="ballz.32d3.bin" size="2097152" crc="d349ab90" sha1="b87044362a6fde38eedb3675b09b6c005c39c739"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="baoxiao">
 		<description>Bao Xiao San Guo (Chi)</description>
 		<year>199?</year>
@@ -16221,6 +16221,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="ggroundp" cloneof="gground">
+		<description>Gain Ground (prototype 19900727)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="gain ground (jul 27, 1990 prototype).bin" size="524288" crc="f5c0b45f" sha1="a4d70df77ed08a9233076250c93c8d8a0c0ba715" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gforce2a" cloneof="gforce2">
 		<description>Galaxy Force II (World)</description>
 		<year>1991</year>
@@ -17713,6 +17724,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="junglep" cloneof="jungle">
+		<description>Disney's The Jungle Book (prototype)</description>
+		<year>1994</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="the jungle book (wces 1994 prototype).bin" size="1048576" crc="20b97d87" sha1="df79f4d61d1de7f9a3ed056f98a94dcad2ae8e18"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jstrikep" cloneof="jstrike">
 		<description>Jungle Strike (USA, Prototype)</description>
 		<year>1993</year>
@@ -19168,6 +19190,21 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="megaturrp" cloneof="megaturr">
+		<description>Mega Turrican (prototype 19930518)</description>
+		<year>1993</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="mega turrican (may 18, 1993 prototype).bin" size="1048576" crc="3ba35acd" sha1="486fd963b1389806a565dab21c81c46c273c8e5f"/>
+<!-- labels on 512K 27C040s:
+				<rom name="megaturrican odd" size="524288" crc="" sha1="" offset="0x000001" loadflag="load16_byte"/>
+				<rom name="megaturrican even" size="524288" crc="" sha1="" offset="0x000000" loadflag="load16_byte"/>
+-->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="megalo">
 		<description>Mega Lo Mania (Euro, v1.1)</description>
 		<year>1992</year>
@@ -19241,6 +19278,18 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="mpr-13285.bin" size="524288" crc="6a70791b" sha1="8960bac2027cdeadb07e535a77597fb783e1433b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwalkp" cloneof="mwalk">
+		<description>Michael Jackson's Moonwalker (prototype 19900424)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="michael jackson's moonwalker (apr 24, 1990 prototype).bin" size="524288" crc="dc7ed8c1" sha1="6ce4ce7af4265d9be6bfe5021eb64839a73fdac6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -27379,6 +27428,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="tazmaniap" cloneof="tazmania">
+		<description>Taz-Mania (prototype)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="taz-mania (prototype).bin" size="524288" crc="1415b80f" sha1="31c49bba3d1fb10ebde060bacd47d17857d04404"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dreamteam" cloneof="teamusa">
 		<description>USA Basketball World Challenge (Jpn)</description>
 		<year>1992</year>
@@ -29229,6 +29289,42 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 				<rom name="waterworld (euro) (prototype).bin" size="2097152" crc="51c80498" sha1="35e4186654a677a43d16861f9832199c5cb5e0ef"/>
 			</dataarea>
 		</part>
+	</software>
+
+<!-- Apparently dumper modified ROM in some unspecified way to allow it to boot -->
+	<software name="waynegp" cloneof="wayneg">
+		<description>Wayne Gretzky and the NHLPA All-Stars (prototype 19950217)</description>
+		<year>1995</year>
+		<publisher>Time Warner Interactive</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram"/>
+			<feature name="pcb" value="SEGA 1988/171-5663/M5 TEST 8MB"/>
+			<feature name="ic1" value="D27C020-150V10"/>
+			<feature name="ic2" value="27C020-15"/>
+			<feature name="ic3" value="27C020-15"/>
+			<feature name="ic4" value="AM27C020-150DC"/>
+			<feature name="ic5" value="M27C2001-15F1"/> <!-- mostly obscured by tape -->
+			<feature name="ic6" value="27C020-15"/>
+			<feature name="ic7" value="27C020-15"/>
+			<feature name="ic8" value="AM27C020-150DC"/>
+			<feature name="ic9" value="MB8464A-10LL-SK"/>
+			<feature name="ic10" value="315-5341"/>
+			<feature name="ic11" value="T529F"/>
+			<feature name="dipswitch" value="SW1"/> <!-- (''.') -->
+			<feature name="batt?" value="(Lithium Cell)"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="wayne gretzky and the nhlpa all-stars (feb 17, 1995 prototype).bin" size="2097152" crc="79d6f482" sha1="0d84dfdba84764904f26e773f0427fa0fffe3c83" status="baddump"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+<!-- LABEL(S)
+
+    TRACY EGAN (408)232-3213 VER.02/17B/95
+    WAYNE GRETZKY
+    AND THE NHLPA ALL STARS
+    TM AND (C) 1995 TIME WARNER INTERACTIVE
+-->
 	</software>
 
 	<software name="waynewld">
@@ -32593,6 +32689,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="agent hugo - environment at risk (unl).bin" size="2097152" crc="be32d65b" sha1="5f2d9ee7945c50c64b9664148befcb2f6ed48d54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legobatm">
+		<description>LEGO Batman (Russia)</description>
+		<year>2014</year>
+		<publisher>KDS</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="lego batman (unl).bin" size="524288" crc="00da53a9" sha1="f65d7d21794c33fd69449bd3046656269aacadd4"/>
 			</dataarea>
 		</part>
 	</software>
