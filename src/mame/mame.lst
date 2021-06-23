@@ -2721,6 +2721,7 @@ a486sv2g                        // ASUS VL/I-486SV2G
 aa486s                          // ASUS PCI/I-A486S
 abae4                           // Abit 486 EISA-AE4 motherboard (486)
 abah4                           // Abit AH4(T) motherboard (486)
+abav4                           // Abit AB-AV4 (aka VL-BUS 486)
 abax4                           // Abit AB-AX4 motherboard (486)
 abpb4                           // Abit AB-PB4 motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
@@ -2746,10 +2747,12 @@ apxena1                         // 1993 Apricot XEN PC (A1 Motherboard)
 apxenls3                        // 1991 Apricot XEN-LS (Venus IV Motherboard)
 apxenp2                         // 1993 Apricot XEN PC (P2 Motherboard)
 apxlsam                         // 1993 Apricot XEN-LS II (Samurai Motherboard)
+ar4glx3                         // Addtech Research 4GLX3 Green-B 4GPV3.1
 as496                           // Arstoria AS496 motherboard (486)
 at486                           // 19?? IBM AT 486
 atc1415                         // A-Trend ATC-1415 motherboard (486)
 atc1425a                        // A-Trend ATC-1425A
+atc1425b                        // A-Trend ATC-1425B
 bluenote                        // Highscreen Colani Blue Note (486)
 ch48633c                        // Chicony CH-486-33C motherboard (486)
 ch486spm                        // Chaintech 486SPM motherboard (486)
@@ -2787,9 +2790,11 @@ hot419                          // Shuttle HOT-419 motherboard (486)
 hot433                          // Shuttle HOT-433 motherboard (486)
 ibm2133                         // IBM PS/1 2133
 jakms41                         // Jamicon KM-S4-1 VER 1.1
+jwj403tg                        // JETWAY J-403TG motherboard (486)
 jwj446a                         // Jetway J-446A motherboard (486)
 lion3500                        // 1993 Lion 3500C/T notebook
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+lsucm486v30                     // Lucky Star UCM-486V30
 mb1433aeap                      // BIOSTAR - MB-1433/50 AEA-P - V:1
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
 mb1433uiv                       // Biostar MB-1433UIV motherboard (486)
@@ -2839,6 +2844,8 @@ so30h                           // SOYO 30H motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 sto486wb                        // Auva-Cam-33-P2 = See-Thru Sto486Wb motherboard (486)
 td4ipaio                        // TD-4IP-UMC-AIO motherboard (486)
+tmpat48pg4                      // TMC PAT48PG4
+tmpat48av                       // TMC PAT48AV
 ts34t25                         // Highscreen 486-25 aka Midwest Micro Elite TS34T-25 notebook
 um486                           // Elitegroup UM486/UM486sx Rev.1.4. motherboard (486)
 um486v                          // Elitegroup UM486V-AIO motherboard (486)
