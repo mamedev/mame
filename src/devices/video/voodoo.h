@@ -42,7 +42,7 @@ static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
 
 namespace voodoo
 {
-	
+
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -202,7 +202,6 @@ private:
 	static packet_handler s_packet_handler[8];
 };
 
-
 struct shared_tables
 {
 	// constructor
@@ -218,6 +217,15 @@ struct shared_tables
 	rgb_t rgb565[65536];    // RGB 5-6-5 lookup table
 	rgb_t argb1555[65536];  // ARGB 1-5-5-5 lookup table
 	rgb_t argb4444[65536];  // ARGB 4-4-4-4 lookup table
+};
+
+struct setup_vertex
+{
+	float x, y;               // X, Y coordinates
+	float z, wb;              // Z and broadcast W values
+	float r, g, b, a;         // A, R, G, B values
+	float s0, t0, w0;         // W, S, T for TMU 0
+	float s1, t1, w1;         // W, S, T for TMU 1
 };
 
 class debug_stats
@@ -361,15 +369,6 @@ protected:
 		u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_ram + m_auxoffs) : nullptr; }
 		u16 *ram_end() const { return (u16 *)(m_ram + m_mask + 1); }
 
-		struct setup_vertex
-		{
-			float x, y;               // X, Y coordinates
-			float z, wb;              // Z and broadcast W values
-			float r, g, b, a;         // A, R, G, B values
-			float s0, t0, w0;         // W, S, T for TMU 0
-			float s1, t1, w1;         // W, S, T for TMU 1
-		};
-
 		u8 *m_ram;                    // pointer to frame buffer RAM
 		u32 m_mask;                   // mask to apply to pointers
 		u32 m_rgboffs[3];             // word offset to 3 RGB buffers
@@ -416,7 +415,7 @@ protected:
 		voodoo::thread_stats_block m_lfb_stats; // LFB access statistics
 
 		u8 m_sverts = 0;              // number of vertices ready
-		setup_vertex m_svert[3];      // 3 setup vertices
+		voodoo::setup_vertex m_svert[3];      // 3 setup vertices
 
 		voodoo::memory_fifo m_fifo;   // framebuffer memory fifo
 		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
@@ -450,9 +449,6 @@ protected:
 	void adjust_vblank_timer();
 	s32 fastfill();
 	s32 triangle();
-	s32 begin_triangle();
-	s32 draw_triangle();
-	s32 setup_and_draw_triangle();
 
 	void accumulate_statistics(const voodoo::thread_stats_block &block);
 	void update_statistics(bool accumulate);
@@ -469,6 +465,12 @@ protected:
 	void register_save();
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
+
+	// setup engine
+	s32 begin_triangle();
+	s32 draw_triangle();
+	void populate_setup_vertex(voodoo::setup_vertex &vertex);
+	s32 setup_and_draw_triangle();
 
 	// configuration
 	const voodoo_model m_model;              // which voodoo model

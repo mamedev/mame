@@ -1593,7 +1593,7 @@ u32 command_fifo::packet_type_3(u32 command)
 	m_device.m_reg.write(voodoo_regs::reg_sSetupMode, BIT(command, 10, 8) | (BIT(command, 22, 4) << 16));
 
 	// loop over triangles
-	voodoo_device_base::fbi_state::setup_vertex svert = { 0 };
+	setup_vertex svert = { 0 };
 	u32 cycles = 0;
 	for (u32 trinum = 0; trinum < count; trinum++)
 	{
@@ -3898,20 +3898,7 @@ s32 voodoo_device_base::triangle()
 s32 voodoo_device_base::begin_triangle()
 {
 	// extract all the data from registers
-	auto &sv = m_fbi.m_svert[2];
-	sv.x  = m_reg.read_float(voodoo_regs::reg_sVx);
-	sv.y  = m_reg.read_float(voodoo_regs::reg_sVy);
-	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
-	sv.w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
-	sv.s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
-	sv.t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
-	sv.w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
-	sv.s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
-	sv.t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
-	sv.a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
-	sv.r  = m_reg.read_float(voodoo_regs::reg_sRed);
-	sv.g  = m_reg.read_float(voodoo_regs::reg_sGreen);
-	sv.b  = m_reg.read_float(voodoo_regs::reg_sBlue);
+	populate_setup_vertex(m_fbi.m_svert[2]);
 
 	// spread it across all three verts and reset the count
 	m_fbi.m_svert[0] = m_fbi.m_svert[1] = m_fbi.m_svert[2];
@@ -3935,20 +3922,7 @@ s32 voodoo_device_base::draw_triangle()
 	m_fbi.m_svert[1] = m_fbi.m_svert[2];
 
 	// extract all the data from registers
-	auto &sv = m_fbi.m_svert[2];
-	sv.x  = m_reg.read_float(voodoo_regs::reg_sVx);
-	sv.y  = m_reg.read_float(voodoo_regs::reg_sVy);
-	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
-	sv.w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
-	sv.s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
-	sv.t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
-	sv.w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
-	sv.s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
-	sv.t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
-	sv.a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
-	sv.r  = m_reg.read_float(voodoo_regs::reg_sRed);
-	sv.g  = m_reg.read_float(voodoo_regs::reg_sGreen);
-	sv.b  = m_reg.read_float(voodoo_regs::reg_sBlue);
+	populate_setup_vertex(m_fbi.m_svert[2]);
 
 	// if we have enough verts, go ahead and draw
 	int cycles = 0;
@@ -3958,135 +3932,156 @@ s32 voodoo_device_base::draw_triangle()
 }
 
 
+//-------------------------------------------------
+//  populate_setup_vertex - fill in the given
+//  setup_vertex with data from the registers
+//-------------------------------------------------
 
-/***************************************************************************
-    TRIANGLE HELPERS
-***************************************************************************/
+void voodoo_device_base::populate_setup_vertex(setup_vertex &vertex)
+{
+	vertex.x  = m_reg.read_float(voodoo_regs::reg_sVx);
+	vertex.y  = m_reg.read_float(voodoo_regs::reg_sVy);
+	vertex.wb = m_reg.read_float(voodoo_regs::reg_sWb);
+	vertex.w0 = m_reg.read_float(voodoo_regs::reg_sWtmu0);
+	vertex.s0 = m_reg.read_float(voodoo_regs::reg_sS_W0);
+	vertex.t0 = m_reg.read_float(voodoo_regs::reg_sT_W0);
+	vertex.w1 = m_reg.read_float(voodoo_regs::reg_sWtmu1);
+	vertex.s1 = m_reg.read_float(voodoo_regs::reg_sS_Wtmu1);
+	vertex.t1 = m_reg.read_float(voodoo_regs::reg_sT_Wtmu1);
+	vertex.a  = m_reg.read_float(voodoo_regs::reg_sAlpha);
+	vertex.r  = m_reg.read_float(voodoo_regs::reg_sRed);
+	vertex.g  = m_reg.read_float(voodoo_regs::reg_sGreen);
+	vertex.b  = m_reg.read_float(voodoo_regs::reg_sBlue);
+}
 
-/*-------------------------------------------------
-    setup_and_draw_triangle - process the setup
-    parameters and render the triangle
--------------------------------------------------*/
+
+//-------------------------------------------------
+//  setup_and_draw_triangle - process the setup
+//  parameters and render the triangle
+//-------------------------------------------------
 
 s32 voodoo_device_base::setup_and_draw_triangle()
 {
-	/* compute the divisor */
-	// Just need sign for now
-	float divisor = ((m_fbi.m_svert[0].x - m_fbi.m_svert[1].x) * (m_fbi.m_svert[0].y - m_fbi.m_svert[2].y) -
-					 (m_fbi.m_svert[0].x - m_fbi.m_svert[2].x) * (m_fbi.m_svert[0].y - m_fbi.m_svert[1].y));
+	auto &sv0 = m_fbi.m_svert[0];
+	auto &sv1 = m_fbi.m_svert[1];
+	auto &sv2 = m_fbi.m_svert[2];
 
-	/* backface culling */
+	// compute the divisor, but we only need to know the sign up front
+	// for backface culling
+	float divisor = (sv0.x - sv1.x) * (sv0.y - sv2.y) - (sv0.x - sv2.x) * (sv0.y - sv1.y);
+
+	// backface culling
 	auto const setup_mode = m_reg.setup_mode();
-	if (setup_mode.enable_culling() & 0x20000)
+	if (setup_mode.enable_culling())
 	{
 		int culling_sign = setup_mode.culling_sign();
 		int divisor_sign = (divisor < 0);
 
-		/* if doing strips and ping pong is enabled, apply the ping pong */
+		// if doing strips and ping pong is enabled, apply the ping pong
 		if (!setup_mode.fan_mode() && !setup_mode.disable_ping_pong_correction())
 			culling_sign ^= (m_fbi.m_sverts - 3) & 1;
 
-		/* if our sign matches the culling sign, we're done for */
+		// if our sign matches the culling sign, we're done for
 		if (divisor_sign == culling_sign)
 			return TRIANGLE_SETUP_CLOCKS;
 	}
 
-	// Finish the divisor
+	// compute the reciprocal now that we know we need it
 	divisor = 1.0f / divisor;
 
-	/* grab the X/Ys at least */
-	m_fbi.m_ax = s16(m_fbi.m_svert[0].x * 16.0f);
-	m_fbi.m_ay = s16(m_fbi.m_svert[0].y * 16.0f);
-	m_fbi.m_bx = s16(m_fbi.m_svert[1].x * 16.0f);
-	m_fbi.m_by = s16(m_fbi.m_svert[1].y * 16.0f);
-	m_fbi.m_cx = s16(m_fbi.m_svert[2].x * 16.0f);
-	m_fbi.m_cy = s16(m_fbi.m_svert[2].y * 16.0f);
+	// grab the X/Ys at least
+	m_fbi.m_ax = s16(sv0.x * 16.0f);
+	m_fbi.m_ay = s16(sv0.y * 16.0f);
+	m_fbi.m_bx = s16(sv1.x * 16.0f);
+	m_fbi.m_by = s16(sv1.y * 16.0f);
+	m_fbi.m_cx = s16(sv2.x * 16.0f);
+	m_fbi.m_cy = s16(sv2.y * 16.0f);
 
-	/* compute the dx/dy values */
-	float dx1 = m_fbi.m_svert[0].y - m_fbi.m_svert[2].y;
-	float dx2 = m_fbi.m_svert[0].y - m_fbi.m_svert[1].y;
-	float dy1 = m_fbi.m_svert[0].x - m_fbi.m_svert[1].x;
-	float dy2 = m_fbi.m_svert[0].x - m_fbi.m_svert[2].x;
+	// compute the dx/dy values
+	float dx1 = sv0.y - sv2.y;
+	float dx2 = sv0.y - sv1.y;
+	float dy1 = sv0.x - sv1.x;
+	float dy2 = sv0.x - sv2.x;
 
-	/* set up R,G,B */
+	// set up R,G,B
 	float tdiv = divisor * 4096.0f;
 	if (setup_mode.setup_rgb())
 	{
-		m_fbi.m_startr = (s32)(m_fbi.m_svert[0].r * 4096.0f);
-		m_fbi.m_drdx = (s32)(((m_fbi.m_svert[0].r - m_fbi.m_svert[1].r) * dx1 - (m_fbi.m_svert[0].r - m_fbi.m_svert[2].r) * dx2) * tdiv);
-		m_fbi.m_drdy = (s32)(((m_fbi.m_svert[0].r - m_fbi.m_svert[2].r) * dy1 - (m_fbi.m_svert[0].r - m_fbi.m_svert[1].r) * dy2) * tdiv);
-		m_fbi.m_startg = (s32)(m_fbi.m_svert[0].g * 4096.0f);
-		m_fbi.m_dgdx = (s32)(((m_fbi.m_svert[0].g - m_fbi.m_svert[1].g) * dx1 - (m_fbi.m_svert[0].g - m_fbi.m_svert[2].g) * dx2) * tdiv);
-		m_fbi.m_dgdy = (s32)(((m_fbi.m_svert[0].g - m_fbi.m_svert[2].g) * dy1 - (m_fbi.m_svert[0].g - m_fbi.m_svert[1].g) * dy2) * tdiv);
-		m_fbi.m_startb = (s32)(m_fbi.m_svert[0].b * 4096.0f);
-		m_fbi.m_dbdx = (s32)(((m_fbi.m_svert[0].b - m_fbi.m_svert[1].b) * dx1 - (m_fbi.m_svert[0].b - m_fbi.m_svert[2].b) * dx2) * tdiv);
-		m_fbi.m_dbdy = (s32)(((m_fbi.m_svert[0].b - m_fbi.m_svert[2].b) * dy1 - (m_fbi.m_svert[0].b - m_fbi.m_svert[1].b) * dy2) * tdiv);
+		m_fbi.m_startr = s32(sv0.r * 4096.0f);
+		m_fbi.m_drdx = s32(((sv0.r - sv1.r) * dx1 - (sv0.r - sv2.r) * dx2) * tdiv);
+		m_fbi.m_drdy = s32(((sv0.r - sv2.r) * dy1 - (sv0.r - sv1.r) * dy2) * tdiv);
+		m_fbi.m_startg = s32(sv0.g * 4096.0f);
+		m_fbi.m_dgdx = s32(((sv0.g - sv1.g) * dx1 - (sv0.g - sv2.g) * dx2) * tdiv);
+		m_fbi.m_dgdy = s32(((sv0.g - sv2.g) * dy1 - (sv0.g - sv1.g) * dy2) * tdiv);
+		m_fbi.m_startb = s32(sv0.b * 4096.0f);
+		m_fbi.m_dbdx = s32(((sv0.b - sv1.b) * dx1 - (sv0.b - sv2.b) * dx2) * tdiv);
+		m_fbi.m_dbdy = s32(((sv0.b - sv2.b) * dy1 - (sv0.b - sv1.b) * dy2) * tdiv);
 	}
 
-	/* set up alpha */
+	// set up alpha
 	if (setup_mode.setup_alpha())
 	{
-		m_fbi.m_starta = (s32)(m_fbi.m_svert[0].a * 4096.0f);
-		m_fbi.m_dadx = (s32)(((m_fbi.m_svert[0].a - m_fbi.m_svert[1].a) * dx1 - (m_fbi.m_svert[0].a - m_fbi.m_svert[2].a) * dx2) * tdiv);
-		m_fbi.m_dady = (s32)(((m_fbi.m_svert[0].a - m_fbi.m_svert[2].a) * dy1 - (m_fbi.m_svert[0].a - m_fbi.m_svert[1].a) * dy2) * tdiv);
+		m_fbi.m_starta = s32(sv0.a * 4096.0f);
+		m_fbi.m_dadx = s32(((sv0.a - sv1.a) * dx1 - (sv0.a - sv2.a) * dx2) * tdiv);
+		m_fbi.m_dady = s32(((sv0.a - sv2.a) * dy1 - (sv0.a - sv1.a) * dy2) * tdiv);
 	}
 
-	/* set up Z */
+	// set up Z
 	if (setup_mode.setup_z())
 	{
-		m_fbi.m_startz = (s32)(m_fbi.m_svert[0].z * 4096.0f);
-		m_fbi.m_dzdx = (s32)(((m_fbi.m_svert[0].z - m_fbi.m_svert[1].z) * dx1 - (m_fbi.m_svert[0].z - m_fbi.m_svert[2].z) * dx2) * tdiv);
-		m_fbi.m_dzdy = (s32)(((m_fbi.m_svert[0].z - m_fbi.m_svert[2].z) * dy1 - (m_fbi.m_svert[0].z - m_fbi.m_svert[1].z) * dy2) * tdiv);
+		m_fbi.m_startz = s32(sv0.z * 4096.0f);
+		m_fbi.m_dzdx = s32(((sv0.z - sv1.z) * dx1 - (sv0.z - sv2.z) * dx2) * tdiv);
+		m_fbi.m_dzdy = s32(((sv0.z - sv2.z) * dy1 - (sv0.z - sv1.z) * dy2) * tdiv);
 	}
 
-	/* set up Wb */
+	// set up Wb
 	tdiv = divisor * 65536.0f * 65536.0f;
 	if (setup_mode.setup_wb())
 	{
-		m_fbi.m_startw = m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.m_svert[0].wb * 65536.0f * 65536.0f);
-		m_fbi.m_dwdx = m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.m_svert[0].wb - m_fbi.m_svert[1].wb) * dx1 - (m_fbi.m_svert[0].wb - m_fbi.m_svert[2].wb) * dx2) * tdiv;
-		m_fbi.m_dwdy = m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = ((m_fbi.m_svert[0].wb - m_fbi.m_svert[2].wb) * dy1 - (m_fbi.m_svert[0].wb - m_fbi.m_svert[1].wb) * dy2) * tdiv;
+		m_fbi.m_startw = m_tmu[0].m_startw = m_tmu[1].m_startw = s64(sv0.wb * 65536.0f * 65536.0f);
+		m_fbi.m_dwdx = m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = s64(((sv0.wb - sv1.wb) * dx1 - (sv0.wb - sv2.wb) * dx2) * tdiv);
+		m_fbi.m_dwdy = m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = s64(((sv0.wb - sv2.wb) * dy1 - (sv0.wb - sv1.wb) * dy2) * tdiv);
 	}
 
-	/* set up W0 */
+	// set up W0
 	if (setup_mode.setup_w0())
 	{
-		m_tmu[0].m_startw = m_tmu[1].m_startw = (s64)(m_fbi.m_svert[0].w0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = ((m_fbi.m_svert[0].w0 - m_fbi.m_svert[1].w0) * dx1 - (m_fbi.m_svert[0].w0 - m_fbi.m_svert[2].w0) * dx2) * tdiv;
-		m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = ((m_fbi.m_svert[0].w0 - m_fbi.m_svert[2].w0) * dy1 - (m_fbi.m_svert[0].w0 - m_fbi.m_svert[1].w0) * dy2) * tdiv;
+		m_tmu[0].m_startw = m_tmu[1].m_startw = s64(sv0.w0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = s64(((sv0.w0 - sv1.w0) * dx1 - (sv0.w0 - sv2.w0) * dx2) * tdiv);
+		m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = s64(((sv0.w0 - sv2.w0) * dy1 - (sv0.w0 - sv1.w0) * dy2) * tdiv);
 	}
 
-	/* set up S0,T0 */
+	// set up S0,T0
 	if (setup_mode.setup_st0())
 	{
-		m_tmu[0].m_starts = m_tmu[1].m_starts = (s64)(m_fbi.m_svert[0].s0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dsdx = m_tmu[1].m_dsdx = ((m_fbi.m_svert[0].s0 - m_fbi.m_svert[1].s0) * dx1 - (m_fbi.m_svert[0].s0 - m_fbi.m_svert[2].s0) * dx2) * tdiv;
-		m_tmu[0].m_dsdy = m_tmu[1].m_dsdy = ((m_fbi.m_svert[0].s0 - m_fbi.m_svert[2].s0) * dy1 - (m_fbi.m_svert[0].s0 - m_fbi.m_svert[1].s0) * dy2) * tdiv;
-		m_tmu[0].m_startt = m_tmu[1].m_startt = (s64)(m_fbi.m_svert[0].t0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dtdx = m_tmu[1].m_dtdx = ((m_fbi.m_svert[0].t0 - m_fbi.m_svert[1].t0) * dx1 - (m_fbi.m_svert[0].t0 - m_fbi.m_svert[2].t0) * dx2) * tdiv;
-		m_tmu[0].m_dtdy = m_tmu[1].m_dtdy = ((m_fbi.m_svert[0].t0 - m_fbi.m_svert[2].t0) * dy1 - (m_fbi.m_svert[0].t0 - m_fbi.m_svert[1].t0) * dy2) * tdiv;
+		m_tmu[0].m_starts = m_tmu[1].m_starts = s64(sv0.s0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dsdx = m_tmu[1].m_dsdx = s64(((sv0.s0 - sv1.s0) * dx1 - (sv0.s0 - sv2.s0) * dx2) * tdiv);
+		m_tmu[0].m_dsdy = m_tmu[1].m_dsdy = s64(((sv0.s0 - sv2.s0) * dy1 - (sv0.s0 - sv1.s0) * dy2) * tdiv);
+		m_tmu[0].m_startt = m_tmu[1].m_startt = s64(sv0.t0 * 65536.0f * 65536.0f);
+		m_tmu[0].m_dtdx = m_tmu[1].m_dtdx = s64(((sv0.t0 - sv1.t0) * dx1 - (sv0.t0 - sv2.t0) * dx2) * tdiv);
+		m_tmu[0].m_dtdy = m_tmu[1].m_dtdy = s64(((sv0.t0 - sv2.t0) * dy1 - (sv0.t0 - sv1.t0) * dy2) * tdiv);
 	}
 
-	/* set up W1 */
+	// set up W1
 	if (setup_mode.setup_w1())
 	{
-		m_tmu[1].m_startw = (s64)(m_fbi.m_svert[0].w1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dwdx = ((m_fbi.m_svert[0].w1 - m_fbi.m_svert[1].w1) * dx1 - (m_fbi.m_svert[0].w1 - m_fbi.m_svert[2].w1) * dx2) * tdiv;
-		m_tmu[1].m_dwdy = ((m_fbi.m_svert[0].w1 - m_fbi.m_svert[2].w1) * dy1 - (m_fbi.m_svert[0].w1 - m_fbi.m_svert[1].w1) * dy2) * tdiv;
+		m_tmu[1].m_startw = s64(sv0.w1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dwdx = s64(((sv0.w1 - sv1.w1) * dx1 - (sv0.w1 - sv2.w1) * dx2) * tdiv);
+		m_tmu[1].m_dwdy = s64(((sv0.w1 - sv2.w1) * dy1 - (sv0.w1 - sv1.w1) * dy2) * tdiv);
 	}
 
-	/* set up S1,T1 */
+	// set up S1,T1
 	if (setup_mode.setup_st1())
 	{
-		m_tmu[1].m_starts = (s64)(m_fbi.m_svert[0].s1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dsdx = ((m_fbi.m_svert[0].s1 - m_fbi.m_svert[1].s1) * dx1 - (m_fbi.m_svert[0].s1 - m_fbi.m_svert[2].s1) * dx2) * tdiv;
-		m_tmu[1].m_dsdy = ((m_fbi.m_svert[0].s1 - m_fbi.m_svert[2].s1) * dy1 - (m_fbi.m_svert[0].s1 - m_fbi.m_svert[1].s1) * dy2) * tdiv;
-		m_tmu[1].m_startt = (s64)(m_fbi.m_svert[0].t1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dtdx = ((m_fbi.m_svert[0].t1 - m_fbi.m_svert[1].t1) * dx1 - (m_fbi.m_svert[0].t1 - m_fbi.m_svert[2].t1) * dx2) * tdiv;
-		m_tmu[1].m_dtdy = ((m_fbi.m_svert[0].t1 - m_fbi.m_svert[2].t1) * dy1 - (m_fbi.m_svert[0].t1 - m_fbi.m_svert[1].t1) * dy2) * tdiv;
+		m_tmu[1].m_starts = s64(sv0.s1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dsdx = s64(((sv0.s1 - sv1.s1) * dx1 - (sv0.s1 - sv2.s1) * dx2) * tdiv);
+		m_tmu[1].m_dsdy = s64(((sv0.s1 - sv2.s1) * dy1 - (sv0.s1 - sv1.s1) * dy2) * tdiv);
+		m_tmu[1].m_startt = s64(sv0.t1 * 65536.0f * 65536.0f);
+		m_tmu[1].m_dtdx = s64(((sv0.t1 - sv1.t1) * dx1 - (sv0.t1 - sv2.t1) * dx2) * tdiv);
+		m_tmu[1].m_dtdy = s64(((sv0.t1 - sv2.t1) * dy1 - (sv0.t1 - sv1.t1) * dy2) * tdiv);
 	}
 
-	/* draw the triangle */
+	// draw the triangle
 	return triangle();
 }
 
