@@ -3155,8 +3155,8 @@ void voodoo_device_base::flush_fifos(attotime const &current_time)
 	while (m_operation_end <= current_time)
 	{
 		// loop over 0-cycle stuff; this constitutes the bulk of our writes
-		s32 cycles;
-		do
+		s32 cycles = 0;
+		while (cycles == 0)
 		{
 			// we might be in CMDFIFO mode
 			voodoo::command_fifo &cmdfifo = m_fbi.m_cmdfifo[m_fbi.m_cmdfifo[0].enabled() ? 0 : 1];
@@ -3206,7 +3206,6 @@ void voodoo_device_base::flush_fifos(attotime const &current_time)
 				cycles = lfb_w(address & 0xffffff, data, mem_mask);
 			}
 		}
-		while (cycles == 0);
 
 		// account for those cycles
 		m_operation_end += clocks_to_attotime(cycles);
