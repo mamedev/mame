@@ -26,7 +26,6 @@
 #include "stream.h"
 #include "unicode.h"
 #include "charconv.h"
-#include "pool.h"
 #include "timeconv.h"
 
 namespace imgtool
@@ -461,10 +460,10 @@ struct imgtool_module
 {
 	imgtool_class imgclass;
 
-	const char *name;
-	const char *description;
-	const char *extensions;
-	const char *eoln;
+	std::string name;
+	std::string description;
+	std::string extensions;
+	std::string eoln;
 
 	size_t image_extra_bytes;
 
@@ -489,7 +488,7 @@ struct imgtool_module
 	uint32_t block_size;
 
 	const util::option_guide *createimage_optguide;
-	const char *createimage_optspec;
+	std::string createimage_optspec;
 
 	const void *extra;
 };
@@ -531,7 +530,6 @@ public:
 	const modulelist &modules() { return m_modules; }
 
 private:
-	object_pool *   m_pool;
 	modulelist      m_modules;
 
 	// internal lookup and iteration
@@ -540,11 +538,6 @@ private:
 	// helpers
 	void add_class(const imgtool_class *imgclass);
 	int module_compare(const imgtool_module *m1, const imgtool_module *m2, sort_type sort);
-
-	// memory allocators for pooled library memory (these should go away in further C++-ification)
-	void *imgtool_library_malloc(size_t mem);
-	char *imgtool_library_strdup(const char *s);
-	char *imgtool_library_strdup_allow_null(const char *s);
 };
 
 } // namespace imgtool
