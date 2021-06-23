@@ -2323,20 +2323,24 @@ void ioport_manager::load_game_config(util::xml::data_node const *portnode, int 
 			if (pos && (std::string_view::npos != pos))
 			{
 				parent_tag = parent_tag.substr(0, pos);
-				for (pos = parent_tag.rfind(':'); pos && (std::string_view::npos != pos); pos = parent_tag.rfind(':'))
+				if (!machine().root_device().subdevice(parent_tag))
 				{
-					parent_tag = parent_tag.substr(0, pos);
-					device_t const *const parent_device(machine().root_device().subdevice(parent_tag));
-					if (parent_device)
+					for (pos = parent_tag.rfind(':'); pos && (std::string_view::npos != pos); pos = parent_tag.rfind(':'))
 					{
-						device_slot_interface const *slot;
-						if (parent_device->interface(slot))
+						std::string_view const child_tag(parent_tag.substr(pos + 1));
+						parent_tag = parent_tag.substr(0, pos);
+						device_t const *const parent_device(machine().root_device().subdevice(parent_tag));
+						if (parent_device)
 						{
-							if (!m_deselected_card_config)
-								m_deselected_card_config = util::xml::file::create().release();
-							portnode->copy_into(*m_deselected_card_config);
+							device_slot_interface const *slot;
+							if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
+							{
+								if (!m_deselected_card_config)
+									m_deselected_card_config = util::xml::file::create().release();
+								portnode->copy_into(*m_deselected_card_config);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}

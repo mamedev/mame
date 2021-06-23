@@ -1562,7 +1562,7 @@ void c64_state::ntsc(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("NTSC");
 	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("NTSC");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -1735,7 +1735,7 @@ void c64_state::pal(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("c64_cass").set_filter("PAL");
 	// disk softlist split into originals and misc (homebrew and cracks)
 	SOFTWARE_LIST(config, "flop525_orig").set_original("c64_flop_orig").set_filter("PAL");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("c64_flop_misc").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop525_misc").set_original("c64_flop_misc").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
