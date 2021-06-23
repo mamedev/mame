@@ -437,7 +437,7 @@ protected:
 
 
 	void check_stalled_cpu(attotime current_time);
-	void flush_fifos(attotime const &current_time);
+	void flush_fifos(attotime current_time);
 	void init_fbi(fbi_state *f, void *memory, int fbmem);
 	s32 register_w(offs_t offset, u32 data);
 	s32 swapbuffer(u32 data);

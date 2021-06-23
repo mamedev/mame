@@ -3137,7 +3137,7 @@ void voodoo_device_base::tmu_state::texture_w(offs_t offset, u32 data, bool seq_
  *
  *************************************/
 
-void voodoo_device_base::flush_fifos(attotime const &current_time)
+void voodoo_device_base::flush_fifos(attotime current_time)
 {
 	// check for recursive calls
 	if (m_flush_flag)
