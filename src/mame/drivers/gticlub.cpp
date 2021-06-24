@@ -762,7 +762,7 @@ void gticlub_state::machine_reset()
 
 uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_k001604[0]->draw_back_layer(bitmap, cliprect);
+	m_k001604[0]->draw_back_layer(screen, bitmap, cliprect);
 
 	m_k001005->draw(bitmap, cliprect);
 
@@ -870,17 +870,13 @@ void gticlub_state::gticlub(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_size(512, 384);
-	screen.set_visarea(0, 511, 0, 383);
+	screen.set_size(1024, 1024);
+	screen.set_visarea(40, 511+40, 28, 383+28);		// needs CRTC emulation
 	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
 	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(1);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);
-	m_k001604[0]->set_roz_mem_offset(0);
 	m_k001604[0]->set_palette(m_palette);
 
 	K001005(config, m_k001005, 0, m_k001006[0]);
@@ -925,10 +921,6 @@ void gticlub_state::slrasslt(machine_config &config)
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
-
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(0);
-	m_k001604[0]->set_txt_mem_offset(16384);
 }
 
 void gticlub_state::hangplt(machine_config &config)
@@ -992,17 +984,9 @@ void gticlub_state::hangplt(machine_config &config)
 	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_two_screens<1>));
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);
-	m_k001604[0]->set_roz_mem_offset(16384);
 	m_k001604[0]->set_palette(m_palette);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_layer_size(0);
-	m_k001604[1]->set_roz_size(1);
-	m_k001604[1]->set_txt_mem_offset(0);
-	m_k001604[1]->set_roz_mem_offset(16384);
 	m_k001604[1]->set_palette(m_palette);
 
 	K056800(config, m_k056800, XTAL(33'868'800)/2);

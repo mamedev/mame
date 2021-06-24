@@ -1132,7 +1132,7 @@ uint32_t cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &b
 {
 	if (m_has_psac)
 	{
-		m_k001604->draw_back_layer(bitmap, cliprect);
+		m_k001604->draw_back_layer(screen, bitmap, cliprect);
 		m_k001604->draw_front_layer(screen, bitmap, cliprect);
 	}
 
@@ -3314,10 +3314,6 @@ void cobra_state::cobra(machine_config &config)
 	M48T58(config, "m48t58", 0);
 
 	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
-	m_k001604->set_layer_size(0);
-	m_k001604->set_roz_size(1);
-	m_k001604->set_txt_mem_offset(0);  // correct?
-	m_k001604->set_roz_mem_offset(0);  // correct?
 	m_k001604->set_palette(m_palette);
 
 	COBRA_JVS_HOST(config, m_jvs_host, 4000000);

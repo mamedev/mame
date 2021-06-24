@@ -28,8 +28,8 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 {
 	m_k001006 = k001006;
 
-	int width = screen.width();
-	int height = screen.height();
+	int width = 512;
+	int height = 384;
 
 	m_fb[0] = std::make_unique<bitmap_rgb32>( width, height);
 	m_fb[1] = std::make_unique<bitmap_rgb32>( width, height);
@@ -40,7 +40,7 @@ k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, devi
 	m_3dfifo_ptr = 0;
 	m_fb_page = 0;
 
-	m_cliprect = screen.cliprect();
+	m_cliprect = rectangle(0, width-1, 0, height-1);
 
 	for (int k=0; k < 8; k++)
 	{
@@ -143,8 +143,6 @@ void k001005_renderer::render_polygons()
 	vertex_t *vertex4;
 
 	uint32_t *fifo = m_3dfifo.get();
-
-	const rectangle& visarea = screen().visible_area();
 
 	int index = 0;
 
@@ -331,8 +329,8 @@ void k001005_renderer::render_polygons()
 					vertex4 = &v[3];
 				}
 
-				render_triangle(visarea, rd_scan_tex, 6, *vertex1, *vertex2, *vertex3);
-				render_triangle(visarea, rd_scan_tex, 6, *vertex3, *vertex4, *vertex1);
+				render_triangle(m_cliprect, rd_scan_tex, 6, *vertex1, *vertex2, *vertex3);
+				render_triangle(m_cliprect, rd_scan_tex, 6, *vertex3, *vertex4, *vertex1);
 
 				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
@@ -419,7 +417,7 @@ void k001005_renderer::render_polygons()
 
 				if (new_verts == 1)
 				{
-					render_triangle(visarea, rd_scan_tex, 6, v[0], v[1], v[2]);
+					render_triangle(m_cliprect, rd_scan_tex, 6, v[0], v[1], v[2]);
 
 					memcpy(&m_prev_v[1], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[2], &v[1], sizeof(vertex_t));
@@ -427,8 +425,8 @@ void k001005_renderer::render_polygons()
 				}
 				else if (new_verts == 2)
 				{
-					render_triangle(visarea, rd_scan_tex, 6, v[0], v[1], v[2]);
-					render_triangle(visarea, rd_scan_tex, 6, v[2], v[3], v[0]);
+					render_triangle(m_cliprect, rd_scan_tex, 6, v[0], v[1], v[2]);
+					render_triangle(m_cliprect, rd_scan_tex, 6, v[2], v[3], v[0]);
 
 					memcpy(&m_prev_v[0], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[1], &v[1], sizeof(vertex_t));
@@ -516,7 +514,7 @@ void k001005_renderer::render_polygons()
 					vertex3 = &v[2];
 				}
 
-				render_triangle(visarea, rd_scan, 3, *vertex1, *vertex2, *vertex3);
+				render_triangle(m_cliprect, rd_scan, 3, *vertex1, *vertex2, *vertex3);
 
 				memcpy(&m_prev_v[1], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[2], vertex2, sizeof(vertex_t));
@@ -553,8 +551,8 @@ void k001005_renderer::render_polygons()
 					vertex4 = &v[3];
 				}
 
-				render_triangle(visarea, rd_scan, 3, *vertex1, *vertex2, *vertex3);
-				render_triangle(visarea, rd_scan, 3, *vertex3, *vertex4, *vertex1);
+				render_triangle(m_cliprect, rd_scan, 3, *vertex1, *vertex2, *vertex3);
+				render_triangle(m_cliprect, rd_scan, 3, *vertex3, *vertex4, *vertex1);
 
 				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
@@ -623,7 +621,7 @@ void k001005_renderer::render_polygons()
 
 				if (new_verts == 1)
 				{
-					render_triangle(visarea, rd_scan, 3, v[0], v[1], v[2]);
+					render_triangle(m_cliprect, rd_scan, 3, v[0], v[1], v[2]);
 
 					memcpy(&m_prev_v[1], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[2], &v[1], sizeof(vertex_t));
@@ -631,8 +629,8 @@ void k001005_renderer::render_polygons()
 				}
 				else if (new_verts == 2)
 				{
-					render_triangle(visarea, rd_scan, 3, v[0], v[1], v[2]);
-					render_triangle(visarea, rd_scan, 3, v[2], v[3], v[0]);
+					render_triangle(m_cliprect, rd_scan, 3, v[0], v[1], v[2]);
+					render_triangle(m_cliprect, rd_scan, 3, v[2], v[3], v[0]);
 
 					memcpy(&m_prev_v[0], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[1], &v[1], sizeof(vertex_t));
@@ -685,12 +683,12 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(visarea, rd_scan_2d, 0, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_2d, 0, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(visarea, rd_scan_2d, 0, v[0], v[1], v[2]);
-				render_triangle(visarea, rd_scan_2d, 0, v[2], v[3], v[0]);
+				render_triangle(m_cliprect, rd_scan_2d, 0, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_2d, 0, v[2], v[3], v[0]);
 			}
 		}
 		else if (cmd == 0x8000008b)
@@ -774,12 +772,12 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(visarea, rd_scan_tex2d, 5, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(visarea, rd_scan_tex2d, 5, v[0], v[1], v[2]);
-				render_triangle(visarea, rd_scan_tex2d, 5, v[2], v[3], v[0]);
+				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[2], v[3], v[0]);
 			}
 		}
 		else if (cmd == 0x80000106 || cmd == 0x80000121 || cmd == 0x80000126)
@@ -827,12 +825,12 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(visarea, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(visarea, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
-				render_triangle(visarea, rd_scan_gour_blend, 6, v[2], v[3], v[0]);
+				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
+				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[2], v[3], v[0]);
 			}
 
 			// TODO: can this poly type form strips?
@@ -1163,13 +1161,13 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
 	{
 		uint32_t *const bmp = &bitmap.pix(j);
-		uint32_t const *const src = &m_fb[m_fb_page^1]->pix(j);
+		uint32_t const *const src = &m_fb[m_fb_page^1]->pix(j-cliprect.min_y);
 
 		for (int i = cliprect.min_x; i <= cliprect.max_x; i++)
 		{
-			if (src[i] & 0xff000000)
+			if (src[i-cliprect.min_x] & 0xff000000)
 			{
-				bmp[i] = src[i];
+				bmp[i] = src[i-cliprect.min_x];
 			}
 		}
 	}

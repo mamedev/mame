@@ -709,17 +709,9 @@ void nwktr_state::nwktr(machine_config &config)
 	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);  // correct?
-	m_k001604[0]->set_roz_mem_offset(0);  // correct?
 	m_k001604[0]->set_palette(m_palette);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_layer_size(0);
-	m_k001604[1]->set_roz_size(1);
-	m_k001604[1]->set_txt_mem_offset(0);  // correct?
-	m_k001604[1]->set_roz_mem_offset(0);  // correct?
 	m_k001604[1]->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -742,10 +734,6 @@ void nwktr_state::nwktr(machine_config &config)
 void nwktr_state::thrilld(machine_config &config)
 {
 	nwktr(config);
-
-	m_k001604[0]->set_layer_size(1);
-
-	m_k001604[1]->set_layer_size(1);
 }
 
 /*****************************************************************************/

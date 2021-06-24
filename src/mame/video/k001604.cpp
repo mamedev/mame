@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "k001604.h"
+#include "screen.h"
 
 
 /***************************************************************************/
@@ -11,6 +12,140 @@
 /*                                                                         */
 /***************************************************************************/
 
+/*
+   Character RAM:
+   * Foreground tiles 2x 1Mbit SRAM in a 16-bit bus (256KB = 4096 8x8 tiles or 1024 16x16 tiles).
+   * Background tiles 4x 1Mbit SRAM in a 16-bit bus (512KB = 8192 8x8 tiles or 2048 16x16 tiles). Empty solder pads on NWK-TR.
+   
+   Tile RAM:
+   * 3x 256Kbit SRAMs in a 24-bit bus
+   * Each tile entry is 24 bits, 32768 total
+
+   CLUT RAM:
+   * 2x 256KBit SRAMs on NWK-TR in a 16-bit bus (32768 colors)
+   * 2x 64Kbit SRAMs on "GTI Club" in a 16-bit bus (8192 colors)
+
+   Background and foreground layer with ROZ capabilities
+   Both tilemaps are 128x128 tiles, with ability to use smaller sub-tilemaps
+   Foreground seems to use 8x8 tiles only, background can select 8x8 or 16x16 tiles   
+
+   Registers:
+
+   Offset Bits
+   00     sxxxxxxxxxxxxxxx ---------------- Foreground X start (13.3 fixed point)
+          ---------------- sxxxxxxxxxxxxxxx Foreground Y start (13.3 fixed point)
+   04     sxxxxxxxxxxxxxxx ---------------- Foreground ROZ XY (5.11 fixed point) Tilemap Y-increment per screen pixel increment
+          ---------------- sxxxxxxxxxxxxxxx Foreground ROZ YY (5.11 fixed point) Tilemap Y-increment per screen line increment
+   08     sxxxxxxxxxxxxxxx ---------------- Foreground ROZ XX (5.11 fixed point) Tilemap X-increment per screen pixel increment
+          ---------------- sxxxxxxxxxxxxxxx Foreground ROZ YX (5.11 fixed point) Tilemap X-increment per screen line increment
+   0c     ???????????????? ----------------
+          ---------------- ????????????????
+   20     sxxxxxxxxxxxxxxx ---------------- Background X start (13.3 fixed point)
+	  	  ---------------- sxxxxxxxxxxxxxxx Background Y start (13.3 fixed point)
+   24     sxxxxxxxxxxxxxxx ---------------- Background ROZ XX (5.11 fixed point)
+		  ---------------- sxxxxxxxxxxxxxxx Background ROZ YX (5.11 fixed point)
+   28     sxxxxxxxxxxxxxxx ---------------- Background ROZ YY (5.11 fixed point)
+		  ---------------- sxxxxxxxxxxxxxxx Background ROZ XY (5.11 fixed point)
+   2c     ???????????????? ----------------
+          ---------------- ????????????????
+   40     xxxxxxxxxxxxxxxx ----------------
+          ---------------- xxxxxxxxxxxxxxxx
+   44     xxxxxxxxxxxxxxxx ----------------
+          ---------------- xxxxxxxxxxxxxxxx
+   48     xxxxxxxxxxxxxxxx ----------------
+          ---------------- xxxxxxxxxxxxxxxx
+   50     xxxxxxxxxxxxxxxx ----------------
+          ---------------- xxxxxxxxxxxxxxxx
+   54     xxxxxxxxxxxxxxxx ----------------
+          ---------------- xxxxxxxxxxxxxxxx
+   60     x--------------- ---------------- FG tilemap enable?
+          -x-------------- ---------------- BG tilemap enable?
+          -------x-------- ---------------- Select FG/BG tiles for character RAM read/write access
+		  -------0-------- ---------------- FG character RAM
+		  -------1-------- ---------------- BG character RAM
+		  ---------x------ ---------------- BG tile size
+		  ---------0------ ---------------- 16x16
+		  ---------1------ ---------------- 8x8
+		  ---------------- --------------xx Character bank for FG tiles
+		  ---------------- ------xx-------- Character bank for BG tiles
+		  ------------xx-- ---------------- Tilemap layout (both bits either set or unset)		  
+		  ------------00-- ---------------- "landscape", 256 tiles wide
+		  ------------11-- ---------------- "portrait", 128 tiles wide
+	6c    -x-------------- ---------------- Swap FG/BG tilemap location in portrait mode? (used by Solar Assault) Might also swap left/right in landscape mode but nothing uses this.
+	      -0-------------- ---------------- FG Tilemap at 0x0000, BG at 0x4000
+		  -1-------------- ---------------- FG Tilemap at 0x4000, BG at 0x0000
+		  --------x------- ---------------- ?
+		  ---------xx----- ---------------- FG sub tilemap width?
+		  ------------x--- ---------------- ?
+		  -------------xx- ---------------- FG sub tilemap height?
+		  ---------------- ----x----------- Enable BG sub tilemap?
+		  ---------------- -----xx--------- BG sub tilemap width?
+		  ---------------- -----00--------- 128 tiles
+		  ---------------- -----10--------- 64 tiles
+		  ---------------- -----11--------- 32 tiles
+		  ---------------- --------x------- ?
+		  ---------------- ---------xx----- BG sub tilemap height?
+		  ---------------- ---------00----- 128 tiles
+		  ---------------- ---------10----- 64 tiles
+		  ---------------- ---------11----- 32 tiles
+		  ---------------- ------------x--- ?
+		  ---------------- -------------xx- BG sub tilemap X (in units of 32 tiles)
+
+
+   Tilemap layout:
+   "landscape" mode:
+
+           0               128              256
+   0x0000  +----------------+----------------+
+           |                |                |
+           |                |                |
+           |   Foreground   |   Background   |
+           |  128x128 tiles |  128x128 tiles |
+           |                |                |
+           |                |                |
+   0x8000  +----------------+----------------+
+
+   "portrait" mode:
+
+           0               128              
+   0x0000  +----------------+
+           |                |
+           |                |
+           |   Foreground   |
+           |  128x128 tiles |
+           |                |
+           |                |
+   0x4000  +----------------+
+           |                |
+           |                |
+           |   Background   |
+           |  128x128 tiles |
+           |                |
+           |                |
+           +----------------+
+
+    Tilemap sub-split:
+	Tilemap can be split in X and Y direction into 32/64/128 x 32/64/128 sub-tilemaps
+	Sub-tilemap selection works in units of 32 tiles
+
+	       0     32    64    96   128
+		   +-----+-----+-----+-----+
+		   |     |     |     |     |
+           | 0,0 | 1,0 | 2,0 | 3,0 |
+        32 +-----+-----+-----+-----+
+		   |     |     |     |     |
+           | 0,1 | 1,1 | 2,1 | 3,1 |
+        64 +-----+-----+-----+-----+
+		   |     |     |     |     |
+		   | 0,2 | 1,2 | 2,2 | 3,2 |
+		96 +-----+-----+-----+-----+
+		   |     |     |     |     |
+		   | 0,3 | 1,3 | 2,3 | 3,3 |
+	   128 +-----+-----+-----+-----+
+
+
+
+*/
 
 #define K001604_NUM_TILES_LAYER0        16384
 #define K001604_NUM_TILES_LAYER1        4096
@@ -20,11 +155,6 @@ DEFINE_DEVICE_TYPE(K001604, k001604_device, "k001604_device", "K001604 2D tilema
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001604, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
-	m_layer_size(0),
-	m_roz_size(0),
-	m_txt_mem_offset(0),
-	m_roz_mem_offset(0),
-	m_layer_roz(nullptr),
 	m_tile_ram(nullptr),
 	m_char_ram(nullptr),
 	m_reg(nullptr)
@@ -62,32 +192,19 @@ void k001604_device::device_start()
 		16*256
 	};
 
-	int roz_tile_size;
-
 	m_char_ram = make_unique_clear<uint32_t[]>(0x200000 / 4);
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
 	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
 	/* create tilemaps */
-	roz_tile_size = m_roz_size ? 16 : 8;
+	m_fg_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_fg)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128);
+	m_fg_tilemap->set_transparent_pen(0);
 
-	if (m_layer_size)
-	{
-		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_0_size1)), 8, 8, 64, 64);
-		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_1_size1)), 8, 8, 64, 64);
+	m_bg_tilemap8 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_bg8)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128);
+	m_bg_tilemap8->set_transparent_pen(0);
 
-		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_roz)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_roz_256)), roz_tile_size, roz_tile_size, 128, 64);
-	}
-	else
-	{
-		m_layer_8x8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_0_size0)), 8, 8, 64, 64);
-		m_layer_8x8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_8x8)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_8x8_1_size0)), 8, 8, 64, 64);
-
-		m_layer_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_layer_roz)), tilemap_mapper_delegate(*this, FUNC(k001604_device::scan_layer_roz_128)), roz_tile_size, roz_tile_size, 128, 64);
-	}
-
-	m_layer_8x8[0]->set_transparent_pen(0);
-	m_layer_8x8[1]->set_transparent_pen(0);
+	m_bg_tilemap16 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_bg16)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+	m_bg_tilemap16->set_transparent_pen(0);
 
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
 	set_gfx(1, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
@@ -113,50 +230,15 @@ void k001604_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-/* FIXME: The TILEMAP_MAPPER below depends on parameters passed by the device interface (being game dependent).
-we might simplify the code, by passing the whole TILEMAP_MAPPER as a callback in the interface, but is it really worth? */
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_0_size0)
+TILE_GET_INFO_MEMBER(k001604_device::tile_info_fg)
 {
-	/* logical (col,row) -> memory offset */
-	return (row * 128) + col + m_txt_mem_offset;
-}
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_0_size1)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 256) + col + m_txt_mem_offset;
-}
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_1_size0)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 128) + col + 64 + m_txt_mem_offset;
-}
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_8x8_1_size1)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 256) + col + 64 + m_txt_mem_offset;
-}
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_roz_128)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 128) + col + m_roz_mem_offset;
-}
-
-TILEMAP_MAPPER_MEMBER(k001604_device::scan_layer_roz_256)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 256) + col + 128 + m_roz_mem_offset;
-}
-
-TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
-{
-	uint32_t val = m_tile_ram[tile_index];
-	int color = (val >> 17) & 0x1f;
-	int tile = (val & 0x7fff);
+	uint32_t tilebase = (m_reg[0x18] & 0x40000) ? ((m_reg[0x1b] & 0x40000000) ? 0x4000 : 0x0000) : 0x0000;
+	uint32_t x = tile_index & 0x7f;
+	uint32_t y = tile_index / 128;
+	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;	
+	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilebase];
+	int color = (val >> 17) & 0x1f;	
+	int tile = val & 0x3fff;
 	int flags = 0;
 
 	if (val & 0x400000)
@@ -167,131 +249,76 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_8x8)
 	tileinfo.set(0, tile, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(k001604_device::tile_info_layer_roz)
+TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg8)
 {
-	uint32_t val = m_tile_ram[tile_index];
-	int flags = 0;
+	uint32_t tilebase = (m_reg[0x18] & 0x40000) ? ((m_reg[0x1b] & 0x40000000) ? 0x0000 : 0x4000) : 0x0000;
+	uint32_t x = tile_index & 0x7f;
+	uint32_t y = tile_index / 128;
+	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;
+	uint32_t tilemap_xstart = (m_reg[0x18] & 0x40000) ? 0 : 128;
+	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilemap_xstart + tilebase];
 	int color = (val >> 17) & 0x1f;
-	int tile = m_roz_size ? (val & 0x7ff) : (val & 0x1fff);
+	int tile = 0x2000 + (val & 0x1fff);
+	int flags = 0;
 
 	if (val & 0x400000)
 		flags |= TILE_FLIPX;
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	tile += m_roz_size ? 0x800 : 0x2000;
+	tileinfo.set(0, tile, color, flags);
+}
 
-	tileinfo.set(m_roz_size, tile, color, flags);
+TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
+{	
+	uint32_t tilebase = (m_reg[0x18] & 0x40000) ? ((m_reg[0x1b] & 0x40000000) ? 0x0000 : 0x4000) : 0x0000;
+	uint32_t x = tile_index & 0x7f;
+	uint32_t y = tile_index / 128;
+	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;
+	uint32_t tilemap_xstart = (m_reg[0x18] & 0x40000) ? 0 : 128;
+	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilemap_xstart + tilebase];
+	int color = (val >> 17) & 0x1f;
+	int tile = 0x800 + (val & 0x7ff);
+	int flags = 0;
+
+	if (val & 0x400000)
+		flags |= TILE_FLIPX;
+	if (val & 0x800000)
+		flags |= TILE_FLIPY;
+
+	tileinfo.set(1, tile, color, flags);
 }
 
 
-void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+
+void k001604_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool front, tilemap_t* tilemap)
 {
-	bitmap.fill(0, cliprect);
+	const rectangle& visarea = screen.visible_area();
+	static const int SUBTILEMAP_DIMENSION[4] = { 128, 128, 64, 32 };		// entry 1 seems unused	
 
-	if ((m_reg[0x60 / 4] & 0x40000000) == 0)
-		return;
+	int32_t startx, starty, incxx, incyx, incxy, incyy;
 
-	int tile_size = m_roz_size ? 16 : 8;
-
-	int32_t x  = (int16_t)((m_reg[0x08] >> 16) & 0xffff);
-	int32_t y  = (int16_t)((m_reg[0x08] >>  0) & 0xffff);
-	int32_t xx = (int16_t)((m_reg[0x09] >>  0) & 0xffff);
-	int32_t xy = (int16_t)((m_reg[0x09] >> 16) & 0xffff);
-	int32_t yx = (int16_t)((m_reg[0x0a] >>  0) & 0xffff);
-	int32_t yy = (int16_t)((m_reg[0x0a] >> 16) & 0xffff);
-
-	int pivotx = (int16_t)((m_reg[0x00] >> 16) & 0xffff);
-	int pivoty = (int16_t)((m_reg[0x00] >>  0) & 0xffff);
-
-	int startx  = ((x - pivotx) * 256) * 32;
-	int starty  = ((y - pivoty) * 256) * 32;
-	int incxx = (xx) * 32;
-	int incxy = (-xy) * 32;
-	int incyx = (-yx) * 32;
-	int incyy = (yy) * 32;
-
-	bitmap_ind16& pixmap = m_layer_roz->pixmap();
-
-	// extract start/end points
-	int sx = cliprect.min_x;
-	int sy = cliprect.min_y;
-	int ex = cliprect.max_x;
-	int ey = cliprect.max_y;
-
-	const rgb_t *clut = palette().palette()->entry_list_raw();
-
-	int window_x, window_y, window_xmask, window_ymask;
-
-	int layer_size = (m_reg[0x1b] >> 9) & 3;
-
-	if (m_roz_size)
-		window_x = ((m_reg[0x1b] >> 1) & 3) * 512;
+	if (front)
+	{
+		startx = (int32_t)((int16_t)(m_reg[0x00] >> 16)) << 13;
+		starty = (int32_t)((int16_t)(m_reg[0x00])) << 13;
+		incyy = (int32_t)((int16_t)(m_reg[0x01])) << 5;
+		incxy = (int32_t)((int16_t)(m_reg[0x01] >> 16)) << 5;
+		incyx = (int32_t)((int16_t)(m_reg[0x02])) << 5;
+		incxx= (int32_t)((int16_t)(m_reg[0x02] >> 16)) << 5;
+	}
 	else
-		window_x = ((m_reg[0x1b] >> 1) & 1) * 512;
-
-	window_y = 0;
-
-	switch (layer_size)
 	{
-		case 0: window_xmask = (128 * tile_size) - 1; break;
-		case 2: window_xmask = (64 * tile_size) - 1; break;
-		case 3: window_xmask = (32 * tile_size) - 1; break;
-		default: fatalerror("k001604_draw_back_layer(): layer_size %d\n", layer_size);
+		startx = (int32_t)((int16_t)(m_reg[0x08] >> 16)) << 13;
+		starty = (int32_t)((int16_t)(m_reg[0x08])) << 13;
+		incxx = (int32_t)((int16_t)(m_reg[0x09])) << 5;
+		incyx = (int32_t)((int16_t)(m_reg[0x09] >> 16)) << 5;
+		incxy = (int32_t)((int16_t)(m_reg[0x0a])) << 5;
+		incyy = (int32_t)((int16_t)(m_reg[0x0a] >> 16)) << 5;		
 	}
 
-	window_ymask = pixmap.height() - 1;
-
-
-	// loop over rows
-	while (sy <= ey)
-	{
-		// initialize X counters
-		int x = sx;
-		uint32_t cx = startx;
-		uint32_t cy = starty;
-
-		uint32_t *dest = &bitmap.pix(sy, sx);
-
-		// loop over columns
-		while (x <= ex)
-		{
-			*dest = clut[pixmap.pix(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x)];
-
-			// advance in X
-			cx += incxx;
-			cy += incxy;
-			x++;
-			dest++;
-		}
-
-		// advance in Y
-		startx += incyx;
-		starty += incyy;
-		sy++;
-	}
-}
-
-void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	int32_t x = (int16_t)((m_reg[0x00] >> 16) & 0xffff);
-	int32_t y = (int16_t)((m_reg[0x00] >> 0) & 0xffff);
-	int32_t yy = (int16_t)((m_reg[0x01] >> 0) & 0xffff);
-	int32_t xy = (int16_t)((m_reg[0x01] >> 16) & 0xffff);
-	int32_t yx = (int16_t)((m_reg[0x02] >> 0) & 0xffff);
-	int32_t xx = (int16_t)((m_reg[0x02] >> 16) & 0xffff);
-
-	int pivotx = (int16_t)(0xfec0);
-	int pivoty = (int16_t)(0xff28);
-
-	int startx = ((x - pivotx) * 256) * 32;
-	int starty = ((y - pivoty) * 256) * 32;
-	int incxx = (xx) * 32;
-	int incxy = (-xy) * 32;
-	int incyx = (-yx) * 32;
-	int incyy = (yy) * 32;
-
-	bitmap_ind16& pixmap = m_layer_8x8[0]->pixmap();
+	bitmap_ind16& pixmap = tilemap->pixmap();
+	const rgb_t* clut = palette().palette()->entry_list_raw();
 
 	// extract start/end points
 	int sx = cliprect.min_x;
@@ -299,16 +326,36 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	int ex = cliprect.max_x;
 	int ey = cliprect.max_y;
 
-	const rgb_t *clut = palette().palette()->entry_list_raw();
+	uint32_t sub_x, sub_y, sub_xmask, sub_ymask;
+	if (front)
+	{
+		sub_xmask = (128 * 8) - 1;
+		sub_ymask = (128 * 8) - 1;
+		sub_x = 0;
+		sub_y = 0;
+	}
+	else
+	{
+		int tile_size = (m_reg[0x18] & 0x400000) ? 8 : 16;
 
-	int window_x, window_y, window_xmask, window_ymask;
+		if (m_reg[0x1b] & 0x800)
+		{
+			sub_xmask = (SUBTILEMAP_DIMENSION[(m_reg[0x1b] >> 9) & 0x3] * tile_size) - 1;
+			sub_ymask = (SUBTILEMAP_DIMENSION[(m_reg[0x1b] >> 5) & 0x3] * tile_size) - 1;
+			sub_x = (((m_reg[0x1b] >> 1) & 0x3) * 32)* tile_size;
+			sub_y = 0 * tile_size;
+		}
+		else
+		{
+			sub_xmask = (128 * tile_size) - 1;
+			sub_ymask = (128 * tile_size) - 1;
+			sub_x = 0;
+			sub_y = 0;
+		}
+	}
 
-	window_x = 0;
-	window_y = 0;
-	window_xmask = pixmap.width() - 1;
-	window_ymask = pixmap.height() - 1;
-
-
+	// draw the tilemap
+	// 
 	// loop over rows
 	while (sy <= ey)
 	{
@@ -317,15 +364,15 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 		uint32_t cx = startx;
 		uint32_t cy = starty;
 
-		uint32_t *dest = &bitmap.pix(sy, sx);
+		uint32_t* dest = &bitmap.pix(sy, sx);
 
 		// loop over columns
 		while (x <= ex)
 		{
-			uint16_t pix = pixmap.pix(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x);
-			if ((pix & 0xff) != 0)
+			uint16_t pen = pixmap.pix((((cy >> 16) + visarea.min_y) & sub_ymask) + sub_y, (((cx >> 16) + visarea.min_x) & sub_xmask) + sub_x);
+			if ((pen & 0xff) != 0 || !front)
 			{
-				*dest = clut[pix];
+				*dest = clut[pen];
 			}
 
 			// advance in X
@@ -340,6 +387,26 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 		starty += incyy;
 		sy++;
 	}
+}
+
+
+
+void k001604_device::draw_back_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	bitmap.fill(0, cliprect);
+
+	if ((m_reg[0x60 / 4] & 0x40000000) == 0)
+		return;
+
+	draw_tilemap(screen, bitmap, cliprect, false, (m_reg[0x18] & 0x400000) ? m_bg_tilemap8 : m_bg_tilemap16);
+}
+
+void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	if ((m_reg[0x60 / 4] & 0x80000000) == 0)
+		return;
+
+	draw_tilemap(screen, bitmap, cliprect, true, m_fg_tilemap);
 }
 
 uint32_t k001604_device::tile_r(offs_t offset)
@@ -377,47 +444,42 @@ uint32_t k001604_device::reg_r(offs_t offset)
 
 void k001604_device::tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	int x/*, y*/;
 	COMBINE_DATA(m_tile_ram.get() + offset);
 
-	if (m_layer_size)
+	if (m_reg[0x18] & 0x40000)
 	{
-		x = offset & 0xff;
-		/*y = offset / 256;*/
-	}
-	else
-	{
-		x = offset & 0x7f;
-		/*y = offset / 128;*/
-	}
-
-	if (m_layer_size)
-	{
-		if (x < 64)
-		{
-			m_layer_8x8[0]->mark_tile_dirty(offset);
+		// portrait
+		uint32_t fg_tilebase = (m_reg[0x1b] & 0x40000000) ? 0x4000 : 0x0000;
+		uint32_t bg_tilebase = (m_reg[0x1b] & 0x40000000) ? 0x0000 : 0x4000;
+		
+		if (offset >= fg_tilebase && offset < fg_tilebase + 0x4000)
+		{			
+			m_fg_tilemap->mark_tile_dirty(offset - fg_tilebase);
 		}
-		else if (x < 128)
+		if (offset >= bg_tilebase && offset < bg_tilebase + 0x4000)
 		{
-			m_layer_8x8[1]->mark_tile_dirty(offset);
-		}
-		else
-		{
-			m_layer_roz->mark_tile_dirty(offset);
+			if (m_reg[0x18] & 0x400000)
+				m_bg_tilemap8->mark_tile_dirty(offset - bg_tilebase);
+			else
+				m_bg_tilemap16->mark_tile_dirty(offset - bg_tilebase);
 		}
 	}
 	else
 	{
-		if (x < 64)
+		// landscape
+		uint32_t x = offset & 0xff;
+		uint32_t y = offset / 256;
+		if (x < 128)
 		{
-			m_layer_8x8[0]->mark_tile_dirty(offset);
+			m_fg_tilemap->mark_tile_dirty((y * 128) + x);
 		}
 		else
 		{
-			m_layer_8x8[1]->mark_tile_dirty(offset);
+			if (m_reg[0x18] & 0x400000)
+				m_bg_tilemap8->mark_tile_dirty((y * 128) + (x - 128));
+			else
+				m_bg_tilemap16->mark_tile_dirty((y * 128) + (x - 128));
 		}
-
-		m_layer_roz->mark_tile_dirty(offset);
 	}
 }
 
@@ -444,18 +506,4 @@ void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
-
-	switch (offset)
-	{
-		case 0x8:
-		case 0x9:
-		case 0xa:
-			//printf("K001604_reg_w %02X, %08X, %08X\n", offset, data, mem_mask);
-			break;
-	}
-
-	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
-	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %s\n", chip, offset, data, mem_mask, m_maincpu->pc());
-	}
 }
