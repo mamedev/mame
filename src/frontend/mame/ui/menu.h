@@ -139,12 +139,13 @@ protected:
 	// flags to pass to process
 	enum
 	{
-		PROCESS_NOKEYS      = 1,
-		PROCESS_LR_REPEAT   = 2,
-		PROCESS_CUSTOM_ONLY = 4,
-		PROCESS_ONLYCHAR    = 8,
-		PROCESS_NOINPUT     = 16,
-		PROCESS_NOIMAGE     = 32
+		PROCESS_NOKEYS      = 1 << 0,
+		PROCESS_LR_ALWAYS   = 1 << 1,
+		PROCESS_LR_REPEAT   = 1 << 2,
+		PROCESS_CUSTOM_ONLY = 1 << 3,
+		PROCESS_ONLYCHAR    = 1 << 4,
+		PROCESS_NOINPUT     = 1 << 5,
+		PROCESS_NOIMAGE     = 1 << 6
 	};
 
 	// options for reset
