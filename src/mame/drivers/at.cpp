@@ -4343,9 +4343,17 @@ ROM_START( at486 )
 	ROM_SYSTEM_BIOS(31, "109k", "1.09K")
 	ROMX_LOAD("award_486dx_0097042.bin", 0x10000, 0x10000, CRC(b620534b) SHA1(d3777a82cb35639d386a1840dd5cf52527ec6f8b), ROM_BIOS(31))
 	// 32: UNIC2 94V-0 9326 - OPTI chipset (3 chips)
-	// X0-0100-001378-00101111-060692-495SX_A
+	// BIOS-String: X0-0100-001378-00101111-060692-495SX_A
 	ROM_SYSTEM_BIOS(32, "unic2", "UNIC 2 94V-0")
 	ROMX_LOAD("amibios-486dx-1992-aa8707058-m27c512.bin", 0x10000, 0x10000, CRC(a2b3e326) SHA1(b29c5668fb3337893ef3a96f053f90b929bac0d6), ROM_BIOS(32))
+	// 33: BIOS-String: 40-0100-001276-00101111-060692-495_X86-0
+	// OPTi 82C495 SX, F82C206 - CPU: two solder pads and two CPU sockets - RAM: 8xSIMM30, Cach: 10x28pin DIP - ISA8: 2, ISA16: 3, ISA16/VLB: 3
+	ROM_SYSTEM_BIOS(33, "495sx1", "495sx-1")
+	ROMX_LOAD("495sx-1.bin", 0x10000, 0x10000, CRC(318a99a3) SHA1(e57380ed2a802cd1648a32317313ade5221f1213), ROM_BIOS(33))
+	// 34: Chipset: marked QDI - CPU: Socket 3, 25MHz-50MHz - RAM: 4xSIMM30, 2xSIMM72, Cache: 8x32pin DIP (4x28pin DIP filled), 1x32pin DIP (filled with 28pin DIP)
+	// BIOS: AMI 486DX ISA BIOS AC2849676 - OSC: 18.31818 - ISA8: 1, ISA16: 3, ISA16/VL: 3
+	ROM_SYSTEM_BIOS(34, "qdi486", "QDI486") // screen remains blank
+	ROMX_LOAD("qdi486.bin", 0x10000, 0x10000, CRC(f44a5a45) SHA1(57cfd7c6524eba21395642bd57b726b45eef4b6a), ROM_BIOS(34))
 ROM_END
 
 
@@ -4885,7 +4893,7 @@ ROM_END
 // Jetway J-403TG
 ROM_START( jwj403tg )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	// 0: JETWAY J-403TG (VER.D2E) Chipset: OPTi 82C895, 85C602 - CPU: Socket 3 - Keyboard BIOS: AMIKEY-2 - 
+	// 0: JETWAY J-403TG (VER.D2E) Chipset: OPTi 82C895, 85C602 - CPU: Socket 3 - Keyboard BIOS: AMIKEY-2 -
 	// RAM: 4xSIMM32, 3xSIMM72, Cache: 8xW24257AK-15, 1xW24129AK - ISA16: 5, ISA16/VLB: 3 (2xMASTER, 1xSLAVE)
 	ROM_SYSTEM_BIOS(0, "verd2e", "VER.D2E") // BIOS-String: 40-0101-428060-00101111-111192-UMC491C-0
 	ROMX_LOAD( "ver_d2e.bin", 0x10000, 0x10000, CRC(5d3b86bb) SHA1(d7c3cfbb5b858efacc7cee872a4ef5c9666f9d06), ROM_BIOS(0))
@@ -4960,6 +4968,12 @@ ROM_START( lsucm486v30 ) // BIOS string: 40-0100-001256-00101111-111192-SIS3486-
 	ROM_LOAD( "ucm-486v30.bin", 0x10000, 0x10000, CRC(90ec73a2) SHA1(2fc17f7eed09c2f7d0139670677cc84bbc2964de))
 ROM_END
 
+// SOYO 486 VESA 025D2 - Chipset: SiS 85C461, 85C407 - BIOS: AMI - Keyboard BIOS: AMI (c)1988 - CPU: i486sx-33, full 486 socket provided
+// RAM: 8xSIMM30, Cache: 8x28pin - ISA8: 1, ISA16: 4, ISA16/VL: 2 - BIOS-String: 40-0100-001102-00101111-080893-SIS461 / REV MG
+ROM_START( so025d2 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "soyo-486-vesa.bin", 0x10000, 0x10000, CRC(da798d7b) SHA1(15a8c1e244ee29ef5c61e05659f8ec7f8eaa8ab7))
+ROM_END
 
 // ***** 486 motherboards using the SiS BTQ 85C401/85C402 + 85C206 chipset
 
@@ -5476,6 +5490,18 @@ ROM_END
 ROM_START( pt430 ) // no display
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "pt430.bin", 0x10000, 0x10000, CRC(d455c949) SHA1(c57c82ed015528f3d223f59c94ed6b8a9c323c39))
+ROM_END
+
+// PowerTech MB457 aka Pine PT-2068.1 - Chipset: UMC UM8498F & UMC UM8496F - CPU: Intel 80486DX4-100, solder pads for UMC U5 Green CPU
+// RAM: 4xSIMM30, 1xSIMM72 - ISA8: 1, ISA16: 4 - BIOS/Version: Award 486DX J314549
+ROM_START( ptmb457 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	// 0: BIOS-String: 10/19/94-UMC-498GP-2C4X6S21-00 / REV A
+	ROM_SYSTEM_BIOS(0, "101994", "10/19/94")
+	ROMX_LOAD( "umc-mb457-1.bin", 0x10000, 0x10000, CRC(71f66fec) SHA1(c798d68eb851fc93cc8a3dd67009b47388488e51), ROM_BIOS(0))
+	// 1: BIOS-String: 02/07/95-UMC-498GP-2C4X6000-00 / PT-2068.1
+	ROM_SYSTEM_BIOS( 1, "020795", "02/07/95")
+	ROMX_LOAD( "umc-mb457-2.bin", 0x10000, 0x10000, CRC(2654aefd) SHA1(b888f4f891108a5ef268688840ff20be3a8e6aa5), ROM_BIOS(1))
 ROM_END
 
 // Soyo 025R2 - Chipset: UM8498F, UM8486F - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 4x28pin, 4x32pin, TAG, used: 4xUM61512AK-15, AE88128AK-15
@@ -6327,6 +6353,7 @@ COMP( 199?, pkm0038s,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, pm486pu,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PROTECH",  "PM486PU-S7", MACHINE_NOT_WORKING )
 COMP( 199?, pt430,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Pine Technology", "PT-430", MACHINE_NOT_WORKING )
 COMP( 199?, pt432b,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Pine Technology", "PT-432b aka SR-M401-A", MACHINE_NOT_WORKING )
+COMP( 199?, ptmb457,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PowerTech", "MB457", MACHINE_NOT_WORKING )
 COMP( 199?, pwaih4077c,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Mitac", "PWA-IH4077C", MACHINE_NOT_WORKING )
 COMP( 199?, pwaih4077d,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Mitac", "PWA-IH4077D", MACHINE_NOT_WORKING )
 COMP( 199?, px486p3,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "PX486P3", MACHINE_NOT_WORKING )
@@ -6334,6 +6361,7 @@ COMP( 1990, qi900,     ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sis85c496, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sm48650usc,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
+COMP( 199?, so025d2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "025D2", MACHINE_NOT_WORKING )
 COMP( 199?, so025k2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "025K2", MACHINE_NOT_WORKING )
 COMP( 199?, so025r2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "025R2", MACHINE_NOT_WORKING )
 COMP( 199?, so30h,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "30H", MACHINE_NOT_WORKING )
