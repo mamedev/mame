@@ -14095,6 +14095,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="midwint2_525">
+		<description>Midwinter II - Flames of Freedom (USA)</description>
+		<year>1992</year>
+		<publisher>Microplay Software</publisher>
+		<info name="developer" value="Maelstrom Games" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Midwinter II [Microplay] [1992] [5.25HD] [Disk 1 of 2] [Program Disc].img" size="1228800" crc="9cb25023" sha1="8b2662b8ed599dca2193d466c3777c429a890ac3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Midwinter II [Microplay] [1992] [5.25HD] [Disk 2 of 2] [Graphics Disk].img" size="1228800" crc="2fa25a4f" sha1="84ce0fad8f2591ee73f2653f9e356fe2409047f4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mission">
 		<!-- converted from DDI format -->
 		<description>Mission (Traditional Chinese)</description>
@@ -15234,6 +15251,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="monkeyde" cloneof="monkeyk">
+		<description>The Secret of Monkey Island (Germany)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="(VGA) V1.1 14.Feb.91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="ee632892" sha1="6f04374ec9dfbfd2ead1559833fee7952136158d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="36cd209f" sha1="f62fadeabfac36f7ae00879e5f739278bfebccca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="beffb663" sha1="31d5cda6451d75e649d256b6d282318e85f8b9c1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="22c6965b" sha1="734a928c4b52173fe3bb8e0b234acc91c7119fa8"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="monkeyit" cloneof="monkeyk">
 		<description>The Secret of Monkey Island (Italy)</description>
 		<year>1991</year>
@@ -15259,6 +15304,35 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkeyes" cloneof="monkeyk">
+		<description>The Secret of Monkey Island (Spain, Maxi Juegos/Erbe release)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="distributor" value="Erbe Software" />
+		<info name="version" value="(VGA) - Spanish 1.0, 23.May.91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="8f127a18" sha1="68203db84f30d889838a768b5ad091eb0b933114"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="4bec8479" sha1="e2a0166eed4070e967d9fdbf7e76490a55db878e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="461bb6a0" sha1="f779518cf126015ff4667e042485b731f989b487"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="60ccc3c2" sha1="582ea7d42c9a49ac5622bc49a768cec764db486b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15401,23 +15475,59 @@ license:CC0
 	</software>
 
 	<software name="simcit2k">
-		<description>Sim City 2000 (Ver 1.00)</description>
-		<year>1993</year>
+		<description>SimCity 2000 (Ver 1.00)</description>
+		<year>1994</year>
 		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a"/>
+				<rom name="SimCity 2000 [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="29f6ce7d" sha1="dd4b83f292fe4847301937e2a79e03cbce40189f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a"/>
+				<rom name="SimCity 2000 [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5e92d463" sha1="3ded49b704cf56efb661ad630b4d80010927a18d"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="simcit2kde" cloneof="simcit2k">
+		<description>SimCity 2000 (Germany, Ver 1.00)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="0f6bc7bd" sha1="f8898eac0849688ce1ecf6f21b19fdff31313214"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a9d34795" sha1="b3f414ed7ae188334145bcab10dee21ae8b95503"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2kes" cloneof="simcit2k">
+		<description>SimCity 2000 (Spain, Ver 1.00, Dro Soft release)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ea003323" sha1="a2000dcc1f93dc4115f45405702ed3d19ef64af9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6134aa4e" sha1="f2c2be9784d359d9aa6ae1032c40bc1ee6f0ada3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Floppy 2 - Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="simcit2ka" cloneof="simcit2k">
-		<description>Sim City 2000 (Ver 1.01)</description>
+		<description>SimCity 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -15427,7 +15537,25 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986"/>
+				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- On this release, the floppy disks don't have the label -->
+	<software name="simcit2kb" cloneof="simcit2k">
+		<description>SimCity 2000 (Ver 1.00, alt)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17043,12 +17171,12 @@ license:CC0
 		<info name="developer" value="id Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 2 of 2].img" size="368640" crc="1f0e273a" sha1="a7d822d67742e25fdc56ba1346f13d2faa7a7a64"/>
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 2 of 2].img" size="368640" crc="1f0e273a" sha1="a7d822d67742e25fdc56ba1346f13d2faa7a7a64"/>
 			</dataarea>
 		</part>
 	</software>
