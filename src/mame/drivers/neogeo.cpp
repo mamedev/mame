@@ -1948,7 +1948,7 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 	NEOGEO_SPRITE_OPTIMZIED(config, m_sprgen, 0).set_screen(m_screen);
 
 	/* audio hardware */
-	INPUT_MERGER_ALL_HIGH(config, m_audionmi);
+	INPUT_MERGER_ALL_HIGH(config, m_audionmi).initial_state(~u32(3));
 	m_audionmi->output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
