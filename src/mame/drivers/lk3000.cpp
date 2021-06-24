@@ -154,10 +154,10 @@ u8 lk3000_state::p1_r()
 		data |= m_inputs[~m_p4 & 7]->read();
 
 	// read rom data
-	if (m_p5 & 0x20)
+	if (~m_p5 & 0x20)
 	{
 		// P00-P06: A0-A6, P50-P54: A7-A11, P07 selects chip
-		u16 offset = (m_p0 & 0x7f) | (m_p5 << 7 & 0xf80) | (m_p0 << 5 & 0x1000);
+		u16 offset = (~m_p0 & 0x7f) | (~m_p5 << 7 & 0xf80) | (~m_p0 << 5 & 0x1000);
 		data |= m_cart->read_rom(offset + 0x800);
 	}
 
@@ -317,10 +317,10 @@ void lk3000_state::lk3000(machine_config &config)
 	psu.write_b().set(FUNC(lk3000_state::p5_w));
 
 	// video hardware
-	DL1414T(config, m_dl1414[0], u32(0)).update().set(FUNC(lk3000_state::update_display<0>));
-	DL1414T(config, m_dl1414[1], u32(0)).update().set(FUNC(lk3000_state::update_display<1>));
-	DL1414T(config, m_dl1414[2], u32(0)).update().set(FUNC(lk3000_state::update_display<2>));
-	DL1414T(config, m_dl1414[3], u32(0)).update().set(FUNC(lk3000_state::update_display<3>));
+	DL1414T(config, m_dl1414[0], 0U).update().set(FUNC(lk3000_state::update_display<0>));
+	DL1414T(config, m_dl1414[1], 0U).update().set(FUNC(lk3000_state::update_display<1>));
+	DL1414T(config, m_dl1414[2], 0U).update().set(FUNC(lk3000_state::update_display<2>));
+	DL1414T(config, m_dl1414[3], 0U).update().set(FUNC(lk3000_state::update_display<3>));
 	config.set_default_layout(layout_lk3000);
 
 	// cartridge
