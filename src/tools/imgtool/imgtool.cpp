@@ -139,7 +139,7 @@ static imgtoolerr_t markerrorsource(imgtoolerr_t err)
 static void internal_error(const imgtool_module *module, const char *message)
 {
 #ifdef MAME_DEBUG
-	printf("%s: %s\n", module->name, message);
+	printf("%s: %s\n", module->name.c_str(), message);
 #endif
 }
 
