@@ -2825,6 +2825,189 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="freedos10">
+		<description>FreeDOS 1.0</description>
+		<year>2006</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.0" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 base CD"/>
+			<diskarea name="cdrom">
+				<disk name="fdbasecd" sha1="4adf8033c7d02f30e9ef9caf68d90b8d131d1759"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 base WS"/>
+			<diskarea name="cdrom">
+				<disk name="fdbasews" sha1="a34535fd4d2c719bf5c0de46b0174ff3e0726924"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 full CD"/>
+			<diskarea name="cdrom">
+				<disk name="fdfullcd" sha1="c61303fb65f22c5d4731b921677e11b69c7cfbd5"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 full WS"/>
+			<diskarea name="cdrom">
+				<disk name="fdfullws" sha1="bfdfe1b9e3c4d697e69ea47dd436b6d291bee5bd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos10a" cloneof="freedos10">
+		<description>FreeDOS 1.0 (updated)</description>
+		<year>2007</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.0"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Base CD"/>
+			<diskarea name="cdrom">
+				<disk name="fdbasecd" sha1="dd786f321046514e5f24abbf340b63dd4dadb30c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Base CD with source"/>
+			<diskarea name="cdrom">
+				<disk name="fdbasews" sha1="ac6941c1322c74df58093305f7bc9aed8180c4cd"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Full CD"/>
+			<diskarea name="cdrom">
+				<disk name="fdfullcd" sha1="7ee77df8277da136a7b19eb57afba106dd654233"/>
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="FreeDOS 1.0 Full CD with source"/>
+			<diskarea name="cdrom">
+				<disk name="fdfullws" sha1="0868559412de4d35b8d5081a6dec87d665ed9c1f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos11">
+		<description>FreeDOS 1.1</description>
+		<year>2012</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.1"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fd11src" sha1="3e81da055507f4dd3f906d08f2b21fa47553cf92"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos12">
+		<description>FreeDOS 1.2</description>
+		<year>2016</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.2"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Standard installer"/>
+			<diskarea name="cdrom">
+				<disk name="fd12cd" sha1="6241ffcfcbd119c09a71622a31ef73d110542716"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy installer"/>
+			<diskarea name="cdrom">
+				<disk name="fd12lgcy" sha1="86ff1e0c49029c68ad24a0110e32929ec26b2760"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc1">
+		<description>FreeDOS 1.3 Release Candidate 1</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC1"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD 1"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live1" sha1="0eea3f4a33a47a3425f44377e521579d954781d7"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="LiveCD 2"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live2" sha1="859562545a8ea1c11378e4422756a7dbb1b1171c"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="6e7f457b161df9400c0f1dde0e0a209c6edb21d6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc2">
+		<description>FreeDOS 1.3 Release Candidate 2</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC2"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="183f63a9a35d95b10e1befa9b92060bf7a290726"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="5a6bd7eed9700e18b3207c4af828b6da7138db60"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc3">
+		<description>FreeDOS 1.3 Release Candidate 3</description>
+		<year>2020</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC3"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="df8e74fbf7328f522bcbc677697bbbb9dd300c8b"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="4f8c9809b335e5f8910edf4ce9c6fd1e5c53ebf5"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<software name="freedos13rc4">
+		<description>FreeDOS 1.3 Release Candidate 4</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13live" sha1="85bdfb46bc8cb955aa5bc6df1850b03aa0cef1e0"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13lgcy" sha1="34be19cb2465925f1a5576c1eb3144f315621882"/>
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD"/>
+			<diskarea name="cdrom">
+				<disk name="fd13bns" sha1="1fe2a984fffe11c4587e625f845200c219a0893d"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- DOS -->
 	<!-- Rereleased software, apparently identical to the floppy counterpart -->
 	<software name="keycad">
