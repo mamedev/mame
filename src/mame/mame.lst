@@ -42038,6 +42038,9 @@ vpoker                          // (c) 198?
 @source:vroulet.cpp
 vroulet                         // (c) 1989 World Game
 
+@source:vsmjtria.cpp
+vsmjtria                        //
+
 @source:vsnes.cpp
 balonfgt                        // (c) 1984 Nintendo
 bnglngby                        // (c) 1985 Nintendo licensed by Broderbund Software Inc.

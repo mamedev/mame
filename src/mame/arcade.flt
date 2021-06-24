@@ -1429,6 +1429,7 @@ voyager.cpp
 vp101.cpp
 vpoker.cpp
 vroulet.cpp
+vsmjtria.cpp
 vsnes.cpp
 vulgus.cpp
 wacky_gator.cpp

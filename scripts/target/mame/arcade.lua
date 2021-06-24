@@ -1060,6 +1060,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/albazc.cpp",
 	MAME_DIR .. "src/mame/drivers/albazg.cpp",
 	MAME_DIR .. "src/mame/drivers/rmhaihai.cpp",
+	MAME_DIR .. "src/mame/drivers/vsmjtria.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "alliedl")
