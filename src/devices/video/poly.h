@@ -300,7 +300,7 @@ public:
 	uint32_t render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents);
 
 	// polygons
-	template<int _NumVerts>
+	template<int NumVerts>
 	uint32_t render_polygon(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t *v);
 
 	// public helpers
@@ -318,7 +318,6 @@ private:
 
 	static constexpr int SCANLINES_PER_BUCKET = 32;
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
-	static constexpr int UNITS_PER_POLY       = (100 / SCANLINES_PER_BUCKET);
 
 	// polygon_info describes a single polygon, which includes the poly_params
 	struct polygon_info
@@ -338,13 +337,10 @@ private:
 		}
 
 		std::atomic<uint32_t> count_next;             // number of scanlines and index of next item to process
-		polygon_info *      polygon;                // pointer to polygon
-		int16_t               scanline;               // starting scanline
-		uint16_t              previtem;               // index of previous item in the same bucket
-	#ifndef PTR64
-		uint32_t              dummy;                  // pad to 16 bytes
-	#endif
-		extent_t            extent[SCANLINES_PER_BUCKET]; // array of scanline extents
+		polygon_info *        polygon;                // pointer to polygon
+		int32_t               scanline;               // starting scanline
+		uint32_t              previtem;               // index of previous item in the same bucket
+		extent_t              extent[SCANLINES_PER_BUCKET]; // array of scanline extents
 	};
 
 	//-------------------------------------------------
@@ -422,7 +418,7 @@ private:
 	unit_array          m_unit;                     // array of work units
 
 	// buckets
-	uint16_t              m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
+	uint32_t              m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
 
 	// statistics
 	uint32_t              m_tiles;                    // number of tiles queued
@@ -501,9 +497,9 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 	printf("Total triangles = %d\n", m_triangles);
 	printf("Total quads = %d\n", m_quads);
 	if (m_pixels > 1000000000)
-		printf("Total pixels   = %d%09d\n", (uint32_t)(m_pixels / 1000000000), (uint32_t)(m_pixels % 1000000000));
+		printf("Total pixels   = %d%09d\n", uint32_t(m_pixels / 1000000000), uint32_t(m_pixels % 1000000000));
 	else
-		printf("Total pixels   = %d\n", (uint32_t)m_pixels);
+		printf("Total pixels   = %d\n", uint32_t(m_pixels));
 
 	printf("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
 	printf("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
@@ -529,11 +525,11 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 	{
 		work_unit &unit = *(work_unit *)param;
 		polygon_info &polygon = *unit.polygon;
-		int count = unit.count_next & 0xffff;
+		int count = unit.count_next & 0xff;
 		uint32_t orig_count_next;
 
 		// if our previous item isn't done yet, enqueue this item to the end and proceed
-		if (unit.previtem != 0xffff)
+		if (unit.previtem != 0xffffffff)
 		{
 			work_unit &prevunit = polygon.m_owner->m_unit.byindex(unit.previtem);
 			if (prevunit.count_next != 0)
@@ -545,7 +541,7 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 				do
 				{
 					orig_count_next = prevunit.count_next;
-					new_count_next = orig_count_next | (unitnum << 16);
+					new_count_next = orig_count_next | (unitnum << 8);
 				} while (!prevunit.count_next.compare_exchange_weak(orig_count_next, new_count_next, std::memory_order_release, std::memory_order_relaxed));
 
 #if KEEP_POLY_STATISTICS
@@ -571,7 +567,7 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 		} while (!unit.count_next.compare_exchange_weak(orig_count_next, 0, std::memory_order_release, std::memory_order_relaxed));
 
 		// if we have no more work to do, do nothing
-		orig_count_next >>= 16;
+		orig_count_next >>= 8;
 		if (orig_count_next == 0)
 			break;
 		param = &polygon.m_owner->m_unit.byindex(orig_count_next);
@@ -650,11 +646,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(const
 
 	// first sort by Y
 	if (v2->y < v1->y)
-	{
-		const vertex_t *tv = v1;
-		v1 = v2;
-		v2 = tv;
-	}
+		std::swap(v1, v2);
 
 	// compute some integral X/Y vertex values
 	int32_t v1y = round_coordinate(v1->y);
@@ -700,11 +692,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(const
 
 	// force start < stop
 	if (istartx > istopx)
-	{
-		int32_t temp = istartx;
-		istartx = istopx;
-		istopx = temp;
-	}
+		std::swap(istartx, istopx);
 
 	// include the right edge if requested
 	if (Flags & POLY_FLAG_INCLUDE_RIGHT_EDGE)
@@ -713,10 +701,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(const
 	// apply left/right clipping
 	if (!(Flags & POLY_FLAG_NO_CLIPPING))
 	{
-		if (istartx < cliprect.left())
-			istartx = cliprect.left();
-		if (istopx > cliprect.right())
-			istopx = cliprect.right() + 1;
+		istartx = std::max(istartx, cliprect.left());
+		istopx = std::min(istopx, cliprect.right() + 1);
 		if (istartx >= istopx)
 			return 0;
 	}
@@ -727,12 +713,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(const
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v2yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = ((uint32_t)curscan / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
+		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
 		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
-		scaninc = SCANLINES_PER_BUCKET - (uint32_t)curscan % SCANLINES_PER_BUCKET;
+		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
@@ -744,18 +730,15 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(const
 		// iterate over extents
 		for (int extnum = 0; extnum < unit.count_next; extnum++)
 		{
-			// compute the ending X based on which part of the triangle we're in
-			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
-
 			// set the extent and update the total pixel count
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
 			BaseType fullstartx = BaseType(istartx) + BaseType(0.5);
+			BaseType fully = BaseType(curscan + extnum) + BaseType(0.5);
 			for (int paramnum = 0; paramnum < paramcount; paramnum++)
 			{
 				extent.param[paramnum].start = v1->p[paramnum] + fullstartx * param_dpdx[paramnum] + fully * param_dpdy[paramnum];
@@ -788,22 +771,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 	// first sort by Y
 	if (v2->y < v1->y)
-	{
-		const vertex_t *tv = v1;
-		v1 = v2;
-		v2 = tv;
-	}
+		std::swap(v1, v2);
 	if (v3->y < v2->y)
 	{
-		const vertex_t *tv = v2;
-		v2 = v3;
-		v3 = tv;
+		std::swap(v2, v3);
 		if (v2->y < v1->y)
-		{
-			const vertex_t *tv2 = v1;
-			v1 = v2;
-			v2 = tv2;
-		}
+			std::swap(v1, v2);
 	}
 
 	// compute some integral X/Y vertex values
@@ -822,12 +795,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 	}
 
 	// determine total X extents
-	BaseType minx = v1->x;
-	BaseType maxx = v1->x;
-	if (v2->x < minx) minx = v2->x;
-	else if (v2->x > maxx) maxx = v2->x;
-	if (v3->x < minx) minx = v3->x;
-	else if (v3->x > maxx) maxx = v3->x;
+	BaseType minx = std::min(std::min(v1->x, v2->x), v3->x);
+	BaseType maxx = std::max(std::max(v1->x, v2->x), v3->x);
 
 	// allocate and populate a new polygon
 	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v3yclip, callback);
@@ -887,12 +856,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v3yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = ((uint32_t)curscan / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
+		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
 		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
-		scaninc = SCANLINES_PER_BUCKET - (uint32_t)curscan % SCANLINES_PER_BUCKET;
+		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
@@ -919,11 +888,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 			// force start < stop
 			if (istartx > istopx)
-			{
-				int32_t temp = istartx;
-				istartx = istopx;
-				istopx = temp;
-			}
+				std::swap(istartx, istopx);
 
 			// include the right edge if requested
 			if (Flags & POLY_FLAG_INCLUDE_RIGHT_EDGE)
@@ -932,10 +897,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 			// apply left/right clipping
 			if (!(Flags & POLY_FLAG_NO_CLIPPING))
 			{
-				if (istartx < cliprect.left())
-					istartx = cliprect.left();
-				if (istopx > cliprect.right())
-					istopx = cliprect.right() + 1;
+				istartx = std::max(istartx, cliprect.left());
+				istopx = std::min(istopx, cliprect.right() + 1);
 			}
 
 			// set the extent and update the total pixel count
@@ -944,7 +907,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 			extent_t &extent = unit.extent[extnum];
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 
 			// fill in the parameters for the extent
@@ -1027,12 +989,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 	int32_t scaninc = 1;
 	for (int32_t curscan = v1yclip; curscan < v3yclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = ((uint32_t)curscan / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
+		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
 		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
-		scaninc = SCANLINES_PER_BUCKET - (uint32_t)curscan % SCANLINES_PER_BUCKET;
+		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
@@ -1050,14 +1012,10 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 			// apply left/right clipping
 			if (!(Flags & POLY_FLAG_NO_CLIPPING))
 			{
-				if (istartx < cliprect.left())
-					istartx = cliprect.left();
-				if (istartx > cliprect.right())
-					istartx = cliprect.right() + 1;
-				if (istopx < cliprect.left())
-					istopx = cliprect.left();
-				if (istopx > cliprect.right())
-					istopx = cliprect.right() + 1;
+				istartx = std::max(istartx, cliprect.left());
+				istartx = std::min(istartx, cliprect.right() + 1);
+				istopx = std::max(istopx, cliprect.left());
+				istopx = std::min(istopx, cliprect.right() + 1);
 			}
 
 			// set the extent and update the total pixel count
@@ -1071,11 +1029,11 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 				extent.param[paramnum].start = srcextent.param[paramnum].start;
 				extent.param[paramnum].dpdx = srcextent.param[paramnum].dpdx;
 			}
-
 			extent.userdata = srcextent.userdata;
+
 			if (istartx < istopx)
 				pixels += istopx - istartx;
-			else if(istopx < istartx)
+			else if (istopx < istartx)
 				pixels += istartx - istopx;
 		}
 	}
@@ -1096,7 +1054,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 //-------------------------------------------------
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
-template<int _NumVerts>
+template<int NumVerts>
 uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(const rectangle &cliprect, render_delegate callback, int paramcount, const vertex_t *v)
 {
 	// determine min/max Y vertices
@@ -1104,16 +1062,14 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 	BaseType maxx = v[0].x;
 	int minv = 0;
 	int maxv = 0;
-	for (int vertnum = 1; vertnum < _NumVerts; vertnum++)
+	for (int vertnum = 1; vertnum < NumVerts; vertnum++)
 	{
 		if (v[vertnum].y < v[minv].y)
 			minv = vertnum;
 		else if (v[vertnum].y > v[maxv].y)
 			maxv = vertnum;
-		if (v[vertnum].x < minx)
-			minx = v[vertnum].x;
-		else if (v[vertnum].x > maxx)
-			maxx = v[vertnum].x;
+		minx = std::min(minx, v[vertnum].x);
+		maxx = std::max(maxx, v[vertnum].x);
 	}
 
 	// determine start/end scanlines
@@ -1144,13 +1100,13 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 		BaseType dxdy;                         // dx/dy along the edge
 		BaseType dpdy[std::max(1, MaxParams)]; // per-parameter dp/dy values
 	};
-	poly_edge fedgelist[_NumVerts - 1];
+	poly_edge fedgelist[NumVerts - 1];
 	poly_edge *edgeptr = &fedgelist[0];
-	for (int curv = minv; curv != maxv; curv = (curv == _NumVerts - 1) ? 0 : (curv + 1))
+	for (int curv = minv; curv != maxv; curv = (curv == NumVerts - 1) ? 0 : (curv + 1))
 	{
 		// set the two vertices
 		edgeptr->v1 = &v[curv];
-		edgeptr->v2 = &v[(curv == _NumVerts - 1) ? 0 : (curv + 1)];
+		edgeptr->v2 = &v[(curv == NumVerts - 1) ? 0 : (curv + 1)];
 
 		// if horizontal, skip altogether
 		if (edgeptr->v1->y == edgeptr->v2->y)
@@ -1165,13 +1121,13 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 	}
 
 	// walk backward to build up the backward edge list
-	poly_edge bedgelist[_NumVerts - 1];
+	poly_edge bedgelist[NumVerts - 1];
 	edgeptr = &bedgelist[0];
-	for (int curv = minv; curv != maxv; curv = (curv == 0) ? (_NumVerts - 1) : (curv - 1))
+	for (int curv = minv; curv != maxv; curv = (curv == 0) ? (NumVerts - 1) : (curv - 1))
 	{
 		// set the two vertices
 		edgeptr->v1 = &v[curv];
-		edgeptr->v2 = &v[(curv == 0) ? (_NumVerts - 1) : (curv - 1)];
+		edgeptr->v2 = &v[(curv == 0) ? (NumVerts - 1) : (curv - 1)];
 
 		// if horizontal, skip altogether
 		if (edgeptr->v1->y == edgeptr->v2->y)
@@ -1207,12 +1163,12 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 	int32_t scaninc = 1;
 	for (int32_t curscan = minyclip; curscan < maxyclip; curscan += scaninc)
 	{
-		uint32_t bucketnum = ((uint32_t)curscan / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
+		uint32_t bucketnum = (uint32_t(curscan) / SCANLINES_PER_BUCKET) % TOTAL_BUCKETS;
 		uint32_t unit_index = m_unit.count();
 		work_unit &unit = m_unit.next();
 
 		// determine how much to advance to hit the next bucket
-		scaninc = SCANLINES_PER_BUCKET - (uint32_t)curscan % SCANLINES_PER_BUCKET;
+		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
 		unit.polygon = &polygon;
@@ -1279,7 +1235,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 				istartx = istopx = 0;
 			extent.startx = istartx;
 			extent.stopx = istopx;
-			extent.userdata = nullptr;
 			pixels += istopx - istartx;
 		}
 	}
