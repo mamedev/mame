@@ -12,7 +12,6 @@
 #define STROBE_DELAY 1  // in usec
 #define ACK_DELAY 1     // in usec
 
-//#define DEBUG_BUFFER_DISPLAY
 
 ROM_START( etiprintbuffer_device )
 	ROM_REGION( 0x800, "maincpu", 0 )
@@ -26,14 +25,14 @@ static INPUT_PORTS_START ( etiprintbuffer_device )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear Buffer") PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, clear_sw, 0)
 
 	PORT_START("CONFIG")
-#ifdef DEBUG_BUFFER_DISPLAY
+#ifdef DEBUG_ETI_BUFFER
 	PORT_CONFNAME(0x03, 0x01, "ETI Buffer Debug Display")
 	PORT_CONFSETTING(0x00, "Off")
 	PORT_CONFSETTING(0x01, "LEDs")
 	PORT_CONFSETTING(0x02, "Buffer Head/Tail")
 #endif
 	PORT_CONFNAME(0x0c, 0x0c, "Ram Size")
-	PORT_CONFSETTING(0x00, "0K (will not work, passes FF to printer)")  // ram size of 0k will pass only 00 on to printer, use for ram test failure
+//  PORT_CONFSETTING(0x00, "0K (buffer will not work, passes FF to printer)")  // ram size of 0k will pass only 0xFF on to printer, use for ram test failure
 	PORT_CONFSETTING(0x04, "16K")
 	PORT_CONFSETTING(0x08, "32K")
 	PORT_CONFSETTING(0x0c, "48K")
@@ -169,7 +168,7 @@ void etiprintbuffer_device::device_add_mconfig(machine_config &config)
 	OUTPUT_LATCH(config, m_ctx_data_out);
 	m_ctx->set_output_latch(*m_ctx_data_out);
 
-#ifdef DEBUG_BUFFER_DISPLAY
+#ifdef DEBUG_ETI_BUFFER
 	// video hardware
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -177,7 +176,7 @@ void etiprintbuffer_device::device_add_mconfig(machine_config &config)
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	screen.set_visarea(0, SCREEN_WIDTH-1, 0, SCREEN_HEIGHT-1);
 	screen.set_screen_update(FUNC(etiprintbuffer_device::screen_update_etibuffer));
-	screen.set_physical_aspect(1,40);
+	screen.set_physical_aspect(1,40); // long and slender
 #endif
 
 	config.set_default_layout(layout_etibuffer);
@@ -259,10 +258,11 @@ void etiprintbuffer_device::device_timer(emu_timer &timer, device_timer_id id, i
 //  FUNCTIONS FOR DEBUG DISPLAY
 //**************************************************************************
 
+#ifdef DEBUG_ETI_BUFFER
 
 void etiprintbuffer_device::drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color)
 {
-#ifdef DEBUG_BUFFER_DISPLAY
+
 	double pct1 = (xval1 - x1) / (x2-x1);
 	double pct2 = (xval2 - x1) / (x2-x1);
 	// clamp range to 0,1.0
@@ -271,28 +271,26 @@ void etiprintbuffer_device::drawbar(double xval1, double xval2, double x1, doubl
 	double yval1 = pct1 * (y2 - y1) + y1;
 	double yval2 = pct2 * (y2 - y1) + y1;
 	bitmap.plot_box(0, yval1, width, yval2-yval1+1, color);
-#endif
 }
 
-void etiprintbuffer_device::draw7seg(u8 digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color)
+void etiprintbuffer_device::draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor)
 {
-#ifdef DEBUG_BUFFER_DISPLAY
+	// pass nonzero erasecolor to erase blank segments
 	const u8 pat[] = { 0x3f, 0x06,  0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
-	u8 seg = pat[digit & 0xf];
+	u8 seg = is_digit ? pat[data & 0xf] : data;
 
-	if (BIT(seg,0)) bitmap.plot_box(x0,       y0,                  width, thick,  color);
-	if (BIT(seg,1)) bitmap.plot_box(x0+width, y0+thick,            thick, height, color);
-	if (BIT(seg,2)) bitmap.plot_box(x0+width, y0+2*thick+height,   thick, height, color);
-	if (BIT(seg,3)) bitmap.plot_box(x0,       y0+2*thick+2*height, width, thick,  color);
-	if (BIT(seg,4)) bitmap.plot_box(x0-thick, y0+2*thick+height,   thick, height, color);
-	if (BIT(seg,5)) bitmap.plot_box(x0-thick, y0+thick,            thick, height, color);
-	if (BIT(seg,6)) bitmap.plot_box(x0,       y0+thick+height,     width, thick,  color);
-#endif
+	if (BIT(seg,0) || erasecolor) bitmap.plot_box(x0,       y0,                  width, thick,       BIT(seg,0) ? color : erasecolor);
+	if (BIT(seg,1) || erasecolor) bitmap.plot_box(x0+width, y0+thick,            thick, height,      BIT(seg,1) ? color : erasecolor);
+	if (BIT(seg,2) || erasecolor) bitmap.plot_box(x0+width, y0+2*thick+height,   thick, height,      BIT(seg,2) ? color : erasecolor);
+	if (BIT(seg,3) || erasecolor) bitmap.plot_box(x0,       y0+2*thick+2*height, width, thick,       BIT(seg,3) ? color : erasecolor);
+	if (BIT(seg,4) || erasecolor) bitmap.plot_box(x0-thick, y0+2*thick+height,   thick, height,      BIT(seg,4) ? color : erasecolor);
+	if (BIT(seg,5) || erasecolor) bitmap.plot_box(x0-thick, y0+thick,            thick, height,      BIT(seg,5) ? color : erasecolor);
+	if (BIT(seg,6) || erasecolor) bitmap.plot_box(x0,       y0+thick+height,     width, thick,       BIT(seg,6) ? color : erasecolor);
+	if (BIT(seg,7) || erasecolor) bitmap.plot_box(x0+width+thick, y0+2*thick+2*height, thick, thick, BIT(seg,7) ? color : erasecolor); // draw dot
 }
 
 uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-#ifdef DEBUG_BUFFER_DISPLAY
 	u8 ledsize = 8;
 	u32 ledoncolor  = 0xff0000;
 	u32 ledoffcolor = 0x7f0000;
@@ -321,7 +319,7 @@ uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, b
 
 		drawbar(0, 1, 0, 1, ledsize, SCREEN_HEIGHT, 16, bitmap, emptycolor);
 
-		barcolor = (m_buffersize > 0xbfc0 ? fullcolor : datacolor);
+		barcolor = (m_buffersize > 0xbfc0 ? fullcolor : datacolor); // when its almost full, make bar a different color
 		bool nowrap = m_bufferhead >= m_buffertail;
 
 		if (nowrap) // draw from tail to head
@@ -336,16 +334,27 @@ uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, b
 		drawbar(m_buffertail, m_buffertail+256, 0x4000, 0xffff, ledsize, SCREEN_HEIGHT, 16, bitmap, buffertailcolor);
 		drawbar(m_bufferhead, m_bufferhead+256, 0x4000, 0xffff, ledsize, SCREEN_HEIGHT, 16, bitmap, bufferheadcolor);
 
-		// draw hex digits of buffersize
+		// draw hex digits of m_buffersize
 		u16 seg7w = 4;
 		u16 seg7h = 3;
 		u16 seg7t = 1;
 		u32 seg7color = 0xff2222;
 
-		draw7seg((m_buffersize & 0xf)    >> 0,  9,16, seg7w, seg7h, seg7t, bitmap, seg7color);
-		draw7seg((m_buffersize & 0xf0)   >> 4,  2,16, seg7w, seg7h, seg7t, bitmap, seg7color);
-		draw7seg((m_buffersize & 0xf00)  >> 8,  9,30, seg7w, seg7h, seg7t, bitmap, seg7color);
-		draw7seg((m_buffersize & 0xf000) >> 12, 2,30, seg7w, seg7h, seg7t, bitmap, seg7color);
+		if (pc >= 0x200 && pc <= 0x800)  m_buffersize = 0x7E57; // have debug display say "test" while doing self test
+
+		draw7seg((m_buffersize & 0xf)    >> 0,  true, 9,30, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+		draw7seg((m_buffersize & 0xf0)   >> 4,  true, 2,30, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+		draw7seg((m_buffersize & 0xf00)  >> 8,  true, 9,16, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+		draw7seg((m_buffersize & 0xf000) >> 12, true, 2,16, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+
+
+		if (pc >= 0x200 && pc <= 0x800)  // display pc while doing self test
+		{
+			draw7seg((pc & 0xf)    >> 0,  true, 9,66, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+			draw7seg((pc & 0xf0)   >> 4,  true, 2,66, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+			draw7seg((pc & 0xf00)  >> 8,  true, 9,50, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+			draw7seg((pc & 0xf000) >> 12, true, 2,50, seg7w, seg7h, seg7t, bitmap, seg7color, 0);
+		}
 	}
 	if (display) // draw leds
 	{
@@ -355,7 +364,6 @@ uint32_t etiprintbuffer_device::screen_update_etibuffer(screen_device &screen, b
 		bitmap.plot_box(0,         0, ledsize, ledsize, led1 ? ledoncolor : ledoffcolor);  // draw led1
 		bitmap.plot_box(0+ledsize, 0, ledsize, ledsize, led2 ? ledoncolor : ledoffcolor);  // draw led2
 	}
-#endif
 	return 0;
 }
-
+#endif

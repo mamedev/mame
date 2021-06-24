@@ -2,10 +2,13 @@
 // copyright-holders:Golden Child
 /***********************************************************************
 
-    Electronics Today International Print Buffer
+    Electronics Today International Print Buffer 48K
 
     Designed by Nick Sawyer and published in the July and August 1985
        issues of Electronics Today International (UK Edition)
+
+    https://worldradiohistory.com/UK/Electronics-Today-UK/80s/Electronics-Today-1985-08.pdf
+    https://worldradiohistory.com/UK/Electronics-Today-UK/80s/Electronics-Today-1985-07.pdf
 
     Electronics-Today-1985-07.pdf
         (pages 33-37 part 1 : schematic, parts list, description)
@@ -18,16 +21,30 @@
     Electronics-Today-1985-10.pdf (page 58) (follow up notes)
     Electronics-Today-1985-11.pdf (page 13) (follow up notes)
 
-     Some interesting notes about the rom code:
+     Some notes about the rom code:
 
-    * All state is held in the registers so entire 48k ram can be used.
+    * All state is held in the cpu registers so entire 48k ram can be used.
     * Uses no subroutine calls and avoids use of the stack.
     * For refresh, executes continuous opcodes located between XX80 and XXF0
         in the memory map at least once every 4ms.
 
     * Rom code is entered from the scanned magazine,
-       with a bug fixed by inserting an 0x00 nop at 0x382,
-       shifting bytes 0x382-0x3ee to 0x383-0x3ef.
+       with a bug fixed by inserting a 0x00 nop at 0x382,
+       shifting bytes 0x382-0x3ee to 0x383-0x3ef to make the hardcoded
+       addresses point at the correct locations.
+
+    * Memory map is simple:
+
+    0x0000-0x7ff    rom code
+    0x1000-0x1fff   reads parallel data in, strobes ack and clears busy
+    0x2000-0x2fff   writes data to parallel out
+    0x3000-0x3fff   write will strobe the parallel out
+    0x4000-0xffff   ram (all used for buffer)
+
+    * IO map:
+
+    0x0000-0xffff   any read returns status of parallel in strobe received in bit 6,
+                    and not busy parallel out in bit 7
 
 ***********************************************************************/
 
@@ -35,6 +52,9 @@
 #define MAME_BUS_CENTRONICS_ETIBUFFERDEV_H
 
 #pragma once
+
+// enable DEBUG_ETI_BUFFER for a screen display of buffer head, tail and size.
+//#define DEBUG_ETI_BUFFER
 
 #include "ctronics.h"
 #include "screen.h"
@@ -88,9 +108,6 @@ protected:
 	void etiprintbuffer_device_memmap(address_map &map);
 	void etiprintbuffer_device_iomap(address_map &map);
 
-	uint32_t screen_update_etibuffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color);
-	void draw7seg(u8 digit, int x0, int y0, int w, int h, int t, bitmap_rgb32 &bitmap, u32 color);
 
 	uint8_t eti_status_r(offs_t offset);
 	uint8_t eti_read_1000(offs_t offset);
@@ -108,11 +125,17 @@ protected:
 
 	enum { TIMER_ACK, TIMER_STROBEOUT };
 
+	u8 m_ram[48 * 1024];  // 48k ram
+
+#ifdef DEBUG_ETI_BUFFER
+	uint32_t screen_update_etibuffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color);
+	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor = 0x1);
+
 	u16 m_buffersize = 0;  // used to draw graphic representation of buffer
 	u16 m_bufferhead = 0;
 	u16 m_buffertail = 0;
-
-	u8 m_ram[48 * 1024];  // 48k ram
+#endif
 };
 
 // device type definition
