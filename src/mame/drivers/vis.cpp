@@ -76,13 +76,13 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 {
 	m_sample[m_samples++] = data;
 	m_curcount++;
-	if((m_samples >= 2) || ((m_mode & 0x08) != 0x08))
+	if((m_samples >= 2) || !(m_mode & 0x8))
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
 void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(((m_samples < 2) && ((m_mode & 0x08) == 0x08)) || !m_samples)
+	if(((m_samples < 2) && (m_mode & 8)) || !m_samples)
 		return;
 	switch(m_mode & 0x88)
 	{
@@ -111,7 +111,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 	}
 
-	if(m_sample_byte >= 2)
+	if(m_sample_byte >= (m_mode & 8 ? 4 : 2))
 	{
 		m_sample_byte = 0;
 		m_samples = 0;
