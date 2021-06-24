@@ -764,7 +764,10 @@ uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb3
 {
 	m_k001604[0]->draw_back_layer(screen, bitmap, cliprect);
 
-	m_k001005->draw(bitmap, cliprect);
+	if (m_konppc[0].output_3d_enabled())
+	{
+		m_k001005->draw(bitmap, cliprect);
+	}
 
 	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);
 
