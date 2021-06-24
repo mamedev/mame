@@ -44,7 +44,7 @@ struct os9_diskinfo
 	unsigned int octal_track_density : 1;
 
 	char name[33];
-	uint8_t *allocation_bitmap;
+	uint8_t allocation_bitmap[65536];
 };
 
 
@@ -670,10 +670,7 @@ static imgtoolerr_t os9_diskimage_open(imgtool::image &image, imgtool::stream::p
 		return IMGTOOLERR_CORRUPTIMAGE;
 
 	/* is the allocation bitmap too big? */
-	info->allocation_bitmap = (uint8_t*)image.malloc(info->allocation_bitmap_bytes);
-	if (!info->allocation_bitmap)
-		return IMGTOOLERR_OUTOFMEMORY;
-	memset(info->allocation_bitmap, 0, info->allocation_bitmap_bytes);
+	memset(&info->allocation_bitmap[0], 0, info->allocation_bitmap_bytes);
 
 	/* sectors per track and track size don't jive? */
 	if (info->sectors_per_track != track_size_in_sectors)
