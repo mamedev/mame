@@ -227,6 +227,8 @@ protected:
 	const char *timer_type_string(void);
 	void reset_timer(void);
 	void timer_elapsed(void);
+	const attotime m_short_timer_source;
+	const attotime m_long_timer_source;
 
 	// video
 	bool update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *palette);

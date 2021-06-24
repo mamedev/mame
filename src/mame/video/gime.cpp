@@ -134,6 +134,8 @@ gime_device::gime_device(const machine_config &mconfig, device_type type, const 
 	, m_cart_device(*this, finder_base::DUMMY_TAG)
 	, m_rom(nullptr)
 	, m_rom_region(*this, finder_base::DUMMY_TAG)
+	, m_short_timer_source(attotime::from_hz(clock) * 3648)
+	, m_long_timer_source(attotime::from_hz(clock) * 16)
 {
 }
 
@@ -479,11 +481,14 @@ void gime_device::reset_timer(void)
 
 		if (timer_type() == GIME_TIMER_63USEC)
 		{
-			m_gime_clock_timer->adjust(attotime::from_usec(63.695) * m_timer_value);
+			// master clock divided by 8, divided by 228, divided by 2
+			m_gime_clock_timer->adjust(m_short_timer_source * m_timer_value);
+
 		}
 		else
 		{
-			m_gime_clock_timer->adjust(attotime::from_nsec(279.365) * m_timer_value);
+			// master clock divided by 8, divided by 2
+			m_gime_clock_timer->adjust(m_long_timer_source * m_timer_value);
 		}
 	}
 	else
