@@ -311,7 +311,7 @@ int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cli
 		drawbuf = m_fbi.m_backbuf;
 
 	// copy from the current front buffer
-	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", m_screen->vpos(), m_fbi.m_rgboffs[m_fbi.m_frontbuf]);
+	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_fbi.m_rgboffs[m_fbi.m_frontbuf]);
 	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
 		m_fbi.copy_scanline(&bitmap.pix(y), drawbuf, y, cliprect.min_x, cliprect.max_x + 1, pens);
 
@@ -725,10 +725,10 @@ void voodoo_device_base::update_statistics(bool accumulate)
 
 void voodoo_device_base::swap_buffers()
 {
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", m_screen->vpos());
+	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", screen().vpos());
 
 	/* force a partial update */
-	m_screen->update_partial(m_screen->vpos());
+	screen().update_partial(screen().vpos());
 	m_fbi.m_video_changed = true;
 
 	/* keep a history of swap intervals */
@@ -780,7 +780,7 @@ void voodoo_device_base::swap_buffers()
 	/* update the statistics (debug) */
 	if (DEBUG_STATS && m_stats.display)
 	{
-		const rectangle &visible_area = m_screen->visible_area();
+		const rectangle &visible_area = screen().visible_area();
 		int screen_area = visible_area.width() * visible_area.height();
 		char *statsptr = m_stats.buffer;
 		int pixelcount;
@@ -837,11 +837,11 @@ void voodoo_device_base::swap_buffers()
 
 void voodoo_device_base::adjust_vblank_timer()
 {
-	attotime vblank_period = m_screen->time_until_pos(m_fbi.m_vsyncstart);
+	attotime vblank_period = screen().time_until_pos(m_fbi.m_vsyncstart);
 	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
-		vblank_period = m_screen->frame_period();
+		vblank_period = screen().frame_period();
 	m_vsync_start_timer->adjust(vblank_period);
 }
 
@@ -899,7 +899,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_callback )
 		swap_buffers();
 
 	/* set a timer for the next off state */
-	m_vsync_stop_timer->adjust(m_screen->time_until_pos(m_fbi.m_vsyncstop));
+	m_vsync_stop_timer->adjust(screen().time_until_pos(m_fbi.m_vsyncstop));
 
 	/* set internal state and call the client */
 	m_fbi.m_vblank = true;
@@ -2324,7 +2324,7 @@ s32 voodoo_device_base::register_w(offs_t offset, u32 data)
 			{
 				m_renderer->wait(m_reg.name(regnum));
 				m_reg.write(regnum, data);
-				m_fbi.recompute_screen_params(m_reg, *m_screen);
+				m_fbi.recompute_screen_params(m_reg, screen());
 				adjust_vblank_timer();
 			}
 			break;
@@ -3497,7 +3497,7 @@ u32 voodoo_device_base::register_r(offs_t offset)
 			}
 			else {
 				// Want screen position from vblank off
-				result = m_screen->vpos();
+				result = screen().vpos();
 			}
 			break;
 
@@ -3513,10 +3513,10 @@ u32 voodoo_device_base::register_r(offs_t offset)
 			}
 			else {
 				// Want screen position from vblank off
-				result = m_screen->vpos();
+				result = screen().vpos();
 			}
 			// Hpos
-			result |= m_screen->hpos() << 16;
+			result |= screen().hpos() << 16;
 			break;
 
 		/* cmdFifo -- Voodoo2 only */
@@ -4092,12 +4092,12 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 
 voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
 	m_model(model),
 	m_chipmask(0),
 	m_fbmem_in_mb(0),
 	m_tmumem0_in_mb(0),
 	m_tmumem1_in_mb(0),
-	m_screen(*this, finder_base::DUMMY_TAG),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_vblank_cb(*this),
 	m_stall_cb(*this),

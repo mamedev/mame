@@ -985,7 +985,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
-				m_screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+				screen().configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
 				// Set the vsync start and stop
 				m_fbi.m_vsyncstart = vstart;
