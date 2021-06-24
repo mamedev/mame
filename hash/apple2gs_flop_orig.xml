@@ -3041,4 +3041,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pipedrm">
+		<description>Pipe Dream</description>
+		<year>1990</year>
+		<publisher>Lucasfilm</publisher>
+		<info name="release" value="2021-06-22"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Pipe Dream" is a 1990 board game developed by Visual Concepts and distributed by Lucasfilm Games. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296163">
+				<rom name="pipe dream iigs.woz" size="1296163" crc="d77ebd90" sha1="8d02426c2e3418d5162382ff9040de2523b81915"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="showoff">
+		<description>ShowOff (Version 1.1)</description>
+		<year>1987</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-22"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"ShowOff" is a 1987 graphics program developed by Serge Hervy and Jean-Claude Lévy, and distributed by Broderbund Software. This is version 1.1. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="1296706">
+				<rom name="showoff iigs - disk 1 - program.woz" size="1296706" crc="bfb15e70" sha1="99bda5575d3865d8ccda8e82c3d5f8a6fe3e6e02"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Slide show disk"/>
+			<dataarea name="flop" size="1296215">
+				<rom name="showoff iigs - disk 2 - slide show.woz" size="1296215" crc="ea8b58f6" sha1="5ac168d50f82fab9a9d859864a595cd9a0190b1f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Graphics collection - world events"/>
+			<dataarea name="flop" size="1296238">
+				<rom name="showoff iigs - disk 3 - graphics collection- world events.woz" size="1296238" crc="9552e081" sha1="1166cbf373d52be3e62c167c5261973aba3a3e65"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
