@@ -124,7 +124,7 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 		}
 		else
 		{
-			iu = (tex_base_x + (((int)u >> 4) & 0x3f)) & 0x7ff;
+			iu = (tex_base_x + (((int)u >> 4) & ((0x08 << tex_wrap_x) - 1))) & 0x7ff;
 		}
 
 		if (!tex_wrap_y)
@@ -133,7 +133,7 @@ void tc0780fpa_renderer::render_texture_scan(int32_t scanline, const extent_t &e
 		}
 		else
 		{
-			iv = (tex_base_y + (((int)v >> 4) & 0x3f)) & 0x7ff;
+			iv = (tex_base_y + (((int)v >> 4) & ((0x08 << tex_wrap_y) - 1))) & 0x7ff;
 		}
 
 		texel = m_texture[(iv * 2048) + iu];
@@ -260,8 +260,8 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+			extra.tex_wrap_x = (cmd >> 6) & 3;
+			extra.tex_wrap_y = (cmd >> 4) & 3;
 
 			for (i=0; i < 3; i++)
 			{
@@ -362,8 +362,8 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 			extra.tex_base_x = ((texbase >> 0) & 0xff) << 4;
 			extra.tex_base_y = ((texbase >> 8) & 0xff) << 4;
 
-			extra.tex_wrap_x = (cmd & 0xc0) ? 1 : 0;
-			extra.tex_wrap_y = (cmd & 0x30) ? 1 : 0;
+			extra.tex_wrap_x = (cmd >> 6) & 3;
+			extra.tex_wrap_y = (cmd >> 4) & 3;
 
 			for (i=0; i < 4; i++)
 			{
@@ -375,7 +375,7 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 				vert[i].p[0] = (uint16_t)(polygon_fifo[ptr++]);
 			}
 
-			if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
+			if (vert[0].p[0] < 0xc000 && vert[1].p[0] < 0xc000 && vert[2].p[0] < 0xc000 && vert[3].p[0] < 0xc000)
 			{
 				render_polygon<4>(m_cliprect, render_delegate(&tc0780fpa_renderer::render_texture_scan, this), 4, vert);
 			}
