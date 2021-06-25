@@ -133,7 +133,6 @@ Dynamic English 3C Pack                                       DynEd Japan       
 E to Oto ga Deru Ongaku Yougo Jiten                           Rittor Music                      1992/4     SET(CD+FD)
 Ed Bogas' Music Machine (Marty-compatible)                    Fujitsu                           1994/4     CD
 Ehon Writer Pro                                               Fujitsu                           1995/5     CD
-Ehon Writer V1.1                                              Fujitsu                           1993/12    CD
 Ei-Doku-Nichi Saishin Kagaku Gijutsu Yougo Jiten              Sanshusha                         1990/2     CD
 Ei-Futsu-Doku-Nichi 4-kagokugo Jiten                          Sanshusha                         1990/2     CD
 Eigo de Eigo ni Tsuyoku Naru 1                                Infortech                         1990/4     CD
@@ -156,7 +155,6 @@ Fancy Illust: Hattori Yuki no Wakuwaku Cut-shuu               CSK Research Insti
 F-BASIC Compiler V1.1                                         Fujitsu                           1990/12    CD
 FIRSTHAND ACCESS(Disc1)                                       DynEd Japan                       1994/11    SET(CD+FD)
 FIRSTHAND ACCESS(Disc2)                                       DynEd Japan                       1994/11    SET(CD+FD)
-FlexData Collection Vol. 1                                    Fujitsu                           1993/11    CD
 FM Towns Appli Jikkou Set                                     Fujitsu                           1993/6     CD
 FM Towns de Manabu School-Ace Alpha                           Fujitsu                           1993/4     CD
 FM Towns Free Ware Collection (EYE COM-ban)                   Fujitsu                           1989/11    CD
@@ -384,9 +382,7 @@ O Hoshi Senjutsu Daireigen                                    Victor Entertainme
 Orient Express                                                Gyousei                           1994/12    CD
 Oryx Blue Wave: Eikou e no Kiseki                             Data West                         1995/10    SET(CD+FD)
 Otto Anime-kun                                                Nihon Micom Hanbai                1990/3     CD
-Pasocon de Tanoshimu Yama to Chizu                            Inter Limited Logic               1995/10    CD
 Petit Collage                                                 Pandora Box                       1994/3     CD
-* Planet Harmony                                              Datt Japan                        1993/9     SET(CD+FD)
 Pocky 1-2 & Ponyon                                            Ponytail Soft                     1994/6     CD
 Powers of Ten                                                 Datt Japan                        1995/10    CD
 Present                                                       Orange House                      1991/6     ?
@@ -433,10 +429,6 @@ Shadow of the Beast: Mashou no Okite (1991-10-11)             Victor Entertainme
 Shakaika Database: Nihon no Bunka / Sangyou / Shizen          Nihon Kyouiku System              1991/12    CD
 Shanghai: Banri no Choujou                                    Electronic Arts Victor            1995/9     CD
 Shijou Saikyou no Video Bible                                 System Sacom                      1989/12    CD
-Shiki wo Irodoru Nihon no Shouka: Aki-hen                     Toshiba EMI                       1991/10    CD
-Shiki wo Irodoru Nihon no Shouka: Fuyu-hen                    Toshiba EMI                       1991/10    CD
-Shiki wo Irodoru Nihon no Shouka: Haru-hen                    Toshiba EMI                       1991/4     CD
-Shiki wo Irodoru Nihon no Shouka: Natsu-hen                   Toshiba EMI                       1991/4     CD
 Shin Eiwa / Waei Chuujiten                                    Fujitsu                           1993/11    CD
 Shoubunsha Area Guide: 74 Zenkoku Pension Guide               Com Staff                         1989/12    CD
 Shougakkou 4-nen Kyouzai Set                                  Uchida Youkou                     1993/5     CD
@@ -467,11 +459,9 @@ Super Kakitaoshi                                              Nikkonren Kikaku  
 Super Zurukamashi                                             Nikkonren Kikaku                  1993/?     SET(CD+FD)
 Taiken Shiyou! Marty Channel 2                                Fujitsu                           1993/6     CD×02
 Takken Ou                                                     Techno Business                   1994/10    CD
-Tamashii no Mon: Dante "Shinkyoku" yori                       Koei                              1993/6     SET(CD+FD)
 Tankyuu-kun                                                   Fujitsu                           1996/11    CD
 Tanoshii Sansuu Set 1-2-nen                                   Dainippon Tosho                   1994/3     SET(CD+FD)
 Teata -vision- (V1.0-1.3)                                     Nanken Koubou                     1995/6     SET(CD+FD)
-Tender Light Vol. 1                                           Fujitsu                           1994/3     CD
 Tensai Kyuutei Ongaku no Kanade                               Fujitsu                           1992/12    CD
 Tenshi-tachi no Gogo 3: Bangai-hen Hanseiban                  JAST                              1993/3     ?
 Tenshi-tachi no Gogo Collection 2                             JAST                              1995/11    CD
@@ -480,7 +470,6 @@ Tenshi-tachi no Gogo: Tenkousei                               JAST              
 Teo: Mou Hitotsu no Chikyuu                                   Fujitsu Parex                     1995/9     SET(CD+FD)
 Teo: Mou Hitotsu no Chikyuu Ver. 2                            Fujitsu Parex                     1996/7     CD
 Tera Towns 2                                                  Nihon Micom Hanbai                1993/4     CD
-* The 4th Unit Series: Wyatt (Demo-you Disc) [DWFT2901]       Data West                         1992/?     SET(CD+FD)
 The Book of MIDI                                              Fujitsu                           1992/9     CD
 The Lost Secret                                               DynEd Japan                       1993/7     SET(CD+FD)
 The Manhole 2                                                 Sun Denshi                        1993/5     ?
@@ -633,24 +622,6 @@ User/save disks that can be created from the game itself are not included.
 			<feature name="part_id" value="LaserDoc Ver. 1.0 - Linux Document CD" />
 			<diskarea name="cdrom">
 				<disk name="debian-gnu-linux-2.0r2-with-hamm-jp-laserdoc-1.0.laser5" sha1="c666d3be1ebb283d5646f4e14659679264390aa8" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="gnutowns">
-		<!--
-		 Origin: Neo Kobe Collection
-		 <rom name="[OS] GNU for Towns Release 2.ccd" size="960" crc="7f29e47b" sha1="3ce894acb64c62a3168f89fe45f8534eb3c2fed3"/>
-		 <rom name="[OS] GNU for Towns Release 2.cue" size="131" crc="151e64da" sha1="f7a346b0b46235cd7c747dff65fd8cd9fb3bb653"/>
-		 <rom name="[OS] GNU for Towns Release 2.img" size="470106000" crc="9beda416" sha1="a3458a0d05379789605d67478ed5a0b781c98608"/>
-		 <rom name="[OS] GNU for Towns Release 2.sub" size="19188000" crc="ca4100f7" sha1="865d399ce89aac843219d272ce094d9654265862"/>
-		 -->
-		<description>GNU for Towns Release 2</description>
-		<year>1991</year>
-		<publisher>FM Users Group</publisher>
-		<part name="cdrom" interface="fmt_cdrom">
-			<diskarea name="cdrom">
-				<disk name="[os] gnu for towns release 2" sha1="88cd789cc6b608c554b9421488e2baf4e986385c" />
 			</diskarea>
 		</part>
 	</software>
@@ -1378,10 +1349,9 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
-	<software name="wyattd" supported="no">
+	<software name="wyattd">
 		<!--
-		Origin: redump.org
+		Origin: redump.org (CD) / tenyuhuang (floppy)
 		<rom name="4th Unit Series, The - Wyatt (Japan) (Demo).bin" size="20067264" crc="da15d99e" sha1="cea77c59a8b3d3a994b6ce3a16b60ab2f6d7ee80"/>
 		<rom name="4th Unit Series, The - Wyatt (Japan) (Demo).cue" size="109" crc="0053dd38" sha1="a807e23c06be4fdcb4427903309b2d1831918a94"/>
 		-->
@@ -1389,6 +1359,11 @@ User/save disks that can be created from the game itself are not included.
 		<year>1992</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="serial" value="DWFT 2901"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="wyatt_demo.hdm" size="1261568" crc="2e4a5209" sha1="3179cd145554e0b61a3fabc16ff57b1d4bd8f619" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="4th unit series, the - wyatt (japan) (demo)" sha1="11f520ed69649e58f78124e7af8f9b5dc5243d81" />
@@ -1656,8 +1631,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="aburner" supported="partial">
+	<software name="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Rev 1) (Track 1).bin" size="6985440" crc="e43d4e88" sha1="fcfba206bc0996baae9de2c3781124399824bbf5"/>
@@ -1683,7 +1657,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburnera" cloneof="aburner" supported="partial">
+	<software name="aburnera" cloneof="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Rev 1) (Alt) (Track 1).bin" size="6985440" crc="e43d4e88" sha1="fcfba206bc0996baae9de2c3781124399824bbf5"/>
@@ -1709,7 +1683,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="aburnero" cloneof="aburner" supported="partial">
+	<software name="aburnero" cloneof="aburner">
 		<!--
 		Origin: redump.org
 		<rom name="After Burner (Japan) (Track 1).bin" size="7126560" crc="789fc2c6" sha1="0604f645a7777df34006b93baa1c2f68d3379dad"/>
@@ -2448,11 +2422,21 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="genchohi">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.ccd" size="3055" crc="478bb01c" sha1="0d21688a825b1382c79a204d89b4cd5e25c59dfd"/>
-		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.cue" size="581" crc="423ffe1c" sha1="ba96220a93040f96dc7a3e0d30f2a208370fe388"/>
-		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.img" size="530387760" crc="18044a4e" sha1="c42c5bf43c64025e801046b847ae65f39ac592a6"/>
-		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi.sub" size="21648480" crc="fa1cd6bf" sha1="93857a5c366722623dedf0e29d9a31fc6426ee6a"/>
+		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 01).bin" size="10231200" crc="a1acf445" sha1="0d39d0d10c90a5155ba0344a76d77856a3a537b2"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 02).bin" size="56499744" crc="2301251e" sha1="4ad4598956cadcd940f716d54783dd249986ca5f"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 03).bin" size="49457856" crc="334132e2" sha1="32fa7dd48869c6ddc978f2ad1568c9abf7921214"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 04).bin" size="42218400" crc="96bea4eb" sha1="8f67ca74fb392368f49eeb46f1e754d23f9b6ab0"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 05).bin" size="43464960" crc="65ce5b02" sha1="3c3c621cba41d37f55e179ce366d030dfee067f8"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 06).bin" size="47804400" crc="fa64d7ab" sha1="8bb9ae43bef1548b77acaee7158de35efb255a06"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 07).bin" size="37232160" crc="a06380f5" sha1="d8579d76b8543e1efcb0088f146f6242da79d57e"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 08).bin" size="42505344" crc="612eaaa7" sha1="0c26da534e2b1be2c221a38c9a81ce95ba7baa50"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 09).bin" size="49109760" crc="3e6ac68d" sha1="fc79134a2fbd47042d96c8f94a1dcc9554b96bd6"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 10).bin" size="36832320" crc="a6e38326" sha1="c1b38b2dbfd3f209c59a6afdacccd13135e0e69a"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 11).bin" size="16953216" crc="ae436680" sha1="9de847e3e1b2247ca5bc88b468a6b3604c5a3877"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 12).bin" size="66507504" crc="c98406f3" sha1="b0ee268f359c9f7881d1c6e93ce77f0ef45c3952"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan) (Track 13).bin" size="31570896" crc="2bab4216" sha1="db856cc253f056ba14e7f6c4ebc68e9ae864e8fb"/>
+		<rom name="Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan).cue" size="1791" crc="8f815749" sha1="6727e15164a1faff425257bcbb289e32a706e14e"/>
 		-->
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>1993</year>
@@ -2461,9 +2445,14 @@ User/save disks that can be created from the game itself are not included.
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
 		<info name="release" value="199302xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="aoki ookami to shiroki mejika - genchou hishi (system disk).hdm" size="1261568" crc="fd062028" sha1="8153620634e8ae88ca07394c74bafc5f44729e68" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="aoki ookami to shiroki mejika - genchou hishi" sha1="45b8790a77cb77632f067f366cc055e830eddae8" />
+				<disk name="aoki ookami to shiroki mejika - genchou hishi (japan)" sha1="e683318c867c41c26d1fd7ea498ab9668045fd01" />
 			</diskarea>
 		</part>
 	</software>
@@ -2523,8 +2512,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="asu120ex" supported="partial">
+	<software name="asu120ex">
 		<!--
 		Origin: redump.org
 		<rom name="Asuka 120% Excellent - Burning Fest. Excellent (Japan) (Track 01).bin" size="11830560" crc="2d5ade87" sha1="99314bca20b659f8fa0491db172a3a5a69dcda91"/>
@@ -2552,7 +2540,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="MTC-1114"/>
 		<info name="alt_title" value="あすか 120% BURNING Fest. エクセレント" />
 		<info name="release" value="199412xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1261568">
@@ -3809,20 +3797,20 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="caltiny">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Tiny Steps - Cal Gaiden.ccd" size="955" crc="eaba5e61" sha1="3ae82d1e729b7c0178e2dffca1b57658a02903ad"/>
-		<rom name="Tiny Steps - Cal Gaiden.cue" size="126" crc="24f6df45" sha1="1a7f8ea86c1b4071143d9b6e8af12cae59e89e3f"/>
-		<rom name="Tiny Steps - Cal Gaiden.img" size="194929056" crc="6f8b3267" sha1="6140d4655dc29b0631dd9afc37e798971e2e0cb3"/>
-		<rom name="Tiny Steps - Cal Gaiden.sub" size="7956288" crc="b09a6744" sha1="f41121849b37ba69ee8dafc2996ae1142c9d7cf1"/>
+		Origin: redump.org
+		<rom name="CAL Gaiden - Tiny Step - Tiny Steps Behind the CAL (Japan) (Track 1).bin" size="7239456" crc="1906ed83" sha1="6666bf77a5e6cf1eb64f382fb59ebc674e8c8a49"/>
+		<rom name="CAL Gaiden - Tiny Step - Tiny Steps Behind the CAL (Japan) (Track 2).bin" size="187689600" crc="a5a779dd" sha1="d82db3e58961c8ff152e6c4fce0b57ec1e79e543"/>
+		<rom name="CAL Gaiden - Tiny Step - Tiny Steps Behind the CAL (Japan).cue" size="309" crc="058f93e1" sha1="6fa6c31722cbbf1dc3750ac0e2fcbcf8857414ee"/>
 		-->
 		<description>Cal Gaiden - Tiny Steps Behind the Cal</description>
 		<year>1993</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
+		<info name="serial" value="MTC-1063"/>
 		<info name="alt_title" value="タイニィステップ CAL外伝" />
 		<info name="release" value="199307xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="tiny steps - cal gaiden" sha1="d4e6dfbb519a2890187b89a685fcc5abbd05e709" />
+				<disk name="cal gaiden - tiny step - tiny steps behind the cal (japan)" sha1="166c9dbf4d56ae2d93b04421a002f10933f46223" />
 			</diskarea>
 		</part>
 	</software>
@@ -4874,6 +4862,45 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="dangel (japan)" sha1="ff4ddc6fbc13d3c4b28d2a0cc738c7b674ca3d5c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dante">
+		<!--
+		Origin: redump.org (CD) / CoolFox (floppy)
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 01).bin" size="10231200" crc="48001e73" sha1="d5c3f2f18699bdcbec52f26ac97ea755d7806ab3"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 02).bin" size="58588320" crc="f612f905" sha1="b13b1314e8887e46b1d5004e5c731338266448af"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 03).bin" size="46781280" crc="64fbd1c4" sha1="eb4dcb583d44b4d8beb06b65bf085e4990b31315"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 04).bin" size="62709024" crc="807ade3c" sha1="e8a1bd0c2558a8e59a8b993b6ba4ed07f8f28acd"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 05).bin" size="46981200" crc="ef792628" sha1="82aa3cc2987a770585e6ba50598590b7afdd86b1"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 06).bin" size="40278000" crc="dad4bfbb" sha1="c73168e0f378f0f58469b11a1fb2fd2961154901"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 07).bin" size="48587616" crc="76cfac8a" sha1="3c71437f9692ef63eab068afd1a650046896cf0c"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 08).bin" size="32939760" crc="97f8762d" sha1="fa523ff5d74154b64fc40c8f4cdb5f98b17eaac7"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 09).bin" size="35590464" crc="677825ac" sha1="38fb3256bb015c9b694d3d6e3343107bf30d90a5"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 10).bin" size="38996160" crc="e32a128c" sha1="80abab32deb2a7c957e6d3aefe8ccdd47831c436"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 11).bin" size="77176176" crc="167286ad" sha1="f051bc25f186e62dd5a7d6ab78dc1ea2c3984601"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 12).bin" size="59446800" crc="b51f4986" sha1="13ef51a332fc28d25ef9d5c1f90c6a4b9c5abf69"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 13).bin" size="20796384" crc="db405365" sha1="b3b065b8526e7db877bdda3533be52b72ffaf5d0"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 14).bin" size="74741856" crc="142ba8f3" sha1="e3ebb2ea35df83caa8a802ed0aae6665a2246d19"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan) (Track 15).bin" size="37796640" crc="ceb39975" sha1="82e4e09a96d45eb5a14a1117edac1d1640f96461"/>
+		<rom name="Tamashii no Mon - Dante Shinkyoku yori (Japan).cue" size="1982" crc="993b72dd" sha1="752a3dd25f30392f5f27606a7d887d86eefead1b"/>
+		-->
+		<description>Tamashii no Mon - Dante "Shinkyoku" yori</description>
+		<year>1993</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="serial" value="HMD-159"/>
+		<info name="alt_title" value="魂の門　～ダンテ「神曲」より～" />
+		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="tamashii_no_mon.hdm" size="1261568" crc="a80ca050" sha1="9c99bac43cc237f7b8845676104b08fdf2fcd7d3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tamashii no mon - dante shinkyoku yori (japan)" sha1="b5bd130adc1bde19a8da86c0b87c75c0f79b4226" />
 			</diskarea>
 		</part>
 	</software>
@@ -6080,10 +6107,29 @@ User/save disks that can be created from the game itself are not included.
 	<software name="ehonwrit1110" cloneof="ehonwrit">
 		<!--
 		Origin: redump.org
+		<rom name="Ehon Writer V1.1 L10 (Japan).bin" size="73735200" crc="6f6e31d6" sha1="9b25cc0f3b3757ecb304315e65bdcbb7a4201e51"/>
+		<rom name="Ehon Writer V1.1 L10 (Japan).cue" size="117" crc="acfc71c9" sha1="fb4d83773c2875718ed6dc9a5e7cc6999143ac69"/>
+		-->
+		<description>Ehon Writer V1.1 L10 (FMB-3011)</description>
+		<year>1994</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="A276CF90 / FMB-3011"/>
+		<info name="alt_title" value="えほんらいたー" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ehon writer v1.1 l10 (japan)" sha1="7e50b2620a90528e3b9ccd24f79536ec11dcf4f7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ehonwrit1110a" cloneof="ehonwrit">
+		<!--
+		Origin: redump.org
 		<rom name="Ehon Writer V1.1 L10 (Japan) (Rev A).bin" size="66679200" crc="136dc616" sha1="81cbbbe8dedeb021964de6d6c65ab1a5e4f2fd2e"/>
 		<rom name="Ehon Writer V1.1 L10 (Japan) (Rev A).cue" size="125" crc="6e9efc03" sha1="dc59d77aeebaff1dc98ffc128b5c5b0eb92c7e0e"/>
 		-->
-		<description>Ehon Writer V1.1 L10</description>
+		<description>Ehon Writer V1.1 L10 (FMB-3011A)</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="A276CF90 / FMB-3011A"/>
@@ -6981,8 +7027,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="excel10" supported="partial">
+	<software name="excel10">
 		<!--
 		Origin: redump.org
 		<rom name="Excellent 10 (Japan) (Track 01).bin" size="29639904" crc="9a05c578" sha1="3d79f05f83d2b259e7dcb79ecd08f7578c3f97cc"/>
@@ -7444,6 +7489,26 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="flexdata">
+		<!--
+		 Origin: redump.org
+		<rom name="FM Towns FlexData Collection Vol. 1 - E to Oto no 365-nichi (Japan).bin" size="89611200" crc="8401630a" sha1="76441ab2d5d619b6f459501d4f1db7adc6278e11"/>
+		<rom name="FM Towns FlexData Collection Vol. 1 - E to Oto no 365-nichi (Japan).cue" size="133" crc="6d0a50eb" sha1="7f85003afea5880835b2396dfecf5c29807e90ff"/>
+		 -->
+		<description>FM Towns FlexData Collection Vol. 1 - E to Oto no 365-nichi</description>
+		<year>1993</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="HME-222 / B276F0G1 / FMB-3009"/>
+		<info name="alt_title" value="絵と音の３６５日" />
+		<info name="release" value="199311xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fm towns flexdata collection vol. 1 - e to oto no 365-nichi (japan)" sha1="898454b9ab54bdaa8fff9b3d93fa8e81a555c4b7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="fmtappc">
 		<!--
 		Origin: redump.org
@@ -7662,13 +7727,12 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="freewill">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Free Will - Knight of Argent.ccd" size="953" crc="35eca1f9" sha1="a678eef186119d802b8f6859e4b5c176e8dbf0b7"/>
-		<rom name="Free Will - Knight of Argent.cue" size="131" crc="03587dfa" sha1="cb626893a454ff9fcb2470b03a5c2cea8130c313"/>
-		<rom name="Free Will - Knight of Argent.img" size="30164400" crc="09637f47" sha1="7314175f7d33ce88ccad87945f32122a5512206f"/>
-		<rom name="Free Will - Knight of Argent.sub" size="1231200" crc="decf56f2" sha1="b4460ee2c0b9b9d14a7fac384ce1ceadf7ce4298"/>
+		Origin: redump.org
+		<rom name="Free Will - Knight of Argent (Japan) (Track 1).bin" size="10231200" crc="2307b963" sha1="d0b1f49935eb53edad16c6b4a07ad85c880ec8d0"/>
+		<rom name="Free Will - Knight of Argent (Japan) (Track 2).bin" size="19933200" crc="5260ca49" sha1="f9aacb9de2a66601a1da3e6239c8bf85f46b2ad4"/>
+		<rom name="Free Will - Knight of Argent (Japan).cue" size="265" crc="85ef4bd8" sha1="bfcc6758863ee105cd058fa12bf486f84cdb1612"/>
 		-->
-		<description>Free Will: Knight of Argent</description>
+		<description>Free Will - Knight of Argent</description>
 		<year>1992</year>
 		<publisher>ソフコム (Sofcom)</publisher>
 		<info name="serial" value="HMD-185"/>
@@ -7676,13 +7740,12 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="free will - knight of argent" sha1="ad5646cf46d8b0243220dd783e96f556e9a85467" />
+				<disk name="free will - knight of argent (japan)" sha1="b9244d898c5898c843b7a990e60b7e118939bc1b" />
 			</diskarea>
 		</part>
 	</software>
 
-	<!-- Severe graphics issues -->
-	<software name="frogfstd" supported="no">
+	<software name="frogfstd">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Frog Feast Demo.iso" size="952320" crc="ed3e8b42" sha1="82b60aefb5061bc7d1761183fe77548d1a23b4a3"/>
@@ -8708,6 +8771,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="gnutowns">
+		<!--
+		 Origin: redump.org
+		<rom name="GNU for Towns Rel. 2 (Japan) (Track 1).bin" size="454759200" crc="a955c873" sha1="083ab50e6d107996ad6a685072d3d25fbd1b81a8"/>
+		<rom name="GNU for Towns Rel. 2 (Japan) (Track 2).bin" size="15346800" crc="e330bfd4" sha1="e02388253bde95e363cc8b855df2f710d2c73598"/>
+		<rom name="GNU for Towns Rel. 2 (Japan).cue" size="226" crc="9a8e96b3" sha1="934c6d1e8b36f0be8c1f74afba5fc639686cbdbe"/>
+		 -->
+		<description>GNU for Towns Release 2</description>
+		<year>1991</year>
+		<publisher>FM Users Group</publisher>
+		<info name="serial" value="HMC-117"/>
+		<info name="release" value="199104xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="gnu for towns rel. 2 (japan)" sha1="cd22ccaa7d4b6da00c2289f7bb70fbcd78aa5f3c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gokinyu">
 		<!--
 		Origin: redump.org
@@ -9148,8 +9230,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="gunship" supported="partial">
+	<software name="gunship">
 		<!--
 		Origin: redump.org
 		<rom name="Gunship - The Helicopter Simulation (Japan) (Track 1).bin" size="20815200" crc="11dc9417" sha1="7431efb87370ecbc9e253d2610151ff78367a0d5"/>
@@ -11841,21 +11922,20 @@ User/save disks that can be created from the game itself are not included.
 	<!-- Windows / Mac / FM Towns hybrid -->
 	<software name="kjmarian">
 		<!--
-		Origin: private dump (rockleevk)
-		<rom name="IMAGE.CCD" size="777" crc="f5e8d4dc" sha1="aaecd6eabc9b1bf0c95e8e2b005fc58ccf8253c4"/>
-		<rom name="IMAGE.cue" size="69" crc="02599f28" sha1="152366092283279915a12175200e2a1e2bdd5f55"/>
-		<rom name="IMAGE.img" size="151494672" crc="787bd2eb" sha1="5002a837851725fbe6f1cce0b66dddccd8c3a0e9"/>
-		<rom name="IMAGE.sub" size="6183456" crc="9dc484ad" sha1="66aa398af49f199e45ba5a220d548090dc390c68"/>
+		Origin: redump.org
+		<rom name="Kikai Jikake no Marian (Japan).bin" size="151494672" crc="787bd2eb" sha1="5002a837851725fbe6f1cce0b66dddccd8c3a0e9"/>
+		<rom name="Kikai Jikake no Marian (Japan).cue" size="119" crc="ad7a442d" sha1="4583de1bfc29313f17015027e92fcb9e0f8938c4"/>
 		-->
 		<description>Kikai Jikake no Marian</description>
 		<year>1994</year>
 		<publisher>ジャニス (Janis)</publisher>
+		<info name="serial" value="JAN-048-TR"/>
 		<info name="alt_title" value="機械じかけのマリアン" />
 		<info name="release" value="199408xx" />
 		<info name="usage" value="Requires 8 MB RAM and TownsOS V2.1 L40 or later"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="kjmarian" sha1="3cd9d330f7e32a53b5a65d85a7cbbd573763b84f" />
+				<disk name="kikai jikake no marian (japan)" sha1="3cd9d330f7e32a53b5a65d85a7cbbd573763b84f" />
 			</diskarea>
 		</part>
 	</software>
@@ -12435,13 +12515,9 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="landlore">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Lands of Lore.mdf" size="21664800" crc="0077471e" sha1="3a91b542d84a5a499db3cb9465937f66f7082922"/>
-		<rom name="Lands of Lore.mds" size="500" crc="035354ef" sha1="ac84f5f76553316178991132d07f0d0086245109"/>
-
-		*after conversion with IsoBuster+EAC *
-		<rom name="lands of lore.bin" size="20815200" crc="84903d38" sha1="b90ab7dfbe70a07276569aee59c5d64e8b2d5546"/>
-		<rom name="lands of lore.cue" size="74" crc="95020903" sha1="994125d8e7d1be1ebe0728e1bdb4258f648ef50a"/>
+		Origin: redump.org
+		<rom name="Lands of Lore - The Throne of Chaos (Japan).bin" size="20815200" crc="84903d38" sha1="b90ab7dfbe70a07276569aee59c5d64e8b2d5546"/>
+		<rom name="Lands of Lore - The Throne of Chaos (Japan).cue" size="109" crc="2b10edb3" sha1="d0f207a5251b341fbc800b06c381a23fbeea64b9"/>
 		-->
 		<description>Lands of Lore - The Throne of Chaos</description>
 		<year>1995</year>
@@ -12450,9 +12526,16 @@ User/save disks that can be created from the game itself are not included.
 		<info name="alt_title" value="ランズ オブ ロア" />
 		<info name="release" value="199501xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- This disk is included with the CD and contains pre-made saves at the start of the game, but it can also work with any blank disk -->
+			<feature name="part_id" value="Blank Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="lands_of_lore.hdm" size="1261568" crc="eaf15ec6" sha1="6a00499b09999b878c89a3db9ab27ee54ca2b11c" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="lands of lore" sha1="849e7ec5c5844ec8b774328513b6c6b5d52106e0" />
+				<disk name="lands of lore - the throne of chaos (japan)" sha1="c87c0a4f748cbc17f8cf62a332027d549ec3fce9" />
 			</diskarea>
 		</part>
 	</software>
@@ -12859,8 +12942,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Runs too fast? -->
-	<software name="lastsurv" supported="partial">
+	<software name="lastsurv">
 		<!--
 		Origin: redump.org
 		<rom name="Last Survivor (Japan) (Track 1).bin" size="13759200" crc="8655d470" sha1="e57e9280e729ae54ffda5bbe0b87879b45907d81"/>
@@ -13663,8 +13745,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="madstalk" supported="no">
+	<software name="madstalk">
 		<!--
 		Origin: redump.org
 		<rom name="Mad Stalker - FullMetalForce (Japan) (Track 01).bin" size="6091680" crc="48fa8e70" sha1="52285cb2a977e67a540f75585d0887c50b633dc6"/>
@@ -13689,6 +13770,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="MTC-1092"/>
 		<info name="alt_title" value="マッドストーカー" />
 		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="mad stalker - fullmetalforce (Japan)" sha1="8132a52178a6c5c692a34cde37d6863b75e4e671" />
@@ -15232,8 +15314,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Fails to play the intro, otherwise works -->
-	<software name="mspectre" supported="partial">
+	<software name="mspectre">
 		<!--
 		Origin: redump.org
 		<rom name="Megaspectre (Japan) (Track 1).bin" size="20462400" crc="7090f37e" sha1="8287b38c8908b10d4b26bd35d05a80fe047b379b"/>
@@ -16110,65 +16191,65 @@ User/save disks that can be created from the game itself are not included.
 	<software name="nhorz2e1">
 		<!--
 		Origin: redump.org
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 01).bin" size="10231200" crc="d0a86335" sha1="b3d4d2db57fb81bfb111bdfb3218b0137e4a9282"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 02).bin" size="5755344" crc="23be5ea1" sha1="3bdb5b884acd3234f815a0c8cf50e89be18afe6b"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 03).bin" size="8932896" crc="62df43f9" sha1="b874a4c95f0d3889541bba120fe6ef598d659aee"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 04).bin" size="8448384" crc="fd1b52a6" sha1="33318d6863a8350a9db4876e27c4a7c8f3398bac"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 05).bin" size="15024576" crc="5f2d38b3" sha1="9b977c4916d95a5b4d781128c7678891095ba76b"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 06).bin" size="14182560" crc="f2108ee6" sha1="4d7aea90b0c2e0fab013b4634ad114eec5923cd9"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 07).bin" size="16010064" crc="c616ac9f" sha1="4d3f01486c1614d7ac33e5afb0d706720a1ba0be"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 08).bin" size="11407200" crc="3904c083" sha1="a56c94e10a780496c2d7d7cf450d0a7e7e39a15d"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 09).bin" size="9897216" crc="d47c8f34" sha1="e0cae58bed291c4c1ca3d143749490c37a01b9ed"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 10).bin" size="16057104" crc="a9c9b227" sha1="2b5e4d5d953cd831a41ba7574384e70471e6976f"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 11).bin" size="10544016" crc="b1dedaf7" sha1="d99807cdde7facafa891f622deacc79141400ae9"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 12).bin" size="12482064" crc="b8f856ac" sha1="3c4b6f66b0528d1bf72529c7f75932e10cb8707b"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 13).bin" size="15429120" crc="c232a3ac" sha1="27cdf05f51fbb05a0cd11073ab34f1abb0174c22"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 14).bin" size="5546016" crc="b30c1f27" sha1="5d7f8c1682ee41cc0b718bd4a6e9997b006544d0"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 15).bin" size="17298960" crc="1b87a1bb" sha1="49ae87554abfe5d776f6305c13023059aee714a2"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 16).bin" size="21384384" crc="a4eaf9ed" sha1="1440054d6e56f96cc0ba64f04526821bcf4d3367"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 17).bin" size="14801136" crc="3b66fa82" sha1="f399cae78530d09e5a04f72c7c732350b9128ddc"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 18).bin" size="6303360" crc="93eb6f5f" sha1="c78444e67517455c47404def0447744263e92035"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 19).bin" size="5590704" crc="69a7edf9" sha1="dad4af4131411b2a75a9fd107266a9f0a0990ca0"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 20).bin" size="14394240" crc="dc35c8ef" sha1="6296cf7c8471e7fbd54aa6a5cdf0c7cb9efdb275"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 21).bin" size="13065360" crc="572c9fbc" sha1="bf572f939bf3cf5cf7549ca506958c23085b4a7a"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 22).bin" size="19345200" crc="32e0273b" sha1="daf4c59e35253b2e2a28a51089af94936fb99d0a"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 23).bin" size="6463296" crc="927e0900" sha1="18fe197b7192ac725a77290af97fd0c3a77ebe94"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 24).bin" size="9008160" crc="f6c4285e" sha1="7f3ebf305d94be8535bd43ca6c4988b53ee78667"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 25).bin" size="12305664" crc="04a8b00c" sha1="066717d2d14a8f337aae838d99ea579316fd96fe"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 26).bin" size="14518896" crc="023c3f73" sha1="f9d6442da067ae0bc49c138b5cb19ae929165144"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 27).bin" size="12482064" crc="1269e9b2" sha1="7c1c81fc80f0b837f0f819fdaf4f3f91e0a4b942"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 28).bin" size="13307616" crc="de089b2b" sha1="cdb67ebf97442762cbfdb0295e8cbb6d86a77589"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 29).bin" size="3386880" crc="3c6076d4" sha1="32fb122a78d3c333da12e056057ae3364564fb3b"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 30).bin" size="1168944" crc="ad2c22c5" sha1="3b42d215abab53f39bdf571b4a34850d7bccb4ee"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 31).bin" size="15264480" crc="794af20e" sha1="7fd15371f6b104a883b2e784609531e09e2600b4"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 32).bin" size="7032480" crc="c17ae885" sha1="934eae4a59af27512f58674fbf49f57467ff8b5d"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 33).bin" size="11061456" crc="ba019714" sha1="77a011fb43738604b843a7b3f8c6b7013e77d304"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 34).bin" size="17468304" crc="b131e00e" sha1="6f513df8115797aa722c70e3ef47901a3438cc50"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 35).bin" size="7662816" crc="66efe9c9" sha1="d89537edde196de1839fafa94ab84b6b650bf0a5"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 36).bin" size="15292704" crc="f7cc0c0c" sha1="b646994d47874d905a78452597d236be777d4073"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 37).bin" size="14330736" crc="b21d08b1" sha1="303ba4af0a7811eea2b3fd981f85b125a72e2be3"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 38).bin" size="14829360" crc="10dcc3de" sha1="8a79d9c782c6b37746f80b27bc9a726b58f9c0ae"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 39).bin" size="2940000" crc="2184760c" sha1="709382a16a8e954c270ea1804fd83e54f8090743"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 40).bin" size="21367920" crc="5d70ec81" sha1="c54d8a3e27a232451423d9795bc4f1f0134f428c"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 41).bin" size="12423264" crc="323d20ea" sha1="dc647f067333c9b1e35ab6af2156df6cadd31429"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 42).bin" size="10943856" crc="2535516d" sha1="f9f1e68ad4daec7bb2bd6a8fa3ca455c39983edd"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 43).bin" size="13469904" crc="2ac23722" sha1="88c3a853189f5586ee22088909e2a3e6f0878bb4"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 44).bin" size="3234000" crc="06484c02" sha1="e23c4b870923c5fdb564711f3edfd33beb447a6b"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 45).bin" size="21085680" crc="ec36c923" sha1="3cb3d9fc1232a3854f2d3398ecd4238ae204aa65"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 46).bin" size="11331936" crc="6dac708c" sha1="5aecd985b65c958d4df2a93d39130ad03b462e66"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan) (Track 47).bin" size="27605424" crc="471d623f" sha1="2c37ad2ea37f9f12bf573590c6bcebd2de0b36ce"/>
-		<rom name="New Horizon CD Learning System II - English Course 1 (Japan).cue" size="6232" crc="516632e9" sha1="6b568ee885512ad3d7a3eccb91c98fcbff6fef63"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 01).bin" size="10231200" crc="d0a86335" sha1="b3d4d2db57fb81bfb111bdfb3218b0137e4a9282"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 02).bin" size="5755344" crc="23be5ea1" sha1="3bdb5b884acd3234f815a0c8cf50e89be18afe6b"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 03).bin" size="8932896" crc="62df43f9" sha1="b874a4c95f0d3889541bba120fe6ef598d659aee"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 04).bin" size="8448384" crc="fd1b52a6" sha1="33318d6863a8350a9db4876e27c4a7c8f3398bac"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 05).bin" size="15024576" crc="5f2d38b3" sha1="9b977c4916d95a5b4d781128c7678891095ba76b"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 06).bin" size="14182560" crc="f2108ee6" sha1="4d7aea90b0c2e0fab013b4634ad114eec5923cd9"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 07).bin" size="16010064" crc="c616ac9f" sha1="4d3f01486c1614d7ac33e5afb0d706720a1ba0be"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 08).bin" size="11407200" crc="3904c083" sha1="a56c94e10a780496c2d7d7cf450d0a7e7e39a15d"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 09).bin" size="9897216" crc="d47c8f34" sha1="e0cae58bed291c4c1ca3d143749490c37a01b9ed"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 10).bin" size="16057104" crc="a9c9b227" sha1="2b5e4d5d953cd831a41ba7574384e70471e6976f"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 11).bin" size="10544016" crc="b1dedaf7" sha1="d99807cdde7facafa891f622deacc79141400ae9"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 12).bin" size="12482064" crc="b8f856ac" sha1="3c4b6f66b0528d1bf72529c7f75932e10cb8707b"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 13).bin" size="15429120" crc="c232a3ac" sha1="27cdf05f51fbb05a0cd11073ab34f1abb0174c22"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 14).bin" size="5546016" crc="b30c1f27" sha1="5d7f8c1682ee41cc0b718bd4a6e9997b006544d0"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 15).bin" size="17298960" crc="1b87a1bb" sha1="49ae87554abfe5d776f6305c13023059aee714a2"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 16).bin" size="21384384" crc="a4eaf9ed" sha1="1440054d6e56f96cc0ba64f04526821bcf4d3367"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 17).bin" size="14801136" crc="3b66fa82" sha1="f399cae78530d09e5a04f72c7c732350b9128ddc"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 18).bin" size="6303360" crc="93eb6f5f" sha1="c78444e67517455c47404def0447744263e92035"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 19).bin" size="5590704" crc="69a7edf9" sha1="dad4af4131411b2a75a9fd107266a9f0a0990ca0"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 20).bin" size="14394240" crc="dc35c8ef" sha1="6296cf7c8471e7fbd54aa6a5cdf0c7cb9efdb275"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 21).bin" size="13065360" crc="572c9fbc" sha1="bf572f939bf3cf5cf7549ca506958c23085b4a7a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 22).bin" size="19345200" crc="32e0273b" sha1="daf4c59e35253b2e2a28a51089af94936fb99d0a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 23).bin" size="6463296" crc="927e0900" sha1="18fe197b7192ac725a77290af97fd0c3a77ebe94"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 24).bin" size="9008160" crc="f6c4285e" sha1="7f3ebf305d94be8535bd43ca6c4988b53ee78667"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 25).bin" size="12305664" crc="04a8b00c" sha1="066717d2d14a8f337aae838d99ea579316fd96fe"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 26).bin" size="14518896" crc="023c3f73" sha1="f9d6442da067ae0bc49c138b5cb19ae929165144"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 27).bin" size="12482064" crc="1269e9b2" sha1="7c1c81fc80f0b837f0f819fdaf4f3f91e0a4b942"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 28).bin" size="13307616" crc="de089b2b" sha1="cdb67ebf97442762cbfdb0295e8cbb6d86a77589"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 29).bin" size="3386880" crc="3c6076d4" sha1="32fb122a78d3c333da12e056057ae3364564fb3b"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 30).bin" size="1168944" crc="ad2c22c5" sha1="3b42d215abab53f39bdf571b4a34850d7bccb4ee"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 31).bin" size="15264480" crc="794af20e" sha1="7fd15371f6b104a883b2e784609531e09e2600b4"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 32).bin" size="7032480" crc="c17ae885" sha1="934eae4a59af27512f58674fbf49f57467ff8b5d"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 33).bin" size="11061456" crc="ba019714" sha1="77a011fb43738604b843a7b3f8c6b7013e77d304"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 34).bin" size="17468304" crc="b131e00e" sha1="6f513df8115797aa722c70e3ef47901a3438cc50"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 35).bin" size="7662816" crc="66efe9c9" sha1="d89537edde196de1839fafa94ab84b6b650bf0a5"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 36).bin" size="15292704" crc="f7cc0c0c" sha1="b646994d47874d905a78452597d236be777d4073"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 37).bin" size="14330736" crc="b21d08b1" sha1="303ba4af0a7811eea2b3fd981f85b125a72e2be3"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 38).bin" size="14829360" crc="10dcc3de" sha1="8a79d9c782c6b37746f80b27bc9a726b58f9c0ae"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 39).bin" size="2940000" crc="2184760c" sha1="709382a16a8e954c270ea1804fd83e54f8090743"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 40).bin" size="21367920" crc="5d70ec81" sha1="c54d8a3e27a232451423d9795bc4f1f0134f428c"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 41).bin" size="12423264" crc="323d20ea" sha1="dc647f067333c9b1e35ab6af2156df6cadd31429"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 42).bin" size="10943856" crc="2535516d" sha1="f9f1e68ad4daec7bb2bd6a8fa3ca455c39983edd"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 43).bin" size="13469904" crc="2ac23722" sha1="88c3a853189f5586ee22088909e2a3e6f0878bb4"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 44).bin" size="3234000" crc="06484c02" sha1="e23c4b870923c5fdb564711f3edfd33beb447a6b"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 45).bin" size="21085680" crc="ec36c923" sha1="3cb3d9fc1232a3854f2d3398ecd4238ae204aa65"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 46).bin" size="11331936" crc="6dac708c" sha1="5aecd985b65c958d4df2a93d39130ad03b462e66"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (Track 47).bin" size="27605424" crc="471d623f" sha1="2c37ad2ea37f9f12bf573590c6bcebd2de0b36ce"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan).cue" size="6232" crc="c35e6018" sha1="b5479aa28ed3dda9708b952749d037e3da6e02d8"/>
 		-->
-		<description>New Horizon CD Learning System II - English Course 1</description>
+		<description>CD Learning System II - New Horizon English Course 1</description>
 		<year>1993</year>
 		<publisher>東京書籍 (Tokyo Shoseki)</publisher>
 		<info name="serial" value="HMD-186 / MTC-1004"/>
-		<info name="alt_title" value="NEW HORIZON CD ラーニングシステム II 1年" />
+		<info name="alt_title" value="ＣＤ ラーニングシステム Ⅱ ＮＥＷ　ＨＯＲＩＺＯＮ １年" />
 		<info name="release" value="199305xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="new horizon cd learning system ii - english course 1 (japan)" sha1="b75d8ca2fcbe6cf85059c608a117af5ad6316c39" />
+				<disk name="cd learning system ii - new horizon english course 1 (japan)" sha1="b75d8ca2fcbe6cf85059c608a117af5ad6316c39" />
 			</diskarea>
 		</part>
 	</software>
@@ -16176,65 +16257,120 @@ User/save disks that can be created from the game itself are not included.
 	<software name="nhorz2e1m">
 		<!--
 		Origin: redump.org
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 01).bin" size="10231200" crc="d63bcafe" sha1="43d9dc1d884e6030af2cedcefd8539dddfeaa19a"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 02).bin" size="5755344" crc="34acdef2" sha1="a44dd1cb06905687dba1662c0ff4d4dce1c15490"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 03).bin" size="8932896" crc="d79fe8e0" sha1="7008a7db7e5d0d943121b213d57a49bded6a1efd"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 04).bin" size="8448384" crc="191d50b8" sha1="76333f15638cacb3aa8e407ee8c51aace7d60ae1"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 05).bin" size="15024576" crc="49e62daf" sha1="248889fa5b22d41007bf65e65aa0464d2b0a8bea"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 06).bin" size="14182560" crc="7d21221d" sha1="c6ab088c2c176fd3cfa229e90e76a719c3dcdbed"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 07).bin" size="16010064" crc="eb87e73a" sha1="e503ba1e99c7023ee3881c5c7e08e038f92d9bda"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 08).bin" size="11407200" crc="78e7a2f1" sha1="837dc763d1cd76097ee1ca39dc7d83813cc5d331"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 09).bin" size="9897216" crc="fd52e707" sha1="d424c210db2f64379b53ec540e6c62ea1f424fa8"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 10).bin" size="16057104" crc="777578f8" sha1="372f6ff46af7388a2ae04cf0564fd6177fea0282"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 11).bin" size="10544016" crc="b91d1c67" sha1="fa26ffd9860876da5fb304bea74a2ee818681b0a"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 12).bin" size="12482064" crc="c2678071" sha1="e7940c03b695a437348396b2cd2c5c1d316fcfac"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 13).bin" size="15429120" crc="d7515ed8" sha1="11afc5de187441f4d05bcb1e551a25084e7e9b65"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 14).bin" size="5546016" crc="aef9de69" sha1="e370d6150e8ab12c1b280e2a6ed4810eeaf6bdf4"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 15).bin" size="17298960" crc="b37468d1" sha1="ab94e3687e56a210018b15ac8d1216fc690c1fde"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 16).bin" size="21384384" crc="1d22aa14" sha1="5f2411b197b3b76f60e69bc254d75d750766c7cb"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 17).bin" size="14801136" crc="3f58bbfc" sha1="7e23ca3fe55aab967a2a7a3fa9e713ab1c72d1bf"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 18).bin" size="6303360" crc="af41c24c" sha1="14f0d6123d4e85331a6d7009c9e0b78e5836c80a"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 19).bin" size="5590704" crc="2e2b93ad" sha1="d958a3e255bf64002acea964a0a413c19b6add6c"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 20).bin" size="14394240" crc="505569ab" sha1="74927ce3ef5eec22afc6aeeef8a946e706ef3ef7"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 21).bin" size="13065360" crc="72967f86" sha1="496bff6cbbe38651fba34b984b1b04541e453fec"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 22).bin" size="19345200" crc="39f34d16" sha1="617631c534c96ac46f0934678746f3307826091e"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 23).bin" size="6463296" crc="55ec916d" sha1="0affd0ef404b793a6ceb7f5c80201116cbe9679a"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 24).bin" size="9008160" crc="0b2819b7" sha1="e48da562f8593ecd244a959ef6db97d8cab9b83f"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 25).bin" size="12305664" crc="388c08d6" sha1="716475d8a632764be7ef32123088844af8170b85"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 26).bin" size="14518896" crc="61229e63" sha1="905f6bef121575b5e989607aa6224f1689ead54d"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 27).bin" size="12482064" crc="f804fe57" sha1="34c3597e7bf32792e49e8ae34fc5a75aee8044cd"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 28).bin" size="13307616" crc="116b10b5" sha1="17e7b650800cd03ddfadd6d505e2dc9a9d8c93a3"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 29).bin" size="3386880" crc="4601cb20" sha1="6ffbf208b1bc979577f51c38ba95076b78d66c59"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 30).bin" size="1168944" crc="98a60a42" sha1="98506f4d8d08c90112a5cc0ebb38b3ade68feb78"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 31).bin" size="15264480" crc="02b734b7" sha1="9fc9533d22be21c1c0198825fb9afb905472bd20"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 32).bin" size="7032480" crc="5c54495d" sha1="1660bd6f637a7b02ada37e3b5afb3dec78ec19e3"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 33).bin" size="11061456" crc="fba05f49" sha1="14f41aba00207c0c4278764f6f21405cead9a520"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 34).bin" size="17468304" crc="d11a50b3" sha1="d1570dda3a16c5f761cc65626bb3930f0b6eede2"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 35).bin" size="7662816" crc="48195e04" sha1="900ae32e9274b02bb1bb3e9d1b68fed6309dfe91"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 36).bin" size="15292704" crc="026c9c27" sha1="d78e4a91b6c10df274c1965cb1c8839270694b05"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 37).bin" size="14330736" crc="cb3e78ec" sha1="5f5810cf603f4ab1a8eaebc876fc309bcd5218bf"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 38).bin" size="14829360" crc="7a0f63b9" sha1="a0c351ef8899938e7c776d37c8487129c0ed3e28"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 39).bin" size="2940000" crc="89a13457" sha1="a528780e2025de6c246582fa9cb92b6184817f76"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 40).bin" size="21367920" crc="d039262d" sha1="cdbfc3f633d1ef10b2ded4407e23aaa694eb3ae2"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 41).bin" size="12423264" crc="2b5115f0" sha1="8f4be24b7a6ab76dfc9e9906268477fe1141d14d"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 42).bin" size="10943856" crc="80fcb8ab" sha1="fdf4bc9da74b828ddb761a3928209e351034f841"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 43).bin" size="13469904" crc="8b4dacfa" sha1="159ac48b684a15c902a0da171ec771c842db7d97"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 44).bin" size="3234000" crc="890b0d30" sha1="06a4d63ed6e4c2ec353f0185ad56ad10e7d1e7eb"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 45).bin" size="21085680" crc="21070b7e" sha1="7182828502da28eb5e3be7379f2b1b298ff0862e"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 46).bin" size="11331936" crc="0f39f7f8" sha1="901619459972754477b3c46ce1c165a1b0794b42"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty) (Track 47).bin" size="27605424" crc="b60a5475" sha1="b44339316b76ef8c7d4291deda1d446b777c8fef"/>
-		<rom name="New Horizon English Course 1 - CD Learning System II (Japan) (FM Towns Marty).cue" size="7054" crc="71f68e4f" sha1="4b1d48b54572d8231d9918f86b534c2f67769efc"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 01).bin" size="10231200" crc="d63bcafe" sha1="43d9dc1d884e6030af2cedcefd8539dddfeaa19a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 02).bin" size="5755344" crc="34acdef2" sha1="a44dd1cb06905687dba1662c0ff4d4dce1c15490"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 03).bin" size="8932896" crc="d79fe8e0" sha1="7008a7db7e5d0d943121b213d57a49bded6a1efd"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 04).bin" size="8448384" crc="191d50b8" sha1="76333f15638cacb3aa8e407ee8c51aace7d60ae1"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 05).bin" size="15024576" crc="49e62daf" sha1="248889fa5b22d41007bf65e65aa0464d2b0a8bea"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 06).bin" size="14182560" crc="7d21221d" sha1="c6ab088c2c176fd3cfa229e90e76a719c3dcdbed"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 07).bin" size="16010064" crc="eb87e73a" sha1="e503ba1e99c7023ee3881c5c7e08e038f92d9bda"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 08).bin" size="11407200" crc="78e7a2f1" sha1="837dc763d1cd76097ee1ca39dc7d83813cc5d331"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 09).bin" size="9897216" crc="fd52e707" sha1="d424c210db2f64379b53ec540e6c62ea1f424fa8"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 10).bin" size="16057104" crc="777578f8" sha1="372f6ff46af7388a2ae04cf0564fd6177fea0282"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 11).bin" size="10544016" crc="b91d1c67" sha1="fa26ffd9860876da5fb304bea74a2ee818681b0a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 12).bin" size="12482064" crc="c2678071" sha1="e7940c03b695a437348396b2cd2c5c1d316fcfac"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 13).bin" size="15429120" crc="d7515ed8" sha1="11afc5de187441f4d05bcb1e551a25084e7e9b65"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 14).bin" size="5546016" crc="aef9de69" sha1="e370d6150e8ab12c1b280e2a6ed4810eeaf6bdf4"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 15).bin" size="17298960" crc="b37468d1" sha1="ab94e3687e56a210018b15ac8d1216fc690c1fde"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 16).bin" size="21384384" crc="1d22aa14" sha1="5f2411b197b3b76f60e69bc254d75d750766c7cb"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 17).bin" size="14801136" crc="3f58bbfc" sha1="7e23ca3fe55aab967a2a7a3fa9e713ab1c72d1bf"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 18).bin" size="6303360" crc="af41c24c" sha1="14f0d6123d4e85331a6d7009c9e0b78e5836c80a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 19).bin" size="5590704" crc="2e2b93ad" sha1="d958a3e255bf64002acea964a0a413c19b6add6c"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 20).bin" size="14394240" crc="505569ab" sha1="74927ce3ef5eec22afc6aeeef8a946e706ef3ef7"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 21).bin" size="13065360" crc="72967f86" sha1="496bff6cbbe38651fba34b984b1b04541e453fec"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 22).bin" size="19345200" crc="39f34d16" sha1="617631c534c96ac46f0934678746f3307826091e"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 23).bin" size="6463296" crc="55ec916d" sha1="0affd0ef404b793a6ceb7f5c80201116cbe9679a"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 24).bin" size="9008160" crc="0b2819b7" sha1="e48da562f8593ecd244a959ef6db97d8cab9b83f"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 25).bin" size="12305664" crc="388c08d6" sha1="716475d8a632764be7ef32123088844af8170b85"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 26).bin" size="14518896" crc="61229e63" sha1="905f6bef121575b5e989607aa6224f1689ead54d"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 27).bin" size="12482064" crc="f804fe57" sha1="34c3597e7bf32792e49e8ae34fc5a75aee8044cd"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 28).bin" size="13307616" crc="116b10b5" sha1="17e7b650800cd03ddfadd6d505e2dc9a9d8c93a3"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 29).bin" size="3386880" crc="4601cb20" sha1="6ffbf208b1bc979577f51c38ba95076b78d66c59"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 30).bin" size="1168944" crc="98a60a42" sha1="98506f4d8d08c90112a5cc0ebb38b3ade68feb78"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 31).bin" size="15264480" crc="02b734b7" sha1="9fc9533d22be21c1c0198825fb9afb905472bd20"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 32).bin" size="7032480" crc="5c54495d" sha1="1660bd6f637a7b02ada37e3b5afb3dec78ec19e3"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 33).bin" size="11061456" crc="fba05f49" sha1="14f41aba00207c0c4278764f6f21405cead9a520"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 34).bin" size="17468304" crc="d11a50b3" sha1="d1570dda3a16c5f761cc65626bb3930f0b6eede2"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 35).bin" size="7662816" crc="48195e04" sha1="900ae32e9274b02bb1bb3e9d1b68fed6309dfe91"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 36).bin" size="15292704" crc="026c9c27" sha1="d78e4a91b6c10df274c1965cb1c8839270694b05"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 37).bin" size="14330736" crc="cb3e78ec" sha1="5f5810cf603f4ab1a8eaebc876fc309bcd5218bf"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 38).bin" size="14829360" crc="7a0f63b9" sha1="a0c351ef8899938e7c776d37c8487129c0ed3e28"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 39).bin" size="2940000" crc="89a13457" sha1="a528780e2025de6c246582fa9cb92b6184817f76"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 40).bin" size="21367920" crc="d039262d" sha1="cdbfc3f633d1ef10b2ded4407e23aaa694eb3ae2"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 41).bin" size="12423264" crc="2b5115f0" sha1="8f4be24b7a6ab76dfc9e9906268477fe1141d14d"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 42).bin" size="10943856" crc="80fcb8ab" sha1="fdf4bc9da74b828ddb761a3928209e351034f841"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 43).bin" size="13469904" crc="8b4dacfa" sha1="159ac48b684a15c902a0da171ec771c842db7d97"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 44).bin" size="3234000" crc="890b0d30" sha1="06a4d63ed6e4c2ec353f0185ad56ad10e7d1e7eb"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 45).bin" size="21085680" crc="21070b7e" sha1="7182828502da28eb5e3be7379f2b1b298ff0862e"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 46).bin" size="11331936" crc="0f39f7f8" sha1="901619459972754477b3c46ce1c165a1b0794b42"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty) (Track 47).bin" size="27605424" crc="b60a5475" sha1="b44339316b76ef8c7d4291deda1d446b777c8fef"/>
+		<rom name="CD Learning System II - New Horizon English Course 1 (Japan) (FM Towns Marty).cue" size="7054" crc="20557dcd" sha1="b1cc54fa5218d336289ed48483f9b4523a29171b"/>
 		-->
-		<description>New Horizon CD Learning System II - English Course 1 (FM Towns Marty version)</description>
+		<description>CD Learning System II - New Horizon English Course 1 (FM Towns Marty version)</description>
 		<year>1993</year>
 		<publisher>東京書籍 (Tokyo Shoseki)</publisher>
 		<info name="serial" value="HME-174"/>
-		<info name="alt_title" value="NEW HORIZON CD ラーニングシステム II 1年" />
+		<info name="alt_title" value="ＣＤ ラーニングシステム Ⅱ ＮＥＷ　ＨＯＲＩＺＯＮ １年" />
 		<info name="release" value="199305xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="new horizon english course 1 - cd learning system ii (japan) (fm towns marty)" sha1="ca1e3f72ad1d40e27ff48f135587396e4a55272f" />
+				<disk name="cd learning system ii - new horizon english course 1 (japan) (fm towns marty)" sha1="ca1e3f72ad1d40e27ff48f135587396e4a55272f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nhorz2e2">
+		<!--
+		Origin: redump.org
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 01).bin" size="10231200" crc="164b3286" sha1="15cadf2dbcddb612bf2fdcf270b21dd2edb35928"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 02).bin" size="5861184" crc="e453e649" sha1="2207da170770d1bc059d2b7513294e667195e62d"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 03).bin" size="16040640" crc="afc885a8" sha1="2f49063fe8aea3fd83feeda22ff8ea0c1237d381"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 04).bin" size="14730576" crc="6bf39f97" sha1="83ebc078536342575990e5841c071246a24e394e"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 05).bin" size="26577600" crc="b8898dd5" sha1="a81019f58beae5142d2de6e6fd1fffc67e5cb129"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 06).bin" size="19215840" crc="3293654c" sha1="ede9803b24392a57f11a112ff2ea5289e5b3c648"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 07).bin" size="32845680" crc="fde693b3" sha1="ee8d59623d29dba5874c8b516cc13a18dd7eab2c"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 08).bin" size="8448384" crc="ca5b8643" sha1="d8c9f24b831ed169ee91e9a0ead77be763498d07"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 09).bin" size="6451536" crc="033fa91e" sha1="6af2136ecd19c65a01750b2eec91b83c3c36e887"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 10).bin" size="17875200" crc="fb38b03d" sha1="2b01248a84d988ee6aba9d962174a31d3c22a630"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 11).bin" size="22050000" crc="24ea9f84" sha1="9425c53add63c358581d3a6acd53e8d3b179a70d"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 12).bin" size="21243264" crc="70e49a11" sha1="cc0f315404837b44afd826b9aacc48ffb171561f"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 13).bin" size="35181216" crc="124b5cdb" sha1="ee7d63328941feda3eb3cfafb39f0fa60b7b780b"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 14).bin" size="9278640" crc="0a4b771f" sha1="e715f9ffff8d0fe7cecd23cceff233ac0b290729"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 15).bin" size="5644800" crc="d0105b88" sha1="0f81fb43a220440b7752608d8f435dddf6135549"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 16).bin" size="18451440" crc="114f15d8" sha1="be147d4a07257c3dc0af2379952285441b31c7ee"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 17).bin" size="45287760" crc="d1882b88" sha1="e90b2e2e54cd44878c940eb5344c5c691d89861b"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 18).bin" size="18961824" crc="b4fa6dc8" sha1="f2307dcbbe3858c64df5ff24999306b4bc782611"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 19).bin" size="37820160" crc="193f1ffa" sha1="4b67b23034e70cf61b1823ca21e68fa86c775367"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 20).bin" size="6221040" crc="236d0da6" sha1="65fc1d5de7a1e4b932aa63aa99d4821ac99d606d"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 21).bin" size="16287600" crc="5268a1a3" sha1="7478381d7a1bf74d323fd9ac6ab5c6d5ef0b40a5"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 22).bin" size="14159040" crc="51a784ae" sha1="51042a46f42533721d3964862980d204f61c5b6f"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 23).bin" size="17346000" crc="926c8a03" sha1="9ada733f3b3bdc05635370c84e0a91c14e00e8d3"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 24).bin" size="16341696" crc="fa693aaf" sha1="ba3e02229bb38501fb38b07d8d7cfc3f4a899197"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 25).bin" size="23771664" crc="69b94ec7" sha1="e659f3ad8e0fe52f692a597d470f7b124f314e2b"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 26).bin" size="4068960" crc="6e1b9f18" sha1="6e3914e0dab2bc72a9dd46d6d9f0e8cbdc9616a9"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 27).bin" size="16694496" crc="592cca9b" sha1="a5002a75baabd2c9005ac8db43e94791552a7c23"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 28).bin" size="14857584" crc="32c39d48" sha1="03a3fa4060fd488a9493d5b7b6fc5929e8a77442"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 29).bin" size="13578096" crc="cffe9daf" sha1="9538acb170833b787cbca78e27155f8c121fee0f"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 30).bin" size="21066864" crc="2beb3777" sha1="2f94e397a67407aaf0a22d4564fbab915430460d"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 31).bin" size="15370320" crc="344fec05" sha1="a5acda8949ff92cd63bc20db2c1d8ffe7699652d"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 32).bin" size="27095040" crc="948fe602" sha1="faf26ab1c364caa71470152ea6f54aa2b253eada"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 33).bin" size="16435776" crc="d5dfbafc" sha1="9ba54f3ee2b2aa441271c62e03775d341a54b076"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 34).bin" size="23261280" crc="de38eae2" sha1="fe562b1e681a045db89a21662d6388de53e011bf"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 35).bin" size="28946064" crc="f14af48a" sha1="8af94526f702f8f8dfc720eed6a0506ee3fd1e47"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan) (Track 36).bin" size="32300016" crc="2c6d2bbb" sha1="887630cb424a4644f0842f1408157d13676b33a4"/>
+		<rom name="CD Learning System II - New Horizon English Course 2 (Japan).cue" size="4780" crc="89358d54" sha1="57cdc14f71716e8c79d893316e587615a5e774e1"/>
+		-->
+		<description>CD Learning System II - New Horizon English Course 2</description>
+		<year>1993</year>
+		<publisher>東京書籍 (Tokyo Shoseki)</publisher>
+		<info name="serial" value="HMD-187"/>
+		<info name="alt_title" value="ＣＤ ラーニングシステム Ⅱ ＮＥＷ　ＨＯＲＩＺＯＮ ２年" />
+		<info name="release" value="199305xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd learning system ii - new horizon english course 2 (japan)" sha1="892e92424ebfa48e6dd135c07d5d67de3a58bd6d" />
 			</diskarea>
 		</part>
 	</software>
@@ -17755,10 +17891,9 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
-	<software name="pharmony" supported="no">
+	<software name="pharmony">
 		<!--
-		Origin: redump.org
+		Origin: redump.org (CD) / tenyuhuang (floppy)
 		<rom name="Planet Harmony (Japan) (Track 01).bin" size="20815200" crc="12eaea21" sha1="e5ebb6cb876091a69f59d1c9b421b27b53725104"/>
 		<rom name="Planet Harmony (Japan) (Track 02).bin" size="47592720" crc="6ad17a13" sha1="247ce92ea2f3d4efd2573f8a3100fd99195bba04"/>
 		<rom name="Planet Harmony (Japan) (Track 03).bin" size="9109296" crc="f04642a8" sha1="e0308ef3d3be0c30ad11e3814375a76c4455b195"/>
@@ -17782,6 +17917,11 @@ User/save disks that can be created from the game itself are not included.
 		<publisher>ダットジャパン (Datt Japan)</publisher>
 		<info name="serial" value="HME-105"/>
 		<info name="release" value="199309xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="planet_harmony.hdm" size="1261568" crc="a4a3c875" sha1="936e6cdba9e408eb80b3ffafca88a91abc54f7bc" offset="000000" />
+			</dataarea>
+		</part>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="planet harmony (japan)" sha1="b866b435ccc6456f075dbc723b4673522a9c483e" />
@@ -17832,39 +17972,35 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="planedge">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Planet&apos;s Edge.mdf" size="505977120" crc="c5b4995e" sha1="0b10f77379f32071901fb35ce564f6c37344e486"/>
-		<rom name="Planet&apos;s Edge.mds" size="2788" crc="7fd7420c" sha1="1858ebb841cb01779375d20a8ee35bac30c1648a"/>
-
-		*after conversion with IsoBuster+EAC *
-		<rom name="planet's edge.cue" size="3979" crc="e306ba6e" sha1="74a7a43488f75044bca7d7a2998b0202857f3eb9"/>
-		<rom name="track01.bin" size="20815200" crc="b361ec6a" sha1="043e34c61c3c8294b37c062f0a97ee069f52218a"/>
-		<rom name="track02.bin" size="12171600" crc="29cb2a55" sha1="35aa60443e628121370cd6c5cd7d3b6269ab8919"/>
-		<rom name="track03.bin" size="16581600" crc="be2afd7d" sha1="34d0d1d541f705b2d08d1600d01657bee046e0c0"/>
-		<rom name="track04.bin" size="11070864" crc="960bc339" sha1="6a315e8336f0615dcfe96a87e07c85d711dadfca"/>
-		<rom name="track05.bin" size="39814656" crc="fc319e6f" sha1="6ab64f392b96259aef8b12501dfc504c4c8eb178"/>
-		<rom name="track06.bin" size="2163840" crc="94ccda2e" sha1="0c705b109f3ae5b270cea4a2a033af6844283bd3"/>
-		<rom name="track07.bin" size="2097984" crc="d4159ffa" sha1="125d262f1cd1964eff5bec63a0c56d9d365d53ef"/>
-		<rom name="track08.bin" size="17463600" crc="0b140ab0" sha1="cf7b342d015f96705719f93b4a55bce8d4109bf5"/>
-		<rom name="track09.bin" size="12202176" crc="0ec44d04" sha1="367965d08896be36e9342b410aa3504c0d781c73"/>
-		<rom name="track10.bin" size="14017920" crc="37fb71e9" sha1="0eee784ee975e2c88a728494f70545a516c958eb"/>
-		<rom name="track11.bin" size="18738384" crc="274abddd" sha1="03e36f4da08c672a756ea31accce8f77027a7421"/>
-		<rom name="track12.bin" size="15459696" crc="4bb5f86d" sha1="cd145576ef0aa65039ca5395c32eb027aeaa5110"/>
-		<rom name="track13.bin" size="28134624" crc="09d8677d" sha1="9d4a2a94ebfbbaa588f04fb8e60634c56eb45852"/>
-		<rom name="track14.bin" size="10849776" crc="2ccfa8f7" sha1="8f547916f93db5b0f9d17705a95fef952a34cb58"/>
-		<rom name="track15.bin" size="13159440" crc="15ef0fc8" sha1="651136eec6ccc501775b0ea2e6a1a66f6647ba42"/>
-		<rom name="track16.bin" size="7373520" crc="4137fa28" sha1="a24d498dfd60ec35dadc439d3bbb1db1562cbf8b"/>
-		<rom name="track17.bin" size="5339040" crc="a64fcf18" sha1="26592303aad0f5e18b5311138af4670b318f77d6"/>
-		<rom name="track18.bin" size="11360160" crc="77674747" sha1="fcb8444d1d2cc7e5afdd355d0e485aa89d863ebd"/>
-		<rom name="track19.bin" size="21349104" crc="5cd3ec1c" sha1="92eef0f5d7b8e492a6987d42b877c88284bf73e2"/>
-		<rom name="track20.bin" size="41395200" crc="cacc65c3" sha1="ad5c81158c694a275cf8e2770daeb76991dc01c1"/>
-		<rom name="track21.bin" size="12206880" crc="c0779ba5" sha1="89835128e4c23d7270214b657971cae9d9e64242"/>
-		<rom name="track22.bin" size="13382880" crc="8fc3fb6f" sha1="65f01b1c0e65542f7cd15d5816e56eff6f42e6f3"/>
-		<rom name="track23.bin" size="45334800" crc="1a632770" sha1="27c47d2ac8120ef04d357be3967004c95ca931be"/>
-		<rom name="track24.bin" size="23385936" crc="aa0d5326" sha1="0ef0c4e610978c68488ecc1091556d2edae01377"/>
-		<rom name="track25.bin" size="37561440" crc="950d3b2a" sha1="2099f5c41b49640c3a2c6b03643e76e81845aff1"/>
-		<rom name="track26.bin" size="10525200" crc="c57f022b" sha1="ee131353aff512fd48eec1ab770e534af042fbdc"/>
-		<rom name="track27.bin" size="22532160" crc="44eed348" sha1="5a5b6e1c4b6bcdd86a75650792daa1d98e005cd5"/>
+		Origin: redump.org
+		<rom name="Planet's Edge (Japan) (Track 01).bin" size="20815200" crc="b361ec6a" sha1="043e34c61c3c8294b37c062f0a97ee069f52218a"/>
+		<rom name="Planet's Edge (Japan) (Track 02).bin" size="12171600" crc="3d7777fd" sha1="84dfc251da8986023deaa52e2e1dc665c4f6ff10"/>
+		<rom name="Planet's Edge (Japan) (Track 03).bin" size="16581600" crc="f0c29764" sha1="1a72e574ca78604d5383be6ed582828d2bfc8be6"/>
+		<rom name="Planet's Edge (Japan) (Track 04).bin" size="11070864" crc="71d1d8dd" sha1="bc7ce4fb5c75742e508a62b61220207b3cf11316"/>
+		<rom name="Planet's Edge (Japan) (Track 05).bin" size="39814656" crc="458b3e41" sha1="cc7c1c09e4ba7f03844d05879afabbb3e51cbaf9"/>
+		<rom name="Planet's Edge (Japan) (Track 06).bin" size="2163840" crc="7207dd2d" sha1="308d45896c0a504e2f29ef98061878fb5308dd93"/>
+		<rom name="Planet's Edge (Japan) (Track 07).bin" size="2097984" crc="01dd59d0" sha1="c39c32f962bba0fb54fc2d253e486662403167a5"/>
+		<rom name="Planet's Edge (Japan) (Track 08).bin" size="17463600" crc="de2f5af9" sha1="38904c98f332f3ea683cd1c588c86833006ba51a"/>
+		<rom name="Planet's Edge (Japan) (Track 09).bin" size="12202176" crc="6ae4515f" sha1="8a9bd95887cd2205ff7942179fa8dc0cf5c8ff23"/>
+		<rom name="Planet's Edge (Japan) (Track 10).bin" size="14017920" crc="3ca56224" sha1="46331fed6ab7efc558e7d1efb8f7a5b5c5b877db"/>
+		<rom name="Planet's Edge (Japan) (Track 11).bin" size="18738384" crc="c3fa9ef4" sha1="37baa12fba15b723e026dd52c8ed55f60c796094"/>
+		<rom name="Planet's Edge (Japan) (Track 12).bin" size="15459696" crc="d3578ce4" sha1="aa8cbd00d0cfcc5203e8996e739989e18098963e"/>
+		<rom name="Planet's Edge (Japan) (Track 13).bin" size="28134624" crc="a9d5f2ce" sha1="4ff2bbf8d1cabd2c6dfb61517599010100e78b1a"/>
+		<rom name="Planet's Edge (Japan) (Track 14).bin" size="10849776" crc="fc4f2875" sha1="2a8e52f486a3495e8f5161218cd8e3007cbdfa48"/>
+		<rom name="Planet's Edge (Japan) (Track 15).bin" size="13159440" crc="000c1c8c" sha1="9fd93d880f6917a111c95463ee33e2b2827902f1"/>
+		<rom name="Planet's Edge (Japan) (Track 16).bin" size="7373520" crc="1a0bbacc" sha1="9515bb3ae7ff3e33d7674c9de791f3769c102df6"/>
+		<rom name="Planet's Edge (Japan) (Track 17).bin" size="5339040" crc="0c37d62e" sha1="73e99ac4453d6f665c55c8cad10514aab284a71b"/>
+		<rom name="Planet's Edge (Japan) (Track 18).bin" size="11360160" crc="1194cba1" sha1="a2ae85f5cc391345f64c2e5d7e8d213ad09ad8d3"/>
+		<rom name="Planet's Edge (Japan) (Track 19).bin" size="21349104" crc="0af272a3" sha1="b7bed9408452283c4703a7e4f270c40bccd61ff6"/>
+		<rom name="Planet's Edge (Japan) (Track 20).bin" size="41395200" crc="f38cc918" sha1="76bed640839ce258f9ffce5e87f2ce9b229098b0"/>
+		<rom name="Planet's Edge (Japan) (Track 21).bin" size="12206880" crc="ed0af14c" sha1="1bfadd95db2277e38bbc69b05e454e301e81c049"/>
+		<rom name="Planet's Edge (Japan) (Track 22).bin" size="13382880" crc="3f959896" sha1="48704f88a645971f6f3599cf6f1a84b2550dd6fa"/>
+		<rom name="Planet's Edge (Japan) (Track 23).bin" size="45334800" crc="b9a2760c" sha1="6cd1ba157c2bed5808bd386f9f0f56482b20da5d"/>
+		<rom name="Planet's Edge (Japan) (Track 24).bin" size="23385936" crc="0dd0cb5b" sha1="c64ffd9f4192b02ad33ad93ce42632d9d98cdf3c"/>
+		<rom name="Planet's Edge (Japan) (Track 25).bin" size="37561440" crc="eb0e5f21" sha1="e0db6c6c15becc811ad64d0527966223b5958afe"/>
+		<rom name="Planet's Edge (Japan) (Track 26).bin" size="10525200" crc="9bd09bcb" sha1="4b639a200b6d0ac8d87f64f9f44ef83e9fd3e42f"/>
+		<rom name="Planet's Edge (Japan) (Track 27).bin" size="22532160" crc="e0362d78" sha1="e215c3aebf00fb9f885942ff49721af0ef1a076c"/>
+		<rom name="Planet's Edge (Japan).cue" size="3114" crc="7f6bd9ff" sha1="2853d442afc5939d0a23a7b6f932d46bfaa90e1a"/>
 		-->
 		<description>Planet's Edge</description>
 		<year>1993</year>
@@ -17875,7 +18011,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="planet's edge" sha1="41c000e9a1f73d76437ab56bee363d481f56b58f" />
+				<disk name="planet's edge (japan)" sha1="a5906fac0d1efaef2d82551fe0e89d27a4680987" />
 			</diskarea>
 		</part>
 	</software>
@@ -18306,6 +18442,7 @@ User/save disks that can be created from the game itself are not included.
 		<description>Psychic Detective Series Vol. 1 - Invitation - Kage kara no Shoutaijou</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="CRM-1137"/>
 		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol. 1　インビテーション　影からの招待状" />
 		<info name="release" value="198903xx" />
 		<part name="cdrom" interface="fmt_cdrom">
@@ -20219,6 +20356,130 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="shkaki">
+		<!--
+		Origin: redump.org
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 01).bin" size="52920000" crc="e46b38f4" sha1="944240bd8e1a76c8e4d52b5fb742212930f0094b"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 02).bin" size="3732624" crc="6e5b2544" sha1="6648de39fdf1293c392aa9e19aaf6d4e6eedbe15"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 03).bin" size="22680336" crc="a9096e70" sha1="34a82d04c56657cee1754a51a0098050001933f0"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 04).bin" size="41576304" crc="05f62fb2" sha1="675fb1f96a9730a09b2ed6bf12e2efc329e98e7e"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 05).bin" size="30935856" crc="db591368" sha1="72dbb25d284d21a309066958c9fb9d806a198a7c"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 06).bin" size="34167504" crc="45d4f22d" sha1="51f8f0743fa2d69b95f3f3c54b6592265be5b582"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 07).bin" size="30265536" crc="6db01c7d" sha1="5f001b11a0fde1dfaf38d06b9516b61db5571bdc"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 08).bin" size="36209040" crc="d16f1680" sha1="7edf27e3a33411aa6b42a0f9ac7048db5832bf3d"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 09).bin" size="16727424" crc="6b756142" sha1="4de7bf9be6a237b16c4e9384a26999eaa03e7068"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 10).bin" size="48258336" crc="2bc5b70a" sha1="9aa259ffbe1da9eac0347fb138d4db10657edf10"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 11).bin" size="23395344" crc="72c99b4b" sha1="5aa5f8b69a61403d62b583331674fd038cad5f1c"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan) (Track 12).bin" size="16593360" crc="10c6a1db" sha1="32ebc65d7ed877e70bdf11f6a5517cbd7b4a9bbd"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Aki (Japan).cue" size="1686" crc="f7bbfd47" sha1="29573d98333b1d796c1c22e77c586dad64e9ce28"/>
+		-->
+		<description>Shiki o Irodoru - Nihon no Shouka - Aki</description>
+		<year>1991</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMC-103"/>
+		<info name="alt_title" value="四季を彩る　日本の唱歌　秋" />
+		<info name="release" value="199110xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiki o irodoru - nihon no shouka - aki (japan)" sha1="366bc814e8547b80d3e79a0ce6d3a7854316da4e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shkfuyu">
+		<!--
+		Origin: redump.org
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 01).bin" size="52920000" crc="a458e672" sha1="d86ca7813de9267bf036d867a4d04d9255cd0adc"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 02).bin" size="3857280" crc="fddad9aa" sha1="d4cfd314ae602e3869c73f2b501479f5f807cdf0"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 03).bin" size="18486720" crc="93479cc3" sha1="aa226213bb244f2cbd69e1dd33898fe81774f465"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 04).bin" size="39212544" crc="1d518535" sha1="b9f2eb0aec4c627ee1fb05e36f1618e8149653c9"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 05).bin" size="32982096" crc="52071180" sha1="e18e5d61c491d9106b74f7e2d21ed1d27773a70e"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 06).bin" size="47263440" crc="cf2b48db" sha1="84f8bc3d00b9e50e2501e51e1a60e3d8e71d0b30"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 07).bin" size="42164304" crc="74d7e8b3" sha1="4f2feec93d6d9a6cec00877a341921f7b9dc888c"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 08).bin" size="26267136" crc="53f4f88f" sha1="57a68f17b083f8de62de8e2715cda9527bfbc89a"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 09).bin" size="23265984" crc="406442a6" sha1="e317147b3ef5b5ee59e4c663cb2ce573cfac813a"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 10).bin" size="39019680" crc="c4235570" sha1="e21038c68055ad82b1f189a80a55bcac190b706a"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 11).bin" size="23190720" crc="442910d5" sha1="32fdef9611901f93118d8bcca6c7e1294a7cea97"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan) (Track 12).bin" size="16522800" crc="3756de43" sha1="b7b7b9f8ddca516d7bc8319cdf524460d639abc2"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Fuyu (Japan).cue" size="1698" crc="d8bc2380" sha1="5286e0ac21bbefe1879ec96ac2fa1a832109aec4"/>
+		-->
+		<description>Shiki o Irodoru - Nihon no Shouka - Fuyu</description>
+		<year>1991</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMC-104"/>
+		<info name="alt_title" value="四季を彩る　日本の唱歌　冬" />
+		<info name="release" value="199110xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiki o irodoru - nihon no shouka - fuyu (japan)" sha1="6bd36144a1d3555862fb6472c2cb172bff53e2b0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shkharu">
+		<!--
+		Origin: redump.org
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 01).bin" size="105487200" crc="1d9024c9" sha1="63048d6376c83fc333d798c8e9b2f9acbfbbaa74"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 02).bin" size="3410400" crc="025cb3be" sha1="1273be1161cd26dbbe3ca1db4c3f56589bc3ef04"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 03).bin" size="32069520" crc="48df442a" sha1="1549c06dd55e7aee4053c2bce1a967c0b0e69b05"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 04).bin" size="34868400" crc="c25484e2" sha1="9a1ba4c3376037bf57cbadcf0f00b6224bac96ad"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 05).bin" size="24218544" crc="78c0d45f" sha1="c943df1f39c5721eb334d6051205ec2d0b4eafa8"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 06).bin" size="49415520" crc="3e091034" sha1="1da6b21a19b0a4e0ff4a578682d622da02cdba28"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 07).bin" size="60528720" crc="cefeec09" sha1="e48ce80f98c576657ac17fe971e9a3e64f917413"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 08).bin" size="32634000" crc="ec60f4f2" sha1="ad7c65877cf5864dce12b1f0b7fee8feaebb37e5"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 09).bin" size="22856736" crc="9b98622a" sha1="ca748e9e3edde2e16099362a07f9a292c0845a10"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 10).bin" size="38024784" crc="aa31e3c7" sha1="708a1a7902ac26458165041ae3d33c388e52478f"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 11).bin" size="19321680" crc="a643d424" sha1="18d7679245bab86291e7c60346aeb843084546e1"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan) (Track 12).bin" size="11042640" crc="5e42c408" sha1="de418fbb37ceae54b541d9e80c9f3ca6daa07ca0"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Haru (Japan).cue" size="1698" crc="1645803c" sha1="95d84e876e8272f243a4952fd77767d62c1e31c3"/>
+		-->
+		<description>Shiki o Irodoru - Nihon no Shouka - Haru</description>
+		<year>1991</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMC-101"/>
+		<info name="alt_title" value="四季を彩る　日本の唱歌　春" />
+		<info name="release" value="199104xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiki o irodoru - nihon no shouka - haru (japan)" sha1="d0ed384cc09907f66624117d02850e5effeee7b0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="shknatsu">
+		<!--
+		Origin: redump.org
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 01).bin" size="105487200" crc="206ef0d4" sha1="527cb32682cc4f6b9bde5e4124b7efe3a500285e"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 02).bin" size="3504480" crc="b223cf4d" sha1="f40aaf2f49270a59f8c3379f1644efc46a6ae764"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 03).bin" size="29863344" crc="2453345e" sha1="40e9570be3f0ac1b33eba17eb65b4c3d70a75344"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 04).bin" size="38720976" crc="ddd077b8" sha1="254768fc768ee5f9fdb07c247556db68f47d1c3b"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 05).bin" size="21913584" crc="c6400f74" sha1="57350c565e19fe4a08e53cd7a05a475bd8ea3010"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 06).bin" size="34609680" crc="6ce4e155" sha1="1196250b2df423f9d4221be86f2e5db2fdeaac9d"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 07).bin" size="34386240" crc="2ec01b46" sha1="8a07a6750bf340fb3a32473e0c6857707c511658"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 08).bin" size="39332496" crc="ec0f1ef3" sha1="766f2f6875ab60153535d62e29eea99690f73e5b"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 09).bin" size="25660320" crc="42818447" sha1="885ff6aa26d3ed40edcad695350dc8c934495fe0"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 10).bin" size="28870800" crc="dfc46c77" sha1="8c6e9d8aeb8370e08514749f4e94c0478b7d128a"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 11).bin" size="21443184" crc="4d2b148b" sha1="5ac09e07fa28bc93553a4d8c89d443a463835fa1"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan) (Track 12).bin" size="11701200" crc="c9dc2b1a" sha1="d2ad7d48764379bd6ebfa35bdf58f31665a10657"/>
+		<rom name="Shiki o Irodoru - Nihon no Shouka - Natsu (Japan).cue" size="1710" crc="6bf4bf91" sha1="8be6da4fa36b4351279875d13cab381e39c04ed9"/>
+		-->
+		<description>Shiki o Irodoru - Nihon no Shouka - Natsu</description>
+		<year>1991</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMC-102"/>
+		<info name="alt_title" value="四季を彩る　日本の唱歌　夏" />
+		<info name="release" value="199104xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shiki o irodoru - nihon no shouka - natsu (japan)" sha1="8fcba3bc95d8741ce01d4dbfb945efe40f4f47f3" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="shooting">
 		<!--
 		Origin: redump.org
@@ -21116,8 +21377,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="beast" supported="partial">
+	<software name="beast">
 		<!--
 		Origin: redump.org
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Track 1).bin" size="41454000" crc="f72daa92" sha1="8dfce09b1420ad8e17da50bcee49b9a5aa555699"/>
@@ -21144,8 +21404,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="beast2" supported="partial">
+	<software name="beast2">
 		<!--
 		Origin: redump.org
 		<rom name="Shadow of the Beast II - Juushin no Jubaku (Japan) (Track 01).bin" size="73735200" crc="153631da" sha1="f3f3109f0c5e95d549de3c63efe9e21baff638cb"/>
@@ -21805,21 +22064,20 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="taiken93">
+	<software name="taikencd">
 		<!--
-		Origin: Neo Kobe Collection
-		<rom name="Taikenban CD.ccd" size="753" crc="5f366f82" sha1="9e3905d566e7cde8cfdd2ace47e870838d7f61ae"/>
-		<rom name="Taikenban CD.cue" size="94" crc="a5ee2a98" sha1="7c432e082de327e5330db6522d227f46a7f02aee"/>
-		<rom name="Taikenban CD.img" size="284709600" crc="772123dc" sha1="07d373dc9de8c7f421a49a359d9f8e11437512d5"/>
-		<rom name="Taikenban CD.sub" size="11620800" crc="edf596b4" sha1="a60cd2a8c98045917dfa41f7eed5bf78d0354e52"/>
+		Origin: redump.org
+		<rom name="Taikenban CD (Japan).bin" size="284709600" crc="772123dc" sha1="07d373dc9de8c7f421a49a359d9f8e11437512d5"/>
+		<rom name="Taikenban CD (Japan).cue" size="86" crc="014433d4" sha1="96031bfeb7d2179f0aa0b60eb5478ab46d89ff0d"/>
 		-->
-		<description>Towns Taikenban CD '93</description>
+		<description>Taikenban CD</description>
 		<year>1993</year>
 		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="体験版ＣＤ" />
 		<info name="usage" value="Requires 2 MB RAM to boot, some demos require more"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="taikenban cd" sha1="4bfe5252ef91a95b06a2ece9b60f110cf913d980" />
+				<disk name="taikenban cd (japan)" sha1="2b750db6cd4e6f416bf36e76a52188ad897c7deb" />
 			</diskarea>
 		</part>
 	</software>
@@ -22169,6 +22427,25 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="towns-telop (japan)" sha1="bfd73a565bd224798eec08e648a0fc6be5bfa41a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tenderlt">
+		<!--
+		Origin: redump.org
+		<rom name="TenderLight V1.1 L10 (Japan).bin" size="10231200" crc="980c5d55" sha1="c671e4a38b2e9c5b27e6031cc7529b1d610396f5"/>
+		<rom name="TenderLight V1.1 L10 (Japan).cue" size="94" crc="50e48ee4" sha1="7b83a3ac78cadc50104abbd1e556f5064b353117"/>
+		-->
+		<description>TenderLight V1.1 L10</description>
+		<year>1994</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="FMB-3017 / B276F010"/>
+		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="tenderlight v1.1 l10 (japan)" sha1="863885b8f6d41089bf82f2038c697ba579037e23" />
 			</diskarea>
 		</part>
 	</software>
@@ -22682,7 +22959,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- This revision seems to be quite different from the original, internally. It works mostly fine and doesn't require a floppy disk. -->
+	<!-- This revision seems to be quite different from the original, internally. It doesn't require a floppy disk and doesn't freak out if a mouse is connected to port 2. -->
 	<software name="tqod">
 		<!--
 		Origin: redump.org
@@ -22712,8 +22989,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Graphics/sound issues; hangs when starting a fight -->
-	<software name="tqodo" cloneof="tqod" supported="no">
+	<software name="tqodo" cloneof="tqod">
 		<!--
 		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
 		<rom name="Queen of Duelist, The (Japan) (Track 01).bin" size="15523200" crc="e54628d2" sha1="4a96e0328f960ad6581a834252a38f8db427b11f"/>
@@ -22734,7 +23010,7 @@ User/save disks that can be created from the game itself are not included.
 		<info name="serial" value="HME-166"/>
 		<info name="alt_title" value="クイーン・オブ・デュエリスト" />
 		<info name="release" value="199306xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="User Disk" />
 			<dataarea name="flop" size="1261568">
@@ -23098,10 +23374,26 @@ User/save disks that can be created from the game itself are not included.
 		<year>1990</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="serial" value="B276D010"/>
-		<info name="release" value="199411xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="towns paint v1.1l20 (japan)" sha1="ac943aca97da28d24c07ed0c7118b15bc237befb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tpaint22">
+		<!--
+		Origin: redump.org
+		<rom name="Towns Paint V1.1 L22 (Japan).bin" size="40748400" crc="90e5222d" sha1="14ad868cee4d35a38b8593e3ee531c5fc911dee9"/>
+		<rom name="Towns Paint V1.1 L22 (Japan).cue" size="117" crc="c3696262" sha1="15613ac271a2f5a6efd0d8d971f44eb2d48ed1e0"/>
+		-->
+		<description>TownsPAINT V1.1 L22</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276D010"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns paint v1.1 l22 (japan)" sha1="b0197f0a286103d74267816400aee18366fffcd6" />
 			</diskarea>
 		</part>
 	</software>
@@ -23733,6 +24025,31 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="vidbible">
+		<!--
+		Origin: redump.org
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 1).bin" size="261777600" crc="01d0473f" sha1="8ed8aa110754cc54c9217701d59b8cc05ea7da9e"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 2).bin" size="3880800" crc="56903d96" sha1="5baa34fe7687fe35e2b20baa307180850335bb07"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 3).bin" size="12065760" crc="3ed0a753" sha1="6c8eb9f71516ceebbaa719fedb7c5f224431dd13"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 4).bin" size="20838720" crc="d5f2764b" sha1="93fc9ac798fa2d4726856f16ae19152b215dbb36"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 5).bin" size="27683040" crc="a60c45cc" sha1="5c26c6cb81770b52cc48d383e16c00b85f44caa5"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 6).bin" size="37185120" crc="df9ac100" sha1="76de5f986da3674e33e130b72f273b0cad45f5dd"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 7).bin" size="40619040" crc="51791b26" sha1="7ee913cdc861967ece55822475891512c1be07f8"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan) (Track 8).bin" size="4240656" crc="d857d22c" sha1="16069802ecf695570f0edc9c74709abf11a530d3"/>
+		<rom name="Shijou Saikyou no Video Bible - The Greatest Video Bible in the World (Japan).cue" size="1373" crc="0b9ba5a5" sha1="36eb10d35a23a8293f164458c7ba44589939ca6e"/>
+		-->
+		<description>Shijou Saikyou no Video Bible - The Greatest Video Bible in the World</description>
+		<year>1989</year>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<info name="alt_title" value="史上最強のビデオバイブル" />
+		<info name="release" value="198912xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shijou saikyou no video bible - the greatest video bible in the world (Japan)" sha1="c21276f6f78b18a6307e23220b76f324836729a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Missing a floppy disk. The software can be installed without the floppy but hangs while starting. -->
 	<software name="vkoubou" supported="no">
 		<!--
@@ -24082,19 +24399,50 @@ User/save disks that can be created from the game itself are not included.
 
 	<software name="weltowns">
 		<!--
-		Origin: P2P
-		<rom name="Image.cdm" size="2386" crc="2def7326" sha1="c4082e70feb3e1b962d3b39ec88f39fa8077d9a1"/>
-		<rom name="Image.cue" size="422" crc="5b8e2b26" sha1="e4a48f4bd93169c4ac3d931c7798c57a126d67be"/>
-		<rom name="Image.img" size="593767104" crc="ab811e94" sha1="9c3f0317400dd75fff06d42001379d4bc1574aba"/>
-		<rom name="Image.sub" size="24235392" crc="504f0723" sha1="2492808f9cbcd86261a915778ae786ffc8e81fb0"/>
+		Origin: redump.org
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 1).bin" size="634687200" crc="2920ce12" sha1="fed5ea5ec24f501f1b8f2615e68868650e5bf5b9"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 2).bin" size="1058400" crc="648c227c" sha1="729c8d0d2eb161d068c48a84826268f9ec790222"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 3).bin" size="1058400" crc="648c227c" sha1="729c8d0d2eb161d068c48a84826268f9ec790222"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 4).bin" size="1058400" crc="648c227c" sha1="729c8d0d2eb161d068c48a84826268f9ec790222"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 5).bin" size="1058400" crc="648c227c" sha1="729c8d0d2eb161d068c48a84826268f9ec790222"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 6).bin" size="1705200" crc="9000789e" sha1="ebd9fc2433a723ac66f6828c3f1989c960cad699"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 7).bin" size="11976384" crc="8380afe1" sha1="76b82ce07961c6c5a01e93da901a74356ed8ae67"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 8).bin" size="8885856" crc="be130fe6" sha1="e95d22ead6edae6ae34ab865742fecb1c9c05cf5"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc) (Track 9).bin" size="11658864" crc="49805558" sha1="69e9e46d1d760cc38f10d91b4477d55db4af0c72"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Green Disc).cue" size="1206" crc="7159db93" sha1="a360913ea7184b01882ef74f52c58af8158fbe55"/>
 		-->
-		<description>Welcome to FM Towns</description>
+		<description>Welcome to FM Towns (1994-12-19)</description>
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="usage" value="Requires 3 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="weltowns" sha1="81318dcbf6689d005e400fefae51cd775ddea0fe" />
+				<disk name="welcome to fm towns 1 (japan) (green disc)" sha1="23580f69a57342027db5f0ddd60982d455f6db9f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="weltownso" cloneof="weltowns">
+		<!--
+		Origin: redump.org
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 1).bin" size="423007200" crc="183aa051" sha1="17a5a36c32846a101fc371384971f3aea4088f5b"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 2).bin" size="10306464" crc="547ca50d" sha1="af2f32265b2b259cf22cd84830e51adfe7d64393"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 3).bin" size="11054400" crc="308444b1" sha1="97b0e4c817e09fcd8278071843abdca7b1feeea8"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 4).bin" size="11284896" crc="2cbcb941" sha1="3ef43c66f65b6bc46e276629423c773fd46c6932"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 5).bin" size="11129664" crc="e065d675" sha1="43c16d2716f0cee0ed89089e7b8abf8f6e745bbb"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 6).bin" size="94463376" crc="dfc79c47" sha1="0096842741f90dbd52273f9b7032e534eb316a1a"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 7).bin" size="11976384" crc="1ef2ea11" sha1="b71d0b3847f28f936a19a0d04cf7d3095a328415"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 8).bin" size="8885856" crc="9c881a7a" sha1="3035b2e06e23ab2bad33805e7824b0e95c783ae2"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc) (Track 9).bin" size="11658864" crc="977259bd" sha1="3c3963db548e722daea53873ce568dc0870f85a8"/>
+		<rom name="Welcome to FM Towns 1 (Japan) (Red Disc).cue" size="1188" crc="abe6e63b" sha1="8bc2ffdb1936f56bcea5b733291d8a6b75ad9c64"/>
+		-->
+		<description>Welcome to FM Towns (1994-09-29)</description>
+		<year>1994</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="usage" value="Requires 3 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="welcome to fm towns 1 (japan) (red disc)" sha1="4c25e870b7675569568025654878f76ec0ac4f6d" />
 			</diskarea>
 		</part>
 	</software>
@@ -24633,23 +24981,48 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!--
+	    DOS/V / Windows / Mac / FM Towns hybrid.
+
+	    Collection of pictures and software related to mountains. The only FM Towns software included is a
+	    3D landscape viewer called BERMUDA, and the PMB2BMD converter for it.
+	-->
+
+	<software name="yamachiz">
+		<!--
+		Origin: redump.org
+		<rom name="PersoCom de Tanoshimu - Yama to Chizu Vol. 1 (Japan).bin" size="484366176" crc="82a36a71" sha1="2d3b43a7ec7e52f64b9d99cdb7ff4cb64d843018"/>
+		<rom name="PersoCom de Tanoshimu - Yama to Chizu Vol. 1 (Japan).cue" size="118" crc="7704f69d" sha1="f19fd77eed100b29d755d361dafb53ecb5d28e6f"/>
+		-->
+		<description>PersoCom de Tanoshimu - Yama to Chizu Vol. 1</description>
+		<year>1995</year>
+		<publisher>インターリミテッドロジック (Inter Limited Logic)</publisher>
+		<info name="serial" value="ILL-951026"/>
+		<info name="alt_title" value="パソコンで楽しむ　山と地図　Ｖｏｌ．１" />
+		<info name="release" value="199510xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="persocom de tanoshimu - yama to chizu vol. 1 (japan)" sha1="82f96c44f6fd81d141cfa511bf501bb8bbc84006" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows / Mac / FM Towns hybrid -->
 	<software name="yamane">
 		<!--
-		Origin: P2P
-		<rom name="Image.cdm" size="846" crc="4ac3798a" sha1="161c359022316373a8bf391ae95d59ec8ed85cc8"/>
-		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
-		<rom name="Image.img" size="222685008" crc="b11f3172" sha1="44d900320fc2e8835c1dc60e18c5b4c3eff9d3e8"/>
-		<rom name="Image.sub" size="9089184" crc="5c9d4b57" sha1="411a1d54dd28d8fef4cef74e25c61689c98379b1"/>
+		Origin: redump.org
+		<rom name="Yamane no Sumu Mori (Japan).bin" size="222685008" crc="b11f3172" sha1="44d900320fc2e8835c1dc60e18c5b4c3eff9d3e8"/>
+		<rom name="Yamane no Sumu Mori (Japan).cue" size="93" crc="0d219acb" sha1="08b70c77c716f1e6f2edd06688f311c939c3d3c9"/>
 		-->
 		<description>Yamane no Sumu Mori</description>
 		<year>1995</year>
 		<publisher>インターリミテッドロジック (Inter Limited Logic)</publisher>
+		<info name="serial" value="ILL-950616"/>
 		<info name="alt_title" value="ヤマネの棲む森" />
 		<info name="release" value="199506xx" />
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="yamane" sha1="4a672f5b90f0fb81238915b60a4e093e672dd2dd" />
+				<disk name="yamane no sumu mori (japan)" sha1="2a9dc6932410c54a10ba629e753768c8fd1b07c1" />
 			</diskarea>
 		</part>
 	</software>
