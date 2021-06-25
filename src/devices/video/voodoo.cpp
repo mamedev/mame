@@ -4188,6 +4188,7 @@ void voodoo_device_base::device_start()
 	{
 		// Voodoo Banshee/3 have shared RAM; Voodoo 3 has two TMUs
 		m_tmumem[0] = m_tmumem[1] = m_fbmem;
+		m_tmumem0_in_mb = m_tmumem1_in_mb = m_fbmem_in_mb;
 		m_chipmask |= (m_model == MODEL_VOODOO_3) ? 0x04 : 0x00;
 	}
 
