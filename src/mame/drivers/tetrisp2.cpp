@@ -55,8 +55,8 @@ stepstag:
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "sound/ymz280b.h"
 
+#include "emuopts.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -131,7 +131,7 @@ void tetrisp2_state::rockn2_adpcmbank_w(u16 data)
 
 u16 tetrisp2_state::rockn_soundvolume_r()
 {
-	return 0xffff;
+	return 0xff;
 }
 
 void tetrisp2_state::rockn_soundvolume_w(u16 data)
@@ -518,7 +518,9 @@ void stepstag_state::stepstag_b00000_w(u16 data)
 
 void  stepstag_state::stepstag_main2pc_w(u16 data)
 {
-	popmessage("cmd @ pc: 0x%x\n", data);
+	m_stepstag_main2pc = data;
+	popmessage("cmd to pc: 0x%4x\n", data);	// printf
+	stepstag_state::simulate_pc();
 }
 
 u16 stepstag_state::unknown_read_0xc00000()
@@ -609,40 +611,42 @@ void stepstag_state::stepstag_button_leds_w(offs_t offset, u16 data, u16 mem_mas
 void stepstag_state::stepstag_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x100000, 0x103fff).ram().share("spriteram");                                   // Object RAM
-	map(0x108000, 0x10ffff).ram();                                                         // Work RAM
+	map(0x100000, 0x103fff).ram().share("spriteram");									// Object RAM
+	map(0x108000, 0x10ffff).ram();														// Work RAM
 	map(0x200000, 0x23ffff).rw(FUNC(stepstag_state::tetrisp2_priority_r), FUNC(stepstag_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");        // Palette
-	map(0x400000, 0x403fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");           // Foreground
-	map(0x404000, 0x407fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");           // Background
-//  map(0x408000, 0x409fff).ram();                                                         // ???
-	map(0x500000, 0x50ffff).ram();                                                         // Line
-	map(0x600000, 0x60ffff).ram().w(FUNC(stepstag_state::tetrisp2_vram_rot_w)).share("vram_rot");         // Rotation
+	map(0x300000, 0x31ffff).ram().w(FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");		// Palette
+	map(0x400000, 0x403fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");			// Foreground
+	map(0x404000, 0x407fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");			// Background
+//  map(0x408000, 0x409fff).ram();														// ???
+	map(0x500000, 0x50ffff).ram();														// Line
+	map(0x600000, 0x60ffff).ram().w(FUNC(stepstag_state::tetrisp2_vram_rot_w)).share("vram_rot");		// Rotation
 	map(0x900000, 0x903fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
 //  map(0x904000, 0x907fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w);                 // NVRAM (mirror)
-	map(0xa00000, 0xa00001).nopr().w(FUNC(stepstag_state::stepstag_neon_w));  // Neon??
-	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));          // I/O
-	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));                    // I/O
-	map(0xa30000, 0xa30001).rw(FUNC(stepstag_state::rockn_soundvolume_r), FUNC(stepstag_state::rockn_soundvolume_w));         // Sound Volume
-	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));
-	map(0xa44000, 0xa44001).nopr();     // watchdog
-	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));                                   // PC Comm
-//  map(0xa4c000, 0xa4c001).nopw();    // PC?
+	map(0xa00000, 0xa00001).nopr().w(FUNC(stepstag_state::stepstag_neon_w));					// Neon
+	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));		// I/O
+	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));				// I/O
+	map(0xa30000, 0xa30001).portr("VOLUME").w(FUNC(stepstag_state::rockn_soundvolume_w));		// Sound Volume
+	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));				// PC Comm r
+	map(0xa44000, 0xa44001).nopr();														// watchdog
+	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));				// PC Comm w
+//  map(0xa4c000, 0xa4c001).nopw();														// PC?
 	map(0xa50000, 0xa50001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(stepstag_state::stepstag_soundlatch_word_w));
-	map(0xa60000, 0xa60003).w("ymz", FUNC(ymz280b_device::write)).umask16(0x00ff);             // Sound
 
-	map(0xb00000, 0xb00001).w(FUNC(stepstag_state::stepstag_b00000_w));                                    // init xilinx uploading??
-	map(0xb20000, 0xb20001).w(FUNC(stepstag_state::stepstag_b20000_w));                                    // 98343 interface board xilinx uploading?
-	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");                             // Foreground Scrolling
-	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");                             // Background Scrolling
-	map(0xb4003e, 0xb4003f).ram();                                                         // scr_size
-	map(0xb60000, 0xb6002f).writeonly().share("rotregs");                               // Rotation Registers
+	map(0xa60000, 0xa60003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0x00ff); // Sound
+	map(0xa60000, 0xa60003).rw("ymz1", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
+
+	map(0xb00000, 0xb00001).w(FUNC(stepstag_state::stepstag_b00000_w));					// init xilinx uploading??
+	map(0xb20000, 0xb20001).w(FUNC(stepstag_state::stepstag_b20000_w));					// 98343 interface board xilinx uploading?
+	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");								// Foreground Scrolling
+	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");								// Background Scrolling
+	map(0xb4003e, 0xb4003f).ram();														// scr_size
+	map(0xb60000, 0xb6002f).writeonly().share("rotregs");								// Rotation Registers
 	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
-	map(0xbe0000, 0xbe0001).nopr();                                                     // INT-level1 dummy read
-	map(0xbe0002, 0xbe0003).portr("BUTTONS");                                        // Inputs
-	map(0xbe0004, 0xbe0005).r(FUNC(stepstag_state::stepstag_coins_r));                                      // Inputs & protection
-	map(0xbe0008, 0xbe0009).portr("DSW");                                            // Inputs
-	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));       // Watchdog
+	map(0xbe0000, 0xbe0001).nopr();														// INT-level1 dummy read
+	map(0xbe0002, 0xbe0003).portr("BUTTONS");											// Inputs
+	map(0xbe0004, 0xbe0005).r(FUNC(stepstag_state::stepstag_coins_r));					// Inputs & protection
+	map(0xbe0008, 0xbe0009).portr("DSW");												// Inputs
+	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));		// Watchdog
 }
 
 // Sub CPU (sprites)
@@ -651,11 +655,9 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	// scrambled palettes?
+	// yuv (uyvy) format
 	map(0x300000, 0x33ffff).ram().w(FUNC(stepstag_state::stepstag_palette_left_w)).share("paletteram1");
-
 	map(0x400000, 0x43ffff).ram().w(FUNC(stepstag_state::stepstag_palette_mid_w)).share("paletteram2");
-
 	map(0x500000, 0x53ffff).ram().w(FUNC(stepstag_state::stepstag_palette_right_w)).share("paletteram3");
 
 	// rgb brightness?
@@ -686,7 +688,7 @@ void stepstag_state::stepstag_sub_map(address_map &map)
 
 	map(0xc00000, 0xc00001).r(FUNC(stepstag_state::unknown_read_0xc00000)).nopw(); //??
 	map(0xd00000, 0xd00001).nopr(); // watchdog
-	map(0xf00000, 0xf00001).nopw(); //??
+	map(0xf00000, 0xf00001).nopw(); // {0,1,2,3} D1 D0 upload??
 	map(0xffff00, 0xffff01).r(FUNC(stepstag_state::unknown_read_0xffff00));
 }
 
@@ -696,6 +698,17 @@ void stepstag_state::vjdash_map(address_map &map)
 	stepstag_map(map);
 }
 
+
+void stepstag_state::ymz280b_map(address_map &map)
+{
+	// map.global_mask(0x3fffff);
+	map(0x000000, 0xffffff).ram().share("ymz_ram");
+}
+
+void stepstag_state::ymz280b_map1(address_map &map)
+{
+	map(0x000000, 0xffffff).ram().share("ymz_ram1");
+}
 
 /***************************************************************************
 
@@ -1129,6 +1142,12 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( stepstag )
+	PORT_START("VOLUME")	// $a30000.w
+	PORT_DIPNAME( 0x00ff, 0x0000, "Sound Volume")	// Potentiometer output sampled by 8-bit A/D, then read by main CPU
+	PORT_DIPSETTING(      0x0000, "max")			// TODO, 256 steps
+	PORT_DIPSETTING(      0x007f, "mid")
+	PORT_DIPSETTING(      0x00ff, "min")
+
 	PORT_START("BUTTONS") // $be0002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )                           // P2 start (middle)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)    // P2 left
@@ -1166,9 +1185,9 @@ static INPUT_PORTS_START( stepstag )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
 
 	PORT_START("RHYTHM") // $a10000.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left")  PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left")  PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left")  PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left")  PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right") PORT_CODE(KEYCODE_K)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left")  PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right") PORT_CODE(KEYCODE_M)
@@ -1287,6 +1306,16 @@ static INPUT_PORTS_START( stepstag )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vjdash )
+	PORT_START("VOLUME")	// $a30000.w
+	PORT_DIPNAME( 0x00ff, 0x0000, "Sound VR2")	// Potentiometer output sampled by 8-bit A/D, then read by main CPU
+	PORT_DIPSETTING(      0x0000, "max")		// TODO, 256 steps
+	PORT_DIPSETTING(      0x007f, "mid")
+	PORT_DIPSETTING(      0x00ff, "min")
+	PORT_DIPNAME( 0xff00, 0x0000, "Sound VR1")
+	PORT_DIPSETTING(      0x0000, "max")
+	PORT_DIPSETTING(      0x7f00, "mid")
+	PORT_DIPSETTING(      0xff00, "min")
+
 	PORT_START("BUTTONS") // $be0002.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)    // P2 up
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)    // P2 down
@@ -1305,56 +1334,6 @@ static INPUT_PORTS_START( vjdash )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/*  PORT_DIPNAME( 0x0001, 0x0001, "DIPSW debug_2-0_INPUTS") // pour debug temperarement
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, "DIPSW debug_2-1")
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, "DIPSW debug_2-2")
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, "DIPSW debug_2-3")
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, "DIPSW debug_2-4")
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, "DIPSW debug_2-5")
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, "DIPSW debug_2-6")
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, "DIPSW debug_2-7")
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-    PORT_DIPNAME(0x0100, 0x0100, "DIPSW debug_2_8")
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(0x0200, 0x0200, "DIPSW debug_2_9")
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x0400, 0x0400, "DIPSW debug_2_a")
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x0800, 0x0800, "DIPSW debug_2_b")
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x1000, 0x1000, "DIPSW debug_2_c")
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x2000, 0x2000, "DIPSW debug_2_d")
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x4000, 0x4000, "DIPSW debug_2_e")
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME(    0x8000, 0x8000, "DIPSW debug_2_f")
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-*/
 	PORT_START("COINS") // $be0004.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1374,12 +1353,12 @@ static INPUT_PORTS_START( vjdash )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("RHYTHM") // $a10000.w
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Left")      PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Top-Right")     PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Left")      PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Mid-Right")     PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Left")      PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 Btm-Right")     PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 SOUND KEY 1")   PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 SOUND KEY 2")   PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 SOUND KEY 3")   PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 MONITOR KEY 1") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 MONITOR KEY 2") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P2 MONITOR KEY 3") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START2  )      // P2 start
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER   ) PORT_NAME("P1 SOUND KEY 1")   PORT_CODE(KEYCODE_Z)
@@ -1860,26 +1839,143 @@ TIMER_DEVICE_CALLBACK_MEMBER(stepstag_state::field_cb)
 	// irq 4 is definitely a 30 Hz-ish here as well,
 	// except we have a multi-screen arrangement setup and no way to pinpoint source
 	m_subcpu->set_input_line(4, HOLD_LINE);
+	stepstag_state::simulate_pc();	// any better place to put it into schedule?
 }
 
 void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal)
 {
 	// TODO: unknown clock and parameters
-	// assume there's a 42.954 MHz/6 like nndmseal to compensate the higher res
-	screen->set_raw(xtal/6, 455, 0, 352, 262, 0, 240);
+	screen->set_raw(xtal, 429, 0, 352, 525, 0, 240);	// should be 0-479 interlaced
 }
+
+void stepstag_state::simulate_pc()
+{
+	/*command list(stepstag):
+	$010x - start mpeg playing?
+	$02xx - ?
+	$03xx - open mpeg file set
+		$0311 jaleco logo animation
+		$0319 demo L/R bg
+	$04xx - ?
+	$07xx - load sound files to particular addresses of ymz280b ram
+		$070x stereo game music
+		$071x sound effects
+		$072x sample set for music selection
+		$07ff clear music sample region?
+	*/
+	FILE *inFile;
+	unsigned int size, position;	// position2
+	const unsigned int total_ram = 0x1000000;	// full 16MB for each ymz280b
+	if(strcmp(machine().system().name,"vjdash") == 0)
+		position = 0x400000;
+	//	position2 = 0xa00000;	// bass?
+	else
+		position = 0x900000;
+
+	if((m_stepstag_main2pc & 0xff0) == 0x700)
+	{
+		inFile = fopen("bgm_l", "rb");
+		if( inFile )
+		{
+			fseek(inFile, 0, SEEK_END);
+			size = ftell(inFile);
+			rewind(inFile);
+			if(size > total_ram - position)
+				size = total_ram - position;
+			fread(m_ymzram + position, 1, size, inFile);
+			fclose(inFile);
+		}
+//		else
+//			printf("BGM file of Left Channel not found!\n");
+
+		inFile = fopen("bgm_r", "rb");
+		if( inFile )
+		{
+			fseek(inFile, 0, SEEK_END);
+			size = ftell(inFile);
+			rewind(inFile);
+			if(size > total_ram - position)
+				size = total_ram - position;
+			fread(m_ymzram1 + position, 1, size, inFile);
+			fclose(inFile);
+		}
+//		else
+//			printf("BGM file of Right Channel not found!\n");
+	}
+	else if((m_stepstag_main2pc & 0x0ff0)==0x720)	//music selection
+	{
+		position += 0x100000;
+
+		inFile=fopen("bgm_sample", "rb");
+		if( inFile )
+		{
+			fseek(inFile, 0, SEEK_END);
+			size = ftell(inFile);
+			rewind(inFile);
+			if(size > total_ram - position)
+				size = total_ram - position;
+			fread(m_ymzram + position, 1, size, inFile);
+			fclose(inFile);
+			memcpy(m_ymzram1 + position, m_ymzram + position, size);
+		}
+	}
+	else if((m_stepstag_main2pc & 0x0fff)==0x714)	//sound effects
+	{
+		position = 0;
+
+		inFile=fopen("sound_effects", "rb");
+		if( inFile )
+		{
+			fseek(inFile, 0, SEEK_END);
+			size = ftell(inFile);
+			rewind(inFile);
+			if(size > total_ram - position)
+				size = total_ram - position;
+			fread(m_ymzram + position, 1, size, inFile);
+			fclose(inFile);
+			memcpy(m_ymzram1 + position, m_ymzram + position, size);
+		}
+	}
+	else if((m_stepstag_main2pc & 0x0fff)==0x715)	//sound effects 2
+	{
+		position = 0x400000;
+
+		inFile=fopen("vjs02.vjs", "rb");
+		if( inFile )
+		{
+			fseek(inFile, 0, SEEK_END);
+			size = ftell(inFile);
+			rewind(inFile);
+			if(size > total_ram - position)
+				size = total_ram - position;
+			fread(m_ymzram + position, 1, size, inFile);
+			fclose(inFile);
+			memcpy(m_ymzram1 + position, m_ymzram + position, size);
+		}
+	}
+	else if((m_stepstag_main2pc & 0x0f00)==0x7ff)
+	{
+	}
+	else if((m_stepstag_main2pc & 0x0f00)==0x700)	 printf(" cmd 0x%x !! unknown !!!\n", m_stepstag_main2pc);
+
+	m_stepstag_main2pc = 0;
+}
+
+/*void stepstag_state::simulate_vj_sub()
+{
+}*/
 
 void stepstag_state::stepstag(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(12'000'000)); // unknown
+	M68000(config, m_maincpu, XTAL(12'000'000));	// unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	constexpr XTAL subxtal = XTAL(42'954'545); // unknown
-	constexpr XTAL sub_pixel_clock = subxtal/6;
+	constexpr XTAL subxtal = XTAL(13'500'000);	// 2x ntsc mpeg-1 clock
+	constexpr XTAL sub_pixel_clock = subxtal/2;
 
-	M68000(config, m_subcpu, subxtal/3);
+	M68000(config, m_subcpu, subxtal);
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
-	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
+	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(29.97));	//standard NTSC 525 interlaced mode
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1887,26 +1983,30 @@ void stepstag_state::stepstag(machine_config &config)
 
 	// video hardware
 
-	// this screen arrangement is weird:
-	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width,
-	// we are either missing a bit from the config regs or those writes are null and
-	// these screens are driven by something else.
-	// Also note: main 68k tilemap/sprite/palette aren't even displayed with this arrangement,
-	// even tho usage is minimal (POST/test mode), maybe just a left-over ...
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_orientation(ROT270);
-	setup_non_sysctrl_screen(config, &lscreen, subxtal);
-	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
-
+	// The mid-CRT is supposed to have a video switcher to choose one from two sources:
+	// In normal game operation mode, a 352*240*29.97Hz video from the sub cpu board;
+	// While in POST/test mode, a 320x224*60.6Hz from the main cpu board, similar to Rock'n Tread series
+	// TODO: Where is the switching signal from, sysctrl?
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_orientation(ROT0);
 	// TODO: connected to the non sysctrl CRTC anyway?
 	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
+///	m_screen->set_raw(sub_pixel_clock, 429, 0, 352, 525, 0, 240);	// should be 0-479 interlaced
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
 
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_orientation(ROT270);
+	setup_non_sysctrl_screen(config, &lscreen, sub_pixel_clock);
+	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
+
+/*	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
+	mscreen.set_orientation(ROT0);
+	setup_non_sysctrl_screen(config, &mscreen, sub_pixel_clock);
+	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
+*/
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
-	setup_non_sysctrl_screen(config, &rscreen, subxtal);
+	setup_non_sysctrl_screen(config, &rscreen, sub_pixel_clock);
 	rscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_right));
 
 	MCFG_VIDEO_START_OVERRIDE(stepstag_state, stepstag)
@@ -1917,14 +2017,14 @@ void stepstag_state::stepstag(machine_config &config)
 	PALETTE(config, m_vj_palette_m).set_entries(0x8000);
 	PALETTE(config, m_vj_palette_r).set_entries(0x8000);
 
-	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_sprite, XTAL(48'000'000)/8);
 	m_sprite->set_palette(m_palette);
 	m_sprite->set_color_base(0);
 	m_sprite->set_color_entries(16);
 	m_sprite->set_zoom(false);
 
 	// (left screen, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, sub_pixel_clock); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_l, sub_pixel_clock);
 	m_vj_sprite_l->set_palette(m_vj_palette_l);
 	m_vj_sprite_l->set_color_base(0);
 	m_vj_sprite_l->set_color_entries(0x80);
@@ -1932,7 +2032,7 @@ void stepstag_state::stepstag(machine_config &config)
 	m_vj_sprite_l->set_yuv(true);
 
 	// (mid screen, horizontal)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, sub_pixel_clock); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_m, sub_pixel_clock);
 	m_vj_sprite_m->set_palette(m_vj_palette_m);
 	m_vj_sprite_m->set_color_base(0);
 	m_vj_sprite_m->set_color_entries(0x80);
@@ -1940,7 +2040,7 @@ void stepstag_state::stepstag(machine_config &config)
 	m_vj_sprite_m->set_yuv(true);
 
 	// (right screens, vertical in stepping stage)
-	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, sub_pixel_clock); // unknown
+	JALECO_MEGASYSTEM32_SPRITE(config, m_vj_sprite_r, sub_pixel_clock);
 	m_vj_sprite_r->set_palette(m_vj_palette_r);
 	m_vj_sprite_r->set_color_base(0);
 	m_vj_sprite_r->set_color_entries(0x80);
@@ -1957,9 +2057,15 @@ void stepstag_state::stepstag(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	YMZ280B(config, m_ymz, XTAL(16'934'400));
+	m_ymz->set_addrmap(0, &stepstag_state::ymz280b_map);
+	m_ymz->add_route(0, "lspeaker", 1.0);  // 2-Way, Bass Treble?
+	m_ymz->add_route(1, "lspeaker", 1.0);
+
+	YMZ280B(config, m_ymz1, XTAL(16'934'400));
+	m_ymz1->set_addrmap(0, &stepstag_state::ymz280b_map1);
+	m_ymz1->add_route(0, "rspeaker", 1.0);
+	m_ymz1->add_route(1, "rspeaker", 1.0);
 }
 
 void stepstag_state::vjdash(machine_config &config)    // 4 Screens
@@ -1967,11 +2073,11 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	M68000(config, m_maincpu, XTAL(12'000'000)); // 12MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::vjdash_map);
 
-	constexpr XTAL subxtal = XTAL(42'954'545); // unknown
+	constexpr XTAL subxtal = XTAL(13'500'000);
 	constexpr XTAL main_pixel_clock = XTAL(48'000'000)/8;
-	constexpr XTAL sub_pixel_clock = subxtal/6;
+	constexpr XTAL sub_pixel_clock = subxtal;
 
-	M68000(config, m_subcpu, subxtal/3);
+	M68000(config, m_subcpu, subxtal);
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
 
@@ -2040,11 +2146,20 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
+	SPEAKER(config, "lbass").rear_left();
+	SPEAKER(config, "rbass").rear_right();
+
 	GENERIC_LATCH_16(config, m_soundlatch);
 
-	ymz280b_device &ymz(YMZ280B(config, "ymz", subxtal/3)); // unknown
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	YMZ280B(config, m_ymz, XTAL(16'934'400));
+	m_ymz->set_addrmap(0, &stepstag_state::ymz280b_map);
+	m_ymz->add_route(0, "lbass", 1.0);
+	m_ymz->add_route(1, "lspeaker", 1.0);
+
+	YMZ280B(config, m_ymz1, XTAL(16'934'400));
+	m_ymz1->set_addrmap(0, &stepstag_state::ymz280b_map1);
+	m_ymz1->add_route(0, "rbass", 1.0);
+	m_ymz1->add_route(1, "rspeaker", 1.0);
 }
 
 
@@ -2711,6 +2826,12 @@ ROM_START( vjdash )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.ic59", 0x00000, 0x80000, CRC(f7cf8d62) SHA1(8a1bf3a4eb431b71262d9dda47caa0ba0a0127f6) )
 	ROM_LOAD16_BYTE( "vjdash1_ver1.2.ic65", 0x00001, 0x80000, CRC(6d01bef5) SHA1(1f27a82cd583451b32f14967d8db00448543f948) )
+	ROM_FILL( 0x58fc0, 1, 0xff )	// patch to boot to game without sub code dumped
+	ROM_FILL( 0x58ffa, 1, 0xff )
+	ROM_FILL( 0x58fca, 1, 0x60 )
+	ROM_FILL( 0x58fcb, 1, 0x14 )
+	ROM_FILL( 0x59004, 1, 0x60 )
+	ROM_FILL( 0x59005, 1, 0x14 )
 
 	ROM_REGION( 0x100000, "sub", ROMREGION_ERASE ) // 68000
 	ROM_LOAD16_BYTE( "vjdash4_ver1.2.11", 0x00000, 0x80000, NO_DUMP )
@@ -2719,15 +2840,15 @@ ROM_START( vjdash )
 	ROM_FILL( 0x100, 1, 0x60 )
 	ROM_FILL( 0x101, 1, 0xfe )
 
-	ROM_REGION( 0x0c00000, "sprite_l", ROMREGION_ERASE )    // left screen sprites
+	ROM_REGION( 0x0c00000, "sprite_l", ROMREGION_ERASE )	// left screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x1800000, "sprite_m", ROMREGION_ERASE )     // middle screen sprites
+	ROM_REGION( 0x1800000, "sprite_m", ROMREGION_ERASE )	// middle screen sprites
 	ROM_LOAD( "vjdash-03", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-04", 0x400000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x0c00000, "sprite_r", ROMREGION_ERASE )   // right screen sprites
+	ROM_REGION( 0x0c00000, "sprite_r", ROMREGION_ERASE )	// right screen sprites
 	ROM_LOAD( "vjdash-01", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD( "vjdash-02", 0x400000, 0x400000, NO_DUMP )
 
@@ -2747,9 +2868,6 @@ ROM_START( vjdash )
 
 	ROM_REGION( 0x010000, "xilinx", 0 )  // XILINX CPLD
 	ROM_LOAD( "15c.ic49", 0x000000, 38807, CRC(60d50907) SHA1(c5a837b3105ba15fcec103154c8c4d00924974e1) )
-
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
-	ROM_LOAD( "vjdash-sound", 0x000000, 0x400000, NO_DUMP )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE("vjdash", 0, NO_DUMP)
@@ -2802,9 +2920,6 @@ ROM_START( stepstag )
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
 	ROM_LOAD( "stepstag_rott", 0x000000, 0x400000, NO_DUMP )
 
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  // Samples
-	ROM_LOAD( "stepstag-sound", 0x000000, 0x400000, NO_DUMP )
-
 	DISK_REGION( "disks" )
 	DISK_IMAGE("stepstag", 0, NO_DUMP)
 ROM_END
@@ -2855,9 +2970,6 @@ ROM_START( step3 )
 	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE )   /* 16x16x8 (Background) */
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE )   /* 16x16x8 (Rotation) */
-
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE )  /* Samples */
-	ROM_LOAD( "step3-sound", 0x000000, 0x400000, NO_DUMP )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE("step3", 0, NO_DUMP)
