@@ -122,7 +122,7 @@ public:
 	command_fifo(voodoo_device_base &device);
 
 	// initialization
-	void init(std::vector<u8> &ram) { m_ram = reinterpret_cast<u32 *>(&ram[0]); m_mask = (ram.size() / 4) - 1; }
+	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
 
 	// getters
 	bool enabled() const { return m_enable; }
@@ -316,7 +316,7 @@ protected:
 	{
 		tmu_state(voodoo_device_base &device) : m_device(device), m_reg(device.model()) { }
 
-		void init(int index, voodoo::shared_tables &share, std::vector<u8> &memory);
+		void init(int index, voodoo::shared_tables &share, u8 *ram, u32 size);
 		voodoo::rasterizer_texture &prepare_texture();
 		s32 compute_lodbase();
 		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
@@ -346,7 +346,7 @@ protected:
 	struct fbi_state
 	{
 		fbi_state(voodoo_device_base &device) : m_cmdfifo{ device, device } { }
-		void init(voodoo_model model, std::vector<u8> &memory);
+		void init(voodoo_model model, u8 *ram, u32 size);
 
 		void recompute_screen_params(voodoo::voodoo_regs &regs, screen_device &screen);
 		void recompute_video_memory(voodoo::voodoo_regs &regs);
@@ -509,8 +509,9 @@ protected:
 	voodoo::debug_stats m_stats;             // internal statistics
 
 	// allocated memory
-	std::vector<u8> m_fbmem;                 // allocated framebuffer
-	std::vector<u8> m_tmumem[2];             // allocated texture memory
+	u8 *m_fbmem;                             // pointer to aligned framebuffer
+	u8 *m_tmumem[2];                         // pointer to aligned texture memory
+	std::unique_ptr<u8[]> m_memory;          // allocated framebuffer/texture memory
 	std::unique_ptr<voodoo::shared_tables> m_shared; // shared tables
 };
 

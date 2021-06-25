@@ -418,11 +418,11 @@ void voodoo_device_base::set_init_enable(u32 newval)
  *
  *************************************/
 
-void voodoo_device_base::fbi_state::init(voodoo_model model, std::vector<u8> &memory)
+void voodoo_device_base::fbi_state::init(voodoo_model model, u8 *ram, u32 size)
 {
 	// allocate frame buffer RAM and set pointers
-	m_ram = &memory[0];
-	m_mask = memory.size() - 1;
+	m_ram = ram;
+	m_mask = size - 1;
 	m_rgboffs[0] = m_rgboffs[1] = m_rgboffs[2] = 0;
 	m_auxoffs = ~0;
 
@@ -455,8 +455,8 @@ void voodoo_device_base::fbi_state::init(voodoo_model model, std::vector<u8> &me
 
 	// initialize the memory FIFO
 	m_fifo.configure(nullptr, 0);
-	m_cmdfifo[0].init(memory);
-	m_cmdfifo[1].init(memory);
+	m_cmdfifo[0].init(ram, size);
+	m_cmdfifo[1].init(ram, size);
 
 	if (model <= MODEL_VOODOO_2)
 	{
@@ -506,12 +506,12 @@ shared_tables::shared_tables()
 }
 
 
-void voodoo_device_base::tmu_state::init(int index, shared_tables &share, std::vector<u8> &memory)
+void voodoo_device_base::tmu_state::init(int index, shared_tables &share, u8 *ram, u32 size)
 {
 	// configure texture RAM
 	m_index = index;
-	m_ram = &memory[0];
-	m_mask = memory.size() - 1;
+	m_ram = ram;
+	m_mask = size - 1;
 	m_regdirty = true;
 	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
 
@@ -2246,7 +2246,7 @@ s32 voodoo_device_base::register_w(offs_t offset, u32 data)
 
 		// other commands
 		case voodoo_regs::reg_nopCMD:
-			m_renderer->wait(m_reg.name(regnum));
+//			m_renderer->wait(m_reg.name(regnum));
 			if (BIT(data, 0))
 				reset_counters();
 			if (BIT(data, 1))
@@ -4115,7 +4115,8 @@ voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_typ
 	m_vsync_stop_timer(nullptr),
 	m_vsync_start_timer(nullptr),
 	m_stall_resume_timer(nullptr),
-	m_shared(new shared_tables)
+	m_fbmem(nullptr),
+	m_tmumem{ nullptr, nullptr }
 {
 }
 
@@ -4135,6 +4136,9 @@ voodoo_device_base::~voodoo_device_base()
 
 void voodoo_device_base::device_start()
 {
+	// create shared tables
+	m_shared = std::make_unique<shared_tables>();
+
 	// validate configuration
 	if (m_fbmem_in_mb == 0)
 		fatalerror("Invalid Voodoo memory configuration");
@@ -4165,28 +4169,35 @@ void voodoo_device_base::device_start()
 	voodoo::dither_helper::init_static();
 
 	// allocate memory
-	m_fbmem.resize(m_fbmem_in_mb << 20);
+	u32 total_allocation = m_fbmem_in_mb + (m_reg.rev1_or_2() ? (m_tmumem0_in_mb + m_tmumem1_in_mb) : 0 );
+	m_memory = std::make_unique<u8[]>(total_allocation * 1024 * 1024 + 4096);
+
+	// configure frame buffer memory, aligning the base to a 4k boundary
+	m_fbmem = (u8 *)(((uintptr_t(m_memory.get()) + 4095) >> 12) << 12);
+
+	// configure texture memory
 	m_chipmask = 0x03;
 	if (m_reg.rev1_or_2())
 	{
 		// Voodoo 1/2 have separate framebuffer and texture RAM
-		m_tmumem[0].resize(m_tmumem0_in_mb << 20);
-		m_tmumem[1].resize(m_tmumem1_in_mb << 20);
+		m_tmumem[0] = m_fbmem + m_fbmem_in_mb * 1024 * 1024;
+		m_tmumem[1] = m_tmumem[0] + m_tmumem0_in_mb * 1024 * 1024;
 		m_chipmask |= (m_tmumem1_in_mb != 0) ? 0x04 : 0x00;
 	}
 	else
 	{
 		// Voodoo Banshee/3 have shared RAM; Voodoo 3 has two TMUs
+		m_tmumem[0] = m_tmumem[1] = m_fbmem;
 		m_chipmask |= (m_model == MODEL_VOODOO_3) ? 0x04 : 0x00;
 	}
 
 	// initialize the frame buffer
-	m_fbi.init(m_model, m_fbmem);
+	m_fbi.init(m_model, m_fbmem, m_fbmem_in_mb * 1024 * 1024);
 
 	// initialize the TMUs
-	m_tmu[0].init(0, *m_shared.get(), m_tmumem[0].empty() ? m_fbmem : m_tmumem[0]);
+	m_tmu[0].init(0, *m_shared.get(), m_tmumem[0], m_tmumem0_in_mb * 1024 * 1024);
 	if (BIT(m_chipmask, 2))
-		m_tmu[1].init(1, *m_shared.get(), m_tmumem[1].empty() ? m_fbmem : m_tmumem[1]);
+		m_tmu[1].init(1, *m_shared.get(), m_tmumem[1], m_tmumem1_in_mb * 1024 * 1024);
 
 	// determine the TMU configuration flags
 	u16 tmu_config = 0x11;   // revision 1
