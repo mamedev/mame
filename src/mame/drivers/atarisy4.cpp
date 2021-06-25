@@ -214,7 +214,7 @@ private:
  *************************************/
 
 atarisy4_state::atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen) :
-	poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>(screen),
+	poly_manager<float, atarisy4_polydata, 2, POLY_FLAG_NO_WORK_QUEUE>(screen.machine()),
 	m_state(state)
 {
 }
