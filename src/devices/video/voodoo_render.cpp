@@ -1340,20 +1340,9 @@ u32 voodoo_renderer::enqueue_fastfill(poly_data &poly)
 	}
 
 	// create a block of 64 identical extents
-	voodoo_renderer::extent_t extents[64];
-	extents[0].startx = poly.clipleft;
-	extents[0].stopx = poly.clipright;
-	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
-
-	// iterate over the full area
-	voodoo_renderer::render_delegate fastfill_cb(&voodoo_renderer::rasterizer_fastfill, this);
-	u32 pixels = 0;
-	for (int y = poly.cliptop; y < poly.clipbottom; y += std::size(extents))
-	{
-		int numextents = std::min(poly.clipbottom - y, int(std::size(extents)));
-		pixels += render_triangle_custom(global_cliprect, fastfill_cb, y, numextents, extents);
-	}
-	return pixels;
+	vertex_t v1(poly.clipleft, poly.cliptop);
+	vertex_t v2(poly.clipright, poly.clipbottom);
+	return render_tile<0>(global_cliprect, render_delegate(&voodoo_renderer::rasterizer_fastfill, this), v1, v2);
 }
 
 
@@ -1396,7 +1385,7 @@ u32 voodoo_renderer::enqueue_triangle(poly_data &poly, vertex_t const *vert)
 	// set the info and render the triangle
 	info->polys++;
 	poly.info = info;
-	return render_triangle(global_cliprect, poly.info->callback, 0, vert[0], vert[1], vert[2]);
+	return render_triangle<0>(global_cliprect, poly.info->callback, vert[0], vert[1], vert[2]);
 }
 
 

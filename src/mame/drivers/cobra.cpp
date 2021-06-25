@@ -2533,7 +2533,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_texture_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 8, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<8>(visarea, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						else
@@ -2541,7 +2541,7 @@ void cobra_renderer::gfx_fifo_exec()
 							render_delegate rd = render_delegate(&cobra_renderer::render_color_scan, this);
 							for (int i=2; i < units; i++)
 							{
-								render_triangle(visarea, rd, 5, vert[i-2], vert[i-1], vert[i]);
+								render_triangle<5>(visarea, rd, vert[i-2], vert[i-1], vert[i]);
 							}
 						}
 						break;

@@ -1441,7 +1441,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].p[2] = color.g();
 			pVert[2].p[3] = color.b();
 
-			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), 4, pVert[0], pVert[1], pVert[2]);
+			render_triangle<4>(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
 	}
 	else
@@ -1497,7 +1497,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].p[5] = pvjp1.texCoords[0];
 			pVert[2].p[6] = pvjp1.texCoords[1];
 
-			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_texture_scanline, this), 7, pVert[0], pVert[1], pVert[2]);
+			render_triangle<7>(visibleArea, render_delegate(&hng64_poly_renderer::render_texture_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
 	}
 }

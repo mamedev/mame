@@ -365,7 +365,10 @@ void midvunit_renderer::process_dma_queue()
 	objectdata.dither = ((m_state.m_dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	render_polygon<4>(m_state.m_screen->visible_area(), callback, textured ? 2 : 0, vert);
+	if (textured)
+		render_polygon<4, 2>(m_state.m_screen->visible_area(), callback, vert);
+	else
+		render_polygon<4, 0>(m_state.m_screen->visible_area(), callback, vert);
 }
 
 

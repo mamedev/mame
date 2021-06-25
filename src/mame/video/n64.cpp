@@ -25,6 +25,7 @@ TODO:
 *******************************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "includes/n64.h"
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"

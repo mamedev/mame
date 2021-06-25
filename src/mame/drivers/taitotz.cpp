@@ -1344,7 +1344,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
+			render_triangle<6>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1434,7 +1434,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
+			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;

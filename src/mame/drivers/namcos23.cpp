@@ -1266,6 +1266,7 @@ Notes:
 #include "sound/c352.h"
 #include "video/poly.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
@@ -2222,7 +2223,7 @@ void namcos23_state::render_one_model(const namcos23_render_entry *re)
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 
 		// Should be unnecessary now that frustum clipping happens, but this still culls polys behind the camera
-		p->vertex_count = render.polymgr->zclip_if_less(ne, pv, p->pv, 4, 0.00001f);
+		p->vertex_count = render.polymgr->zclip_if_less<4>(ne, pv, p->pv, 0.00001f);
 
 		// Project if you don't clip on the near plane
 		if(p->vertex_count >= 3) {
@@ -2316,13 +2317,13 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<4, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<5, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 		else if (p->vertex_count == 6)
-			render_polygon<6>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
+			render_polygon<6, 4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), p->pv);
 	}
 	render.poly_count = 0;
 }

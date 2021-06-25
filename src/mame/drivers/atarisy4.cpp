@@ -359,7 +359,7 @@ void atarisy4_state::atarisy4_renderer::draw_polygon(uint16_t color)
 		v3.x = m_state.m_gpu.points[i].x;
 		v3.y = m_state.m_gpu.points[i].y;
 
-		render_triangle(clip, rd_scan, 1, v1, v2, v3);
+		render_triangle<1>(clip, rd_scan, v1, v2, v3);
 		v2 = v3;
 	}
 }
