@@ -76833,6 +76833,61 @@ be better to redump them properly. -->
 	</software>
 
 
+<!-- These are more recent dumps of unlicensed homebrew games that have been released on cartridge. They need to be verified against physical carts. -->
+
+	<software name="puritans">
+		<description>2A03Puritans</description>
+		<year>2013</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="2a03pur" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="1048576">
+				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" status="baddump" />
+			</dataarea>
+			<!-- 8 VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Author self-published through mail order, carts made by RetroZone -->
+	<software name="et">
+		<description>E.T.</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" status="baddump" />
+			</dataarea>
+			<!-- 8 VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glider">
+		<description>Glider</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cufrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="glider.prg" size="131072" crc="1b00c2b3" sha1="670fbb3c9a3f51a878d68a45930ee3fab4beb8dd" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. The following roms are freely available digital releases. They need to be checked against commercial physical carts. -->
 
 	<software name="a53vol1">
@@ -76840,9 +76895,9 @@ be better to redump them properly. -->
 		<year>2013</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" offset="00000" />
+				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -76855,9 +76910,9 @@ be better to redump them properly. -->
 		<year>2014</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" offset="00000" />
+				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -76870,9 +76925,9 @@ be better to redump them properly. -->
 		<year>2018</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="1048576">
-				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" offset="00000" />
+				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? Sinking Feeling needs this much. -->
 			<dataarea name="vram" size="32768">

@@ -59,10 +59,10 @@ static const nes_mmc mmc_list[] =
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
 	{ 27, UNL_WORLDHERO },  // 27 World Hero board - Unsupported
-	{ 28, BTL_ACTION53 },   // 28 - Multi-discrete PCB designed by Tepples for Action 53
-	// 29 Unused
-	// 30 UNROM 512 + Flash, currently unsupported
-	{ 31, BTL_2A03_PURITANS },   // 31 - PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
+	{ 28, UNL_ACTION53 },   // 28 - Multi-discrete PCB designed by Tepples for Action 53
+	{ 29, UNL_CUFROM },     // 29 - homebrew PCB used by Glider
+	{ 30, UNL_UNROM512 },   // 30 - UNROM 512 + Flash
+	{ 31, UNL_2A03PURITANS },   // 31 - PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
 	{ 32, IREM_G101 },
 	{ 33, TAITO_TC0190FMC },
 	{ 34, STD_BXROM },
@@ -134,7 +134,7 @@ static const nes_mmc mmc_list[] =
 	// 100 images hacked to work with nesticle?
 	// 101 Unused (Urusei Yatsura had been assigned to this mapper, but it's Mapper 87)
 	// 102 Unused
-	{ 103, UNL_2708 },  // 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
+	{ 103, UNL_2708 },  // 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion)
 	{ 104, CAMERICA_GOLDENFIVE },
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
@@ -560,6 +560,28 @@ void nes_cart_slot_device::call_load_ines()
 					break;
 				case 0x09:
 					m_cart->set_mirroring(PPU_MIRROR_HIGH);
+					break;
+			}
+			break;
+
+		case UNL_UNROM512:
+			// this mapper also uses mirroring flags differently
+			m_cart->set_four_screen_vram(false);
+			switch (local_options & 0x09)
+			{
+				case 0x00:
+					m_cart->set_mirroring(PPU_MIRROR_HORZ);
+					break;
+				case 0x01:
+					m_cart->set_mirroring(PPU_MIRROR_VERT);
+					break;
+				case 0x08:
+					m_cart->set_mirroring(PPU_MIRROR_LOW);
+					m_cart->set_pcb_ctrl_mirror(true);
+					break;
+				case 0x09:
+					m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
+					m_cart->set_four_screen_vram(true);
 					break;
 			}
 			break;
