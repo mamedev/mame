@@ -873,7 +873,13 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (m_reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer->timer->adjust(TIMER_PERIOD * timer->count, which);
+	{
+		// unsure what a 0-length timer should do, but it produces an infinite loop so guard against it
+		u32 effcount = timer->count;
+		if (effcount == 0)
+			effcount = (which != 0) ? 0xffffff : 0xffffffff;
+		timer->timer->adjust(TIMER_PERIOD * effcount, which);
+	}
 	else
 		timer->active = timer->count = 0;
 
