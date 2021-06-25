@@ -2833,25 +2833,25 @@ license:CC0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 base CD"/>
 			<diskarea name="cdrom">
-				<disk name="fdbasecd" sha1="4adf8033c7d02f30e9ef9caf68d90b8d131d1759"/>
+				<disk name="fd10basecd" sha1="4adf8033c7d02f30e9ef9caf68d90b8d131d1759"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 base WS"/>
 			<diskarea name="cdrom">
-				<disk name="fdbasews" sha1="a34535fd4d2c719bf5c0de46b0174ff3e0726924"/>
+				<disk name="fd10basews" sha1="a34535fd4d2c719bf5c0de46b0174ff3e0726924"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 full CD"/>
 			<diskarea name="cdrom">
-				<disk name="fdfullcd" sha1="c61303fb65f22c5d4731b921677e11b69c7cfbd5"/>
+				<disk name="fd10fullcd" sha1="c61303fb65f22c5d4731b921677e11b69c7cfbd5"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 full WS"/>
 			<diskarea name="cdrom">
-				<disk name="fdfullws" sha1="bfdfe1b9e3c4d697e69ea47dd436b6d291bee5bd"/>
+				<disk name="fd10fullws" sha1="bfdfe1b9e3c4d697e69ea47dd436b6d291bee5bd"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2864,25 +2864,25 @@ license:CC0
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 Base CD"/>
 			<diskarea name="cdrom">
-				<disk name="fdbasecd" sha1="dd786f321046514e5f24abbf340b63dd4dadb30c"/>
+				<disk name="fd10abasecd" sha1="dd786f321046514e5f24abbf340b63dd4dadb30c"/>
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 Base CD with source"/>
 			<diskarea name="cdrom">
-				<disk name="fdbasews" sha1="ac6941c1322c74df58093305f7bc9aed8180c4cd"/>
+				<disk name="fd10abasews" sha1="ac6941c1322c74df58093305f7bc9aed8180c4cd"/>
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 Full CD"/>
 			<diskarea name="cdrom">
-				<disk name="fdfullcd" sha1="7ee77df8277da136a7b19eb57afba106dd654233"/>
+				<disk name="fd10afullcd" sha1="7ee77df8277da136a7b19eb57afba106dd654233"/>
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
 			<feature name="part_id" value="FreeDOS 1.0 Full CD with source"/>
 			<diskarea name="cdrom">
-				<disk name="fdfullws" sha1="0868559412de4d35b8d5081a6dec87d665ed9c1f"/>
+				<disk name="fd10afullws" sha1="0868559412de4d35b8d5081a6dec87d665ed9c1f"/>
 			</diskarea>
 		</part>
 	</software>
