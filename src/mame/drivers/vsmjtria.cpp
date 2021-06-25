@@ -30,8 +30,6 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "layout/generic.h"
-
 
 namespace {
 
@@ -40,7 +38,7 @@ class vsmjtria_state : public driver_device
 public:
 	vsmjtria_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_cpu(*this, "cpu%u", 0U),
 		m_gfxdecode(*this, "gfxdecode%u", 0U),
 		m_colorram(*this, "colorram%u", 0U),
 		m_videoram(*this, "videoram%u", 0U),
@@ -57,7 +55,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device_array<cpu_device, 2> m_cpu;
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
@@ -67,6 +65,7 @@ private:
 	tilemap_t *m_bg_tilemap[2];
 	uint8_t m_keyboard_cmd[2];
 
+	template <uint8_t Which> void nmi_w(uint8_t data);
 	template <uint8_t Which> void ctrl_w(uint8_t data);
 	uint8_t p1_keyboard_r();
 	uint8_t p2_keyboard_r();
@@ -89,6 +88,12 @@ void vsmjtria_state::machine_start()
 	m_keyboard_cmd[0] = m_keyboard_cmd[1] = 0;
 
 	save_item(NAME(m_keyboard_cmd));
+}
+
+template <uint8_t Which>
+void vsmjtria_state::nmi_w(uint8_t data)
+{
+	m_cpu[Which]->pulse_input_line(INPUT_LINE_NMI, m_cpu[Which]->minimum_quantum_time());
 }
 
 template <uint8_t Which>
@@ -189,7 +194,8 @@ void vsmjtria_state::main_io_map(address_map &map)
 	map(0x8020, 0x8020).r("ay0", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("ay0", FUNC(ay8910_device::address_data_w));
 	map(0x8060, 0x8060).w(FUNC(vsmjtria_state::ctrl_w<0>));
-	// 0x80e0 latch to and from subcpu?
+	map(0x80c0, 0x80c0).w(FUNC(vsmjtria_state::nmi_w<1>));
+	map(0x80e0, 0x80e0).r("latch1", FUNC(generic_latch_8_device::read)).w("latch0", FUNC(generic_latch_8_device::write));
 }
 
 void vsmjtria_state::sub_prg_map(address_map &map)
@@ -208,7 +214,8 @@ void vsmjtria_state::sub_io_map(address_map &map)
 	map(0x8020, 0x8020).r("ay1", FUNC(ay8910_device::data_r));
 	map(0x8020, 0x8021).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x8060, 0x8060).w(FUNC(vsmjtria_state::ctrl_w<1>));
-	// 0x80e0 latch to and from maincpu?
+	map(0x80c0, 0x80c0).w(FUNC(vsmjtria_state::nmi_w<0>));
+	map(0x80e0, 0x80e0).r("latch0", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 }
 
 
@@ -216,7 +223,7 @@ static INPUT_PORTS_START( vsmjtria )
 	// TODO: coins?
 
 	PORT_START("P1_KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) // for single player mode
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Single Start")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_M )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
@@ -258,7 +265,7 @@ static INPUT_PORTS_START( vsmjtria )
 	PORT_START("P1_KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) // selects VS mode for player 1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1) PORT_NAME("P1 VS Start")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -266,7 +273,7 @@ static INPUT_PORTS_START( vsmjtria )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Single Start")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_I ) PORT_PLAYER(2)
@@ -308,7 +315,7 @@ static INPUT_PORTS_START( vsmjtria )
 	PORT_START("P2_KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) // selects VS mode for player 2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2) PORT_NAME("P2 VS Start")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -440,18 +447,23 @@ GFXDECODE_END
 
 void vsmjtria_state::vsmjtria(machine_config &config)
 {
-	Z80(config, m_maincpu, 20_MHz_XTAL / 5); // divider guessed
-	m_maincpu->set_addrmap(AS_PROGRAM, &vsmjtria_state::main_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &vsmjtria_state::main_io_map);
-	m_maincpu->set_vblank_int("lscreen", FUNC(vsmjtria_state::irq0_line_hold));
+	config.set_perfect_quantum("cpu0"); // crude way to make comms work - does it have FIFOs rather than latches?
 
-	z80_device &sub(Z80(config, "subcpu", 20_MHz_XTAL / 5)); // divider guessed
-	sub.set_addrmap(AS_PROGRAM, &vsmjtria_state::sub_prg_map);
-	sub.set_addrmap(AS_IO, &vsmjtria_state::sub_io_map);
-	sub.set_vblank_int("rscreen", FUNC(vsmjtria_state::irq0_line_hold));
+	Z80(config, m_cpu[0], 20_MHz_XTAL / 5); // divider guessed
+	m_cpu[0]->set_addrmap(AS_PROGRAM, &vsmjtria_state::main_prg_map);
+	m_cpu[0]->set_addrmap(AS_IO, &vsmjtria_state::main_io_map);
+	m_cpu[0]->set_vblank_int("lscreen", FUNC(vsmjtria_state::irq0_line_hold));
+
+	Z80(config, m_cpu[1], 20_MHz_XTAL / 5); // divider guessed
+	m_cpu[1]->set_addrmap(AS_PROGRAM, &vsmjtria_state::sub_prg_map);
+	m_cpu[1]->set_addrmap(AS_IO, &vsmjtria_state::sub_io_map);
+	m_cpu[1]->set_vblank_int("rscreen", FUNC(vsmjtria_state::irq0_line_hold));
 
 	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+
+	GENERIC_LATCH_8(config, "latch0");
+	GENERIC_LATCH_8(config, "latch1");
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
 	ppi0.in_pa_callback().set_log("ppi0 pa read");
@@ -474,8 +486,6 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode[0], "palette0", gfx_vsmjtria_main);
 	GFXDECODE(config, m_gfxdecode[1], "palette1", gfx_vsmjtria_sub);
-
-	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -507,11 +517,11 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 }
 
 ROM_START( vsmjtria )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // only 5.n8 and 6.n12 differ, and only for 2 bytes
+	ROM_REGION( 0x10000, "cpu0", 0 ) // only 5.n8 and 6.n12 differ, and only for 2 bytes
 	ROM_LOAD( "dyna 5.n8",  0x0000, 0x8000, CRC(526e3e6e) SHA1(db7b116f285761b040bb3b5cb3e00f5bf78606a9) )
 	ROM_LOAD( "dyna 41.n7", 0x8000, 0x8000, CRC(0c150add) SHA1(856de25fe43b656ea7c3066f838de6581df896c9) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 )
+	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "dyna 6.n12",  0x0000, 0x8000, CRC(f1b09d7a) SHA1(89b653ce332f3b1c1c9f7b82e3636dfb329ebd93) )
 	ROM_LOAD( "dyna 41.n13", 0x8000, 0x8000, CRC(0c150add) SHA1(856de25fe43b656ea7c3066f838de6581df896c9) )
 
