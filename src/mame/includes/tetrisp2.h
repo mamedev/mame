@@ -6,6 +6,7 @@
 #include "video/ms32_sprite.h"
 #include "emupal.h"
 #include "tilemap.h"
+#include "sound/ymz280b.h"
 
 class tetrisp2_state : public driver_device
 {
@@ -214,6 +215,10 @@ public:
 		, m_vj_paletteram_m(*this, "paletteram2")
 		, m_vj_paletteram_r(*this, "paletteram3")
 		, m_soundlatch(*this, "soundlatch")
+		, m_ymz(*this, "ymz")
+		, m_ymz1(*this, "ymz1")
+		, m_ymzram(*this, "ymz_ram")
+		, m_ymzram1(*this, "ymz_ram1")
 	{ }
 
 	void stepstag(machine_config &config);
@@ -227,6 +232,8 @@ private:
 	u16 stepstag_coins_r();
 	u16 vj_upload_idx;
 	bool vj_upload_fini;
+//	bool fg_ascii_mode;
+//	bool stepstag_mid_switcher;
 	void stepstag_b00000_w(u16 data);
 	void stepstag_b20000_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void stepstag_main2pc_w(u16 data);
@@ -251,6 +258,11 @@ private:
 	void stepstag_map(address_map &map);
 	void stepstag_sub_map(address_map &map);
 	void vjdash_map(address_map &map);
+	void ymz280b_map(address_map &map);
+	void ymz280b_map1(address_map &map);
+
+	u16 m_stepstag_main2pc;
+	u16 m_stepstag_pc2main;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(field_cb);
 	void setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal);
@@ -268,5 +280,12 @@ private:
 	optional_shared_ptr<u16> m_vj_paletteram_m;
 	optional_shared_ptr<u16> m_vj_paletteram_r;
 	required_device<generic_latch_16_device> m_soundlatch;
+	required_device<ymz280b_device> m_ymz;
+	required_device<ymz280b_device> m_ymz1;
+	required_shared_ptr<u8> m_ymzram;
+	required_shared_ptr<u8> m_ymzram1;
+
 	void convert_yuv422_to_rgb888(palette_device *paldev, u16 *palram,u32 offset);
+	void simulate_pc();
+//	unsigned int load_sample(unsigned char* buffer, const char* path);
 };
