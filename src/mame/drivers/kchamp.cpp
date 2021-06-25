@@ -323,27 +323,27 @@ INPUT_PORTS_END
 
 static const gfx_layout tilelayout =
 {
-	8,8,    /* tile size */
-	256*8,  /* number of tiles */
-	2,  /* bits per pixel */
-	{ 0x4000*8, 0 }, /* plane offsets */
-	{ 0,1,2,3,4,5,6,7 }, /* x offsets */
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 }, /* y offsets */
-	8*8 /* offset to next tile */
+	8,8,    // tile size
+	256*8,  // number of tiles
+	2,  // bits per pixel
+	{ 0x4000*8, 0 }, // plane offsets
+	{ 0,1,2,3,4,5,6,7 }, // x offsets
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 }, // y offsets
+	8*8 // offset to next tile
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* tile size */
-	512,    /* number of tiles */
-	2,  /* bits per pixel */
-	{ 0xC000*8, 0 }, /* plane offsets */
+	16,16,  // tile size
+	512,    // number of tiles
+	2,  // bits per pixel
+	{ 0xC000*8, 0 }, // plane offsets
 	{ 0,1,2,3,4,5,6,7,
 		0x2000*8+0,0x2000*8+1,0x2000*8+2,0x2000*8+3,
-		0x2000*8+4,0x2000*8+5,0x2000*8+6,0x2000*8+7 }, /* x offsets */
+		0x2000*8+4,0x2000*8+5,0x2000*8+6,0x2000*8+7 }, // x offsets
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-	8*8,9*8,10*8,11*8,12*8,13*8,14*8, 15*8 }, /* y offsets */
-	16*8    /* ofset to next tile */
+	8*8,9*8,10*8,11*8,12*8,13*8,14*8, 15*8 }, // y offsets
+	16*8    // ofset to next tile
 };
 
 static GFXDECODE_START( gfx_kchamp )
@@ -405,17 +405,17 @@ void kchamp_state::machine_reset()
 
 void kchamp_state::kchampvs(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* verified on pcb */
+	// Basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* verified on pcb */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
-	/* IRQs triggered from main CPU */
-	/* NMIs from MSM5205 */
+	// IRQs triggered from main CPU
+	// NMIs from MSM5205
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -424,9 +424,9 @@ void kchamp_state::kchampvs(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.10); /* verified on pcb */
+	screen.set_refresh_hz(59.10); // verified on PCB
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
@@ -437,21 +437,21 @@ void kchamp_state::kchampvs(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
-	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
+	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
+	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    // verified on PCB
 
 	LS157(config, m_adpcm_select, 0); // at 4C
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_msm, 375000);  /* verified on pcb, discrete circuit clock */
-	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  /* interrupt function */
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback */
+	MSM5205(config, m_msm, 375000);  // verified on PCB, discrete circuit clock
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  // interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  // 1 / 96 = 3906.25Hz playback
 	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -461,17 +461,17 @@ void kchamp_state::kchampvs(machine_config &config)
 
 void kchamp_state::kchamp(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* 12MHz / 4 = 3.0 MHz */
+	// Basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     // 12MHz / 4 = 3.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
 	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* 12MHz / 4 = 3.0 MHz */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    // 12MHz / 4 = 3.0 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */
-	/* IRQs triggered from main CPU */
-	/* NMIs from 125Hz clock */
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); // Hz
+	// IRQs triggered from main CPU
+	// NMIs from 125Hz clock
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
 	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
@@ -479,7 +479,7 @@ void kchamp_state::kchamp(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -492,14 +492,14 @@ void kchamp_state::kchamp(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
 	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
-	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
+	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
+	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); // Guess based on actual PCB recordings of karatedo
 
 	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
 }
@@ -529,37 +529,37 @@ ROM_START( kchamp )
 	ROM_LOAD( "b018.bin", 0x8000, 0x2000, CRC(b824abc7) SHA1(4a30fec025150e889600a78497700155e743c99e) )
 	ROM_LOAD( "b019.bin", 0xa000, 0x2000, CRC(3b487a46) SHA1(7837e480fd4648e0d3f792b79fa0019e063abdc6) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "b026.bin", 0x0000, 0x2000, CRC(999ed2c7) SHA1(f01e4ee81f8f7b0d1cf001d3ec01a9210f8109b4) )
-	ROM_LOAD( "b025.bin", 0x2000, 0x2000, CRC(33171e07) SHA1(55ee74c9f1d86ec13d92ea0d1b700bbe24b79def) ) /* adpcm */
-	ROM_LOAD( "b024.bin", 0x4000, 0x2000, CRC(910b48b9) SHA1(c6a2f8266ff1f14b462b92d47a4a86542df77cdd) ) /* adpcm */
+	ROM_LOAD( "b025.bin", 0x2000, 0x2000, CRC(33171e07) SHA1(55ee74c9f1d86ec13d92ea0d1b700bbe24b79def) ) // ADPCM
+	ROM_LOAD( "b024.bin", 0x4000, 0x2000, CRC(910b48b9) SHA1(c6a2f8266ff1f14b462b92d47a4a86542df77cdd) ) // ADPCM
 	ROM_LOAD( "b023.bin", 0x6000, 0x2000, CRC(47f66aac) SHA1(484802cfbff7c5f51dd97cb3b2321e137b03481c) )
 	ROM_LOAD( "b022.bin", 0x8000, 0x2000, CRC(5928e749) SHA1(a4dbd6f2a6a7aa9597875dfd781e55b0fb14d49b) )
 	ROM_LOAD( "b021.bin", 0xa000, 0x2000, CRC(ca17e3ba) SHA1(91a3ccd6045dcef5f3293d669fe5a4df59cd954b) )
 	ROM_LOAD( "b020.bin", 0xc000, 0x2000, CRC(ada4f2cd) SHA1(15a4ed7497cb6c06f523ebe38bc4eb6dbcd09549) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "b000.bin", 0x00000, 0x2000, CRC(a4fa98a1) SHA1(33b9a1a56d72ffa5f4e16b69e6e19af5a2882b2c) )  /* plane0 */ /* tiles */
-	ROM_LOAD( "b001.bin", 0x04000, 0x2000, CRC(fea09f7c) SHA1(174fc8022c455438538e6a3b67c7effc857ae634) )  /* plane1 */ /* tiles */
+	ROM_LOAD( "b000.bin", 0x00000, 0x2000, CRC(a4fa98a1) SHA1(33b9a1a56d72ffa5f4e16b69e6e19af5a2882b2c) )  // plane0, tiles
+	ROM_LOAD( "b001.bin", 0x04000, 0x2000, CRC(fea09f7c) SHA1(174fc8022c455438538e6a3b67c7effc857ae634) )  // plane1, tiles
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "b013.bin", 0x00000, 0x2000, CRC(eaad4168) SHA1(f31b05ffb86677157f3a44cdcf0f9a729e0ab259) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "b004.bin", 0x02000, 0x2000, CRC(10a47e2d) SHA1(97fe2de3ce2b8dc017dceffce494be18695708d2) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "b012.bin", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "b003.bin", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "b011.bin", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "b002.bin", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "b007.bin", 0x0c000, 0x2000, CRC(cb91d16b) SHA1(bf32a03e7882b74280b29fa004429b77ad52e5ee) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "b010.bin", 0x0e000, 0x2000, CRC(489c9c04) SHA1(d920ef4f03e1b2e871df0cb2d672689c89febe96) )  /* bot, plane1 */ /* sprites */
-	ROM_LOAD( "b006.bin", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "b009.bin", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  /* bot, plane1 */ /* sprites */
-	ROM_LOAD( "b005.bin", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "b008.bin", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  /* bot, plane1 */ /* sprites */
+	ROM_LOAD( "b013.bin", 0x00000, 0x2000, CRC(eaad4168) SHA1(f31b05ffb86677157f3a44cdcf0f9a729e0ab259) )  // Top, plane0, sprites
+	ROM_LOAD( "b004.bin", 0x02000, 0x2000, CRC(10a47e2d) SHA1(97fe2de3ce2b8dc017dceffce494be18695708d2) )  // Bot, plane0, sprites
+	ROM_LOAD( "b012.bin", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  // Top, plane0, sprites
+	ROM_LOAD( "b003.bin", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  // Bot, plane0, sprites
+	ROM_LOAD( "b011.bin", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  // Top, plane0, sprites
+	ROM_LOAD( "b002.bin", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  // Bot, plane0, sprites
+	ROM_LOAD( "b007.bin", 0x0c000, 0x2000, CRC(cb91d16b) SHA1(bf32a03e7882b74280b29fa004429b77ad52e5ee) )  // Top, plane1, sprites
+	ROM_LOAD( "b010.bin", 0x0e000, 0x2000, CRC(489c9c04) SHA1(d920ef4f03e1b2e871df0cb2d672689c89febe96) )  // Bot, plane1, sprites
+	ROM_LOAD( "b006.bin", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  // Top, plane1, sprites
+	ROM_LOAD( "b009.bin", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  // Bot, plane1, sprites
+	ROM_LOAD( "b005.bin", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  // Top, plane1, sprites
+	ROM_LOAD( "b008.bin", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  // Bot, plane1, sprites
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26", 0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26", 0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 ROM_START( karatedo )
@@ -571,37 +571,80 @@ ROM_START( karatedo )
 	ROM_LOAD( "be18", 0x8000, 0x2000, CRC(a09046ad) SHA1(665973bffc38e36b8b0f6bc79e10db280be0613e) )
 	ROM_LOAD( "be19", 0xa000, 0x2000, CRC(0cdc4da9) SHA1(405454deda311abb8badd58a47529e42ddce5f6a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "be26", 0x0000, 0x2000, CRC(999ab0a3) SHA1(6aa545cee7a261f3dc5774dea2066f1412f63f49) )
-	ROM_LOAD( "be25", 0x2000, 0x2000, CRC(253bf0da) SHA1(33bae6401003dc57deaa14bf7f6a7ebad5b7efe3) ) /* adpcm */
-	ROM_LOAD( "be24", 0x4000, 0x2000, CRC(e2c188af) SHA1(b7a0801a4c634694f1556873fd21f7e13441be17) ) /* adpcm */
+	ROM_LOAD( "be25", 0x2000, 0x2000, CRC(253bf0da) SHA1(33bae6401003dc57deaa14bf7f6a7ebad5b7efe3) ) // ADPCM
+	ROM_LOAD( "be24", 0x4000, 0x2000, CRC(e2c188af) SHA1(b7a0801a4c634694f1556873fd21f7e13441be17) ) // ADPCM
 	ROM_LOAD( "be23", 0x6000, 0x2000, CRC(25262de1) SHA1(6264cd82756be9e1cdcd9ad3c3dfc6fef78dab8f) )
 	ROM_LOAD( "be22", 0x8000, 0x2000, CRC(38055c48) SHA1(8406a52aaa7e56093a8d8552e928988b6fdd6c95) )
 	ROM_LOAD( "be21", 0xa000, 0x2000, CRC(5f0efbe7) SHA1(f831efd02c917adac827fe6db8449ca8707b3d44) )
 	ROM_LOAD( "be20", 0xc000, 0x2000, CRC(cbe8a533) SHA1(04cb41c487c2f951417628ed2888e04d59a39d29) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "be00",     0x00000, 0x2000, CRC(cec020f2) SHA1(07c501cc24797000f369fd98a26efe13875107bb) )  /* plane0 */ /* tiles */
-	ROM_LOAD( "be01",     0x04000, 0x2000, CRC(cd96271c) SHA1(bcc71010e5489b19ad1553141c7b2e366bbbc68f) )  /* plane1 */ /* tiles */
+	ROM_LOAD( "be00",     0x00000, 0x2000, CRC(cec020f2) SHA1(07c501cc24797000f369fd98a26efe13875107bb) )  // plane0, tiles
+	ROM_LOAD( "be01",     0x04000, 0x2000, CRC(cd96271c) SHA1(bcc71010e5489b19ad1553141c7b2e366bbbc68f) )  // plane1, tiles
 
 	ROM_REGION( 0x18000, "gfx2", 0 )
-	ROM_LOAD( "be13",     0x00000, 0x2000, CRC(fb358707) SHA1(37124f1f545787723fecf466d8dcd31b88cdd75d) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "be04",     0x02000, 0x2000, CRC(48372bf8) SHA1(28231b3bdb1d7226d7856554ba667b6d61f4fe22) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "b012.bin", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "b003.bin", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "b011.bin", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  /* top, plane0 */ /* sprites */
-	ROM_LOAD( "b002.bin", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  /* bot, plane0 */ /* sprites */
-	ROM_LOAD( "be07",     0x0c000, 0x2000, CRC(40f2b6fb) SHA1(8d9ee04d917a8e143bd00fa7582990213bfa42d3) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "be10",     0x0e000, 0x2000, CRC(325c0a97) SHA1(0159536ff0ebac8ccf65aac1a524a30b3fca3418) )  /* bot, plane1 */ /* sprites */
-	ROM_LOAD( "b006.bin", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "b009.bin", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  /* bot, plane1 */ /* sprites */
-	ROM_LOAD( "b005.bin", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  /* top, plane1 */ /* sprites */
-	ROM_LOAD( "b008.bin", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  /* bot, plane1 */ /* sprites */
+	ROM_LOAD( "be13",     0x00000, 0x2000, CRC(fb358707) SHA1(37124f1f545787723fecf466d8dcd31b88cdd75d) )  // Top, plane0, sprites
+	ROM_LOAD( "be04",     0x02000, 0x2000, CRC(48372bf8) SHA1(28231b3bdb1d7226d7856554ba667b6d61f4fe22) )  // Bot, plane0, sprites
+	ROM_LOAD( "b012.bin", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  // Top, plane0, sprites
+	ROM_LOAD( "b003.bin", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  // Bot, plane0, sprites
+	ROM_LOAD( "b011.bin", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  // Top, plane0, sprites
+	ROM_LOAD( "b002.bin", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  // Bot, plane0, sprites
+	ROM_LOAD( "be07",     0x0c000, 0x2000, CRC(40f2b6fb) SHA1(8d9ee04d917a8e143bd00fa7582990213bfa42d3) )  // Top, plane1, sprites
+	ROM_LOAD( "be10",     0x0e000, 0x2000, CRC(325c0a97) SHA1(0159536ff0ebac8ccf65aac1a524a30b3fca3418) )  // Bot, plane1, sprites
+	ROM_LOAD( "b006.bin", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  // Top, plane1, sprites
+	ROM_LOAD( "b009.bin", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  // Bot, plane1, sprites
+	ROM_LOAD( "b005.bin", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  // Top, plane1, sprites
+	ROM_LOAD( "b008.bin", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  // Bot, plane1, sprites
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26", 0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26", 0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25", 0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
+ROM_END
+
+// Bootleg from Tecfri
+ROM_START( kchamptec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "13.bin", 0x0000, 0x2000, CRC(0000d1a0) SHA1(0c584096825e1d3cc718e0bda1abb897a7f4d2df) )
+	ROM_LOAD( "12.bin", 0x2000, 0x2000, CRC(03fae67e) SHA1(3b6a30f39f5ad512415e3b8ba6e07f3118e28d9e) )
+	ROM_LOAD( "11.bin", 0x4000, 0x2000, CRC(3b6e1d08) SHA1(ecf7d2b0f31f04c0be7d5a1f450b9c95d9f54d80) )
+	ROM_LOAD( "10.bin", 0x6000, 0x2000, CRC(53036ef7) SHA1(aeb56a7ab5f76907c83d250d8693d8532d515fb6) )
+	ROM_LOAD( "9.bin",  0x8000, 0x2000, CRC(b824abc7) SHA1(4a30fec025150e889600a78497700155e743c99e) )
+	ROM_LOAD( "8.bin",  0xa000, 0x2000, CRC(18cd5a0c) SHA1(0b4c3d2f3487db0a487b9d882d8abaeeb2464539) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
+	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(999ed2c7) SHA1(f01e4ee81f8f7b0d1cf001d3ec01a9210f8109b4) )
+	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(33171e07) SHA1(55ee74c9f1d86ec13d92ea0d1b700bbe24b79def) ) // ADPCM
+	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(d5501588) SHA1(3177a6bdf9408be25c5763cb0a7d8ea0acc80f89) ) // ADPCM
+	ROM_LOAD( "4.bin", 0x6000, 0x2000, CRC(47f66aac) SHA1(484802cfbff7c5f51dd97cb3b2321e137b03481c) )
+	ROM_LOAD( "5.bin", 0x8000, 0x2000, BAD_DUMP CRC(5928e749) SHA1(a4dbd6f2a6a7aa9597875dfd781e55b0fb14d49b) ) // Bad EPROM
+	ROM_LOAD( "6.bin", 0xa000, 0x2000, CRC(ca17e3ba) SHA1(91a3ccd6045dcef5f3293d669fe5a4df59cd954b) )
+	ROM_LOAD( "7.bin", 0xc000, 0x2000, CRC(ada4f2cd) SHA1(15a4ed7497cb6c06f523ebe38bc4eb6dbcd09549) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "27.bin", 0x00000, 0x2000, CRC(a4fa98a1) SHA1(33b9a1a56d72ffa5f4e16b69e6e19af5a2882b2c) )  // plane0, tiles
+	ROM_LOAD( "26.bin", 0x04000, 0x2000, CRC(fea09f7c) SHA1(174fc8022c455438538e6a3b67c7effc857ae634) )  // plane1, tiles
+
+	ROM_REGION( 0x18000, "gfx2", 0 )
+	ROM_LOAD( "14.bin", 0x00000, 0x2000, CRC(eaad4168) SHA1(f31b05ffb86677157f3a44cdcf0f9a729e0ab259) )  // Top, plane0, sprites
+	ROM_LOAD( "23.bin", 0x02000, 0x2000, CRC(10a47e2d) SHA1(97fe2de3ce2b8dc017dceffce494be18695708d2) )  // Bot, plane0, sprites
+	ROM_LOAD( "15.bin", 0x04000, 0x2000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )  // Top, plane0, sprites
+	ROM_LOAD( "24.bin", 0x06000, 0x2000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )  // Bot, plane0, sprites
+	ROM_LOAD( "16.bin", 0x08000, 0x2000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )  // Top, plane0, sprites
+	ROM_LOAD( "25.bin", 0x0a000, 0x2000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )  // Bot, plane0, sprites
+	ROM_LOAD( "20.bin", 0x0c000, 0x2000, CRC(cb91d16b) SHA1(bf32a03e7882b74280b29fa004429b77ad52e5ee) )  // Top, plane1, sprites
+	ROM_LOAD( "17.bin", 0x0e000, 0x2000, CRC(489c9c04) SHA1(d920ef4f03e1b2e871df0cb2d672689c89febe96) )  // Bot, plane1, sprites
+	ROM_LOAD( "21.bin", 0x10000, 0x2000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )  // Top, plane1, sprites
+	ROM_LOAD( "18.bin", 0x12000, 0x2000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )  // Bot, plane1, sprites
+	ROM_LOAD( "22.bin", 0x14000, 0x2000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )  // Top, plane1, sprites
+	ROM_LOAD( "19.bin", 0x16000, 0x2000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )  // Bot, plane1, sprites
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "br27.1", 0x0000,  0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26.2", 0x0100,  0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25.3", 0x0200,  0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 /* Bootleg from the Spanish company "Automaticos Arfyc"
@@ -664,7 +707,7 @@ ROM_START( kchampvs )
 	ROM_LOAD( "bs19.d6",  0x0a000, 0x02000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
 	ROM_CONTINUE(         0x0e000, 0x02000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "bs18.d4",  0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
 	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
 	ROM_LOAD( "bs16.d1",  0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
@@ -690,9 +733,9 @@ ROM_START( kchampvs )
 	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 ROM_START( kchampvs2 )
@@ -705,7 +748,7 @@ ROM_START( kchampvs2 )
 	ROM_LOAD( "lt.d6",    0x0a000, 0x02000, CRC(c3bc6e46) SHA1(a7b9420592905b0df5ff00c392d887f40395179f) )
 	ROM_CONTINUE(         0x0e000, 0x02000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "lt.d4",    0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
 	ROM_LOAD( "lt.d2",    0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
 	ROM_LOAD( "lt.d1",    0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
@@ -731,9 +774,9 @@ ROM_START( kchampvs2 )
 	ROM_LOAD( "lt.c10",   0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "lt.k10",   0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "lt.k9",    0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "lt.k8",    0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "lt.k10",   0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "lt.k9",    0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "lt.k8",    0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 // This version has a mix of the "Karate Champ (US VS version, set 1)" ROMs and a few ROMs unique to "Taisen Karate Dou (Japan VS version)" along with 1 completely unique program ROM.
@@ -748,7 +791,7 @@ ROM_START( kchampvs3 )
 	ROM_LOAD( "bs19.d6",  0x0a000, 0x02000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
 	ROM_CONTINUE(         0x0e000, 0x02000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "bs18.d4",  0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
 	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
 	ROM_LOAD( "bs16.d1",  0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
@@ -774,9 +817,9 @@ ROM_START( kchampvs3 )
 	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 // This version has a mix of the "Karate Champ (US VS version, set 1)" ROMs and a few ROMs unique to "Taisen Karate Dou (Japan VS version)".
@@ -791,7 +834,7 @@ ROM_START( kchampvs4 )
 	ROM_LOAD( "bs19.d6",  0x0a000, 0x02000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
 	ROM_CONTINUE(         0x0e000, 0x02000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "bs18.d4",  0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
 	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
 	ROM_LOAD( "bs16.d1",  0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
@@ -817,9 +860,9 @@ ROM_START( kchampvs4 )
 	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 ROM_START( karatevs )
@@ -832,7 +875,7 @@ ROM_START( karatevs )
 	ROM_LOAD( "br19.d6",  0x0a000, 0x02000, CRC(dd2239d2) SHA1(0533d5abf8e25a4aeec2f7832b657eab56fd11f0) )
 	ROM_CONTINUE(         0x0e000, 0x02000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "br18.d4",  0x00000, 0x02000, CRC(00ccb8ea) SHA1(83d69684dc3ad37aca03c901fd23c7652134766f) )
 	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
 	ROM_LOAD( "br16.d1",  0x04000, 0x02000, CRC(2512d961) SHA1(f0cd1be112b915d700e0587759606d48d115a83f) )
@@ -858,9 +901,9 @@ ROM_START( karatevs )
 	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
-	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
-	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) // Red
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) // Green
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) // Blue
 ROM_END
 
 
@@ -887,15 +930,15 @@ void kchamp_state::init_kchampvs()
 	    turns the encryption on, but this doesn't explain the
 	    encrypted address for the jump.
 	 */
-	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
+	m_decrypted_opcodes[0] = rom[0];  // this is a jump
 	int A = rom[1] + 256 * rom[2];
-	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
-	rom[A+1] ^= 0xee;       /* fix address of the second jump */
+	m_decrypted_opcodes[A] = rom[A];  // fix opcode on first jump address (again, a jump)
+	rom[A+1] ^= 0xee;                 // fix address of the second jump
 	A = rom[A+1] + 256 * rom[A+2];
-	m_decrypted_opcodes[A] = rom[A];  /* fix third opcode (ld a,$xx) */
+	m_decrypted_opcodes[A] = rom[A];  // fix third opcode (ld a,$xx)
 	A += 2;
-	m_decrypted_opcodes[A] = rom[A];  /* fix fourth opcode (ld ($xxxx),a */
-	/* and from here on, opcodes are encrypted */
+	m_decrypted_opcodes[A] = rom[A];  // fix fourth opcode (ld ($xxxx),a)
+	// and from here on, opcodes are encrypted
 
 	m_msm_play_lo_nibble = true;
 }
@@ -910,6 +953,7 @@ void kchamp_state::init_kchampvs2()
 
 GAME( 1984, kchamp,    0,      kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karatedo,  kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamptec, kchamp, kchamp,       kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Tecfri)",      "Karate Champ (Tecfri bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, karateda,  kchamp, kchamp_arfyc, kchamp,   kchamp_state,  empty_init,     ROT90, "bootleg (Arfyc)",       "Karate Dou (Arfyc bootleg)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kchampvs,  kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1984, kchampvs2, kchamp, kchampvs,     kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)",  MACHINE_SUPPORTS_SAVE )
