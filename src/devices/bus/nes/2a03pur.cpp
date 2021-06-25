@@ -7,7 +7,7 @@
 
 
  Here we emulate the PCB designed by infiniteneslives and
- rainwarrior for this homebew multicart [mapper 31]
+ rainwarrior for this homebrew multicart [mapper 31]
  The main difference of this PCB compared to others is that it
  uses 4k PRG banks!
 
