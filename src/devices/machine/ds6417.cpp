@@ -166,7 +166,7 @@ WRITE_LINE_MEMBER( ds6417_device::clock_w )
 
 					}
 					m_start = true;
-					fseek(m_addr & 0x7fff, SEEK_SET);
+					fseek(m_addr & 0x3fff, SEEK_SET);
 					break;
 			}
 		}

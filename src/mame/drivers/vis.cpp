@@ -780,13 +780,23 @@ uint8_t vis_state::memcard_r(offs_t offset)
 {
 	if(offset)
 	{
-		if((m_cardreg & 0x18) == 0x18)
+		if(m_cardreg & 0x10)
 		{
 			if(m_cardcnt == 8)
 				return 0;
-			m_card->clock_w(1);
-			m_card->clock_w(0);
-			m_cardval = (m_cardval >> 1) | (m_card->data_r() ? 0x80 : 0);
+			if(m_cardreg & 8)
+			{
+				m_card->clock_w(1);
+				m_card->clock_w(0);
+				m_cardval = (m_cardval >> 1) | (m_card->data_r() ? 0x80 : 0);
+			}
+			else
+			{
+				m_card->clock_w(0);
+				m_card->data_w(BIT(m_cardval, 0));
+				m_card->clock_w(1);
+				m_cardval >>= 1;
+			}
 			m_cardcnt++;
 			return 0x80;
 		}
@@ -803,14 +813,19 @@ void vis_state::memcard_w(offs_t offset, uint8_t data)
 {
 	if(offset)
 	{
-		if((data & 0x18) != 0x18)
+		if(!(data & 0x10) && !(m_cardreg & 0x10))
 		{
 			m_card->data_w(BIT(data, 1));
 			m_card->clock_w(BIT(data, 0));
 			m_card->reset_w(!BIT(data, 2));
 		}
 		m_cardreg = data;
+		m_cardcnt = data & 8 ? 0 : 8;
+	}
+	else
+	{
 		m_cardcnt = 0;
+		m_cardval = data;
 	}
 }
 
