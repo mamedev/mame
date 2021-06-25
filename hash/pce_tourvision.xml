@@ -471,7 +471,7 @@ Parasol Stars
 	<software name="dragnegg">
 		<description>Dragon Egg! (TourVisión PCE bootleg)</description>
 		<year>1991</year>
-		<publisher>bootleg (TourVisión) / Masiya</publisher>
+		<publisher>bootleg (TourVisión) / Masaya</publisher>
 		<info name="alt_title" value="どらごんEGG!"/>
 		<part name="cart" interface="tourvision_cart">
 			<feature name="id" value="0x62"/>

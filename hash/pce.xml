@@ -930,7 +930,7 @@ license:CC0
 	<software name="dragnegg">
 		<description>Dragon Egg!</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91003"/>
 		<info name="release" value="19910927"/>
 		<info name="alt_title" value="どらごんEGG!"/>
@@ -1568,7 +1568,7 @@ license:CC0
 	<software name="xserd">
 		<description>Hisou Kihei - Xserd</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90002"/>
 		<info name="release" value="19900223"/>
 		<info name="alt_title" value="飛装騎兵カイザード"/>
@@ -1761,7 +1761,7 @@ license:CC0
 	<software name="shubibi2">
 		<description>Kaizou Choujin Shubibinman 2 - Aratanaru Teki</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91001"/>
 		<info name="release" value="19910427"/>
 		<info name="alt_title" value="改造町人 シュビビンマン2 ―新たなる敵―"/>
@@ -1803,7 +1803,7 @@ license:CC0
 	<software name="kickball">
 		<description>Kickball</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90004"/>
 		<info name="release" value="19901123"/>
 		<info name="alt_title" value="キックボール"/>
@@ -2337,7 +2337,7 @@ license:CC0
 	<software name="motorod2">
 		<description>Moto Roader II</description>
 		<year>1991</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS91002"/>
 		<info name="release" value="19910329"/>
 		<info name="alt_title" value="モトローダーII"/>
@@ -2421,7 +2421,7 @@ license:CC0
 	<software name="nazomasq">
 		<description>Nazo no Masquerade</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90003"/>
 		<info name="release" value="19900302"/>
 		<info name="alt_title" value="謎のマスカレード"/>
@@ -4248,7 +4248,7 @@ license:CC0
 	<software name="wallaby">
 		<description>Wallaby!! - Usagi no Kuni no Kangaroo Race</description>
 		<year>1990</year>
-		<publisher>Masiya</publisher>
+		<publisher>Masaya</publisher>
 		<info name="serial" value="NCS90005"/>
 		<info name="release" value="19901214"/>
 		<info name="alt_title" value="ワラビー!! ウサギの国のカンガルーレース"/>
