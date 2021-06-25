@@ -34,9 +34,10 @@ private:
 	tilemap_t* m_bg_tilemap8;
 	tilemap_t* m_bg_tilemap16;
 
-	std::unique_ptr<uint32_t[]>       m_tile_ram;
-	std::unique_ptr<uint32_t[]>       m_char_ram;
-	std::unique_ptr<uint32_t[]>       m_reg;
+	std::unique_ptr<uint32_t[]> m_tile_ram;
+	std::unique_ptr<uint8_t[]> m_fg_char_ram;
+	std::unique_ptr<uint8_t[]> m_bg_char_ram;
+	std::unique_ptr<uint32_t[]> m_reg;
 
 	TILE_GET_INFO_MEMBER(tile_info_fg);
 	TILE_GET_INFO_MEMBER(tile_info_bg8);

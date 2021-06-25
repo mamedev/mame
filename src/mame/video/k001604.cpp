@@ -14,8 +14,12 @@
 
 /*
    Character RAM:
-   * Foreground tiles 2x 1Mbit SRAM in a 16-bit bus (256KB = 4096 8x8 tiles or 1024 16x16 tiles).
-   * Background tiles 4x 1Mbit SRAM in a 16-bit bus (512KB = 8192 8x8 tiles or 2048 16x16 tiles). Empty solder pads on NWK-TR.
+   * Foreground tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
+       - GTI Club: 37C 34C 32C 29C filled
+	   - NWK-TR: 34A 31A filled, no empty solder pads
+   * Background tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
+       - GTI Club: 37A 34A filled, 32A 29A empty
+	   - NWK-TR: 34C 31C 28C 25C empty
    
    Tile RAM:
    * 3x 256Kbit SRAMs in a 24-bit bus
@@ -147,16 +151,14 @@
 
 */
 
-#define K001604_NUM_TILES_LAYER0        16384
-#define K001604_NUM_TILES_LAYER1        4096
-
 DEFINE_DEVICE_TYPE(K001604, k001604_device, "k001604_device", "K001604 2D tilemaps + 2x ROZ")
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001604, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_tile_ram(nullptr),
-	m_char_ram(nullptr),
+	m_fg_char_ram(nullptr),
+	m_bg_char_ram(nullptr),
 	m_reg(nullptr)
 {
 }
@@ -170,30 +172,31 @@ void k001604_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
-	static const gfx_layout k001604_char_layout_layer_8x8 =
+	static const gfx_layout char_layout_8x8 =
 	{
 		8, 8,
-		K001604_NUM_TILES_LAYER0,
+		8192,
 		8,
-		{ 8,9,10,11,12,13,14,15 },
-		{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16 },
-		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128 },
-		8*128
+		{ 0,1,2,3,4,5,6,7 },
+		{ 1*8, 0*8, 3*8, 2*8, 5*8, 4*8, 7*8, 6*8 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+		8*64
 	};
 
-	static const gfx_layout k001604_char_layout_layer_16x16 =
+	static const gfx_layout char_layout_16x16 =
 	{
 		16, 16,
-		K001604_NUM_TILES_LAYER1,
+		2048,
 		8,
-		{ 8,9,10,11,12,13,14,15 },
-		{ 1*16, 0*16, 3*16, 2*16, 5*16, 4*16, 7*16, 6*16, 9*16, 8*16, 11*16, 10*16, 13*16, 12*16, 15*16, 14*16 },
-		{ 0*256, 1*256, 2*256, 3*256, 4*256, 5*256, 6*256, 7*256, 8*256, 9*256, 10*256, 11*256, 12*256, 13*256, 14*256, 15*256 },
-		16*256
+		{ 0,1,2,3,4,5,6,7 },
+		{ 1*8, 0*8, 3*8, 2*8, 5*8, 4*8, 7*8, 6*8, 9*8, 8*8, 11*8, 10*8, 13*8, 12*8, 15*8, 14*8 },
+		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		16*128
 	};
 
-	m_char_ram = make_unique_clear<uint32_t[]>(0x200000 / 4);
-	m_tile_ram = make_unique_clear<uint32_t[]>(0x20000 / 4);
+	m_fg_char_ram = make_unique_clear<uint8_t[]>(0x80000);		// 4x 128Kx8
+	m_bg_char_ram = make_unique_clear<uint8_t[]>(0x80000);		// 4x 128Kx8
+	m_tile_ram = make_unique_clear<uint32_t[]>(0x8000);			// 32K x 24 bits
 	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
 	/* create tilemaps */
@@ -206,12 +209,15 @@ void k001604_device::device_start()
 	m_bg_tilemap16 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k001604_device::tile_info_bg16)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 	m_bg_tilemap16->set_transparent_pen(0);
 
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(1, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_fg_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), char_layout_8x8, &m_bg_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(2, std::make_unique<gfx_element>(&palette(), char_layout_16x16, &m_bg_char_ram[0], 0, palette().entries() / 16, 0));
+
 
 	save_pointer(NAME(m_reg), 0x400 / 4);
-	save_pointer(NAME(m_char_ram), 0x200000 / 4);
-	save_pointer(NAME(m_tile_ram), 0x20000 / 4);
+	save_pointer(NAME(m_fg_char_ram), 0x80000);
+	save_pointer(NAME(m_bg_char_ram), 0x80000);
+	save_pointer(NAME(m_tile_ram), 0x8000);
 
 }
 
@@ -221,8 +227,9 @@ void k001604_device::device_start()
 
 void k001604_device::device_reset()
 {
-	memset(m_char_ram.get(), 0, 0x200000);
-	memset(m_tile_ram.get(), 0, 0x10000);
+	memset(m_fg_char_ram.get(), 0, 0x80000);
+	memset(m_bg_char_ram.get(), 0, 0x80000);
+	memset(m_tile_ram.get(), 0, 0x8000);
 	memset(m_reg.get(), 0, 0x400);
 }
 
@@ -238,7 +245,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_fg)
 	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;	
 	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilebase];
 	int color = (val >> 17) & 0x1f;	
-	int tile = val & 0x3fff;
+	int tile = val & 0x1fff;
 	int flags = 0;
 
 	if (val & 0x400000)
@@ -258,7 +265,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg8)
 	uint32_t tilemap_xstart = (m_reg[0x18] & 0x40000) ? 0 : 128;
 	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilemap_xstart + tilebase];
 	int color = (val >> 17) & 0x1f;
-	int tile = 0x2000 + (val & 0x1fff);
+	int tile = val & 0x1fff;
 	int flags = 0;
 
 	if (val & 0x400000)
@@ -266,7 +273,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg8)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	tileinfo.set(0, tile, color, flags);
+	tileinfo.set(1, tile, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
@@ -278,7 +285,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
 	uint32_t tilemap_xstart = (m_reg[0x18] & 0x40000) ? 0 : 128;
 	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilemap_xstart + tilebase];
 	int color = (val >> 17) & 0x1f;
-	int tile = 0x800 + (val & 0x7ff);
+	int tile = val & 0x7ff;
 	int flags = 0;
 
 	if (val & 0x400000)
@@ -286,7 +293,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
 	if (val & 0x800000)
 		flags |= TILE_FLIPY;
 
-	tileinfo.set(1, tile, color, flags);
+	tileinfo.set(2, tile, color, flags);
 }
 
 
@@ -416,19 +423,24 @@ uint32_t k001604_device::tile_r(offs_t offset)
 
 uint32_t k001604_device::char_r(offs_t offset)
 {
-	int set, bank;
+	int chip;
 	uint32_t addr;
 
-	set = (m_reg[0x60 / 4] & 0x1000000) ? 0x100000 : 0;
+	bool bg = (m_reg[0x60 / 4] & 0x1000000) ? true : false;
 
-	if (set)
-		bank = (m_reg[0x60 / 4] >> 8) & 0x3;
+	// select individual RAM chip to access
+	if (bg)
+		chip = (m_reg[0x60 / 4] >> 8) & 0x3;
 	else
-		bank = (m_reg[0x60 / 4] & 0x3);
+		chip = (m_reg[0x60 / 4] & 0x3);
 
-	addr = offset + ((set + (bank * 0x40000)) / 4);
+	addr = (offset + (chip * 0x10000)) * 2;
 
-	return m_char_ram[addr];
+	uint32_t res = 0;
+	res |= (uint32_t)(bg ? m_bg_char_ram[addr+1] : m_fg_char_ram[addr+1]) << 24;
+	res |= (uint32_t)(bg ? m_bg_char_ram[addr] : m_fg_char_ram[addr]) << 8;
+
+	return res;
 }
 
 uint32_t k001604_device::reg_r(offs_t offset)
@@ -485,22 +497,46 @@ void k001604_device::tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	int set, bank;
+	int chip;
 	uint32_t addr;
 
-	set = (m_reg[0x60/4] & 0x1000000) ? 0x100000 : 0;
+	bool bg = (m_reg[0x60 / 4] & 0x1000000) ? true : false;	
 
-	if (set)
-		bank = (m_reg[0x60 / 4] >> 8) & 0x3;
+	// select individual RAM chip to access
+	if (bg)
+		chip = (m_reg[0x60 / 4] >> 8) & 0x3;
 	else
-		bank = (m_reg[0x60 / 4] & 0x3);
+		chip = (m_reg[0x60 / 4] & 0x3);
 
-	addr = offset + ((set + (bank * 0x40000)) / 4);
+	addr = (offset + (chip * 0x10000)) * 2;
 
-	COMBINE_DATA(m_char_ram.get() + addr);
+	if (bg)
+	{
+		if (ACCESSING_BITS_24_31)
+		{
+			m_bg_char_ram[addr+1] = data >> 24;
+		}
+		if (ACCESSING_BITS_8_15)
+		{
+			m_bg_char_ram[addr] = data >> 8;
+		}
 
-	gfx(0)->mark_dirty(addr / 32);
-	gfx(1)->mark_dirty(addr / 128);
+		gfx(1)->mark_dirty(addr / 64);
+		gfx(2)->mark_dirty(addr / 256);
+	}
+	else
+	{
+		if (ACCESSING_BITS_24_31)
+		{
+			m_fg_char_ram[addr+1] = data >> 24;
+		}
+		if (ACCESSING_BITS_8_15)
+		{
+			m_fg_char_ram[addr] = data >> 8;
+		}
+
+		gfx(0)->mark_dirty(addr / 64);
+	}
 }
 
 void k001604_device::reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
