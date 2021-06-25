@@ -638,18 +638,26 @@ u32 rocknms_state::screen_update_rocknms_right(screen_device &screen, bitmap_rgb
 
 ***************************************************************************/
 
-// Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
+// Temporary hack for stepstag: unaltered ASCII bytes are written in the most significant byte
 // of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
+//
+// Seems to be a new video mode of text-only: the fg layer is split into two, in an interleaved manner
+// tile(char)code value is limited to 255, so only one byte is needed, thus two tile-codes are stored in one original 16-bit word
+// not sure whether each tile-pair uses same palette, or the palette is also interleaved
+// even-byte-tile seems to hava a higher priority (uses 0x0 instead of 0x20 as space code, for transparency?)
+//
+// When in game status(VJDash), the fg layer changes back to normal mode
+// fg layer might also have a clip window
+//
+// TODO: the mode-switching signal and clip data?
 TILE_GET_INFO_MEMBER(stepstag_state::stepstag_get_tile_info_fg)
 {
 	u16 const code_hi = m_vram_fg[ 2 * tile_index ] >> 8;
-	u16 const code_lo = m_vram_fg[ 2 * tile_index ] & 0xf;
-	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
-	if (m_vram_fg[2 * tile_index + 1] != 0)
-		logerror("VRAM ASCII Haut-Mot Non-Zero!!!\n");/////////
+	u16 const code_lo = m_vram_fg[ 2 * tile_index + 1];
+	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);
 	tileinfo.set(2,
 			code_hi,
-			code_lo,
+			code_lo & 0xf,
 			0);
 }
 
@@ -668,7 +676,7 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 
 u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	bitmap.fill(0, cliprect);	// m_vj_palette_l->pen(0x0000)	// chroma key green, for mixing with mpeg FMV underlayer
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
@@ -680,7 +688,7 @@ u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rg
 
 u32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	bitmap.fill(m_vj_palette_l->pen(0x0000), cliprect);
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
