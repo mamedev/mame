@@ -50,19 +50,33 @@ int channelf_state::recalc_palette_offset(int reg1, int reg2)
 	return ((reg2&0x2)|(reg1>>1)) << 2;
 }
 
-uint32_t channelf_state::screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t channelf_state::screen_update_ntsc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return screen_update_channelf(screen, bitmap, cliprect, 4);
+}
+
+uint32_t channelf_state::screen_update_pal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return screen_update_channelf(screen, bitmap, cliprect, 5);
+}
+
+uint32_t channelf_state::screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_rpt)
 {
 	uint16_t ma=0;
 
-	for (uint8_t y = 0; y < 64; y++ )
+	for (uint8_t y = 0; y < 64; y++)
 	{
-		uint16_t *p = &bitmap.pix(y);
 		int const palette_offset = recalc_palette_offset(m_p_videoram[y*128+125]&3, m_p_videoram[y*128+126]&3);
 
-		for (uint16_t x = ma; x < ma + 128; x++)
+		for (int y_pos = y * y_rpt; y_pos < (y * y_rpt) + y_rpt; y_pos++)
 		{
-			uint8_t const col = palette_offset+(m_p_videoram[x|(y<<7)]&3);
-			*p++ = colormap[col];
+			uint16_t *p = &bitmap.pix(y_pos);
+			for (uint16_t x = ma; x < ma + 128; x++)
+			{
+				uint8_t const col = palette_offset+(m_p_videoram[x|(y<<7)]&3);
+				*p++ = colormap[col];
+				*p++ = colormap[col];
+			}
 		}
 		ma+=128;
 	}
