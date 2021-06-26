@@ -1297,6 +1297,8 @@ ROM_START( skysharbl )
 	ROM_LOAD( "1c.ic3", 0x20000, 0x10000, CRC(64f3d88f) SHA1(d0155cfb0a8885d58e34141f9696b9aa208440ca) )
 	ROM_LOAD( "1d.ic4", 0x30000, 0x10000, CRC(3b23a9fc) SHA1(2ac34445618e17371b5eed7eb6f43da4dbb99e28) )
 
+	// This set uses 4 (four) ROMs for the MCU, named "1-A", "1-B", "1-C" and "1-D" on a small subboard along with the TMS320C10
+	// These ROMs are currently undumped, so we're using the DSP code from the other sets.
 	ROM_REGION( 0x2000, "dsp", 0 ) // Co-Processor TMS320C10 MCU code
 	ROM_LOAD16_BYTE( "82s191_r.bin", 0x0001, 0x0800, BAD_DUMP CRC(5b96ae3f) SHA1(e5dca3180bc2b9a2957b55a045e6c2d74ac72873) ) // Not dumped on this set
 	ROM_LOAD16_BYTE( "82s191_l.bin", 0x0000, 0x0800, BAD_DUMP CRC(d5dfc8dd) SHA1(98edc7b097b031b5e1f4f32d4de001d42580816c) ) // Not dumped on this set
