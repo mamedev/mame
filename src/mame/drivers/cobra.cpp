@@ -328,6 +328,7 @@
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0
@@ -359,7 +360,8 @@ class cobra_renderer : public poly_manager<float, cobra_polydata, 8>
 {
 public:
 	cobra_renderer(screen_device &screen)
-		: poly_manager<float, cobra_polydata, 8>(screen)
+		: poly_manager<float, cobra_polydata, 8>(screen.machine())
+		, m_screen(screen)
 	{
 		m_texture_ram = std::make_unique<uint32_t[]>(0x100000);
 
@@ -386,6 +388,7 @@ public:
 		}
 	}
 
+	screen_device &screen() const { return m_screen; }
 	void render_texture_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
 	void draw_point(const rectangle &visarea, vertex_t &v, uint32_t color);
@@ -403,6 +406,7 @@ public:
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 	inline rgb_t texture_fetch(uint32_t *texture, int u, int v, int width, int format);
 private:
+	screen_device &m_screen;
 	std::unique_ptr<bitmap_rgb32> m_framebuffer;
 	std::unique_ptr<bitmap_rgb32> m_backbuffer;
 	std::unique_ptr<bitmap_rgb32> m_overlay;
@@ -2124,7 +2128,7 @@ void cobra_renderer::gfx_exit()
 
 void cobra_renderer::gfx_reset()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	cobra->m_gfx_re_status = RE_STATUS_IDLE;
 }
@@ -2226,7 +2230,7 @@ void cobra_renderer::gfx_write_reg(uint64_t data)
 
 void cobra_renderer::gfx_fifo_exec()
 {
-	cobra_state *cobra = machine().driver_data<cobra_state>();
+	cobra_state *cobra = screen().machine().driver_data<cobra_state>();
 
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
