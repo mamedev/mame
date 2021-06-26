@@ -1279,14 +1279,6 @@ ROM_START( skysharbl )
 	ROM_LOAD( "1e.ic5", 0x04000, 0x04000, CRC(543bbb81) SHA1(8aabc3d4f14b6531af000008b50cf09bb6cd003f) ) // 1xxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "1f.ic6", 0x08000, 0x04000, CRC(d357f494) SHA1(e83560e551ea15cac903e9a8c5ce57d51af175c7) ) // 1xxxxxxxxxxxxx = 0xFF
 
-	// Same data on larger EPROMs with first half empty
-//  ROM_LOAD( "5.bin", 0x08000, 0x04000, NO_DUMP ) // Not dumped on this set
-//  ROM_CONTINUE(0x08000,0x04000)
-//  ROM_LOAD( "6.bin", 0x04000, 0x04000, NO_DUMP ) // Not dumped on this set
-//  ROM_CONTINUE(0x04000,0x04000)
-//  ROM_LOAD( "7.bin", 0x00000, 0x04000, NO_DUMP ) // Not dumped on this set
-//  ROM_CONTINUE(0x00000,0x04000)
-
 	ROM_REGION( 0x20000, "gfx2", 0 ) // fg tiles
 	ROM_LOAD( "1l.ic12", 0x00000, 0x08000, CRC(733b9997) SHA1(75e874a1d148fcc8fa09bb724ce8346565ace4e5) )
 	ROM_LOAD( "1o.ic15", 0x08000, 0x08000, CRC(8b70ef32) SHA1(e1f988d650dce17e3bfbea12e5fddbb671df18d4) )
