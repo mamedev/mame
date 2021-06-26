@@ -652,7 +652,9 @@ void nes_nitra_device::write_h(offs_t offset, uint8_t data)
 
  MMC3 clone (identical, but for switched address lines)
 
- In MESS: Supported
+ NES 2.0: mapper 302
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 

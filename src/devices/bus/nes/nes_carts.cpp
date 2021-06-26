@@ -297,7 +297,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
-	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55?
+	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
 	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
