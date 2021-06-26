@@ -1402,13 +1402,13 @@ void nes_lh53_device::write_h(offs_t offset, uint8_t data)
 
  Games: Doki Doki Panic (FDS conversion)
 
- iNES: mapper 103
-
  This board has a very unique setup, with 8KB of WRAM
  in 0x6000-0x7fff and other 8KB of WRAM in 0xb800-0xd7ff
  which can be switched in 2KB chunks (we attempt to
  emulate this by intercepting reads in that area before
  they get to the PRG banks...)
+
+ iNES: mapper 103
 
  In MAME: Supported.
 

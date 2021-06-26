@@ -355,10 +355,10 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
  Games: A few FDS conversions like Bubble Bobble
         or SMB2
 
- iNES: mapper 142
-
  TODO: available dumps do not seem to use WRAM...
  yet m_reg[4] should switch WRAM bank... investigate!
+
+ iNES: mapper 142
 
  In MAME: Supported?
 
