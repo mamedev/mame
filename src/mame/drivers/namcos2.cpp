@@ -3314,8 +3314,8 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
-	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
-	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration and machine ID code that passes protection */
+	ROM_LOAD( "finalap3bl.nv",  0x000000, 0x2000, CRC(60226586) SHA1(d66afd1149c3c95cbb0108337c530cab78327d97) )
 ROM_END
 
 /* FINEST HOUR */
@@ -5525,6 +5525,20 @@ void namcos2_state::init_finalap3()
 	m_finallap_prot_count = 0;
 }
 
+uint16_t namcos2_state::finalap3bl_prot_r()
+{
+	// code at 0x3f22 expects this to be 0x4d00 or it sets a value in NVRAM which prevents booting
+	// address 0x180020 (0x10 in NVRAM) must also be 0x6b (machine ID code first byte) or the same will occur
+	// for the 2nd issue we use a default NVRAM with this set
+	return 0x4d00;
+}
+
+void namcos2_state::init_finalap3bl()
+{
+	init_finalap3();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3ffff0, 0x3ffff1, read16smo_delegate(*this, FUNC(namcos2_state::finalap3bl_prot_r)));
+}
+
 void namcos2_state::init_finehour()
 {
 	m_gametype = NAMCOS2_FINEST_HOUR;
@@ -5764,7 +5778,7 @@ GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_final
 GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_finalap3bl,ROT0,  "Namco", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
 GAME(  1992, luckywld,   0,        luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
 GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )

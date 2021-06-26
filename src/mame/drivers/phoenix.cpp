@@ -321,7 +321,7 @@ static INPUT_PORTS_START( pleiads )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 
-	/* Based on various sources, no Button 2 was present in Pleiads */
+	/* Based on various sources, no Button 2 was present in Pleiads (Tehkan version) */
 	PORT_MODIFY("CTRL")     /* fake port for multiplexed controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -385,20 +385,20 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN     ) PORT_COCKTAIL
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION( "SW1:3,4" )
 	PORT_DIPSETTING(    0x0c, "25000" )
 	PORT_DIPSETTING(    0x08, "35000" )
 	PORT_DIPSETTING(    0x04, "45000" )
 	PORT_DIPSETTING(    0x00, "55000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Free_Play ) )        PORT_DIPLOCATION( "SW1:5" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )          PORT_DIPLOCATION( "SW1:6,7" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
@@ -406,7 +406,7 @@ static INPUT_PORTS_START( survival )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CAB")       /* fake port for non-memory mapped dip switch */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION( "SW1:8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -1375,6 +1375,9 @@ ROM_START( pleiads )
 	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) ) /* IC 27 on real board */
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) ) /* IC 26 on real board */
 
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910E Multi-Melody IC (according to Centuri version manual)
+	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
 	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
@@ -1446,6 +1449,9 @@ ROM_START( pleiadce )
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x800, "melody", 0 )  // Epson 7910E Multi-Melody IC (according to manual)
+	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */

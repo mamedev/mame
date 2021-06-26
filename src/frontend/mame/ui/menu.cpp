@@ -995,7 +995,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	}
 
 	// bail out
-	if ((flags & PROCESS_ONLYCHAR))
+	if (flags & PROCESS_ONLYCHAR)
 		return;
 
 	// hitting cancel also pops the stack
@@ -1010,8 +1010,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_LEFT_ARROW);
+	bool ignoreright = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_RIGHT_ARROW);
 
 	if ((m_items[0].flags & FLAG_UI_DATS))
 		ignoreleft = ignoreright = false;

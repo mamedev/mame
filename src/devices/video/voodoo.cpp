@@ -5652,7 +5652,7 @@ void voodoo_device::device_start()
 	m_pciint.resolve();
 
 	/* create a multiprocessor work queue */
-	poly = poly_alloc(machine(), 64, sizeof(poly_extra_data), 0);
+	poly_alloc(poly, machine(), 64, sizeof(poly_extra_data), 0);
 	thread_stats = std::make_unique<stats_block[]>(WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
@@ -6477,7 +6477,6 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, regaccess(nullptr)
 	, regnames(nullptr)
 	, alt_regmap(0)
-	, poly(nullptr)
 	, thread_stats(nullptr)
 	, last_status_pc(0)
 	, last_status_value(0)

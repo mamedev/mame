@@ -10550,7 +10550,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="cap-dw-0 prg" size="131072" crc="eddcc468" sha1="9e94ea7d2fa790a61c064a4d31c89603aa1c9e49" offset="00000" />
 			</dataarea>
@@ -21616,7 +21616,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="dbf-ly-0 prg" size="131072" crc="ea31ccd3" sha1="38cbb1a505fbcb02a1220471b7831f68c1261f1b" offset="00000" />
 			</dataarea>
@@ -45313,6 +45313,24 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
+	<software name="cadillacs" cloneof="cadillac">
+		<description>Sample Cassete Cadillac (Jpn)</description>
+		<year>1990</year>
+		<publisher>Hector</publisher>
+		<info name="alt_title" value="キャデラック"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="cadillac (sample).prg" size="32768" crc="38ada3c9" sha1="d7ff3248ced501cfba90ad643c98beed952fb71b" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="cadillac (sample).chr" size="32768" crc="d971e09f" sha1="fe9abfa2641a5b471827e9e83993f4bdfc6fd3fb" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="caesarsp" cloneof="caesars">
 		<description>Caesars Palace (USA, Prototype)</description>
 		<year>1992</year>
@@ -45976,10 +45994,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dinohcky">
-		<description>Dino Hockey (USA, Prototype)</description>
-		<year>1991?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="dinohckya" cloneof="dinohcky">
+		<description>Dino Hockey (USA, prototype)</description>
+		<year>1990?</year>
+		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -45988,6 +46006,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="dino.prg" size="131072" crc="ca9362c3" sha1="651c5063365fcfc60b06ccc73b79e345805888ed" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinohcky">
+		<description>Dino Hockey (USA, 19901218 prototype)</description>
+		<year>1990</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="dino hockey (dec 18, 1990 prototype).prg" size="131072" crc="f31cc4ec" sha1="0e6e32d07a1fa0e9cd2f8303fe06bb5d333e7f84" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="dino hockey (dec 18, 1990 prototype).chr" size="131072" crc="f5e1f13e" sha1="d115ea32ccbb14d53b886727a09d1454632881b5" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46041,6 +46075,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="double dragon ii - the revenge (japan) (beta).prg" size="131072" crc="36d509c2" sha1="9e73e12aa7b1245307002b771e2d4fd2c91d3b05" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon3up" cloneof="ddragon3">
+		<description>Double Dragon III - The Rosetta Stone (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Tradewest</publisher> <!-- switched to Acclaim for release -->
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="double dragon 3 (prototype).prg" size="131072" crc="0250134d" sha1="6f5ec7ad10edc2a83f4b8ce608d3565ce9572e08" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="double dragon 3 (prototype).chr" size="131072" crc="af484499" sha1="cf94a7a7f47a046da74a5766b38cf895c8d37c04" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46338,6 +46389,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="exciting rally - world rally championship (japan).prg" size="131072" crc="46752bc8" sha1="0ac0c6af7e957ee68f97176da3e17169fe8c0e37" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1racep" cloneof="f1race">
+		<description>F-1 Race (Jpn, prototype)</description>
+		<year>1984</year>
+		<publisher>Nintendo</publisher>
+		<info name="alt_title" value="F1レース"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="HVC-RROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="fr prg" size="16384" crc="7725ec33" sha1="4ff0c55592009463730c11e5545817099e5b7b3d" offset="00000" status="baddump"/>
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="fr chr" size="8192" crc="53d0ef5f" sha1="4e0b8b103efd61e2524d2da5702dcff9051fd454" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46717,6 +46787,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="garfieldp" cloneof="garfield">
+		<description>Garfield - A Week of Garfield (Jpn, prototype v0.9)</description>
+		<year>1989</year>
+		<publisher>Towa Chiki</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="a week of garfield (prototype v0.9).prg" size="131072" crc="8a99f953" sha1="e9cd93a6d3ec59cdf30abd67ecc38fdd62128981" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="a week of garfield (prototype v0.9).chr" size="32768" crc="7b99ff2b" sha1="714d06540f60cb78f6d2ffdf8f978b128e8fc5c9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="garfields" cloneof="garfield">
 		<description>Garfield - A Week of Garfield (Jpn, Sample)</description>
 		<year>1989</year>
@@ -46765,6 +46851,33 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="ge chr" size="32768" crc="095a3f30" sha1="1087d80276014ef5f3a507ceba2494ba7ad8d75a" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getsumads" cloneof="getsumad">
+		<description>Getsufuu Maden (Jpn, sample)</description>
+		<year>1987</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="月風魔伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="vrc2" />
+			<feature name="pcb" value="KONAMI-VRC-2" />
+			<feature name="vrc2-pin3" value="PRG A1" />
+			<feature name="vrc2-pin4" value="PRG A0" />
+			<feature name="vrc2-pin21" value="CHR A10" />
+			<feature name="vrc2-pin22" value="CHR A16" />
+			<feature name="vrc2-pin23" value="CHR A11" />
+			<feature name="vrc2-pin24" value="CHR A13" />
+			<feature name="vrc2-pin25" value="CHR A14" />
+			<feature name="vrc2-pin26" value="CHR A12" />
+			<feature name="vrc2-pin27" value="CHR A15" />
+			<feature name="vrc2-pin28" value="NC" />
+			<dataarea name="prg" size="131072">
+				<rom name="getsu fuuma den (japan prototype).prg" size="131072" crc="831f8959" sha1="e60082230d49e5ce4a57ee355d7cc9b7554f8936" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="getsu fuuma den (japan prototype).chr" size="131072" crc="d82b98e2" sha1="6b85abe35bac43e2ad1ae484caffa8d6eb946748" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -47879,6 +47992,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="magdoropp" cloneof="krion">
+		<description>Magical Doropie (Jpn, prototype)</description>
+		<year>1990</year>
+		<publisher>Vic Tokai</publisher>
+		<info name="alt_title" value="まじかるキッズどろぴー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="magical doropie (sample cart).prg" size="131072" crc="8a6153e5" sha1="7ab5ec17adfcf16e1e89f30ca8fdba08482221e0" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="magical doropie (sample cart).chr" size="131072" crc="b2f9ddf5" sha1="a75b62ee24631b8b76affee6da0fe387dd217b82" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magicianp2" cloneof="magician">
 		<description>Magician (USA, Prototype Alt)</description>
 		<year>1991</year>
@@ -48265,6 +48395,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- This was in development for Namco until they discovered they didn't have the rights to release it in Japan. Sound was yet to be added. Built from backup source files. -->
+	<software name="millipdn">
+		<description>Millipede (Jpn, prototype)</description>
+		<year>1986</year>
+		<publisher>Namcot</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="milli.prg" size="16384" crc="cfa0f7b9" sha1="88e78fdb6e91c65412f738259fe31149b99a71f4" offset="00000" status="baddump" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="milli.chr" size="8192" crc="8ab1937f" sha1="14a3e06dbb89144ab1c40fec9224c1e9e4acb583" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="millipedj" cloneof="milliped">
 		<description>Millipede (Jpn)</description>
 		<year>1987</year>
@@ -48281,6 +48428,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="32768">
 				<rom name="millipede (japan).prg" size="16384" crc="ee993635" sha1="7a4e0ac88f45a09a2c64b415f7d32d139feaecc5" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="milonjp" cloneof="milon">
+		<description>Meikyuu Kumikyoku - Milon no Daibouken (Jpn, prototype)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="alt_title" value="迷宮組曲 ミロンの大冒険"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="meikyuu kumikyoku - milon no daibouken (japan) (sample).prg" size="32768" crc="56e8cc4d" sha1="1c750f8a50e502f45b317d12b6a60938671ab0f8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="meikyuu kumikyoku - milon no daibouken (japan) (sample).chr" size="32768" crc="32e880e6" sha1="160c38c739635bef30e76a29d5012d49ca1725d7" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -49259,6 +49424,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="robert byrnes pool challenge (usa) (proto) (unl).prg" size="65536" crc="02aea60e" sha1="5e2c1160e29a701a0086378b16fe0337db7981b7" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robinhup" cloneof="robinh">
+		<description>Robin Hood - Prince of Thieves (USA, 19910516 prototype)</description>
+		<year>1991</year>
+		<publisher>Virgin Interactive</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SGROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="0.ic1" size="131072" crc="46a9943e" sha1="bb347122972125a779536730be7dba9c1c34c288" offset="0x00000" status="baddump" />
+				<rom name="rh may 16 91" size="131072" crc="a62bdbb9" sha1="1bb3148d26633159e4551caecd294e150065e634" offset="0x20000" status="baddump" /> <!-- original label: RH May 16 '91 -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -50252,6 +50435,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="elrondp" cloneof="wizardw">
+		<description>The Tale - Elrond no Eiyuu (Jpn, prototype)</description>
+		<year>1987</year>
+		<publisher>Jaleco</publisher>
+		<info name="alt_title" value="エルロンドの英雄"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="pcb" value="HVC-AMROM" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="131072">
+				<rom name="the tale - elrond no eiyuu (j) (prototype).prg" size="131072" crc="a8b1d1d1" sha1="e7d61cf5dd5f74937c6db87ebf6a8e844847788d" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tjsyrsj">
 		<description>Tantei Jinguuji Saburou - Yokohamakou Renzoku Satsujin Jiken (Jpn)</description>
 		<year>1988</year>
@@ -50750,7 +50951,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="ufouriap" cloneof="ufouria">
-		<description>U-four-ia - The Saga (Euro, Prototype)</description>
+		<description>U-four-ia - The Saga (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50761,6 +50962,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="ufouria - the saga (europe) (beta).prg" size="131072" crc="ca86d061" sha1="ba8671963441daa706c14b1cd7fe71f5d7565f97" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufouriaup" cloneof="ufouria">
+		<description>U-four-ia - The Saga (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="prg 1 ufouria" size="131072" crc="7576e298" sha1="7c04b6e9549fbdbb07ffbd8865f412c24605a347" offset="0x00000" />
+				<rom name="prg 2 ufouria" size="131072" crc="34711cf0" sha1="a93883463080dbb664eff582fa8ea580921edc86" offset="0x20000" /> <!-- original label: PRG 2 UFOURIA * -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ufouria chr" size="131072" crc="c3174dbf" sha1="696d5a57ac145fbcf3f23dcc4a5d7af9446cc107" offset="00000" /> <!-- original label: UFOURIA CHR * -->
 			</dataarea>
 		</part>
 	</software>
@@ -76833,6 +77050,61 @@ be better to redump them properly. -->
 	</software>
 
 
+<!-- These are more recent dumps of unlicensed homebrew games that have been released on cartridge. They need to be verified against physical carts. -->
+
+	<software name="puritans">
+		<description>2A03Puritans</description>
+		<year>2013</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="2a03pur" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="1048576">
+				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" status="baddump" />
+			</dataarea>
+			<!-- 8 VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Author self-published through mail order, carts made by RetroZone -->
+	<software name="et">
+		<description>E.T.</description>
+		<year>2014</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" status="baddump" />
+			</dataarea>
+			<!-- 8 VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glider">
+		<description>Glider</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cufrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="glider.prg" size="131072" crc="1b00c2b3" sha1="670fbb3c9a3f51a878d68a45930ee3fab4beb8dd" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. The following roms are freely available digital releases. They need to be checked against commercial physical carts. -->
 
 	<software name="a53vol1">
@@ -76840,9 +77112,9 @@ be better to redump them properly. -->
 		<year>2013</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" offset="00000" />
+				<rom name="action 53 volume 1.prg" size="524288" crc="6441e8f6" sha1="da92a26ecc64767fdbb63ab8b2d9e7dcd7884fcc" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -76855,9 +77127,9 @@ be better to redump them properly. -->
 		<year>2014</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="524288">
-				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" offset="00000" />
+				<rom name="action 53 volume 2.prg" size="524288" crc="6e61971f" sha1="cb2c6dc8c8be3ee738ad8a793a75475553506e14" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? -->
 			<dataarea name="vram" size="32768">
@@ -76870,9 +77142,9 @@ be better to redump them properly. -->
 		<year>2018</year>
 		<publisher>Infinite NES Lives</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nes_action53" />
+			<feature name="slot" value="action53" />
 			<dataarea name="prg" size="1048576">
-				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" offset="00000" />
+				<rom name="action 53 volume 3.prg" size="1048576" crc="660f8e82" sha1="85c67c171f77a47566f4b9ead1a352c02e2e07a6" status="baddump" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge? Sinking Feeling needs this much. -->
 			<dataarea name="vram" size="32768">
@@ -80427,7 +80699,7 @@ to check why this is different -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_vt5201" />
 			<feature name="pcb" value="BMC-VT5201" />
-			<feature name="mirroring" value="hi" />
+			<feature name="mirroring" value="high" />
 			<dataarea name="chr" size="65536">
 				<rom name="super 35 in 1 (6 in 1 vt5201).chr" size="65536" crc="a3d8d9dd" sha1="34703a76b76c7244a21237e41b8aed7a1ef95cae" offset="00000" status="baddump" />
 			</dataarea>

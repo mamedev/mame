@@ -1060,6 +1060,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/albazc.cpp",
 	MAME_DIR .. "src/mame/drivers/albazg.cpp",
 	MAME_DIR .. "src/mame/drivers/rmhaihai.cpp",
+	MAME_DIR .. "src/mame/drivers/vsmjtria.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "alliedl")
@@ -3616,6 +3617,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/segas18.cpp",
 	MAME_DIR .. "src/mame/includes/segas18.h",
 	MAME_DIR .. "src/mame/video/segas18.cpp",
+	MAME_DIR .. "src/mame/drivers/segas18_astormbl.cpp",
 	MAME_DIR .. "src/mame/drivers/segas24.cpp",
 	MAME_DIR .. "src/mame/includes/segas24.h",
 	MAME_DIR .. "src/mame/video/segas24.cpp",

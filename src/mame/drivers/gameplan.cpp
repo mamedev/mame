@@ -1000,6 +1000,9 @@ void gameplan_state::leprechn(machine_config &config)
 {
 	gameplan(config);
 	m_maincpu->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_0->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_1->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_2->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
 
 	/* basic machine hardware */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::leprechn_audio_map);

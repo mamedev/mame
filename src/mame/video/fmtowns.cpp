@@ -461,6 +461,12 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			break;
 		case 0x03:
 //          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+			if((m_video.towns_crtc_sel == 21) && (m_video.towns_sprite_reg[1] & 0x80))
+			{
+				m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
+					(m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0x80ff) | ((data & 0x7f) << 8);
+				return;
+			}
 			m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
 				(m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0x00ff) | (data << 8);
 			towns_crtc_refresh_mode();

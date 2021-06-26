@@ -1090,9 +1090,9 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t<software name=\"%s\"", util::xml::normalize_string(swinfo.shortname().c_str()));
 		if (!swinfo.parentname().empty())
 			util::stream_format(out, " cloneof=\"%s\"", util::xml::normalize_string(swinfo.parentname().c_str()));
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_PARTIAL)
+		if (swinfo.supported() == software_support::PARTIALLY_SUPPORTED)
 			out << " supported=\"partial\"";
-		if (swinfo.supported() == SOFTWARE_SUPPORTED_NO)
+		else if (swinfo.supported() == software_support::UNSUPPORTED)
 			out << " supported=\"no\"";
 		out << ">\n";
 		util::stream_format(out, "\t\t\t<description>%s</description>\n", util::xml::normalize_string(swinfo.longname().c_str()));

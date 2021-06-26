@@ -1646,17 +1646,18 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 //-------------------------------------------------
 
 ioport_manager::ioport_manager(running_machine &machine)
-	: m_machine(machine),
-		m_safe_to_read(false),
-		m_last_frame_time(attotime::zero),
-		m_last_delta_nsec(0),
-		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
-		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
-		m_playback_accumulated_speed(0),
-		m_playback_accumulated_frames(0),
-		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
-		m_timecode_count(0),
-		m_timecode_last_time(attotime::zero)
+	: m_machine(machine)
+	, m_safe_to_read(false)
+	, m_last_frame_time(attotime::zero)
+	, m_last_delta_nsec(0)
+	, m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)
+	, m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ)
+	, m_playback_accumulated_speed(0)
+	, m_playback_accumulated_frames(0)
+	, m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)
+	, m_timecode_count(0)
+	, m_timecode_last_time(attotime::zero)
+	, m_deselected_card_config(nullptr)
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -1831,6 +1832,7 @@ void ioport_manager::exit()
 
 ioport_manager::~ioport_manager()
 {
+	delete m_deselected_card_config;
 }
 
 
@@ -2053,16 +2055,15 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 	}
 
 	// early exit if no data to parse
-	if (parentnode == nullptr)
+	if (!parentnode)
 		return;
-
-	// iterate over all the remap nodes for controller configs only
-	if (cfg_type == config_type::CONTROLLER)
-		load_remap_table(parentnode);
 
 	// load device map table for controller configs only
 	if (cfg_type == config_type::CONTROLLER)
 	{
+		// iterate over all the remap nodes
+		load_remap_table(parentnode);
+
 		std::unique_ptr<devicemap_table_type> devicemap_table = std::make_unique<devicemap_table_type>();
 		for (util::xml::data_node const *mapdevice_node = parentnode->get_child("mapdevice"); mapdevice_node != nullptr; mapdevice_node = mapdevice_node->get_next_sibling("mapdevice"))
 		{
@@ -2252,19 +2253,18 @@ bool ioport_manager::load_default_config(util::xml::data_node const *portnode, i
 //  data to the current set of input ports
 //-------------------------------------------------
 
-bool ioport_manager::load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
+void ioport_manager::load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
 {
-	// read the mask, index, and defvalue attributes
-	const char *tag = portnode->get_attribute_string("tag", nullptr);
+	// read the mask and defvalue attributes
 	ioport_value mask = portnode->get_attribute_int("mask", 0);
 	ioport_value defvalue = portnode->get_attribute_int("defvalue", 0);
 
-	// find the port we want; if no tag, search them all
-	for (auto &port : m_portlist)
-		if (tag == nullptr || strcmp(port.second->tag(), tag) == 0)
-			for (ioport_field &field : port.second->fields())
-
-				// find the matching mask and defvalue
+	auto const apply =
+		[portnode, type, player, newseq, mask, defvalue] (ioport_port &port) -> bool
+		{
+			for (ioport_field &field : port.fields())
+			{
+				// find the matching mask and default value
 				if (field.type() == type && field.player() == player &&
 					field.mask() == mask && (field.defvalue() & mask) == (defvalue & mask))
 				{
@@ -2274,21 +2274,22 @@ bool ioport_manager::load_game_config(util::xml::data_node const *portnode, int 
 							field.live().seq[seqtype] = newseq[seqtype];
 
 					// fetch configurable attributes
-					// for non-analog fields
-					if (field.live().analog == nullptr)
+					if (!field.live().analog)
 					{
+						// for non-analog fields
+
 						// fetch the value
 						field.live().value = portnode->get_attribute_int("value", field.defvalue());
 
 						// fetch yes/no for toggle setting
-						const char *togstring = portnode->get_attribute_string("toggle", nullptr);
-						if (togstring != nullptr)
-							field.live().toggle = (strcmp(togstring, "yes") == 0);
+						char const *const togstring = portnode->get_attribute_string("toggle", nullptr);
+						if (togstring)
+							field.live().toggle = !strcmp(togstring, "yes");
 					}
-
-					// for analog fields
 					else
 					{
+						// for analog fields
+
 						// get base attributes
 						field.live().analog->m_delta = portnode->get_attribute_int("keydelta", field.delta());
 						field.live().analog->m_centerdelta = portnode->get_attribute_int("centerdelta", field.centerdelta());
@@ -2296,13 +2297,62 @@ bool ioport_manager::load_game_config(util::xml::data_node const *portnode, int 
 
 						// fetch yes/no for reverse setting
 						const char *revstring = portnode->get_attribute_string("reverse", nullptr);
-						if (revstring != nullptr)
-							field.live().analog->m_reverse = (strcmp(revstring, "yes") == 0);
+						if (revstring)
+							field.live().analog->m_reverse = !strcmp(revstring, "yes");
 					}
 					return true;
 				}
+			}
+			return false;
+		};
 
-	return false;
+	// find the port we want
+	char const *const tag = portnode->get_attribute_string("tag", nullptr);
+	if (tag)
+	{
+		auto const port(m_portlist.find(tag));
+		if (m_portlist.end() != port)
+		{
+			apply(*port->second);
+		}
+		else
+		{
+			// see if this belongs to a slot card that isn't inserted
+			std::string_view parent_tag(tag);
+			auto pos(parent_tag.rfind(':'));
+			if (pos && (std::string_view::npos != pos))
+			{
+				parent_tag = parent_tag.substr(0, pos);
+				if (!machine().root_device().subdevice(parent_tag))
+				{
+					for (pos = parent_tag.rfind(':'); pos && (std::string_view::npos != pos); pos = parent_tag.rfind(':'))
+					{
+						std::string_view const child_tag(parent_tag.substr(pos + 1));
+						parent_tag = parent_tag.substr(0, pos);
+						device_t const *const parent_device(machine().root_device().subdevice(parent_tag));
+						if (parent_device)
+						{
+							device_slot_interface const *slot;
+							if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
+							{
+								if (!m_deselected_card_config)
+									m_deselected_card_config = util::xml::file::create().release();
+								portnode->copy_into(*m_deselected_card_config);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// if no tag, search them all
+		for (auto &port : m_portlist)
+			if (apply(*port.second))
+				break;
+	}
 }
 
 
@@ -2497,6 +2547,13 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 					}
 				}
 			}
+
+	// preserve configuration for deselected slot cards
+	if (m_deselected_card_config)
+	{
+		for (util::xml::data_node const *node = m_deselected_card_config->get_first_child(); node; node = node->get_next_sibling())
+			node->copy_into(parentnode);
+	}
 }
 
 
@@ -2510,8 +2567,8 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 //  file
 //-------------------------------------------------
 
-template<typename _Type>
-_Type ioport_manager::playback_read(_Type &result)
+template<typename Type>
+Type ioport_manager::playback_read(Type &result)
 {
 	// protect against nullptr handles if previous reads fail
 	if (!m_playback_file.is_open())
@@ -2682,8 +2739,8 @@ void ioport_manager::playback_port(ioport_port &port)
 //  record_write - write a value to the record file
 //-------------------------------------------------
 
-template<typename _Type>
-void ioport_manager::record_write(_Type value)
+template<typename Type>
+void ioport_manager::record_write(Type value)
 {
 	// protect against nullptr handles if previous reads fail
 	if (!m_record_file.is_open())
@@ -2701,8 +2758,8 @@ void ioport_manager::record_write<bool>(bool value)
 	record_write(byte);
 }
 
-template<typename _Type>
-void ioport_manager::timecode_write(_Type value)
+template<typename Type>
+void ioport_manager::timecode_write(Type value)
 {
 	// protect against nullptr handles if previous reads fail
 	if (!m_timecode_file.is_open())

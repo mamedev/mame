@@ -51,6 +51,7 @@
 #include "rcm.h"
 #include "rexsoft.h"
 #include "sachen.h"
+#include "sealie.h"
 #include "somari.h"
 #include "subor.h"
 #include "tengen.h"
@@ -397,8 +398,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
-	device.option_add_internal("nes_action53",     NES_ACTION53);
-	device.option_add_internal("nes_2a03pur",      NES_2A03PURITANS);
+	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("cufrom",           NES_CUFROM);
+	device.option_add_internal("unrom512",         NES_UNROM512);
+	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
 // other unsupported...
 	device.option_add_internal("ninjaryu",         NES_NROM);    // mapper 111 - UNSUPPORTED
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED

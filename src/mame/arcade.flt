@@ -1124,6 +1124,7 @@ segaorun.cpp
 segas16a.cpp
 segas16b.cpp
 segas18.cpp
+segas18_astormbl.cpp
 segas24.cpp
 segas32.cpp
 segasp.cpp
@@ -1428,6 +1429,7 @@ voyager.cpp
 vp101.cpp
 vpoker.cpp
 vroulet.cpp
+vsmjtria.cpp
 vsnes.cpp
 vulgus.cpp
 wacky_gator.cpp

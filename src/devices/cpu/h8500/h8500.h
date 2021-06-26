@@ -18,8 +18,10 @@ public:
 		H8500_R4, H8500_R5, H8500_FP, H8500_SP
 	};
 
+	void set_mode(u8 mode) { assert(!configured()); m_mode_control = mode; }
+
 protected:
-	h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, int buswidth, int ramsize, address_map_constructor map);
+	h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, int buswidth, int ramsize, int defmode, address_map_constructor map);
 
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -40,7 +42,8 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual bool h8_maximum_mode() const noexcept { return true; }
+	u8 mode_control() const { return m_mode_control; }
+	virtual bool h8_maximum_mode() const noexcept { return m_mode_control == 3 || m_mode_control == 4; } // all except H8/570
 
 private:
 	void ram_map(address_map &map);
@@ -51,6 +54,9 @@ private:
 	address_space_config m_ram_config;
 	address_space *m_program;
 	memory_access<11, 1, 0, ENDIANNESS_BIG>::cache m_ram_cache;
+
+	// misc. configuration
+	u8 m_mode_control;
 
 	// internal registers
 	u16 m_pc;

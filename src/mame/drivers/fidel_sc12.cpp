@@ -180,7 +180,7 @@ void sc12_state::main_map(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( sc12_sidepanel )
+static INPUT_PORTS_START( sc12_base )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("RV / Pawn")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("DM / Knight")
@@ -194,12 +194,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12 )
 	PORT_INCLUDE( fidel_clockdiv_2 )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sc12b )
 	PORT_INCLUDE( fidel_clockdiv_4 )
-	PORT_INCLUDE( sc12_sidepanel )
+	PORT_INCLUDE( sc12_base )
 INPUT_PORTS_END
 
 

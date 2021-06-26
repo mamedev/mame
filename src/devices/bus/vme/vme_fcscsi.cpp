@@ -329,7 +329,6 @@ vme_fcscsi1_card_device::vme_fcscsi1_card_device(const machine_config &mconfig, 
 void vme_fcscsi1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	set_vme_device();
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xe00000);

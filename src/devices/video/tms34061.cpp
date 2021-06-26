@@ -64,14 +64,14 @@ void tms34061_device::device_start()
 	m_vrammask = m_vramsize - 1;
 
 	/* allocate memory for VRAM */
-	m_vram = auto_alloc_array_clear(machine(), u8, m_vramsize + 256 * 2);
+	m_vram_alloc = std::make_unique<u8[]>(m_vramsize + 256 * 2);
 
 	/* allocate memory for latch RAM */
-	m_latchram = auto_alloc_array_clear(machine(), u8, m_vramsize + 256 * 2);
+	m_latchram_alloc = std::make_unique<u8[]>(m_vramsize + 256 * 2);
 
 	/* add some buffer space for VRAM and latch RAM */
-	m_vram += 256;
-	m_latchram += 256;
+	m_vram = &m_vram_alloc[256];
+	m_latchram = &m_latchram_alloc[256];
 
 	/* point the shift register to the base of VRAM for now */
 	m_shiftreg = m_vram;

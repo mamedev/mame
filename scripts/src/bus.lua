@@ -2833,6 +2833,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/rexsoft.h",
 		MAME_DIR .. "src/devices/bus/nes/sachen.cpp",
 		MAME_DIR .. "src/devices/bus/nes/sachen.h",
+		MAME_DIR .. "src/devices/bus/nes/sealie.cpp",
+		MAME_DIR .. "src/devices/bus/nes/sealie.h",
 		MAME_DIR .. "src/devices/bus/nes/somari.cpp",
 		MAME_DIR .. "src/devices/bus/nes/somari.h",
 		MAME_DIR .. "src/devices/bus/nes/subor.cpp",
@@ -4497,8 +4499,6 @@ if (BUSES["SAITEK_OSA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
-		MAME_DIR .. "src/devices/bus/saitek_osa/modules.cpp",
-		MAME_DIR .. "src/devices/bus/saitek_osa/modules.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",

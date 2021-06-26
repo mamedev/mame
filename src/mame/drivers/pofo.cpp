@@ -81,7 +81,7 @@ public:
 		m_keyboard(*this, "keyboard"),
 		m_dtmf(*this, PCD3311T_TAG),
 		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
-		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_timer_tick(*this, TIMER_TICK_TAG),
 		m_nvram(*this, "nvram"),
 		m_ram(*this, "ram"),

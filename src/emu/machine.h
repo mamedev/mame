@@ -62,18 +62,6 @@ constexpr int DEBUG_FLAG_OSD_ENABLED    = 0x00001000;       // The OSD debugger 
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-// global allocation helpers
-#define auto_alloc(m, t)                pool_alloc(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_clear(m, t)          pool_alloc_clear(static_cast<running_machine &>(m).respool(), t)
-#define auto_alloc_array(m, t, c)       pool_alloc_array(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_alloc_array_clear(m, t, c) pool_alloc_array_clear(static_cast<running_machine &>(m).respool(), t, c)
-#define auto_free(m, v)                 pool_free(static_cast<running_machine &>(m).respool(), v)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -125,9 +113,6 @@ class running_machine
 
 	typedef std::function<void (const char*)> logerror_callback;
 
-	// must be at top of member variables
-	resource_pool           m_respool;              // pool of resources for this machine
-
 public:
 	// construction/destruction
 	running_machine(const machine_config &config, machine_manager &manager);
@@ -139,7 +124,6 @@ public:
 	const game_driver &system() const { return m_system; }
 	osd_interface &osd() const;
 	machine_manager &manager() const { return m_manager; }
-	[[deprecated("use smart pointers to manage object lifecycles")]] resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
 	memory_manager &memory() { return m_memory; }
