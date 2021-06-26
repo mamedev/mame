@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-VS Mahjong Triangle (c) 1986? Dyna
+VS Mahjong Triangle (c) 1986 Dyna
 
 Unmarked board with everything doubled up, to provide a versus experience with a single board
 2 players can play separately or one against the other
@@ -579,4 +579,4 @@ void vsmjtria_state::init_vsmjtria()
 } // Anonymous namespace
 
 
-GAME( 1986?, vsmjtria, 0, vsmjtria, vsmjtria, vsmjtria_state, init_vsmjtria, ROT0, "Dyna", "VS Mahjong Triangle", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // puts Home Data in RAM? coins and CPU comms not working
+GAME( 1986, vsmjtria, 0, vsmjtria, vsmjtria, vsmjtria_state, init_vsmjtria, ROT0, "Dyna", "VS Mahjong Triangle", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // puts Home Data in RAM? coins and CPU comms not working

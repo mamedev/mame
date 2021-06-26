@@ -27,7 +27,7 @@
     - outputs (coin counter port same as sound writes?);
     - hook up pots, some are useful for in-game adjustments such as paddle adjust and ball shape (ball is currently a rectangle).
     - hook up background color jumper (can be changed to black or blue)
-    - player bat moves in steps. It this correct compared to real PCB?
+    - player bat moves in steps. Is this correct compared to real PCB?
     - sound (Music requires Epson 7910CQ Multi-Melody ROM & emulation)
     \- victory BGM cuts off too late?
 
