@@ -563,7 +563,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 						// check for a valid tag
 						if (romp->name().size() < MIN_TAG_LENGTH)
-							osd_printf_error("%s: %s part %s data area name '%s' is too short (mut be at least %d characters)\n", m_filename, shortname, part.name(), romp->name(), MIN_TAG_LENGTH);
+							osd_printf_error("%s: %s part %s data area name '%s' is too short (must be at least %d characters)\n", m_filename, shortname, part.name(), romp->name(), MIN_TAG_LENGTH);
 
 						if (std::find_if_not(romp->name().begin(), romp->name().end(), valid_tag_char) != romp->name().end())
 							osd_printf_error("%s: %s part %s data area name '%s' contains invalid characters\n", m_filename, shortname, part.name(), romp->name());
