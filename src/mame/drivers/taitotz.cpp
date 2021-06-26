@@ -172,6 +172,7 @@ Notes:
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
