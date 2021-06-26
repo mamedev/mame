@@ -3680,6 +3680,26 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 		<info name="release" value="19911206" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="3482006">
+				<rom name="detana_twinbee_disk_a.mfm" size="3482006" crc="c6982f00" sha1="131a54f5e7514348c4d704199a6942821b222309" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="3483000">
+				<rom name="detana_twinbee_disk_b.mfm" size="3483000" crc="70f2c5f1" sha1="2607ff58d1b60a9fce704e4d9b0c06bb1facdd3a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dtwinbeec" cloneof="dtwinbee">
+		<description>Detana!! TwinBee (cracked)</description>
+		<year>1991</year>
+		<publisher>コナミ (Konami)</publisher>
+		<info name="alt_title" value="出たな!! ツインビー" />
+		<info name="release" value="19911206" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
 				<rom name="detana twin bee (1991)(konami)(disk 1 of 2)(disk a).dim" size="1261824" crc="533a8631" sha1="707473abd5433f8ef70481b46dee29f255f8bf0c" offset="000000" />
 			</dataarea>
@@ -10425,6 +10445,19 @@ Including "Daikairei Powerup kit to Shin Scenario Make kit" &amp; "Daikairei Tsu
 
 	<software name="pacland">
 		<description>Video Game Anthology vol. 11 - Pac-Land</description>
+		<year>1994</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ビデオゲームアンソロジー vol.11 - パックランド" />
+		<info name="release" value="19941216" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="3444588">
+				<rom name="pac-land.mfm" size="3444588" crc="90a52c23" sha1="8740f9984c37f7b65f2431cb9999ac0723d8f748" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paclandc" cloneof="pacland">
+		<description>Video Game Anthology vol. 11 - Pac-Land (cracked)</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ビデオゲームアンソロジー vol.11 - パックランド" />
