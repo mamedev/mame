@@ -210,8 +210,6 @@ void blstroid_state::blstroid(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

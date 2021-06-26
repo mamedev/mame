@@ -372,8 +372,6 @@ void blueprnt_state::blueprnt(machine_config &config)
 	screen.set_screen_update(FUNC(blueprnt_state::screen_update_blueprnt));
 	screen.set_palette(m_palette);
 
-	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
-
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blueprnt);
 	PALETTE(config, m_palette, FUNC(blueprnt_state::blueprnt_palette), 128*4+8);
 
