@@ -1345,7 +1345,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Compute the shift amount from pc delta to granularity-sized elements
-	u32 granularity_shift = 31 - count_leading_zeros(disasm->opcode_alignment());
+	u32 granularity_shift = 31 - count_leading_zeros_32(disasm->opcode_alignment());
 
 	// Number of pc steps to disassemble
 	u32 count = pclength;
@@ -1355,7 +1355,7 @@ int main(int argc, char *argv[])
 
 	// pc to string conversion
 	std::function<std::string (offs_t pc)> pc_to_string;
-	int aw = 32 - count_leading_zeros(pc_mask);
+	int aw = 32 - count_leading_zeros_32(pc_mask);
 	bool is_octal = opts.octal; // Parameter?  Per-cpu config?
 	if((flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = disasm->page_address_bits();

@@ -14,12 +14,12 @@
     (per-game issues)
     - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
 
-    - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
-      SH-2 synching or it's actually a m68k comms issue.
+    - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous set_maximum_quantum() number,
+      might need strict SH-2 synching or it's actually a m68k comms issue.
 
     - groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
 
-    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
+    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode), but let it wait for about
       10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
       Likely to not be a bug but an in-game design issue.
 
@@ -27,10 +27,16 @@
 
     - vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
       and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
-      to title screen after losing a match
+      to title screen after losing a match (fixed?)
 
     - vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
       sends the opponent out of the ring from whatever position.
+
+    - critcrsh: has a 2 digits 7-seg LED. The current implementation works in test mode, but during gameplay it's stuck
+      on the day's best score, while according to reports it should update the number of critters you have crushed.
+      At the end of the round it outputs the number of crushed critters. Also needs ticket dispenser hookup (redemption
+      is disabled by the game by default, but can be turned on in test menu).
+      Reference video: https://www.youtube.com/watch?v=O9PyIKdSFnU
 
 ************************************************************************************************************************/
 
@@ -50,6 +56,7 @@
 
 #include "coreutil.h"
 
+#include "critcrsh.lh"
 #include "segabill.lh"
 #include "segabillv.lh"
 
@@ -142,7 +149,7 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 //          if (data != m_system_output)
 //              logerror("OUT %02x\n", data);
 			m_system_output = data;
-			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
+			/*Why does the BIOS test these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
@@ -180,6 +187,21 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 	}
 
 	return res;
+}
+
+void stv_state::critcrsh_ioga_w(offs_t offset, uint8_t data)
+{
+	switch (offset * 2 + 1)
+	{
+		case 0x0b:
+			static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 }; // TODO: chip type unknown
+			m_cc_digits[0] = bcd2hex[(data & 0xf0) >> 4];
+			m_cc_digits[1] = bcd2hex[data & 0x0f];
+			break;
+		default:
+			stv_ioga_w(offset, data);
+			break;
+	}
 }
 
 uint8_t stv_state::magzun_ioga_r(offs_t offset)
@@ -998,7 +1020,7 @@ void stv_state::stv_mem(address_map &map)
 void stv_state::critcrsh_mem(address_map &map)
 {
 	stv_mem(map);
-	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::critcrsh_ioga_r), FUNC(stv_state::stv_ioga_w)).umask32(0x00ff00ff);
+	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::critcrsh_ioga_r), FUNC(stv_state::critcrsh_ioga_w)).umask32(0x00ff00ff);
 }
 
 void stv_state::magzun_mem(address_map &map)
@@ -1122,9 +1144,6 @@ void stv_state::stv(machine_config &config)
 	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
 	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
 	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
-
-	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
-	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
@@ -1267,7 +1286,7 @@ void stv_state::hopper(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::hopper_mem);
 }
 
-MACHINE_RESET_MEMBER(stv_state,stv)
+void stv_state::machine_reset()
 {
 	m_scsp_last_line = 0;
 
@@ -1340,8 +1359,10 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state, stv)
+void stv_state::machine_start()
 {
+	m_cc_digits.resolve();
+
 	// save states
 //  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
@@ -3778,8 +3799,8 @@ GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   init_batmanfr, 
 GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   init_colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   init_cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   init_cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tatacot,   critcrsh,critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
+GAMEL(1995, tatacot,   critcrsh,critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
 GAME( 1999, danchih,   stvbios, stvmp,    stvmp,    stv_state,   init_danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )

@@ -184,37 +184,6 @@ void galaxold_state::hustlerb3_map(address_map &map)
 
 }
 
-void galaxold_state::rockclim_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).rw(FUNC(galaxold_state::rockclim_videoram_r), FUNC(galaxold_state::rockclim_videoram_w)).share("rockclim_vram");//4800 - 4803 = bg scroll ?
-	map(0x4800, 0x4803).w(FUNC(galaxold_state::rockclim_scroll_w));
-	map(0x5000, 0x53ff).ram(); //?
-	map(0x5800, 0x5800).portr("IN2");
-	map(0x6000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8800).portr("DSW1");
-	map(0x9000, 0x93ff).ram().w(FUNC(galaxold_state::galaxold_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).r(FUNC(galaxold_state::galaxold_videoram_r));
-	map(0x9800, 0x983f).ram().w(FUNC(galaxold_state::galaxold_attributesram_w)).share("attributesram");
-	map(0x9840, 0x985f).ram().share("spriteram");
-	map(0x9860, 0x987f).ram().share("bulletsram");
-	map(0x9880, 0x98ff).ram();
-	map(0xa000, 0xa000).portr("IN0");
-	map(0xa000, 0xa002).w(FUNC(galaxold_state::galaxold_gfxbank_w));// a002 - sprite bank
-	map(0xa003, 0xa003).w(FUNC(galaxold_state::galaxold_coin_counter_w));
-	map(0xa004, 0xa007).w("cust", FUNC(galaxian_sound_device::lfo_freq_w));
-	map(0xa800, 0xa800).portr("IN1");
-	map(0xa800, 0xa802).w("cust", FUNC(galaxian_sound_device::background_enable_w));
-	map(0xa803, 0xa803).w("cust", FUNC(galaxian_sound_device::noise_enable_w));
-	map(0xa805, 0xa805).w("cust", FUNC(galaxian_sound_device::fire_enable_w));
-	map(0xa806, 0xa807).w("cust", FUNC(galaxian_sound_device::vol_w));
-	map(0xb000, 0xb000).portr("DSW0").w(FUNC(galaxold_state::galaxold_nmi_enable_w));
-	map(0xb006, 0xb006).w(FUNC(galaxold_state::galaxold_flip_screen_x_w));
-	map(0xb007, 0xb007).w(FUNC(galaxold_state::galaxold_flip_screen_y_w));
-	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
-	map(0xb800, 0xb800).w("cust", FUNC(galaxian_sound_device::pitch_w));
-}
 
 
 void galaxold_state::scramblb_map(address_map &map)
@@ -779,90 +748,6 @@ static INPUT_PORTS_START( froggerv )
 INPUT_PORTS_END
 
 
-// verified from Z80 code
-static INPUT_PORTS_START( rockclim )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )             // only adds 1 credit if "Coin Slots" is set to 1
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )  PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )    PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )  PORT_8WAY
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )   PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )  PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )     PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )   PORT_8WAY
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPSETTING(    0x40, "50000" )
-	PORT_DIPNAME( 0x80, 0x00, "Coin Slots" )
-	PORT_DIPSETTING(    0x80, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_LEFT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP )    PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT )   PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT )  PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP )     PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN )   PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x03, "6" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ) )
-INPUT_PORTS_END
 
 
 // verified from Z80 code
@@ -1622,22 +1507,6 @@ static const gfx_layout _4in1_spritelayout =
 	32*8
 };
 
-static const gfx_layout rockclim_charlayout =
-{
-	8,8,
-	256,
-	4,//?
-	{ 4, 0,4096*8+4,4096*8 },
-	{ 3, 2, 1, 0,11 ,10, 9, 8 },
-	{ 0*8*2, 1*8*2, 2*8*2, 3*8*2, 4*8*2, 5*8*2, 6*8*2, 7*8*2 },
-	8*8*2
-};
-
-static GFXDECODE_START( gfx_rockclim )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   32, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 32, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, rockclim_charlayout, 0, 1 )
-GFXDECODE_END
 
 static GFXDECODE_START( gfx_galaxian )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 8 )
@@ -1835,21 +1704,6 @@ void galaxold_state::dkongjrmc(machine_config &config)
 }
 
 
-void galaxold_state::rockclim(machine_config &config)
-{
-	mooncrst(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::rockclim_map);
-	m_gfxdecode->set_info(gfx_rockclim);
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,rockclim)
-	m_palette->set_entries(64+64+2); // 64 colors only, but still uses bullets so we need to keep the palette big
-	m_palette->set_init(FUNC(galaxold_state::rockclim_palette));
-
-	m_screen->set_size(64*8, 32*8);
-}
 
 
 void galaxold_state::drivfrcg(machine_config &config)
@@ -1871,7 +1725,7 @@ void galaxold_state::drivfrcg(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
-	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 64);
+	PALETTE(config, m_palette, FUNC(galaxold_state::s2650_palette), 64);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gmgalax);
 
@@ -1932,7 +1786,7 @@ void galaxold_state::racknrol(machine_config &config)
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
-	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 32);
+	PALETTE(config, m_palette, FUNC(galaxold_state::s2650_palette), 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -1959,7 +1813,7 @@ void galaxold_state::hexpoola(machine_config &config)
 	maincpu.intack_handler().set(FUNC(galaxold_state::hunchbkg_intack));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxian);
-	PALETTE(config, m_palette, FUNC(galaxold_state::rockclim_palette), 32);
+	PALETTE(config, m_palette, FUNC(galaxold_state::s2650_palette), 32);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
@@ -2042,30 +1896,6 @@ ROM_START( froggerv )
 	ROM_LOAD( "ic7",      0x0000, 0x0020, CRC(4ac17114) SHA1(1fa34a556fe445a6bdabfe75b4b679cab6553c8b) )  // SN74288 or equivalent BPROM
 ROM_END
 
-
-ROM_START( rockclim )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lc01.a1",   0x0000, 0x1000, CRC(8601ae8d) SHA1(6e0c3b34ce5e6879ce7a116c5c2660889a68320d) )
-	ROM_LOAD( "lc02.a2",   0x1000, 0x1000, CRC(2dde9d4c) SHA1(7e343113116b94894558819a7f77f77e4e952da7) )
-	ROM_LOAD( "lc03.a3",   0x2000, 0x1000, CRC(82c48a67) SHA1(abf95062eb5c9bd4bb3c9b9af59396a4ca6905d8) )
-	ROM_LOAD( "lc04.a4",   0x3000, 0x1000, CRC(7cd3a04a) SHA1(756c12288e120e6f761b266b91920d17cab6926c) )
-	ROM_LOAD( "lc05.a5",   0x6000, 0x1000, CRC(5e542149) SHA1(425a5a8769c3fa0887db8ff04e2a4f32f18d2679) )
-	ROM_LOAD( "lc06.a6",   0x7000, 0x1000, CRC(b2bdca64) SHA1(e72e63725164c922816dda90ac964a94062eab1b) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "lc08.a9",   0x0000, 0x800, CRC(7f18e1ef) SHA1(2a160b994708ec0f06774dde3ec613af7e3f32c6) )
-	ROM_LOAD( "lc07.a7",   0x0800, 0x800, CRC(f18b50ac) SHA1(a2328eb55882a09403cae1a497c611b494649cac) )
-	ROM_LOAD( "lc10.c9",   0x1000, 0x800, CRC(dec5781b) SHA1(b6277fc890d153db24bd48293780cf239a6aa0e7) )
-	ROM_LOAD( "lc09.c7",   0x1800, 0x800, CRC(06c0b5de) SHA1(561cf99a6be03205c7bc5fd15d4d51ee4d6d164b) )
-
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "lc13.g5",   0x0000, 0x1000, CRC(19475f2b) SHA1(5d42aa45a7b519dacdecd3d2edbfee6971693034) )
-	ROM_LOAD( "lc14.g7",   0x1000, 0x1000, CRC(cc96d1db) SHA1(9713b47b723a5d8837f2a8e8c43e46dc41a62e5b) )
-
-	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "lc12.e9",  0x0000, 0x0020, CRC(f6e76547) SHA1(c9ea78d1876156561b3bbf327d7e0299e1d9fd4a) )
-	ROM_LOAD( "lc11.f4",  0x0020, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
-ROM_END
 
 
 ROM_START( scramblb )
@@ -2654,7 +2484,6 @@ ROM_END
 // Z80 games
 //    YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT             ROT     COMPANY,                         FULLNAME,                                                   FLAGS
 GAME( 1981, vpool,     hustler,  mooncrst,  vpool,     galaxold_state, empty_init,     ROT90,  "bootleg",                       "Video Pool (bootleg on Moon Cresta hardware)",             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rockclim,  0,        rockclim,  rockclim,  galaxold_state, empty_init,     ROT180, "Taito",                         "Rock Climber",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramblb,  scramble, scramblb,  scramblb,  galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg on Galaxian hardware)",                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramb2,   scramble, scramb2,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, scramb3,   scramble, scramb3,   scramb2,   galaxold_state, empty_init,     ROT90,  "bootleg",                       "Scramble (bootleg, set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

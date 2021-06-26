@@ -447,7 +447,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3256">
 				<rom name="frogger1.cmd" size="0x3256" crc="64f592b7" sha1="41ec2e8bf8e0ea37d4620026183092c38d6f8f76"/>
@@ -460,7 +460,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger2.cmd" size="0x3000" crc="eec61bf9" sha1="2e1df95218ca421099e5ca5ac0fdb1e1199372f6"/>
@@ -473,7 +473,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x33f4">
 				<rom name="frogger3.cmd" size="0x33f4" crc="3e6d36a7" sha1="693fcf5798b1b5f9db7de2cc1ae558fefaace1a6"/>
@@ -486,7 +486,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
@@ -499,7 +499,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger5.cmd" size="0x3000" crc="03573bc4" sha1="496b922b1932dbb5bed6870a0e6428897f2afff4"/>
@@ -512,7 +512,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger6.cmd" size="0x3000" crc="4ab1a2c5" sha1="f533224621a75a850f7e7bd158655ef7cd74c6f6"/>
@@ -525,7 +525,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x35e1">
 				<rom name="frogger7.cmd" size="0x35e1" crc="2c0aa48d" sha1="cf7e3c9c8d4d7966a8dbc43c53a87efdd7174c8f"/>
@@ -538,7 +538,7 @@ between them.
 		<year>1981</year>
 		<publisher>Misosys</publisher>
 		<info name="usage" value="Skill 0 is easiest" />
-		<sharedfeat name="compatibility" value="1,3,H,MN" /><!-- [3]: some sounds missing -->
+		<sharedfeat name="compatibility" value="1,3,H,MN" />
 		<part name="quik" interface="trs80_quik">
 			<dataarea name="quik" size="0x3000">
 				<rom name="frogger8.cmd" size="0x3000" crc="550b42af" sha1="4056b075238e45742712f47f6da88f764ff2615a"/>

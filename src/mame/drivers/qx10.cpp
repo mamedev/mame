@@ -34,12 +34,14 @@
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/mc146818.h"
+#include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/qx10kbd.h"
@@ -82,6 +84,7 @@ public:
 		m_hgdc(*this, "upd7220"),
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
+		m_centronics(*this, "centronics"),
 		m_speaker(*this, "speaker"),
 		m_vram_bank(0),
 		m_char_rom(*this, "chargen"),
@@ -124,6 +127,16 @@ private:
 	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
+
+	uint8_t portb_r();
+	void portc_w(uint8_t data);
+
+	void centronics_busy_handler(uint8_t state);
+	void centronics_fault_handler(uint8_t state);
+	void centronics_perror_handler(uint8_t state);
+	void centronics_select_handler(uint8_t state);
+	void centronics_sense_handler(uint8_t state);
+
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
 	DECLARE_WRITE_LINE_MEMBER(speaker_freq);
@@ -154,6 +167,7 @@ private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<rs232_port_device> m_kbd;
+	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device>   m_speaker;
 	uint8_t m_vram_bank;
 	//required_shared_ptr<uint8_t> m_video_ram;
@@ -173,6 +187,14 @@ private:
 	int m_spkr_enable;
 	int m_spkr_freq;
 	int m_pit1_out0;
+
+	/* centronics */
+	int m_centronics_error;
+	int m_centronics_busy;
+	int m_centronics_paper;
+	int m_centronics_select;
+	int m_centronics_sense;
+
 
 	/* memory */
 	int     m_membank;
@@ -449,6 +471,52 @@ uint8_t qx10_state::qx10_30_r()
 			/*m_fdcmotor*/ 0 << 1 |
 			((floppy1 != nullptr) || (floppy2 != nullptr) ? 1 : 0) << 3 |
 			m_membank << 4;
+}
+
+void qx10_state::centronics_busy_handler(uint8_t state)
+{
+	m_centronics_busy = state;
+}
+
+void qx10_state::centronics_perror_handler(uint8_t state)
+{
+	m_centronics_paper = state;
+}
+
+void qx10_state::centronics_fault_handler(uint8_t state)
+{
+	m_centronics_error = state;
+}
+
+void qx10_state::centronics_select_handler(uint8_t state)
+{
+	m_centronics_select = state;
+}
+
+void qx10_state::centronics_sense_handler(uint8_t state)
+{
+	m_centronics_sense = state;
+}
+
+uint8_t qx10_state::portb_r()
+{
+	uint8_t status = 0;
+
+	status |= m_centronics_error  << 3;
+	status |= m_centronics_paper  << 4;
+	status |= m_centronics_busy   << 5;
+	status |= m_centronics_sense  << 6;
+	status |= m_centronics_select << 7;
+
+	return status;
+}
+
+void qx10_state::portc_w(uint8_t data)
+{
+	m_centronics->write_strobe(BIT(data, 0));
+	m_centronics->write_autofd(BIT(data, 4));
+	m_centronics->write_init(!BIT(data, 5));
+	m_pic_s->ir0_w(BIT(data, 3));
 }
 
 /*
@@ -849,6 +917,9 @@ void qx10_state::qx10(machine_config &config)
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 
 	I8255(config, m_ppi, 0);
+	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
+	m_ppi->in_pb_callback().set(FUNC(qx10_state::portb_r));
+	m_ppi->out_pc_callback().set(FUNC(qx10_state::portc_w));
 
 	UPD7220(config, m_hgdc, 16.67_MHz_XTAL/4/2);
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
@@ -871,6 +942,16 @@ void qx10_state::qx10(machine_config &config)
 
 	RS232_PORT(config, m_kbd, keyboard, "qx10");
 	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
+
+	output_latch_device &prndata(OUTPUT_LATCH(config, "prndata"));
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->set_output_latch(prndata);
+	m_centronics->ack_handler().set(m_ppi, FUNC(i8255_device::pc6_w));
+	m_centronics->busy_handler().set(FUNC(qx10_state::centronics_busy_handler));
+	m_centronics->perror_handler().set(FUNC(qx10_state::centronics_perror_handler));
+	m_centronics->fault_handler().set(FUNC(qx10_state::centronics_fault_handler));
+	m_centronics->select_handler().set(FUNC(qx10_state::centronics_select_handler));
+	m_centronics->sense_handler().set(FUNC(qx10_state::centronics_sense_handler));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

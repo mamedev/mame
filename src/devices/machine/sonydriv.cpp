@@ -77,7 +77,7 @@ struct floppy_t
 	unsigned int loadedtrack_dirty : 1; /* has data in track buffer been modified? */
 	size_t loadedtrack_size;        /* size of loaded track */
 	size_t loadedtrack_pos;         /* position within loaded track */
-	uint8_t *loadedtrack_data;        /* pointer to track buffer */
+	std::vector<uint8_t> loadedtrack_data;        /* pointer to track buffer */
 
 	int is_fdhd;                /* is drive an FDHD? */
 	int is_400k;                /* drive is single-sided, which means 400K */
@@ -149,7 +149,6 @@ static void load_track_data(device_t *device,int floppy_select)
 {
 	int track_size;
 	legacy_floppy_image_device *cur_image;
-	uint8_t *new_data;
 	floppy_t *f;
 
 	f = &sony.floppy[floppy_select];
@@ -163,36 +162,29 @@ static void load_track_data(device_t *device,int floppy_select)
 	}
 
 	track_size = floppy_get_track_size(fimg, f->head, cur_image->floppy_drive_get_current_track());
-	if (f->loadedtrack_data) auto_free(device->machine(),f->loadedtrack_data);
-	new_data = auto_alloc_array(device->machine(),uint8_t,track_size);
-	if (!new_data)
-	{
-		return;
-	}
-
-	cur_image->floppy_drive_read_track_data_info_buffer(f->head, new_data, &track_size);
+	f->loadedtrack_data.resize(track_size);
+	cur_image->floppy_drive_read_track_data_info_buffer(f->head, &f->loadedtrack_data[0], &track_size);
 	f->loadedtrack_valid = 1;
 	f->loadedtrack_dirty = 0;
 	f->loadedtrack_size = track_size;
-	f->loadedtrack_data = new_data;
 	f->loadedtrack_pos = 0;
 }
 
 
 
-static void save_track_data(device_t *device, int floppy_select)
+static void save_track_data(running_machine &machine, int floppy_select)
 {
 	legacy_floppy_image_device *cur_image;
 	floppy_t *f;
 	int len;
 
 	f = &sony.floppy[floppy_select];
-	cur_image = floppy_get_device_by_type(device->machine(), FLOPPY_TYPE_SONY, floppy_select);
+	cur_image = floppy_get_device_by_type(machine, FLOPPY_TYPE_SONY, floppy_select);
 
 	if (f->loadedtrack_dirty)
 	{
 		len = f->loadedtrack_size;
-		cur_image->floppy_drive_write_track_data_info_buffer(f->head, f->loadedtrack_data, &len);
+		cur_image->floppy_drive_write_track_data_info_buffer(f->head, &f->loadedtrack_data[0], &len);
 		f->loadedtrack_dirty = 0;
 	}
 }
@@ -216,12 +208,12 @@ uint8_t sony_read_data(device_t *device)
 	if (!f->loadedtrack_valid)
 		load_track_data(device, sony.floppy_select);
 
-	if (!f->loadedtrack_data)
+	if (f->loadedtrack_data.empty())
 	{
 		return 0xFF;
 	}
 
-	result = sony_fetchtrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos);
+	result = sony_fetchtrack(&f->loadedtrack_data[0], f->loadedtrack_size, &f->loadedtrack_pos);
 	return result;
 }
 
@@ -240,12 +232,12 @@ void sony_write_data(device_t *device,uint8_t data)
 	if (!f->loadedtrack_valid)
 		load_track_data(device,sony.floppy_select);
 
-	if (!f->loadedtrack_data)
+	if (f->loadedtrack_data.empty())
 	{
 		return;
 	}
 
-	sony_filltrack(f->loadedtrack_data, f->loadedtrack_size, &f->loadedtrack_pos, data);
+	sony_filltrack(&f->loadedtrack_data[0], f->loadedtrack_size, &f->loadedtrack_pos, data);
 	f->loadedtrack_dirty = 1;
 }
 
@@ -333,7 +325,7 @@ int sony_read_status(device_t *device)
 		case 0x01:  /* Lower head activate */
 			if (f->head != 0)
 			{
-				save_track_data(device,sony.floppy_select);
+				save_track_data(device->machine(),sony.floppy_select);
 				f->head = 0;
 				f->loadedtrack_valid = 0;
 			}
@@ -345,7 +337,7 @@ int sony_read_status(device_t *device)
 		case 0x03:  /* Upper head activate (not on 400k) */
 			if ((f->head != 1) && !(f->is_400k))
 			{
-				save_track_data(device,sony.floppy_select);
+				save_track_data(device->machine(),sony.floppy_select);
 				f->head = 1;
 				f->loadedtrack_valid = 0;
 			}
@@ -482,7 +474,7 @@ static void sony_doaction(device_t *device)
 		case 0x04:  /* Step disk */
 			if (cur_image)
 			{
-				save_track_data(device,sony.floppy_select);
+				save_track_data(device->machine(),sony.floppy_select);
 				if (f->step)
 					cur_image->floppy_drive_seek(-1);
 				else
@@ -599,8 +591,8 @@ void sonydriv_floppy_image_device::device_start()
 	sony.floppy[1].is_fdhd = 0;
 	sony.floppy[0].is_400k = 0;
 	sony.floppy[1].is_400k = 0;
-	sony.floppy[0].loadedtrack_data = nullptr;
-	sony.floppy[1].loadedtrack_data = nullptr;
+	sony.floppy[0].loadedtrack_data.clear();
+	sony.floppy[1].loadedtrack_data.clear();
 	sony.floppy[0].head = 0;
 	sony.floppy[1].head = 0;
 	sony.rotation_speed = 0;
@@ -609,13 +601,9 @@ void sonydriv_floppy_image_device::device_start()
 void sonydriv_floppy_image_device::call_unload()
 {
 	int id;
-	device_t *fdc;
-
-	/* locate the FDC */
-	fdc = machine().device("fdc");
 
 	id = floppy_get_drive_by_type(this,FLOPPY_TYPE_SONY);
-	save_track_data(fdc, id);
+	save_track_data(machine(), id);
 	memset(&sony.floppy[id], 0, sizeof(sony.floppy[id]));
 
 	legacy_floppy_image_device::call_unload();

@@ -233,6 +233,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/eigccppc.h",
 		MAME_DIR .. "src/osd/eigccx86.h",
 		MAME_DIR .. "src/osd/eivc.h",
+		MAME_DIR .. "src/osd/eivcarm.h",
 		MAME_DIR .. "src/osd/eivcx86.h",
 		MAME_DIR .. "src/osd/eminline.h",
 		MAME_DIR .. "src/osd/osdcomm.h",

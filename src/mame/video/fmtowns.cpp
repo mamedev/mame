@@ -423,12 +423,14 @@ uint8_t towns_state::towns_video_440_r(offs_t offset)
 				ret |= 0x80;
 			}
 			ret |= (m_video.towns_sprite_flag ? 0x02 : 0x00);  // Sprite drawing flag
-			ret |= m_video.towns_sprite_page & 0x01;
+			ret |= (m_video.towns_sprite_page & 0x01) ? 1 : 0;;
 			return ret;
 		case 0x10:
 			return m_video.towns_sprite_sel;
 		case 0x12:
 			if(LOG_VID) logerror("SPR: reading register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,m_video.towns_sprite_reg[m_video.towns_sprite_sel]);
+			if(m_video.towns_sprite_sel == 6)
+				return m_video.towns_sprite_page & 0x01 ? 0x10 : 0;
 			return m_video.towns_sprite_reg[m_video.towns_sprite_sel];
 		case 0x18:
 			return m_vram_mask_addr;
@@ -459,6 +461,12 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			break;
 		case 0x03:
 //          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+			if((m_video.towns_crtc_sel == 21) && (m_video.towns_sprite_reg[1] & 0x80))
+			{
+				m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
+					(m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0x80ff) | ((data & 0x7f) << 8);
+				return;
+			}
 			m_video.towns_crtc_reg[m_video.towns_crtc_sel] =
 				(m_video.towns_crtc_reg[m_video.towns_crtc_sel] & 0x00ff) | (data << 8);
 			towns_crtc_refresh_mode();
@@ -475,7 +483,10 @@ void towns_state::towns_video_440_w(offs_t offset, uint8_t data)
 			break;
 		case 0x12:
 			logerror("SPR: writing register %i (0x452) [%02x]\n",m_video.towns_sprite_sel,data);
-			m_video.towns_sprite_reg[m_video.towns_sprite_sel] = data;
+			if(m_video.towns_sprite_sel == 6)
+				m_video.towns_sprite_page = data & 0x80 ? 1 : 0;
+			else
+				m_video.towns_sprite_reg[m_video.towns_sprite_sel] = data;
 			break;
 		case 0x18:
 			m_vram_mask_addr = data & 1;
@@ -966,7 +977,7 @@ void towns_state::render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, boo
 	}
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
+void towns_state::draw_sprites()
 {
 	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	uint16_t xoff = (m_video.towns_sprite_reg[2] | (m_video.towns_sprite_reg[3] << 8)) & 0x1ff;
@@ -1029,17 +1040,6 @@ TIMER_CALLBACK_MEMBER(towns_state::draw_sprites)
 				render_sprite_16((poffset)&0x1ffff,x,y,xflip,yflip,xhalfsize,yhalfsize,rotation,rect);
 		}
 	}
-
-	if(m_video.towns_sprite_page == 0)  // flip VRAM page
-	{
-		m_video.towns_sprite_page = 1;
-		m_video.towns_crtc_reg[21] &= ~0x8000;
-	}
-	else
-	{
-		m_video.towns_sprite_page = 0;
-		m_video.towns_crtc_reg[21] |= 0x8000;
-	}
 	m_video.towns_sprite_flag = 0;
 }
 
@@ -1084,7 +1084,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			off += scroll;
 		}
 		hzoom = ((m_video.towns_crtc_reg[27] & 0x0f00) >> 8) + 1;
-		off += (m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) * (2 >> (hzoom - 1));
+		off += (float)(m_video.towns_crtc_reg[11] - m_video.towns_crtc_reg[22]) * (2.0f / (float)hzoom);
 	}
 	else
 	{
@@ -1096,7 +1096,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 			off += scroll;
 		}
 		hzoom = (m_video.towns_crtc_reg[27] & 0x000f) + 1;
-		off += (m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) * (2 >> (hzoom - 1));
+		off += (float)(m_video.towns_crtc_reg[9] - m_video.towns_crtc_reg[18]) * (2.0f / (float)hzoom);
 	}
 
 	off += line * linesize;
@@ -1463,12 +1463,9 @@ void towns_state::draw_text_layer()
 
 void towns_state::towns_sprite_start()
 {
-	if(!(m_video.towns_sprite_reg[1] & 0x80))
-		return;
-
 	uint16_t sprite_limit = (m_video.towns_sprite_reg[0] | (m_video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	m_video.towns_sprite_flag = 1;  // we are now drawing
-	m_video.sprite_timer->adjust(m_maincpu->cycles_to_attotime(128 * (1025-sprite_limit)));
+	m_video.sprite_timer->adjust(attotime::from_usec(32 + 75 * (1024 - sprite_limit)));
 }
 
 TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
@@ -1487,15 +1484,27 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this), 0, (void*)m_pic_slave);
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
-	if(m_video.towns_sprite_reg[1] & 0x80)
+	if((m_video.towns_sprite_reg[1] & 0x80) && !m_video.towns_sprite_flag)
+	{
+		if(m_video.towns_sprite_page == 0)  // flip VRAM page
+		{
+			m_video.towns_sprite_page = 1;
+			m_video.towns_crtc_reg[21] &= ~0x8000;
+		}
+		else
+		{
+			m_video.towns_sprite_page = 0;
+			m_video.towns_crtc_reg[21] |= 0x8000;
+		}
 		towns_sprite_start();
+	}
 }
 
 void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::draw_sprites),this));
+	m_video.sprite_timer = timer_alloc(TIMER_SPRITES);
 }
 
 uint32_t towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

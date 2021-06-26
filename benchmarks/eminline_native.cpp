@@ -5,7 +5,7 @@
 static void BM_count_leading_zeros_native(benchmark::State& state) {
 	uint32_t cnt = 0x332533;
 	while (state.KeepRunning()) {
-		(void)count_leading_zeros(cnt);
+		(void)count_leading_zeros_32(cnt);
 		cnt++;
 	}
 }

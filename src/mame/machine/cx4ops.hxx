@@ -11,40 +11,40 @@
 ***************************************************************************/
 
 //Sprite Functions
-static void CX4_op00(running_machine& machine)
+static void CX4_op00(address_space &space)
 {
 	switch(cx4.reg[0x4d])
 	{
-		case 0x00: CX4_op00_00(machine); break;
+		case 0x00: CX4_op00_00(space); break;
 		case 0x03: CX4_op00_03(); break;
-		case 0x05: CX4_op00_05(machine); break;
+		case 0x05: CX4_op00_05(space); break;
 		case 0x07: CX4_op00_07(); break;
-		case 0x08: CX4_op00_08(machine); break;
-		case 0x0b: CX4_op00_0b(machine); break;
-		case 0x0c: CX4_op00_0c(machine); break;
+		case 0x08: CX4_op00_08(space); break;
+		case 0x0b: CX4_op00_0b(space); break;
+		case 0x0c: CX4_op00_0c(space); break;
 	}
 }
 
 //Draw Wireframe
-static void CX4_op01(running_machine& machine)
+static void CX4_op01(address_space &space)
 {
 	memset(cx4.ram + 0x300, 0, 2304);
-	CX4_C4DrawWireFrame(machine);
+	CX4_C4DrawWireFrame(space);
 }
 
 //Propulsion
-static void CX4_op05(running_machine &machine)
+static void CX4_op05(address_space &space)
 {
 	int32_t temp = 0x10000;
 	if(CX4_readw(0x1f83))
 	{
 		temp = CX4_sar((temp / CX4_readw(0x1f83)) * CX4_readw(0x1f81), 8);
 	}
-	CX4_writew(machine, 0x1f80, temp);
+	CX4_writew(space, 0x1f80, temp);
 }
 
 //Set Vector length
-static void CX4_op0d(running_machine &machine)
+static void CX4_op0d(address_space &space)
 {
 	cx4.C41FXVal    = CX4_readw(0x1f80);
 	cx4.C41FYVal    = CX4_readw(0x1f83);
@@ -53,8 +53,8 @@ static void CX4_op0d(running_machine &machine)
 	cx4.tanval = (double)cx4.C41FDistVal / cx4.tanval;
 	cx4.C41FYVal = (int16_t)(((double)cx4.C41FYVal * cx4.tanval) * 0.99);
 	cx4.C41FXVal = (int16_t)(((double)cx4.C41FXVal * cx4.tanval) * 0.98);
-	CX4_writew(machine, 0x1f89, cx4.C41FXVal);
-	CX4_writew(machine, 0x1f8c, cx4.C41FYVal);
+	CX4_writew(space, 0x1f89, cx4.C41FXVal);
+	CX4_writew(space, 0x1f8c, cx4.C41FYVal);
 }
 
 //Triangle
@@ -110,18 +110,18 @@ static void CX4_op13(void)
 }
 
 //Pythagorean
-static void CX4_op15(running_machine &machine)
+static void CX4_op15(address_space &space)
 {
 	double temp = 0.0;
 	cx4.C41FXVal = CX4_readw(0x1f80);
 	cx4.C41FYVal = CX4_readw(0x1f83);
 	temp = sqrt((double)cx4.C41FXVal * (double)cx4.C41FXVal + (double)cx4.C41FYVal * (double)cx4.C41FYVal);
 	cx4.C41FDist = (int16_t)temp;
-	CX4_writew(machine, 0x1f80, cx4.C41FDist);
+	CX4_writew(space, 0x1f80, cx4.C41FDist);
 }
 
 //Calculate distance
-static void CX4_op1f(running_machine &machine)
+static void CX4_op1f(address_space &space)
 {
 	cx4.C41FXVal = CX4_readw(0x1f80);
 	cx4.C41FYVal = CX4_readw(0x1f83);
@@ -140,7 +140,7 @@ static void CX4_op1f(running_machine &machine)
 		}
 		cx4.C41FAngleRes &= 0x1ff;
 	}
-	CX4_writew(machine, 0x1f86, cx4.C41FAngleRes);
+	CX4_writew(space, 0x1f86, cx4.C41FAngleRes);
 }
 
 //Trapezoid
@@ -210,7 +210,7 @@ static void CX4_op25(void)
 }
 
 //Transform Coords
-static void CX4_op2d(running_machine &machine)
+static void CX4_op2d(address_space &space)
 {
 	cx4.C4WFXVal  = CX4_readw(0x1f81);
 	cx4.C4WFYVal  = CX4_readw(0x1f84);
@@ -220,8 +220,8 @@ static void CX4_op2d(running_machine &machine)
 	cx4.C4WFDist  = CX4_read (0x1f8b);
 	cx4.C4WFScale = CX4_readw(0x1f90);
 	CX4_C4TransfWireFrame2();
-	CX4_writew(machine, 0x1f80, cx4.C4WFXVal);
-	CX4_writew(machine, 0x1f83, cx4.C4WFYVal);
+	CX4_writew(space, 0x1f80, cx4.C4WFXVal);
+	CX4_writew(space, 0x1f83, cx4.C4WFYVal);
 }
 
 //Sum

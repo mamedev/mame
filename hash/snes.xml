@@ -564,6 +564,22 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="atmosfea">
+		<description>Atmosfear (USA, prototype 19940712)</description>
+		<year>1994</year>
+		<publisher>Beam Software</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="" /> <!-- loose EPROMs -->
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="nightmare 0 12-7-94.u1" size="524288" crc="4610b75e" sha1="19fa46e612016e019d6b636c821013a8c6a92c0e" offset="0x000000" />
+				<rom name="nightmare 1 12-7-94.u2" size="524288" crc="1f929836" sha1="6be6880e7171ab9c9c4254883205f64f2d76e5d8" offset="0x080000" />
+				<rom name="nightmare 2 12-7-94.u3" size="524288" crc="efdf563e" sha1="9c09a4a26b849dd3f4bfd6a73bf4588b8091fff3" offset="0x100000" />
+				<rom name="nightmare 3 12-7-94.u4" size="524288" crc="1ebc5c31" sha1="71284cf5a66e2601c942c0cfc8fa0a4df3f8fec8" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="batmanrj">
 		<!-- udisi -->
 		<!-- Notes: this title is often referred as 'real shitty batman' due to its internal (possibly hacked) name -->
@@ -907,6 +923,46 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 -->
 
+	<software name="collslamp" cloneof="collslam">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release other than its internal header -->
+		<description>College Slam (USA, final prototype)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
+			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
+			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
+			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''..'.'.) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="u1" size="524288" crc="8558dcb1" sha1="6f59d1eb6b08e8530d47ca5309b22031057b1605" offset="0x000000" />
+				<rom name="u2" size="524288" crc="c344d0d9" sha1="289a3132ac5d0ced85c23e02a8ce0ce6a3522df7" offset="0x080000" />
+				<rom name="u3" size="524288" crc="f3ff565c" sha1="c39a7c430a4a0912b40c0fc7fc4c7b16a7866404" offset="0x100000" />
+				<rom name="u4" size="524288" crc="73fad108" sha1="142617c280f5a0c66477c93e28bbea94b4ffa8c9" offset="0x180000" />
+				<rom name="4.u5" size="524288" crc="a6ae1edb" sha1="95e96ae012709935bade8d9adef3dfe7c6afd285" offset="0x200000" />
+				<rom name="u6" size="524288" crc="72b675f4" sha1="233d1a09e4a6e90ca1e65fe9efdeaab85a8cf880" offset="0x280000" />
+			</dataarea>
+			<dataarea name="nvram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="congo">
 		<!-- nesworld.com -->
 		<description>Congo - The Movie - The Secret of Zinj (USA, Prototype)</description>
@@ -931,6 +987,45 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="u2" size="524288" crc="0d1a83bd" sha1="402ab3d703c9196c3484b919ee186e6abb59da8b" offset="0x080000" />
 				<rom name="u3" size="524288" crc="aa226415" sha1="6252e88611a57e989c43735e2f3b113032a70630" offset="0x100000" />
 				<rom name="u4" size="524288" crc="605f9d48" sha1="5a219c97ec284f858136c0dd53e8d6934988a08c" offset="0x180000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutthrp" cloneof="cutthr">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release other than its internal header -->
+		<description>CutThroat Island (Euro, final prototype)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u6" value="U6 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
+			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
+			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
+			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''..'.'.) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="u1" size="524288" crc="c39b42ac" sha1="ae214d7703bfb222d0100a8a7f9d4317c3b83314" offset="0x000000" />
+				<rom name="u2" size="524288" crc="9437a6de" sha1="f06e6ef3bcbc9af13769ff753456a7da9dd31bf8" offset="0x080000" />
+				<rom name="u3" size="524288" crc="b4d8d787" sha1="b95a5166fda55b501663453f9fd8f34e40eac44f" offset="0x100000" />
+				<rom name="u4" size="524288" crc="68f2c6bd" sha1="e60f714584e3140265b2aa2e6b6817845fae4f44" offset="0x180000" />
+			</dataarea>
+			<!-- memory capacity to be confirmed -->
+			<dataarea name="nvram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -985,6 +1080,47 @@ Beyond that last category are the roms waiting to be classified.
 			</dataarea>
 			<dataarea name="addon" size="10240">
 				<rom name="dsp1.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="earthbndp" cloneof="earthbnd">
+		<description>EarthBound (USA, prototype 19950327)</description>
+		<year>1995</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157 [SN74LS157N]" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''.'.) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="earthbound (prototype 19950327).sfc" size="3145728" crc="d3fa35aa" sha1="0686c4d339657489890e43fd39797c893cb992e9" offset="0x000000" />
+<!-- released as binary blob above, these are the eventual label/socket names
+				<rom name="earth bound 3-27-95 e.7 e 0.u1" size="524288" crc="" sha1="" offset="0x000000" />
+				<rom name="earth bound 3-27-95 e.7 e 1.u2" size="524288" crc="" sha1="" offset="0x080000" />
+				<rom name="earth bound 3-27-95 e.7 e 2.u3" size="524288" crc="" sha1="" offset="0x100000" />
+				<rom name="earth bound 3-27-95 e.7 e 3.u4" size="524288" crc="" sha1="" offset="0x180000" />
+				<rom name="earth bound 3-27-95 e.7 e 4.u5" size="524288" crc="" sha1="" offset="0x200000" />
+				<rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="" sha1="" offset="0x280000" />
+-->
+			</dataarea>
+			<dataarea name="nvram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -1142,6 +1278,42 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="fatfury2up" cloneof="fatfury2">
+		<!-- 64history.net -->
+		<description>Fatal Fury 2 (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''..') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="2621440">
+				<rom name="2.u1" size="524288" crc="7d1a991e" sha1="40931ba28bb6a35bf8b88a0a88787676379d6fad" offset="0x000000" />
+				<rom name="fury.u2" size="524288" crc="61cbb024" sha1="f2c8bf4e8e082399860643d57f17112568ef5512" offset="0x080000" />
+				<rom name="fatal.u3" size="524288" crc="af46bef7" sha1="42ea7683c3254159a8723595e56f576ee295ad55" offset="0x100000" />
+				<rom name="takara.u4" size="524288" crc="71af65d1" sha1="5aa51b1a2d478af9fcd3519d297397c5948b1865" offset="0x180000" />
+				<rom name="snk.u5" size="524288" crc="b6d40fc2" sha1="de279f36d46e50fe702f36f63db1e6a2255ea3be" offset="0x200000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ffant3p" cloneof="ffant3">
 		<!-- Rick N. Bruns -->
 		<description>Final Fantasy III (USA, Prototype)</description>
@@ -1289,6 +1461,47 @@ Beyond that last category are the roms waiting to be classified.
 				<rom name="u2" size="524288" crc="af5d863a" sha1="e09b988dbb46549ada62e97f6c9d4e13d7ac9cbd" offset="0x080000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foremanup" cloneof="foreman">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release -->
+		<description>Foreman For Real (USA, final prototype)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
+			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
+			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
+			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''..'.'.) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="u1" size="524288" crc="64280538" sha1="3cfbc6e557c3e54bc6b4279ffc68883fd3a057a1" offset="0x000000" />
+				<rom name="u2" size="524288" crc="31750a94" sha1="9437e9f71c1960b60e5c7b527d17b6e7a2156cd5" offset="0x080000" />
+				<rom name="u3" size="524288" crc="aa29c0aa" sha1="229932c19bb275b738f349d6589d33319c6fec6d" offset="0x100000" />
+				<rom name="u4" size="524288" crc="bdeacce6" sha1="26666e8de91ef4464fa69f0c3bc6beaf40a5c2b8" offset="0x180000" />
+				<rom name="u5" size="524288" crc="81e4afde" sha1="12ac02b5145d4954d1a0787b95f51a75ea93a8c6" offset="0x200000" />
+				<rom name="u6" size="524288" crc="d43e44f5" sha1="07ab3ce7f3ce4e5abed2b74c44c413e1b14b327c" offset="0x280000" />
+			</dataarea>
+			<dataarea name="nvram" size="65536">
 			</dataarea>
 		</part>
 	</software>
@@ -1552,6 +1765,44 @@ Beyond that last category are the roms waiting to be classified.
 			</dataarea>
 			<!-- memory capacity to be confirmed -->
 			<dataarea name="nvram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kylepettp" cloneof="kylepett">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release -->
+		<description>Kyle Petty's No Fear Racing (USA, final prototype)</description>
+		<year>1995</year>
+		<publisher>Williams Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''''') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="no fear 0.u1" size="524288" crc="627d3db3" sha1="d2840580c9c22c4651fd23e2284ae25248e36de2" offset="0x000000" />
+				<rom name="1.u2" size="524288" crc="bad79a90" sha1="e8217cc5737000f975561311b0153cb6aaf32b73" offset="0x080000" />
+				<rom name="2.u3" size="524288" crc="e8aefcd4" sha1="3fe1c22a2f9a1d6f12609532eaefe2f2e6879ac3" offset="0x100000" />
+				<rom name="3.u4" size="524288" crc="ed6afff3" sha1="b61f6753d9613e934780a61542945dce82086e50" offset="0x180000" />
+				<rom name="4.u5" size="524288" crc="2a40f686" sha1="749ee51b2120e52642acfd176708cc77edf62bf0" offset="0x200000" />
+				<rom name="5.u6" size="524288" crc="29b88a05" sha1="47fa76aeb211396323db2711521cfc78d0b03064" offset="0x280000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2263,6 +2514,46 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="samshoup" cloneof="samsho">
+		<!-- 64history.net -->
+		<description>Samurai Shodown (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" />
+			<feature name="u8" value="U8 4/8M EPROM(J)" />
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''..') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="u1" size="524288" crc="860999f1" sha1="5c483ccc236cfc541e830c8f0ec2ddc181cca9cb" offset="0x000000" />
+				<rom name="showdown.u2" size="524288" crc="59a7abfd" sha1="7c2863e72a5166d366169db8a5d72757d7f8afe5" offset="0x080000" />
+				<rom name="samurai.u3" size="524288" crc="977afa23" sha1="b4b942a5aaaa194968c6e6b9236ade30eb3b2a0e" offset="0x100000" />
+				<rom name="u4" size="524288" crc="0c24256c" sha1="96e7e45cddb9d6c931a2f4715ad117eab916c6a2" offset="0x180000" />
+				<rom name="u5" size="524288" crc="b5fce27d" sha1="d71f1a8325982fee0cabc42878c35f951b008e4c" offset="0x200000" />
+				<rom name="takara.u6" size="524288" crc="a1c761ae" sha1="f0769cc84fb4324566aed855b99a01e24cc8a0ea" offset="0x280000" />
+				<rom name="u7" size="524288" crc="0d7a3c43" sha1="7500de759acd73cdacd6864cccf71b4432fa4d84" offset="0x300000" />
+				<rom name="samurai.u8" size="524288" crc="23b9da42" sha1="cfac30ea65f30b6b9931ecee6826e97f80b6faf0" offset="0x380000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="unflfoot">
 		<!-- lostlevels.org -->
 		<description>Sculptured Software's NFL Football (USA, Prototype)</description>
@@ -2339,6 +2630,34 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="262144">
 				<rom name="shooter demo.u1" size="262144" crc="f4aa6642" sha1="5631c3199b96dfd387562a586e4ceb1595cd3d6e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speedracp" cloneof="speedrac">
+		<!-- 64history.net -->
+		<description>Speed Racer in My Most Dangerous Adventures (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-4PV5B-01" />
+			<feature name="u1" value="U1 EPROM" />
+			<feature name="u2" value="U2 EPROM" />
+			<feature name="u3" value="U3 EPROM" />
+			<feature name="u4" value="U4 EPROM" />
+			<feature name="u5" value="U5 SRAM" /> <!-- empty socket -->
+			<feature name="u6" value="U6 PLD" />
+			<feature name="u7" value="U7 74LS157" />
+			<feature name="u8" value="U8 CIC" />
+			<feature name="lockout" value="D411A 9332 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="no shell" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="racer.u1" size="524288" crc="326dc0d1" sha1="b9f1f00e1b598d6415fd0cf3531b9901ae738896" offset="0x000000" />
+				<rom name="speed.u2" size="524288" crc="1bc8756c" sha1="1409dfb7ad43ad8536f3fd56ef406ccad89afef6" offset="0x080000" />
+				<rom name="u3" size="524288" crc="cecbda30" sha1="1785bcf46b9c0524f83a67087b932bf919e0c945" offset="0x100000" />
+				<rom name="u4" size="524288" crc="16c533c5" sha1="ac22a62fad648628738f64331b97f3bcdc0a5948" offset="0x180000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3184,6 +3503,46 @@ Beyond that last category are the roms waiting to be classified.
     </software>
 -->
 
+	<software name="venomup" cloneof="venom">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release other than its internal header. Cartridge labeled "Dragon" -->
+		<description>Venom &amp; Spider-Man - Separation Anxiety (USA, final prototype)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" />
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
+			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
+			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
+			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''..'.'.) -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="u1" size="524288" crc="da6bc5b7" sha1="8fcaded55d10a006c75be357ac6f1c66a12a393a" offset="0x000000" />
+				<rom name="u2" size="524288" crc="da8234aa" sha1="74c363269a8c9406b837a0b5c9c66fc49daf99aa" offset="0x080000" />
+				<rom name="u3" size="524288" crc="869ab5da" sha1="70ee111c806ffe9d2b4ada4577db5be7f43f063b" offset="0x100000" />
+				<rom name="u4" size="524288" crc="35480bbd" sha1="37c7afdbed99f779fdf2888c9602d7181b6c538b" offset="0x180000" />
+				<rom name="4.u5" size="524288" crc="8110db31" sha1="c1ed0ef58afef0d12ea3535474be88597819de04" offset="0x200000" />
+				<rom name="u6" size="524288" crc="e3fcaeb4" sha1="822a4f08a9837aa8b7296aa7ec4b667cae039024" offset="0x280000" />
+			</dataarea>
+			<dataarea name="nvram" size="65536">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wildgunsup" cloneof="wildguns">
 		<!-- lostleves.org -->
 		<description>Wild Guns (USA, Final Prototype)</description>
@@ -3207,6 +3566,44 @@ Beyond that last category are the roms waiting to be classified.
 			<dataarea name="rom" size="1048576">
 				<rom name="wild guns.u1" size="524288" crc="112b8b6f" sha1="44e97d42d0dc42a507885e06e9812093beae7ebc" offset="0x000000" />
 				<rom name="u2"           size="524288" crc="268ca9a2" sha1="9a52b30afd999e089aac1e2806d7f049c75204a1" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wwfagup" cloneof="wwfag">
+		<!-- 64history.net -->
+		<!-- Notes: cartridge labeled "WWF Coin-Up" -->
+		<description>WWF WrestleMania - The Arcade Game (USA, prototype)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330" /> <!-- to be confirmed -->
+			<feature name="u12" value="U12 EP330" /> <!-- to be confirmed -->
+			<feature name="u13" value="U13 LS157" /> <!-- to be confirmed -->
+			<feature name="u14" value="U14 CIC" /> <!-- to be confirmed -->
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''..') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="u1" size="524288" crc="22fa818d" sha1="0c91a9e7f557553c4d93ddd71fbcd1273a1729fc" offset="0x000000" />
+				<rom name="u2" size="524288" crc="dcfabd4a" sha1="21202720eb6082b91d15e7f40dda42ddff7ef53f" offset="0x080000" />
+				<rom name="u3" size="524288" crc="c7964ff5" sha1="700c2cccf1dae89467eb3f031091abd6a784161f" offset="0x100000" />
+				<rom name="wwf 3.u4" size="524288" crc="1666d37b" sha1="2034cb2d4c3c23be4eb54282b4b58b2f2042e24a" offset="0x180000" />
+				<rom name="wwf 4.u5" size="524288" crc="9d9cf9cc" sha1="ff19f63d682be9b68abab73a6d17f0fceb4b3214" offset="0x200000" />
+				<rom name="u6" size="524288" crc="4cb436fd" sha1="67006879494253cc5564972828f0d123ba3a5efa" offset="0x280000" />
 			</dataarea>
 		</part>
 	</software>

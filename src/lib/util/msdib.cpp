@@ -93,9 +93,9 @@ union bitmap_headers
 
 bool dib_parse_mask(uint32_t mask, unsigned &shift, unsigned &bits)
 {
-	shift = count_leading_zeros(mask);
+	shift = count_leading_zeros_32(mask);
 	mask <<= shift;
-	bits = count_leading_ones(mask);
+	bits = count_leading_ones_32(mask);
 	mask <<= shift;
 	shift = 32 - shift - bits;
 	return !mask;

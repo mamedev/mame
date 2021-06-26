@@ -150,7 +150,7 @@ struct legacy_poly_manager
 	osd_work_queue *    queue;                  /* work queue */
 
 	/* triangle work units */
-	work_unit **        unit;                   /* array of work unit pointers */
+	std::vector<work_unit *> unit;                   /* array of work unit pointers */
 	uint32_t              unit_next;              /* index of next unit to allocate */
 	uint32_t              unit_count;             /* number of work units available */
 	size_t              unit_size;              /* size of each work unit, in bytes */
@@ -161,13 +161,13 @@ struct legacy_poly_manager
 	size_t              quadunit_size;          /* size of each work unit, in bytes */
 
 	/* poly data */
-	polygon_info **     polygon;                /* array of polygon pointers */
+	std::vector<polygon_info *> polygon;                /* array of polygon pointers */
 	uint32_t              polygon_next;           /* index of next polygon to allocate */
 	uint32_t              polygon_count;          /* number of polygon items available */
 	size_t              polygon_size;           /* size of each polygon, in bytes */
 
 	/* extra data */
-	void **             extra;                  /* array of extra data pointers */
+	std::vector<void *> extra;                  /* array of extra data pointers */
 	uint32_t              extra_next;             /* index of next extra data to allocate */
 	uint32_t              extra_count;            /* number of extra data items available */
 	size_t              extra_size;             /* size of each extra data, in bytes */
@@ -192,6 +192,10 @@ struct legacy_poly_manager
 	uint32_t              conflicts[WORK_MAX_THREADS]; /* number of conflicts found, per thread */
 	uint32_t              resolved[WORK_MAX_THREADS]; /* number of conflicts resolved, per thread */
 #endif
+
+	std::vector<uint8_t> m_work_unit_alloc;
+	std::vector<uint8_t> m_polygon_alloc;
+	std::vector<uint8_t> m_extra_alloc;
 };
 
 
@@ -200,7 +204,6 @@ struct legacy_poly_manager
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void **allocate_array(running_machine &machine, size_t *itemsize, uint32_t itemcount);
 static void *poly_item_callback(void *param, int threadid);
 static void poly_state_presave(legacy_poly_manager &poly);
 
@@ -311,36 +314,74 @@ static inline polygon_info *allocate_polygon(legacy_poly_manager *poly, int miny
     INITIALIZATION/TEARDOWN
 ***************************************************************************/
 
+legacy_poly_manager_owner::legacy_poly_manager_owner() : m_poly(nullptr)
+{
+}
+
+
+legacy_poly_manager_owner::~legacy_poly_manager_owner()
+{
+	delete m_poly;
+}
+
+/*-------------------------------------------------
+	allocate_array - allocate an array of pointers
+-------------------------------------------------*/
+
+template<typename T>
+static void allocate_array(running_machine &machine, std::vector<uint8_t> &buffer, std::vector<T *> &ptrarray, size_t *itemsize, uint32_t itemcount)
+{
+	int itemnum;
+
+	/* fail if 0 */
+	if (itemcount == 0)
+		return;
+
+	/* round to a cache line boundary */
+	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
+
+	/* allocate the array */
+	ptrarray.resize(itemcount);
+
+	/* allocate the actual items */
+	buffer.resize(*itemsize * itemcount);
+
+	/* initialize the pointer array */
+	for (itemnum = 0; itemnum < itemcount; itemnum++)
+		ptrarray[itemnum] = reinterpret_cast<T *>(&buffer[*itemsize * itemnum]);
+}
+
+
+
 /*-------------------------------------------------
     poly_alloc - initialize a new polygon
     manager
 -------------------------------------------------*/
 
-legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t extra_data_size, uint8_t flags)
+void poly_alloc(legacy_poly_manager_owner &owner, running_machine &machine, int max_polys, size_t extra_data_size, uint8_t flags)
 {
-	legacy_poly_manager *poly;
-
 	/* allocate the manager itself */
-	poly = auto_alloc_clear(machine, <legacy_poly_manager>());
+	legacy_poly_manager *poly = new legacy_poly_manager;
+	owner.m_poly = poly;
 	poly->flags = flags;
 
 	/* allocate polygons */
 	poly->polygon_size = sizeof(polygon_info);
 	poly->polygon_count = std::max(max_polys, 1);
 	poly->polygon_next = 0;
-	poly->polygon = (polygon_info **)allocate_array(machine, &poly->polygon_size, poly->polygon_count);
+	allocate_array(machine, poly->m_polygon_alloc, poly->polygon, &poly->polygon_size, poly->polygon_count);
 
 	/* allocate extra data */
 	poly->extra_size = extra_data_size;
 	poly->extra_count = poly->polygon_count;
 	poly->extra_next = 1;
-	poly->extra = allocate_array(machine, &poly->extra_size, poly->extra_count);
+	allocate_array(machine, poly->m_extra_alloc, poly->extra, &poly->extra_size, poly->extra_count);
 
 	/* allocate triangle work units */
 	poly->unit_size = (flags & POLYLGCY_FLAG_ALLOW_QUADS) ? sizeof(quad_work_unit) : sizeof(tri_work_unit);
 	poly->unit_count = std::min(poly->polygon_count * UNITS_PER_POLY, 65535U);
 	poly->unit_next = 0;
-	poly->unit = (work_unit **)allocate_array(machine, &poly->unit_size, poly->unit_count);
+	allocate_array(machine, poly->m_work_unit_alloc, poly->unit, &poly->unit_size, poly->unit_count);
 
 	/* create the work queue */
 	if (!(flags & POLYLGCY_FLAG_NO_WORK_QUEUE))
@@ -348,7 +389,6 @@ legacy_poly_manager *poly_alloc(running_machine &machine, int max_polys, size_t 
 
 	/* request a pre-save callback for synchronization */
 	machine.save().register_presave(save_prepost_delegate(FUNC(poly_state_presave), poly));
-	return poly;
 }
 
 
@@ -1252,35 +1292,6 @@ int poly_zclip_if_less(int numverts, const poly_vertex *v, poly_vertex *outv, in
 /***************************************************************************
     INTERNAL FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    allocate_array - allocate an array of pointers
--------------------------------------------------*/
-
-static void **allocate_array(running_machine &machine, size_t *itemsize, uint32_t itemcount)
-{
-	void **ptrarray;
-	int itemnum;
-
-	/* fail if 0 */
-	if (itemcount == 0)
-		return nullptr;
-
-	/* round to a cache line boundary */
-	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
-
-	/* allocate the array */
-	ptrarray = auto_alloc_array_clear(machine, void *, itemcount);
-
-	/* allocate the actual items */
-	ptrarray[0] = auto_alloc_array_clear(machine, uint8_t, *itemsize * itemcount);
-
-	/* initialize the pointer array */
-	for (itemnum = 1; itemnum < itemcount; itemnum++)
-		ptrarray[itemnum] = (uint8_t *)ptrarray[0] + *itemsize * itemnum;
-	return ptrarray;
-}
-
 
 /*-------------------------------------------------
     poly_item_callback - callback for each poly

@@ -563,6 +563,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="swatpant">
+		<description>L.A. SWAT + Panther</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="l.a. swat + panther (1988)(mastertronic)(us).atr" size="92176" crc="6c4752f6" sha1="df6a82e8946d7100620c3947d9e7e106f513fa26"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moonmist">
 		<description>Moonmist</description>
 		<year>1986</year>
@@ -710,6 +721,24 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires 128K RAM -->
+	<software name="t34" supported="no"> <!-- fails to load due to insufficient RAM -->
+		<description>T-34: The Battle</description>
+		<year>1994</year>
+		<publisher>A.N.G. Software</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="133136">
+				<rom name="t-34 - the battle (1994)(a.n.g. software)(nl)(fw)(side a).atr" size="133136" crc="4c276dc4" sha1="7720e199b7061852668979feb1a67aa042eac76c"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="133136">
+				<rom name="t-34 - the battle (1994)(a.n.g. software)(nl)(fw)(side b).atr" size="133136" crc="01e1127c" sha1="1477761c8208432f72a013855b85c415f34d2f9d"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Atari Translator allows disks that only work on earlier 400/800 systems to load on later XL/XE machines -->
 	<software name="transltr"> <!-- runs but needs testing -->
 		<description>Atari Translator (USA)</description>
@@ -724,6 +753,43 @@ license:CC0
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="atari translator (1983)(atari)(us)(side b)[req 64k].atr" size="92176" crc="861ac5d7" sha1="70ec2f2cb8cfb83dd528a9eabcf028a3b154e8cd"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only works on PAL, use the a800xlp driver. You must hold the OPTION key (default: F3) when booting to disable BASIC. Game freezes otherwise. -->
+	<software name="turbican" supported="partial"> <!-- Prior comments are probably BTANB. However, seems glitchy even on a800xlp. -->
+		<description>Turbican</description>
+		<year>1993</year>
+		<publisher>ASF s.c.</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="133136">
+				<rom name="turbican (1993)(asf s.c.)(pal)(pl).atr" size="133136" crc="e259549c" sha1="f3a817648a4825ef167b601445d1ad3d00b9d1bc"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoomp" supported="no"> <!-- black screen after loading screens -->
+		<description>Yoomp!</description>
+		<year>2007</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="yoomp (2007)(self-published)(pl)[req 64k].atr" size="92176" crc="5d993a16" sha1="703b6eb652d7e6f8c08c70fb56115d4f516280d8"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zybex">
+		<description>Zybex (Ned)</description>
+		<year>1994</year>
+		<publisher>A.N.G. Software</publisher>
+		<sharedfeat name="compatibility" value="XL/XE"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="zybex (1994)(a.n.g. software)(nl)[req 64k].atr" size="92176" crc="f3774dfc" sha1="17740e3bc981d5eee8c52840db830c8e41de5175"/>  <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

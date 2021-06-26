@@ -26,6 +26,8 @@
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/cmsscsi.h"
+#include "bus/a2bus/titan3plus2.h"
+#include "bus/a2bus/a2mockingboard.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -47,6 +49,8 @@ static void apple3_cards(device_slot_interface &device)
 	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  // Focus Drive IDE card
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);        // CMS Apple II SCSI Card
+	device.option_add("titan3plus2", A2BUS_TITAN3PLUS2); // Titan /// Plus 2 card
+	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);
 }
 
 static void a3_floppies(device_slot_interface &device)

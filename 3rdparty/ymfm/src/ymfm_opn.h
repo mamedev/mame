@@ -644,6 +644,8 @@ protected:
 
 class ym2610
 {
+	static constexpr uint8_t EOS_FLAGS_MASK = 0xbf;
+
 public:
 	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t FM_OUTPUTS = fm_engine::OUTPUTS;

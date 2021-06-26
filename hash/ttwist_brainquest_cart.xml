@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="leapfrog_turbotwistbrainquest_cart" description="LeapFrog Turbo Twist Brain Quest cartridges">
+<softwarelist name="ttwist_brainquest_cart" description="LeapFrog Turbo Twist Brain Quest cartridges">
 	<!-- also compatible with Fact Blaster -->
 
 	<software name="grades5_6" supported="no">

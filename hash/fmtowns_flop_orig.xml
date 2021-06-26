@@ -282,7 +282,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="愛姉妹　～二人の果実～" />
 		<info name="release" value="199409xx" />
-		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -309,12 +309,13 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
-	<software name="asuka120" supported="partial">
+	<software name="asuka120">
 		<description>Asuka 120% Burning Fest.</description>
 		<year>1994</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
 		<info name="alt_title" value="あすか 120% BURNING Fest." />
 		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3444655">
@@ -345,7 +346,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ブランディッシュ" />
 		<info name="release" value="199112xx" />
-		<info name="usage" value="To create the user disk: after the intro you will be asked to insert disk 2. Insert disk 3 instead and follow the instructions." />
+		<info name="usage" value="Requires 2 MB RAM. To create the user disk: after the intro you will be asked to insert disk 2. Insert disk 3 instead and follow the instructions." />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1" />
 			<dataarea name="flop" size="3444689">
@@ -415,6 +416,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="キャメルトライ" />
 		<info name="release" value="199411xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3599768">
 				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a"/>
@@ -442,6 +444,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="ダーウィンズジレンマ" />
 		<info name="release" value="199108xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="darwins_dilemma.hdm" size="1261568" crc="61b65e1f" sha1="f5a109ac842fba5dfc15c9729085da4a71426b26"/>
@@ -454,7 +457,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1995</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="同級生２　スペシャルディスク" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Doukyuusei 2 CD, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, insert the Doukyuusei 2 CD, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -481,6 +484,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア" />
 		<info name="release" value="199205xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -513,6 +517,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="ドア ～ＰＡＲＴ３～" />
 		<info name="release" value="199211xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -546,6 +551,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ダイナソア" />
 		<info name="release" value="199110xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1261568">
@@ -571,7 +577,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1994</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="ドラゴンナイト4　スペシャルディスク" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Dragon Knight 4 CD, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, insert the Dragon Knight 4 CD, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -598,6 +604,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199006xx" />
 		<info name="alt_title" value="ドラゴンスレイヤー 英雄伝説" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Event Disk" />
 			<dataarea name="flop" size="3577270">
@@ -630,6 +637,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>タケル (Takeru) / 日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199302xx" />
 		<info name="alt_title" value="ドラゴンスレイヤー 英雄伝説II" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="3590084">
@@ -668,6 +676,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="エル" />
 		<info name="release" value="199111xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -714,6 +723,18 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<!-- It's unclear what this is exactly, but it's definitely related to TownsGEAR and video cameras -->
+	<software name="gearvid">
+		<description>Gear-Video</description>
+		<year>1991</year>
+		<publisher>インターリミテッドロジック (Inter Limited Logic)</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="gear_video.hdm" size="1261568" crc="633c12b2" sha1="abeca42bd1fcadbbfe90123f1bec7a9c46e7b45d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Probably FMR compatible. It seems to require a specific version of MS-DOS that isn't currently dumped. -->
 	<software name="gokickj" supported="no">
 		<description>Jissen Igo Taikyoku - Gokichi-kun - Chuukyuu (Jou)</description>
@@ -738,6 +759,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="河原崎家の一族" />
 		<info name="release" value="199312xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -872,6 +894,26 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<software name="logowrt2">
+		<description>Logo Writer 2</description>
+		<year>1991</year>
+		<publisher>ロゴジャパン (Logo Japan)</publisher>
+		<info name="alt_title" value="ロゴライター２" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Execution Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="logo_writer_2_execution_disk.hdm" size="1261568" crc="437e9744" sha1="ed0f047e56105737ece66017ac76da99e3b2e6ae" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<!-- Dumped from a damaged disk, with one bad sector and one missing sector -->
+			<feature name="part_id" value="Sample Program" />
+			<dataarea name="flop" size="3444632">
+				<rom name="logo_writer_2_sample_program.mfm" size="3444632" crc="e9df0615" sha1="bc1013d7b00cf5b25e60e87fb93f6330235a0723" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!--
 	Track 15 side 0 of the program disk and track 10 side 0 of the ending disk are protected (overlapped sectors).
 	The game includes a pre-formatted user disk but it can also save to any generic blank disk.
@@ -920,7 +962,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>ジャスト (JAST)</publisher>
 		<info name="alt_title" value="スーパーウルトラむっちんぷりぷりサイボーグマリリンＤＸ" />
 		<info name="release" value="199404xx" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3594134">
@@ -947,7 +989,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>C-Class</publisher>
 		<info name="alt_title" value="麻雀エレガンス" />
 		<info name="release" value="199411xx" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1069,7 +1111,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="野々村病院の人々" />
 		<info name="release" value="199407xx" />
-		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1108,7 +1150,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1993</year>
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="release" value="199309xx" />
-		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A / えぃ" />
 			<dataarea name="flop" size="1261568">
@@ -1147,6 +1189,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>ポニーテールソフト (Ponytail Soft)</publisher>
 		<info name="alt_title" value="ポニオン" />
 		<info name="release" value="199209xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1179,6 +1222,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="プレミアム" />
 		<info name="release" value="199211xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1211,6 +1255,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="プレミアム２" />
 		<info name="release" value="199301xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="premium 2 (disk 1).hdm" size="1261568" crc="1fef893a" sha1="907617847040a74ef6d92a33e9430e46d500076e"/>
@@ -1239,6 +1284,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>アクティブ (Active)</publisher>
 		<info name="alt_title" value="クイズ番長" />
 		<info name="release" value="199205xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1259,12 +1305,58 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<software name="reira">
+		<description>Reira</description>
+		<year>1994</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="レイラ" />
+		<info name="release" value="199407xx" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS 2.1 and run the icon on floppy drive A."/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_a.hdm" size="1261568" crc="3c420487" sha1="65cb11f45707074d623d377c7ab112d077019e16"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_b.hdm" size="1261568" crc="3d80ab37" sha1="b4b4ab5baa06118122977cbdf87b094e1bfd6d55"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_c.hdm" size="1261568" crc="687e5943" sha1="1b65037760c2669df63bc431af9a0e4698c2f3c5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_d.hdm" size="1261568" crc="9d6c169e" sha1="409d744c96c7f5ef02808f1f5c900fad5e3ca31e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_e.hdm" size="1261568" crc="c9282dbd" sha1="dbcaafae8e924b7d4f10681dd0718ad6614fa8a8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1261568">
+				<rom name="reira_disk_f.hdm" size="1261568" crc="cfe95812" sha1="c2a384460e3542f1027e1ddb378e28aa6dbb86b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shangrl">
 		<description>Shangrlia</description>
 		<year>1992</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="シャングリラ" />
 		<info name="release" value="199201xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1296,7 +1388,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1993</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="シャングリラ２　スペシャルディスク" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Shangrlia 2 CD, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, insert the Shangrlia 2 CD, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1318,6 +1410,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="スーパー大戦略" />
 		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk 1" />
 			<dataarea name="flop" size="3428317">
@@ -1338,6 +1431,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>アクティブ (Active)</publisher>
 		<info name="alt_title" value="スウィート・エンジェル" />
 		<info name="release" value="199211xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sweetangel1.hdm" size="1261568" crc="2d128f6f" sha1="9003bab991a3eee955b62b333787779b850b0253"/>
@@ -1357,6 +1451,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>ジャスト (JAST)</publisher>
 		<info name="alt_title" value="天使たちの午後ＶＩ －Ｍｙ　Ｆａｉｒ　Ｔｅａｃｈｅｒ－" />
 		<info name="release" value="199308xx" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="3444635">
@@ -1398,6 +1493,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="闘神都市" />
 		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1448,6 +1544,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>マスターピース (Masterpiece)</publisher>
 		<info name="alt_title" value="トラフィックコンフュージョン" />
 		<info name="release" value="199206xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1466,6 +1563,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<description>Viewpoint Demonstration No. 1</description>
 		<year>1994</year>
 		<publisher>ビング (Ving)</publisher>
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="vp_demo.bin" size="1261568" crc="dba229be" sha1="f4c5fe2cad77183e91b676609050dfe9d324dc8a"/>
@@ -1479,6 +1577,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<publisher>シルキーズ (Silky's)</publisher>
 		<info name="alt_title" value="失われた楽園" />
 		<info name="release" value="199504xx" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1560,7 +1659,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1993</year>
 		<publisher>エルフ (Elf)</publisher>
 		<info name="alt_title" value="ワーズ・ワース　スペシャルディスク" />
-		<info name="usage" value="Boot TownsOS V2.1L20 or later, insert the Words Worth CD, then run the icon on floppy drive A:" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, insert the Words Worth CD, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1629,6 +1728,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="田中ブラザーズ (Tanaka Brothers)" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sa2.hdm" size="1261568" crc="3e3eb153" sha1="71278cfd2f11a879cfe00c267a7de8a4a75f0100"/>

@@ -1300,6 +1300,12 @@ u8 apple2gs_state::adb_read_mousedata()
 
 		result = (absolute & 0x80) | (delta & 0x7F);
 	}
+	else
+	{
+		// no mouse axis data, so just return the button status.  used by some 3200 viewers.
+		result = m_adb_mousey->read() & 0x80;
+	}
+
 	return result;
 }
 
@@ -2186,7 +2192,12 @@ int apple2gs_state::get_vpos()
 {
 	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
 	// or scanline + 200 on PAL (312 lines)
-	return ((m_screen->vpos() + BORDER_TOP) % 262) + 250;
+	int vpos = m_screen->vpos() + (511 - BORDER_TOP + 6);
+	if (vpos > 511)
+	{
+		vpos -= (511 - 250);
+	}
+	return vpos;
 }
 
 void apple2gs_state::process_clock()

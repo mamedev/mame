@@ -129,8 +129,8 @@ enum
 	KAY_BOARD, HOSENKAN_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD,
 	WHIRLWIND_2706, ZEMINA_BOARD,
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
-	BTL_ACTION53,   // homebrew PCB for homebrew multicarts
-	BTL_2A03_PURITANS,   // homebrew PCB
+	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
+	UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,   // homebrew PCBs
 	/* FFE boards, for mappers 6, 8, 17 */
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	/* Unsupported (for place-holder boards, with no working emulation) & no-board (at init) */
@@ -237,9 +237,9 @@ protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
-	void hold_irq_line();
+	[[deprecated("IRQs should be cleared explicitly")]] void hold_irq_line();
 	void reset_cpu();
-	void poke(offs_t offset, uint8_t data);
+	[[deprecated("devices should stop poking into memory spaces where they don't belong")]] void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;

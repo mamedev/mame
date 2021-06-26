@@ -17,6 +17,7 @@
 #ifndef MAME_EMU_HTTP_H
 #define MAME_EMU_HTTP_H
 
+#include <mutex>
 #include <thread>
 #include <ctime>
 #include "server_http.hpp"

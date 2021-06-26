@@ -337,16 +337,25 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 				case 0x01: // 256 colours
 					if(page == 0 || page == 2)
 					{
-						xscr = m_crtc->xscr_gfx(page) & 0x1ff;
-						yscr = m_crtc->yscr_gfx(page) & 0x1ff;
-						lineoffset = (((scanline - m_crtc->vbegin() / divisor) + yscr) & 0x1ff) * 512;
-						loc = xscr & 0x1ff;
+						// What effect do priorites and plane disable have here? Does it work in 16bit color mode?
+						uint16_t xscr0, yscr0, xscr1, yscr1;
+						uint32_t loc0, loc1, lineoffset0, lineoffset1;
+						xscr0 = m_crtc->xscr_gfx(page) & 0x1ff;
+						yscr0 = m_crtc->yscr_gfx(page) & 0x1ff;
+						xscr1 = m_crtc->xscr_gfx(page + 1) & 0x1ff;
+						yscr1 = m_crtc->yscr_gfx(page + 1) & 0x1ff;
+
+						lineoffset0 = (((scanline - m_crtc->vbegin() / divisor) + yscr0) & 0x1ff) * 512;
+						loc0 = xscr0 & 0x1ff;
+						lineoffset1 = (((scanline - m_crtc->vbegin() / divisor) + yscr1) & 0x1ff) * 512;
+						loc1 = xscr1 & 0x1ff;
 						shift = 4;
 						if((m_video.reg[2] & 0x1a00) == 0x1a00)
 							ret = true;
 						for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
 						{
-							colour = ((m_gvram[lineoffset + loc] >> page*shift) & 0x00ff);
+							colour = ((m_gvram[lineoffset0 + loc0] >> page*shift) & 0x000f);
+							colour |= ((m_gvram[lineoffset1 + loc1] >> page*shift) & 0x00f0);
 							if(ret && (colour & 1))
 							{
 								blend = true;
@@ -376,8 +385,10 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 								bitmap.pix(scanline, pixel) = m_special.pix(scanline, pixel);
 								m_special.pix(scanline, pixel) = 0;
 							}
-							loc++;
-							loc &= 0x1ff;
+							loc0++;
+							loc0 &= 0x1ff;
+							loc1++;
+							loc1 &= 0x1ff;
 						}
 					}
 					break;
@@ -510,7 +521,7 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle clip
 	*/
 	int ptr,pri;
 	int divisor = 1;
-	if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+	if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 		divisor = 2;
 
 	for(ptr=508;ptr>=0;ptr-=4)  // stepping through sprites
@@ -550,7 +561,7 @@ void x68k_state::draw_bg(bitmap_ind16 &bitmap, screen_device &screen, int layer,
 	tilemap_t* x68k_bg1;
 	tilemap_t* map;
 	int divisor = 1;
-	if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+	if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 		divisor = 2;
 
 	if((m_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
@@ -751,7 +762,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			rectangle pcgrect = rect;
 			int divisor = 1;
-			if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
+			if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1))
 			{
 				pcgrect.max_y >>= 1;
 				pcgrect.min_y >>= 1;

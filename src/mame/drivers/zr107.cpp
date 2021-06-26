@@ -307,7 +307,7 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_k001604->draw_back_layer(bitmap, cliprect);
+	m_k001604->draw_back_layer(screen, bitmap, cliprect);
 	m_k001005->draw(bitmap, cliprect);
 	m_k001604->draw_front_layer(screen, bitmap, cliprect);
 
@@ -811,13 +811,11 @@ void jetwave_state::jetwave(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(2000000)); // Very high sync needed to prevent lockups - why?
 
 	// video hardware
+	m_screen->set_size(1024, 1024);
+	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);		// needs CRTC emulation
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
 
 	K001604(config, m_k001604, 0);
-	m_k001604->set_layer_size(0);
-	m_k001604->set_roz_size(0);
-	m_k001604->set_txt_mem_offset(0);
-	m_k001604->set_roz_mem_offset(0x4000);
 	m_k001604->set_palette(m_palette);
 
 	// The second K001006 chip connects to the second K001005 chip.

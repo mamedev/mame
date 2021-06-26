@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="leapfrog_turboextreme_cart" description="LeapFrog Turbo Extreme cartridges">
+<softwarelist name="turboextreme_cart" description="LeapFrog Turbo Extreme cartridges">
 
 	<software name="grade2" supported="no">
 		<description>Grade 2 (500-10652)</description>

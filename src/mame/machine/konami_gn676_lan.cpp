@@ -134,8 +134,15 @@ uint32_t konami_gn676_lan_device::lanc2_r(offs_t offset, uint32_t mem_mask)
 			r |= 0xffffff00;
 		}
 	}
-
-	if (offset == 4)
+	else if (offset == 1)
+	{		
+		r |= 0x00005555;		// set all other machines as disconnected
+	}
+	else if (offset == 3)
+	{		
+		r |= 0xffffffff;
+	}
+	else if (offset == 4)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
@@ -170,29 +177,36 @@ void konami_gn676_lan_device::lanc2_w(offs_t offset, uint32_t data, uint32_t mem
 
 			LOG("lanc2_fpga_w: %02X at %08X\n", value, machine().describe_context());
 		}
-		else if (ACCESSING_BITS_8_15)
+		if (ACCESSING_BITS_8_15)
 		{
 			m_lanc2_ram_r = 0;
 			m_lanc2_ram_w = 0;
 			m_lanc2_reg[1] = (uint8_t)(data >> 8);
-		}
-		else if (ACCESSING_BITS_16_23)
-		{
-			if (m_lanc2_reg[0] != 0)
+
+			if (data & 0x1000)
 			{
-				m_lanc2_ram[2] = (data >> 20) & 0xf;
-				m_lanc2_ram[3] = 0;
+				// send out frame for this machine
 			}
+			else
+			{
+				// read from other machines
+				//int machine_id = (m_lanc2_reg[2] >> 4) & 7;
+				//int self = m_lanc2_reg[2] & 1;
+
+				for (auto j = 0; j < 0x110; j++)
+				{
+					m_lanc2_ram[j] = 0xff;
+				}
+			}
+		}
+		if (ACCESSING_BITS_16_23)
+		{
 			m_lanc2_reg[2] = (uint8_t)(data >> 16);
 		}
-		else if (ACCESSING_BITS_0_7)
+		if (ACCESSING_BITS_0_7)
 		{
 			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
 			m_lanc2_ram_w++;
-		}
-		else
-		{
-			LOG("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, machine().describe_context());
 		}
 	}
 	if (offset == 4) // only type B has the chip at 2G

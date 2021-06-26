@@ -59,6 +59,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
+	virtual bool supports_pin35_5v() override { return true; }
+
 private:
 	uint8_t porta_r(offs_t offset);
 	void porta_w(offs_t offset, uint8_t data);

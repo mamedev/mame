@@ -168,7 +168,6 @@ vme_mzr8300_card_device::vme_mzr8300_card_device(const machine_config &mconfig, 
 void vme_mzr8300_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	set_vme_device();
 
 	/* Setup r/w handlers for first SIO in A16 */
 	uint32_t base = 0xFF0000;

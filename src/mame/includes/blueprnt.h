@@ -30,6 +30,13 @@ public:
 		m_colorram(*this, "colorram")
 	{ }
 
+	void blueprnt(machine_config &config);
+	void grasspin(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	/* device/memory pointers */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -59,12 +66,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_VIDEO_START(blueprnt);
 	void blueprnt_palette(palette_device &palette) const;
 	uint32_t screen_update_blueprnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void blueprnt(machine_config &config);
-	void grasspin(machine_config &config);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blueprnt_map(address_map &map);
 	void grasspin_map(address_map &map);
 	void sound_io(address_map &map);

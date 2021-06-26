@@ -168,7 +168,41 @@ ROM_START( minimony )
 	ROM_LOAD( "pat-054_f16r4-25.u1", 0x200, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( minimonya )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "1.5.bin", 0x00000, 0x80000, CRC(ce29f243) SHA1(150b73993d3f840e75cc4567f30a9669b94ff2d5) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // missing, size guessed
+	ROM_LOAD( "samples1.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "samples2.bin", 0x80000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "cat24c16_unidesa.bin", 0x000, 0x800, CRC(25c23555) SHA1(efd9b19633428bab8907fedd2f6211fba1f1a7bd) )
+
+	ROM_REGION( 0x400, "plds", 0 ) // protected
+	ROM_LOAD( "pat-053_f16l8-25.u2", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pat-054_f16r4-25.u1", 0x200, 0x104, NO_DUMP )
+ROM_END
+
+ROM_START( minimonyb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "1.4.bin", 0x00000, 0x80000, CRC(f19470ed) SHA1(68a57641aeeb056ebab8550abb248ebf0b0acb7f) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // missing, size guessed
+	ROM_LOAD( "samples1.bin", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD( "samples2.bin", 0x80000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "cat24c16_unidesa.bin", 0x000, 0x800, CRC(25c23555) SHA1(efd9b19633428bab8907fedd2f6211fba1f1a7bd) )
+
+	ROM_REGION( 0x400, "plds", 0 ) // protected
+	ROM_LOAD( "pat-053_f16l8-25.u2", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pat-054_f16r4-25.u1", 0x200, 0x104, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
 // This has mechanical reels and small LED displays, some other titles have an auxiliary video PCB
-GAME( 199?, minimony, 0, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, minimony,  0,        cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, minimonya, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 2, v1.5?)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, minimonyb, minimony, cirsa910510, cirsa910510, cirsa910510_state, empty_init, ROT0, "Cirsa", "Mini Money (set 3, v1.4?)", MACHINE_IS_SKELETON_MECHANICAL )

@@ -90,7 +90,7 @@ List of known B-System games:
 
     Violence Fight                  (YM2203 sound, 1xMSM6295 )
     Hit The Ice                     (YM2203 sound, 1xMSM6295 )
-    Master of Weapons               (YM2203 sound)
+    Master of Weapon                (YM2203 sound)
 
     Quiz Sekai wa SHOW by shobai    (YM2610-B sound, MB87078 - electronic volume control)
     Puzzle Bobble                   (YM2610-B sound, MB87078 - electronic volume control)
@@ -3276,7 +3276,7 @@ ROM_START( masterwj )
 	ROM_LOAD( "b72-01.5", 0x080000, 0x080000, CRC(a24ac26e) SHA1(895715a2bb0cb15334cba2283bd228b4fc08cd0c) )
 ROM_END
 
-ROM_START( yukiwo ) /* Prototype of Master of Weapons */
+ROM_START( yukiwo ) /* Prototype of Master of Weapon */
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "ic33-rom0e.bin", 0x00000, 0x20000, CRC(a0dd51d9) SHA1(a4740bf08e26e1e576344c95d945df5d970738f2) )
 	ROM_LOAD16_BYTE( "ic24-e882.bin",  0x00001, 0x20000, CRC(d66f29d4) SHA1(0854f1a0943a20693e6cd02825666e39b4fe28ca) )

@@ -1062,11 +1062,11 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 4, 0):     // LZCNT   dst,src
-				PARAM0 = count_leading_zeros(PARAM1);
+				PARAM0 = count_leading_zeros_32(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 4, 1):
-				temp32 = count_leading_zeros(PARAM1);
+				temp32 = count_leading_zeros_32(PARAM1);
 				flags = FLAGS32_NZ(temp32);
 				PARAM0 = temp32;
 				break;
@@ -1675,17 +1675,11 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 0):     // DLZCNT  dst,src
-				if ((uint32_t)(DPARAM1 >> 32) != 0)
-					DPARAM0 = count_leading_zeros(DPARAM1 >> 32);
-				else
-					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
+				DPARAM0 = count_leading_zeros_64(DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_LZCNT, 8, 1):
-				if ((uint32_t)(DPARAM1 >> 32) != 0)
-					temp64 = count_leading_zeros(DPARAM1 >> 32);
-				else
-					temp64 = 32 + count_leading_zeros(DPARAM1);
+				temp64 = count_leading_zeros_64(DPARAM1);
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
 				break;
