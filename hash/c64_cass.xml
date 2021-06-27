@@ -4,6 +4,7 @@
 license:CC0
 
 The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018.
+This list is progressively being updated to reflect The Ultimate Tape Archive V2.0 released 18th August 2020.
 Some others are based on c64tapes.org dumps
 Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm
 -->
@@ -14,19 +15,71 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>10 Computer Hits 2</description>
 		<year>1986</year>
 		<publisher>Beau-Jolly</publisher>
-		<!-- Dumped by The Ultimate Tape Archive V1.0 -->
+		<!-- Dumped by The Ultimate Tape Archive V2.0 -->
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="cass" size="1762760">
-				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1762760" crc="362781a0" sha1="35556185604bef3b91d49367adee9eba11e4975a"/>
+			<feature name="part_id" value="Side A: Superpipeline 2 / Mutant Monty / Henrys House / Gribblys Day Out / Snooker"/>
+			<dataarea name="cass" size="1756359">
+				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="cass" size="1773633">
-				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1773633" crc="a8ece050" sha1="71e252d2b3c620796d1234877e68a9418f01bd89"/>
+			<feature name="part_id" value="Side B: Mama Llama / Raskel / Aqua Racer / Frenzy / Circus"/>
+			<dataarea name="cass" size="1767233">
+				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10hits3">
+		<description>10 Computer Hits 3</description>
+		<year>1986</year>
+		<publisher>Beau-Jolly</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Geoff Capes Strongman / Elidon / Blagger Goes To Hollywood / Cauldron / 3D Lunattack"/>
+			<dataarea name="cass" size="1627377">
+				<rom name="10_Computer_Hits_3_Tape_1.tap" size="1627377" crc="b32d52df" sha1="c0da12e89bf2a78e4c42f9e4ee97776d36746ba4"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Crazy Comets / Dynamite Dan / Herberts Dummy Run / Attack Of The Mutant Camels / Basildon Bond"/>
+			<dataarea name="cass" size="2323293">
+				<rom name="10_Computer_Hits_3_Tape_2.tap" size="2323293" crc="b108b920" sha1="0a4e5ea9df2d4a5d2d6c6362c61f369b3a20bfc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10hits4">
+		<description>10 Computer Hits 4</description>
+		<year>1987</year>
+		<publisher>Beau-Jolly</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Bride of Frankenstein / Alleykat / Classic Snooker / Uchi Mata / Sacred Armour of Antiriad"/>
+			<dataarea name="cass" size="2737528">
+				<rom name="10_Computer_Hits_4_Side_1.tap" size="2737528" crc="b645de8f" sha1="8842cfb4604860718d69e524b86e8bd29c2b5707"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Deactivators / Spindizzy / Skaterock / Iridis Alpha / Magic Madness / Dandy"/>
+			<dataarea name="cass" size="3058784">
+				<rom name="10_Computer_Hits_4_Side_2.tap" size="3058784" crc="a6bc298e" sha1="4d4f50804656720f2cdd3793e9170be2c46ff2b7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="10thfram">
+		<description>10th Frame</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="559120">
+				<rom name="10th_Frame.tap" size="559120" crc="44b5f05e" sha1="d1bdeafff1e1181e37d9edd05793af55c35c75dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,6 +98,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="597566">
 				<rom name="180_a1.tap" size="597566" crc="d251ee24" sha1="88bb175b7335e2473a530988cb5b4701b890960f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1942">
+		<description>1942</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718105">
+				<rom name="1942.tap" size="718105" crc="44b39fa4" sha1="4f42dca7128ceea7dbb5b49c949f7a74645f8715"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1942a">
+		<description>1942 (alt)</description>
+		<year>1986</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718105">
+				<rom name="1942_a1.tap" size="718105" crc="1a156870" sha1="ef8fd74086dbbfe10935f096e6839ab48dc7d5b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1943">
+		<description>1943: The Battle of Midway</description>
+		<year>1988</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="506798">
+				<rom name="1943-_The_Battle_of_Midway.tap" size="506798" crc="4f2d5ea6" sha1="239259c3a50c4dd4d976c160a079120727415761"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,6 +189,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="3dpool">
+		<description>3D Pool</description>
+		<year>1989</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="451892">
+				<rom name="3D_Pool.tap" size="451892" crc="396eb3f6" sha1="4d860e03157a31492c0ff7679d82fd5ddd21e174"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dpoolk">
+		<description>3D Pool (Kixx)</description>
+		<year>1992</year>
+		<publisher>Kixx</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="217093">
+				<rom name="3D_Pool.tap" size="217093" crc="3114cd62" sha1="2c77dddf4165f49ca517a6e0908da3815cd46218"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="a3dpool">
 		<description>American 3D Pool</description>
 		<year>1991</year>
@@ -117,6 +230,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="867657">
 				<rom name="a3dpoolb.tap" size="867657" crc="acc6f5fe" sha1="f21761d9d86e1bc98ea081a7405193e1eae6e30e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4horror">
+		<description>4 Most Horror</description>
+		<year>1988</year>
+		<publisher>Alternative Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: The Rocky Horror Show / Nosferatu The Vampire"/>
+			<dataarea name="cass" size="740742">
+				<rom name="4_Most_Horror_Side_1.tap" size="740742" crc="ea1daa4a" sha1="6b22909e5cb7ab039b4fd1c51d2fbac104edf11c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: She Vampires / Neil Android"/>
+			<dataarea name="cass" size="827592">
+				<rom name="4_Most_Horror_Side_2.tap" size="827592" crc="7ca46ebb" sha1="aecf1c586b8b5f9c5aa14bf0ed5e5ee21fe8473f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,6 +274,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="4soccer">
+		<description>4 Soccer Simulators</description>
+		<year>1989</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: 11-A-Side Soccer / Indoor Soccer"/>
+			<dataarea name="cass" size="1469409">
+				<rom name="4_Soccer_Simulators_Side_1.tap" size="1469409" crc="4a6587da" sha1="866625534a647b3cfed8e7c4d143de8e2794d689"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Street Soccer / Soccer Skills"/>
+			<dataarea name="cass" size="1724525">
+				<rom name="4_Soccer_Simulators_Side_2.tap" size="1724525" crc="4273406c" sha1="b25b84b4d890186aefc13677bc586400f212f67d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4thinch">
+		<description>4th &amp; Inches</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="504438">
+				<rom name="4th_&amp;_Inches.tap" size="504438" crc="89350a77" sha1="2e05f34691f66189c71779713fe353e4e3a90272"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="5thgear">
 		<description>5th Gear</description>
 		<year>1988</year>
@@ -149,6 +314,76 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="556826">
 				<rom name="5th_Gear.tap" size="556826" crc="034fc24a" sha1="826119d74b3d861bb7dd3279248442a5db627c54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="5thgearp">
+		<description>5th Gear (Prism)</description>
+		<year>1992</year>
+		<publisher>Prism Leisure</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="557418">
+				<rom name="5th_Gear.tap" size="557418" crc="dd8af099" sha1="795512a880f8812799f4baa674eac1ea6fae52d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6hits">
+		<description>6 Computer Hits</description>
+		<year>1985</year>
+		<publisher>Beau-Jolly</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Cadcam Warrior / Battle Through Time / Heroes of Karn / Eddie Kidds Jump Challenge / Rocket Roger / Cave Fighter"/>
+			<dataarea name="cass" size="2968544">
+				<rom name="6_Computer_Hits.tap" size="2968544" crc="7f7cfcef" sha1="1f3686bf2b421f22479410cece958aa9ee5c34e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6hitsa">
+		<description>6 Computer Hits (alt)</description>
+		<year>1985</year>
+		<publisher>Beau-Jolly</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Cadcam Warrior / Battle Through Time / Heroes of Karn / Eddie Kidds Jump Challenge / Rocket Roger / Cave Fighter"/>
+			<dataarea name="cass" size="2968543">
+				<rom name="6_Computer_Hits_a1.tap" size="2968543" crc="72399639" sha1="91369bd3314a36f0424dd364fa59f3bd252c0b4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6pak">
+		<description>6 Pak</description>
+		<year>1987</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Scooby Doo / 1942 / Duet"/>
+			<dataarea name="cass" size="1826748">
+				<rom name="6_Pak_Side_1.tap" size="1826748" crc="e213fb21" sha1="b7a6ef8d7d27467ce6dc24839e43a8e1a0ab8250"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Jet Set Willy II / Sacred Armour of Antiriad / Fighting Warrior / Split Personalities"/>
+			<dataarea name="cass" size="2419415">
+				<rom name="6_Pak_Side_1.tap" size="2419415" crc="0ba93379" sha1="a3ae97aa38974642ee391002351882d1aeaa72c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="720">
+		<description>720</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="651462">
+				<rom name="720.tap" size="651462" crc="a986df31" sha1="0c3e738623dbecd10b33bba0d0026d139625c35b"/>
 			</dataarea>
 		</part>
 	</software>
