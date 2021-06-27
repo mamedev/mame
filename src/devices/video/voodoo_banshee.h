@@ -33,13 +33,16 @@ static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 //  VOODOO DEVICES
 //**************************************************************************
 
-class voodoo_banshee_device : public voodoo::voodoo_device_base
+class voodoo_banshee_device_base : public voodoo::voodoo_device_base
 {
 public:
-	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	voodoo_banshee_device_base(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	u32 banshee_r(offs_t offset, u32 mem_mask = ~0);
-	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+
+	u32 banshee_r(offs_t offset, u32 mem_mask = ~0) { return read(offset, mem_mask); }
+	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0) { write(offset, data, mem_mask); }
 	u32 banshee_fb_r(offs_t offset);
 	void banshee_fb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 banshee_io_r(offs_t offset, u32 mem_mask = ~0);
@@ -51,9 +54,27 @@ public:
 	virtual s32 banshee_2d_w(offs_t offset, u32 data) override;
 	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
+	virtual void core_map(address_map &map) override;
+	virtual void lfb_map(address_map &map);
+	virtual void io_map(address_map &map);
+
+	u32 map_io_r(offs_t offset, u32 mem_mask);
+	u32 map_cmd_agp_r(offs_t offset);
+	u32 map_2d_r(offs_t offset);
+	u32 map_register_r(offs_t offset);
+	u32 map_lfb_r(offs_t offset);
+
+	void map_io_w(offs_t offset, u32 data, u32 mem_mask);
+	void map_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask);
+	void map_2d_w(offs_t offset, u32 data, u32 mem_mask);
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Which> void map_texture_w(offs_t offset, u32 data, u32 mem_mask);
+	void map_yuv_w(offs_t offset, u32 data, u32 mem_mask);
+	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask);
+
 protected:
 	// construction
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -98,7 +119,14 @@ protected:
 };
 
 
-class voodoo_3_device : public voodoo_banshee_device
+class voodoo_banshee_device : public voodoo_banshee_device_base
+{
+public:
+	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
+class voodoo_3_device : public voodoo_banshee_device_base
 {
 public:
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

@@ -16,9 +16,13 @@
 #include "screen.h"
 
 
+#define USE_MEMORY_VIEWS (0)
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+#define NEW_REGISTER_DISPATCH (0)
 
 // maximum number of TMUs
 static constexpr int MAX_TMU = 2;
@@ -268,6 +272,7 @@ class voodoo_device_base : public device_t, public device_video_interface
 {
 	friend class voodoo::command_fifo;
 
+protected:
 	// enumeration describing reasons we might be stalled
 	enum stall_state
 	{
@@ -291,8 +296,10 @@ public:
 	// getters
 	voodoo_model model() const { return m_model; }
 
-	u32 read(offs_t offset);
-	void write(offs_t offset, u32 data, u32 mem_mask = ~0);
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0);
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	virtual void core_map(address_map &map) = 0;
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_resume_callback );
@@ -411,13 +418,43 @@ protected:
 		s32 m_dzdy;                   // delta Z per Y
 		s64 m_dwdy;                   // delta W per Y
 
-		voodoo::thread_stats_block m_lfb_stats; // LFB access statistics
+#if NEW_REGISTER_DISPATCH
+		// core registers
+		reg_intr_ctrl m_intr_ctrl;
+		reg_hsync m_hsync;
+		reg_vsync m_vsync;
+		reg_back_porch m_back_porch;
+		reg_video_dimensions m_video_dimensions;
+		reg_clip_minmax m_clip_left_right;
+		reg_clip_minmax m_clip_low_y_high_y;
+		reg_fbz_colorpath m_fbz_color_path;
+		reg_fbz_mode m_fbz_mode;
+		reg_alpha_mode m_alpha_mode;
+		reg_fog_mode m_fog_mode;
+		reg_texture_mode m_texture_mode;
+		reg_texture_lod m_texture_lod;
+		reg_texture_detail m_texture_detail;
+		reg_lfb_mode m_lfb_mode;
+		reg_fbi_init0 m_fbi_init0;
+		reg_fbi_init1 m_fbi_init1;
+		reg_fbi_init2 m_fbi_init2;
+		reg_fbi_init3 m_fbi_init3;
+		reg_fbi_init4 m_fbi_init4;
 
+		// Voodoo-2-specific registers
+		reg_setup_mode m_setup_mode;
+		reg_chroma_range m_chroma_range;
+		reg_fbi_init5 m_fbi_init5;
+		reg_fbi_init6 m_fbi_init6;
+		reg_fbi_init7 m_fbi_init7;
+#endif
 		u8 m_sverts = 0;              // number of vertices ready
-		voodoo::setup_vertex m_svert[3];      // 3 setup vertices
+		voodoo::setup_vertex m_svert[4];      // 3 setup vertices
+		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
 
 		voodoo::memory_fifo m_fifo;   // framebuffer memory fifo
-		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
+
+		voodoo::thread_stats_block m_lfb_stats; // LFB access statistics
 
 		rgb_t m_pen[65536];           // mapping from pixels to pens
 		rgb_t m_clut[512];            // clut gamma data
@@ -461,6 +498,10 @@ protected:
 	// internal helpers
 	bool operation_pending() const { return !m_operation_end.is_zero(); }
 	void clear_pending_operation() { m_operation_end = attotime::zero; }
+	void prepare_for_read();
+	bool prepare_for_write();
+	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
+
 	void register_save();
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
@@ -470,6 +511,8 @@ protected:
 	s32 draw_triangle();
 	void populate_setup_vertex(voodoo::setup_vertex &vertex);
 	s32 setup_and_draw_triangle();
+
+	virtual void update_register_view() { }
 
 	// configuration
 	const voodoo_model m_model;              // which voodoo model
@@ -507,6 +550,9 @@ protected:
 	emu_timer *m_stall_resume_timer;         // timer to resume processing after stall
 
 	voodoo::debug_stats m_stats;             // internal statistics
+#if USE_MEMORY_VIEWS
+	memory_view m_regview;                   // switchable register view
+#endif
 
 	// allocated memory
 	u8 *m_fbmem;                             // pointer to aligned framebuffer
@@ -524,6 +570,20 @@ class voodoo_1_device : public voodoo_device_base
 {
 public:
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	u32 map_register_r(offs_t offset);
+	u32 map_lfb_r(offs_t offset);
+
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	virtual void core_map(address_map &map) override;
+
+protected:
+#if USE_MEMORY_VIEWS
+	virtual void update_register_view() override;
+#endif
 };
 
 
@@ -531,7 +591,22 @@ class voodoo_2_device : public voodoo_device_base
 {
 public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	u32 map_register_r(offs_t offset);
+	u32 map_lfb_r(offs_t offset);
+
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	virtual void core_map(address_map &map) override;
+
+protected:
+#if USE_MEMORY_VIEWS
+	virtual void update_register_view() override;
+#endif
 };
+
 
 
 

@@ -42,20 +42,13 @@ using namespace voodoo;
 
 
 
-DEFINE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device, "voodoo_banshee", "3dfx Voodoo Banshee")
-
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, MODEL_VOODOO_BANSHEE)
-{
-}
-
-voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
+voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
 	: voodoo_device_base(mconfig, type, tag, owner, clock, model)
 {
 }
 
 
-int voodoo_banshee_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if bypassing the clut, don't worry about the rest
 	if (BIT(m_banshee.io[io_vidProcCfg], 11))
@@ -96,7 +89,7 @@ int voodoo_banshee_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void voodoo_banshee_device::device_start()
+void voodoo_banshee_device_base::device_start()
 {
 	// initialize banshee registers
 	memset(m_banshee.io, 0, sizeof(m_banshee.io));
@@ -126,7 +119,7 @@ void voodoo_banshee_device::device_start()
 }
 
 
-s32 voodoo_banshee_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
+s32 voodoo_banshee_device_base::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -180,7 +173,7 @@ s32 voodoo_banshee_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
  *
  *************************************/
 
-u32 voodoo_banshee_device::banshee_agp_r(offs_t offset)
+u32 voodoo_banshee_device_base::banshee_agp_r(offs_t offset)
 {
 	u32 result;
 
@@ -240,41 +233,7 @@ u32 voodoo_banshee_device::banshee_agp_r(offs_t offset)
 }
 
 
-u32 voodoo_banshee_device::banshee_r(offs_t offset, u32 mem_mask)
-{
-	u32 result = 0xffffffff;
-
-	/* if we have something pending, flush the FIFOs up to the current time */
-	if (operation_pending())
-		flush_fifos(machine().time());
-
-	if (offset < 0x80000/4)
-		result = banshee_io_r(offset, mem_mask);
-	else if (offset < 0x100000/4)
-		result = banshee_agp_r(offset);
-	else if (offset < 0x200000/4)
-		logerror("%s:banshee_r(2D:%X)\n", machine().describe_context(), (offset*4) & 0xfffff);
-	else if (offset < 0x600000/4)
-		result = register_r(offset & 0x1fffff/4);
-	else if (offset < 0x800000/4)
-		logerror("%s:banshee_r(TEX0:%X)\n", machine().describe_context(), (offset*4) & 0x1fffff);
-	else if (offset < 0xa00000/4)
-		logerror("%s:banshee_r(TEX1:%X)\n", machine().describe_context(), (offset*4) & 0x1fffff);
-	else if (offset < 0xc00000/4)
-		logerror("%s:banshee_r(FLASH Bios ROM:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
-	else if (offset < 0x1000000/4)
-		logerror("%s:banshee_r(YUV:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
-	else if (offset < 0x2000000/4)
-	{
-		result = lfb_r(offset & 0xffffff/4, true);
-	} else {
-			logerror("%s:banshee_r(%X) Access out of bounds\n", machine().describe_context(), offset*4);
-	}
-	return result;
-}
-
-
-u32 voodoo_banshee_device::banshee_fb_r(offs_t offset)
+u32 voodoo_banshee_device_base::banshee_fb_r(offs_t offset)
 {
 	u32 result = 0xffffffff;
 
@@ -300,7 +259,7 @@ u32 voodoo_banshee_device::banshee_fb_r(offs_t offset)
 }
 
 
-u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
+u8 voodoo_banshee_device_base::banshee_vga_r(offs_t offset)
 {
 	u8 result = 0xff;
 
@@ -395,7 +354,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 }
 
 
-u32 voodoo_banshee_device::banshee_io_r(offs_t offset, u32 mem_mask)
+u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 {
 	u32 result;
 
@@ -439,13 +398,13 @@ u32 voodoo_banshee_device::banshee_io_r(offs_t offset, u32 mem_mask)
 }
 
 
-u32 voodoo_banshee_device::banshee_rom_r(offs_t offset)
+u32 voodoo_banshee_device_base::banshee_rom_r(offs_t offset)
 {
 	logerror("%s:banshee_rom_r(%X)\n", machine().describe_context(), offset*4);
 	return 0xffffffff;
 }
 
-void voodoo_banshee_device::banshee_blit_2d(u32 data)
+void voodoo_banshee_device_base::banshee_blit_2d(u32 data)
 {
 	switch (m_banshee.blt_cmd)
 	{
@@ -539,7 +498,7 @@ void voodoo_banshee_device::banshee_blit_2d(u32 data)
 	}
 }
 
-s32 voodoo_banshee_device::banshee_2d_w(offs_t offset, u32 data)
+s32 voodoo_banshee_device_base::banshee_2d_w(offs_t offset, u32 data)
 {
 	switch (offset)
 	{
@@ -693,7 +652,7 @@ s32 voodoo_banshee_device::banshee_2d_w(offs_t offset, u32 data)
 
 
 
-void voodoo_banshee_device::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	offset &= 0x1ff/4;
 
@@ -782,38 +741,8 @@ void voodoo_banshee_device::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 
-void voodoo_banshee_device::banshee_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	/* if we have something pending, flush the FIFOs up to the current time */
-	if (operation_pending())
-		flush_fifos(machine().time());
 
-	if (offset < 0x80000/4)
-		banshee_io_w(offset, data, mem_mask);
-	else if (offset < 0x100000/4)
-		banshee_agp_w(offset, data, mem_mask);
-	else if (offset < 0x200000/4)
-		logerror("%s:banshee_w(2D:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0xfffff, data, mem_mask);
-	else if (offset < 0x600000/4)
-		register_w(offset & 0x1fffff/4, data);
-	else if (offset < 0x800000/4)
-		logerror("%s:banshee_w(TEX0:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x1fffff, data, mem_mask);
-	else if (offset < 0xa00000/4)
-		logerror("%s:banshee_w(TEX1:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x1fffff, data, mem_mask);
-	else if (offset < 0xc00000/4)
-		logerror("%s:banshee_r(FLASH Bios ROM:%X)\n", machine().describe_context(), (offset*4) & 0x3fffff);
-	else if (offset < 0x1000000/4)
-		logerror("%s:banshee_w(YUV:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0x3fffff, data, mem_mask);
-	else if (offset < 0x2000000/4)
-	{
-		lfb_w(offset & 0xffffff/4, data, mem_mask);
-	} else {
-		logerror("%s:banshee_w Address out of range %08X = %08X & %08X\n", machine().describe_context(), (offset*4), data, mem_mask);
-	}
-}
-
-
-void voodoo_banshee_device::banshee_fb_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device_base::banshee_fb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 addr = offset*4;
 
@@ -838,7 +767,7 @@ void voodoo_banshee_device::banshee_fb_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 
-void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
+void voodoo_banshee_device_base::banshee_vga_w(offs_t offset, u8 data)
 {
 	offset &= 0x1f;
 
@@ -897,7 +826,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 }
 
 
-void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 old;
 
@@ -1028,9 +957,334 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 
+
+//**************************************************************************
+//  VOODOO BANSHEE/VOODOO 3 MEMORY MAP
+//**************************************************************************
+
+//-------------------------------------------------
+//  core_map - device map for core memory access
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::core_map(address_map &map)
+{
+	// Voodoo Banshee/Voodoo 3 memory map:
+	//
+	//   0`00000xxx`xxxxxxxx`xxxxxxxx I/O register remap
+	//   0`00001xxx`xxxxxxxx`xxxxxxxx CMD/AGP transfer/Misc registers
+	//   0`0001xxxx`xxxxxxxx`xxxxxxxx 2D registers
+	//   0`001xxxxx`xxxxxxxx`xxxxxxxx 3D registers
+	//   0`010xxxxx`xxxxxxxx`xxxxxxxx 3D registers (cont'd)
+	//   0`011xxxxx`xxxxxxxx`xxxxxxxx Texture TMU 0 download
+	//   0`100xxxxx`xxxxxxxx`xxxxxxxx Texture TMU 1 download (Voodoo 3 only)
+	//   0`101xxxxx`xxxxxxxx`xxxxxxxx Reserved
+	//   0`11xxxxxx`xxxxxxxx`xxxxxxxx YUV planar space
+	//   1`xxxxxxxx`xxxxxxxx`xxxxxxxx 3D LFB space
+	//
+	map(0x0000000, 0x007ffff).rw(FUNC(voodoo_banshee_device_base::map_io_r), FUNC(voodoo_banshee_device_base::map_io_w));
+	map(0x0080000, 0x00fffff).rw(FUNC(voodoo_banshee_device_base::map_cmd_agp_r), FUNC(voodoo_banshee_device_base::map_cmd_agp_w));
+	map(0x0100000, 0x01fffff).rw(FUNC(voodoo_banshee_device_base::map_2d_r), FUNC(voodoo_banshee_device_base::map_2d_w));
+	map(0x0200000, 0x05fffff).rw(FUNC(voodoo_banshee_device_base::map_register_r), FUNC(voodoo_banshee_device_base::map_register_w));
+	map(0x0600000, 0x07fffff).w(FUNC(voodoo_banshee_device_base::map_texture_w<0>));
+	if (BIT(m_chipmask, 2))
+		map(0x0800000, 0x09fffff).w(FUNC(voodoo_banshee_device_base::map_texture_w<1>));
+	map(0x0c00000, 0x0ffffff).w(FUNC(voodoo_banshee_device_base::map_yuv_w));
+	map(0x1000000, 0x1ffffff).rw(FUNC(voodoo_banshee_device_base::map_lfb_r), FUNC(voodoo_banshee_device_base::map_lfb_w));
+}
+
+void voodoo_banshee_device_base::lfb_map(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).rw(FUNC(voodoo_banshee_device_base::banshee_fb_r), FUNC(voodoo_banshee_device_base::banshee_fb_w));
+}
+
+void voodoo_banshee_device_base::io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(FUNC(voodoo_banshee_device_base::map_io_r), FUNC(voodoo_banshee_device_base::map_io_w));
+}
+
+u32 voodoo_banshee_device_base::read(offs_t offset, u32 mem_mask)
+{
+	switch (offset >> (19-2))
+	{
+	case 0x0000000 >> 19:
+		return map_io_r(offset - 0x0000000/4, mem_mask);
+
+	case 0x0080000 >> 19:
+		return map_cmd_agp_r(offset - 0x0080000/4);
+
+	case 0x0100000 >> 19:	case 0x0180000 >> 19:
+		return map_2d_r(offset - 0x0100000/4);
+
+	case 0x0200000 >> 19:	case 0x0280000 >> 19:	case 0x0300000 >> 19:	case 0x0380000 >> 19:
+	case 0x0400000 >> 19:	case 0x0480000 >> 19:	case 0x0500000 >> 19:	case 0x0580000 >> 19:
+		return map_register_r(offset - 0x0200000/4);
+
+	case 0x1000000 >> 19:	case 0x1080000 >> 19:	case 0x1100000 >> 19:	case 0x1180000 >> 19:
+	case 0x1200000 >> 19:	case 0x1280000 >> 19:	case 0x1300000 >> 19:	case 0x1380000 >> 19:
+	case 0x1400000 >> 19:	case 0x1480000 >> 19:	case 0x1500000 >> 19:	case 0x1580000 >> 19:
+	case 0x1600000 >> 19:	case 0x1680000 >> 19:	case 0x1700000 >> 19:	case 0x1780000 >> 19:
+	case 0x1800000 >> 19:	case 0x1880000 >> 19:	case 0x1900000 >> 19:	case 0x1980000 >> 19:
+	case 0x1a00000 >> 19:	case 0x1a80000 >> 19:	case 0x1b00000 >> 19:	case 0x1b80000 >> 19:
+	case 0x1c00000 >> 19:	case 0x1c80000 >> 19:	case 0x1d00000 >> 19:	case 0x1d80000 >> 19:
+	case 0x1e00000 >> 19:	case 0x1e80000 >> 19:	case 0x1f00000 >> 19:	case 0x1f80000 >> 19:
+		return map_lfb_r(offset - 0x1000000/4);
+
+	default:
+		logerror("%s:voodoo_banshee_device_base::read Address out of range %08X & %08X\n", machine().describe_context(), offset*4, mem_mask);
+		return 0xffffffff;
+	}
+}
+
+void voodoo_banshee_device_base::write(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset >> (19-2))
+	{
+	case 0x0000000 >> 19:
+		map_io_w(offset - 0x0000000/4, data, mem_mask);
+		break;
+
+	case 0x0080000 >> 19:
+		map_cmd_agp_w(offset - 0x0080000/4, data, mem_mask);
+		break;
+
+	case 0x0100000 >> 19:	case 0x0180000 >> 19:
+		map_2d_w(offset - 0x0100000/4, data, mem_mask);
+		break;
+
+	case 0x0200000 >> 19:	case 0x0280000 >> 19:	case 0x0300000 >> 19:	case 0x0380000 >> 19:
+	case 0x0400000 >> 19:	case 0x0480000 >> 19:	case 0x0500000 >> 19:	case 0x0580000 >> 19:
+		map_register_w(offset - 0x0200000/4, data, mem_mask);
+		break;
+
+	case 0x0600000 >> 19:	case 0x0680000 >> 19:	case 0x0700000 >> 19:	case 0x0780000 >> 19:
+		map_texture_w<0>(offset - 0x0600000, data, mem_mask);
+		break;
+
+	case 0x0800000 >> 19:	case 0x0880000 >> 19:	case 0x0900000 >> 19:	case 0x0980000 >> 19:
+		if (BIT(m_chipmask, 2))
+			map_texture_w<1>(offset - 0x0800000, data, mem_mask);
+		break;
+
+	case 0xc000000 >> 19:	case 0xc800000 >> 19:	case 0xd000000 >> 19:	case 0xd800000 >> 19:
+	case 0xe000000 >> 19:	case 0xe800000 >> 19:	case 0xf000000 >> 19:	case 0xf800000 >> 19:
+		map_yuv_w(offset - 0xc000000/4, data, mem_mask);
+		break;
+
+	case 0x1000000 >> 19:	case 0x1080000 >> 19:	case 0x1100000 >> 19:	case 0x1180000 >> 19:
+	case 0x1200000 >> 19:	case 0x1280000 >> 19:	case 0x1300000 >> 19:	case 0x1380000 >> 19:
+	case 0x1400000 >> 19:	case 0x1480000 >> 19:	case 0x1500000 >> 19:	case 0x1580000 >> 19:
+	case 0x1600000 >> 19:	case 0x1680000 >> 19:	case 0x1700000 >> 19:	case 0x1780000 >> 19:
+	case 0x1800000 >> 19:	case 0x1880000 >> 19:	case 0x1900000 >> 19:	case 0x1980000 >> 19:
+	case 0x1a00000 >> 19:	case 0x1a80000 >> 19:	case 0x1b00000 >> 19:	case 0x1b80000 >> 19:
+	case 0x1c00000 >> 19:	case 0x1c80000 >> 19:	case 0x1d00000 >> 19:	case 0x1d80000 >> 19:
+	case 0x1e00000 >> 19:	case 0x1e80000 >> 19:	case 0x1f00000 >> 19:	case 0x1f80000 >> 19:
+		map_lfb_w(offset - 0x1000000/4, data, mem_mask);
+		break;
+
+	default:
+		logerror("%s:voodoo_banshee_device_base::write Address out of range %08X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  map_io_r - handle a mapped read from I/O
+//  space
+//-------------------------------------------------
+
+u32 voodoo_banshee_device_base::map_io_r(offs_t offset, u32 mem_mask)
+{
+	prepare_for_read();
+	return banshee_io_r(offset, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_cmd_agp_r - handle a mapped read from CMD/
+//  AGP space
+//-------------------------------------------------
+
+u32 voodoo_banshee_device_base::map_cmd_agp_r(offs_t offset)
+{
+	prepare_for_read();
+	return banshee_agp_r(offset);
+}
+
+
+//-------------------------------------------------
+//  map_2d_r - handle a mapped read from 2D space
+//-------------------------------------------------
+
+u32 voodoo_banshee_device_base::map_2d_r(offs_t offset)
+{
+	prepare_for_read();
+	logerror("%s:map_2d_r(%X)\n", machine().describe_context(), (offset*4) & 0xfffff);
+	return 0xffffffff;
+}
+
+
+//-------------------------------------------------
+//  map_register_r - handle a mapped read from
+//  regular register space
+//-------------------------------------------------
+
+u32 voodoo_banshee_device_base::map_register_r(offs_t offset)
+{
+	prepare_for_read();
+	return register_r(offset);
+}
+
+
+//-------------------------------------------------
+//  map_lfb_r - handle a mapped read from LFB space
+//-------------------------------------------------
+
+u32 voodoo_banshee_device_base::map_lfb_r(offs_t offset)
+{
+	prepare_for_read();
+	return lfb_r(offset, true);
+}
+
+
+//-------------------------------------------------
+//  map_io_w - handle a mapped write to I/O space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_io_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// no mechanism to stall I/O writes
+	prepare_for_write();
+	banshee_io_w(offset, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_agp_cmd_w - handle a mapped write to CMD/
+//  AGP space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// no mechanism to stall AGP/CMD writes
+	prepare_for_write();
+	banshee_agp_w(offset, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_2d_w - handle a mapped write to 2D space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_2d_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// no mechanism to stall 2D writes
+	prepare_for_write();
+	logerror("%s:map_2d_w(%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_register_w - handle a mapped write to
+//  regular register space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_register_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	bool pending = prepare_for_write();
+
+	// handle register swizzling
+	if (BIT(offset, 20-2))
+		data = swapendian_int32(data);
+
+	// handle aliasing
+	if (BIT(offset, 21-2))
+		offset = (offset & ~0xff) | m_reg.alias(offset);
+
+	// at this point all that matters are the low 12 bits
+	offset &= 0xfff;
+
+	// ignore if writes aren't allowed
+	if (!m_reg.is_writable(offset))
+		return;
+
+	// if this is non-FIFO command, execute immediately
+	if (!m_reg.is_fifo(offset))
+		return void(register_w(offset, data));
+
+	// track swap buffers
+	if ((offset & 0xff) == voodoo_regs::reg_swapbufferCMD)
+		m_fbi.m_swaps_pending++;
+
+	// if we're busy add to the fifo
+	if (pending && m_init_enable.enable_pci_fifo())
+		return add_to_fifo(offset, data, mem_mask);
+
+	// if we get a non-zero number of cycles back, mark things pending
+	int cycles = register_w(offset, data);
+	if (cycles > 0)
+	{
+		// if we ended up with cycles, mark the operation pending
+		m_operation_end = machine().time() + clocks_to_attotime(cycles);
+		if (LOG_FIFO_VERBOSE)
+			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
+	}
+}
+
+
+//-------------------------------------------------
+//  map_texture_w - handle a mapped write to
+//  texture download space
+//-------------------------------------------------
+
+template<int Which>
+void voodoo_banshee_device_base::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	prepare_for_write();
+	logerror("%s:map_texture_w<%d>(%X) = %08X & %08X\n", machine().describe_context(), Which, offset*4, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_yuv_w - handle a mapped write to YUV space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_yuv_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	prepare_for_write();
+	logerror("%s:map_yuv_w(%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_lfb_w - handle a mapped write to LFB space
+//-------------------------------------------------
+
+void voodoo_banshee_device_base::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// if we're busy add to the fifo, else just execute immediately
+	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
+		add_to_fifo(offset | (0x400000/4), data, mem_mask);
+	else
+		lfb_w(offset, data, mem_mask);
+}
+
+
+
+
+
+
+
+DEFINE_DEVICE_TYPE(VOODOO_BANSHEE, voodoo_banshee_device, "voodoo_banshee", "3dfx Voodoo Banshee")
+
+voodoo_banshee_device::voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: voodoo_banshee_device_base(mconfig, VOODOO_BANSHEE, tag, owner, clock, MODEL_VOODOO_BANSHEE)
+{
+}
+
 DEFINE_DEVICE_TYPE(VOODOO_3, voodoo_3_device, "voodoo_3", "3dfx Voodoo 3")
 
 voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_banshee_device(mconfig, VOODOO_3, tag, owner, clock, MODEL_VOODOO_3)
+	: voodoo_banshee_device_base(mconfig, VOODOO_3, tag, owner, clock, MODEL_VOODOO_3)
 {
 }

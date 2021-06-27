@@ -51,27 +51,6 @@ void voodoo_pci_device::config_map(address_map &map)
 	map(0x40, 0x5f).rw(FUNC(voodoo_pci_device::pcictrl_r), FUNC(voodoo_pci_device::pcictrl_w));
 }
 
-// VOODOO_1 & VOODOO_2 map
-void voodoo_pci_device::voodoo_reg_map(address_map &map)
-{
-	map(0x0, 0x00ffffff).rw(m_voodoo, FUNC(voodoo_device_base::read), FUNC(voodoo_device_base::write));
-}
-// VOODOO_BANSHEE and VOODOO_3 maps
-void voodoo_pci_device::banshee_reg_map(address_map &map)
-{
-	map(0x0, 0x01ffffff).rw(m_voodoo, FUNC(voodoo_banshee_device::banshee_r), FUNC(voodoo_banshee_device::banshee_w));
-}
-
-void voodoo_pci_device::lfb_map(address_map &map)
-{
-	map(0x0, 0x01ffffff).rw(m_voodoo, FUNC(voodoo_banshee_device::banshee_fb_r), FUNC(voodoo_banshee_device::banshee_fb_w));
-}
-
-void voodoo_pci_device::io_map(address_map &map)
-{
-	map(0x000, 0x0ff).rw(m_voodoo, FUNC(voodoo_banshee_device::banshee_io_r), FUNC(voodoo_banshee_device::banshee_io_w));
-}
-
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: pci_device(mconfig, type, tag, owner, clock),
 	  m_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
@@ -114,7 +93,7 @@ void voodoo_1_pci_device::device_start()
 
 	voodoo_pci_device::device_start();
 
-	add_map(16 * 1024 * 1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
+	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_1_device::core_map));
 	bank_infos[0].adr = 0xff000000;
 }
 
@@ -124,7 +103,7 @@ void voodoo_2_pci_device::device_start()
 
 	voodoo_pci_device::device_start();
 
-	add_map(16 * 1024 * 1024, M_MEM | M_PREF, FUNC(voodoo_pci_device::voodoo_reg_map));
+	add_map(16 * 1024 * 1024, M_MEM | M_PREF, *m_voodoo, FUNC(voodoo_2_device::core_map));
 	bank_infos[0].adr = 0xff000000;
 }
 
@@ -134,9 +113,9 @@ void voodoo_banshee_pci_device::device_start()
 
 	voodoo_pci_device::device_start();
 
-	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
-	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
-	add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
+	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_banshee_device::core_map));
+	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_banshee_device::lfb_map));
+	add_map(256, M_IO, *m_voodoo, FUNC(voodoo_banshee_device::io_map));
 	bank_infos[0].adr = 0xf8000000;
 	bank_infos[1].adr = 0xf8000008;
 	bank_infos[2].adr = 0xfffffff0;
@@ -148,9 +127,9 @@ void voodoo_3_pci_device::device_start()
 
 	voodoo_pci_device::device_start();
 
-	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::banshee_reg_map));
-	add_map(32 * 1024 * 1024, M_MEM, FUNC(voodoo_pci_device::lfb_map));
-	add_map(256, M_IO, FUNC(voodoo_pci_device::io_map));
+	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_3_device::core_map));
+	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_3_device::lfb_map));
+	add_map(256, M_IO, *m_voodoo, FUNC(voodoo_3_device::io_map));
 	bank_infos[0].adr = 0xf8000000;
 	bank_infos[1].adr = 0xf8000008;
 	bank_infos[2].adr = 0xfffffff0;

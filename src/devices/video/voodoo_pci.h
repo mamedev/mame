@@ -23,11 +23,6 @@ public:
 	u32 vga_r(offs_t offset, u32 mem_mask = ~0);
 	void vga_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	void voodoo_reg_map(address_map &map);
-	void banshee_reg_map(address_map &map);
-	void lfb_map(address_map &map);
-	void io_map(address_map &map);
-
 protected:
 	voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
