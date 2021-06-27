@@ -968,6 +968,8 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 
 void voodoo_banshee_device_base::core_map(address_map &map)
 {
+	printf("voodoo_banshee_device_base::core_map\n");
+
 	// Voodoo Banshee/Voodoo 3 memory map:
 	//
 	//   0`00000xxx`xxxxxxxx`xxxxxxxx I/O register remap
