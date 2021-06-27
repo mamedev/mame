@@ -177,7 +177,7 @@ license:CC0
 
 	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
 	     the data structure is very different, and doesn't start with the FAT16 filesystem?
-		 does the system BIOS detect different cartridge types and handle them in different ways? -->
+	     does the system BIOS detect different cartridge types and handle them in different ways? -->
 	<software name="mmcluba" cloneof="mmclub" supported="no">
 		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
 		<year>2010</year>
@@ -190,7 +190,7 @@ license:CC0
 		</part>
 	</software>
 
-	
+
 
 	<software name="mickeychgr" cloneof="mmclub" supported="no">
 		<description>Micky Maus Wunderhaus (Germany)</description>

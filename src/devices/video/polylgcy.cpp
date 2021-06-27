@@ -325,7 +325,7 @@ legacy_poly_manager_owner::~legacy_poly_manager_owner()
 }
 
 /*-------------------------------------------------
-	allocate_array - allocate an array of pointers
+    allocate_array - allocate an array of pointers
 -------------------------------------------------*/
 
 template<typename T>

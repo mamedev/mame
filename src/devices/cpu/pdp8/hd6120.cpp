@@ -99,7 +99,7 @@
 
         MSB             LSB     Output conditions
         -----------------------------------------
-        IF0     IF1     IF2     IFETCH, direct operands (except if FZ)    
+        IF0     IF1     IF2     IFETCH, direct operands (except if FZ)
         IB0     IB1     IB2     None (until transferred to IF)
         ISF0    ISF1    ISF2    None
         DF0     DF1     DF2     Indirect operand addressing, IOTs, etc.

@@ -135,11 +135,11 @@ uint32_t konami_gn676_lan_device::lanc2_r(offs_t offset, uint32_t mem_mask)
 		}
 	}
 	else if (offset == 1)
-	{		
-		r |= 0x00005555;		// set all other machines as disconnected
+	{
+		r |= 0x00005555;        // set all other machines as disconnected
 	}
 	else if (offset == 3)
-	{		
+	{
 		r |= 0xffffffff;
 	}
 	else if (offset == 4)

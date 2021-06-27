@@ -37,7 +37,7 @@ private:
 	tilemap_t* m_tilemap_256;
 
 	uint32_t m_palette_base;
-	uint32_t m_tilemap_base;	
+	uint32_t m_tilemap_base;
 
 	std::unique_ptr<uint32_t[]>       m_tile_ram;
 	std::unique_ptr<uint32_t[]>       m_char_ram;

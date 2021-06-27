@@ -5,7 +5,7 @@
 #include "machine/segashiobd.h"
 
 /*
-	837-14438 SH I/O BD
+    837-14438 SH I/O BD
 
 |-------------------------------------------------------------------------------------|
 |         CN3                     CN6              CN2         CN1          CN11      |
@@ -31,38 +31,38 @@
 |                     CN4                                   CN7        CN8            |
 |-------------------------------------------------------------------------------------|
 
-	IC1    - Hitachi/Renesas SH4 SoC
-	IC2    - Xilinx Spartan XC2S50 PQ208AMS0341 FPGA
-	IC3    - Xilinx 17S50APC Spartan-II Family OTP Configuration PROM, stamped 6372A
-	IC4,5  - Toshiba TC59S6432CFT-10  512K x4 banks x32bit SDRAM
-	IC6    - Macronix MX29LV160ATTC-90 16Mbit Flash ROM
-	IC7    - ST M68AF127BL55MC6 1Mbit (128K x8) SRAM
-	IC8    - 42-pin DIP socket, unpopulated
-	IC9    - NS USBN9604-28M USB Node Controller
-	OSC1   - 33.3333 MHz
-	OSC2   - 32.0000 MHz
-	OCS3   - 24.0000 MHz
-	SW1,2  - pushbuttons
-	DIPSW1 - 4x DIP switch
-	LED1-5 - LEDs
-	LED6,7 - 7seg LEDs
-	BT1    - Panasonic CR2032 battery
+    IC1    - Hitachi/Renesas SH4 SoC
+    IC2    - Xilinx Spartan XC2S50 PQ208AMS0341 FPGA
+    IC3    - Xilinx 17S50APC Spartan-II Family OTP Configuration PROM, stamped 6372A
+    IC4,5  - Toshiba TC59S6432CFT-10  512K x4 banks x32bit SDRAM
+    IC6    - Macronix MX29LV160ATTC-90 16Mbit Flash ROM
+    IC7    - ST M68AF127BL55MC6 1Mbit (128K x8) SRAM
+    IC8    - 42-pin DIP socket, unpopulated
+    IC9    - NS USBN9604-28M USB Node Controller
+    OSC1   - 33.3333 MHz
+    OSC2   - 32.0000 MHz
+    OCS3   - 24.0000 MHz
+    SW1,2  - pushbuttons
+    DIPSW1 - 4x DIP switch
+    LED1-5 - LEDs
+    LED6,7 - 7seg LEDs
+    BT1    - Panasonic CR2032 battery
 
-	CN1    - 8 pin JST VH series connector
-	 1 12V
-	 2 5V
-	 3 5V
-	 4 3.3V
-	 5 3.3V
-	 6 gnd
-	 7 gnd
-	 8 gnd
-	
-	CN2    - 4 pin JST VH series connector
-	 1 12V
-	 2 12V
-	 3 gnd
-	 4 gnd
+    CN1    - 8 pin JST VH series connector
+     1 12V
+     2 5V
+     3 5V
+     4 3.3V
+     5 3.3V
+     6 gnd
+     7 gnd
+     8 gnd
+
+    CN2    - 4 pin JST VH series connector
+     1 12V
+     2 12V
+     3 gnd
+     4 gnd
 */
 
 DEFINE_DEVICE_TYPE(SEGA837_14438, sega_837_14438_device, "sega837_14438", "Sega 837-14438 SH I/O BD")

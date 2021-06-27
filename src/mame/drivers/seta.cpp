@@ -12143,7 +12143,7 @@ u16 downtown_state::downtown_protection_r(offs_t offset)
 			static const u8 word[] = "WALTZ0";
 			if (offset >= 0x100/2 && offset <= 0x10a/2)
 				return word[offset - 0x100/2];
-			
+
 			// definitely wants to read-back hi-score table from 0x110-0x15f
 			break;
 		}

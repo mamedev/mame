@@ -812,7 +812,7 @@ void jetwave_state::jetwave(machine_config &config)
 
 	// video hardware
 	m_screen->set_size(1024, 1024);
-	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);		// needs CRTC emulation
+	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);      // needs CRTC emulation
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
 
 	K001604(config, m_k001604, 0);

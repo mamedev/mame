@@ -29,7 +29,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
-	// internal state	
+	// internal state
 	tilemap_t* m_fg_tilemap;
 	tilemap_t* m_bg_tilemap8;
 	tilemap_t* m_bg_tilemap16;

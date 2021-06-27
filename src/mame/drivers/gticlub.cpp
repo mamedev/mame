@@ -874,7 +874,7 @@ void gticlub_state::gticlub(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 1024);
-	screen.set_visarea(40, 511+40, 28, 383+28);		// needs CRTC emulation
+	screen.set_visarea(40, 511+40, 28, 383+28);     // needs CRTC emulation
 	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
 	PALETTE(config, m_palette).set_entries(65536);

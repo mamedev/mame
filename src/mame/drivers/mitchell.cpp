@@ -876,7 +876,7 @@ static INPUT_PORTS_START( pangdsw )
 
 // the settings are shown if entering test mode. The game always respects the dip setting, changing the values in test mode has no effect
 // it appears the bootleggers didn't care to add dips for flipscreen, free play and extend values (or at least they haven't been found yet)
-	PORT_START("DSW1") 
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:6,7,8")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )

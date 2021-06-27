@@ -2,42 +2,42 @@
 // copyright-holders:David Haywood
 
 /*
-	Alien Storm 'System 18' bootlegs
+    Alien Storm 'System 18' bootlegs
 
-	these have extensively reworked 68000 code to handle the modified hardware
+    these have extensively reworked 68000 code to handle the modified hardware
 
-	Noteworthy features
-	 - no VDP
-	   (so no backgrounds in gallary stages, some enemies removed from first stage)
-	 - completely reworked background 'tilemaps'
-	   (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
-	 - less capable sound system
-	   (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
+    Noteworthy features
+     - no VDP
+       (so no backgrounds in gallary stages, some enemies removed from first stage)
+     - completely reworked background 'tilemaps'
+       (regular page registers not used, instead there's a new 'row list' defining page and scroll per row)
+     - less capable sound system
+       (only hooked up for astormb2 set, astormbl set is using original sound, which might not be correct)
 
-	Issues
-	 - title screen vanishes as soon as it appears (it's in the wrong half of 'tilemap' pages?)
-	   does this happen on hardware? swapping them causes issues ingame instead, currently a kludge is used to only swap one layer
+    Issues
+     - title screen vanishes as soon as it appears (it's in the wrong half of 'tilemap' pages?)
+       does this happen on hardware? swapping them causes issues ingame instead, currently a kludge is used to only swap one layer
 
-	 - some stuck parts in the gallery stages
-	   again, does this happen on hardware? fixed with same kludge as above?
+     - some stuck parts in the gallery stages
+       again, does this happen on hardware? fixed with same kludge as above?
 
-	 - there are 'bad' pixels near the shadows on some player sprites, but these differences in the GFX ROMs have been found on
-	   more than 1 PCB, does the bootleg hardware need them for some purpose?
+     - there are 'bad' pixels near the shadows on some player sprites, but these differences in the GFX ROMs have been found on
+       more than 1 PCB, does the bootleg hardware need them for some purpose?
 
-	 - the 'Action' 'Destroy' and 'Run' screens don't display properly in attract, this also seems to be related to how
-	   the bootleg is remapping the tilemap pages and needs checking against the bootleg hardware.
+     - the 'Action' 'Destroy' and 'Run' screens don't display properly in attract, this also seems to be related to how
+       the bootleg is remapping the tilemap pages and needs checking against the bootleg hardware.
 
-	 - "Press Start" doesn't flash after inserting a credit, nor does the number of credits display
-	   again this should be verified against the bootleg hardware
+     - "Press Start" doesn't flash after inserting a credit, nor does the number of credits display
+       again this should be verified against the bootleg hardware
 
-	Currently the modified background tilemaps are not handled with the tilemap system, as some of the changes make them much more
-	difficult to fit into the tilemap system.  This might be reconsidered later.
+    Currently the modified background tilemaps are not handled with the tilemap system, as some of the changes make them much more
+    difficult to fit into the tilemap system.  This might be reconsidered later.
 
-	TODO:
+    TODO:
 
-	tidy up + optimized video code, decide if using tilemaps is cleaner or not
-	verify glitches etc. against bootleg hardware
-	convert system18 / bootleg OKI sound system to devices to share with other drivers
+    tidy up + optimized video code, decide if using tilemaps is cleaner or not
+    verify glitches etc. against bootleg hardware
+    convert system18 / bootleg OKI sound system to devices to share with other drivers
 
 */
 
@@ -62,7 +62,7 @@ namespace {
 class segas18_astormbl_state : public sega_16bit_common_base
 {
 protected:
-	segas18_astormbl_state(const machine_config &mconfig, device_type type, const char *tag) 
+	segas18_astormbl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sega_16bit_common_base(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
@@ -107,7 +107,7 @@ private:
 class segas18_astormbl_s18snd_state : public segas18_astormbl_state
 {
 public:
-	segas18_astormbl_s18snd_state(const machine_config &mconfig, device_type type, const char *tag) 
+	segas18_astormbl_s18snd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: segas18_astormbl_state(mconfig, type, tag)
 		, m_soundcpu(*this, "soundcpu")
 		, m_soundbank(*this, "soundbank")
@@ -136,7 +136,7 @@ private:
 class segas18_astormbl_bootsnd_state : public segas18_astormbl_state
 {
 public:
-	segas18_astormbl_bootsnd_state(const machine_config &mconfig, device_type type, const char *tag) 
+	segas18_astormbl_bootsnd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: segas18_astormbl_state(mconfig, type, tag)
 		, m_soundcpu(*this, "soundcpu")
 		, m_soundlatch(*this, "soundlatch")

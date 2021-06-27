@@ -61,12 +61,12 @@ struct legacy_poly_manager;
 class legacy_poly_manager_owner
 {
 public:
-    legacy_poly_manager_owner();
-    ~legacy_poly_manager_owner();
+	legacy_poly_manager_owner();
+	~legacy_poly_manager_owner();
 
-    operator legacy_poly_manager *() { return m_poly; }
+	operator legacy_poly_manager *() { return m_poly; }
 
-    legacy_poly_manager *m_poly;
+	legacy_poly_manager *m_poly;
 };
 
 
