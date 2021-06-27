@@ -503,17 +503,19 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	rscreen.set_screen_update(FUNC(vsmjtria_state::screen_update<1>));
 	rscreen.set_palette("palette1");
 
-	SPEAKER(config, "speaker").front_center();
+	SPEAKER(config, "speaker0").front_left(); // P1 side
 
 	ay8910_device &ay0(AY8910(config, "ay0", 20_MHz_XTAL / 16)); // divider guessed
 	ay0.port_a_read_callback().set_ioport("DSW2");
 	ay0.port_b_read_callback().set_ioport("DSW1");
-	ay0.add_route(ALL_OUTPUTS, "speaker", 0.33);
+	ay0.add_route(ALL_OUTPUTS, "speaker0", 0.33);
+
+	SPEAKER(config, "speaker1").front_right(); // P2 side
 
 	ay8910_device &ay1(AY8910(config, "ay1", 20_MHz_XTAL / 16)); // divider guessed
 	ay1.port_a_read_callback().set_ioport("DSW4");
 	ay1.port_b_read_callback().set_ioport("DSW3");
-	ay1.add_route(ALL_OUTPUTS, "speaker", 0.33);
+	ay1.add_route(ALL_OUTPUTS, "speaker1", 0.33);
 }
 
 ROM_START( vsmjtria )
