@@ -31,7 +31,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="10hits2a">
+	<software name="10hits2a" cloneof="10hits2">
 		<description>10 Computer Hits 2 (alt)</description>
 		<year>1986</year>
 		<publisher>Beau-Jolly</publisher>
@@ -133,7 +133,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="1942a">
+	<software name="1942a" cloneof="1942">
 		<description>1942 (alt)</description>
 		<year>1986</year>
 		<publisher>Elite Systems</publisher>
@@ -220,7 +220,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="3dpoolk">
+	<software name="3dpoolk" cloneof="3dpool">
 		<description>3D Pool (Kixx)</description>
 		<year>1992</year>
 		<publisher>Kixx</publisher>
@@ -337,7 +337,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="5thgearp">
+	<software name="5thgearp" cloneof="5thgear">
 		<description>5th Gear (Prism)</description>
 		<year>1992</year>
 		<publisher>Prism Leisure</publisher>
@@ -362,7 +362,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="6hitsa">
+	<software name="6hitsa" cloneof="6hits">
 		<description>6 Computer Hits (alt)</description>
 		<year>1985</year>
 		<publisher>Beau-Jolly</publisher>
