@@ -26924,7 +26924,7 @@ sold through Takeru vending machines -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
 				<!--<rom name="last tempest, the (1994)(koucha kikaku)(disk 2 of 2)(disk b).dim" size="1261824" crc="6cbba9cd" sha1="3b48f44ea9c2c3b76f32017444f3703359b77174" offset="000000" status="baddump" />-->
-				<rom name="Last_Tempest_B.dim" size="1261824" crc="6d5a7b18" sha1="b4962416747f6d34a1df4572a7c3ea7a04711da1" offset="000000" status="baddump" />
+				<rom name="Last_Tempest_B.dim" size="1261824" crc="3d67e52f" sha1="d78d68763971c6a02bfbee9bc083d402b32d3338" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
