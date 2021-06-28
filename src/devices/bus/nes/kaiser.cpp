@@ -17,10 +17,8 @@
  * Kaiser KS7031
  * Kaiser KS7032
  * Kaiser KS7037
+ * Kaiser KS7057
  * Kaiser KS7058
-
- The Kaiser KS7057 bootleg board is emulated in nes_mmc3_clones.cpp
-
 
  TODO:
  - FCEUmm lists more Kaiser PCBs:
