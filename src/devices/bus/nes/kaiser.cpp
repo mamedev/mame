@@ -57,6 +57,7 @@ DEFINE_DEVICE_TYPE(NES_KS7013B, nes_ks7013b_device, "nes_ks7013b", "NES Cart Kai
 DEFINE_DEVICE_TYPE(NES_KS7031,  nes_ks7031_device,  "nes_ks7031",  "NES Cart Kaiser KS-7031 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7016,  nes_ks7016_device,  "nes_ks7016",  "NES Cart Kaiser KS-7016 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device,  "nes_ks7037",  "NES Cart Kaiser KS-7037 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device,  "nes_ks7057",  "NES Cart Kaiser KS-7057 PCB")
 
 
 nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -111,6 +112,11 @@ nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *
 
 nes_ks7037_device::nes_ks7037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7037, tag, owner, clock)
+{
+}
+
+nes_ks7057_device::nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS7057, tag, owner, clock)
 {
 }
 
@@ -272,6 +278,21 @@ void nes_ks7037_device::pcb_reset()
 
 	memset(m_reg, 0, sizeof(m_reg));
 	m_latch = 0;
+}
+
+void nes_ks7057_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_ks7057_device::pcb_reset()
+{
+	prg8_ab(0x0d);
+	prg16_cdef(0x07);
+	chr8(0, CHRRAM);
+
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 
@@ -737,5 +758,56 @@ void nes_ks7037_device::write_h(offs_t offset, uint8_t data)
 				update_prg();
 				break;
 		}
+	}
+}
+
+/*-------------------------------------------------
+
+ Kaiser Board KS7057
+
+ Games: Gyruss
+
+ This PCB has fixed banks after 0xa000 and 8x2K
+ swappable banks in 0x6000-0x9fff. Pairs of nibble
+ registers (we store joined as bytes) control the banks,
+ with $B000/$B001, $B002/$B003, $C000/$C001, $C002/$C003
+ selecting 4 banks in 0x8000-0x9fff, and $D000/$D001,
+ $D002/$D003, $E000/$E001, $E002/$E003 selecting the
+ remaining 4 banks in 0x6000-0x7fff.
+
+ NES 2.0: mapper 302
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_ks7057_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("ks7057 read_m, offset: %04x\n", offset));
+	return m_prg[0x800 * m_reg[((offset >> 11) & 0x03) + 4] + (offset & 0x7ff)];
+}
+
+u8 nes_ks7057_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("ks7057 read_h, offset: %04x\n", offset));
+	if (offset < 0x2000)
+		return m_prg[0x800 * m_reg[(offset >> 11) & 0x03] + (offset & 0x7ff)];
+
+	return hi_access_rom(offset);
+}
+
+void nes_ks7057_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("ks7057 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x2000)
+		set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	else if (offset >= 0x3000 && offset < 0x6004)
+	{
+		u8 reg = (((offset >> 11) & 0x0e) | BIT(offset, 1)) - 6;
+		if (BIT(offset, 0))
+			m_reg[reg] = (m_reg[reg] & 0x0f) | ((data & 0x03) << 4);
+		else
+			m_reg[reg] = (m_reg[reg] & 0xf0) | (data & 0x0f);
 	}
 }

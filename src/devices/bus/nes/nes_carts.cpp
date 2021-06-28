@@ -259,6 +259,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("ks7031",           NES_KS7031);     //  used in Dracula II (FDS Conversion);
 	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion);
 	device.option_add_internal("ks7037",           NES_KS7037);     //  used in Metroid (FDS Conversion);
+	device.option_add_internal("ks7057",           NES_KS7057);     //  used in Gyruss (FDS Conversion);
 	device.option_add_internal("gs2015",           NES_GS2015);
 	device.option_add_internal("gs2004",           NES_GS2004);
 	device.option_add_internal("gs2013",           NES_GS2013);
@@ -311,7 +312,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sl1632",           NES_REX_SL1632);
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
 	device.option_add_internal("nitra",            NES_NITRA);
-	device.option_add_internal("ks7057",           NES_KS7057); // mapper 196 alt (for Street Fighter VI / Fight Street VI);
+	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);
 	device.option_add_internal("unl_malisb",       NES_MALISB); //  used by Super Mali Splash Bomb
 	device.option_add_internal("family4646",       NES_FAMILY4646);
