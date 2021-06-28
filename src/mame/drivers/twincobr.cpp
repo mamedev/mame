@@ -1266,7 +1266,7 @@ ROM_START( fnshark ) // Based on a different version of the game code? (only a ~
 	ROM_LOAD( "82s123.ic99", 0x240, 0x020, CRC(4fb5df2a) SHA1(506ef2c8e4cf45c256d6831a0a5760732f2de422) ) // BPROM type: 82s123AN - tile to sprite priority ??
 ROM_END
 
-ROM_START( skysharbl )
+ROM_START( skysharkb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
 	ROM_LOAD16_BYTE( "1r.ic18", 0x00000, 0x10000, CRC(ea4bcb43) SHA1(4b5fda235908a9081fdd4cca98294e9e9a34bbf2) )
 	ROM_LOAD16_BYTE( "1q.1ic7", 0x00001, 0x10000, CRC(d1f39ed2) SHA1(2a46a542c29a07b31a6bfa72a2f4d4d26699c13d) )
@@ -1297,7 +1297,7 @@ ROM_START( skysharbl )
 	ROM_LOAD( "1c.ic3", 0x20000, 0x10000, CRC(64f3d88f) SHA1(d0155cfb0a8885d58e34141f9696b9aa208440ca) )
 	ROM_LOAD( "1d.ic4", 0x30000, 0x10000, CRC(3b23a9fc) SHA1(2ac34445618e17371b5eed7eb6f43da4dbb99e28) )
 
-	// This set uses 4 (four) ROMs for the MCU, named "1-A", "1-B", "1-C" and "1-D" on a small subboard along with the TMS320C10
+	// This set uses 4 (four) Fujitsu MB7132E PROMs for the MCU, named "1-A", "1-B", "1-C" and "1-D" on a small subboard along with the TMS320C10NL.
 	// These ROMs are currently undumped, so we're using the DSP code from the other sets.
 	ROM_REGION( 0x2000, "dsp", 0 ) // Co-Processor TMS320C10 MCU code
 	ROM_LOAD16_BYTE( "82s191_r.bin", 0x0001, 0x0800, BAD_DUMP CRC(5b96ae3f) SHA1(e5dca3180bc2b9a2957b55a045e6c2d74ac72873) ) // Not dumped on this set
@@ -1421,7 +1421,7 @@ GAME( 1987, fsharkb,   fshark,   fshark,    fshark,    twincobr_state, init_twin
 GAME( 1987, hishouzab, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Hishou Zame (Japan, bootleg)",          0 )
 GAME( 1987, fsharkbt,  fshark,   fsharkbt,  skyshark,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flying Shark (bootleg with 8741)",      0 )
 GAME( 1987, fnshark,   fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Flyin' Shark (bootleg of Hishou Zame)", 0 )
-GAME( 1987, skysharbl, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                   0 )
+GAME( 1987, skysharkb, fshark,   fshark,    hishouza,  twincobr_state, init_twincobr, ROT270, "bootleg",                                               "Sky Shark (bootleg)",                   0 )
 GAME( 1987, twincobr,  0,        twincobrw, twincobr,  twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Twin Cobra (World)",                    0 )
 GAME( 1987, twincobru, twincobr, twincobrw, twincobru, twincobr_state, init_twincobr, ROT270, "Toaplan / Taito America Corporation (Romstar license)", "Twin Cobra (US)",                       0 )
 GAME( 1987, ktiger,    twincobr, twincobr,  ktiger,    twincobr_state, init_twincobr, ROT270, "Toaplan / Taito Corporation",                           "Kyukyoku Tiger (Japan)",                0 )
