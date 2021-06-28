@@ -2,6 +2,10 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+General usage instructions: Keep pressing Ctrl until you get the choice of Yes or No.
+Press left-arrow to choose Yes. Press Ctrl. Press M so that GAME flashes. Press Ctrl and the game will start.
+
 -->
 
 <softwarelist name="svmu" description="Sega Visual Memory Unit quickloads">
