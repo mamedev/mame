@@ -607,7 +607,7 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		logerror("-- PCB: %s", get_feature("pcb"));
 		if (m_pcb_id == UNSUPPORTED_BOARD)
-			logerror(" (currently not supported by MESS)");
+			logerror(" (currently not supported by MAME)");
 		logerror("\n");
 	}
 	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
