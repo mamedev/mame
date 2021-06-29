@@ -4,22 +4,22 @@
 
     Super A'Can sound driver (UM6619)
 
-	The UM6619 integrates:
+    The UM6619 integrates:
 
-	implemented here:
+    implemented here:
 
-	Custom audio hardware
+    Custom audio hardware
 
-	implemented in supracan_um6618_cpu.cpp:
+    implemented in supracan_um6618_cpu.cpp:
 
-	6502 CPU
-	DMA Controller
-	Pad Interface for 2 controllers
+    6502 CPU
+    DMA Controller
+    Pad Interface for 2 controllers
 
 
-	Currently has a number of unknown registers and functionality.
+    Currently has a number of unknown registers and functionality.
 
-	--------------
+    --------------
 
     There are 6 interrupt sources on the 6502 side, all of which use the IRQ line.
     The register at 0x411 is bitmapped to indicate what source(s) are active.
@@ -41,7 +41,7 @@
 
 #include "supracan_um6619_audiosoc.h"
 
-#define VERBOSE		(0)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 // device type definition

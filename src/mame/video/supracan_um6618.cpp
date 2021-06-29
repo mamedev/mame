@@ -2,12 +2,12 @@
 // copyright-holders:Angelo Salese,Ryan Holtz,David Haywood
 
 /*
-	The UM6619 integrates:
+    The UM6619 integrates:
 
-	Video Controller (Tilemaps + Roz Tilemaps + Sprites)
-	Palette Controller + RAM
-	Sprite DMA Controller
-	Interrupt Generation
+    Video Controller (Tilemaps + Roz Tilemaps + Sprites)
+    Palette Controller + RAM
+    Sprite DMA Controller
+    Interrupt Generation
 
     Known unemulated graphical effects and issues:
     - All: Sprite sizing is still imperfect.
@@ -1063,47 +1063,47 @@ void supracan_um6618_video_device::video_w(offs_t offset, uint16_t data, uint16_
 
 	 0x00: .pp. PPPF CXSM MMfF
 
-		. = reserved
-		p = PRT              Priority 
-		P = PS               Page Size
-		F = FS               Tile Size, 0 = 8x8, 1 = 16x16
-		C = C2               2 Colour Mode
-		X = MIX              Depth? Blend? 0 = 16, 1 = 256
-		S = SC               Wrap
-		M = MSC              Mosaic
-		f = XF               X Flip / Mirror
-		F = YF               Y Flip / Mirror
+	    . = reserved
+	    p = PRT              Priority
+	    P = PS               Page Size
+	    F = FS               Tile Size, 0 = 8x8, 1 = 16x16
+	    C = C2               2 Colour Mode
+	    X = MIX              Depth? Blend? 0 = 16, 1 = 256
+	    S = SC               Wrap
+	    M = MSC              Mosaic
+	    f = XF               X Flip / Mirror
+	    F = YF               Y Flip / Mirror
 
 	 0x02: .XY. SMIA .... ....
 
-		. = reserved
-		X = XO EN            X Offset Enable
-		Y = YO EN            Y Offset Enable
-		S = YM SEL
-		M = YM EN            Y Mapping Enable
-		I = IM               Alt format for tile data?
-		A = A1               Linescroll?
+	    . = reserved
+	    X = XO EN            X Offset Enable
+	    Y = YO EN            Y Offset Enable
+	    S = YM SEL
+	    M = YM EN            Y Mapping Enable
+	    I = IM               Alt format for tile data?
+	    A = A1               Linescroll?
 
-	 0x04: .... .XXX XXXX XXXX  
+	 0x04: .... .XXX XXXX XXXX
 	 0x06: .... .YYY YYYY YYYY
 
-		. = reserved
-		X = SPX             Scroll Position X
-		Y = SPY             Scroll Position Y
+	    . = reserved
+	    X = SPX             Scroll Position X
+	    Y = SPY             Scroll Position Y
 
-	 0x08: PPPP PPPP PPPP P...    
+	 0x08: PPPP PPPP PPPP P...
 
-		P = PNTBK 17-5      Pointer to Tilemap data
+	    P = PNTBK 17-5      Pointer to Tilemap data
 
 	 0x0A: GGGG G... .... ....
 
-		G = PGTBK 17-13     Pointer to Graphic data
+	    G = PGTBK 17-13     Pointer to Graphic data
 
 	 0x0C: XXXX XXXX XXXX XXXX
 	 0x0E: YYYY YYYY YYYY YYYY
 
-		X = XOBK 17-2       Pointer to X Offset data?
-		Y = YMBK 17-2       Pointer to rowscroll data
+	    X = XOBK 17-2       Pointer to X Offset data?
+	    Y = YMBK 17-2       Pointer to rowscroll data
 
 	 0x10: YYYY YYYY YYY. ....
 
@@ -1147,28 +1147,28 @@ void supracan_um6618_video_device::video_w(offs_t offset, uint16_t data, uint16_
 		m_screen_mode_control = data;//(data & 8) ? 0 : 1;
 
 		/*
-		
+
 		fedcba9876543210
 
 		...........pplll
 
 		. = reserved
 		p = pmode
-		l = num layer/depth config	
+		l = num layer/depth config
 
 		l = 000 : 4/2, 4/2, 4/2, 4/2
 		    001 : 16, 16, 4/2
-			010 : 256, 16
-			011 : 16/Y, 16/Y, 2
-			100 : 256/Y, 4/2/Y
-			101 : invalid
-			110 : invalid
-			111 : invalid
+		    010 : 256, 16
+		    011 : 16/Y, 16/Y, 2
+		    100 : 256/Y, 4/2/Y
+		    101 : invalid
+		    110 : invalid
+		    111 : invalid
 
 		p = 00 : tile mode
 		    01 : bitmap mode
-			10 : unknown
-			11 : invalid
+		    10 : unknown
+		    11 : invalid
 
 		*/
 #if 0

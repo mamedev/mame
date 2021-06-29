@@ -2,21 +2,21 @@
 // copyright-holders:Angelo Salese,Ryan Holtz,David Haywood
 
 /*
-	Super A'Can sound driver (UM6619)
- 
-	The UM6619 integrates:
+    Super A'Can sound driver (UM6619)
 
-	implemented here:
+    The UM6619 integrates:
 
-	6502 CPU
-	DMA Controller
-	Pad Interface for 2 controllers
+    implemented here:
 
-	implemented in audio/supracan_um6619_audiosoc.cpp
+    6502 CPU
+    DMA Controller
+    Pad Interface for 2 controllers
 
-	Custom audio hardware
+    implemented in audio/supracan_um6619_audiosoc.cpp
 
-	see audio/supracan_um6619_audiosoc.cpp for further notes
+    Custom audio hardware
+
+    see audio/supracan_um6619_audiosoc.cpp for further notes
 
 */
 
@@ -339,7 +339,7 @@ void supracan_um6619_cpu_device::dma_w(int offset, uint16_t data, uint16_t mem_m
 		if (data & 0x8800)
 		{
 			//if (data & 0x2000)
-			//	m_dma_regs.source-=2;
+			//  m_dma_regs.source-=2;
 			LOGMASKED(LOG_DMA, "dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", m_dma_regs.source[ch], m_dma_regs.dest[ch], m_dma_regs.count[ch] + 1, data);
 
 			for (int i = 0; i <= m_dma_regs.count[ch]; i++)
