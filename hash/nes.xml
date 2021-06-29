@@ -53748,7 +53748,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Extracted from the Caltron 9-in-1 prototype. A real Super Gun cartridge has been dump but is unavailable. This should be replaced with a real dump if it differs. -->
+<!-- Extracted from the Caltron 9-in-1 prototype. A real Super Gun cartridge has been dumped but is unavailable. This extracted rom should be replaced with a real dump if it differs. -->
 	<software name="supergun">
 		<description>Super Gun (Asia)</description>
 		<year>1992</year>
@@ -53911,6 +53911,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="ntdec_asder" />
 			<feature name="pcb" value="NTDEC-112" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="32768">
 				<rom name="master shooter (asia) (unl).chr" size="32768" crc="b2faa272" sha1="d7c69d6fe8367b4950ca330e6892183331ffe8be" offset="00000" status="baddump" />
 			</dataarea>
