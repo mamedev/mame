@@ -2,44 +2,69 @@
 // copyright-holders:Ryan Holtz, superctr
 /***************************************************************************
 
-    Super A'Can sound driver
+    Super A'Can sound driver (UM6619)
 
-    Currently has a number of unknown registers and functionality.
+	The UM6619 integrates:
+
+	implemented here:
+
+	Custom audio hardware
+
+	implemented in supracan_um6618_cpu.cpp:
+
+	6502 CPU
+	DMA Controller
+	Pad Interface for 2 controllers
+
+
+	Currently has a number of unknown registers and functionality.
+
+	--------------
+
+    There are 6 interrupt sources on the 6502 side, all of which use the IRQ line.
+    The register at 0x411 is bitmapped to indicate what source(s) are active.
+    In priority order from most to least important, they are:
+
+    411 value  How acked                     Notes
+    0x40       read reg 0x16 of sound chip   used for DMA-driven sample playback. Register 0x16 may contain which DMA-driven samples are active.
+    0x04       read at 0x405                 latch 1?  0xcd is magic value
+    0x08       read at 0x404                 latch 2?  0xcd is magic value
+    0x10       read at 0x409                 unknown, dispatched but not used in startup 6502 code
+    0x20       read at 0x40a                 IRQ request from 68k, flags data available in shared-RAM mailbox
+    0x80       read reg 0x14 of sound chip   depends on reg 0x14 of sound chip & 0x40: if not set writes 0x8f to reg 0x14,
+                                             otherwise writes 0x4f to reg 0x14 and performs additional processing
+
 
 ****************************************************************************/
 
 #include "emu.h"
-#include "acan.h"
 
-#define VERBOSE     (1)
+#include "supracan_um6619_audiosoc.h"
+
+#define VERBOSE		(0)
 #include "logmacro.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(ACANSND, acan_sound_device, "acansound", "Super A'Can Audio")
+DEFINE_DEVICE_TYPE(SUPRACAN_UM6619_AUDIOSOC, supracan_um6619_audiosoc, "um6619_soc", "UM6619 Audio System on a Chip")
 
-acan_sound_device::acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACANSND, tag, owner, clock)
+supracan_um6619_audiosoc::supracan_um6619_audiosoc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: supracan_um6619_cpu_device(mconfig, SUPRACAN_UM6619_AUDIOSOC, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_timer(nullptr)
-	, m_timer_irq_handler(*this)
-	, m_dma_irq_handler(*this)
-	, m_ram_read(*this)
 	, m_active_channels(0)
 	, m_dma_channels(0)
 {
 }
 
 
-void acan_sound_device::device_start()
+void supracan_um6619_audiosoc::device_start()
 {
+	supracan_um6619_cpu_device::device_start();
+
 	m_stream = stream_alloc(0, 2, clock() / 16 / 5);
 	m_mix = std::make_unique<int32_t[]>((clock() / 16 / 5) * 2);
 	m_timer = timer_alloc(0);
-
-	m_timer_irq_handler.resolve_safe();
-	m_dma_irq_handler.resolve_safe();
-	m_ram_read.resolve_safe(0);
 
 	// register for savestates
 	save_item(NAME(m_active_channels));
@@ -60,22 +85,26 @@ void acan_sound_device::device_start()
 	save_item(NAME(m_regs));
 }
 
-void acan_sound_device::device_reset()
+void supracan_um6619_audiosoc::device_reset()
 {
+	supracan_um6619_cpu_device::device_reset();
+
 	m_active_channels = 0;
 	m_dma_channels = 0;
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
 	m_timer->reset();
-	m_timer_irq_handler(0);
-	m_dma_irq_handler(0);
+	set_sound_irq(7, 0); // Timer IRQ
+	set_sound_irq(6, 0); // DMA IRQ
 }
 
-void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void supracan_um6619_audiosoc::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+	supracan_um6619_cpu_device::device_timer(timer, id, param, ptr);
+
 	if (m_regs[0x14] & 0x40)
 	{
-		m_timer_irq_handler(1);
+		set_sound_irq(7, 1); // timer irq
 
 		// Update frequency
 		uint16_t period = (m_regs[0x12] << 8) + m_regs[0x11];
@@ -83,7 +112,7 @@ void acan_sound_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void supracan_um6619_audiosoc::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	std::fill_n(&m_mix[0], outputs[0].samples() * 2, 0);
 
@@ -96,7 +125,7 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 			for (int s = 0; s < outputs[0].samples(); s++)
 			{
-				uint8_t data = m_ram_read(channel.curr_addr) + 0x80;
+				uint8_t data = m_soundram[channel.curr_addr] + 0x80;
 				int16_t sample = (int16_t)(data << 8);
 
 				channel.frac += channel.addr_increment;
@@ -110,7 +139,7 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 				{
 					if (channel.register9)
 					{
-						m_dma_irq_handler(1);
+						set_sound_irq(6, 1); // dma IRQ
 						keyon_voice(i);
 					}
 					else if (channel.one_shot)
@@ -134,22 +163,24 @@ void acan_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 	}
 }
 
-uint8_t acan_sound_device::read(offs_t offset)
+uint8_t supracan_um6619_audiosoc::sound_read(offs_t offset)
 {
+	m_stream->update();
+
 	if (offset == 0x14)
 	{
 		// acknowledge timer IRQ?
-		m_timer_irq_handler(0);
+		set_sound_irq(7, 0);
 	}
 	else if (offset == 0x16)
 	{
 		// acknowledge DMA IRQ?
-		m_dma_irq_handler(0);
+		set_sound_irq(6, 0);
 	}
 	return m_regs[offset];
 }
 
-void acan_sound_device::keyon_voice(uint8_t voice)
+void supracan_um6619_audiosoc::keyon_voice(uint8_t voice)
 {
 	acan_channel &channel = m_channels[voice];
 	channel.curr_addr = channel.start_addr << 6;
@@ -160,8 +191,10 @@ void acan_sound_device::keyon_voice(uint8_t voice)
 	//printf("Keyon voice %d\n", voice);
 }
 
-void acan_sound_device::write(offs_t offset, uint8_t data)
+void supracan_um6619_audiosoc::sound_write(offs_t offset, uint8_t data)
 {
+	m_stream->update();
+
 	const uint8_t upper = (offset >> 4) & 0x0f;
 	const uint8_t lower = offset & 0x0f;
 
