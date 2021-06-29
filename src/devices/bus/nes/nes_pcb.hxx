@@ -110,6 +110,7 @@ static const nes_pcb pcb_list[] =
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
+	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
 	{ "sa009",            SACHEN_SA009 },
 	{ "sa0036",           SACHEN_SA0036 },
 	{ "sa0037",           SACHEN_SA0037 },
