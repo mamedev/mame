@@ -26,16 +26,13 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 
 TODO:
+- printer or hopper emulation
 - the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode)
 - the Oki sounds terribly, only missing banking or what's going on?
-- controls / dips need to be completed;
-- currently stuck at the call assistant screen due to vendor test failing (printer?), but can enter test mode.
-  To test, it's possible to get to the title screen with the following debugger commands:
-  bpset ed0,1,{do PC=edc;g}
-  bpset ee2,1,{do PC=ee4;g}
-  bpset f20,1,{do PC=f24;g}
-  bpset f28,1,{do PC=f30;g}
-  soft reset (F3)
+- controls / dips need to be completed and better arranged;
+- currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
+  To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
+  mariound won't let you coin up, while tvphoned will go back to the call assistant screen shortly after starting (both believed to be because of missing printer or hopper emulation)
 */
 
 #include "emu.h"
@@ -221,7 +218,7 @@ void banprestoms_state::prg_map(address_map &map)
 	//map(0xc0140, 0xc0141).nopw();
 	map(0xe0000, 0xe0001).portr("DSW1");
 	map(0xe0002, 0xe0003).portr("IN1");
-	map(0xe0004, 0xe0005).portr("IN2");
+	map(0xe0004, 0xe0005).portr("IN2"); //.lr16(NAME([this] () -> uint16_t { return (machine().rand() & 0x0004) | (ioport("IN2")->read() & 0xfffb); }));
 }
 
 static INPUT_PORTS_START( tvphoned )
@@ -244,14 +241,14 @@ static INPUT_PORTS_START( tvphoned )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON13 ) // Card Emp in switch test
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON14 ) // Card Pos in switch test
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Card Pay in switch test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED ) // ?
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED ) // ?
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON16 ) // Hook in switch test
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON13 ) // Card Emp in switch test
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON14 ) // Card Pos in switch test
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Card Pay in switch test
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
+	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // ?
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) // Hook in switch test
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED ) // couldn't find anything from here on
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -287,6 +284,73 @@ static INPUT_PORTS_START( tvphoned )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show any effect in switch test in test mode
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // upper space on the feet platform
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // right space on the feet platform
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) // lower space on the feet platform
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) // left space on the feet platform
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) // left central space on the feet platform
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) // right central space on the feet platform
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW ) // also used to navigate in test mode
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON7 ) // Card Emp
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON8 ) // Card Pos
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON9 ) // Card Pay
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("DSW1") // marked SW0913 on PCB
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -316,8 +380,8 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( gfx_banprestoms )
 	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 )
-	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by Doraemon
-	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by Doraemon
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
+	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x100, 0x10 ) // TODO, doesn't seem to be used by the dumped games
 	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x100, 0x10 )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x200, 0x10 )
 GFXDECODE_END
@@ -388,10 +452,44 @@ ROM_START( tvphoned )
 	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
 	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
 	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
+ROM_END
 
+ROM_START( marioun )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s98_b02.u15",  0x00000, 0x20000, CRC(d88eecfc) SHA1(5a15a1f925ae10e439e5aee8f3ef5a2fa956b80f) )
+	ROM_LOAD16_BYTE( "s98_b01.u14",  0x00001, 0x20000, CRC(60f5e7b0) SHA1(ccbdc42d0d59ec4f96ced682afd879c9fa9f24cc) )
+
+	ROM_REGION( 0x80000, "spr_gfx", 0 )
+	ROM_LOAD( "s98_a05.u119", 0x00000, 0x80000, CRC(b8317dd8) SHA1(37f0be38607e40d7925faf9731b95577cbd56bb0) )
+
+	ROM_REGION( 0x80000, "gfx_tiles", 0 )
+	ROM_LOAD( "s98_a04.u18", 0x00000, 0x80000, CRC(b107c5a0) SHA1(d4e7ef71bfb9a10e72b6292405d0378c95ebba25) ) // TODO: are all of the following used? in attract it seems only fg_gfx and tx_gfx are used
+
+	ROM_REGION( 0x80000, "bg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "md_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "fg_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "tx_gfx", 0 )
+	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "s98_a03.u17", 0x000000, 0x100000, CRC(d6b89223) SHA1(7d7ab34decb994caac82178455f014628cf070b8) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "sc001.u110", 0x000, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc002.u235", 0x200, 0x104, NO_DUMP ) // tibpal16l8-25cn
+	ROM_LOAD( "sc003.u36",  0x400, 0x155, NO_DUMP ) // 18cv8pc-25
+	ROM_LOAD( "sc004c.u68", 0x600, 0x117, NO_DUMP ) // gal16v8a
+	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
 ROM_END
 
 } // Anonymous namespace
 
 
 GAME( 1991, tvphoned, 0, banprestoms, tvphoned, banprestoms_state, empty_init, ROT0, "Banpresto", "TV Phone Doraemon", MACHINE_IS_SKELETON )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, empty_init, ROT0, "Banpresto", "Mario Sports Day",  MACHINE_IS_SKELETON )
