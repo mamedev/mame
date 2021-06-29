@@ -61,9 +61,9 @@
   or manually with the command RUN "<shortname of program in list>"
 
   As for the CC-40+, the product was finalized, but in the end it wasn't released.
-  The hardware is very similar to CC-40. The main differences are the CPU:
-  a TMS70C40 (twice larger internal ROM), and a cassette port separate from Hexbus.
-  The controller chip is a TI TP0373 this time, it appears that the basic functionality
+  The hardware is very similar to CC-40. The main differences are a TMS70C40 CPU
+  (twice larger internal ROM), and a cassette port separate from Hexbus. The
+  controller chip is a TI TP0373 this time, it appears that the basic functionality
   is the same as the one by AMI. Like the CC-40, it had either 6KB or 18KB RAM.
 
   The CC-40+ cassette device number is 1, eg. SAVE"1.FILENAME" to save, and

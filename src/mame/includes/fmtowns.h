@@ -394,6 +394,7 @@ private:
 	static const device_timer_id TIMER_WAIT = 5;
 	static const device_timer_id TIMER_CDSTATUS = 6;
 	static const device_timer_id TIMER_CDDA = 7;
+	static const device_timer_id TIMER_SPRITES = 8;
 	void freerun_inc();
 	void intervaltimer2_timeout();
 	void poll_keyboard();
@@ -413,7 +414,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
-	TIMER_CALLBACK_MEMBER(draw_sprites);
+	void draw_sprites();
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);

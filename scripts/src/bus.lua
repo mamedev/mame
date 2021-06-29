@@ -1614,6 +1614,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/bblue2.h",
 		MAME_DIR .. "src/devices/bus/isa/3xtwin.cpp",
 		MAME_DIR .. "src/devices/bus/isa/3xtwin.h",
+		MAME_DIR .. "src/devices/bus/isa/lrk330.cpp",
+		MAME_DIR .. "src/devices/bus/isa/lrk330.h",
 	}
 end
 
@@ -1741,6 +1743,24 @@ if (BUSES["MTX"]~=null) then
 		MAME_DIR .. "src/devices/bus/mtx/exp.h",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.cpp",
 		MAME_DIR .. "src/devices/bus/mtx/sdx.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/mc10/mc10_cart.h,BUSES["MC10"] = true
+---------------------------------------------------
+if (BUSES["MC10"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mc10/mc10_cart.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/mc10_cart.h",
+		MAME_DIR .. "src/devices/bus/mc10/mcx128.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/mcx128.h",
+		MAME_DIR .. "src/devices/bus/mc10/pak.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/pak.h",
+		MAME_DIR .. "src/devices/bus/mc10/ram.cpp",
+		MAME_DIR .. "src/devices/bus/mc10/ram.h",
 	}
 end
 
@@ -2462,6 +2482,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/suprterminal.h",
 		MAME_DIR .. "src/devices/bus/a2bus/timemasterho.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/timemasterho.h",
+		MAME_DIR .. "src/devices/bus/a2bus/titan3plus2.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/titan3plus2.h",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/transwarp.h",
 		MAME_DIR .. "src/devices/bus/a2bus/uniprint.cpp",
@@ -2811,6 +2833,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/rexsoft.h",
 		MAME_DIR .. "src/devices/bus/nes/sachen.cpp",
 		MAME_DIR .. "src/devices/bus/nes/sachen.h",
+		MAME_DIR .. "src/devices/bus/nes/sealie.cpp",
+		MAME_DIR .. "src/devices/bus/nes/sealie.h",
 		MAME_DIR .. "src/devices/bus/nes/somari.cpp",
 		MAME_DIR .. "src/devices/bus/nes/somari.h",
 		MAME_DIR .. "src/devices/bus/nes/subor.cpp",
@@ -3479,16 +3503,26 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_sym12.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_t4426.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_wpk.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_wpk.h",
+		MAME_DIR .. "src/devices/bus/coco/coco_wpk2p.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_wpk2p.h",
 		MAME_DIR .. "src/devices/bus/coco/cococart.cpp",
 		MAME_DIR .. "src/devices/bus/coco/cococart.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_amtor.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_amtor.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_claw.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_claw.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbsnd.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_jcbspch.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_msx2.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_msx2.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_serial.cpp",
+		MAME_DIR .. "src/devices/bus/coco/dragon_serial.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.cpp",
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.h",
 	}
@@ -4465,8 +4499,6 @@ if (BUSES["SAITEK_OSA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/expansion.h",
-		MAME_DIR .. "src/devices/bus/saitek_osa/modules.cpp",
-		MAME_DIR .. "src/devices/bus/saitek_osa/modules.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.cpp",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestro.h",
 		MAME_DIR .. "src/devices/bus/saitek_osa/maestroa.cpp",

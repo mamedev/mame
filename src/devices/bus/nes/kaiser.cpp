@@ -11,12 +11,13 @@
  * Kaiser KS202
  * Kaiser KS7012
  * Kaiser KS7013B
+ * Kaiser KS7016
  * Kaiser KS7017
  * Kaiser KS7022
+ * Kaiser KS7031
  * Kaiser KS7032
- * Kaiser KS7058
- * Kaiser KS7016
  * Kaiser KS7037
+ * Kaiser KS7058
 
  The Kaiser KS7057 bootleg board is emulated in nes_mmc3_clones.cpp
 
@@ -291,7 +292,7 @@ void nes_ks7037_device::pcb_reset()
 
  iNES: mapper 171
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -318,7 +319,7 @@ void nes_ks7058_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 175
 
- In MESS: Supported?
+ In MAME: Supported?
 
  -------------------------------------------------*/
 
@@ -354,12 +355,12 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
  Games: A few FDS conversions like Bubble Bobble
         or SMB2
 
- iNES:
-
  TODO: available dumps do not seem to use WRAM...
  yet m_reg[4] should switch WRAM bank... investigate!
 
- In MESS: Supported?
+ iNES: mapper 142
+
+ In MAME: Supported?
 
  -------------------------------------------------*/
 
@@ -431,9 +432,9 @@ uint8_t nes_ks7032_device::read_m(offs_t offset)
 
  Games: Super Mario Bros. 3 (Pirate, Alt)
 
- iNES:
+ iNES: mapper 56
 
- In MESS: Supported?
+ In MAME: Supported?
 
  -------------------------------------------------*/
 
@@ -475,9 +476,9 @@ uint8_t nes_ks202_device::read_m(offs_t offset)
 
  Games: Almana no Kiseki FDS conversion
 
- iNES:
+ NES 2.0: mapper 303
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -551,9 +552,9 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 
  Games: Zanac FDS Conversion
 
- iNES:
+ NES 2.0: mapper 346
 
- In MESS: Not working
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -574,9 +575,9 @@ void nes_ks7012_device::write_h(offs_t offset, uint8_t data)
 
  Games: Highway Star FDS Conversion
 
- iNES:
+ NES 2.0: mapper 312
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -607,9 +608,9 @@ void nes_ks7013b_device::write_h(offs_t offset, uint8_t data)
 
  TODO: understand how SRAM is handled...
 
- iNES:
+ NES 2.0: mapper 302
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -640,9 +641,9 @@ void nes_ks7031_device::write_h(offs_t offset, uint8_t data)
 
  Games: Exciting Basket FDS Conversion
 
- iNES:
+ NES 2.0: mapper 306
 
- In MESS: Unsupported.
+ In MAME: Unsupported.
 
  -------------------------------------------------*/
 

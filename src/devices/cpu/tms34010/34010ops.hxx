@@ -2458,16 +2458,16 @@ void tms340x0_device::setcdp(uint16_t op)
 			// .. only single bit set, pitch is power of two!
 			case 1:
 			{
-				m_convdp = 32 - count_leading_zeros(dptch);
+				m_convdp = 32 - count_leading_zeros_32(dptch);
 				COUNT_CYCLES(4);
 				return;
 			}
 			// .. two bits, we can decompose it to sum of two power of two numbers
 			case 2:
 			{
-				uint8_t first_one = count_leading_zeros(dptch);
+				uint8_t first_one = count_leading_zeros_32(dptch);
 				uint8_t v1 = 32 - first_one;
-				uint8_t v2 = 32 - count_leading_zeros(dptch & ~(1 << (first_one - 1)));
+				uint8_t v2 = 32 - count_leading_zeros_32(dptch & ~(1 << (first_one - 1)));
 
 				m_convdp = v2 | (v1 << 8);
 				COUNT_CYCLES(6);

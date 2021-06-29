@@ -18,7 +18,6 @@
 
     TODO:
 
-    - cursor is missing
     - where do CDET and NMD1 connect to ??
     - i/o port 8051
     - screen contrast
@@ -38,6 +37,7 @@
 #include "bus/pofo/ccm.h"
 #include "bus/pofo/exp.h"
 #include "machine/nvram.h"
+#include "machine/pofo_kbd.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/pcd3311.h"
@@ -78,24 +78,22 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M80C88A_TAG),
 		m_lcdc(*this, HD61830_TAG),
+		m_keyboard(*this, "keyboard"),
 		m_dtmf(*this, PCD3311T_TAG),
 		m_ccm(*this, PORTFOLIO_MEMORY_CARD_SLOT_A_TAG),
-		m_exp(*this, PORTFOLIO_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_timer_tick(*this, TIMER_TICK_TAG),
 		m_nvram(*this, "nvram"),
 		m_ram(*this, "ram"),
 		m_rom(*this, M80C88A_TAG),
 		m_char_rom(*this, HD61830_TAG),
-		m_y(*this, "Y%01u", 0),
-		m_battery(*this, "BATTERY"),
-		m_keylatch(0xff)
+		m_battery(*this, "BATTERY")
 	{ }
 
 	void portfolio(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void portfolio_io(address_map &map);
@@ -104,7 +102,6 @@ private:
 
 	void check_interrupt();
 	void trigger_interrupt(int level);
-	void scan_keyboard();
 
 	enum
 	{
@@ -116,10 +113,10 @@ private:
 
 	enum
 	{
-		ROM_APP,
-		CCM_A,
-		CCM_B,
-		ROM_EXT
+		ROM_APP = 0b000, // 0
+		CCM_A   = 0b011, // 3
+		CCM_B   = 0b111, // 7
+		ROM_EXT = 0b010, // 2
 	};
 
 	uint8_t mem_r(offs_t offset);
@@ -129,7 +126,6 @@ private:
 	void io_w(offs_t offset, uint8_t data);
 
 	uint8_t irq_status_r();
-	uint8_t keyboard_r();
 	uint8_t battery_r();
 	uint8_t counter_r(offs_t offset);
 
@@ -142,9 +138,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_int_w );
 
 	void portfolio_palette(palette_device &palette) const;
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	uint8_t hd61830_rd_r(offs_t offset);
@@ -152,6 +148,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
+	required_device<pofo_keyboard_device> m_keyboard;
 	required_device<pcd3311_device> m_dtmf;
 	required_device<portfolio_memory_card_slot_device> m_ccm;
 	required_device<portfolio_expansion_slot_device> m_exp;
@@ -160,13 +157,11 @@ private:
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_rom;
 	required_region_ptr<uint8_t> m_char_rom;
-	required_ioport_array<8> m_y;
 	required_ioport m_battery;
 
 	uint8_t m_ip;
 	uint8_t m_ie;
 	uint16_t m_counter;
-	uint8_t m_keylatch;
 	int m_rom_b;
 };
 
@@ -224,6 +219,13 @@ WRITE_LINE_MEMBER( portfolio_state::wake_w )
 	// TODO
 }
 
+WRITE_LINE_MEMBER( portfolio_state::keyboard_int_w )
+{
+	if (state)
+	{
+		trigger_interrupt(INT_KEYBOARD);
+	}
+}
 
 //-------------------------------------------------
 //  irq_status_r - interrupt status read
@@ -231,9 +233,17 @@ WRITE_LINE_MEMBER( portfolio_state::wake_w )
 
 uint8_t portfolio_state::irq_status_r()
 {
-	return m_ip;
-}
+	uint8_t data = m_ip;
+	/*
+	    The BIOS interrupt 11h (Equipment list) reports that the second floppy drive (B:) is
+	    installed if the 3rd bit is set (which is also the external interrupt line).
+	    It is not clear if the ~NMD1 line is OR or XORed or muxed with the interrupt line,
+	    but this way seems to work.
+	*/
+	data |= !m_exp->nmd1_r() << 3;
 
+	return data;
+}
 
 //-------------------------------------------------
 //  irq_mask_w - interrupt enable mask
@@ -279,80 +289,6 @@ IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 
 	return vector;
 }
-
-
-
-//**************************************************************************
-//  KEYBOARD
-//**************************************************************************
-
-//-------------------------------------------------
-//  scan_keyboard - scan keyboard
-//-------------------------------------------------
-
-void portfolio_state::scan_keyboard()
-{
-	uint8_t keycode = 0xff;
-
-	for (int row = 0; row < 8; row++)
-	{
-		uint8_t data = static_cast<int>(m_y[row]->read());
-
-		if (data != 0xff)
-		{
-			for (int col = 0; col < 8; col++)
-			{
-				if (!BIT(data, col))
-				{
-					keycode = (row * 8) + col;
-				}
-			}
-		}
-	}
-
-	if (keycode != 0xff)
-	{
-		// key pressed
-		if (keycode != m_keylatch)
-		{
-			m_keylatch = keycode;
-
-			trigger_interrupt(INT_KEYBOARD);
-		}
-	}
-	else
-	{
-		// key released
-		if (!(m_keylatch & 0x80))
-		{
-			m_keylatch |= 0x80;
-
-			trigger_interrupt(INT_KEYBOARD);
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
-//-------------------------------------------------
-
-TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
-{
-	scan_keyboard();
-}
-
-
-//-------------------------------------------------
-//  keyboard_r - keyboard scan code register
-//-------------------------------------------------
-
-uint8_t portfolio_state::keyboard_r()
-{
-	return m_keylatch;
-}
-
-
 
 //**************************************************************************
 //  SOUND
@@ -433,10 +369,10 @@ uint8_t portfolio_state::battery_r()
 
 	    bit     signal      description
 
-	    0       ?           1=boots from B:
-	    1       ?           1=boots from external ROM
-	    2       ?           1=boots from B:
-	    3       ?           1=boots from ???
+	    0       ?           bit 0 from bus select (m_rom_b)
+	    1       ?
+	    2       ?           bit 2 from bus select (m_rom_b)
+	    3       ?
 	    4       ?
 	    5       PDET        1=peripheral connected
 	    6       LOWB        0=battery low
@@ -445,6 +381,14 @@ uint8_t portfolio_state::battery_r()
 	*/
 
 	uint8_t data = 0;
+
+	/*
+	    Partially stores what has been written into this port.
+	    Used by interrupt 61h service 24h (Get ROM/CCM state).
+	    Setting bit 1 here causes the BIOS to permanently wedge the external ROM
+	    select on, so mask it out as a workaround.
+	*/
+	data |= (m_rom_b & 0b101);
 
 	// peripheral detect
 	data |= m_exp->pdet_r() << 5;
@@ -479,13 +423,7 @@ void portfolio_state::select_w(uint8_t data)
 
 	if (LOG) logerror("%s %s SELECT %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
-	switch (data & 0x0f)
-	{
-	case 3: m_rom_b = CCM_A; break;
-	case 7: m_rom_b = CCM_B; break;
-	case 0: m_rom_b = ROM_APP; break;
-	case 2: m_rom_b = ROM_EXT; break;
-	}
+	m_rom_b = data & 0x0f;
 }
 
 
@@ -602,6 +540,10 @@ uint8_t portfolio_state::mem_r(offs_t offset)
 		case ROM_EXT:
 			// TODO
 			break;
+
+		default:
+			logerror("%s %s Invalid bus read %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+			break;
 		}
 	}
 	else if (offset >= 0xe0000)
@@ -646,6 +588,14 @@ void portfolio_state::mem_w(offs_t offset, uint8_t data)
 		case CCM_B:
 			ncc1 = 0;
 			break;
+
+		case ROM_EXT:
+		case ROM_APP:
+			break;
+
+		default:
+			logerror("%s %s Invalid bus write %05x\n", machine().time().as_string(), machine().describe_context(), offset & 0x1ffff);
+			break;
 		}
 	}
 
@@ -670,7 +620,7 @@ uint8_t portfolio_state::io_r(offs_t offset)
 		switch ((offset >> 4) & 0x0f)
 		{
 		case 0:
-			data = keyboard_r();
+			data = m_keyboard->read();
 			break;
 
 		case 1:
@@ -703,6 +653,11 @@ uint8_t portfolio_state::io_r(offs_t offset)
 			bcom = 0;
 			break;
 		}
+	}
+	else if (offset == 0x61)
+	{
+		// Magic port to detect the Pofo
+		data = 0x61;
 	}
 
 	data = m_exp->nrdi_r(offset, data, iom, bcom, ncc1);
@@ -819,86 +774,6 @@ void portfolio_state::portfolio_lcdc(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( portfolio )
-	PORT_START("Y0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Atari") PORT_CODE(KEYCODE_TILDE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('^')
-
-	PORT_START("Y1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del Ins") PORT_CODE(KEYCODE_DEL) PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_MAMEKEY(LALT))
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
-
-	PORT_START("Y2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(TAB))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
-
-	PORT_START("Y3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('"') PORT_CHAR('`')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-
-	PORT_START("Y4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-
-	PORT_START("Y5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('8')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-
-	PORT_START("Y6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Fn") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-
-	PORT_START("Y7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-
 	PORT_START("BATTERY")
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
@@ -990,25 +865,10 @@ void portfolio_state::machine_start()
 	save_item(NAME(m_ip));
 	save_item(NAME(m_ie));
 	save_item(NAME(m_counter));
-	save_item(NAME(m_keylatch));
 	save_item(NAME(m_rom_b));
 
 	m_ip = 0;
 }
-
-
-//-------------------------------------------------
-//  machine_reset
-//-------------------------------------------------
-
-void portfolio_state::machine_reset()
-{
-	m_lcdc->reset();
-
-	m_exp->reset();
-}
-
-
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
@@ -1043,6 +903,9 @@ void portfolio_state::portfolio(machine_config &config)
 	m_lcdc->rd_rd_callback().set(FUNC(portfolio_state::hd61830_rd_r));
 	m_lcdc->set_screen(SCREEN_TAG);
 
+	POFO_KEYBOARD(config, m_keyboard);
+	m_keyboard->int_handler().set(FUNC(portfolio_state::keyboard_int_w));
+
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	PCD3311(config, m_dtmf, XTAL(3'578'640)).add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -1057,9 +920,6 @@ void portfolio_state::portfolio(machine_config &config)
 
 	TIMER(config, "counter").configure_periodic(FUNC(portfolio_state::counter_tick), attotime::from_hz(XTAL(32'768)/16384));
 	TIMER(config, TIMER_TICK_TAG).configure_periodic(FUNC(portfolio_state::system_tick), attotime::from_hz(XTAL(32'768)/32768));
-
-	// fake keyboard
-	TIMER(config, "keyboard").configure_periodic(FUNC(portfolio_state::keyboard_tick), attotime::from_usec(2500));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("pofo");

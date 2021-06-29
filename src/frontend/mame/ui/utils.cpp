@@ -20,7 +20,6 @@
 #include "drivenum.h"
 #include "rendfont.h"
 #include "romload.h"
-#include "softlist.h"
 
 #include "corestr.h"
 
@@ -1319,7 +1318,7 @@ class supported_software_filter : public simple_filter_impl_base<software_filter
 public:
 	supported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_YES == info.supported; }
+	virtual bool apply(ui_software_info const &info) const override { return software_support::SUPPORTED == info.supported; }
 };
 
 
@@ -1329,7 +1328,7 @@ class partial_supported_software_filter : public simple_filter_impl_base<softwar
 public:
 	partial_supported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_PARTIAL == info.supported; }
+	virtual bool apply(ui_software_info const &info) const override { return software_support::PARTIALLY_SUPPORTED == info.supported; }
 };
 
 
@@ -1338,7 +1337,7 @@ class unsupported_software_filter : public simple_filter_impl_base<software_filt
 public:
 	unsupported_software_filter(software_filter_data const &data, char const *value, emu_file *file, unsigned indent) { }
 
-	virtual bool apply(ui_software_info const &info) const override { return SOFTWARE_SUPPORTED_NO == info.supported; }
+	virtual bool apply(ui_software_info const &info) const override { return software_support::UNSUPPORTED == info.supported; }
 };
 
 

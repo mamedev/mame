@@ -40,7 +40,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>FORTH v1.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -53,7 +53,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>FORTH v1.1</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -66,7 +66,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>OZLOGO</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -79,7 +79,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Sargon Chess</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -92,7 +92,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>HELP (set 1)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom3 recommended = PAK1]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom3 recommended = PAK1]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -105,7 +105,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>HELP (set 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom3 recommended = PAK1]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom3 recommended = PAK1]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -118,7 +118,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Mydas Dissassembler</description>
 		<year>1984</year>
 		<publisher>Mytek</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -131,7 +131,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Super Disassembler 3.0</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -144,7 +144,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Mytek Word Processor</description>
 		<year>198?</year>
 		<publisher>Mytek</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -157,7 +157,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Microspace Invaders</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -170,7 +170,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Survivor</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -183,7 +183,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Typing Tutor</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -196,7 +196,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 1.0</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -209,7 +209,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 1.2</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -222,7 +222,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 1.2 (Swedish)</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -235,7 +235,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 1.3</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -248,7 +248,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 1.3 Rel 3</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -261,7 +261,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Wordbee 2.0 (Swedish)</description>
 		<year>1982</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [-rom2 recommended]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [-rom2 recommended]"/>
 		<sharedfeat name="compatibility" value="1,2" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -352,7 +352,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom30.mbn" size="0x2000" crc="9aee48e2" sha1="e0598e732b44a08e3f7e77ec63a879ac1434b5ec" />
@@ -365,7 +365,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom31.mbn" size="0x2000" crc="5a904a29" sha1="3120fb65ccefeb180ab80d8d35440c70dc8452c8" />
@@ -378,7 +378,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom32.mbn" size="0x2000" crc="e9f0b82b" sha1="e1f2004a401878468f7f359fd30b0b948ae0eb48" />
@@ -391,7 +391,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom321.mbn" size="0x2000" crc="b07eefaa" sha1="5dab90b2c232673282d215845c9947cc5bdd50c8" />
@@ -404,7 +404,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom321a.mbn" size="0x2000" crc="36852a11" sha1="c45b8d03629e86231c6b256a7435abd87d8872a4" />
@@ -417,7 +417,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom321p.mbn" size="0x2000" crc="3d2e8190" sha1="b4d330e149c4ddaa4a399f90b3ce8a854ddcd271" />
@@ -430,7 +430,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<year>198?</year>
 		<publisher>Microworld</publisher>
 		<info name="usage" value="NET"/>
-		<sharedfeat name="compatibility" value="3" />
+		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_net">
 			<dataarea name="rom" size="0x2000">
 				<rom name="telcom321s.mbn" size="0x2000" crc="00f8fde1" sha1="eb881bbab90c85fd6e29540decd25e884c67f738" />
@@ -468,7 +468,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Viatel 2.0</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -481,7 +481,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Viatel 2.2</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -494,7 +494,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Viatel 2.3</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -507,7 +507,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Videotex 1.1 (Swedish)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -520,7 +520,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Videotex 2.34</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -533,7 +533,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Videotex 2.35</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -546,7 +546,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Shell (pc85)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -559,7 +559,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Shell (pc85b)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -572,7 +572,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Shell (ppc85)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -585,7 +585,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Shell (pc85s)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom7 = PAK5]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom7 = PAK5]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -598,7 +598,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Graphics / Database</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom5 = PAK3]. Database access is PAKn+8"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom5 = PAK3]. Database access is PAKn+8"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x4000">
@@ -611,7 +611,7 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Graphics (Swedish)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom5 = PAK3]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom5 = PAK3]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
@@ -624,11 +624,29 @@ Most roms can be mounted in any slot, although sometimes one is recommended in t
 		<description>Database (Swedish)</description>
 		<year>198?</year>
 		<publisher>Microworld</publisher>
-		<info name="usage" value="EDASM or PAK0 [recommend -rom3 = PAK1]"/>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0 [recommend -rom3 = PAK1]"/>
 		<sharedfeat name="compatibility" value="2,3" />
 		<part name="cart" interface="mbee_pak">
 			<dataarea name="rom" size="0x2000">
 				<rom name="db-s.mbp" size="0x2000" crc="e2094771" sha1="62d7fb66c91d2bd24523bc84e4f005cf2c4480bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascal">
+		<description>Pascal</description>
+		<year>198?</year>
+		<publisher>Microworld</publisher>
+		<info name="usage" value="Press W (pc85-type), or EDASM or PAK0"/>
+		<sharedfeat name="compatibility" value="1,2,3" />
+		<part name="cart1" interface="mbee_pak">
+			<dataarea name="rom" size="0x2000">
+				<rom name="pascal.mbp" size="0x2000" crc="d67c1ce4" sha1="6140fca6cc3e8315f2eb38a7341268fe2d123b71" />
+			</dataarea>
+		</part>
+		<part name="cart2" interface="mbee_net">
+			<dataarea name="rom" size="0x1000">
+				<rom name="pascal.mbn" size="0x1000" crc="b4830252" sha1="98593db159242f8c98f5321253c03ab588b106ba" />
 			</dataarea>
 		</part>
 	</software>

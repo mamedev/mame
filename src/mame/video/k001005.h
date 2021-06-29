@@ -140,7 +140,7 @@ private:
 	uint32_t m_reg_far_z;
 
 
-	k001005_renderer *m_renderer;
+	std::unique_ptr<k001005_renderer> m_renderer;
 };
 
 DECLARE_DEVICE_TYPE(K001005, k001005_device)

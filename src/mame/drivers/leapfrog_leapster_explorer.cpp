@@ -96,7 +96,7 @@ void leapfrog_leapster_explorer_state::leapfrog_leapster_explorer(machine_config
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(leapfrog_leapster_explorer_state::cart_load));
 
-	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_leapster_explorer_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("leapster_explorer_cart");
 }
 
 ROM_START( leapexpr )

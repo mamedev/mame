@@ -135,11 +135,8 @@ newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const ch
 	device_newbrain_expansion_slot_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_fdc(*this, UPD765_TAG),
-	m_floppy0(*this, UPD765_TAG ":0"),
-	m_floppy1(*this, UPD765_TAG ":1"),
-	m_floppy2(*this, UPD765_TAG ":2"),
-	m_floppy3(*this, UPD765_TAG ":3"),
-	m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG)
+	m_floppy(*this, UPD765_TAG ":%u", 0U),
+	m_exp(*this, "exp")
 {
 }
 
@@ -224,10 +221,9 @@ void newbrain_fdc_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 
 void newbrain_fdc_device::moton(int state)
 {
-	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
-	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
-	if (m_floppy2->get_device()) m_floppy2->get_device()->mon_w(!state);
-	if (m_floppy3->get_device()) m_floppy3->get_device()->mon_w(!state);
+	for (auto &floppy : m_floppy)
+		if (floppy->get_device())
+			floppy->get_device()->mon_w(!state);
 }
 
 

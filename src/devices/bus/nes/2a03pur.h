@@ -8,7 +8,7 @@
 #include "nxrom.h"
 
 
-// ======================> nes_racermate_device
+// ======================> nes_2a03pur_device
 
 class nes_2a03pur_device : public nes_nrom_device
 {

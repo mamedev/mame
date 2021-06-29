@@ -1355,7 +1355,7 @@ ROM_START( bestbest )
 	ROM_LOAD16_BYTE( "12.bin", 0x300001, 0x80000, CRC(ca7c8176) SHA1(1ec99db3e0840b4647d6ccdf6fda118fa9ad4f42) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // ?
-	ROM_LOAD( "82s129.5", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // FIXED BITS (0000xx0x0000xxxx)
+	ROM_LOAD( "82s129.5", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // FIXED BITS (0000xx0x0000xxxx), same as the one for starfigh in suna8.cpp
 	ROM_LOAD( "82s129.6", 0x100, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // identical to 82s129.5
 ROM_END
 

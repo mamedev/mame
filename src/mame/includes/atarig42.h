@@ -35,6 +35,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void video_start() override;
 	void video_int_ack_w(uint16_t data = 0);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 	void a2d_select_w(offs_t offset, uint8_t data);
@@ -44,7 +45,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarig42_playfield_scan);
-	DECLARE_VIDEO_START(atarig42);
 	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarig42(machine_config &config);
 	void main_map(address_map &map);

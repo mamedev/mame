@@ -3151,7 +3151,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					}
 
 					/* create a new visarea */
-					visarea.set(hbp, hbp + hvis - 1, vbp, vbp + vvis - 1);
+					visarea.set(hbp, hbp + std::max(hvis - 1, 0), vbp, vbp + std::max(vvis - 1, 0));
 
 					/* keep within bounds */
 					visarea.max_x = (std::min)(visarea.max_x, htotal - 1);
@@ -5652,7 +5652,7 @@ void voodoo_device::device_start()
 	m_pciint.resolve();
 
 	/* create a multiprocessor work queue */
-	poly = poly_alloc(machine(), 64, sizeof(poly_extra_data), 0);
+	poly_alloc(poly, machine(), 64, sizeof(poly_extra_data), 0);
 	thread_stats = std::make_unique<stats_block[]>(WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
@@ -6477,7 +6477,6 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, regaccess(nullptr)
 	, regnames(nullptr)
 	, alt_regmap(0)
-	, poly(nullptr)
 	, thread_stats(nullptr)
 	, last_status_pc(0)
 	, last_status_value(0)

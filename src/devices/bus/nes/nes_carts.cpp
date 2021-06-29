@@ -51,6 +51,7 @@
 #include "rcm.h"
 #include "rexsoft.h"
 #include "sachen.h"
+#include "sealie.h"
 #include "somari.h"
 #include "subor.h"
 #include "tengen.h"
@@ -296,7 +297,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
-	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55?
+	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
 	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
@@ -397,8 +398,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
-	device.option_add_internal("nes_action53",     NES_ACTION53);
-	device.option_add_internal("nes_2a03pur",      NES_2A03PURITANS);
+	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("cufrom",           NES_CUFROM);
+	device.option_add_internal("unrom512",         NES_UNROM512);
+	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
 // other unsupported...
 	device.option_add_internal("ninjaryu",         NES_NROM);    // mapper 111 - UNSUPPORTED
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED

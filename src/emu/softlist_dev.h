@@ -115,7 +115,6 @@ public:
 	bool is_original() const { return softlist_type::ORIGINAL_SYSTEM == m_list_type; }
 	bool is_compatible() const { return softlist_type::COMPATIBLE_SYSTEM == m_list_type; }
 	const char *filter() const { return m_filter; }
-	const char *filename() { return m_file.filename(); }
 
 	// getters that may trigger a parse
 	const std::string &description() { if (!m_parsed) parse(); return m_description; }
@@ -152,7 +151,8 @@ private:
 
 	// internal state
 	bool                        m_parsed;
-	emu_file                    m_file;
+	std::string                 m_filename;
+	std::string                 m_shortname;
 	std::string                 m_description;
 	std::string                 m_errors;
 	std::list<software_info>    m_infolist;

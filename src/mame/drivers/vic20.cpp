@@ -44,7 +44,7 @@ public:
 		m_vic(*this, VIC_TAG),
 		m_iec(*this, CBM_IEC_TAG),
 		m_joy(*this, CONTROL1_TAG),
-		m_exp(*this, VIC20_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_ram(*this, RAM_TAG),

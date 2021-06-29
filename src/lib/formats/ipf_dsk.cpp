@@ -7,24 +7,6 @@
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;
 
-ipf_format::ipf_format() :
-	tinfos(),
-	tcount(0),
-	type(0),
-	release(0),
-	revision(0),
-	encoder_type(0),
-	encoder_revision(0),
-	origin(0),
-	min_cylinder(0),
-	max_cylinder(0),
-	min_head(0),
-	max_head(0),
-	credit_day(0),
-	credit_time(0)
-{
-}
-
 const char *ipf_format::name() const
 {
 	return "ipf";
@@ -59,20 +41,21 @@ int ipf_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 
 bool ipf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	ipf_decode dec;
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> data(size);
 	io_generic_read(io, &data[0], 0, size);
-	bool res = parse(data, image);
+	bool res = dec.parse(data, image);
 	return res;
 }
 
-uint32_t ipf_format::r32(const uint8_t *p)
+uint32_t ipf_format::ipf_decode::r32(const uint8_t *p)
 {
 	return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
 
-uint32_t ipf_format::rb(const uint8_t *&p, int count)
+uint32_t ipf_format::ipf_decode::rb(const uint8_t *&p, int count)
 {
 	uint32_t v = 0;
 	for(int i=0; i<count; i++)
@@ -80,7 +63,7 @@ uint32_t ipf_format::rb(const uint8_t *&p, int count)
 	return v;
 }
 
-uint32_t ipf_format::crc32r(const uint8_t *data, uint32_t size)
+uint32_t ipf_format::ipf_decode::crc32r(const uint8_t *data, uint32_t size)
 {
 	// Reversed crc32
 	uint32_t crc = 0xffffffff;
@@ -95,7 +78,7 @@ uint32_t ipf_format::crc32r(const uint8_t *data, uint32_t size)
 	return ~crc;
 }
 
-bool ipf_format::parse(std::vector<uint8_t> &data, floppy_image *image)
+bool ipf_format::ipf_decode::parse(std::vector<uint8_t> &data, floppy_image *image)
 {
 	image->set_variant(floppy_image::DSDD); // Not handling anything else yet
 	tcount = 84*2+1; // Usual max
@@ -107,7 +90,7 @@ bool ipf_format::parse(std::vector<uint8_t> &data, floppy_image *image)
 	return res;
 }
 
-bool ipf_format::parse_info(const uint8_t *info)
+bool ipf_format::ipf_decode::parse_info(const uint8_t *info)
 {
 	type = r32(info+12);
 	if(type != 1)
@@ -130,7 +113,7 @@ bool ipf_format::parse_info(const uint8_t *info)
 	return true;
 }
 
-ipf_format::track_info *ipf_format::get_index(uint32_t idx)
+ipf_format::ipf_decode::track_info *ipf_format::ipf_decode::get_index(uint32_t idx)
 {
 	if(idx > 1000)
 		return nullptr;
@@ -142,7 +125,7 @@ ipf_format::track_info *ipf_format::get_index(uint32_t idx)
 	return &tinfos[idx];
 }
 
-bool ipf_format::parse_imge(const uint8_t *imge)
+bool ipf_format::ipf_decode::parse_imge(const uint8_t *imge)
 {
 	track_info *t = get_index(r32(imge+64));
 	if(!t)
@@ -176,7 +159,7 @@ bool ipf_format::parse_imge(const uint8_t *imge)
 	return true;
 }
 
-bool ipf_format::parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size)
+bool ipf_format::ipf_decode::parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_extra_size)
 {
 	track_info *t = get_index(r32(data+24));
 	if(!t)
@@ -193,7 +176,7 @@ bool ipf_format::parse_data(const uint8_t *data, uint32_t &pos, uint32_t max_ext
 	return true;
 }
 
-bool ipf_format::scan_one_tag(std::vector<uint8_t> &data, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
+bool ipf_format::ipf_decode::scan_one_tag(std::vector<uint8_t> &data, uint32_t &pos, uint8_t *&tag, uint32_t &tsize)
 {
 	if(data.size()-pos < 12)
 		return false;
@@ -209,7 +192,7 @@ bool ipf_format::scan_one_tag(std::vector<uint8_t> &data, uint32_t &pos, uint8_t
 	return true;
 }
 
-bool ipf_format::scan_all_tags(std::vector<uint8_t> &data)
+bool ipf_format::ipf_decode::scan_all_tags(std::vector<uint8_t> &data)
 {
 	uint32_t pos = 0;
 	uint32_t size = data.size();
@@ -254,7 +237,7 @@ bool ipf_format::scan_all_tags(std::vector<uint8_t> &data)
 	return true;
 }
 
-bool ipf_format::generate_tracks(floppy_image *image)
+bool ipf_format::ipf_decode::generate_tracks(floppy_image *image)
 {
 	for(uint32_t i = 0; i != tcount; i++) {
 		track_info *t = &tinfos[i];
@@ -268,7 +251,7 @@ bool ipf_format::generate_tracks(floppy_image *image)
 	return true;
 }
 
-void ipf_format::rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t size)
+void ipf_format::ipf_decode::rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t size)
 {
 	uint32_t done = 0;
 	for(uint32_t bpos=0; done < size; bpos++) {
@@ -289,7 +272,7 @@ void ipf_format::rotate(std::vector<uint32_t> &track, uint32_t offset, uint32_t 
 	}
 }
 
-void ipf_format::mark_track_splice(std::vector<uint32_t> &track, uint32_t offset, uint32_t size)
+void ipf_format::ipf_decode::mark_track_splice(std::vector<uint32_t> &track, uint32_t offset, uint32_t size)
 {
 	for(int i=0; i<3; i++) {
 		uint32_t pos = (offset + i) % size;
@@ -302,13 +285,13 @@ void ipf_format::mark_track_splice(std::vector<uint32_t> &track, uint32_t offset
 	}
 }
 
-void ipf_format::timing_set(std::vector<uint32_t> &track, uint32_t start, uint32_t end, uint32_t time)
+void ipf_format::ipf_decode::timing_set(std::vector<uint32_t> &track, uint32_t start, uint32_t end, uint32_t time)
 {
 	for(uint32_t i=start; i != end; i++)
 		track[i] = (track[i] & floppy_image::MG_MASK) | time;
 }
 
-bool ipf_format::generate_timings(track_info *t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos)
+bool ipf_format::ipf_decode::generate_timings(track_info *t, std::vector<uint32_t> &track, const std::vector<uint32_t> &data_pos, const std::vector<uint32_t> &gap_pos)
 {
 	timing_set(track, 0, t->size_cells, 2000);
 
@@ -386,7 +369,7 @@ bool ipf_format::generate_timings(track_info *t, std::vector<uint32_t> &track, c
 	return true;
 }
 
-bool ipf_format::generate_track(track_info *t, floppy_image *image)
+bool ipf_format::ipf_decode::generate_track(track_info *t, floppy_image *image)
 {
 	if(!t->size_cells)
 		return true;
@@ -434,7 +417,7 @@ bool ipf_format::generate_track(track_info *t, floppy_image *image)
 	return true;
 }
 
-void ipf_format::track_write_raw(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t cells, bool &context)
+void ipf_format::ipf_decode::track_write_raw(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t cells, bool &context)
 {
 	for(uint32_t i=0; i != cells; i++)
 		*tpos++ = data[i>>3] & (0x80 >> (i & 7)) ? MG_1 : MG_0;
@@ -442,7 +425,7 @@ void ipf_format::track_write_raw(std::vector<uint32_t>::iterator &tpos, const ui
 		context = tpos[-1] == MG_1;
 }
 
-void ipf_format::track_write_mfm(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t start_offset, uint32_t patlen, uint32_t cells, bool &context)
+void ipf_format::ipf_decode::track_write_mfm(std::vector<uint32_t>::iterator &tpos, const uint8_t *data, uint32_t start_offset, uint32_t patlen, uint32_t cells, bool &context)
 {
 	patlen *= 2;
 	for(uint32_t i=0; i != cells; i++) {
@@ -456,13 +439,13 @@ void ipf_format::track_write_mfm(std::vector<uint32_t>::iterator &tpos, const ui
 	}
 }
 
-void ipf_format::track_write_weak(std::vector<uint32_t>::iterator &tpos, uint32_t cells)
+void ipf_format::ipf_decode::track_write_weak(std::vector<uint32_t>::iterator &tpos, uint32_t cells)
 {
 	for(uint32_t i=0; i != cells; i++)
 		*tpos++ = floppy_image::MG_N;
 }
 
-bool ipf_format::generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool &context)
+bool ipf_format::ipf_decode::generate_block_data(const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, std::vector<uint32_t>::iterator tlimit, bool &context)
 {
 	for(;;) {
 		if(data >= dlimit)
@@ -504,7 +487,7 @@ bool ipf_format::generate_block_data(const uint8_t *data, const uint8_t *dlimit,
 	}
 }
 
-bool ipf_format::generate_block_gap_0(uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, std::vector<uint32_t>::iterator &tpos, bool &context)
+bool ipf_format::ipf_decode::generate_block_gap_0(uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, std::vector<uint32_t>::iterator &tpos, bool &context)
 {
 	spos = ipos >= 16 && ipos+16 <= gap_cells ? ipos : gap_cells >> 1;
 	track_write_mfm(tpos, &pattern, 0, 8, spos, context);
@@ -517,7 +500,7 @@ bool ipf_format::generate_block_gap_0(uint32_t gap_cells, uint8_t pattern, uint3
 	return true;
 }
 
-bool ipf_format::gap_description_to_reserved_size(const uint8_t *&data, const uint8_t *dlimit, uint32_t &res_size)
+bool ipf_format::ipf_decode::gap_description_to_reserved_size(const uint8_t *&data, const uint8_t *dlimit, uint32_t &res_size)
 {
 	res_size = 0;
 	for(;;) {
@@ -542,7 +525,7 @@ bool ipf_format::gap_description_to_reserved_size(const uint8_t *&data, const ui
 	}
 }
 
-bool ipf_format::generate_gap_from_description(const uint8_t *&data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, uint32_t size, bool pre, bool &context)
+bool ipf_format::ipf_decode::generate_gap_from_description(const uint8_t *&data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, uint32_t size, bool pre, bool &context)
 {
 	const uint8_t *data1 = data;
 	uint32_t res_size;
@@ -612,7 +595,7 @@ bool ipf_format::generate_gap_from_description(const uint8_t *&data, const uint8
 }
 
 
-bool ipf_format::generate_block_gap_1(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context)
+bool ipf_format::ipf_decode::generate_block_gap_1(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context)
 {
 	if(ipos >= 16 && ipos < gap_cells-16)
 		spos = ipos;
@@ -621,7 +604,7 @@ bool ipf_format::generate_block_gap_1(uint32_t gap_cells, uint32_t &spos, uint32
 	return generate_gap_from_description(data, dlimit, tpos, gap_cells, true, context);
 }
 
-bool ipf_format::generate_block_gap_2(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context)
+bool ipf_format::ipf_decode::generate_block_gap_2(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos, bool &context)
 {
 	if(ipos >= 16 && ipos < gap_cells-16)
 		spos = ipos;
@@ -630,7 +613,7 @@ bool ipf_format::generate_block_gap_2(uint32_t gap_cells, uint32_t &spos, uint32
 	return generate_gap_from_description(data, dlimit, tpos, gap_cells, false, context);
 }
 
-bool ipf_format::generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos,  bool &context)
+bool ipf_format::ipf_decode::generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator &tpos,  bool &context)
 {
 	if(ipos >= 16 && ipos < gap_cells-16)
 		spos = ipos;
@@ -657,7 +640,7 @@ bool ipf_format::generate_block_gap_3(uint32_t gap_cells, uint32_t &spos, uint32
 	return generate_gap_from_description(data, dlimit, tpos+spos+delta, gap_cells - spos - delta, false, context);
 }
 
-bool ipf_format::generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, bool &context)
+bool ipf_format::ipf_decode::generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8_t pattern, uint32_t &spos, uint32_t ipos, const uint8_t *data, const uint8_t *dlimit, std::vector<uint32_t>::iterator tpos, bool &context)
 {
 	switch(gap_type) {
 	case 0:
@@ -673,7 +656,7 @@ bool ipf_format::generate_block_gap(uint32_t gap_type, uint32_t gap_cells, uint8
 	}
 }
 
-bool ipf_format::generate_block(track_info *t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context)
+bool ipf_format::ipf_decode::generate_block(track_info *t, uint32_t idx, uint32_t ipos, std::vector<uint32_t> &track, uint32_t &pos, uint32_t &dpos, uint32_t &gpos, uint32_t &spos, bool &context)
 {
 	const uint8_t *data = t->data;
 	const uint8_t *data_end = t->data + t->data_size;
@@ -705,7 +688,7 @@ bool ipf_format::generate_block(track_info *t, uint32_t idx, uint32_t ipos, std:
 	return true;
 }
 
-uint32_t ipf_format::block_compute_real_size(track_info *t)
+uint32_t ipf_format::ipf_decode::block_compute_real_size(track_info *t)
 {
 	uint32_t size = 0;
 	const uint8_t *thead = t->data;

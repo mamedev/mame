@@ -180,8 +180,6 @@ void vme_hcpu30_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
 
-	set_vme_device();
-
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
 

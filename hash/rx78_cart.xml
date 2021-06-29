@@ -102,8 +102,8 @@ The monitor will expect you to load a program from cassette.
 		<publisher>Bandai</publisher>
 		<info name="usage" value="Z and X to start and move; Space to pick up and put down" />
 		<part name="cart" interface="rx78_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="burgershop.bin" size="16384" crc="b5a5ffc5" sha1="3b5fb0e670dce635d5220c0ffcae69da7c55049b" />
+			<dataarea name="rom" size="8192">
+				<rom name="burgershop.bin" size="8192" crc="2428ad88" sha1="a773125aeb85646a6e3d15c4c2f2685d9e5232c9" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,16 +112,16 @@ The monitor will expect you to load a program from cassette.
 		<description>Challenge Golf</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
-		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to rotate view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
+		<info name="usage" value="Q1 = Home or Backspace; Q2 = \ or End; ZXCV to rotate player; Arrows to adjust view; Middle row or Ctrl to choose a club; Alt or Space to shoot; Enter to abandon hole." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="ChallengeGolf.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
+				<rom name="3128c62-3g1.ic1.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
 				<rom size="0x2000" offset="0x0000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cracer" supported="partial"><!-- various bugs -->
+	<software name="cracer">
 		<description>Champion Racer</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
@@ -133,10 +133,11 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
-	<software name="exbaseb" supported="no"><!-- gfx issues -->
+	<software name="exbaseb">
 		<description>Excite Baseball</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
+		<info name="usage" value="Blue player uses arrows; Red player uses R,D,F,G" /><!-- difficult to hit the ball -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="exbaseb1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
@@ -230,8 +231,8 @@ The monitor will expect you to load a program from cassette.
 		<publisher>Bandai</publisher>
 		<info name="usage" value="1 player: Use P[];./ticPGDN to move, Space to fire. 2 players: P1 use Arrows,Ctrl,Alt; P2 use RDFGAS" />
 		<part name="cart" interface="rx78_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ultraman.bin" size="16384" crc="0ba54dfb" sha1="5ba7eb4779d5c362e4751102b31d8e0083e06310" />
+			<dataarea name="rom" size="8192">
+				<rom name="ultraman.bin" size="8192" crc="f7bc2394" sha1="e124c7325044abc615b807c0b670bbaa35d94264" />
 			</dataarea>
 		</part>
 	</software>

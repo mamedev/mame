@@ -1199,6 +1199,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds6417.h,MACHINES["DS6417"] = true
+---------------------------------------------------
+
+if (MACHINES["DS6417"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds6417.cpp",
+		MAME_DIR .. "src/devices/machine/ds6417.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ds75160a.h,MACHINES["DS75160A"] = true
 ---------------------------------------------------
 
@@ -4744,5 +4756,16 @@ if (MACHINES["NS32202"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ns32202.cpp",
 		MAME_DIR .. "src/devices/machine/ns32202.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ns32082.h,MACHINES["NS32082"] = true
+---------------------------------------------------
+if (MACHINES["NS32082"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ns32082.cpp",
+		MAME_DIR .. "src/devices/machine/ns32082.h",
 	}
 end

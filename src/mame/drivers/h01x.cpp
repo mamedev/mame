@@ -95,8 +95,6 @@ private:
 };
 
 
-static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
-
 void h01x_state::h01x(machine_config &config)
 {
 	// basic machine hardware
@@ -123,7 +121,7 @@ void h01x_state::h01x(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).set_levels(4, speaker_levels);
+	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */

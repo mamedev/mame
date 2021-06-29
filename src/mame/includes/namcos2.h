@@ -114,6 +114,7 @@ public:
 	void init_valkyrie();
 	void init_fourtrax();
 	void init_finalap3();
+	void init_finalap3bl();
 	void init_luckywld();
 	void init_assaultj();
 	void init_dsaberj();
@@ -241,7 +242,9 @@ enum
 
 	uint16_t namcos2_68k_key_r(offs_t offset);
 	void namcos2_68k_key_w(offs_t offset, uint16_t data);
-	uint16_t namcos2_finallap_prot_r(offs_t offset);
+	uint16_t namcos2_finallap_prot_r(offs_t offset); // finalap2, finalap3
+	uint16_t finalap3bl_prot_r(); // finalap3bl
+
 	void GollyGhostUpdateLED_c4(int data);
 	void GollyGhostUpdateLED_c6(int data);
 	void GollyGhostUpdateLED_c8(int data);

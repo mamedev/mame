@@ -53,7 +53,7 @@ class chd_file;
 namespace util { class archive_file; }
 
 // declared in xmlfile.h
-namespace util::xml { class data_node; }
+namespace util::xml { class data_node; class file; }
 
 
 

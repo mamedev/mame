@@ -309,8 +309,10 @@ static const nes_pcb pcb_list[] =
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
 	{ "nocash_nochr",     NOCASH_NOCHR },
-	{ "nes_action53",     BTL_ACTION53 },
-	{ "nes_2a03pur",      BTL_2A03_PURITANS },
+	{ "action53",         UNL_ACTION53 },
+	{ "cufrom",           UNL_CUFROM },
+	{ "unrom512",         UNL_UNROM512 },
+	{ "2a03pur",          UNL_2A03PURITANS },
 	{ "ffe3",             FFE3_BOARD },
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
@@ -605,7 +607,7 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		logerror("-- PCB: %s", get_feature("pcb"));
 		if (m_pcb_id == UNSUPPORTED_BOARD)
-			logerror(" (currently not supported by MESS)");
+			logerror(" (currently not supported by MAME)");
 		logerror("\n");
 	}
 	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);

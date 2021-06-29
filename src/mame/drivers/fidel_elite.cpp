@@ -61,17 +61,17 @@ uninteresting to emulate as separate drivers.
 #include "emu.h"
 #include "machine/fidel_clockdiv.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/i8255.h"
 #include "machine/sensorboard.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "sound/s14001a.h"
 #include "sound/dac.h"
+#include "sound/s14001a.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -150,21 +150,15 @@ protected:
 	void ppi_portc_w(u8 data);
 
 	bool m_rotate;
-	u8 m_led_data;
-	u8 m_7seg_data;
-	u8 m_inp_mux;
-	u8 m_speech_bank;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
 };
 
 void elite_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
-
-	// zerofill
-	m_led_data = 0;
-	m_7seg_data = 0;
-	m_inp_mux = 0;
-	m_speech_bank = 0;
 
 	// register for savestates
 	save_item(NAME(m_led_data));
@@ -182,8 +176,8 @@ void elite_state::machine_reset()
 void elite_state::set_cpu_freq()
 {
 	// known official CPU speeds: 3MHz(EAS), 3.57MHz(PC/EWC/Privat), 4MHz(PC/EAS-C)
-	u8 inp = ioport("FAKE")->read();
-	m_maincpu->set_unscaled_clock((inp & 2) ? 4_MHz_XTAL : ((inp & 1) ? 3.579545_MHz_XTAL : 3_MHz_XTAL));
+	static const XTAL xtal[3] = { 3_MHz_XTAL, 3.579545_MHz_XTAL, 4_MHz_XTAL };
+	m_maincpu->set_unscaled_clock(xtal[ioport("FAKE")->read() % 3]);
 	div_refresh();
 }
 

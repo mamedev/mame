@@ -429,7 +429,6 @@ endif
 ifneq (,$(findstring s390x,$(UNAME)))
 BIGENDIAN := 1
 endif
-endif # BIGENDIAN
 # FreeBSD
 ifneq (,$(findstring powerpc,$(UNAME)))
 ifneq (,$(findstring powerpc64le,$(UNAME)))
@@ -438,6 +437,7 @@ else
 BIGENDIAN := 1
 endif
 endif
+endif # BIGENDIAN
 
 ifndef PYTHON_EXECUTABLE
 PYTHON := python

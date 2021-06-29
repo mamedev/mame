@@ -135,7 +135,7 @@ static inline int32_t fast_reciplog(int64_t value, int32_t *log2)
 	}
 
 	/* determine how many leading zeros in the value and shift it up high */
-	lz = count_leading_zeros(temp);
+	lz = count_leading_zeros_32(temp);
 	temp <<= lz;
 	exp += lz;
 
@@ -1852,15 +1852,15 @@ do                                                                              
 			wfloat = 0xffff;                                                    \
 		else                                                                    \
 		{                                                                       \
-			int exp = count_leading_zeros(temp);                                \
+			int exp = count_leading_zeros_32(temp);                             \
 			wfloat = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;       \
 		}                                                                       \
 	}                                                                           \
 																				\
 	/* compute depth value (W or Z) for this pixel */                           \
-	if (FBZMODE_WBUFFER_SELECT(FBZMODE))                                   \
+	if (FBZMODE_WBUFFER_SELECT(FBZMODE))                                        \
 	{                                                                           \
-		if (!FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE))                          \
+		if (!FBZMODE_DEPTH_FLOAT_SELECT(FBZMODE))                               \
 			depthval = wfloat;                                                      \
 		else                                                                        \
 		{                                                                           \
@@ -1873,7 +1873,7 @@ do                                                                              
 					depthval = 0xffff;                                              \
 				else                                                                \
 				{                                                                   \
-					int exp = count_leading_zeros(temp);                            \
+					int exp = count_leading_zeros_32(temp);                         \
 					depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
 				}                                                                   \
 			}                                                                       \
@@ -1884,11 +1884,11 @@ do                                                                              
 		CLAMPED_Z(ITERZ, FBZCOLORPATH, depthval);                               \
 	}                                                                           \
 	/* add the bias */                                                          \
-	biasdepth = depthval;                                                     \
+	biasdepth = depthval;                                                       \
 	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
 	{                                                                           \
-		biasdepth += (int16_t)vd->reg[zaColor].u;                                \
-		CLAMP(biasdepth, 0, 0xffff);                                             \
+		biasdepth += (int16_t)vd->reg[zaColor].u;                               \
+		CLAMP(biasdepth, 0, 0xffff);                                            \
 	}
 
 
@@ -1898,12 +1898,12 @@ do                                                                              
 	/* handle depth buffer testing */                                           \
 	if (FBZMODE_ENABLE_DEPTHBUF(FBZMODE))                                       \
 	{                                                                           \
-		int32_t depthsource;                                                      \
+		int32_t depthsource;                                                    \
 																				\
 		/* the source depth is either the iterated W/Z+bias or a */             \
 		/* constant value */                                                    \
 		if (FBZMODE_DEPTH_SOURCE_COMPARE(FBZMODE) == 0)                         \
-			depthsource = biasdepth;                                             \
+			depthsource = biasdepth;                                            \
 		else                                                                    \
 			depthsource = (uint16_t)vd->reg[zaColor].u;                         \
 																				\
