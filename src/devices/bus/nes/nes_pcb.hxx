@@ -171,6 +171,7 @@ static const nes_pcb pcb_list[] =
 	{ "ks7013b",          KAISER_KS7013B },    // used in Highway Star (FDS Conversion)
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
 	{ "ks7037",           KAISER_KS7037 },  // Metroid FDS Chinese
+	{ "ks7057",           KAISER_KS7057 },  // Gyruss (FDS Conversion)
 	{ "gs2015",           RCM_GS2015 },
 	{ "gs2004",           RCM_GS2004 },
 	{ "gs2013",           RCM_GS2013 },
@@ -209,7 +210,7 @@ static const nes_pcb pcb_list[] =
 	{ "sl1632",           REXSOFT_SL1632 },
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "nitra",            NITRA_TDA },
-	{ "ks7057",           UNL_KS7057 },  // mapper 196 alt (for Street Fighter VI / Fight Street VI },
+	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
 	{ "pikay2k",          BTL_PIKACHUY2K },  // mapper 254

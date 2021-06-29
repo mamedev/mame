@@ -21,13 +21,13 @@ public:
 };
 
 
-// ======================> nes_ks7057_device
+// ======================> nes_fs6_device
 
-class nes_ks7057_device : public nes_txrom_device
+class nes_fs6_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fs6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void write_h(offs_t offset, uint8_t data) override;
@@ -718,7 +718,7 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device)
-DECLARE_DEVICE_TYPE(NES_KS7057,        nes_ks7057_device)
+DECLARE_DEVICE_TYPE(NES_FS6,           nes_fs6_device)
 DECLARE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device)
 DECLARE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device)
 DECLARE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device)
