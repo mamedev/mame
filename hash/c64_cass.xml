@@ -145,7 +145,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="1943">
+	<software name="1943" supported="no"> <!-- crashes when starting new game -->
 		<description>1943: The Battle of Midway</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
