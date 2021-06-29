@@ -134,7 +134,7 @@ void nes_ntdec_asder_device::write_h(offs_t offset, u8 data)
 					prg8_x(m_latch, data);
 					break;
 				case 2: case 3:
-					chr2_x((m_latch - 2) << 1, data >> 1, CHRROM);
+					chr2_x((m_latch & 0x01) << 1, data >> 1, CHRROM);
 					break;
 				case 4: case 5: case 6: case 7:
 					u16 high = BIT(m_chr_outer, m_latch) << 8;
