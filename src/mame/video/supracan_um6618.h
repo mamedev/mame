@@ -36,9 +36,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	void palette_init(palette_device &palette) const;
-
-
 	struct sprdma_regs_t
 	{
 		uint32_t src;
@@ -49,6 +46,30 @@ private:
 		uint16_t control;
 	};
 
+	void palette_init(palette_device &palette) const;
+
+	void write_swapped_byte(int offset, uint8_t byte);
+	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
+	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
+	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
+	TILE_GET_INFO_MEMBER(get_roz_tile_info);
+
+	TIMER_CALLBACK_MEMBER(hbl_callback);
+	TIMER_CALLBACK_MEMBER(line_on_callback);
+	TIMER_CALLBACK_MEMBER(line_off_callback);
+	TIMER_CALLBACK_MEMBER(video_callback);
+
+	int get_tilemap_region(int layer);
+	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
+	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
+	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
+	void draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
+	void draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cliprect, gfx_element *gfx, int tile, bool xflip, bool yflip, int dstx, int dsty);
+	void draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect);
+	void mark_active_tilemap_all_dirty(int layer);
+	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
+
 	sprdma_regs_t m_sprdma_regs;
 
 	emu_timer *m_video_timer;
@@ -57,7 +78,6 @@ private:
 	emu_timer *m_line_off_timer;
 
 	std::vector<uint8_t> m_vram_addr_swapped;
-
 
 	uint16_t m_sprite_count;
 	uint32_t m_sprite_base_addr;
@@ -92,28 +112,6 @@ private:
 	bitmap_ind16 m_sprite_final_bitmap;
 	bitmap_ind8 m_sprite_mask_bitmap;
 	bitmap_ind8 m_prio_bitmap;
-
-	void write_swapped_byte(int offset, uint8_t byte);
-	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
-	TILE_GET_INFO_MEMBER(get_roz_tile_info);
-
-	TIMER_CALLBACK_MEMBER(hbl_callback);
-	TIMER_CALLBACK_MEMBER(line_on_callback);
-	TIMER_CALLBACK_MEMBER(line_off_callback);
-	TIMER_CALLBACK_MEMBER(video_callback);
-
-	int get_tilemap_region(int layer);
-	void get_tilemap_info_common(int layer, tile_data &tileinfo, int count);
-	void get_roz_tilemap_info(int layer, tile_data &tileinfo, int count);
-	int get_tilemap_dimensions(int &xsize, int &ysize, int layer);
-	void draw_sprite_tile(bitmap_ind16 &dst, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
-	void draw_sprite_tile_mask(bitmap_ind8 &dst, const rectangle &cliprect, gfx_element *gfx, int tile, bool xflip, bool yflip, int dstx, int dsty);
-	void draw_sprite_tile_masked(bitmap_ind16 &dst, bitmap_ind8 &mask, bitmap_ind8 &priomap, const rectangle &cliprect, gfx_element *gfx, int tile, int palette, bool xflip, bool yflip, int dstx, int dsty, int prio);
-	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bitmap_ind8 &priomap, const rectangle &cliprect);
-	void mark_active_tilemap_all_dirty(int layer);
-	void draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
