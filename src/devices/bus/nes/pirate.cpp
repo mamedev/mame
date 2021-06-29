@@ -425,7 +425,6 @@ void nes_ninjaryu_device::device_start()
 
 void nes_ninjaryu_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	m_reg[0] = 0x0f;
 	m_reg[1] = m_reg[2] = m_reg[3] = 0;
 
@@ -1279,7 +1278,7 @@ void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
  them serially. The one existing game has 256K CHR, so this
  must have at least 1 more bit for CHR banking. Other differences?
 
- In MAME: Preliminary Supported
+ In MAME: Preliminary supported.
 
  -------------------------------------------------*/
 
@@ -1303,11 +1302,11 @@ void nes_ninjaryu_device::update_chr()
 {
 	if (BIT(m_reg[0], 4))
 	{
-		chr4_0(m_reg[1], m_chr_source);
-		chr4_4(m_reg[2], m_chr_source);
+		chr4_0(m_reg[1], CHRROM);
+		chr4_4(m_reg[2], CHRROM);
 	}
 	else
-		chr8(m_reg[1] >> 1, m_chr_source);
+		chr8(m_reg[1] >> 1, CHRROM);
 }
 
 void nes_ninjaryu_device::write_h(offs_t offset, uint8_t data)
@@ -1353,7 +1352,7 @@ void nes_ninjaryu_device::write_h(offs_t offset, uint8_t data)
 
  NES 2.0: mapper 519
 
- In MAME: Preliminary Supported
+ In MAME: Preliminary supported.
 
  -------------------------------------------------*/
 
@@ -1367,14 +1366,14 @@ void nes_eh8813a_device::write_h(offs_t offset, uint8_t data)
 	chr8(data & 0x7f, m_chr_source);
 	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	uint8_t prg = offset & 0x3f;
+	uint8_t bank = offset & 0x3f;
 	if (BIT(offset, 7))
 	{
-		prg16_89ab(prg);
-		prg16_cdef(prg);
+		prg16_89ab(bank);
+		prg16_cdef(bank);
 	}
 	else
-		prg32(prg >> 1);
+		prg32(bank >> 1);
 
 	m_latch = BIT(offset, 6);
 }
