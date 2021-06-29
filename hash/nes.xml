@@ -75449,10 +75449,6 @@ be better to redump them properly. -->
 			<dataarea name="prg" size="131072">
 				<rom name="street fighter vi 16 peoples (unl).prg" size="131072" crc="f7b93e43" sha1="462780b4cbb84364a107b1b37a6a5278eefc6cbf" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
 		</part>
 	</software>
 
