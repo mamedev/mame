@@ -113,7 +113,7 @@ static const nes_mmc mmc_list[] =
 	{ 78, IREM_HOLYDIVR },
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
-	// 81 NTDEC's Super Gun. Dump available?
+	{ 81, NTDEC_N715021 }, // 81 Super Gun
 	{ 82, TAITO_X1_017 },
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
