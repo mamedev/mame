@@ -249,17 +249,19 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
 	device.option_add_internal("hes",              NES_HES);
 	device.option_add_internal("hosenkan",         NES_HOSENKAN);
-	device.option_add_internal("ks7058",           NES_KS7058);
 	device.option_add_internal("ks202",            NES_KS202);      // mapper 56
-	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
+	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
+	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)
+	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion)
+	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion)
 	device.option_add_internal("ks7017",           NES_KS7017);
-	device.option_add_internal("ks7032",           NES_KS7032);     //  mapper 142
-	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion);
-	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion);
-	device.option_add_internal("ks7031",           NES_KS7031);     //  used in Dracula II (FDS Conversion);
-	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion);
-	device.option_add_internal("ks7037",           NES_KS7037);     //  used in Metroid (FDS Conversion);
-	device.option_add_internal("ks7057",           NES_KS7057);     //  used in Gyruss (FDS Conversion);
+	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
+	device.option_add_internal("ks7030",           NES_KS7030);     // used in Doki Doki Panic alt (FDS Conversion)
+	device.option_add_internal("ks7031",           NES_KS7031);     // used in Dracula II (FDS Conversion)
+	device.option_add_internal("ks7032",           NES_KS7032);     // mapper 142
+	device.option_add_internal("ks7037",           NES_KS7037);     // used in Metroid (FDS Conversion)
+	device.option_add_internal("ks7057",           NES_KS7057);     // used in Gyruss (FDS Conversion)
+	device.option_add_internal("ks7058",           NES_KS7058);
 	device.option_add_internal("gs2015",           NES_GS2015);
 	device.option_add_internal("gs2004",           NES_GS2004);
 	device.option_add_internal("gs2013",           NES_GS2013);

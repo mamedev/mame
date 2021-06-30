@@ -9,21 +9,18 @@
  Here we emulate the following Kaiser bootleg PCBs
 
  * Kaiser KS202
+ * Kaiser KS7010
  * Kaiser KS7012
  * Kaiser KS7013B
  * Kaiser KS7016
  * Kaiser KS7017
  * Kaiser KS7022
+ * Kaiser KS7030
  * Kaiser KS7031
  * Kaiser KS7032
  * Kaiser KS7037
  * Kaiser KS7057
  * Kaiser KS7058
-
- TODO:
- - FCEUmm lists more Kaiser PCBs:
-   * KS7030 (for Yume Koujou Doki Doki Panic by Kaiser?)
-   but there seem to be no available dumps...
 
  ***********************************************************************************************************/
 
@@ -50,8 +47,10 @@ DEFINE_DEVICE_TYPE(NES_KS7022,  nes_ks7022_device,  "nes_ks7022",  "NES Cart Kai
 DEFINE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device,  "nes_ks7032",  "NES Cart Kaiser KS-7032 PCB")
 DEFINE_DEVICE_TYPE(NES_KS202,   nes_ks202_device,   "nes_ks202",   "NES Cart Kaiser KS-202 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7017,  nes_ks7017_device,  "nes_ks7017",  "NES Cart Kaiser KS-7017 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7010,  nes_ks7010_device,  "nes_ks7010",  "NES Cart Kaiser KS-7010 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7012,  nes_ks7012_device,  "nes_ks7012",  "NES Cart Kaiser KS-7012 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7013B, nes_ks7013b_device, "nes_ks7013b", "NES Cart Kaiser KS-7013B PCB")
+DEFINE_DEVICE_TYPE(NES_KS7030,  nes_ks7030_device,  "nes_ks7030",  "NES Cart Kaiser KS-7030 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7031,  nes_ks7031_device,  "nes_ks7031",  "NES Cart Kaiser KS-7031 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7016,  nes_ks7016_device,  "nes_ks7016",  "NES Cart Kaiser KS-7016 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device,  "nes_ks7037",  "NES Cart Kaiser KS-7037 PCB")
@@ -88,6 +87,11 @@ nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_ks7010_device::nes_ks7010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS7010, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7012, tag, owner, clock)
 {
@@ -95,6 +99,11 @@ nes_ks7012_device::nes_ks7012_device(const machine_config &mconfig, const char *
 
 nes_ks7013b_device::nes_ks7013b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7013B, tag, owner, clock)
+{
+}
+
+nes_ks7030_device::nes_ks7030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS7030, tag, owner, clock)
 {
 }
 
@@ -200,6 +209,22 @@ void nes_ks7017_device::pcb_reset()
 	m_irq_status = 0;
 }
 
+void nes_ks7010_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_ks7010_device::pcb_reset()
+{
+	prg16_89ab(0x05);    // all upper banks are fixed
+	prg16_cdef(0x03);
+	chr8(0, CHRROM);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+
+	m_latch = 0;
+}
+
 void nes_ks7012_device::device_start()
 {
 	common_start();
@@ -223,6 +248,21 @@ void nes_ks7013b_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
+}
+
+void nes_ks7030_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_ks7030_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // not really used...
+	chr8(0, CHRRAM);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+
+	m_reg[0] = m_reg[1] = 0;
 }
 
 void nes_ks7031_device::device_start()
@@ -457,7 +497,6 @@ uint8_t nes_ks7032_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-
 void nes_ks202_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("ks202 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -567,6 +606,42 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 
 /*-------------------------------------------------
 
+ Kaiser Board KS7010
+
+ Games: Akumajo Dracula FDS Conversion
+
+ This board has fixed PRG banks in 0x8000-0xffff.
+ 0x6000-0x7fff is an 8K swappable PRG bank. This bank
+ and the CHR bank are BOTH set by the same latch.
+ Moreover, the latch is set by READING certain
+ addresses and the exact mask is still unknown...
+
+ NES 2.0: mapper 554
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_ks7010_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("ks7010 read_m, offset: %04x, data: %02x\n", offset, data));
+	return m_prg[m_latch * 0x2000 + offset];
+}
+
+u8 nes_ks7010_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("ks7010 read_h, offset: %04x, data: %02x\n", offset, data));
+	if ((offset >= 0x4ab6 && offset <= 0x4ad6) || offset == 0x6be2 || offset == 0x6be3 || offset == 0x6e32 || offset == 0x7ffc) // HACK! FIXME
+	{
+		m_latch = (offset >> 2) & 0x0f;
+		chr8(m_latch, CHRROM);
+	}
+
+	return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
  Kaiser Board KS7012
 
  Games: Zanac FDS Conversion
@@ -586,7 +661,6 @@ void nes_ks7012_device::write_h(offs_t offset, uint8_t data)
 	if (offset == 0x6e36)
 		prg32(1);
 }
-
 
 /*-------------------------------------------------
 
@@ -612,6 +686,77 @@ void nes_ks7013b_device::write_h(offs_t offset, uint8_t data)
 	set_nt_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
+/*-------------------------------------------------
+
+ Kaiser Board KS7030
+
+ Games: Doki Doki Panic (FDS conversion)
+
+ This board has a complicated memory layout. The last
+ 32k of the mask ROM is fixed into 0x8000-0xffff, but
+ 8k of WRAM and 8k of bankable PRG (in two 4k banks)
+ are adjacent and overlaid. The ranges are as follows.
+
+   WRAM:                   PRG:
+     - 3k, 0x6000-0x6bff     - 1k, 0x6c00-0x6fff (reg 1, last 1k)
+     - 2k, 0xb800-0xbfff     - 4k, 0x7000-0x7fff (reg 0)
+     - 3k, 0xcc00-0xd7ff     - 3k, 0xc000-0xcc00 (reg 1, initial 3k)
+
+ The two registers latch part of the address in writes
+ to 0x8000-0x8fff and 0x9000-0x9fff respectively.
+
+ NES 2.0: mapper 347
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_ks7030_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("ks7030 read_m, offset: %04x\n", offset));
+	if (offset < 0x0c00)         // first of 3k WRAM
+		return m_prgram[offset];
+	else if (offset < 0x1000)    // last 1k of 4k PRG bank
+		return m_prg[m_reg[1] * 0x1000 + offset];
+	else                         // 4k PRG
+		return m_prg[0x10000 + m_reg[0] * 0x1000 + (offset & 0x0fff)];
+}
+
+void nes_ks7030_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("ks7030 write_m, offset: %04x\n", offset));
+	if (offset < 0x0c00)         // first 3k of WRAM
+		m_prgram[offset] = data;
+}
+
+u8 nes_ks7030_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("ks7030 read_h, offset: %04x\n", offset));
+	if (offset < 0x3800 || offset >= 0x5800)    // fixed 32k PRG, split 14k and 10k windows
+		return m_prg[0x18000 + (offset & 0x7fff)];
+	else if (offset < 0x4000)                   // middle 2k of WRAM
+		return m_prgram[offset - 0x2c00];
+	else if (offset < 0x4c00)                   // first 3k of 4k PRG bank
+		return m_prg[m_reg[1] * 0x1000 + (offset & 0x0fff)];
+	else                                        // last 3k of WRAM
+		return m_prgram[offset - 0x3800];
+}
+
+void nes_ks7030_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("ks7030 write_h, offset: %04x\n", offset));
+	if (offset < 0x1000)
+	{
+		set_nt_mirroring(BIT(offset, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		m_reg[0] = offset & 0x07;
+	}
+	else if (offset < 0x2000)
+		m_reg[1] = offset & 0x0f;
+	else if (offset >= 0x3800 && offset < 0x4000)    // middle 2k of WRAM
+		m_prgram[offset - 0x2c00] = data;
+	else if (offset >= 0x4c00 && offset < 0x5800)    // last 3k of WRAM
+		m_prgram[offset - 0x3800] = data;
+}
 
 /*-------------------------------------------------
 
@@ -652,8 +797,6 @@ void nes_ks7031_device::write_h(offs_t offset, uint8_t data)
 	m_reg[(offset >> 11) & 3] = data & 0x3f;
 }
 
-
-
 /*-------------------------------------------------
 
  Kaiser Board KS7016
@@ -681,7 +824,6 @@ void nes_ks7016_device::write_h(offs_t offset, uint8_t data)
 	if ((offset & 0x5943) == 0x5903)
 		m_reg = (mask != 0x30) ? 0xb : (((offset >> 2) & 0x0f) << 1);
 }
-
 
 /*-------------------------------------------------
 
