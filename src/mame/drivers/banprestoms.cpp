@@ -27,8 +27,8 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 TODO:
 - printer or hopper emulation
-- the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode)
-- the Oki sounds terribly, only missing banking or what's going on?
+- the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode in tvphoned)
+- Oki banking
 - controls / dips need to be completed and better arranged;
 - currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
   To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
@@ -64,6 +64,8 @@ public:
 	{ }
 
 	void banprestoms(machine_config &config);
+
+	void init_oki();
 
 protected:
 	virtual void machine_start() override;
@@ -488,8 +490,39 @@ ROM_START( marioun )
 	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
 ROM_END
 
+void banprestoms_state::init_oki() // The Oki mask ROM is in a strange format, load it so that MAME can make use of it
+{
+	uint8_t *okirom = memregion("oki")->base();
+	std::vector<uint8_t> buffer(0x100000);
+	memcpy(&buffer[0], okirom, 0x100000);
+
+	for (int i = 0; i < 0x80000; i += 4)
+		okirom[i / 2] = buffer[i];
+
+	for (int i = 1; i < 0x80000; i += 4)
+		okirom[(i - 1) / 2 + 0x40000] = buffer[i];
+
+	for (int i = 2; i < 0x80000; i += 4)
+		okirom[i / 2] = buffer[i];
+
+	for (int i = 3; i < 0x80000; i += 4)
+		okirom[(i - 1) / 2 + 0x40000] = buffer[i];
+
+	for (int i = 0x80000; i < 0x100000; i += 4)
+		okirom[i / 2 + 0x40000] = buffer[i];
+
+	for (int i = 0x80001; i < 0x100000; i += 4)
+		okirom[(i - 1) / 2 + 0x80000] = buffer[i];
+
+	for (int i = 0x80002; i < 0x100000; i += 4)
+		okirom[i / 2 + 0x40000] = buffer[i];
+
+	for (int i = 0x80003; i < 0x100000; i += 4)
+		okirom[(i - 1) / 2 + 0x80000] = buffer[i];
+}
+
 } // Anonymous namespace
 
 
-GAME( 1991, tvphoned, 0, banprestoms, tvphoned, banprestoms_state, empty_init, ROT0, "Banpresto", "TV Phone Doraemon", MACHINE_IS_SKELETON )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, empty_init, ROT0, "Banpresto", "Mario Sports Day",  MACHINE_IS_SKELETON )
+GAME( 1991, tvphoned, 0, banprestoms, tvphoned, banprestoms_state, init_oki, ROT0, "Banpresto", "TV Phone Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Mario Sports Day",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
