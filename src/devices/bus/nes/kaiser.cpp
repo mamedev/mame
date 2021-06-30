@@ -698,9 +698,9 @@ void nes_ks7013b_device::write_h(offs_t offset, uint8_t data)
  are adjacent and overlaid. The ranges are as follows.
 
    WRAM:                   PRG:
-     - 3k, 0x6000-0x6bff     - 1k, 0x6c00-0x6fff (1st reg, last 1k)
-     - 2k, 0xb800-0xbfff     - 4k, 0x7000-0x7fff (2nd reg)
-     - 3k, 0xcc00-0xd7ff     - 3k, 0xc000-0xcc00 (1st reg, initial 3k)
+     - 3k, 0x6000-0x6bff     - 1k, 0x6c00-0x6fff (reg 1, last 1k)
+     - 2k, 0xb800-0xbfff     - 4k, 0x7000-0x7fff (reg 0)
+     - 3k, 0xcc00-0xd7ff     - 3k, 0xc000-0xcc00 (reg 1, initial 3k)
 
  The two registers latch part of the address in writes
  to 0x8000-0x8fff and 0x9000-0x9fff respectively.
