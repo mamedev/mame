@@ -112,6 +112,14 @@ void nes_ntdec_n715021_device::pcb_reset()
  Games: Cobra Mission, Fighting Hero III, Huang Di, Master
  Shooter
 
+ This board supports swappable 8K PRG banks at 0x8000 and
+ 0xa000 via 2 registers. 16K above is fixed. CHR ROM is
+ selected by 6 registers: 2x2K for the first two, and 4x1K
+ for the remaining 4. The former can only address 256K of
+ CHR while the latter combines with latch at 0xc000 to
+ span 512K. Registers are not directly written to but
+ selected at 0x8000.
+
  iNES: mapper 112
 
  In MAME: Supported.
@@ -122,7 +130,7 @@ void nes_ntdec_asder_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ntdec_asder write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6001)
+	switch (offset & 0x6001)    // writes only at even addresses
 	{
 		case 0x0000:
 			m_latch = data & 0x07;
