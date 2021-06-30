@@ -33,7 +33,7 @@ TODO:
 - controls / dips need to be completed and better arranged
 - currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
   To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
-  tvphoned will go back to the call assistant screen shortly after starting (both believed to be because of missing printer or hopper emulation)
+  tvphoned will go back to the call assistant screen shortly after starting (believed to be because of missing printer or hopper emulation)
 */
 
 #include "emu.h"
@@ -161,25 +161,42 @@ void banprestoms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		int y = m_spriteram[offs + 3];
 		int x = m_spriteram[offs + 2];
 
-		if (x & 0x8000) x = 0 - (0x200 - (x & 0x1ff));
-		else x &= 0x1ff;
-		if (y & 0x8000) y = 0 -(0x200 -( y & 0x1ff));
-		else y &= 0x1ff;
-
 		int color = m_spriteram[offs] & 0x3f;
 		int fx = m_spriteram[offs] & 0x4000;
 		int fy = m_spriteram[offs] & 0x2000;
 		int dy = ((m_spriteram[offs] & 0x0380) >> 7) + 1;
 		int dx = ((m_spriteram[offs] & 0x1c00) >> 10) + 1;
 
+		// co-ordinates don't have a sign bit, there must be wrapping logic
+		// co-ordinate masking might need to be applied during drawing instead
+		x &= 0x1ff;
+		if (x >= 0x180)
+			x -= 0x200;
+
+		y &= 0x1ff;
+		if (y >= 0x180)
+			y -= 0x200;
+
 		for (int ax = 0; ax < dx; ax++)
+		{
 			for (int ay = 0; ay < dy; ay++)
 			{
-				if (!fx)
-					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + ay * 16, 15);
+				if (!fy)
+				{
+					if (!fx)
+						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + ay * 16, 15);
+					else
+						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + ay * 16, 15);
+				}
 				else
-					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + ay * 16, 15);
+				{
+					if (!fx)
+						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + ax * 16, y + (dy - 1 - ay) * 16, 15);
+					else
+						m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, sprite++, color, fx, fy, x + (dx - 1 - ax) * 16, y + (dy - 1 - ay) * 16, 15);
+				}
 			}
+		}
 	}
 }
 
@@ -188,13 +205,13 @@ uint32_t banprestoms_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
 	m_tilemap[0]->set_scrollx(0, m_scrollram[0]);
-	m_tilemap[0]->set_scrolly(0, m_scrollram[1]);
+	m_tilemap[0]->set_scrolly(0, m_scrollram[1] - 16);
 	m_tilemap[1]->set_scrollx(0, m_scrollram[2]);
-	m_tilemap[1]->set_scrolly(0, m_scrollram[3]);
+	m_tilemap[1]->set_scrolly(0, m_scrollram[3] - 16);
 	m_tilemap[2]->set_scrollx(0, m_scrollram[4]);
-	m_tilemap[2]->set_scrolly(0, m_scrollram[5]);
+	m_tilemap[2]->set_scrolly(0, m_scrollram[5] - 16);
 	m_tilemap[3]->set_scrollx(0, 128);
-	m_tilemap[3]->set_scrolly(0, 0);
+	m_tilemap[3]->set_scrolly(0, -16);
 
 	if (!(m_layer_en & 0x0001)) { m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0); }
 	if (!(m_layer_en & 0x0010)) { draw_sprites(bitmap, cliprect, 2); }
@@ -426,7 +443,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0, 320-1, 16, 256-1);
+	screen.set_visarea(0, 320-1, 16, 240-1);
 	screen.set_screen_update(FUNC(banprestoms_state::screen_update));
 	screen.set_palette(m_palette);
 
