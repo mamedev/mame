@@ -28,8 +28,9 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 TODO:
 - printer or hopper emulation
 - the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode in tvphoned)
-- Oki banking
-- controls / dips need to be completed and better arranged;
+- verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
+- lamps
+- controls / dips need to be completed and better arranged
 - currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
   To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
   mariound won't let you coin up, while tvphoned will go back to the call assistant screen shortly after starting (both believed to be because of missing printer or hopper emulation)
@@ -60,7 +61,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram%u", 0U),
-		m_spriteram(*this, "sprite_ram")
+		m_spriteram(*this, "sprite_ram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void banprestoms(machine_config &config);
@@ -79,10 +81,14 @@ private:
 	required_shared_ptr_array<uint16_t, 4> m_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	required_memory_bank m_okibank;
+
 	tilemap_t *m_tilemap[4];
 
 	uint16_t m_layer_en;
 	uint16_t m_scrollram[6];
+
+	void okibank_w(uint16_t data);
 
 	template <uint8_t Which> void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void layer_en_w(uint16_t data);
@@ -94,12 +100,23 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void prg_map(address_map &map);
+	void oki_map(address_map &map);
 };
 
 
 void banprestoms_state::machine_start()
 {
+	m_okibank->configure_entries(0, 4, memregion("oki")->base(), 0x40000);
+	m_okibank->set_entry(0);
 }
+
+
+void banprestoms_state::okibank_w(uint16_t data)
+{
+	m_okibank->set_entry(data & 0x03);
+	// TODO: what do the other bits do? Lamps?
+}
+
 
 void banprestoms_state::video_start()
 {
@@ -216,12 +233,18 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0xc0000, 0xc004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0xc0080, 0xc0081).nopw(); // CRTC related ?
 	map(0xc00c0, 0xc00c1).nopw(); // CRTC related ?
-	//map(0xc0100, 0xc0101).nopw(); // Oki banking?
+	map(0xc0100, 0xc0101).w(FUNC(banprestoms_state::okibank_w));
 	//map(0xc0140, 0xc0141).nopw();
 	map(0xe0000, 0xe0001).portr("DSW1");
 	map(0xe0002, 0xe0003).portr("IN1");
 	map(0xe0004, 0xe0005).portr("IN2"); //.lr16(NAME([this] () -> uint16_t { return (machine().rand() & 0x0004) | (ioport("IN2")->read() & 0xfffb); }));
 }
+
+void banprestoms_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).bankr(m_okibank);
+}
+
 
 static INPUT_PORTS_START( tvphoned )
 	PORT_START("IN1")
@@ -418,6 +441,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // TODO: check frequency and pin 7.
+	oki.set_addrmap(0, &banprestoms_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -490,7 +514,7 @@ ROM_START( marioun )
 	ROM_LOAD( "sc006.u248", 0x800, 0x117, NO_DUMP ) // gal16v8a
 ROM_END
 
-void banprestoms_state::init_oki() // The Oki mask ROM is in a strange format, load it so that MAME can make use of it
+void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, load it so that MAME can make use of it
 {
 	uint8_t *okirom = memregion("oki")->base();
 	std::vector<uint8_t> buffer(0x100000);
