@@ -5,10 +5,10 @@
 Banpresto medal games with Seibu customs
 
 Confirmed games (but there are probably several more):
-Mario Sports Day
-TV Phone Doraemon
+Mario Undoukai
+Terebi Denwa Doraemon
 
-The following is from Mario Sports Day PCB pics:
+The following is from Mario Undoukai PCB pics:
 
 BS9001-2 main PCB + BS9001-A ROM PCB
 Main components:
@@ -27,13 +27,13 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 TODO:
 - printer or hopper emulation
-- the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode in tvphoned)
+- the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode in tvdenwad)
 - verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
 - lamps
 - controls / dips need to be completed and better arranged
 - currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
   To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
-  tvphoned will go back to the call assistant screen shortly after starting (believed to be because of missing printer or hopper emulation)
+  tvdenwad will go back to the call assistant screen shortly after starting (believed to be because of missing printer or hopper emulation)
 */
 
 #include "emu.h"
@@ -263,7 +263,7 @@ void banprestoms_state::oki_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( tvphoned )
+static INPUT_PORTS_START( tvdenwad )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // 1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // 2
@@ -463,7 +463,7 @@ void banprestoms_state::banprestoms(machine_config &config)
 }
 
 
-ROM_START( tvphoned )
+ROM_START( tvdenwad )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s82_a02.u15",  0x00000, 0x20000, CRC(479f790f) SHA1(a544c6493feb74ec8727f6b7f491ce6e5d24e316) )
 	ROM_LOAD16_BYTE( "s82_a01.u14",  0x00001, 0x20000, CRC(ac7cccdb) SHA1(5c0877e1831663113aa3284e323bf7665b5baa71) )
@@ -565,5 +565,5 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 } // Anonymous namespace
 
 
-GAME( 1991, tvphoned, 0, banprestoms, tvphoned, banprestoms_state, init_oki, ROT0, "Banpresto", "TV Phone Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Mario Sports Day",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
