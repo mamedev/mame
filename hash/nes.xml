@@ -66452,6 +66452,22 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="akumafds">
+		<description>Akumajou Dracula (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7010" />
+			<feature name="pcb" value="KAISER-KS7010" />
+			<dataarea name="prg" size="131072">
+				<rom name="ks110" size="131072" crc="844e28de" sha1="f7f2138b60e782e47d12413ecbb09559b805427a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ks109" size="131072" crc="d752a959" sha1="0d12c7bc3cdb21b72bcfb281237bfe8f171641c5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="almanfds">
 		<description>Almana no Kiseki (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -66591,6 +66607,26 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<!-- 16k WRAM on cartridge -->
 			<dataarea name="wram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokidokia" cloneof="dokidoki">
+		<description>Doki Doki Panic (Asia, FDS conversion, alt PCB)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<info name="usage" value="At title screen hold down start button for a while"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7030" />
+			<feature name="pcb" value="KAISER-KS7030" />
+			<dataarea name="prg" size="131072">
+				<rom name="ks127" size="131072" crc="1d244a42" sha1="b2a4e4bf31c8d9401c9d706a5bebfd0359d22efc" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
