@@ -33,7 +33,7 @@ TODO:
 - controls / dips need to be completed and better arranged
 - currently stuck at the call assistant screen due to vendor test failing (printer / hopper?), but can enter test mode.
   To test the games, it's possible to get the attract mode running by enabling the hack in the memory map at 0xe0004-0xe0005.
-  mariound won't let you coin up, while tvphoned will go back to the call assistant screen shortly after starting (both believed to be because of missing printer or hopper emulation)
+  tvphoned will go back to the call assistant screen shortly after starting (both believed to be because of missing printer or hopper emulation)
 */
 
 #include "emu.h"
@@ -114,7 +114,7 @@ void banprestoms_state::machine_start()
 void banprestoms_state::okibank_w(uint16_t data)
 {
 	m_okibank->set_entry(data & 0x03);
-	// TODO: what do the other bits do? Lamps?
+	// TODO: what do the other bits do?
 }
 
 
@@ -234,7 +234,7 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0xc0080, 0xc0081).nopw(); // CRTC related ?
 	map(0xc00c0, 0xc00c1).nopw(); // CRTC related ?
 	map(0xc0100, 0xc0101).w(FUNC(banprestoms_state::okibank_w));
-	//map(0xc0140, 0xc0141).nopw();
+	//map(0xc0140, 0xc0141).nopw(); // in marioun bit 3 is lamp according to test mode
 	map(0xe0000, 0xe0001).portr("DSW1");
 	map(0xe0002, 0xe0003).portr("IN1");
 	map(0xe0004, 0xe0005).portr("IN2"); //.lr16(NAME([this] () -> uint16_t { return (machine().rand() & 0x0004) | (ioport("IN2")->read() & 0xfffb); }));
@@ -337,11 +337,11 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON9 ) // Card Pay
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
