@@ -27,7 +27,7 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 TODO:
 - printer or hopper emulation
-- the GFX emulation was adapted from other drivers using the Seibu customs, it needs more adjustments (i.e sprite / tilemap priority in doors' scene in attract mode in tvdenwad)
+- the GFX emulation was adapted from other drivers using the Seibu customs, it might need more adjustments
 - verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
 - lamps
 - controls / dips need to be completed and better arranged
