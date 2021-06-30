@@ -580,10 +580,6 @@ void voodoo_device_base::register_save()
 	save_item(NAME(m_fbi.m_vblank_swap_pending));
 	save_item(NAME(m_fbi.m_vblank_swap));
 	save_item(NAME(m_fbi.m_vblank_dont_swap));
-	save_item(NAME(m_fbi.m_sign));
-	save_item(NAME(m_fbi.m_startw));
-	save_item(NAME(m_fbi.m_dwdx));
-	save_item(NAME(m_fbi.m_dwdy));
 	save_item(NAME(m_fbi.m_lfb_stats.pixels_in));
 	save_item(NAME(m_fbi.m_lfb_stats.pixels_out));
 	save_item(NAME(m_fbi.m_lfb_stats.chroma_fail));
@@ -635,15 +631,6 @@ void voodoo_device_base::register_save()
 		save_item(NAME(tmu->m_reg.m_regs), index);
 		if (tmu->m_ram != m_fbi.m_ram)
 			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
-		save_item(NAME(tmu->m_starts), index);
-		save_item(NAME(tmu->m_startt), index);
-		save_item(NAME(tmu->m_startw), index);
-		save_item(NAME(tmu->m_dsdx), index);
-		save_item(NAME(tmu->m_dtdx), index);
-		save_item(NAME(tmu->m_dwdx), index);
-		save_item(NAME(tmu->m_dsdy), index);
-		save_item(NAME(tmu->m_dtdy), index);
-		save_item(NAME(tmu->m_dwdy), index);
 		save_item(NAME(tmu->m_palette), index);
 	}
 }
@@ -1170,8 +1157,8 @@ inline rasterizer_texture &voodoo_device_base::tmu_state::prepare_texture()
 inline s32 voodoo_device_base::tmu_state::compute_lodbase()
 {
 	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
-	s64 texdx = s64(m_dsdx >> 14) * s64(m_dsdx >> 14) + s64(m_dtdx >> 14) * s64(m_dtdx >> 14);
-	s64 texdy = s64(m_dsdy >> 14) * s64(m_dsdy >> 14) + s64(m_dtdy >> 14) * s64(m_dtdy >> 14);
+	s64 texdx = s64(m_reg.ds_dx() >> 14) * s64(m_reg.ds_dx() >> 14) + s64(m_reg.dt_dx() >> 14) * s64(m_reg.dt_dx() >> 14);
+	s64 texdy = s64(m_reg.ds_dy() >> 14) * s64(m_reg.ds_dy() >> 14) + s64(m_reg.dt_dy() >> 14) * s64(m_reg.dt_dy() >> 14);
 
 	// pick whichever is larger and shift off some high bits -> 28.20
 	if (texdx < texdy)
@@ -2054,43 +2041,43 @@ u32 voodoo_device_base::reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_starts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_starts = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_starts = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_s(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_s(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_startt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_startt = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_startt = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_t(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_t(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dsdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dsdx = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dtdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dtdx = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dsdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dsdy = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dy(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dtdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dtdy = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dy(data64);
 	return 0;
 }
 
@@ -2107,43 +2094,43 @@ u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_fstarts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_starts = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_starts = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_s(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_s(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fstartt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_startt = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_startt = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_t(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_t(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_dsdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dsdx = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_dtdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dtdx = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_dsdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dsdy = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dy(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_dtdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dtdy = data64;
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dy(data64);
 	return 0;
 }
 
@@ -2157,25 +2144,25 @@ u32 voodoo_device_base::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_startw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
-	if (BIT(chipmask, 0)) m_fbi.m_startw = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_startw = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_startw = data64;
+	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_w(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_w(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
-	if (BIT(chipmask, 0)) m_fbi.m_dwdx = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dwdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dwdx = data64;
+	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
-	if (BIT(chipmask, 0)) m_fbi.m_dwdy = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dwdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dwdy = data64;
+	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dy(data64);
 	return 0;
 }
 
@@ -2189,25 +2176,25 @@ u32 voodoo_device_base::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_fstartw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 0)) m_fbi.m_startw = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_startw = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_startw = data64;
+	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_w(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_w(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 0)) m_fbi.m_dwdx = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dwdx = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dwdx = data64;
+	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 0)) m_fbi.m_dwdy = data64;
-	if (BIT(chipmask, 1)) m_tmu[0].m_dwdy = data64;
-	if (BIT(chipmask, 2)) m_tmu[1].m_dwdy = data64;
+	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dy(data64);
 	return 0;
 }
 
@@ -2219,7 +2206,6 @@ u32 voodoo_device_base::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_device_base::reg_triangle_w(u32 chipmask, u32 regnum, u32 data)
 {
-	m_fbi.m_sign = data;
 	return triangle();
 }
 
@@ -3827,19 +3813,19 @@ s32 voodoo_device_base::triangle()
 	poly.startb = m_reg.start_b();
 	poly.starta = m_reg.start_a();
 	poly.startz = m_reg.start_z();
-	poly.startw = m_fbi.m_startw;
+	poly.startw = m_reg.start_w();
 	poly.drdx = m_reg.dr_dx();
 	poly.dgdx = m_reg.dg_dx();
 	poly.dbdx = m_reg.db_dx();
 	poly.dadx = m_reg.da_dx();
 	poly.dzdx = m_reg.dz_dx();
-	poly.dwdx = m_fbi.m_dwdx;
+	poly.dwdx = m_reg.dw_dx();
 	poly.drdy = m_reg.dr_dy();
 	poly.dgdy = m_reg.dg_dy();
 	poly.dbdy = m_reg.db_dy();
 	poly.dady = m_reg.da_dy();
 	poly.dzdy = m_reg.dz_dy();
-	poly.dwdy = m_fbi.m_dwdy;
+	poly.dwdy = m_reg.dw_dy();
 
 	// perform subpixel adjustments -- note that the documentation indicates this
 	// is done in the internal registers, so do it there
@@ -3854,19 +3840,19 @@ s32 voodoo_device_base::triangle()
 		m_reg.write(voodoo_regs::reg_startB, poly.startb += (dy * poly.dbdy + dx * poly.dbdx) >> 4);
 		m_reg.write(voodoo_regs::reg_startA, poly.starta += (dy * poly.dady + dx * poly.dadx) >> 4);
 		m_reg.write(voodoo_regs::reg_startZ, poly.startz += (dy * poly.dzdy + dx * poly.dzdx) >> 4);
-		m_fbi.m_startw += (dy * poly.dwdy + dx * poly.dwdx) >> 4;
+		m_reg.write_start_w(poly.startw += (dy * poly.dwdy + dx * poly.dwdx) >> 4);
 
 		// adjust iterated W/S/T for TMU 0
-		m_tmu[0].m_startw += (dy * m_tmu[0].m_dwdy + dx * m_tmu[0].m_dwdx) >> 4;
-		m_tmu[0].m_starts += (dy * m_tmu[0].m_dsdy + dx * m_tmu[0].m_dsdx) >> 4;
-		m_tmu[0].m_startt += (dy * m_tmu[0].m_dtdy + dx * m_tmu[0].m_dtdx) >> 4;
+		m_tmu[0].m_reg.write_start_w(m_tmu[0].m_reg.start_w() + ((dy * m_tmu[0].m_reg.dw_dy() + dx * m_tmu[0].m_reg.dw_dx()) >> 4));
+		m_tmu[0].m_reg.write_start_s(m_tmu[0].m_reg.start_s() + ((dy * m_tmu[0].m_reg.ds_dy() + dx * m_tmu[0].m_reg.ds_dx()) >> 4));
+		m_tmu[0].m_reg.write_start_t(m_tmu[0].m_reg.start_t() + ((dy * m_tmu[0].m_reg.dt_dy() + dx * m_tmu[0].m_reg.dt_dx()) >> 4));
 
 		// adjust iterated W/S/T for TMU 1
 		if (BIT(m_chipmask, 2))
 		{
-			m_tmu[1].m_startw += (dy * m_tmu[1].m_dwdy + dx * m_tmu[1].m_dwdx) >> 4;
-			m_tmu[1].m_starts += (dy * m_tmu[1].m_dsdy + dx * m_tmu[1].m_dsdx) >> 4;
-			m_tmu[1].m_startt += (dy * m_tmu[1].m_dtdy + dx * m_tmu[1].m_dtdx) >> 4;
+			m_tmu[1].m_reg.write_start_w(m_tmu[1].m_reg.start_w() + ((dy * m_tmu[1].m_reg.dw_dy() + dx * m_tmu[1].m_reg.dw_dx()) >> 4));
+			m_tmu[1].m_reg.write_start_s(m_tmu[1].m_reg.start_s() + ((dy * m_tmu[1].m_reg.ds_dy() + dx * m_tmu[1].m_reg.ds_dx()) >> 4));
+			m_tmu[1].m_reg.write_start_t(m_tmu[1].m_reg.start_t() + ((dy * m_tmu[1].m_reg.dt_dy() + dx * m_tmu[1].m_reg.dt_dx()) >> 4));
 		}
 	}
 
@@ -3874,15 +3860,15 @@ s32 voodoo_device_base::triangle()
 	poly.tex0 = nullptr;
 	if (poly.raster.texmode0().raw() != 0xffffffff)
 	{
-		poly.starts0 = m_tmu[0].m_starts;
-		poly.startt0 = m_tmu[0].m_startt;
-		poly.startw0 = m_tmu[0].m_startw;
-		poly.ds0dx = m_tmu[0].m_dsdx;
-		poly.dt0dx = m_tmu[0].m_dtdx;
-		poly.dw0dx = m_tmu[0].m_dwdx;
-		poly.ds0dy = m_tmu[0].m_dsdy;
-		poly.dt0dy = m_tmu[0].m_dtdy;
-		poly.dw0dy = m_tmu[0].m_dwdy;
+		poly.starts0 = m_tmu[0].m_reg.start_s();
+		poly.startt0 = m_tmu[0].m_reg.start_t();
+		poly.startw0 = m_tmu[0].m_reg.start_w();
+		poly.ds0dx = m_tmu[0].m_reg.ds_dx();
+		poly.dt0dx = m_tmu[0].m_reg.dt_dx();
+		poly.dw0dx = m_tmu[0].m_reg.dw_dx();
+		poly.ds0dy = m_tmu[0].m_reg.ds_dy();
+		poly.dt0dy = m_tmu[0].m_reg.dt_dy();
+		poly.dw0dy = m_tmu[0].m_reg.dw_dy();
 		poly.lodbase0 = m_tmu[0].compute_lodbase();
 		poly.tex0 = &m_tmu[0].prepare_texture();
 		if (DEBUG_STATS)
@@ -3893,15 +3879,15 @@ s32 voodoo_device_base::triangle()
 	poly.tex1 = nullptr;
 	if (poly.raster.texmode1().raw() != 0xffffffff)
 	{
-		poly.starts1 = m_tmu[1].m_starts;
-		poly.startt1 = m_tmu[1].m_startt;
-		poly.startw1 = m_tmu[1].m_startw;
-		poly.ds1dx = m_tmu[1].m_dsdx;
-		poly.dt1dx = m_tmu[1].m_dtdx;
-		poly.dw1dx = m_tmu[1].m_dwdx;
-		poly.ds1dy = m_tmu[1].m_dsdy;
-		poly.dt1dy = m_tmu[1].m_dtdy;
-		poly.dw1dy = m_tmu[1].m_dwdy;
+		poly.starts1 = m_tmu[1].m_reg.start_s();
+		poly.startt1 = m_tmu[1].m_reg.start_t();
+		poly.startw1 = m_tmu[1].m_reg.start_w();
+		poly.ds1dx = m_tmu[1].m_reg.ds_dx();
+		poly.dt1dx = m_tmu[1].m_reg.dt_dx();
+		poly.dw1dx = m_tmu[1].m_reg.dw_dx();
+		poly.ds1dy = m_tmu[1].m_reg.ds_dy();
+		poly.dt1dy = m_tmu[1].m_reg.dt_dy();
+		poly.dw1dy = m_tmu[1].m_reg.dw_dy();
 		poly.lodbase1 = m_tmu[1].compute_lodbase();
 		poly.tex1 = &m_tmu[1].prepare_texture();
 		if (DEBUG_STATS)
@@ -4064,47 +4050,83 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 	tdiv = divisor * 65536.0f * 65536.0f;
 	if (setup_mode.setup_wb())
 	{
-		m_fbi.m_startw = m_tmu[0].m_startw = m_tmu[1].m_startw = s64(sv0.wb * 65536.0f * 65536.0f);
-		m_fbi.m_dwdx = m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = s64(((sv0.wb - sv1.wb) * dx1 - (sv0.wb - sv2.wb) * dx2) * tdiv);
-		m_fbi.m_dwdy = m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = s64(((sv0.wb - sv2.wb) * dy1 - (sv0.wb - sv1.wb) * dy2) * tdiv);
+		s64 startw = s64(sv0.wb * 65536.0f * 65536.0f);
+		s64 dwdx = s64(((sv0.wb - sv1.wb) * dx1 - (sv0.wb - sv2.wb) * dx2) * tdiv);
+		s64 dwdy = s64(((sv0.wb - sv2.wb) * dy1 - (sv0.wb - sv1.wb) * dy2) * tdiv);
+		m_reg.write_start_w(startw);
+		m_reg.write_dw_dx(dwdx);
+		m_reg.write_dw_dy(dwdy);
+		m_tmu[0].m_reg.write_start_w(startw);
+		m_tmu[0].m_reg.write_dw_dx(dwdx);
+		m_tmu[0].m_reg.write_dw_dy(dwdy);
+		m_tmu[1].m_reg.write_start_w(startw);
+		m_tmu[1].m_reg.write_dw_dx(dwdx);
+		m_tmu[1].m_reg.write_dw_dy(dwdy);
 	}
 
 	// set up W0
 	if (setup_mode.setup_w0())
 	{
-		m_tmu[0].m_startw = m_tmu[1].m_startw = s64(sv0.w0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dwdx = m_tmu[1].m_dwdx = s64(((sv0.w0 - sv1.w0) * dx1 - (sv0.w0 - sv2.w0) * dx2) * tdiv);
-		m_tmu[0].m_dwdy = m_tmu[1].m_dwdy = s64(((sv0.w0 - sv2.w0) * dy1 - (sv0.w0 - sv1.w0) * dy2) * tdiv);
+		s64 startw = s64(sv0.w0 * 65536.0f * 65536.0f);
+		s64 dwdx = s64(((sv0.w0 - sv1.w0) * dx1 - (sv0.w0 - sv2.w0) * dx2) * tdiv);
+		s64 dwdy = s64(((sv0.w0 - sv2.w0) * dy1 - (sv0.w0 - sv1.w0) * dy2) * tdiv);
+		m_tmu[0].m_reg.write_start_w(startw);
+		m_tmu[0].m_reg.write_dw_dx(dwdx);
+		m_tmu[0].m_reg.write_dw_dy(dwdy);
+		m_tmu[1].m_reg.write_start_w(startw);
+		m_tmu[1].m_reg.write_dw_dx(dwdx);
+		m_tmu[1].m_reg.write_dw_dy(dwdy);
 	}
 
 	// set up S0,T0
 	if (setup_mode.setup_st0())
 	{
-		m_tmu[0].m_starts = m_tmu[1].m_starts = s64(sv0.s0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dsdx = m_tmu[1].m_dsdx = s64(((sv0.s0 - sv1.s0) * dx1 - (sv0.s0 - sv2.s0) * dx2) * tdiv);
-		m_tmu[0].m_dsdy = m_tmu[1].m_dsdy = s64(((sv0.s0 - sv2.s0) * dy1 - (sv0.s0 - sv1.s0) * dy2) * tdiv);
-		m_tmu[0].m_startt = m_tmu[1].m_startt = s64(sv0.t0 * 65536.0f * 65536.0f);
-		m_tmu[0].m_dtdx = m_tmu[1].m_dtdx = s64(((sv0.t0 - sv1.t0) * dx1 - (sv0.t0 - sv2.t0) * dx2) * tdiv);
-		m_tmu[0].m_dtdy = m_tmu[1].m_dtdy = s64(((sv0.t0 - sv2.t0) * dy1 - (sv0.t0 - sv1.t0) * dy2) * tdiv);
+		s64 starts = s64(sv0.s0 * 65536.0f * 65536.0f);
+		s64 dsdx = s64(((sv0.s0 - sv1.s0) * dx1 - (sv0.s0 - sv2.s0) * dx2) * tdiv);
+		s64 dsdy = s64(((sv0.s0 - sv2.s0) * dy1 - (sv0.s0 - sv1.s0) * dy2) * tdiv);
+		s64 startt = s64(sv0.t0 * 65536.0f * 65536.0f);
+		s64 dtdx = s64(((sv0.t0 - sv1.t0) * dx1 - (sv0.t0 - sv2.t0) * dx2) * tdiv);
+		s64 dtdy = s64(((sv0.t0 - sv2.t0) * dy1 - (sv0.t0 - sv1.t0) * dy2) * tdiv);
+		m_tmu[0].m_reg.write_start_s(starts);
+		m_tmu[0].m_reg.write_start_t(startt);
+		m_tmu[0].m_reg.write_ds_dx(dsdx);
+		m_tmu[0].m_reg.write_dt_dx(dtdx);
+		m_tmu[0].m_reg.write_ds_dy(dsdy);
+		m_tmu[0].m_reg.write_dt_dy(dtdy);
+		m_tmu[1].m_reg.write_start_s(starts);
+		m_tmu[1].m_reg.write_start_t(startt);
+		m_tmu[1].m_reg.write_ds_dx(dsdx);
+		m_tmu[1].m_reg.write_dt_dx(dtdx);
+		m_tmu[1].m_reg.write_ds_dy(dsdy);
+		m_tmu[1].m_reg.write_dt_dy(dtdy);
 	}
 
 	// set up W1
 	if (setup_mode.setup_w1())
 	{
-		m_tmu[1].m_startw = s64(sv0.w1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dwdx = s64(((sv0.w1 - sv1.w1) * dx1 - (sv0.w1 - sv2.w1) * dx2) * tdiv);
-		m_tmu[1].m_dwdy = s64(((sv0.w1 - sv2.w1) * dy1 - (sv0.w1 - sv1.w1) * dy2) * tdiv);
+		s64 startw = s64(sv0.w1 * 65536.0f * 65536.0f);
+		s64 dwdx = s64(((sv0.w1 - sv1.w1) * dx1 - (sv0.w1 - sv2.w1) * dx2) * tdiv);
+		s64 dwdy = s64(((sv0.w1 - sv2.w1) * dy1 - (sv0.w1 - sv1.w1) * dy2) * tdiv);
+		m_tmu[1].m_reg.write_start_w(startw);
+		m_tmu[1].m_reg.write_dw_dx(dwdx);
+		m_tmu[1].m_reg.write_dw_dy(dwdy);
 	}
 
 	// set up S1,T1
 	if (setup_mode.setup_st1())
 	{
-		m_tmu[1].m_starts = s64(sv0.s1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dsdx = s64(((sv0.s1 - sv1.s1) * dx1 - (sv0.s1 - sv2.s1) * dx2) * tdiv);
-		m_tmu[1].m_dsdy = s64(((sv0.s1 - sv2.s1) * dy1 - (sv0.s1 - sv1.s1) * dy2) * tdiv);
-		m_tmu[1].m_startt = s64(sv0.t1 * 65536.0f * 65536.0f);
-		m_tmu[1].m_dtdx = s64(((sv0.t1 - sv1.t1) * dx1 - (sv0.t1 - sv2.t1) * dx2) * tdiv);
-		m_tmu[1].m_dtdy = s64(((sv0.t1 - sv2.t1) * dy1 - (sv0.t1 - sv1.t1) * dy2) * tdiv);
+		s64 starts = s64(sv0.s1 * 65536.0f * 65536.0f);
+		s64 dsdx = s64(((sv0.s1 - sv1.s1) * dx1 - (sv0.s1 - sv2.s1) * dx2) * tdiv);
+		s64 dsdy = s64(((sv0.s1 - sv2.s1) * dy1 - (sv0.s1 - sv1.s1) * dy2) * tdiv);
+		s64 startt = s64(sv0.t1 * 65536.0f * 65536.0f);
+		s64 dtdx = s64(((sv0.t1 - sv1.t1) * dx1 - (sv0.t1 - sv2.t1) * dx2) * tdiv);
+		s64 dtdy = s64(((sv0.t1 - sv2.t1) * dy1 - (sv0.t1 - sv1.t1) * dy2) * tdiv);
+		m_tmu[1].m_reg.write_start_s(starts);
+		m_tmu[1].m_reg.write_start_t(startt);
+		m_tmu[1].m_reg.write_ds_dx(dsdx);
+		m_tmu[1].m_reg.write_dt_dx(dtdx);
+		m_tmu[1].m_reg.write_ds_dy(dsdy);
+		m_tmu[1].m_reg.write_dt_dy(dtdy);
 	}
 
 	// draw the triangle

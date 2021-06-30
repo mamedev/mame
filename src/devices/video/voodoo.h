@@ -356,13 +356,6 @@ protected:
 		voodoo::voodoo_regs m_reg;      // TMU registers
 		bool m_regdirty;                // true if the LOD/mode/base registers have changed
 
-		s64 m_starts, m_startt;         // starting S,T (14.18)
-		s64 m_startw;                   // starting W (2.30)
-		s64 m_dsdx, m_dtdx;             // delta S,T per X
-		s64 m_dwdx;                     // delta W per X
-		s64 m_dsdy, m_dtdy;             // delta S,T per Y
-		s64 m_dwdy;                     // delta W per Y
-
 		rgb_t *m_texel[16];             // texel lookups for each format
 		bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
 		rgb_t m_palette[2][256];        // 2 versions of the palette
@@ -422,12 +415,6 @@ protected:
 		u8 m_vblank_swap;             // swap when we hit this count
 		u8 m_vblank_dont_swap;        // don't actually swap when we hit this point
 
-		// triangle setup info
-		s32 m_sign;                   // triangle sign
-		s64 m_startw;                 // starting W (16.32)
-		s64 m_dwdx;                   // delta W per X
-		s64 m_dwdy;                   // delta W per Y
-
 		u8 m_sverts = 0;              // number of vertices ready
 		voodoo::setup_vertex m_svert[4];      // 3 setup vertices
 		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
@@ -447,7 +434,7 @@ protected:
 		void data_w(u8 regum, u8 data);
 		void data_r(u8 regnum);
 
-		u8 m_reg[8];                 // 8 registers
+		u8 m_reg[32];              // 8/32 registers (rev1/rev2+)
 		u8 read_result;            // pending read result
 	};
 
@@ -455,7 +442,6 @@ protected:
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);
 	void init_fbi(fbi_state *f, void *memory, int fbmem);
-	s32 register_w(offs_t offset, u32 data);
 	s32 swapbuffer(u32 data);
 	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 lfb_r(offs_t offset, bool lfb_3d);

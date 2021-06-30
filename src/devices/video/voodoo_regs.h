@@ -1113,16 +1113,25 @@ public:
 	s32 start_b() const { return s24(m_regs[reg_startB].u); }
 	s32 start_a() const { return s24(m_regs[reg_startA].u); }
 	s32 start_z() const { return m_regs[reg_startZ].u; }
+	s64 start_s() const { return m_starts; }
+	s64 start_t() const { return m_startt; }
+	s64 start_w() const { return m_startw; }
 	s32 dr_dx() const { return s24(m_regs[reg_dRdX].u); }
 	s32 dg_dx() const { return s24(m_regs[reg_dGdX].u); }
 	s32 db_dx() const { return s24(m_regs[reg_dBdX].u); }
 	s32 da_dx() const { return s24(m_regs[reg_dAdX].u); }
 	s32 dz_dx() const { return m_regs[reg_dZdX].u; }
+	s64 ds_dx() const { return m_dsdx; }
+	s64 dt_dx() const { return m_dtdx; }
+	s64 dw_dx() const { return m_dwdx; }
 	s32 dr_dy() const { return s24(m_regs[reg_dRdY].u); }
 	s32 dg_dy() const { return s24(m_regs[reg_dGdY].u); }
 	s32 db_dy() const { return s24(m_regs[reg_dBdY].u); }
 	s32 da_dy() const { return s24(m_regs[reg_dAdY].u); }
 	s32 dz_dy() const { return m_regs[reg_dZdY].u; }
+	s64 ds_dy() const { return m_dsdy; }
+	s64 dt_dy() const { return m_dtdy; }
+	s64 dw_dy() const { return m_dwdy; }
 	reg_fbz_colorpath fbz_colorpath() const { return reg_fbz_colorpath(m_regs[reg_fbzColorPath].u); }
 	reg_fog_mode fog_mode() const { return reg_fog_mode(m_regs[reg_fogMode].u); }
 	reg_alpha_mode alpha_mode() const { return reg_alpha_mode(m_regs[reg_alphaMode].u); }
@@ -1174,6 +1183,15 @@ public:
 	void add(u32 index, u32 data) { m_regs[index].u += data; }
 	void clear_set(u32 index, u32 clear, u32 set) { m_regs[index].u &= ~clear; m_regs[index].u |= set; }
 	void write_float(u32 index, float data) { m_regs[index].f = data; }
+	void write_start_s(s64 data) { m_starts = data; }
+	void write_start_t(s64 data) { m_startt = data; }
+	void write_start_w(s64 data) { m_startw = data; }
+	void write_ds_dx(s64 data) { m_dsdx = data; }
+	void write_dt_dx(s64 data) { m_dtdx = data; }
+	void write_dw_dx(s64 data) { m_dwdx = data; }
+	void write_ds_dy(s64 data) { m_dsdy = data; }
+	void write_dt_dy(s64 data) { m_dtdy = data; }
+	void write_dw_dy(s64 data) { m_dwdy = data; }
 
 	// special swap history helper
 	void update_swap_history(u32 count) { m_regs[reg_fbiSwapHistory].u = (m_regs[reg_fbiSwapHistory].u << 4) | count; }
@@ -1188,6 +1206,12 @@ public:
 		float f;
 	};
 	register_data m_regs[0x100];
+	s64 m_starts, m_startt;         // starting S,T (14.18)
+	s64 m_startw;                   // starting W (2.30) -> 16.48
+	s64 m_dsdx, m_dtdx;             // delta S,T per X
+	s64 m_dwdx;                     // delta W per X
+	s64 m_dsdy, m_dtdy;             // delta S,T per Y
+	s64 m_dwdy;                     // delta W per Y
 private:
 	u8 m_revision;
 	static u8 const s_alias_map[0x40];
