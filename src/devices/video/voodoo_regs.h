@@ -27,29 +27,81 @@ static constexpr u8 LFB_ALPHA_PRESENT     = 2;
 static constexpr u8 LFB_DEPTH_PRESENT     = 4;
 static constexpr u8 LFB_DEPTH_PRESENT_MSW = 8;
 
-// flags for the register access array
-static constexpr u8 REGISTER_READ         = 0x01; // reads are allowed
-static constexpr u8 REGISTER_WRITE        = 0x02; // writes are allowed
-static constexpr u8 REGISTER_PIPELINED    = 0x04; // writes are pipelined
-static constexpr u8 REGISTER_FIFO         = 0x08; // writes go to FIFO
-static constexpr u8 REGISTER_WRITETHRU    = 0x10; // writes are valid even for CMDFIFO
 
-// shorter combinations to make the table smaller
-static constexpr u8 REG_R    = REGISTER_READ;
-static constexpr u8 REG_W    = REGISTER_WRITE;
-static constexpr u8 REG_WT   = REGISTER_WRITE | REGISTER_WRITETHRU;
-static constexpr u8 REG_RW   = REGISTER_READ | REGISTER_WRITE;
-static constexpr u8 REG_RWT  = REGISTER_READ | REGISTER_WRITE | REGISTER_WRITETHRU;
-static constexpr u8 REG_RP   = REGISTER_READ | REGISTER_PIPELINED;
-static constexpr u8 REG_WP   = REGISTER_WRITE | REGISTER_PIPELINED;
-static constexpr u8 REG_RWP  = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED;
-static constexpr u8 REG_RWPT = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_WRITETHRU;
-static constexpr u8 REG_RF   = REGISTER_READ | REGISTER_FIFO;
-static constexpr u8 REG_WF   = REGISTER_WRITE | REGISTER_FIFO;
-static constexpr u8 REG_RWF  = REGISTER_READ | REGISTER_WRITE | REGISTER_FIFO;
-static constexpr u8 REG_RPF  = REGISTER_READ | REGISTER_PIPELINED | REGISTER_FIFO;
-static constexpr u8 REG_WPF  = REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO;
-static constexpr u8 REG_RWPF = REGISTER_READ | REGISTER_WRITE | REGISTER_PIPELINED | REGISTER_FIFO;
+//**************************************************************************
+//  REGISTER TABLE TYPES
+//**************************************************************************
+
+// ======================> static_register_table_entry
+
+template<typename BaseType>
+struct static_register_table_entry
+{
+	using read_handler = u32 (BaseType::*)(u32 chipmask, u32 regnum);
+	using write_handler = u32 (BaseType::*)(u32 chipmask, u32 regnum, u32 data);
+
+	u32 m_mask;                // mask to apply to written data
+	u32 m_chipmask_flags;      // valid chips, plus flags
+	char const *m_name;        // string name
+	write_handler m_write;     // write handler
+	read_handler m_read;       // read handler
+};
+
+
+// ======================> register_table_entry
+
+class register_table_entry
+{
+public:
+	// internal delegates
+	using read_handler = delegate<u32 (u32, u32)>;
+	using write_handler = delegate<u32 (u32, u32, u32)>;
+
+	// flags for the chipmask
+	static constexpr u32 CHIPMASK_NA       = 0x0000;
+	static constexpr u32 CHIPMASK_FBI      = 0x0001;
+	static constexpr u32 CHIPMASK_TREX     = 0x0006;
+	static constexpr u32 CHIPMASK_FBI_TREX = 0x0007;
+
+	// flags for the sync state
+	static constexpr u32 SYNC_NA           = 0x0000;
+	static constexpr u32 SYNC_NOSYNC       = 0x0000;
+	static constexpr u32 SYNC_SYNC         = 0x0100;
+
+	// flags for the FIFO state
+	static constexpr u32 FIFO_NA           = 0x0000;
+	static constexpr u32 FIFO_NOFIFO       = 0x0000;
+	static constexpr u32 FIFO_FIFO         = 0x0200;
+
+	// simple getters
+	char const *name() const { return m_name; }
+	bool is_sync() const { return ((m_chipmask_flags & SYNC_SYNC) != 0); }
+	bool is_fifo() const { return ((m_chipmask_flags & FIFO_FIFO) != 0); }
+
+	// read/write helpers
+	u32 read(voodoo_device_base &device, u32 chipmask, u32 regnum) const;
+	u32 write(voodoo_device_base &device, u32 chipmask, u32 regnum, u32 data) const;
+
+	// unpack from a static entry
+	template<typename BaseType>
+	void unpack(static_register_table_entry<BaseType> const &source, BaseType &device)
+	{
+		m_mask = source.m_mask;
+		m_chipmask_flags = source.m_chipmask_flags;
+		m_name = source.m_name;
+		m_write = write_handler(source.m_write, &device);
+		m_read = read_handler(source.m_read, &device);
+	}
+
+private:
+	// internal state
+	u32 m_mask;                // mask to apply to written data
+	u32 m_chipmask_flags;      // valid chips, plus flags
+	char const *m_name;        // string name
+	write_handler m_write;     // write handler
+	read_handler m_read;       // read handler
+};
+
 
 
 //**************************************************************************
@@ -830,6 +882,8 @@ private:
 class voodoo_regs
 {
 public:
+	static constexpr s32 s24(s32 value) { return s32(value << 8) >> 8; }
+
 	// 0x000
 	static constexpr u32 reg_vdstatus =        0x000/4;   // R  P
 	static constexpr u32 reg_intrCtrl =        0x004/4;   // RW P   -- Voodoo2/Banshee only
@@ -1024,9 +1078,7 @@ public:
 
 	// constructor
 	voodoo_regs(voodoo_model model) :
-		m_revision((model == MODEL_VOODOO_1) ? 1 : (model == MODEL_VOODOO_2) ? 2 : 3),
-		m_names(s_names[m_revision - 1]),
-		m_access(s_access[m_revision - 1])
+		m_revision((model == MODEL_VOODOO_1) ? 1 : (model == MODEL_VOODOO_2) ? 2 : 3)
 	{
 		for (int index = 0; index < std::size(m_regs); index++)
 			m_regs[index].u = 0;
@@ -1044,25 +1096,33 @@ public:
 	bool rev1_or_2() const { return (m_revision <= 2); }
 	bool rev2_or_3() const { return (m_revision >= 2); }
 
-	// helpers
-	bool is_readable(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_READ) != 0); }
-	bool is_writable(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_WRITE) != 0); }
-	bool is_writethru(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_WRITETHRU) != 0); }
-	bool is_fifo(u32 regnum) { return ((m_access[regnum & 0xff] & REGISTER_FIFO) != 0); }
-	char const *name(u32 regnum) { return m_names[regnum & 0xff]; }
-
 	// register aliasing
-	u32 alias(u32 regnum) const
-	{
-		regnum &= 0xff;
-		if (regnum < 0x40 && (m_revision == 3 || fbi_init3().tri_register_remap()))
-			return s_alias_map[regnum];
-		return regnum;
-	}
+	static u32 alias(u32 regnum) { return (regnum < 0x40) ? s_alias_map[regnum] : regnum; }
 
 	// simple readers
 	u32 read(u32 index) const { return m_regs[index].u; }
 	float read_float(u32 index) const { return m_regs[index].f; }
+	s32 ax() const { return s16(m_regs[reg_vertexAx].u); }
+	s32 ay() const { return s16(m_regs[reg_vertexAy].u); }
+	s32 bx() const { return s16(m_regs[reg_vertexBx].u); }
+	s32 by() const { return s16(m_regs[reg_vertexBy].u); }
+	s32 cx() const { return s16(m_regs[reg_vertexCx].u); }
+	s32 cy() const { return s16(m_regs[reg_vertexCy].u); }
+	s32 start_r() const { return s24(m_regs[reg_startR].u); }
+	s32 start_g() const { return s24(m_regs[reg_startG].u); }
+	s32 start_b() const { return s24(m_regs[reg_startB].u); }
+	s32 start_a() const { return s24(m_regs[reg_startA].u); }
+	s32 start_z() const { return m_regs[reg_startZ].u; }
+	s32 dr_dx() const { return s24(m_regs[reg_dRdX].u); }
+	s32 dg_dx() const { return s24(m_regs[reg_dGdX].u); }
+	s32 db_dx() const { return s24(m_regs[reg_dBdX].u); }
+	s32 da_dx() const { return s24(m_regs[reg_dAdX].u); }
+	s32 dz_dx() const { return m_regs[reg_dZdX].u; }
+	s32 dr_dy() const { return s24(m_regs[reg_dRdY].u); }
+	s32 dg_dy() const { return s24(m_regs[reg_dGdY].u); }
+	s32 db_dy() const { return s24(m_regs[reg_dBdY].u); }
+	s32 da_dy() const { return s24(m_regs[reg_dAdY].u); }
+	s32 dz_dy() const { return m_regs[reg_dZdY].u; }
 	reg_fbz_colorpath fbz_colorpath() const { return reg_fbz_colorpath(m_regs[reg_fbzColorPath].u); }
 	reg_fog_mode fog_mode() const { return reg_fog_mode(m_regs[reg_fogMode].u); }
 	reg_alpha_mode alpha_mode() const { return reg_alpha_mode(m_regs[reg_alphaMode].u); }
@@ -1130,19 +1190,7 @@ public:
 	register_data m_regs[0x100];
 private:
 	u8 m_revision;
-	char const *const *const m_names;
-	u8 const *const m_access;
-
 	static u8 const s_alias_map[0x40];
-
-	static u8 const *const s_access[3];
-	static u8 const s_access_rev1[0x100];
-	static u8 const s_access_rev2[0x100];
-	static u8 const s_access_rev3[0x100];
-
-	static char const *const *const s_names[3];
-	static char const *const s_names_rev1[0x100];
-	static char const *const s_names_rev3[0x100];
 
 public:
 	static char const *const s_banshee_io_reg_name[0x40];

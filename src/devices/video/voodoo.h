@@ -22,8 +22,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define NEW_REGISTER_DISPATCH (0)
-
 // maximum number of TMUs
 static constexpr int MAX_TMU = 2;
 
@@ -40,16 +38,13 @@ enum voodoo_model : u8
 static constexpr u32 STD_VOODOO_1_CLOCK = 50000000;
 static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
 
-#include "voodoo_regs.h"
-#include "voodoo_render.h"
-
-
-namespace voodoo
-{
 
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
+
+namespace voodoo
+{
 
 // debug
 static constexpr bool DEBUG_DEPTH = false;		// ENTER key to view depthbuf
@@ -58,26 +53,49 @@ static constexpr bool DEBUG_STATS = false;		// \ key to view stats
 
 												// logging
 static constexpr bool LOG_VBLANK_SWAP = false;
-static constexpr bool LOG_FIFO = false;
-static constexpr bool LOG_FIFO_VERBOSE = false;
-static constexpr bool LOG_REGISTERS = false;
+static constexpr bool LOG_FIFO = true;
+static constexpr bool LOG_FIFO_VERBOSE = true;
+static constexpr bool LOG_REGISTERS = true;
 static constexpr bool LOG_WAITS = false;
 static constexpr bool LOG_LFB = false;
 static constexpr bool LOG_TEXTURE_RAM = false;
-static constexpr bool LOG_CMDFIFO = false;
-static constexpr bool LOG_CMDFIFO_VERBOSE = false;
+static constexpr bool LOG_CMDFIFO = true;
+static constexpr bool LOG_CMDFIFO_VERBOSE = true;
 static constexpr bool LOG_BANSHEE_2D = false;
 
 // Need to turn off cycle eating when debugging MIPS drc
 // otherwise timer interrupts won't match nodrc debug mode.
 static constexpr bool EAT_CYCLES = true;
 
+}
+
 
 //**************************************************************************
 //  INTERNAL CLASSES
 //**************************************************************************
 
+namespace voodoo
+{
 class voodoo_device_base;
+}
+
+// include register and render classes
+#include "voodoo_regs.h"
+#include "voodoo_render.h"
+
+namespace voodoo
+{
+
+
+// FIFO flags, added to offset
+static constexpr offs_t FIFO_FLAGS_MASK     = 0xf0000000;
+static constexpr offs_t FIFO_TYPE_MASK      = 0xc0000000;
+static constexpr offs_t FIFO_TYPE_REGISTER  = 0x00000000;
+static constexpr offs_t FIFO_TYPE_LFB       = 0x40000000;
+static constexpr offs_t FIFO_TYPE_TEXTURE   = 0x80000000;
+static constexpr offs_t FIFO_NO_16_31       = 0x20000000;
+static constexpr offs_t FIFO_NO_0_15        = 0x10000000;
+
 
 // ======================> memory_fifo
 
@@ -271,6 +289,7 @@ public:
 class voodoo_device_base : public device_t, public device_video_interface
 {
 	friend class voodoo::command_fifo;
+	friend class voodoo::register_table_entry;
 
 protected:
 	// enumeration describing reasons we might be stalled
@@ -296,8 +315,8 @@ public:
 	// getters
 	voodoo_model model() const { return m_model; }
 
-	virtual u32 read(offs_t offset, u32 mem_mask = ~0);
-	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0);
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) = 0;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
 
 	virtual void core_map(address_map &map) = 0;
 
@@ -405,49 +424,10 @@ protected:
 
 		// triangle setup info
 		s32 m_sign;                   // triangle sign
-		s16 m_ax, m_ay;               // vertex A x,y (12.4)
-		s16 m_bx, m_by;               // vertex B x,y (12.4)
-		s16 m_cx, m_cy;               // vertex C x,y (12.4)
-		s32 m_startr, m_startg, m_startb, m_starta; // starting R,G,B,A (12.12)
-		s32 m_startz;                 // starting Z (20.12)
 		s64 m_startw;                 // starting W (16.32)
-		s32 m_drdx, m_dgdx, m_dbdx, m_dadx; // delta R,G,B,A per X
-		s32 m_dzdx;                   // delta Z per X
 		s64 m_dwdx;                   // delta W per X
-		s32 m_drdy, m_dgdy, m_dbdy, m_dady; // delta R,G,B,A per Y
-		s32 m_dzdy;                   // delta Z per Y
 		s64 m_dwdy;                   // delta W per Y
 
-#if NEW_REGISTER_DISPATCH
-		// core registers
-		reg_intr_ctrl m_intr_ctrl;
-		reg_hsync m_hsync;
-		reg_vsync m_vsync;
-		reg_back_porch m_back_porch;
-		reg_video_dimensions m_video_dimensions;
-		reg_clip_minmax m_clip_left_right;
-		reg_clip_minmax m_clip_low_y_high_y;
-		reg_fbz_colorpath m_fbz_color_path;
-		reg_fbz_mode m_fbz_mode;
-		reg_alpha_mode m_alpha_mode;
-		reg_fog_mode m_fog_mode;
-		reg_texture_mode m_texture_mode;
-		reg_texture_lod m_texture_lod;
-		reg_texture_detail m_texture_detail;
-		reg_lfb_mode m_lfb_mode;
-		reg_fbi_init0 m_fbi_init0;
-		reg_fbi_init1 m_fbi_init1;
-		reg_fbi_init2 m_fbi_init2;
-		reg_fbi_init3 m_fbi_init3;
-		reg_fbi_init4 m_fbi_init4;
-
-		// Voodoo-2-specific registers
-		reg_setup_mode m_setup_mode;
-		reg_chroma_range m_chroma_range;
-		reg_fbi_init5 m_fbi_init5;
-		reg_fbi_init6 m_fbi_init6;
-		reg_fbi_init7 m_fbi_init7;
-#endif
 		u8 m_sverts = 0;              // number of vertices ready
 		voodoo::setup_vertex m_svert[4];      // 3 setup vertices
 		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
@@ -490,8 +470,6 @@ protected:
 	void update_statistics(bool accumulate);
 	void reset_counters();
 
-	u32 register_r(offs_t offset);
-
 	void swap_buffers();
 
 protected:
@@ -502,6 +480,13 @@ protected:
 	bool prepare_for_write();
 	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
 
+	u32 chipmask_from_offset(u32 offset)
+	{
+		u32 chipmask = BIT(offset, 8, 4);
+		if (chipmask == 0)
+			chipmask = 0xf;
+		return chipmask & m_chipmask;
+	}
 	void register_save();
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
@@ -511,6 +496,62 @@ protected:
 	s32 draw_triangle();
 	void populate_setup_vertex(voodoo::setup_vertex &vertex);
 	s32 setup_and_draw_triangle();
+
+	// register read accessors
+	u32 reg_invalid_r(u32 chipmask, u32 regnum);
+	u32 reg_passive_r(u32 chipmask, u32 regnum);
+	u32 reg_status_r(u32 chipmask, u32 offset);
+	u32 reg_fbiinit2_r(u32 chipmask, u32 offset);
+	u32 reg_vretrace_r(u32 chipmask, u32 offset);
+	u32 reg_stats_r(u32 chipmask, u32 offset);
+
+	// register write accessors
+	u32 reg_invalid_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_passive_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_starts_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_startt_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dsdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dtdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dsdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dtdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstarts_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstartt_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_startw_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dwdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dwdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstartw_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_triangle_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_nop_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fastfill_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fogtable_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_video_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_clut_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dac_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_texture_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_palette_w(u32 chipmask, u32 regnum, u32 data);
+
+	// Voodoo-2 specific read handlers
+	u32 reg_hvretrace_r(u32 chipmask, u32 offset);
+
+	// Voodoo-2 specific write handlers
+	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_userintr_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
 
 	virtual void update_register_view() { }
 
@@ -554,6 +595,8 @@ protected:
 	memory_view m_regview;                   // switchable register view
 #endif
 
+	register_table_entry m_regtable[256];    // generated register table
+
 	// allocated memory
 	u8 *m_fbmem;                             // pointer to aligned framebuffer
 	u8 *m_tmumem[2];                         // pointer to aligned texture memory
@@ -571,6 +614,9 @@ class voodoo_1_device : public voodoo_device_base
 public:
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+
 	u32 map_register_r(offs_t offset);
 	u32 map_lfb_r(offs_t offset);
 
@@ -580,10 +626,11 @@ public:
 
 	virtual void core_map(address_map &map) override;
 
-protected:
-#if USE_MEMORY_VIEWS
-	virtual void update_register_view() override;
-#endif
+	// register accessors
+	u32 reg_status_w(u32 chipmask, u32 offset, u32 data);
+
+private:
+	static voodoo::static_register_table_entry<voodoo_1_device> const s_register_table[256];
 };
 
 
@@ -592,6 +639,9 @@ class voodoo_2_device : public voodoo_device_base
 public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+
 	u32 map_register_r(offs_t offset);
 	u32 map_lfb_r(offs_t offset);
 
@@ -605,6 +655,9 @@ protected:
 #if USE_MEMORY_VIEWS
 	virtual void update_register_view() override;
 #endif
+
+private:
+	static voodoo::static_register_table_entry<voodoo_2_device> const s_register_table[256];
 };
 
 

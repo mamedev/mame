@@ -86,6 +86,14 @@ protected:
 	void banshee_blit_2d(u32 data);
 	s32 lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
 
+	u32 reg_status_r(u32 chipmask, u32 offset);
+	u32 reg_colbufbase_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_colbufstride_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_auxbufbase_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_auxbufstride_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_swappending_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_overbuffer_w(u32 chipmask, u32 regnum, u32 data);
+
 	// internal state
 	struct banshee_info
 	{
@@ -116,6 +124,9 @@ protected:
 		u32 blt_src_bpp = 0;
 	};
 	banshee_info m_banshee;                  // Banshee state
+
+private:
+	static voodoo::static_register_table_entry<voodoo_banshee_device_base> const s_register_table[256];
 };
 
 

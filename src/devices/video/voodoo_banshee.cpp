@@ -45,6 +45,8 @@ using namespace voodoo;
 voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
 	: voodoo_device_base(mconfig, type, tag, owner, clock, model)
 {
+	for (int index = 0; index < std::size(m_regtable); index++)
+		m_regtable[index].unpack(s_register_table[index], *this);
 }
 
 
@@ -116,6 +118,103 @@ void voodoo_banshee_device_base::device_start()
 	save_item(NAME(m_banshee.gc));
 	save_item(NAME(m_banshee.att));
 	save_item(NAME(m_banshee.attff));
+}
+
+
+u32 voodoo_banshee_device_base::reg_status_r(u32 chipmask, u32 offset)
+{
+	u32 result = 0;
+
+	// bits 5:0 are the PCI FIFO free space
+	result |= std::min(m_pci_fifo.space() / 2, 0x3f) << 0;
+
+	// bit 6 is the vertical retrace
+	result |= m_fbi.m_vblank << 6;
+
+	// bit 7 is FBI graphics engine busy
+	// bit 8 is TREX busy
+	// bit 9 is overall busy */
+	if (operation_pending())
+		result |= (1 << 7) | (1 << 8) | (1 << 9);
+
+	// bit 10 is 2D busy
+
+	// bit 11 is cmd FIFO 0 busy
+	if (m_fbi.m_cmdfifo[0].enabled() && m_fbi.m_cmdfifo[0].depth() > 0)
+		result |= 1 << 11;
+
+	// bit 12 is cmd FIFO 1 busy
+	if (m_fbi.m_cmdfifo[1].enabled() && m_fbi.m_cmdfifo[1].depth() > 0)
+		result |= 1 << 12;
+
+	// bits 30:28 are the number of pending swaps
+	result |= std::min<u32>(m_fbi.m_swaps_pending, 7) << 28;
+
+	// eat some cycles since people like polling here
+	if (EAT_CYCLES)
+		m_cpu->eat_cycles(1000);
+
+	// bit 31 is PCI interrupt pending (not implemented)
+	return result;
+}
+
+u32 voodoo_banshee_device_base::reg_colbufbase_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_reg.write(regnum, data);
+		m_fbi.m_rgboffs[1] = data & m_fbi.m_mask & ~0x0f;
+	}
+	return 0;
+}
+
+u32 voodoo_banshee_device_base::reg_colbufstride_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_reg.write(regnum, data);
+		u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
+		if (newpix != m_fbi.m_rowpixels)
+		{
+			m_renderer->set_rowpixels(m_fbi.m_rowpixels = newpix);
+			m_fbi.m_video_changed = true;
+		}
+	}
+	return 0;
+}
+
+u32 voodoo_banshee_device_base::reg_auxbufbase_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_reg.write(regnum, data);
+		m_fbi.m_auxoffs = data & m_fbi.m_mask & ~0x0f;
+	}
+	return 0;
+}
+
+u32 voodoo_banshee_device_base::reg_auxbufstride_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_reg.write(regnum, data);
+		u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
+		if (newpix != m_fbi.m_rowpixels)
+			fatalerror("aux buffer stride differs from color buffer stride\n");
+	}
+	return 0;
+}
+
+u32 voodoo_banshee_device_base::reg_swappending_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0)) m_fbi.m_swaps_pending++;
+	return 0;
+}
+
+u32 voodoo_banshee_device_base::reg_overbuffer_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0)) m_reg.write(regnum, data);
+	return 0;
 }
 
 
@@ -364,7 +463,7 @@ u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 	switch (offset)
 	{
 		case io_status:
-			result = register_r(0);
+			result = m_regtable[voodoo_regs::reg_vdstatus].read(*this, 1, voodoo_regs::reg_vdstatus);
 			break;
 
 		case io_dacData:
@@ -1134,7 +1233,16 @@ u32 voodoo_banshee_device_base::map_2d_r(offs_t offset)
 u32 voodoo_banshee_device_base::map_register_r(offs_t offset)
 {
 	prepare_for_read();
-	return register_r(offset);
+
+	// extract chipmask and register
+	u32 chipmask = BIT(offset, 8, 4);
+	if (chipmask == 0)
+		chipmask = 0xf;
+	chipmask &= m_chipmask;
+	u32 regnum = BIT(offset, 0, 8);
+
+	// look up the register
+	return m_regtable[regnum].read(*this, chipmask, regnum);
 }
 
 
@@ -1195,35 +1303,38 @@ void voodoo_banshee_device_base::map_register_w(offs_t offset, u32 data, u32 mem
 {
 	bool pending = prepare_for_write();
 
+	// extract chipmask and register
+	u32 chipmask = BIT(offset, 8, 4);
+	if (chipmask == 0)
+		chipmask = 0xf;
+	chipmask &= m_chipmask;
+	u32 regnum = BIT(offset, 0, 8);
+
 	// handle register swizzling
 	if (BIT(offset, 20-2))
 		data = swapendian_int32(data);
 
 	// handle aliasing
 	if (BIT(offset, 21-2))
-		offset = (offset & ~0xff) | m_reg.alias(offset);
+		regnum = voodoo_regs::alias(regnum);
 
-	// at this point all that matters are the low 12 bits
-	offset &= 0xfff;
-
-	// ignore if writes aren't allowed
-	if (!m_reg.is_writable(offset))
-		return;
+	// look up the register
+	auto const &regentry = m_regtable[regnum];
 
 	// if this is non-FIFO command, execute immediately
-	if (!m_reg.is_fifo(offset))
-		return void(register_w(offset, data));
+	if (!regentry.is_fifo())
+		return void(regentry.write(*this, chipmask, regnum, data));
 
 	// track swap buffers
-	if ((offset & 0xff) == voodoo_regs::reg_swapbufferCMD)
+	if (regnum == voodoo_regs::reg_swapbufferCMD)
 		m_fbi.m_swaps_pending++;
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo(offset, data, mem_mask);
+		return add_to_fifo((chipmask << 4) | regnum | FIFO_TYPE_REGISTER, data, mem_mask);
 
 	// if we get a non-zero number of cycles back, mark things pending
-	int cycles = register_w(offset, data);
+	int cycles = regentry.write(*this, chipmask, regnum, data);
 	if (cycles > 0)
 	{
 		// if we ended up with cycles, mark the operation pending
