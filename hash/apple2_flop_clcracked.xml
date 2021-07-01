@@ -23653,10 +23653,18 @@ license:CC0
 		<year>1987</year>
 		<publisher>Activision</publisher>
 		<info name="release" value="2015-08-27"/>
+		<!-- Updated on June 30th, 2021 to fix missing side B -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="aliens (4am crack).dsk" size="143360" crc="a5cde005" sha1="20ab58e08cc16cf2c52c3d7cb6460cc42f3cd59e" />
+				<rom name="aliens (4am crack) side a.dsk" size="143360" crc="f73e332e" sha1="80bf2611d515eb4c8812f46c2bcca4e95087c34e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="aliens (4am crack) side b.dsk" size="143360" crc="001325b2" sha1="077d7e3d9fb920b6f7cfc69381eb447f44ce0713" />
 			</dataarea>
 		</part>
 	</software>

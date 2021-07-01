@@ -12131,10 +12131,18 @@ license:CC0
 		<info name="release" value="2020-04-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
+		<!-- Updated on June 30th, 2021 to fix missing side B -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241429">
-				<rom name="aliens.woz" size="241429" crc="2ccbad87" sha1="d254d20ef3095666ada034ea47327ef08375a672"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241454">
+				<rom name="aliens side a.woz" size="241454" crc="b2c5a729" sha1="61c4390f38e22f10944d08b22b2cfb8b2a15f433" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241512">
+				<rom name="aliens side b.woz" size="241512" crc="679750d7" sha1="6cebf1e969058e9fc0dd45b8641bdf0affb6160c" />
 			</dataarea>
 		</part>
 	</software>
