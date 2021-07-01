@@ -5180,7 +5180,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="freedos13rc4_720">
-		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition,  3.5" 720k)</description>
+		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 3.5" 720k)</description>
 		<year>2021</year>
 		<publisher>The FreeDOS Project</publisher>
 		<info name="version" value="1.3-RC4"/>

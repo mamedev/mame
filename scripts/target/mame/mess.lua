@@ -1899,6 +1899,7 @@ files {
 	MAME_DIR .. "src/mame/machine/lynx.cpp",
 	MAME_DIR .. "src/mame/drivers/pofo.cpp",
 	MAME_DIR .. "src/mame/machine/pofo_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/pofo_kbd.h",
 	MAME_DIR .. "src/mame/drivers/tvboy.cpp",
 }
 
