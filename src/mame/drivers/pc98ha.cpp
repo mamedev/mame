@@ -17,12 +17,12 @@
 		  Somehow obf irq is on at boot if battery failed?
     - power handling;
     - pc98ha specifics:
-		- RTC is upd4991a (unemulated), current hookup throws 2065 as year, 
-		  it's parallel instead of serial and incompatible with everything else ugh;
+		- RTC is upd4991a (partially done), it's parallel instead of serial and incompatible with
+		  everything else ugh;
 		- EMS fails at boot, it's never ever really checked;
         - MSDOS cannot detect EMS properly, is there a flag somewhere?
         - JEIDA memory card interface;
-        - optional docking station (for floppy device only or anything else?);
+        - optional docking station (for floppy device only or can mount other stuff?);
 
 **************************************************************************************************/
 
@@ -78,13 +78,16 @@ void pc98lt_state::power_control_w(offs_t offset, u8 data)
 	if (BIT(data, 0))
 		logerror("%s: power_control_w power off signal ON\n", machine().describe_context());
 	// pc98ha bit 1: flips between 0->1 on system boot failure, in tandem with standby mode held
-	if (data & ~0x05)
+	if (data & ~0x07)
 		logerror("%s: power_control_w unknown signal sent %02x\n", machine().describe_context(), data);
 }
 
-// TODO: intentionally repeated from base pc98
+// TODO: intentionally repeated from base pc98, until I understand what's going on here.
+// (supposedly should be same from base pc98 minus the V50 integrations and whatever the "docking station" really adds up)
 u8 pc98lt_state::floppy_mode_r(offs_t offset)
 {
+	// floppy "mode" identifies drive capabilities, if 2dd/2hd exclusive or mixed type.
+	// and to my understanding it doesn't really read from write reg ...
 	return (m_floppy_mode & 3) | 0x08;
 }
 
@@ -100,6 +103,7 @@ void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
 
 u8 pc98lt_state::fdc_ctrl_r(offs_t offset)
 {
+	// TODO: doesn't work as intended, bit 4 is supposedly if the drive has a disk in or not according to documentation.
 	int ret = (m_fdc->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
 	ret |= (m_fdc->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
 	return ret | 0x64;
