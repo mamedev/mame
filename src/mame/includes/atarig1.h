@@ -30,6 +30,24 @@ public:
 			m_in1(*this, "IN1"),
 			m_mo_command(*this, "mo_command") { }
 
+	void atarig1(machine_config &config);
+	void pfslap111(machine_config &config);
+	void pfslap112(machine_config &config);
+	void pfslap113(machine_config &config);
+	void pfslap114(machine_config &config);
+	void pitfightb(machine_config &config);
+	void hydrap(machine_config &config);
+	void hydra(machine_config &config);
+
+	void init_hydrap();
+	void init_hydra();
+	void init_pitfight();
+	void init_pitfightb();
+
+protected:
+	virtual void video_start() override;
+
+private:
 	optional_device<atari_slapstic_device> m_slapstic;
 	optional_memory_bank m_slapstic_bank;
 	required_device<atari_jsa_ii_device> m_jsa;
@@ -46,7 +64,7 @@ public:
 
 	bool            m_bslapstic_primed;
 
-	int             m_pfscroll_xoffset;
+	uint8_t           m_pfscroll_xoffset;
 	uint16_t          m_current_control;
 	uint8_t           m_playfield_tile_bank;
 	uint16_t          m_playfield_xscroll;
@@ -59,22 +77,9 @@ public:
 	uint16_t a2d_data_r();
 	void pitfightb_cheap_slapstic_tweak(offs_t offset);
 	void update_bank(int bank);
-	void init_hydrap();
-	void init_hydra();
-	void init_pitfight();
-	void init_pitfightb();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_VIDEO_START(atarig1);
 	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void atarig1(machine_config &config);
-	void pfslap111(machine_config &config);
-	void pfslap112(machine_config &config);
-	void pfslap113(machine_config &config);
-	void pfslap114(machine_config &config);
-	void pitfightb(machine_config &config);
-	void hydrap(machine_config &config);
-	void hydra(machine_config &config);
 	void main_map(address_map &map);
 	void pitfight_map(address_map &map);
 	void hydra_map(address_map &map);

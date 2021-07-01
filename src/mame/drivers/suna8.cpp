@@ -2985,6 +2985,9 @@ ROM_START( starfigh )
 	ROM_LOAD( "starfgtr.b6",   0xc0000, 0x10000, CRC(47d6049c) SHA1(cae0795a19cb6bb8bdabc10c200aa6f8d78dd347) )
 	ROM_LOAD( "starfgtr.a6",   0xd0000, 0x10000, CRC(4a33f6f3) SHA1(daa0a1a43b1b60e2f05b9934fdd6b5f285a0b93a) )
 	ROM_COPY( "gfx1", 0xc0000, 0xe0000, 0x20000 )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.5q", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) ) // ??, same as the ones for bestbest in suna16.cpp
 ROM_END
 
 

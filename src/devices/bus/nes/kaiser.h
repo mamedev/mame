@@ -127,6 +127,28 @@ private:
 };
 
 
+// ======================> nes_ks7010_device
+
+class nes_ks7010_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks7010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual u8 read_h(offs_t offset) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_latch;
+};
+
+
 // ======================> nes_ks7012_device
 
 class nes_ks7012_device : public nes_nrom_device
@@ -144,6 +166,7 @@ protected:
 	virtual void device_start() override;
 };
 
+
 // ======================> nes_ks7013b_device
 
 class nes_ks7013b_device : public nes_nrom_device
@@ -160,6 +183,30 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+};
+
+
+// ======================> nes_ks7030_device
+
+class nes_ks7030_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks7030_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_reg[2];
 };
 
 
@@ -207,6 +254,7 @@ private:
 	uint8_t m_reg;
 };
 
+
 // ======================> nes_ks7037_device
 
 class nes_ks7037_device : public nes_nrom_device
@@ -233,16 +281,42 @@ private:
 };
 
 
+// ======================> nes_ks7057_device
+
+class nes_ks7057_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_ks7057_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_reg[8];
+};
+
+
 // device type definition
-DECLARE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device)
-DECLARE_DEVICE_TYPE(NES_KS7022,  nes_ks7022_device)
-DECLARE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device)
 DECLARE_DEVICE_TYPE(NES_KS202,   nes_ks202_device)
-DECLARE_DEVICE_TYPE(NES_KS7017,  nes_ks7017_device)
+DECLARE_DEVICE_TYPE(NES_KS7010,  nes_ks7010_device)
 DECLARE_DEVICE_TYPE(NES_KS7012,  nes_ks7012_device)
-DECLARE_DEVICE_TYPE(NES_KS7013B, nes_ks7013b_device)
-DECLARE_DEVICE_TYPE(NES_KS7031,  nes_ks7031_device)
 DECLARE_DEVICE_TYPE(NES_KS7016,  nes_ks7016_device)
+DECLARE_DEVICE_TYPE(NES_KS7017,  nes_ks7017_device)
+DECLARE_DEVICE_TYPE(NES_KS7013B, nes_ks7013b_device)
+DECLARE_DEVICE_TYPE(NES_KS7022,  nes_ks7022_device)
+DECLARE_DEVICE_TYPE(NES_KS7030,  nes_ks7030_device)
+DECLARE_DEVICE_TYPE(NES_KS7031,  nes_ks7031_device)
+DECLARE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device)
 DECLARE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device)
+DECLARE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device)
+DECLARE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device)
 
 #endif // MAME_BUS_NES_KAISER_H

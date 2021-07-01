@@ -106,6 +106,14 @@ void konppc_device::set_cgboard_texture_bank(int board, const char *bank, uint8_
 	machine().root_device().membank(bank)->configure_entries(0, 2, rom, 0x800000);
 }
 
+bool konppc_device::output_3d_enabled()
+{
+	if (cgboard_id < MAX_CG_BOARDS)
+		return enable_3d[cgboard_id];
+	else
+		return false;
+}
+
 /*****************************************************************************/
 
 /* CG Board DSP interface for PowerPC */
@@ -153,6 +161,11 @@ void konppc_device::cgboard_dsp_comm_w_ppc(offs_t offset, uint32_t data, uint32_
 
 				if (data & 0x04000000)
 					dsp.set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+			}
+
+			if (ACCESSING_BITS_16_23)
+			{
+				enable_3d[cgboard_id] = (data & 0x400000) ? true : false;
 			}
 
 			if (ACCESSING_BITS_0_7)

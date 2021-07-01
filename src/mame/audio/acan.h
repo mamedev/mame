@@ -17,7 +17,8 @@ public:
 	acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto ram_read() { return m_ram_read.bind(); }
-	auto irq_handler() { return m_irq_handler.bind(); }
+	auto timer_irq_handler() { return m_timer_irq_handler.bind(); }
+	auto dma_irq_handler() { return m_dma_irq_handler.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -41,6 +42,7 @@ private:
 		uint16_t end_addr;
 		uint32_t addr_increment;
 		uint32_t frac;
+		uint8_t  register9;
 		uint8_t  envelope[4];
 		uint8_t  volume;
 		uint8_t  volume_l;
@@ -48,13 +50,18 @@ private:
 		bool     one_shot;
 	};
 
+	void keyon_voice(uint8_t voice);
+
 	sound_stream *m_stream;
 	emu_timer *m_timer;
-	devcb_write_line m_irq_handler;
+	devcb_write_line m_timer_irq_handler;
+	devcb_write_line m_dma_irq_handler;
 	devcb_read8 m_ram_read;
 	uint16_t m_active_channels;
-	acan_channel m_channels[15];
+	uint16_t m_dma_channels;
+	acan_channel m_channels[16];
 	uint8_t m_regs[256];
+	std::unique_ptr<int32_t[]> m_mix;
 };
 
 DECLARE_DEVICE_TYPE(ACANSND, acan_sound_device)

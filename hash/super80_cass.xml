@@ -28,13 +28,56 @@ M-2325 : Power transformer
 H-3200 : Metal Case
 H-8402 : Bare main PCB (included in K-3600)
 P-2670 : S100 socket (included in K-3606)
+X-1186 : 16k of 4116 RAM
 X-3790 : Debug/Disassembler
 X-3791 : Editor-Assembler
+B-3600 : Construction Manual
+B-3602 : Basic Manual
+B-3606 : Dick Smith's First Book of Super-80 Programs
 
 These 2 games were never advertised, but since the details are available...
 
 X-3792 : Dungeon Dilemma
-X-3607 : Horse Race
+X-3793 : Horse Race
+
+
+List of known lost commercial games:
+Name                        Publisher or Author                           Notes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PACKMEN                     Microcomputer Engineering (MCE)               VDUEB only
+Super-80 Invaders           Microcomputer Engineering (MCE)               VDUEB only
+Martian Attack              Microcomputer Engineering (MCE)               VDUEB only
+Othello                     Microcomputer Engineering (MCE)               VDUEB only
+Adventure                   Microcomputer Engineering (MCE)               VDUEB only
+Super-80 Chess              Microcomputer Engineering (MCE)               VDUEB only
+ZIP ZAP                     Bemak
+Laser Raider                Bemak
+Mini Typewriter             Bemak
+Super-80 Tables             Bemak
+Supermind Challender        Bemak
+Keeper                      Matrix Software (George Georgiou)
+Black Jack                  Matrix Software
+Simon                       Matrix Software
+Simon II                    Matrix Software
+Space Rescue                Matrix Software
+Froggy                      Matrix Software
+Yahtzee                     Matrix Software
+Poker                       Matrix Software
+Vegas Black Jack            Matrix Software
+Keeper                      Matrix Software
+Adventure                   Matrix Software
+Dungeon Dilemma (improved)  Matrix Software
+Star Trek                   Matrix Software
+Sargon Chess                Matrix Software
+Breakout                    Matrix Software
+Scrambler                   Matrix Software
+Rally X                     Matrix Software
+Super Invaders              Megasoft
+Sea Wars                    Megasoft
+Chess Chasers               Megasoft
+Hangman                     Megasoft
+Life                        Megasoft
+Macro/Z80 + D/BUG           Tawarri (Scott MacDonald)
 
 -->
 
@@ -47,7 +90,7 @@ X-3607 : Horse Race
 		<description>Horse Race</description>
 		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
-		<info name="serial" value="X-3607" /><!-- 012L1 -->
+		<info name="serial" value="X-3793" /><!-- 012L1 -->
 		<info name="developer" value="George Georgiou"/>
 		<info name="usage" value="LOAD while in BASIC, then RUN" />
 		<sharedfeat name="compatibility" value="DEF,D,E,M" />
@@ -113,7 +156,6 @@ X-3607 : Horse Race
 <!--
      Various commercial releases for use with super80, super80d and super80e, recorded at 300 baud.
      Mini Typewriter has bugs.
-     There was quite a lot of commercially-available software available, however 99 percent of it has been lost forever.
  -->
 	<software name="eldraw">
 		<description>El Draw 3.6.3</description>
@@ -174,13 +216,14 @@ X-3607 : Horse Race
 		<publisher>Bemak</publisher>
 		<info name="serial" value="403" />
 		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D,M" />
+		<sharedfeat name="compatibility" value="D" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15616026">
-				<rom name="zipzap.wav" size="15616026" crc="7bf30894" sha1="50fe59484b5eb39f37933f23754e7f1c2c0f322b"/>
+			<dataarea name="cass" size="0xfb7438">
+				<rom name="zipzap.wav" size="0xfb7438" crc="e57ca5d5" sha1="520753d06f6bd931ea4ea40c0929fa66ca8f41a6"/>
 			</dataarea>
 		</part>
 	</software>
+
 <!--
      Various homebrew programs for use with super80, super80d and super80e, recorded at 300 baud.
      Some are ok, some are junk.
@@ -534,32 +577,6 @@ X-3607 : Horse Race
 			</dataarea>
 		</part>
 	</software>
-	<software name="zipzapa" cloneof="zipzap">
-		<description>Zip Zap (sound fixed)</description>
-		<year>198?</year>
-		<publisher>Bemak</publisher>
-		<info name="serial" value="403a" />
-		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15618506">
-				<rom name="zipzapa.wav" size="15618506" crc="bb16ab34" sha1="6dc6209af690ccad61eb8aef0bb0509ab9743813"/>
-			</dataarea>
-		</part>
-	</software>
-	<software name="zipzap1" cloneof="zipzap">
-		<description>Zip Zap (R1)</description>
-		<year>198?</year>
-		<publisher>Bemak</publisher>
-		<info name="serial" value="403R1" />
-		<info name="usage" value="super80d only. L to load, G100 to run" />
-		<sharedfeat name="compatibility" value="D,M" />
-		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15618496">
-				<rom name="zipzap1.wav" size="15618496" crc="5b98c625" sha1="871e278c0da48c236689fa7d20017d6f2ceb9c9b"/>
-			</dataarea>
-		</part>
-	</software>
 	<software name="zipzap2j" cloneof="zipzap">
 		<description>Zip Zap (R2)(with arrows)</description>
 		<year>198?</year>
@@ -568,8 +585,8 @@ X-3607 : Horse Race
 		<info name="usage" value="super80d only. L to load, G100 to run" />
 		<sharedfeat name="compatibility" value="D,M" />
 		<part name="cass" interface="super80_cass">
-			<dataarea name="cass" size="15621606">
-				<rom name="zipzap2j.wav" size="15621606" crc="89258a7f" sha1="c1e8eeed52ce98e65c35a12e65207aef681b2ac4"/>
+			<dataarea name="cass" size="0xfb8046">
+				<rom name="zipzap2j.wav" size="0xfb8046" crc="734039d9" sha1="7c936325937877582dd40098dcf20df3fbf46aae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1647,6 +1664,31 @@ X-3607 : Horse Race
 			</dataarea>
 		</part>
 	</software>
+	<software name="crazym">
+		<description>Crazy Maze</description>
+		<year>1983</year>
+		<publisher>Matrix Software</publisher>
+		<info name="usage" value="L to load, G0 to run" />
+		<sharedfeat name="compatibility" value="D" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="0x1bfd222">
+				<rom name="crazym.wav" size="0x1bfd222" crc="094412f9" sha1="a32f716313745bbd8b14cb54a0f8f3817fe059f7"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="crazymj">
+		<description>Crazy Maze (with arrows)</description>
+		<year>1983</year>
+		<publisher>Matrix Software</publisher>
+		<info name="usage" value="T3 then, L to load, G0 to run" />
+		<sharedfeat name="compatibility" value="D,M" />
+		<part name="cass" interface="super80_cass">
+			<dataarea name="cass" size="0x1bfd20e">
+				<rom name="crazymj.wav" size="0x1bfd20e" crc="f723e58d" sha1="213a9dca5f58206cd415aa34eb4f0a70eb785c7b"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!--
      Various homebrew programs for use with super80v (80 column display), recorded at 600 baud.
      Most of these have been partially rewritten by myself to take advantage of the features of the super80v.

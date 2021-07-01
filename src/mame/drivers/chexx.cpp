@@ -71,6 +71,9 @@ exact clone of the 1st generation ICE Chexx hardware (https://www.recreativas.or
  |            x2  T74LS365B1     x2      |
  |___________ COST _____________ TIME ___|
 
+The electromechanical game Fire Escape (1984, Mech-Tronic Games, Inc.)
+appears to run on very similar hardware, with a AY8912 but no Digitalker.
+
 ***************************************************************************/
 
 #include "emu.h"

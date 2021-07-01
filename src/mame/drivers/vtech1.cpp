@@ -450,7 +450,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const double speaker_levels[] = {-1.0, 0.0, 1.0, 0.0};
+static const double speaker_levels[] = { 0.0, 1.0, -1.0, 0.0 };
 
 void vtech1_base_state::vtech1(machine_config &config)
 {

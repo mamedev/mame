@@ -631,14 +631,9 @@ void uml::instruction::simplify()
 			if (m_param[1].is_immediate())
 			{
 				if (m_size == 4)
-					convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate()));
+					convert_to_mov_immediate(count_leading_zeros_32(m_param[1].immediate()));
 				else if (m_size == 8)
-				{
-					if ((m_param[1].immediate() >> 32) == 0)
-						convert_to_mov_immediate(32 + count_leading_zeros(m_param[1].immediate()));
-					else
-						convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate() >> 32));
-				}
+					convert_to_mov_immediate(count_leading_zeros_64(m_param[1].immediate()));
 			}
 			break;
 

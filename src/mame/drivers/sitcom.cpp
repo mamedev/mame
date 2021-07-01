@@ -334,8 +334,6 @@ void sitcom_timer_state::machine_start()
 void sitcom_timer_state::machine_reset()
 {
 	sitcom_state::machine_reset();
-
-	m_ds2->ce_w(0);
 }
 
 void sitcom_timer_state::update_dac(uint8_t value)

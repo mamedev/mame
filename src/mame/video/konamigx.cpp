@@ -277,8 +277,6 @@ void konamigx_state::wipezbuf(int noshadow)
 #define GX_MAX_LAYERS  6
 #define GX_MAX_OBJECTS (GX_MAX_SPRITES + GX_MAX_LAYERS)
 
-static struct GX_OBJ { int order, offs, code, color; } *gx_objpool;
-
 void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 {
 	m_gx_objdma = 0;
@@ -286,13 +284,14 @@ void konamigx_state::konamigx_mixer_init(screen_device &screen, int objdma)
 
 	m_gx_objzbuf = &screen.priority().pix(0);
 	m_gx_shdzbuf = std::make_unique<uint8_t[]>(GX_ZBUFSIZE);
-	gx_objpool = auto_alloc_array(machine(), struct GX_OBJ, GX_MAX_OBJECTS);
+	m_gx_objpool = std::make_unique<GX_OBJ[]>(GX_MAX_OBJECTS);
 
 	m_k054338->export_config(&m_K054338_shdRGB);
 
 	if (objdma)
 	{
-		m_gx_spriteram = auto_alloc_array(machine(), uint16_t, 0x2000/2);
+		m_gx_spriteram_alloc = std::make_unique<uint16_t[]>(0x2000/2);
+		m_gx_spriteram = m_gx_spriteram_alloc.get();
 		m_gx_objdma = 1;
 	}
 	else
@@ -323,14 +322,14 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 	int objbuf[GX_MAX_OBJECTS];
 	int shadowon[3], shdpri[3], layerid[6], layerpri[6];
 
-	struct GX_OBJ *objpool, *objptr;
+	GX_OBJ *objpool, *objptr;
 	int cltc_shdpri, /*prflp,*/ disp;
 
 	// buffer can move when it's resized, so refresh the pointer
 	m_gx_objzbuf = &screen.priority().pix(0);
 
 	// abort if object database failed to initialize
-	objpool = gx_objpool;
+	objpool = m_gx_objpool.get();
 	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
@@ -818,7 +817,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 					int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack,
 
 					/* passed from above function */
-					struct GX_OBJ *objpool,
+					GX_OBJ *objpool,
 					int *objbuf,
 					int nobj
 					)
@@ -828,7 +827,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 	for (int count=0; count<nobj; count++)
 	{
-		struct GX_OBJ *objptr = objpool + objbuf[count];
+		GX_OBJ *objptr = objpool + objbuf[count];
 		int order  = objptr->order;
 		int offs   = objptr->offs;
 		int code   = objptr->code;

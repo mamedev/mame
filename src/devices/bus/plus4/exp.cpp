@@ -90,15 +90,6 @@ void plus4_expansion_slot_device::device_start()
 	m_read_dma_cd.resolve_safe(0xff);
 	m_write_dma_cd.resolve_safe();
 	m_write_aec.resolve_safe();
-
-	// inherit bus clock
-	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
-	if (clock() == 0)
-	{
-		plus4_expansion_slot_device *root = machine().device<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 

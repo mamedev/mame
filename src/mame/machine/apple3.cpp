@@ -770,20 +770,15 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 {
 	uint8_t rv = 0xff;
 
-	if (m_inh_state)
+	// /INH handling
+	for (int slot = 1; slot < 5; slot++)
 	{
-		for (int slot = 1; slot < 4; slot++)
+		device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
+		if (slotdevice != nullptr)
 		{
-			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
-			if (slotdevice != nullptr)
+			if (slotdevice->inh_check(offset, false))
 			{
-				if ((slotdevice->inh_type() & INH_READ) == INH_READ)
-				{
-					if ((offset >= slotdevice->inh_start()) && (offset <= slotdevice->inh_end()))
-					{
-						return slotdevice->read_inh_rom(offset);
-					}
-				}
+				return slotdevice->read_inh_rom(offset);
 			}
 		}
 	}
@@ -925,25 +920,6 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 
 void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 {
-	if (m_inh_state)
-	{
-		for (int slot = 1; slot < 4; slot++)
-		{
-			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
-			if (slotdevice != nullptr)
-			{
-				if ((slotdevice->inh_type() & INH_WRITE) == INH_WRITE)
-				{
-					if ((offset >= slotdevice->inh_start()) && (offset <= slotdevice->inh_end()))
-					{
-						slotdevice->write_inh_rom(offset, data);
-						return;
-					}
-				}
-			}
-		}
-	}
-
 	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{
 		uint8_t *test;
@@ -953,6 +929,19 @@ void apple3_state::apple3_memory_w(offs_t offset, uint8_t data)
 		{
 			*test = data;
 			return;
+		}
+	}
+
+	for (int slot = 1; slot < 5; slot++)
+	{
+		device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(slot);
+		if (slotdevice != nullptr)
+		{
+			if (slotdevice->inh_check(offset, true))
+			{
+				slotdevice->write_inh_rom(offset, data);
+				return;
+			}
 		}
 	}
 

@@ -206,13 +206,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controller input issues -->
-	<software name="abunaten" supported="no">
+	<software name="abunaten">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="あぶないてんぐ伝説" />
 		<info name="release" value="199004xx" />
+		<info name="usage" value="Mouse must not be connected to port 2"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -240,6 +240,7 @@ license:CC0
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="コラムス" />
 		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1282512">
 				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" status="baddump" />
@@ -247,12 +248,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controller input issues -->
-	<software name="dps" supported="no">
+	<software name="dps">
 		<description>D.P.S - Dream Program System</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199004xx" />
+		<info name="usage" value="Mouse must not be connected to port 2"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="d.p.s - dream program system (disk 1).hdm" size="1261568" crc="26a600e3" sha1="0a4d4966aa19540445d032e93d7b2ca22979720f"/>
@@ -271,6 +272,7 @@ license:CC0
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199009xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -303,6 +305,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199104xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -335,6 +338,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199111xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -361,6 +365,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- For some reason, it needs to have a CD inserted in the drive (any CD with a data track will work), or it will hang -->
 	<software name="drstop">
 		<description>Dr. Stop!</description>
 		<year>1990</year>
@@ -536,6 +541,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 01" />
 		<info name="release" value="199305xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 01 (disk 1).hdm" size="1261568" crc="bcacfc71" sha1="ff4f4cd0846d0fdab5d60d163d8d4a91b06ca8cb"/>
@@ -554,6 +560,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 02" />
 		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 02 (disk 1).hdm" size="1261568" crc="fde9b8e5" sha1="08274b1e0912d7a03194279a814be4421ab79e75"/>
@@ -572,6 +579,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 03" />
 		<info name="release" value="199308xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 03 (disk 1).hdm" size="1261568" crc="ab3d77d0" sha1="14ca7e31131d411408e4c532ae0a9c77d28160f8"/>
@@ -590,6 +598,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 04" />
 		<info name="release" value="199309xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 04 (disk 1).hdm" size="1261568" crc="cd83229e" sha1="3a52b0cee6a15de47c322157997cb7176abdee98"/>
@@ -608,6 +617,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 05" />
 		<info name="release" value="199310xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 05 (disk 1).hdm" size="1261568" crc="87c29800" sha1="3872d0b64d9973c78cd482d6bfdd489002b483d6"/>
@@ -626,6 +636,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 06" />
 		<info name="release" value="199311xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 06 (disk 1).hdm" size="1261568" crc="8bfd3e9b" sha1="aa626bb3356839cf7071ce8d8d8cc09c9951b220"/>
@@ -644,6 +655,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 07" />
 		<info name="release" value="199312xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 07 (disk 1).hdm" size="1261568" crc="ed76de63" sha1="af2d6bcd4373245bfd7a66ac0f4c7c61a5942f9d"/>
@@ -667,6 +679,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 08" />
 		<info name="release" value="199401xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 08 (disk 1).hdm" size="1261568" crc="f8954bcb" sha1="796336813e695c6073e334c2fc7aae7f1fa6fe6a"/>
@@ -690,6 +703,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 09" />
 		<info name="release" value="199402xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 09 (disk 1).hdm" size="1261568" crc="92e7dd6c" sha1="815405e0a58ee2105e86472281757ca4b5826f3d"/>
@@ -713,6 +727,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 10" />
 		<info name="release" value="199403xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 10 (disk 1).hdm" size="1261568" crc="be436f73" sha1="2d9f8a0b90d59c48a25ac3c18cf753e87aae22ce"/>
@@ -736,6 +751,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 11" />
 		<info name="release" value="199404xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 11 (disk 1).hdm" size="1261568" crc="11c06a95" sha1="97a260b2d26215518d180a2ac6959f6032049909"/>
@@ -759,6 +775,7 @@ license:CC0
 		<publisher>タケル (Takeru)</publisher>
 		<info name="alt_title" value="宝魔ハンターライム Vol. 12" />
 		<info name="release" value="199405xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="houma hunter lime vol. 12 (disk 1).hdm" size="1261568" crc="1e8f5e4e" sha1="13a081f80bd8d18dd1454c5ffeffb0430382e82d"/>
@@ -786,6 +803,8 @@ license:CC0
 		<year>1992</year>
 		<publisher>Software House Parsley</publisher>
 		<info name="alt_title" value="イマージュ" />
+		<info name="release" value="199405xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="image (disk 1).xdf" size="1261568" crc="eff55b4f" sha1="595401dd34085b204200058f06518dbed30dab50"/>
@@ -804,6 +823,7 @@ license:CC0
 		<publisher>オレンジハウス (Orange House)</publisher>
 		<info name="alt_title" value="イリウム" />
 		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -845,6 +865,7 @@ license:CC0
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="alt_title" value="幻影都市" />
 		<info name="release" value="199303xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
@@ -908,13 +929,15 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Probably built from files extracted from one of Active's CD-based games -->
 	<software name="mjfantt">
 		<description>Mahjong Gensoukyoku / Mahjong Fantasia Taikenban</description>
 		<year>1992</year>
 		<publisher>Active</publisher>
 		<info name="alt_title" value="麻雀幻想曲体験版" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS 2.1, insert this disk and run the icon on drive A." />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1261568">
+			<dataarea name="flop" size="1261568">
 				<rom name="mahjong gensoukyoku taikenban.bin" size="1261568" crc="bbd5391b" sha1="0d172601b6f1644b6389ffd721885f7ba5307ec2"/>
 			</dataarea>
 		</part>
@@ -932,13 +955,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controller input issues -->
-	<software name="rance" supported="no">
+	<software name="rance">
 		<description>Rance - Hikari o Motomete</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス 光をもとめて" />
 		<info name="release" value="199003xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="rance - hikari o motomete (disk 1).hdm" size="1261568" crc="fc54292a" sha1="a6dde9bfc776bdaa703be54a5fe68cee3c5a3b13"/>
@@ -961,13 +984,13 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Controller input issues; can be played with the numpad -->
-	<software name="rance2" supported="partial">
-		<description>Rance 2 - Hangyaku no Shoujotachi</description>
+	<software name="rance2">
+		<description>Rance 2 - Hangyaku no Shoujo-tachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="ランス２ 反逆の少女たち" />
 		<info name="release" value="199006xx" />
+		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1006,51 +1029,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="reira">
-		<description>Reira</description>
-		<year>1994</year>
-		<publisher>シルキーズ (Silky's)</publisher>
-		<info name="alt_title" value="レイラ" />
-		<info name="release" value="199407xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk a).hdm" size="1261568" crc="7ca28bcc" sha1="bcbd502d3aca183f00211dd91b34b9c6a8a53419"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk b).hdm" size="1261568" crc="3d66ddc6" sha1="05d1d20dd5c535dfe653e6afd23e0e256c3639ec"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk c).hdm" size="1261568" crc="03fa528c" sha1="635043a3490b03ee0ef06d901e774ae46f14963c"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk D" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk d).hdm" size="1261568" crc="d26f5aef" sha1="9d59989831b58ed6098b517b29f45514932c8580"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk E" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk e).hdm" size="1261568" crc="9008a977" sha1="32cf426ce9f15489c92dd1effc58da5380ea6f16"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk F" />
-			<dataarea name="flop" size="1261568">
-				<rom name="reira (disk f).hdm" size="1261568" crc="fa05a62c" sha1="1990124f647a164b18380b1686094ef29ee100e2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shogisei">
+	<!-- It seems iompossible to make this work, even on real hardware. Could it be a bad dump? -->
+	<software name="shogisei" supported="no">
 		<description>Shougi Seiten</description>
 		<year>1992</year>
 		<publisher>ホームデータ (Home Data)</publisher>
@@ -1082,6 +1062,7 @@ license:CC0
 		<publisher>ヴァージンハウス (Virgin House)</publisher>
 		<info name="alt_title" value="そけゆけナンパくん" />
 		<info name="release" value="199108xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
@@ -1107,6 +1088,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199209xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
 			<dataarea name="flop" size="1261568">
@@ -1152,6 +1134,7 @@ license:CC0
 		<description>Ving Soft Collection</description>
 		<year>1993?</year>
 		<publisher>ビング (Ving)</publisher>
+		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="ving.bin" size="1261568" crc="b380deb5" sha1="3f906b81a5277fe971b2d05ba2e739130873c143"/>
@@ -1274,6 +1257,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H2SO4" />
+		<info name="usage" value="Run PUZZLE.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="15 puzzle.bin" size="1261568" crc="bd08eb1e" sha1="c74ab5fb58ff31219d6365156cbb2eee1d53738f"/>
@@ -1286,6 +1270,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Seiichi Hanai" />
+		<info name="usage" value="Run ABAS.EXP from TownsOS V1.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="abas.bin" size="1261568" crc="8ceb7dc7" sha1="c448d1eaa1a0a11334cb798754167f1ac8da9ad1"/>
@@ -1298,6 +1283,7 @@ license:CC0
 		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Seiichi Hanai" />
+		<info name="usage" value="Run ABASNEW.EXP from TownsOS V1.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="abas new.bin" size="1261568" crc="977cabda" sha1="ad43310f17e707d27058d932d8757d9bc151ef60"/>
@@ -1314,7 +1300,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
-		<info name="usage" value="Requires AfterBurner II CD to work" />
+		<info name="usage" value="Copy AB2.EXP from the After Burner CD to the floppy disk, then run AB2AGAIN.EXE to patch. Run AB2START.BAT from TownsOS V1.1 to start the patched game." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="after burner 2 again.hdm" size="1261568" crc="59135c6d" sha1="0d76f0e628ac61e56a5cb69f6252e4e8088410be"/>
@@ -1327,6 +1313,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="air raider.hdm" size="1261568" crc="b59eb70b" sha1="464b0be803d03dbe514514242b0fa83bfcabf2e0"/>
@@ -1339,6 +1326,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H2SO4" />
+		<info name="usage" value="Run B-BR3.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="b-braker 3.bin" size="1261568" crc="2f02a9dc" sha1="1755088ff6a8b4262459caf68914e93b8b297aaa"/>
@@ -1352,6 +1340,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Fighters Progect" />
 		<info name="alt_title" value="BATTLE FIGHTERS 2 -夢を賭けた戦い-" />
+		<info name="usage" value="Requires 3 MB RAM. Run FB386.EXP from TownsOS V2.1, then load BATTLE_2.BAS from the F-BASIC386 interface, and run the program."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="battle fighters 2.bin" size="1261568" crc="3e9b8b02" sha1="778f7ad583ee605af36859472f02366ca3c237e5"/>
@@ -1359,6 +1348,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires 80 track / 300 rpm disk support -->
 	<software name="batfght3" supported="no">
 		<description>Battle Fighters 3 - Inishie no Jashin Densetsu</description>
 		<year>1997</year>
@@ -1378,6 +1368,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H2SO4" />
 		<info name="alt_title" value="ばう" />
+		<info name="usage" value="Run BAU.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="bau.bin" size="1261568" crc="37707193" sha1="53e6b6e959e4f97fb5580c7bef7278088d6fc814"/>
@@ -1387,9 +1378,10 @@ license:CC0
 
 	<software name="bliss1">
 		<description>Bliss Collection #01 - Whips Ct. 1</description>
-		<year>199?</year>
+		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="M.J. Kozou" />
+		<info name="usage" value="Run WHIPS.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="bliss collection #01 - whips ct. 1.hdm" size="1261568" crc="40f6e006" sha1="5792731e65d92832e58f9c92e25ee49c402cfaa8"/>
@@ -1399,7 +1391,7 @@ license:CC0
 
 	<software name="bliss2">
 		<description>Bliss Collection #02 - Vips</description>
-		<year>199?</year>
+		<year>1990</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="M.J. Kozou" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1414,6 +1406,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="M.J. Kozou" />
+		<info name="usage" value="Run VIPS.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="bliss collection #02 - vips [set 1].hdm" size="1261568" crc="addf99cb" sha1="93f46d54cc8736bb0a547f2a8851648486d2901a"/>
@@ -1426,6 +1419,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="M.J. Kozou" />
+		<info name="usage" value="Run WHIPS_2.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="bliss collection #03 - whips ct. 2 pro.hdm" size="1261568" crc="2537528d" sha1="15463f7961f658e1f69781946545edf23719b4b5"/>
@@ -1435,9 +1429,10 @@ license:CC0
 
 	<software name="bliss7">
 		<description>Bliss Collection #07 - Whips Ct. 4</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="M.J. Kozou" />
+		<info name="usage" value="Run WHIPS4.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="bliss collection #07 - whips ct. 4.hdm" size="1261568" crc="a4e41cca" sha1="cd3738b5e40c510813a1506653fbb74d9907efba"/>
@@ -1450,6 +1445,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="クエイト (Kueito)" />
+		<info name="usage" value="Run FB386.EXP from TownsOS V2.1, then load BREAK.BAS from the F-BASIC386 interface, and run the program."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="break of tower.bin" size="1261568" crc="6488afc7" sha1="d21bfd8586d90884f5967c808ab6e58d11178397"/>
@@ -1470,6 +1466,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires 80 track / 300 rpm disk support -->
 	<software name="dreamfgt" supported="no">
 		<description>Dream Fighters</description>
 		<year>199?</year>
@@ -1487,6 +1484,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="exgmaze.hdm" size="1261568" crc="91549a87" sha1="513f70b6b45b0d90491f05c80bcd0af012017299"/>
@@ -1499,6 +1497,7 @@ license:CC0
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="ground attack.xdf" size="1261568" crc="22a962fe" sha1="bc62681034a93e89a5a938ddfe571a4837cdabc4"/>
@@ -1512,6 +1511,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="クエイト (Kueito)" />
 		<info name="alt_title" value="覇王争奪バトルファイターズ" />
+		<info name="usage" value="Requires 3 MB RAM. Run FB386.EXP from TownsOS V2.1, then load BREAK.BAS from the F-BASIC386 interface, and run the program."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="battle fighters.bin" size="1261568" crc="911e58ab" sha1="4c379fb688e04c41e348fef8e483d925e0d55cd8"/>
@@ -1526,6 +1526,7 @@ license:CC0
 		<info name="alt_title" value="ヘボリス" />
 		<info name="developer" value="Kenji Hosimoto" />
 		<info name="version" value="0.6" />
+		<info name="usage" value="Run HEBORIS.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="heboris.bin" size="1261568" crc="3bb75819" sha1="7ea2b0d71d4388f6221de81a16a9093cd206aeae"/>
@@ -1538,6 +1539,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H. Taira" />
+		<info name="usage" value="Run HEEX.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="heli-command.bin" size="1261568" crc="3a293e26" sha1="100dcc10784925394e670dbb1f4cbd55d838995d"/>
@@ -1550,6 +1552,7 @@ license:CC0
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H. Taira" />
+		<info name="usage" value="Run HE_RE.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="heli-rescue.bin" size="1261568" crc="c76213e0" sha1="e484c53db79a1bc27aec40b1c175f339c1f5a59c"/>
@@ -1563,6 +1566,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="★YOU" />
 		<info name="alt_title" value="カスタリア" />
+		<info name="usage" value="Run KASTALIA.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="kastalia.bin" size="1261568" crc="56f09e17" sha1="e38322747dd729a38a03d133ed678fa42bcb3a9d"/>
@@ -1576,6 +1580,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="MAR-RYLL" />
 		<info name="alt_title" value="Iron Fist 改訂版" />
+		<info name="usage" value="Run IRONFIST.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="iron fist kaiteiban.bin" size="1261568" crc="cd13d7b3" sha1="04075a09ed137249c33d156b7331fb1a3e437e66"/>
@@ -1626,6 +1631,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="H2SO4" />
 		<info name="alt_title" value="Mister・名探偵登場" />
+		<info name="usage" value="Run MISTER14.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="mister meitantei toujou.bin" size="1261568" crc="28f3c8c9" sha1="33ab0ee15e3f403ad5743119561f8649c03f3f94"/>
@@ -1638,6 +1644,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Junior" />
+		<info name="usage" value="Run PANIC.EXP from TownsOS"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="panic ball ii.bin" size="1261568" crc="8de28ae6" sha1="6944feed861130d7712198950097d55b031efd61"/>
@@ -1650,6 +1657,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="planet attacker.hdm" size="1261568" crc="5f61b43e" sha1="0f809ea7a3f5ac74e6940260026b429f2365a417"/>
@@ -1663,6 +1671,7 @@ license:CC0
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="くぁずる" />
 		<info name="developer" value="Team B-2" />
+		<info name="usage" value="Run QUAZZLE.EXP from TownsOS V2.1"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1261568">
 				<rom name="quazzle.bin" size="1261568" crc="59d635c4" sha1="66bc4ebdb7feaec191f10b74772572efc53835e2"/>
@@ -1681,6 +1690,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires 80 track / 300 rpm disk support -->
 	<software name="rumstorm" supported="no">
 		<description>Rumstorm</description>
 		<year>2000</year>
@@ -1693,6 +1703,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Requires 80 track / 300 rpm disk support -->
 	<software name="rumuder" supported="no">
 		<description>Rumuder</description>
 		<year>1997</year>
@@ -1710,6 +1721,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sword edge.hdm" size="1261568" crc="4d6c28b7" sha1="a1634b970a22ea6f1b800f7ca55ab762b83f121d"/>
@@ -1722,6 +1734,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sword edge (map editor).hdm" size="1261568" crc="36ddef97" sha1="2cd272d7df959c4210931b2743a01e3ff9050df4"/>
@@ -1734,6 +1747,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sword edge (sprite editor).hdm" size="1261568" crc="72947abc" sha1="c5bd8ae472dc54712f9c4094e203dcb908d777ac"/>
@@ -1746,6 +1760,7 @@ license:CC0
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="YS-11" />
+		<info name="usage" value="Boot TownsOS V2.1 and run the icon on floppy drive A:"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="tactical air wing.hdm" size="1261568" crc="eef1aa60" sha1="d94798c490464ebf73803900ee5eec80b55939f8"/>

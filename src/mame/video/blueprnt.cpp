@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 
 
-VIDEO_START_MEMBER(blueprnt_state,blueprnt)
+void blueprnt_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blueprnt_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -123,11 +123,9 @@ VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 }
 
 
-void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void blueprnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code = m_spriteram[offs + 1];
 		int sx = m_spriteram[offs + 3];

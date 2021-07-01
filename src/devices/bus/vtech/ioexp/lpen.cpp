@@ -4,7 +4,7 @@
 
     VTech Laser Lightpen Interface
 
-	Skeleton just to document the I/O ports used
+    Skeleton just to document the I/O ports used
 
 ***************************************************************************/
 

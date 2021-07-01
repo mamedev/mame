@@ -566,6 +566,249 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="freedos10">
+		<description>FreeDOS 1.0 (bootdisk)</description>
+		<year>2006</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.0"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="fdboot.img" size="1474560" crc="5160c4c9" sha1="813fa09f2278b0b83b67c6d2bda68a46cd83234d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos12">
+		<description>FreeDOS 1.2 (bootdisk)</description>
+		<year>2016</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.2"/>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="FLOPPY.img" size="1474560" crc="e8b32691" sha1="2dd8bb9751176533dd7d00160a5eed0d8cbb4725"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc1">
+		<description>FreeDOS 1.3 Release Candidate 1 (bootdisk)</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC1"/>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="FD13FLOP.IMG" size="1474560" crc="27efbe97" sha1="7a4e3b21c7c6eacd38fadd5b4f43db0c7a756dd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc2">
+		<description>FreeDOS 1.3 Release Candidate 2 (bootdisk)</description>
+		<year>2019</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC2"/>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="FD13FLOP.IMG" size="1474560" crc="280b9f4a" sha1="8d03e815712e3f885e7beb849552bb16d60a3b58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc3">
+		<description>FreeDOS 1.3 Release Candidate 3 (bootdisk)</description>
+		<year>2020</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC3"/>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="FD13FLOP.IMG" size="1474560" crc="128677ac" sha1="1adc07c319efd8976913cb29f1050401d12ff505"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc3_35" cloneof="freedos13rc3">
+		<description>FreeDOS 1.3 Release Candidate 3 (Floppy-Only Edition)</description>
+		<year>2020</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC3"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer"/>
+			<dataarea name="flop" size="737280">
+				<rom name="x86-BOOT.img" size="737280" crc="7a7e546c" sha1="9650f3349cac0d75648fbb87be9709ba6d43d169"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK1.img" size="1474560" crc="00ecf574" sha1="8c1338d758f29ded2d45a2b72e65669ccf18238e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK2.img" size="1474560" crc="0f6dd9f9" sha1="cbda56be2c44070c6a03b7ff8c0a490c699621a2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK3.img" size="1474560" crc="1f017feb" sha1="cf0c3d398456d49f68aec07e68a1e9a63e5ca6e0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK4.img" size="1474560" crc="a4495ae0" sha1="71bdaf51a23fd6973452d00a878d6a331fb30773"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK5.img" size="1474560" crc="11c4f960" sha1="579503ca18e960ce562a019c2a3084695e18b4f3"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86-DSK6.img" size="1474560" crc="140969f3" sha1="a4a36f60e09222866919367959f60de8b3e05d6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc4">
+		<description>FreeDOS 1.3 Release Candidate 4 (bootdisk)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="FD13FLOP.img" size="1474560" crc="866dceed" sha1="7dfeecef443b2f0f69de0d508e5a17490961ebcf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc4_120" cloneof="freedos13rc4">
+		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 5.25" 1.2MB)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installer"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86BOOT.img" size="1228800" crc="9f37531a" sha1="b7e6864befbcff2c431a5ea0ab5dc6078582dba4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK01.img" size="1228800" crc="b3345585" sha1="6e47f0bf4339a83efdddd698a2578eef5a429943"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK02.img" size="1228800" crc="133dea45" sha1="3a5a15304ec83ee36a47ca6008ec6111086a771f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK03.img" size="1228800" crc="9b3cf022" sha1="30fcffe0ec0307102ba4b4931b1a90aacd3f956f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK04.img" size="1228800" crc="139f3f88" sha1="d66de4753d85b6bedbb8e713fc35e3ba631d4ea5"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK05.img" size="1228800" crc="edc2f2fb" sha1="7f066b2bf098df7b367cbaed718559a1956d79e1"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK06.img" size="1228800" crc="22b6d765" sha1="161a89842efd5b513a66efa8408b68c94d824dc3"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK07.img" size="1228800" crc="76e6cb54" sha1="2f10e13eb87fbcc919ecae58f3f4de5c5423560d"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK08.img" size="1228800" crc="1f40035c" sha1="2f77a9ce2327661bd2382754ee14c336cb0a090c"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9"/>
+			<dataarea name="flop" size="1228800">
+				<rom name="x86DSK09.img" size="1228800" crc="8fca3748" sha1="191fa86c65107602f033cb3678abc4ba330b926f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos13rc4_144" cloneof="freedos13rc4">
+		<description>FreeDOS 1.3 Release Candidate 4 (Floppy-Only Edition, 3.5" 1.44MB)</description>
+		<year>2021</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.3-RC4"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86BOOT.img" size="1474560" crc="54c36ad6" sha1="01965a591db9f23ac6e5f65a265f6d0f54283617"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK01.img" size="1474560" crc="5e215709" sha1="7c352c6ce1701001c8c77a9344734f25dc5c4b4d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK02.img" size="1474560" crc="0bfc28be" sha1="6d6d838014c79727e067713d11dbb28a0a61bf79"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK03.img" size="1474560" crc="7ebae211" sha1="a2c2f4e36d08ecad6e52b9966654ada53737324a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK04.img" size="1474560" crc="737c3b1c" sha1="0a3dc842584b4ba72d2e17e98f48f55aa1f6716e"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK05.img" size="1474560" crc="ab83a0ac" sha1="2e53e28cd8f631881ad3f780d3104c4cb2d17d84"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK06.img" size="1474560" crc="eb7bbfcf" sha1="ad30e015e1c487b9dc437b5b3d50f1c1730d6fd6"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="x86DSK07.img" size="1474560" crc="a212caf9" sha1="a355c89e82c524a40f5b7ab561e82af1a3a0fcdd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gem11">
 		<description>GEM Desktop 1.1</description>
 		<year>1985</year>
@@ -1171,21 +1414,25 @@ license:CC0
 		<year>1987</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1228800">
 				<rom name="disk01.img" size="1228800" crc="82aa993f" sha1="69bd8297a2e0f75a7d0c4eeccb3ed92337410f9a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1228800">
 				<rom name="disk02.img" size="1228800" crc="57bd21ef" sha1="c0db3c3e36834ac2c6138bbc870faa084b98874f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1228800">
 				<rom name="disk03.img" size="1228800" crc="9658d1ae" sha1="1b0fe4fd4d634e3a2e754087b0c9ce33eb9751bb"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Operating System/2 Installation Diskette"/>
 			<dataarea name="flop" size="1228800">
 				<rom name="install.img" size="1228800" crc="812732b4" sha1="7de26b049eef2d1edf55ba5dc1bc19ac4703d789"/>
 			</dataarea>
@@ -1197,26 +1444,31 @@ license:CC0
 		<year>1988</year>
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install.img" size="1474560" crc="ea6699f9" sha1="32ed36322d28654aa1967ad34cdbba2cbd8ad054"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="7cf8d448" sha1="3ff1658482be2887c085ccde4acebec5454b7db5"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="cbd4dc12" sha1="3055ec5dd9c7d9095010217726b4a5f0267f8fb6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="64b87f7b" sha1="ed2371d898071fc264be529dc2e8c98e738458a9"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk4.img" size="1474560" crc="6f6e4286" sha1="5a6c32eb3a2193225b7b26dea7f98c77b7f95759"/>
 			</dataarea>
@@ -1253,26 +1505,31 @@ license:CC0
 		<year>1988</year>
 		<publisher>Microsoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install.img" size="1474560" crc="ea6699f9" sha1="32ed36322d28654aa1967ad34cdbba2cbd8ad054"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk01.img" size="1474560" crc="7cf8d448" sha1="3ff1658482be2887c085ccde4acebec5454b7db5"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk02.img" size="1474560" crc="cbd4dc12" sha1="3055ec5dd9c7d9095010217726b4a5f0267f8fb6"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk03.img" size="1474560" crc="64b87f7b" sha1="ed2371d898071fc264be529dc2e8c98e738458a9"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk04.img" size="1474560" crc="6f6e4286" sha1="5a6c32eb3a2193225b7b26dea7f98c77b7f95759"/>
 			</dataarea>
@@ -1523,106 +1780,127 @@ license:CC0
 		<year>1992</year>
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install.img" size="1474560" crc="e3d354e2" sha1="323145b425246d8e4adcad28b823895a4bc51a25"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk01.img" size="1474560" crc="692c1cf0" sha1="659b3b48b48969d74db66f1923d3ad1fd5dd54f0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk02.img" size="1474560" crc="e2f618a3" sha1="3a26d0584071d52c6b4190a29d4288e7ddd33770"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk03.img" size="1474560" crc="10c3af03" sha1="015774b4db9b250928aa2ff36e0d1b63a9477d2e"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk04.img" size="1474560" crc="9e8a5dfa" sha1="dc198a5604c1b218475f182a1ac56e29e5748962"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 5"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk05.img" size="1474560" crc="6976d354" sha1="a0aeeeb687c864ee2e61b1d37b6f91b800cf02ea"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 6"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk06.img" size="1474560" crc="8274472c" sha1="5dc9c28159311700f9e0791ce6bfdea0f33e0117"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 7"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk07.img" size="1474560" crc="91633577" sha1="859aba836181a54143ddcf1364f857d1b23468f6"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 8"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk08.img" size="1474560" crc="7616a344" sha1="0a8ad83d000fb837e56a051de761e3fe6dd7a9d0"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 9"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk09.img" size="1474560" crc="f8956e3e" sha1="14684bdfaa2fe0a5378c2cb268e0dea58e2c6a7d"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 10"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk10.img" size="1474560" crc="7801cf94" sha1="4dceecda95592476d96bef1aa23d6c5afc20a124"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 11"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk11.img" size="1474560" crc="79b377cc" sha1="12fc97ba487b282e768f6f579cb2b6f45eacdff8"/>
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 12"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk12.img" size="1474560" crc="1b3c5a50" sha1="46f8bfbf00d89688878431319b3f82569ced1223"/>
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 13"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk13.img" size="1474560" crc="6888728a" sha1="6de5c8f76cc9689b1ab3f96b7d22c4e0cb3c3cfc"/>
 			</dataarea>
 		</part>
 		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 14"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk14.img" size="1474560" crc="3e1efcca" sha1="298db0316f88dec4e6a31e53e2aa249ff030c2e1"/>
 			</dataarea>
 		</part>
 		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 15"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk15.img" size="1474560" crc="465fddbf" sha1="57011fabdc66337f742c259dcfbd117b95bf62e4"/>
 			</dataarea>
 		</part>
 		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Printer driver diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="printer drivers 1.img" size="1474560" crc="49e3dd29" sha1="5333ba64ae4d00367d16590a6fd9a9a7ae877fa7"/>
 			</dataarea>
 		</part>
 		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Printer driver diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="printer drivers 2.img" size="1474560" crc="9e78125a" sha1="4a1198f32567d50498e68e612b64ea9c5dc45e3a"/>
 			</dataarea>
 		</part>
 		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Printer driver diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="printer drivers 3.img" size="1474560" crc="20b0b8dc" sha1="310077e82893b79b0286fc118207727295e8d7a6"/>
 			</dataarea>
 		</part>
 		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Printer driver diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="printer drivers 4.img" size="1474560" crc="323c4554" sha1="312b96c21deab9c120c62035bae119b08e54152e"/>
 			</dataarea>
 		</part>
 		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Printer driver diskette 5"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="printer drivers 5.img" size="1474560" crc="6a991f58" sha1="1f85cfef88f4cf04ba280be67ec690988d003281"/>
 			</dataarea>
@@ -1634,91 +1912,109 @@ license:CC0
 		<year>1993</year>
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Installation Diskette"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="install.img" size="1474560" crc="cadc4acc" sha1="5caffea9bfd51b498c80d2a3b65e5bab54d635ff"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 1"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk01.img" size="1474560" crc="13153bfe" sha1="3a25574f079cfad65b0f009f2e773602d0d95a99"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 2"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk02.img" size="1474560" crc="1aa4eb9e" sha1="125a5d16e7a5629173465ff6a5ea5edd78626f02"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 3"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk03.img" size="1474560" crc="38f574ec" sha1="12dc9de0b34ab48527372a917e80b8ffabf198ca"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 4"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk04.img" size="1474560" crc="1e51141a" sha1="4aa4da0bca969008a7d288884998ecbc761bb13c"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 5"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk05.img" size="1474560" crc="4726b456" sha1="1ced4219f7be9d0baf5e74aae801383b0d5d5ead"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 6"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk06.img" size="1474560" crc="451b50ab" sha1="b44e422d557d39f2770602ceeb5305899b4054f4"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 7"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk07.img" size="1474560" crc="672125d2" sha1="bac6fffde0ec1e6923ae4a27325e8a1d8ea205a4"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 8"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk08.img" size="1474560" crc="f66286e8" sha1="d9c4525915e5eb8919d25569bd8f81c7d70165ab"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 9"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk09.img" size="1474560" crc="b8b3a958" sha1="4ade78b9663a0b3292df904455c2b4655869b90b"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 10"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk10.img" size="1474560" crc="520de48c" sha1="a1dcad1c1ffddd28341cb7c408c154415df6ea0d"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 11"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk11.img" size="1474560" crc="9a9ec81c" sha1="7bdec215e64f3fafa66b5073081f3e9416b83e4a"/>
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 12"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk12.img" size="1474560" crc="5b9177d2" sha1="1d5e20737c6d7b041e79d7a23005aa1b3270a8c8"/>
 			</dataarea>
 		</part>
 		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 13"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk13.img" size="1474560" crc="e4e0611b" sha1="82004ea8b5a4e13816d59cc1e839a240975554b7"/>
 			</dataarea>
 		</part>
 		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 14"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk14.img" size="1474560" crc="4bf2120f" sha1="2ef320bb840e01fe73eb286bd734ed03e6859183"/>
 			</dataarea>
 		</part>
 		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 15"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk15.img" size="1474560" crc="0fb8328d" sha1="cf8d2b785a4f50855733e0680915977ff5c8053a"/>
 			</dataarea>
 		</part>
 		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 16"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk16.img" size="1474560" crc="ad4e6091" sha1="40be30cbdefdac925d811f746c03f0a6d2b01899"/>
 			</dataarea>
 		</part>
 		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="Operating System/2 Diskette 17"/>
 			<dataarea name="flop" size="1474560">
 				<rom name="disk17.img" size="1474560" crc="68bcf933" sha1="6acc07024b7485e893ca218bec5c9eedaa8ea725"/>
 			</dataarea>
@@ -1973,7 +2269,7 @@ license:CC0
 	</software>
 
 	<software name="pcdos61">
-		<description>IBM DOS (Version 6.1)</description>
+		<description>IBM DOS (Version 6.1, Update)</description>
 		<year>1993</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="6.1" />
@@ -2004,7 +2300,7 @@ license:CC0
 	</software>
 
 	<software name="pcdos61a" cloneof="pcdos61">
-		<description>IBM DOS (Version 6.1, Alt)</description>
+		<description>IBM DOS (Version 6.1)</description>
 		<year>1993</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="6.1" />
@@ -14095,6 +14391,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="midwint2_525">
+		<description>Midwinter II - Flames of Freedom (USA)</description>
+		<year>1992</year>
+		<publisher>Microplay Software</publisher>
+		<info name="developer" value="Maelstrom Games" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Midwinter II [Microplay] [1992] [5.25HD] [Disk 1 of 2] [Program Disc].img" size="1228800" crc="9cb25023" sha1="8b2662b8ed599dca2193d466c3777c429a890ac3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Midwinter II [Microplay] [1992] [5.25HD] [Disk 2 of 2] [Graphics Disk].img" size="1228800" crc="2fa25a4f" sha1="84ce0fad8f2591ee73f2653f9e356fe2409047f4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mission">
 		<!-- converted from DDI format -->
 		<description>Mission (Traditional Chinese)</description>
@@ -15234,6 +15547,34 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="monkeyde" cloneof="monkeyk">
+		<description>The Secret of Monkey Island (Germany)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="version" value="(VGA) V1.1 14.Feb.91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="ee632892" sha1="6f04374ec9dfbfd2ead1559833fee7952136158d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="36cd209f" sha1="f62fadeabfac36f7ae00879e5f739278bfebccca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="beffb663" sha1="31d5cda6451d75e649d256b6d282318e85f8b9c1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Germany) [Lucasfilm] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="22c6965b" sha1="734a928c4b52173fe3bb8e0b234acc91c7119fa8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monkeyit" cloneof="monkeyk">
 		<description>The Secret of Monkey Island (Italy)</description>
 		<year>1991</year>
@@ -15259,6 +15600,35 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Secret of Monkey Island (Italy) [Lucasfilm Games] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="2aab0101" sha1="689d2958ec39ab1dbdee508c66b4d8aedde71126"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monkeyes" cloneof="monkeyk">
+		<description>The Secret of Monkey Island (Spain, Maxi Juegos/Erbe release)</description>
+		<year>1991</year>
+		<publisher>Lucasfilm Games</publisher>
+		<info name="developer" value="Lucasfilm Games" />
+		<info name="distributor" value="Erbe Software" />
+		<info name="version" value="(VGA) - Spanish 1.0, 23.May.91" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="8f127a18" sha1="68203db84f30d889838a768b5ad091eb0b933114"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="4bec8479" sha1="e2a0166eed4070e967d9fdbf7e76490a55db878e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="461bb6a0" sha1="f779518cf126015ff4667e042485b731f989b487"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Secret of Monkey Island (Spain) [Lucasfilm] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="60ccc3c2" sha1="582ea7d42c9a49ac5622bc49a768cec764db486b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15401,23 +15771,59 @@ license:CC0
 	</software>
 
 	<software name="simcit2k">
-		<description>Sim City 2000 (Ver 1.00)</description>
-		<year>1993</year>
+		<description>SimCity 2000 (Ver 1.00)</description>
+		<year>1994</year>
 		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a"/>
+				<rom name="SimCity 2000 [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="29f6ce7d" sha1="dd4b83f292fe4847301937e2a79e03cbce40189f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a"/>
+				<rom name="SimCity 2000 [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5e92d463" sha1="3ded49b704cf56efb661ad630b4d80010927a18d"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="simcit2kde" cloneof="simcit2k">
+		<description>SimCity 2000 (Germany, Ver 1.00)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="0f6bc7bd" sha1="f8898eac0849688ce1ecf6f21b19fdff31313214"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Germany) [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a9d34795" sha1="b3f414ed7ae188334145bcab10dee21ae8b95503"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcit2kes" cloneof="simcit2k">
+		<description>SimCity 2000 (Spain, Ver 1.00, Dro Soft release)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ea003323" sha1="a2000dcc1f93dc4115f45405702ed3d19ef64af9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="SimCity 2000 (Spain) [Maxis] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6134aa4e" sha1="f2c2be9784d359d9aa6ae1032c40bc1ee6f0ada3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Floppy 2 - Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="simcit2ka" cloneof="simcit2k">
-		<description>Sim City 2000 (Ver 1.01)</description>
+		<description>SimCity 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -15427,7 +15833,25 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986"/>
+				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- On this release, the floppy disks don't have the label -->
+	<software name="simcit2kb" cloneof="simcit2k">
+		<description>SimCity 2000 (Ver 1.00, alt)</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17043,12 +17467,12 @@ license:CC0
 		<info name="developer" value="id Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5e073ffe" sha1="7b5a43fdd162a89d2697e8ab840520a5f2c73c6f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [3.5DD] [Disk 2 of 2].img" size="368640" crc="1f0e273a" sha1="a7d822d67742e25fdc56ba1346f13d2faa7a7a64"/>
+				<rom name="Wolfenstein 3D (shareware) [CWI Information Services] [1993] [5.25DD] [Disk 2 of 2].img" size="368640" crc="1f0e273a" sha1="a7d822d67742e25fdc56ba1346f13d2faa7a7a64"/>
 			</dataarea>
 		</part>
 	</software>

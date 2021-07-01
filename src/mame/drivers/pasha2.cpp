@@ -98,7 +98,6 @@ public:
 	pasha2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_wram(*this, "wram")
-		, m_paletteram(*this, "paletteram")
 		, m_mainbank(*this, "mainbank")
 		, m_lamps_r(*this, "lamp_p%u_r", 1U)
 		, m_lamps_g(*this, "lamp_p%u_g", 1U)
@@ -120,47 +119,55 @@ protected:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint16_t> m_wram;
-	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<u16> m_wram;
 
 	required_memory_bank m_mainbank;
 
+	// output finders
 	output_finder<3> m_lamps_r;
 	output_finder<3> m_lamps_g;
 	output_finder<3> m_lamps_b;
 
-	// video-related
-	uint8_t m_vbuffer;
-
-	// memory
-	std::unique_ptr<uint8_t[]> m_bitmap0[2];
-	std::unique_ptr<uint8_t[]> m_bitmap1[2];
-	void misc_w(offs_t offset, uint16_t data);
-	void palette_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void vbuffer_set_w(uint16_t data);
-	void vbuffer_clear_w(uint16_t data);
-	void bitmap_0_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	void bitmap_1_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	void pasha2_lamps_w(uint16_t data);
-	uint16_t pasha2_speedup_r(offs_t offset);
-	template<int Chip> void oki_bank_w(offs_t offset, uint16_t data);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
+
+	// video-related
+	u8 m_vbuffer = 0;
+	bitmap_ind16 m_bg_bitmap[2];
+	bitmap_ind16 m_fg_bitmap[2];
+
+	// video functions
+	void vbuffer_set_w(u16 data);
+	void vbuffer_clear_w(u16 data);
+	void bg_bitmap_w(offs_t offset, u8 data);
+	void fg_bitmap_w(offs_t offset, u8 data);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	// peripheral handlers
+	template<int Chip> void oki_bank_w(offs_t offset, u16 data);
+	void misc_w(offs_t offset, u16 data);
+	void pasha2_lamps_w(u16 data);
+
+	// speedup functions
+	u16 pasha2_speedup_r(offs_t offset);
+
+	// address maps
 	void pasha2_io(address_map &map);
 	void pasha2_map(address_map &map);
 	void zdrum_audio_map(address_map &map);
 };
 
 
-void pasha2_state::misc_w(offs_t offset, uint16_t data)
+void pasha2_state::misc_w(offs_t offset, u16 data)
 {
 	if (offset)
 	{
 		if (data & 0x0800)
 		{
-			int bank = data & 0xf000;
+			const u16 bank = data & 0xf000;
 
 			switch (bank)
 			{
@@ -176,53 +183,38 @@ void pasha2_state::misc_w(offs_t offset, uint16_t data)
 	}
 }
 
-void pasha2_state::palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int color;
-
-	COMBINE_DATA(&m_paletteram[offset]);
-
-	offset &= 0xff;
-
-	color = (m_paletteram[offset] >> 8) | (m_paletteram[offset + 0x100] & 0xff00);
-	m_palette->set_pen_color(offset * 2 + 0, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
-
-	color = (m_paletteram[offset] & 0xff) | ((m_paletteram[offset + 0x100] & 0xff) << 8);
-	m_palette->set_pen_color(offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
-}
-
-void pasha2_state::vbuffer_set_w(uint16_t data)
+void pasha2_state::vbuffer_set_w(u16 data)
 {
 	m_vbuffer = 1;
 }
 
-void pasha2_state::vbuffer_clear_w(uint16_t data)
+void pasha2_state::vbuffer_clear_w(u16 data)
 {
 	m_vbuffer = 0;
 }
 
-void pasha2_state::bitmap_0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void pasha2_state::bg_bitmap_w(offs_t offset, u8 data)
 {
-	COMBINE_DATA(&m_bitmap0[m_vbuffer][offset]);
+	m_bg_bitmap[m_vbuffer].pix(offset >> 9, offset & 0x1ff) = (data & 0xff) | 0x100;
 }
 
-void pasha2_state::bitmap_1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void pasha2_state::fg_bitmap_w(offs_t offset, u8 data)
 {
 	// handle overlapping pixels without writing them
 	if ((data & 0xff) == 0xff)
 		return;
 
-	COMBINE_DATA(&m_bitmap1[m_vbuffer][offset]);
+	m_fg_bitmap[m_vbuffer].pix(offset >> 9, offset & 0x1ff) = data & 0xff;
 }
 
 template<int Chip>
-void pasha2_state::oki_bank_w(offs_t offset, uint16_t data)
+void pasha2_state::oki_bank_w(offs_t offset, u16 data)
 {
 	if (offset)
 		m_oki[Chip]->set_rom_bank(data & 1);
 }
 
-void pasha2_state::pasha2_lamps_w(uint16_t data)
+void pasha2_state::pasha2_lamps_w(u16 data)
 {
 	for (int p = 0; p < 3; p++)
 	{
@@ -234,9 +226,11 @@ void pasha2_state::pasha2_lamps_w(uint16_t data)
 
 void pasha2_state::pasha2_map(address_map &map)
 {
+	// MEM0 (DRAM)
 	map(0x00000000, 0x001fffff).ram().share("wram");
-	map(0x40000000, 0x4001ffff).ram().w(FUNC(pasha2_state::bitmap_0_w));
-	map(0x40020000, 0x4003ffff).ram().w(FUNC(pasha2_state::bitmap_1_w));
+	// MEM1 (VRAM and Video registers)
+	map(0x40000000, 0x4001ffff).ram().w(FUNC(pasha2_state::bg_bitmap_w));
+	map(0x40020000, 0x4003ffff).ram().w(FUNC(pasha2_state::fg_bitmap_w));
 	map(0x40060000, 0x40060001).nopw();
 	map(0x40064000, 0x40064001).nopw();
 	map(0x40068000, 0x40068001).nopw();
@@ -244,8 +238,11 @@ void pasha2_state::pasha2_map(address_map &map)
 	map(0x40070000, 0x40070001).w(FUNC(pasha2_state::vbuffer_clear_w));
 	map(0x40074000, 0x40074001).w(FUNC(pasha2_state::vbuffer_set_w));
 	map(0x40078000, 0x40078001).nopw(); //once at startup -> to disable the eeprom?
+	// MEM2 (Bankswitched ROM)
 	map(0x80000000, 0x803fffff).bankr("mainbank");
-	map(0xe0000000, 0xe00003ff).ram().w(FUNC(pasha2_state::palette_w)).share("paletteram"); //tilemap? palette?
+	// MEM3 (Palette, Boot ROM)
+	map(0xe0000000, 0xe00001ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette"); //tilemap? palette?
+	map(0xe0000200, 0xe00003ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext"); // "
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
 
@@ -448,39 +445,24 @@ INPUT_PORTS_END
 
 void pasha2_state::video_start()
 {
+	// 2 512x256 8bpp bitmaps, Both are double buffered
 	for (int i = 0; i < 2; i++)
 	{
-		m_bitmap0[i] = make_unique_clear<uint8_t[]>(0x20000);
-		m_bitmap1[i] = make_unique_clear<uint8_t[]>(0x20000);
-		save_pointer(NAME(m_bitmap0[i]), 0x20000, i);
-		save_pointer(NAME(m_bitmap1[i]), 0x20000, i);
+		m_bg_bitmap[i].allocate(512, 256);
+		m_fg_bitmap[i].allocate(512, 256);
+
+		m_bg_bitmap[i].fill(0x100); // Palette space 0x100-0x1ff
+		m_fg_bitmap[i].fill(0);     // Palette space 0x000-0x0ff
+
+		save_item(NAME(m_bg_bitmap[i]), i);
+		save_item(NAME(m_fg_bitmap[i]), i);
 	}
 }
 
-uint32_t pasha2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 pasha2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// 2 512x256 bitmaps
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		int count = cliprect.min_x | (y << 9);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			bitmap.pix(y, x) = m_bitmap0[(m_vbuffer ^ 1)][count++] | 0x100;
-		}
-	}
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		int count = cliprect.min_x | (y << 9);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			int color = m_bitmap1[(m_vbuffer ^ 1)][count++];
-			if (color != 0)
-				bitmap.pix(y, x) = color;
-
-		}
-	}
+	copybitmap(bitmap, m_bg_bitmap[(m_vbuffer ^ 1)], 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, m_fg_bitmap[(m_vbuffer ^ 1)], 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -505,12 +487,12 @@ void pasha2_state::machine_reset()
 void pasha2_state::pasha2(machine_config &config)
 {
 	// basic machine hardware
-	E116XT(config, m_maincpu, 20000000*4);     // 4x internal multiplier
+	E116XT(config, m_maincpu, 20_MHz_XTAL*4);     // 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &pasha2_state::pasha2_map);
 	m_maincpu->set_addrmap(AS_IO, &pasha2_state::pasha2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(pasha2_state::irq0_line_hold));
 
-	AT89C52(config, "audiocpu", 12000000);     // clock from docs
+	AT89C52(config, "audiocpu", 12_MHz_XTAL);     // clock from docs
 	// TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -524,14 +506,15 @@ void pasha2_state::pasha2(machine_config &config)
 	screen.set_screen_update(FUNC(pasha2_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x200);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
+	m_palette->set_membits(8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki[0], 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, m_oki[1], 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	//and ATMEL DREAM SAM9773
 }
@@ -599,7 +582,7 @@ ROM_START( zdrum )
 	DISK_IMAGE( "zdrum", 0, NO_DUMP )
 ROM_END
 
-uint16_t pasha2_state::pasha2_speedup_r(offs_t offset)
+u16 pasha2_state::pasha2_speedup_r(offs_t offset)
 {
 	if(m_maincpu->pc() == 0x8302)
 		m_maincpu->spin_until_interrupt();

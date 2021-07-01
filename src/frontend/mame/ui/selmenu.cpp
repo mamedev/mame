@@ -683,12 +683,12 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 			tempbuf[2] = _("Software is parent");
 
 		// next line is supported status
-		if (swinfo->supported == SOFTWARE_SUPPORTED_NO)
+		if (swinfo->supported == software_support::UNSUPPORTED)
 		{
 			tempbuf[3] = _("Supported: No");
 			color = UI_RED_COLOR;
 		}
-		else if (swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL)
+		else if (swinfo->supported == software_support::PARTIALLY_SUPPORTED)
 		{
 			tempbuf[3] = _("Supported: Partial");
 			color = UI_YELLOW_COLOR;
@@ -700,7 +700,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		}
 
 		// last line is romset name
-		tempbuf[4] = string_format(_("romset: %1$-.100s"), swinfo->shortname);
+		tempbuf[4] = string_format(_("Software list/item: %1$s:%2$s"), swinfo->listname, swinfo->shortname);
 	}
 	else if (driver)
 	{

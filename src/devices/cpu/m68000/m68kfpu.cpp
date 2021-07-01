@@ -1165,6 +1165,13 @@ void m68000_base_device::WRITE_EA_FPE(int mode, int reg, floatx80 fpr, uint32 di
 			break;
 		}
 
+		case 6: // (An) + (Xn) + d8
+		{
+			u32 ea = EA_AY_IX_32();
+			store_extended_float80(ea, fpr);
+			break;
+		}
+
 		case 7:
 		{
 			switch (reg)
@@ -1442,7 +1449,7 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 		}
 		case 0x06:      // FLOGNP1
 		{
-			m_fpr[dst] = floatx80_flognp1 (source);
+			m_fpr[dst] = floatx80_flognp1(source);
 			SET_CONDITION_CODES(m_fpr[dst]);
 			m_icount -= 594; // for MC68881
 			break;
@@ -1600,7 +1607,14 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 9;
 			break;
 		}
-		case 0x31:      // FSINCOS
+		case 0x30:      // FSINCOS
+		case 0x31:
+		case 0x32:
+		case 0x33:
+		case 0x34:
+		case 0x35:
+		case 0x36:
+		case 0x37:
 		{
 			m_fpr[dst] = source;
 			floatx80_fsin(m_fpr[dst]);
@@ -1820,17 +1834,6 @@ void m68000_base_device::fmovem(u16 w2)
 	int mode = (w2 >> 11) & 0x3;
 	int reglist = w2 & 0xff;
 
-	u32 mem_addr = 0;
-	switch (ea >> 3)
-	{
-		case 5:     // (d16, An)
-			mem_addr= EA_AY_DI_32();
-			break;
-		case 6:     // (An) + (Xn) + d8
-			mem_addr= EA_AY_IX_32();
-			break;
-	}
-
 	if (dir)    // From FP regs to mem
 	{
 		switch (mode)
@@ -1874,8 +1877,7 @@ void m68000_base_device::fmovem(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-
+				int di_mode = (imode == 5);
 				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
 
 				for (i=0; i < 8; i++)
@@ -1909,23 +1911,17 @@ void m68000_base_device::fmovem(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
+				int di_mode = (imode == 5);
 				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						switch (ea >> 3)
+						m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
+						if (di_mode)
 						{
-							case 5:     // (d16, An)
-							case 6:     // (An) + (Xn) + d8
-								m_fpr[7-i] = load_extended_float80(mem_addr);
-								mem_addr += 12;
-								break;
-							default:
-								m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
-								break;
+							di_mode_ea += 12;
 						}
 						m_icount -= 2;
 					}

@@ -37,7 +37,22 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sandy">
+	<software name="morphy">
+		<description>Morphy Edition - Master Chess</description>
+		<year>1981</year>
+		<publisher>Applied Concepts</publisher>
+		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x02" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="7075-03" offset="0x4000" size="0x1000" crc="3787e728" sha1="c5408fefdd0fa213b535cbc1e530defd6d90fcfa" /> <!-- HN462732 -->
+				<rom                offset="0x6000" size="0x1000" loadflag="reload" />
+				<rom name="7076-04" offset="0x5000" size="0x1000" crc="57867a31" sha1="06f415231b4fbf95a9b95664ef2c9c7d1342ef56" /> <!-- " -->
+				<rom                offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sandy" cloneof="morphy">
 		<description>Sandy Edition - Master Chess</description>
 		<year>1981</year>
 		<publisher>Applied Concepts / Sandy Electronic</publisher>

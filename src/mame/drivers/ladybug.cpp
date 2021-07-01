@@ -74,7 +74,7 @@ unknown dips
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
-#include "machine/latch8.h"
+#include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 #include "screen.h"
 #include "speaker.h"
@@ -157,8 +157,8 @@ void mrsdyna_state::mrsdyna_cpu1_map(address_map &map)
 	// LS138 @ N3 (bottom 3 bits)
 	// (all of these are read/write)
 	map(0x8005, 0x8005).mirror(0x1ff8).r(FUNC(mrsdyna_state::mrsdyna_protection_r));  // OE on PAL @ K2 (16R6, U001) (100x xxxx xxxx x101)
-	map(0x8006, 0x8006).mirror(0x1ff8).w("soundlatch_low", FUNC(latch8_device::write)); // LS374 @ P6
-	map(0x8007, 0x8007).mirror(0x1ff8).w("soundlatch_high", FUNC(latch8_device::write)); // LS374 @ R6
+	map(0x8006, 0x8006).mirror(0x1ff8).w("soundlatch_low", FUNC(generic_latch_8_device::write)); // LS374 @ P6
+	map(0x8007, 0x8007).mirror(0x1ff8).w("soundlatch_high", FUNC(generic_latch_8_device::write)); // LS374 @ R6
 	map(0x8000, 0x8000).mirror(0x1ff8).portr("IN0");
 	map(0x8001, 0x8001).mirror(0x1ff8).portr("IN1");
 	map(0x8002, 0x8002).mirror(0x1ff8).portr("DSW0");
@@ -176,8 +176,8 @@ void mrsdyna_state::mrsdyna_cpu2_map(address_map &map)
 	// LS138 @ P7
 	map(0x0000, 0x5fff).rom(); // 2764s at H6,J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
-	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
-	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(generic_latch_8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(generic_latch_8_device::read)); // LS374 @ R6
 	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(mrsdyna_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
 	// LS138 @ P7 (nY7) and LS139 @ H4
 	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
@@ -191,8 +191,8 @@ void sraider_state::sraider_cpu2_map(address_map &map)
 	// LS138 @ P7
 	map(0x0000, 0x5fff).rom(); // 2764s at H6, J6, and L6
 	map(0x6000, 0x63ff).mirror(0x0400).ram(); // 2x2114 @ M6/N6
-	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(latch8_device::read)); // LS374 @ P6
-	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(latch8_device::read)); // LS374 @ R6
+	map(0x8000, 0x8000).mirror(0x1fff).r("soundlatch_low", FUNC(generic_latch_8_device::read)); // LS374 @ P6
+	map(0xa000, 0xa000).mirror(0x1fff).r("soundlatch_high", FUNC(generic_latch_8_device::read)); // LS374 @ R6
 	map(0xc000, 0xc000).mirror(0x1fff).r(FUNC(sraider_state::mrsdyna_rnd_r)); // LS125 @ P8 - reads 556 outputs to D1 and D0?
 	// LS138 @ P7 (nY7) and LS139 @ H4
 	map(0xe000, 0xe0ff).mirror(0x0300).writeonly().share("grid_data"); // HD6148P @ D6
@@ -263,32 +263,32 @@ static INPUT_PORTS_START( ladybug )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SWA(J2):8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )           PORT_DIPLOCATION("SWA(J2):6")
 	PORT_DIPSETTING(    0x00, "3 Letters" )
 	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)  PORT_DIPLOCATION("SWA(J2):5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze" )                     PORT_DIPLOCATION("SWA(J2):4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )           PORT_DIPLOCATION("SWA(J2):3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )         PORT_DIPLOCATION("SWA(J2):2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )             PORT_DIPLOCATION("SWA(J2):1")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SWB(K2):8,7,6,5")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -300,7 +300,7 @@ static INPUT_PORTS_START( ladybug )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SWB(K2):4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
@@ -361,24 +361,24 @@ static INPUT_PORTS_START( snapjack )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SWA(J2):8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )           PORT_DIPLOCATION("SWA(J2):6")
 	PORT_DIPSETTING(    0x00, "3 Letters" )
 	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )           PORT_DIPLOCATION("SWA(J2):5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x10, 0x00, "unused1?" )
+	PORT_DIPNAME( 0x10, 0x10, "unused1?" )                   PORT_DIPLOCATION("SWA(J2):4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "unused2?" )
+	PORT_DIPNAME( 0x20, 0x20, "unused2?" )                   PORT_DIPLOCATION("SWA(J2):3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )             PORT_DIPLOCATION("SWA(J2):2,1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
@@ -386,7 +386,7 @@ static INPUT_PORTS_START( snapjack )
 
 	PORT_START("DSW1")
 	/* coinage is slightly different from Lady Bug and Cosmic Avenger */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SWB(K2):8,7,6,5")
 	PORT_DIPSETTING(    0x05, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -399,7 +399,7 @@ static INPUT_PORTS_START( snapjack )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x04 all give 1 Coin/1 Credit */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SWB(K2):4,3,2,1")
 	PORT_DIPSETTING(    0x50, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
@@ -449,30 +449,30 @@ static INPUT_PORTS_START( cavenger )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SWA(J2):8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
+	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )           PORT_DIPLOCATION("SWA(J2):6")
 	PORT_DIPSETTING(    0x00, "3 Letters" )
 	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )           PORT_DIPLOCATION("SWA(J2):5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x00, "Initial High Score" )
+	PORT_DIPNAME( 0x30, 0x00, "Initial High Score" )         PORT_DIPLOCATION("SWA(J2):4,3")
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x30, "5000" )
 	PORT_DIPSETTING(    0x20, "8000" )
 	PORT_DIPSETTING(    0x10, "10000" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )             PORT_DIPLOCATION("SWA(J2):2,1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SWB(K2):8,7,6,5")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( cavenger )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SWB(K2):4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
@@ -531,32 +531,32 @@ static INPUT_PORTS_START( dorodon )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SWA(J2):8,7")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )        PORT_DIPLOCATION("SWA(J2):6")
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)  PORT_DIPLOCATION("SWA(J2):5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze" )                     PORT_DIPLOCATION("SWA(J2):4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )           PORT_DIPLOCATION("SWA(J2):3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )         PORT_DIPLOCATION("SWA(J2):2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )             PORT_DIPLOCATION("SWA(J2):1")
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )            PORT_DIPLOCATION("SWB(K2):8,7,6,5")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
@@ -568,7 +568,7 @@ static INPUT_PORTS_START( dorodon )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	/* settings 0x00 through 0x05 all give 1 Coin/1 Credit */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )            PORT_DIPLOCATION("SWB(K2):4,3,2,1")
 	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_1C ) )
@@ -870,8 +870,8 @@ void mrsdyna_state::mrsdyna(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu1_map);
 	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
 
-	LATCH8(config, "soundlatch_low");
-	LATCH8(config, "soundlatch_high");
+	GENERIC_LATCH_8(config, "soundlatch_low");
+	GENERIC_LATCH_8(config, "soundlatch_high");
 
 	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
 	sub.set_addrmap(AS_PROGRAM, &mrsdyna_state::mrsdyna_cpu2_map);
@@ -907,8 +907,8 @@ void sraider_state::sraider(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &sraider_state::mrsdyna_cpu1_map);
 	maincpu.set_vblank_int("screen", FUNC(mrsdyna_state::irq0_line_hold));
 
-	LATCH8(config, "soundlatch_low");
-	LATCH8(config, "soundlatch_high");
+	GENERIC_LATCH_8(config, "soundlatch_low");
+	GENERIC_LATCH_8(config, "soundlatch_high");
 
 	z80_device &sub(Z80(config, "sub", 4000000));   /* 4 MHz */
 	sub.set_addrmap(AS_PROGRAM, &sraider_state::sraider_cpu2_map);
@@ -1118,7 +1118,7 @@ ROM_START( mrsdyna )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// NOTE: Mrs. Dynamite returns ROM ERROR in test mode.  It does an 8-bit checksum on these 3
 	//       ROMs and computes 0xFF.  The answer to pass the test is 0x00.
-	//       THowever, these images were dumped twice, and seem to work fine.
+	//       However, these images were dumped twice, and seem to work fine.
 	ROM_LOAD( "mrsd-8203a-r4.f3", 0x0000, 0x2000, CRC(c944062c) SHA1(c61fc327d67595e601f6a7e5e337646f5f9d351b) )
 	ROM_LOAD( "mrsd-8203a-n4.f2", 0x2000, 0x2000, CRC(d1b9c7bb) SHA1(c139c8ae5b14924eb04a265095a7ab95ac5370af) )
 	ROM_LOAD( "mrsd-8203a-m4.f1", 0x4000, 0x2000, CRC(d25b1dfe) SHA1(f68c6fb2cda37fcffbe7c3c2a3cc5cb372c4101b) )

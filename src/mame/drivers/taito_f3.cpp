@@ -4314,7 +4314,7 @@ void taito_f3_state::tile_decode()
 
 	*/
 
-	u8 *srcdata, *dest;
+	u8 *dest;
 	// all but bubsymphb (bootleg board with different sprite gfx layout), 2mindril (no sprite gfx roms)
 	if (m_gfxdecode->gfx(5) != nullptr)
 	{
@@ -4322,10 +4322,10 @@ void taito_f3_state::tile_decode()
 		gfx_element *spr_gfx_hi = m_gfxdecode->gfx(5);
 
 		// allocate memory for the assembled data
-		srcdata = auto_alloc_array(machine(), u8, spr_gfx->elements() * spr_gfx->width() * spr_gfx->height());
+		m_decoded_gfx5 = std::make_unique<u8[]>(spr_gfx->elements() * spr_gfx->width() * spr_gfx->height());
 
 		// loop over elements
-		dest = srcdata;
+		dest = m_decoded_gfx5.get();
 		for (int c = 0; c < spr_gfx->elements(); c++)
 		{
 			const u8 *c1base = spr_gfx->get_data(c);
@@ -4346,7 +4346,7 @@ void taito_f3_state::tile_decode()
 			}
 		}
 
-		spr_gfx->set_raw_layout(srcdata, spr_gfx->width(), spr_gfx->height(), spr_gfx->elements(), 8 * spr_gfx->width(), 8 * spr_gfx->width() * spr_gfx->height());
+		spr_gfx->set_raw_layout(m_decoded_gfx5.get(), spr_gfx->width(), spr_gfx->height(), spr_gfx->elements(), 8 * spr_gfx->width(), 8 * spr_gfx->width() * spr_gfx->height());
 		m_gfxdecode->set_gfx(5, nullptr);
 	}
 
@@ -4356,10 +4356,10 @@ void taito_f3_state::tile_decode()
 		gfx_element *pf_gfx_hi = m_gfxdecode->gfx(4);
 
 		// allocate memory for the assembled data
-		srcdata = auto_alloc_array(machine(), u8, pf_gfx->elements() * pf_gfx->width() * pf_gfx->height());
+		m_decoded_gfx4 = std::make_unique<u8[]>(pf_gfx->elements() * pf_gfx->width() * pf_gfx->height());
 
 		// loop over elements
-		dest = srcdata;
+		dest = m_decoded_gfx4.get();
 		for (int c = 0; c < pf_gfx->elements(); c++)
 		{
 			const u8 *c0base = pf_gfx->get_data(c);
@@ -4379,7 +4379,7 @@ void taito_f3_state::tile_decode()
 			}
 		}
 
-		pf_gfx->set_raw_layout(srcdata, pf_gfx->width(), pf_gfx->height(), pf_gfx->elements(), 8 * pf_gfx->width(), 8 * pf_gfx->width() * pf_gfx->height());
+		pf_gfx->set_raw_layout(m_decoded_gfx4.get(), pf_gfx->width(), pf_gfx->height(), pf_gfx->elements(), 8 * pf_gfx->width(), 8 * pf_gfx->width() * pf_gfx->height());
 		m_gfxdecode->set_gfx(4, nullptr);
 	}
 }

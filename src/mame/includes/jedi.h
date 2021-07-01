@@ -46,7 +46,7 @@ public:
 		m_sacklatch(*this, "sacklatch"),
 		m_tms(*this, "tms"),
 		m_novram(*this, "novram12%c", 'b'),
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 		m_gfxdecode(*this, "gfxdecode"),
 #endif
 		m_palette(*this, "palette"),
@@ -115,8 +115,9 @@ private:
 	required_device<generic_latch_8_device> m_sacklatch;
 	required_device<tms5220_device> m_tms;
 	required_device_array<x2212_device, 2> m_novram;
-#ifdef DEBUG_GFXDECODE
+#if DEBUG_GFXDECODE
 	required_device<gfxdecode_device> m_gfxdecode;
+	std::unique_ptr<u8[]> m_gfxdata;
 #endif
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

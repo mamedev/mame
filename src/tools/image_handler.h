@@ -33,7 +33,7 @@ struct floppy_format_info {
 
 struct floppy_create_info {
 	const filesystem_manager_t *m_manager;
-		
+
 	floppy_format_type m_type;
 	u32 m_image_size;
 	u32 m_key;

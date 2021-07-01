@@ -242,7 +242,7 @@ uint32_t mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind1
 
 
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites(bitmap, cliprect);		
+		draw_sprites(bitmap, cliprect);
 	}
 	else if (m_bg_mask)
 	{

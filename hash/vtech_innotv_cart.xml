@@ -8,7 +8,7 @@ license:CC0
 
 <!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged -->
 
-<softwarelist name="vtech_innotv_innotabmax_cart" description="VTech InnoTV / InnoTAB MAX cartridges">
+<softwarelist name="vtech_innotv_cart" description="VTech InnoTV / InnoTAB MAX cartridges">
 
 	<software name="pawpatrl" supported="no">
 		<description>Paw Patrol - Pups Save a UFO! (80-274103 UK)</description>

@@ -39,7 +39,6 @@ class emu_timer
 	friend class device_scheduler;
 	friend class simple_list<emu_timer>;
 	friend class fixed_allocator<emu_timer>;
-	friend class resource_pool_object<emu_timer>;
 
 	// construction/destruction
 	emu_timer();

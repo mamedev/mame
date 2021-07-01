@@ -7,9 +7,9 @@ license:CC0
 
 	<!-- 1 - MISSILEVADER -->
 	<software name="misvader">
-		<description>MISSILEVADER</description>
+		<description>Missilevader</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="missilevader.bin" size="4096" crc="a634a472" sha1="ac4d4a6adae0c7bf19b3c70e70d6541e0814ab34" offset="000000" />
@@ -19,9 +19,9 @@ license:CC0
 
 	<!-- 2 - SPACEFIRE -->
 	<software name="spfire">
-		<description>SPACEFIRE</description>
+		<description>Space Fire</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="spacefire.bin" size="4096" crc="85ce4a88" sha1="3bd00bd4978bc1d27a8e31da00f3f24bcb4f76fd" offset="000000" />
@@ -31,9 +31,9 @@ license:CC0
 
 	<!-- 3 - OTHELLO -->
 	<software name="othello">
-		<description>OTHELLO</description>
+		<description>Othello</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="othello.bin" size="4096" crc="fb3c070e" sha1="9df64c78d32f5d31caea936877f47f8d1cdf538b" offset="000000" />
@@ -43,9 +43,9 @@ license:CC0
 
 	<!-- 4 - GUNPROFESSIONAL -->
 	<software name="gunprof">
-		<description>GUNPROFESSIONAL</description>
+		<description>Gun Fighter</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="gunprofessional.bin" size="4096" crc="05db65c0" sha1="09dd817ba35103507d50d44583ddcbb74e463dc8" offset="000000" />
@@ -55,9 +55,9 @@ license:CC0
 
 	<!-- 5 - PACPACBIRD -->
 	<software name="pacpac">
-		<description>PACPACBIRD</description>
+		<description>Pac Pac Bird</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="pacpacbird.bin" size="4096" crc="b550e119" sha1="57923a51f8d52f341fe4bec0401189058875fc69" offset="000000" />
@@ -67,9 +67,9 @@ license:CC0
 
 	<!-- 6 - SUBMARINE -->
 	<software name="submar">
-		<description>SUBMARINE</description>
+		<description>Submarine</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="submarine.bin" size="4096" crc="b7d67a05" sha1="1f4929c019608342363bc6337650cc8e763c4430" offset="000000" />
@@ -79,9 +79,9 @@ license:CC0
 
 	<!-- 7 - BEAMGALAXIAN -->
 	<software name="beamgala">
-		<description>BEAMGALAXIAN</description>
+		<description>Beamgalaxian</description>
 		<year>19??</year>
-		<publisher>unknown</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="sv8000_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="beamgalaxian.bin" size="4096" crc="009f9567" sha1="78b0d57e83f0a428befac57d5c0869eeefc35953" offset="000000" />

@@ -312,7 +312,6 @@ private:
 // a render_texture is used to track transformations when building an object list
 class render_texture
 {
-	friend resource_pool_object<render_texture>::~resource_pool_object();
 	friend class simple_list<render_texture>;
 	friend class fixed_allocator<render_texture>;
 	friend class render_manager;
@@ -378,7 +377,6 @@ private:
 // a render_container holds a list of items and an orientation for the entire collection
 class render_container
 {
-	friend resource_pool_object<render_container>::~resource_pool_object();
 	friend class simple_list<render_container>;
 	friend class render_manager;
 	friend class render_target;
@@ -499,7 +497,6 @@ private:
 // a render_target describes a surface that is being rendered to
 class render_target
 {
-	friend resource_pool_object<render_target>::~resource_pool_object();
 	friend class simple_list<render_target>;
 	friend class render_manager;
 

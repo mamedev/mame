@@ -845,7 +845,7 @@ public:
 	}
 
 private:
-	static keyboard_trans_table* sdlinput_read_keymap(running_machine &machine)
+	keyboard_trans_table* sdlinput_read_keymap(running_machine &machine)
 	{
 		char *keymap_filename;
 		FILE *keymap_file;
@@ -875,7 +875,7 @@ private:
 			key_trans_entries[i] = default_table[i];
 
 		// Allocate the trans table to be associated with the machine so we don't have to free it
-		keyboard_trans_table *custom_table = auto_alloc(machine, keyboard_trans_table(std::move(key_trans_entries), default_table.size()));
+		m_custom_table = std::make_unique<keyboard_trans_table>(std::move(key_trans_entries), default_table.size());
 
 		while (!feof(keymap_file))
 		{
@@ -907,10 +907,9 @@ private:
 
 					if (sk >= 0 && index >= 0)
 					{
-						key_trans_entry &entry = (*custom_table)[index];
+						key_trans_entry &entry = (*m_custom_table)[index];
 						entry.sdl_scancode = sk;
-						entry.ui_name = auto_alloc_array(machine, char, strlen(kns) + 1);
-						strcpy(entry.ui_name, kns);
+						entry.ui_name = const_cast<char *>(m_ui_names.emplace_back(kns).c_str());
 						osd_printf_verbose("Keymap: Mapped <%s> to <%s> with ui-text <%s>\n", sks, mks, kns);
 					}
 					else
@@ -922,8 +921,11 @@ private:
 		fclose(keymap_file);
 		osd_printf_verbose("Keymap: Processed %d lines\n", line);
 
-		return custom_table;
+		return m_custom_table.get();
 	}
+
+	std::unique_ptr<keyboard_trans_table> m_custom_table;
+	std::list<std::string> m_ui_names;
 };
 
 //============================================================
