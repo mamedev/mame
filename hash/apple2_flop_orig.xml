@@ -16884,4 +16884,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pop35">
+		<description>Prince of Persia (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card -->
+		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297161">
+				<rom name="prince of persia 800k.woz" size="1297161" crc="e166d56a" sha1="d9558d25a3d3d91542f32abba9e6b0e2f2c75b09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwlybdy">
+		<description>Woolly's Birthday (Version 1.0) (800K 3.5")</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Woolly's Birthday" is a 1994 educational game developed by Dee Dee Daus, Ruth Kivisto, Pat Korn, Claudio Valenzuela, and Ju Chang Wang, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296222">
+				<rom name="woolly's birthday 800k.woz" size="1296222" crc="a38217f8" sha1="18fdd8d2e5903d0959545de4c7103d35ec997ef8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trlspmth">
+		<description>Troll Sports Math (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-07-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or
+        Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a
+        Liron or other compatible drive controller card.
+
+        Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or
+        Apple SuperDrive (G7287), will not work due to
+        incompatibilities created by the copy protection. -->
+		<!--"Troll Sports Math" is a 1991 educational program developed by Millicent Sabater, Gregory Truex, Thomas Whiting, and Toby Shack, and distributed by Troll Associates. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a Liron or other compatible drive controller card. Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or Apple SuperDrive (G7287), will not work due to incompatibilities created by the copy protection.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296310">
+				<rom name="troll sports math 800k.woz" size="1296310" crc="911766c4" sha1="94362e66024c4a0b2ff924d939972f20f5add785"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
