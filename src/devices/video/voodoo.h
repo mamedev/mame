@@ -291,9 +291,8 @@ class voodoo_device_base : public device_t, public device_video_interface
 	friend class voodoo::command_fifo;
 	friend class voodoo::register_table_entry;
 
-protected:
 	// enumeration describing reasons we might be stalled
-	enum stall_state
+	enum stall_state : u8
 	{
 		NOT_STALLED = 0,
 		STALLED_UNTIL_FIFO_LWM,
@@ -315,19 +314,16 @@ public:
 	// getters
 	voodoo_model model() const { return m_model; }
 
+	// address map and read/write helpers
+	virtual void core_map(address_map &map) = 0;
 	virtual u32 read(offs_t offset, u32 mem_mask = ~0) = 0;
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
 
-	virtual void core_map(address_map &map) = 0;
-
-	TIMER_CALLBACK_MEMBER( vblank_off_callback );
-	TIMER_CALLBACK_MEMBER( stall_resume_callback );
-	TIMER_CALLBACK_MEMBER( vblank_callback );
-
-	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	// external control
 	void set_init_enable(u32 newval);
 
-	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
+	// video update
+	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// construction
@@ -337,6 +333,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
+
+	TIMER_CALLBACK_MEMBER( vblank_off_callback );
+	TIMER_CALLBACK_MEMBER( stall_resume_callback );
+	TIMER_CALLBACK_MEMBER( vblank_callback );
+
+	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
 
 	struct tmu_state
 	{
@@ -362,16 +364,6 @@ protected:
 	};
 
 
-	struct dac_state
-	{
-		void data_w(u8 regum, u8 data);
-		void data_r(u8 regnum);
-
-		u8 m_reg[32];              // 8/32 registers (rev1/rev2+)
-		u8 read_result;            // pending read result
-	};
-
-
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);
 	s32 swapbuffer(u32 data);
@@ -390,7 +382,6 @@ protected:
 
 	void swap_buffers();
 
-protected:
 	// overrides
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
 
@@ -551,8 +542,9 @@ protected:
 	// register state
 	voodoo::voodoo_regs m_reg;               // FBI registers
 	register_table_entry m_regtable[256];    // generated register table
-	dac_state m_dac;                         // DAC state
 	tmu_state m_tmu[MAX_TMU];                // TMU states
+	u8 m_dac_reg[32];                        // up to 32 DAC registers
+	u8 m_dac_read_result;                    // pending DAC read result
 
 	// timers
 	emu_timer *m_vsync_start_timer;          // VBLANK timer

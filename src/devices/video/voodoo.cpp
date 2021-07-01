@@ -507,8 +507,8 @@ void voodoo_device_base::register_save()
 	save_item(NAME(m_pci_fifo_mem));
 
 	/* register states: dac */
-	save_item(NAME(m_dac.m_reg));
-	save_item(NAME(m_dac.read_result));
+	save_item(NAME(m_dac_reg));
+	save_item(NAME(m_dac_read_result));
 
 	/* register states: fbi */
 	save_pointer(NAME(m_fbram), m_fbmask + 1);
@@ -1017,47 +1017,6 @@ void voodoo_device_base::tmu_state::ncc_w(offs_t regnum, u32 data)
 
 
 
-/*************************************
- *
- *  Faux DAC implementation
- *
- *************************************/
-
-void voodoo_device_base::dac_state::data_w(u8 regnum, u8 data)
-{
-	m_reg[regnum] = data;
-}
-
-
-void voodoo_device_base::dac_state::data_r(u8 regnum)
-{
-	u8 result = 0xff;
-
-	/* switch off the DAC register requested */
-	switch (regnum)
-	{
-		case 5:
-			/* this is just to make startup happy */
-			switch (m_reg[7])
-			{
-				case 0x01:  result = 0x55; break;
-				case 0x07:  result = 0x71; break;
-				case 0x0b:  result = 0x79; break;
-			}
-			break;
-
-		default:
-			result = m_reg[regnum];
-			break;
-	}
-
-	/* remember the read result; it is fetched elsewhere */
-	read_result = result;
-}
-
-
-
-
 inline rasterizer_texture &voodoo_device_base::tmu_state::prepare_texture()
 {
 	auto &renderer = m_device.renderer();
@@ -1283,7 +1242,7 @@ u32 voodoo_device_base::reg_status_r(u32 chipmask, u32 regnum)
 u32 voodoo_device_base::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 {
 	// bit 2 of the initEnable register maps this to dacRead
-	return m_init_enable.remap_init_to_dac() ? m_dac.read_result : m_reg.read(regnum);
+	return m_init_enable.remap_init_to_dac() ? m_dac_read_result : m_reg.read(regnum);
 }
 
 
@@ -1694,10 +1653,20 @@ u32 voodoo_device_base::reg_dac_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		// upper 2 address bits are only on Voodoo2+ but are masked by the
 		// register entry for Voodoo 1 so safe to just use them as presented
+		u32 regnum = BIT(data, 8, 3) + 8 * BIT(data, 12, 2);
 		if (!BIT(data, 11))
-			m_dac.data_w(BIT(data, 8, 3) + 8 * BIT(data, 12, 2), BIT(data, 0, 8));
+			m_dac_reg[regnum] = BIT(data, 0, 8);
 		else
-			m_dac.data_r(BIT(data, 8, 3) + 8 * BIT(data, 12, 2));
+		{
+			// this is just to make startup happy
+			m_dac_read_result = m_dac_reg[regnum];
+			switch (m_dac_reg[7])
+			{
+				case 0x01:  m_dac_read_result = 0x55; break;
+				case 0x07:  m_dac_read_result = 0x71; break;
+				case 0x0b:  m_dac_read_result = 0x79; break;
+			}
+		}
 	}
 	return 0;
 }
