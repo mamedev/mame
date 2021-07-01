@@ -520,6 +520,8 @@ public:
 	voodoo_renderer(running_machine &machine, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
 
 	// simple getters
+	s32 yorigin() const { return m_yorigin; }
+	u32 rowpixels() const { return m_rowpixels; }
 	std::vector<thread_stats_block> &thread_stats() { return m_thread_stats; }
 
 	// allocate a new poly_data and fill in the rasterizer_params

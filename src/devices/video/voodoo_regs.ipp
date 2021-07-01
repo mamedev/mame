@@ -479,11 +479,11 @@ REGISTER_TABLE_BEGIN
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(cmdFifoBaseAddr, passive,     cmdfifo,     26, FBI,        SYNC, NOFIFO)    // 1e0 - cmdFIFO mode
 	REGISTER_ENTRY(cmdFifoBump,     passive,     unimplemented,16,FBI,        SYNC, NOFIFO)    // 1e4 - cmdFIFO mode
-	REGISTER_ENTRY(cmdFifoRdPtr,    cmdfifoptr,  cmdfifo,     32, FBI,        SYNC, NOFIFO)    // 1e8 - cmdFIFO mode
+	REGISTER_ENTRY(cmdFifoRdPtr,    cmdfifoptr,  cmdfifoptr,  32, FBI,        SYNC, NOFIFO)    // 1e8 - cmdFIFO mode
 	REGISTER_ENTRY(cmdFifoAMin,     passive,     cmdfifo,     32, FBI,        SYNC, NOFIFO)    // 1ec - cmdFIFO mode
 	REGISTER_ENTRY(cmdFifoAMax,     passive,     cmdfifo,     32, FBI,        SYNC, NOFIFO)    // 1f0 - cmdFIFO mode
-	REGISTER_ENTRY(cmdFifoDepth,    cmdfifodepth,cmdfifo,     16, FBI,        SYNC, NOFIFO)    // 1f4 - cmdFIFO mode
-	REGISTER_ENTRY(cmdFifoHoles,    cmdfifoholes,cmdfifo,     16, FBI,        SYNC, NOFIFO)    // 1f8 - cmdFIFO mode
+	REGISTER_ENTRY(cmdFifoDepth,    cmdfifodepth,cmdfifodepth,16, FBI,        SYNC, NOFIFO)    // 1f4 - cmdFIFO mode
+	REGISTER_ENTRY(cmdFifoHoles,    cmdfifoholes,cmdfifoholes,16, FBI,        SYNC, NOFIFO)    // 1f8 - cmdFIFO mode
 	RESERVED_ENTRY                                                                             // 1fc
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(fbiInit4,        passive,     fbiinit,     32, FBI,      NOSYNC, NOFIFO)    // 200

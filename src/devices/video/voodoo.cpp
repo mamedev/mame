@@ -303,18 +303,26 @@ inline u32 voodoo::memory_fifo::remove()
 int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
 {
 	// reset the video changed flag
-	bool changed = m_fbi.m_video_changed;
-	m_fbi.m_video_changed = false;
+	bool changed = m_video_changed;
+	m_video_changed = false;
 
 	// select the buffer to draw
-	int drawbuf = m_fbi.m_frontbuf;
+	int drawbuf = m_frontbuf;
 	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
-		drawbuf = m_fbi.m_backbuf;
+		drawbuf = m_backbuf;
 
 	// copy from the current front buffer
-	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_fbi.m_rgboffs[m_fbi.m_frontbuf]);
+	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
+	u32 rowpixels = m_renderer->rowpixels();
 	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-		m_fbi.copy_scanline(&bitmap.pix(y), drawbuf, y, cliprect.min_x, cliprect.max_x + 1, pens);
+	{
+		if (y < m_yoffs)
+			continue;
+		u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * rowpixels - m_xoffs;
+		u32 *dst = &bitmap.pix(y);
+		for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+			dst[x] = pens[src[x]];
+	}
 
 	// update stats display
 	if (DEBUG_STATS)
@@ -337,7 +345,7 @@ int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cli
 		{
 			for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				u16 const *const src = m_fbi.aux_buffer() + (y - m_fbi.m_yoffs) * m_fbi.m_rowpixels - m_fbi.m_xoffs;
+				u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
 				u32 *const dst = &bitmap.pix(y);
 				for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
 					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
@@ -353,19 +361,19 @@ int voodoo_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	if (m_reg.fbi_init1().software_blank())
 	{
 		bitmap.fill(0, cliprect);
-		int changed = m_fbi.m_video_changed;
-		m_fbi.m_video_changed = false;
+		int changed = m_video_changed;
+		m_video_changed = false;
 		return changed;
 	}
 
 	// if the CLUT is dirty, recompute the pens array
-	if (m_fbi.m_clut_dirty)
+	if (m_clut_dirty)
 	{
-		rgb_t const *clutbase = &m_fbi.m_clut[0];
+		rgb_t const *clutbase = &m_clut[0];
 
 		// kludge: some of the Midway games write 0 to the last entry when they obviously mean FF
-		if ((m_fbi.m_clut[32] & 0xffffff) == 0 && (m_fbi.m_clut[31] & 0xffffff) != 0)
-			m_fbi.m_clut[32] = 0x20ffffff;
+		if ((m_clut[32] & 0xffffff) == 0 && (m_clut[31] & 0xffffff) != 0)
+			m_clut[32] = 0x20ffffff;
 
 		// compute the R/G/B pens first
 		u8 rtable[32], gtable[64], btable[32];
@@ -387,13 +395,13 @@ int voodoo_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		// now compute the actual pens array
 		for (u32 pen = 0; pen < 65536; pen++)
-			m_fbi.m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
+			m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
 
 		// no longer dirty
-		m_fbi.m_clut_dirty = false;
-		m_fbi.m_video_changed = true;
+		m_clut_dirty = false;
+		m_video_changed = true;
 	}
-	return update_common(bitmap, cliprect, &m_fbi.m_pen[0]);
+	return update_common(bitmap, cliprect, &m_pen[0]);
 }
 
 
@@ -418,61 +426,6 @@ void voodoo_device_base::set_init_enable(u32 newval)
  *  Common initialization
  *
  *************************************/
-
-void voodoo_device_base::fbi_state::init(voodoo_model model, u8 *ram, u32 size)
-{
-	// allocate frame buffer RAM and set pointers
-	m_ram = ram;
-	m_mask = size - 1;
-	m_rgboffs[0] = m_rgboffs[1] = m_rgboffs[2] = 0;
-	m_auxoffs = ~0;
-
-	m_frontbuf = 0;
-	m_backbuf = 1;
-	m_swaps_pending = 0;
-	m_video_changed = true;
-
-	m_yorigin = 0;
-	m_lfb_base = 0;
-	m_lfb_stride = (model <= MODEL_VOODOO_2) ? 10 : 11;
-
-	m_width = 512;
-	m_height = 384;
-	m_xoffs = 0;
-	m_yoffs = 0;
-	m_vsyncstart = 0;
-	m_vsyncstop = 0;
-	m_rowpixels = 0;
-
-	m_vblank = 0;
-	m_vblank_count = 0;
-	m_vblank_swap_pending = 0;
-	m_vblank_swap = 0;
-	m_vblank_dont_swap = 0;
-
-	m_lfb_stats.reset();
-
-	m_sverts = 0;
-
-	// initialize the memory FIFO
-	m_fifo.configure(nullptr, 0);
-	m_cmdfifo[0].init(ram, size);
-	m_cmdfifo[1].init(ram, size);
-
-	if (model <= MODEL_VOODOO_2)
-	{
-		for (int pen = 0; pen < 32; pen++)
-			m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
-		m_clut[32] = rgb_t(32,0xff,0xff,0xff);
-	}
-	else
-	{
-		for (int pen = 0; pen < 512; pen++)
-			m_clut[pen] = rgb_t(pen, pen, pen);
-	}
-	m_clut_dirty = true;
-}
-
 
 shared_tables::shared_tables()
 {
@@ -558,65 +511,63 @@ void voodoo_device_base::register_save()
 	save_item(NAME(m_dac.read_result));
 
 	/* register states: fbi */
-	save_pointer(NAME(m_fbi.m_ram), m_fbi.m_mask + 1);
-	save_item(NAME(m_fbi.m_rgboffs));
-	save_item(NAME(m_fbi.m_auxoffs));
-	save_item(NAME(m_fbi.m_frontbuf));
-	save_item(NAME(m_fbi.m_backbuf));
-	save_item(NAME(m_fbi.m_swaps_pending));
-	save_item(NAME(m_fbi.m_video_changed));
-	save_item(NAME(m_fbi.m_yorigin));
-	save_item(NAME(m_fbi.m_lfb_base));
-	save_item(NAME(m_fbi.m_lfb_stride));
-	save_item(NAME(m_fbi.m_width));
-	save_item(NAME(m_fbi.m_height));
-	save_item(NAME(m_fbi.m_xoffs));
-	save_item(NAME(m_fbi.m_yoffs));
-	save_item(NAME(m_fbi.m_vsyncstart));
-	save_item(NAME(m_fbi.m_vsyncstop));
-	save_item(NAME(m_fbi.m_rowpixels));
-	save_item(NAME(m_fbi.m_vblank));
-	save_item(NAME(m_fbi.m_vblank_count));
-	save_item(NAME(m_fbi.m_vblank_swap_pending));
-	save_item(NAME(m_fbi.m_vblank_swap));
-	save_item(NAME(m_fbi.m_vblank_dont_swap));
-	save_item(NAME(m_fbi.m_lfb_stats.pixels_in));
-	save_item(NAME(m_fbi.m_lfb_stats.pixels_out));
-	save_item(NAME(m_fbi.m_lfb_stats.chroma_fail));
-	save_item(NAME(m_fbi.m_lfb_stats.zfunc_fail));
-	save_item(NAME(m_fbi.m_lfb_stats.afunc_fail));
-	save_item(NAME(m_fbi.m_lfb_stats.clip_fail));
-	save_item(NAME(m_fbi.m_lfb_stats.stipple_count));
-	save_item(NAME(m_fbi.m_sverts));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, x));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, y));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, a));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, r));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, g));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, b));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, z));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, wb));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, w0));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, s0));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, t0));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, w1));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, s1));
-	save_item(STRUCT_MEMBER(m_fbi.m_svert, t1));
-//	save_item(NAME(m_fbi.m_fifo.m_size));
-//	save_item(NAME(m_fbi.m_fifo.m_in));
-//	save_item(NAME(m_fbi.m_fifo.m_out));
+	save_pointer(NAME(m_fbram), m_fbmask + 1);
+	save_item(NAME(m_rgboffs));
+	save_item(NAME(m_auxoffs));
+	save_item(NAME(m_frontbuf));
+	save_item(NAME(m_backbuf));
+	save_item(NAME(m_swaps_pending));
+	save_item(NAME(m_video_changed));
+	save_item(NAME(m_lfb_base));
+	save_item(NAME(m_lfb_stride));
+	save_item(NAME(m_width));
+	save_item(NAME(m_height));
+	save_item(NAME(m_xoffs));
+	save_item(NAME(m_yoffs));
+	save_item(NAME(m_vsyncstart));
+	save_item(NAME(m_vsyncstop));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_vblank_count));
+	save_item(NAME(m_vblank_swap_pending));
+	save_item(NAME(m_vblank_swap));
+	save_item(NAME(m_vblank_dont_swap));
+	save_item(NAME(m_lfb_stats.pixels_in));
+	save_item(NAME(m_lfb_stats.pixels_out));
+	save_item(NAME(m_lfb_stats.chroma_fail));
+	save_item(NAME(m_lfb_stats.zfunc_fail));
+	save_item(NAME(m_lfb_stats.afunc_fail));
+	save_item(NAME(m_lfb_stats.clip_fail));
+	save_item(NAME(m_lfb_stats.stipple_count));
+	save_item(NAME(m_sverts));
+	save_item(STRUCT_MEMBER(m_svert, x));
+	save_item(STRUCT_MEMBER(m_svert, y));
+	save_item(STRUCT_MEMBER(m_svert, a));
+	save_item(STRUCT_MEMBER(m_svert, r));
+	save_item(STRUCT_MEMBER(m_svert, g));
+	save_item(STRUCT_MEMBER(m_svert, b));
+	save_item(STRUCT_MEMBER(m_svert, z));
+	save_item(STRUCT_MEMBER(m_svert, wb));
+	save_item(STRUCT_MEMBER(m_svert, w0));
+	save_item(STRUCT_MEMBER(m_svert, s0));
+	save_item(STRUCT_MEMBER(m_svert, t0));
+	save_item(STRUCT_MEMBER(m_svert, w1));
+	save_item(STRUCT_MEMBER(m_svert, s1));
+	save_item(STRUCT_MEMBER(m_svert, t1));
+//	save_item(NAME(m_fbmem_fifo.m_size));
+//	save_item(NAME(m_fbmem_fifo.m_in));
+//	save_item(NAME(m_fbmem_fifo.m_out));
 /*
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, enable));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, count_holes));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, base));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, end));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, rdptr));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, amin));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, amax));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, depth));
-	save_item(STRUCT_MEMBER(m_fbi.m_cmdfifo, holes));
+	save_item(STRUCT_MEMBER(m_cmdfifo, enable));
+	save_item(STRUCT_MEMBER(m_cmdfifo, count_holes));
+	save_item(STRUCT_MEMBER(m_cmdfifo, base));
+	save_item(STRUCT_MEMBER(m_cmdfifo, end));
+	save_item(STRUCT_MEMBER(m_cmdfifo, rdptr));
+	save_item(STRUCT_MEMBER(m_cmdfifo, amin));
+	save_item(STRUCT_MEMBER(m_cmdfifo, amax));
+	save_item(STRUCT_MEMBER(m_cmdfifo, depth));
+	save_item(STRUCT_MEMBER(m_cmdfifo, holes));
 */
-	save_item(NAME(m_fbi.m_clut));
+	save_item(NAME(m_clut));
 
 	// renderer states
 //	save_item(NAME(m_renderer->m_fogblend));
@@ -629,7 +580,7 @@ void voodoo_device_base::register_save()
 		if (tmu->m_ram == nullptr)
 			continue;
 		save_item(NAME(tmu->m_reg.m_regs), index);
-		if (tmu->m_ram != m_fbi.m_ram)
+		if (tmu->m_ram != m_fbram)
 			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
 		save_item(NAME(tmu->m_palette), index);
 	}
@@ -678,8 +629,8 @@ void voodoo_device_base::update_statistics(bool accumulate)
 
 	/* accumulate/reset statistics from the LFB */
 	if (accumulate)
-		accumulate_statistics(m_fbi.m_lfb_stats);
-	m_fbi.m_lfb_stats.reset();
+		accumulate_statistics(m_lfb_stats);
+	m_lfb_stats.reset();
 }
 
 
@@ -696,36 +647,36 @@ void voodoo_device_base::swap_buffers()
 
 	/* force a partial update */
 	screen().update_partial(screen().vpos());
-	m_fbi.m_video_changed = true;
+	m_video_changed = true;
 
 	/* keep a history of swap intervals */
-	m_reg.update_swap_history(std::min<u8>(m_fbi.m_vblank_count, 15));
+	m_reg.update_swap_history(std::min<u8>(m_vblank_count, 15));
 
 	/* rotate the buffers */
 	if (m_reg.rev1_or_2())
 	{
-		if (m_reg.rev1() || !m_fbi.m_vblank_dont_swap)
+		if (m_reg.rev1() || !m_vblank_dont_swap)
 		{
-			if (m_fbi.m_rgboffs[2] == ~0)
+			if (m_rgboffs[2] == ~0)
 			{
-				m_fbi.m_frontbuf = 1 - m_fbi.m_frontbuf;
-				m_fbi.m_backbuf = 1 - m_fbi.m_frontbuf;
+				m_frontbuf = 1 - m_frontbuf;
+				m_backbuf = 1 - m_frontbuf;
 			}
 			else
 			{
-				m_fbi.m_frontbuf = (m_fbi.m_frontbuf + 1) % 3;
-				m_fbi.m_backbuf = (m_fbi.m_frontbuf + 1) % 3;
+				m_frontbuf = (m_frontbuf + 1) % 3;
+				m_backbuf = (m_frontbuf + 1) % 3;
 			}
 		}
 	}
 	else
-		m_fbi.m_rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbi.m_mask & ~0x0f;
+		m_rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbmask & ~0x0f;
 
 	/* decrement the pending count and reset our state */
-	if (m_fbi.m_swaps_pending)
-		m_fbi.m_swaps_pending--;
-	m_fbi.m_vblank_count = 0;
-	m_fbi.m_vblank_swap_pending = false;
+	if (m_swaps_pending)
+		m_swaps_pending--;
+	m_vblank_count = 0;
+	m_vblank_swap_pending = false;
 
 	/* reset the last_op_time to now and start processing the next command */
 	if (operation_pending())
@@ -804,7 +755,7 @@ void voodoo_device_base::swap_buffers()
 
 void voodoo_device_base::adjust_vblank_timer()
 {
-	attotime vblank_period = screen().time_until_pos(m_fbi.m_vsyncstart);
+	attotime vblank_period = screen().time_until_pos(m_vsyncstart);
 	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
@@ -818,7 +769,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_off_callback )
 	if (LOG_VBLANK_SWAP) logerror("--- vblank end\n");
 
 	/* set internal state and call the client */
-	m_fbi.m_vblank = false;
+	m_vblank = false;
 
 	// PCI Vblank IRQ enable is VOODOO2 and up
 	if (m_reg.rev2_or_3())
@@ -853,23 +804,23 @@ TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_callback )
 	}
 
 	/* increment the count */
-	m_fbi.m_vblank_count++;
-	if (m_fbi.m_vblank_count > 250)
-		m_fbi.m_vblank_count = 250;
-	if (LOG_VBLANK_SWAP) logerror("---- vblank count = %u swap = %u pending = %u", m_fbi.m_vblank_count, m_fbi.m_vblank_swap, m_fbi.m_vblank_swap_pending);
-	if (m_fbi.m_vblank_swap_pending)
-		if (LOG_VBLANK_SWAP) logerror(" (target=%d)", m_fbi.m_vblank_swap);
+	m_vblank_count++;
+	if (m_vblank_count > 250)
+		m_vblank_count = 250;
+	if (LOG_VBLANK_SWAP) logerror("---- vblank count = %u swap = %u pending = %u", m_vblank_count, m_vblank_swap, m_vblank_swap_pending);
+	if (m_vblank_swap_pending)
+		if (LOG_VBLANK_SWAP) logerror(" (target=%d)", m_vblank_swap);
 	if (LOG_VBLANK_SWAP) logerror("\n");
 
 	/* if we're past the swap count, do the swap */
-	if (m_fbi.m_vblank_swap_pending && m_fbi.m_vblank_count >= m_fbi.m_vblank_swap)
+	if (m_vblank_swap_pending && m_vblank_count >= m_vblank_swap)
 		swap_buffers();
 
 	/* set a timer for the next off state */
-	m_vsync_stop_timer->adjust(screen().time_until_pos(m_fbi.m_vsyncstop));
+	m_vsync_stop_timer->adjust(screen().time_until_pos(m_vsyncstop));
 
 	/* set internal state and call the client */
-	m_fbi.m_vblank = true;
+	m_vblank = true;
 
 	// PCI Vblank IRQ enable is VOODOO2 and up
 	if (m_reg.rev2_or_3())
@@ -910,8 +861,8 @@ void voodoo_device_base::soft_reset()
 {
 	reset_counters();
 	m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
-	m_fbi.m_fifo.reset();
 	m_pci_fifo.reset();
+	m_fbmem_fifo.reset();
 }
 
 
@@ -922,32 +873,32 @@ void voodoo_device_base::soft_reset()
  *
  *************************************/
 
-void voodoo_device_base::fbi_state::recompute_video_memory(voodoo_regs &regs)
+void voodoo_device_base::recompute_video_memory()
 {
 	// remember the front buffer configuration to check for changes
 	u16 *starting_front = front_buffer();
-	u32 starting_rowpix = m_rowpixels;
+	u32 starting_rowpix = m_renderer->rowpixels();
 
 	// memory config is determined differently between V1 and V2
-	u32 memory_config = regs.fbi_init2().enable_triple_buf();
-	if (regs.rev2() && memory_config == 0)
-		memory_config = regs.fbi_init5().buffer_allocation();
+	u32 memory_config = m_reg.fbi_init2().enable_triple_buf();
+	if (m_reg.rev2() && memory_config == 0)
+		memory_config = m_reg.fbi_init5().buffer_allocation();
 
 	// tiles are 64x16 (V1) or 32x32 (V2); x_tiles specifies how many half-tiles
-	u32 xtiles = regs.fbi_init1().x_video_tiles();
-	if (regs.rev2())
+	u32 xtiles = m_reg.fbi_init1().x_video_tiles();
+	if (m_reg.rev2())
 	{
 		xtiles = (xtiles << 1) |
-				(regs.fbi_init1().x_video_tiles_bit5() << 5) |
-				(regs.fbi_init6().x_video_tiles_bit0());
+				(m_reg.fbi_init1().x_video_tiles_bit5() << 5) |
+				(m_reg.fbi_init6().x_video_tiles_bit0());
 	}
-	m_rowpixels = xtiles * (regs.rev1() ? 64 : 32);
+	u32 rowpixels = xtiles * (m_reg.rev1() ? 64 : 32);
 
 	// first RGB buffer always starts at 0
 	m_rgboffs[0] = 0;
 
 	// second RGB buffer starts immediately afterwards
-	u32 const buffer_pages = regs.fbi_init2().video_buffer_offset();
+	u32 const buffer_pages = m_reg.fbi_init2().video_buffer_offset();
 	m_rgboffs[1] = buffer_pages * 0x1000;
 
 	// remaining buffers are based on the config
@@ -974,15 +925,15 @@ void voodoo_device_base::fbi_state::recompute_video_memory(voodoo_regs &regs)
 
 	// clamp the RGB buffers to video memory
 	for (int buf = 0; buf < 3; buf++)
-		if (m_rgboffs[buf] != ~0 && m_rgboffs[buf] > m_mask)
-			m_rgboffs[buf] = m_mask;
+		if (m_rgboffs[buf] != ~0 && m_rgboffs[buf] > m_fbmask)
+			m_rgboffs[buf] = m_fbmask;
 
 	// clamp the aux buffer to video memory
-	if (m_auxoffs != ~0 && m_auxoffs > m_mask)
-		m_auxoffs = m_mask;
+	if (m_auxoffs != ~0 && m_auxoffs > m_fbmask)
+		m_auxoffs = m_fbmask;
 
 /*  osd_printf_debug("rgb[0] = %08X   rgb[1] = %08X   rgb[2] = %08X   aux = %08X\n",
-            m_fbi.m_rgboffs[0], m_fbi.m_rgboffs[1], m_fbi.m_rgboffs[2], m_fbi.m_auxoffs);*/
+            m_rgboffs[0], m_rgboffs[1], m_rgboffs[2], m_auxoffs);*/
 
 	// reset our front/back buffers if they are out of range
 	if (m_rgboffs[2] == ~0)
@@ -994,29 +945,30 @@ void voodoo_device_base::fbi_state::recompute_video_memory(voodoo_regs &regs)
 	}
 
 	// mark video changed if the front buffer configuration is different
-	if (front_buffer() != starting_front || m_rowpixels != starting_rowpix)
+	if (front_buffer() != starting_front || rowpixels != starting_rowpix)
 		m_video_changed = true;
+	m_renderer->set_rowpixels(rowpixels);
 }
 
 
-void voodoo_device_base::fbi_state::recompute_fifo_layout(voodoo_regs &regs)
+void voodoo_device_base::recompute_fifo_layout()
 {
 	// compute the memory FIFO location and size
-	u32 fifo_last_page = regs.fbi_init4().memory_fifo_stop_row();
-	if (fifo_last_page > m_mask / 0x1000)
-		fifo_last_page = m_mask / 0x1000;
+	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
+	if (fifo_last_page > m_fbmask / 0x1000)
+		fifo_last_page = m_fbmask / 0x1000;
 
 	// is it valid and enabled?
-	u32 const fifo_start_page = regs.fbi_init4().memory_fifo_start_row();
-	if (fifo_start_page <= fifo_last_page && regs.fbi_init0().enable_memory_fifo())
+	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
+	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
 	{
 		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
-		m_fifo.configure((u32 *)(m_ram + fifo_start_page * 0x1000), size);
+		m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
 	}
 
 	/* if not, disable the FIFO */
 	else
-		m_fifo.configure(nullptr, 0);
+		m_fbmem_fifo.configure(nullptr, 0);
 }
 
 
@@ -1202,7 +1154,7 @@ void voodoo_device_base::check_stalled_cpu(attotime current_time)
 		/* if there's room in the memory FIFO now, we can proceed */
 		if (m_reg.fbi_init0().enable_memory_fifo())
 		{
-			if (m_fbi.m_fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+			if (m_fbmem_fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
 				resume = true;
 		}
 		else if (m_pci_fifo.space() > 2 * m_reg.fbi_init0().pci_fifo_lwm())
@@ -1214,7 +1166,7 @@ void voodoo_device_base::check_stalled_cpu(attotime current_time)
 	{
 		if (m_reg.fbi_init0().enable_memory_fifo())
 		{
-			if (m_fbi.m_fifo.empty() && m_pci_fifo.empty())
+			if (m_fbmem_fifo.empty() && m_pci_fifo.empty())
 				resume = true;
 		}
 		else if (m_pci_fifo.empty())
@@ -1231,7 +1183,7 @@ void voodoo_device_base::check_stalled_cpu(attotime current_time)
 		if (!m_stall_cb.isnull())
 			m_stall_cb(false);
 		else
-			machine().scheduler().trigger(m_trigger);
+			machine().scheduler().trigger(m_stall_trigger);
 	}
 
 	/* if not, set a timer for the next one */
@@ -1255,7 +1207,7 @@ void voodoo_device_base::stall_cpu(stall_state state)
 	if (!m_stall_cb.isnull())
 		m_stall_cb(true);
 	else
-		m_cpu->spin_until_trigger(m_trigger);
+		m_cpu->spin_until_trigger(m_stall_trigger);
 
 	// set a timer to clear the stall
 	m_stall_resume_timer->adjust(m_operation_end - machine().time());
@@ -1295,7 +1247,7 @@ u32 voodoo_device_base::reg_status_r(u32 chipmask, u32 regnum)
 	result |= std::min(m_pci_fifo.space() / 2, 0x3f) << 0;
 
 	// bit 6 is the vertical retrace
-	result |= m_fbi.m_vblank << 6;
+	result |= m_vblank << 6;
 
 	// bit 7 is FBI graphics engine busy
 	// bit 8 is TREX busy
@@ -1304,16 +1256,16 @@ u32 voodoo_device_base::reg_status_r(u32 chipmask, u32 regnum)
 		result |= (1 << 7) | (1 << 8) | (1 << 9);
 
 	// bits 10-11 is displayed buffer
-	result |= m_fbi.m_frontbuf << 10;
+	result |= m_frontbuf << 10;
 
 	// bits 12-27 is memory FIFO free space
 	if (m_reg.fbi_init0().enable_memory_fifo() == 0)
 		result |= 0xffff << 12;
 	else
-		result |= std::min(m_fbi.m_fifo.space() / 2, 0xffff) << 12;
+		result |= std::min(m_fbmem_fifo.space() / 2, 0xffff) << 12;
 
 	// bits 30:28 are the number of pending swaps
-	result |= std::min<s32>(m_fbi.m_swaps_pending, 7) << 28;
+	result |= std::min<s32>(m_swaps_pending, 7) << 28;
 
 	// eat some cycles since people like polling here
 	if (EAT_CYCLES)
@@ -1346,7 +1298,7 @@ u32 voodoo_device_base::reg_vretrace_r(u32 chipmask, u32 regnum)
 		m_cpu->eat_cycles(10);
 
 	// return 0 if vblank is active
-	return m_fbi.m_vblank ? 0 : screen().vpos();
+	return m_vblank ? 0 : screen().vpos();
 }
 
 
@@ -1663,18 +1615,15 @@ u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 
 		// compute FIFO layout when fbiInit0 or fbiInit4 change
 		if (regnum == voodoo_regs::reg_fbiInit0 || regnum == voodoo_regs::reg_fbiInit4)
-			m_fbi.recompute_fifo_layout(m_reg);
+			recompute_fifo_layout();
 
 		// recompute video memory when fbiInit1 or fbiInit2 change
 		if (regnum == voodoo_regs::reg_fbiInit1 || regnum == voodoo_regs::reg_fbiInit2)
-		{
-			m_fbi.recompute_video_memory(m_reg);
-			m_renderer->set_rowpixels(m_fbi.m_rowpixels);
-		}
+			recompute_video_memory();
 
 		// update Y origina when fbiInit3 changes
 		if (regnum == voodoo_regs::reg_fbiInit3)
-			m_renderer->set_yorigin(m_fbi.m_yorigin = m_reg.fbi_init3().yorigin_subtract());
+			m_renderer->set_yorigin(m_reg.fbi_init3().yorigin_subtract());
 	}
 	return 0;
 }
@@ -1682,7 +1631,7 @@ u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 
 //-------------------------------------------------
 //  reg_video_w -- write to a video configuration
-//  register
+//  register; synchronize then recompute everything
 //-------------------------------------------------
 
 u32 voodoo_device_base::reg_video_w(u32 chipmask, u32 regnum, u32 data)
@@ -1691,15 +1640,27 @@ u32 voodoo_device_base::reg_video_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("video_configuration");
 		m_reg.write(regnum, data);
-		m_fbi.recompute_screen_params(m_reg, screen());
-		adjust_vblank_timer();
+
+		auto const hsync = m_reg.hsync();
+		auto const vsync = m_reg.vsync();
+		auto const back_porch = m_reg.back_porch();
+		auto const video_dimensions = m_reg.video_dimensions();
+		if (hsync.raw() != 0 && vsync.raw() != 0 && video_dimensions.raw() != 0 && back_porch.raw() != 0)
+		{
+			recompute_video_timing(
+					hsync.hsync_on(m_reg.rev1()), hsync.hsync_off(m_reg.rev1()),
+					video_dimensions.xwidth(m_reg.rev1()), back_porch.horizontal(m_reg.rev1()) + 2,
+					vsync.vsync_on(m_reg.rev1()), vsync.vsync_off(m_reg.rev1()),
+					video_dimensions.yheight(m_reg.rev1()), back_porch.vertical(m_reg.rev1()));
+		}
 	}
 	return 0;
 }
 
 
 //-------------------------------------------------
-//  reg_clut_w -- write to clutData
+//  reg_clut_w -- write to clutData; mark dirty if
+//  changed
 //-------------------------------------------------
 
 u32 voodoo_device_base::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
@@ -1710,10 +1671,10 @@ u32 voodoo_device_base::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
 		if (m_reg.fbi_init1().video_timing_reset() == 0)
 		{
 			int index = BIT(data, 24, 8);
-			if (index <= 32)
+			if (index <= 32 && m_clut[index] != data)
 			{
-				m_fbi.m_clut[index] = data;
-				m_fbi.m_clut_dirty = true;
+				m_clut[index] = data;
+				m_clut_dirty = true;
 			}
 		}
 		else
@@ -1789,69 +1750,59 @@ u32 voodoo_device_base::reg_palette_w(u32 chipmask, u32 regnum, u32 data)
 
 
 
-void voodoo_device_base::fbi_state::recompute_screen_params(voodoo_regs &regs, screen_device &screen)
+void voodoo_device_base::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp)
 {
-	auto const hsync = regs.hsync();
-	auto const vsync = regs.vsync();
-	auto const back_porch = regs.back_porch();
-	auto const video_dimensions = regs.video_dimensions();
-	if (hsync.raw() != 0 && vsync.raw() != 0 && video_dimensions.raw() != 0 && back_porch.raw() != 0)
+	u32 htotal = hsyncoff + 1 + hsyncon + 1;
+	u32 vtotal = vsyncoff + vsyncon;
+
+	// create a new visarea from the backporch and visible values
+	rectangle visarea(hbp, hbp + std::max(s32(hvis) - 1, 0), vbp, vbp + std::max(s32(vvis) - 1, 0));
+
+	// keep within bounds
+	visarea.max_x = std::min<s32>(visarea.max_x, htotal - 1);
+	visarea.max_y = std::min<s32>(visarea.max_y, vtotal - 1);
+
+	// compute the new period for standard res, medium res, and VGA res
+	attoseconds_t stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
+	attoseconds_t medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
+	attoseconds_t vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
+
+	// compute a diff against the current refresh period
+	attoseconds_t refresh = screen().frame_period().attoseconds();
+	attoseconds_t stddiff = std::abs(stdperiod - refresh);
+	attoseconds_t meddiff = std::abs(medperiod - refresh);
+	attoseconds_t vgadiff = std::abs(vgaperiod - refresh);
+
+	osd_printf_debug("hSync=%d-%d, bp=%d, vis=%d  vSync=%d-%d, bp=%d, vis=%d\n", hsyncon, hsyncoff, hbp, hvis, vsyncon, vsyncoff, vbp, vvis);
+	osd_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
+
+	// configure the screen based on which one matches the closest
+	if (stddiff < meddiff && stddiff < vgadiff)
 	{
-		u32 htotal = hsync.hsync_off(regs.rev1()) + 1 + hsync.hsync_on(regs.rev1()) + 1;
-		u32 vtotal = vsync.vsync_off(regs.rev1()) + vsync.vsync_on(regs.rev1());
-		u32 hvis = video_dimensions.xwidth(regs.rev1());
-		u32 vvis = video_dimensions.yheight(regs.rev1());
-		u32 hbp = back_porch.horizontal(regs.rev1()) + 2;
-		u32 vbp = back_porch.vertical(regs.rev1());
-
-		/* create a new visarea */
-		rectangle visarea(hbp, hbp + std::max(s32(hvis) - 1, 0), vbp, vbp + std::max(s32(vvis) - 1, 0));
-
-		/* keep within bounds */
-		visarea.max_x = std::min<s32>(visarea.max_x, htotal - 1);
-		visarea.max_y = std::min<s32>(visarea.max_y, vtotal - 1);
-
-		/* compute the new period for standard res, medium res, and VGA res */
-		attoseconds_t stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
-		attoseconds_t medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
-		attoseconds_t vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
-
-		/* compute a diff against the current refresh period */
-		attoseconds_t refresh = screen.frame_period().attoseconds();
-		attoseconds_t stddiff = std::abs(stdperiod - refresh);
-		attoseconds_t meddiff = std::abs(medperiod - refresh);
-		attoseconds_t vgadiff = std::abs(vgaperiod - refresh);
-
-		osd_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
-			hsync.raw(), vsync.raw(), back_porch.raw(), video_dimensions.raw());
-		osd_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
-
-		/* configure the screen based on which one matches the closest */
-		if (stddiff < meddiff && stddiff < vgadiff)
-		{
-			screen.configure(htotal, vtotal, visarea, stdperiod);
-			osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
-		}
-		else if (meddiff < vgadiff)
-		{
-			screen.configure(htotal, vtotal, visarea, medperiod);
-			osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
-		}
-		else
-		{
-			screen.configure(htotal, vtotal, visarea, vgaperiod);
-			osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
-		}
-
-		/* configure the new framebuffer info */
-		m_width = hvis;
-		m_height = vvis;
-		m_xoffs = hbp;
-		m_yoffs = vbp;
-		m_vsyncstart = vsync.vsync_off(regs.rev1());
-		m_vsyncstop = vsync.vsync_on(regs.rev1());
-		osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
+		screen().configure(htotal, vtotal, visarea, stdperiod);
+		osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 	}
+	else if (meddiff < vgadiff)
+	{
+		screen().configure(htotal, vtotal, visarea, medperiod);
+		osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
+	}
+	else
+	{
+		screen().configure(htotal, vtotal, visarea, vgaperiod);
+		osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
+	}
+
+	// configure the new framebuffer info
+	m_width = hvis;
+	m_height = vvis;
+	m_xoffs = hbp;
+	m_yoffs = vbp;
+	m_vsyncstart = vsyncoff;
+	m_vsyncstop = vsyncon;
+	osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
+
+	adjust_vblank_timer();
 }
 
 /*************************************
@@ -2082,8 +2033,8 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	// compute X,Y
-	s32 x = offset & ((1 << m_fbi.m_lfb_stride) - 1);
-	s32 y = (offset >> m_fbi.m_lfb_stride) & 0x3ff;
+	s32 x = offset & ((1 << m_lfb_stride) - 1);
+	s32 y = (offset >> m_lfb_stride) & 0x3ff;
 
 	// adjust the mask based on which half of the data is written
 	if (!ACCESSING_BITS_0_15)
@@ -2097,20 +2048,20 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	switch (destbuf)
 	{
 		case 0:         // front buffer
-			dest = m_fbi.front_buffer();
-			m_fbi.m_video_changed = true;
+			dest = front_buffer();
+			m_video_changed = true;
 			break;
 
 		case 1:         // back buffer
-			dest = m_fbi.back_buffer();
+			dest = back_buffer();
 			break;
 
 		default:        // reserved
 			return 0;
 	}
-	u32 destmax = m_fbi.ram_end() - dest;
-	u16 *depth = m_fbi.aux_buffer();
-	u32 depthmax = m_fbi.ram_end() - depth;
+	u32 destmax = ram_end() - dest;
+	u16 *depth = aux_buffer();
+	u32 depthmax = ram_end() - depth;
 
 	// simple case: no pipeline
 	auto const fbzmode = m_reg.fbz_mode();
@@ -2121,10 +2072,10 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		// determine the screen Y
 		s32 scry = y;
 		if (lfbmode.y_origin())
-			scry = m_fbi.m_yorigin - y;
+			scry = m_renderer->yorigin() - y;
 
 		// advance pointers to the proper row
-		u32 bufoffs = scry * m_fbi.m_rowpixels + x;
+		u32 bufoffs = scry * m_renderer->rowpixels() + x;
 
 		// wait for any outstanding work to finish
 		m_renderer->wait("LFB Write");
@@ -2172,12 +2123,12 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		// determine the screen Y
 		s32 scry = y;
 		if (fbzmode.y_origin())
-			scry = m_fbi.m_yorigin - y;
+			scry = m_renderer->yorigin() - y;
 
 		// advance pointers to the proper row
-		dest += scry * m_fbi.m_rowpixels;
+		dest += scry * m_renderer->rowpixels();
 		if (depth != nullptr)
-			depth += scry * m_fbi.m_rowpixels;
+			depth += scry * m_renderer->rowpixels();
 
 		// make a dummy poly_extra_data structure with some cached values
 		poly_data poly;
@@ -2199,7 +2150,7 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			printf("Warning: rotated stipple pattern\n");
 
 		// loop over up to two pixels
-		thread_stats_block &threadstats = m_fbi.m_lfb_stats;
+		thread_stats_block &threadstats = m_lfb_stats;
 		rgbaint_t iterargb(0);
 		for (int pix = 0; mask != 0; pix++)
 		{
@@ -2323,7 +2274,7 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 		while (cycles == 0)
 		{
 			// we might be in CMDFIFO mode
-			voodoo::command_fifo &cmdfifo = m_fbi.m_cmdfifo[m_fbi.m_cmdfifo[0].enabled() ? 0 : 1];
+			voodoo::command_fifo &cmdfifo = m_cmdfifo[m_cmdfifo[0].enabled() ? 0 : 1];
 			if (cmdfifo.enabled())
 			{
 				// if we don't have anything to execute, we're done for now
@@ -2340,7 +2291,7 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 			}
 
 			// we are in standard PCI/memory FIFO mode
-			voodoo::memory_fifo &memfifo = !m_fbi.m_fifo.empty() ? m_fbi.m_fifo : m_pci_fifo;
+			voodoo::memory_fifo &memfifo = !m_fbmem_fifo.empty() ? m_fbmem_fifo : m_pci_fifo;
 			if (memfifo.empty())
 			{
 				clear_pending_operation();
@@ -2417,8 +2368,8 @@ u32 voodoo_device_base::lfb_r(offs_t offset, bool lfb_3d)
 
 	/* compute X,Y */
 	offset <<= 1;
-	x = offset & ((1 << m_fbi.m_lfb_stride) - 1);
-	y = (offset >> m_fbi.m_lfb_stride);
+	x = offset & ((1 << m_lfb_stride) - 1);
+	y = (offset >> m_lfb_stride);
 
 	/* select the target buffer */
 	auto const lfbmode = m_reg.lfb_mode();
@@ -2429,17 +2380,17 @@ u32 voodoo_device_base::lfb_r(offs_t offset, bool lfb_3d)
 		switch (destbuf)
 		{
 			case 0:         /* front buffer */
-				buffer = m_fbi.front_buffer();
+				buffer = front_buffer();
 				break;
 
 			case 1:         /* back buffer */
-				buffer = m_fbi.back_buffer();
+				buffer = back_buffer();
 				break;
 
 			case 2:         /* aux buffer */
-				if (m_fbi.m_auxoffs == ~0)
+				if (m_auxoffs == ~0)
 					return 0xffffffff;
-				buffer = m_fbi.aux_buffer();
+				buffer = aux_buffer();
 				break;
 
 			default:        /* reserved */
@@ -2449,18 +2400,18 @@ u32 voodoo_device_base::lfb_r(offs_t offset, bool lfb_3d)
 		/* determine the screen Y */
 		scry = y;
 		if (lfbmode.y_origin())
-			scry = m_fbi.m_yorigin - y;
+			scry = m_renderer->yorigin() - y;
 	}
 	else
 	{
 		// Direct lfb access
-		buffer = (u16 *)(m_fbi.m_ram + m_fbi.m_lfb_base*4);
+		buffer = (u16 *)(m_fbram + m_lfb_base*4);
 		scry = y;
 	}
-	bufmax = m_fbi.ram_end() - buffer;
+	bufmax = ram_end() - buffer;
 
 	/* advance pointers to the proper row */
-	bufoffs = scry * m_fbi.m_rowpixels + x;
+	bufoffs = scry * m_renderer->rowpixels() + x;
 	if (bufoffs >= bufmax)
 	{
 		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X\n", x, y, lfb_3d, offset, (u32) bufoffs);
@@ -2564,12 +2515,12 @@ void voodoo_device_base::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:moving PCI FIFO to memory FIFO\n");
 		while (!m_pci_fifo.empty() && valid[(m_pci_fifo.peek() >> 22) & 3])
 		{
-			m_fbi.m_fifo.add(m_pci_fifo.remove());
-			m_fbi.m_fifo.add(m_pci_fifo.remove());
+			m_fbmem_fifo.add(m_pci_fifo.remove());
+			m_fbmem_fifo.add(m_pci_fifo.remove());
 		}
 
 		// if we're above the HWM as a result, stall
-		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbi.m_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbmem_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
 		{
 			if (LOG_FIFO) logerror("VOODOO.FIFO:hit memory FIFO HWM -- stalling\n");
 			stall_cpu(STALLED_UNTIL_FIFO_LWM);
@@ -2712,7 +2663,7 @@ void voodoo_1_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// track swap buffers
 	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_fbi.m_swaps_pending++;
+		m_swaps_pending++;
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
@@ -2770,8 +2721,8 @@ s32 voodoo_device_base::fastfill()
 	auto &poly = m_renderer->alloc_poly();
 
 	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
-	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? m_fbi.back_buffer() : m_fbi.front_buffer();
-	poly.depthbase = m_fbi.aux_buffer();
+	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? back_buffer() : front_buffer();
+	poly.depthbase = aux_buffer();
 	poly.clipleft = m_reg.clip_left();
 	poly.clipright = m_reg.clip_right();
 	poly.cliptop = m_reg.clip_top();
@@ -2791,9 +2742,9 @@ s32 voodoo_device_base::fastfill()
 s32 voodoo_device_base::swapbuffer(u32 data)
 {
 	// set the don't swap value for Voodoo 2
-	m_fbi.m_vblank_swap_pending = true;
-	m_fbi.m_vblank_swap = BIT(data, 1, 8);
-	m_fbi.m_vblank_dont_swap = BIT(data, 9);
+	m_vblank_swap_pending = true;
+	m_vblank_swap = BIT(data, 1, 8);
+	m_vblank_dont_swap = BIT(data, 9);
 
 	// if we're not syncing to the retrace, process the command immediately
 	if (!BIT(data, 0))
@@ -2804,7 +2755,7 @@ s32 voodoo_device_base::swapbuffer(u32 data)
 
 	// determine how many cycles to wait; we deliberately overshoot here because
 	// the final count gets updated on the VBLANK
-	return (m_fbi.m_vblank_swap + 1) * clock() / 10;
+	return (m_vblank_swap + 1) * clock() / 10;
 }
 
 
@@ -2820,8 +2771,8 @@ s32 voodoo_device_base::triangle()
 	auto &poly = m_renderer->alloc_poly();
 
 	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
-	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? m_fbi.back_buffer() : m_fbi.front_buffer();
-	poly.depthbase = m_fbi.aux_buffer();
+	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? back_buffer() : front_buffer();
+	poly.depthbase = aux_buffer();
 	poly.clipleft = m_reg.clip_left();
 	poly.clipright = m_reg.clip_right();
 	poly.cliptop = m_reg.clip_top();
@@ -2969,24 +2920,45 @@ voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_typ
 	m_vblank_cb(*this),
 	m_stall_cb(*this),
 	m_pciint_cb(*this),
-	m_reg(model),
-	m_trigger(0),
-	m_flush_flag(false),
-	m_last_status_pc(0),
-	m_last_status_value(0),
 	m_init_enable(0),
 	m_stall_state(NOT_STALLED),
+	m_stall_trigger(0),
 	m_operation_end(attotime::zero),
-	m_fbi(*this),
+	m_flush_flag(false),
+	m_fbram(nullptr),
+	m_fbmask(0),
+	m_rgboffs{ u32(~0), u32(~0), u32(~0) },
+	m_auxoffs(~0),
+	m_frontbuf(0),
+	m_backbuf(1),
+	m_video_changed(true),
+	m_lfb_base(0),
+	m_lfb_stride(0),
+	m_width(512),
+	m_height(384),
+	m_xoffs(0),
+	m_yoffs(0),
+	m_vsyncstart(0),
+	m_vsyncstop(0),
+	m_swaps_pending(0),
+	m_vblank(0),
+	m_vblank_count(0),
+	m_vblank_swap_pending(0),
+	m_vblank_swap(0),
+	m_vblank_dont_swap(0),
+	m_reg(model),
 	m_tmu{ *this, *this },
-	m_vsync_stop_timer(nullptr),
 	m_vsync_start_timer(nullptr),
+	m_vsync_stop_timer(nullptr),
 	m_stall_resume_timer(nullptr),
+	m_sverts(0),
+	m_cmdfifo{ *this, *this },
 #if USE_MEMORY_VIEWS
 	m_regview(*this, "registers"),
 #endif
-	m_fbmem(nullptr),
-	m_tmumem{ nullptr, nullptr }
+	m_last_status_pc(0),
+	m_last_status_value(0),
+	m_clut_dirty(true)
 {
 }
 
@@ -3025,7 +2997,7 @@ void voodoo_device_base::device_start()
 				break;
 			index++;
 		}
-	m_trigger = 51324 + index;
+	m_stall_trigger = 51324 + index;
 
 	// resolve callbacks
 	m_vblank_cb.resolve();
@@ -3041,32 +3013,79 @@ void voodoo_device_base::device_start()
 	m_memory = std::make_unique<u8[]>(total_allocation * 1024 * 1024 + 4096);
 
 	// configure frame buffer memory, aligning the base to a 4k boundary
-	m_fbmem = (u8 *)(((uintptr_t(m_memory.get()) + 4095) >> 12) << 12);
+	m_fbram = (u8 *)(((uintptr_t(m_memory.get()) + 4095) >> 12) << 12);
+	m_fbmask = m_fbmem_in_mb * 1024 * 1024 - 1;
 
 	// configure texture memory
+	u8 *tmumem[2] = { nullptr, nullptr };
 	m_chipmask = 0x03;
 	if (m_reg.rev1_or_2())
 	{
 		// Voodoo 1/2 have separate framebuffer and texture RAM
-		m_tmumem[0] = m_fbmem + m_fbmem_in_mb * 1024 * 1024;
-		m_tmumem[1] = m_tmumem[0] + m_tmumem0_in_mb * 1024 * 1024;
+		tmumem[0] = m_fbram + m_fbmem_in_mb * 1024 * 1024;
+		tmumem[1] = tmumem[0] + m_tmumem0_in_mb * 1024 * 1024;
 		m_chipmask |= (m_tmumem1_in_mb != 0) ? 0x04 : 0x00;
 	}
 	else
 	{
 		// Voodoo Banshee/3 have shared RAM; Voodoo 3 has two TMUs
-		m_tmumem[0] = m_tmumem[1] = m_fbmem;
+		tmumem[0] = tmumem[1] = m_fbram;
 		m_tmumem0_in_mb = m_tmumem1_in_mb = m_fbmem_in_mb;
 		m_chipmask |= (m_model == MODEL_VOODOO_3) ? 0x04 : 0x00;
 	}
 
 	// initialize the frame buffer
-	m_fbi.init(m_model, m_fbmem, m_fbmem_in_mb * 1024 * 1024);
+	// allocate frame buffer RAM and set pointers
+	m_rgboffs[0] = m_rgboffs[1] = m_rgboffs[2] = 0;
+	m_auxoffs = ~0;
+
+	m_frontbuf = 0;
+	m_backbuf = 1;
+	m_swaps_pending = 0;
+	m_video_changed = true;
+
+	m_lfb_base = 0;
+	m_lfb_stride = (m_model <= MODEL_VOODOO_2) ? 10 : 11;
+
+	m_width = 512;
+	m_height = 384;
+	m_xoffs = 0;
+	m_yoffs = 0;
+	m_vsyncstart = 0;
+	m_vsyncstop = 0;
+
+	m_vblank = 0;
+	m_vblank_count = 0;
+	m_vblank_swap_pending = 0;
+	m_vblank_swap = 0;
+	m_vblank_dont_swap = 0;
+
+	m_lfb_stats.reset();
+
+	m_sverts = 0;
+
+	// initialize the memory FIFO
+	m_fbmem_fifo.configure(nullptr, 0);
+	m_cmdfifo[0].init(m_fbram, m_fbmask + 1);
+	m_cmdfifo[1].init(m_fbram, m_fbmask + 1);
+
+	if (m_model <= MODEL_VOODOO_2)
+	{
+		for (int pen = 0; pen < 32; pen++)
+			m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
+		m_clut[32] = rgb_t(32,0xff,0xff,0xff);
+	}
+	else
+	{
+		for (int pen = 0; pen < 512; pen++)
+			m_clut[pen] = rgb_t(pen, pen, pen);
+	}
+	m_clut_dirty = true;
 
 	// initialize the TMUs
-	m_tmu[0].init(0, *m_shared.get(), m_tmumem[0], m_tmumem0_in_mb * 1024 * 1024);
+	m_tmu[0].init(0, *m_shared.get(), tmumem[0], m_tmumem0_in_mb * 1024 * 1024);
 	if (BIT(m_chipmask, 2))
-		m_tmu[1].init(1, *m_shared.get(), m_tmumem[1], m_tmumem1_in_mb * 1024 * 1024);
+		m_tmu[1].init(1, *m_shared.get(), tmumem[1], m_tmumem1_in_mb * 1024 * 1024);
 
 	// determine the TMU configuration flags
 	u16 tmu_config = 0x11;   // revision 1
@@ -3117,7 +3136,7 @@ void voodoo_device_base::device_reset()
 void voodoo_device_base::device_post_load()
 {
 	// dirty everything so it gets recomputed
-	m_fbi.m_clut_dirty = true;
+	m_clut_dirty = true;
 	for (tmu_state &tm : m_tmu)
 	{
 		tm.m_regdirty = true;
@@ -3126,10 +3145,7 @@ void voodoo_device_base::device_post_load()
 
 	// recompute video memory to get the FBI FIFO base recomputed
 	if (m_reg.rev1_or_2())
-	{
-		m_fbi.recompute_video_memory(m_reg);
-		m_renderer->set_rowpixels(m_fbi.m_rowpixels);
-	}
+		recompute_video_memory();
 }
 
 
@@ -3607,11 +3623,10 @@ u32 command_fifo::packet_type_3(u32 command)
 
 		// if we're starting a new strip, or if this is the first of a set of verts
 		// for a series of individual triangles, initialize all the verts
-		auto &fbi = m_device.m_fbi;
 		if ((code == 1 && trinum == 0) || (code == 0 && trinum % 3 == 0))
 		{
-			fbi.m_sverts = 1;
-			fbi.m_svert[0] = fbi.m_svert[1] = fbi.m_svert[2] = svert;
+			m_device.m_sverts = 1;
+			m_device.m_svert[0] = m_device.m_svert[1] = m_device.m_svert[2] = svert;
 		}
 
 		// otherwise, add this to the list
@@ -3619,14 +3634,14 @@ u32 command_fifo::packet_type_3(u32 command)
 		{
 			// for strip mode, shuffle vertex 1 down to 0
 			if (!BIT(command, 22))
-				fbi.m_svert[0] = fbi.m_svert[1];
+				m_device.m_svert[0] = m_device.m_svert[1];
 
 			// copy 2 down to 1 and add our new one regardless
-			fbi.m_svert[1] = fbi.m_svert[2];
-			fbi.m_svert[2] = svert;
+			m_device.m_svert[1] = m_device.m_svert[2];
+			m_device.m_svert[2] = svert;
 
 			// if we have enough, draw
-			if (++fbi.m_sverts >= 3)
+			if (++m_device.m_sverts >= 3)
 				cycles += m_device.setup_and_draw_triangle();
 		}
 	}
@@ -3770,30 +3785,30 @@ command_fifo::packet_handler command_fifo::s_packet_handler[8] =
 //  reg_hvretrace_r - hvRetrace register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_hvretrace_r(u32 chipmask, u32 offset)
+u32 voodoo_device_base::reg_hvretrace_r(u32 chipmask, u32 regnum)
 {
 	// eat some cycles since people like polling here
 	if (EAT_CYCLES)
 		m_cpu->eat_cycles(10);
 
 	// return 0 for vertical if vblank is active
-	u32 result = m_fbi.m_vblank ? 0 : screen().vpos();
+	u32 result = m_vblank ? 0 : screen().vpos();
 	return result |= screen().hpos() << 16;
 }
 
-u32 voodoo_device_base::reg_cmdfifoptr_r(u32 chipmask, u32 offset)
+u32 voodoo_device_base::reg_cmdfifoptr_r(u32 chipmask, u32 regnum)
 {
-	return m_fbi.m_cmdfifo[0].read_pointer();
+	return m_cmdfifo[0].read_pointer();
 }
 
-u32 voodoo_device_base::reg_cmdfifodepth_r(u32 chipmask, u32 offset)
+u32 voodoo_device_base::reg_cmdfifodepth_r(u32 chipmask, u32 regnum)
 {
-	return m_fbi.m_cmdfifo[0].depth();
+	return m_cmdfifo[0].depth();
 }
 
-u32 voodoo_device_base::reg_cmdfifoholes_r(u32 chipmask, u32 offset)
+u32 voodoo_device_base::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
 {
-	return m_fbi.m_cmdfifo[0].holes();
+	return m_cmdfifo[0].holes();
 }
 
 
@@ -3848,13 +3863,43 @@ u32 voodoo_device_base::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("cmdFifo write");
 		m_reg.write(regnum, data);
-		m_fbi.m_cmdfifo[0].set_base(BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 0, 10) << 12);
-		m_fbi.m_cmdfifo[0].set_end((BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 16, 10) + 1) << 12);
-		m_fbi.m_cmdfifo[0].set_read_pointer(m_reg.read(voodoo_regs::reg_cmdFifoRdPtr));
-		m_fbi.m_cmdfifo[0].set_address_min(m_reg.read(voodoo_regs::reg_cmdFifoAMin));
-		m_fbi.m_cmdfifo[0].set_address_max(m_reg.read(voodoo_regs::reg_cmdFifoAMax));
-		m_fbi.m_cmdfifo[0].set_depth(m_reg.read(voodoo_regs::reg_cmdFifoDepth));
-		m_fbi.m_cmdfifo[0].set_holes(m_reg.read(voodoo_regs::reg_cmdFifoHoles));
+		m_cmdfifo[0].set_base(BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 0, 10) << 12);
+		m_cmdfifo[0].set_end((BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 16, 10) + 1) << 12);
+		m_cmdfifo[0].set_address_min(m_reg.read(voodoo_regs::reg_cmdFifoAMin));
+		m_cmdfifo[0].set_address_max(m_reg.read(voodoo_regs::reg_cmdFifoAMax));
+	}
+	return 0;
+}
+
+u32 voodoo_device_base::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_renderer->wait("cmdFifoReadPtr");
+		m_reg.write(regnum, data);
+		m_cmdfifo[0].set_read_pointer(data);
+	}
+	return 0;
+}
+
+u32 voodoo_device_base::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_renderer->wait("cmdFifoDepth");
+		m_reg.write(regnum, data);
+		m_cmdfifo[0].set_depth(data);
+	}
+	return 0;
+}
+
+u32 voodoo_device_base::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_renderer->wait("cmdFifoHoles");
+		m_reg.write(regnum, data);
+		m_cmdfifo[0].set_holes(data);
 	}
 	return 0;
 }
@@ -3866,12 +3911,9 @@ u32 voodoo_device_base::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 		m_renderer->wait("fbiInit5-7");
 		m_reg.write(regnum, data);
 		if (regnum == voodoo_regs::reg_fbiInit6)
-		{
-			m_fbi.recompute_video_memory(m_reg);
-			m_renderer->set_rowpixels(m_fbi.m_rowpixels);
-		}
-		m_fbi.m_cmdfifo[0].set_enable(m_reg.fbi_init7().cmdfifo_enable());
-		m_fbi.m_cmdfifo[0].set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
+			recompute_video_memory();
+		m_cmdfifo[0].set_enable(m_reg.fbi_init7().cmdfifo_enable());
+		m_cmdfifo[0].set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
 		update_register_view();
 	}
 	return 0;
@@ -3896,7 +3938,7 @@ u32 voodoo_device_base::reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data)
 s32 voodoo_device_base::begin_triangle()
 {
 	// extract setup data
-	auto &sv = m_fbi.m_svert[2];
+	auto &sv = m_svert[2];
 	sv.x = m_reg.read_float(voodoo_regs::reg_sVx);
 	sv.y = m_reg.read_float(voodoo_regs::reg_sVy);
 	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
@@ -3912,8 +3954,8 @@ s32 voodoo_device_base::begin_triangle()
 	sv.b = m_reg.read_float(voodoo_regs::reg_sBlue);
 
 	// spread it across all three verts and reset the count
-	m_fbi.m_svert[0] = m_fbi.m_svert[1] = sv;
-	m_fbi.m_sverts = 1;
+	m_svert[0] = m_svert[1] = sv;
+	m_sverts = 1;
 	return 0;
 }
 
@@ -3927,13 +3969,13 @@ s32 voodoo_device_base::draw_triangle()
 {
 	// for strip mode, shuffle vertex 1 down to 0
 	if (!m_reg.setup_mode().fan_mode())
-		m_fbi.m_svert[0] = m_fbi.m_svert[1];
+		m_svert[0] = m_svert[1];
 
 	// copy 2 down to 1 regardless
-	m_fbi.m_svert[1] = m_fbi.m_svert[2];
+	m_svert[1] = m_svert[2];
 
 	// extract setup data
-	auto &sv = m_fbi.m_svert[2];
+	auto &sv = m_svert[2];
 	sv.x = m_reg.read_float(voodoo_regs::reg_sVx);
 	sv.y = m_reg.read_float(voodoo_regs::reg_sVy);
 	sv.wb = m_reg.read_float(voodoo_regs::reg_sWb);
@@ -3950,7 +3992,7 @@ s32 voodoo_device_base::draw_triangle()
 
 	// if we have enough verts, go ahead and draw
 	int cycles = 0;
-	if (++m_fbi.m_sverts >= 3)
+	if (++m_sverts >= 3)
 		cycles = setup_and_draw_triangle();
 	return cycles;
 }
@@ -3963,9 +4005,9 @@ s32 voodoo_device_base::draw_triangle()
 
 s32 voodoo_device_base::setup_and_draw_triangle()
 {
-	auto &sv0 = m_fbi.m_svert[0];
-	auto &sv1 = m_fbi.m_svert[1];
-	auto &sv2 = m_fbi.m_svert[2];
+	auto &sv0 = m_svert[0];
+	auto &sv1 = m_svert[1];
+	auto &sv2 = m_svert[2];
 
 	// compute the divisor, but we only need to know the sign up front
 	// for backface culling
@@ -3980,7 +4022,7 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 
 		// if doing strips and ping pong is enabled, apply the ping pong
 		if (!setup_mode.fan_mode() && !setup_mode.disable_ping_pong_correction())
-			culling_sign ^= (m_fbi.m_sverts - 3) & 1;
+			culling_sign ^= (m_sverts - 3) & 1;
 
 		// if our sign matches the culling sign, we're done for
 		if (divisor_sign == culling_sign)
@@ -4150,7 +4192,7 @@ void voodoo_2_device::map_register_cmdfifo_w(offs_t offset, u32 data, u32 mem_ma
 	{
 		// track swap buffers regardless
 		if (regnum == voodoo_regs::reg_swapbufferCMD)
-			m_fbi.m_swaps_pending++;
+			m_swaps_pending++;
 		logerror("Ignoring write to %s in CMDFIFO mode\n", m_reg.name(offset));
 		return;
 	}
@@ -4167,7 +4209,7 @@ void voodoo_2_device::map_cmdfifo_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (BIT(offset, 18-2))
 		data = swapendian_int32(data);
-	m_fbi.m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
+	m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
 }
 
 #endif
@@ -4314,7 +4356,7 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 		// check for byte swizzling (bit 18)
 		if (BIT(offset, 18-2))
 			data = swapendian_int32(data);
-		m_fbi.m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
+		m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
 		return;
 	}
 #endif
@@ -4340,7 +4382,7 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// track swap buffers
 	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_fbi.m_swaps_pending++;
+		m_swaps_pending++;
 
 #if !USE_MEMORY_VIEWS
 	// if cmdfifo is enabled, ignore everything else

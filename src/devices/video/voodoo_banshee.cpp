@@ -57,9 +57,9 @@ int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cl
 		return update_common(bitmap, cliprect, m_shared->rgb565);
 
 	// if the CLUT is dirty, recompute the pens array
-	if (m_fbi.m_clut_dirty)
+	if (m_clut_dirty)
 	{
-		rgb_t const *clutbase = &m_fbi.m_clut[256 * BIT(m_banshee.io[io_vidProcCfg], 13)];
+		rgb_t const *clutbase = &m_clut[256 * BIT(m_banshee.io[io_vidProcCfg], 13)];
 
 		// compute R/G/B pens first
 		u8 rtable[32], gtable[64], btable[32];
@@ -81,13 +81,13 @@ int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		// now compute the actual pens array
 		for (u32 pen = 0; pen < 65536; pen++)
-			m_fbi.m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
+			m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
 
 		// no longer dirty
-		m_fbi.m_clut_dirty = false;
-		m_fbi.m_video_changed = true;
+		m_clut_dirty = false;
+		m_video_changed = true;
 	}
-	return update_common(bitmap, cliprect, &m_fbi.m_pen[0]);
+	return update_common(bitmap, cliprect, &m_pen[0]);
 }
 
 
@@ -129,7 +129,7 @@ u32 voodoo_banshee_device_base::reg_status_r(u32 chipmask, u32 offset)
 	result |= std::min(m_pci_fifo.space() / 2, 0x3f) << 0;
 
 	// bit 6 is the vertical retrace
-	result |= m_fbi.m_vblank << 6;
+	result |= m_vblank << 6;
 
 	// bit 7 is FBI graphics engine busy
 	// bit 8 is TREX busy
@@ -140,15 +140,15 @@ u32 voodoo_banshee_device_base::reg_status_r(u32 chipmask, u32 offset)
 	// bit 10 is 2D busy
 
 	// bit 11 is cmd FIFO 0 busy
-	if (m_fbi.m_cmdfifo[0].enabled() && m_fbi.m_cmdfifo[0].depth() > 0)
+	if (m_cmdfifo[0].enabled() && m_cmdfifo[0].depth() > 0)
 		result |= 1 << 11;
 
 	// bit 12 is cmd FIFO 1 busy
-	if (m_fbi.m_cmdfifo[1].enabled() && m_fbi.m_cmdfifo[1].depth() > 0)
+	if (m_cmdfifo[1].enabled() && m_cmdfifo[1].depth() > 0)
 		result |= 1 << 12;
 
 	// bits 30:28 are the number of pending swaps
-	result |= std::min<u32>(m_fbi.m_swaps_pending, 7) << 28;
+	result |= std::min<u32>(m_swaps_pending, 7) << 28;
 
 	// eat some cycles since people like polling here
 	if (EAT_CYCLES)
@@ -163,7 +163,7 @@ u32 voodoo_banshee_device_base::reg_colbufbase_w(u32 chipmask, u32 regnum, u32 d
 	if (BIT(chipmask, 0))
 	{
 		m_reg.write(regnum, data);
-		m_fbi.m_rgboffs[1] = data & m_fbi.m_mask & ~0x0f;
+		m_rgboffs[1] = data & m_fbmask & ~0x0f;
 	}
 	return 0;
 }
@@ -174,10 +174,10 @@ u32 voodoo_banshee_device_base::reg_colbufstride_w(u32 chipmask, u32 regnum, u32
 	{
 		m_reg.write(regnum, data);
 		u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
-		if (newpix != m_fbi.m_rowpixels)
+		if (newpix != m_renderer->rowpixels())
 		{
-			m_renderer->set_rowpixels(m_fbi.m_rowpixels = newpix);
-			m_fbi.m_video_changed = true;
+			m_renderer->set_rowpixels(newpix);
+			m_video_changed = true;
 		}
 	}
 	return 0;
@@ -188,7 +188,7 @@ u32 voodoo_banshee_device_base::reg_auxbufbase_w(u32 chipmask, u32 regnum, u32 d
 	if (BIT(chipmask, 0))
 	{
 		m_reg.write(regnum, data);
-		m_fbi.m_auxoffs = data & m_fbi.m_mask & ~0x0f;
+		m_auxoffs = data & m_fbmask & ~0x0f;
 	}
 	return 0;
 }
@@ -199,7 +199,7 @@ u32 voodoo_banshee_device_base::reg_auxbufstride_w(u32 chipmask, u32 regnum, u32
 	{
 		m_reg.write(regnum, data);
 		u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
-		if (newpix != m_fbi.m_rowpixels)
+		if (newpix != m_renderer->rowpixels())
 			fatalerror("aux buffer stride differs from color buffer stride\n");
 	}
 	return 0;
@@ -207,7 +207,7 @@ u32 voodoo_banshee_device_base::reg_auxbufstride_w(u32 chipmask, u32 regnum, u32
 
 u32 voodoo_banshee_device_base::reg_swappending_w(u32 chipmask, u32 regnum, u32 data)
 {
-	if (BIT(chipmask, 0)) m_fbi.m_swaps_pending++;
+	if (BIT(chipmask, 0)) m_swaps_pending++;
 	return 0;
 }
 
@@ -242,11 +242,11 @@ s32 voodoo_banshee_device_base::lfb_direct_w(offs_t offset, u32 data, u32 mem_ma
 	// TODO: This direct write is not verified.
 	// For direct lfb access just write the data
 	offset <<= 1;
-	int const x = offset & ((1 << m_fbi.m_lfb_stride) - 1);
-	int const y = offset >> m_fbi.m_lfb_stride;
-	u16 *const dest = (u16 *)&m_fbi.m_ram[m_fbi.m_lfb_base * 4];
-	u32 const destmax = m_fbi.ram_end() - dest;
-	u32 const bufoffs = y * m_fbi.m_rowpixels + x;
+	int const x = offset & ((1 << m_lfb_stride) - 1);
+	int const y = offset >> m_lfb_stride;
+	u16 *const dest = (u16 *)&m_fbram[m_lfb_base * 4];
+	u32 const destmax = ram_end() - dest;
+	u32 const bufoffs = y * m_renderer->rowpixels() + x;
 	if (bufoffs >= destmax)
 	{
 		logerror("lfb_direct_w: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X data=%08X\n", x, y, offset, bufoffs, data);
@@ -258,7 +258,7 @@ s32 voodoo_banshee_device_base::lfb_direct_w(offs_t offset, u32 data, u32 mem_ma
 		dest[bufoffs + 1] = data >> 16;
 
 	// Need to notify that frame buffer has changed
-	m_fbi.m_video_changed = true;
+	m_video_changed = true;
 	if (LOG_LFB)
 		logerror("VOODOO.LFB:write direct (%d,%d) = %08X & %08X\n", x, y, data, mem_mask);
 	return 0;
@@ -282,43 +282,43 @@ u32 voodoo_banshee_device_base::banshee_agp_r(offs_t offset)
 	switch (offset)
 	{
 		case cmdRdPtrL0:
-			result = m_fbi.m_cmdfifo[0].read_pointer();
+			result = m_cmdfifo[0].read_pointer();
 			break;
 
 		case cmdAMin0:
-			result = m_fbi.m_cmdfifo[0].address_min();
+			result = m_cmdfifo[0].address_min();
 			break;
 
 		case cmdAMax0:
-			result = m_fbi.m_cmdfifo[0].address_max();
+			result = m_cmdfifo[0].address_max();
 			break;
 
 		case cmdFifoDepth0:
-			result = m_fbi.m_cmdfifo[0].depth();
+			result = m_cmdfifo[0].depth();
 			break;
 
 		case cmdHoleCnt0:
-			result = m_fbi.m_cmdfifo[0].holes();
+			result = m_cmdfifo[0].holes();
 			break;
 
 		case cmdRdPtrL1:
-			result = m_fbi.m_cmdfifo[1].read_pointer();
+			result = m_cmdfifo[1].read_pointer();
 			break;
 
 		case cmdAMin1:
-			result = m_fbi.m_cmdfifo[1].address_min();
+			result = m_cmdfifo[1].address_min();
 			break;
 
 		case cmdAMax1:
-			result = m_fbi.m_cmdfifo[1].address_max();
+			result = m_cmdfifo[1].address_max();
 			break;
 
 		case cmdFifoDepth1:
-			result = m_fbi.m_cmdfifo[1].depth();
+			result = m_cmdfifo[1].depth();
 			break;
 
 		case cmdHoleCnt1:
-			result = m_fbi.m_cmdfifo[1].holes();
+			result = m_cmdfifo[1].holes();
 			break;
 
 		default:
@@ -340,19 +340,19 @@ u32 voodoo_banshee_device_base::banshee_fb_r(offs_t offset)
 	if (operation_pending())
 		flush_fifos(machine().time());
 
-	if (offset < m_fbi.m_lfb_base)
+	if (offset < m_lfb_base)
 	{
 		if (LOG_LFB)
 			logerror("%s:banshee_fb_r(%X)\n", machine().describe_context(), offset*4);
-		if (offset*4 <= m_fbi.m_mask)
-			result = ((u32 *)m_fbi.m_ram)[offset];
+		if (offset*4 <= m_fbmask)
+			result = ((u32 *)m_fbram)[offset];
 		else
 			logerror("%s:banshee_fb_r(%X) Access out of bounds\n", machine().describe_context(), offset*4);
 	}
 	else {
 		if (LOG_LFB)
-			logerror("%s:banshee_fb_r(%X) to lfb_r: %08X lfb_base=%08X\n", machine().describe_context(), offset*4, offset - m_fbi.m_lfb_base, m_fbi.m_lfb_base);
-		result = lfb_r(offset - m_fbi.m_lfb_base, false);
+			logerror("%s:banshee_fb_r(%X) to lfb_r: %08X lfb_base=%08X\n", machine().describe_context(), offset*4, offset - m_lfb_base, m_lfb_base);
+		result = lfb_r(offset - m_lfb_base, false);
 	}
 	return result;
 }
@@ -467,7 +467,7 @@ u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 			break;
 
 		case io_dacData:
-			result = m_fbi.m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
+			result = m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_dac_r(%X)\n", machine().describe_context(), m_banshee.io[io_dacAddr] & 0x1ff);
 			break;
@@ -537,27 +537,27 @@ void voodoo_banshee_device_base::banshee_blit_2d(u32 data)
 			switch (m_banshee.blt_dst_bpp)
 			{
 				case 1:
-					m_fbi.m_ram[addr+0] = data & 0xff;
-					m_fbi.m_ram[addr+1] = (data >> 8) & 0xff;
-					m_fbi.m_ram[addr+2] = (data >> 16) & 0xff;
-					m_fbi.m_ram[addr+3] = (data >> 24) & 0xff;
+					m_fbram[addr+0] = data & 0xff;
+					m_fbram[addr+1] = (data >> 8) & 0xff;
+					m_fbram[addr+2] = (data >> 16) & 0xff;
+					m_fbram[addr+3] = (data >> 24) & 0xff;
 					m_banshee.blt_dst_x += 4;
 					break;
 				case 2:
-					m_fbi.m_ram[addr+1] = data & 0xff;
-					m_fbi.m_ram[addr+0] = (data >> 8) & 0xff;
-					m_fbi.m_ram[addr+3] = (data >> 16) & 0xff;
-					m_fbi.m_ram[addr+2] = (data >> 24) & 0xff;
+					m_fbram[addr+1] = data & 0xff;
+					m_fbram[addr+0] = (data >> 8) & 0xff;
+					m_fbram[addr+3] = (data >> 16) & 0xff;
+					m_fbram[addr+2] = (data >> 24) & 0xff;
 					m_banshee.blt_dst_x += 2;
 					break;
 				case 3:
 					m_banshee.blt_dst_x += 1;
 					break;
 				case 4:
-					m_fbi.m_ram[addr+3] = data & 0xff;
-					m_fbi.m_ram[addr+2] = (data >> 8) & 0xff;
-					m_fbi.m_ram[addr+1] = (data >> 16) & 0xff;
-					m_fbi.m_ram[addr+0] = (data >> 24) & 0xff;
+					m_fbram[addr+3] = data & 0xff;
+					m_fbram[addr+2] = (data >> 8) & 0xff;
+					m_fbram[addr+1] = (data >> 16) & 0xff;
+					m_fbram[addr+0] = (data >> 24) & 0xff;
 					m_banshee.blt_dst_x += 1;
 					break;
 			}
@@ -760,74 +760,74 @@ void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_
 	{
 		case cmdBaseAddr0:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[0].set_base(BIT(data, 0, 24) << 12);
-			m_fbi.m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_cmdfifo[0].set_base(BIT(data, 0, 24) << 12);
+			m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize0:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
-			m_fbi.m_cmdfifo[0].set_enable(BIT(data, 8));
-			m_fbi.m_cmdfifo[0].set_count_holes(!BIT(data, 10));
+			m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_cmdfifo[0].set_enable(BIT(data, 8));
+			m_cmdfifo[0].set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump0:
 			fatalerror("cmdBump0\n");
 
 		case cmdRdPtrL0:
-			m_fbi.m_cmdfifo[0].set_read_pointer(data);
+			m_cmdfifo[0].set_read_pointer(data);
 			break;
 
 		case cmdAMin0:
-			m_fbi.m_cmdfifo[0].set_address_min(data);
+			m_cmdfifo[0].set_address_min(data);
 			break;
 
 		case cmdAMax0:
-			m_fbi.m_cmdfifo[0].set_address_max(data);
+			m_cmdfifo[0].set_address_max(data);
 			break;
 
 		case cmdFifoDepth0:
-			m_fbi.m_cmdfifo[0].set_depth(data);
+			m_cmdfifo[0].set_depth(data);
 			break;
 
 		case cmdHoleCnt0:
-			m_fbi.m_cmdfifo[0].set_holes(data);
+			m_cmdfifo[0].set_holes(data);
 			break;
 
 		case cmdBaseAddr1:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[1].set_base(BIT(data, 0, 24) << 12);
-			m_fbi.m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_cmdfifo[1].set_base(BIT(data, 0, 24) << 12);
+			m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize1:
 			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_fbi.m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
-			m_fbi.m_cmdfifo[1].set_enable(BIT(data, 8));
-			m_fbi.m_cmdfifo[1].set_count_holes(!BIT(data, 10));
+			m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_cmdfifo[1].set_enable(BIT(data, 8));
+			m_cmdfifo[1].set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump1:
 			fatalerror("cmdBump1\n");
 
 		case cmdRdPtrL1:
-			m_fbi.m_cmdfifo[1].set_read_pointer(data);
+			m_cmdfifo[1].set_read_pointer(data);
 			break;
 
 		case cmdAMin1:
-			m_fbi.m_cmdfifo[1].set_address_min(data);
+			m_cmdfifo[1].set_address_min(data);
 			break;
 
 		case cmdAMax1:
-			m_fbi.m_cmdfifo[1].set_address_max(data);
+			m_cmdfifo[1].set_address_max(data);
 			break;
 
 		case cmdFifoDepth1:
-			m_fbi.m_cmdfifo[1].set_depth(data);
+			m_cmdfifo[1].set_depth(data);
 			break;
 
 		case cmdHoleCnt1:
-			m_fbi.m_cmdfifo[1].set_holes(data);
+			m_cmdfifo[1].set_holes(data);
 			break;
 
 		default:
@@ -849,12 +849,12 @@ void voodoo_banshee_device_base::banshee_fb_w(offs_t offset, u32 data, u32 mem_m
 	if (operation_pending())
 		flush_fifos(machine().time());
 
-	if (offset < m_fbi.m_lfb_base)
+	if (offset < m_lfb_base)
 	{
-		if (!m_fbi.m_cmdfifo[0].write_if_in_range(addr, data) && !m_fbi.m_cmdfifo[1].write_if_in_range(addr, data))
+		if (!m_cmdfifo[0].write_if_in_range(addr, data) && !m_cmdfifo[1].write_if_in_range(addr, data))
 		{
-			if (offset*4 <= m_fbi.m_mask)
-				COMBINE_DATA(&((u32 *)m_fbi.m_ram)[offset]);
+			if (offset*4 <= m_fbmask)
+				COMBINE_DATA(&((u32 *)m_fbram)[offset]);
 			else
 				logerror("%s:banshee_fb_w Out of bounds (%X) = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			if (LOG_LFB)
@@ -862,7 +862,7 @@ void voodoo_banshee_device_base::banshee_fb_w(offs_t offset, u32 data, u32 mem_m
 		}
 	}
 	else
-		lfb_direct_w(offset - m_fbi.m_lfb_base, data, mem_mask);
+		lfb_direct_w(offset - m_lfb_base, data, mem_mask);
 }
 
 
@@ -938,17 +938,17 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 		case io_vidProcCfg:
 			COMBINE_DATA(&m_banshee.io[offset]);
 			if ((m_banshee.io[offset] ^ old) & 0x2000)
-				m_fbi.m_clut_dirty = true;
+				m_clut_dirty = true;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_dacData:
 			COMBINE_DATA(&m_banshee.io[offset]);
-			if (m_banshee.io[offset] != m_fbi.m_clut[m_banshee.io[io_dacAddr] & 0x1ff])
+			if (m_banshee.io[offset] != m_clut[m_banshee.io[io_dacAddr] & 0x1ff])
 			{
-				m_fbi.m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
-				m_fbi.m_clut_dirty = true;
+				m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
+				m_clut_dirty = true;
 			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_dac_w(%X) = %08X & %08X\n", machine().describe_context(), m_banshee.io[io_dacAddr] & 0x1ff, data, mem_mask);
@@ -957,16 +957,16 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 		case io_miscInit0:
 			m_renderer->wait(voodoo_regs::s_banshee_io_reg_name[offset]);
 			COMBINE_DATA(&m_banshee.io[offset]);
-			m_renderer->set_yorigin(m_fbi.m_yorigin = (data >> 18) & 0xfff);
+			m_renderer->set_yorigin((data >> 18) & 0xfff);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vidScreenSize:
 			if (data & 0xfff)
-				m_fbi.m_width = data & 0xfff;
+				m_width = data & 0xfff;
 			if (data & 0xfff000)
-				m_fbi.m_height = (data >> 12) & 0xfff;
+				m_height = (data >> 12) & 0xfff;
 			[[fallthrough]];
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
@@ -999,15 +999,15 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 			const double frame_period = vtotal * htotal / video_clock;
 			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
 
-			int width = m_fbi.m_width;
-			int height = m_fbi.m_height;
-			//m_fbi.m_xoffs = hbp;
-			//m_fbi.m_yoffs = vbp;
+			int width = m_width;
+			int height = m_height;
+			//m_xoffs = hbp;
+			//m_yoffs = vbp;
 
 			if (m_banshee.io[io_vidOverlayDudx] != 0)
-				width = (m_fbi.m_width * m_banshee.io[io_vidOverlayDudx]) / 1048576;
+				width = (m_width * m_banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (m_banshee.io[io_vidOverlayDvdy] != 0)
-				height = (m_fbi.m_height * m_banshee.io[io_vidOverlayDvdy]) / 1048576;
+				height = (m_height * m_banshee.io[io_vidOverlayDvdy]) / 1048576;
 			if (LOG_REGISTERS)
 				logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n",
 					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
@@ -1016,8 +1016,8 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 				screen().configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
 				// Set the vsync start and stop
-				m_fbi.m_vsyncstart = vstart;
-				m_fbi.m_vsyncstop = vstop;
+				m_vsyncstart = vstart;
+				m_vsyncstop = vstop;
 				adjust_vblank_timer();
 			}
 			if (LOG_REGISTERS)
@@ -1026,8 +1026,8 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 		}
 
 		case io_lfbMemoryConfig:
-			m_fbi.m_lfb_base = (data & 0x1fff) << (12-2);
-			m_fbi.m_lfb_stride = ((data >> 13) & 7) + 9;
+			m_lfb_base = (data & 0x1fff) << (12-2);
+			m_lfb_stride = ((data >> 13) & 7) + 9;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -1327,7 +1327,7 @@ void voodoo_banshee_device_base::map_register_w(offs_t offset, u32 data, u32 mem
 
 	// track swap buffers
 	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_fbi.m_swaps_pending++;
+		m_swaps_pending++;
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
