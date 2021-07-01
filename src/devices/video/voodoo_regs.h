@@ -1149,9 +1149,6 @@ public:
 	reg_fbi_init2 fbi_init2() const { return reg_fbi_init2(m_regs[reg_fbiInit2].u); }
 	reg_fbi_init3 fbi_init3() const { return reg_fbi_init3(m_regs[reg_fbiInit3].u); }
 	reg_fbi_init4 fbi_init4() const { return reg_fbi_init4(m_regs[reg_fbiInit4].u); }
-	reg_fbi_init5 fbi_init5() const { return reg_fbi_init5(m_regs[reg_fbiInit5].u); }
-	reg_fbi_init6 fbi_init6() const { return reg_fbi_init6(m_regs[reg_fbiInit6].u); }
-	reg_fbi_init7 fbi_init7() const { return reg_fbi_init7(m_regs[reg_fbiInit7].u); }
 	reg_texture_mode texture_mode() const { return reg_texture_mode(m_regs[reg_textureMode].u); }
 	reg_texture_lod texture_lod() const { return reg_texture_lod(m_regs[reg_tLOD].u); }
 	reg_texture_detail texture_detail() const { return reg_texture_detail(m_regs[reg_tDetail].u); }
@@ -1162,11 +1159,16 @@ public:
 	reg_clip_minmax clip_left_right() const { return reg_clip_minmax(m_regs[reg_clipLeftRight].u); }
 	reg_clip_minmax clip_lowy_highy() const { return reg_clip_minmax(m_regs[reg_clipLowYHighY].u); }
 	u32 swap_history() const { return m_regs[reg_fbiSwapHistory].u; }
-	reg_intr_ctrl intr_ctrl() const { return reg_intr_ctrl(m_regs[reg_intrCtrl].u); }
 	reg_hsync hsync() const { return reg_hsync(m_regs[reg_hSync].u); }
 	reg_vsync vsync() const { return reg_vsync(m_regs[reg_vSync].u); }
 	reg_video_dimensions video_dimensions() const { return reg_video_dimensions(m_regs[reg_videoDimensions].u); }
 	reg_back_porch back_porch() const { return reg_back_porch(m_regs[reg_backPorch].u); }
+
+	// voodoo-2-specific reads
+	reg_intr_ctrl intr_ctrl() const { return reg_intr_ctrl(m_regs[reg_intrCtrl].u); }
+	reg_fbi_init5 fbi_init5() const { return reg_fbi_init5(m_regs[reg_fbiInit5].u); }
+	reg_fbi_init6 fbi_init6() const { return reg_fbi_init6(m_regs[reg_fbiInit6].u); }
+	reg_fbi_init7 fbi_init7() const { return reg_fbi_init7(m_regs[reg_fbiInit7].u); }
 	reg_setup_mode setup_mode() const { return reg_setup_mode(m_regs[reg_sSetupMode].u); }
 
 	// special case for the TMU configuration register, which is otherwise undocumented

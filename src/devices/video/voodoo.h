@@ -416,7 +416,7 @@ protected:
 		u8 m_vblank_dont_swap;        // don't actually swap when we hit this point
 
 		u8 m_sverts = 0;              // number of vertices ready
-		voodoo::setup_vertex m_svert[4];      // 3 setup vertices
+		voodoo::setup_vertex m_svert[3];      // 3 setup vertices
 		voodoo::command_fifo m_cmdfifo[2];    // command FIFOs
 
 		voodoo::memory_fifo m_fifo;   // framebuffer memory fifo
@@ -529,6 +529,9 @@ protected:
 
 	// Voodoo-2 specific read handlers
 	u32 reg_hvretrace_r(u32 chipmask, u32 offset);
+	u32 reg_cmdfifoptr_r(u32 chipmask, u32 offset);
+	u32 reg_cmdfifodepth_r(u32 chipmask, u32 offset);
+	u32 reg_cmdfifoholes_r(u32 chipmask, u32 offset);
 
 	// Voodoo-2 specific write handlers
 	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
