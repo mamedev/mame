@@ -913,8 +913,6 @@ void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I
 
 	m_adc1038->set_gti_club_hack(false);
 
-	m_k056230->set_thunderh_hack(true);
-
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
