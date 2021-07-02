@@ -56,6 +56,20 @@ u32 register_table_entry::read(voodoo_device_base &device, u32 chipmask, u32 reg
 }
 
 
+void voodoo_regs::register_save(save_proxy &save)
+{
+	save.save_item(NAME(m_regs));
+	save.save_item(NAME(m_starts));
+	save.save_item(NAME(m_startt));
+	save.save_item(NAME(m_startw));
+	save.save_item(NAME(m_dsdx));
+	save.save_item(NAME(m_dtdx));
+	save.save_item(NAME(m_dwdx));
+	save.save_item(NAME(m_dsdy));
+	save.save_item(NAME(m_dtdy));
+	save.save_item(NAME(m_dwdy));
+}
+
 
 //**************************************************************************
 //  ALIAS MAP OF FIRST 64 REGISTERS

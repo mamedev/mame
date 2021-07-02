@@ -77,6 +77,7 @@ static constexpr bool EAT_CYCLES = true;
 namespace voodoo
 {
 class voodoo_device_base;
+class save_proxy;
 }
 
 // include register and render classes
@@ -85,6 +86,49 @@ class voodoo_device_base;
 
 namespace voodoo
 {
+
+// ======================> save_proxy
+
+// save_proxy is a helper class to make hierarchical state saving more manageable
+class save_proxy
+{
+public:
+	save_proxy(device_t &device) :
+		m_device(device)
+	{
+	}
+
+	template<typename T>
+	void save_item(T &&item, char const *name)
+	{
+		std::string fullname = m_prefix;
+		fullname += name;
+		m_device.save_item(std::forward<T>(item), fullname.c_str());
+	}
+
+	template<typename T>
+	void save_pointer(T &&item, char const *name, u32 count)
+	{
+		std::string fullname = m_prefix;
+		fullname += name;
+		m_device.save_pointer(std::forward<T>(item), fullname.c_str(), count);
+	}
+
+	template<typename T>
+	void save_class(T &item, char const *name)
+	{
+		std::string orig = m_prefix;
+		m_prefix += name;
+		m_prefix += "/";
+		item.register_save(*this);
+		m_prefix = orig;
+	}
+
+private:
+	device_t &m_device;
+	std::string m_prefix;
+};
+
 
 // ======================> shared_tables
 
@@ -122,6 +166,10 @@ public:
 	// initialization
 	void init(int index, shared_tables const &share, u8 *ram, u32 size);
 
+	// state saving
+	void register_save(save_proxy &save);
+	void post_load();
+
 	// simple getters
 	voodoo_regs &regs() { return m_reg; }
 	bool dirty() const { return m_regdirty; }
@@ -134,9 +182,6 @@ public:
 
 	// prepare a texture for the renderer
 	rasterizer_texture &prepare_texture(voodoo_renderer &renderer);
-
-	// state management
-	void post_load() { m_regdirty = true; m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true; }
 
 private:
 	// internal state
@@ -179,6 +224,9 @@ public:
 	// configuration
 	void configure(u32 *base, u32 size) { m_base = base; m_size = size; reset(); }
 
+	// state saving
+	void register_save(save_proxy &save);
+
 	// basic queries
 	u32 peek() { return m_base[m_out]; }
 	bool empty() const { return (m_in == m_out); }
@@ -213,6 +261,9 @@ public:
 
 	// initialization
 	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
+
+	// state saving
+	void register_save(save_proxy &save);
 
 	// getters
 	bool enabled() const { return m_enable; }
@@ -293,8 +344,31 @@ private:
 };
 
 
+// ======================> setup_vertex
+
+// setup_vertex a set of coordinates managed by the triangle setup engine
+// that was introduced with the Voodoo-2
 struct setup_vertex
 {
+	// state saving
+	void register_save(save_proxy &save)
+	{
+		save.save_item(NAME(x));
+		save.save_item(NAME(y));
+		save.save_item(NAME(z));
+		save.save_item(NAME(wb));
+		save.save_item(NAME(r));
+		save.save_item(NAME(g));
+		save.save_item(NAME(b));
+		save.save_item(NAME(a));
+		save.save_item(NAME(s0));
+		save.save_item(NAME(t0));
+		save.save_item(NAME(w0));
+		save.save_item(NAME(s1));
+		save.save_item(NAME(t1));
+		save.save_item(NAME(w1));
+	}
+
 	float x, y;               // X, Y coordinates
 	float z, wb;              // Z and broadcast W values
 	float r, g, b, a;         // A, R, G, B values
@@ -303,6 +377,9 @@ struct setup_vertex
 };
 
 
+// ======================> debug_stats
+
+// debug_stats are enabled via DEBUG_STATS and displayed via the backslash key
 class debug_stats
 {
 public:
@@ -333,6 +410,7 @@ public:
 	u8 render_override = 0;    // render override
 	char buffer[1024];           // string
 };
+
 
 
 //**************************************************************************
@@ -389,7 +467,7 @@ protected:
 
 	// system management
 	void soft_reset();
-	void register_save();
+	virtual void register_save(save_proxy &save, u32 total_allocation);
 
 	// VBLANK timing
 	void adjust_vblank_start_timer();
@@ -424,6 +502,7 @@ protected:
 	// read/write and FIFO helpers
 	void prepare_for_read();
 	bool prepare_for_write();
+	void recompute_fbmem_fifo();
 	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
 	void flush_fifos(attotime current_time);
 

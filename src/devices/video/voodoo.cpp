@@ -237,67 +237,7 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
 
 
 //**************************************************************************
-//  MEMORY FIFO
-//**************************************************************************
-
-//-------------------------------------------------
-//  memory_fifo - constructor
-//-------------------------------------------------
-
-voodoo::memory_fifo::memory_fifo() :
-	m_base(nullptr),
-	m_size(0),
-	m_in(0),
-	m_out(0)
-{
-}
-
-
-//-------------------------------------------------
-//  add - append an item to the fifo
-//-------------------------------------------------
-
-inline void voodoo::memory_fifo::add(u32 data)
-{
-	// compute the value of 'in' after we add this item
-	s32 next_in = m_in + 1;
-	if (next_in >= m_size)
-		next_in = 0;
-
-	// as long as it's not equal to the output pointer, we can do it
-	if (next_in != m_out)
-	{
-		m_base[m_in] = data;
-		m_in = next_in;
-	}
-}
-
-
-//-------------------------------------------------
-//  remove - remove the next item from the fifo
-//-------------------------------------------------
-
-inline u32 voodoo::memory_fifo::remove()
-{
-	// return invalid data if empty
-	if (m_out == m_in)
-		return 0xffffffff;
-
-	// determine next output
-	s32 next_out = m_out + 1;
-	if (next_out >= m_size)
-		next_out = 0;
-
-	// fetch current and advance
-	u32 data = m_base[m_out];
-	m_out = next_out;
-	return data;
-}
-
-
-
-//**************************************************************************
-//  TMU state
+//  TMU STATE
 //**************************************************************************
 
 //-------------------------------------------------
@@ -313,6 +253,18 @@ void tmu_state::init(int index, shared_tables const &share, u8 *ram, u32 size)
 	m_regdirty = true;
 	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
 	m_texel_lookup = &share.texel[0];
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
+
+void tmu_state::register_save(save_proxy &save)
+{
+	// register state
+	save.save_class(NAME(m_reg));
+	save.save_item(NAME(m_palette));
 }
 
 
@@ -410,11 +362,99 @@ inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
 }
 
 
+//-------------------------------------------------
+//  post_load - mark everything dirty following a
+//  state load
+//-------------------------------------------------
+
+void tmu_state::post_load()
+{
+	m_regdirty = true;
+	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
+}
 
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+
+//**************************************************************************
+//  MEMORY FIFO
+//**************************************************************************
+
+//-------------------------------------------------
+//  memory_fifo - constructor
+//-------------------------------------------------
+
+memory_fifo::memory_fifo() :
+	m_base(nullptr),
+	m_size(0),
+	m_in(0),
+	m_out(0)
+{
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
+
+void memory_fifo::register_save(save_proxy &save)
+{
+	save.save_item(NAME(m_size));
+	save.save_item(NAME(m_in));
+	save.save_item(NAME(m_out));
+}
+
+
+//-------------------------------------------------
+//  add - append an item to the fifo
+//-------------------------------------------------
+
+inline void memory_fifo::add(u32 data)
+{
+	// compute the value of 'in' after we add this item
+	s32 next_in = m_in + 1;
+	if (next_in >= m_size)
+		next_in = 0;
+
+	// as long as it's not equal to the output pointer, we can do it
+	if (next_in != m_out)
+	{
+		m_base[m_in] = data;
+		m_in = next_in;
+	}
+}
+
+
+//-------------------------------------------------
+//  remove - remove the next item from the fifo
+//-------------------------------------------------
+
+inline u32 memory_fifo::remove()
+{
+	// return invalid data if empty
+	if (m_out == m_in)
+		return 0xffffffff;
+
+	// determine next output
+	s32 next_out = m_out + 1;
+	if (next_out >= m_size)
+		next_out = 0;
+
+	// fetch current and advance
+	u32 data = m_base[m_out];
+	m_out = next_out;
+	return data;
+}
+
+
+
+//**************************************************************************
+//  COMMAND FIFO
+//**************************************************************************
+
+
+
+
+
 
 int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
 {
@@ -598,99 +638,65 @@ ALLOW_SAVE_TYPE(voodoo_device_base::stall_state);
 ALLOW_SAVE_TYPE(voodoo::reg_init_en);
 ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
 
-void voodoo_device_base::register_save()
+void voodoo_device_base::register_save(save_proxy &save, u32 total_allocation)
 {
-	/* register states: core */
-	save_item(NAME(m_reg.m_regs));
+	// PCI state/FIFOs
+	save.save_item(NAME(m_init_enable));
+	save.save_item(NAME(m_stall_state));
+	save.save_item(NAME(m_operation_end));
+	save.save_class(NAME(m_pci_fifo));
+	save.save_class(NAME(m_fbmem_fifo));
 
-	/* register states: pci */
-//	save_item(NAME(m_pci_fifo.m_in));
-//	save_item(NAME(m_pci_fifo.m_out));
-	save_item(NAME(m_init_enable));
-	save_item(NAME(m_stall_state));
-	save_item(NAME(m_operation_end));
-	save_item(NAME(m_pci_fifo_mem));
+	// allocated memory
+	save.save_pointer(NAME(m_fbram), 1024 * 1024 * total_allocation);
+	save.save_class(NAME(*m_renderer.get()));
 
-	/* register states: dac */
-	save_item(NAME(m_dac_reg));
-	save_item(NAME(m_dac_read_result));
+	// video buffer configuration
+	save.save_item(NAME(m_rgboffs));
+	save.save_item(NAME(m_auxoffs));
+	save.save_item(NAME(m_frontbuf));
+	save.save_item(NAME(m_backbuf));
 
-	/* register states: fbi */
-	save_pointer(NAME(m_fbram), m_fbmask + 1);
-	save_item(NAME(m_rgboffs));
-	save_item(NAME(m_auxoffs));
-	save_item(NAME(m_frontbuf));
-	save_item(NAME(m_backbuf));
-	save_item(NAME(m_swaps_pending));
-	save_item(NAME(m_video_changed));
-	save_item(NAME(m_lfb_base));
-	save_item(NAME(m_lfb_stride));
-	save_item(NAME(m_width));
-	save_item(NAME(m_height));
-	save_item(NAME(m_xoffs));
-	save_item(NAME(m_yoffs));
-	save_item(NAME(m_vsyncstart));
-	save_item(NAME(m_vsyncstop));
-	save_item(NAME(m_vblank));
-	save_item(NAME(m_vblank_count));
-	save_item(NAME(m_vblank_swap_pending));
-	save_item(NAME(m_vblank_swap));
-	save_item(NAME(m_vblank_dont_swap));
-	save_item(NAME(m_lfb_stats.pixels_in));
-	save_item(NAME(m_lfb_stats.pixels_out));
-	save_item(NAME(m_lfb_stats.chroma_fail));
-	save_item(NAME(m_lfb_stats.zfunc_fail));
-	save_item(NAME(m_lfb_stats.afunc_fail));
-	save_item(NAME(m_lfb_stats.clip_fail));
-	save_item(NAME(m_lfb_stats.stipple_count));
-	save_item(NAME(m_sverts));
-	save_item(STRUCT_MEMBER(m_svert, x));
-	save_item(STRUCT_MEMBER(m_svert, y));
-	save_item(STRUCT_MEMBER(m_svert, a));
-	save_item(STRUCT_MEMBER(m_svert, r));
-	save_item(STRUCT_MEMBER(m_svert, g));
-	save_item(STRUCT_MEMBER(m_svert, b));
-	save_item(STRUCT_MEMBER(m_svert, z));
-	save_item(STRUCT_MEMBER(m_svert, wb));
-	save_item(STRUCT_MEMBER(m_svert, w0));
-	save_item(STRUCT_MEMBER(m_svert, s0));
-	save_item(STRUCT_MEMBER(m_svert, t0));
-	save_item(STRUCT_MEMBER(m_svert, w1));
-	save_item(STRUCT_MEMBER(m_svert, s1));
-	save_item(STRUCT_MEMBER(m_svert, t1));
-//	save_item(NAME(m_fbmem_fifo.m_size));
-//	save_item(NAME(m_fbmem_fifo.m_in));
-//	save_item(NAME(m_fbmem_fifo.m_out));
-/*
-	save_item(STRUCT_MEMBER(m_cmdfifo, enable));
-	save_item(STRUCT_MEMBER(m_cmdfifo, count_holes));
-	save_item(STRUCT_MEMBER(m_cmdfifo, base));
-	save_item(STRUCT_MEMBER(m_cmdfifo, end));
-	save_item(STRUCT_MEMBER(m_cmdfifo, rdptr));
-	save_item(STRUCT_MEMBER(m_cmdfifo, amin));
-	save_item(STRUCT_MEMBER(m_cmdfifo, amax));
-	save_item(STRUCT_MEMBER(m_cmdfifo, depth));
-	save_item(STRUCT_MEMBER(m_cmdfifo, holes));
-*/
-	save_item(NAME(m_clut));
+	// linear frame buffer access configuration
+	save.save_item(NAME(m_lfb_base));
+	save.save_item(NAME(m_lfb_stride));
 
-	// renderer states
-//	save_item(NAME(m_renderer->m_fogblend));
-//	save_item(NAME(m_renderer->m_fogdelta));
+	// video configuration
+	save.save_item(NAME(m_width));
+	save.save_item(NAME(m_height));
+	save.save_item(NAME(m_xoffs));
+	save.save_item(NAME(m_yoffs));
+	save.save_item(NAME(m_vsyncstart));
+	save.save_item(NAME(m_vsyncstop));
 
-	/* register states: tmu */
-/*
-	for (int index = 0; index < std::size(m_tmu); index++)
-	{
-		tmu_state *tmu = &m_tmu[index];
-		if (tmu->m_ram == nullptr)
-			continue;
-		save_item(NAME(tmu->m_reg.m_regs), index);
-		if (tmu->m_ram != m_fbram)
-			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
-		save_item(NAME(tmu->m_palette), index);
-	}
-*/
+	// VBLANK/swapping state
+	save.save_item(NAME(m_swaps_pending));
+	save.save_item(NAME(m_vblank));
+	save.save_item(NAME(m_vblank_count));
+	save.save_item(NAME(m_vblank_swap_pending));
+	save.save_item(NAME(m_vblank_swap));
+	save.save_item(NAME(m_vblank_dont_swap));
+
+	// register state
+	save.save_class(NAME(m_reg));
+	save.save_class(NAME(m_tmu[0]));
+	save.save_class(NAME(m_tmu[1]));
+	save.save_item(NAME(m_dac_reg));
+	save.save_item(NAME(m_dac_read_result));
+
+	// Voodoo 2 stuff
+	save.save_item(NAME(m_sverts));
+	save.save_class(NAME(m_svert[0]));
+	save.save_class(NAME(m_svert[1]));
+	save.save_class(NAME(m_svert[2]));
+	save.save_class(NAME(m_cmdfifo[0]));
+	save.save_class(NAME(m_cmdfifo[1]));
+
+	// memory for PCI FIFO
+	save.save_item(NAME(m_pci_fifo_mem));
+
+	// pens and CLUT
+	save.save_item(NAME(m_clut));
 }
 
 
@@ -1564,24 +1570,7 @@ u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 
 		// compute FIFO layout when fbiInit0 or fbiInit4 change
 		if (regnum == voodoo_regs::reg_fbiInit0 || regnum == voodoo_regs::reg_fbiInit4)
-		{
-			// compute the memory FIFO location and size
-			u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
-			if (fifo_last_page > m_fbmask / 0x1000)
-				fifo_last_page = m_fbmask / 0x1000;
-
-			// is it valid and enabled?
-			u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
-			if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
-			{
-				u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
-				m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
-			}
-
-			// if not, disable the FIFO
-			else
-				m_fbmem_fifo.configure(nullptr, 0);
-		}
+			recompute_fbmem_fifo();
 
 		// recompute video memory when fbiInit1 or fbiInit2 change
 		if (regnum == voodoo_regs::reg_fbiInit1 || regnum == voodoo_regs::reg_fbiInit2)
@@ -2224,6 +2213,26 @@ s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
  *  Flush data from the FIFOs
  *
  *************************************/
+
+void voodoo_device_base::recompute_fbmem_fifo()
+{
+	// compute the memory FIFO location and size
+	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
+	if (fifo_last_page > m_fbmask / 0x1000)
+		fifo_last_page = m_fbmask / 0x1000;
+
+	// is it valid and enabled?
+	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
+	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
+	{
+		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
+		m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
+	}
+
+	// if not, disable the FIFO
+	else
+		m_fbmem_fifo.configure(nullptr, 0);
+}
 
 void voodoo_device_base::flush_fifos(attotime current_time)
 {
@@ -3042,7 +3051,8 @@ void voodoo_device_base::device_start()
 	soft_reset();
 
 	// register for save states
-	register_save();
+	save_proxy save(*this);
+	register_save(save, total_allocation);
 }
 
 
@@ -3068,9 +3078,9 @@ void voodoo_device_base::device_post_load()
 	for (tmu_state &tm : m_tmu)
 		tm.post_load();
 
-	// recompute video memory to get the FBI FIFO base recomputed
+	// recompute FBI memory FIFO to get the base pointer set
 	if (m_reg.rev1_or_2())
-		recompute_video_memory();
+		recompute_fbmem_fifo();
 }
 
 
@@ -3113,6 +3123,24 @@ command_fifo::command_fifo(voodoo_device_base &device) :
 	m_depth(0),
 	m_holes(0)
 {
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
+
+void command_fifo::register_save(save_proxy &save)
+{
+	save.save_item(NAME(m_enable));
+	save.save_item(NAME(m_count_holes));
+	save.save_item(NAME(m_ram_base));
+	save.save_item(NAME(m_ram_end));
+	save.save_item(NAME(m_read_index));
+	save.save_item(NAME(m_address_min));
+	save.save_item(NAME(m_address_max));
+	save.save_item(NAME(m_depth));
+	save.save_item(NAME(m_holes));
 }
 
 

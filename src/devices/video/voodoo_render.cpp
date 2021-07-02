@@ -1329,6 +1329,19 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const
 
 
 //-------------------------------------------------
+//  register_save - register for saving states
+//-------------------------------------------------
+
+void voodoo_renderer::register_save(save_proxy &save)
+{
+	save.save_item(NAME(m_rowpixels));
+	save.save_item(NAME(m_yorigin));
+	save.save_item(NAME(m_fogblend));
+	save.save_item(NAME(m_fogdelta));
+}
+
+
+//-------------------------------------------------
 //  alloc_poly - allocate a new poly_data object
 //  and compute the raster parameters
 //-------------------------------------------------

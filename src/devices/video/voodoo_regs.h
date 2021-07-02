@@ -1084,6 +1084,9 @@ public:
 			m_regs[index].u = 0;
 	}
 
+	// state saving
+	void register_save(save_proxy &save);
+
 	// revisions:
 	//   1 = original Voodoo
 	//   2 = Voodoo 2
@@ -1201,7 +1204,7 @@ public:
 	// access to a chunk of registers
 	u32 *subset(u32 index) { return reinterpret_cast<u32 *>(&m_regs[index]); }
 
-//private:
+private:
 	union register_data
 	{
 		u32 u;
@@ -1214,7 +1217,6 @@ public:
 	s64 m_dwdx;                     // delta W per X
 	s64 m_dsdy, m_dtdy;             // delta S,T per Y
 	s64 m_dwdy;                     // delta W per Y
-private:
 	u8 m_revision;
 	static u8 const s_alias_map[0x40];
 

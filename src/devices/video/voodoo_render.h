@@ -517,6 +517,9 @@ public:
 	// construction
 	voodoo_renderer(running_machine &machine, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs);
 
+	// state saving
+	void register_save(save_proxy &save);
+
 	// simple getters
 	s32 yorigin() const { return m_yorigin; }
 	u32 rowpixels() const { return m_rowpixels; }
