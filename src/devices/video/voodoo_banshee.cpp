@@ -43,10 +43,17 @@ using namespace voodoo;
 
 
 voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
-	: voodoo_device_base(mconfig, type, tag, owner, clock, model)
+	: voodoo_2_device_base(mconfig, type, tag, owner, clock, model)
 {
 	for (int index = 0; index < std::size(m_regtable); index++)
 		m_regtable[index].unpack(s_register_table[index], *this);
+}
+
+
+u16 *voodoo_banshee_device_base::draw_buffer_indirect(int index, bool depth_allowed)
+{
+	// LFB and drawing is confined to the back buffer
+	return back_buffer();
 }
 
 
@@ -107,7 +114,7 @@ void voodoo_banshee_device_base::device_start()
 	m_banshee.io[io_tmuGbeInit] = 0x00000bfb;
 
 	// call our parent
-	voodoo_device_base::device_start();
+	voodoo_2_device_base::device_start();
 
 	/* register states: banshee */
 	save_item(NAME(m_banshee.io));
@@ -1090,7 +1097,7 @@ void voodoo_banshee_device_base::core_map(address_map &map)
 	if (BIT(m_chipmask, 2))
 		map(0x0800000, 0x09fffff).w(FUNC(voodoo_banshee_device_base::map_texture_w<1>));
 	map(0x0c00000, 0x0ffffff).w(FUNC(voodoo_banshee_device_base::map_yuv_w));
-	map(0x1000000, 0x1ffffff).rw(FUNC(voodoo_banshee_device_base::map_lfb_r), FUNC(voodoo_banshee_device_base::map_lfb_w));
+	map(0x1000000, 0x1ffffff).w(FUNC(voodoo_banshee_device_base::map_lfb_w));
 }
 
 void voodoo_banshee_device_base::lfb_map(address_map &map)
@@ -1119,16 +1126,6 @@ u32 voodoo_banshee_device_base::read(offs_t offset, u32 mem_mask)
 	case 0x0200000 >> 19:	case 0x0280000 >> 19:	case 0x0300000 >> 19:	case 0x0380000 >> 19:
 	case 0x0400000 >> 19:	case 0x0480000 >> 19:	case 0x0500000 >> 19:	case 0x0580000 >> 19:
 		return map_register_r(offset - 0x0200000/4);
-
-	case 0x1000000 >> 19:	case 0x1080000 >> 19:	case 0x1100000 >> 19:	case 0x1180000 >> 19:
-	case 0x1200000 >> 19:	case 0x1280000 >> 19:	case 0x1300000 >> 19:	case 0x1380000 >> 19:
-	case 0x1400000 >> 19:	case 0x1480000 >> 19:	case 0x1500000 >> 19:	case 0x1580000 >> 19:
-	case 0x1600000 >> 19:	case 0x1680000 >> 19:	case 0x1700000 >> 19:	case 0x1780000 >> 19:
-	case 0x1800000 >> 19:	case 0x1880000 >> 19:	case 0x1900000 >> 19:	case 0x1980000 >> 19:
-	case 0x1a00000 >> 19:	case 0x1a80000 >> 19:	case 0x1b00000 >> 19:	case 0x1b80000 >> 19:
-	case 0x1c00000 >> 19:	case 0x1c80000 >> 19:	case 0x1d00000 >> 19:	case 0x1d80000 >> 19:
-	case 0x1e00000 >> 19:	case 0x1e80000 >> 19:	case 0x1f00000 >> 19:	case 0x1f80000 >> 19:
-		return map_lfb_r(offset - 0x1000000/4);
 
 	default:
 		logerror("%s:voodoo_banshee_device_base::read Address out of range %08X & %08X\n", machine().describe_context(), offset*4, mem_mask);
@@ -1243,17 +1240,6 @@ u32 voodoo_banshee_device_base::map_register_r(offs_t offset)
 
 	// look up the register
 	return m_regtable[regnum].read(*this, chipmask, regnum);
-}
-
-
-//-------------------------------------------------
-//  map_lfb_r - handle a mapped read from LFB space
-//-------------------------------------------------
-
-u32 voodoo_banshee_device_base::map_lfb_r(offs_t offset)
-{
-	prepare_for_read();
-	return lfb_r(offset, true);
 }
 
 

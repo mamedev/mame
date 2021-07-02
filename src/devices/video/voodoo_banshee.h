@@ -33,10 +33,12 @@ static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 //  VOODOO DEVICES
 //**************************************************************************
 
-class voodoo_banshee_device_base : public voodoo::voodoo_device_base
+class voodoo_banshee_device_base : public voodoo::voodoo_2_device_base
 {
 public:
 	voodoo_banshee_device_base(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u16 *draw_buffer_indirect(int index, bool depth_allowed) override;
 
 	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
@@ -62,7 +64,6 @@ public:
 	u32 map_cmd_agp_r(offs_t offset);
 	u32 map_2d_r(offs_t offset);
 	u32 map_register_r(offs_t offset);
-	u32 map_lfb_r(offs_t offset);
 
 	void map_io_w(offs_t offset, u32 data, u32 mem_mask);
 	void map_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask);

@@ -77,6 +77,7 @@ static constexpr bool EAT_CYCLES = true;
 namespace voodoo
 {
 class voodoo_device_base;
+class voodoo_2_device_base;
 class save_proxy;
 }
 
@@ -257,7 +258,7 @@ class command_fifo
 {
 public:
 	// construction
-	command_fifo(voodoo_device_base &device);
+	command_fifo(voodoo_2_device_base &device);
 
 	// initialization
 	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
@@ -327,7 +328,7 @@ private:
 	u32 packet_type_unknown(u32 command);
 
 	// internal state
-	voodoo_device_base &m_device;  // reference to our device
+	voodoo_2_device_base &m_device;// reference to our device
 	u32 *m_ram;                    // base of RAM
 	u32 m_mask;                    // mask for RAM accesses
 	bool m_enable;                 // enabled?
@@ -419,7 +420,6 @@ public:
 
 class voodoo_device_base : public device_t, public device_video_interface
 {
-	friend class voodoo::command_fifo;
 	friend class voodoo::register_table_entry;
 
 	// enumeration describing reasons we might be stalled
@@ -471,8 +471,8 @@ protected:
 
 	// VBLANK timing
 	void adjust_vblank_start_timer();
-	TIMER_CALLBACK_MEMBER( vblank_start );
-	TIMER_CALLBACK_MEMBER( vblank_stop );
+	virtual void vblank_start(void *ptr, s32 param);
+	virtual void vblank_stop(void *ptr, s32 param);
 	void swap_buffers();
 
 	// video timing and updates
@@ -489,10 +489,8 @@ protected:
 	void update_statistics(bool accumulate);
 	void reset_counters();
 
-	// overrides
-	virtual s32 banshee_2d_w(offs_t offset, u32 data);
-
 	// buffer accessors
+	virtual u16 *draw_buffer_indirect(int index, bool depth_allowed);
 	u16 *draw_buffer(int index) const { return (u16 *)(m_fbram + m_rgboffs[index]); }
 	u16 *front_buffer() const { return draw_buffer(m_frontbuf); }
 	u16 *back_buffer() const { return draw_buffer(m_backbuf); }
@@ -504,7 +502,7 @@ protected:
 	bool prepare_for_write();
 	void recompute_fbmem_fifo();
 	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
-	void flush_fifos(attotime current_time);
+	virtual void flush_fifos(attotime current_time);
 
 	// stall management
 	bool operation_pending() const { return !m_operation_end.is_zero(); }
@@ -569,30 +567,6 @@ protected:
 	u32 reg_dac_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_texture_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_palette_w(u32 chipmask, u32 regnum, u32 data);
-
-	// Voodoo-2 specific read handlers
-	u32 reg_hvretrace_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifoptr_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifodepth_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifoholes_r(u32 chipmask, u32 regnum);
-
-	// Voodoo-2 specific write handlers
-	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_userintr_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
-
-	// Voodoo-2 specific helpers
-	s32 begin_triangle();
-	s32 draw_triangle();
-	s32 setup_and_draw_triangle();
-	virtual void update_register_view() { }
 
 	// configuration
 	const voodoo_model m_model;              // which voodoo model
@@ -664,14 +638,6 @@ protected:
 	voodoo::debug_stats m_stats;             // internal statistics
 	voodoo::thread_stats_block m_lfb_stats;  // LFB access statistics
 
-	// Voodoo 2 stuff
-	u8 m_sverts = 0;                         // number of vertices ready
-	voodoo::setup_vertex m_svert[3];         // 3 setup vertices
-	voodoo::command_fifo m_cmdfifo[2];       // command FIFOs
-#if USE_MEMORY_VIEWS
-	memory_view m_regview;                   // switchable register view
-#endif
-
 	// tracking for logging
 	offs_t m_last_status_pc;                 // PC of last status description (for logging)
 	u32 m_last_status_value;                 // value of last status read (for logging)
@@ -685,10 +651,72 @@ protected:
 	rgb_t m_pen[65536];                      // mapping from pixels to pens
 };
 
+
+
+class voodoo_2_device_base : public voodoo_device_base
+{
+	friend class command_fifo;
+
+public:
+
+protected:
+	// construction
+	voodoo_2_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+
+	// device-level overrides
+	virtual void device_start() override;
+//	virtual void device_reset() override;
+//	virtual void device_post_load() override;
+
+	// system management
+//	void soft_reset();
+	virtual void register_save(save_proxy &save, u32 total_allocation) override;
+
+	virtual void flush_fifos(attotime current_time) override;
+
+	virtual void vblank_start(void *ptr, s32 param) override;
+	virtual void vblank_stop(void *ptr, s32 param) override;
+
+	virtual s32 banshee_2d_w(offs_t offset, u32 data);
+
+	// Voodoo-2 specific read handlers
+	u32 reg_hvretrace_r(u32 chipmask, u32 regnum);
+	u32 reg_cmdfifoptr_r(u32 chipmask, u32 regnum);
+	u32 reg_cmdfifodepth_r(u32 chipmask, u32 regnum);
+	u32 reg_cmdfifoholes_r(u32 chipmask, u32 regnum);
+
+	// Voodoo-2 specific write handlers
+	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_userintr_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
+
+	// Voodoo-2 specific helpers
+	s32 begin_triangle();
+	s32 draw_triangle();
+	s32 setup_and_draw_triangle();
+	virtual void update_register_view() { }
+
+	// Voodoo 2 stuff
+	u8 m_sverts = 0;                         // number of vertices ready
+	voodoo::setup_vertex m_svert[3];         // 3 setup vertices
+	voodoo::command_fifo m_cmdfifo[2];       // command FIFOs
+#if USE_MEMORY_VIEWS
+	memory_view m_regview;                   // switchable register view
+#endif
+};
+
 }
 
 
 using voodoo::voodoo_device_base;
+using voodoo::voodoo_2_device_base;
 
 class voodoo_1_device : public voodoo_device_base
 {
@@ -715,7 +743,7 @@ private:
 };
 
 
-class voodoo_2_device : public voodoo_device_base
+class voodoo_2_device : public voodoo_2_device_base
 {
 public:
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
