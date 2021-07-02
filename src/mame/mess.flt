@@ -618,7 +618,6 @@ microkorg.cpp
 micromon.cpp
 micronic.cpp
 microtan.cpp
-microterm.cpp
 microterm_f8.cpp
 microvsn.cpp
 mightyframe.cpp
@@ -661,6 +660,8 @@ ms9540.cpp
 msbc1.cpp
 mstation.cpp
 msx.cpp
+mt420.cpp
+mt5510.cpp
 mt735.cpp
 mtd1256.cpp
 mtx.cpp

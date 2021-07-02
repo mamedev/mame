@@ -23203,10 +23203,6 @@ micron                          // 1980 Micron
 spinveti                        // 1980 Space Invasion (ETI)
 mt6809                          // 1984 Microtan 65 (6809 CPU)
 
-@source:microterm.cpp
-mt420                           //
-mt5510                          //
-
 @source:microterm_f8.cpp
 act5a                           //
 
@@ -30888,6 +30884,12 @@ yis503ii                        //
 yis503m                         //
 yis604                          //
 yis60464                        //
+
+@source:mt420.cpp
+mt420                           //
+
+@source:mt5510.cpp
+mt5510                          //
 
 @source:mt735.cpp
 mt735                           //
