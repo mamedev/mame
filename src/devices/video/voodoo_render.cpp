@@ -151,6 +151,32 @@ static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const
 }
 
 
+//-------------------------------------------------
+//  compute_lodbase - compute the base LOD value
+//-------------------------------------------------
+
+static inline s32 ATTR_FORCE_INLINE compute_lodbase(s64 dsdx, s64 dsdy, s64 dtdx, s64 dtdy)
+{
+	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
+	dsdx >>= 14;
+	dsdy >>= 14;
+	dtdx >>= 14;
+	dtdy >>= 14;
+	s64 texdx = dsdx * dsdx + dtdx * dtdx;
+	s64 texdy = dsdy * dsdy + dtdy * dtdy;
+
+	// pick whichever is larger and shift off some high bits -> 28.20
+	s64 maxval = std::max(texdx, texdy) >> 16;
+
+	// use our fast reciprocal/log on this value; it expects input as a
+	// 16.32 number, and returns the log of the reciprocal, so we have to
+	// adjust the result: negative to get the log of the original value
+	// plus 12 to account for the extra exponent, and divided by 2 to
+	// get the log of the square root of texdx
+	return (fast_log2(double(maxval), 0) + (12 << 8)) / 2;
+}
+
+
 
 //**************************************************************************
 //  RASTERIZER PARAMS
@@ -2325,6 +2351,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	s32 iterz = poly.startz + dy * poly.dzdy + dx * poly.dzdx;
 	s64 iterw = (poly.startw + dy * poly.dwdy + dx * poly.dwdx) << 16;
 	s64 iterw_delta = poly.dwdx << 16;
+	s32 lodbase0 = 0;
 	if (GenericFlags & rasterizer_params::GENERIC_TEX0)
 	{
 		iterstw0.set(
@@ -2332,7 +2359,9 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			poly.startt0 + dy * poly.dt0dy + dx * poly.dt0dx,
 			poly.startw0 + dy * poly.dw0dy + dx * poly.dw0dx);
 		deltastw0.set(poly.ds0dx, poly.dt0dx, poly.dw0dx);
+		lodbase0 = compute_lodbase(poly.ds0dx, poly.ds0dy, poly.dt0dx, poly.dt0dy);
 	}
+	s32 lodbase1 = 0;
 	if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 	{
 		iterstw1.set(
@@ -2340,6 +2369,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			poly.startt1 + dy * poly.dt1dy + dx * poly.dt1dx,
 			poly.startw1 + dy * poly.dw1dy + dx * poly.dw1dx);
 		deltastw1.set(poly.ds1dx, poly.dt1dx, poly.dw1dx);
+		lodbase1 = compute_lodbase(poly.ds1dx, poly.ds1dy, poly.dt1dx, poly.dt1dy);
 	}
 	poly.info->scanlines++;
 
@@ -2368,7 +2398,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 			{
 				s32 lod1;
-				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, poly.lodbase1, lod1);
+				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, lodbase1, lod1);
 				if (GenericFlags & rasterizer_params::GENERIC_TEX1_IDENTITY)
 					texel = texel_t1;
 				else
@@ -2383,7 +2413,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 				if (!texmode0.seq_8_downld())
 				{
 					s32 lod0;
-					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, poly.lodbase0, lod0);
+					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, lodbase0, lod0);
 					if (GenericFlags & rasterizer_params::GENERIC_TEX0_IDENTITY)
 						texel = texel_t0;
 					else

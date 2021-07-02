@@ -448,7 +448,6 @@ struct poly_data
 	s64 dw0dx;                  // delta W per X
 	s64 ds0dy, dt0dy;           // delta S,T per Y
 	s64 dw0dy;                  // delta W per Y
-	s32 lodbase0;               // used during rasterization
 
 	s64 starts1, startt1;       // starting S,T (14.18)
 	s64 startw1;                // starting W (2.30)
@@ -456,7 +455,6 @@ struct poly_data
 	s64 dw1dx;                  // delta W per X
 	s64 ds1dy, dt1dy;           // delta S,T per Y
 	s64 dw1dy;                  // delta W per Y
-	s32 lodbase1;               // used during rasterization
 
 	rgb_t color0, color1;       // colors consumed by the rasterizer
 	rgb_t chromakey;            // chromakey

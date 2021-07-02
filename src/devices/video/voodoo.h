@@ -53,14 +53,14 @@ static constexpr bool DEBUG_STATS = false;		// \ key to view stats
 
 												// logging
 static constexpr bool LOG_VBLANK_SWAP = false;
-static constexpr bool LOG_FIFO = true;
-static constexpr bool LOG_FIFO_VERBOSE = true;
-static constexpr bool LOG_REGISTERS = true;
+static constexpr bool LOG_FIFO = false;
+static constexpr bool LOG_FIFO_VERBOSE = false;
+static constexpr bool LOG_REGISTERS = false;
 static constexpr bool LOG_WAITS = false;
 static constexpr bool LOG_LFB = false;
 static constexpr bool LOG_TEXTURE_RAM = false;
-static constexpr bool LOG_CMDFIFO = true;
-static constexpr bool LOG_CMDFIFO_VERBOSE = true;
+static constexpr bool LOG_CMDFIFO = false;
+static constexpr bool LOG_CMDFIFO_VERBOSE = false;
 static constexpr bool LOG_BANSHEE_2D = false;
 
 // Need to turn off cycle eating when debugging MIPS drc
@@ -94,13 +94,16 @@ struct shared_tables
 	// constructor
 	shared_tables();
 
+	// texel lookups
+	rgb_t *texel[16];       // 16 texture formats
+
 	// 8-bit lookups
 	rgb_t rgb332[256];      // RGB 3-3-2 lookup table
 	rgb_t alpha8[256];      // alpha 8-bit lookup table
 	rgb_t int8[256];        // intensity 8-bit lookup table
 	rgb_t ai44[256];        // alpha, intensity 4-4 lookup table
 
-							// 16-bit lookups
+	// 16-bit lookups
 	rgb_t rgb565[65536];    // RGB 5-6-5 lookup table
 	rgb_t argb1555[65536];  // ARGB 1-5-5-5 lookup table
 	rgb_t argb4444[65536];  // ARGB 4-4-4-4 lookup table
@@ -116,6 +119,9 @@ public:
 	// construction
 	tmu_state(voodoo_model model) : m_reg(model) { }
 
+	// initialization
+	void init(int index, shared_tables const &share, u8 *ram, u32 size);
+
 	// simple getters
 	voodoo_regs &regs() { return m_reg; }
 	bool dirty() const { return m_regdirty; }
@@ -123,23 +129,29 @@ public:
 	// simple setters
 	void mark_dirty() { m_regdirty = true; }
 
-	void init(int index, shared_tables &share, u8 *ram, u32 size);
+	// write to the NCC/palette registers
 	void ncc_w(offs_t offset, u32 data);
-	voodoo::rasterizer_texture &prepare_texture(voodoo::voodoo_renderer &renderer);
-	s32 compute_lodbase();
+
+	// prepare a texture for the renderer
+	rasterizer_texture &prepare_texture(voodoo_renderer &renderer);
 
 	// state management
 	void post_load() { m_regdirty = true; m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true; }
 
 private:
+	// internal state
 	int m_index;                    // index of ourself
 	u8 *m_ram = nullptr;            // pointer to our RAM
 	u32 m_mask = 0;                 // mask to apply to pointers
 
+	// register state
 	voodoo_regs m_reg;              // TMU registers
 	bool m_regdirty;                // true if the LOD/mode/base registers have changed
 
-	rgb_t *m_texel[16];             // texel lookups for each format
+	// lookups
+	rgb_t const * const *m_texel_lookup; // texel lookups for each format
+
+	// palettes
 	bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
 	rgb_t m_palette[2][256];        // 2 versions of the palette
 };
@@ -192,8 +204,7 @@ private:
 
 // ======================> command_fifo
 
-// command_fifo is a more intelligent FIFO that was introduced with the
-// Voodoo-2
+// command_fifo is a more intelligent FIFO that was introduced with the Voodoo-2
 class command_fifo
 {
 public:
@@ -376,29 +387,29 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
-	TIMER_CALLBACK_MEMBER( vblank_off_callback );
-	TIMER_CALLBACK_MEMBER( stall_resume_callback );
-	TIMER_CALLBACK_MEMBER( vblank_callback );
-
-	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
-
-	void check_stalled_cpu(attotime current_time);
-	void flush_fifos(attotime current_time);
-	s32 swapbuffer(u32 data);
-	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
-	u32 lfb_r(offs_t offset, bool lfb_3d);
-	s32 texture_w(offs_t offset, u32 data);
-	void stall_cpu(stall_state state);
+	// system management
 	void soft_reset();
-	void adjust_vblank_timer();
-	s32 fastfill();
+	void register_save();
+
+	// VBLANK timing
+	void adjust_vblank_start_timer();
+	TIMER_CALLBACK_MEMBER( vblank_start );
+	TIMER_CALLBACK_MEMBER( vblank_stop );
+	void swap_buffers();
+
+	// video timing and updates
+	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
+	void recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp);
+	void recompute_video_memory();
+
+	// rendering
+	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
 	s32 triangle();
 
+	// statistics
 	void accumulate_statistics(const voodoo::thread_stats_block &block);
 	void update_statistics(bool accumulate);
 	void reset_counters();
-
-	void swap_buffers();
 
 	// overrides
 	virtual s32 banshee_2d_w(offs_t offset, u32 data);
@@ -410,12 +421,23 @@ protected:
 	u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_fbram + m_auxoffs) : nullptr; }
 	u16 *ram_end() const { return (u16 *)(m_fbram + m_fbmask + 1); }
 
-	// internal helpers
-	bool operation_pending() const { return !m_operation_end.is_zero(); }
-	void clear_pending_operation() { m_operation_end = attotime::zero; }
+	// read/write and FIFO helpers
 	void prepare_for_read();
 	bool prepare_for_write();
 	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
+	void flush_fifos(attotime current_time);
+
+	// stall management
+	bool operation_pending() const { return !m_operation_end.is_zero(); }
+	void clear_pending_operation() { m_operation_end = attotime::zero; }
+	void check_stalled_cpu(attotime current_time);
+	void stall_cpu(stall_state state);
+	TIMER_CALLBACK_MEMBER( stall_resume_callback );
+
+	// reads and writes
+	u32 lfb_r(offs_t offset, bool lfb_3d);
+	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	s32 texture_w(offs_t offset, u32 data);
 
 	u32 chipmask_from_offset(u32 offset)
 	{
@@ -424,20 +446,6 @@ protected:
 			chipmask = 0xf;
 		return chipmask & m_chipmask;
 	}
-	void register_save();
-	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
-
-	void init(voodoo_model model, u8 *ram, u32 size);
-
-	void recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp);
-	void recompute_video_memory();
-	void recompute_fifo_layout();
-
-	// setup engine
-	s32 begin_triangle();
-	s32 draw_triangle();
-	void populate_setup_vertex(voodoo::setup_vertex &vertex);
-	s32 setup_and_draw_triangle();
 
 	// register read accessors
 	u32 reg_invalid_r(u32 chipmask, u32 regnum);
@@ -501,6 +509,10 @@ protected:
 	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
 
+	// Voodoo-2 specific helpers
+	s32 begin_triangle();
+	s32 draw_triangle();
+	s32 setup_and_draw_triangle();
 	virtual void update_register_view() { }
 
 	// configuration

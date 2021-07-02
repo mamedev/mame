@@ -1018,7 +1018,7 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 				// Set the vsync start and stop
 				m_vsyncstart = vstart;
 				m_vsyncstop = vstop;
-				adjust_vblank_timer();
+				adjust_vblank_start_timer();
 			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);

@@ -304,7 +304,7 @@ inline u32 voodoo::memory_fifo::remove()
 //  init - configure local state
 //-------------------------------------------------
 
-void tmu_state::init(int index, shared_tables &share, u8 *ram, u32 size)
+void tmu_state::init(int index, shared_tables const &share, u8 *ram, u32 size)
 {
 	// configure texture RAM
 	m_index = index;
@@ -312,24 +312,7 @@ void tmu_state::init(int index, shared_tables &share, u8 *ram, u32 size)
 	m_mask = size - 1;
 	m_regdirty = true;
 	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
-
-	// create pointers to the static lookups
-	m_texel[0] = share.rgb332;
-	m_texel[1] = nullptr;
-	m_texel[2] = share.alpha8;
-	m_texel[3] = share.int8;
-	m_texel[4] = share.ai44;
-	m_texel[5] = nullptr;
-	m_texel[6] = nullptr;
-	m_texel[7] = nullptr;
-	m_texel[8] = share.rgb332;
-	m_texel[9] = nullptr;
-	m_texel[10] = share.rgb565;
-	m_texel[11] = share.argb1555;
-	m_texel[12] = share.argb4444;
-	m_texel[13] = share.int8;
-	m_texel[14] = nullptr;
-	m_texel[15] = nullptr;
+	m_texel_lookup = &share.texel[0];
 }
 
 
@@ -389,7 +372,7 @@ inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
 		// determine the lookup
 		auto const texmode = m_reg.texture_mode();
 		u32 const texformat = texmode.format();
-		rgb_t const *lookup = m_texel[texformat];
+		rgb_t const *lookup = m_texel_lookup[texformat];
 
 		// if null lookup, then we need something dynamic
 		if (lookup == nullptr)
@@ -424,32 +407,6 @@ inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
 		m_regdirty = false;
 	}
 	return renderer.last_texture(m_index);
-}
-
-
-//-------------------------------------------------
-//  compute_lodbase - compute the base LOD value
-//-------------------------------------------------
-
-inline s32 tmu_state::compute_lodbase()
-{
-	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
-	s64 dsdx = s64(m_reg.ds_dx() >> 14);
-	s64 dsdy = s64(m_reg.ds_dy() >> 14);
-	s64 dtdx = s64(m_reg.dt_dx() >> 14);
-	s64 dtdy = s64(m_reg.dt_dy() >> 14);
-	s64 texdx = dsdx * dsdx + dtdx * dtdx;
-	s64 texdy = dsdy * dsdy + dtdy * dtdy;
-
-	// pick whichever is larger and shift off some high bits -> 28.20
-	s64 maxval = std::max(texdx, texdy) >> 16;
-
-	// use our fast reciprocal/log on this value; it expects input as a
-	// 16.32 number, and returns the log of the reciprocal, so we have to
-	// adjust the result: negative to get the log of the original value
-	// plus 12 to account for the extra exponent, and divided by 2 to
-	// get the log of the square root of texdx
-	return (fast_log2(double(maxval), 0) + (12 << 8)) / 2;
 }
 
 
@@ -588,6 +545,24 @@ void voodoo_device_base::set_init_enable(u32 newval)
 
 shared_tables::shared_tables()
 {
+	// configure the array of texel formats
+	texel[0] = rgb332;
+	texel[1] = nullptr;
+	texel[2] = alpha8;
+	texel[3] = int8;
+	texel[4] = ai44;
+	texel[5] = nullptr;
+	texel[6] = nullptr;
+	texel[7] = nullptr;
+	texel[8] = rgb332;
+	texel[9] = nullptr;
+	texel[10] = rgb565;
+	texel[11] = argb1555;
+	texel[12] = argb4444;
+	texel[13] = int8;
+	texel[14] = nullptr;
+	texel[15] = nullptr;
+
 	// build static 8-bit texel tables
 	for (int val = 0; val < 256; val++)
 	{
@@ -775,97 +750,89 @@ void voodoo_device_base::update_statistics(bool accumulate)
 
 void voodoo_device_base::swap_buffers()
 {
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", screen().vpos());
+	if (LOG_VBLANK_SWAP)
+		logerror("--- swap_buffers @ %d\n", screen().vpos());
 
-	/* force a partial update */
+	// force a partial update
 	screen().update_partial(screen().vpos());
 	m_video_changed = true;
 
-	/* keep a history of swap intervals */
+	// keep a history of swap intervals
 	m_reg.update_swap_history(std::min<u8>(m_vblank_count, 15));
 
-	/* rotate the buffers */
+	// rotate the buffers
 	if (m_reg.rev1_or_2())
 	{
 		if (m_reg.rev1() || !m_vblank_dont_swap)
 		{
-			if (m_rgboffs[2] == ~0)
-			{
-				m_frontbuf = 1 - m_frontbuf;
-				m_backbuf = 1 - m_frontbuf;
-			}
-			else
-			{
-				m_frontbuf = (m_frontbuf + 1) % 3;
-				m_backbuf = (m_frontbuf + 1) % 3;
-			}
+			u32 buffers = (m_rgboffs[2] == ~0) ? 2 : 3;
+			m_frontbuf = (m_frontbuf + 1) % buffers;
+			m_backbuf = (m_frontbuf + 1) % buffers;
 		}
 	}
 	else
 		m_rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbmask & ~0x0f;
 
-	/* decrement the pending count and reset our state */
-	if (m_swaps_pending)
+	// decrement the pending count and reset our state
+	if (m_swaps_pending != 0)
 		m_swaps_pending--;
 	m_vblank_count = 0;
 	m_vblank_swap_pending = false;
 
-	/* reset the last_op_time to now and start processing the next command */
+	// reset the last_op_time to now and start processing the next command
 	if (operation_pending())
 	{
-		if (LOG_VBLANK_SWAP) logerror("---- swap_buffers flush begin\n");
+		if (LOG_VBLANK_SWAP)
+			logerror("---- swap_buffers flush begin\n");
 		flush_fifos(m_operation_end = machine().time());
-		if (LOG_VBLANK_SWAP) logerror("---- swap_buffers flush end\n");
+		if (LOG_VBLANK_SWAP)
+			logerror("---- swap_buffers flush end\n");
 	}
 
-	/* we may be able to unstall now */
+	// we may be able to unstall now
 	if (m_stall_state != NOT_STALLED)
 		check_stalled_cpu(machine().time());
 
-	/* periodically log rasterizer info */
+	// periodically log rasterizer info
 	m_stats.swaps++;
 	if (m_stats.swaps % 1000 == 0)
 		m_renderer->dump_rasterizer_stats();
 
-	/* update the statistics (debug) */
-	if (DEBUG_STATS && m_stats.display)
-	{
-		const rectangle &visible_area = screen().visible_area();
-		int screen_area = visible_area.width() * visible_area.height();
-		char *statsptr = m_stats.buffer;
-		int pixelcount;
-		int i;
-
-		update_statistics(true);
-		pixelcount = m_stats.total_pixels_out;
-
-		statsptr += sprintf(statsptr, "Swap:%6d\n", m_stats.swaps);
-		statsptr += sprintf(statsptr, "Hist:%08X\n", m_reg.swap_history());
-		statsptr += sprintf(statsptr, "Stal:%6d\n", m_stats.stalls);
-		statsptr += sprintf(statsptr, "Rend:%6d%%\n", pixelcount * 100 / screen_area);
-		statsptr += sprintf(statsptr, "Poly:%6d\n", m_stats.total_triangles);
-		statsptr += sprintf(statsptr, "PxIn:%6d\n", m_stats.total_pixels_in);
-		statsptr += sprintf(statsptr, "POut:%6d\n", m_stats.total_pixels_out);
-		statsptr += sprintf(statsptr, "Clip:%6d\n", m_stats.total_clipped);
-		statsptr += sprintf(statsptr, "Stip:%6d\n", m_stats.total_stippled);
-		statsptr += sprintf(statsptr, "Chro:%6d\n", m_stats.total_chroma_fail);
-		statsptr += sprintf(statsptr, "ZFun:%6d\n", m_stats.total_zfunc_fail);
-		statsptr += sprintf(statsptr, "AFun:%6d\n", m_stats.total_afunc_fail);
-		statsptr += sprintf(statsptr, "RegW:%6d\n", m_stats.reg_writes);
-		statsptr += sprintf(statsptr, "RegR:%6d\n", m_stats.reg_reads);
-		statsptr += sprintf(statsptr, "LFBW:%6d\n", m_stats.lfb_writes);
-		statsptr += sprintf(statsptr, "LFBR:%6d\n", m_stats.lfb_reads);
-		statsptr += sprintf(statsptr, "TexW:%6d\n", m_stats.tex_writes);
-		statsptr += sprintf(statsptr, "TexM:");
-		for (i = 0; i < 16; i++)
-			if (m_stats.texture_mode[i])
-				*statsptr++ = "0123456789ABCDEF"[i];
-		*statsptr = 0;
-	}
-
-	/* update statistics */
+	// update the statistics (debug)
 	if (DEBUG_STATS)
 	{
+		if (m_stats.display)
+		{
+			update_statistics(true);
+			u32 pixelcount = m_stats.total_pixels_out;
+
+			int screen_area = screen().visible_area().width() * screen().visible_area().height();
+			char *statsptr = m_stats.buffer;
+			statsptr += sprintf(statsptr, "Swap:%6d\n", m_stats.swaps);
+			statsptr += sprintf(statsptr, "Hist:%08X\n", m_reg.swap_history());
+			statsptr += sprintf(statsptr, "Stal:%6d\n", m_stats.stalls);
+			statsptr += sprintf(statsptr, "Rend:%6d%%\n", pixelcount * 100 / screen_area);
+			statsptr += sprintf(statsptr, "Poly:%6d\n", m_stats.total_triangles);
+			statsptr += sprintf(statsptr, "PxIn:%6d\n", m_stats.total_pixels_in);
+			statsptr += sprintf(statsptr, "POut:%6d\n", m_stats.total_pixels_out);
+			statsptr += sprintf(statsptr, "Clip:%6d\n", m_stats.total_clipped);
+			statsptr += sprintf(statsptr, "Stip:%6d\n", m_stats.total_stippled);
+			statsptr += sprintf(statsptr, "Chro:%6d\n", m_stats.total_chroma_fail);
+			statsptr += sprintf(statsptr, "ZFun:%6d\n", m_stats.total_zfunc_fail);
+			statsptr += sprintf(statsptr, "AFun:%6d\n", m_stats.total_afunc_fail);
+			statsptr += sprintf(statsptr, "RegW:%6d\n", m_stats.reg_writes);
+			statsptr += sprintf(statsptr, "RegR:%6d\n", m_stats.reg_reads);
+			statsptr += sprintf(statsptr, "LFBW:%6d\n", m_stats.lfb_writes);
+			statsptr += sprintf(statsptr, "LFBR:%6d\n", m_stats.lfb_reads);
+			statsptr += sprintf(statsptr, "TexW:%6d\n", m_stats.tex_writes);
+			statsptr += sprintf(statsptr, "TexM:");
+			for (int mode = 0; mode < 16; mode++)
+				if (m_stats.texture_mode[mode])
+					*statsptr++ = "0123456789ABCDEF"[mode];
+			*statsptr = 0;
+		}
+
+		// reset internal statistics
 		m_stats.stalls = 0;
 		m_stats.total_triangles = 0;
 		m_stats.total_pixels_in = 0;
@@ -885,10 +852,10 @@ void voodoo_device_base::swap_buffers()
 }
 
 
-void voodoo_device_base::adjust_vblank_timer()
+void voodoo_device_base::adjust_vblank_start_timer()
 {
 	attotime vblank_period = screen().time_until_pos(m_vsyncstart);
-	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
+	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_start_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
 		vblank_period = screen().frame_period();
@@ -896,78 +863,78 @@ void voodoo_device_base::adjust_vblank_timer()
 }
 
 
-TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_off_callback )
+TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_start )
 {
-	if (LOG_VBLANK_SWAP) logerror("--- vblank end\n");
+	if (LOG_VBLANK_SWAP)
+		logerror("--- vblank start\n");
 
-	/* set internal state and call the client */
-	m_vblank = false;
-
-	// PCI Vblank IRQ enable is VOODOO2 and up
-	if (m_reg.rev2_or_3())
-	{
-		if (m_reg.intr_ctrl().vsync_falling_enable())
-		{
-			m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
-			if (!m_pciint_cb.isnull())
-				m_pciint_cb(true);
-		}
-	}
-
-	// External vblank handler
-	if (!m_vblank_cb.isnull())
-		m_vblank_cb(false);
-
-	/* go to the end of the next frame */
-	adjust_vblank_timer();
-}
-
-
-TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_callback )
-{
-	if (LOG_VBLANK_SWAP) logerror("--- vblank start\n");
-
-	/* flush the pipes */
+	// flush the pipes
 	if (operation_pending())
 	{
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
+		if (LOG_VBLANK_SWAP)
+			logerror("---- vblank flush begin\n");
 		flush_fifos(machine().time());
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
+		if (LOG_VBLANK_SWAP)
+			logerror("---- vblank flush end\n");
 	}
 
-	/* increment the count */
-	m_vblank_count++;
-	if (m_vblank_count > 250)
-		m_vblank_count = 250;
-	if (LOG_VBLANK_SWAP) logerror("---- vblank count = %u swap = %u pending = %u", m_vblank_count, m_vblank_swap, m_vblank_swap_pending);
-	if (m_vblank_swap_pending)
-		if (LOG_VBLANK_SWAP) logerror(" (target=%d)", m_vblank_swap);
-	if (LOG_VBLANK_SWAP) logerror("\n");
+	// increment the count
+	m_vblank_count = std::min(m_vblank_count + 1, 250);
 
-	/* if we're past the swap count, do the swap */
+	// logging
+	if (LOG_VBLANK_SWAP)
+		logerror("---- vblank count = %u swap = %u pending = %u", m_vblank_count, m_vblank_swap, m_vblank_swap_pending);
+	if (LOG_VBLANK_SWAP && m_vblank_swap_pending)
+		logerror(" (target=%d)", m_vblank_swap);
+	if (LOG_VBLANK_SWAP)
+		logerror("\n");
+
+	// if we're past the swap count, do the swap
 	if (m_vblank_swap_pending && m_vblank_count >= m_vblank_swap)
 		swap_buffers();
 
-	/* set a timer for the next off state */
+	// set a timer for the next off state
 	m_vsync_stop_timer->adjust(screen().time_until_pos(m_vsyncstop));
 
-	/* set internal state and call the client */
+	// set internal state and call the client
 	m_vblank = true;
 
-	// PCI Vblank IRQ enable is VOODOO2 and up
-	if (m_reg.rev2_or_3())
+	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
+	if (m_reg.rev2_or_3() && m_reg.intr_ctrl().vsync_rising_enable())
 	{
-		if (m_reg.intr_ctrl().vsync_rising_enable())
-		{
-			m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
-			if (!m_pciint_cb.isnull())
-				m_pciint_cb(true);
-		}
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
 	}
 
-	// External vblank handler
+	// notify external VBLANK handler on all models
 	if (!m_vblank_cb.isnull())
 		m_vblank_cb(true);
+}
+
+
+TIMER_CALLBACK_MEMBER( voodoo_device_base::vblank_stop )
+{
+	if (LOG_VBLANK_SWAP)
+		logerror("--- vblank end\n");
+
+	// set internal state and call the client
+	m_vblank = false;
+
+	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
+	if (m_reg.rev2_or_3() && m_reg.intr_ctrl().vsync_falling_enable())
+	{
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
+	}
+
+	// notify external VBLANK handler on all models
+	if (!m_vblank_cb.isnull())
+		m_vblank_cb(false);
+
+	// go to the end of the next frame
+	adjust_vblank_start_timer();
 }
 
 
@@ -1064,9 +1031,6 @@ void voodoo_device_base::recompute_video_memory()
 	if (m_auxoffs != ~0 && m_auxoffs > m_fbmask)
 		m_auxoffs = m_fbmask;
 
-/*  osd_printf_debug("rgb[0] = %08X   rgb[1] = %08X   rgb[2] = %08X   aux = %08X\n",
-            m_rgboffs[0], m_rgboffs[1], m_rgboffs[2], m_auxoffs);*/
-
 	// reset our front/back buffers if they are out of range
 	if (m_rgboffs[2] == ~0)
 	{
@@ -1083,33 +1047,6 @@ void voodoo_device_base::recompute_video_memory()
 }
 
 
-void voodoo_device_base::recompute_fifo_layout()
-{
-	// compute the memory FIFO location and size
-	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
-	if (fifo_last_page > m_fbmask / 0x1000)
-		fifo_last_page = m_fbmask / 0x1000;
-
-	// is it valid and enabled?
-	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
-	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
-	{
-		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
-		m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
-	}
-
-	/* if not, disable the FIFO */
-	else
-		m_fbmem_fifo.configure(nullptr, 0);
-}
-
-
-
-/*************************************
- *
- *  NCC table management
- *
- *************************************/
 
 /*************************************
  *
@@ -1554,7 +1491,20 @@ u32 voodoo_device_base::reg_nop_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_device_base::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 {
-	return fastfill();
+	auto &poly = m_renderer->alloc_poly();
+
+	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
+	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? back_buffer() : front_buffer();
+	poly.depthbase = aux_buffer();
+	poly.clipleft = m_reg.clip_left();
+	poly.clipright = m_reg.clip_right();
+	poly.cliptop = m_reg.clip_top();
+	poly.clipbottom = m_reg.clip_bottom();
+	poly.color1 = m_reg.color1().argb();
+	poly.zacolor = m_reg.za_color();
+
+	// 2 pixels per clock
+	return m_renderer->enqueue_fastfill(poly) / 2;
 }
 
 
@@ -1565,7 +1515,22 @@ u32 voodoo_device_base::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
 {
 	m_renderer->wait("swapbufferCMD");
-	return swapbuffer(data);
+
+	// the don't swap value is Voodoo 2-only, masked off by the register engine
+	m_vblank_swap_pending = true;
+	m_vblank_swap = BIT(data, 1, 8);
+	m_vblank_dont_swap = BIT(data, 9);
+
+	// if we're not syncing to the retrace, process the command immediately
+	if (!BIT(data, 0))
+	{
+		swap_buffers();
+		return 0;
+	}
+
+	// determine how many cycles to wait; we deliberately overshoot here because
+	// the final count gets updated on the VBLANK
+	return (m_vblank_swap + 1) * clock() / 10;
 }
 
 
@@ -1599,7 +1564,24 @@ u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 
 		// compute FIFO layout when fbiInit0 or fbiInit4 change
 		if (regnum == voodoo_regs::reg_fbiInit0 || regnum == voodoo_regs::reg_fbiInit4)
-			recompute_fifo_layout();
+		{
+			// compute the memory FIFO location and size
+			u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
+			if (fifo_last_page > m_fbmask / 0x1000)
+				fifo_last_page = m_fbmask / 0x1000;
+
+			// is it valid and enabled?
+			u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
+			if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
+			{
+				u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
+				m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
+			}
+
+			// if not, disable the FIFO
+			else
+				m_fbmem_fifo.configure(nullptr, 0);
+		}
 
 		// recompute video memory when fbiInit1 or fbiInit2 change
 		if (regnum == voodoo_regs::reg_fbiInit1 || regnum == voodoo_regs::reg_fbiInit2)
@@ -1796,7 +1778,7 @@ void voodoo_device_base::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 h
 	m_vsyncstop = vsyncon;
 	osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
 
-	adjust_vblank_timer();
+	adjust_vblank_start_timer();
 }
 
 /*************************************
@@ -2704,53 +2686,6 @@ void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 //-------------------------------------------------
-//  fastfill - execute the 'fastfill' command
-//-------------------------------------------------
-
-s32 voodoo_device_base::fastfill()
-{
-	auto &poly = m_renderer->alloc_poly();
-
-	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
-	poly.destbase = (m_reg.rev3() || m_reg.fbz_mode().draw_buffer() == 1) ? back_buffer() : front_buffer();
-	poly.depthbase = aux_buffer();
-	poly.clipleft = m_reg.clip_left();
-	poly.clipright = m_reg.clip_right();
-	poly.cliptop = m_reg.clip_top();
-	poly.clipbottom = m_reg.clip_bottom();
-	poly.color1 = m_reg.color1().argb();
-	poly.zacolor = m_reg.za_color();
-
-	// 2 pixels per clock
-	return m_renderer->enqueue_fastfill(poly) / 2;
-}
-
-
-//-------------------------------------------------
-//  swapbuffer - execute the 'swapbuffer' command
-//-------------------------------------------------
-
-s32 voodoo_device_base::swapbuffer(u32 data)
-{
-	// set the don't swap value for Voodoo 2
-	m_vblank_swap_pending = true;
-	m_vblank_swap = BIT(data, 1, 8);
-	m_vblank_dont_swap = BIT(data, 9);
-
-	// if we're not syncing to the retrace, process the command immediately
-	if (!BIT(data, 0))
-	{
-		swap_buffers();
-		return 0;
-	}
-
-	// determine how many cycles to wait; we deliberately overshoot here because
-	// the final count gets updated on the VBLANK
-	return (m_vblank_swap + 1) * clock() / 10;
-}
-
-
-//-------------------------------------------------
 //  triangle - execute the 'triangle' command
 //-------------------------------------------------
 
@@ -2836,7 +2771,6 @@ s32 voodoo_device_base::triangle()
 		poly.ds0dy = tmu0regs.ds_dy();
 		poly.dt0dy = tmu0regs.dt_dy();
 		poly.dw0dy = tmu0regs.dw_dy();
-		poly.lodbase0 = m_tmu[0].compute_lodbase();
 		poly.tex0 = &m_tmu[0].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
 			m_stats.texture_mode[tmu0regs.texture_mode().format()]++;
@@ -2856,7 +2790,6 @@ s32 voodoo_device_base::triangle()
 		poly.ds1dy = tmu1regs.ds_dy();
 		poly.dt1dy = tmu1regs.dt_dy();
 		poly.dw1dy = tmu1regs.dw_dy();
-		poly.lodbase1 = m_tmu[1].compute_lodbase();
 		poly.tex1 = &m_tmu[1].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
 			m_stats.texture_mode[tmu1regs.texture_mode().format()]++;
@@ -3000,8 +2933,8 @@ void voodoo_device_base::device_start()
 	m_pciint_cb.resolve();
 
 	// allocate timers
-	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_off_callback), this), this);
-	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_callback),this), this);
+	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_stop), this), this);
+	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_start),this), this);
 
 	// allocate memory
 	u32 total_allocation = m_fbmem_in_mb + (m_reg.rev1_or_2() ? (m_tmumem0_in_mb + m_tmumem1_in_mb) : 0 );
@@ -3902,7 +3835,7 @@ u32 voodoo_device_base::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("fbiInit5-7");
 		m_reg.write(regnum, data);
-		if (regnum == voodoo_regs::reg_fbiInit6)
+		if (regnum == voodoo_regs::reg_fbiInit5 || regnum == voodoo_regs::reg_fbiInit6)
 			recompute_video_memory();
 		m_cmdfifo[0].set_enable(m_reg.fbi_init7().cmdfifo_enable());
 		m_cmdfifo[0].set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
