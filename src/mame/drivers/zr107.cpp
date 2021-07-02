@@ -346,9 +346,14 @@ uint32_t midnrun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	m_k001005->draw(bitmap, cliprect);
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, 1, 0, 0);
+
+	if (m_konppc->output_3d_enabled())
+	{
+		m_k001005->draw(bitmap, cliprect);
+	}
+		
+	m_k056832->tilemap_draw_dj(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
 }
@@ -491,7 +496,7 @@ void zr107_state::machine_start()
 void midnrun_state::main_memmap(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share(m_workram);
-	map(0x74000000, 0x74003fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x74000000, 0x74001fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)).mirror(0x2000);
 	map(0x74020000, 0x7402003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
 	map(0x74080000, 0x74081fff).ram().w(FUNC(midnrun_state::paletteram32_w)).share(m_generic_paletteram_32);
