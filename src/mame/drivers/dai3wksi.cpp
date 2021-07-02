@@ -5,7 +5,7 @@
 --------------------------
 Galaxy Force
 PCB: SIV-01-A
-Run Away
+Runaway
 PCB: SIV-01-B
 --------------------------
 Dai 3 Wakusei
@@ -715,7 +715,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, runaways, 0,     dai3wksi, runaways, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Run Away (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, runaways, 0,     dai3wksi, runaways, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Runaway (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
