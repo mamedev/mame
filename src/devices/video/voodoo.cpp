@@ -296,6 +296,165 @@ inline u32 voodoo::memory_fifo::remove()
 
 
 
+//**************************************************************************
+//  TMU state
+//**************************************************************************
+
+//-------------------------------------------------
+//  init - configure local state
+//-------------------------------------------------
+
+void tmu_state::init(int index, shared_tables &share, u8 *ram, u32 size)
+{
+	// configure texture RAM
+	m_index = index;
+	m_ram = ram;
+	m_mask = size - 1;
+	m_regdirty = true;
+	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
+
+	// create pointers to the static lookups
+	m_texel[0] = share.rgb332;
+	m_texel[1] = nullptr;
+	m_texel[2] = share.alpha8;
+	m_texel[3] = share.int8;
+	m_texel[4] = share.ai44;
+	m_texel[5] = nullptr;
+	m_texel[6] = nullptr;
+	m_texel[7] = nullptr;
+	m_texel[8] = share.rgb332;
+	m_texel[9] = nullptr;
+	m_texel[10] = share.rgb565;
+	m_texel[11] = share.argb1555;
+	m_texel[12] = share.argb4444;
+	m_texel[13] = share.int8;
+	m_texel[14] = nullptr;
+	m_texel[15] = nullptr;
+}
+
+
+//-------------------------------------------------
+//  ncc_w - handle a write to the NCC/palette
+//  registers
+//-------------------------------------------------
+
+void tmu_state::ncc_w(offs_t regnum, u32 data)
+{
+	u32 regindex = regnum - voodoo_regs::reg_nccTable;
+
+	// I/Q entries in NCC 0 reference the palette if the high bit is set
+	if (BIT(data, 31) && regindex >= 4 && regindex < 12)
+	{
+		// extract the palette index
+		int const index = (BIT(data, 24, 7) << 1) | BIT(regindex, 0);
+
+		// compute RGB and ARGB values
+		rgb_t rgb = 0xff000000 | data;
+		rgb_t argb = argbexpand<6,6,6,6>(data, 18, 12, 6, 0);
+
+		// set and mark dirty
+		if (m_palette[0][index] != rgb)
+		{
+			m_palette[0][index] = rgb;
+			m_palette_dirty[0] = true;
+		}
+		if (m_palette[1][index] != argb)
+		{
+			m_palette[1][index] = argb;
+			m_palette_dirty[1] = true;
+		}
+		return;
+	}
+
+	// if no delta, don't mark dirty
+	if (m_reg.read(regnum) == data)
+		return;
+
+	// write the updated data and mark dirty
+	m_reg.write(regnum, data);
+	m_palette_dirty[2 + regindex / 12] = true;
+}
+
+
+//-------------------------------------------------
+//  prepare_texture - handle updating the texture
+//  state if the texture configuration is dirty
+//-------------------------------------------------
+
+inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
+{
+	// if the texture parameters are dirty, update them
+	if (m_regdirty)
+	{
+		// determine the lookup
+		auto const texmode = m_reg.texture_mode();
+		u32 const texformat = texmode.format();
+		rgb_t const *lookup = m_texel[texformat];
+
+		// if null lookup, then we need something dynamic
+		if (lookup == nullptr)
+		{
+			// could be either straight palette or NCC table
+			int palindex;
+			if ((texformat & 7) == 1)
+			{
+				// NCC case: palindex = 2 or 3 based on table select
+				palindex = 2 + texmode.ncc_table_select();
+				if (m_palette_dirty[palindex])
+				{
+					u32 const *regs = m_reg.subset(voodoo_regs::reg_nccTable + 12 * (palindex & 1));
+					renderer.alloc_palette(m_index * 4 + palindex).compute_ncc(regs);
+				}
+			}
+			else
+			{
+				// palette case: palindex = 0 or 1 based on RGB vs RGBA
+				palindex = (texformat == 6) ? 1 : 0;
+				if (m_palette_dirty[palindex])
+					renderer.alloc_palette(m_index * 4 + palindex).copy(&m_palette[palindex & 1][0]);
+			}
+
+			// clear the dirty flag and fetch the texels
+			m_palette_dirty[palindex] = false;
+			lookup = renderer.last_palette(m_index * 4 + palindex).texels();
+		}
+
+		// recompute the rasterization parameters
+		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, lookup);
+		m_regdirty = false;
+	}
+	return renderer.last_texture(m_index);
+}
+
+
+//-------------------------------------------------
+//  compute_lodbase - compute the base LOD value
+//-------------------------------------------------
+
+inline s32 tmu_state::compute_lodbase()
+{
+	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
+	s64 dsdx = s64(m_reg.ds_dx() >> 14);
+	s64 dsdy = s64(m_reg.ds_dy() >> 14);
+	s64 dtdx = s64(m_reg.dt_dx() >> 14);
+	s64 dtdy = s64(m_reg.dt_dy() >> 14);
+	s64 texdx = dsdx * dsdx + dtdx * dtdx;
+	s64 texdy = dsdy * dsdy + dtdy * dtdy;
+
+	// pick whichever is larger and shift off some high bits -> 28.20
+	s64 maxval = std::max(texdx, texdy) >> 16;
+
+	// use our fast reciprocal/log on this value; it expects input as a
+	// 16.32 number, and returns the log of the reciprocal, so we have to
+	// adjust the result: negative to get the log of the original value
+	// plus 12 to account for the extra exponent, and divided by 2 to
+	// get the log of the square root of texdx
+	return (fast_log2(double(maxval), 0) + (12 << 8)) / 2;
+}
+
+
+
+
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
@@ -460,35 +619,6 @@ shared_tables::shared_tables()
 }
 
 
-void voodoo_device_base::tmu_state::init(int index, shared_tables &share, u8 *ram, u32 size)
-{
-	// configure texture RAM
-	m_index = index;
-	m_ram = ram;
-	m_mask = size - 1;
-	m_regdirty = true;
-	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
-
-	// create pointers to the static lookups
-	m_texel[0] = share.rgb332;
-	m_texel[1] = nullptr;
-	m_texel[2] = share.alpha8;
-	m_texel[3] = share.int8;
-	m_texel[4] = share.ai44;
-	m_texel[5] = nullptr;
-	m_texel[6] = nullptr;
-	m_texel[7] = nullptr;
-	m_texel[8] = share.rgb332;
-	m_texel[9] = nullptr;
-	m_texel[10] = share.rgb565;
-	m_texel[11] = share.argb1555;
-	m_texel[12] = share.argb4444;
-	m_texel[13] = share.int8;
-	m_texel[14] = nullptr;
-	m_texel[15] = nullptr;
-}
-
-
 ALLOW_SAVE_TYPE(voodoo_device_base::stall_state);
 ALLOW_SAVE_TYPE(voodoo::reg_init_en);
 ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
@@ -574,6 +704,7 @@ void voodoo_device_base::register_save()
 //	save_item(NAME(m_renderer->m_fogdelta));
 
 	/* register states: tmu */
+/*
 	for (int index = 0; index < std::size(m_tmu); index++)
 	{
 		tmu_state *tmu = &m_tmu[index];
@@ -584,6 +715,7 @@ void voodoo_device_base::register_save()
 			save_pointer(NAME(tmu->m_ram), tmu->m_mask + 1, index);
 		save_item(NAME(tmu->m_palette), index);
 	}
+*/
 }
 
 
@@ -979,113 +1111,6 @@ void voodoo_device_base::recompute_fifo_layout()
  *
  *************************************/
 
-void voodoo_device_base::tmu_state::ncc_w(offs_t regnum, u32 data)
-{
-	u32 regindex = regnum - voodoo_regs::reg_nccTable;
-
-	// I/Q entries in NCC 0 reference the palette if the high bit is set
-	if (BIT(data, 31) && regindex >= 4 && regindex < 12)
-	{
-		// extract the palette index
-		int const index = (BIT(data, 24, 7) << 1) | BIT(regindex, 0);
-
-		// compute RGB and ARGB values
-		rgb_t rgb = 0xff000000 | data;
-		rgb_t argb = argbexpand<6,6,6,6>(data, 18, 12, 6, 0);
-
-		// set and mark dirty
-		if (m_palette[0][index] != rgb)
-		{
-			m_palette[0][index] = rgb;
-			m_palette_dirty[0] = true;
-		}
-		if (m_palette[1][index] != argb)
-		{
-			m_palette[1][index] = argb;
-			m_palette_dirty[1] = true;
-		}
-	}
-
-	// if no delta, don't mark dirty
-	if (m_reg.read(regnum) == data)
-		return;
-
-	// write the updated data and mark dirty
-	m_reg.write(regnum, data);
-	m_palette_dirty[2 + regindex / 12] = true;
-}
-
-
-
-inline rasterizer_texture &voodoo_device_base::tmu_state::prepare_texture()
-{
-	auto &renderer = m_device.renderer();
-
-	// if the texture parameters are dirty, update them
-	if (m_regdirty)
-	{
-		// determine the lookup
-		auto const texmode = m_reg.texture_mode();
-		u32 const texformat = texmode.format();
-		rgb_t const *lookup = m_texel[texformat];
-
-		// if null lookup, then we need something dynamic
-		if (lookup == nullptr)
-		{
-			// could be either straight palette or NCC table
-			int palindex;
-			if ((texformat & 7) == 1)
-			{
-				// NCC case: palindex = 2 or 3 based on table select
-				palindex = 2 + texmode.ncc_table_select();
-				if (m_palette_dirty[palindex])
-				{
-					u32 const *regs = m_reg.subset(voodoo_regs::reg_nccTable + 12 * (palindex & 1));
-					renderer.alloc_palette(m_index * 4 + palindex).compute_ncc(regs);
-				}
-			}
-			else
-			{
-				// palette case: palindex = 0 or 1 based on RGB vs RGBA
-				palindex = (texformat == 6) ? 1 : 0;
-				if (m_palette_dirty[palindex])
-					renderer.alloc_palette(m_index * 4 + palindex).copy(&m_palette[palindex & 1][0]);
-			}
-
-			// clear the dirty flag and fetch the texels
-			m_palette_dirty[palindex] = false;
-			lookup = renderer.last_palette(m_index * 4 + palindex).texels();
-		}
-
-		// recompute the rasterization parameters
-		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, lookup);
-		m_regdirty = false;
-	}
-	return renderer.last_texture(m_index);
-}
-
-
-inline s32 voodoo_device_base::tmu_state::compute_lodbase()
-{
-	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
-	s64 texdx = s64(m_reg.ds_dx() >> 14) * s64(m_reg.ds_dx() >> 14) + s64(m_reg.dt_dx() >> 14) * s64(m_reg.dt_dx() >> 14);
-	s64 texdy = s64(m_reg.ds_dy() >> 14) * s64(m_reg.ds_dy() >> 14) + s64(m_reg.dt_dy() >> 14) * s64(m_reg.dt_dy() >> 14);
-
-	// pick whichever is larger and shift off some high bits -> 28.20
-	if (texdx < texdy)
-		texdx = texdy;
-	texdx >>= 16;
-
-	// use our fast reciprocal/log on this value; it expects input as a
-	// 16.32 number, and returns the log of the reciprocal, so we have to
-	// adjust the result: negative to get the log of the original value
-	// plus 12 to account for the extra exponent, and divided by 2 to
-	// get the log of the square root of texdx
-	return (fast_log2(double(texdx), 0) + (12 << 8)) / 2;
-}
-
-
-
 /*************************************
  *
  *  Stall the active cpu until we are
@@ -1300,8 +1325,8 @@ u32 voodoo_device_base::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_passive_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0)) m_reg.write(regnum, data);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write(regnum, data);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write(regnum, data);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write(regnum, data);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write(regnum, data);
 	return 0;
 }
 
@@ -1340,43 +1365,43 @@ u32 voodoo_device_base::reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_starts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_s(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_s(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_s(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_s(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_startt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_t(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_t(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_t(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_t(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dy(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dy(data64);
 	return 0;
 }
 
@@ -1393,43 +1418,43 @@ u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 u32 voodoo_device_base::reg_fstarts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_s(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_s(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_s(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_s(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fstartt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_t(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_t(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_t(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_t(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_ds_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_ds_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dy(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dt_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dt_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dy(data64);
 	return 0;
 }
 
@@ -1444,24 +1469,24 @@ u32 voodoo_device_base::reg_startw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_w(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_w(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_w(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_w(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dw_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dw_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dy(data64);
 	return 0;
 }
 
@@ -1476,24 +1501,24 @@ u32 voodoo_device_base::reg_fstartw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_start_w(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_start_w(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_w(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_w(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dx(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dx(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dw_dx(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dx(data64);
 	return 0;
 }
 u32 voodoo_device_base::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
-	if (BIT(chipmask, 1)) m_tmu[0].m_reg.write_dw_dy(data64);
-	if (BIT(chipmask, 2)) m_tmu[1].m_reg.write_dw_dy(data64);
+	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dw_dy(data64);
+	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dy(data64);
 	return 0;
 }
 
@@ -1681,18 +1706,18 @@ u32 voodoo_device_base::reg_texture_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 1))
 	{
-		if (data != m_tmu[0].m_reg.read(regnum))
+		if (data != m_tmu[0].regs().read(regnum))
 		{
-			m_tmu[0].m_reg.write(regnum, data);
-			m_tmu[0].m_regdirty = true;
+			m_tmu[0].regs().write(regnum, data);
+			m_tmu[0].mark_dirty();
 		}
 	}
 	if (BIT(chipmask, 2))
 	{
-		if (data != m_tmu[1].m_reg.read(regnum))
+		if (data != m_tmu[1].regs().read(regnum))
 		{
-			m_tmu[1].m_reg.write(regnum, data);
-			m_tmu[1].m_regdirty = true;
+			m_tmu[1].regs().write(regnum, data);
+			m_tmu[1].mark_dirty();
 		}
 	}
 	return 0;
@@ -2154,17 +2179,17 @@ s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
 	if (!BIT(m_chipmask, 1 + tmunum))
 		return 0;
 
-	// wait for any outstanding work to finish, then let the TMU do the work
+	// wait for any outstanding work to finish
 	m_renderer->wait("Texture write");
 
 	// the seq_8_downld flag seems to always come from TMU #0
-	m_tmu[tmunum].texture_w(offset, data, m_tmu[0].m_reg.texture_mode().seq_8_downld());
-	return 0;
-}
+	bool seq_8_downld = m_tmu[0].regs().texture_mode().seq_8_downld();
 
-void voodoo_device_base::tmu_state::texture_w(offs_t offset, u32 data, bool seq_8_downld)
-{
-	auto const texlod = m_reg.texture_lod();
+	// pull out modes from the TMU and update state
+	auto &regs = m_tmu[tmunum].regs();
+	auto const texlod = regs.texture_lod();
+	auto const texmode = regs.texture_mode();
+	auto &texture = m_tmu[tmunum].prepare_texture(*m_renderer.get());
 
 	// texture direct not handled (but never seen so far)
 	if (texlod.tdirect_write())
@@ -2176,14 +2201,10 @@ void voodoo_device_base::tmu_state::texture_w(offs_t offset, u32 data, bool seq_
 	if (texlod.tdata_swap())
 		data = (data >> 16) | (data << 16);
 
-	// update texture info if dirty
-	auto const texmode = m_reg.texture_mode();
-	auto &texture = prepare_texture();
-
 	// determine destination pointer
 	u32 scale = (texmode.format() < 8) ? 1 : 2;
 	u8 *dest;
-	if (m_reg.rev1_or_2())
+	if (regs.rev1_or_2())
 	{
 		u32 lod = BIT(offset, 15, 4);
 		u32 tt = BIT(offset, 7, 8);
@@ -2191,7 +2212,7 @@ void voodoo_device_base::tmu_state::texture_w(offs_t offset, u32 data, bool seq_
 
 		// validate parameters
 		if (lod > 8)
-			return;
+			return 0;
 		dest = texture.write_ptr(lod, ts, tt, scale);
 	}
 	else
@@ -2211,6 +2232,7 @@ void voodoo_device_base::tmu_state::texture_w(offs_t offset, u32 data, bool seq_
 		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
 		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
 	}
+	return 0;
 }
 
 
@@ -2275,9 +2297,9 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 			u32 data = memfifo.remove();
 
 			// target the appropriate location
-			switch (offset & FIFO_TYPE_MASK)
+			switch (offset & memory_fifo::TYPE_MASK)
 			{
-				case FIFO_TYPE_REGISTER:
+				case memory_fifo::TYPE_REGISTER:
 				{
 					// just use the chipmask raw since it was adjusted prior to being added to the FIFO
 					u32 regnum = BIT(offset, 0, 8);
@@ -2285,18 +2307,18 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 					break;
 				}
 
-				case FIFO_TYPE_TEXTURE:
-					cycles = texture_w(offset & ~FIFO_FLAGS_MASK, data);
+				case memory_fifo::TYPE_TEXTURE:
+					cycles = texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
 					break;
 
-				case FIFO_TYPE_LFB:
+				case memory_fifo::TYPE_LFB:
 				{
 					u32 mem_mask = 0xffffffff;
-					if (offset & FIFO_NO_16_31)
+					if (offset & memory_fifo::NO_16_31)
 						mem_mask &= 0x0000ffff;
-					if (offset & FIFO_NO_0_15)
+					if (offset & memory_fifo::NO_0_15)
 						mem_mask &= 0xffff0000;
-					cycles = lfb_w(offset & ~FIFO_FLAGS_MASK, data, mem_mask);
+					cycles = lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
 					break;
 				}
 			}
@@ -2455,9 +2477,9 @@ void voodoo_device_base::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 {
 	// modify the offset based on the mem_mask
 	if (!ACCESSING_BITS_16_31)
-		offset |= FIFO_NO_16_31;
+		offset |= memory_fifo::NO_16_31;
 	if (!ACCESSING_BITS_0_15)
-		offset |= FIFO_NO_0_15;
+		offset |= memory_fifo::NO_0_15;
 
 	// if there's room in the PCI FIFO, add there
 	if (LOG_FIFO_VERBOSE)
@@ -2636,7 +2658,7 @@ void voodoo_1_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 8) | regnum | FIFO_TYPE_REGISTER, data, mem_mask);
+		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
 
 	// if we get a non-zero number of cycles back, mark things pending
 	u32 cycles = regentry.write(*this, chipmask, regnum, data);
@@ -2658,7 +2680,7 @@ void voodoo_1_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// if we're busy add to the fifo, else just execute immediately
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | FIFO_TYPE_LFB, data, mem_mask);
+		add_to_fifo(offset | memory_fifo::TYPE_LFB, data, mem_mask);
 	else
 		lfb_w(offset, data, mem_mask);
 }
@@ -2673,7 +2695,7 @@ void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// if we're busy add to the fifo, else just execute immediately
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | FIFO_TYPE_TEXTURE, data, mem_mask);
+		add_to_fifo(offset | memory_fifo::TYPE_TEXTURE, data, mem_mask);
 	else
 		texture_w(offset, data);
 }
@@ -2785,16 +2807,18 @@ s32 voodoo_device_base::triangle()
 		m_reg.write_start_w(poly.startw += (dy * poly.dwdy + dx * poly.dwdx) >> 4);
 
 		// adjust iterated W/S/T for TMU 0
-		m_tmu[0].m_reg.write_start_w(m_tmu[0].m_reg.start_w() + ((dy * m_tmu[0].m_reg.dw_dy() + dx * m_tmu[0].m_reg.dw_dx()) >> 4));
-		m_tmu[0].m_reg.write_start_s(m_tmu[0].m_reg.start_s() + ((dy * m_tmu[0].m_reg.ds_dy() + dx * m_tmu[0].m_reg.ds_dx()) >> 4));
-		m_tmu[0].m_reg.write_start_t(m_tmu[0].m_reg.start_t() + ((dy * m_tmu[0].m_reg.dt_dy() + dx * m_tmu[0].m_reg.dt_dx()) >> 4));
+		auto &tmu0regs = m_tmu[0].regs();
+		tmu0regs.write_start_w(tmu0regs.start_w() + ((dy * tmu0regs.dw_dy() + dx * tmu0regs.dw_dx()) >> 4));
+		tmu0regs.write_start_s(tmu0regs.start_s() + ((dy * tmu0regs.ds_dy() + dx * tmu0regs.ds_dx()) >> 4));
+		tmu0regs.write_start_t(tmu0regs.start_t() + ((dy * tmu0regs.dt_dy() + dx * tmu0regs.dt_dx()) >> 4));
 
 		// adjust iterated W/S/T for TMU 1
 		if (BIT(m_chipmask, 2))
 		{
-			m_tmu[1].m_reg.write_start_w(m_tmu[1].m_reg.start_w() + ((dy * m_tmu[1].m_reg.dw_dy() + dx * m_tmu[1].m_reg.dw_dx()) >> 4));
-			m_tmu[1].m_reg.write_start_s(m_tmu[1].m_reg.start_s() + ((dy * m_tmu[1].m_reg.ds_dy() + dx * m_tmu[1].m_reg.ds_dx()) >> 4));
-			m_tmu[1].m_reg.write_start_t(m_tmu[1].m_reg.start_t() + ((dy * m_tmu[1].m_reg.dt_dy() + dx * m_tmu[1].m_reg.dt_dx()) >> 4));
+			auto &tmu1regs = m_tmu[1].regs();
+			tmu1regs.write_start_w(tmu1regs.start_w() + ((dy * tmu1regs.dw_dy() + dx * tmu1regs.dw_dx()) >> 4));
+			tmu1regs.write_start_s(tmu1regs.start_s() + ((dy * tmu1regs.ds_dy() + dx * tmu1regs.ds_dx()) >> 4));
+			tmu1regs.write_start_t(tmu1regs.start_t() + ((dy * tmu1regs.dt_dy() + dx * tmu1regs.dt_dx()) >> 4));
 		}
 	}
 
@@ -2802,38 +2826,40 @@ s32 voodoo_device_base::triangle()
 	poly.tex0 = nullptr;
 	if (poly.raster.texmode0().raw() != 0xffffffff)
 	{
-		poly.starts0 = m_tmu[0].m_reg.start_s();
-		poly.startt0 = m_tmu[0].m_reg.start_t();
-		poly.startw0 = m_tmu[0].m_reg.start_w();
-		poly.ds0dx = m_tmu[0].m_reg.ds_dx();
-		poly.dt0dx = m_tmu[0].m_reg.dt_dx();
-		poly.dw0dx = m_tmu[0].m_reg.dw_dx();
-		poly.ds0dy = m_tmu[0].m_reg.ds_dy();
-		poly.dt0dy = m_tmu[0].m_reg.dt_dy();
-		poly.dw0dy = m_tmu[0].m_reg.dw_dy();
+		auto &tmu0regs = m_tmu[0].regs();
+		poly.starts0 = tmu0regs.start_s();
+		poly.startt0 = tmu0regs.start_t();
+		poly.startw0 = tmu0regs.start_w();
+		poly.ds0dx = tmu0regs.ds_dx();
+		poly.dt0dx = tmu0regs.dt_dx();
+		poly.dw0dx = tmu0regs.dw_dx();
+		poly.ds0dy = tmu0regs.ds_dy();
+		poly.dt0dy = tmu0regs.dt_dy();
+		poly.dw0dy = tmu0regs.dw_dy();
 		poly.lodbase0 = m_tmu[0].compute_lodbase();
-		poly.tex0 = &m_tmu[0].prepare_texture();
+		poly.tex0 = &m_tmu[0].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
-			m_stats.texture_mode[m_tmu[0].m_reg.texture_mode().format()]++;
+			m_stats.texture_mode[tmu0regs.texture_mode().format()]++;
 	}
 
 	// fill in texture 1 parameters
 	poly.tex1 = nullptr;
 	if (poly.raster.texmode1().raw() != 0xffffffff)
 	{
-		poly.starts1 = m_tmu[1].m_reg.start_s();
-		poly.startt1 = m_tmu[1].m_reg.start_t();
-		poly.startw1 = m_tmu[1].m_reg.start_w();
-		poly.ds1dx = m_tmu[1].m_reg.ds_dx();
-		poly.dt1dx = m_tmu[1].m_reg.dt_dx();
-		poly.dw1dx = m_tmu[1].m_reg.dw_dx();
-		poly.ds1dy = m_tmu[1].m_reg.ds_dy();
-		poly.dt1dy = m_tmu[1].m_reg.dt_dy();
-		poly.dw1dy = m_tmu[1].m_reg.dw_dy();
+		auto &tmu1regs = m_tmu[1].regs();
+		poly.starts1 = tmu1regs.start_s();
+		poly.startt1 = tmu1regs.start_t();
+		poly.startw1 = tmu1regs.start_w();
+		poly.ds1dx = tmu1regs.ds_dx();
+		poly.dt1dx = tmu1regs.dt_dx();
+		poly.dw1dx = tmu1regs.dw_dx();
+		poly.ds1dy = tmu1regs.ds_dy();
+		poly.dt1dy = tmu1regs.dt_dy();
+		poly.dw1dy = tmu1regs.dw_dy();
 		poly.lodbase1 = m_tmu[1].compute_lodbase();
-		poly.tex1 = &m_tmu[1].prepare_texture();
+		poly.tex1 = &m_tmu[1].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
-			m_stats.texture_mode[m_tmu[1].m_reg.texture_mode().format()]++;
+			m_stats.texture_mode[tmu1regs.texture_mode().format()]++;
 	}
 
 	// fill in color parameters
@@ -2916,7 +2942,7 @@ voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_typ
 	m_vblank_swap(0),
 	m_vblank_dont_swap(0),
 	m_reg(model),
-	m_tmu{ *this, *this },
+	m_tmu{ model, model },
 	m_vsync_start_timer(nullptr),
 	m_vsync_stop_timer(nullptr),
 	m_stall_resume_timer(nullptr),
@@ -3064,7 +3090,7 @@ void voodoo_device_base::device_start()
 		tmu_config |= 0xc0;  // two TMUs
 
 	// create the renderer
-	m_renderer = std::make_unique<voodoo_renderer>(machine(), tmu_config, m_shared->rgb565, m_reg, &m_tmu[0].m_reg, BIT(m_chipmask, 2) ? &m_tmu[1].m_reg : nullptr);
+	m_renderer = std::make_unique<voodoo_renderer>(machine(), tmu_config, m_shared->rgb565, m_reg, &m_tmu[0].regs(), BIT(m_chipmask, 2) ? &m_tmu[1].regs() : nullptr);
 
 	// set up the PCI FIFO
 	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
@@ -3107,10 +3133,7 @@ void voodoo_device_base::device_post_load()
 	// dirty everything so it gets recomputed
 	m_clut_dirty = true;
 	for (tmu_state &tm : m_tmu)
-	{
-		tm.m_regdirty = true;
-		tm.m_palette_dirty[0] = tm.m_palette_dirty[1] = tm.m_palette_dirty[2] = tm.m_palette_dirty[3] = true;
-	}
+		tm.post_load();
 
 	// recompute video memory to get the FBI FIFO base recomputed
 	if (m_reg.rev1_or_2())
@@ -4050,6 +4073,8 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 	// set up Wb
 	float const wscale = 65536.0f * 65536.0f;
 	float const wdiv = wscale * divisor;
+	auto &tmu0reg = m_tmu[0].regs();
+	auto &tmu1reg = m_tmu[1].regs();
 	if (setup_mode.setup_wb())
 	{
 		s64 startw = s64(sv0.wb * wscale);
@@ -4058,12 +4083,12 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 		m_reg.write_start_w(startw);
 		m_reg.write_dw_dx(dwdx);
 		m_reg.write_dw_dy(dwdy);
-		m_tmu[0].m_reg.write_start_w(startw);
-		m_tmu[0].m_reg.write_dw_dx(dwdx);
-		m_tmu[0].m_reg.write_dw_dy(dwdy);
-		m_tmu[1].m_reg.write_start_w(startw);
-		m_tmu[1].m_reg.write_dw_dx(dwdx);
-		m_tmu[1].m_reg.write_dw_dy(dwdy);
+		tmu0reg.write_start_w(startw);
+		tmu0reg.write_dw_dx(dwdx);
+		tmu0reg.write_dw_dy(dwdy);
+		tmu1reg.write_start_w(startw);
+		tmu1reg.write_dw_dx(dwdx);
+		tmu1reg.write_dw_dy(dwdy);
 	}
 
 	// set up W0
@@ -4072,12 +4097,12 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 		s64 startw = s64(sv0.w0 * wscale);
 		s64 dwdx = s64(((sv0.w0 - sv1.w0) * dx1 - (sv0.w0 - sv2.w0) * dx2) * wdiv);
 		s64 dwdy = s64(((sv0.w0 - sv2.w0) * dy1 - (sv0.w0 - sv1.w0) * dy2) * wdiv);
-		m_tmu[0].m_reg.write_start_w(startw);
-		m_tmu[0].m_reg.write_dw_dx(dwdx);
-		m_tmu[0].m_reg.write_dw_dy(dwdy);
-		m_tmu[1].m_reg.write_start_w(startw);
-		m_tmu[1].m_reg.write_dw_dx(dwdx);
-		m_tmu[1].m_reg.write_dw_dy(dwdy);
+		tmu0reg.write_start_w(startw);
+		tmu0reg.write_dw_dx(dwdx);
+		tmu0reg.write_dw_dy(dwdy);
+		tmu1reg.write_start_w(startw);
+		tmu1reg.write_dw_dx(dwdx);
+		tmu1reg.write_dw_dy(dwdy);
 	}
 
 	// set up S0,T0
@@ -4091,18 +4116,18 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 		s64 startt = s64(sv0.t0 * stscale);
 		s64 dtdx = s64(((sv0.t0 - sv1.t0) * dx1 - (sv0.t0 - sv2.t0) * dx2) * stdiv);
 		s64 dtdy = s64(((sv0.t0 - sv2.t0) * dy1 - (sv0.t0 - sv1.t0) * dy2) * stdiv);
-		m_tmu[0].m_reg.write_start_s(starts);
-		m_tmu[0].m_reg.write_start_t(startt);
-		m_tmu[0].m_reg.write_ds_dx(dsdx);
-		m_tmu[0].m_reg.write_dt_dx(dtdx);
-		m_tmu[0].m_reg.write_ds_dy(dsdy);
-		m_tmu[0].m_reg.write_dt_dy(dtdy);
-		m_tmu[1].m_reg.write_start_s(starts);
-		m_tmu[1].m_reg.write_start_t(startt);
-		m_tmu[1].m_reg.write_ds_dx(dsdx);
-		m_tmu[1].m_reg.write_dt_dx(dtdx);
-		m_tmu[1].m_reg.write_ds_dy(dsdy);
-		m_tmu[1].m_reg.write_dt_dy(dtdy);
+		tmu0reg.write_start_s(starts);
+		tmu0reg.write_start_t(startt);
+		tmu0reg.write_ds_dx(dsdx);
+		tmu0reg.write_dt_dx(dtdx);
+		tmu0reg.write_ds_dy(dsdy);
+		tmu0reg.write_dt_dy(dtdy);
+		tmu1reg.write_start_s(starts);
+		tmu1reg.write_start_t(startt);
+		tmu1reg.write_ds_dx(dsdx);
+		tmu1reg.write_dt_dx(dtdx);
+		tmu1reg.write_ds_dy(dsdy);
+		tmu1reg.write_dt_dy(dtdy);
 	}
 
 	// set up W1
@@ -4111,9 +4136,9 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 		s64 startw = s64(sv0.w1 * wscale);
 		s64 dwdx = s64(((sv0.w1 - sv1.w1) * dx1 - (sv0.w1 - sv2.w1) * dx2) * wdiv);
 		s64 dwdy = s64(((sv0.w1 - sv2.w1) * dy1 - (sv0.w1 - sv1.w1) * dy2) * wdiv);
-		m_tmu[1].m_reg.write_start_w(startw);
-		m_tmu[1].m_reg.write_dw_dx(dwdx);
-		m_tmu[1].m_reg.write_dw_dy(dwdy);
+		tmu1reg.write_start_w(startw);
+		tmu1reg.write_dw_dx(dwdx);
+		tmu1reg.write_dw_dy(dwdy);
 	}
 
 	// set up S1,T1
@@ -4125,12 +4150,12 @@ s32 voodoo_device_base::setup_and_draw_triangle()
 		s64 startt = s64(sv0.t1 * stscale);
 		s64 dtdx = s64(((sv0.t1 - sv1.t1) * dx1 - (sv0.t1 - sv2.t1) * dx2) * stdiv);
 		s64 dtdy = s64(((sv0.t1 - sv2.t1) * dy1 - (sv0.t1 - sv1.t1) * dy2) * stdiv);
-		m_tmu[1].m_reg.write_start_s(starts);
-		m_tmu[1].m_reg.write_start_t(startt);
-		m_tmu[1].m_reg.write_ds_dx(dsdx);
-		m_tmu[1].m_reg.write_dt_dx(dtdx);
-		m_tmu[1].m_reg.write_ds_dy(dsdy);
-		m_tmu[1].m_reg.write_dt_dy(dtdy);
+		tmu1reg.write_start_s(starts);
+		tmu1reg.write_start_t(startt);
+		tmu1reg.write_ds_dx(dsdx);
+		tmu1reg.write_dt_dx(dtdx);
+		tmu1reg.write_ds_dy(dsdy);
+		tmu1reg.write_dt_dy(dtdy);
 	}
 
 	// draw the triangle
@@ -4364,7 +4389,7 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 8) | regnum | FIFO_TYPE_REGISTER, data, mem_mask);
+		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
 
 	// if we get a non-zero number of cycles back, mark things pending
 	int cycles = regentry.write(*this, chipmask, regnum, data);
@@ -4386,7 +4411,7 @@ void voodoo_2_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// if we're busy add to the fifo, else just execute immediately
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | FIFO_TYPE_LFB, data, mem_mask);
+		add_to_fifo(offset | memory_fifo::TYPE_LFB, data, mem_mask);
 	else
 		lfb_w(offset, data, mem_mask);
 }
@@ -4401,7 +4426,7 @@ void voodoo_2_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// if we're busy add to the fifo, else just execute immediately
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | FIFO_TYPE_TEXTURE, data, mem_mask);
+		add_to_fifo(offset | memory_fifo::TYPE_TEXTURE, data, mem_mask);
 	else
 		texture_w(offset, data);
 }

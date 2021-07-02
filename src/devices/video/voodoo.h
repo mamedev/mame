@@ -86,15 +86,63 @@ class voodoo_device_base;
 namespace voodoo
 {
 
+// ======================> shared_tables
 
-// FIFO flags, added to offset
-static constexpr offs_t FIFO_FLAGS_MASK     = 0xf0000000;
-static constexpr offs_t FIFO_TYPE_MASK      = 0xc0000000;
-static constexpr offs_t FIFO_TYPE_REGISTER  = 0x00000000;
-static constexpr offs_t FIFO_TYPE_LFB       = 0x40000000;
-static constexpr offs_t FIFO_TYPE_TEXTURE   = 0x80000000;
-static constexpr offs_t FIFO_NO_16_31       = 0x20000000;
-static constexpr offs_t FIFO_NO_0_15        = 0x10000000;
+// shared_tables are global tables that are shared between different components
+struct shared_tables
+{
+	// constructor
+	shared_tables();
+
+	// 8-bit lookups
+	rgb_t rgb332[256];      // RGB 3-3-2 lookup table
+	rgb_t alpha8[256];      // alpha 8-bit lookup table
+	rgb_t int8[256];        // intensity 8-bit lookup table
+	rgb_t ai44[256];        // alpha, intensity 4-4 lookup table
+
+							// 16-bit lookups
+	rgb_t rgb565[65536];    // RGB 5-6-5 lookup table
+	rgb_t argb1555[65536];  // ARGB 1-5-5-5 lookup table
+	rgb_t argb4444[65536];  // ARGB 4-4-4-4 lookup table
+};
+
+
+// ======================> tmu_state
+
+// tmu_state holds TMU-specific register and palette state
+class tmu_state
+{
+public:
+	// construction
+	tmu_state(voodoo_model model) : m_reg(model) { }
+
+	// simple getters
+	voodoo_regs &regs() { return m_reg; }
+	bool dirty() const { return m_regdirty; }
+
+	// simple setters
+	void mark_dirty() { m_regdirty = true; }
+
+	void init(int index, shared_tables &share, u8 *ram, u32 size);
+	void ncc_w(offs_t offset, u32 data);
+	voodoo::rasterizer_texture &prepare_texture(voodoo::voodoo_renderer &renderer);
+	s32 compute_lodbase();
+
+	// state management
+	void post_load() { m_regdirty = true; m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true; }
+
+private:
+	int m_index;                    // index of ourself
+	u8 *m_ram = nullptr;            // pointer to our RAM
+	u32 m_mask = 0;                 // mask to apply to pointers
+
+	voodoo_regs m_reg;              // TMU registers
+	bool m_regdirty;                // true if the LOD/mode/base registers have changed
+
+	rgb_t *m_texel[16];             // texel lookups for each format
+	bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
+	rgb_t m_palette[2][256];        // 2 versions of the palette
+};
 
 
 // ======================> memory_fifo
@@ -104,6 +152,15 @@ static constexpr offs_t FIFO_NO_0_15        = 0x10000000;
 class memory_fifo
 {
 public:
+	// FIFO flags, added to offset
+	static constexpr offs_t FLAGS_MASK     = 0xf0000000;
+	static constexpr offs_t TYPE_MASK      = 0xc0000000;
+	static constexpr offs_t TYPE_REGISTER  = 0x00000000;
+	static constexpr offs_t TYPE_LFB       = 0x40000000;
+	static constexpr offs_t TYPE_TEXTURE   = 0x80000000;
+	static constexpr offs_t NO_16_31       = 0x20000000;
+	static constexpr offs_t NO_0_15        = 0x10000000;
+
 	// construction
 	memory_fifo();
 
@@ -224,22 +281,6 @@ private:
 	static packet_handler s_packet_handler[8];
 };
 
-struct shared_tables
-{
-	// constructor
-	shared_tables();
-
-	// 8-bit lookups
-	rgb_t rgb332[256];      // RGB 3-3-2 lookup table
-	rgb_t alpha8[256];      // alpha 8-bit lookup table
-	rgb_t int8[256];        // intensity 8-bit lookup table
-	rgb_t ai44[256];        // alpha, intensity 4-4 lookup table
-
-	// 16-bit lookups
-	rgb_t rgb565[65536];    // RGB 5-6-5 lookup table
-	rgb_t argb1555[65536];  // ARGB 1-5-5-5 lookup table
-	rgb_t argb4444[65536];  // ARGB 4-4-4-4 lookup table
-};
 
 struct setup_vertex
 {
@@ -249,6 +290,7 @@ struct setup_vertex
 	float s0, t0, w0;         // W, S, T for TMU 0
 	float s1, t1, w1;         // W, S, T for TMU 1
 };
+
 
 class debug_stats
 {
@@ -339,30 +381,6 @@ protected:
 	TIMER_CALLBACK_MEMBER( vblank_callback );
 
 	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
-
-	struct tmu_state
-	{
-		tmu_state(voodoo_device_base &device) : m_device(device), m_reg(device.model()) { }
-
-		void init(int index, voodoo::shared_tables &share, u8 *ram, u32 size);
-		voodoo::rasterizer_texture &prepare_texture();
-		s32 compute_lodbase();
-		void texture_w(offs_t offset, u32 data, bool seq_8_downld);
-		void ncc_w(offs_t offset, u32 data);
-
-		voodoo_device_base &m_device;   // reference back to our owner
-		int m_index;                    // index of ourself
-		u8 *m_ram = nullptr;            // pointer to our RAM
-		u32 m_mask = 0;                 // mask to apply to pointers
-
-		voodoo::voodoo_regs m_reg;      // TMU registers
-		bool m_regdirty;                // true if the LOD/mode/base registers have changed
-
-		rgb_t *m_texel[16];             // texel lookups for each format
-		bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
-		rgb_t m_palette[2][256];        // 2 versions of the palette
-	};
-
 
 	void check_stalled_cpu(attotime current_time);
 	void flush_fifos(attotime current_time);

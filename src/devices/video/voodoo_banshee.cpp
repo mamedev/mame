@@ -1331,7 +1331,7 @@ void voodoo_banshee_device_base::map_register_w(offs_t offset, u32 data, u32 mem
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 4) | regnum | FIFO_TYPE_REGISTER, data, mem_mask);
+		return add_to_fifo((chipmask << 4) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
 
 	// if we get a non-zero number of cycles back, mark things pending
 	int cycles = regentry.write(*this, chipmask, regnum, data);
