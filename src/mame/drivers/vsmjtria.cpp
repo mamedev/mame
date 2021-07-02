@@ -10,13 +10,22 @@ Unmarked board with everything doubled up, to provide a versus experience with a
 CPU:    2x Z80
 RAM:    6x M5M5117P
 Sound:  2x AY-3-8910
-I/O:    2x 8255, 4x 8-dip banks, 1x single dip
+I/O:    2x 8255, 4x 8-dip banks, 1x single dip switch (at position 11m)
 OSC:    20MHz
 
+Notes:
+- Loosely based off rmhaihai.cpp.
+  Changes needed for merging both implementations seems too trivial to warrant a
+  device merge (basically just the video HW and a few bits).
+
 TODO:
-- coins don't work (set to free play to test for now)
-- VS. feature communications aren't implemented
-- the hardware is based on the one in rmhaihai.cpp. Derive, merge or neither?
+- CPU seems a bit too slow when deciding about what tile to discard (may be btanb);
+- Upper byte of I/O access seems to be some extra comms state machine
+  (i.e. it more or less mimic the commands that CPUs send between each other).
+  Maybe just a debug port that is read thru external HW?
+- Pinpoint how HW reads SW2 (position 11m) single bit dip;
+- Pinpoint how HW reads the three lead-filled marked as SW1 (position 1b);
+
 */
 
 #include "emu.h"
@@ -63,7 +72,8 @@ private:
 	tilemap_t *m_bg_tilemap[2];
 	uint8_t m_keyboard_cmd[2];
 
-	template <uint8_t Which> void nmi_w(uint8_t data);
+	template <uint8_t Which> void nmi_set_w(uint8_t data);
+	template <uint8_t Which> void nmi_ack_w(uint8_t data);
 	template <uint8_t Which> void ctrl_w(uint8_t data);
 	template <uint8_t Which> uint8_t keyboard_r();
 	template <uint8_t Which> void keyboard_w(uint8_t data);
@@ -79,51 +89,9 @@ private:
 	void sub_io_map(address_map &map);
 };
 
-
-void vsmjtria_state::machine_start()
-{
-	m_keyboard_cmd[0] = m_keyboard_cmd[1] = 0;
-
-	save_item(NAME(m_keyboard_cmd));
-}
-
-template <uint8_t Which>
-void vsmjtria_state::nmi_w(uint8_t data)
-{
-	m_cpu[Which]->pulse_input_line(INPUT_LINE_NMI, m_cpu[Which]->minimum_quantum_time());
-}
-
-template <uint8_t Which>
-void vsmjtria_state::ctrl_w(uint8_t data)
-{
-	flip_screen_set(data & 0x01);
-
-	// (data & 0x02) is switched on and off in service mode
-
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
-	machine().bookkeeping().coin_counter_w(0, data & 0x08);
-}
-
-template <uint8_t Which>
-uint8_t vsmjtria_state::keyboard_r()
-{
-	uint8_t data = 0x00;
-
-	if (BIT(m_keyboard_cmd[Which], 0)) data |= m_key[Which][0]->read();
-	if (BIT(m_keyboard_cmd[Which], 1)) data |= m_key[Which][1]->read();
-	if (BIT(m_keyboard_cmd[Which], 2)) data |= m_key[Which][2]->read();
-	if (BIT(m_keyboard_cmd[Which], 3)) data |= m_key[Which][3]->read();
-	if (BIT(m_keyboard_cmd[Which], 4)) data |= m_key[Which][4]->read();
-
-	return data;
-}
-
-template <uint8_t Which>
-void vsmjtria_state::keyboard_w(uint8_t data)
-{
-	m_keyboard_cmd[Which] = data;
-}
-
+/*
+ * Video section
+ */
 
 void vsmjtria_state::video_start()
 {
@@ -162,6 +130,55 @@ uint32_t vsmjtria_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+/*
+ * I/O
+ */
+
+template <uint8_t Which>
+void vsmjtria_state::nmi_set_w(uint8_t data)
+{
+	m_cpu[Which]->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+template <uint8_t Which>
+void vsmjtria_state::nmi_ack_w(uint8_t data)
+{
+	m_cpu[Which]->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+// TODO: flip screen and coin counter are actually never triggered, are they really connected for this HW?
+// (ctrl_w fn comes from rmhaihai.cpp assumption of being identical, it's most likely not present here)
+template <uint8_t Which>
+void vsmjtria_state::ctrl_w(uint8_t data)
+{
+//	flip_screen_set(data & 0x01);
+	m_bg_tilemap[Which]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+
+	// (data & 0x02) is switched on and off in service mode
+
+	machine().bookkeeping().coin_lockout_w(Which, ~data & 0x04);
+	machine().bookkeeping().coin_counter_w(Which, data & 0x08);
+}
+
+template <uint8_t Which>
+uint8_t vsmjtria_state::keyboard_r()
+{
+	uint8_t data = 0x00;
+
+	if (BIT(m_keyboard_cmd[Which], 0)) data |= m_key[Which][0]->read();
+	if (BIT(m_keyboard_cmd[Which], 1)) data |= m_key[Which][1]->read();
+	if (BIT(m_keyboard_cmd[Which], 2)) data |= m_key[Which][2]->read();
+	if (BIT(m_keyboard_cmd[Which], 3)) data |= m_key[Which][3]->read();
+	if (BIT(m_keyboard_cmd[Which], 4)) data |= m_key[Which][4]->read();
+
+	return data;
+}
+
+template <uint8_t Which>
+void vsmjtria_state::keyboard_w(uint8_t data)
+{
+	m_keyboard_cmd[Which] = data;
+}
 
 void vsmjtria_state::main_prg_map(address_map &map)
 {
@@ -169,18 +186,20 @@ void vsmjtria_state::main_prg_map(address_map &map)
 	map(0xa000, 0xa7ff).ram().share("nvram0");
 	map(0xa800, 0xafff).ram().w(FUNC(vsmjtria_state::colorram_w<0>)).share(m_colorram[0]);
 	map(0xb000, 0xb7ff).ram().w(FUNC(vsmjtria_state::videoram_w<0>)).share(m_videoram[0]);
-	map(0xc000, 0xdfff).rom();
+	map(0xc000, 0xdfff).rom().region("cpu0", 0xa000);
 	map(0xe000, 0xffff).rom();
 }
 
 void vsmjtria_state::main_io_map(address_map &map)
 {
-	map(0x8000, 0x8003).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x8020, 0x8020).r("ay0", FUNC(ay8910_device::data_r));
-	map(0x8020, 0x8021).w("ay0", FUNC(ay8910_device::address_data_w));
-	map(0x8060, 0x8060).w(FUNC(vsmjtria_state::ctrl_w<0>));
-	map(0x80c0, 0x80c0).w(FUNC(vsmjtria_state::nmi_w<1>));
-	map(0x80e0, 0x80e0).r("latch1", FUNC(generic_latch_8_device::read)).w("latch0", FUNC(generic_latch_8_device::write));
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).r("ay0", FUNC(ay8910_device::data_r));
+	map(0x20, 0x21).w("ay0", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x60).w(FUNC(vsmjtria_state::ctrl_w<0>));
+	map(0xa0, 0xa0).w(FUNC(vsmjtria_state::nmi_ack_w<0>));
+	map(0xc0, 0xc0).w(FUNC(vsmjtria_state::nmi_set_w<1>));
+	map(0xe0, 0xe0).r("latch1", FUNC(generic_latch_8_device::read)).w("latch0", FUNC(generic_latch_8_device::write));
 }
 
 void vsmjtria_state::sub_prg_map(address_map &map)
@@ -189,29 +208,33 @@ void vsmjtria_state::sub_prg_map(address_map &map)
 	map(0xa000, 0xa7ff).ram().share("nvram1");
 	map(0xa800, 0xafff).ram().w(FUNC(vsmjtria_state::colorram_w<1>)).share(m_colorram[1]);
 	map(0xb000, 0xb7ff).ram().w(FUNC(vsmjtria_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0xc000, 0xdfff).rom();
+	map(0xc000, 0xdfff).rom().region("cpu1", 0xa000);
 	map(0xe000, 0xffff).rom();
 }
 
 void vsmjtria_state::sub_io_map(address_map &map)
 {
-	map(0x8000, 0x8003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x8020, 0x8020).r("ay1", FUNC(ay8910_device::data_r));
-	map(0x8020, 0x8021).w("ay1", FUNC(ay8910_device::address_data_w));
-	map(0x8060, 0x8060).w(FUNC(vsmjtria_state::ctrl_w<1>));
-	map(0x80c0, 0x80c0).w(FUNC(vsmjtria_state::nmi_w<0>));
-	map(0x80e0, 0x80e0).r("latch0", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x20).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x20, 0x21).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x60).w(FUNC(vsmjtria_state::ctrl_w<1>));
+	map(0xa0, 0xa0).w(FUNC(vsmjtria_state::nmi_ack_w<1>));
+	map(0xc0, 0xc0).w(FUNC(vsmjtria_state::nmi_set_w<0>));
+	map(0xe0, 0xe0).r("latch0", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
 }
 
 
 static INPUT_PORTS_START( vsmjtria )
+	// TODO: deduplicate all inputs here
+	// either use a C-style macro or device-ify
 	PORT_START("P1_COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
 
 	PORT_START("P2_COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
 
@@ -437,6 +460,13 @@ GFXDECODE_END
 static GFXDECODE_START( gfx_vsmjtria_sub )
 	GFXDECODE_ENTRY( "subgfx", 0, charlayout, 0, 32 )
 GFXDECODE_END
+
+void vsmjtria_state::machine_start()
+{
+	m_keyboard_cmd[0] = m_keyboard_cmd[1] = 0;
+
+	save_item(NAME(m_keyboard_cmd));
+}
 
 void vsmjtria_state::vsmjtria(machine_config &config)
 {
