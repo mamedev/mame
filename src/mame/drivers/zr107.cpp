@@ -797,7 +797,7 @@ void midnrun_state::midnrun(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midnrun_state::main_memmap);
 
-	config.set_maximum_quantum(attotime::from_hz(750000)); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(1500000)); // Very high sync needed to prevent lockups - why?
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
