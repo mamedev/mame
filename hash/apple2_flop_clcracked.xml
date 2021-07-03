@@ -42854,4 +42854,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dskdrctr">
+		<description>Disk Director (SoftSmith) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-03"/>
+		<!--"Disk Director" is a 1983 set of disk utilities developed by Sensible Software. This is the SoftSmith re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="disk director (softsmith) (4am and san inc crack).dsk" size="143360" crc="a8722aba" sha1="cad9258dd20090f3d463aaa0f2dfd5fdad6c180c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

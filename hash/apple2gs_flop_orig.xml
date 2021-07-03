@@ -3240,4 +3240,52 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="paperboy">
+		<description>Paperboy</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2021-07-02"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 256K Apple IIgs ROM 01 -->
+		<!--"Paperboy" is a 1988 action game developed by Tengen and distributed by Mindscape. It requires a 256K Apple IIgs ROM 01.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1305356">
+				<rom name="paperboy iigs.woz" size="1305356" crc="8fdf4e3c" sha1="4409b0d1168e0a693f82bf1fc7366cfe65595443"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="columngs">
+		<description>Columns GS</description>
+		<year>1991</year>
+		<publisher>Quality Computers</publisher>
+		<info name="release" value="2021-07-02"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
+		<!--"Columns GS" is a 1991 action game developed by Kenrick Mock and James Brookes, and distributed by Quality Computers. It requires a 768K Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296172">
+				<rom name="columns iigs.woz" size="1296172" crc="d812dde7" sha1="069506469e9d558784a0e47cefdf29915d17a807"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopyrm">
+		<description>Snoopy's Reading Machine</description>
+		<year>1990</year>
+		<publisher>American School Publishers</publisher>
+		<info name="release" value="2021-07-02"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1 MB Apple IIgs ROM 01 or later -->
+		<!--"Snoopy's Reading Machine" is a 1990 educational game developed by Susan Mahoney and Associates, and distributed by American School Publishers. It requires a 1 MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296223">
+				<rom name="snoopy's reading machine iigs.woz" size="1296223" crc="4cf5f0b6" sha1="b5a0fa27cd2cb586db45c00034f7b27599f709ed"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
