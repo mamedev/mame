@@ -127,6 +127,8 @@ public:
 private:
 	uint16_t bankedarea_r(offs_t offset);
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t eeprom_r(offs_t offset);
+	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void led_out_w(uint8_t data);
 	void fifo_out_w(uint8_t data);
 	uint8_t via_pa_r();
@@ -237,6 +239,9 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
 
 	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
+
+	// overlaps with SCC but only uses even addresses
+	map(0xc00000, 0xc00400).rw(FUNC(lwriter_state::eeprom_r), FUNC(lwriter_state::eeprom_w)).umask16(0xff00);
 }
 
 static INPUT_PORTS_START( lwriter )
@@ -299,6 +304,36 @@ void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		return;
 	}
 	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+}
+
+uint8_t lwriter_state::eeprom_r(offs_t offset)
+{
+	uint8_t result = 0;
+	// adjust offset to match real hardware mapping
+	switch (offset) {
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83: {
+			uint8_t signature[] = {0x7a, 0x53, 0xda, 0x71};
+			result = signature[offset-0x80];
+			break;
+		}
+		case 0xb0:
+			result = 0x1; // disable printing the test page (dostartpage)
+			break;
+		case 0xf3:
+			result = 0x1; // special switch procedure 1 to invoke executive (58 + 0xb9)
+			break;
+	}
+
+	logerror("eeprom_r! %x %x\n", offset, result);
+	return result;
+}
+
+void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	logerror("eeprom_w! %x %x %x\n", offset, data, mem_mask);
 }
 
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
