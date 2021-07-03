@@ -38,7 +38,8 @@ class voodoo_banshee_device_base : public voodoo_2_device
 public:
 	voodoo_banshee_device_base(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual u16 *draw_buffer_indirect(int index, bool depth_allowed) override;
+	virtual u16 *lfb_buffer_indirect(int index) override;
+	virtual u16 *draw_buffer_indirect(int index) override;
 
 	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
@@ -80,6 +81,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual u32 execute_fifos() override;
+
 	virtual void rotate_buffers() override;
 
 	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
@@ -102,6 +105,8 @@ protected:
 	u32 reg_overbuffer_w(u32 chipmask, u32 regnum, u32 data);
 
 	// internal state
+	voodoo::command_fifo m_cmdfifo2;         // second command FIFO
+
 	u32 m_reg_io[0x40];               // I/O registers
 	u32 m_reg_agp[0x80];              // AGP registers
 	u8 m_reg_vga[0x20];              // VGA registers

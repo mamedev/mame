@@ -42,18 +42,37 @@ using namespace voodoo;
 
 
 
-voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
-	: voodoo_2_device(mconfig, type, tag, owner, clock, model)
+voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+	voodoo_2_device(mconfig, type, tag, owner, clock, model),
+	m_cmdfifo2(*this)
 {
 	for (int index = 0; index < std::size(m_regtable); index++)
 		m_regtable[index].unpack(s_register_table[index], *this);
 }
 
 
-u16 *voodoo_banshee_device_base::draw_buffer_indirect(int index, bool depth_allowed)
+u16 *voodoo_banshee_device_base::lfb_buffer_indirect(int index)
 {
-	// LFB and drawing is confined to the back buffer
+	// LFB access is configured via I/O registers
+	return (u16 *)(m_fbram + m_lfb_base * 4);
+}
+
+u16 *voodoo_banshee_device_base::draw_buffer_indirect(int index)
+{
+	// drawing is confined to the back buffer
 	return back_buffer();
+}
+
+u32 voodoo_banshee_device_base::execute_fifos()
+{
+	// we might be in CMDFIFO mode
+	if (m_cmdfifo.enabled())
+		return m_cmdfifo.execute_if_ready();
+	if (m_cmdfifo2.enabled())
+		return m_cmdfifo2.execute_if_ready();
+
+	// otherwise, run the traditional memory FIFOs
+	return voodoo_1_device::execute_fifos();
 }
 
 
@@ -108,6 +127,9 @@ void voodoo_banshee_device_base::device_start()
 	// start like a Voodoo-2
 	voodoo_2_device::device_start();
 
+	// initialize the second cmdfifo
+	m_cmdfifo2.init(m_fbram, m_fbmask + 1);
+
 	// LFB stride defaualts to 11 on Banshee and later
 	m_lfb_stride = 11;
 
@@ -135,6 +157,7 @@ void voodoo_banshee_device_base::register_save(save_proxy &save, u32 total_alloc
 	voodoo_2_device::register_save(save, total_allocation);
 
 	// Voodoo Banshee stuff
+	save.save_class(NAME(m_cmdfifo2));
 	save.save_item(NAME(m_reg_io));
 	save.save_item(NAME(m_reg_agp));
 	save.save_item(NAME(m_reg_vga));
@@ -233,11 +256,11 @@ u32 voodoo_banshee_device_base::reg_status_r(u32 chipmask, u32 offset)
 	// bit 10 is 2D busy
 
 	// bit 11 is cmd FIFO 0 busy
-	if (m_cmdfifo[0].enabled() && m_cmdfifo[0].depth() > 0)
+	if (m_cmdfifo.enabled() && m_cmdfifo.depth() > 0)
 		result |= 1 << 11;
 
 	// bit 12 is cmd FIFO 1 busy
-	if (m_cmdfifo[1].enabled() && m_cmdfifo[1].depth() > 0)
+	if (m_cmdfifo2.enabled() && m_cmdfifo2.depth() > 0)
 		result |= 1 << 12;
 
 	// bits 30:28 are the number of pending swaps
@@ -375,43 +398,43 @@ u32 voodoo_banshee_device_base::banshee_agp_r(offs_t offset)
 	switch (offset)
 	{
 		case cmdRdPtrL0:
-			result = m_cmdfifo[0].read_pointer();
+			result = m_cmdfifo.read_pointer();
 			break;
 
 		case cmdAMin0:
-			result = m_cmdfifo[0].address_min();
+			result = m_cmdfifo.address_min();
 			break;
 
 		case cmdAMax0:
-			result = m_cmdfifo[0].address_max();
+			result = m_cmdfifo.address_max();
 			break;
 
 		case cmdFifoDepth0:
-			result = m_cmdfifo[0].depth();
+			result = m_cmdfifo.depth();
 			break;
 
 		case cmdHoleCnt0:
-			result = m_cmdfifo[0].holes();
+			result = m_cmdfifo.holes();
 			break;
 
 		case cmdRdPtrL1:
-			result = m_cmdfifo[1].read_pointer();
+			result = m_cmdfifo2.read_pointer();
 			break;
 
 		case cmdAMin1:
-			result = m_cmdfifo[1].address_min();
+			result = m_cmdfifo2.address_min();
 			break;
 
 		case cmdAMax1:
-			result = m_cmdfifo[1].address_max();
+			result = m_cmdfifo2.address_max();
 			break;
 
 		case cmdFifoDepth1:
-			result = m_cmdfifo[1].depth();
+			result = m_cmdfifo2.depth();
 			break;
 
 		case cmdHoleCnt1:
-			result = m_cmdfifo[1].holes();
+			result = m_cmdfifo2.holes();
 			break;
 
 		default:
@@ -445,7 +468,7 @@ u32 voodoo_banshee_device_base::banshee_fb_r(offs_t offset)
 	else {
 		if (LOG_LFB)
 			logerror("%s:banshee_fb_r(%X) to lfb_r: %08X lfb_base=%08X\n", machine().describe_context(), offset*4, offset - m_lfb_base, m_lfb_base);
-		result = lfb_r(offset - m_lfb_base, false);
+		result = lfb_r(offset - m_lfb_base);
 	}
 	return result;
 }
@@ -839,74 +862,74 @@ void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_
 	{
 		case cmdBaseAddr0:
 			COMBINE_DATA(&m_reg_agp[offset]);
-			m_cmdfifo[0].set_base(BIT(data, 0, 24) << 12);
-			m_cmdfifo[0].set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_cmdfifo.set_base(BIT(data, 0, 24) << 12);
+			m_cmdfifo.set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize0:
 			COMBINE_DATA(&m_reg_agp[offset]);
-			m_cmdfifo[0].set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
-			m_cmdfifo[0].set_enable(BIT(data, 8));
-			m_cmdfifo[0].set_count_holes(!BIT(data, 10));
+			m_cmdfifo.set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_cmdfifo.set_enable(BIT(data, 8));
+			m_cmdfifo.set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump0:
 			fatalerror("cmdBump0\n");
 
 		case cmdRdPtrL0:
-			m_cmdfifo[0].set_read_pointer(data);
+			m_cmdfifo.set_read_pointer(data);
 			break;
 
 		case cmdAMin0:
-			m_cmdfifo[0].set_address_min(data);
+			m_cmdfifo.set_address_min(data);
 			break;
 
 		case cmdAMax0:
-			m_cmdfifo[0].set_address_max(data);
+			m_cmdfifo.set_address_max(data);
 			break;
 
 		case cmdFifoDepth0:
-			m_cmdfifo[0].set_depth(data);
+			m_cmdfifo.set_depth(data);
 			break;
 
 		case cmdHoleCnt0:
-			m_cmdfifo[0].set_holes(data);
+			m_cmdfifo.set_holes(data);
 			break;
 
 		case cmdBaseAddr1:
 			COMBINE_DATA(&m_reg_agp[offset]);
-			m_cmdfifo[1].set_base(BIT(data, 0, 24) << 12);
-			m_cmdfifo[1].set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_cmdfifo2.set_base(BIT(data, 0, 24) << 12);
+			m_cmdfifo2.set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize1:
 			COMBINE_DATA(&m_reg_agp[offset]);
-			m_cmdfifo[1].set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
-			m_cmdfifo[1].set_enable(BIT(data, 8));
-			m_cmdfifo[1].set_count_holes(!BIT(data, 10));
+			m_cmdfifo2.set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_cmdfifo2.set_enable(BIT(data, 8));
+			m_cmdfifo2.set_count_holes(!BIT(data, 10));
 			break;
 
 		case cmdBump1:
 			fatalerror("cmdBump1\n");
 
 		case cmdRdPtrL1:
-			m_cmdfifo[1].set_read_pointer(data);
+			m_cmdfifo2.set_read_pointer(data);
 			break;
 
 		case cmdAMin1:
-			m_cmdfifo[1].set_address_min(data);
+			m_cmdfifo2.set_address_min(data);
 			break;
 
 		case cmdAMax1:
-			m_cmdfifo[1].set_address_max(data);
+			m_cmdfifo2.set_address_max(data);
 			break;
 
 		case cmdFifoDepth1:
-			m_cmdfifo[1].set_depth(data);
+			m_cmdfifo2.set_depth(data);
 			break;
 
 		case cmdHoleCnt1:
-			m_cmdfifo[1].set_holes(data);
+			m_cmdfifo2.set_holes(data);
 			break;
 
 		default:
@@ -930,7 +953,7 @@ void voodoo_banshee_device_base::banshee_fb_w(offs_t offset, u32 data, u32 mem_m
 
 	if (offset < m_lfb_base)
 	{
-		if (!m_cmdfifo[0].write_if_in_range(addr, data) && !m_cmdfifo[1].write_if_in_range(addr, data))
+		if (!m_cmdfifo.write_if_in_range(addr, data) && !m_cmdfifo2.write_if_in_range(addr, data))
 		{
 			if (offset*4 <= m_fbmask)
 				COMBINE_DATA(&((u32 *)m_fbram)[offset]);

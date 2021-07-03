@@ -425,6 +425,23 @@ protected:
 	void soft_reset();
 	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation);
 
+	// buffer accessors
+	virtual u16 *draw_buffer_indirect(int index);
+	virtual u16 *lfb_buffer_indirect(int index);
+	u16 *draw_buffer(int index) const { return (u16 *)(m_fbram + m_rgboffs[index]); }
+	u16 *front_buffer() const { return draw_buffer(m_frontbuf); }
+	u16 *back_buffer() const { return draw_buffer(m_backbuf); }
+	u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_fbram + m_auxoffs) : nullptr; }
+	u16 *ram_end() const { return (u16 *)(m_fbram + m_fbmask + 1); }
+
+	// read/write and FIFO helpers
+	void prepare_for_read();
+	bool prepare_for_write();
+	void recompute_fbmem_fifo();
+	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
+	void flush_fifos(attotime current_time);
+	virtual u32 execute_fifos();
+
 	// mapped reads
 	u32 map_register_r(offs_t offset);
 	u32 map_lfb_r(offs_t offset);
@@ -435,8 +452,9 @@ protected:
 	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// reads and writes
-	u32 lfb_r(offs_t offset, bool lfb_3d);
+	u32 lfb_r(offs_t offset);
 	void lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 expand_lfb_data(voodoo::reg_lfb_mode const lfbmode, u32 data, rgb_t src_color[2], u16 src_depth[2]);
 	virtual void texture_w(offs_t offset, u32 data);
 
 	// register read accessors
@@ -505,21 +523,6 @@ protected:
 	void accumulate_statistics(const voodoo::thread_stats_block &block);
 	void update_statistics(bool accumulate);
 	void reset_counters();
-
-	// buffer accessors
-	virtual u16 *draw_buffer_indirect(int index, bool depth_allowed);
-	u16 *draw_buffer(int index) const { return (u16 *)(m_fbram + m_rgboffs[index]); }
-	u16 *front_buffer() const { return draw_buffer(m_frontbuf); }
-	u16 *back_buffer() const { return draw_buffer(m_backbuf); }
-	u16 *aux_buffer() const { return (m_auxoffs != ~0) ? (u16 *)(m_fbram + m_auxoffs) : nullptr; }
-	u16 *ram_end() const { return (u16 *)(m_fbram + m_fbmask + 1); }
-
-	// read/write and FIFO helpers
-	void prepare_for_read();
-	bool prepare_for_write();
-	void recompute_fbmem_fifo();
-	void add_to_fifo(u32 offset, u32 data, u32 mem_mask);
-	virtual void flush_fifos(attotime current_time);
 
 	// stall management
 	bool operation_pending() const { return !m_operation_end.is_zero(); }
@@ -659,7 +662,7 @@ public:
 	void set_holes(u32 holes) { m_holes = holes; }
 
 	// operations
-	s32 execute_if_ready();
+	u32 execute_if_ready();
 
 	// write to the FIFO if within the address range
 	bool write_if_in_range(offs_t addr, u32 data)
@@ -790,7 +793,7 @@ protected:
 	// system management
 	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
 
-	virtual void flush_fifos(attotime current_time) override;
+	virtual u32 execute_fifos() override;
 
 	virtual void recompute_video_memory() override;
 
@@ -827,7 +830,7 @@ protected:
 	// Voodoo 2 stuff
 	u8 m_sverts = 0;                         // number of vertices ready
 	voodoo::setup_vertex m_svert[3];         // 3 setup vertices
-	voodoo::command_fifo m_cmdfifo[2];       // command FIFOs
+	voodoo::command_fifo m_cmdfifo;          // command FIFO
 #if USE_MEMORY_VIEWS
 	memory_view m_regview;                   // switchable register view
 #endif

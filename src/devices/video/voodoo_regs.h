@@ -22,10 +22,16 @@ namespace voodoo
 //**************************************************************************
 
 // flags for LFB writes
-static constexpr u8 LFB_RGB_PRESENT       = 1;
-static constexpr u8 LFB_ALPHA_PRESENT     = 2;
-static constexpr u8 LFB_DEPTH_PRESENT     = 4;
-static constexpr u8 LFB_DEPTH_PRESENT_MSW = 8;
+static constexpr u8 LFB_RGB_PRESENT_0       = 0x01;
+static constexpr u8 LFB_ALPHA_PRESENT_0     = 0x02;
+static constexpr u8 LFB_DEPTH_PRESENT_0     = 0x04;
+static constexpr u8 LFB_DEPTH_PRESENT_MSW_0 = 0x08;
+static constexpr u8 LFB_PIXEL0_MASK         = 0x0f;
+
+static constexpr u8 LFB_RGB_PRESENT_1       = 0x10;
+static constexpr u8 LFB_ALPHA_PRESENT_1     = 0x20;
+static constexpr u8 LFB_DEPTH_PRESENT_1     = 0x40;
+static constexpr u8 LFB_PIXEL1_MASK         = 0x70;
 
 
 //**************************************************************************

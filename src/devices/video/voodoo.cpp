@@ -1046,70 +1046,27 @@ void voodoo_1_device::device_post_load()
 }
 
 
+//-------------------------------------------------
+//  soft_reset - handle reset when initiated by
+//  a register write
+//-------------------------------------------------
 
-u16 *voodoo_1_device::draw_buffer_indirect(int index, bool depth_allowed)
+void voodoo_1_device::soft_reset()
 {
-	switch (index)
-	{
-		case 0:	m_video_changed = true; return front_buffer();
-		case 1:	return back_buffer();
-		case 2: return depth_allowed ? aux_buffer() : nullptr;
-		default: return nullptr;
-	}
+	reset_counters();
+	m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
+	m_pci_fifo.reset();
+	m_fbmem_fifo.reset();
 }
 
 
+//-------------------------------------------------
+//  register_save - register items for save states
+//-------------------------------------------------
 
-
-int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
-{
-	// reset the video changed flag
-	bool changed = m_video_changed;
-	m_video_changed = false;
-
-	// select the buffer to draw
-	int drawbuf = m_frontbuf;
-	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
-		drawbuf = m_backbuf;
-
-	// copy from the current front buffer
-	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
-	u32 rowpixels = m_renderer->rowpixels();
-	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		if (y < m_yoffs)
-			continue;
-		u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * rowpixels - m_xoffs;
-		u32 *dst = &bitmap.pix(y);
-		for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
-			dst[x] = pens[src[x]];
-	}
-
-	// update stats display
-	if (DEBUG_STATS && m_stats.update_display_state(machine().input().code_pressed(KEYCODE_BACKSLASH)))
-		popmessage(m_stats.string(), 0, 0);
-
-	// overwrite with the depth buffer if debugging and the ENTER key is pressed
-	if (DEBUG_DEPTH && machine().input().code_pressed(KEYCODE_ENTER))
-		for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
-			u32 *const dst = &bitmap.pix(y);
-			for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
-		}
-
-	return changed;
-}
-
-
-
-
-
-
+ALLOW_SAVE_TYPE(reg_init_en);
+ALLOW_SAVE_TYPE(voodoo_regs::register_data);
 ALLOW_SAVE_TYPE(voodoo_1_device::stall_state);
-ALLOW_SAVE_TYPE(voodoo::reg_init_en);
-ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
 
 void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
 {
@@ -1163,6 +1120,873 @@ void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
 	// pens and CLUT
 	save.save_item(NAME(m_clut));
 }
+
+
+//-------------------------------------------------
+//  draw_buffer_indirect - given a 2-bit index,
+//  return the front/back buffer for drawing
+//-------------------------------------------------
+
+u16 *voodoo_1_device::draw_buffer_indirect(int index)
+{
+	switch (index)
+	{
+		case 0:	m_video_changed = true; return front_buffer();
+		case 1:	return back_buffer();
+		default: return nullptr;
+	}
+}
+
+
+//-------------------------------------------------
+//  lfb_buffer_indirect - given a 2-bit index,
+//  return the front/back/depth buffer for LFB
+//  access
+//-------------------------------------------------
+
+u16 *voodoo_1_device::lfb_buffer_indirect(int index)
+{
+	switch (index)
+	{
+		case 0:	m_video_changed = true; return front_buffer();
+		case 1:	return back_buffer();
+		case 2: return aux_buffer();
+		default: return nullptr;
+	}
+}
+
+
+//-------------------------------------------------
+//  prepare_for_read - handle housekeeping before
+//  processing a direct PCI read
+//-------------------------------------------------
+
+void voodoo_1_device::prepare_for_read()
+{
+	// if we have something pending, flush the FIFOs up to the current time
+	if (operation_pending())
+		flush_fifos(machine().time());
+}
+
+
+//-------------------------------------------------
+//  prepare_for_write - handle housekeeping before
+//  processing a direct PCI write
+//-------------------------------------------------
+
+bool voodoo_1_device::prepare_for_write()
+{
+	// should not be getting accesses while stalled (but we do)
+	if (m_stall_state != NOT_STALLED)
+		logerror("voodoo_1_device::write while stalled!\n");
+
+	// if we have something pending, flush the FIFOs up to the current time
+	bool pending = operation_pending();
+	if (pending)
+	{
+		flush_fifos(machine().time());
+		pending = operation_pending();
+	}
+	return pending;
+}
+
+
+//-------------------------------------------------
+//  recompute_fbmem_fifo - recompute and configure
+//  the framebuffer RAM-based FIFO based on the
+//  fbiInit registers
+//-------------------------------------------------
+
+void voodoo_1_device::recompute_fbmem_fifo()
+{
+	// compute the memory FIFO location and size
+	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
+	if (fifo_last_page > m_fbmask / 0x1000)
+		fifo_last_page = m_fbmask / 0x1000;
+
+	// is it valid and enabled?
+	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
+	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
+	{
+		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
+		m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
+	}
+
+	// if not, disable the FIFO
+	else
+		m_fbmem_fifo.configure(nullptr, 0);
+}
+
+
+//-------------------------------------------------
+//  add_to_fifo - add a write to the PCI FIFO,
+//  spilling to the memory FIFO as configured
+//-------------------------------------------------
+
+void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
+{
+	// add flags to the offset based on the mem_mask
+	if (!ACCESSING_BITS_16_31)
+		offset |= memory_fifo::NO_16_31;
+	if (!ACCESSING_BITS_0_15)
+		offset |= memory_fifo::NO_0_15;
+
+	// if there's room in the PCI FIFO, add there
+	if (LOG_FIFO_VERBOSE)
+		logerror("VOODOO.%d.FIFO:adding to PCI FIFO @ %08X=%08X\n", this, offset, data);
+	if (m_pci_fifo.full())
+		fatalerror("PCI FIFO full\n");
+
+	// add as offset/data pair
+	m_pci_fifo.add(offset);
+	m_pci_fifo.add(data);
+
+	// handle flushing to the memory FIFO
+	if (m_reg.fbi_init0().enable_memory_fifo() && m_pci_fifo.space() <= 2 * m_reg.fbi_init4().memory_fifo_lwm())
+	{
+		u8 valid[4];
+
+		// determine which types of data can go to the memory FIFO
+		valid[0] = true;
+		valid[1] = m_reg.fbi_init0().lfb_to_memory_fifo();
+		valid[2] = valid[3] = m_reg.fbi_init0().texmem_to_memory_fifo();
+
+		// flush everything we can
+		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:moving PCI FIFO to memory FIFO\n");
+		while (!m_pci_fifo.empty() && valid[(m_pci_fifo.peek() >> 22) & 3])
+		{
+			m_fbmem_fifo.add(m_pci_fifo.remove());
+			m_fbmem_fifo.add(m_pci_fifo.remove());
+		}
+
+		// if we're above the HWM as a result, stall
+		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbmem_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+		{
+			if (LOG_FIFO) logerror("VOODOO.FIFO:hit memory FIFO HWM -- stalling\n");
+			stall_cpu(STALLED_UNTIL_FIFO_LWM);
+		}
+	}
+
+	// if we're at the LWM for the PCI FIFO, stall
+	if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_pci_fifo.space() <= 2 * m_reg.fbi_init0().pci_fifo_lwm())
+	{
+		if (LOG_FIFO) logerror("VOODOO.FIFO:hit PCI FIFO free LWM -- stalling\n");
+		stall_cpu(STALLED_UNTIL_FIFO_LWM);
+	}
+}
+
+
+//-------------------------------------------------
+//  flush_fifos - flush data out of FIFOs up to
+//  the current time
+//-------------------------------------------------
+
+void voodoo_1_device::flush_fifos(attotime current_time)
+{
+	// check for recursive calls
+	if (m_flush_flag)
+		return;
+	m_flush_flag = true;
+
+	// should only be called if something is pending
+	if (!operation_pending())
+		fatalerror("flush_fifos called with no pending operation\n");
+
+	if (LOG_FIFO_VERBOSE)
+		logerror("VOODOO.FIFO:flush_fifos start -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
+
+	// loop while we still have cycles to burn
+	while (m_operation_end <= current_time)
+	{
+		// execute from the FIFOs until we get something that's non-zero
+		u32 cycles = execute_fifos();
+
+		// if nothing remains, we're done; clear the flags
+		if (cycles == 0)
+		{
+			clear_pending_operation();
+			if (LOG_FIFO_VERBOSE)
+				logerror("VOODOO.FIFO:flush_fifos end -- FIFOs empty\n");
+			m_flush_flag = false;
+			return;
+		}
+
+		// account for those cycles
+		m_operation_end += clocks_to_attotime(cycles);
+
+		if (LOG_FIFO_VERBOSE)
+			logerror("VOODOO.FIFO:update -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
+	}
+
+	if (LOG_FIFO_VERBOSE)
+		logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %s\n", m_operation_end.as_string(18));
+
+	m_flush_flag = false;
+}
+
+
+//-------------------------------------------------
+//  execute_fifos - execute commands from the FIFOs
+//  until a non-zero cycle count operation is run
+//-------------------------------------------------
+
+u32 voodoo_1_device::execute_fifos()
+{
+	// loop until FIFOs are empty or until we get a non-zero cycle count
+	while (1)
+	{
+		// prioritize framebuffer FIFO over PCI FIFO
+		voodoo::memory_fifo &memfifo = !m_fbmem_fifo.empty() ? m_fbmem_fifo : m_pci_fifo;
+
+		// if empty, return 0
+		if (memfifo.empty())
+			return 0;
+
+		// extract address and data
+		u32 offset = memfifo.remove();
+		u32 data = memfifo.remove();
+
+		// target the appropriate location
+		switch (offset & memory_fifo::TYPE_MASK)
+		{
+			case memory_fifo::TYPE_REGISTER:
+			{
+				// just use the chipmask raw since it was adjusted prior to being added to the FIFO
+				u32 regnum = BIT(offset, 0, 8);
+				u32 chipmask = BIT(offset, 8, 4);
+
+				// if we got a non-zero number of cycles back, return
+				u32 cycles = m_regtable[regnum].write(*this, chipmask, regnum, data);
+				if (cycles > 0)
+					return cycles;
+				break;
+			}
+
+			case memory_fifo::TYPE_TEXTURE:
+				texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
+				break;
+
+			case memory_fifo::TYPE_LFB:
+			{
+				u32 mem_mask = 0xffffffff;
+				if (offset & memory_fifo::NO_16_31)
+					mem_mask &= 0x0000ffff;
+				if (offset & memory_fifo::NO_0_15)
+					mem_mask &= 0xffff0000;
+				lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
+				break;
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  map_register_r - handle a mapped read from
+//  regular register space
+//-------------------------------------------------
+
+u32 voodoo_1_device::map_register_r(offs_t offset)
+{
+	prepare_for_read();
+
+	// extract chipmask and register
+	u32 chipmask = chipmask_from_offset(offset);
+	u32 regnum = BIT(offset, 0, 8);
+	return m_regtable[regnum].read(*this, chipmask, regnum);
+}
+
+
+//-------------------------------------------------
+//  map_lfb_r - handle a mapped read from LFB space
+//-------------------------------------------------
+
+u32 voodoo_1_device::map_lfb_r(offs_t offset)
+{
+	prepare_for_read();
+	return lfb_r(offset);
+}
+
+
+//-------------------------------------------------
+//  map_register_w - handle a mapped write to
+//  regular register space
+//-------------------------------------------------
+
+void voodoo_1_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	bool pending = prepare_for_write();
+
+	// extract chipmask and register
+	u32 chipmask = chipmask_from_offset(offset);
+	u32 regnum = BIT(offset, 0, 8);
+
+	// handle register swizzling -- manual says bit 21; voodoo2 manual says bit 20
+	// guessing it does not overlap with the alternate register mapping bit
+	if (BIT(offset, 20-2) && m_reg.fbi_init0().swizzle_reg_writes())
+		data = swapendian_int32(data);
+
+	// handle aliasing
+	if (BIT(offset, 21-2) && m_reg.fbi_init3().tri_register_remap())
+		regnum = voodoo_regs::alias(regnum);
+
+	// look up the register
+	auto const &regentry = m_regtable[regnum];
+
+	// track swap buffer commands seen
+	if (regnum == voodoo_regs::reg_swapbufferCMD)
+		m_swaps_pending++;
+
+	// if this is non-FIFO command, execute immediately
+	if (!regentry.is_fifo())
+		return void(regentry.write(*this, chipmask, regnum, data));
+
+	// if we're busy add to the FIFO
+	if (pending && m_init_enable.enable_pci_fifo())
+		return add_to_fifo(memory_fifo::TYPE_REGISTER | (chipmask << 8) | regnum, data, mem_mask);
+
+	// if we get a non-zero number of cycles back, mark things pending
+	u32 cycles = regentry.write(*this, chipmask, regnum, data);
+	if (cycles > 0)
+	{
+		m_operation_end = machine().time() + clocks_to_attotime(cycles);
+		if (LOG_FIFO_VERBOSE)
+			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
+	}
+}
+
+
+//-------------------------------------------------
+//  map_lfb_w - handle a mapped write to LFB space
+//-------------------------------------------------
+
+void voodoo_1_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// if we're busy add to the FIFO, else just execute immediately
+	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
+		add_to_fifo(memory_fifo::TYPE_LFB | offset, data, mem_mask);
+	else
+		lfb_w(offset, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  map_texture_w - handle a mapped write to
+//  texture space
+//-------------------------------------------------
+
+void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// if we're busy add to the FIFO, else just execute immediately
+	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
+		add_to_fifo(memory_fifo::TYPE_TEXTURE | offset, data, mem_mask);
+	else
+		texture_w(offset, data);
+}
+
+
+//-------------------------------------------------
+//  lfb_r - handle a read from the linear frame
+//  buffer
+//-------------------------------------------------
+
+u32 voodoo_1_device::lfb_r(offs_t offset)
+{
+	// statistics
+	if (DEBUG_STATS)
+		m_stats.m_lfb_reads++;
+
+	// linear frame buffer reads are inherently 16-bit; convert offset to an pixel index
+	offset <<= 1;
+
+	// convert offset into X/Y coordinates
+	s32 x = offset & ((1 << m_lfb_stride) - 1);
+	s32 y = offset >> m_lfb_stride;
+	s32 scry = y;
+
+	// effective Y is determined by the Y origin bit
+	scry &= 0x3ff;
+	auto const lfbmode = m_reg.lfb_mode();
+	if (lfbmode.y_origin())
+		scry = m_renderer->yorigin() - scry;
+
+	// select the target buffer
+	u16 *buffer = lfb_buffer_indirect(lfbmode.read_buffer_select());
+	if (buffer == nullptr)
+		return 0xffffffff;
+
+	// advance pointers to the proper row
+	buffer += scry * m_renderer->rowpixels() + x;
+	if (buffer + 1 >= ram_end())
+	{
+		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X\n", x, y, offset, u32(buffer - lfb_buffer_indirect(lfbmode.read_buffer_select())));
+		return 0xffffffff;
+	}
+
+	// wait for any outstanding work to finish before reading
+	m_renderer->wait("LFB read");
+
+	// read and assemble two pixels
+	u32 data = buffer[0] | (buffer[1] << 16);
+
+	// word swapping
+	if (lfbmode.word_swap_reads())
+		data = (data << 16) | (data >> 16);
+
+	// byte swizzling
+	if (lfbmode.byte_swizzle_reads())
+		data = swapendian_int32(data);
+
+	if (LOG_LFB)
+		logerror("VOODOO.LFB:read (%d,%d) = %08X\n", x, y, data);
+	return data;
+}
+
+
+//-------------------------------------------------
+//  lfb_w - handle a write to the linear frame
+//  buffer
+//-------------------------------------------------
+
+void voodoo_1_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// statistics
+	if (DEBUG_STATS)
+		m_stats.m_lfb_writes++;
+
+	// byte swizzling
+	auto const lfbmode = m_reg.lfb_mode();
+	if (lfbmode.byte_swizzle_writes())
+	{
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
+	}
+
+	// word swapping
+	if (lfbmode.word_swap_writes())
+	{
+		data = (data << 16) | (data >> 16);
+		mem_mask = (mem_mask << 16) | (mem_mask >> 16);
+	}
+
+	// convert the incoming data
+	rgb_t src_color[2];
+	u16 src_depth[2];
+	u32 mask = expand_lfb_data(lfbmode, data, src_color, src_depth);
+
+	// if there are two pixels, then the offset is *2
+	if ((mask & LFB_PIXEL1_MASK) != 0)
+		offset <<= 1;
+
+	// compute X,Y
+	s32 x = offset & ((1 << m_lfb_stride) - 1);
+	s32 y = (offset >> m_lfb_stride) & 0x3ff;
+
+	// adjust the mask based on which half of the data is written
+	if (!ACCESSING_BITS_0_15)
+		mask &= ~(LFB_PIXEL0_MASK - LFB_DEPTH_PRESENT_MSW_0);
+	if (!ACCESSING_BITS_16_31)
+		mask &= ~(LFB_PIXEL1_MASK + LFB_DEPTH_PRESENT_MSW_0);
+
+	// select the target buffers
+	u16 *dest = draw_buffer_indirect(lfbmode.write_buffer_select());
+	if (dest == nullptr)
+		return;
+	u16 *depth = aux_buffer();
+	u16 *end = ram_end();
+
+	// simple case: no pipeline
+	auto const fbzmode = m_reg.fbz_mode();
+	if (!lfbmode.enable_pixel_pipeline())
+	{
+		if (LOG_LFB)
+			logerror("VOODOO.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
+
+		// determine the screen Y
+		s32 scry = y;
+		if (lfbmode.y_origin())
+			scry = m_renderer->yorigin() - y;
+
+		// advance pointers to the proper row
+		dest += scry * m_renderer->rowpixels() + x;
+		if (depth != nullptr)
+			depth += scry * m_renderer->rowpixels() + x;
+
+		// wait for any outstanding work to finish
+		m_renderer->wait("LFB Write");
+
+		// loop over up to two pixels
+		voodoo::dither_helper dither(scry, fbzmode);
+		for (int pix = 0; mask != 0; pix++)
+		{
+			// make sure we care about this pixel
+			if ((mask & LFB_PIXEL0_MASK) != 0)
+			{
+				// write to the RGB buffer
+				rgb_t pixel = src_color[pix];
+				if ((mask & LFB_RGB_PRESENT_0) != 0 && dest + pix < end)
+					dest[pix] = dither.pixel(x, pixel.r(), pixel.g(), pixel.b());
+
+				// make sure we have an aux buffer to write to
+				if (depth != nullptr && depth + pix < end)
+				{
+					if (fbzmode.enable_alpha_planes())
+					{
+						// write to the alpha buffer
+						if ((mask & LFB_ALPHA_PRESENT_0) != 0)
+							depth[pix] = pixel.a();
+					}
+					else
+					{
+						// write to the depth buffer
+						if ((mask & (LFB_DEPTH_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0)) != 0)
+							depth[pix] = src_depth[pix];
+					}
+				}
+
+				// track pixel writes to the frame buffer regardless of mask
+				m_reg.add(voodoo_regs::reg_fbiPixelsOut, 1);
+			}
+
+			// advance our pointers
+			x++;
+			mask >>= 4;
+		}
+	}
+
+	// tricky case: run the full pixel pipeline on the pixel
+	else
+	{
+		if (LOG_LFB)
+			logerror("VOODOO.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
+
+		// determine the screen Y
+		s32 scry = y;
+		if (fbzmode.y_origin())
+			scry = m_renderer->yorigin() - y;
+
+		// advance pointers to the proper row
+		dest += scry * m_renderer->rowpixels();
+		if (depth != nullptr)
+			depth += scry * m_renderer->rowpixels();
+
+		// make a dummy poly_extra_data structure with some cached values
+		poly_data poly;
+		poly.raster.compute(m_reg, nullptr, nullptr);
+		poly.destbase = dest;
+		poly.depthbase = depth;
+		poly.clipleft = m_reg.clip_left();
+		poly.clipright = m_reg.clip_right();
+		poly.cliptop = m_reg.clip_top();
+		poly.clipbottom = m_reg.clip_bottom();
+		poly.color0 = m_reg.color0().argb();
+		poly.color1 = m_reg.color1().argb();
+		poly.chromakey = m_reg.chroma_key().argb();
+		poly.fogcolor = m_reg.fog_color().argb();
+		poly.zacolor = m_reg.za_color();
+		poly.stipple = m_reg.stipple();
+		poly.alpharef = m_reg.alpha_mode().alpharef();
+		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
+			printf("Warning: rotated stipple pattern\n");
+
+		// loop over up to two pixels
+		thread_stats_block &threadstats = m_lfb_stats;
+		rgbaint_t iterargb(0);
+		for (int pix = 0; mask != 0; pix++)
+		{
+			// make sure we care about this pixel
+			if ((mask & LFB_PIXEL0_MASK) != 0)
+				m_renderer->pixel_pipeline(threadstats, poly, lfbmode, x, y, src_color[pix], src_depth[pix]);
+
+			// advance our pointers
+			x++;
+			mask >>= 4;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  expand_lfb_data - expand a 32-bit raw data
+//  value into 1 or 2 expanded RGBA and depth
+//  values
+//-------------------------------------------------
+
+u32 voodoo_1_device::expand_lfb_data(reg_lfb_mode const lfbmode, u32 data, rgb_t src_color[2], u16 src_depth[2])
+{
+	// extract default depth value from low bits of zaColor
+	src_depth[0] = src_depth[1] = m_reg.za_color() & 0xffff;
+
+	// if not otherwise specified, alpha defaults to the upper bits of zaColor
+	u32 src_alpha = m_reg.za_color() >> 24;
+
+	// extract color information from the data
+	switch (16 * lfbmode.rgba_lanes() + lfbmode.write_format())
+	{
+		case 16*0 + 0:      // ARGB, format 0: 16-bit RGB 5-6-5
+		case 16*2 + 0:      // RGBA, format 0: 16-bit RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,6,5>(data, 27, 21, 16).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*1 + 0:      // ABGR, format 0: 16-bit RGB 5-6-5
+		case 16*3 + 0:      // BGRA, format 0: 16-bit RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,6,5>(data, 16, 21, 27).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*0 + 1:      // ARGB, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 26, 21, 16).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*1 + 1:      // ABGR, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 16, 21, 26).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*2 + 1:      // RGBA, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 27, 22, 17).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*3 + 1:      // BGRA, format 1: 16-bit RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
+			src_color[1] = rgbexpand<5,5,5>(data, 17, 22, 27).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0 | LFB_RGB_PRESENT_1;
+
+		case 16*0 + 2:      // ARGB, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
+			src_color[1] = argbexpand<1,5,5,5>(data, 31, 26, 21, 16);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_RGB_PRESENT_1 | LFB_ALPHA_PRESENT_1;
+
+		case 16*1 + 2:      // ABGR, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
+			src_color[1] = argbexpand<1,5,5,5>(data, 31, 16, 21, 26);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_RGB_PRESENT_1 | LFB_ALPHA_PRESENT_1;
+
+		case 16*2 + 2:      // RGBA, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
+			src_color[1] = argbexpand<1,5,5,5>(data, 16, 27, 22, 17);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_RGB_PRESENT_1 | LFB_ALPHA_PRESENT_1;
+
+		case 16*3 + 2:      // BGRA, format 2: 16-bit ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
+			src_color[1] = argbexpand<1,5,5,5>(data, 16, 17, 22, 27);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_RGB_PRESENT_1 | LFB_ALPHA_PRESENT_1;
+
+		case 16*0 + 4:      // ARGB, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data, 16,  8,  0).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0;
+
+		case 16*1 + 4:      // ABGR, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data,  0,  8, 16).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0;
+
+		case 16*2 + 4:      // RGBA, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data, 24, 16,  8).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0;
+
+		case 16*3 + 4:      // BGRA, format 4: 32-bit RGB x-8-8-8
+			src_color[0] = rgbexpand<8,8,8>(data,  8, 16, 24).set_a(src_alpha);
+			return LFB_RGB_PRESENT_0;
+
+		case 16*0 + 5:      // ARGB, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data, 24, 16,  8,  0);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0;
+
+		case 16*1 + 5:      // ABGR, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data, 24,  0,  8, 16);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0;
+
+		case 16*2 + 5:      // RGBA, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data,  0, 24, 16,  8);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0;
+
+		case 16*3 + 5:      // BGRA, format 5: 32-bit ARGB 8-8-8-8
+			src_color[0] = argbexpand<8,8,8,8>(data,  0,  8, 16, 24);
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0;
+
+		case 16*0 + 12:     // ARGB, format 12: 32-bit depth+RGB 5-6-5
+		case 16*2 + 12:     // RGBA, format 12: 32-bit depth+RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*1 + 12:     // ABGR, format 12: 32-bit depth+RGB 5-6-5
+		case 16*3 + 12:     // BGRA, format 12: 32-bit depth+RGB 5-6-5
+			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*0 + 13:     // ARGB, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*1 + 13:     // ABGR, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*2 + 13:     // RGBA, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*3 + 13:     // BGRA, format 13: 32-bit depth+RGB x-5-5-5
+			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*0 + 14:     // ARGB, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*1 + 14:     // ABGR, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*2 + 14:     // RGBA, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*3 + 14:     // BGRA, format 14: 32-bit depth+ARGB 1-5-5-5
+			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
+			src_depth[0] = data >> 16;
+			return LFB_RGB_PRESENT_0 | LFB_ALPHA_PRESENT_0 | LFB_DEPTH_PRESENT_MSW_0;
+
+		case 16*0 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*1 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*2 + 15:     // ARGB, format 15: 16-bit depth
+		case 16*3 + 15:     // ARGB, format 15: 16-bit depth
+			src_depth[0] = data & 0xffff;
+			src_depth[1] = data >> 16;
+			return LFB_DEPTH_PRESENT_0 | LFB_DEPTH_PRESENT_1;
+
+		default:            // reserved
+			logerror("lfb_w: Unknown format\n");
+			return 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  texture_w - handle writes to texture RAM
+//-------------------------------------------------
+
+void voodoo_1_device::texture_w(offs_t offset, u32 data)
+{
+	// statistics
+	if (DEBUG_STATS)
+		m_stats.m_tex_writes++;
+
+	// point to the right TMU
+	int tmunum = BIT(offset, 19, 2);
+	if (!BIT(m_chipmask, 1 + tmunum))
+		return;
+
+	// wait for any outstanding work to finish
+	m_renderer->wait("Texture write");
+
+	// the seq_8_downld flag seems to always come from TMU #0
+	bool seq_8_downld = m_tmu[0].regs().texture_mode().seq_8_downld();
+
+	// pull out modes from the TMU and update state
+	auto &regs = m_tmu[tmunum].regs();
+	auto const texlod = regs.texture_lod();
+	auto const texmode = regs.texture_mode();
+	auto &texture = m_tmu[tmunum].prepare_texture(*m_renderer.get());
+
+	// texture direct not handled (but never seen so far)
+	if (texlod.tdirect_write())
+		fatalerror("Texture direct write!\n");
+
+	// swizzle the data
+	if (texlod.tdata_swizzle())
+		data = swapendian_int32(data);
+	if (texlod.tdata_swap())
+		data = (data >> 16) | (data << 16);
+
+	// determine destination pointer
+	u32 bytes_per_texel = (texmode.format() < 8) ? 1 : 2;
+	u32 lod = BIT(offset, 15, 4);
+	u32 tt = BIT(offset, 7, 8);
+	u32 ts = (offset << ((seq_8_downld && bytes_per_texel == 1) ? 2 : 1)) & 0xff;
+
+	// validate parameters
+	if (lod > 8)
+		return;
+	u8 *dest = texture.write_ptr(lod, ts, tt, bytes_per_texel);
+
+	// write the four bytes in little-endian order
+	if (bytes_per_texel == 1)
+	{
+		dest[BYTE4_XOR_LE(0)] = (data >> 0) & 0xff;
+		dest[BYTE4_XOR_LE(1)] = (data >> 8) & 0xff;
+		dest[BYTE4_XOR_LE(2)] = (data >> 16) & 0xff;
+		dest[BYTE4_XOR_LE(3)] = (data >> 24) & 0xff;
+	}
+	else
+	{
+		u16 *dest16 = reinterpret_cast<u16 *>(dest);
+		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
+		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
+	}
+}
+
+
+
+
+
+
+int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
+{
+	// reset the video changed flag
+	bool changed = m_video_changed;
+	m_video_changed = false;
+
+	// select the buffer to draw
+	int drawbuf = m_frontbuf;
+	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
+		drawbuf = m_backbuf;
+
+	// copy from the current front buffer
+	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
+	u32 rowpixels = m_renderer->rowpixels();
+	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		if (y < m_yoffs)
+			continue;
+		u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * rowpixels - m_xoffs;
+		u32 *dst = &bitmap.pix(y);
+		for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+			dst[x] = pens[src[x]];
+	}
+
+	// update stats display
+	if (DEBUG_STATS && m_stats.update_display_state(machine().input().code_pressed(KEYCODE_BACKSLASH)))
+		popmessage(m_stats.string(), 0, 0);
+
+	// overwrite with the depth buffer if debugging and the ENTER key is pressed
+	if (DEBUG_DEPTH && machine().input().code_pressed(KEYCODE_ENTER))
+		for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
+			u32 *const dst = &bitmap.pix(y);
+			for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+		}
+
+	return changed;
+}
+
+
+
+
 
 
 /*************************************
@@ -1358,15 +2182,6 @@ void voodoo_1_device::reset_counters()
 	m_reg.write(voodoo_regs::reg_fbiZfuncFail, 0);
 	m_reg.write(voodoo_regs::reg_fbiAfuncFail, 0);
 	m_reg.write(voodoo_regs::reg_fbiPixelsOut, 0);
-}
-
-
-void voodoo_1_device::soft_reset()
-{
-	reset_counters();
-	m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
-	m_pci_fifo.reset();
-	m_fbmem_fifo.reset();
 }
 
 
@@ -1894,7 +2709,7 @@ u32 voodoo_1_device::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 	auto &poly = m_renderer->alloc_poly();
 
 	// determine the draw buffer (Banshee and later are hard-coded to the back buffer)
-	poly.destbase = draw_buffer_indirect(m_reg.fbz_mode().draw_buffer(), false);
+	poly.destbase = draw_buffer_indirect(m_reg.fbz_mode().draw_buffer());
 	if (poly.destbase == nullptr)
 		return 0;
 	poly.depthbase = aux_buffer();
@@ -2166,905 +2981,6 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	adjust_vblank_start_timer();
 }
 
-/*************************************
- *
- *  Voodoo LFB writes
- *
- *************************************/
-void voodoo_1_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// statistics
-	if (DEBUG_STATS)
-		m_stats.m_lfb_writes++;
-
-	// byte swizzling
-	auto const lfbmode = m_reg.lfb_mode();
-	if (lfbmode.byte_swizzle_writes())
-	{
-		data = swapendian_int32(data);
-		mem_mask = swapendian_int32(mem_mask);
-	}
-
-	// word swapping
-	if (lfbmode.word_swap_writes())
-	{
-		data = (data << 16) | (data >> 16);
-		mem_mask = (mem_mask << 16) | (mem_mask >> 16);
-	}
-
-	// extract default depth value from low bits of zaColor
-	u16 sz[2];
-	sz[0] = sz[1] = m_reg.za_color() & 0xffff;
-
-	// if not otherwise specified, alpha defaults to the upper bits of zaColor
-	u32 src_alpha = m_reg.za_color() >> 24;
-
-	// extract color information from the data
-	rgb_t src_color[2];
-	u32 mask = 0;
-	switch (16 * lfbmode.rgba_lanes() + lfbmode.write_format())
-	{
-		case 16*0 + 0:      // ARGB, format 0: 16-bit RGB 5-6-5
-		case 16*2 + 0:      // RGBA, format 0: 16-bit RGB 5-6-5
-			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,6,5>(data, 27, 21, 16).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*1 + 0:      // ABGR, format 0: 16-bit RGB 5-6-5
-		case 16*3 + 0:      // BGRA, format 0: 16-bit RGB 5-6-5
-			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,6,5>(data, 16, 21, 27).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*0 + 1:      // ARGB, format 1: 16-bit RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,5,5>(data, 26, 21, 16).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*1 + 1:      // ABGR, format 1: 16-bit RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,5,5>(data, 16, 21, 26).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*2 + 1:      // RGBA, format 1: 16-bit RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,5,5>(data, 27, 22, 17).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*3 + 1:      // BGRA, format 1: 16-bit RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
-			src_color[1] = rgbexpand<5,5,5>(data, 17, 22, 27).set_a(src_alpha);
-			mask = LFB_RGB_PRESENT | (LFB_RGB_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		case 16*0 + 2:      // ARGB, format 2: 16-bit ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
-			src_color[1] = argbexpand<1,5,5,5>(data, 31, 26, 21, 16);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
-			offset <<= 1;
-			break;
-
-		case 16*1 + 2:      // ABGR, format 2: 16-bit ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
-			src_color[1] = argbexpand<1,5,5,5>(data, 31, 16, 21, 26);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
-			offset <<= 1;
-			break;
-
-		case 16*2 + 2:      // RGBA, format 2: 16-bit ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
-			src_color[1] = argbexpand<1,5,5,5>(data, 16, 27, 22, 17);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
-			offset <<= 1;
-			break;
-
-		case 16*3 + 2:      // BGRA, format 2: 16-bit ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
-			src_color[1] = argbexpand<1,5,5,5>(data, 16, 17, 22, 27);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | ((LFB_RGB_PRESENT | LFB_ALPHA_PRESENT) << 4);
-			offset <<= 1;
-			break;
-
-		case 16*0 + 4:      // ARGB, format 4: 32-bit RGB x-8-8-8
-			src_color[0] = rgbexpand<8,8,8>(data, 16,  8,  0);
-			mask = LFB_RGB_PRESENT;
-			break;
-
-		case 16*1 + 4:      // ABGR, format 4: 32-bit RGB x-8-8-8
-			src_color[0] = rgbexpand<8,8,8>(data,  0,  8, 16);
-			mask = LFB_RGB_PRESENT;
-			break;
-
-		case 16*2 + 4:      // RGBA, format 4: 32-bit RGB x-8-8-8
-			src_color[0] = rgbexpand<8,8,8>(data, 24, 16,  8);
-			mask = LFB_RGB_PRESENT;
-			break;
-
-		case 16*3 + 4:      // BGRA, format 4: 32-bit RGB x-8-8-8
-			src_color[0] = rgbexpand<8,8,8>(data,  8, 16, 24);
-			mask = LFB_RGB_PRESENT;
-			break;
-
-		case 16*0 + 5:      // ARGB, format 5: 32-bit ARGB 8-8-8-8
-			src_color[0] = argbexpand<8,8,8,8>(data, 24, 16,  8,  0);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
-			break;
-
-		case 16*1 + 5:      // ABGR, format 5: 32-bit ARGB 8-8-8-8
-			src_color[0] = argbexpand<8,8,8,8>(data, 24,  0,  8, 16);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
-			break;
-
-		case 16*2 + 5:      // RGBA, format 5: 32-bit ARGB 8-8-8-8
-			src_color[0] = argbexpand<8,8,8,8>(data,  0, 24, 16,  8);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
-			break;
-
-		case 16*3 + 5:      // BGRA, format 5: 32-bit ARGB 8-8-8-8
-			src_color[0] = argbexpand<8,8,8,8>(data,  0,  8, 16, 24);
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT;
-			break;
-
-		case 16*0 + 12:     // ARGB, format 12: 32-bit depth+RGB 5-6-5
-		case 16*2 + 12:     // RGBA, format 12: 32-bit depth+RGB 5-6-5
-			src_color[0] = rgbexpand<5,6,5>(data, 11,  5,  0).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*1 + 12:     // ABGR, format 12: 32-bit depth+RGB 5-6-5
-		case 16*3 + 12:     // BGRA, format 12: 32-bit depth+RGB 5-6-5
-			src_color[0] = rgbexpand<5,6,5>(data,  0,  5, 11).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*0 + 13:     // ARGB, format 13: 32-bit depth+RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data, 10,  5,  0).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*1 + 13:     // ABGR, format 13: 32-bit depth+RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data,  0,  5, 10).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*2 + 13:     // RGBA, format 13: 32-bit depth+RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data, 11,  6,  1).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*3 + 13:     // BGRA, format 13: 32-bit depth+RGB x-5-5-5
-			src_color[0] = rgbexpand<5,5,5>(data,  1,  6, 11).set_a(src_alpha);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*0 + 14:     // ARGB, format 14: 32-bit depth+ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data, 15, 10,  5,  0);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*1 + 14:     // ABGR, format 14: 32-bit depth+ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data, 15,  0,  5, 10);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*2 + 14:     // RGBA, format 14: 32-bit depth+ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data,  0, 11,  6,  1);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*3 + 14:     // BGRA, format 14: 32-bit depth+ARGB 1-5-5-5
-			src_color[0] = argbexpand<1,5,5,5>(data,  0,  1,  6, 11);
-			sz[0] = data >> 16;
-			mask = LFB_RGB_PRESENT | LFB_ALPHA_PRESENT | LFB_DEPTH_PRESENT_MSW;
-			break;
-
-		case 16*0 + 15:     // ARGB, format 15: 16-bit depth
-		case 16*1 + 15:     // ARGB, format 15: 16-bit depth
-		case 16*2 + 15:     // ARGB, format 15: 16-bit depth
-		case 16*3 + 15:     // ARGB, format 15: 16-bit depth
-			sz[0] = data & 0xffff;
-			sz[1] = data >> 16;
-			mask = LFB_DEPTH_PRESENT | (LFB_DEPTH_PRESENT << 4);
-			offset <<= 1;
-			break;
-
-		default:            // reserved
-			logerror("lfb_w: Unknown format\n");
-			return;
-	}
-
-	// compute X,Y
-	s32 x = offset & ((1 << m_lfb_stride) - 1);
-	s32 y = (offset >> m_lfb_stride) & 0x3ff;
-
-	// adjust the mask based on which half of the data is written
-	if (!ACCESSING_BITS_0_15)
-		mask &= ~(0x0f - LFB_DEPTH_PRESENT_MSW);
-	if (!ACCESSING_BITS_16_31)
-		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
-
-	// select the target buffer
-	u16 *dest = draw_buffer_indirect(lfbmode.write_buffer_select(), false);
-	if (dest == nullptr)
-		return;
-	u32 destmax = ram_end() - dest;
-	u16 *depth = aux_buffer();
-	u32 depthmax = ram_end() - depth;
-
-	// simple case: no pipeline
-	auto const fbzmode = m_reg.fbz_mode();
-	if (!lfbmode.enable_pixel_pipeline())
-	{
-		if (LOG_LFB) logerror("VOODOO.LFB:write raw mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
-
-		// determine the screen Y
-		s32 scry = y;
-		if (lfbmode.y_origin())
-			scry = m_renderer->yorigin() - y;
-
-		// advance pointers to the proper row
-		u32 bufoffs = scry * m_renderer->rowpixels() + x;
-
-		// wait for any outstanding work to finish
-		m_renderer->wait("LFB Write");
-
-		// loop over up to two pixels
-		voodoo::dither_helper dither(scry, fbzmode);
-		for (int pix = 0; mask != 0; pix++)
-		{
-			// make sure we care about this pixel
-			if ((mask & 0x0f) != 0)
-			{
-				// write to the RGB buffer
-				rgb_t pixel = src_color[pix];
-				if ((mask & LFB_RGB_PRESENT) && bufoffs < destmax)
-					dest[bufoffs] = dither.pixel(x, pixel.r(), pixel.g(), pixel.b());
-
-				// make sure we have an aux buffer to write to
-				if (depth != nullptr && bufoffs < depthmax)
-				{
-					// write to the alpha buffer
-					if ((mask & LFB_ALPHA_PRESENT) && fbzmode.enable_alpha_planes())
-						depth[bufoffs] = pixel.a();
-
-					// write to the depth buffer
-					if ((mask & (LFB_DEPTH_PRESENT | LFB_DEPTH_PRESENT_MSW)) && !fbzmode.enable_alpha_planes())
-						depth[bufoffs] = sz[pix];
-				}
-
-				// track pixel writes to the frame buffer regardless of mask
-				m_reg.add(voodoo_regs::reg_fbiPixelsOut, 1);
-			}
-
-			// advance our pointers
-			bufoffs++;
-			x++;
-			mask >>= 4;
-		}
-	}
-
-	// tricky case: run the full pixel pipeline on the pixel
-	else
-	{
-		if (LOG_LFB) logerror("VOODOO.LFB:write pipelined mode %X (%d,%d) = %08X & %08X\n", lfbmode.write_format(), x, y, data, mem_mask);
-
-		// determine the screen Y
-		s32 scry = y;
-		if (fbzmode.y_origin())
-			scry = m_renderer->yorigin() - y;
-
-		// advance pointers to the proper row
-		dest += scry * m_renderer->rowpixels();
-		if (depth != nullptr)
-			depth += scry * m_renderer->rowpixels();
-
-		// make a dummy poly_extra_data structure with some cached values
-		poly_data poly;
-		poly.raster.compute(m_reg, nullptr, nullptr);
-		poly.destbase = dest;
-		poly.depthbase = depth;
-		poly.clipleft = m_reg.clip_left();
-		poly.clipright = m_reg.clip_right();
-		poly.cliptop = m_reg.clip_top();
-		poly.clipbottom = m_reg.clip_bottom();
-		poly.color0 = m_reg.color0().argb();
-		poly.color1 = m_reg.color1().argb();
-		poly.chromakey = m_reg.chroma_key().argb();
-		poly.fogcolor = m_reg.fog_color().argb();
-		poly.zacolor = m_reg.za_color();
-		poly.stipple = m_reg.stipple();
-		poly.alpharef = m_reg.alpha_mode().alpharef();
-		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
-			printf("Warning: rotated stipple pattern\n");
-
-		// loop over up to two pixels
-		thread_stats_block &threadstats = m_lfb_stats;
-		rgbaint_t iterargb(0);
-		for (int pix = 0; mask != 0; pix++)
-		{
-			// make sure we care about this pixel
-			if ((mask & 0x0f) != 0)
-				m_renderer->pixel_pipeline(threadstats, poly, lfbmode, x, y, src_color[pix], sz[pix]);
-
-			// advance our pointers
-			x++;
-			mask >>= 4;
-		}
-	}
-}
-
-
-
-/*************************************
- *
- *  Voodoo texture RAM writes
- *
- *************************************/
-
-void voodoo_1_device::texture_w(offs_t offset, u32 data)
-{
-	// statistics
-	if (DEBUG_STATS)
-		m_stats.m_tex_writes++;
-
-	// point to the right TMU
-	int tmunum = BIT(offset, 19, 2);
-	if (!BIT(m_chipmask, 1 + tmunum))
-		return;
-
-	// wait for any outstanding work to finish
-	m_renderer->wait("Texture write");
-
-	// the seq_8_downld flag seems to always come from TMU #0
-	bool seq_8_downld = m_tmu[0].regs().texture_mode().seq_8_downld();
-
-	// pull out modes from the TMU and update state
-	auto &regs = m_tmu[tmunum].regs();
-	auto const texlod = regs.texture_lod();
-	auto const texmode = regs.texture_mode();
-	auto &texture = m_tmu[tmunum].prepare_texture(*m_renderer.get());
-
-	// texture direct not handled (but never seen so far)
-	if (texlod.tdirect_write())
-		fatalerror("Texture direct write!\n");
-
-	// swizzle the data
-	if (texlod.tdata_swizzle())
-		data = swapendian_int32(data);
-	if (texlod.tdata_swap())
-		data = (data >> 16) | (data << 16);
-
-	// determine destination pointer
-	u32 bytes_per_texel = (texmode.format() < 8) ? 1 : 2;
-	u32 lod = BIT(offset, 15, 4);
-	u32 tt = BIT(offset, 7, 8);
-	u32 ts = (offset << ((seq_8_downld && bytes_per_texel == 1) ? 2 : 1)) & 0xff;
-
-	// validate parameters
-	if (lod > 8)
-		return;
-	u8 *dest = texture.write_ptr(lod, ts, tt, bytes_per_texel);
-
-	// write the four bytes in little-endian order
-	if (bytes_per_texel == 1)
-	{
-		dest[BYTE4_XOR_LE(0)] = (data >> 0) & 0xff;
-		dest[BYTE4_XOR_LE(1)] = (data >> 8) & 0xff;
-		dest[BYTE4_XOR_LE(2)] = (data >> 16) & 0xff;
-		dest[BYTE4_XOR_LE(3)] = (data >> 24) & 0xff;
-	}
-	else
-	{
-		u16 *dest16 = reinterpret_cast<u16 *>(dest);
-		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
-		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
-	}
-}
-
-
-
-/*************************************
- *
- *  Flush data from the FIFOs
- *
- *************************************/
-
-void voodoo_1_device::recompute_fbmem_fifo()
-{
-	// compute the memory FIFO location and size
-	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
-	if (fifo_last_page > m_fbmask / 0x1000)
-		fifo_last_page = m_fbmask / 0x1000;
-
-	// is it valid and enabled?
-	u32 const fifo_start_page = m_reg.fbi_init4().memory_fifo_start_row();
-	if (fifo_start_page <= fifo_last_page && m_reg.fbi_init0().enable_memory_fifo())
-	{
-		u32 size = std::min<u32>((fifo_last_page + 1 - fifo_start_page) * 0x1000 / 4, 65536*2);
-		m_fbmem_fifo.configure((u32 *)(m_fbram + fifo_start_page * 0x1000), size);
-	}
-
-	// if not, disable the FIFO
-	else
-		m_fbmem_fifo.configure(nullptr, 0);
-}
-
-void voodoo_1_device::flush_fifos(attotime current_time)
-{
-	// check for recursive calls
-	if (m_flush_flag)
-		return;
-	m_flush_flag = true;
-
-	// should only be called if something is pending
-	if (!operation_pending())
-		fatalerror("flush_fifos called with no pending operation\n");
-
-	if (LOG_FIFO_VERBOSE)
-		logerror("VOODOO.FIFO:flush_fifos start -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
-
-	// loop while we still have cycles to burn
-	while (m_operation_end <= current_time)
-	{
-		// loop over 0-cycle stuff; this constitutes the bulk of our writes
-		s32 cycles = 0;
-		while (cycles == 0)
-		{
-			// we are in standard PCI/memory FIFO mode
-			voodoo::memory_fifo &memfifo = !m_fbmem_fifo.empty() ? m_fbmem_fifo : m_pci_fifo;
-			if (memfifo.empty())
-			{
-				clear_pending_operation();
-				if (LOG_FIFO_VERBOSE)
-					logerror("VOODOO.FIFO:flush_fifos end -- FIFOs empty\n");
-				m_flush_flag = false;
-				return;
-			}
-
-			// extract address and data
-			u32 offset = memfifo.remove();
-			u32 data = memfifo.remove();
-
-			// target the appropriate location
-			switch (offset & memory_fifo::TYPE_MASK)
-			{
-				case memory_fifo::TYPE_REGISTER:
-				{
-					// just use the chipmask raw since it was adjusted prior to being added to the FIFO
-					u32 regnum = BIT(offset, 0, 8);
-					cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
-					break;
-				}
-
-				case memory_fifo::TYPE_TEXTURE:
-					texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
-					break;
-
-				case memory_fifo::TYPE_LFB:
-				{
-					u32 mem_mask = 0xffffffff;
-					if (offset & memory_fifo::NO_16_31)
-						mem_mask &= 0x0000ffff;
-					if (offset & memory_fifo::NO_0_15)
-						mem_mask &= 0xffff0000;
-					lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
-					break;
-				}
-			}
-		}
-
-		// account for those cycles
-		m_operation_end += clocks_to_attotime(cycles);
-
-		if (LOG_FIFO_VERBOSE)
-			logerror("VOODOO.FIFO:update -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
-	}
-
-	if (LOG_FIFO_VERBOSE)
-		logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %s\n", m_operation_end.as_string(18));
-
-	m_flush_flag = false;
-}
-
-void voodoo_2_device::flush_fifos(attotime current_time)
-{
-	// check for recursive calls
-	if (m_flush_flag)
-		return;
-	m_flush_flag = true;
-
-	// should only be called if something is pending
-	if (!operation_pending())
-		fatalerror("flush_fifos called with no pending operation\n");
-
-	if (LOG_FIFO_VERBOSE)
-		logerror("VOODOO.FIFO:flush_fifos start -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
-
-	// loop while we still have cycles to burn
-	while (m_operation_end <= current_time)
-	{
-		// loop over 0-cycle stuff; this constitutes the bulk of our writes
-		s32 cycles = 0;
-		while (cycles == 0)
-		{
-			// we might be in CMDFIFO mode
-			voodoo::command_fifo &cmdfifo = m_cmdfifo[m_cmdfifo[0].enabled() ? 0 : 1];
-			if (cmdfifo.enabled())
-			{
-				// if we don't have anything to execute, we're done for now
-				cycles = cmdfifo.execute_if_ready();
-				if (cycles == -1)
-				{
-					clear_pending_operation();
-					if (LOG_FIFO_VERBOSE)
-						logerror("VOODOO.FIFO:flush_fifos end -- CMDFIFO empty\n");
-					m_flush_flag = false;
-					return;
-				}
-				continue;
-			}
-
-			// we are in standard PCI/memory FIFO mode
-			voodoo::memory_fifo &memfifo = !m_fbmem_fifo.empty() ? m_fbmem_fifo : m_pci_fifo;
-			if (memfifo.empty())
-			{
-				clear_pending_operation();
-				if (LOG_FIFO_VERBOSE)
-					logerror("VOODOO.FIFO:flush_fifos end -- FIFOs empty\n");
-				m_flush_flag = false;
-				return;
-			}
-
-			// extract address and data
-			u32 offset = memfifo.remove();
-			u32 data = memfifo.remove();
-
-			// target the appropriate location
-			switch (offset & memory_fifo::TYPE_MASK)
-			{
-				case memory_fifo::TYPE_REGISTER:
-				{
-					// just use the chipmask raw since it was adjusted prior to being added to the FIFO
-					u32 regnum = BIT(offset, 0, 8);
-					cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
-					break;
-				}
-
-				case memory_fifo::TYPE_TEXTURE:
-					texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
-					break;
-
-				case memory_fifo::TYPE_LFB:
-				{
-					u32 mem_mask = 0xffffffff;
-					if (offset & memory_fifo::NO_16_31)
-						mem_mask &= 0x0000ffff;
-					if (offset & memory_fifo::NO_0_15)
-						mem_mask &= 0xffff0000;
-					lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
-					break;
-				}
-			}
-		}
-
-		// account for those cycles
-		m_operation_end += clocks_to_attotime(cycles);
-
-		if (LOG_FIFO_VERBOSE)
-			logerror("VOODOO.FIFO:update -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
-	}
-
-	if (LOG_FIFO_VERBOSE)
-		logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %s\n", m_operation_end.as_string(18));
-
-	m_flush_flag = false;
-}
-
-
-
-/*************************************
- *
- *  Handle an LFB read
- *
- *************************************/
-
-u32 voodoo_1_device::lfb_r(offs_t offset, bool lfb_3d)
-{
-	u16 *buffer;
-	u32 bufmax;
-	u32 bufoffs;
-	u32 data;
-	int x, y, scry;
-
-	/* statistics */
-	if (DEBUG_STATS)
-		m_stats.m_lfb_reads++;
-
-	/* compute X,Y */
-	offset <<= 1;
-	x = offset & ((1 << m_lfb_stride) - 1);
-	y = (offset >> m_lfb_stride);
-
-	/* select the target buffer */
-	auto const lfbmode = m_reg.lfb_mode();
-	if (lfb_3d)
-	{
-		y &= 0x3ff;
-		buffer = draw_buffer_indirect(lfbmode.read_buffer_select(), true);
-		if (buffer == nullptr)
-			return 0xffffffff;
-
-		/* determine the screen Y */
-		scry = y;
-		if (lfbmode.y_origin())
-			scry = m_renderer->yorigin() - y;
-	}
-	else
-	{
-		// Direct lfb access
-		buffer = (u16 *)(m_fbram + m_lfb_base*4);
-		scry = y;
-	}
-	bufmax = ram_end() - buffer;
-
-	/* advance pointers to the proper row */
-	bufoffs = scry * m_renderer->rowpixels() + x;
-	if (bufoffs >= bufmax)
-	{
-		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i lfb_3d=%i offset=%08X bufoffs=%08X\n", x, y, lfb_3d, offset, (u32) bufoffs);
-		return 0xffffffff;
-	}
-
-	/* wait for any outstanding work to finish */
-	m_renderer->wait("LFB read");
-
-	/* compute the data */
-	data = buffer[bufoffs + 0] | (buffer[bufoffs + 1] << 16);
-
-	/* word swapping */
-	if (lfbmode.word_swap_reads())
-		data = (data << 16) | (data >> 16);
-
-	/* byte swizzling */
-	if (lfbmode.byte_swizzle_reads())
-		data = swapendian_int32(data);
-
-	if (LOG_LFB) logerror("VOODOO.LFB:read (%d,%d) = %08X\n", x, y, data);
-	return data;
-}
-
-
-
-//**************************************************************************
-//  MEMORY ACCESS UTILITIES
-//**************************************************************************
-
-//-------------------------------------------------
-//  prepare_for_read - handle housekeeping before
-//  processing a direct PCI read
-//-------------------------------------------------
-
-void voodoo_1_device::prepare_for_read()
-{
-	// if we have something pending, flush the FIFOs up to the current time
-	if (operation_pending())
-		flush_fifos(machine().time());
-}
-
-
-//-------------------------------------------------
-//  prepare_for_write - handle housekeeping before
-//  processing a direct PCI write
-//-------------------------------------------------
-
-bool voodoo_1_device::prepare_for_write()
-{
-	// should not be getting accesses while stalled (but we do)
-	if (m_stall_state != NOT_STALLED)
-		logerror("voodoo_1_device::write while stalled!\n");
-
-	// if we have something pending, flush the FIFOs up to the current time
-	bool pending = operation_pending();
-	if (pending)
-	{
-		flush_fifos(machine().time());
-		pending = operation_pending();
-	}
-	return pending;
-}
-
-
-//-------------------------------------------------
-//  add_to_fifo - add a write to the PCI FIFO,
-//  spilling to the memory FIFO as configured
-//-------------------------------------------------
-
-void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
-{
-	// modify the offset based on the mem_mask
-	if (!ACCESSING_BITS_16_31)
-		offset |= memory_fifo::NO_16_31;
-	if (!ACCESSING_BITS_0_15)
-		offset |= memory_fifo::NO_0_15;
-
-	// if there's room in the PCI FIFO, add there
-	if (LOG_FIFO_VERBOSE)
-		logerror("VOODOO.%d.FIFO:adding to PCI FIFO @ %08X=%08X\n", this, offset, data);
-	if (!m_pci_fifo.full())
-	{
-		m_pci_fifo.add(offset);
-		m_pci_fifo.add(data);
-	}
-	else
-		fatalerror("PCI FIFO full\n");
-
-	// handle flushing to the memory FIFO
-	if (m_reg.fbi_init0().enable_memory_fifo() && m_pci_fifo.space() <= 2 * m_reg.fbi_init4().memory_fifo_lwm())
-	{
-		u8 valid[4];
-
-		// determine which types of data can go to the memory FIFO
-		valid[0] = true;
-		valid[1] = m_reg.fbi_init0().lfb_to_memory_fifo();
-		valid[2] = valid[3] = m_reg.fbi_init0().texmem_to_memory_fifo();
-
-		// flush everything we can
-		if (LOG_FIFO_VERBOSE) logerror("VOODOO.FIFO:moving PCI FIFO to memory FIFO\n");
-		while (!m_pci_fifo.empty() && valid[(m_pci_fifo.peek() >> 22) & 3])
-		{
-			m_fbmem_fifo.add(m_pci_fifo.remove());
-			m_fbmem_fifo.add(m_pci_fifo.remove());
-		}
-
-		// if we're above the HWM as a result, stall
-		if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_fbmem_fifo.items() >= 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
-		{
-			if (LOG_FIFO) logerror("VOODOO.FIFO:hit memory FIFO HWM -- stalling\n");
-			stall_cpu(STALLED_UNTIL_FIFO_LWM);
-		}
-	}
-
-	// if we're at the LWM for the PCI FIFO, stall
-	if (m_reg.fbi_init0().stall_pcie_for_hwm() && m_pci_fifo.space() <= 2 * m_reg.fbi_init0().pci_fifo_lwm())
-	{
-		if (LOG_FIFO) logerror("VOODOO.FIFO:hit PCI FIFO free LWM -- stalling\n");
-		stall_cpu(STALLED_UNTIL_FIFO_LWM);
-	}
-}
-
-
-
-//**************************************************************************
-//  VOODOO 1 MEMORY MAP
-//**************************************************************************
-
-//-------------------------------------------------
-//  map_register_r - handle a mapped read from
-//  regular register space
-//-------------------------------------------------
-
-u32 voodoo_1_device::map_register_r(offs_t offset)
-{
-	prepare_for_read();
-
-	// extract chipmask and register
-	u32 chipmask = chipmask_from_offset(offset);
-	u32 regnum = BIT(offset, 0, 8);
-
-	// look up the register
-	return m_regtable[regnum].read(*this, chipmask, regnum);
-}
-
-
-//-------------------------------------------------
-//  map_lfb_r - handle a mapped read from LFB space
-//-------------------------------------------------
-
-u32 voodoo_1_device::map_lfb_r(offs_t offset)
-{
-	prepare_for_read();
-	return lfb_r(offset, true);
-}
-
-
-//-------------------------------------------------
-//  map_register_w - handle a mapped write to
-//  regular register space
-//-------------------------------------------------
-
-void voodoo_1_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	bool pending = prepare_for_write();
-
-	// extract chipmask and register
-	u32 chipmask = chipmask_from_offset(offset);
-	u32 regnum = BIT(offset, 0, 8);
-
-	// handle register swizzling -- manual says bit 21; voodoo2 manual says bit 20
-	// guessing it does not overlap with the alternate register mapping bit
-	if (BIT(offset, 20-2) && m_reg.fbi_init0().swizzle_reg_writes())
-		data = swapendian_int32(data);
-
-	// handle aliasing
-	if (BIT(offset, 21-2) && m_reg.fbi_init3().tri_register_remap())
-		regnum = voodoo_regs::alias(regnum);
-
-	// look up the register
-	auto const &regentry = m_regtable[regnum];
-
-	// if this is non-FIFO command, execute immediately
-	if (!regentry.is_fifo())
-		return void(regentry.write(*this, chipmask, regnum, data));
-
-	// track swap buffers
-	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_swaps_pending++;
-
-	// if we're busy add to the fifo
-	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
-
-	// if we get a non-zero number of cycles back, mark things pending
-	u32 cycles = regentry.write(*this, chipmask, regnum, data);
-	if (cycles > 0)
-	{
-		// if we ended up with cycles, mark the operation pending
-		m_operation_end = machine().time() + clocks_to_attotime(cycles);
-		if (LOG_FIFO_VERBOSE)
-			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
-	}
-}
-
-
-//-------------------------------------------------
-//  map_lfb_w - handle a mapped write to LFB space
-//-------------------------------------------------
-
-void voodoo_1_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// if we're busy add to the fifo, else just execute immediately
-	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | memory_fifo::TYPE_LFB, data, mem_mask);
-	else
-		lfb_w(offset, data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  map_texture_w - handle a mapped write to
-//  texture space
-//-------------------------------------------------
-
-void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// if we're busy add to the fifo, else just execute immediately
-	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | memory_fifo::TYPE_TEXTURE, data, mem_mask);
-	else
-		texture_w(offset, data);
-}
-
-
 
 
 //-------------------------------------------------
@@ -3079,7 +2995,7 @@ s32 voodoo_1_device::triangle()
 	auto &poly = m_renderer->alloc_poly();
 
 	// determine the draw buffer
-	poly.destbase = draw_buffer_indirect(m_reg.fbz_mode().draw_buffer(), false);
+	poly.destbase = draw_buffer_indirect(m_reg.fbz_mode().draw_buffer());
 	if (poly.destbase == nullptr)
 		return TRIANGLE_SETUP_CLOCKS;
 	poly.depthbase = aux_buffer();
@@ -3262,8 +3178,7 @@ void voodoo_2_device::device_start()
 
 	// initialize Voodoo 2 additions
 	m_sverts = 0;
-	m_cmdfifo[0].init(m_fbram, m_fbmask + 1);
-	m_cmdfifo[1].init(m_fbram, m_fbmask + 1);
+	m_cmdfifo.init(m_fbram, m_fbmask + 1);
 }
 
 void voodoo_2_device::recompute_video_memory()
@@ -3301,24 +3216,32 @@ void command_fifo::register_save(save_proxy &save)
 
 
 //-------------------------------------------------
-//  execute_if_ready - if we have enough data to
-//  execute a command, do so; otherwise, return -1
+//  execute_if_ready - execute everything we have
+//  the data for, until we encounter an operation
+//  that consumes a non-zero number of cycles
 //-------------------------------------------------
 
-s32 command_fifo::execute_if_ready()
+u32 command_fifo::execute_if_ready()
 {
-	// all CMDFIFO commands need at least one word
-	if (m_depth == 0)
-		return -1;
+	while (1)
+	{
+		// all CMDFIFO commands need at least one word
+		if (m_depth == 0)
+			return 0;
 
-	// see if we have enough for the current command
-	u32 const needed_depth = words_needed(peek_next());
-	if (m_depth < needed_depth)
-		return -1;
+		// see if we have enough for the current command
+		u32 const needed_depth = words_needed(peek_next());
+		if (m_depth < needed_depth)
+			return 0;
 
-	// read the next command and handle it based on the low 3 bits
-	u32 command = read_next();
-	return (this->*s_packet_handler[BIT(command, 0, 3)])(command);
+		// read the next command and handle it based on the low 3 bits
+		u32 command = read_next();
+		u32 cycles = (this->*s_packet_handler[BIT(command, 0, 3)])(command);
+
+		// if the number of cycles is non-zero, return
+		if (cycles > 0)
+			return cycles;
+	}
 }
 
 
@@ -3891,7 +3814,7 @@ command_fifo::packet_handler command_fifo::s_packet_handler[8] =
 voodoo_2_device::voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
 	voodoo_1_device(mconfig, type, tag, owner, clock, model),
 	m_sverts(0),
-	m_cmdfifo{ *this, *this }
+	m_cmdfifo(*this)
 #if USE_MEMORY_VIEWS
 	m_regview(*this, "registers")
 #endif
@@ -3910,8 +3833,17 @@ void voodoo_2_device::register_save(save_proxy &save, u32 total_allocation)
 	save.save_class(NAME(m_svert[0]));
 	save.save_class(NAME(m_svert[1]));
 	save.save_class(NAME(m_svert[2]));
-	save.save_class(NAME(m_cmdfifo[0]));
-	save.save_class(NAME(m_cmdfifo[1]));
+	save.save_class(NAME(m_cmdfifo));
+}
+
+u32 voodoo_2_device::execute_fifos()
+{
+	// we might be in CMDFIFO mode
+	if (m_cmdfifo.enabled())
+		return m_cmdfifo.execute_if_ready();
+
+	// otherwise, run the traditional memory FIFOs
+	return voodoo_1_device::execute_fifos();
 }
 
 
@@ -3959,17 +3891,17 @@ u32 voodoo_2_device::reg_hvretrace_r(u32 chipmask, u32 regnum)
 
 u32 voodoo_2_device::reg_cmdfifoptr_r(u32 chipmask, u32 regnum)
 {
-	return m_cmdfifo[0].read_pointer();
+	return m_cmdfifo.read_pointer();
 }
 
 u32 voodoo_2_device::reg_cmdfifodepth_r(u32 chipmask, u32 regnum)
 {
-	return m_cmdfifo[0].depth();
+	return m_cmdfifo.depth();
 }
 
 u32 voodoo_2_device::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
 {
-	return m_cmdfifo[0].holes();
+	return m_cmdfifo.holes();
 }
 
 
@@ -4052,10 +3984,10 @@ u32 voodoo_2_device::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("cmdFifo write");
 		m_reg.write(regnum, data);
-		m_cmdfifo[0].set_base(BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 0, 10) << 12);
-		m_cmdfifo[0].set_end((BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 16, 10) + 1) << 12);
-		m_cmdfifo[0].set_address_min(m_reg.read(voodoo_regs::reg_cmdFifoAMin));
-		m_cmdfifo[0].set_address_max(m_reg.read(voodoo_regs::reg_cmdFifoAMax));
+		m_cmdfifo.set_base(BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 0, 10) << 12);
+		m_cmdfifo.set_end((BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 16, 10) + 1) << 12);
+		m_cmdfifo.set_address_min(m_reg.read(voodoo_regs::reg_cmdFifoAMin));
+		m_cmdfifo.set_address_max(m_reg.read(voodoo_regs::reg_cmdFifoAMax));
 	}
 	return 0;
 }
@@ -4066,7 +3998,7 @@ u32 voodoo_2_device::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("cmdFifoReadPtr");
 		m_reg.write(regnum, data);
-		m_cmdfifo[0].set_read_pointer(data);
+		m_cmdfifo.set_read_pointer(data);
 	}
 	return 0;
 }
@@ -4077,7 +4009,7 @@ u32 voodoo_2_device::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("cmdFifoDepth");
 		m_reg.write(regnum, data);
-		m_cmdfifo[0].set_depth(data);
+		m_cmdfifo.set_depth(data);
 	}
 	return 0;
 }
@@ -4088,7 +4020,7 @@ u32 voodoo_2_device::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 	{
 		m_renderer->wait("cmdFifoHoles");
 		m_reg.write(regnum, data);
-		m_cmdfifo[0].set_holes(data);
+		m_cmdfifo.set_holes(data);
 	}
 	return 0;
 }
@@ -4101,8 +4033,8 @@ u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 		m_reg.write(regnum, data);
 		if (regnum == voodoo_regs::reg_fbiInit5 || regnum == voodoo_regs::reg_fbiInit6)
 			recompute_video_memory();
-		m_cmdfifo[0].set_enable(m_reg.fbi_init7().cmdfifo_enable());
-		m_cmdfifo[0].set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
+		m_cmdfifo.set_enable(m_reg.fbi_init7().cmdfifo_enable());
+		m_cmdfifo.set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
 		update_register_view();
 	}
 	return 0;
@@ -4527,7 +4459,7 @@ u32 voodoo_2_device::map_register_r(offs_t offset)
 u32 voodoo_2_device::map_lfb_r(offs_t offset)
 {
 	prepare_for_read();
-	return lfb_r(offset, true);
+	return lfb_r(offset);
 }
 
 
@@ -4547,7 +4479,7 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 		// check for byte swizzling (bit 18)
 		if (BIT(offset, 18-2))
 			data = swapendian_int32(data);
-		m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
+		m_cmdfifo.write_direct(BIT(offset, 0, 16), data);
 		return;
 	}
 #endif
