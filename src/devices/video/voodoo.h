@@ -51,7 +51,7 @@ static constexpr bool DEBUG_DEPTH = false;		// ENTER key to view depthbuf
 static constexpr bool DEBUG_BACKBUF = false;	// L key to view backbuf
 static constexpr bool DEBUG_STATS = false;		// \ key to view stats
 
-												// logging
+// logging
 static constexpr bool LOG_VBLANK_SWAP = false;
 static constexpr bool LOG_FIFO = false;
 static constexpr bool LOG_FIFO_VERBOSE = false;
@@ -91,7 +91,7 @@ namespace voodoo
 
 // ======================> save_proxy
 
-// save_proxy is a helper class to make hierarchical state saving more manageable
+// save_proxy is a helper class to make hierarchical state saving more manageable;
 class save_proxy
 {
 public:
@@ -142,7 +142,7 @@ private:
 // shared_tables are global tables that are shared between different components
 struct shared_tables
 {
-	// constructor
+	// construction
 	shared_tables();
 
 	// texel lookups
@@ -168,7 +168,7 @@ class tmu_state
 {
 public:
 	// construction
-	tmu_state(voodoo_model model) : m_reg(model) { }
+	tmu_state(voodoo_model model);
 
 	// initialization
 	void init(int index, shared_tables const &share, u8 *ram, u32 size);
@@ -192,20 +192,20 @@ public:
 
 private:
 	// internal state
-	int m_index;                    // index of ourself
-	u8 *m_ram = nullptr;            // pointer to our RAM
-	u32 m_mask = 0;                 // mask to apply to pointers
+	int m_index;                         // index of ourself
+	u8 *m_ram = nullptr;                 // pointer to our RAM
+	u32 m_mask = 0;                      // mask to apply to pointers
 
 	// register state
-	voodoo_regs m_reg;              // TMU registers
-	bool m_regdirty;                // true if the LOD/mode/base registers have changed
+	voodoo_regs m_reg;                   // TMU registers
+	bool m_regdirty;                     // true if the LOD/mode/base registers have changed
 
 	// lookups
 	rgb_t const * const *m_texel_lookup; // texel lookups for each format
 
 	// palettes
-	bool m_palette_dirty[4];        // true if palette (0-1) or NCC (2-3) is dirty
-	rgb_t m_palette[2][256];        // 2 versions of the palette
+	bool m_palette_dirty[4];             // true if palette (0-1) or NCC (2-3) is dirty
+	rgb_t m_palette[2][256];             // 2 versions of the palette
 };
 
 
@@ -229,7 +229,7 @@ public:
 	memory_fifo();
 
 	// configuration
-	void configure(u32 *base, u32 size) { m_base = base; m_size = size; reset(); }
+	void configure(u32 *base, u32 size);
 
 	// state saving
 	void register_save(save_proxy &save);
@@ -258,165 +258,57 @@ private:
 };
 
 
-// ======================> command_fifo
-
-// command_fifo is a more intelligent FIFO that was introduced with the Voodoo-2
-class command_fifo
-{
-public:
-	// construction
-	command_fifo(voodoo_2_device &device);
-
-	// initialization
-	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
-
-	// state saving
-	void register_save(save_proxy &save);
-
-	// getters
-	bool enabled() const { return m_enable; }
-	u32 address_min() const { return m_address_min; }
-	u32 address_max() const { return m_address_max; }
-	u32 read_pointer() const { return m_read_index * 4; }
-	u32 depth() const { return m_depth; }
-	u32 holes() const { return m_holes; }
-
-	// setters
-	void set_enable(bool enabled) { m_enable = enabled; }
-	void set_count_holes(bool count) { m_count_holes = count; }
-	void set_base(u32 base) { m_ram_base = base; }
-	void set_end(u32 end) { m_ram_end = end; }
-	void set_size(u32 size) { m_ram_end = m_ram_base + size; }
-	void set_read_pointer(u32 ptr) { m_read_index = ptr / 4; }
-	void set_address_min(u32 addr) { m_address_min = addr; }
-	void set_address_max(u32 addr) { m_address_max = addr; }
-	void set_depth(u32 depth) { m_depth = depth; }
-	void set_holes(u32 holes) { m_holes = holes; }
-
-	// operations
-	s32 execute_if_ready();
-
-	// write to the FIFO if within the address range
-	bool write_if_in_range(offs_t addr, u32 data)
-	{
-		if (m_enable && addr >= m_ram_base && addr < m_ram_end)
-		{
-			write(addr, data);
-			return true;
-		}
-		return false;
-	}
-
-	// write directly to the FIFO, relative to the base
-	void write_direct(offs_t offset, u32 data)
-	{
-		write(m_ram_base + offset * 4, data);
-	}
-
-private:
-	// internal helpers
-	void consume(u32 words) { m_read_index += words; m_depth -= words; }
-	u32 peek_next() { return m_ram[m_read_index & m_mask]; }
-	u32 read_next() { u32 result = peek_next(); consume(1); return result; }
-	float read_next_float() { float result = *(float *)&m_ram[m_read_index & m_mask]; consume(1); return result; }
-
-	// internal operations
-	u32 words_needed(u32 command);
-	void write(offs_t addr, u32 data);
-
-	// packet handlers
-	using packet_handler = u32 (command_fifo::*)(u32);
-	u32 packet_type_0(u32 command);
-	u32 packet_type_1(u32 command);
-	u32 packet_type_2(u32 command);
-	u32 packet_type_3(u32 command);
-	u32 packet_type_4(u32 command);
-	u32 packet_type_5(u32 command);
-	u32 packet_type_unknown(u32 command);
-
-	// internal state
-	voodoo_2_device &m_device;     // reference to our device
-	u32 *m_ram;                    // base of RAM
-	u32 m_mask;                    // mask for RAM accesses
-	bool m_enable;                 // enabled?
-	bool m_count_holes;            // count holes?
-	u32 m_ram_base;                // base address in framebuffer RAM
-	u32 m_ram_end;                 // end address in framebuffer RAM
-	u32 m_read_index;              // current read index into 32-bit RAM
-	u32 m_address_min;             // minimum address
-	u32 m_address_max;             // maximum address
-	u32 m_depth;                   // current depth
-	u32 m_holes;                   // number of holes
-
-	static packet_handler s_packet_handler[8];
-};
-
-
-// ======================> setup_vertex
-
-// setup_vertex a set of coordinates managed by the triangle setup engine
-// that was introduced with the Voodoo-2
-struct setup_vertex
-{
-	// state saving
-	void register_save(save_proxy &save)
-	{
-		save.save_item(NAME(x));
-		save.save_item(NAME(y));
-		save.save_item(NAME(z));
-		save.save_item(NAME(wb));
-		save.save_item(NAME(r));
-		save.save_item(NAME(g));
-		save.save_item(NAME(b));
-		save.save_item(NAME(a));
-		save.save_item(NAME(s0));
-		save.save_item(NAME(t0));
-		save.save_item(NAME(w0));
-		save.save_item(NAME(s1));
-		save.save_item(NAME(t1));
-		save.save_item(NAME(w1));
-	}
-
-	float x, y;               // X, Y coordinates
-	float z, wb;              // Z and broadcast W values
-	float r, g, b, a;         // A, R, G, B values
-	float s0, t0, w0;         // W, S, T for TMU 0
-	float s1, t1, w1;         // W, S, T for TMU 1
-};
-
-
 // ======================> debug_stats
 
-// debug_stats are enabled via DEBUG_STATS and displayed via the backslash key
+// debug_stats are enabled via DEBUG_STATS and displayed via the backslash key;
+// these are independent of the real on-chip stats kept in thread_stats_block
 class debug_stats
 {
 public:
-	debug_stats()
-	{
-		std::fill(std::begin(texture_mode), std::end(texture_mode), 0);
-		buffer[0] = 0;
-	}
+	// construction
+	debug_stats();
 
-	u8 lastkey = 0;            // last key state
-	u8 display = 0;            // display stats?
-	s32 swaps = 0;              // total swaps
-	s32 stalls = 0;             // total stalls
-	s32 total_triangles = 0;    // total triangles
-	s32 total_pixels_in = 0;    // total pixels in
-	s32 total_pixels_out = 0;   // total pixels out
-	s32 total_chroma_fail = 0;  // total chroma fail
-	s32 total_zfunc_fail = 0;   // total z func fail
-	s32 total_afunc_fail = 0;   // total a func fail
-	s32 total_clipped = 0;      // total clipped
-	s32 total_stippled = 0;     // total stippled
-	s32 lfb_writes = 0;         // LFB writes
-	s32 lfb_reads = 0;          // LFB reads
-	s32 reg_writes = 0;         // register writes
-	s32 reg_reads = 0;          // register reads
-	s32 tex_writes = 0;         // texture writes
-	s32 texture_mode[16];       // 16 different texture modes
-	u8 render_override = 0;    // render override
-	char buffer[1024];           // string
+	// add in states from the emulation
+	void add_emulation_stats(thread_stats_block const &block);
+
+	// reset the stats
+	void reset();
+
+	// simple getters
+	bool displayed() const { return m_display; }
+	char const *string() const { return m_string.c_str(); }
+
+	// compute the string to display
+	void update_string(rectangle const &visarea, u32 swap_history);
+
+	// based on the current key state, update and return whether stats should be shown
+	bool update_display_state(bool key_pressed);
+
+	// public access to the statistics that are hand-updated
+	s32 m_swaps;              // total swaps
+	s32 m_stalls;             // total stalls
+	s32 m_triangles;          // total triangles
+	s32 m_lfb_writes;         // LFB writes
+	s32 m_lfb_reads;          // LFB reads
+	s32 m_reg_writes;         // register writes
+	s32 m_reg_reads;          // register reads
+	s32 m_tex_writes;         // texture writes
+	s32 m_texture_mode[16];   // 16 different texture modes
+
+private:
+	// stats that are updated from emulation stats
+	s32 m_pixels_in;          // total pixels in
+	s32 m_pixels_out;         // total pixels out
+	s32 m_chroma_fail;        // total chroma fail
+	s32 m_zfunc_fail;         // total z func fail
+	s32 m_afunc_fail;         // total a func fail
+	s32 m_clipped;            // total clipped
+	s32 m_stippled;           // total stippled
+
+	// internal state
+	bool m_lastkey;           // last key state
+	bool m_display;           // display stats?
+	std::string m_string;     // string
 };
 
 }
@@ -459,6 +351,9 @@ protected:
 	// internal construction
 	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
+	// device-level overrides
+	virtual void device_start() override;
+
 	// configuration
 	const voodoo_model m_model;              // which voodoo model
 	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
@@ -494,6 +389,13 @@ class voodoo_1_device : public generic_voodoo_device
 		STALLED_UNTIL_FIFO_EMPTY
 	};
 
+protected:
+	// number of clocks to set up a triangle (just a guess)
+	static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
+
+	// internal construction
+	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+
 public:
 	// construction
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -514,9 +416,6 @@ public:
 	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
-	// internal construction
-	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -721,12 +620,144 @@ protected:
 //  VOODOO 2 DEVICE
 //**************************************************************************
 
+namespace voodoo
+{
+
+// ======================> command_fifo
+
+// command_fifo is a more intelligent FIFO that was introduced with the Voodoo-2
+class command_fifo
+{
+public:
+	// construction
+	command_fifo(voodoo_2_device &device);
+
+	// initialization
+	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
+
+	// state saving
+	void register_save(save_proxy &save);
+
+	// getters
+	bool enabled() const { return m_enable; }
+	u32 address_min() const { return m_address_min; }
+	u32 address_max() const { return m_address_max; }
+	u32 read_pointer() const { return m_read_index * 4; }
+	u32 depth() const { return m_depth; }
+	u32 holes() const { return m_holes; }
+
+	// setters
+	void set_enable(bool enabled) { m_enable = enabled; }
+	void set_count_holes(bool count) { m_count_holes = count; }
+	void set_base(u32 base) { m_ram_base = base; }
+	void set_end(u32 end) { m_ram_end = end; }
+	void set_size(u32 size) { m_ram_end = m_ram_base + size; }
+	void set_read_pointer(u32 ptr) { m_read_index = ptr / 4; }
+	void set_address_min(u32 addr) { m_address_min = addr; }
+	void set_address_max(u32 addr) { m_address_max = addr; }
+	void set_depth(u32 depth) { m_depth = depth; }
+	void set_holes(u32 holes) { m_holes = holes; }
+
+	// operations
+	s32 execute_if_ready();
+
+	// write to the FIFO if within the address range
+	bool write_if_in_range(offs_t addr, u32 data)
+	{
+		if (m_enable && addr >= m_ram_base && addr < m_ram_end)
+		{
+			write(addr, data);
+			return true;
+		}
+		return false;
+	}
+
+	// write directly to the FIFO, relative to the base
+	void write_direct(offs_t offset, u32 data)
+	{
+		write(m_ram_base + offset * 4, data);
+	}
+
+private:
+	// internal helpers
+	void consume(u32 words) { m_read_index += words; m_depth -= words; }
+	u32 peek_next() { return m_ram[m_read_index & m_mask]; }
+	u32 read_next() { u32 result = peek_next(); consume(1); return result; }
+	float read_next_float() { float result = *(float *)&m_ram[m_read_index & m_mask]; consume(1); return result; }
+
+	// internal operations
+	u32 words_needed(u32 command);
+	void write(offs_t addr, u32 data);
+
+	// packet handlers
+	using packet_handler = u32 (command_fifo::*)(u32);
+	u32 packet_type_0(u32 command);
+	u32 packet_type_1(u32 command);
+	u32 packet_type_2(u32 command);
+	u32 packet_type_3(u32 command);
+	u32 packet_type_4(u32 command);
+	u32 packet_type_5(u32 command);
+	u32 packet_type_unknown(u32 command);
+
+	// internal state
+	voodoo_2_device &m_device;     // reference to our device
+	u32 *m_ram;                    // base of RAM
+	u32 m_mask;                    // mask for RAM accesses
+	bool m_enable;                 // enabled?
+	bool m_count_holes;            // count holes?
+	u32 m_ram_base;                // base address in framebuffer RAM
+	u32 m_ram_end;                 // end address in framebuffer RAM
+	u32 m_read_index;              // current read index into 32-bit RAM
+	u32 m_address_min;             // minimum address
+	u32 m_address_max;             // maximum address
+	u32 m_depth;                   // current depth
+	u32 m_holes;                   // number of holes
+
+	static packet_handler s_packet_handler[8];
+};
+
+
+// ======================> setup_vertex
+
+// setup_vertex a set of coordinates managed by the triangle setup engine
+// that was introduced with the Voodoo-2
+struct setup_vertex
+{
+	// state saving
+	void register_save(save_proxy &save)
+	{
+		save.save_item(NAME(x));
+		save.save_item(NAME(y));
+		save.save_item(NAME(z));
+		save.save_item(NAME(wb));
+		save.save_item(NAME(r));
+		save.save_item(NAME(g));
+		save.save_item(NAME(b));
+		save.save_item(NAME(a));
+		save.save_item(NAME(s0));
+		save.save_item(NAME(t0));
+		save.save_item(NAME(w0));
+		save.save_item(NAME(s1));
+		save.save_item(NAME(t1));
+		save.save_item(NAME(w1));
+	}
+
+	float x, y;               // X, Y coordinates
+	float z, wb;              // Z and broadcast W values
+	float r, g, b, a;         // A, R, G, B values
+	float s0, t0, w0;         // W, S, T for TMU 0
+	float s1, t1, w1;         // W, S, T for TMU 1
+};
+
+}
+
+
 DECLARE_DEVICE_TYPE(VOODOO_2, voodoo_2_device)
 
 // ======================> voodoo_2_device
 
 // voodoo_2_device represents the 2nd generation of 3dfx Voodoo Graphics devices;
-// these are pretty similar in architecture to the first generation, with the 
+// these are pretty similar in architecture to the first generation, with the
 // addition of command FIFOs and several other smaller features
 class voodoo_2_device: public voodoo_1_device
 {

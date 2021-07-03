@@ -18,7 +18,7 @@ u32 register_table_entry::write(voodoo_1_device &device, u32 chipmask, u32 regnu
 {
 	// statistics if enabled
 	if (DEBUG_STATS)
-		device.m_stats.reg_writes++;
+		device.m_stats.m_reg_writes++;
 
 	// log if enabled
 	if (LOG_REGISTERS)
@@ -33,7 +33,14 @@ u32 register_table_entry::write(voodoo_1_device &device, u32 chipmask, u32 regnu
 
 u32 register_table_entry::read(voodoo_1_device &device, u32 chipmask, u32 regnum) const
 {
+	// statistics if enabled
+	if (DEBUG_STATS)
+		device.m_stats.m_reg_reads++;
+
+	// get the result
 	u32 result = m_read(chipmask & m_chipmask_flags, regnum) & m_mask;
+
+	// log if enabled
 	if (LOG_REGISTERS)
 	{
 		// don't log multiple identical status reads from the same address

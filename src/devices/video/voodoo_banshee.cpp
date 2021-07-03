@@ -171,7 +171,7 @@ void voodoo_banshee_device_base::texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)
-		m_stats.tex_writes++;
+		m_stats.m_tex_writes++;
 
 	// point to the right TMU
 	int tmunum = BIT(offset, 19, 2);
@@ -315,7 +315,7 @@ s32 voodoo_banshee_device_base::lfb_direct_w(offs_t offset, u32 data, u32 mem_ma
 {
 	// statistics
 	if (DEBUG_STATS)
-		m_stats.lfb_writes++;
+		m_stats.m_lfb_writes++;
 
 	// byte swizzling
 	auto const lfbmode = m_reg.lfb_mode();

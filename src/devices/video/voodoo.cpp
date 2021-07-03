@@ -151,8 +151,10 @@ rasterizer_texture::recompute()
 voodoo_renderer::voodoo_renderer()
  - fogdelta_mask = 0xff (1) vs 0xfc (2/3)
 
-*/
+todo:
+ - size the CLUT properly
 
+*/
 
 #include "emu.h"
 #include "screen.h"
@@ -161,16 +163,6 @@ voodoo_renderer::voodoo_renderer()
 #include "voodoo_regs.ipp"
 
 using namespace voodoo;
-
-
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// number of clocks to set up a triangle (just a guess)
-static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
-
 
 
 //**************************************************************************
@@ -247,10 +239,78 @@ static inline s64 float_to_int64(u32 data, int fixedbits)
 }
 
 
+//**************************************************************************
+//  SHARED TABLES
+//**************************************************************************
+
+//-------------------------------------------------
+//  shared_tables - constructor
+//-------------------------------------------------
+
+shared_tables::shared_tables()
+{
+	// configure the array of texel formats
+	texel[0] = rgb332;
+	texel[1] = nullptr;
+	texel[2] = alpha8;
+	texel[3] = int8;
+	texel[4] = ai44;
+	texel[5] = nullptr;
+	texel[6] = nullptr;
+	texel[7] = nullptr;
+	texel[8] = rgb332;
+	texel[9] = nullptr;
+	texel[10] = rgb565;
+	texel[11] = argb1555;
+	texel[12] = argb4444;
+	texel[13] = int8;
+	texel[14] = nullptr;
+	texel[15] = nullptr;
+
+	// build static 8-bit texel tables
+	for (int val = 0; val < 256; val++)
+	{
+		// 8-bit RGB (3-3-2)
+		rgb332[val] = rgbexpand<3,3,2>(val, 5, 2, 0).set_a(0xff);
+
+		// 8-bit alpha
+		alpha8[val] = rgb_t(val, val, val, val);
+
+		// 8-bit intensity
+		int8[val] = rgb_t(0xff, val, val, val);
+
+		// 8-bit alpha, intensity
+		ai44[val] = argbexpand<4,4,4,4>(val, 4, 0, 0, 0);
+	}
+
+	// build static 16-bit texel tables
+	for (int val = 0; val < 65536; val++)
+	{
+		// table 10 = 16-bit RGB (5-6-5)
+		rgb565[val] = rgbexpand<5,6,5>(val, 11, 5, 0).set_a(0xff);
+
+		// table 11 = 16 ARGB (1-5-5-5)
+		argb1555[val] = argbexpand<1,5,5,5>(val, 15, 10, 5, 0);
+
+		// table 12 = 16-bit ARGB (4-4-4-4)
+		argb4444[val] = argbexpand<4,4,4,4>(val, 12, 8, 4, 0);
+	}
+}
+
 
 //**************************************************************************
 //  TMU STATE
 //**************************************************************************
+
+//-------------------------------------------------
+//  tmu_state - constructor
+//-------------------------------------------------
+
+tmu_state::tmu_state(voodoo_model model) :
+	m_reg(model)
+{
+}
+
 
 //-------------------------------------------------
 //  init - configure local state
@@ -277,6 +337,18 @@ void tmu_state::register_save(save_proxy &save)
 	// register state
 	save.save_class(NAME(m_reg));
 	save.save_item(NAME(m_palette));
+}
+
+
+//-------------------------------------------------
+//  post_load - mark everything dirty following a
+//  state load
+//-------------------------------------------------
+
+void tmu_state::post_load()
+{
+	m_regdirty = true;
+	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
 }
 
 
@@ -374,18 +446,6 @@ inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
 }
 
 
-//-------------------------------------------------
-//  post_load - mark everything dirty following a
-//  state load
-//-------------------------------------------------
-
-void tmu_state::post_load()
-{
-	m_regdirty = true;
-	m_palette_dirty[0] = m_palette_dirty[1] = m_palette_dirty[2] = m_palette_dirty[3] = true;
-}
-
-
 
 //**************************************************************************
 //  MEMORY FIFO
@@ -401,6 +461,18 @@ memory_fifo::memory_fifo() :
 	m_in(0),
 	m_out(0)
 {
+}
+
+
+//-------------------------------------------------
+//  configure - set the base/size and reset
+//-------------------------------------------------
+
+void memory_fifo::configure(u32 *base, u32 size)
+{
+	m_base = base;
+	m_size = size;
+	reset();
 }
 
 
@@ -458,10 +530,521 @@ inline u32 memory_fifo::remove()
 }
 
 
+//**************************************************************************
+//  DEBUG STATS
+//**************************************************************************
+
+//-------------------------------------------------
+//  debug_stats - constructor
+//-------------------------------------------------
+
+debug_stats::debug_stats() :
+	m_lastkey(false),
+	m_display(false)
+{
+	reset();
+}
+
+
+//-------------------------------------------------
+//  add_emulation_stats - add in statistics from
+//  the emulation stats
+//-------------------------------------------------
+
+void debug_stats::add_emulation_stats(thread_stats_block const &block)
+{
+	m_pixels_in += block.pixels_in;
+	m_pixels_out += block.pixels_out;
+	m_chroma_fail += block.chroma_fail;
+	m_zfunc_fail += block.zfunc_fail;
+	m_afunc_fail += block.afunc_fail;
+	m_clipped += block.clip_fail;
+	m_stippled += block.stipple_count;
+}
+
+
+//-------------------------------------------------
+//  reset - reset per-swap statistics
+//-------------------------------------------------
+
+void debug_stats::reset()
+{
+	m_stalls = 0;
+	m_triangles = 0;
+	m_pixels_in = 0;
+	m_pixels_out = 0;
+	m_chroma_fail = 0;
+	m_zfunc_fail = 0;
+	m_afunc_fail = 0;
+	m_clipped = 0;
+	m_stippled = 0;
+	m_reg_writes = 0;
+	m_reg_reads = 0;
+	m_lfb_writes = 0;
+	m_lfb_reads = 0;
+	m_tex_writes = 0;
+	std::fill_n(&m_texture_mode[0], std::size(m_texture_mode), 0);
+}
+
+
+//-------------------------------------------------
+//  update_string - compute the string to display
+//  all the statistics
+//-------------------------------------------------
+
+void debug_stats::update_string(rectangle const &visarea, u32 swap_history)
+{
+	// create a string of texture modes used
+	char texmodes[17] = { 0 };
+	char *texptr = &texmodes[0];
+	for (int mode = 0; mode < 16; mode++)
+		if (m_texture_mode[mode])
+			*texptr++ = "0123456789ABCDEF"[mode];
+	*texptr = 0;
+
+	// build the string
+	m_string = string_format("Swap:%6d\n"
+							 "Hist:%08X\n"
+							 "Stal:%6d\n"
+							 "Rend:%6d%%\n"
+							 "Poly:%6d\n"
+							 "PxIn:%6d\n"
+							 "POut:%6d\n"
+							 "Clip:%6d\n"
+							 "Stip:%6d\n"
+							 "Chro:%6d\n"
+							 "ZFun:%6d\n"
+							 "AFun:%6d\n"
+							 "RegW:%6d\n"
+							 "RegR:%6d\n"
+							 "LFBW:%6d\n"
+							 "LFBR:%6d\n"
+							 "TexW:%6d\n"
+							 "TexM:%s",
+							 m_swaps, swap_history, m_stalls, m_pixels_out * 100 / (visarea.width() * visarea.height()),
+							 m_triangles, m_pixels_in, m_pixels_out, m_clipped, m_stippled,
+							 m_chroma_fail, m_zfunc_fail, m_afunc_fail,
+							 m_reg_writes, m_reg_reads, m_lfb_writes, m_lfb_reads, m_tex_writes, texmodes);
+}
+
+
+//-------------------------------------------------
+//  update_display_state - based on the current key
+//  state, update and return whether stats should
+//  be shown
+//-------------------------------------------------
+
+bool debug_stats::update_display_state(bool key_pressed)
+{
+	if (key_pressed && key_pressed != m_lastkey)
+		m_display = !m_display;
+	m_lastkey = key_pressed;
+	return m_display;
+}
+
+
 
 //**************************************************************************
-//  COMMAND FIFO
+//  GENERIC VOODOO DEVICE
 //**************************************************************************
+
+//-------------------------------------------------
+//  generic_voodoo_device - constructor
+//-------------------------------------------------
+
+generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	m_model(model),
+	m_fbmem_in_mb(0),
+	m_tmumem0_in_mb(0),
+	m_tmumem1_in_mb(0),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_vblank_cb(*this),
+	m_stall_cb(*this),
+	m_pciint_cb(*this)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
+
+void generic_voodoo_device::device_start()
+{
+	// resolve callbacks
+	m_vblank_cb.resolve();
+	m_stall_cb.resolve();
+	m_pciint_cb.resolve();
+}
+
+
+//**************************************************************************
+//  VOODOO 1 DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  voodoo_1_device - constructor
+//-------------------------------------------------
+
+voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+	generic_voodoo_device(mconfig, type, tag, owner, clock, model),
+	m_chipmask(1),
+	m_init_enable(0),
+	m_stall_state(NOT_STALLED),
+	m_stall_trigger(0),
+	m_operation_end(attotime::zero),
+	m_flush_flag(false),
+	m_fbram(nullptr),
+	m_fbmask(0),
+	m_rgboffs{ u32(~0), u32(~0), u32(~0) },
+	m_auxoffs(~0),
+	m_frontbuf(0),
+	m_backbuf(1),
+	m_video_changed(true),
+	m_lfb_base(0),
+	m_lfb_stride(0),
+	m_width(512),
+	m_height(384),
+	m_xoffs(0),
+	m_yoffs(0),
+	m_vsyncstart(0),
+	m_vsyncstop(0),
+	m_swaps_pending(0),
+	m_vblank(0),
+	m_vblank_count(0),
+	m_vblank_swap_pending(0),
+	m_vblank_swap(0),
+	m_vblank_dont_swap(0),
+	m_reg(model),
+	m_tmu{ model, model },
+	m_vsync_start_timer(nullptr),
+	m_vsync_stop_timer(nullptr),
+	m_stall_resume_timer(nullptr),
+	m_last_status_pc(0),
+	m_last_status_value(0),
+	m_clut_dirty(true)
+{
+	for (int index = 0; index < std::size(m_regtable); index++)
+		m_regtable[index].unpack(s_register_table[index], *this);
+}
+
+
+//-------------------------------------------------
+//  ~voodoo_1_device - destructor
+//-------------------------------------------------
+
+voodoo_1_device::~voodoo_1_device()
+{
+}
+
+
+//-------------------------------------------------
+//  core_map - device map for core memory access
+//-------------------------------------------------
+
+void voodoo_1_device::core_map(address_map &map)
+{
+	// Voodoo-1 memory map:
+	//
+	//   00ab----`--ccccrr`rrrrrr-- Register access
+	//                                a = alternate register map if fbi_init3().tri_register_remap()
+	//                                b = byte swizzle data if fbi_init0().swizzle_reg_writes()
+	//                                c = chip mask select
+	//                                r = register index ($00-$FF)
+	//   01-yyyyy`yyyyyxxx`xxxxxxx- Linear frame buffer access (16-bit)
+	//   01yyyyyy`yyyyxxxx`xxxxxx-- Linear frame buffer access (32-bit)
+	//   1-ccllll`tttttttt`sssssss- Texture memory access, where:
+	//                                c = chip mask select
+	//                                l = LOD
+	//                                t = Y index
+	//                                s = X index
+	//
+	map(0x000000, 0x3fffff).rw(FUNC(voodoo_1_device::map_register_r), FUNC(voodoo_1_device::map_register_w));
+	map(0x400000, 0x7fffff).rw(FUNC(voodoo_1_device::map_lfb_r), FUNC(voodoo_1_device::map_lfb_w));
+	map(0x800000, 0xffffff).w(FUNC(voodoo_1_device::map_texture_w));
+}
+
+
+//-------------------------------------------------
+//  read - generic read handler until everyone is
+//  using the memory map
+//-------------------------------------------------
+
+u32 voodoo_1_device::read(offs_t offset, u32 mem_mask)
+{
+	switch (offset >> (22-2))
+	{
+		case 0x000000 >> 22:
+			return map_register_r(offset);
+
+		case 0x400000 >> 22:
+			return map_lfb_r(offset - 0x400000/4);
+
+		default:
+			return 0xffffffff;
+	}
+}
+
+
+//-------------------------------------------------
+//  write - generic write handler until everyone is
+//  using the memory map
+//-------------------------------------------------
+
+void voodoo_1_device::write(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset >> (22-2))
+	{
+		case 0x000000 >> 22:
+			map_register_w(offset, data, mem_mask);
+			break;
+
+		case 0x400000 >> 22:
+			map_lfb_w(offset - 0x400000/4, data, mem_mask);
+			break;
+
+		case 0x800000 >> 22:
+		case 0xc00000 >> 22:
+			map_texture_w(offset - 0x800000/4, data, mem_mask);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  set_init_enable - set the externally-controlled
+//  init_en register
+//-------------------------------------------------
+
+void voodoo_1_device::set_init_enable(u32 newval)
+{
+	m_init_enable = reg_init_en(newval);
+	if (LOG_REGISTERS)
+		logerror("VOODOO.REG:initEnable write = %08X\n", newval);
+}
+
+
+//-------------------------------------------------
+//  update - update the screen bitmap
+//-------------------------------------------------
+
+int voodoo_1_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// if we are blank, just fill with black
+	if (m_reg.fbi_init1().software_blank())
+	{
+		bitmap.fill(0, cliprect);
+		int changed = m_video_changed;
+		m_video_changed = false;
+		return changed;
+	}
+
+	// if the CLUT is dirty, recompute the pens array
+	if (m_clut_dirty)
+	{
+		rgb_t const *clutbase = &m_clut[0];
+
+		// kludge: some of the Midway games write 0 to the last entry when they obviously mean FF
+		if ((m_clut[32] & 0xffffff) == 0 && (m_clut[31] & 0xffffff) != 0)
+			m_clut[32] = 0x20ffffff;
+
+		// compute the R/B pens first
+		u8 rtable[32], gtable[64], btable[32];
+		for (u32 rawcolor = 0; rawcolor < 32; rawcolor++)
+		{
+			// treat rawcolor as a 5-bit value, scale up to 8 bits, and linear interpolate for red/blue
+			u32 color = pal5bit(rawcolor);
+			rtable[rawcolor] = (clutbase[color >> 3].r() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].r() * (color & 7)) >> 3;
+			btable[rawcolor] = (clutbase[color >> 3].b() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].b() * (color & 7)) >> 3;
+		}
+
+		// then the G pens
+		for (u32 rawcolor = 0; rawcolor < 64; rawcolor++)
+		{
+			// treat rawcolor as a 6-bit value, scale up to 8 bits, and linear interpolate
+			u32 color = pal6bit(rawcolor);
+			gtable[rawcolor] = (clutbase[color >> 3].g() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].g() * (color & 7)) >> 3;
+		}
+
+		// now assemble the values into their final form
+		for (u32 pen = 0; pen < 65536; pen++)
+			m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
+
+		// no longer dirty
+		m_clut_dirty = false;
+		m_video_changed = true;
+	}
+	return update_common(bitmap, cliprect, &m_pen[0]);
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
+
+void voodoo_1_device::device_start()
+{
+	// resolve configuration-related items
+	generic_voodoo_device::device_start();
+
+	// validate configuration
+	if (m_fbmem_in_mb == 0)
+		fatalerror("Invalid Voodoo memory configuration");
+	if (!BIT(m_chipmask, 1) && m_tmumem0_in_mb == 0)
+		fatalerror("Invalid Voodoo memory configuration");
+
+	// create shared tables
+	m_shared = std::make_unique<shared_tables>();
+	voodoo::dither_helper::init_static();
+
+	// determine our index within the system, then set our trigger
+	u32 index = 0;
+	for (device_t &scan : device_enumerator(machine().root_device()))
+		if (scan.type() == this->type())
+		{
+			if (&scan == this)
+				break;
+			index++;
+		}
+	m_stall_trigger = 51324 + index;
+
+	// allocate timers for VBLANK
+	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_stop), this), this);
+	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_start),this), this);
+
+	// add TMUs to the chipmask if memory is specified (later chips leave
+	// the tmumem values at 0 and set the chipmask directly to indicate
+	// that RAM is shared)
+	if (m_tmumem0_in_mb != 0)
+	{
+		m_chipmask |= 2;
+		if (m_tmumem1_in_mb != 0)
+			m_chipmask |= 4;
+	}
+
+	// allocate memory
+	u32 total_allocation = m_fbmem_in_mb + m_tmumem0_in_mb + m_tmumem1_in_mb;
+	m_memory = std::make_unique<u8[]>(total_allocation * 1024 * 1024 + 4096);
+
+	// configure frame buffer memory, aligning the base to a 4k boundary
+	m_fbram = (u8 *)(((uintptr_t(m_memory.get()) + 4095) >> 12) << 12);
+	m_fbmask = m_fbmem_in_mb * 1024 * 1024 - 1;
+
+	// configure texture memory
+	u8 *tmumem[2] = { nullptr, nullptr };
+	u8 tmusize[2] = { m_tmumem0_in_mb, m_tmumem1_in_mb };
+	if (tmusize[0] != 0)
+	{
+		// separate framebuffer and texture RAM (Voodoo 1/2)
+		tmumem[0] = m_fbram + m_fbmem_in_mb * 1024 * 1024;
+		tmumem[1] = tmumem[0] + tmusize[0] * 1024 * 1024;
+	}
+	else
+	{
+		// shared framebuffer and texture RAM (Voodoo Banshee/3)
+		tmumem[0] = tmumem[1] = m_fbram;
+		tmusize[0] = tmusize[1] = m_fbmem_in_mb;
+	}
+
+	// initialize the frame buffer
+	m_rgboffs[0] = m_rgboffs[1] = m_rgboffs[2] = 0;
+	m_auxoffs = ~0;
+
+	m_frontbuf = 0;
+	m_backbuf = 1;
+	m_swaps_pending = 0;
+	m_video_changed = true;
+
+	m_lfb_base = 0;
+	m_lfb_stride = 10;
+
+	m_width = 512;
+	m_height = 384;
+	m_xoffs = 0;
+	m_yoffs = 0;
+	m_vsyncstart = 0;
+	m_vsyncstop = 0;
+
+	m_vblank = 0;
+	m_vblank_count = 0;
+	m_vblank_swap_pending = 0;
+	m_vblank_swap = 0;
+	m_vblank_dont_swap = 0;
+
+	m_lfb_stats.reset();
+
+	// initialize the memory FIFO
+	m_fbmem_fifo.configure(nullptr, 0);
+
+	// initialize the CLUT
+	for (int pen = 0; pen < 32; pen++)
+		m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
+	m_clut[32] = rgb_t(32,0xff,0xff,0xff);
+	m_clut_dirty = true;
+
+	// initialize the TMUs
+	u16 tmu_config = 0x11;
+	m_tmu[0].init(0, *m_shared.get(), tmumem[0], tmusize[0] * 1024 * 1024);
+	if (BIT(m_chipmask, 2))
+	{
+		m_tmu[1].init(1, *m_shared.get(), tmumem[1], tmusize[1] * 1024 * 1024);
+		tmu_config |= 0xc0;
+	}
+
+	// create the renderer
+	m_renderer = std::make_unique<voodoo_renderer>(machine(), tmu_config, m_shared->rgb565, m_reg, &m_tmu[0].regs(), BIT(m_chipmask, 2) ? &m_tmu[1].regs() : nullptr);
+
+	// set up the PCI FIFO
+	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
+	m_stall_state = NOT_STALLED;
+	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::stall_resume_callback), this));
+
+	// initialize registers
+	m_init_enable = 0;
+	m_reg.write(voodoo_regs::reg_fbiInit0, (1 << 4) | (0x10 << 6));
+	m_reg.write(voodoo_regs::reg_fbiInit1, (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20));
+	m_reg.write(voodoo_regs::reg_fbiInit2, (1 << 6) | (0x100 << 23));
+	m_reg.write(voodoo_regs::reg_fbiInit3, (2 << 13) | (0xf << 17));
+	m_reg.write(voodoo_regs::reg_fbiInit4, (1 << 0));
+
+	// do a soft reset to reset everything else
+	soft_reset();
+
+	// register for save states
+	save_proxy save(*this);
+	register_save(save, total_allocation);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void voodoo_1_device::device_reset()
+{
+	soft_reset();
+}
+
+
+//-------------------------------------------------
+//  device_post_load - update after loading save
+//  state
+//-------------------------------------------------
+
+void voodoo_1_device::device_post_load()
+{
+	// dirty everything so it gets recomputed
+	m_clut_dirty = true;
+	for (tmu_state &tm : m_tmu)
+		tm.post_load();
+
+	// recompute FBI memory FIFO to get the base pointer set
+	if (m_fbmem_fifo.configured())
+		recompute_fbmem_fifo();
+}
+
 
 
 u16 *voodoo_1_device::draw_buffer_indirect(int index, bool depth_allowed)
@@ -503,157 +1086,25 @@ int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &clipre
 	}
 
 	// update stats display
-	if (DEBUG_STATS)
-	{
-		int statskey = (machine().input().code_pressed(KEYCODE_BACKSLASH));
-		if (statskey && statskey != m_stats.lastkey)
-			m_stats.display = !m_stats.display;
-		m_stats.lastkey = statskey;
+	if (DEBUG_STATS && m_stats.update_display_state(machine().input().code_pressed(KEYCODE_BACKSLASH)))
+		popmessage(m_stats.string(), 0, 0);
 
-		/* display stats */
-		if (m_stats.display)
-			popmessage(m_stats.buffer, 0, 0);
-	}
-
-	// update render override
-	if (DEBUG_DEPTH)
-	{
-		m_stats.render_override = machine().input().code_pressed(KEYCODE_ENTER);
-		if (m_stats.render_override)
+	// overwrite with the depth buffer if debugging and the ENTER key is pressed
+	if (DEBUG_DEPTH && machine().input().code_pressed(KEYCODE_ENTER))
+		for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-			{
-				u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
-				u32 *const dst = &bitmap.pix(y);
-				for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
-					dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
-			}
+			u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
+			u32 *const dst = &bitmap.pix(y);
+			for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
 		}
-	}
+
 	return changed;
 }
 
-int voodoo_1_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// if we are blank, just fill with black
-	if (m_reg.fbi_init1().software_blank())
-	{
-		bitmap.fill(0, cliprect);
-		int changed = m_video_changed;
-		m_video_changed = false;
-		return changed;
-	}
-
-	// if the CLUT is dirty, recompute the pens array
-	if (m_clut_dirty)
-	{
-		rgb_t const *clutbase = &m_clut[0];
-
-		// kludge: some of the Midway games write 0 to the last entry when they obviously mean FF
-		if ((m_clut[32] & 0xffffff) == 0 && (m_clut[31] & 0xffffff) != 0)
-			m_clut[32] = 0x20ffffff;
-
-		// compute the R/G/B pens first
-		u8 rtable[32], gtable[64], btable[32];
-		for (u32 rawcolor = 0; rawcolor < 32; rawcolor++)
-		{
-			// treat X as a 5-bit value, scale up to 8 bits, and linear interpolate for red/blue
-			u32 color = pal5bit(rawcolor);
-			rtable[rawcolor] = (clutbase[color >> 3].r() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].r() * (color & 7)) >> 3;
-			btable[rawcolor] = (clutbase[color >> 3].b() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].b() * (color & 7)) >> 3;
-
-			// treat X as a 6-bit value with LSB=0, scale up to 8 bits, and linear interpolate
-			color = pal6bit(rawcolor * 2 + 0);
-			gtable[rawcolor * 2 + 0] = (clutbase[color >> 3].g() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].g() * (color & 7)) >> 3;
-
-			// treat X as a 6-bit value with LSB=1, scale up to 8 bits, and linear interpolate
-			color = pal6bit(rawcolor * 2 + 1);
-			gtable[rawcolor * 2 + 1] = (clutbase[color >> 3].g() * (8 - (color & 7)) + clutbase[(color >> 3) + 1].g() * (color & 7)) >> 3;
-		}
-
-		// now compute the actual pens array
-		for (u32 pen = 0; pen < 65536; pen++)
-			m_pen[pen] = rgb_t(rtable[BIT(pen, 11, 5)], gtable[BIT(pen, 5, 6)], btable[BIT(pen, 0, 5)]);
-
-		// no longer dirty
-		m_clut_dirty = false;
-		m_video_changed = true;
-	}
-	return update_common(bitmap, cliprect, &m_pen[0]);
-}
 
 
 
-/*************************************
- *
- *  Chip reset
- *
- *************************************/
-
-void voodoo_1_device::set_init_enable(u32 newval)
-{
-	m_init_enable = reg_init_en(newval);
-	if (LOG_REGISTERS)
-		logerror("VOODOO.REG:initEnable write = %08X\n", newval);
-}
-
-
-
-/*************************************
- *
- *  Common initialization
- *
- *************************************/
-
-shared_tables::shared_tables()
-{
-	// configure the array of texel formats
-	texel[0] = rgb332;
-	texel[1] = nullptr;
-	texel[2] = alpha8;
-	texel[3] = int8;
-	texel[4] = ai44;
-	texel[5] = nullptr;
-	texel[6] = nullptr;
-	texel[7] = nullptr;
-	texel[8] = rgb332;
-	texel[9] = nullptr;
-	texel[10] = rgb565;
-	texel[11] = argb1555;
-	texel[12] = argb4444;
-	texel[13] = int8;
-	texel[14] = nullptr;
-	texel[15] = nullptr;
-
-	// build static 8-bit texel tables
-	for (int val = 0; val < 256; val++)
-	{
-		// 8-bit RGB (3-3-2)
-		rgb332[val] = rgbexpand<3,3,2>(val, 5, 2, 0).set_a(0xff);
-
-		// 8-bit alpha
-		alpha8[val] = rgb_t(val, val, val, val);
-
-		// 8-bit intensity
-		int8[val] = rgb_t(0xff, val, val, val);
-
-		// 8-bit alpha, intensity
-		ai44[val] = argbexpand<4,4,4,4>(val, 4, 0, 0, 0);
-	}
-
-	// build static 16-bit texel tables
-	for (int val = 0; val < 65536; val++)
-	{
-		// table 10 = 16-bit RGB (5-6-5)
-		rgb565[val] = rgbexpand<5,6,5>(val, 11, 5, 0).set_a(0xff);
-
-		// table 11 = 16 ARGB (1-5-5-5)
-		argb1555[val] = argbexpand<1,5,5,5>(val, 15, 10, 5, 0);
-
-		// table 12 = 16-bit ARGB (4-4-4-4)
-		argb4444[val] = argbexpand<4,4,4,4>(val, 12, 8, 4, 0);
-	}
-}
 
 
 ALLOW_SAVE_TYPE(voodoo_1_device::stall_state);
@@ -720,32 +1171,24 @@ void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
  *
  *************************************/
 
-void voodoo_1_device::accumulate_statistics(const thread_stats_block &block)
+void voodoo_1_device::accumulate_statistics(thread_stats_block const &block)
 {
-	/* apply internal voodoo statistics */
+	// update live voodoo statistics
 	m_reg.add(voodoo_regs::reg_fbiPixelsIn, block.pixels_in);
 	m_reg.add(voodoo_regs::reg_fbiPixelsOut, block.pixels_out);
 	m_reg.add(voodoo_regs::reg_fbiChromaFail, block.chroma_fail);
 	m_reg.add(voodoo_regs::reg_fbiZfuncFail, block.zfunc_fail);
 	m_reg.add(voodoo_regs::reg_fbiAfuncFail, block.afunc_fail);
 
-	/* apply emulation statistics */
+	// update emulation statistics
 	if (DEBUG_STATS)
-	{
-		m_stats.total_pixels_in += block.pixels_in;
-		m_stats.total_pixels_out += block.pixels_out;
-		m_stats.total_chroma_fail += block.chroma_fail;
-		m_stats.total_zfunc_fail += block.zfunc_fail;
-		m_stats.total_afunc_fail += block.afunc_fail;
-		m_stats.total_clipped += block.clip_fail;
-		m_stats.total_stippled += block.stipple_count;
-	}
+		m_stats.add_emulation_stats(block);
 }
 
 
 void voodoo_1_device::update_statistics(bool accumulate)
 {
-	/* accumulate/reset statistics from all units */
+	// accumulate/reset statistics from all units
 	for (auto &stats : m_renderer->thread_stats())
 	{
 		if (accumulate)
@@ -753,7 +1196,7 @@ void voodoo_1_device::update_statistics(bool accumulate)
 		stats.reset();
 	}
 
-	/* accumulate/reset statistics from the LFB */
+	// accumulate/reset statistics from the LFB
 	if (accumulate)
 		accumulate_statistics(m_lfb_stats);
 	m_lfb_stats.reset();
@@ -813,60 +1256,19 @@ void voodoo_1_device::swap_buffers()
 		check_stalled_cpu(machine().time());
 
 	// periodically log rasterizer info
-	m_stats.swaps++;
-	if (m_stats.swaps % 1000 == 0)
+	m_stats.m_swaps++;
+	if (m_stats.m_swaps % 1000 == 0)
 		m_renderer->dump_rasterizer_stats();
 
 	// update the statistics (debug)
 	if (DEBUG_STATS)
 	{
-		if (m_stats.display)
+		if (m_stats.displayed())
 		{
 			update_statistics(true);
-			u32 pixelcount = m_stats.total_pixels_out;
-
-			int screen_area = screen().visible_area().width() * screen().visible_area().height();
-			char *statsptr = m_stats.buffer;
-			statsptr += sprintf(statsptr, "Swap:%6d\n", m_stats.swaps);
-			statsptr += sprintf(statsptr, "Hist:%08X\n", m_reg.swap_history());
-			statsptr += sprintf(statsptr, "Stal:%6d\n", m_stats.stalls);
-			statsptr += sprintf(statsptr, "Rend:%6d%%\n", pixelcount * 100 / screen_area);
-			statsptr += sprintf(statsptr, "Poly:%6d\n", m_stats.total_triangles);
-			statsptr += sprintf(statsptr, "PxIn:%6d\n", m_stats.total_pixels_in);
-			statsptr += sprintf(statsptr, "POut:%6d\n", m_stats.total_pixels_out);
-			statsptr += sprintf(statsptr, "Clip:%6d\n", m_stats.total_clipped);
-			statsptr += sprintf(statsptr, "Stip:%6d\n", m_stats.total_stippled);
-			statsptr += sprintf(statsptr, "Chro:%6d\n", m_stats.total_chroma_fail);
-			statsptr += sprintf(statsptr, "ZFun:%6d\n", m_stats.total_zfunc_fail);
-			statsptr += sprintf(statsptr, "AFun:%6d\n", m_stats.total_afunc_fail);
-			statsptr += sprintf(statsptr, "RegW:%6d\n", m_stats.reg_writes);
-			statsptr += sprintf(statsptr, "RegR:%6d\n", m_stats.reg_reads);
-			statsptr += sprintf(statsptr, "LFBW:%6d\n", m_stats.lfb_writes);
-			statsptr += sprintf(statsptr, "LFBR:%6d\n", m_stats.lfb_reads);
-			statsptr += sprintf(statsptr, "TexW:%6d\n", m_stats.tex_writes);
-			statsptr += sprintf(statsptr, "TexM:");
-			for (int mode = 0; mode < 16; mode++)
-				if (m_stats.texture_mode[mode])
-					*statsptr++ = "0123456789ABCDEF"[mode];
-			*statsptr = 0;
+			m_stats.update_string(screen().visible_area(), m_reg.swap_history());
 		}
-
-		// reset internal statistics
-		m_stats.stalls = 0;
-		m_stats.total_triangles = 0;
-		m_stats.total_pixels_in = 0;
-		m_stats.total_pixels_out = 0;
-		m_stats.total_chroma_fail = 0;
-		m_stats.total_zfunc_fail = 0;
-		m_stats.total_afunc_fail = 0;
-		m_stats.total_clipped = 0;
-		m_stats.total_stippled = 0;
-		m_stats.reg_writes = 0;
-		m_stats.reg_reads = 0;
-		m_stats.lfb_writes = 0;
-		m_stats.lfb_reads = 0;
-		m_stats.tex_writes = 0;
-		memset(m_stats.texture_mode, 0, sizeof(m_stats.texture_mode));
+		m_stats.reset();
 	}
 }
 
@@ -1120,7 +1522,7 @@ void voodoo_1_device::stall_cpu(stall_state state)
 	// set the state and update statistics
 	m_stall_state = state;
 	if (DEBUG_STATS)
-		m_stats.stalls++;
+		m_stats.m_stalls++;
 
 	// either call the callback, or spin the CPU
 	if (!m_stall_cb.isnull())
@@ -1773,7 +2175,7 @@ void voodoo_1_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
-		m_stats.lfb_writes++;
+		m_stats.m_lfb_writes++;
 
 	// byte swizzling
 	auto const lfbmode = m_reg.lfb_mode();
@@ -2123,7 +2525,7 @@ void voodoo_1_device::texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)
-		m_stats.tex_writes++;
+		m_stats.m_tex_writes++;
 
 	// point to the right TMU
 	int tmunum = BIT(offset, 19, 2);
@@ -2396,7 +2798,7 @@ u32 voodoo_1_device::lfb_r(offs_t offset, bool lfb_3d)
 
 	/* statistics */
 	if (DEBUG_STATS)
-		m_stats.lfb_reads++;
+		m_stats.m_lfb_reads++;
 
 	/* compute X,Y */
 	offset <<= 1;
@@ -2555,68 +2957,6 @@ void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 //**************************************************************************
 //  VOODOO 1 MEMORY MAP
 //**************************************************************************
-
-//-------------------------------------------------
-//  core_map - device map for core memory access
-//-------------------------------------------------
-
-void voodoo_1_device::core_map(address_map &map)
-{
-	printf("voodoo_1_device::core_map\n");
-
-	// Voodoo-1 memory map:
-	//
-	//   00ab----`--ccccrr`rrrrrr-- Register access
-	//                                a = alternate register map if fbi_init3().tri_register_remap()
-	//                                b = byte swizzle data if fbi_init0().swizzle_reg_writes()
-	//                                c = chip mask select
-	//                                r = register index ($00-$FF)
-	//   01-yyyyy`yyyyyxxx`xxxxxxx- Linear frame buffer access (16-bit)
-	//   01yyyyyy`yyyyxxxx`xxxxxx-- Linear frame buffer access (32-bit)
-	//   1-ccllll`tttttttt`sssssss- Texture memory access, where:
-	//                                c = chip mask select
-	//                                l = LOD
-	//                                t = Y index
-	//                                s = X index
-	//
-	map(0x000000, 0x3fffff).rw(FUNC(voodoo_1_device::map_register_r), FUNC(voodoo_1_device::map_register_w));
-	map(0x400000, 0x7fffff).rw(FUNC(voodoo_1_device::map_lfb_r), FUNC(voodoo_1_device::map_lfb_w));
-	map(0x800000, 0xffffff).w(FUNC(voodoo_1_device::map_texture_w));
-}
-
-u32 voodoo_1_device::read(offs_t offset, u32 mem_mask)
-{
-	switch (offset >> (22-2))
-	{
-		case 0x000000 >> 22:
-			return map_register_r(offset);
-
-		case 0x400000 >> 22:
-			return map_lfb_r(offset - 0x400000/4);
-
-		default:
-			return 0xffffffff;
-	}
-}
-
-void voodoo_1_device::write(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (offset >> (22-2))
-	{
-		case 0x000000 >> 22:
-			map_register_w(offset, data, mem_mask);
-			break;
-
-		case 0x400000 >> 22:
-			map_lfb_w(offset - 0x400000/4, data, mem_mask);
-			break;
-
-		case 0x800000 >> 22:
-		case 0xc00000 >> 22:
-			map_texture_w(offset - 0x800000/4, data, mem_mask);
-			break;
-	}
-}
 
 //-------------------------------------------------
 //  map_register_r - handle a mapped read from
@@ -2817,7 +3157,7 @@ s32 voodoo_1_device::triangle()
 		poly.dw0dy = tmu0regs.dw_dy();
 		poly.tex0 = &m_tmu[0].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
-			m_stats.texture_mode[tmu0regs.texture_mode().format()]++;
+			m_stats.m_texture_mode[tmu0regs.texture_mode().format()]++;
 	}
 
 	// fill in texture 1 parameters
@@ -2836,7 +3176,7 @@ s32 voodoo_1_device::triangle()
 		poly.dw1dy = tmu1regs.dw_dy();
 		poly.tex1 = &m_tmu[1].prepare_texture(*m_renderer.get());
 		if (DEBUG_STATS)
-			m_stats.texture_mode[tmu1regs.texture_mode().format()]++;
+			m_stats.m_texture_mode[tmu1regs.texture_mode().format()]++;
 	}
 
 	// fill in color parameters
@@ -2863,7 +3203,7 @@ s32 voodoo_1_device::triangle()
 	// update stats
 	m_reg.add(voodoo_regs::reg_fbiTrianglesOut, 1);
 	if (DEBUG_STATS)
-		m_stats.total_triangles++;
+		m_stats.m_triangles++;
 
 	g_profiler.stop();
 
@@ -2875,246 +3215,6 @@ s32 voodoo_1_device::triangle()
 }
 
 
-//-------------------------------------------------
-//  generic_voodoo_device - constructor
-//-------------------------------------------------
-
-generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_video_interface(mconfig, *this),
-	m_model(model),
-	m_fbmem_in_mb(0),
-	m_tmumem0_in_mb(0),
-	m_tmumem1_in_mb(0),
-	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_vblank_cb(*this),
-	m_stall_cb(*this),
-	m_pciint_cb(*this)
-{
-}
-	
-
-//-------------------------------------------------
-//  voodoo_1_device - constructor
-//-------------------------------------------------
-
-voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
-	generic_voodoo_device(mconfig, type, tag, owner, clock, model),
-	m_chipmask(1),
-	m_init_enable(0),
-	m_stall_state(NOT_STALLED),
-	m_stall_trigger(0),
-	m_operation_end(attotime::zero),
-	m_flush_flag(false),
-	m_fbram(nullptr),
-	m_fbmask(0),
-	m_rgboffs{ u32(~0), u32(~0), u32(~0) },
-	m_auxoffs(~0),
-	m_frontbuf(0),
-	m_backbuf(1),
-	m_video_changed(true),
-	m_lfb_base(0),
-	m_lfb_stride(0),
-	m_width(512),
-	m_height(384),
-	m_xoffs(0),
-	m_yoffs(0),
-	m_vsyncstart(0),
-	m_vsyncstop(0),
-	m_swaps_pending(0),
-	m_vblank(0),
-	m_vblank_count(0),
-	m_vblank_swap_pending(0),
-	m_vblank_swap(0),
-	m_vblank_dont_swap(0),
-	m_reg(model),
-	m_tmu{ model, model },
-	m_vsync_start_timer(nullptr),
-	m_vsync_stop_timer(nullptr),
-	m_stall_resume_timer(nullptr),
-	m_last_status_pc(0),
-	m_last_status_value(0),
-	m_clut_dirty(true)
-{
-	for (int index = 0; index < std::size(m_regtable); index++)
-		m_regtable[index].unpack(s_register_table[index], *this);
-}
-
-
-//-------------------------------------------------
-//  ~voodoo_1_device - destructor
-//-------------------------------------------------
-
-voodoo_1_device::~voodoo_1_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device startup
-//-------------------------------------------------
-
-void voodoo_1_device::device_start()
-{
-	// validate configuration
-	if (m_fbmem_in_mb == 0)
-		fatalerror("Invalid Voodoo memory configuration");
-	if (!BIT(m_chipmask, 1) && m_tmumem0_in_mb == 0)
-		fatalerror("Invalid Voodoo memory configuration");
-
-	// create shared tables
-	m_shared = std::make_unique<shared_tables>();
-	voodoo::dither_helper::init_static();
-
-	// determine our index within the system, then set our trigger
-	u32 index = 0;
-	for (device_t &scan : device_enumerator(machine().root_device()))
-		if (scan.type() == this->type())
-		{
-			if (&scan == this)
-				break;
-			index++;
-		}
-	m_stall_trigger = 51324 + index;
-
-	// resolve callbacks
-	m_vblank_cb.resolve();
-	m_stall_cb.resolve();
-	m_pciint_cb.resolve();
-
-	// allocate timers for VBLANK
-	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_stop), this), this);
-	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_start),this), this);
-
-	// add TMUs to the chipmask if memory is specified
-	if (m_tmumem0_in_mb != 0)
-	{
-		m_chipmask |= 2;
-		if (m_tmumem1_in_mb != 0)
-			m_chipmask |= 4;
-	}
-
-	// allocate memory
-	u32 total_allocation = m_fbmem_in_mb + m_tmumem0_in_mb + m_tmumem1_in_mb;
-	m_memory = std::make_unique<u8[]>(total_allocation * 1024 * 1024 + 4096);
-
-	// configure frame buffer memory, aligning the base to a 4k boundary
-	m_fbram = (u8 *)(((uintptr_t(m_memory.get()) + 4095) >> 12) << 12);
-	m_fbmask = m_fbmem_in_mb * 1024 * 1024 - 1;
-
-	// configure texture memory
-	u8 *tmumem[2] = { nullptr, nullptr };
-	if (m_tmumem0_in_mb != 0)
-	{
-		// separate framebuffer and texture RAM (Voodoo 1/2)
-		tmumem[0] = m_fbram + m_fbmem_in_mb * 1024 * 1024;
-		tmumem[1] = tmumem[0] + m_tmumem0_in_mb * 1024 * 1024;
-	}
-	else
-	{
-		// shared framebuffer and texture RAM (Voodoo Banshee/3)
-		tmumem[0] = tmumem[1] = m_fbram;
-		m_tmumem0_in_mb = m_tmumem1_in_mb = m_fbmem_in_mb;
-	}
-
-	// initialize the frame buffer
-	// allocate frame buffer RAM and set pointers
-	m_rgboffs[0] = m_rgboffs[1] = m_rgboffs[2] = 0;
-	m_auxoffs = ~0;
-
-	m_frontbuf = 0;
-	m_backbuf = 1;
-	m_swaps_pending = 0;
-	m_video_changed = true;
-
-	m_lfb_base = 0;
-	m_lfb_stride = 10;
-
-	m_width = 512;
-	m_height = 384;
-	m_xoffs = 0;
-	m_yoffs = 0;
-	m_vsyncstart = 0;
-	m_vsyncstop = 0;
-
-	m_vblank = 0;
-	m_vblank_count = 0;
-	m_vblank_swap_pending = 0;
-	m_vblank_swap = 0;
-	m_vblank_dont_swap = 0;
-
-	m_lfb_stats.reset();
-
-	// initialize the memory FIFO
-	m_fbmem_fifo.configure(nullptr, 0);
-
-	// initialize the CLUT
-	for (int pen = 0; pen < 32; pen++)
-		m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
-	m_clut[32] = rgb_t(32,0xff,0xff,0xff);
-	m_clut_dirty = true;
-
-	// initialize the TMUs
-	u16 tmu_config = 0x11;
-	m_tmu[0].init(0, *m_shared.get(), tmumem[0], m_tmumem0_in_mb * 1024 * 1024);
-	if (BIT(m_chipmask, 2))
-	{
-		m_tmu[1].init(1, *m_shared.get(), tmumem[1], m_tmumem1_in_mb * 1024 * 1024);
-		tmu_config |= 0xc0;
-	}
-
-	// create the renderer
-	m_renderer = std::make_unique<voodoo_renderer>(machine(), tmu_config, m_shared->rgb565, m_reg, &m_tmu[0].regs(), BIT(m_chipmask, 2) ? &m_tmu[1].regs() : nullptr);
-
-	// set up the PCI FIFO
-	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
-	m_stall_state = NOT_STALLED;
-	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::stall_resume_callback), this));
-
-	// initialize registers
-	m_init_enable = 0;
-	m_reg.write(voodoo_regs::reg_fbiInit0, (1 << 4) | (0x10 << 6));
-	m_reg.write(voodoo_regs::reg_fbiInit1, (1 << 1) | (1 << 8) | (1 << 12) | (2 << 20));
-	m_reg.write(voodoo_regs::reg_fbiInit2, (1 << 6) | (0x100 << 23));
-	m_reg.write(voodoo_regs::reg_fbiInit3, (2 << 13) | (0xf << 17));
-	m_reg.write(voodoo_regs::reg_fbiInit4, (1 << 0));
-
-	// do a soft reset to reset everything else
-	soft_reset();
-
-	// register for save states
-	save_proxy save(*this);
-	register_save(save, total_allocation);
-}
-
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void voodoo_1_device::device_reset()
-{
-	soft_reset();
-}
-
-
-//-------------------------------------------------
-//  device_post_load - update after loading save
-//  state
-//-------------------------------------------------
-
-void voodoo_1_device::device_post_load()
-{
-	// dirty everything so it gets recomputed
-	m_clut_dirty = true;
-	for (tmu_state &tm : m_tmu)
-		tm.post_load();
-
-	// recompute FBI memory FIFO to get the base pointer set
-	if (m_fbmem_fifo.configured())
-		recompute_fbmem_fifo();
-}
 
 
 DEFINE_DEVICE_TYPE(VOODOO_1, voodoo_1_device, "voodoo_1", "3dfx Voodoo Graphics")
