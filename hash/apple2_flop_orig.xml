@@ -5584,17 +5584,19 @@ license:CC0
 		<info name="release" value="2019-06-16"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- Redumped on July 3rd, 2021 to fix side 2, which
+		should not have write protection. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - program disk.woz" size="234759" crc="5b42e1f6" sha1="1f6ce95fccd334e8faaf9217735f14da3c9e8d99" />
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - program disk.woz" size="234834" crc="54e443c6" sha1="7ff4c81a96d18d89609e3e1d2ed7e79c7cc10597" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Player disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - player disk.woz" size="234759" crc="98271568" sha1="a0a2546b2b1e7328000aa51de2024233ad06e410" />
+			<feature name="part_id" value="Side B - Player disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - player disk.woz" size="234834" crc="6c1893b0" sha1="d82a0833180147b967eee6cf954b8a7939ca5a02" />
 			</dataarea>
 		</part>
 	</software>
