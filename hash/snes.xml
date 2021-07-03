@@ -1112,12 +1112,12 @@ Beyond that last category are the roms waiting to be classified.
 			<dataarea name="rom" size="3145728">
 				<rom name="earthbound (prototype 19950327).sfc" size="3145728" crc="d3fa35aa" sha1="0686c4d339657489890e43fd39797c893cb992e9" offset="0x000000" />
 <!-- released as binary blob above, these are the eventual label/socket names
-				<rom name="earth bound 3-27-95 e.7 e 0.u1" size="524288" crc="" sha1="" offset="0x000000" />
-				<rom name="earth bound 3-27-95 e.7 e 1.u2" size="524288" crc="" sha1="" offset="0x080000" />
-				<rom name="earth bound 3-27-95 e.7 e 2.u3" size="524288" crc="" sha1="" offset="0x100000" />
-				<rom name="earth bound 3-27-95 e.7 e 3.u4" size="524288" crc="" sha1="" offset="0x180000" />
-				<rom name="earth bound 3-27-95 e.7 e 4.u5" size="524288" crc="" sha1="" offset="0x200000" />
-				<rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="" sha1="" offset="0x280000" />
+                <rom name="earth bound 3-27-95 e.7 e 0.u1" size="524288" crc="" sha1="" offset="0x000000" />
+                <rom name="earth bound 3-27-95 e.7 e 1.u2" size="524288" crc="" sha1="" offset="0x080000" />
+                <rom name="earth bound 3-27-95 e.7 e 2.u3" size="524288" crc="" sha1="" offset="0x100000" />
+                <rom name="earth bound 3-27-95 e.7 e 3.u4" size="524288" crc="" sha1="" offset="0x180000" />
+                <rom name="earth bound 3-27-95 e.7 e 4.u5" size="524288" crc="" sha1="" offset="0x200000" />
+                <rom name="earth bound 3-27-95 e.7 e 5.u6" size="524288" crc="" sha1="" offset="0x280000" />
 -->
 			</dataarea>
 			<dataarea name="nvram" size="65536">

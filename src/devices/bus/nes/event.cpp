@@ -97,7 +97,7 @@ void nes_event_device::pcb_reset()
 
  iNES: mapper 105
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 

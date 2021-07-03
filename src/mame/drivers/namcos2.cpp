@@ -463,7 +463,7 @@ Custom Chips:                       Final Lap   Assault     LuckyWld    System21
     C106    OBJ:X-Axis Zoom Control   *           *
     C107    Land Line Buffer          *
     C116    Screen Waveform Generator *           *           *                                   *
-    C121    Yamaha YM2151 Sound Gen   *           *           *
+    C121    Glue logic for the 6809   *           *           *
     C123    GFX:Tile Mem Decoder      *           *           *                                   *
     C134    OBJ:Address Generator     *           *
     C135    OBJ:Line matching         *           *

@@ -378,7 +378,7 @@ uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->voodoo_update(bitmap, cliprect);
-	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);	// K001604 on slave board doesn't seem to output anything. Bug or intended?
+	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
 
 	return 0;
 }
@@ -407,7 +407,7 @@ uint8_t nwktr_state::sysreg_r(offs_t offset)
 		case 4:
 			r = m_dsw->read();
 			break;
-		default:		
+		default:
 			break;
 	}
 
@@ -439,11 +439,11 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 7:
 			/*
-				0x80 = EXRES1
-				0x40 = EXRES0
-				0x20 = EXID1
-				0x10 = EXID0
-				0x01 = EXRGB
+			    0x80 = EXRES1
+			    0x40 = EXRES0
+			    0x20 = EXID1
+			    0x10 = EXID0
+			    0x01 = EXRGB
 			*/
 			if (data & 0x80) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -455,7 +455,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
 			// This could mean broadcast to both CG boards?
 
-			m_exrgb = data & 0x1;		// Select which CG Board outputs signal
+			m_exrgb = data & 0x1;       // Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;

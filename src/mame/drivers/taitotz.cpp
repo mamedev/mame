@@ -213,7 +213,7 @@ Notes:
         0x7004:            0x4003d554()
         0x7005:            0x4003d168()
         0x8000:            ?                                        Used by vibration (force feedback?) on pwrshovl
-		0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
+        0x9100:            ?                                        Dendego3 speedometer and brake meter. io_shared[0x1c3c] = speed, io_shared[0x1c3e] = brake
         0xa000:            ?                                        Used by vibration (force feedback?) on pwrshovl
         0xf000:            0x4002f328() TLCS_Init
         0xf010:            0x4002f074()                             Enables TLCS watchdog timer
@@ -1989,7 +1989,7 @@ void taitotz_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		/*
 		if (m_io_share_ram[0xfff] == 0x1010)
 		{
-			printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
+		    printf("PPC -> TLCS cmd 1010:   %04X %04X %04X %04X\n", m_io_share_ram[0x1a02/2], m_io_share_ram[0x1a04/2], m_io_share_ram[0x1a06/2], m_io_share_ram[0x1a08/2]);
 		}
 		*/
 

@@ -27,8 +27,8 @@
         16  A3                 33  GND
         17  A5                 34  GND
 
-	SEL is an input to the MC-10 that allows the cartridge to remove
-	the internal chips from the bus.
+    SEL is an input to the MC-10 that allows the cartridge to remove
+    the internal chips from the bus.
 
 *********************************************************************/
 

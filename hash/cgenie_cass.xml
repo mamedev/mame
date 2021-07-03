@@ -176,19 +176,19 @@ is confirmed.
 	</software>
 
 	<!--
-		Load or type an Z80 assembler program as BASIC lines. Example:
-		10  ORG 4800H
-		20  LD  HL,4400H
-		30  LD  DE,4401H
-		40  LD  BC,3FFH
-		50  LD  (HL),42
-		60  LDIR
-		60  RET
-		70  END 4800H
-		Note there are two blanks after a line number. If you want to define a label,
-		use just one blank and write e.g. '40 LABEL: LD HL,1234H'.
-		Finally you can use NAME /OA to output to cassette,
-		/NS to not create the symbol table, /TM to assemble to memory.
+	    Load or type an Z80 assembler program as BASIC lines. Example:
+	    10  ORG 4800H
+	    20  LD  HL,4400H
+	    30  LD  DE,4401H
+	    40  LD  BC,3FFH
+	    50  LD  (HL),42
+	    60  LDIR
+	    60  RET
+	    70  END 4800H
+	    Note there are two blanks after a line number. If you want to define a label,
+	    use just one blank and write e.g. '40 LABEL: LD HL,1234H'.
+	    Finally you can use NAME /OA to output to cassette,
+	    /NS to not create the symbol table, /TM to assemble to memory.
 	-->
 	<software name="colasm">
 		<description>Colour-Assembler</description>

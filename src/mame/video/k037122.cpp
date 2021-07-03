@@ -15,7 +15,7 @@ Konami 037122
     ---------------- ----------xxxxxx Green
 
     Tilemap can be rotated, zoomed, similar to K053936 "simple mode"
-	Tilemap can be configured either as 256x64 tiles (2048x512 pixels) or 128x128 tiles (1024x1024 pixels), Each tile is 8bpp 8x8.
+    Tilemap can be configured either as 256x64 tiles (2048x512 pixels) or 128x128 tiles (1024x1024 pixels), Each tile is 8bpp 8x8.
 
     Tile format (4 byte (1x32bit word) per each tile)
     Bits                              Description
@@ -45,19 +45,19 @@ Konami 037122
     20     sxxxxxxxxxxxxxxx ---------------- X counter starting value (12.4 fixed point)
            ---------------- sxxxxxxxxxxxxxxx Y counter starting value (12.4 fixed point)
     24     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each line (4.12 fixed point)
-	       ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
+           ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each line (4.12 fixed point)
     28     sxxxxxxxxxxxxxxx ---------------- amount to add to the X counter after each horizontal pixel (4.12 fixed point)
-	       ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each horizontal pixel (4.12 fixed point)
+           ---------------- sxxxxxxxxxxxxxxx amount to add to the Y counter after each horizontal pixel (4.12 fixed point)
     30     ---------------x ---------------- Tilemap size
-		   ---------------0 ---------------- 128x128
-		   ---------------1 ---------------- 256x64
+           ---------------0 ---------------- 128x128
+           ---------------1 ---------------- 256x64
            ---------------- -------------xxx Character RAM bank
-	34     ---------------- -------------x-- CLUT location
-		   ---------------- -------------0-- CLUT at 0x00000-0x08000
-		   ---------------- -------------1-- CLUT at 0x18000-0x20000
-		   ---------------x ---------------- Tilemap Y origin
-		   ---------------0 ---------------- Origin at tilemap center
-		   ---------------1 ---------------- Origin at 0
+    34     ---------------- -------------x-- CLUT location
+           ---------------- -------------0-- CLUT at 0x00000-0x08000
+           ---------------- -------------1-- CLUT at 0x18000-0x20000
+           ---------------x ---------------- Tilemap Y origin
+           ---------------0 ---------------- Origin at tilemap center
+           ---------------1 ---------------- Origin at 0
 
     Other bits/registers unknown, some registers are used
 
@@ -173,7 +173,7 @@ void k037122_device::tile_draw( screen_device &screen, bitmap_rgb32 &bitmap, con
 	int16_t incxx = m_reg[0xa] >> 16;
 	int16_t incxy = m_reg[0xa] & 0xffff;
 	int16_t incyx = m_reg[0x9] >> 16;
-	int16_t incyy = m_reg[0x9] & 0xffff;	
+	int16_t incyy = m_reg[0x9] & 0xffff;
 
 	if (m_reg[0xc] & 0x10000)
 	{

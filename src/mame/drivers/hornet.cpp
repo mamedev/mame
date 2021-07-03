@@ -567,14 +567,14 @@ void hornet_state::sysreg_w(offs_t offset, uint8_t data)
 		case 4: // System Register 1
 		{
 			/*
-				0x80 = SNDRES (sound reset)
-				0x40 = COMRES (COM reset)
-				0x20 = COINRQ2 (EEPROM SCL?)
-				0x10 = COINRQ1 (EEPROM data)
-				0x08 = ADCS (ADC CS)
-				0x04 = ADCONV (ADC CONV)
-				0x02 = ADDI (ADC DI)
-				0x01 = ADDSCLK (ADC SCLK)
+			    0x80 = SNDRES (sound reset)
+			    0x40 = COMRES (COM reset)
+			    0x20 = COINRQ2 (EEPROM SCL?)
+			    0x10 = COINRQ1 (EEPROM data)
+			    0x08 = ADCS (ADC CS)
+			    0x04 = ADCONV (ADC CONV)
+			    0x02 = ADDI (ADC DI)
+			    0x01 = ADDSCLK (ADC SCLK)
 			*/
 			m_adc12138->cs_w((data >> 3) & 0x1);
 			m_adc12138->conv_w((data >> 2) & 0x1);

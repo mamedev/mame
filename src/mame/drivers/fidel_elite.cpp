@@ -6,9 +6,6 @@
 Fidelity Elite A/S series hardware (EAS, EAG, PC)
 see fidel_eag68k.cpp for 68000-based EAG hardware
 
-TODO:
-- add feas (original program)
-
 BTANB:
 - feasglab locks up at boot if it was powered off in the middle of the game.
   To resolve this, hold the Game Control button while booting to clear nvram.
@@ -563,14 +560,14 @@ void eag_state::eag2100(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( feasbu )
+ROM_START( feas )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("hm_6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A
+	ROM_LOAD("elite", 0x8000, 0x0800, CRC(cc904af9) SHA1(2b1d54c597a445ccc1ec73838e4bd2ac5154d7ad) ) // Intel D2764-2
 	ROM_CONTINUE( 0x9000, 0x0800 )
 	ROM_CONTINUE( 0x8800, 0x0800 )
 	ROM_CONTINUE( 0x9800, 0x0800 )
-	ROM_LOAD("101-1052a02", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) ) // Mostek MK36C63N-5
-	ROM_LOAD("101-1052a01", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a02", 0xc000, 0x2000, CRC(fee42863) SHA1(1854bb9cddb883d86e0d98594ac0186fb3908a01) ) // Mostek MK36C63N-5
+	ROM_LOAD("101-1052a01", 0xe000, 0x2000, CRC(41261e1b) SHA1(43664e30348a708fbe449b47e6eed39d4e9acb4c) ) // "
 
 	// speech ROM
 	ROM_DEFAULT_BIOS("en")
@@ -587,6 +584,36 @@ ROM_START( feasbu )
 
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) ) // NEC D2332C
+	ROM_RELOAD(            0x1000, 0x1000)
+	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) ) // NEC D2364C
+	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) ) // "
+	ROMX_LOAD("101-64106", 0x0000, 0x2000, CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9), ROM_BIOS(3) ) // "
+ROM_END
+
+ROM_START( feasbu )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("eli_bu3", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) )
+	ROM_CONTINUE( 0x9000, 0x0800 )
+	ROM_CONTINUE( 0x8800, 0x0800 )
+	ROM_CONTINUE( 0x9800, 0x0800 )
+	ROM_LOAD("eli_bu1", 0xc000, 0x2000, CRC(859d69f1) SHA1(a8b057683369e2387f22fc7e916b6f3c75d44b21) )
+	ROM_LOAD("eli_bu2", 0xe000, 0x2000, CRC(571a33a7) SHA1(43b110cf0918caf16643178f401e58b2dc73894f) )
+
+	// speech ROM
+	ROM_DEFAULT_BIOS("en")
+	ROM_SYSTEM_BIOS(0, "en", "English")
+	ROM_SYSTEM_BIOS(1, "de", "German")
+	ROM_SYSTEM_BIOS(2, "fr", "French")
+	ROM_SYSTEM_BIOS(3, "sp", "Spanish")
+
+	ROM_REGION( 1, "language", 0 )
+	ROMX_FILL(0, 1, 3, ROM_BIOS(0) )
+	ROMX_FILL(0, 1, 2, ROM_BIOS(1) )
+	ROMX_FILL(0, 1, 1, ROM_BIOS(2) )
+	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
 	ROM_RELOAD(            0x1000, 0x1000)
 	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
 	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
@@ -730,7 +757,7 @@ ROM_START( feasglab )
 	ROMX_FILL(0, 1, 0, ROM_BIOS(3) )
 
 	ROM_REGION( 0x2000, "speech", 0 )
-	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) ) // NEC D2332C
+	ROMX_LOAD("101-32107", 0x0000, 0x1000, CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d), ROM_BIOS(0) )
 	ROM_RELOAD(            0x1000, 0x1000)
 	ROMX_LOAD("101-64101", 0x0000, 0x2000, CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff), ROM_BIOS(1) )
 	ROMX_LOAD("101-64105", 0x0000, 0x2000, CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3), ROM_BIOS(2) )
@@ -891,11 +918,12 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT CMP MACHINE   INPUT  STATE        INIT          COMPANY, FULLNAME, FLAGS
-CONS( 1983, feasbu,    0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1983, feasbua,   feasbu, 0, ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasgla,   feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasglaa,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, feasglab,  feasbu, 0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feas,      0,      0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feasbu,    feas,   0, eas,      eas,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EAS)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1983, feasbua,   feas,   0, ewc,      ewc,   elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Budapest program, model EWC)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasgla,   feas,   0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasglaa,  feas,   0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, feasglab,  feas,   0, easc,     easc,  elite_state, empty_init,   "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 
 CONS( 1982, fpres,     0,      0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (original program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1983, fpresbu,   fpres,  0, pc,       pc,    elite_state, empty_init,   "Fidelity Electronics", "Prestige Challenger (Budapest program)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

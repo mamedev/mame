@@ -36,7 +36,6 @@
 #include "emu.h"
 #include "audio/efo_zsu.h"
 
-#include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "speaker.h"
 
@@ -48,11 +47,16 @@ DEFINE_DEVICE_TYPE(CEDAR_MAGNET_SOUND, cedar_magnet_sound_device, "gedmag_sound"
 
 efo_zsu_device::efo_zsu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_ctc0(*this, "ctc0")
-	, m_ctc1(*this, "ctc1")
+	, m_ctc(*this, "ctc%u", 0U)
+	, m_ctc0_ch0(*this, "ctc0:ch0")
+	, m_ctc0_ch2(*this, "ctc0:ch2")
 	, m_soundlatch(*this, "soundlatch")
 	, m_fifo(*this, "fifo")
 	, m_adpcm(*this, "adpcm")
+	, m_fifo_shift_timer(nullptr)
+	, m_adpcm_clock_timer(nullptr)
+	, m_ctc0_ck0_restart_timer(nullptr)
+	, m_ay1_porta(0)
 {
 }
 
@@ -100,8 +104,8 @@ void efo_zsu_device::zsu_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x00, 0x03).rw(m_ctc0, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x04, 0x07).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x00, 0x03).rw(m_ctc[0], FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x04, 0x07).rw(m_ctc[1], FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 
 	map(0x08, 0x08).w(FUNC(efo_zsu_device::adpcm_fifo_w));
 
@@ -135,13 +139,31 @@ void efo_zsu_device::ay1_porta_w(u8 data)
 	m_adpcm->reset_w(data & 1);
 	if (data & 1)
 		m_fifo->reset();
-	// D4-D6 likely used to select clock for ctc0 channel 2
-	// other bits probably used to modulate analog sound output
+
+	if ((data & 0x60) != (m_ay1_porta & 0x60))
+	{
+		// CK2 selection (74HC03 open collectors)
+		if (BIT(data, 6))
+			m_ctc0_ch2->set_unscaled_clock(8_MHz_XTAL / 8); // 1 MHz
+		else if (BIT(data, 5))
+			m_ctc0_ch2->set_unscaled_clock(8_MHz_XTAL / 16); // 500 KHz
+		else if (BIT(data, 4))
+			m_ctc0_ch2->set_unscaled_clock(8_MHz_XTAL / 32); // 250 KHz
+		else
+			m_ctc0_ch2->set_unscaled_clock(0);
+	}
+
+	m_ay1_porta = data;
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z0_w)
 {
-//  printf("USED ctc0_z0_w %d\n", state);
+	if (state)
+	{
+		// TODO: also temporarily clears CA on HC4066 filtering switch
+		m_ctc0_ch0->set_unscaled_clock(0);
+		m_ctc0_ck0_restart_timer->adjust(attotime::from_hz(8_MHz_XTAL / 256));
+	}
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z1_w)
@@ -151,27 +173,55 @@ WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z1_w)
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z0_w)
 {
-	printf("ctc1_z0_w %d\n", state);
+//	printf("ctc1_z0_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z1_w)
 {
-	printf("ctc1_z1_w %d\n", state);
+//	printf("ctc1_z1_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z2_w)
 {
-	printf("ctc1_z2_w %d\n", state);
+//	printf("ctc1_z2_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z2_w)
 {
-	printf("ctc0_z2_w %d\n", state);
+	if (state)
+	{
+		// Retrigger timers (actually HC393 ripple counters using gated outputs of HC393 prescaler)
+		// N.B. This must be done first to avoid spurious rising edge on TRG3
+		m_fifo_shift_timer->adjust(attotime::from_ticks(8, 8_MHz_XTAL / 4));
+		m_adpcm_clock_timer->adjust(attotime::from_ticks(4, 8_MHz_XTAL / 64));
+
+		m_fifo->so_w(0);
+		m_ctc[0]->trg3(0);
+		m_adpcm->vclk_w(1);
+	}
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::fifo_dor_w)
 {
-	// combined with a clock signal and used to drive ctc0 channel 3
+	if (!m_fifo_shift_timer->enabled())
+		m_ctc[0]->trg3(!state);
+}
+
+TIMER_CALLBACK_MEMBER(efo_zsu_device::fifo_shift)
+{
+	m_fifo->so_w(1);
+	if (!m_fifo->dor_r())
+		m_ctc[0]->trg3(1);
+}
+
+TIMER_CALLBACK_MEMBER(efo_zsu_device::adpcm_clock)
+{
+	m_adpcm->vclk_w(0);
+}
+
+TIMER_CALLBACK_MEMBER(efo_zsu_device::ctc0_ck0_restart)
+{
+	m_ctc0_ch0->set_unscaled_clock(8_MHz_XTAL / 4);
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -185,36 +235,34 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 {
 	cedar_magnet_board_interface::reset_assert_callback(ptr,param);
 	// reset lines go to the ctc as well?
-	m_ctc0->reset();
-	m_ctc1->reset();
+	m_ctc[0]->reset();
+	m_ctc[1]->reset();
 }
 
 
 void efo_zsu_device::device_add_mconfig(machine_config &config)
 {
-	z80_device& soundcpu(Z80(config, "soundcpu", 4000000));
+	z80_device& soundcpu(Z80(config, "soundcpu", 8_MHz_XTAL / 2));
 	soundcpu.set_addrmap(AS_PROGRAM, &efo_zsu_device::zsu_map);
 	soundcpu.set_addrmap(AS_IO, &efo_zsu_device::zsu_io);
 	soundcpu.set_daisy_config(daisy_chain);
 
-	Z80CTC(config, m_ctc0, 4000000);
-	m_ctc0->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
-	m_ctc0->zc_callback<0>().set(FUNC(efo_zsu_device::ctc0_z0_w));
-	m_ctc0->zc_callback<1>().set(FUNC(efo_zsu_device::ctc0_z1_w));
-	m_ctc0->zc_callback<2>().set(FUNC(efo_zsu_device::ctc0_z2_w));
+	Z80CTC(config, m_ctc[0], 8_MHz_XTAL / 2);
+	m_ctc[0]->set_clk<0>(8_MHz_XTAL / 4); // actually gated
+	m_ctc[0]->set_clk<1>(8_MHz_XTAL / 4);
+	m_ctc[0]->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_ctc[0]->zc_callback<0>().set(FUNC(efo_zsu_device::ctc0_z0_w));
+	m_ctc[0]->zc_callback<1>().set(FUNC(efo_zsu_device::ctc0_z1_w));
+	m_ctc[0]->zc_callback<2>().set(FUNC(efo_zsu_device::ctc0_z2_w));
 
-	Z80CTC(config, m_ctc1, 4000000);
-	m_ctc1->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<1>));
-	m_ctc1->zc_callback<0>().set(FUNC(efo_zsu_device::ctc1_z0_w));
-	m_ctc1->zc_callback<1>().set(FUNC(efo_zsu_device::ctc1_z1_w));
-	m_ctc1->zc_callback<2>().set(FUNC(efo_zsu_device::ctc1_z2_w));
-
-#if 0 // does nothing useful now
-	clock_device &ck1mhz(CLOCK(config, "ck1mhz", 4000000/4);
-	ck1mhz.signal_handler().set(m_ctc1, FUNC(z80ctc_device::trg0));
-	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg1));
-	ck1mhz.signal_handler().append(m_ctc1, FUNC(z80ctc_device::trg2));
-#endif
+	Z80CTC(config, m_ctc[1], 8_MHz_XTAL / 2);
+	m_ctc[1]->set_clk<0>(8_MHz_XTAL / 8);
+	m_ctc[1]->set_clk<1>(8_MHz_XTAL / 8);
+	m_ctc[1]->set_clk<2>(8_MHz_XTAL / 8);
+	m_ctc[1]->intr_callback().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	m_ctc[1]->zc_callback<0>().set(FUNC(efo_zsu_device::ctc1_z0_w));
+	m_ctc[1]->zc_callback<1>().set(FUNC(efo_zsu_device::ctc1_z1_w));
+	m_ctc[1]->zc_callback<2>().set(FUNC(efo_zsu_device::ctc1_z2_w));
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set("soundirq", FUNC(input_merger_device::in_w<2>));
@@ -223,11 +271,11 @@ void efo_zsu_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd0(AY8910(config, "aysnd0", 4000000/2));
+	ay8910_device &aysnd0(AY8910(config, "aysnd0", 8_MHz_XTAL / 4));
 	aysnd0.port_a_write_callback().set_membank("rombank").mask(0x03);
 	aysnd0.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	ay8910_device &aysnd1(AY8910(config, "aysnd1", 4000000/2));
+	ay8910_device &aysnd1(AY8910(config, "aysnd1", 8_MHz_XTAL / 4));
 	aysnd1.port_a_write_callback().set(FUNC(efo_zsu_device::ay1_porta_w));
 	aysnd1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
@@ -235,7 +283,9 @@ void efo_zsu_device::device_add_mconfig(machine_config &config)
 	m_fifo->out_ready_cb().set(FUNC(efo_zsu_device::fifo_dor_w));
 	m_fifo->out_cb().set(m_adpcm, FUNC(msm5205_device::data_w));
 
-	MSM5205(config, m_adpcm, 4000000/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	MSM5205(config, m_adpcm, 8_MHz_XTAL / 16);
+	m_adpcm->set_prescaler_selector(msm5205_device::SEX_4B); // Pins 1, 2 & 3 all tied to Vdd
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void cedar_magnet_sound_device::device_add_mconfig(machine_config &config)
@@ -250,17 +300,15 @@ void cedar_magnet_sound_device::device_add_mconfig(machine_config &config)
 void efo_zsu_device::device_start()
 {
 	memory_bank *rombank = membank("rombank");
-	rombank->configure_entries(0, 4, &static_cast<u8 *>(memregion("soundcpu")->base())[0x8000], 0x8000);
-	rombank->set_entry(0); // 10K/GND pulldowns on banking lines
-}
+	if (rombank != nullptr)
+	{
+		rombank->configure_entries(0, 4, &static_cast<u8 *>(memregion("soundcpu")->base())[0x8000], 0x8000);
+		membank("rombank")->set_entry(3); // 10K/+5 pullups on banking lines
+	}
 
-void efo_zsu1_device::device_start()
-{
-	memory_bank *rombank = membank("rombank");
-	rombank->configure_entries(0, 4, &static_cast<u8 *>(memregion("soundcpu")->base())[0x8000], 0x8000);
-	rombank->set_entry(3); // 10K/+5 pullups on banking lines
-}
+	m_fifo_shift_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::fifo_shift), this));
+	m_adpcm_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::adpcm_clock), this));
+	m_ctc0_ck0_restart_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(efo_zsu_device::ctc0_ck0_restart), this));
 
-void cedar_magnet_sound_device::device_start()
-{
+	save_item(NAME(m_ay1_porta));
 }

@@ -19198,8 +19198,8 @@ but dumps still have to be confirmed.
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="mega turrican (may 18, 1993 prototype).bin" size="1048576" crc="3ba35acd" sha1="486fd963b1389806a565dab21c81c46c273c8e5f"/>
 <!-- labels on 512K 27C040s:
-				<rom name="megaturrican odd" size="524288" crc="" sha1="" offset="0x000001" loadflag="load16_byte"/>
-				<rom name="megaturrican even" size="524288" crc="" sha1="" offset="0x000000" loadflag="load16_byte"/>
+                <rom name="megaturrican odd" size="524288" crc="" sha1="" offset="0x000001" loadflag="load16_byte"/>
+                <rom name="megaturrican even" size="524288" crc="" sha1="" offset="0x000000" loadflag="load16_byte"/>
 -->
 			</dataarea>
 		</part>

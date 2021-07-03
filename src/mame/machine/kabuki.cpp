@@ -74,7 +74,7 @@ Known games:
 Mahjong Gakuen 2 Gakuen-chou no Fukushuu 76543210  01234567    aa55     a5
 Poker Ladies                              "    "    "    "      ""      ""
 Dokaben                                   "    "    "    "      ""      ""
-Dokaben 2                                             unknown
+Dokaben 2                                 "    "    "    "      ""      ""
 Pang / Buster Bros / Pomping World       01234567  76543210    6548     24
 Capcom Baseball                           "    "    "    "      ""      ""
 Capcom World                             04152637  40516273    5751     43

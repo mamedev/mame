@@ -963,10 +963,10 @@ license:CC0
 		<element ref="keyfill"><bounds x="564" y="494" width="2395" height="524" /></element>
 
 		<!-- key layout:
-			wwwww bbbbbb wwwwwww bbbbbbbb wwwwwwww   wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww
+		    wwwww bbbbbb wwwwwww bbbbbbbb wwwwwwww   wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww bbbbbbbb wwwwwwww
 		      45    44      53      44       45         45       44       44       44       44       44      45
-			0->45 48->92 95->148 151->195 198->243   243->288 291->335 338->382 385->429 432->476 479->523 526->571
-			0->79        82->161          164->243   246->325          328->407          410->489          492->571
+		    0->45 48->92 95->148 151->195 198->243   243->288 291->335 338->382 385->429 432->476 479->523 526->571
+		    0->79        82->161          164->243   246->325          328->407          410->489          492->571
 		-->
 
 		<!-- octave 0 -->

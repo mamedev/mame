@@ -3129,7 +3129,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					attoseconds_t refresh = vd->m_screen->frame_period().attoseconds();
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
-					rectangle visarea;					
+					rectangle visarea;
 
 					if (vd->vd_type == TYPE_VOODOO_2)
 					{

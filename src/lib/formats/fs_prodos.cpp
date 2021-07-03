@@ -347,7 +347,7 @@ filesystem_t::dir_t fs_prodos::impl::root_dir::dir_get(uint64_t key)
 fs_prodos::impl::dir::dir(impl &fs, const u8 *entry, u16 base_block, u16 key, root_dir *parent_dir) : root_dir(fs, base_block), m_parent_dir(parent_dir), m_key(key)
 {
 	memcpy(m_entry, entry, 39);
-	(void)m_key;	
+	(void)m_key;
 	(void)m_parent_dir;
 }
 

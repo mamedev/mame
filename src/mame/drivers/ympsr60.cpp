@@ -4,9 +4,9 @@
     Yamaha PSR-60/PSR-70 PortaSound keyboards
     Preliminary driver by R. Belmont, major thanks to reverse-engineering work by JKN0
 
-	Note: PSR-50 is likely the same hardware.
+    Note: PSR-50 is likely the same hardware.
 
-	Special thanks to
+    Special thanks to
 
     Documentation: https://github.com/JKN0/PSR70-reverse
     More documentation: https://retroandreverse.blogspot.com/2021/01/reversing-psr-70-hardware.html
@@ -14,9 +14,9 @@
                         https://retroandreverse.blogspot.com/2021/01/digging-into-ymopq.html
 
     Service manuals: https://elektrotanya.com/yamaha_psr-60.pdf/download.html
-	                 https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
+                     https://elektrotanya.com/yamaha_psr-70_sm.pdf/download.html
 
-	Thanks to Lord Nightmare for help with the BBD filter chain
+    Thanks to Lord Nightmare for help with the BBD filter chain
 
     CPU: Z80 @ 6 MHz
     Sound: YM3533 "OPQ" FM @ 3.58 MHz + YM2154 "RYP" sample playback chip for drums
@@ -284,8 +284,8 @@ void psr60_state::drvif_w(offs_t offset, u8 data)
 		for (int bit = 0; bit < 4; bit++)
 			m_drvif_out[m_drvif_select][bit] = BIT(data, 3 - bit);
 	}
-//	else
-//		printf("DRVIF: %02X = %02X\n", offset, data);
+//  else
+//      printf("DRVIF: %02X = %02X\n", offset, data);
 }
 
 INPUT_CHANGED_MEMBER(psr60_state::drvif_changed)
@@ -677,11 +677,11 @@ void psr60_state::psr_common(machine_config &config)
 
 	YM3533(config, m_ym3533, 3.579545_MHz_XTAL);
 	m_ym3533->irq_handler().set(FUNC(psr60_state::ym_irq_w));
-	m_ym3533->add_route(0, m_lmixer, 0.16);		// channel 1 = ORC
+	m_ym3533->add_route(0, m_lmixer, 0.16);     // channel 1 = ORC
 	m_ym3533->add_route(0, m_rmixer, 0.16);
-	m_ym3533->add_route(1, m_lmixer, 0.22);		// channel 2 = SABC
+	m_ym3533->add_route(1, m_lmixer, 0.22);     // channel 2 = SABC
 	m_ym3533->add_route(1, m_rmixer, 0.22);
-	m_ym3533->add_route(1, m_ic204a, 1.0);		// routed to BBD via filters
+	m_ym3533->add_route(1, m_ic204a, 1.0);      // routed to BBD via filters
 
 	YM2154(config, m_ryp4, 2250000);
 	m_ryp4->irq_handler().set(FUNC(psr60_state::ryp4_irq_w));

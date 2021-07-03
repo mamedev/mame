@@ -130,10 +130,10 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(floppy_image *image)
 			switch(mode) {
 			case 0: // idle
 				if(buf == 0x80808000fee718c3)
-					mode = 1;					
+					mode = 1;
 				count = 0;
 				break;
-				
+
 			case 1: // sector header
 				if(count == 24) {
 					uint8_t trk = buf >> 16;
@@ -148,23 +148,23 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(floppy_image *image)
 					mode = 2;
 				}
 				break;
-						
+
 			case 2: // look for sector data
 				if(buf == 0x80808000fee718c3)
-					mode = 1;					
+					mode = 1;
 				else if(buf == 0x80808000c318e7fe)
 					mode = 3;
 				count = 0;
 				break;
-				
+
 			case 3: // sector data
 				if(count <= 128*8 && !(count & 7)) {
 					uint8_t byte = buf;
 					checksum += byte;
 					*dest++ = byte;
 				} else if(count == 128*8+16) {
-					//					uint16_t disk_checksum = buf;
-					//					printf("sector checksum %04x %04x\n", checksum, disk_checksum);
+					//                  uint16_t disk_checksum = buf;
+					//                  printf("sector checksum %04x %04x\n", checksum, disk_checksum);
 					mode = 0;
 				}
 				break;
@@ -280,10 +280,10 @@ bool vtech_dsk_format::load(io_generic *io, uint32_t form_factor, const std::vec
 		switch(mode) {
 		case 0: // idle
 			if(buf == 0x80808000fee718c3)
-				mode = 1;					
+				mode = 1;
 			count = 0;
 			break;
-			
+
 		case 1: // sector header
 			if(count == 3) {
 				uint8_t trk = buf >> 16;
@@ -298,15 +298,15 @@ bool vtech_dsk_format::load(io_generic *io, uint32_t form_factor, const std::vec
 				mode = 2;
 			}
 			break;
-			
+
 		case 2: // look for sector data
 			if(buf == 0x80808000fee718c3)
-				mode = 1;					
+				mode = 1;
 			else if(buf == 0x80808000c318e7fe)
 				mode = 3;
 			count = 0;
 			break;
-			
+
 		case 3: // sector data
 			if(count <= 128) {
 				uint8_t byte = buf;

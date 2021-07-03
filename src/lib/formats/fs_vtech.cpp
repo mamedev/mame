@@ -189,7 +189,7 @@ std::vector<u8> fs_vtech::impl::file::read_all()
 	u8 track = m_entry[0xa];
 	u8 sector = m_entry[0xb];
 	int len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc)) & 0xffff) + 1;
-	
+
 	std::vector<u8> data(len, 0);
 	int pos = 0;
 	while(pos < len) {
@@ -219,7 +219,7 @@ fs_vtech::impl::file_t fs_vtech::impl::root_dir::file_create(const fs_meta_data 
 			if(type != 'T' && type != 'B') {
 				std::string fname = info.get_string(fs_meta_name::name, "");
 				fname.resize(8, ' ');
-				
+
 				bdir.w8  (off+0x0, info.get_flag(fs_meta_name::basic, true) ? 'T' : 'B');
 				bdir.w8  (off+0x1, ':');
 				bdir.wstr(off+0x2, fname);

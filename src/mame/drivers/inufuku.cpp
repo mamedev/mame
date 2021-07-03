@@ -179,16 +179,16 @@ void inufuku_state::palettereg_w(offs_t offset, u16 data)
 			m_bg_palettebank = (data & 0xf000) >> 12;
 			m_bg_tilemap->mark_all_dirty();
 			/*
-				if (data & ~0xf000)
-					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			    if (data & ~0xf000)
+			        logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
 			*/
 			break;
 		case 0x03:
 			m_tx_palettebank = (data & 0xf000) >> 12;
 			m_tx_tilemap->mark_all_dirty();
 			/*
-				if (data & ~0xf000)
-					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			    if (data & ~0xf000)
+			        logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
 			*/
 			break;
 		default:
@@ -209,8 +209,8 @@ void inufuku_state::scrollreg_w(offs_t offset, u16 data)
 		case 0x04:
 			m_bg_raster = BIT(~data, 9);
 			/*
-				if (data & ~0x0200)
-					logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
+			    if (data & ~0x0200)
+			        logerror("%s: palettereg_w %02X: %04x\n", machine().describe_context(), offset << 1, data);
 			*/
 			break;
 		default:

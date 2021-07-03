@@ -67,11 +67,14 @@ WRITE_LINE_MEMBER(sbmjb_state::screen_vblank) // TODO: copy-pasted from other dr
 void sbmjb_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xc000, 0xdfff).ram();
+	map(0xf000, 0xf00f).rw("io", FUNC(te7751_device::read), FUNC(te7751_device::write));
 }
 
 void sbmjb_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0xc000, 0xdfff).ram();
 }
 
 void sbmjb_state::tc0091lvc_map(address_map &map) // TODO: copy-pasted from other drivers using same chip, to be verified
@@ -126,7 +129,7 @@ void sbmjb_state::sbmjb(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(sbmjb_state::scanline_callback), "screen", 0, 1);
 
-	TE7750(config, "io"); // TE7751
+	TE7751(config, "io");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // all wrong

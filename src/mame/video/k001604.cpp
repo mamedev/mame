@@ -16,11 +16,11 @@
    Character RAM:
    * Foreground tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37C 34C 32C 29C filled
-	   - NWK-TR: 34A 31A filled, no empty solder pads
+       - NWK-TR: 34A 31A filled, no empty solder pads
    * Background tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37A 34A filled, 32A 29A empty
-	   - NWK-TR: 34C 31C 28C 25C empty
-   
+       - NWK-TR: 34C 31C 28C 25C empty
+
    Tile RAM:
    * 3x 256Kbit SRAMs in a 24-bit bus
    * Each tile entry is 24 bits, 32768 total
@@ -31,7 +31,7 @@
 
    Background and foreground layer with ROZ capabilities
    Both tilemaps are 128x128 tiles, with ability to use smaller sub-tilemaps
-   Foreground seems to use 8x8 tiles only, background can select 8x8 or 16x16 tiles   
+   Foreground seems to use 8x8 tiles only, background can select 8x8 or 16x16 tiles
 
    Registers:
 
@@ -45,11 +45,11 @@
    0c     ???????????????? ----------------
           ---------------- ????????????????
    20     sxxxxxxxxxxxxxxx ---------------- Background X start (13.3 fixed point)
-	  	  ---------------- sxxxxxxxxxxxxxxx Background Y start (13.3 fixed point)
+          ---------------- sxxxxxxxxxxxxxxx Background Y start (13.3 fixed point)
    24     sxxxxxxxxxxxxxxx ---------------- Background ROZ XX (5.11 fixed point)
-		  ---------------- sxxxxxxxxxxxxxxx Background ROZ YX (5.11 fixed point)
+          ---------------- sxxxxxxxxxxxxxxx Background ROZ YX (5.11 fixed point)
    28     sxxxxxxxxxxxxxxx ---------------- Background ROZ YY (5.11 fixed point)
-		  ---------------- sxxxxxxxxxxxxxxx Background ROZ XY (5.11 fixed point)
+          ---------------- sxxxxxxxxxxxxxxx Background ROZ XY (5.11 fixed point)
    2c     ???????????????? ----------------
           ---------------- ????????????????
    40     xxxxxxxxxxxxxxxx ----------------
@@ -65,35 +65,35 @@
    60     x--------------- ---------------- FG tilemap enable?
           -x-------------- ---------------- BG tilemap enable?
           -------x-------- ---------------- Select FG/BG tiles for character RAM read/write access
-		  -------0-------- ---------------- FG character RAM
-		  -------1-------- ---------------- BG character RAM
-		  ---------x------ ---------------- BG tile size
-		  ---------0------ ---------------- 16x16
-		  ---------1------ ---------------- 8x8
-		  ---------------- --------------xx Character bank for FG tiles
-		  ---------------- ------xx-------- Character bank for BG tiles
-		  ------------xx-- ---------------- Tilemap layout (both bits either set or unset)		  
-		  ------------00-- ---------------- "landscape", 256 tiles wide
-		  ------------11-- ---------------- "portrait", 128 tiles wide
-	6c    -x-------------- ---------------- Swap FG/BG tilemap location in portrait mode? (used by Solar Assault) Might also swap left/right in landscape mode but nothing uses this.
-	      -0-------------- ---------------- FG Tilemap at 0x0000, BG at 0x4000
-		  -1-------------- ---------------- FG Tilemap at 0x4000, BG at 0x0000
-		  --------x------- ---------------- ?
-		  ---------xx----- ---------------- FG sub tilemap width?
-		  ------------x--- ---------------- ?
-		  -------------xx- ---------------- FG sub tilemap height?
-		  ---------------- ----x----------- Enable BG sub tilemap?
-		  ---------------- -----xx--------- BG sub tilemap width?
-		  ---------------- -----00--------- 128 tiles
-		  ---------------- -----10--------- 64 tiles
-		  ---------------- -----11--------- 32 tiles
-		  ---------------- --------x------- ?
-		  ---------------- ---------xx----- BG sub tilemap height?
-		  ---------------- ---------00----- 128 tiles
-		  ---------------- ---------10----- 64 tiles
-		  ---------------- ---------11----- 32 tiles
-		  ---------------- ------------x--- ?
-		  ---------------- -------------xx- BG sub tilemap X (in units of 32 tiles)
+          -------0-------- ---------------- FG character RAM
+          -------1-------- ---------------- BG character RAM
+          ---------x------ ---------------- BG tile size
+          ---------0------ ---------------- 16x16
+          ---------1------ ---------------- 8x8
+          ---------------- --------------xx Character bank for FG tiles
+          ---------------- ------xx-------- Character bank for BG tiles
+          ------------xx-- ---------------- Tilemap layout (both bits either set or unset)
+          ------------00-- ---------------- "landscape", 256 tiles wide
+          ------------11-- ---------------- "portrait", 128 tiles wide
+    6c    -x-------------- ---------------- Swap FG/BG tilemap location in portrait mode? (used by Solar Assault) Might also swap left/right in landscape mode but nothing uses this.
+          -0-------------- ---------------- FG Tilemap at 0x0000, BG at 0x4000
+          -1-------------- ---------------- FG Tilemap at 0x4000, BG at 0x0000
+          --------x------- ---------------- ?
+          ---------xx----- ---------------- FG sub tilemap width?
+          ------------x--- ---------------- ?
+          -------------xx- ---------------- FG sub tilemap height?
+          ---------------- ----x----------- Enable BG sub tilemap?
+          ---------------- -----xx--------- BG sub tilemap width?
+          ---------------- -----00--------- 128 tiles
+          ---------------- -----10--------- 64 tiles
+          ---------------- -----11--------- 32 tiles
+          ---------------- --------x------- ?
+          ---------------- ---------xx----- BG sub tilemap height?
+          ---------------- ---------00----- 128 tiles
+          ---------------- ---------10----- 64 tiles
+          ---------------- ---------11----- 32 tiles
+          ---------------- ------------x--- ?
+          ---------------- -------------xx- BG sub tilemap X (in units of 32 tiles)
 
 
    Tilemap layout:
@@ -111,7 +111,7 @@
 
    "portrait" mode:
 
-           0               128              
+           0               128
    0x0000  +----------------+
            |                |
            |                |
@@ -129,23 +129,23 @@
            +----------------+
 
     Tilemap sub-split:
-	Tilemap can be split in X and Y direction into 32/64/128 x 32/64/128 sub-tilemaps
-	Sub-tilemap selection works in units of 32 tiles
+    Tilemap can be split in X and Y direction into 32/64/128 x 32/64/128 sub-tilemaps
+    Sub-tilemap selection works in units of 32 tiles
 
-	       0     32    64    96   128
-		   +-----+-----+-----+-----+
-		   |     |     |     |     |
+           0     32    64    96   128
+           +-----+-----+-----+-----+
+           |     |     |     |     |
            | 0,0 | 1,0 | 2,0 | 3,0 |
         32 +-----+-----+-----+-----+
-		   |     |     |     |     |
+           |     |     |     |     |
            | 0,1 | 1,1 | 2,1 | 3,1 |
         64 +-----+-----+-----+-----+
-		   |     |     |     |     |
-		   | 0,2 | 1,2 | 2,2 | 3,2 |
-		96 +-----+-----+-----+-----+
-		   |     |     |     |     |
-		   | 0,3 | 1,3 | 2,3 | 3,3 |
-	   128 +-----+-----+-----+-----+
+           |     |     |     |     |
+           | 0,2 | 1,2 | 2,2 | 3,2 |
+        96 +-----+-----+-----+-----+
+           |     |     |     |     |
+           | 0,3 | 1,3 | 2,3 | 3,3 |
+       128 +-----+-----+-----+-----+
 
 
 
@@ -194,9 +194,9 @@ void k001604_device::device_start()
 		16*128
 	};
 
-	m_fg_char_ram = make_unique_clear<uint8_t[]>(0x80000);		// 4x 128Kx8
-	m_bg_char_ram = make_unique_clear<uint8_t[]>(0x80000);		// 4x 128Kx8
-	m_tile_ram = make_unique_clear<uint32_t[]>(0x8000);			// 32K x 24 bits
+	m_fg_char_ram = make_unique_clear<uint8_t[]>(0x80000);      // 4x 128Kx8
+	m_bg_char_ram = make_unique_clear<uint8_t[]>(0x80000);      // 4x 128Kx8
+	m_tile_ram = make_unique_clear<uint32_t[]>(0x8000);         // 32K x 24 bits
 	m_reg = make_unique_clear<uint32_t[]>(0x400 / 4);
 
 	/* create tilemaps */
@@ -242,9 +242,9 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_fg)
 	uint32_t tilebase = (m_reg[0x18] & 0x40000) ? ((m_reg[0x1b] & 0x40000000) ? 0x4000 : 0x0000) : 0x0000;
 	uint32_t x = tile_index & 0x7f;
 	uint32_t y = tile_index / 128;
-	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;	
+	uint32_t tilemap_pitch = (m_reg[0x18] & 0x40000) ? 128 : 256;
 	uint32_t val = m_tile_ram[(y * tilemap_pitch) + x + tilebase];
-	int color = (val >> 17) & 0x1f;	
+	int color = (val >> 17) & 0x1f;
 	int tile = val & 0x1fff;
 	int flags = 0;
 
@@ -277,7 +277,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg8)
 }
 
 TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
-{	
+{
 	uint32_t tilebase = (m_reg[0x18] & 0x40000) ? ((m_reg[0x1b] & 0x40000000) ? 0x0000 : 0x4000) : 0x0000;
 	uint32_t x = tile_index & 0x7f;
 	uint32_t y = tile_index / 128;
@@ -301,7 +301,7 @@ TILE_GET_INFO_MEMBER(k001604_device::tile_info_bg16)
 void k001604_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool front, tilemap_t* tilemap)
 {
 	const rectangle& visarea = screen.visible_area();
-	static const int SUBTILEMAP_DIMENSION[4] = { 128, 128, 64, 32 };		// entry 1 seems unused	
+	static const int SUBTILEMAP_DIMENSION[4] = { 128, 128, 64, 32 };        // entry 1 seems unused
 
 	int32_t startx, starty, incxx, incyx, incxy, incyy;
 
@@ -321,7 +321,7 @@ void k001604_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, c
 		incxx = (int32_t)((int16_t)(m_reg[0x09])) << 5;
 		incyx = (int32_t)((int16_t)(m_reg[0x09] >> 16)) << 5;
 		incxy = (int32_t)((int16_t)(m_reg[0x0a])) << 5;
-		incyy = (int32_t)((int16_t)(m_reg[0x0a] >> 16)) << 5;		
+		incyy = (int32_t)((int16_t)(m_reg[0x0a] >> 16)) << 5;
 	}
 
 	bitmap_ind16& pixmap = tilemap->pixmap();
@@ -362,7 +362,7 @@ void k001604_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 
 	// draw the tilemap
-	// 
+	//
 	// loop over rows
 	while (sy <= ey)
 	{
@@ -463,9 +463,9 @@ void k001604_device::tile_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// portrait
 		uint32_t fg_tilebase = (m_reg[0x1b] & 0x40000000) ? 0x4000 : 0x0000;
 		uint32_t bg_tilebase = (m_reg[0x1b] & 0x40000000) ? 0x0000 : 0x4000;
-		
+
 		if (offset >= fg_tilebase && offset < fg_tilebase + 0x4000)
-		{			
+		{
 			m_fg_tilemap->mark_tile_dirty(offset - fg_tilebase);
 		}
 		if (offset >= bg_tilebase && offset < bg_tilebase + 0x4000)
@@ -500,7 +500,7 @@ void k001604_device::char_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	int chip;
 	uint32_t addr;
 
-	bool bg = (m_reg[0x60 / 4] & 0x1000000) ? true : false;	
+	bool bg = (m_reg[0x60 / 4] & 0x1000000) ? true : false;
 
 	// select individual RAM chip to access
 	if (bg)

@@ -874,7 +874,7 @@ void gticlub_state::gticlub(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 1024);
-	screen.set_visarea(40, 511+40, 28, 383+28);		// needs CRTC emulation
+	screen.set_visarea(40, 511+40, 28, 383+28);     // needs CRTC emulation
 	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
 	PALETTE(config, m_palette).set_entries(65536);
@@ -912,8 +912,6 @@ void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I
 	gticlub(config);
 
 	m_adc1038->set_gti_club_hack(false);
-
-	m_k056230->set_thunderh_hack(true);
 
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
