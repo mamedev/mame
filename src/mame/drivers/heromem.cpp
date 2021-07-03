@@ -115,6 +115,8 @@ void heromem_state::maincpu_prg_map(address_map &map)
 	map(0xf201, 0xf201).rw("tc0140syt_l", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 	map(0xf300, 0xf300).w("tc0140syt_r", FUNC(tc0140syt_device::master_port_w));
 	map(0xf301, 0xf301).rw("tc0140syt_r", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xf400, 0xf403).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf500, 0xf50f).rw("io", FUNC(te7751_device::read), FUNC(te7751_device::write));
 	// TODO: lots more writes
 }
 
@@ -218,7 +220,7 @@ void heromem_state::heromem(machine_config &config)
 
 	I8255(config, "ppi"); // MB89255B
 
-	TE7750(config, "io"); // TE7751
+	TE7751(config, "io");
 
 	// video hardware
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
