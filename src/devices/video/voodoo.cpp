@@ -144,27 +144,6 @@ bits(7:4) and bit(24)), X, and Y:
 /*
 Revision sensitivity:
 
-swap_buffers()
- - updating the frontbuf/backbuf index (1/2) vs setting rgboffs[0] (3+)
-
-recompute_video_memory()
- - using fbiInit5.buffer_allocation (2)
- - extended xtiles (2)
-
-reg_video_w()
- - recompute_video_timing values
-
-texture_w()
- - dest = from lod/s/t (1/2) vs linear (3)
-
-device_start()
- - checks TMUMEM0 for non-zero (1/2) vs don't care
- - total_allocation = fb+tmu (1/2) vs fbmem only
- - tmu_config |= 0x800 if rev 2
-
-device_post_load()
- - recompute_fbmem_fifo if rev 1/2
-
 rasterizer_texture::recompute()
  - addr shift/mask = 3/0xfffff (1/2) vs 0/0xfffff0 (3)
  - bilinear mask - 0xf0 (1) vs 0xff (2/3)
@@ -788,6 +767,16 @@ void voodoo_device_base::update_statistics(bool accumulate)
  *
  *************************************/
 
+void voodoo_device_base::rotate_buffers()
+{
+	if (!m_vblank_dont_swap)
+	{
+		u32 buffers = (m_rgboffs[2] == ~0) ? 2 : 3;
+		m_frontbuf = (m_frontbuf + 1) % buffers;
+		m_backbuf = (m_frontbuf + 1) % buffers;
+	}
+}
+
 void voodoo_device_base::swap_buffers()
 {
 	if (LOG_VBLANK_SWAP)
@@ -800,18 +789,8 @@ void voodoo_device_base::swap_buffers()
 	// keep a history of swap intervals
 	m_reg.update_swap_history(std::min<u8>(m_vblank_count, 15));
 
-	// rotate the buffers
-	if (m_reg.rev1_or_2())
-	{
-		if (m_reg.rev1() || !m_vblank_dont_swap)
-		{
-			u32 buffers = (m_rgboffs[2] == ~0) ? 2 : 3;
-			m_frontbuf = (m_frontbuf + 1) % buffers;
-			m_backbuf = (m_frontbuf + 1) % buffers;
-		}
-	}
-	else
-		m_rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbmask & ~0x0f;
+	// rotate the buffers; implementation differs between models
+	rotate_buffers();
 
 	// decrement the pending count and reset our state
 	if (m_swaps_pending != 0)
@@ -945,20 +924,6 @@ void voodoo_device_base::vblank_start(void *ptr, s32 param)
 }
 
 
-void voodoo_2_device_base::vblank_start(void *ptr, s32 param)
-{
-	voodoo_device_base::vblank_start(ptr, param);
-
-	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
-	if (m_reg.intr_ctrl().vsync_rising_enable())
-	{
-		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
-	}
-}
-
-
 void voodoo_device_base::vblank_stop(void *ptr, s32 param)
 {
 	if (LOG_VBLANK_SWAP)
@@ -973,19 +938,6 @@ void voodoo_device_base::vblank_stop(void *ptr, s32 param)
 
 	// go to the end of the next frame
 	adjust_vblank_start_timer();
-}
-
-void voodoo_2_device_base::vblank_stop(void *ptr, s32 param)
-{
-	voodoo_device_base::vblank_stop(ptr, param);
-
-	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
-	if (m_reg.intr_ctrl().vsync_falling_enable())
-	{
-		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
-	}
 }
 
 
@@ -1025,24 +977,19 @@ void voodoo_device_base::soft_reset()
 
 void voodoo_device_base::recompute_video_memory()
 {
+	// configuration is either double-buffered (0) or triple-buffered (1)
+	u32 config = m_reg.fbi_init2().enable_triple_buf();
+
+	// 4-bit tile count; tiles are 64x16
+	u32 xtiles = m_reg.fbi_init1().x_video_tiles();
+	recompute_video_memory_common(config, xtiles * 64);
+}
+
+void voodoo_device_base::recompute_video_memory_common(u32 config, u32 rowpixels)
+{
 	// remember the front buffer configuration to check for changes
 	u16 *starting_front = front_buffer();
 	u32 starting_rowpix = m_renderer->rowpixels();
-
-	// memory config is determined differently between V1 and V2
-	u32 memory_config = m_reg.fbi_init2().enable_triple_buf();
-	if (m_reg.rev2() && memory_config == 0)
-		memory_config = m_reg.fbi_init5().buffer_allocation();
-
-	// tiles are 64x16 (V1) or 32x32 (V2); x_tiles specifies how many half-tiles
-	u32 xtiles = m_reg.fbi_init1().x_video_tiles();
-	if (m_reg.rev2())
-	{
-		xtiles = (xtiles << 1) |
-				(m_reg.fbi_init1().x_video_tiles_bit5() << 5) |
-				(m_reg.fbi_init6().x_video_tiles_bit0());
-	}
-	u32 rowpixels = xtiles * (m_reg.rev1() ? 64 : 32);
 
 	// first RGB buffer always starts at 0
 	m_rgboffs[0] = 0;
@@ -1052,7 +999,7 @@ void voodoo_device_base::recompute_video_memory()
 	m_rgboffs[1] = buffer_pages * 0x1000;
 
 	// remaining buffers are based on the config
-	switch (memory_config)
+	switch (config)
 	{
 		case 3: // reserved
 //			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
@@ -1643,17 +1590,17 @@ u32 voodoo_device_base::reg_video_w(u32 chipmask, u32 regnum, u32 data)
 		m_renderer->wait("video_configuration");
 		m_reg.write(regnum, data);
 
-		auto const hsync = m_reg.hsync();
-		auto const vsync = m_reg.vsync();
-		auto const back_porch = m_reg.back_porch();
-		auto const video_dimensions = m_reg.video_dimensions();
+		auto const hsync = m_reg.hsync<true>();
+		auto const vsync = m_reg.vsync<true>();
+		auto const back_porch = m_reg.back_porch<true>();
+		auto const video_dimensions = m_reg.video_dimensions<true>();
 		if (hsync.raw() != 0 && vsync.raw() != 0 && video_dimensions.raw() != 0 && back_porch.raw() != 0)
 		{
 			recompute_video_timing(
-					hsync.hsync_on(m_reg.rev1()), hsync.hsync_off(m_reg.rev1()),
-					video_dimensions.xwidth(m_reg.rev1()), back_porch.horizontal(m_reg.rev1()) + 2,
-					vsync.vsync_on(m_reg.rev1()), vsync.vsync_off(m_reg.rev1()),
-					video_dimensions.yheight(m_reg.rev1()), back_porch.vertical(m_reg.rev1()));
+					hsync.hsync_on(), hsync.hsync_off(),
+					video_dimensions.xwidth(), back_porch.horizontal() + 2,
+					vsync.vsync_on(), vsync.vsync_off(),
+					video_dimensions.yheight(), back_porch.vertical());
 		}
 	}
 	return 0;
@@ -1822,7 +1769,7 @@ void voodoo_device_base::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 h
  *  Voodoo LFB writes
  *
  *************************************/
-s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -2041,7 +1988,7 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 
 		default:            // reserved
 			logerror("lfb_w: Unknown format\n");
-			return 0;
+			return;
 	}
 
 	// compute X,Y
@@ -2057,7 +2004,7 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	// select the target buffer
 	u16 *dest = draw_buffer_indirect(lfbmode.write_buffer_select(), false);
 	if (dest == nullptr)
-		return 0;
+		return;
 	u32 destmax = ram_end() - dest;
 	u16 *depth = aux_buffer();
 	u32 depthmax = ram_end() - depth;
@@ -2162,7 +2109,6 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			mask >>= 4;
 		}
 	}
-	return 0;
 }
 
 
@@ -2173,7 +2119,7 @@ s32 voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
  *
  *************************************/
 
-s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
+void voodoo_device_base::texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -2182,7 +2128,7 @@ s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
 	// point to the right TMU
 	int tmunum = BIT(offset, 19, 2);
 	if (!BIT(m_chipmask, 1 + tmunum))
-		return 0;
+		return;
 
 	// wait for any outstanding work to finish
 	m_renderer->wait("Texture write");
@@ -2207,24 +2153,18 @@ s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
 		data = (data >> 16) | (data << 16);
 
 	// determine destination pointer
-	u32 scale = (texmode.format() < 8) ? 1 : 2;
-	u8 *dest;
-	if (regs.rev1_or_2())
-	{
-		u32 lod = BIT(offset, 15, 4);
-		u32 tt = BIT(offset, 7, 8);
-		u32 ts = (offset << ((seq_8_downld && scale == 1) ? 2 : 1)) & 0xff;
+	u32 bytes_per_texel = (texmode.format() < 8) ? 1 : 2;
+	u32 lod = BIT(offset, 15, 4);
+	u32 tt = BIT(offset, 7, 8);
+	u32 ts = (offset << ((seq_8_downld && bytes_per_texel == 1) ? 2 : 1)) & 0xff;
 
-		// validate parameters
-		if (lod > 8)
-			return 0;
-		dest = texture.write_ptr(lod, ts, tt, scale);
-	}
-	else
-		dest = texture.write_ptr(0, offset * 4, 0, 1);
+	// validate parameters
+	if (lod > 8)
+		return;
+	u8 *dest = texture.write_ptr(lod, ts, tt, bytes_per_texel);
 
 	// write the four bytes in little-endian order
-	if (scale == 1)
+	if (bytes_per_texel == 1)
 	{
 		dest[BYTE4_XOR_LE(0)] = (data >> 0) & 0xff;
 		dest[BYTE4_XOR_LE(1)] = (data >> 8) & 0xff;
@@ -2237,7 +2177,6 @@ s32 voodoo_device_base::texture_w(offs_t offset, u32 data)
 		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
 		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
 	}
-	return 0;
 }
 
 
@@ -2307,28 +2246,28 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 			// target the appropriate location
 			switch (offset & memory_fifo::TYPE_MASK)
 			{
-			case memory_fifo::TYPE_REGISTER:
-			{
-				// just use the chipmask raw since it was adjusted prior to being added to the FIFO
-				u32 regnum = BIT(offset, 0, 8);
-				cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
-				break;
-			}
+				case memory_fifo::TYPE_REGISTER:
+				{
+					// just use the chipmask raw since it was adjusted prior to being added to the FIFO
+					u32 regnum = BIT(offset, 0, 8);
+					cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
+					break;
+				}
 
-			case memory_fifo::TYPE_TEXTURE:
-				cycles = texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
-				break;
+				case memory_fifo::TYPE_TEXTURE:
+					texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
+					break;
 
-			case memory_fifo::TYPE_LFB:
-			{
-				u32 mem_mask = 0xffffffff;
-				if (offset & memory_fifo::NO_16_31)
-					mem_mask &= 0x0000ffff;
-				if (offset & memory_fifo::NO_0_15)
-					mem_mask &= 0xffff0000;
-				cycles = lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
-				break;
-			}
+				case memory_fifo::TYPE_LFB:
+				{
+					u32 mem_mask = 0xffffffff;
+					if (offset & memory_fifo::NO_16_31)
+						mem_mask &= 0x0000ffff;
+					if (offset & memory_fifo::NO_0_15)
+						mem_mask &= 0xffff0000;
+					lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
+					break;
+				}
 			}
 		}
 
@@ -2401,28 +2340,28 @@ void voodoo_2_device_base::flush_fifos(attotime current_time)
 			// target the appropriate location
 			switch (offset & memory_fifo::TYPE_MASK)
 			{
-			case memory_fifo::TYPE_REGISTER:
-			{
-				// just use the chipmask raw since it was adjusted prior to being added to the FIFO
-				u32 regnum = BIT(offset, 0, 8);
-				cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
-				break;
-			}
+				case memory_fifo::TYPE_REGISTER:
+				{
+					// just use the chipmask raw since it was adjusted prior to being added to the FIFO
+					u32 regnum = BIT(offset, 0, 8);
+					cycles = m_regtable[regnum].write(*this, BIT(offset, 8, 4), regnum, data);
+					break;
+				}
 
-			case memory_fifo::TYPE_TEXTURE:
-				cycles = texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
-				break;
+				case memory_fifo::TYPE_TEXTURE:
+					texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
+					break;
 
-			case memory_fifo::TYPE_LFB:
-			{
-				u32 mem_mask = 0xffffffff;
-				if (offset & memory_fifo::NO_16_31)
-					mem_mask &= 0x0000ffff;
-				if (offset & memory_fifo::NO_0_15)
-					mem_mask &= 0xffff0000;
-				cycles = lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
-				break;
-			}
+				case memory_fifo::TYPE_LFB:
+				{
+					u32 mem_mask = 0xffffffff;
+					if (offset & memory_fifo::NO_16_31)
+						mem_mask &= 0x0000ffff;
+					if (offset & memory_fifo::NO_0_15)
+						mem_mask &= 0xffff0000;
+					lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
+					break;
+				}
 			}
 		}
 
@@ -2945,7 +2884,7 @@ voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_model(model),
-	m_chipmask(0),
+	m_chipmask(1),
 	m_fbmem_in_mb(0),
 	m_tmumem0_in_mb(0),
 	m_tmumem1_in_mb(0),
@@ -3009,7 +2948,7 @@ void voodoo_device_base::device_start()
 	// validate configuration
 	if (m_fbmem_in_mb == 0)
 		fatalerror("Invalid Voodoo memory configuration");
-	if (m_reg.rev1_or_2() && m_tmumem0_in_mb == 0)
+	if (!BIT(m_chipmask, 1) && m_tmumem0_in_mb == 0)
 		fatalerror("Invalid Voodoo memory configuration");
 
 	// create shared tables
@@ -3032,12 +2971,20 @@ void voodoo_device_base::device_start()
 	m_stall_cb.resolve();
 	m_pciint_cb.resolve();
 
-	// allocate timers
+	// allocate timers for VBLANK
 	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_stop), this), this);
 	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_start),this), this);
 
+	// add TMUs to the chipmask if memory is specified
+	if (m_tmumem0_in_mb != 0)
+	{
+		m_chipmask |= 2;
+		if (m_tmumem1_in_mb != 0)
+			m_chipmask |= 4;
+	}
+
 	// allocate memory
-	u32 total_allocation = m_fbmem_in_mb + (m_reg.rev1_or_2() ? (m_tmumem0_in_mb + m_tmumem1_in_mb) : 0 );
+	u32 total_allocation = m_fbmem_in_mb + m_tmumem0_in_mb + m_tmumem1_in_mb;
 	m_memory = std::make_unique<u8[]>(total_allocation * 1024 * 1024 + 4096);
 
 	// configure frame buffer memory, aligning the base to a 4k boundary
@@ -3046,20 +2993,17 @@ void voodoo_device_base::device_start()
 
 	// configure texture memory
 	u8 *tmumem[2] = { nullptr, nullptr };
-	m_chipmask = 0x03;
-	if (m_reg.rev1_or_2())
+	if (m_tmumem0_in_mb != 0)
 	{
-		// Voodoo 1/2 have separate framebuffer and texture RAM
+		// separate framebuffer and texture RAM (Voodoo 1/2)
 		tmumem[0] = m_fbram + m_fbmem_in_mb * 1024 * 1024;
 		tmumem[1] = tmumem[0] + m_tmumem0_in_mb * 1024 * 1024;
-		m_chipmask |= (m_tmumem1_in_mb != 0) ? 0x04 : 0x00;
 	}
 	else
 	{
-		// Voodoo Banshee/3 have shared RAM; Voodoo 3 has two TMUs
+		// shared framebuffer and texture RAM (Voodoo Banshee/3)
 		tmumem[0] = tmumem[1] = m_fbram;
 		m_tmumem0_in_mb = m_tmumem1_in_mb = m_fbmem_in_mb;
-		m_chipmask |= (m_model == MODEL_VOODOO_3) ? 0x04 : 0x00;
 	}
 
 	// initialize the frame buffer
@@ -3073,7 +3017,7 @@ void voodoo_device_base::device_start()
 	m_video_changed = true;
 
 	m_lfb_base = 0;
-	m_lfb_stride = (m_model <= MODEL_VOODOO_2) ? 10 : 11;
+	m_lfb_stride = 10;
 
 	m_width = 512;
 	m_height = 384;
@@ -3093,30 +3037,20 @@ void voodoo_device_base::device_start()
 	// initialize the memory FIFO
 	m_fbmem_fifo.configure(nullptr, 0);
 
-	if (m_model <= MODEL_VOODOO_2)
-	{
-		for (int pen = 0; pen < 32; pen++)
-			m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
-		m_clut[32] = rgb_t(32,0xff,0xff,0xff);
-	}
-	else
-	{
-		for (int pen = 0; pen < 512; pen++)
-			m_clut[pen] = rgb_t(pen, pen, pen);
-	}
+	// initialize the CLUT
+	for (int pen = 0; pen < 32; pen++)
+		m_clut[pen] = rgb_t(pen, pal5bit(pen), pal5bit(pen), pal5bit(pen));
+	m_clut[32] = rgb_t(32,0xff,0xff,0xff);
 	m_clut_dirty = true;
 
 	// initialize the TMUs
+	u16 tmu_config = 0x11;
 	m_tmu[0].init(0, *m_shared.get(), tmumem[0], m_tmumem0_in_mb * 1024 * 1024);
 	if (BIT(m_chipmask, 2))
+	{
 		m_tmu[1].init(1, *m_shared.get(), tmumem[1], m_tmumem1_in_mb * 1024 * 1024);
-
-	// determine the TMU configuration flags
-	u16 tmu_config = 0x11;   // revision 1
-	if (m_reg.rev2())
-		tmu_config |= 0x800;
-	if (BIT(m_chipmask, 2))
-		tmu_config |= 0xc0;  // two TMUs
+		tmu_config |= 0xc0;
+	}
 
 	// create the renderer
 	m_renderer = std::make_unique<voodoo_renderer>(machine(), tmu_config, m_shared->rgb565, m_reg, &m_tmu[0].regs(), BIT(m_chipmask, 2) ? &m_tmu[1].regs() : nullptr);
@@ -3142,15 +3076,6 @@ void voodoo_device_base::device_start()
 	register_save(save, total_allocation);
 }
 
-void voodoo_2_device_base::device_start()
-{
-	voodoo_device_base::device_start();
-
-	m_sverts = 0;
-	m_cmdfifo[0].init(m_fbram, m_fbmask + 1);
-	m_cmdfifo[1].init(m_fbram, m_fbmask + 1);
-
-}
 
 
 //-------------------------------------------------
@@ -3176,7 +3101,7 @@ void voodoo_device_base::device_post_load()
 		tm.post_load();
 
 	// recompute FBI memory FIFO to get the base pointer set
-	if (m_reg.rev1_or_2())
+	if (m_fbmem_fifo.configured())
 		recompute_fbmem_fifo();
 }
 
@@ -3222,6 +3147,36 @@ command_fifo::command_fifo(voodoo_2_device_base &device) :
 {
 }
 
+
+void voodoo_2_device_base::device_start()
+{
+	// start like a Voodoo-1
+	voodoo_device_base::device_start();
+
+	// TMU configuration has an extra bit
+	m_renderer->set_tmu_config(m_renderer->tmu_config() | 0x800);
+
+	// initialize Voodoo 2 additions
+	m_sverts = 0;
+	m_cmdfifo[0].init(m_fbram, m_fbmask + 1);
+	m_cmdfifo[1].init(m_fbram, m_fbmask + 1);
+}
+
+void voodoo_2_device_base::recompute_video_memory()
+{
+	// for backwards compatibility, the triple-buffered bit is still supported
+	u32 config = m_reg.fbi_init2().enable_triple_buf();
+
+	// but if left at 0, configuration comes from fbiInit5 instead
+	if (config == 0)
+		config = m_reg.fbi_init5().buffer_allocation();
+
+	// 6-bit tile count is assembled from various bits; tiles are 32x32
+	u32 xtiles = m_reg.fbi_init6().x_video_tiles_bit0() |
+				 (m_reg.fbi_init1().x_video_tiles() << 1) |
+				 (m_reg.fbi_init1().x_video_tiles_bit5() << 5);
+	recompute_video_memory_common(config, xtiles * 32);
+}
 
 //-------------------------------------------------
 //  register_save - register for save states
@@ -3764,7 +3719,6 @@ u32 command_fifo::packet_type_5(u32 command)
 	u32 target = read_next() / 4;
 
 	// handle LFB writes
-	u32 cycles = 0;
 	switch (BIT(command, 30, 2))
 	{
 		// Linear FB
@@ -3774,7 +3728,6 @@ u32 command_fifo::packet_type_5(u32 command)
 
 			for (u32 word = 0; word < count; word++)
 				m_ram[target++ & m_mask] = little_endianize_int32(read_next());
-			cycles = count;
 			break;
 
 		// 3D LFB
@@ -3783,7 +3736,7 @@ u32 command_fifo::packet_type_5(u32 command)
 				m_device.logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
 			for (u32 word = 0; word < count; word++)
-				cycles += m_device.lfb_w(target++, read_next(), 0xffffffff);
+				m_device.lfb_w(target++, read_next(), 0xffffffff);
 			break;
 
 		// Planar YUV
@@ -3800,10 +3753,10 @@ u32 command_fifo::packet_type_5(u32 command)
 				m_device.logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
 			for (u32 word = 0; word < count; word++)
-				cycles += m_device.texture_w(target++, read_next());
+				m_device.texture_w(target++, read_next());
 			break;
 	}
-	return cycles;
+	return 0;
 }
 
 
@@ -3856,6 +3809,33 @@ void voodoo_2_device_base::register_save(save_proxy &save, u32 total_allocation)
 }
 
 
+void voodoo_2_device_base::vblank_start(void *ptr, s32 param)
+{
+	voodoo_device_base::vblank_start(ptr, param);
+
+	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
+	if (m_reg.intr_ctrl().vsync_rising_enable())
+	{
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
+	}
+}
+
+
+void voodoo_2_device_base::vblank_stop(void *ptr, s32 param)
+{
+	voodoo_device_base::vblank_stop(ptr, param);
+
+	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
+	if (m_reg.intr_ctrl().vsync_falling_enable())
+	{
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
+	}
+}
+
 //-------------------------------------------------
 //  reg_hvretrace_r - hvRetrace register read
 //-------------------------------------------------
@@ -3897,6 +3877,34 @@ u32 voodoo_2_device_base::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 		// Setting bit 31 clears the PCI interrupts
 		if (BIT(data, 31) && !m_pciint_cb.isnull())
 			m_pciint_cb(false);
+	}
+	return 0;
+}
+
+//-------------------------------------------------
+//  reg_video2_w -- write to a video configuration
+//  register; synchronize then recompute everything
+//-------------------------------------------------
+
+u32 voodoo_2_device_base::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
+{
+	if (BIT(chipmask, 0))
+	{
+		m_renderer->wait("video_configuration");
+		m_reg.write(regnum, data);
+
+		auto const hsync = m_reg.hsync<false>();
+		auto const vsync = m_reg.vsync<false>();
+		auto const back_porch = m_reg.back_porch<false>();
+		auto const video_dimensions = m_reg.video_dimensions<false>();
+		if (hsync.raw() != 0 && vsync.raw() != 0 && video_dimensions.raw() != 0 && back_porch.raw() != 0)
+		{
+			recompute_video_timing(
+					hsync.hsync_on(), hsync.hsync_off(),
+					video_dimensions.xwidth(), back_porch.horizontal() + 2,
+					vsync.vsync_on(), vsync.vsync_off(),
+					video_dimensions.yheight(), back_porch.vertical());
+		}
 	}
 	return 0;
 }

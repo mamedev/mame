@@ -409,6 +409,8 @@ public:
 	constexpr u32 tdata_swap() const     { return BIT(m_value, 26, 1); }
 	constexpr u32 tdirect_write() const  { return BIT(m_value, 27, 1); }  // Voodoo 2 only
 	constexpr u32 magic() const          { return BIT(m_value, 28, 4); }
+	constexpr u32 tmirrors() const       { return BIT(m_value, 28, 1); }  // Voodoo Banshee+ only
+	constexpr u32 tmirrort() const       { return BIT(m_value, 29, 1); }  // Voodoo Banshee+ only
 
 	constexpr u32 normalize()
 	{
@@ -811,15 +813,16 @@ private:
 
 // ======================> reg_hsync
 
+template<bool Rev1>
 class reg_hsync
 {
 public:
 	constexpr reg_hsync(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const                { return m_value; }
-	constexpr u32 hsync_on(bool rev1) const  { return BIT(m_value, 0, rev1 ? 8 : 9); }
-	constexpr u32 hsync_off(bool rev1) const { return BIT(m_value, 16, rev1 ? 10 : 11); }
+	constexpr u32 raw() const       { return m_value; }
+	constexpr u32 hsync_on() const  { return BIT(m_value, 0, Rev1 ? 8 : 9); }
+	constexpr u32 hsync_off() const { return BIT(m_value, 16, Rev1 ? 10 : 11); }
 
 private:
 	u32 m_value;
@@ -828,15 +831,16 @@ private:
 
 // ======================> reg_vsync
 
+template<bool Rev1>
 class reg_vsync
 {
 public:
 	constexpr reg_vsync(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const                { return m_value; }
-	constexpr u32 vsync_on(bool rev1) const  { return BIT(m_value, 0, rev1 ? 12 : 13); }
-	constexpr u32 vsync_off(bool rev1) const { return BIT(m_value, 16, rev1 ? 12 : 13); }
+	constexpr u32 raw() const       { return m_value; }
+	constexpr u32 vsync_on() const  { return BIT(m_value, 0, Rev1 ? 12 : 13); }
+	constexpr u32 vsync_off() const { return BIT(m_value, 16, Rev1 ? 12 : 13); }
 
 private:
 	u32 m_value;
@@ -845,15 +849,16 @@ private:
 
 // ======================> reg_video_dimensions
 
+template<bool Rev1>
 class reg_video_dimensions
 {
 public:
 	constexpr reg_video_dimensions(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const              { return m_value; }
-	constexpr u32 xwidth(bool rev1) const  { return BIT(m_value, 0, rev1 ? 10 : 11); }
-	constexpr u32 yheight(bool rev1) const { return BIT(m_value, 16, rev1 ? 10 : 11); }
+	constexpr u32 raw() const     { return m_value; }
+	constexpr u32 xwidth() const  { return BIT(m_value, 0, Rev1 ? 10 : 11); }
+	constexpr u32 yheight() const { return BIT(m_value, 16, Rev1 ? 10 : 11); }
 
 private:
 	u32 m_value;
@@ -862,15 +867,16 @@ private:
 
 // ======================> reg_back_porch
 
+template<bool Rev1>
 class reg_back_porch
 {
 public:
 	constexpr reg_back_porch(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 raw() const                 { return m_value; }
-	constexpr u32 horizontal(bool rev1) const { return BIT(m_value, 0, rev1 ? 8 : 9); }
-	constexpr u32 vertical(bool rev1) const   { return BIT(m_value, 16, rev1 ? 8 : 9); }
+	constexpr u32 raw() const        { return m_value; }
+	constexpr u32 horizontal() const { return BIT(m_value, 0, Rev1 ? 8 : 9); }
+	constexpr u32 vertical() const   { return BIT(m_value, 16, Rev1 ? 8 : 9); }
 
 private:
 	u32 m_value;
@@ -1162,10 +1168,10 @@ public:
 	reg_clip_minmax clip_left_right() const { return reg_clip_minmax(m_regs[reg_clipLeftRight].u); }
 	reg_clip_minmax clip_lowy_highy() const { return reg_clip_minmax(m_regs[reg_clipLowYHighY].u); }
 	u32 swap_history() const { return m_regs[reg_fbiSwapHistory].u; }
-	reg_hsync hsync() const { return reg_hsync(m_regs[reg_hSync].u); }
-	reg_vsync vsync() const { return reg_vsync(m_regs[reg_vSync].u); }
-	reg_video_dimensions video_dimensions() const { return reg_video_dimensions(m_regs[reg_videoDimensions].u); }
-	reg_back_porch back_porch() const { return reg_back_porch(m_regs[reg_backPorch].u); }
+	template<bool Rev1> reg_hsync<Rev1> hsync() const { return reg_hsync<Rev1>(m_regs[reg_hSync].u); }
+	template<bool Rev1> reg_vsync<Rev1> vsync() const { return reg_vsync<Rev1>(m_regs[reg_vSync].u); }
+	template<bool Rev1> reg_video_dimensions<Rev1> video_dimensions() const { return reg_video_dimensions<Rev1>(m_regs[reg_videoDimensions].u); }
+	template<bool Rev1> reg_back_porch<Rev1> back_porch() const { return reg_back_porch<Rev1>(m_regs[reg_backPorch].u); }
 
 	// voodoo-2-specific reads
 	reg_intr_ctrl intr_ctrl() const { return reg_intr_ctrl(m_regs[reg_intrCtrl].u); }

@@ -502,21 +502,21 @@ REGISTER_TABLE_BEGIN
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(fbiInit4,        passive,     fbiinit,     32, FBI,      NOSYNC, NOFIFO)    // 200
 	REGISTER_ENTRY(vRetrace,        vretrace,    invalid,     13, FBI,          NA,     NA)    // 204
-	REGISTER_ENTRY(backPorch,       passive,     video,       25, FBI,      NOSYNC, NOFIFO)    // 208
-	REGISTER_ENTRY(videoDimensions, passive,     video,       27, FBI,      NOSYNC, NOFIFO)    // 20c
+	REGISTER_ENTRY(backPorch,       passive,     video2,      25, FBI,      NOSYNC, NOFIFO)    // 208
+	REGISTER_ENTRY(videoDimensions, passive,     video2,      27, FBI,      NOSYNC, NOFIFO)    // 20c
 	REGISTER_ENTRY(fbiInit0,        passive,     fbiinit,     31, FBI,      NOSYNC, NOFIFO)    // 210
 	REGISTER_ENTRY(fbiInit1,        passive,     fbiinit,     32, FBI,      NOSYNC, NOFIFO)    // 214
 	REGISTER_ENTRY(fbiInit2,        fbiinit2,    fbiinit,     32, FBI,      NOSYNC, NOFIFO)    // 218
 	REGISTER_ENTRY(fbiInit3,        passive,     fbiinit,     32, FBI,      NOSYNC, NOFIFO)    // 21c
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
-	REGISTER_ENTRY(hSync,           invalid,     video,       27, FBI,      NOSYNC, NOFIFO)    // 220
-	REGISTER_ENTRY(vSync,           invalid,     video,       29, FBI,      NOSYNC, NOFIFO)    // 224
+	REGISTER_ENTRY(hSync,           invalid,     video2,      27, FBI,      NOSYNC, NOFIFO)    // 220
+	REGISTER_ENTRY(vSync,           invalid,     video2,      29, FBI,      NOSYNC, NOFIFO)    // 224
 	REGISTER_ENTRY(clutData,        invalid,     clut,        30, FBI,      NOSYNC, NOFIFO)    // 228
 	REGISTER_ENTRY(dacData,         invalid,     dac,         14, FBI,      NOSYNC, NOFIFO)    // 22c
 	REGISTER_ENTRY(maxRgbDelta,     invalid,     unimplemented,24,FBI,      NOSYNC, NOFIFO)    // 230
-	REGISTER_ENTRY(hBorder,         invalid,     video,       25, FBI,      NOSYNC, NOFIFO)    // 234 - cmdFIFO mode
-	REGISTER_ENTRY(vBorder,         invalid,     video,       25, FBI,      NOSYNC, NOFIFO)    // 238 - cmdFIFO mode
-	REGISTER_ENTRY(borderColor,     invalid,     video,       24, FBI,      NOSYNC, NOFIFO)    // 23c - cmdFIFO mode
+	REGISTER_ENTRY(hBorder,         invalid,     unimplemented,25,FBI,      NOSYNC, NOFIFO)    // 234 - cmdFIFO mode
+	REGISTER_ENTRY(vBorder,         invalid,     unimplemented,25,FBI,      NOSYNC, NOFIFO)    // 238 - cmdFIFO mode
+	REGISTER_ENTRY(borderColor,     invalid,     unimplemented,24,FBI,      NOSYNC, NOFIFO)    // 23c - cmdFIFO mode
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(hvRetrace,       hvretrace,   invalid,     27, FBI,          NA,     NA)    // 240
 	REGISTER_ENTRY(fbiInit5,        passive,     fbiinit5_7,  32, FBI,      NOSYNC, NOFIFO)    // 244 - cmdFIFO mode

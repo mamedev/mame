@@ -80,6 +80,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual void rotate_buffers() override;
+
+	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
+
+	virtual void texture_w(offs_t offset, u32 data) override;
+
 	// device-level overrides
 	u32 banshee_agp_r(offs_t offset);
 	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -96,37 +102,32 @@ protected:
 	u32 reg_overbuffer_w(u32 chipmask, u32 regnum, u32 data);
 
 	// internal state
-	struct banshee_info
-	{
-		u32 io[0x40];               // I/O registers
-		u32 agp[0x80];              // AGP registers
-		u8  vga[0x20];              // VGA registers
-		u8  crtc[0x27];             // VGA CRTC registers
-		u8  seq[0x05];              // VGA sequencer registers
-		u8  gc[0x05];               // VGA graphics controller registers
-		u8  att[0x15];              // VGA attribute registers
-		u8  attff;                  // VGA attribute flip-flop
+	u32 m_reg_io[0x40];               // I/O registers
+	u32 m_reg_agp[0x80];              // AGP registers
+	u8 m_reg_vga[0x20];              // VGA registers
+	u8 m_reg_vga_crtc[0x27];             // VGA CRTC registers
+	u8 m_reg_vga_seq[0x05];              // VGA sequencer registers
+	u8 m_reg_vga_gc[0x05];               // VGA graphics controller registers
+	u8 m_reg_vga_att[0x15];              // VGA attribute registers
+	u8 m_reg_vga_att_ff = 0;                  // VGA attribute flip-flop
 
-		u32 blt_regs[0x20];         // 2D Blitter registers
-		u32 blt_dst_base = 0;
-		u32 blt_dst_x = 0;
-		u32 blt_dst_y = 0;
-		u32 blt_dst_width = 0;
-		u32 blt_dst_height = 0;
-		u32 blt_dst_stride = 0;
-		u32 blt_dst_bpp = 0;
-		u32 blt_cmd = 0;
-		u32 blt_src_base = 0;
-		u32 blt_src_x = 0;
-		u32 blt_src_y = 0;
-		u32 blt_src_width = 0;
-		u32 blt_src_height = 0;
-		u32 blt_src_stride = 0;
-		u32 blt_src_bpp = 0;
-	};
-	banshee_info m_banshee;                  // Banshee state
+	u32 m_blt_regs[0x20];         // 2D Blitter registers
+	u32 m_blt_dst_base = 0;
+	u32 m_blt_dst_x = 0;
+	u32 m_blt_dst_y = 0;
+	u32 m_blt_dst_width = 0;
+	u32 m_blt_dst_height = 0;
+	u32 m_blt_dst_stride = 0;
+	u32 m_blt_dst_bpp = 0;
+	u32 m_blt_cmd = 0;
+	u32 m_blt_src_base = 0;
+	u32 m_blt_src_x = 0;
+	u32 m_blt_src_y = 0;
+	u32 m_blt_src_width = 0;
+	u32 m_blt_src_height = 0;
+	u32 m_blt_src_stride = 0;
+	u32 m_blt_src_bpp = 0;
 
-private:
 	static voodoo::static_register_table_entry<voodoo_banshee_device_base> const s_register_table[256];
 };
 
@@ -142,6 +143,11 @@ class voodoo_3_device : public voodoo_banshee_device_base
 {
 public:
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 };
 
 

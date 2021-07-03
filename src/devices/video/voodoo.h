@@ -229,7 +229,8 @@ public:
 	void register_save(save_proxy &save);
 
 	// basic queries
-	u32 peek() { return m_base[m_out]; }
+	bool configured() const { return (m_size != 0); }
+	u32 peek() const { return m_base[m_out]; }
 	bool empty() const { return (m_in == m_out); }
 	bool full() const { return ((m_in + 1) == m_out) || (m_in == (m_size - 1) && m_out == 0); }
 	s32 items() const { s32 result = m_in - m_out; if (result < 0) result += m_size; return result; }
@@ -474,11 +475,13 @@ protected:
 	virtual void vblank_start(void *ptr, s32 param);
 	virtual void vblank_stop(void *ptr, s32 param);
 	void swap_buffers();
+	virtual void rotate_buffers();
 
 	// video timing and updates
 	int update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens);
 	void recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp);
-	void recompute_video_memory();
+	virtual void recompute_video_memory();
+	void recompute_video_memory_common(u32 config, u32 rowpixels);
 
 	// rendering
 	voodoo::voodoo_renderer &renderer() { return *m_renderer; }
@@ -513,8 +516,8 @@ protected:
 
 	// reads and writes
 	u32 lfb_r(offs_t offset, bool lfb_3d);
-	s32 lfb_w(offs_t offset, u32 data, u32 mem_mask);
-	s32 texture_w(offs_t offset, u32 data);
+	void lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	virtual void texture_w(offs_t offset, u32 data);
 
 	u32 chipmask_from_offset(u32 offset)
 	{
@@ -674,6 +677,8 @@ protected:
 
 	virtual void flush_fifos(attotime current_time) override;
 
+	virtual void recompute_video_memory() override;
+
 	virtual void vblank_start(void *ptr, s32 param) override;
 	virtual void vblank_stop(void *ptr, s32 param) override;
 
@@ -687,6 +692,7 @@ protected:
 
 	// Voodoo-2 specific write handlers
 	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_video2_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_userintr_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data);

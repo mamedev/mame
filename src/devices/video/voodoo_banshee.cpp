@@ -60,13 +60,13 @@ u16 *voodoo_banshee_device_base::draw_buffer_indirect(int index, bool depth_allo
 int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if bypassing the clut, don't worry about the rest
-	if (BIT(m_banshee.io[io_vidProcCfg], 11))
+	if (BIT(m_reg_io[io_vidProcCfg], 11))
 		return update_common(bitmap, cliprect, m_shared->rgb565);
 
 	// if the CLUT is dirty, recompute the pens array
 	if (m_clut_dirty)
 	{
-		rgb_t const *clutbase = &m_clut[256 * BIT(m_banshee.io[io_vidProcCfg], 13)];
+		rgb_t const *clutbase = &m_clut[256 * BIT(m_reg_io[io_vidProcCfg], 13)];
 
 		// compute R/G/B pens first
 		u8 rtable[32], gtable[64], btable[32];
@@ -100,31 +100,117 @@ int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cl
 
 void voodoo_banshee_device_base::device_start()
 {
-	// initialize banshee registers
-	memset(m_banshee.io, 0, sizeof(m_banshee.io));
-	m_banshee.io[io_pciInit0] = 0x01800040;
-	m_banshee.io[io_sipMonitor] = 0x40000000;
-	m_banshee.io[io_lfbMemoryConfig] = 0x000a2200;
-	m_banshee.io[io_dramInit0] = 0x00579d29;
-	if (m_fbmem_in_mb == 16)
-		m_banshee.io[io_dramInit0] |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
-	else
-		m_banshee.io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
-	m_banshee.io[io_dramInit1] = 0x00f02200;
-	m_banshee.io[io_tmuGbeInit] = 0x00000bfb;
+	// pre-set the chipmask and clear the TMU memory to indicate we're shared
+	if (m_chipmask == 0x01)
+		m_chipmask = 0x03;
+	m_tmumem0_in_mb = m_tmumem1_in_mb = 0;
 
-	// call our parent
+	// start like a Voodoo-2
 	voodoo_2_device_base::device_start();
 
-	/* register states: banshee */
-	save_item(NAME(m_banshee.io));
-	save_item(NAME(m_banshee.agp));
-	save_item(NAME(m_banshee.vga));
-	save_item(NAME(m_banshee.crtc));
-	save_item(NAME(m_banshee.seq));
-	save_item(NAME(m_banshee.gc));
-	save_item(NAME(m_banshee.att));
-	save_item(NAME(m_banshee.attff));
+	// LFB stride defaualts to 11 on Banshee and later
+	m_lfb_stride = 11;
+
+	// 512-entry CLUT on Banshee and later
+	for (int pen = 0; pen < 512; pen++)
+		m_clut[pen] = rgb_t(pen, pen, pen);
+
+	// initialize banshee registers
+	memset(m_reg_io, 0, sizeof(m_reg_io));
+	m_reg_io[io_pciInit0] = 0x01800040;
+	m_reg_io[io_sipMonitor] = 0x40000000;
+	m_reg_io[io_lfbMemoryConfig] = 0x000a2200;
+	m_reg_io[io_dramInit0] = 0x00579d29;
+	if (m_fbmem_in_mb == 16)
+		m_reg_io[io_dramInit0] |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
+	else
+		m_reg_io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
+	m_reg_io[io_dramInit1] = 0x00f02200;
+	m_reg_io[io_tmuGbeInit] = 0x00000bfb;
+}
+
+
+void voodoo_banshee_device_base::register_save(save_proxy &save, u32 total_allocation)
+{
+	voodoo_2_device_base::register_save(save, total_allocation);
+
+	// Voodoo Banshee stuff
+	save.save_item(NAME(m_reg_io));
+	save.save_item(NAME(m_reg_agp));
+	save.save_item(NAME(m_reg_vga));
+	save.save_item(NAME(m_reg_vga_crtc));
+	save.save_item(NAME(m_reg_vga_seq));
+	save.save_item(NAME(m_reg_vga_gc));
+	save.save_item(NAME(m_reg_vga_att));
+	save.save_item(NAME(m_reg_vga_att_ff));
+	save.save_item(NAME(m_blt_regs));
+	save.save_item(NAME(m_blt_dst_base));
+	save.save_item(NAME(m_blt_dst_x));
+	save.save_item(NAME(m_blt_dst_y));
+	save.save_item(NAME(m_blt_dst_width));
+	save.save_item(NAME(m_blt_dst_height));
+	save.save_item(NAME(m_blt_dst_stride));
+	save.save_item(NAME(m_blt_dst_bpp));
+	save.save_item(NAME(m_blt_cmd));
+	save.save_item(NAME(m_blt_src_base));
+	save.save_item(NAME(m_blt_src_x));
+	save.save_item(NAME(m_blt_src_y));
+	save.save_item(NAME(m_blt_src_width));
+	save.save_item(NAME(m_blt_src_height));
+	save.save_item(NAME(m_blt_src_stride));
+	save.save_item(NAME(m_blt_src_bpp));
+}
+
+void voodoo_banshee_device_base::rotate_buffers()
+{
+	m_rgboffs[0] = m_reg.read(voodoo_regs::reg_leftOverlayBuf) & m_fbmask & ~0x0f;
+}
+
+
+void voodoo_banshee_device_base::texture_w(offs_t offset, u32 data)
+{
+	// statistics
+	if (DEBUG_STATS)
+		m_stats.tex_writes++;
+
+	// point to the right TMU
+	int tmunum = BIT(offset, 19, 2);
+	if (!BIT(m_chipmask, 1 + tmunum))
+		return;
+
+	// wait for any outstanding work to finish
+	m_renderer->wait("Texture write");
+
+	// pull out modes from the TMU and update state
+	auto &regs = m_tmu[tmunum].regs();
+	auto const texlod = regs.texture_lod();
+	auto const texmode = regs.texture_mode();
+	auto &texture = m_tmu[tmunum].prepare_texture(*m_renderer.get());
+
+	// swizzle the data
+	if (texlod.tdata_swizzle())
+		data = swapendian_int32(data);
+	if (texlod.tdata_swap())
+		data = (data >> 16) | (data << 16);
+
+	// determine destination pointer
+	u8 *dest = texture.write_ptr(0, offset * 4, 0, 1);
+
+	// write the four bytes in little-endian order
+	u32 bytes_per_texel = (texmode.format() < 8) ? 1 : 2;
+	if (bytes_per_texel == 1)
+	{
+		dest[BYTE4_XOR_LE(0)] = (data >> 0) & 0xff;
+		dest[BYTE4_XOR_LE(1)] = (data >> 8) & 0xff;
+		dest[BYTE4_XOR_LE(2)] = (data >> 16) & 0xff;
+		dest[BYTE4_XOR_LE(3)] = (data >> 24) & 0xff;
+	}
+	else
+	{
+		u16 *dest16 = reinterpret_cast<u16 *>(dest);
+		dest16[BYTE_XOR_LE(0)] = (data >> 0) & 0xffff;
+		dest16[BYTE_XOR_LE(1)] = (data >> 16) & 0xffff;
+	}
 }
 
 
@@ -329,7 +415,7 @@ u32 voodoo_banshee_device_base::banshee_agp_r(offs_t offset)
 			break;
 
 		default:
-			result = m_banshee.agp[offset];
+			result = m_reg_agp[offset];
 			break;
 	}
 
@@ -376,10 +462,10 @@ u8 voodoo_banshee_device_base::banshee_vga_r(offs_t offset)
 	{
 		/* attribute access */
 		case 0x3c0:
-			if (m_banshee.vga[0x3c1 & 0x1f] < std::size(m_banshee.att))
-				result = m_banshee.att[m_banshee.vga[0x3c1 & 0x1f]];
+			if (m_reg_vga[0x3c1 & 0x1f] < std::size(m_reg_vga_att))
+				result = m_reg_vga_att[m_reg_vga[0x3c1 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_att_r(%X)\n", machine().describe_context(), m_banshee.vga[0x3c1 & 0x1f]);
+				logerror("%s:banshee_att_r(%X)\n", machine().describe_context(), m_reg_vga[0x3c1 & 0x1f]);
 			break;
 
 		/* Input status 0 */
@@ -397,41 +483,41 @@ u8 voodoo_banshee_device_base::banshee_vga_r(offs_t offset)
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (m_banshee.vga[0x3c4 & 0x1f] < std::size(m_banshee.seq))
-				result = m_banshee.seq[m_banshee.vga[0x3c4 & 0x1f]];
+			if (m_reg_vga[0x3c4 & 0x1f] < std::size(m_reg_vga_seq))
+				result = m_reg_vga_seq[m_reg_vga[0x3c4 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_seq_r(%X)\n", machine().describe_context(), m_banshee.vga[0x3c4 & 0x1f]);
+				logerror("%s:banshee_seq_r(%X)\n", machine().describe_context(), m_reg_vga[0x3c4 & 0x1f]);
 			break;
 
 		/* Feature control */
 		case 0x3ca:
-			result = m_banshee.vga[0x3da & 0x1f];
-			m_banshee.attff = 0;
+			result = m_reg_vga[0x3da & 0x1f];
+			m_reg_vga_att_ff = 0;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Miscellaneous output */
 		case 0x3cc:
-			result = m_banshee.vga[0x3c2 & 0x1f];
+			result = m_reg_vga[0x3c2 & 0x1f];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (m_banshee.vga[0x3ce & 0x1f] < std::size(m_banshee.gc))
-				result = m_banshee.gc[m_banshee.vga[0x3ce & 0x1f]];
+			if (m_reg_vga[0x3ce & 0x1f] < std::size(m_reg_vga_gc))
+				result = m_reg_vga_gc[m_reg_vga[0x3ce & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_gc_r(%X)\n", machine().describe_context(), m_banshee.vga[0x3ce & 0x1f]);
+				logerror("%s:banshee_gc_r(%X)\n", machine().describe_context(), m_reg_vga[0x3ce & 0x1f]);
 			break;
 
 		/* CRTC access */
 		case 0x3d5:
-			if (m_banshee.vga[0x3d4 & 0x1f] < std::size(m_banshee.crtc))
-				result = m_banshee.crtc[m_banshee.vga[0x3d4 & 0x1f]];
+			if (m_reg_vga[0x3d4 & 0x1f] < std::size(m_reg_vga_crtc))
+				result = m_reg_vga_crtc[m_reg_vga[0x3d4 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_crtc_r(%X)\n", machine().describe_context(), m_banshee.vga[0x3d4 & 0x1f]);
+				logerror("%s:banshee_crtc_r(%X)\n", machine().describe_context(), m_reg_vga[0x3d4 & 0x1f]);
 			break;
 
 		/* Input status 1 */
@@ -451,7 +537,7 @@ u8 voodoo_banshee_device_base::banshee_vga_r(offs_t offset)
 			break;
 
 		default:
-			result = m_banshee.vga[offset];
+			result = m_reg_vga[offset];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_r(%X)\n", machine().describe_context(), 0x3c0+offset);
 			break;
@@ -474,9 +560,9 @@ u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 			break;
 
 		case io_dacData:
-			result = m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
+			result = m_clut[m_reg_io[io_dacAddr] & 0x1ff] = m_reg_io[offset];
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_dac_r(%X)\n", machine().describe_context(), m_banshee.io[io_dacAddr] & 0x1ff);
+				logerror("%s:banshee_dac_r(%X)\n", machine().describe_context(), m_reg_io[io_dacAddr] & 0x1ff);
 			break;
 
 		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
@@ -494,7 +580,7 @@ u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 			break;
 
 		default:
-			result = m_banshee.io[offset];
+			result = m_reg_io[offset];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_r(%s)\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset]);
 			break;
@@ -512,7 +598,7 @@ u32 voodoo_banshee_device_base::banshee_rom_r(offs_t offset)
 
 void voodoo_banshee_device_base::banshee_blit_2d(u32 data)
 {
-	switch (m_banshee.blt_cmd)
+	switch (m_blt_cmd)
 	{
 		case 0:         // NOP - wait for idle
 		{
@@ -534,45 +620,45 @@ void voodoo_banshee_device_base::banshee_blit_2d(u32 data)
 
 		case 3:         // Host-to-screen blit
 		{
-			u32 addr = m_banshee.blt_dst_base;
+			u32 addr = m_blt_dst_base;
 
-			addr += (m_banshee.blt_dst_y * m_banshee.blt_dst_stride) + (m_banshee.blt_dst_x * m_banshee.blt_dst_bpp);
+			addr += (m_blt_dst_y * m_blt_dst_stride) + (m_blt_dst_x * m_blt_dst_bpp);
 
 			if (LOG_BANSHEE_2D)
-				logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, m_banshee.blt_dst_x, m_banshee.blt_dst_y);
+				logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, m_blt_dst_x, m_blt_dst_y);
 
-			switch (m_banshee.blt_dst_bpp)
+			switch (m_blt_dst_bpp)
 			{
 				case 1:
 					m_fbram[addr+0] = data & 0xff;
 					m_fbram[addr+1] = (data >> 8) & 0xff;
 					m_fbram[addr+2] = (data >> 16) & 0xff;
 					m_fbram[addr+3] = (data >> 24) & 0xff;
-					m_banshee.blt_dst_x += 4;
+					m_blt_dst_x += 4;
 					break;
 				case 2:
 					m_fbram[addr+1] = data & 0xff;
 					m_fbram[addr+0] = (data >> 8) & 0xff;
 					m_fbram[addr+3] = (data >> 16) & 0xff;
 					m_fbram[addr+2] = (data >> 24) & 0xff;
-					m_banshee.blt_dst_x += 2;
+					m_blt_dst_x += 2;
 					break;
 				case 3:
-					m_banshee.blt_dst_x += 1;
+					m_blt_dst_x += 1;
 					break;
 				case 4:
 					m_fbram[addr+3] = data & 0xff;
 					m_fbram[addr+2] = (data >> 8) & 0xff;
 					m_fbram[addr+1] = (data >> 16) & 0xff;
 					m_fbram[addr+0] = (data >> 24) & 0xff;
-					m_banshee.blt_dst_x += 1;
+					m_blt_dst_x += 1;
 					break;
 			}
 
-			if (m_banshee.blt_dst_x >= m_banshee.blt_dst_width)
+			if (m_blt_dst_x >= m_blt_dst_width)
 			{
-				m_banshee.blt_dst_x = 0;
-				m_banshee.blt_dst_y++;
+				m_blt_dst_x = 0;
+				m_blt_dst_y++;
 			}
 			break;
 		}
@@ -599,7 +685,7 @@ void voodoo_banshee_device_base::banshee_blit_2d(u32 data)
 
 		default:
 		{
-			fatalerror("blit_2d: unknown command %d\n", m_banshee.blt_cmd);
+			fatalerror("blit_2d: unknown command %d\n", m_blt_cmd);
 		}
 	}
 }
@@ -609,134 +695,120 @@ s32 voodoo_banshee_device_base::banshee_2d_w(offs_t offset, u32 data)
 	switch (offset)
 	{
 		case banshee2D_command:
+		{
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0xf, data >> 24);
 
-			m_banshee.blt_src_x        = m_banshee.blt_regs[banshee2D_srcXY] & 0xfff;
-			m_banshee.blt_src_y        = (m_banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
-			m_banshee.blt_src_base     = m_banshee.blt_regs[banshee2D_srcBaseAddr] & 0xffffff;
-			m_banshee.blt_src_stride   = m_banshee.blt_regs[banshee2D_srcFormat] & 0x3fff;
-			m_banshee.blt_src_width    = m_banshee.blt_regs[banshee2D_srcSize] & 0xfff;
-			m_banshee.blt_src_height   = (m_banshee.blt_regs[banshee2D_srcSize] >> 16) & 0xfff;
+			static u8 const s_format_bpp[16] = { 1,1,1,2,3,4,1,1,2,2,1,1,1,1,1,1 };
 
-			switch ((m_banshee.blt_regs[banshee2D_srcFormat] >> 16) & 0xf)
-			{
-				case 1: m_banshee.blt_src_bpp = 1; break;
-				case 3: m_banshee.blt_src_bpp = 2; break;
-				case 4: m_banshee.blt_src_bpp = 3; break;
-				case 5: m_banshee.blt_src_bpp = 4; break;
-				case 8: m_banshee.blt_src_bpp = 2; break;
-				case 9: m_banshee.blt_src_bpp = 2; break;
-				default: m_banshee.blt_src_bpp = 1; break;
-			}
+			m_blt_src_x        = BIT(m_blt_regs[banshee2D_srcXY], 0, 12);
+			m_blt_src_y        = BIT(m_blt_regs[banshee2D_srcXY], 16, 12);
+			m_blt_src_base     = BIT(m_blt_regs[banshee2D_srcBaseAddr], 0, 24);
+			m_blt_src_stride   = BIT(m_blt_regs[banshee2D_srcFormat], 0, 14);
+			m_blt_src_width    = BIT(m_blt_regs[banshee2D_srcSize], 0, 12);
+			m_blt_src_height   = BIT(m_blt_regs[banshee2D_srcSize], 16, 12);
+			m_blt_src_bpp      = s_format_bpp[BIT(m_blt_regs[banshee2D_srcFormat], 16, 4)];
 
-			m_banshee.blt_dst_x        = m_banshee.blt_regs[banshee2D_dstXY] & 0xfff;
-			m_banshee.blt_dst_y        = (m_banshee.blt_regs[banshee2D_dstXY] >> 16) & 0xfff;
-			m_banshee.blt_dst_base     = m_banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
-			m_banshee.blt_dst_stride   = m_banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
-			m_banshee.blt_dst_width    = m_banshee.blt_regs[banshee2D_dstSize] & 0xfff;
-			m_banshee.blt_dst_height   = (m_banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
+			m_blt_dst_x        = BIT(m_blt_regs[banshee2D_dstXY], 0, 12);
+			m_blt_dst_y        = BIT(m_blt_regs[banshee2D_dstXY], 16, 12);
+			m_blt_dst_base     = BIT(m_blt_regs[banshee2D_dstBaseAddr], 0, 24);
+			m_blt_dst_stride   = BIT(m_blt_regs[banshee2D_dstFormat], 0, 14);
+			m_blt_dst_width    = BIT(m_blt_regs[banshee2D_dstSize], 0, 12);
+			m_blt_dst_height   = BIT(m_blt_regs[banshee2D_dstSize], 16, 12);
+			m_blt_dst_bpp      = s_format_bpp[BIT(m_blt_regs[banshee2D_dstFormat], 16, 3)];
 
-			switch ((m_banshee.blt_regs[banshee2D_dstFormat] >> 16) & 0x7)
-			{
-				case 1: m_banshee.blt_dst_bpp = 1; break;
-				case 3: m_banshee.blt_dst_bpp = 2; break;
-				case 4: m_banshee.blt_dst_bpp = 3; break;
-				case 5: m_banshee.blt_dst_bpp = 4; break;
-				default: m_banshee.blt_dst_bpp = 1; break;
-			}
-
-			m_banshee.blt_cmd = data & 0xf;
+			m_blt_cmd = BIT(data, 0, 4);
 			break;
+		}
 
 		case banshee2D_colorBack:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:colorBack: %08X\n", data);
-			m_banshee.blt_regs[banshee2D_colorBack] = data;
+			m_blt_regs[banshee2D_colorBack] = data;
 			break;
 
 		case banshee2D_colorFore:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:colorFore: %08X\n", data);
-			m_banshee.blt_regs[banshee2D_colorFore] = data;
+			m_blt_regs[banshee2D_colorFore] = data;
 			break;
 
 		case banshee2D_srcBaseAddr:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:srcBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
-			m_banshee.blt_regs[banshee2D_srcBaseAddr] = data;
+			m_blt_regs[banshee2D_srcBaseAddr] = data;
 			break;
 
 		case banshee2D_dstBaseAddr:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:dstBaseAddr: %08X, %s\n", data & 0xffffff, data & 0x80000000 ? "tiled" : "non-tiled");
-			m_banshee.blt_regs[banshee2D_dstBaseAddr] = data;
+			m_blt_regs[banshee2D_dstBaseAddr] = data;
 			break;
 
 		case banshee2D_srcSize:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:srcSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_srcSize] = data;
+			m_blt_regs[banshee2D_srcSize] = data;
 			break;
 
 		case banshee2D_dstSize:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:dstSize: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_dstSize] = data;
+			m_blt_regs[banshee2D_dstSize] = data;
 			break;
 
 		case banshee2D_srcXY:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:srcXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_srcXY] = data;
+			m_blt_regs[banshee2D_srcXY] = data;
 			break;
 
 		case banshee2D_dstXY:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:dstXY: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_dstXY] = data;
+			m_blt_regs[banshee2D_dstXY] = data;
 			break;
 
 		case banshee2D_srcFormat:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:srcFormat: str %d, fmt %d, packing %d\n", data & 0x3fff, (data >> 16) & 0xf, (data >> 22) & 0x3);
-			m_banshee.blt_regs[banshee2D_srcFormat] = data;
+			m_blt_regs[banshee2D_srcFormat] = data;
 			break;
 
 		case banshee2D_dstFormat:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:dstFormat: str %d, fmt %d\n", data & 0x3fff, (data >> 16) & 0xf);
-			m_banshee.blt_regs[banshee2D_dstFormat] = data;
+			m_blt_regs[banshee2D_dstFormat] = data;
 			break;
 
 		case banshee2D_clip0Min:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:clip0Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_clip0Min] = data;
+			m_blt_regs[banshee2D_clip0Min] = data;
 			break;
 
 		case banshee2D_clip0Max:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:clip0Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_clip0Max] = data;
+			m_blt_regs[banshee2D_clip0Max] = data;
 			break;
 
 		case banshee2D_clip1Min:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:clip1Min: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_clip1Min] = data;
+			m_blt_regs[banshee2D_clip1Min] = data;
 			break;
 
 		case banshee2D_clip1Max:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:clip1Max: %d, %d\n", data & 0xfff, (data >> 16) & 0xfff);
-			m_banshee.blt_regs[banshee2D_clip1Max] = data;
+			m_blt_regs[banshee2D_clip1Max] = data;
 			break;
 
 		case banshee2D_rop:
 			if (LOG_BANSHEE_2D)
 				logerror("   2D:rop: %d, %d, %d\n",  data & 0xff, (data >> 8) & 0xff, (data >> 16) & 0xff);
-			m_banshee.blt_regs[banshee2D_rop] = data;
+			m_blt_regs[banshee2D_rop] = data;
 			break;
 
 		default:
@@ -766,14 +838,14 @@ void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_
 	switch (offset)
 	{
 		case cmdBaseAddr0:
-			COMBINE_DATA(&m_banshee.agp[offset]);
+			COMBINE_DATA(&m_reg_agp[offset]);
 			m_cmdfifo[0].set_base(BIT(data, 0, 24) << 12);
-			m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			m_cmdfifo[0].set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize0:
-			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_cmdfifo[0].set_size((BIT(m_banshee.agp[cmdBaseSize0], 0, 8) + 1) << 12);
+			COMBINE_DATA(&m_reg_agp[offset]);
+			m_cmdfifo[0].set_size((BIT(m_reg_agp[cmdBaseSize0], 0, 8) + 1) << 12);
 			m_cmdfifo[0].set_enable(BIT(data, 8));
 			m_cmdfifo[0].set_count_holes(!BIT(data, 10));
 			break;
@@ -802,14 +874,14 @@ void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_
 			break;
 
 		case cmdBaseAddr1:
-			COMBINE_DATA(&m_banshee.agp[offset]);
+			COMBINE_DATA(&m_reg_agp[offset]);
 			m_cmdfifo[1].set_base(BIT(data, 0, 24) << 12);
-			m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			m_cmdfifo[1].set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
 			break;
 
 		case cmdBaseSize1:
-			COMBINE_DATA(&m_banshee.agp[offset]);
-			m_cmdfifo[1].set_size((BIT(m_banshee.agp[cmdBaseSize1], 0, 8) + 1) << 12);
+			COMBINE_DATA(&m_reg_agp[offset]);
+			m_cmdfifo[1].set_size((BIT(m_reg_agp[cmdBaseSize1], 0, 8) + 1) << 12);
 			m_cmdfifo[1].set_enable(BIT(data, 8));
 			m_cmdfifo[1].set_count_holes(!BIT(data, 10));
 			break;
@@ -838,7 +910,7 @@ void voodoo_banshee_device_base::banshee_agp_w(offs_t offset, u32 data, u32 mem_
 			break;
 
 		default:
-			COMBINE_DATA(&m_banshee.agp[offset]);
+			COMBINE_DATA(&m_reg_agp[offset]);
 			break;
 	}
 
@@ -883,48 +955,48 @@ void voodoo_banshee_device_base::banshee_vga_w(offs_t offset, u8 data)
 		/* attribute access */
 		case 0x3c0:
 		case 0x3c1:
-			if (m_banshee.attff == 0)
+			if (m_reg_vga_att_ff == 0)
 			{
-				m_banshee.vga[0x3c1 & 0x1f] = data;
+				m_reg_vga[0x3c1 & 0x1f] = data;
 				if (LOG_REGISTERS)
 					logerror("%s:banshee_vga_w(%X) = %02X\n", machine().describe_context(), 0x3c0+offset, data);
 			}
 			else
 			{
-				if (m_banshee.vga[0x3c1 & 0x1f] < std::size(m_banshee.att))
-					m_banshee.att[m_banshee.vga[0x3c1 & 0x1f]] = data;
+				if (m_reg_vga[0x3c1 & 0x1f] < std::size(m_reg_vga_att))
+					m_reg_vga_att[m_reg_vga[0x3c1 & 0x1f]] = data;
 				if (LOG_REGISTERS)
-					logerror("%s:banshee_att_w(%X) = %02X\n", machine().describe_context(), m_banshee.vga[0x3c1 & 0x1f], data);
+					logerror("%s:banshee_att_w(%X) = %02X\n", machine().describe_context(), m_reg_vga[0x3c1 & 0x1f], data);
 			}
-			m_banshee.attff ^= 1;
+			m_reg_vga_att_ff ^= 1;
 			break;
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (m_banshee.vga[0x3c4 & 0x1f] < std::size(m_banshee.seq))
-				m_banshee.seq[m_banshee.vga[0x3c4 & 0x1f]] = data;
+			if (m_reg_vga[0x3c4 & 0x1f] < std::size(m_reg_vga_seq))
+				m_reg_vga_seq[m_reg_vga[0x3c4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_seq_w(%X) = %02X\n", machine().describe_context(), m_banshee.vga[0x3c4 & 0x1f], data);
+				logerror("%s:banshee_seq_w(%X) = %02X\n", machine().describe_context(), m_reg_vga[0x3c4 & 0x1f], data);
 			break;
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (m_banshee.vga[0x3ce & 0x1f] < std::size(m_banshee.gc))
-				m_banshee.gc[m_banshee.vga[0x3ce & 0x1f]] = data;
+			if (m_reg_vga[0x3ce & 0x1f] < std::size(m_reg_vga_gc))
+				m_reg_vga_gc[m_reg_vga[0x3ce & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_gc_w(%X) = %02X\n", machine().describe_context(), m_banshee.vga[0x3ce & 0x1f], data);
+				logerror("%s:banshee_gc_w(%X) = %02X\n", machine().describe_context(), m_reg_vga[0x3ce & 0x1f], data);
 			break;
 
 		/* CRTC access */
 		case 0x3d5:
-			if (m_banshee.vga[0x3d4 & 0x1f] < std::size(m_banshee.crtc))
-				m_banshee.crtc[m_banshee.vga[0x3d4 & 0x1f]] = data;
+			if (m_reg_vga[0x3d4 & 0x1f] < std::size(m_reg_vga_crtc))
+				m_reg_vga_crtc[m_reg_vga[0x3d4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_crtc_w(%X) = %02X\n", machine().describe_context(), m_banshee.vga[0x3d4 & 0x1f], data);
+				logerror("%s:banshee_crtc_w(%X) = %02X\n", machine().describe_context(), m_reg_vga[0x3d4 & 0x1f], data);
 			break;
 
 		default:
-			m_banshee.vga[offset] = data;
+			m_reg_vga[offset] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_vga_w(%X) = %02X\n", machine().describe_context(), 0x3c0+offset, data);
 			break;
@@ -937,33 +1009,33 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 	u32 old;
 
 	offset &= 0xff/4;
-	old = m_banshee.io[offset];
+	old = m_reg_io[offset];
 
 	/* switch off the offset */
 	switch (offset)
 	{
 		case io_vidProcCfg:
-			COMBINE_DATA(&m_banshee.io[offset]);
-			if ((m_banshee.io[offset] ^ old) & 0x2000)
+			COMBINE_DATA(&m_reg_io[offset]);
+			if ((m_reg_io[offset] ^ old) & 0x2000)
 				m_clut_dirty = true;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_dacData:
-			COMBINE_DATA(&m_banshee.io[offset]);
-			if (m_banshee.io[offset] != m_clut[m_banshee.io[io_dacAddr] & 0x1ff])
+			COMBINE_DATA(&m_reg_io[offset]);
+			if (m_reg_io[offset] != m_clut[m_reg_io[io_dacAddr] & 0x1ff])
 			{
-				m_clut[m_banshee.io[io_dacAddr] & 0x1ff] = m_banshee.io[offset];
+				m_clut[m_reg_io[io_dacAddr] & 0x1ff] = m_reg_io[offset];
 				m_clut_dirty = true;
 			}
 			if (LOG_REGISTERS)
-				logerror("%s:banshee_dac_w(%X) = %08X & %08X\n", machine().describe_context(), m_banshee.io[io_dacAddr] & 0x1ff, data, mem_mask);
+				logerror("%s:banshee_dac_w(%X) = %08X & %08X\n", machine().describe_context(), m_reg_io[io_dacAddr] & 0x1ff, data, mem_mask);
 			break;
 
 		case io_miscInit0:
 			m_renderer->wait(voodoo_regs::s_banshee_io_reg_name[offset]);
-			COMBINE_DATA(&m_banshee.io[offset]);
+			COMBINE_DATA(&m_reg_io[offset]);
 			m_renderer->set_yorigin((data >> 18) & 0xfff);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
@@ -978,20 +1050,20 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{
-			COMBINE_DATA(&m_banshee.io[offset]);
+			COMBINE_DATA(&m_reg_io[offset]);
 
 			// Get horizontal total and vertical total from CRTC registers
-			int htotal = (m_banshee.crtc[0] + 5) * 8;
-			int vtotal = m_banshee.crtc[6];
-			vtotal |= ((m_banshee.crtc[7] >> 0) & 0x1) << 8;
-			vtotal |= ((m_banshee.crtc[7] >> 5) & 0x1) << 9;
+			int htotal = (m_reg_vga_crtc[0] + 5) * 8;
+			int vtotal = m_reg_vga_crtc[6];
+			vtotal |= ((m_reg_vga_crtc[7] >> 0) & 0x1) << 8;
+			vtotal |= ((m_reg_vga_crtc[7] >> 5) & 0x1) << 9;
 			vtotal += 2;
 
-			int vstart = m_banshee.crtc[0x10];
-			vstart |= ((m_banshee.crtc[7] >> 2) & 0x1) << 8;
-			vstart |= ((m_banshee.crtc[7] >> 7) & 0x1) << 9;
+			int vstart = m_reg_vga_crtc[0x10];
+			vstart |= ((m_reg_vga_crtc[7] >> 2) & 0x1) << 8;
+			vstart |= ((m_reg_vga_crtc[7] >> 7) & 0x1) << 9;
 
-			int vstop = m_banshee.crtc[0x11] & 0xf;
+			int vstop = m_reg_vga_crtc[0x11] & 0xf;
 			// Compare to see if vstop is before or after low 4 bits of vstart
 			if (vstop < (vstart & 0xf))
 				vstop |= (vstart + 0x10) & ~0xf;
@@ -999,9 +1071,9 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 				vstop |= vstart & ~0xf;
 
 			// Get pll k, m and n from pllCtrl0
-			const u32 k = (m_banshee.io[io_pllCtrl0] >> 0) & 0x3;
-			const u32 m = (m_banshee.io[io_pllCtrl0] >> 2) & 0x3f;
-			const u32 n = (m_banshee.io[io_pllCtrl0] >> 8) & 0xff;
+			const u32 k = (m_reg_io[io_pllCtrl0] >> 0) & 0x3;
+			const u32 m = (m_reg_io[io_pllCtrl0] >> 2) & 0x3f;
+			const u32 n = (m_reg_io[io_pllCtrl0] >> 8) & 0xff;
 			const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
 			const double frame_period = vtotal * htotal / video_clock;
 			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
@@ -1011,10 +1083,10 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 			//m_xoffs = hbp;
 			//m_yoffs = vbp;
 
-			if (m_banshee.io[io_vidOverlayDudx] != 0)
-				width = (m_width * m_banshee.io[io_vidOverlayDudx]) / 1048576;
-			if (m_banshee.io[io_vidOverlayDvdy] != 0)
-				height = (m_height * m_banshee.io[io_vidOverlayDvdy]) / 1048576;
+			if (m_reg_io[io_vidOverlayDudx] != 0)
+				width = (m_width * m_reg_io[io_vidOverlayDudx]) / 1048576;
+			if (m_reg_io[io_vidOverlayDvdy] != 0)
+				height = (m_height * m_reg_io[io_vidOverlayDvdy]) / 1048576;
 			if (LOG_REGISTERS)
 				logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n",
 					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
@@ -1055,7 +1127,7 @@ void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_m
 			break;
 
 		default:
-			COMBINE_DATA(&m_banshee.io[offset]);
+			COMBINE_DATA(&m_reg_io[offset]);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -1387,3 +1459,14 @@ voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag,
 	: voodoo_banshee_device_base(mconfig, VOODOO_3, tag, owner, clock, MODEL_VOODOO_3)
 {
 }
+
+void voodoo_3_device::device_start()
+{
+	// Voodoo-3 has 2 TMUs standard
+	if (m_chipmask == 0x01)
+		m_chipmask = 0x07;
+
+	// start like a Banshee
+	voodoo_banshee_device_base::device_start();
+}
+

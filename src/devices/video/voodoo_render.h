@@ -523,7 +523,11 @@ public:
 	// simple getters
 	s32 yorigin() const { return m_yorigin; }
 	u32 rowpixels() const { return m_rowpixels; }
+	u16 tmu_config() const { return m_tmu_config; }
 	std::vector<thread_stats_block> &thread_stats() { return m_thread_stats; }
+
+	// simple setters
+	void set_tmu_config(u16 value) { m_tmu_config = value; }
 
 	// allocate a new poly_data and fill in the rasterizer_params
 	poly_data &alloc_poly();
