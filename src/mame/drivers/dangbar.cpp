@@ -14,7 +14,7 @@ Main PCB named Hi-Pric P41 B 8813960102 (8813970102)
 - HD68B09P (audio CPU)
 - CY7C132 DPRAM
 - C140 (custom Namco audio chip)
-- C121 (custom Namco YM2151 compatible)
+- C121 (custom Namco glue logic for the 6809)
 - OSC1 49.1520MHz
 - 1 4-dip bank
 
@@ -27,7 +27,6 @@ Pic too blurry to read the chip markings
 #include "cpu/m6809/m6809.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/c140.h"
-#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -106,8 +105,6 @@ void dangbar_state::dangbar(machine_config &config)
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
 
 	C140(config, "c140", 49.152_MHz_XTAL / 384 / 6).add_route(ALL_OUTPUTS, "mono", 0.75); // 21.333kHz, copied from other Namco drivers
-
-	YM2151(config, "ymsnd", 49.152_MHz_XTAL / 24).add_route(ALL_OUTPUTS, "mono", 0.75); // actually Namco C121, divider guessed
 }
 
 
