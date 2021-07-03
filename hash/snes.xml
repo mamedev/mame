@@ -18995,28 +18995,6 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="mk2u" cloneof="mk2">
-		<description>Mortal Kombat II (USA, Rev. A)</description>
-		<year>1994</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="SNS-28-USA" />
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-BJ0N-01" />
-			<feature name="u1" value="U1 P0" />
-			<feature name="u2" value="U2 P1" />
-			<feature name="u3" value="U3 LS00" />
-			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A 9403 BA" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="sns-28-0 p0.u1" size="2097152" crc="2e67ea27" sha1="ad0b75a058c16f257fc2a4421c1fc1bca1241b1d" offset="0x000000" />
-				<rom name="sns-28-0 p3.u2" size="1048576" crc="a5048535" sha1="707f7d275399ab348616550fc51ff5b0e18df30a" offset="0x200000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mother2" cloneof="earthbnd">
 		<description>Mother 2 - Gyiyg no Gyakushuu (Jpn)</description>
 		<year>1994</year>
@@ -48681,19 +48659,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-<!-- European or US proto? fix setname accordingly -->
-	<software name="mk3p1" cloneof="mk3">
-		<description>Mortal Kombat 3 (Prototype 19950713)</description>
-		<year>1995</year>
-		<publisher>Williams Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="4194304">
-				<rom name="mortal kombat 3 r21.sfc" size="4194304" crc="8db650f1" sha1="1fa8c39e5d904ff68d095785ce611b96d4c2809c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mk2a" cloneof="mk2">
 		<description>Mortal Kombat II (Euro)</description>
 		<year>1994</year>
@@ -48702,6 +48667,27 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mortal kombat ii (europe).sfc" size="3145728" crc="1cc0c6ef" sha1="5e078f59779dc4d26fea5b5b38292f30e1e64961" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk2u" cloneof="mk2">
+		<description>Mortal Kombat II (USA, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="SNS-28-USA" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9439 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mortal kombat ii (usa) (rev 1).sfc" size="3145728" crc="70bb5513" sha1="f6aa5291759e982ea249c4b76f729ca2f4ab1cf4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
