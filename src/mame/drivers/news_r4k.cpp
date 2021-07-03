@@ -60,7 +60,7 @@
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and probably DMA for sound, floppy, etc.)
  *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
- *   - Sony CXD8418Q WSC-PARK3: not emulated, but some of the general platform functions might be from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
+ *   - Sony CXD8418Q WSC-PARK3: not fully emulated, but some of the general platform functions may come from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
  *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
@@ -256,16 +256,14 @@ protected:
     // Freerun timer (1us period)
     // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
     emu_timer *m_freerun_timer;
-    uint32_t freerun_timer_val;
-    const int FREERUN_FREQUENCY = 1000000; // Hz
+    uint32_t m_freerun_timer_val;
     TIMER_CALLBACK_MEMBER(freerun_clock);
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
 
     // Hardware timer TIMER0 (10ms period)
-    // TODO: Is this programmable somehow?
+    // TODO: Is this programmable somehow? 100Hz is what the NetBSD kernel expects.
     emu_timer *m_timer0_timer;
-    const int TIMER0_FREQUENCY = 100; // Hz, From NetBSD
     TIMER_CALLBACK_MEMBER(timer0_clock);
     void timer0_w(offs_t offset, uint32_t data);
 
@@ -281,9 +279,11 @@ protected:
     const uint32_t ICACHE_SIZE = 16384;
     const uint32_t DCACHE_SIZE = 16384;
     const char *MAIN_MEMORY_DEFAULT = "64M";
+    const int FREERUN_FREQUENCY = 1000000; // Hz
+    const int TIMER0_FREQUENCY = 100; // Hz
 
     // RAM debug
-    bool map_shift = false;
+    bool m_map_shift = false;
     uint8_t debug_ram_r(offs_t offset);
     void debug_ram_w(offs_t offset, uint8_t data);
 };
@@ -360,6 +360,7 @@ void news_r4k_state::machine_common(machine_config &config)
     // DMA controller
     // TODO: interrupts, join bus, etc.
     DMAC3(config, m_dmac, 0);
+    m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
     // Create SCSI buses
     NSCSI_BUS(config, m_scsibus0);
@@ -406,6 +407,10 @@ void news_r4k_state::cpu_map(address_map &map)
     // reads to return zero while unmapping everything high doesn't fix this issue, so
     // there must be a side effect caused by unmapping high somewhere.
     map.unmap_value_low();
+
+    // This is the RAM that is used before main memory is initialized
+    // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
+    map(0x1e980000, 0x1e9fffff).ram(); // TODO: double-check RAM length (0x1e99ffff end?)
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM (system firmware)
@@ -514,26 +519,24 @@ void news_r4k_state::cpu_map_debug(address_map &map)
         if (data == 0x10001)
         {
             LOG("Enabling map shift!\n");
-            map_shift = true;
+            m_map_shift = true;
         }
         else
         {
             LOG("Disabling map shift!\n");
-            map_shift = false;
+            m_map_shift = false;
         }
     }));
 
     // APbus region
+    // WSC-PARK3 gate array
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // 0x14c00000-0x14c40000 also has APbus stuff
     // map(0x14c00000, 0x14c0000f).lr8(NAME([this](offs_t offset) {return 0x0;}));
 
-    map(0x1e980000, 0x1e9fffff).ram(); // This is the RAM that is used before main memory is initialized
-                                       // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
-
     // More onboard devices that needs to be mapped for the platform to boot
     map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
-    map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
+    map(0x1f3e0000, 0x1f3effff).lr8(NAME([this](offs_t offset) {
         if (offset % 4 == 2)
         {
             return 0x6f;
@@ -558,7 +561,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 uint8_t news_r4k_state::debug_ram_r(offs_t offset)
 {
     uint8_t result = 0xff;
-    if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
+    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff) || (!m_map_shift && offset >= 0x7f00000))
     {
         // TODO: need to check bigger offsets?
         result = m_ram->read(offset);
@@ -578,7 +581,7 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
  */
 void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
 {
-    if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
+    if ((offset <= 0x1ffffff) || (m_map_shift && offset <= 0x3ffffff) || (!m_map_shift && offset >= 0x7f00000))
     {
         m_ram->write(offset, data);
     }
@@ -602,7 +605,7 @@ void news_r4k_state::machine_start()
     save_item(NAME(m_inten));
     save_item(NAME(m_intst));
     save_item(NAME(m_int_state));
-    save_item(NAME(freerun_timer_val));
+    save_item(NAME(m_freerun_timer_val));
 
     // Allocate freerunning clock
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
@@ -616,13 +619,13 @@ void news_r4k_state::machine_start()
  */
 TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
 {
-    freerun_timer_val++;
+    m_freerun_timer_val++;
 }
 
 /*
  * timer0_clock
  *
- * Method to handle a tick of the hardware clock.
+ * Method to handle a tick of the TIMER0 hardware clock.
  */
 TIMER_CALLBACK_MEMBER(news_r4k_state::timer0_clock)
 {
@@ -638,7 +641,7 @@ TIMER_CALLBACK_MEMBER(news_r4k_state::timer0_clock)
  */
 void news_r4k_state::machine_reset()
 {
-    freerun_timer_val = 0;
+    m_freerun_timer_val = 0;
     m_freerun_timer->adjust(attotime::zero, 0, attotime::from_hz(FREERUN_FREQUENCY));
     m_timer0_timer->adjust(attotime::zero, 0, attotime::from_hz(TIMER0_FREQUENCY));
 }
@@ -706,7 +709,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
     // However, more advanced APbus DMA functionality is still unimplemented. Neither the monitor ROM nor the
     // NetBSD floppy miniroot attempts to use any of it as far as I can tell. That might change when SCSI
     // is implemented, but many of the Sony devices that the APbus connects to have their own DMA controllers
-    // like the FIFO chip used for floppy, sound, etc, the DMAC3, etc.
+    // like the FIFO chip used for subsystems like the FDC and sound, the DMAC3 used for SCSI, etc.
     // The 5000 series seems to have a lot of DMA controllers...
     //
     // NetBSD has some code that can use the APbus DMA, see the following for more information.
@@ -731,7 +734,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+    LOG("APBus read triggered at offset 0x%x, returning 0x%x\n", offset, value);
     return value;
 }
 
@@ -752,7 +755,10 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
     // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
-    LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+    if(data != 0x424f4d42) // mask out reset noise
+    {
+        LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
+    }
 }
 
 /*
@@ -762,7 +768,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
  */
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
-    return freerun_timer_val;
+    return m_freerun_timer_val;
 }
 
 /*
@@ -773,7 +779,7 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
 void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
 {
     LOG("freerun_w: Set freerun timer to 0x%x\n", data);
-    freerun_timer_val = data;
+    m_freerun_timer_val = data;
 }
 
 /*
@@ -862,7 +868,7 @@ void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
  */
 void news_r4k_state::int_check()
 {
-    // The R4000 has 6 hardware interrupt pins
+    // The R4000 series has 6 bits in the interrupt register
     // These map to the 6 INTST/EN/CLR groups on the NEWS platform
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c
     // and https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
@@ -871,7 +877,7 @@ void news_r4k_state::int_check()
     {
         int state = m_intst[i] & m_inten[i];
         //LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
-        if (state != m_int_state[i]) // Interrupt changed state
+        if (m_int_state[i] != state > 0) // Interrupt changed state
         {
             //LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
             m_int_state[i] = state > 0;
@@ -936,17 +942,14 @@ PORT_DIPSETTING(0x00, "Main Memory Enabled")
 PORT_DIPSETTING(0x80, "Main Memory Disabled");
 INPUT_PORTS_END
 
-// ROM definitions
 ROM_START(nws5000x)
 
-// If you want to run a modified/patched version of this ROM, apply the following change to bypass the MROM's checksum enforcement.
-// Change the instruction at offset 0x70C in the file to `bne $0, $0, $bfc009c4` (0x140000AD in hex).
 ROM_REGION64_BE(0x40000, "mrom", 0)
 ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
-// idrom and macrom dumps include unmapped space that would ideally be umasked.
-// Additionally, there is machine-specific information contained within, so there is no "golden" full-chip hash.
+// idrom and macrom dumps include unmapped space that would ideally be umasked, but this is functionally the same.
+// Additionally, there is machine-specific information contained within each of these, so there are no "golden" full-chip hashes.
 ROM_REGION64_BE(0x400, "idrom", 0)
 ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
 
