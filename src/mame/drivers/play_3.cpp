@@ -539,7 +539,7 @@ void play_3_state::sklflite(machine_config &config)
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 
-	EFO_ZSU1(config, m_zsu, 0);
+	EFO_ZSU1(config, m_zsu);
 }
 
 

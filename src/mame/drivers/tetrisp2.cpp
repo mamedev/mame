@@ -2339,6 +2339,55 @@ ROM_START( nndmseala )
 	ROM_LOAD( "mr97016-04.ic9", 0x000000, 0x200000, CRC(f421232b) SHA1(d9cdc911566e795e6968d4b349c008b47132bea3) )
 ROM_END
 
+ROM_START( nndmsealb ) // NS-96205 96017 + NS-97211 97005
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_LOAD16_BYTE( "1-ver1.1.ic1", 0x00000, 0x40000, CRC(b0845ef3) SHA1(a73918b400cb2e7c2e6869c385e5da8aacec6466) )
+	ROM_LOAD16_BYTE( "3-ver1.1.ic3", 0x00001, 0x40000, CRC(405a51f6) SHA1(718accae0104089180fe6ceaf6f1fc3d92c275eb) )
+
+	ROM_REGION( 0x100000, "sprite", ROMREGION_ERASE )    // 8x8x8 (Sprites)
+// This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work.
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   // 16x16x8 (Background)
+	ROM_LOAD( "mr98009-02.ic6", 0x000000, 0x200000, CRC(94f1a8ba) SHA1(a9b627d27aac7c548977d0f799b1d7389801c8d8) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   // 16x16x8 (Rotation)
+	ROM_LOAD( "mr98009-01.ic2", 0x000000, 0x400000, CRC(b3451bd0) SHA1(84c879b417c2042810f310ff366da7790afd1f81) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 )   // 8x8x8 (Foreground)
+	ROM_LOAD( "mr98009-03.ic10", 0x000000, 0x100000, CRC(f0574f06) SHA1(42ff312dde90406b0aa355ff455765b12bbd6e6c) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )   // Samples
+	// filled in from "okisource"
+
+	ROM_REGION( 0x200000, "okisource", 0 )  // Samples
+	ROM_LOAD( "mr97016-04.ic12", 0x000000, 0x200000, CRC(f421232b) SHA1(d9cdc911566e795e6968d4b349c008b47132bea3) )
+ROM_END
+
+ROM_START( nndmsealc ) // NS-96205 96017 + NS-96206A 96017
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 Code
+	ROM_LOAD16_BYTE( "ver1.0.ic1", 0x00000, 0x40000, CRC(cd75ae3f) SHA1(654c79b91d863eabb11adc56a729628cc6e6b567) )
+	ROM_LOAD16_BYTE( "ver1.0.ic3", 0x00001, 0x40000, CRC(42a0eb1c) SHA1(8c3a773233e051a8706444e5584aa9fa0aad7189) )
+
+	ROM_REGION( 0x100000, "sprite", ROMREGION_ERASE )    // 8x8x8 (Sprites)
+// This game doesn't use sprites, but the region needs to be a valid size for at least one sprite 'page' for the init to work.
+
+	ROM_REGION( 0x400000, "gfx2", 0 )   // 16x16x8 (Background)
+	ROM_LOAD( "mr98058-02.ic7", 0x000000, 0x400000, CRC(9d8401e3) SHA1(4b113f47c94b113d680c5420cdd5709e5b93b069) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 )   // 16x16x8 (Rotation)
+	ROM_LOAD( "mr98058-01.ic2", 0x000000, 0x400000, CRC(a10848f0) SHA1(e86ed4fe85658046572903c6903e6ac9d885b85c) )
+
+	ROM_REGION( 0x100000, "gfx4", 0 )   // 8x8x8 (Foreground)
+	ROM_LOAD( "mr98058-03.ic10", 0x000000, 0x100000, CRC(4696609b) SHA1(6810483426b4c94e5d8b6fff4cbbbf3d953e26a7) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE )   // Samples
+	// filled in from "okisource"
+
+	ROM_REGION( 0x200000, "okisource", 0 )  // Samples
+	ROM_LOAD( "mr97016-04.ic16", 0x000000, 0x200000, CRC(f421232b) SHA1(d9cdc911566e795e6968d4b349c008b47132bea3) )
+ROM_END
+
+
 /***************************************************************************
 
                             Rock'n Tread 1 (Japan)
@@ -2878,8 +2927,10 @@ GAME( 1997, tetrisp2a, tetrisp2, tetrisp2, tetrisp2,  tetrisp2_state, empty_init
 GAME( 1997, tetrisp2j, tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.2)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, tetrisp2ja,tetrisp2, tetrisp2, tetrisp2j, tetrisp2_state, empty_init,   ROT0,    "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan, V2.1)",          MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver.)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseal,  0,        nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1997, nndmseala, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.0?)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // version guessed
+GAME( 1997, nndmsealb, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (Astro Boy ver. 1.1)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // appears to have one more mode than the one above, ver taken from PRG ROM labels
+GAME( 1997, nndmsealc, nndmseal, nndmseal, nndmseal,  tetrisp2_state, init_rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max / Jaleco", "Nandemo Seal Iinkai (alternate ver 1.0)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // only shows Jaleco copyright even though I'Max is in strings in ROMs. Ver taken from PRG ROM labels
 
 GAME( 1999, rockn,     0,        rockn,    rockn,     tetrisp2_state, init_rockn,   ROT270, "Jaleco",         "Rock'n Tread (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockna,    rockn,    rockn,    rockn,     tetrisp2_state, init_rockn1,  ROT270, "Jaleco",         "Rock'n Tread (Japan, alternate)", MACHINE_SUPPORTS_SAVE )

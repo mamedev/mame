@@ -519,7 +519,7 @@ ROM_START( msisaac )
 //  ROM_LOAD( "a30-14"    , 0x0000, 0x0800, CRC(c4690279) ) //40love
 //  ROM_LOAD( "a22-19.31",  0x0000, 0x0800, CRC(06a71df0) ) //buggy challenge
 //  ROM_LOAD( "a45-19",     0x0000, 0x0800, CRC(5378253c) ) //flstory
-//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(e08b8846) ) //lkage
+//  ROM_LOAD( "a54-19",     0x0000, 0x0800, CRC(0e8b8846) ) //lkage
 
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "a34_02.bin", 0x0000, 0x2000, CRC(50da1a81) SHA1(8aa5a896f3e1173155d4574f5e1c2703e334cf44) )
