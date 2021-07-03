@@ -360,7 +360,7 @@ void news_r4k_state::machine_common(machine_config &config)
     // DMA controller
     // TODO: interrupts, join bus, etc.
     DMAC3(config, m_dmac, 0);
-    m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
+    // m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
     // Create SCSI buses
     NSCSI_BUS(config, m_scsibus0);
@@ -877,7 +877,7 @@ void news_r4k_state::int_check()
     {
         int state = m_intst[i] & m_inten[i];
         //LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
-        if (m_int_state[i] != state > 0) // Interrupt changed state
+        if (m_int_state[i] != (state > 0)) // Interrupt changed state
         {
             //LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
             m_int_state[i] = state > 0;
