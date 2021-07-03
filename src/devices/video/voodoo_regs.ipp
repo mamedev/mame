@@ -14,7 +14,7 @@
 
 using namespace voodoo;
 
-u32 register_table_entry::write(voodoo_device_base &device, u32 chipmask, u32 regnum, u32 data) const
+u32 register_table_entry::write(voodoo_1_device &device, u32 chipmask, u32 regnum, u32 data) const
 {
 	// statistics if enabled
 	if (DEBUG_STATS)
@@ -31,7 +31,7 @@ u32 register_table_entry::write(voodoo_device_base &device, u32 chipmask, u32 re
 	return m_write(chipmask & m_chipmask_flags, regnum, data & m_mask);
 }
 
-u32 register_table_entry::read(voodoo_device_base &device, u32 chipmask, u32 regnum) const
+u32 register_table_entry::read(voodoo_1_device &device, u32 chipmask, u32 regnum) const
 {
 	u32 result = m_read(chipmask & m_chipmask_flags, regnum) & m_mask;
 	if (LOG_REGISTERS)

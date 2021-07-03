@@ -79,8 +79,8 @@ public:
 	bool is_fifo() const { return ((m_chipmask_flags & FIFO_FIFO) != 0); }
 
 	// read/write helpers
-	u32 read(voodoo_device_base &device, u32 chipmask, u32 regnum) const;
-	u32 write(voodoo_device_base &device, u32 chipmask, u32 regnum, u32 data) const;
+	u32 read(voodoo_1_device &device, u32 chipmask, u32 regnum) const;
+	u32 write(voodoo_1_device &device, u32 chipmask, u32 regnum, u32 data) const;
 
 	// unpack from a static entry
 	template<typename BaseType>

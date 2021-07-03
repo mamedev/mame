@@ -198,7 +198,7 @@ void iteagle_state::iteagle(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	subdevice<voodoo_device_base>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
 
 	ITEAGLE_EEPROM(config, m_eeprom, 0);
 

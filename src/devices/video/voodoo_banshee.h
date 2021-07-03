@@ -33,7 +33,7 @@ static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 //  VOODOO DEVICES
 //**************************************************************************
 
-class voodoo_banshee_device_base : public voodoo::voodoo_2_device_base
+class voodoo_banshee_device_base : public voodoo_2_device
 {
 public:
 	voodoo_banshee_device_base(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

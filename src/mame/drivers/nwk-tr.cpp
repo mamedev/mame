@@ -334,7 +334,7 @@ private:
 	required_device_array<k001604_device, 2> m_k001604;
 	required_device<konppc_device> m_konppc;
 	required_device<adc12138_device> m_adc12138;
-	required_device_array<voodoo_device_base, 2> m_voodoo;
+	required_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_ioport_array<3> m_in;
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;

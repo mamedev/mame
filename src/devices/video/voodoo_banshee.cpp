@@ -43,7 +43,7 @@ using namespace voodoo;
 
 
 voodoo_banshee_device_base::voodoo_banshee_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model)
-	: voodoo_2_device_base(mconfig, type, tag, owner, clock, model)
+	: voodoo_2_device(mconfig, type, tag, owner, clock, model)
 {
 	for (int index = 0; index < std::size(m_regtable); index++)
 		m_regtable[index].unpack(s_register_table[index], *this);
@@ -106,7 +106,7 @@ void voodoo_banshee_device_base::device_start()
 	m_tmumem0_in_mb = m_tmumem1_in_mb = 0;
 
 	// start like a Voodoo-2
-	voodoo_2_device_base::device_start();
+	voodoo_2_device::device_start();
 
 	// LFB stride defaualts to 11 on Banshee and later
 	m_lfb_stride = 11;
@@ -132,7 +132,7 @@ void voodoo_banshee_device_base::device_start()
 
 void voodoo_banshee_device_base::register_save(save_proxy &save, u32 total_allocation)
 {
-	voodoo_2_device_base::register_save(save, total_allocation);
+	voodoo_2_device::register_save(save, total_allocation);
 
 	// Voodoo Banshee stuff
 	save.save_item(NAME(m_reg_io));

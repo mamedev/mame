@@ -464,7 +464,7 @@ inline u32 memory_fifo::remove()
 //**************************************************************************
 
 
-u16 *voodoo_device_base::draw_buffer_indirect(int index, bool depth_allowed)
+u16 *voodoo_1_device::draw_buffer_indirect(int index, bool depth_allowed)
 {
 	switch (index)
 	{
@@ -478,7 +478,7 @@ u16 *voodoo_device_base::draw_buffer_indirect(int index, bool depth_allowed)
 
 
 
-int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
+int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
 {
 	// reset the video changed flag
 	bool changed = m_video_changed;
@@ -533,7 +533,7 @@ int voodoo_device_base::update_common(bitmap_rgb32 &bitmap, const rectangle &cli
 	return changed;
 }
 
-int voodoo_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int voodoo_1_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if we are blank, just fill with black
 	if (m_reg.fbi_init1().software_blank())
@@ -590,7 +590,7 @@ int voodoo_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
  *
  *************************************/
 
-void voodoo_device_base::set_init_enable(u32 newval)
+void voodoo_1_device::set_init_enable(u32 newval)
 {
 	m_init_enable = reg_init_en(newval);
 	if (LOG_REGISTERS)
@@ -656,11 +656,11 @@ shared_tables::shared_tables()
 }
 
 
-ALLOW_SAVE_TYPE(voodoo_device_base::stall_state);
+ALLOW_SAVE_TYPE(voodoo_1_device::stall_state);
 ALLOW_SAVE_TYPE(voodoo::reg_init_en);
 ALLOW_SAVE_TYPE(voodoo::voodoo_regs::register_data);
 
-void voodoo_device_base::register_save(save_proxy &save, u32 total_allocation)
+void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
 {
 	// PCI state/FIFOs
 	save.save_item(NAME(m_init_enable));
@@ -720,7 +720,7 @@ void voodoo_device_base::register_save(save_proxy &save, u32 total_allocation)
  *
  *************************************/
 
-void voodoo_device_base::accumulate_statistics(const thread_stats_block &block)
+void voodoo_1_device::accumulate_statistics(const thread_stats_block &block)
 {
 	/* apply internal voodoo statistics */
 	m_reg.add(voodoo_regs::reg_fbiPixelsIn, block.pixels_in);
@@ -743,7 +743,7 @@ void voodoo_device_base::accumulate_statistics(const thread_stats_block &block)
 }
 
 
-void voodoo_device_base::update_statistics(bool accumulate)
+void voodoo_1_device::update_statistics(bool accumulate)
 {
 	/* accumulate/reset statistics from all units */
 	for (auto &stats : m_renderer->thread_stats())
@@ -767,7 +767,7 @@ void voodoo_device_base::update_statistics(bool accumulate)
  *
  *************************************/
 
-void voodoo_device_base::rotate_buffers()
+void voodoo_1_device::rotate_buffers()
 {
 	if (!m_vblank_dont_swap)
 	{
@@ -777,7 +777,7 @@ void voodoo_device_base::rotate_buffers()
 	}
 }
 
-void voodoo_device_base::swap_buffers()
+void voodoo_1_device::swap_buffers()
 {
 	if (LOG_VBLANK_SWAP)
 		logerror("--- swap_buffers @ %d\n", screen().vpos());
@@ -871,7 +871,7 @@ void voodoo_device_base::swap_buffers()
 }
 
 
-void voodoo_device_base::adjust_vblank_start_timer()
+void voodoo_1_device::adjust_vblank_start_timer()
 {
 	attotime vblank_period = screen().time_until_pos(m_vsyncstart);
 	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_start_timer: period: %s\n", vblank_period.as_string());
@@ -882,7 +882,7 @@ void voodoo_device_base::adjust_vblank_start_timer()
 }
 
 
-void voodoo_device_base::vblank_start(void *ptr, s32 param)
+void voodoo_1_device::vblank_start(void *ptr, s32 param)
 {
 	if (LOG_VBLANK_SWAP)
 		logerror("--- vblank start\n");
@@ -924,7 +924,7 @@ void voodoo_device_base::vblank_start(void *ptr, s32 param)
 }
 
 
-void voodoo_device_base::vblank_stop(void *ptr, s32 param)
+void voodoo_1_device::vblank_stop(void *ptr, s32 param)
 {
 	if (LOG_VBLANK_SWAP)
 		logerror("--- vblank end\n");
@@ -948,7 +948,7 @@ void voodoo_device_base::vblank_stop(void *ptr, s32 param)
  *
  *************************************/
 
-void voodoo_device_base::reset_counters()
+void voodoo_1_device::reset_counters()
 {
 	update_statistics(false);
 	m_reg.write(voodoo_regs::reg_fbiPixelsIn, 0);
@@ -959,7 +959,7 @@ void voodoo_device_base::reset_counters()
 }
 
 
-void voodoo_device_base::soft_reset()
+void voodoo_1_device::soft_reset()
 {
 	reset_counters();
 	m_reg.write(voodoo_regs::reg_fbiTrianglesOut, 0);
@@ -975,7 +975,7 @@ void voodoo_device_base::soft_reset()
  *
  *************************************/
 
-void voodoo_device_base::recompute_video_memory()
+void voodoo_1_device::recompute_video_memory()
 {
 	// configuration is either double-buffered (0) or triple-buffered (1)
 	u32 config = m_reg.fbi_init2().enable_triple_buf();
@@ -985,7 +985,7 @@ void voodoo_device_base::recompute_video_memory()
 	recompute_video_memory_common(config, xtiles * 64);
 }
 
-void voodoo_device_base::recompute_video_memory_common(u32 config, u32 rowpixels)
+void voodoo_1_device::recompute_video_memory_common(u32 config, u32 rowpixels)
 {
 	// remember the front buffer configuration to check for changes
 	u16 *starting_front = front_buffer();
@@ -1053,13 +1053,13 @@ void voodoo_device_base::recompute_video_memory_common(u32 config, u32 rowpixels
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( voodoo_device_base::stall_resume_callback )
+TIMER_CALLBACK_MEMBER( voodoo_1_device::stall_resume_callback )
 {
 	check_stalled_cpu(machine().time());
 }
 
 
-void voodoo_device_base::check_stalled_cpu(attotime current_time)
+void voodoo_1_device::check_stalled_cpu(attotime current_time)
 {
 	int resume = false;
 
@@ -1111,7 +1111,7 @@ void voodoo_device_base::check_stalled_cpu(attotime current_time)
 }
 
 
-void voodoo_device_base::stall_cpu(stall_state state)
+void voodoo_1_device::stall_cpu(stall_state state)
 {
 	// sanity check
 	if (!operation_pending())
@@ -1138,7 +1138,7 @@ void voodoo_device_base::stall_cpu(stall_state state)
 //  reg_invalid_r - generic invalid register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_invalid_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_invalid_r(u32 chipmask, u32 regnum)
 {
 	return 0xffffffff;
 }
@@ -1148,7 +1148,7 @@ u32 voodoo_device_base::reg_invalid_r(u32 chipmask, u32 regnum)
 //  reg_passive_r - generic passive register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_passive_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_passive_r(u32 chipmask, u32 regnum)
 {
 	return m_reg.read(regnum);
 }
@@ -1158,7 +1158,7 @@ u32 voodoo_device_base::reg_passive_r(u32 chipmask, u32 regnum)
 //  reg_status_r - status register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_status_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_status_r(u32 chipmask, u32 regnum)
 {
 	u32 result = 0;
 
@@ -1199,7 +1199,7 @@ u32 voodoo_device_base::reg_status_r(u32 chipmask, u32 regnum)
 //  reg_fbiinit2_r - fbiInit2 register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fbiinit2_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 {
 	// bit 2 of the initEnable register maps this to dacRead
 	return m_init_enable.remap_init_to_dac() ? m_dac_read_result : m_reg.read(regnum);
@@ -1210,7 +1210,7 @@ u32 voodoo_device_base::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 //  reg_vretrace_r - vRetrace register read
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_vretrace_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_vretrace_r(u32 chipmask, u32 regnum)
 {
 	// eat some cycles since people like polling here
 	if (EAT_CYCLES)
@@ -1225,7 +1225,7 @@ u32 voodoo_device_base::reg_vretrace_r(u32 chipmask, u32 regnum)
 //  reg_stats_r - statistics register reads
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_stats_r(u32 chipmask, u32 regnum)
+u32 voodoo_1_device::reg_stats_r(u32 chipmask, u32 regnum)
 {
 	update_statistics(true);
 	return m_reg.read(regnum);
@@ -1236,7 +1236,7 @@ u32 voodoo_device_base::reg_stats_r(u32 chipmask, u32 regnum)
 //  reg_invalid_w - generic invalid register write
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 {
 	logerror("%s: Unexpected write to register %02X[%X] = %08X\n", machine().describe_context(), regnum, chipmask, data);
 	return 0;
@@ -1247,7 +1247,7 @@ u32 voodoo_device_base::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_status_w - status register write (Voodoo 1)
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
 {
 	logerror("%s: Unimplemented write to register %02X(%X) = %08X\n", machine().describe_context(), regnum, chipmask, data);
 	return 0;
@@ -1257,7 +1257,7 @@ u32 voodoo_device_base::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_passive_w - generic passive register write
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_passive_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_passive_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0)) m_reg.write(regnum, data);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write(regnum, data);
@@ -1271,7 +1271,7 @@ u32 voodoo_device_base::reg_passive_w(u32 chipmask, u32 regnum, u32 data)
 //  point to x.4 fixed point conversion
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return reg_passive_w(chipmask, regnum - 0x80/4, float_to_int32(data, 4));
 }
@@ -1282,7 +1282,7 @@ u32 voodoo_device_base::reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data)
 //  floating point to x.12 fixed point conversion
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return reg_passive_w(chipmask, regnum - 0x80/4, float_to_int32(data, 12));
 }
@@ -1297,42 +1297,42 @@ u32 voodoo_device_base::reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_dtdy_w -- write to dTdY (14.18)
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_starts_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_starts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_s(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_s(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_startt_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_startt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_t(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_t(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dsdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dx(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dtdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dx(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dsdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dy(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dy(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 14;
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dy(data64);
@@ -1350,42 +1350,42 @@ u32 voodoo_device_base::reg_dtdy_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_fdtdy_w -- write to fdTdY
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fstarts_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fstarts_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_s(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_s(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fstartt_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fstartt_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_start_t(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_t(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dx(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dx(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dt_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_ds_dy(data64);
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_ds_dy(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 1)) m_tmu[0].regs().write_dt_dy(data64);
@@ -1400,7 +1400,7 @@ u32 voodoo_device_base::reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_dwdy_w -- write to dWdY (2.30 -> 16.32)
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_startw_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_startw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
@@ -1408,7 +1408,7 @@ u32 voodoo_device_base::reg_startw_w(u32 chipmask, u32 regnum, u32 data)
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_w(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dwdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
@@ -1416,7 +1416,7 @@ u32 voodoo_device_base::reg_dwdx_w(u32 chipmask, u32 regnum, u32 data)
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = s64(s32(data)) << 2;
 	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
@@ -1432,7 +1432,7 @@ u32 voodoo_device_base::reg_dwdy_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_fdwdy_w -- write to fdWdY
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fstartw_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fstartw_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_start_w(data64);
@@ -1440,7 +1440,7 @@ u32 voodoo_device_base::reg_fstartw_w(u32 chipmask, u32 regnum, u32 data)
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_start_w(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_dw_dx(data64);
@@ -1448,7 +1448,7 @@ u32 voodoo_device_base::reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data)
 	if (BIT(chipmask, 2)) m_tmu[1].regs().write_dw_dx(data64);
 	return 0;
 }
-u32 voodoo_device_base::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
 {
 	s64 data64 = float_to_int64(data, 32);
 	if (BIT(chipmask, 0))          m_reg.write_dw_dy(data64);
@@ -1463,7 +1463,7 @@ u32 voodoo_device_base::reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data)
 //  ftriangleCMD
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_triangle_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_triangle_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return triangle();
 }
@@ -1473,7 +1473,7 @@ u32 voodoo_device_base::reg_triangle_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_nop_w -- write to nopCMD
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_nop_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_nop_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(data, 0))
 		reset_counters();
@@ -1487,7 +1487,7 @@ u32 voodoo_device_base::reg_nop_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_fastfill_w -- write to fastfillCMD
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 {
 	auto &poly = m_renderer->alloc_poly();
 
@@ -1512,7 +1512,7 @@ u32 voodoo_device_base::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_swapbuffer_w -- write to swapbufferCMD
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
 {
 	m_renderer->wait("swapbufferCMD");
 
@@ -1538,7 +1538,7 @@ u32 voodoo_device_base::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_fogtable_w -- write to fogTable
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fogtable_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fogtable_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0)) m_renderer->write_fog(2 * (regnum - voodoo_regs::reg_fogTable), data);
 	return 0;
@@ -1549,7 +1549,7 @@ u32 voodoo_device_base::reg_fogtable_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_fbiinit_w -- write to an fbiinit register
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0) && m_init_enable.enable_hw_init())
 	{
@@ -1583,7 +1583,7 @@ u32 voodoo_device_base::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 //  register; synchronize then recompute everything
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_video_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_video_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -1612,7 +1612,7 @@ u32 voodoo_device_base::reg_video_w(u32 chipmask, u32 regnum, u32 data)
 //  changed
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -1637,7 +1637,7 @@ u32 voodoo_device_base::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
 //  reg_dac_w -- write to dacData
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_dac_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_dac_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -1667,7 +1667,7 @@ u32 voodoo_device_base::reg_dac_w(u32 chipmask, u32 regnum, u32 data)
 //  dirty if changed
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_texture_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_texture_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 1))
 	{
@@ -1694,7 +1694,7 @@ u32 voodoo_device_base::reg_texture_w(u32 chipmask, u32 regnum, u32 data)
 //  NCC table; mark dirty if changed
 //-------------------------------------------------
 
-u32 voodoo_device_base::reg_palette_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_1_device::reg_palette_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 1)) m_tmu[0].ncc_w(regnum, data);
 	if (BIT(chipmask, 2)) m_tmu[1].ncc_w(regnum, data);
@@ -1709,7 +1709,7 @@ u32 voodoo_device_base::reg_palette_w(u32 chipmask, u32 regnum, u32 data)
 
 
 
-void voodoo_device_base::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp)
+void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp)
 {
 	u32 htotal = hsyncoff + 1 + hsyncon + 1;
 	u32 vtotal = vsyncoff + vsyncon;
@@ -1769,7 +1769,7 @@ void voodoo_device_base::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 h
  *  Voodoo LFB writes
  *
  *************************************/
-void voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_1_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -2119,7 +2119,7 @@ void voodoo_device_base::lfb_w(offs_t offset, u32 data, u32 mem_mask)
  *
  *************************************/
 
-void voodoo_device_base::texture_w(offs_t offset, u32 data)
+void voodoo_1_device::texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -2187,7 +2187,7 @@ void voodoo_device_base::texture_w(offs_t offset, u32 data)
  *
  *************************************/
 
-void voodoo_device_base::recompute_fbmem_fifo()
+void voodoo_1_device::recompute_fbmem_fifo()
 {
 	// compute the memory FIFO location and size
 	u32 fifo_last_page = m_reg.fbi_init4().memory_fifo_stop_row();
@@ -2207,7 +2207,7 @@ void voodoo_device_base::recompute_fbmem_fifo()
 		m_fbmem_fifo.configure(nullptr, 0);
 }
 
-void voodoo_device_base::flush_fifos(attotime current_time)
+void voodoo_1_device::flush_fifos(attotime current_time)
 {
 	// check for recursive calls
 	if (m_flush_flag)
@@ -2284,7 +2284,7 @@ void voodoo_device_base::flush_fifos(attotime current_time)
 	m_flush_flag = false;
 }
 
-void voodoo_2_device_base::flush_fifos(attotime current_time)
+void voodoo_2_device::flush_fifos(attotime current_time)
 {
 	// check for recursive calls
 	if (m_flush_flag)
@@ -2386,7 +2386,7 @@ void voodoo_2_device_base::flush_fifos(attotime current_time)
  *
  *************************************/
 
-u32 voodoo_device_base::lfb_r(offs_t offset, bool lfb_3d)
+u32 voodoo_1_device::lfb_r(offs_t offset, bool lfb_3d)
 {
 	u16 *buffer;
 	u32 bufmax;
@@ -2462,7 +2462,7 @@ u32 voodoo_device_base::lfb_r(offs_t offset, bool lfb_3d)
 //  processing a direct PCI read
 //-------------------------------------------------
 
-void voodoo_device_base::prepare_for_read()
+void voodoo_1_device::prepare_for_read()
 {
 	// if we have something pending, flush the FIFOs up to the current time
 	if (operation_pending())
@@ -2475,11 +2475,11 @@ void voodoo_device_base::prepare_for_read()
 //  processing a direct PCI write
 //-------------------------------------------------
 
-bool voodoo_device_base::prepare_for_write()
+bool voodoo_1_device::prepare_for_write()
 {
 	// should not be getting accesses while stalled (but we do)
 	if (m_stall_state != NOT_STALLED)
-		logerror("voodoo_device_base::write while stalled!\n");
+		logerror("voodoo_1_device::write while stalled!\n");
 
 	// if we have something pending, flush the FIFOs up to the current time
 	bool pending = operation_pending();
@@ -2497,7 +2497,7 @@ bool voodoo_device_base::prepare_for_write()
 //  spilling to the memory FIFO as configured
 //-------------------------------------------------
 
-void voodoo_device_base::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
+void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 {
 	// modify the offset based on the mem_mask
 	if (!ACCESSING_BITS_16_31)
@@ -2731,7 +2731,7 @@ void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 //  triangle - execute the 'triangle' command
 //-------------------------------------------------
 
-s32 voodoo_device_base::triangle()
+s32 voodoo_1_device::triangle()
 {
 	g_profiler.start(PROFILER_USER2);
 
@@ -2875,23 +2875,32 @@ s32 voodoo_device_base::triangle()
 }
 
 
-
 //-------------------------------------------------
-//  voodoo_device_base - constructor
+//  generic_voodoo_device - constructor
 //-------------------------------------------------
 
-voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_model(model),
-	m_chipmask(1),
 	m_fbmem_in_mb(0),
 	m_tmumem0_in_mb(0),
 	m_tmumem1_in_mb(0),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_vblank_cb(*this),
 	m_stall_cb(*this),
-	m_pciint_cb(*this),
+	m_pciint_cb(*this)
+{
+}
+	
+
+//-------------------------------------------------
+//  voodoo_1_device - constructor
+//-------------------------------------------------
+
+voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+	generic_voodoo_device(mconfig, type, tag, owner, clock, model),
+	m_chipmask(1),
 	m_init_enable(0),
 	m_stall_state(NOT_STALLED),
 	m_stall_trigger(0),
@@ -2927,14 +2936,16 @@ voodoo_device_base::voodoo_device_base(const machine_config &mconfig, device_typ
 	m_last_status_value(0),
 	m_clut_dirty(true)
 {
+	for (int index = 0; index < std::size(m_regtable); index++)
+		m_regtable[index].unpack(s_register_table[index], *this);
 }
 
 
 //-------------------------------------------------
-//  ~voodoo_device_base - destructor
+//  ~voodoo_1_device - destructor
 //-------------------------------------------------
 
-voodoo_device_base::~voodoo_device_base()
+voodoo_1_device::~voodoo_1_device()
 {
 }
 
@@ -2943,7 +2954,7 @@ voodoo_device_base::~voodoo_device_base()
 //  device_start - device startup
 //-------------------------------------------------
 
-void voodoo_device_base::device_start()
+void voodoo_1_device::device_start()
 {
 	// validate configuration
 	if (m_fbmem_in_mb == 0)
@@ -2972,8 +2983,8 @@ void voodoo_device_base::device_start()
 	m_pciint_cb.resolve();
 
 	// allocate timers for VBLANK
-	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_stop), this), this);
-	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::vblank_start),this), this);
+	m_vsync_stop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_stop), this), this);
+	m_vsync_start_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::vblank_start),this), this);
 
 	// add TMUs to the chipmask if memory is specified
 	if (m_tmumem0_in_mb != 0)
@@ -3058,7 +3069,7 @@ void voodoo_device_base::device_start()
 	// set up the PCI FIFO
 	m_pci_fifo.configure(m_pci_fifo_mem, 64*2);
 	m_stall_state = NOT_STALLED;
-	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device_base::stall_resume_callback), this));
+	m_stall_resume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_1_device::stall_resume_callback), this));
 
 	// initialize registers
 	m_init_enable = 0;
@@ -3082,7 +3093,7 @@ void voodoo_device_base::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void voodoo_device_base::device_reset()
+void voodoo_1_device::device_reset()
 {
 	soft_reset();
 }
@@ -3093,7 +3104,7 @@ void voodoo_device_base::device_reset()
 //  state
 //-------------------------------------------------
 
-void voodoo_device_base::device_post_load()
+void voodoo_1_device::device_post_load()
 {
 	// dirty everything so it gets recomputed
 	m_clut_dirty = true;
@@ -3107,13 +3118,6 @@ void voodoo_device_base::device_post_load()
 
 
 DEFINE_DEVICE_TYPE(VOODOO_1, voodoo_1_device, "voodoo_1", "3dfx Voodoo Graphics")
-
-voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_device_base(mconfig, VOODOO_1, tag, owner, clock, MODEL_VOODOO_1)
-{
-	for (int index = 0; index < std::size(m_regtable); index++)
-		m_regtable[index].unpack(s_register_table[index], *this);
-}
 
 
 
@@ -3131,7 +3135,7 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, const char *tag,
 //  command_fifo - constructor
 //-------------------------------------------------
 
-command_fifo::command_fifo(voodoo_2_device_base &device) :
+command_fifo::command_fifo(voodoo_2_device &device) :
 	m_device(device),
 	m_ram(nullptr),
 	m_mask(0),
@@ -3148,10 +3152,10 @@ command_fifo::command_fifo(voodoo_2_device_base &device) :
 }
 
 
-void voodoo_2_device_base::device_start()
+void voodoo_2_device::device_start()
 {
 	// start like a Voodoo-1
-	voodoo_device_base::device_start();
+	voodoo_1_device::device_start();
 
 	// TMU configuration has an extra bit
 	m_renderer->set_tmu_config(m_renderer->tmu_config() | 0x800);
@@ -3162,7 +3166,7 @@ void voodoo_2_device_base::device_start()
 	m_cmdfifo[1].init(m_fbram, m_fbmask + 1);
 }
 
-void voodoo_2_device_base::recompute_video_memory()
+void voodoo_2_device::recompute_video_memory()
 {
 	// for backwards compatibility, the triple-buffered bit is still supported
 	u32 config = m_reg.fbi_init2().enable_triple_buf();
@@ -3784,20 +3788,22 @@ command_fifo::packet_handler command_fifo::s_packet_handler[8] =
 };
 
 
-voodoo_2_device_base::voodoo_2_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
-	voodoo_device_base(mconfig, type, tag, owner, clock, model),
+voodoo_2_device::voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
+	voodoo_1_device(mconfig, type, tag, owner, clock, model),
 	m_sverts(0),
 	m_cmdfifo{ *this, *this }
 #if USE_MEMORY_VIEWS
 	m_regview(*this, "registers")
 #endif
 {
+	for (int index = 0; index < std::size(m_regtable); index++)
+		m_regtable[index].unpack(s_register_table[index], *this);
 }
 
 
-void voodoo_2_device_base::register_save(save_proxy &save, u32 total_allocation)
+void voodoo_2_device::register_save(save_proxy &save, u32 total_allocation)
 {
-	voodoo_device_base::register_save(save, total_allocation);
+	voodoo_1_device::register_save(save, total_allocation);
 
 	// Voodoo 2 stuff
 	save.save_item(NAME(m_sverts));
@@ -3809,9 +3815,9 @@ void voodoo_2_device_base::register_save(save_proxy &save, u32 total_allocation)
 }
 
 
-void voodoo_2_device_base::vblank_start(void *ptr, s32 param)
+void voodoo_2_device::vblank_start(void *ptr, s32 param)
 {
-	voodoo_device_base::vblank_start(ptr, param);
+	voodoo_1_device::vblank_start(ptr, param);
 
 	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
 	if (m_reg.intr_ctrl().vsync_rising_enable())
@@ -3823,9 +3829,9 @@ void voodoo_2_device_base::vblank_start(void *ptr, s32 param)
 }
 
 
-void voodoo_2_device_base::vblank_stop(void *ptr, s32 param)
+void voodoo_2_device::vblank_stop(void *ptr, s32 param)
 {
-	voodoo_device_base::vblank_stop(ptr, param);
+	voodoo_1_device::vblank_stop(ptr, param);
 
 	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
 	if (m_reg.intr_ctrl().vsync_falling_enable())
@@ -3840,7 +3846,7 @@ void voodoo_2_device_base::vblank_stop(void *ptr, s32 param)
 //  reg_hvretrace_r - hvRetrace register read
 //-------------------------------------------------
 
-u32 voodoo_2_device_base::reg_hvretrace_r(u32 chipmask, u32 regnum)
+u32 voodoo_2_device::reg_hvretrace_r(u32 chipmask, u32 regnum)
 {
 	// eat some cycles since people like polling here
 	if (EAT_CYCLES)
@@ -3851,24 +3857,24 @@ u32 voodoo_2_device_base::reg_hvretrace_r(u32 chipmask, u32 regnum)
 	return result |= screen().hpos() << 16;
 }
 
-u32 voodoo_2_device_base::reg_cmdfifoptr_r(u32 chipmask, u32 regnum)
+u32 voodoo_2_device::reg_cmdfifoptr_r(u32 chipmask, u32 regnum)
 {
 	return m_cmdfifo[0].read_pointer();
 }
 
-u32 voodoo_2_device_base::reg_cmdfifodepth_r(u32 chipmask, u32 regnum)
+u32 voodoo_2_device::reg_cmdfifodepth_r(u32 chipmask, u32 regnum)
 {
 	return m_cmdfifo[0].depth();
 }
 
-u32 voodoo_2_device_base::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
+u32 voodoo_2_device::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
 {
 	return m_cmdfifo[0].holes();
 }
 
 
 // voodoo 2
-u32 voodoo_2_device_base::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3886,7 +3892,7 @@ u32 voodoo_2_device_base::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 //  register; synchronize then recompute everything
 //-------------------------------------------------
 
-u32 voodoo_2_device_base::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3910,7 +3916,7 @@ u32 voodoo_2_device_base::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
 }
 
 // voodoo 2
-u32 voodoo_2_device_base::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
 {
 	rgb_t rgbdata(data);
 	m_reg.write_float(voodoo_regs::reg_sAlpha, float(rgbdata.a()));
@@ -3921,7 +3927,7 @@ u32 voodoo_2_device_base::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
 }
 
 // voodoo 2
-u32 voodoo_2_device_base::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 {
 	m_renderer->wait("userIntrCMD");
 
@@ -3940,7 +3946,7 @@ u32 voodoo_2_device_base::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3954,7 +3960,7 @@ u32 voodoo_2_device_base::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3965,7 +3971,7 @@ u32 voodoo_2_device_base::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3976,7 +3982,7 @@ u32 voodoo_2_device_base::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
@@ -3987,7 +3993,7 @@ u32 voodoo_2_device_base::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0) && m_init_enable.enable_hw_init())
 	{
@@ -4002,12 +4008,12 @@ u32 voodoo_2_device_base::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-u32 voodoo_2_device_base::reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return draw_triangle();
 }
 
-u32 voodoo_2_device_base::reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data)
+u32 voodoo_2_device::reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return begin_triangle();
 }
@@ -4018,7 +4024,7 @@ u32 voodoo_2_device_base::reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data)
 //  command
 //-------------------------------------------------
 
-s32 voodoo_2_device_base::begin_triangle()
+s32 voodoo_2_device::begin_triangle()
 {
 	// extract setup data
 	auto &sv = m_svert[2];
@@ -4048,7 +4054,7 @@ s32 voodoo_2_device_base::begin_triangle()
 //  command
 //-------------------------------------------------
 
-s32 voodoo_2_device_base::draw_triangle()
+s32 voodoo_2_device::draw_triangle()
 {
 	// for strip mode, shuffle vertex 1 down to 0
 	if (!m_reg.setup_mode().fan_mode())
@@ -4086,7 +4092,7 @@ s32 voodoo_2_device_base::draw_triangle()
 //  parameters and render the triangle
 //-------------------------------------------------
 
-s32 voodoo_2_device_base::setup_and_draw_triangle()
+s32 voodoo_2_device::setup_and_draw_triangle()
 {
 	auto &sv0 = m_svert[0];
 	auto &sv1 = m_svert[1];
@@ -4254,7 +4260,7 @@ s32 voodoo_2_device_base::setup_and_draw_triangle()
 }
 
 
-s32 voodoo_2_device_base::banshee_2d_w(offs_t offset, u32 data)
+s32 voodoo_2_device::banshee_2d_w(offs_t offset, u32 data)
 {
 	// placeholder for Banshee 2D access
 	return 0;
@@ -4524,11 +4530,4 @@ void voodoo_2_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 DEFINE_DEVICE_TYPE(VOODOO_2, voodoo_2_device, "voodoo_2", "3dfx Voodoo 2")
-
-voodoo_2_device::voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_2_device_base(mconfig, VOODOO_2, tag, owner, clock, MODEL_VOODOO_2)
-{
-	for (int index = 0; index < std::size(m_regtable); index++)
-		m_regtable[index].unpack(s_register_table[index], *this);
-}
 

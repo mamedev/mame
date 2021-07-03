@@ -74,10 +74,11 @@ static constexpr bool EAT_CYCLES = true;
 //  INTERNAL CLASSES
 //**************************************************************************
 
+class voodoo_1_device;
+class voodoo_2_device;
+
 namespace voodoo
 {
-class voodoo_device_base;
-class voodoo_2_device_base;
 class save_proxy;
 }
 
@@ -94,11 +95,13 @@ namespace voodoo
 class save_proxy
 {
 public:
+	// constructor
 	save_proxy(device_t &device) :
 		m_device(device)
 	{
 	}
 
+	// save an item; append the current prefix and pass through
 	template<typename T>
 	void save_item(T &&item, char const *name)
 	{
@@ -107,6 +110,7 @@ public:
 		m_device.save_item(std::forward<T>(item), fullname.c_str());
 	}
 
+	// save a pointer item; append the current prefix and pass through
 	template<typename T>
 	void save_pointer(T &&item, char const *name, u32 count)
 	{
@@ -115,6 +119,7 @@ public:
 		m_device.save_pointer(std::forward<T>(item), fullname.c_str(), count);
 	}
 
+	// save a class; update the prefix then call the register_save method on the class
 	template<typename T>
 	void save_class(T &item, char const *name)
 	{
@@ -126,6 +131,7 @@ public:
 	}
 
 private:
+	// internal state
 	device_t &m_device;
 	std::string m_prefix;
 };
@@ -259,7 +265,7 @@ class command_fifo
 {
 public:
 	// construction
-	command_fifo(voodoo_2_device_base &device);
+	command_fifo(voodoo_2_device &device);
 
 	// initialization
 	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
@@ -329,7 +335,7 @@ private:
 	u32 packet_type_unknown(u32 command);
 
 	// internal state
-	voodoo_2_device_base &m_device;// reference to our device
+	voodoo_2_device &m_device;     // reference to our device
 	u32 *m_ram;                    // base of RAM
 	u32 m_mask;                    // mask for RAM accesses
 	bool m_enable;                 // enabled?
@@ -413,28 +419,20 @@ public:
 	char buffer[1024];           // string
 };
 
+}
 
 
 //**************************************************************************
-//  VOODOO DEVICES
+//  GENERIC VOODOO DEVICE
 //**************************************************************************
 
-class voodoo_device_base : public device_t, public device_video_interface
+// ======================> generic_voodoo_device
+
+// generic_voodoo_device is a base class that can be used to represent any of the
+// specific voodoo devices below
+class generic_voodoo_device : public device_t, public device_video_interface
 {
-	friend class voodoo::register_table_entry;
-
-	// enumeration describing reasons we might be stalled
-	enum stall_state : u8
-	{
-		NOT_STALLED = 0,
-		STALLED_UNTIL_FIFO_LWM,
-		STALLED_UNTIL_FIFO_EMPTY
-	};
-
 public:
-	// destruction
-	virtual ~voodoo_device_base();
-
 	// configuration
 	void set_fbmem(int value) { m_fbmem_in_mb = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0_in_mb = value1; m_tmumem1_in_mb = value2; }
@@ -452,14 +450,72 @@ public:
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) = 0;
 
 	// external control
-	void set_init_enable(u32 newval);
+	virtual void set_init_enable(u32 newval) = 0;
 
 	// video update
-	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) = 0;
 
 protected:
+	// internal construction
+	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+
+	// configuration
+	const voodoo_model m_model;              // which voodoo model
+	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
+	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
+	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
+	required_device<cpu_device> m_cpu;       // the CPU we interact with
+	devcb_write_line m_vblank_cb;            // VBLANK callback
+	devcb_write_line m_stall_cb;             // stalling callback
+	devcb_write_line m_pciint_cb;            // PCI interrupt callback
+};
+
+
+//**************************************************************************
+//  VOODOO 1 DEVICE
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE(VOODOO_1, voodoo_1_device)
+
+// ======================> voodoo_1_device
+
+// voodoo_1_device represents the original generation of 3dfx Voodoo Graphics devices;
+// these devices have independent framebuffer and texture memory, and can be flexibly
+// configured with 1 or 2 TMUs
+class voodoo_1_device : public generic_voodoo_device
+{
+	friend class voodoo::register_table_entry;
+
+	// enumeration describing reasons we might be stalled
+	enum stall_state : u8
+	{
+		NOT_STALLED = 0,
+		STALLED_UNTIL_FIFO_LWM,
+		STALLED_UNTIL_FIFO_EMPTY
+	};
+
+public:
 	// construction
-	voodoo_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, MODEL_VOODOO_1) { }
+
+	// destruction
+	virtual ~voodoo_1_device();
+
+	// address map and read/write helpers
+	virtual void core_map(address_map &map) override;
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+
+	// external control
+	virtual void set_init_enable(u32 newval) override;
+
+	// video update
+	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+protected:
+	// internal construction
+	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -468,7 +524,66 @@ protected:
 
 	// system management
 	void soft_reset();
-	virtual void register_save(save_proxy &save, u32 total_allocation);
+	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation);
+
+	// mapped reads
+	u32 map_register_r(offs_t offset);
+	u32 map_lfb_r(offs_t offset);
+
+	// mapped writes
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	// reads and writes
+	u32 lfb_r(offs_t offset, bool lfb_3d);
+	void lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	virtual void texture_w(offs_t offset, u32 data);
+
+	// register read accessors
+	u32 reg_invalid_r(u32 chipmask, u32 regnum);
+	u32 reg_passive_r(u32 chipmask, u32 regnum);
+	u32 reg_status_r(u32 chipmask, u32 regnum);
+	u32 reg_fbiinit2_r(u32 chipmask, u32 regnum);
+	u32 reg_vretrace_r(u32 chipmask, u32 regnum);
+	u32 reg_stats_r(u32 chipmask, u32 regnum);
+
+	// register write accessors
+	u32 reg_status_w(u32 chipmask, u32 offset, u32 data);
+	u32 reg_invalid_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_passive_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_starts_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_startt_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dsdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dtdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dsdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dtdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstarts_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstartt_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_startw_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dwdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dwdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fstartw_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_triangle_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_nop_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fastfill_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fogtable_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_video_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_clut_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_dac_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_texture_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_palette_w(u32 chipmask, u32 regnum, u32 data);
 
 	// VBLANK timing
 	void adjust_vblank_start_timer();
@@ -514,11 +629,7 @@ protected:
 	void stall_cpu(stall_state state);
 	TIMER_CALLBACK_MEMBER( stall_resume_callback );
 
-	// reads and writes
-	u32 lfb_r(offs_t offset, bool lfb_3d);
-	void lfb_w(offs_t offset, u32 data, u32 mem_mask);
-	virtual void texture_w(offs_t offset, u32 data);
-
+	// misc helpers
 	u32 chipmask_from_offset(u32 offset)
 	{
 		u32 chipmask = BIT(offset, 8, 4);
@@ -527,60 +638,8 @@ protected:
 		return chipmask & m_chipmask;
 	}
 
-	// register read accessors
-	u32 reg_invalid_r(u32 chipmask, u32 regnum);
-	u32 reg_passive_r(u32 chipmask, u32 regnum);
-	u32 reg_status_r(u32 chipmask, u32 regnum);
-	u32 reg_fbiinit2_r(u32 chipmask, u32 regnum);
-	u32 reg_vretrace_r(u32 chipmask, u32 regnum);
-	u32 reg_stats_r(u32 chipmask, u32 regnum);
-
-	// register write accessors
-	u32 reg_invalid_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_passive_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fpassive_4_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fpassive_12_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_starts_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_startt_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dsdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dtdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dsdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dtdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fstarts_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fstartt_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdsdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdtdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdsdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdtdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_startw_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dwdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dwdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fstartw_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdwdx_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fdwdy_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_triangle_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_nop_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fastfill_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fogtable_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_video_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_clut_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_dac_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_texture_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_palette_w(u32 chipmask, u32 regnum, u32 data);
-
 	// configuration
-	const voodoo_model m_model;              // which voodoo model
 	u8 m_chipmask;                           // mask for which chips are available
-	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
-	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
-	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
-	required_device<cpu_device> m_cpu;       // the CPU we interact with
-	devcb_write_line m_vblank_cb;            // VBLANK callback
-	devcb_write_line m_stall_cb;             // stalling callback
-	devcb_write_line m_pciint_cb;            // PCI interrupt callback
 
 	// PCI state/FIFOs
 	voodoo::reg_init_en m_init_enable;       // initEnable value (set externally)
@@ -627,8 +686,8 @@ protected:
 
 	// register state
 	voodoo::voodoo_regs m_reg;               // FBI registers
-	register_table_entry m_regtable[256];    // generated register table
-	tmu_state m_tmu[MAX_TMU];                // TMU states
+	voodoo::register_table_entry m_regtable[256]; // generated register table
+	voodoo::tmu_state m_tmu[MAX_TMU];        // TMU states
 	u8 m_dac_reg[32];                        // up to 32 DAC registers
 	u8 m_dac_read_result;                    // pending DAC read result
 
@@ -652,28 +711,53 @@ protected:
 	rgb_t m_clut[512];                       // clut gamma data
 	bool m_clut_dirty;                       // do we need to recompute?
 	rgb_t m_pen[65536];                      // mapping from pixels to pens
+
+	// register table
+	static voodoo::static_register_table_entry<voodoo_1_device> const s_register_table[256];
 };
 
 
+//**************************************************************************
+//  VOODOO 2 DEVICE
+//**************************************************************************
 
-class voodoo_2_device_base : public voodoo_device_base
+DECLARE_DEVICE_TYPE(VOODOO_2, voodoo_2_device)
+
+// ======================> voodoo_2_device
+
+// voodoo_2_device represents the 2nd generation of 3dfx Voodoo Graphics devices;
+// these are pretty similar in architecture to the first generation, with the 
+// addition of command FIFOs and several other smaller features
+class voodoo_2_device: public voodoo_1_device
 {
-	friend class command_fifo;
+	friend class voodoo::command_fifo;
 
 public:
+	// construction
+	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, MODEL_VOODOO_2) { }
+
+	// address map and read/write helpers
+	virtual void core_map(address_map &map) override;
+	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
+	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
 
 protected:
-	// construction
-	voodoo_2_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	// internal construction
+	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
-//	virtual void device_reset() override;
-//	virtual void device_post_load() override;
+
+	u32 map_register_r(offs_t offset);
+	u32 map_lfb_r(offs_t offset);
+
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// system management
-//	void soft_reset();
-	virtual void register_save(save_proxy &save, u32 total_allocation) override;
+	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
 
 	virtual void flush_fifos(attotime current_time) override;
 
@@ -716,69 +800,9 @@ protected:
 #if USE_MEMORY_VIEWS
 	memory_view m_regview;                   // switchable register view
 #endif
-};
 
-}
-
-
-using voodoo::voodoo_device_base;
-using voodoo::voodoo_2_device_base;
-
-class voodoo_1_device : public voodoo_device_base
-{
-public:
-	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
-	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-
-	u32 map_register_r(offs_t offset);
-	u32 map_lfb_r(offs_t offset);
-
-	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	virtual void core_map(address_map &map) override;
-
-	// register accessors
-	u32 reg_status_w(u32 chipmask, u32 offset, u32 data);
-
-private:
-	static voodoo::static_register_table_entry<voodoo_1_device> const s_register_table[256];
-};
-
-
-class voodoo_2_device : public voodoo_2_device_base
-{
-public:
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
-	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
-
-	u32 map_register_r(offs_t offset);
-	u32 map_lfb_r(offs_t offset);
-
-	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	virtual void core_map(address_map &map) override;
-
-protected:
-#if USE_MEMORY_VIEWS
-	virtual void update_register_view() override;
-#endif
-
-private:
+	// register table
 	static voodoo::static_register_table_entry<voodoo_2_device> const s_register_table[256];
 };
-
-
-
-
-DECLARE_DEVICE_TYPE(VOODOO_1,       voodoo_1_device)
-DECLARE_DEVICE_TYPE(VOODOO_2,       voodoo_2_device)
 
 #endif // MAME_VIDEO_VOODOO_H
