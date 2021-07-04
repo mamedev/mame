@@ -226,7 +226,10 @@ void konppc_device::dsp_comm_sharc_w(int board, int offset, uint32_t data)
 			if (offset == 1)
 			{
 				if (data & 0x03)
+				{
 					m_dsp[0]->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+					m_dsp[0]->abort_timeslice();
+				}
 			}
 			break;
 		}
