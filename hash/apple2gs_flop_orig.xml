@@ -75,7 +75,7 @@ license:CC0
 		<!-- Redumped on May 3rd 2021. -->
 		<!--"Qix" is a 1990 action game developed by Ryan Ridges and John Lund, and distributed by Taito. It requires a 512K Apple IIgs.-->
 
-		<part name="flop0" interface="floppy_3_5">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296123">
 				<rom name="qix iigs.woz" size="1296123" crc="6955cd6b" sha1="fb20f487be264892bf3828ec8a5c8cabb57f751c" />
 			</dataarea>
@@ -2132,12 +2132,13 @@ license:CC0
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2021-06-07"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- It requires a 512K Apple IIgs. -->
-		<!--"The Print Shop IIgs" is a 1987 graphics program developed by David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein, and distributed by Broderbund Software. This is version 1.0. It requires a 512K Apple IIgs.-->
+		<!-- It requires a 512K Apple IIgs ROM 01 or earlier. -->
+		<!-- The disk image was modified on July 4th, 2021 to correct the compatibility information. -->
+		<!--"The Print Shop IIgs" is a 1987 graphics program developed by David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein, and distributed by Broderbund Software. This is version 1.0. It requires a 512K Apple IIgs ROM 01 or earlier.-->
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296808">
-				<rom name="the print shop iigs.woz" size="1296808" crc="5e6c4c53" sha1="3bea5c841e8459cab65d1b6382f66d15ee0b61e4"/>
+			<dataarea name="flop" size="1296816">
+				<rom name="the print shop iigs.woz" size="1296816" crc="57ecd472" sha1="689f6ead1f9ab1a4ffc6fa04088ad063943cb75d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2164,12 +2165,13 @@ license:CC0
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2021-06-07"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- It requires a 256K Apple IIgs. -->
-		<!--"Fantavision IIgs" is a 1987 graphics program developed by Scott Anderson and Ken Rosen, and distributed by Broderbund Software. It requires a 256K Apple IIgs.-->
+		<!-- It requires a 256K Apple IIgs ROM 01 or earlier. -->
+		<!-- The disk image was modified on July 4th, 2021 to correct the compatibility information. -->
+		<!--"Fantavision IIgs" is a 1987 graphics program developed by Scott Anderson and Ken Rosen, and distributed by Broderbund Software. It requires a 256K Apple IIgs ROM 01 or earlier.-->
 
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1296691">
-				<rom name="fantavision iigs.woz" size="1296691" crc="4c7648fd" sha1="ece3cc2473fedfaa497dea84e01f1b07b43bdeb1"/>
+			<dataarea name="flop" size="1296699">
+				<rom name="fantavision iigs.woz" size="1296699" crc="c179c918" sha1="bf336245b80f5fa0718f717cb8cfad8208996e31" />
 			</dataarea>
 		</part>
 	</software>
