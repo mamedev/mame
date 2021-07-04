@@ -63,7 +63,7 @@
  * W5 : enables /RESET from J1 P14 (this makes the board reset on S11 power up reset only). absent.
  * W6 : enables the 3.579545MHz clock to the YM2151. present.
  * W7 : ties J4 pin 1 and 2 to GND. absent, despite being present on the schematics.
- * W8 : ties J4 pin 5-through-inductor and the final audio power amp + pins to +12v. absent, as power is presuambly delivered in through J4 pin 5 instead.
+ * W8 : ties J4 pin 5-through-inductor and the final audio power amp + pins to +12v. absent, as power is presumably delivered in through J4 pin 5 instead.
 
  * see https://a.allegroimg.com/s1024/0c2cfa/0433164f4bfa94aa99cec60874f5 re: W2 being connected on the real board. (also see undumped REV1 rom)
  * see https://a.allegroimg.com/s1024/0c3dce/74cdfa004e1dbac943986a94999b re: W8 being absent
