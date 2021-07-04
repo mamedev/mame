@@ -25,6 +25,7 @@
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "imagedev/cassette.h"
+#include "sound/ay8910.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 #include "video/mc6845.h"
