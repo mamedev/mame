@@ -688,6 +688,8 @@ void generic_voodoo_device::device_start()
 //  voodoo_1_device - constructor
 //-------------------------------------------------
 
+DEFINE_DEVICE_TYPE(VOODOO_1, voodoo_1_device, "voodoo_1", "3dfx Voodoo Graphics")
+
 voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model) :
 	generic_voodoo_device(mconfig, type, tag, owner, clock, model),
 	m_chipmask(1),
@@ -1939,418 +1941,6 @@ void voodoo_1_device::texture_w(offs_t offset, u32 data)
 }
 
 
-
-
-
-
-int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
-{
-	// reset the video changed flag
-	bool changed = m_video_changed;
-	m_video_changed = false;
-
-	// select the buffer to draw
-	int drawbuf = m_frontbuf;
-	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
-		drawbuf = m_backbuf;
-
-	// copy from the current front buffer
-	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
-	u32 rowpixels = m_renderer->rowpixels();
-	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		if (y < m_yoffs)
-			continue;
-		u16 const *const src = draw_buffer(drawbuf) + (y - m_yoffs) * rowpixels - m_xoffs;
-		u32 *dst = &bitmap.pix(y);
-		for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
-			dst[x] = pens[src[x]];
-	}
-
-	// update stats display
-	if (DEBUG_STATS && m_stats.update_display_state(machine().input().code_pressed(KEYCODE_BACKSLASH)))
-		popmessage(m_stats.string(), 0, 0);
-
-	// overwrite with the depth buffer if debugging and the ENTER key is pressed
-	if (DEBUG_DEPTH && machine().input().code_pressed(KEYCODE_ENTER))
-		for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
-			u32 *const dst = &bitmap.pix(y);
-			for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
-		}
-
-	return changed;
-}
-
-
-
-
-
-
-/*************************************
- *
- *  Statistics management
- *
- *************************************/
-
-void voodoo_1_device::accumulate_statistics(thread_stats_block const &block)
-{
-	// update live voodoo statistics
-	m_reg.add(voodoo_regs::reg_fbiPixelsIn, block.pixels_in);
-	m_reg.add(voodoo_regs::reg_fbiPixelsOut, block.pixels_out);
-	m_reg.add(voodoo_regs::reg_fbiChromaFail, block.chroma_fail);
-	m_reg.add(voodoo_regs::reg_fbiZfuncFail, block.zfunc_fail);
-	m_reg.add(voodoo_regs::reg_fbiAfuncFail, block.afunc_fail);
-
-	// update emulation statistics
-	if (DEBUG_STATS)
-		m_stats.add_emulation_stats(block);
-}
-
-
-void voodoo_1_device::update_statistics(bool accumulate)
-{
-	// accumulate/reset statistics from all units
-	for (auto &stats : m_renderer->thread_stats())
-	{
-		if (accumulate)
-			accumulate_statistics(stats);
-		stats.reset();
-	}
-
-	// accumulate/reset statistics from the LFB
-	if (accumulate)
-		accumulate_statistics(m_lfb_stats);
-	m_lfb_stats.reset();
-}
-
-
-
-/*************************************
- *
- *  VBLANK management
- *
- *************************************/
-
-void voodoo_1_device::rotate_buffers()
-{
-	if (!m_vblank_dont_swap)
-	{
-		u32 buffers = (m_rgboffs[2] == ~0) ? 2 : 3;
-		m_frontbuf = (m_frontbuf + 1) % buffers;
-		m_backbuf = (m_frontbuf + 1) % buffers;
-	}
-}
-
-void voodoo_1_device::swap_buffers()
-{
-	if (LOG_VBLANK_SWAP)
-		logerror("--- swap_buffers @ %d\n", screen().vpos());
-
-	// force a partial update
-	screen().update_partial(screen().vpos());
-	m_video_changed = true;
-
-	// keep a history of swap intervals
-	m_reg.update_swap_history(std::min<u8>(m_vblank_count, 15));
-
-	// rotate the buffers; implementation differs between models
-	rotate_buffers();
-
-	// decrement the pending count and reset our state
-	if (m_swaps_pending != 0)
-		m_swaps_pending--;
-	m_vblank_count = 0;
-	m_vblank_swap_pending = false;
-
-	// reset the last_op_time to now and start processing the next command
-	if (operation_pending())
-	{
-		if (LOG_VBLANK_SWAP)
-			logerror("---- swap_buffers flush begin\n");
-		flush_fifos(m_operation_end = machine().time());
-		if (LOG_VBLANK_SWAP)
-			logerror("---- swap_buffers flush end\n");
-	}
-
-	// we may be able to unstall now
-	if (m_stall_state != NOT_STALLED)
-		check_stalled_cpu(machine().time());
-
-	// periodically log rasterizer info
-	m_stats.m_swaps++;
-	if (m_stats.m_swaps % 1000 == 0)
-		m_renderer->dump_rasterizer_stats();
-
-	// update the statistics (debug)
-	if (DEBUG_STATS)
-	{
-		if (m_stats.displayed())
-		{
-			update_statistics(true);
-			m_stats.update_string(screen().visible_area(), m_reg.swap_history());
-		}
-		m_stats.reset();
-	}
-}
-
-
-void voodoo_1_device::adjust_vblank_start_timer()
-{
-	attotime vblank_period = screen().time_until_pos(m_vsyncstart);
-	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_start_timer: period: %s\n", vblank_period.as_string());
-	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
-	if (vblank_period == attotime::zero)
-		vblank_period = screen().frame_period();
-	m_vsync_start_timer->adjust(vblank_period);
-}
-
-
-void voodoo_1_device::vblank_start(void *ptr, s32 param)
-{
-	if (LOG_VBLANK_SWAP)
-		logerror("--- vblank start\n");
-
-	// flush the pipes
-	if (operation_pending())
-	{
-		if (LOG_VBLANK_SWAP)
-			logerror("---- vblank flush begin\n");
-		flush_fifos(machine().time());
-		if (LOG_VBLANK_SWAP)
-			logerror("---- vblank flush end\n");
-	}
-
-	// increment the count
-	m_vblank_count = std::min(m_vblank_count + 1, 250);
-
-	// logging
-	if (LOG_VBLANK_SWAP)
-		logerror("---- vblank count = %u swap = %u pending = %u", m_vblank_count, m_vblank_swap, m_vblank_swap_pending);
-	if (LOG_VBLANK_SWAP && m_vblank_swap_pending)
-		logerror(" (target=%d)", m_vblank_swap);
-	if (LOG_VBLANK_SWAP)
-		logerror("\n");
-
-	// if we're past the swap count, do the swap
-	if (m_vblank_swap_pending && m_vblank_count >= m_vblank_swap)
-		swap_buffers();
-
-	// set a timer for the next off state
-	m_vsync_stop_timer->adjust(screen().time_until_pos(m_vsyncstop));
-
-	// set internal state and call the client
-	m_vblank = true;
-
-	// notify external VBLANK handler on all models
-	if (!m_vblank_cb.isnull())
-		m_vblank_cb(true);
-}
-
-
-void voodoo_1_device::vblank_stop(void *ptr, s32 param)
-{
-	if (LOG_VBLANK_SWAP)
-		logerror("--- vblank end\n");
-
-	// set internal state and call the client
-	m_vblank = false;
-
-	// notify external VBLANK handler on all models
-	if (!m_vblank_cb.isnull())
-		m_vblank_cb(false);
-
-	// go to the end of the next frame
-	adjust_vblank_start_timer();
-}
-
-
-
-/*************************************
- *
- *  Chip reset
- *
- *************************************/
-
-void voodoo_1_device::reset_counters()
-{
-	update_statistics(false);
-	m_reg.write(voodoo_regs::reg_fbiPixelsIn, 0);
-	m_reg.write(voodoo_regs::reg_fbiChromaFail, 0);
-	m_reg.write(voodoo_regs::reg_fbiZfuncFail, 0);
-	m_reg.write(voodoo_regs::reg_fbiAfuncFail, 0);
-	m_reg.write(voodoo_regs::reg_fbiPixelsOut, 0);
-}
-
-
-
-/*************************************
- *
- *  Recompute video memory layout
- *
- *************************************/
-
-void voodoo_1_device::recompute_video_memory()
-{
-	// configuration is either double-buffered (0) or triple-buffered (1)
-	u32 config = m_reg.fbi_init2().enable_triple_buf();
-
-	// 4-bit tile count; tiles are 64x16
-	u32 xtiles = m_reg.fbi_init1().x_video_tiles();
-	recompute_video_memory_common(config, xtiles * 64);
-}
-
-void voodoo_1_device::recompute_video_memory_common(u32 config, u32 rowpixels)
-{
-	// remember the front buffer configuration to check for changes
-	u16 *starting_front = front_buffer();
-	u32 starting_rowpix = m_renderer->rowpixels();
-
-	// first RGB buffer always starts at 0
-	m_rgboffs[0] = 0;
-
-	// second RGB buffer starts immediately afterwards
-	u32 const buffer_pages = m_reg.fbi_init2().video_buffer_offset();
-	m_rgboffs[1] = buffer_pages * 0x1000;
-
-	// remaining buffers are based on the config
-	switch (config)
-	{
-		case 3: // reserved
-//			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
-			[[fallthrough]];
-		case 0: // 2 color buffers, 1 aux buffer
-			m_rgboffs[2] = ~0;
-			m_auxoffs = 2 * buffer_pages * 0x1000;
-			break;
-
-		case 1: // 3 color buffers, 0 aux buffers
-			m_rgboffs[2] = 2 * buffer_pages * 0x1000;
-			m_auxoffs = ~0;
-			break;
-
-		case 2: // 3 color buffers, 1 aux buffers
-			m_rgboffs[2] = 2 * buffer_pages * 0x1000;
-			m_auxoffs = 3 * buffer_pages * 0x1000;
-			break;
-	}
-
-	// clamp the RGB buffers to video memory
-	for (int buf = 0; buf < 3; buf++)
-		if (m_rgboffs[buf] != ~0 && m_rgboffs[buf] > m_fbmask)
-			m_rgboffs[buf] = m_fbmask;
-
-	// clamp the aux buffer to video memory
-	if (m_auxoffs != ~0 && m_auxoffs > m_fbmask)
-		m_auxoffs = m_fbmask;
-
-	// reset our front/back buffers if they are out of range
-	if (m_rgboffs[2] == ~0)
-	{
-		if (m_frontbuf == 2)
-			m_frontbuf = 0;
-		if (m_backbuf == 2)
-			m_backbuf = 0;
-	}
-
-	// mark video changed if the front buffer configuration is different
-	if (front_buffer() != starting_front || rowpixels != starting_rowpix)
-		m_video_changed = true;
-	m_renderer->set_rowpixels(rowpixels);
-}
-
-
-
-/*************************************
- *
- *  Stall the active cpu until we are
- *  ready
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER( voodoo_1_device::stall_resume_callback )
-{
-	check_stalled_cpu(machine().time());
-}
-
-
-void voodoo_1_device::check_stalled_cpu(attotime current_time)
-{
-	int resume = false;
-
-	/* flush anything we can */
-	if (operation_pending())
-		flush_fifos(current_time);
-
-	/* if we're just stalled until the LWM is passed, see if we're ok now */
-	if (m_stall_state == STALLED_UNTIL_FIFO_LWM)
-	{
-		/* if there's room in the memory FIFO now, we can proceed */
-		if (m_reg.fbi_init0().enable_memory_fifo())
-		{
-			if (m_fbmem_fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
-				resume = true;
-		}
-		else if (m_pci_fifo.space() > 2 * m_reg.fbi_init0().pci_fifo_lwm())
-			resume = true;
-	}
-
-	/* if we're stalled until the FIFOs are empty, check now */
-	else if (m_stall_state == STALLED_UNTIL_FIFO_EMPTY)
-	{
-		if (m_reg.fbi_init0().enable_memory_fifo())
-		{
-			if (m_fbmem_fifo.empty() && m_pci_fifo.empty())
-				resume = true;
-		}
-		else if (m_pci_fifo.empty())
-			resume = true;
-	}
-
-	/* resume if necessary */
-	if (resume || !operation_pending())
-	{
-		if (LOG_FIFO) logerror("VOODOO.FIFO:Stall condition cleared; resuming\n");
-		m_stall_state = NOT_STALLED;
-
-		/* either call the callback, or trigger the trigger */
-		if (!m_stall_cb.isnull())
-			m_stall_cb(false);
-		else
-			machine().scheduler().trigger(m_stall_trigger);
-	}
-
-	/* if not, set a timer for the next one */
-	else
-		m_stall_resume_timer->adjust(m_operation_end - current_time);
-}
-
-
-void voodoo_1_device::stall_cpu(stall_state state)
-{
-	// sanity check
-	if (!operation_pending())
-		fatalerror("FIFOs not empty, no op pending!\n");
-
-	// set the state and update statistics
-	m_stall_state = state;
-	if (DEBUG_STATS)
-		m_stats.m_stalls++;
-
-	// either call the callback, or spin the CPU
-	if (!m_stall_cb.isnull())
-		m_stall_cb(true);
-	else
-		m_cpu->spin_until_trigger(m_stall_trigger);
-
-	// set a timer to clear the stall
-	m_stall_resume_timer->adjust(m_operation_end - machine().time());
-}
-
-
-
 //-------------------------------------------------
 //  reg_invalid_r - generic invalid register read
 //-------------------------------------------------
@@ -2919,12 +2509,220 @@ u32 voodoo_1_device::reg_palette_w(u32 chipmask, u32 regnum, u32 data)
 }
 
 
+//-------------------------------------------------
+//  adjust_vblank_start_timer -- adjust the VBLANK
+//  start timer based on latest information
+//-------------------------------------------------
+
+void voodoo_1_device::adjust_vblank_start_timer()
+{
+	attotime time_until_blank = screen().time_until_pos(m_vsyncstart);
+	if (LOG_VBLANK_SWAP)
+		logerror("adjust_vblank_start_timer: period: %s\n", time_until_blank.as_string());
+
+	// if zero, adjust to next frame, otherwise we may get stuck in an infinite loop
+	if (time_until_blank == attotime::zero)
+		time_until_blank = screen().frame_period();
+	m_vsync_start_timer->adjust(time_until_blank);
+}
 
 
+//-------------------------------------------------
+//  vblank_start -- timer callback for the start
+//  of VBLANK
+//-------------------------------------------------
+
+void voodoo_1_device::vblank_start(void *ptr, s32 param)
+{
+	if (LOG_VBLANK_SWAP)
+		logerror("--- vblank start\n");
+
+	// flush the pipes
+	if (operation_pending())
+	{
+		if (LOG_VBLANK_SWAP)
+			logerror("---- vblank flush begin\n");
+		flush_fifos(machine().time());
+		if (LOG_VBLANK_SWAP)
+			logerror("---- vblank flush end\n");
+	}
+
+	// increment the count
+	m_vblank_count = std::min(m_vblank_count + 1, 250);
+
+	// logging
+	if (LOG_VBLANK_SWAP)
+		logerror("---- vblank count = %u swap = %u pending = %u", m_vblank_count, m_vblank_swap, m_vblank_swap_pending);
+	if (LOG_VBLANK_SWAP && m_vblank_swap_pending)
+		logerror(" (target=%d)", m_vblank_swap);
+	if (LOG_VBLANK_SWAP)
+		logerror("\n");
+
+	// if we're past the swap count, do the swap
+	if (m_vblank_swap_pending && m_vblank_count >= m_vblank_swap)
+		swap_buffers();
+
+	// set a timer for the next off state
+	m_vsync_stop_timer->adjust(screen().time_until_pos(m_vsyncstop));
+
+	// set internal state and call the client
+	m_vblank = true;
+
+	// notify external VBLANK handler on all models
+	if (!m_vblank_cb.isnull())
+		m_vblank_cb(true);
+}
 
 
+//-------------------------------------------------
+//  vblank_stop -- timer callback for the end of
+//  VBLANK
+//-------------------------------------------------
+
+void voodoo_1_device::vblank_stop(void *ptr, s32 param)
+{
+	if (LOG_VBLANK_SWAP)
+		logerror("--- vblank end\n");
+
+	// set internal state and call the client
+	m_vblank = false;
+
+	// notify external VBLANK handler on all models
+	if (!m_vblank_cb.isnull())
+		m_vblank_cb(false);
+
+	// go to the end of the next frame
+	adjust_vblank_start_timer();
+}
 
 
+//-------------------------------------------------
+//  swap_buffers -- perform a buffer swap; in most
+//  cases this comes at VBLANK time
+//-------------------------------------------------
+
+void voodoo_1_device::swap_buffers()
+{
+	if (LOG_VBLANK_SWAP)
+		logerror("--- swap_buffers @ %d\n", screen().vpos());
+
+	// force a partial update
+	screen().update_partial(screen().vpos());
+	m_video_changed = true;
+
+	// keep a history of swap intervals
+	m_reg.update_swap_history(std::min<u8>(m_vblank_count, 15));
+
+	// rotate the buffers; implementation differs between models
+	rotate_buffers();
+
+	// decrement the pending count and reset our state
+	if (m_swaps_pending != 0)
+		m_swaps_pending--;
+	m_vblank_count = 0;
+	m_vblank_swap_pending = false;
+
+	// reset the last_op_time to now and start processing the next command
+	if (operation_pending())
+	{
+		if (LOG_VBLANK_SWAP)
+			logerror("---- swap_buffers flush begin\n");
+		flush_fifos(m_operation_end = machine().time());
+		if (LOG_VBLANK_SWAP)
+			logerror("---- swap_buffers flush end\n");
+	}
+
+	// we may be able to unstall now
+	if (m_stall_state != NOT_STALLED)
+		check_stalled_cpu(machine().time());
+
+	// periodically log rasterizer info
+	m_stats.m_swaps++;
+	if (m_stats.m_swaps % 1000 == 0)
+		m_renderer->dump_rasterizer_stats();
+
+	// update the statistics (debug)
+	if (DEBUG_STATS)
+	{
+		if (m_stats.displayed())
+		{
+			update_statistics(true);
+			m_stats.update_string(screen().visible_area(), m_reg.swap_history());
+		}
+		m_stats.reset();
+	}
+}
+
+
+//-------------------------------------------------
+//  rotate_buffers -- rotate the buffers according
+//  to the current buffer config; this is split
+//  out so later devices can override
+//-------------------------------------------------
+
+void voodoo_1_device::rotate_buffers()
+{
+	if (!m_vblank_dont_swap)
+	{
+		u32 buffers = (m_rgboffs[2] == ~0) ? 2 : 3;
+		m_frontbuf = (m_frontbuf + 1) % buffers;
+		m_backbuf = (m_frontbuf + 1) % buffers;
+	}
+}
+
+
+//-------------------------------------------------
+//  update_common -- shared update function
+//-------------------------------------------------
+
+int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
+{
+	// reset the video changed flag
+	bool changed = m_video_changed;
+	m_video_changed = false;
+
+	// select the buffer to draw
+	int drawbuf = m_frontbuf;
+	if (DEBUG_BACKBUF && machine().input().code_pressed(KEYCODE_L))
+		drawbuf = m_backbuf;
+
+	// copy from the current front buffer
+	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
+	u32 rowpixels = m_renderer->rowpixels();
+	u16 *buffer_base = draw_buffer(drawbuf);
+	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		if (y < m_yoffs)
+			continue;
+		u16 const *const src = buffer_base + (y - m_yoffs) * rowpixels - m_xoffs;
+		u32 *dst = &bitmap.pix(y);
+		for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+			dst[x] = pens[src[x]];
+	}
+
+	// update stats display
+	if (DEBUG_STATS && m_stats.update_display_state(machine().input().code_pressed(KEYCODE_BACKSLASH)))
+		popmessage(m_stats.string(), 0, 0);
+
+	// overwrite with the depth buffer if debugging and the ENTER key is pressed
+	if (DEBUG_DEPTH && machine().input().code_pressed(KEYCODE_ENTER))
+		for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			u16 const *const src = aux_buffer() + (y - m_yoffs) * rowpixels - m_xoffs;
+			u32 *const dst = &bitmap.pix(y);
+			for (s32 x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dst[x] = ((src[x] << 8) & 0xff0000) | ((src[x] >> 0) & 0xff00) | ((src[x] >> 8) & 0xff);
+		}
+
+	return changed;
+}
+
+
+//-------------------------------------------------
+//  recompute_video_timing -- given hsync and
+//  vsync parameter, find the best match for known
+//  monitor types and select the best fit
+//-------------------------------------------------
 
 void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis, u32 hbp, u32 vsyncon, u32 vsyncoff, u32 vvis, u32 vbp)
 {
@@ -2981,6 +2779,87 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	adjust_vblank_start_timer();
 }
 
+
+//-------------------------------------------------
+//  recompute_video_memory -- compute the layout
+//  of video memory
+//-------------------------------------------------
+
+void voodoo_1_device::recompute_video_memory()
+{
+	// configuration is either double-buffered (0) or triple-buffered (1)
+	u32 config = m_reg.fbi_init2().enable_triple_buf();
+
+	// 4-bit tile count; tiles are 64x16
+	u32 xtiles = m_reg.fbi_init1().x_video_tiles();
+	recompute_video_memory_common(config, xtiles * 64);
+}
+
+
+//-------------------------------------------------
+//  recompute_video_memory_common -- core logic
+//  for video memory layout based on 2-bit config
+//  and the computed rowpixels
+//-------------------------------------------------
+
+void voodoo_1_device::recompute_video_memory_common(u32 config, u32 rowpixels)
+{
+	// remember the front buffer configuration to check for changes
+	u16 *starting_front = front_buffer();
+	u32 starting_rowpix = m_renderer->rowpixels();
+
+	// first RGB buffer always starts at 0
+	m_rgboffs[0] = 0;
+
+	// second RGB buffer starts immediately afterwards
+	u32 const buffer_pages = m_reg.fbi_init2().video_buffer_offset();
+	m_rgboffs[1] = buffer_pages * 0x1000;
+
+	// remaining buffers are based on the config
+	switch (config)
+	{
+		case 3: // reserved
+//			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
+			[[fallthrough]];
+		case 0: // 2 color buffers, 1 aux buffer
+			m_rgboffs[2] = ~0;
+			m_auxoffs = 2 * buffer_pages * 0x1000;
+			break;
+
+		case 1: // 3 color buffers, 0 aux buffers
+			m_rgboffs[2] = 2 * buffer_pages * 0x1000;
+			m_auxoffs = ~0;
+			break;
+
+		case 2: // 3 color buffers, 1 aux buffers
+			m_rgboffs[2] = 2 * buffer_pages * 0x1000;
+			m_auxoffs = 3 * buffer_pages * 0x1000;
+			break;
+	}
+
+	// clamp the RGB buffers to video memory
+	for (int buf = 0; buf < 3; buf++)
+		if (m_rgboffs[buf] != ~0 && m_rgboffs[buf] > m_fbmask)
+			m_rgboffs[buf] = m_fbmask;
+
+	// clamp the aux buffer to video memory
+	if (m_auxoffs != ~0 && m_auxoffs > m_fbmask)
+		m_auxoffs = m_fbmask;
+
+	// reset our front/back buffers if they are out of range
+	if (m_rgboffs[2] == ~0)
+	{
+		if (m_frontbuf == 2)
+			m_frontbuf = 0;
+		if (m_backbuf == 2)
+			m_backbuf = 0;
+	}
+
+	// mark video changed if the front buffer configuration is different
+	if (front_buffer() != starting_front || rowpixels != starting_rowpix)
+		m_video_changed = true;
+	m_renderer->set_rowpixels(rowpixels);
+}
 
 
 //-------------------------------------------------
@@ -3131,9 +3010,175 @@ s32 voodoo_1_device::triangle()
 }
 
 
+//-------------------------------------------------
+//  accumulate_statistics - add the statistics
+//  from the given thread block to the shared
+//  statistics
+//-------------------------------------------------
+
+void voodoo_1_device::accumulate_statistics(thread_stats_block const &block)
+{
+	// update live voodoo statistics
+	m_reg.add(voodoo_regs::reg_fbiPixelsIn, block.pixels_in);
+	m_reg.add(voodoo_regs::reg_fbiPixelsOut, block.pixels_out);
+	m_reg.add(voodoo_regs::reg_fbiChromaFail, block.chroma_fail);
+	m_reg.add(voodoo_regs::reg_fbiZfuncFail, block.zfunc_fail);
+	m_reg.add(voodoo_regs::reg_fbiAfuncFail, block.afunc_fail);
+
+	// update emulation statistics
+	if (DEBUG_STATS)
+		m_stats.add_emulation_stats(block);
+}
 
 
-DEFINE_DEVICE_TYPE(VOODOO_1, voodoo_1_device, "voodoo_1", "3dfx Voodoo Graphics")
+//-------------------------------------------------
+//  update_statistics - gather statistics from
+//  all threads and then reset the thread-local
+//  information
+//-------------------------------------------------
+
+void voodoo_1_device::update_statistics(bool accumulate)
+{
+	// accumulate/reset statistics from all units
+	for (auto &stats : m_renderer->thread_stats())
+	{
+		if (accumulate)
+			accumulate_statistics(stats);
+		stats.reset();
+	}
+
+	// accumulate/reset statistics from the LFB
+	if (accumulate)
+		accumulate_statistics(m_lfb_stats);
+	m_lfb_stats.reset();
+}
+
+
+//-------------------------------------------------
+//  reset_counters - reset the exposed statistics
+//  counters to 0
+//-------------------------------------------------
+
+void voodoo_1_device::reset_counters()
+{
+	update_statistics(false);
+	m_reg.write(voodoo_regs::reg_fbiPixelsIn, 0);
+	m_reg.write(voodoo_regs::reg_fbiChromaFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiZfuncFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiAfuncFail, 0);
+	m_reg.write(voodoo_regs::reg_fbiPixelsOut, 0);
+}
+
+
+//-------------------------------------------------
+//  check_stalled_cpu - determine if it's time to
+//  un-stall a CPU given pending operations
+//-------------------------------------------------
+
+void voodoo_1_device::check_stalled_cpu(attotime current_time)
+{
+	bool resume = false;
+
+	// flush anything we can
+	if (operation_pending())
+		flush_fifos(current_time);
+
+	// if we're just stalled until the LWM is passed, see if we're ok now
+	if (m_stall_state == STALLED_UNTIL_FIFO_LWM)
+	{
+		// if there's room in the memory FIFO now, we can proceed
+		if (m_reg.fbi_init0().enable_memory_fifo())
+		{
+			if (m_fbmem_fifo.items() < 2 * 32 * m_reg.fbi_init0().memory_fifo_hwm())
+				resume = true;
+		}
+		else if (m_pci_fifo.space() > 2 * m_reg.fbi_init0().pci_fifo_lwm())
+			resume = true;
+	}
+
+	// if we're stalled until the FIFOs are empty, check now
+	else if (m_stall_state == STALLED_UNTIL_FIFO_EMPTY)
+	{
+		if (m_reg.fbi_init0().enable_memory_fifo())
+		{
+			if (m_fbmem_fifo.empty() && m_pci_fifo.empty())
+				resume = true;
+		}
+		else if (m_pci_fifo.empty())
+			resume = true;
+	}
+
+	// resume if necessary
+	if (resume || !operation_pending())
+	{
+		if (LOG_FIFO)
+			logerror("VOODOO.FIFO:Stall condition cleared; resuming\n");
+		m_stall_state = NOT_STALLED;
+
+		// either call the callback, or trigger the trigger
+		if (!m_stall_cb.isnull())
+			m_stall_cb(false);
+		else
+			machine().scheduler().trigger(m_stall_trigger);
+	}
+
+	// if not, set a timer for the next one
+	else
+		m_stall_resume_timer->adjust(m_operation_end - current_time);
+}
+
+
+//-------------------------------------------------
+//  stall_cpu - stall our associated CPU until
+//  operations are complete
+//-------------------------------------------------
+
+void voodoo_1_device::stall_cpu(stall_state state)
+{
+	// sanity check
+	if (!operation_pending())
+		fatalerror("FIFOs not empty, no op pending!\n");
+
+	// set the state and update statistics
+	m_stall_state = state;
+	if (DEBUG_STATS)
+		m_stats.m_stalls++;
+
+	// either call the callback, or spin the CPU
+	if (!m_stall_cb.isnull())
+		m_stall_cb(true);
+	else
+		m_cpu->spin_until_trigger(m_stall_trigger);
+
+	// set a timer to clear the stall
+	m_stall_resume_timer->adjust(m_operation_end - machine().time());
+}
+
+
+//-------------------------------------------------
+//  stall_resume_callback - timer callback to
+//  check the stall state for our CPU
+//-------------------------------------------------
+
+void voodoo_1_device::stall_resume_callback(void *ptr, s32 param)
+{
+	check_stalled_cpu(machine().time());
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

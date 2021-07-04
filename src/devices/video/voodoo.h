@@ -466,7 +466,6 @@ protected:
 	u32 reg_stats_r(u32 chipmask, u32 regnum);
 
 	// register write accessors
-	u32 reg_status_w(u32 chipmask, u32 offset, u32 data);
 	u32 reg_invalid_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_passive_w(u32 chipmask, u32 regnum, u32 data);
@@ -529,7 +528,7 @@ protected:
 	void clear_pending_operation() { m_operation_end = attotime::zero; }
 	void check_stalled_cpu(attotime current_time);
 	void stall_cpu(stall_state state);
-	TIMER_CALLBACK_MEMBER( stall_resume_callback );
+	void stall_resume_callback(void *ptr, s32 param);
 
 	// misc helpers
 	u32 chipmask_from_offset(u32 offset)
