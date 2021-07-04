@@ -105,6 +105,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
+		, m_dsw1(*this, "DSW1")
 		, m_overlay(1)
 	{ }
 
@@ -131,6 +132,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 	required_device<via6522_device> m_via;
+	required_ioport m_dsw1;
 
 	uint16_t *m_dram_ptr, *m_sram_ptr, *m_rom_ptr;
 	bool m_overlay;
@@ -216,6 +218,18 @@ void lwriter_state::maincpu_map(address_map &map)
 }
 
 static INPUT_PORTS_START( lwriter )
+	PORT_START("DSW1")
+	// Switch 1 | Switch 2 | switchsetting value | Meaning
+	// Down       Down                         0   serial batch mode 1200 baud (0)
+	// Up         Down                         1   serial batch mode 9600 baud (1)
+	// Down       Up                           2   diablo emulation (special switch = 0)
+	// Down       Up                           2   executive mode (special switch = 1)
+	// Up         Up                           3   apple talk
+	PORT_DIPNAME(0x60, 0x20, "Switch")
+	PORT_DIPSETTING(  0x00, "Serial batch mode 1200 baud")
+	PORT_DIPSETTING(  0x40, "Serial batch mode 9600 baud")
+	PORT_DIPSETTING(  0x20, "Diablo emulation (special switch = 0) / Executive mode (special switch = 1)")
+	PORT_DIPSETTING(  0x60, "AppleTalk")
 INPUT_PORTS_END
 
 /* Start it up */
@@ -284,7 +298,8 @@ void lwriter_state::fifo_out_w(uint8_t data)
 uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
-	return 0xFF;
+	uint8_t result = m_dsw1->read();;
+	return result | 0x9C;
 }
 
 void lwriter_state::via_pa_w(uint8_t data)
