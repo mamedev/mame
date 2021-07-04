@@ -594,7 +594,7 @@ ROM_START( rpunch )
 
 	ROM_REGION( 0x40000, "upd", 0 )
 	ROM_LOAD( "rl_f18.bin", 0x00000, 0x20000, CRC(47840673) SHA1(ffe20f8772a987f5dd06a3f348a1e3cfed26e19e) )
-//  ROM_LOAD( "rpunch.91", 0x00000, 0x0f000, CRC(7512cc59) )
+//  ROM_LOAD( "rpunch.91",  0x00000, 0x0f000, CRC(7512cc59) SHA1(1eb151a1a9cdb7922d2cb422dff41d452238a2b8) )
 ROM_END
 
 ROM_START( rabiolep )

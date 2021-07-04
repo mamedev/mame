@@ -756,8 +756,8 @@ ROM_START( twincobr )
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 /****** The following are from a bootleg board. ******
     A0 and A1 are swapped between the TMS320C10 and these BPROMs on the board.
-    ROM_LOAD16_BYTE( "tc1b",        0x0000, 0x0800, CRC(1757cc33) )
-    ROM_LOAD16_BYTE( "tc2a",        0x0001, 0x0800, CRC(d6d878c9) )
+    ROM_LOAD16_BYTE( "tc1b",        0x0000, 0x0800, CRC(1757cc33) SHA1(1f54e9ddac1a644e9459415a51a0d516008cd4c6) )
+    ROM_LOAD16_BYTE( "tc2a",        0x0001, 0x0800, CRC(d6d878c9) SHA1(fb2dd8dba0b1ce1959e1b6e62840fdd7a97ceb92) )
 */
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )    // Chars
