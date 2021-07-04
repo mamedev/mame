@@ -151,6 +151,9 @@ protected:
 		m_io_read[1].resolve();
 		m_io_write[0].resolve();
 		m_io_write[1].resolve();
+
+		// remember the busy end time
+		save_item(NAME(m_busy_end));
 	}
 
 	// timer callbacks
