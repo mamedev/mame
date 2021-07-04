@@ -72295,19 +72295,23 @@ Other
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="batman4" cloneof="batmanrj" supported="no">
+	<software name="batman4" cloneof="batmanrj">
 		<description>Batman 4 (Batman - Return of the Joker pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="262144">
 				<rom name="batman 4 (unl).chr" size="262144" crc="5d5f12b7" sha1="73dede39c092b908ee813660c8a46fa0af7219b6" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="batman 4 (unl).prg" size="131072" crc="123b3792" sha1="95b08688c277e5d697f34f44a893918fd091b552" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -72627,14 +72631,15 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="fifa96" cloneof="goal2" supported="no">
+	<software name="fifa96" cloneof="goal2">
 		<description>FIFA International 2' 96 (Goal!! pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="fifa international 2' 96 (unl).chr" size="131072" crc="d2b2f562" sha1="14d378ce21af97e5bb45473322c25c2599366952" offset="00000" status="baddump" />
 			</dataarea>
@@ -73294,14 +73299,15 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="pizzamar" cloneof="pizzapop" supported="no">
+	<software name="pizzamar" cloneof="pizzapop">
 		<description>Pizza Pop Mario (Pizza Pop pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="pizza pop mario (unl).chr" size="131072" crc="37f34d22" sha1="a81956ae321112396bff8649d70a7be7e591e917" offset="00000" status="baddump" />
 			</dataarea>
