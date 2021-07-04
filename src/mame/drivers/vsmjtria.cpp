@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Ivan Vangelista, Vas Crabb, Angelo Salese
 
 /*
 VS Mahjong Triangle (c) 1986 Dyna
@@ -16,15 +16,21 @@ OSC:    20MHz
 Notes:
 - Loosely based off rmhaihai.cpp.
   Changes needed for merging both implementations seems too trivial to warrant a
-  device merge (basically just the video HW and a few bits).
+  driver merge, basically just the video HW, the CRTC (448x224 clocked at 20 MHz?)
+  and a few I/O bits looks very similar, the odd screen size is also a thing in srmp2.cpp
+  and probably other Seta HWs.
+- CPU seems a bit too slow when deciding about what tile to discard,
+  it also takes a bit too much to sync when a player takes a tile from the pond in
+  a VS play. It's most likely btanb unless a gameplay video proves otherwise;
 
 TODO:
-- CPU seems a bit too slow when deciding about what tile to discard (may be btanb);
 - Upper byte of I/O access seems to be some extra comms state machine
   (i.e. it more or less mimic the commands that CPUs send between each other).
   Maybe just a debug port that is read thru external HW?
-- Pinpoint how HW reads SW2 (position 11m) single bit dip;
-- Pinpoint how HW reads the three lead-filled marked as SW1 (position 1b);
+- Pinpoint how HW reads SW2 (position 11m) single slider switch.
+  It may not be read by the CPUs at all, but just act as a NVRAM clear given the position;
+- Pinpoint how HW reads the three lead-filled marked as SW1 (position 1b).
+  It's located next to the key matrix, maybe just ext debugging?
 
 */
 
@@ -165,11 +171,11 @@ uint8_t vsmjtria_state::keyboard_r()
 {
 	uint8_t data = 0x00;
 
-	if (BIT(m_keyboard_cmd[Which], 0)) data |= m_key[Which][0]->read();
-	if (BIT(m_keyboard_cmd[Which], 1)) data |= m_key[Which][1]->read();
-	if (BIT(m_keyboard_cmd[Which], 2)) data |= m_key[Which][2]->read();
-	if (BIT(m_keyboard_cmd[Which], 3)) data |= m_key[Which][3]->read();
-	if (BIT(m_keyboard_cmd[Which], 4)) data |= m_key[Which][4]->read();
+	for (int key_n = 0; key_n < 5; key_n ++ )
+	{
+		if (BIT(m_keyboard_cmd[Which], key_n))
+			data |= m_key[Which][key_n]->read();
+	}
 
 	return data;
 }
@@ -177,6 +183,8 @@ uint8_t vsmjtria_state::keyboard_r()
 template <uint8_t Which>
 void vsmjtria_state::keyboard_w(uint8_t data)
 {
+	// bits 6-5 are always set when accessed, unknown purpose
+	// 0x60 (at boot only, not read back), then 0x61 -> 0x62 -> 0x64 -> 0x68 -> 0x70 and back to 0x61
 	m_keyboard_cmd[Which] = data;
 }
 
@@ -229,14 +237,14 @@ static INPUT_PORTS_START( vsmjtria )
 	// TODO: deduplicate all inputs here
 	// either use a C-style macro or device-ify
 	PORT_START("P1_COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // masked out after being read
 
 	PORT_START("P2_COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x1e, IP_ACTIVE_LOW, IPT_UNKNOWN ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // masked out after being read
 
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Single Start")
@@ -472,6 +480,8 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 {
 	config.set_perfect_quantum("cpu0"); // crude way to make comms work - does it have FIFOs rather than latches?
 
+	// Both CPUs are LH0080A -> Z80A, nominally 4 MHz
+	// Clock also controls sound tempo, which at /4 sounds too fast already.
 	Z80(config, m_cpu[0], 20_MHz_XTAL / 5); // divider guessed
 	m_cpu[0]->set_addrmap(AS_PROGRAM, &vsmjtria_state::main_prg_map);
 	m_cpu[0]->set_addrmap(AS_IO, &vsmjtria_state::main_io_map);
@@ -604,4 +614,4 @@ void vsmjtria_state::init_vsmjtria()
 } // Anonymous namespace
 
 
-GAME( 1986, vsmjtria, 0, vsmjtria, vsmjtria, vsmjtria_state, init_vsmjtria, ROT0, "Dyna", "VS Mahjong Triangle", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // puts Home Data in RAM? coins and CPU comms not working
+GAME( 1986, vsmjtria, 0, vsmjtria, vsmjtria, vsmjtria_state, init_vsmjtria, ROT0, "Dyna", "VS Mahjong Triangle", MACHINE_SUPPORTS_SAVE ) // puts Home Data in RAM?
