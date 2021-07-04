@@ -361,7 +361,7 @@ Jumpers set on GFX PCB to scope monitor:
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
 #include "video/k037122.h"
-#include "video/voodoo.h"
+#include "video/voodoo_2.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

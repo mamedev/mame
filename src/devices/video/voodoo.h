@@ -16,14 +16,9 @@
 #include "screen.h"
 
 
-#define USE_MEMORY_VIEWS (0)
-
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-// maximum number of TMUs
-static constexpr int MAX_TMU = 2;
 
 // enumeration specifying which model of Voodoo we are emulating
 enum voodoo_model : u8
@@ -36,7 +31,6 @@ enum voodoo_model : u8
 
 // nominal clock values
 static constexpr u32 STD_VOODOO_1_CLOCK = 50000000;
-static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
 
 
 //**************************************************************************
@@ -75,7 +69,6 @@ static constexpr bool EAT_CYCLES = true;
 //**************************************************************************
 
 class voodoo_1_device;
-class voodoo_2_device;
 
 namespace voodoo
 {
@@ -311,6 +304,90 @@ private:
 	std::string m_string;     // string
 };
 
+
+// ======================> static_register_table_entry
+
+// static_register_table_entry represents a read/write handler pair for Voodoo
+// registers, along with a valid mask, access flags, and a string name
+template<typename BaseType>
+struct static_register_table_entry
+{
+	static constexpr u32 make_mask(int maskbits)
+	{
+		if (maskbits == 0)
+			return 0;
+		if (maskbits == 32)
+			return 0xffffffff;
+		return (1 << maskbits) - 1;
+	}
+
+	using read_handler = u32 (BaseType::*)(u32 chipmask, u32 regnum);
+	using write_handler = u32 (BaseType::*)(u32 chipmask, u32 regnum, u32 data);
+
+	u32 m_mask;                // mask to apply to written data
+	u32 m_chipmask_flags;      // valid chips, plus flags
+	char const *m_name;        // string name
+	write_handler m_write;     // write handler
+	read_handler m_read;       // read handler
+};
+
+
+// ======================> register_table_entry
+
+// register_table_entry is a live version of static_register_table_entry with
+// bound delegates in place of the member function pointers
+class register_table_entry
+{
+public:
+	// internal delegates
+	using read_handler = delegate<u32 (u32, u32)>;
+	using write_handler = delegate<u32 (u32, u32, u32)>;
+
+	// flags for the chipmask
+	static constexpr u32 CHIPMASK_NA       = 0x0000;
+	static constexpr u32 CHIPMASK_FBI      = 0x0001;
+	static constexpr u32 CHIPMASK_TREX     = 0x0006;
+	static constexpr u32 CHIPMASK_FBI_TREX = 0x0007;
+
+	// flags for the sync state
+	static constexpr u32 SYNC_NA           = 0x0000;
+	static constexpr u32 SYNC_NOSYNC       = 0x0000;
+	static constexpr u32 SYNC_SYNC         = 0x0100;
+
+	// flags for the FIFO state
+	static constexpr u32 FIFO_NA           = 0x0000;
+	static constexpr u32 FIFO_NOFIFO       = 0x0000;
+	static constexpr u32 FIFO_FIFO         = 0x0200;
+
+	// simple getters
+	char const *name() const { return m_name; }
+	bool is_sync() const { return ((m_chipmask_flags & SYNC_SYNC) != 0); }
+	bool is_fifo() const { return ((m_chipmask_flags & FIFO_FIFO) != 0); }
+
+	// read/write helpers
+	u32 read(voodoo_1_device &device, u32 chipmask, u32 regnum) const;
+	u32 write(voodoo_1_device &device, u32 chipmask, u32 regnum, u32 data) const;
+
+	// unpack from a static entry
+	template<typename BaseType>
+	void unpack(static_register_table_entry<BaseType> const &source, BaseType &device)
+	{
+		m_mask = source.m_mask;
+		m_chipmask_flags = source.m_chipmask_flags;
+		m_name = source.m_name;
+		m_write = write_handler(source.m_write, &device);
+		m_read = read_handler(source.m_read, &device);
+	}
+
+private:
+	// internal state
+	u32 m_mask;                // mask to apply to written data
+	u32 m_chipmask_flags;      // valid chips, plus flags
+	char const *m_name;        // string name
+	write_handler m_write;     // write handler
+	read_handler m_read;       // read handler
+};
+
 }
 
 
@@ -388,6 +465,18 @@ class voodoo_1_device : public generic_voodoo_device
 		STALLED_UNTIL_FIFO_LWM,
 		STALLED_UNTIL_FIFO_EMPTY
 	};
+
+	// flags for LFB writes
+	static constexpr u8 LFB_RGB_PRESENT_0       = 0x01;
+	static constexpr u8 LFB_ALPHA_PRESENT_0     = 0x02;
+	static constexpr u8 LFB_DEPTH_PRESENT_0     = 0x04;
+	static constexpr u8 LFB_DEPTH_PRESENT_MSW_0 = 0x08;
+	static constexpr u8 LFB_PIXEL0_MASK         = 0x0f;
+
+	static constexpr u8 LFB_RGB_PRESENT_1       = 0x10;
+	static constexpr u8 LFB_ALPHA_PRESENT_1     = 0x20;
+	static constexpr u8 LFB_DEPTH_PRESENT_1     = 0x40;
+	static constexpr u8 LFB_PIXEL1_MASK         = 0x70;
 
 protected:
 	// number of clocks to set up a triangle (just a guess)
@@ -588,7 +677,7 @@ protected:
 	// register state
 	voodoo::voodoo_regs m_reg;               // FBI registers
 	voodoo::register_table_entry m_regtable[256]; // generated register table
-	voodoo::tmu_state m_tmu[MAX_TMU];        // TMU states
+	voodoo::tmu_state m_tmu[2];              // TMU states
 	u8 m_dac_reg[32];                        // up to 32 DAC registers
 	u8 m_dac_read_result;                    // pending DAC read result
 
@@ -619,223 +708,66 @@ protected:
 
 
 //**************************************************************************
-//  VOODOO 2 DEVICE
+//  INLINE FUNCITIONS
 //**************************************************************************
 
-namespace voodoo
+//-------------------------------------------------
+//  write - handle a write through a register table
+//  entry, performing any necessary logging
+//-------------------------------------------------
+
+inline u32 voodoo::register_table_entry::write(voodoo_1_device &device, u32 chipmask, u32 regnum, u32 data) const
 {
+	// statistics if enabled
+	if (DEBUG_STATS)
+		device.m_stats.m_reg_writes++;
 
-// ======================> command_fifo
-
-// command_fifo is a more intelligent FIFO that was introduced with the Voodoo-2
-class command_fifo
-{
-public:
-	// construction
-	command_fifo(voodoo_2_device &device);
-
-	// initialization
-	void init(u8 *ram, u32 size) { m_ram = (u32 *)ram; m_mask = (size / 4) - 1; }
-
-	// state saving
-	void register_save(save_proxy &save);
-
-	// getters
-	bool enabled() const { return m_enable; }
-	u32 address_min() const { return m_address_min; }
-	u32 address_max() const { return m_address_max; }
-	u32 read_pointer() const { return m_read_index * 4; }
-	u32 depth() const { return m_depth; }
-	u32 holes() const { return m_holes; }
-
-	// setters
-	void set_enable(bool enabled) { m_enable = enabled; }
-	void set_count_holes(bool count) { m_count_holes = count; }
-	void set_base(u32 base) { m_ram_base = base; }
-	void set_end(u32 end) { m_ram_end = end; }
-	void set_size(u32 size) { m_ram_end = m_ram_base + size; }
-	void set_read_pointer(u32 ptr) { m_read_index = ptr / 4; }
-	void set_address_min(u32 addr) { m_address_min = addr; }
-	void set_address_max(u32 addr) { m_address_max = addr; }
-	void set_depth(u32 depth) { m_depth = depth; }
-	void set_holes(u32 holes) { m_holes = holes; }
-
-	// operations
-	u32 execute_if_ready();
-
-	// write to the FIFO if within the address range
-	bool write_if_in_range(offs_t addr, u32 data)
+	// log if enabled
+	if (LOG_REGISTERS)
 	{
-		if (m_enable && addr >= m_ram_base && addr < m_ram_end)
-		{
-			write(addr, data);
-			return true;
-		}
-		return false;
+		if (regnum < voodoo_regs::reg_fvertexAx || regnum > voodoo_regs::reg_fdWdY)
+			device.logerror("VOODOO.REG:%s(%d) write = %08X\n", m_name, chipmask, data);
+		else
+			device.logerror("VOODOO.REG:%s(%d) write = %f\n", m_name, chipmask, double(u2f(data)));
 	}
-
-	// write directly to the FIFO, relative to the base
-	void write_direct(offs_t offset, u32 data)
-	{
-		write(m_ram_base + offset * 4, data);
-	}
-
-private:
-	// internal helpers
-	void consume(u32 words) { m_read_index += words; m_depth -= words; }
-	u32 peek_next() { return m_ram[m_read_index & m_mask]; }
-	u32 read_next() { u32 result = peek_next(); consume(1); return result; }
-	float read_next_float() { float result = *(float *)&m_ram[m_read_index & m_mask]; consume(1); return result; }
-
-	// internal operations
-	u32 words_needed(u32 command);
-	void write(offs_t addr, u32 data);
-
-	// packet handlers
-	using packet_handler = u32 (command_fifo::*)(u32);
-	u32 packet_type_0(u32 command);
-	u32 packet_type_1(u32 command);
-	u32 packet_type_2(u32 command);
-	u32 packet_type_3(u32 command);
-	u32 packet_type_4(u32 command);
-	u32 packet_type_5(u32 command);
-	u32 packet_type_unknown(u32 command);
-
-	// internal state
-	voodoo_2_device &m_device;     // reference to our device
-	u32 *m_ram;                    // base of RAM
-	u32 m_mask;                    // mask for RAM accesses
-	bool m_enable;                 // enabled?
-	bool m_count_holes;            // count holes?
-	u32 m_ram_base;                // base address in framebuffer RAM
-	u32 m_ram_end;                 // end address in framebuffer RAM
-	u32 m_read_index;              // current read index into 32-bit RAM
-	u32 m_address_min;             // minimum address
-	u32 m_address_max;             // maximum address
-	u32 m_depth;                   // current depth
-	u32 m_holes;                   // number of holes
-
-	static packet_handler s_packet_handler[8];
-};
-
-
-// ======================> setup_vertex
-
-// setup_vertex a set of coordinates managed by the triangle setup engine
-// that was introduced with the Voodoo-2
-struct setup_vertex
-{
-	// state saving
-	void register_save(save_proxy &save)
-	{
-		save.save_item(NAME(x));
-		save.save_item(NAME(y));
-		save.save_item(NAME(z));
-		save.save_item(NAME(wb));
-		save.save_item(NAME(r));
-		save.save_item(NAME(g));
-		save.save_item(NAME(b));
-		save.save_item(NAME(a));
-		save.save_item(NAME(s0));
-		save.save_item(NAME(t0));
-		save.save_item(NAME(w0));
-		save.save_item(NAME(s1));
-		save.save_item(NAME(t1));
-		save.save_item(NAME(w1));
-	}
-
-	float x, y;               // X, Y coordinates
-	float z, wb;              // Z and broadcast W values
-	float r, g, b, a;         // A, R, G, B values
-	float s0, t0, w0;         // W, S, T for TMU 0
-	float s1, t1, w1;         // W, S, T for TMU 1
-};
-
+	return m_write(chipmask & m_chipmask_flags, regnum, data & m_mask);
 }
 
 
-DECLARE_DEVICE_TYPE(VOODOO_2, voodoo_2_device)
+//-------------------------------------------------
+//  read - handle a read through a register table
+//  entry, performing any necessary logging
+//-------------------------------------------------
 
-// ======================> voodoo_2_device
-
-// voodoo_2_device represents the 2nd generation of 3dfx Voodoo Graphics devices;
-// these are pretty similar in architecture to the first generation, with the
-// addition of command FIFOs and several other smaller features
-class voodoo_2_device: public voodoo_1_device
+inline u32 voodoo::register_table_entry::read(voodoo_1_device &device, u32 chipmask, u32 regnum) const
 {
-	friend class voodoo::command_fifo;
+	// statistics if enabled
+	if (DEBUG_STATS)
+		device.m_stats.m_reg_reads++;
 
-public:
-	// construction
-	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, MODEL_VOODOO_2) { }
+	// get the result
+	u32 result = m_read(chipmask & m_chipmask_flags, regnum) & m_mask;
 
-	// address map and read/write helpers
-	virtual void core_map(address_map &map) override;
-	virtual u32 read(offs_t offset, u32 mem_mask = ~0) override;
-	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+	// log if enabled
+	if (LOG_REGISTERS)
+	{
+		// don't log multiple identical status reads from the same address
+		bool logit = true;
+		if (regnum == voodoo_regs::reg_vdstatus)
+		{
+			offs_t pc = device.m_cpu->pc();
+			if (pc == device.m_last_status_pc && result == device.m_last_status_value)
+				logit = false;
+			device.m_last_status_pc = pc;
+			device.m_last_status_value = result;
+		}
+		if (regnum == voodoo_regs::reg_cmdFifoRdPtr)
+			logit = false;
 
-protected:
-	// internal construction
-	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
-
-	// device-level overrides
-	virtual void device_start() override;
-
-	u32 map_register_r(offs_t offset);
-	u32 map_lfb_r(offs_t offset);
-
-	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	// system management
-	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
-
-	virtual u32 execute_fifos() override;
-
-	virtual void recompute_video_memory() override;
-
-	virtual void vblank_start(void *ptr, s32 param) override;
-	virtual void vblank_stop(void *ptr, s32 param) override;
-
-	virtual s32 banshee_2d_w(offs_t offset, u32 data);
-
-	// Voodoo-2 specific read handlers
-	u32 reg_hvretrace_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifoptr_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifodepth_r(u32 chipmask, u32 regnum);
-	u32 reg_cmdfifoholes_r(u32 chipmask, u32 regnum);
-
-	// Voodoo-2 specific write handlers
-	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_video2_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_userintr_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
-	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
-
-	// Voodoo-2 specific helpers
-	s32 begin_triangle();
-	s32 draw_triangle();
-	s32 setup_and_draw_triangle();
-	virtual void update_register_view() { }
-
-	// Voodoo 2 stuff
-	u8 m_sverts = 0;                         // number of vertices ready
-	voodoo::setup_vertex m_svert[3];         // 3 setup vertices
-	voodoo::command_fifo m_cmdfifo;          // command FIFO
-#if USE_MEMORY_VIEWS
-	memory_view m_regview;                   // switchable register view
-#endif
-
-	// register table
-	static voodoo::static_register_table_entry<voodoo_2_device> const s_register_table[256];
-};
+		if (logit)
+			device.logerror("VOODOO.REG:%s read = %08X\n", m_name, result);
+	}
+	return result;
+}
 
 #endif // MAME_VIDEO_VOODOO_H

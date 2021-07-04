@@ -24,8 +24,7 @@
 static constexpr u32 STD_VOODOO_BANSHEE_CLOCK = 90000000;
 static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
 
-#include "voodoo_regs.h"
-#include "voodoo_render.h"
+#include "voodoo_2.h"
 
 
 

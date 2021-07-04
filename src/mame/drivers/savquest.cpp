@@ -55,7 +55,7 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-#include "video/voodoo.h"
+#include "video/voodoo_2.h"
 #include "machine/ds128x.h"
 #include "bus/isa/sblaster.h"
 
