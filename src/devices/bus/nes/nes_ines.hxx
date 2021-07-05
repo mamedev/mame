@@ -139,7 +139,7 @@ static const nes_mmc mmc_list[] =
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
-	{ 108, WHIRLWIND_2706 },
+	{ 108, UNL_LH28_LH54 }, // 108 is 4 variant boards, loading depends on proper NES 2.0 headers with correct submapper info
 	// 109 Unused
 	// 110 Unused
 	// 111 Ninja Ryuukenden Chinese? - Unsupported
@@ -482,6 +482,18 @@ void nes_cart_slot_device::call_load_ines()
 				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
+		}
+		// iNES Mapper 108
+		else if (mapper == 108)
+		{
+			if (submapper == 1)
+				pcb_id = UNL_DH08;
+			else if (submapper == 2)
+				pcb_id = UNL_LH31;
+			else if (submapper == 3)
+				pcb_id = UNL_LH28_LH54;
+			else if (submapper == 4)
+				pcb_id = UNL_LE05;
 		}
 		// iNES Mapper 185
 		else if (mapper == 185)

@@ -66544,7 +66544,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="bublbfds">
 		<description>Bubble Bobble (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7032" />
 			<feature name="pcb" value="UNL-KS7032" />
@@ -66557,14 +66557,16 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<!-- This has been hacked to run on a different hardware -->
-	<software name="bublbfdsa" cloneof="bublbfds" supported="partial">
-		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB)</description>
+	<!-- This has been hacked to run on different hardware -->
+	<software name="bublbfdsa" cloneof="bublbfds">
+		<description>Bubble Bobble (Asia, FDS conversion, alt PCB)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH31"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="unl_dh08" />
+			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="DH-08" />
 			<dataarea name="prg" size="131072">
 				<rom name="bubble bobble (fds conversion, kaiser hacked)(unl)[p1].prg" size="131072" crc="af799590" sha1="71511ecb1e5d99f38a04ec9291b1abd4b512c42d" offset="00000" status="baddump" />
 			</dataarea>
@@ -66574,14 +66576,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<!-- This runs on a different hardware -->
+	<!-- This runs on yet another different hardware -->
 	<software name="bublbfdsb" cloneof="bublbfds">
-		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB 2)</description>
+		<description>Bubble Bobble (Asia, FDS conversion, alt PCB 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<!-- Not clear if both or only one dump came from a cart with this serial, NesDev wiki seems to think both and that this is a later release -->
+		<info name="serial" value="LH31"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_bb" />
-			<feature name="pcb" value="UNL-BB" />
+			<feature name="slot" value="unl_lh31" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u].chr" size="32768" crc="a0f6ee8e" sha1="01e2ebbc9636bfd43876383bde3b1cb2c478f885" offset="00000" status="baddump" />
@@ -66668,9 +66671,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<description>Falsion (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH54"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="unl_lh28_lh54" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="falsion (fds conversion, whirlwind manu)(unl).prg" size="131072" crc="80589df6" sha1="12ddd9edb8894c200c9d89b9ee5673f1202aba19" offset="00000" status="baddump" />
@@ -66770,10 +66773,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="meikyfds">
 		<description>Meikyuu Jiin Dababa (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH28"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="unl_lh28_lh54" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="meikyuu jiin dababa (fds conversion) (unl).prg" size="131072" crc="d8012992" sha1="5f0943dc8145542abc70bf20e4754b3c08653399" offset="00000" status="baddump" />
@@ -66843,7 +66846,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="nazomfds" supported="no">
 		<description>Nazo no Murasamejou (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>Whirlwind Manu?</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH53"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_lh53" />
 			<feature name="pcb" value="UNL-LH53" />
@@ -66864,10 +66868,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="prowrfds">
 		<description>ProWres - Famicom Wrestling Association (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LE05"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_bb" />
-			<feature name="pcb" value="UNL-BB" />
+			<feature name="slot" value="unl_le05" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="prowres (fds conversion, le05 simplified)(unl)[u].chr" size="16384" crc="58d4719f" sha1="372c4873696578ab56bdc8ec8133099194a864b7" offset="00000" status="baddump" />
@@ -77927,10 +77931,11 @@ be better to redump them properly. -->
 	<software name="mc_20">
 		<description>20 in 1</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_20in1" />
 			<feature name="pcb" value="BMC-20IN1" />
+			<feature name="pcb_model" value="KS-7041" />
 			<dataarea name="prg" size="524288">
 				<rom name="20-in-1 [p1].prg" size="524288" crc="8f4fec56" sha1="0934fcf5f83a6ebef24d43ce577a547a31303615" offset="00000" status="baddump" />
 			</dataarea>

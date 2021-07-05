@@ -127,7 +127,6 @@ static const unif unif_list[] =
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  SVISION16_BOARD}, // mapper 53
 	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
-	{ "UNL-BB",                     0,    0, CHRRAM_0,  UNL_BB},
 	{ "UNL-LH32",                   0,    0, CHRRAM_0,  UNL_LH32},
 	{ "UNL-LH53",                   0,    0, CHRRAM_0,  UNL_LH53},
 	{ "BMC-G-146",                  0,    0, CHRRAM_0,  BMC_G146},
