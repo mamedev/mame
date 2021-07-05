@@ -95,7 +95,7 @@ address_map_entry &memory_view::memory_view_entry::operator()(offs_t start, offs
 	return (*m_map)(start, end);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian>
+template<int Level, int Width, int AddrShift>
 class memory_view_entry_specific : public memory_view::memory_view_entry
 {
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -115,8 +115,8 @@ public:
 
 	virtual ~memory_view_entry_specific() = default;
 
-	handler_entry_read <Width, AddrShift, Endian> *r() { return static_cast<handler_entry_read <Width, AddrShift, Endian> *>(m_view.m_handler_read); }
-	handler_entry_write<Width, AddrShift, Endian> *w() { return static_cast<handler_entry_write<Width, AddrShift, Endian> *>(m_view.m_handler_write); }
+	handler_entry_read <Width, AddrShift> *r() { return static_cast<handler_entry_read <Width, AddrShift> *>(m_view.m_handler_read); }
+	handler_entry_write<Width, AddrShift> *w() { return static_cast<handler_entry_write<Width, AddrShift> *>(m_view.m_handler_write); }
 
 	void invalidate_caches(read_or_write readorwrite) { return m_view.m_space->invalidate_caches(readorwrite); }
 
@@ -345,12 +345,12 @@ public:
 			check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, Endian, READ>(m_view.m_space, handler_r);
+				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, READ>(m_view.m_space, handler_r);
 				hand_r->set_address_info(nstart, nmask);
 				r()->populate(nstart, nend, nmirror, hand_r);
 			} else {
-				auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, Endian, READ>(m_view.m_space, handler_r);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_r = new handler_entry_read_delegate<AccessWidth, -AccessWidth, READ>(m_view.m_space, handler_r);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, endianness(), hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				r()->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_r->unref();
@@ -378,12 +378,12 @@ public:
 			check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(m_view.m_space, handler_w);
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, WRITE>(m_view.m_space, handler_w);
 				hand_w->set_address_info(nstart, nmask);
 				w()->populate(nstart, nend, nmirror, hand_w);
 			} else {
-				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(m_view.m_space, handler_w);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_w, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, WRITE>(m_view.m_space, handler_w);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, endianness(), hand_w, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				w()->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_w->unref();
@@ -412,21 +412,21 @@ public:
 			check_optimize_all("install_readwrite_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
-				auto hand_r = new handler_entry_read_delegate <Width, AddrShift, Endian, READ>(m_view.m_space, handler_r);
+				auto hand_r = new handler_entry_read_delegate <Width, AddrShift, READ>(m_view.m_space, handler_r);
 				hand_r->set_address_info(nstart, nmask);
 				r() ->populate(nstart, nend, nmirror, hand_r);
 
-				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>(m_view.m_space, handler_w);
+				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, WRITE>(m_view.m_space, handler_w);
 				hand_w->set_address_info(nstart, nmask);
 				w()->populate(nstart, nend, nmirror, hand_w);
 			} else {
-				auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, Endian, READ>(m_view.m_space, handler_r);
-				memory_units_descriptor<Width, AddrShift, Endian> descriptor(AccessWidth, Endian, hand_r, nstart, nend, nmask, nunitmask, ncswidth);
+				auto hand_r = new handler_entry_read_delegate <AccessWidth, -AccessWidth, READ>(m_view.m_space, handler_r);
+				memory_units_descriptor<Width, AddrShift> descriptor(AccessWidth, endianness(), hand_r, nstart, nend, nmask, nunitmask, ncswidth);
 				hand_r->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				r() ->populate_mismatched(nstart, nend, nmirror, descriptor);
 				hand_r->unref();
 
-				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, Endian, WRITE>(m_view.m_space, handler_w);
+				auto hand_w = new handler_entry_write_delegate<AccessWidth, -AccessWidth, WRITE>(m_view.m_space, handler_w);
 				descriptor.set_subunit_handler(hand_w);
 				hand_w->set_address_info(descriptor.get_handler_start(), descriptor.get_handler_mask());
 				w()->populate_mismatched(nstart, nend, nmirror, descriptor);
@@ -438,41 +438,33 @@ public:
 };
 
 namespace {
-	template<int Level, int Width, int AddrShift, endianness_t Endian> memory_view::memory_view_entry *mve_make_1(const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
-		return new memory_view_entry_specific<Level, Width, AddrShift, Endian>(config, manager, view, id);
+	template<int Level, int Width, int AddrShift> memory_view::memory_view_entry *mve_make_1(const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
+		return new memory_view_entry_specific<Level, Width, AddrShift>(config, manager, view, id);
 	}
 
-	template<int Width, int AddrShift, endianness_t Endian> memory_view::memory_view_entry *mve_make_2(int Level, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
+	template<int Width, int AddrShift> memory_view::memory_view_entry *mve_make_2(int Level, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
 		switch(Level) {
-		case 0: return mve_make_1<0, Width, AddrShift, Endian>(config, manager, view, id);
-		case 1: return mve_make_1<1, Width, AddrShift, Endian>(config, manager, view, id);
+		case 0: return mve_make_1<0, Width, AddrShift>(config, manager, view, id);
+		case 1: return mve_make_1<1, Width, AddrShift>(config, manager, view, id);
 		default: abort();
 		}
 	}
 
-	template<int Width, int AddrShift> memory_view::memory_view_entry *mve_make_3(int Level, endianness_t Endian, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
-		switch(Endian) {
-		case ENDIANNESS_LITTLE: return mve_make_2<Width, AddrShift, ENDIANNESS_LITTLE>(Level, config, manager, view, id);
-		case ENDIANNESS_BIG:    return mve_make_2<Width, AddrShift, ENDIANNESS_BIG>   (Level, config, manager, view, id);
-		default: abort();
-		}
-	}
-
-	memory_view::memory_view_entry *mve_make(int Level, int Width, int AddrShift, endianness_t Endian, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
+	memory_view::memory_view_entry *mve_make(int Level, int Width, int AddrShift, const address_space_config &config, memory_manager &manager, memory_view &view, int id) {
 		switch (Width | (AddrShift + 4)) {
-		case  8|(4+1): return mve_make_3<0,  1>(Level, Endian, config, manager, view, id);
-		case  8|(4-0): return mve_make_3<0,  0>(Level, Endian, config, manager, view, id);
-		case 16|(4+3): return mve_make_3<1,  3>(Level, Endian, config, manager, view, id);
-		case 16|(4-0): return mve_make_3<1,  0>(Level, Endian, config, manager, view, id);
-		case 16|(4-1): return mve_make_3<1, -1>(Level, Endian, config, manager, view, id);
-		case 32|(4+3): return mve_make_3<2,  3>(Level, Endian, config, manager, view, id);
-		case 32|(4-0): return mve_make_3<2,  0>(Level, Endian, config, manager, view, id);
-		case 32|(4-1): return mve_make_3<2, -1>(Level, Endian, config, manager, view, id);
-		case 32|(4-2): return mve_make_3<2, -2>(Level, Endian, config, manager, view, id);
-		case 64|(4-0): return mve_make_3<3,  0>(Level, Endian, config, manager, view, id);
-		case 64|(4-1): return mve_make_3<3, -1>(Level, Endian, config, manager, view, id);
-		case 64|(4-2): return mve_make_3<3, -2>(Level, Endian, config, manager, view, id);
-		case 64|(4-3): return mve_make_3<3, -3>(Level, Endian, config, manager, view, id);
+		case  8|(4+1): return mve_make_2<0,  1>(Level, config, manager, view, id);
+		case  8|(4-0): return mve_make_2<0,  0>(Level, config, manager, view, id);
+		case 16|(4+3): return mve_make_2<1,  3>(Level, config, manager, view, id);
+		case 16|(4-0): return mve_make_2<1,  0>(Level, config, manager, view, id);
+		case 16|(4-1): return mve_make_2<1, -1>(Level, config, manager, view, id);
+		case 32|(4+3): return mve_make_2<2,  3>(Level, config, manager, view, id);
+		case 32|(4-0): return mve_make_2<2,  0>(Level, config, manager, view, id);
+		case 32|(4-1): return mve_make_2<2, -1>(Level, config, manager, view, id);
+		case 32|(4-2): return mve_make_2<2, -2>(Level, config, manager, view, id);
+		case 64|(4-0): return mve_make_2<3,  0>(Level, config, manager, view, id);
+		case 64|(4-1): return mve_make_2<3, -1>(Level, config, manager, view, id);
+		case 64|(4-2): return mve_make_2<3, -2>(Level, config, manager, view, id);
+		case 64|(4-3): return mve_make_2<3, -3>(Level, config, manager, view, id);
 		default: abort();
 		}
 	}
@@ -487,7 +479,7 @@ memory_view::memory_view_entry &memory_view::operator[](int slot)
 	if (i == m_entry_mapping.end()) {
 		memory_view_entry *e;
 		int id = m_entries.size();
-		e = mve_make(emu::detail::handler_entry_dispatch_level(m_config->addr_width()), m_config->data_width(), m_config->addr_shift(), m_config->endianness(),
+		e = mve_make(emu::detail::handler_entry_dispatch_level(m_config->addr_width()), m_config->data_width(), m_config->addr_shift(),
 					 *m_config, m_device.machine().memory(), *this, id);
 		m_entries.resize(id+1);
 		m_entries[id].reset(e);
@@ -607,7 +599,7 @@ void memory_view::memory_view_entry::prepare_device_map(address_map &map)
 }
 
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::populate_from_map(address_map *map)
 {
 	// no map specified, use the space-specific one and import the submaps
 	if (map == nullptr) {
@@ -703,68 +695,60 @@ void memory_view::initialize_from_address_map(offs_t addrstart, offs_t addrend, 
 }
 
 namespace {
-	template<int Width, int AddrShift, endianness_t Endian> void h_make_1(int HighBits, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
+	template<int Width, int AddrShift> void h_make_1(int HighBits, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
 		switch(HighBits) {
-		case  0: r = new handler_entry_read_dispatch<std::max(0, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(0, Width), Width, AddrShift, Endian>(&space, view); break;
-		case  1: r = new handler_entry_read_dispatch<std::max(1, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(1, Width), Width, AddrShift, Endian>(&space, view); break;
-		case  2: r = new handler_entry_read_dispatch<std::max(2, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(2, Width), Width, AddrShift, Endian>(&space, view); break;
-		case  3: r = new handler_entry_read_dispatch<std::max(3, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(3, Width), Width, AddrShift, Endian>(&space, view); break;
-		case  4: r = new handler_entry_read_dispatch< 4, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 4, Width, AddrShift, Endian>(&space, view); break;
-		case  5: r = new handler_entry_read_dispatch< 5, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 5, Width, AddrShift, Endian>(&space, view); break;
-		case  6: r = new handler_entry_read_dispatch< 6, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 6, Width, AddrShift, Endian>(&space, view); break;
-		case  7: r = new handler_entry_read_dispatch< 7, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 7, Width, AddrShift, Endian>(&space, view); break;
-		case  8: r = new handler_entry_read_dispatch< 8, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 8, Width, AddrShift, Endian>(&space, view); break;
-		case  9: r = new handler_entry_read_dispatch< 9, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 9, Width, AddrShift, Endian>(&space, view); break;
-		case 10: r = new handler_entry_read_dispatch<10, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<10, Width, AddrShift, Endian>(&space, view); break;
-		case 11: r = new handler_entry_read_dispatch<11, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<11, Width, AddrShift, Endian>(&space, view); break;
-		case 12: r = new handler_entry_read_dispatch<12, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<12, Width, AddrShift, Endian>(&space, view); break;
-		case 13: r = new handler_entry_read_dispatch<13, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<13, Width, AddrShift, Endian>(&space, view); break;
-		case 14: r = new handler_entry_read_dispatch<14, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<14, Width, AddrShift, Endian>(&space, view); break;
-		case 15: r = new handler_entry_read_dispatch<15, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<15, Width, AddrShift, Endian>(&space, view); break;
-		case 16: r = new handler_entry_read_dispatch<16, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<16, Width, AddrShift, Endian>(&space, view); break;
-		case 17: r = new handler_entry_read_dispatch<17, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<17, Width, AddrShift, Endian>(&space, view); break;
-		case 18: r = new handler_entry_read_dispatch<18, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<18, Width, AddrShift, Endian>(&space, view); break;
-		case 19: r = new handler_entry_read_dispatch<19, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<19, Width, AddrShift, Endian>(&space, view); break;
-		case 20: r = new handler_entry_read_dispatch<20, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<20, Width, AddrShift, Endian>(&space, view); break;
-		case 21: r = new handler_entry_read_dispatch<21, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<21, Width, AddrShift, Endian>(&space, view); break;
-		case 22: r = new handler_entry_read_dispatch<22, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<22, Width, AddrShift, Endian>(&space, view); break;
-		case 23: r = new handler_entry_read_dispatch<23, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<23, Width, AddrShift, Endian>(&space, view); break;
-		case 24: r = new handler_entry_read_dispatch<24, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<24, Width, AddrShift, Endian>(&space, view); break;
-		case 25: r = new handler_entry_read_dispatch<25, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<25, Width, AddrShift, Endian>(&space, view); break;
-		case 26: r = new handler_entry_read_dispatch<26, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<26, Width, AddrShift, Endian>(&space, view); break;
-		case 27: r = new handler_entry_read_dispatch<27, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<27, Width, AddrShift, Endian>(&space, view); break;
-		case 28: r = new handler_entry_read_dispatch<28, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<28, Width, AddrShift, Endian>(&space, view); break;
-		case 29: r = new handler_entry_read_dispatch<29, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<29, Width, AddrShift, Endian>(&space, view); break;
-		case 30: r = new handler_entry_read_dispatch<30, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<30, Width, AddrShift, Endian>(&space, view); break;
-		case 31: r = new handler_entry_read_dispatch<31, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<31, Width, AddrShift, Endian>(&space, view); break;
-		case 32: r = new handler_entry_read_dispatch<32, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<32, Width, AddrShift, Endian>(&space, view); break;
+		case  0: r = new handler_entry_read_dispatch<std::max(0, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(0, Width), Width, AddrShift>(&space, view); break;
+		case  1: r = new handler_entry_read_dispatch<std::max(1, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(1, Width), Width, AddrShift>(&space, view); break;
+		case  2: r = new handler_entry_read_dispatch<std::max(2, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(2, Width), Width, AddrShift>(&space, view); break;
+		case  3: r = new handler_entry_read_dispatch<std::max(3, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(3, Width), Width, AddrShift>(&space, view); break;
+		case  4: r = new handler_entry_read_dispatch< 4, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 4, Width, AddrShift>(&space, view); break;
+		case  5: r = new handler_entry_read_dispatch< 5, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 5, Width, AddrShift>(&space, view); break;
+		case  6: r = new handler_entry_read_dispatch< 6, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 6, Width, AddrShift>(&space, view); break;
+		case  7: r = new handler_entry_read_dispatch< 7, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 7, Width, AddrShift>(&space, view); break;
+		case  8: r = new handler_entry_read_dispatch< 8, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 8, Width, AddrShift>(&space, view); break;
+		case  9: r = new handler_entry_read_dispatch< 9, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 9, Width, AddrShift>(&space, view); break;
+		case 10: r = new handler_entry_read_dispatch<10, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<10, Width, AddrShift>(&space, view); break;
+		case 11: r = new handler_entry_read_dispatch<11, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<11, Width, AddrShift>(&space, view); break;
+		case 12: r = new handler_entry_read_dispatch<12, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<12, Width, AddrShift>(&space, view); break;
+		case 13: r = new handler_entry_read_dispatch<13, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<13, Width, AddrShift>(&space, view); break;
+		case 14: r = new handler_entry_read_dispatch<14, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<14, Width, AddrShift>(&space, view); break;
+		case 15: r = new handler_entry_read_dispatch<15, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<15, Width, AddrShift>(&space, view); break;
+		case 16: r = new handler_entry_read_dispatch<16, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<16, Width, AddrShift>(&space, view); break;
+		case 17: r = new handler_entry_read_dispatch<17, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<17, Width, AddrShift>(&space, view); break;
+		case 18: r = new handler_entry_read_dispatch<18, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<18, Width, AddrShift>(&space, view); break;
+		case 19: r = new handler_entry_read_dispatch<19, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<19, Width, AddrShift>(&space, view); break;
+		case 20: r = new handler_entry_read_dispatch<20, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<20, Width, AddrShift>(&space, view); break;
+		case 21: r = new handler_entry_read_dispatch<21, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<21, Width, AddrShift>(&space, view); break;
+		case 22: r = new handler_entry_read_dispatch<22, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<22, Width, AddrShift>(&space, view); break;
+		case 23: r = new handler_entry_read_dispatch<23, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<23, Width, AddrShift>(&space, view); break;
+		case 24: r = new handler_entry_read_dispatch<24, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<24, Width, AddrShift>(&space, view); break;
+		case 25: r = new handler_entry_read_dispatch<25, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<25, Width, AddrShift>(&space, view); break;
+		case 26: r = new handler_entry_read_dispatch<26, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<26, Width, AddrShift>(&space, view); break;
+		case 27: r = new handler_entry_read_dispatch<27, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<27, Width, AddrShift>(&space, view); break;
+		case 28: r = new handler_entry_read_dispatch<28, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<28, Width, AddrShift>(&space, view); break;
+		case 29: r = new handler_entry_read_dispatch<29, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<29, Width, AddrShift>(&space, view); break;
+		case 30: r = new handler_entry_read_dispatch<30, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<30, Width, AddrShift>(&space, view); break;
+		case 31: r = new handler_entry_read_dispatch<31, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<31, Width, AddrShift>(&space, view); break;
+		case 32: r = new handler_entry_read_dispatch<32, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<32, Width, AddrShift>(&space, view); break;
 		default: abort();
 		}
 	}
 
-	template<int Width, int AddrShift> void h_make_2(int HighBits, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
-		switch(Endian) {
-		case ENDIANNESS_LITTLE: h_make_1<Width, AddrShift, ENDIANNESS_LITTLE>(HighBits, space, view, r, w); break;
-		case ENDIANNESS_BIG:    h_make_1<Width, AddrShift, ENDIANNESS_BIG>   (HighBits, space, view, r, w); break;
-		default: abort();
-		}
-	}
-
-	void h_make(int HighBits, int Width, int AddrShift, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
+	void h_make(int HighBits, int Width, int AddrShift, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
 		switch (Width | (AddrShift + 4)) {
-		case  8|(4+1): h_make_2<0,  1>(HighBits, Endian, space, view, r, w); break;
-		case  8|(4-0): h_make_2<0,  0>(HighBits, Endian, space, view, r, w); break;
-		case 16|(4+3): h_make_2<1,  3>(HighBits, Endian, space, view, r, w); break;
-		case 16|(4-0): h_make_2<1,  0>(HighBits, Endian, space, view, r, w); break;
-		case 16|(4-1): h_make_2<1, -1>(HighBits, Endian, space, view, r, w); break;
-		case 32|(4+3): h_make_2<2,  3>(HighBits, Endian, space, view, r, w); break;
-		case 32|(4-0): h_make_2<2,  0>(HighBits, Endian, space, view, r, w); break;
-		case 32|(4-1): h_make_2<2, -1>(HighBits, Endian, space, view, r, w); break;
-		case 32|(4-2): h_make_2<2, -2>(HighBits, Endian, space, view, r, w); break;
-		case 64|(4-0): h_make_2<3,  0>(HighBits, Endian, space, view, r, w); break;
-		case 64|(4-1): h_make_2<3, -1>(HighBits, Endian, space, view, r, w); break;
-		case 64|(4-2): h_make_2<3, -2>(HighBits, Endian, space, view, r, w); break;
-		case 64|(4-3): h_make_2<3, -3>(HighBits, Endian, space, view, r, w); break;
+		case  8|(4+1): h_make_1<0,  1>(HighBits, space, view, r, w); break;
+		case  8|(4-0): h_make_1<0,  0>(HighBits, space, view, r, w); break;
+		case 16|(4+3): h_make_1<1,  3>(HighBits, space, view, r, w); break;
+		case 16|(4-0): h_make_1<1,  0>(HighBits, space, view, r, w); break;
+		case 16|(4-1): h_make_1<1, -1>(HighBits, space, view, r, w); break;
+		case 32|(4+3): h_make_1<2,  3>(HighBits, space, view, r, w); break;
+		case 32|(4-0): h_make_1<2,  0>(HighBits, space, view, r, w); break;
+		case 32|(4-1): h_make_1<2, -1>(HighBits, space, view, r, w); break;
+		case 32|(4-2): h_make_1<2, -2>(HighBits, space, view, r, w); break;
+		case 64|(4-0): h_make_1<3,  0>(HighBits, space, view, r, w); break;
+		case 64|(4-1): h_make_1<3, -1>(HighBits, space, view, r, w); break;
+		case 64|(4-2): h_make_1<3, -2>(HighBits, space, view, r, w); break;
+		case 64|(4-3): h_make_1<3, -3>(HighBits, space, view, r, w); break;
 		default: abort();
 		}
 	}
@@ -790,7 +774,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		offs_t span = addrstart ^ addrend;
 		u32 awidth = 32 - count_leading_zeros_32(span);
 
-		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write);
+		h_make(awidth, m_config->data_width(), m_config->addr_shift(), space, *this, m_handler_read, m_handler_write);
 		m_handler_read->ref();
 		m_handler_write->ref();
 	}
@@ -826,7 +810,7 @@ void memory_view::memory_view_entry::check_range_address(const char *function, o
 		fatalerror("%s: The range %x-%x exceeds the view window boundaries %x-%x.\n", function, addrstart, addrend, m_view.m_addrstart, m_view.m_addrend);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	VPRINTF("memory_view::install_ram_generic(%s-%s mirror=%s, %s, %p)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -843,7 +827,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	// map for read
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
 	{
-		auto hand_r = new handler_entry_read_memory<Width, AddrShift, Endian>(m_view.m_space, baseptr);
+		auto hand_r = new handler_entry_read_memory<Width, AddrShift>(m_view.m_space, baseptr);
 		hand_r->set_address_info(nstart, nmask);
 		r()->populate(nstart, nend, nmirror, hand_r);
 	}
@@ -851,7 +835,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	// map for write
 	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE)
 	{
-		auto hand_w = new handler_entry_write_memory<Width, AddrShift, Endian>(m_view.m_space, baseptr);
+		auto hand_w = new handler_entry_write_memory<Width, AddrShift>(m_view.m_space, baseptr);
 		hand_w->set_address_info(nstart, nmask);
 		w()->populate(nstart, nend, nmirror, hand_w);
 	}
@@ -859,7 +843,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	invalidate_caches(readorwrite);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
 	VPRINTF("memory_view::unmap(%*x-%*x mirror=%*x, %s, %s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -875,14 +859,14 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 
 	// read space
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE) {
-		auto handler = static_cast<handler_entry_read<Width, AddrShift, Endian> *>(quiet ? m_view.m_space->nop_r() : m_view.m_space->unmap_r());
+		auto handler = static_cast<handler_entry_read<Width, AddrShift> *>(quiet ? m_view.m_space->nop_r() : m_view.m_space->unmap_r());
 		handler->ref();
 		r()->populate(nstart, nend, nmirror, handler);
 	}
 
 	// write space
 	if (readorwrite == read_or_write::WRITE || readorwrite == read_or_write::READWRITE) {
-		auto handler = static_cast<handler_entry_write<Width, AddrShift, Endian> *>(quiet ? m_view.m_space->nop_w() : m_view.m_space->unmap_w());
+		auto handler = static_cast<handler_entry_write<Width, AddrShift> *>(quiet ? m_view.m_space->nop_w() : m_view.m_space->unmap_w());
 		handler->ref();
 		w()->populate(nstart, nend, nmirror, handler);
 	}
@@ -890,7 +874,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	invalidate_caches(readorwrite);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_view(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_view &view)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_view(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_view &view)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_view", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -899,12 +883,12 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	w()->select_u(m_id);
 
 	auto handlers = view.make_handlers(*m_view.m_space, addrstart, addrend);
-	r()->populate(nstart, nend, nmirror, static_cast<handler_entry_read <Width, AddrShift, Endian> *>(handlers.first));
-	w()->populate(nstart, nend, nmirror, static_cast<handler_entry_write<Width, AddrShift, Endian> *>(handlers.second));
+	r()->populate(nstart, nend, nmirror, static_cast<handler_entry_read <Width, AddrShift> *>(handlers.first));
+	w()->populate(nstart, nend, nmirror, static_cast<handler_entry_write<Width, AddrShift> *>(handlers.second));
 	view.make_subdispatch(key()); // Must be called after populate
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_read_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_read_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -914,7 +898,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto handler = new handler_entry_read_tap<Width, AddrShift, Endian>(m_view.m_space, *mph, name, tap);
+	auto handler = new handler_entry_read_tap<Width, AddrShift>(m_view.m_space, *mph, name, tap);
 	r()->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
@@ -923,7 +907,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	return mph;
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_write_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tap, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_write_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -933,7 +917,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto handler = new handler_entry_write_tap<Width, AddrShift, Endian>(m_view.m_space, *mph, name, tap);
+	auto handler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *mph, name, tap);
 	w()->populate_passthrough(nstart, nend, nmirror, handler);
 	handler->unref();
 
@@ -942,7 +926,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	return mph;
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
+template<int Level, int Width, int AddrShift> memory_passthrough_handler *memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_tap(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string name, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapr, std::function<void (offs_t offset, uX &data, uX mem_mask)> tapw, memory_passthrough_handler *mph)
 {
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_readwrite_tap", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
@@ -952,11 +936,11 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	r()->select_u(m_id);
 	w()->select_u(m_id);
 
-	auto rhandler = new handler_entry_read_tap <Width, AddrShift, Endian>(m_view.m_space, *mph, name, tapr);
+	auto rhandler = new handler_entry_read_tap <Width, AddrShift>(m_view.m_space, *mph, name, tapr);
 	r() ->populate_passthrough(nstart, nend, nmirror, rhandler);
 	rhandler->unref();
 
-	auto whandler = new handler_entry_write_tap<Width, AddrShift, Endian>(m_view.m_space, *mph, name, tapw);
+	auto whandler = new handler_entry_write_tap<Width, AddrShift>(m_view.m_space, *mph, name, tapw);
 	w()->populate_passthrough(nstart, nend, nmirror, whandler);
 	whandler->unref();
 
@@ -965,7 +949,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	return mph;
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask, int cswidth)
 {
 	check_range_address("install_device_delegate", addrstart, addrend);
 	address_map map(*m_view.m_space, addrstart, addrend, unitmask, cswidth, m_view.m_device, delegate);
@@ -974,7 +958,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	populate_from_map(&map);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF("memory_view::install_readwrite_port(%*x-%*x mirror=%*x, read=\"%s\" / write=\"%s\")\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -996,7 +980,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_view.m_name, m_view.m_device.tag());
 
 		// map the range and set the ioport
-		auto hand_r = new handler_entry_read_ioport<Width, AddrShift, Endian>(m_view.m_space, port);
+		auto hand_r = new handler_entry_read_ioport<Width, AddrShift>(m_view.m_space, port);
 		r()->populate(nstart, nend, nmirror, hand_r);
 	}
 
@@ -1008,13 +992,13 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_view.m_name, m_view.m_device.tag());
 
 		// map the range and set the ioport
-		auto hand_w = new handler_entry_write_ioport<Width, AddrShift, Endian>(m_view.m_space, port);
+		auto hand_w = new handler_entry_write_ioport<Width, AddrShift>(m_view.m_space, port);
 		w()->populate(nstart, nend, nmirror, hand_w);
 	}
 
 	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
+template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Level, Width, AddrShift>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank)
 {
 	VPRINTF("memory_view::install_readwrite_bank(%*x-%*x mirror=%*x, read=\"%s\" / write=\"%s\")\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1030,7 +1014,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	// map the read bank
 	if (rbank != nullptr)
 	{
-		auto hand_r = new handler_entry_read_memory_bank<Width, AddrShift, Endian>(m_view.m_space, *rbank);
+		auto hand_r = new handler_entry_read_memory_bank<Width, AddrShift>(m_view.m_space, *rbank);
 		hand_r->set_address_info(nstart, nmask);
 		r()->populate(nstart, nend, nmirror, hand_r);
 	}
@@ -1038,7 +1022,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	// map the write bank
 	if (wbank != nullptr)
 	{
-		auto hand_w = new handler_entry_write_memory_bank<Width, AddrShift, Endian>(m_view.m_space, *wbank);
+		auto hand_w = new handler_entry_write_memory_bank<Width, AddrShift>(m_view.m_space, *wbank);
 		hand_w->set_address_info(nstart, nmask);
 		w()->populate(nstart, nend, nmirror, hand_w);
 	}

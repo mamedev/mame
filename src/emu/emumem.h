@@ -469,7 +469,7 @@ constexpr int handler_entry_dispatch_lowbits(int highbits, int width, int ashift
 
 // ======================> memory_units_descritor forwards declaration
 
-template<int Width, int AddrShift, endianness_t Endian> class memory_units_descriptor;
+template<int Width, int AddrShift> class memory_units_descriptor;
 
 
 
@@ -558,9 +558,9 @@ protected:
 
 // Provides the populate/read/get_ptr/lookup API
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_passthrough;
+template<int Width, int AddrShift> class handler_entry_read_passthrough;
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read : public handler_entry
+template<int Width, int AddrShift> class handler_entry_read : public handler_entry
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -568,8 +568,8 @@ public:
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
 	struct mapping {
-		handler_entry_read<Width, AddrShift, Endian> *original;
-		handler_entry_read<Width, AddrShift, Endian> *patched;
+		handler_entry_read<Width, AddrShift> *original;
+		handler_entry_read<Width, AddrShift> *patched;
 		u8 ukey;
 	};
 
@@ -578,9 +578,9 @@ public:
 
 	virtual uX read(offs_t offset, uX mem_mask) const = 0;
 	virtual void *get_ptr(offs_t offset) const;
-	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift, Endian> *&handler) const;
+	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_read<Width, AddrShift> *&handler) const;
 
-	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler) {
+	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_read<Width, AddrShift> *handler) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		if(mirror)
@@ -589,10 +589,10 @@ public:
 			populate_nomirror(start, end, start, end, handler);
 	}
 
-	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift, Endian> *handler);
-	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift, Endian> *handler);
+	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> *handler);
+	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read<Width, AddrShift> *handler);
 
-	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
+	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		std::vector<mapping> mappings;
@@ -602,10 +602,10 @@ public:
 			populate_mismatched_nomirror(start, end, start, end, descriptor, START|END, mappings);
 	}
 
-	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings);
-	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings);
 
-	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler) {
+	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		std::vector<mapping> mappings;
@@ -615,26 +615,26 @@ public:
 			populate_passthrough_nomirror(start, end, start, end, handler, mappings);
 	}
 
-	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
-	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_read_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings);
 
 	// Remove a set of passthrough handlers, leaving the lower handler in their place
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
 
 	// Return the internal structures of the root dispatch
-	virtual const handler_entry_read<Width, AddrShift, Endian> *const *get_dispatch() const;
+	virtual const handler_entry_read<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges);
-	virtual handler_entry_read<Width, AddrShift, Endian> *dup();
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual handler_entry_read<Width, AddrShift> *dup();
 };
 
 // =====================-> The parent class of all write handlers
 
 // Provides the populate/write/get_ptr/lookup API
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_passthrough;
+template<int Width, int AddrShift> class handler_entry_write_passthrough;
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write : public handler_entry
+template<int Width, int AddrShift> class handler_entry_write : public handler_entry
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
@@ -642,8 +642,8 @@ public:
 	static constexpr u32 NATIVE_MASK = Width + AddrShift >= 0 ? make_bitmask<u32>(Width + AddrShift) : 0;
 
 	struct mapping {
-		handler_entry_write<Width, AddrShift, Endian> *original;
-		handler_entry_write<Width, AddrShift, Endian> *patched;
+		handler_entry_write<Width, AddrShift> *original;
+		handler_entry_write<Width, AddrShift> *patched;
 		u8 ukey;
 	};
 
@@ -652,9 +652,9 @@ public:
 
 	virtual void write(offs_t offset, uX data, uX mem_mask) const = 0;
 	virtual void *get_ptr(offs_t offset) const;
-	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift, Endian> *&handler) const;
+	virtual void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift> *&handler) const;
 
-	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler) {
+	inline void populate(offs_t start, offs_t end, offs_t mirror, handler_entry_write<Width, AddrShift> *handler) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		if(mirror)
@@ -663,10 +663,10 @@ public:
 			populate_nomirror(start, end, start, end, handler);
 	}
 
-	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift, Endian> *handler);
-	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift, Endian> *handler);
+	virtual void populate_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> *handler);
+	virtual void populate_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write<Width, AddrShift> *handler);
 
-	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor) {
+	inline void populate_mismatched(offs_t start, offs_t end, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 
@@ -677,10 +677,10 @@ public:
 			populate_mismatched_nomirror(start, end, start, end, descriptor, START|END, mappings);
 	}
 
-	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, u8 rkey, std::vector<mapping> &mappings);
-	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift, Endian> &descriptor, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, const memory_units_descriptor<Width, AddrShift> &descriptor, u8 rkey, std::vector<mapping> &mappings);
+	virtual void populate_mismatched_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, const memory_units_descriptor<Width, AddrShift> &descriptor, std::vector<mapping> &mappings);
 
-	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler) {
+	inline void populate_passthrough(offs_t start, offs_t end, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift> *handler) {
 		start &= ~NATIVE_MASK;
 		end |= NATIVE_MASK;
 		std::vector<mapping> mappings;
@@ -690,24 +690,24 @@ public:
 			populate_passthrough_nomirror(start, end, start, end, handler, mappings);
 	}
 
-	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
-	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift, Endian> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_nomirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings);
+	virtual void populate_passthrough_mirror(offs_t start, offs_t end, offs_t ostart, offs_t oend, offs_t mirror, handler_entry_write_passthrough<Width, AddrShift> *handler, std::vector<mapping> &mappings);
 
 	// Remove a set of passthrough handlers, leaving the lower handler in their place
 	virtual void detach(const std::unordered_set<handler_entry *> &handlers);
 
 	// Return the internal structures of the root dispatch
-	virtual const handler_entry_write<Width, AddrShift, Endian> *const *get_dispatch() const;
+	virtual const handler_entry_write<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift, Endian> **dispatch, handler_entry::range *ranges);
-	virtual handler_entry_write<Width, AddrShift, Endian> *dup();
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual handler_entry_write<Width, AddrShift> *dup();
 };
 
 // =====================-> Passthrough handler management structure
 class memory_passthrough_handler
 {
-	template<int Width, int AddrShift, endianness_t Endian> friend class handler_entry_read_passthrough;
-	template<int Width, int AddrShift, endianness_t Endian> friend class handler_entry_write_passthrough;
+	template<int Width, int AddrShift> friend class handler_entry_read_passthrough;
+	template<int Width, int AddrShift> friend class handler_entry_write_passthrough;
 
 public:
 	memory_passthrough_handler(address_space &space) : m_space(space) {}
@@ -724,8 +724,8 @@ private:
 
 // =====================-> Forward declaration for address_space
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_unmapped;
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_unmapped;
+template<int Width, int AddrShift> class handler_entry_read_unmapped;
+template<int Width, int AddrShift> class handler_entry_write_unmapped;
 
 // ======================> address offset -> byte offset
 
@@ -993,14 +993,14 @@ template<int Width, int AddrShift, endianness_t Endian, int TargetWidth, bool Al
 
 // ======================> Direct dispatching
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX dispatch_read(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift, Endian> *const *dispatch)
+template<int Level, int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX dispatch_read(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->read(offset, mem_mask);
 }
 
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void dispatch_write(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift, Endian> *const *dispatch)
+template<int Level, int Width, int AddrShift> void dispatch_write(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
 {
 	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
 	return dispatch[(offset & mask) >> LowBits]->write(offset, data, mem_mask);
@@ -1068,15 +1068,15 @@ private:
 
 	offs_t                      m_addrmask;                // address mask
 
-	const handler_entry_read<Width, AddrShift, Endian> *const *m_dispatch_read;
-	const handler_entry_write<Width, AddrShift, Endian> *const *m_dispatch_write;
+	const handler_entry_read<Width, AddrShift> *const *m_dispatch_read;
+	const handler_entry_write<Width, AddrShift> *const *m_dispatch_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0)) {
-		return dispatch_read<Level, Width, AddrShift, Endian>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);;
+		return dispatch_read<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
 	}
 
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
-		dispatch_write<Level, Width, AddrShift, Endian>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);;
+		dispatch_write<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);
 	}
 
 	void set(address_space *space, std::pair<const void *, const void *> rw);
@@ -1174,11 +1174,11 @@ private:
 	offs_t                      m_addrend_r;               // maximum valid address for reading
 	offs_t                      m_addrstart_w;             // minimum valid address for writing
 	offs_t                      m_addrend_w;               // maximum valid address for writing
-	handler_entry_read <Width, AddrShift, Endian> *m_cache_r;  // read cache
-	handler_entry_write<Width, AddrShift, Endian> *m_cache_w;  // write cache
+	handler_entry_read <Width, AddrShift> *m_cache_r;  // read cache
+	handler_entry_write<Width, AddrShift> *m_cache_w;  // write cache
 
-	handler_entry_read <Width, AddrShift, Endian> *m_root_read;  // decode tree roots
-	handler_entry_write<Width, AddrShift, Endian> *m_root_write;
+	handler_entry_read <Width, AddrShift> *m_root_read;  // decode tree roots
+	handler_entry_write<Width, AddrShift> *m_root_write;
 
 	NativeType read_native(offs_t address, NativeType mask = ~NativeType(0));
 	void write_native(offs_t address, NativeType data, NativeType mask = ~NativeType(0));
@@ -1539,8 +1539,8 @@ class address_space : public address_space_installer
 {
 	friend class memory_bank;
 	friend class memory_block;
-	template<int Width, int AddrShift, endianness_t Endian> friend class handler_entry_read_unmapped;
-	template<int Width, int AddrShift, endianness_t Endian> friend class handler_entry_write_unmapped;
+	template<int Width, int AddrShift> friend class handler_entry_read_unmapped;
+	template<int Width, int AddrShift> friend class handler_entry_write_unmapped;
 
 	struct notifier_t {
 		std::function<void (read_or_write)> m_notifier;
@@ -1653,8 +1653,8 @@ public:
 	void prepare_device_map(address_map &map);
 	void populate_from_map(address_map *map = nullptr);
 
-	template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_unmapped <Width, AddrShift, Endian> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift, Endian> *>(m_unmap_r); }
-	template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_unmapped<Width, AddrShift, Endian> *get_unmap_w() const { return static_cast<handler_entry_write_unmapped<Width, AddrShift, Endian> *>(m_unmap_w); }
+	template<int Width, int AddrShift> handler_entry_read_unmapped <Width, AddrShift> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift> *>(m_unmap_r); }
+	template<int Width, int AddrShift> handler_entry_write_unmapped<Width, AddrShift> *get_unmap_w() const { return static_cast<handler_entry_write_unmapped<Width, AddrShift> *>(m_unmap_w); }
 
 	handler_entry *unmap_r() const { return m_unmap_r; }
 	handler_entry *unmap_w() const { return m_unmap_w; }
@@ -1809,9 +1809,9 @@ private:
 class memory_view
 {
 	template<int Level, int Width, int AddrShift, endianness_t Endian> friend class address_space_specific;
-	template<int Level, int Width, int AddrShift, endianness_t Endian> friend class memory_view_entry_specific;
-	template<int HighBits, int Width, int AddrShift, endianness_t Endian> friend class handler_entry_write_dispatch;
-	template<int HighBits, int Width, int AddrShift, endianness_t Endian> friend class handler_entry_read_dispatch;
+	template<int Level, int Width, int AddrShift> friend class memory_view_entry_specific;
+	template<int HighBits, int Width, int AddrShift> friend class handler_entry_write_dispatch;
+	template<int HighBits, int Width, int AddrShift> friend class handler_entry_read_dispatch;
 	friend class memory_view_entry;
 	friend class address_map_entry;
 	friend class address_map;
@@ -2030,8 +2030,8 @@ set(address_space *space, std::pair<const void *, const void *> rw)
 {
 	m_space = space;
 	m_addrmask = space->addrmask();
-	m_dispatch_read  = (const handler_entry_read <Width, AddrShift, Endian> *const *)(rw.first);
-	m_dispatch_write = (const handler_entry_write<Width, AddrShift, Endian> *const *)(rw.second);
+	m_dispatch_read  = (const handler_entry_read <Width, AddrShift> *const *)(rw.first);
+	m_dispatch_write = (const handler_entry_write<Width, AddrShift> *const *)(rw.second);
 }
 
 
@@ -2054,8 +2054,8 @@ set(address_space *space, std::pair<void *, void *> rw)
 									   m_cache_w = nullptr;
 								   }
 							   });
-	m_root_read  = (handler_entry_read <Width, AddrShift, Endian> *)(rw.first);
-	m_root_write = (handler_entry_write<Width, AddrShift, Endian> *)(rw.second);
+	m_root_read  = (handler_entry_read <Width, AddrShift> *)(rw.first);
+	m_root_write = (handler_entry_write<Width, AddrShift> *)(rw.second);
 
 	// Protect against a wandering memset
 	m_addrstart_r = 1;
