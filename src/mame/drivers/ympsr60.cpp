@@ -649,7 +649,7 @@ void psr60_state::psr_common(machine_config &config)
 	m_ic205->add_route(0, m_ic206a, 1.0);
 
 	FILTER_RC(config, m_postbbd_rc);
-	m_postbbd_rc->set_rc(filter_rc_device::LOWPASS_2C, RES_K(22), 0, 0, CAP_U(0.0015));
+	m_postbbd_rc->set_rc(filter_rc_device::LOWPASS, RES_K(22), 0, 0, CAP_U(0.0015));
 	m_postbbd_rc->add_route(0, m_ic205, 1.0);
 
 	MIXER(config, m_bbd_mixer);
@@ -665,7 +665,7 @@ void psr60_state::psr_common(machine_config &config)
 	m_ic204b->add_route(0, m_bbd, 1.0);
 
 	FILTER_RC(config, m_first_rc);
-	m_first_rc->set_rc(filter_rc_device::LOWPASS_2C, RES_R(22), 0, 0, CAP_U(0.0015));
+	m_first_rc->set_rc(filter_rc_device::LOWPASS, RES_R(22), 0, 0, CAP_U(0.0015));
 	m_first_rc->add_route(0, m_ic204b, 1.0);
 
 	// not accurate, not correctly modeling the 22k resistor bypassing the 22k resistor in series

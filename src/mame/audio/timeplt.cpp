@@ -103,7 +103,7 @@ void timeplt_audio_device::set_filter(filter_rc_device &device, int data)
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
 
-	device.filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 5100, 0, CAP_P(C));
+	device.filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 5100, 0, CAP_P(C));
 }
 
 
