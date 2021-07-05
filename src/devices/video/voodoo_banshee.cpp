@@ -34,6 +34,13 @@
 using namespace voodoo;
 
 
+
+void banshee_io_regs::register_save(save_proxy &save)
+{
+	save.save_item(NAME(m_regs));
+}
+
+
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -77,13 +84,14 @@ u32 voodoo_banshee_device_base::execute_fifos()
 int voodoo_banshee_device_base::update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if bypassing the clut, don't worry about the rest
-	if (BIT(m_reg_io[io_vidProcCfg], 11))
+	u32 config = m_io_regs.read(banshee_io_regs::vidProcCfg);
+	if (BIT(config, 11))
 		return update_common(bitmap, cliprect, m_shared->rgb565);
 
 	// if the CLUT is dirty, recompute the pens array
 	if (m_clut_dirty)
 	{
-		rgb_t const *clutbase = &m_clut[256 * BIT(m_reg_io[io_vidProcCfg], 13)];
+		rgb_t const *clutbase = &m_clut[256 * BIT(config, 13)];
 
 		// compute R/G/B pens first
 		u8 rtable[32], gtable[64], btable[32];
@@ -136,17 +144,18 @@ void voodoo_banshee_device_base::device_start()
 		m_clut[pen] = rgb_t(pen, pen, pen);
 
 	// initialize banshee registers
-	memset(m_reg_io, 0, sizeof(m_reg_io));
-	m_reg_io[io_pciInit0] = 0x01800040;
-	m_reg_io[io_sipMonitor] = 0x40000000;
-	m_reg_io[io_lfbMemoryConfig] = 0x000a2200;
-	m_reg_io[io_dramInit0] = 0x00579d29;
+	m_io_regs.reset();
+	m_io_regs.write(banshee_io_regs::pciInit0, 0x01800040);
+	m_io_regs.write(banshee_io_regs::sipMonitor, 0x40000000);
+	m_io_regs.write(banshee_io_regs::lfbMemoryConfig, 0x000a2200);
+	u32 dram0 = 0x00579d29;
 	if (m_fbmem_in_mb == 16)
-		m_reg_io[io_dramInit0] |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
+		dram0 |= 0x0c000000;      // Midway Vegas (denver) expects 2 banks of 16MBit SGRAMs
 	else
-		m_reg_io[io_dramInit0] |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
-	m_reg_io[io_dramInit1] = 0x00f02200;
-	m_reg_io[io_tmuGbeInit] = 0x00000bfb;
+		dram0 |= 0x08000000;      // Konami Viper expects 16MBit SGRAMs
+	m_io_regs.write(banshee_io_regs::dramInit0, dram0);
+	m_io_regs.write(banshee_io_regs::dramInit1, 0x00f02200);
+	m_io_regs.write(banshee_io_regs::tmuGbeInit, 0x00000bfb);
 }
 
 
@@ -156,7 +165,7 @@ void voodoo_banshee_device_base::register_save(save_proxy &save, u32 total_alloc
 
 	// Voodoo Banshee stuff
 	save.save_class(NAME(m_cmdfifo2));
-	save.save_item(NAME(m_reg_io));
+	save.save_class(NAME(m_io_regs));
 	save.save_item(NAME(m_reg_agp));
 	save.save_item(NAME(m_reg_vga));
 	save.save_item(NAME(m_reg_vga_crtc));
@@ -329,6 +338,50 @@ u32 voodoo_banshee_device_base::reg_overbuffer_w(u32 chipmask, u32 regnum, u32 d
 {
 	if (BIT(chipmask, 0)) m_reg.write(regnum, data);
 	return 0;
+}
+
+void voodoo_banshee_device_base::recompute_video()
+{
+	// get horizontal total and vertical total from CRTC registers
+	u32 htotal = (m_reg_vga_crtc[0] + 5) * 8;
+	u32 vtotal = (m_reg_vga_crtc[6] | (BIT(m_reg_vga_crtc[7], 0) << 8) | (BIT(m_reg_vga_crtc[7], 5) << 9)) + 2;
+	if (htotal == 0 || vtotal == 0)
+		return;
+
+	// compute start/stop for vertical retrace
+	u32 vstart = m_reg_vga_crtc[0x10] | (BIT(m_reg_vga_crtc[7], 2) << 8) | (BIT(m_reg_vga_crtc[7], 7) << 9);
+	u32 vstop = m_reg_vga_crtc[0x11] & 0xf;
+
+	// compare to see if vstop is before or after low 4 bits of vstart
+	if (vstop < (vstart & 0xf))
+		vstop |= (vstart + 0x10) & ~0xf;
+	else
+		vstop |= vstart & ~0xf;
+
+	// get pll k, m and n from pllCtrl0
+	const u32 pll0 = m_io_regs.read(banshee_io_regs::pllCtrl0);
+	const u32 k = BIT(pll0, 0, 2);
+	const u32 m = BIT(pll0, 2, 6);
+	const u32 n = BIT(pll0, 8, 8);
+	const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
+	const double frame_period = vtotal * htotal / video_clock;
+
+	// compute scaled screen size, using the overlay fraction if specified
+	u32 dudx = m_io_regs.read(banshee_io_regs::vidOverlayDudx);
+	u32 dvdy = m_io_regs.read(banshee_io_regs::vidOverlayDvdy);
+	u32 width = (dudx != 0) ? ((m_width * dudx) >> 20) : m_width;
+	u32 height = (dvdy != 0) ? ((m_height * dvdy) >> 20) : m_height;
+	if (LOG_REGISTERS)
+		logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n", htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
+
+	// configure the screen
+	rectangle visarea(0, width - 1, 0, height - 1);
+	screen().configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+
+	// set the vsync start and stop
+	m_vsyncstart = vstart;
+	m_vsyncstop = vstop;
+	adjust_vblank_start_timer();
 }
 
 
@@ -586,44 +639,41 @@ u8 voodoo_banshee_device_base::banshee_vga_r(offs_t offset)
 
 u32 voodoo_banshee_device_base::banshee_io_r(offs_t offset, u32 mem_mask)
 {
-	u32 result;
+	// by default just return regular data
+	offset &= 0x3f;
+	u32 result = m_io_regs.read(offset);
 
-	offset &= 0xff/4;
-
-	/* switch off the offset */
+	// handle special offsets
 	switch (offset)
 	{
-		case io_status:
+		// status reflects the voodoo status
+		case banshee_io_regs::status:
 			result = m_regtable[voodoo_regs::reg_vdstatus].read(*this, 1, voodoo_regs::reg_vdstatus);
 			break;
 
-		case io_dacData:
-			result = m_clut[m_reg_io[io_dacAddr] & 0x1ff] = m_reg_io[offset];
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_dac_r(%X)\n", machine().describe_context(), m_reg_io[io_dacAddr] & 0x1ff);
+		// DAC data reads fetch data from the CLUT
+		case banshee_io_regs::dacData:
+			result = m_clut[BIT(m_io_regs.read(banshee_io_regs::dacAddr), 0, 9)];
 			break;
 
-		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
-		case io_vgac0:  case io_vgac4:  case io_vgac8:  case io_vgacc:
-		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
+		// VGA reads are special and byte-wise
+		case banshee_io_regs::vgab0: case banshee_io_regs::vgab4: case banshee_io_regs::vgab8: case banshee_io_regs::vgabc:
+		case banshee_io_regs::vgac0: case banshee_io_regs::vgac4: case banshee_io_regs::vgac8: case banshee_io_regs::vgacc:
+		case banshee_io_regs::vgad0: case banshee_io_regs::vgad4: case banshee_io_regs::vgad8: case banshee_io_regs::vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
-				result |= banshee_vga_r(offset*4+0) << 0;
+				result |= banshee_vga_r(offset * 4 + 0) << 0;
 			if (ACCESSING_BITS_8_15)
-				result |= banshee_vga_r(offset*4+1) << 8;
+				result |= banshee_vga_r(offset * 4 + 1) << 8;
 			if (ACCESSING_BITS_16_23)
-				result |= banshee_vga_r(offset*4+2) << 16;
+				result |= banshee_vga_r(offset * 4 + 2) << 16;
 			if (ACCESSING_BITS_24_31)
-				result |= banshee_vga_r(offset*4+3) << 24;
-			break;
-
-		default:
-			result = m_reg_io[offset];
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_r(%s)\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset]);
+				result |= banshee_vga_r(offset * 4 + 3) << 24;
 			break;
 	}
 
+	if (LOG_REGISTERS)
+		logerror("%s:banshee_io_r(%s) = %08X\n", machine().describe_context(), m_io_regs.name(offset), result);
 	return result;
 }
 
@@ -1044,132 +1094,73 @@ void voodoo_banshee_device_base::banshee_vga_w(offs_t offset, u8 data)
 
 void voodoo_banshee_device_base::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 old;
+	// need to block if Y origin is changing; everything else can proceed
+	offset &= 0x3f;
+	if (offset == banshee_io_regs::miscInit0)
+		m_renderer->wait(m_io_regs.name(offset));
 
-	offset &= 0xff/4;
-	old = m_reg_io[offset];
+	// fetch original value and compute new value
+	u32 newval = m_io_regs.write(offset, data, mem_mask);
 
-	/* switch off the offset */
-	switch (offset)
+	// handle special cases
+	switch (offset & 0x3f)
 	{
-		case io_vidProcCfg:
-			COMBINE_DATA(&m_reg_io[offset]);
-			if ((m_reg_io[offset] ^ old) & 0x2000)
-				m_clut_dirty = true;
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
-			break;
-
-		case io_dacData:
-			COMBINE_DATA(&m_reg_io[offset]);
-			if (m_reg_io[offset] != m_clut[m_reg_io[io_dacAddr] & 0x1ff])
-			{
-				m_clut[m_reg_io[io_dacAddr] & 0x1ff] = m_reg_io[offset];
-				m_clut_dirty = true;
-			}
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_dac_w(%X) = %08X & %08X\n", machine().describe_context(), m_reg_io[io_dacAddr] & 0x1ff, data, mem_mask);
-			break;
-
-		case io_miscInit0:
-			m_renderer->wait(voodoo_regs::s_banshee_io_reg_name[offset]);
-			COMBINE_DATA(&m_reg_io[offset]);
-			m_renderer->set_yorigin((data >> 18) & 0xfff);
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
-			break;
-
-		case io_vidScreenSize:
-			if (data & 0xfff)
-				m_width = data & 0xfff;
-			if (data & 0xfff000)
-				m_height = (data >> 12) & 0xfff;
-			[[fallthrough]];
-		case io_vidOverlayDudx:
-		case io_vidOverlayDvdy:
+		// dacData writes indirectly to the CLUT registers; mark dirty if changing
+		case banshee_io_regs::dacData:
 		{
-			COMBINE_DATA(&m_reg_io[offset]);
-
-			// Get horizontal total and vertical total from CRTC registers
-			int htotal = (m_reg_vga_crtc[0] + 5) * 8;
-			int vtotal = m_reg_vga_crtc[6];
-			vtotal |= ((m_reg_vga_crtc[7] >> 0) & 0x1) << 8;
-			vtotal |= ((m_reg_vga_crtc[7] >> 5) & 0x1) << 9;
-			vtotal += 2;
-
-			int vstart = m_reg_vga_crtc[0x10];
-			vstart |= ((m_reg_vga_crtc[7] >> 2) & 0x1) << 8;
-			vstart |= ((m_reg_vga_crtc[7] >> 7) & 0x1) << 9;
-
-			int vstop = m_reg_vga_crtc[0x11] & 0xf;
-			// Compare to see if vstop is before or after low 4 bits of vstart
-			if (vstop < (vstart & 0xf))
-				vstop |= (vstart + 0x10) & ~0xf;
-			else
-				vstop |= vstart & ~0xf;
-
-			// Get pll k, m and n from pllCtrl0
-			const u32 k = (m_reg_io[io_pllCtrl0] >> 0) & 0x3;
-			const u32 m = (m_reg_io[io_pllCtrl0] >> 2) & 0x3f;
-			const u32 n = (m_reg_io[io_pllCtrl0] >> 8) & 0xff;
-			const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
-			const double frame_period = vtotal * htotal / video_clock;
-			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
-
-			int width = m_width;
-			int height = m_height;
-			//m_xoffs = hbp;
-			//m_yoffs = vbp;
-
-			if (m_reg_io[io_vidOverlayDudx] != 0)
-				width = (m_width * m_reg_io[io_vidOverlayDudx]) / 1048576;
-			if (m_reg_io[io_vidOverlayDvdy] != 0)
-				height = (m_height * m_reg_io[io_vidOverlayDvdy]) / 1048576;
-			if (LOG_REGISTERS)
-				logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n",
-					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
-			if (htotal > 0 && vtotal > 0) {
-				rectangle visarea(0, width - 1, 0, height - 1);
-				screen().configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
-
-				// Set the vsync start and stop
-				m_vsyncstart = vstart;
-				m_vsyncstop = vstop;
-				adjust_vblank_start_timer();
+			u32 dacaddr = BIT(m_io_regs.read(banshee_io_regs::dacAddr), 0, 9);
+			if (newval != m_clut[dacaddr])
+			{
+				m_clut[dacaddr] = newval;
+				m_clut_dirty = true;
 			}
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
 			break;
 		}
 
-		case io_lfbMemoryConfig:
-			m_lfb_base = (data & 0x1fff) << (12-2);
-			m_lfb_stride = ((data >> 13) & 7) + 9;
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
+		// miscInit0 can alter the rendering Y origin
+		case banshee_io_regs::miscInit0:
+			m_renderer->set_yorigin(BIT(newval, 18, 12));
 			break;
 
-		case io_vgab0:  case io_vgab4:  case io_vgab8:  case io_vgabc:
-		case io_vgac0:  case io_vgac4:  case io_vgac8:  case io_vgacc:
-		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
+		// vidScreenSize causes the video to be reconfigured
+		case banshee_io_regs::vidScreenSize:
+			if (BIT(newval, 0, 12) != 0)
+				m_width = BIT(data, 0, 12);
+			if (BIT(newval, 12, 12) != 0)
+				m_height = BIT(data, 12, 12);
+			if (m_width != 0 && m_height != 0)
+				recompute_video();
+			break;
+
+		// vidOverlayDudx/vidOverlayDudy impact how we configure the video
+		case banshee_io_regs::vidOverlayDudx:
+		case banshee_io_regs::vidOverlayDvdy:
+			recompute_video();
+			break;
+
+		// lfbMemoryConfig affects LFB reads
+		case banshee_io_regs::lfbMemoryConfig:
+			m_lfb_base = BIT(newval, 0, 13) << (12-2);
+			m_lfb_stride = BIT(newval, 13, 3) + 9;
+			break;
+
+		// VGA is special and byte-wise
+		case banshee_io_regs::vgab0: case banshee_io_regs::vgab4: case banshee_io_regs::vgab8: case banshee_io_regs::vgabc:
+		case banshee_io_regs::vgac0: case banshee_io_regs::vgac4: case banshee_io_regs::vgac8: case banshee_io_regs::vgacc:
+		case banshee_io_regs::vgad0: case banshee_io_regs::vgad4: case banshee_io_regs::vgad8: case banshee_io_regs::vgadc:
 			if (ACCESSING_BITS_0_7)
-				banshee_vga_w(offset*4+0, data >> 0);
+				banshee_vga_w(offset * 4 + 0, BIT(data, 0, 8));
 			if (ACCESSING_BITS_8_15)
-				banshee_vga_w(offset*4+1, data >> 8);
+				banshee_vga_w(offset * 4 + 1, BIT(data, 8, 8));
 			if (ACCESSING_BITS_16_23)
-				banshee_vga_w(offset*4+2, data >> 16);
+				banshee_vga_w(offset * 4 + 2, BIT(data, 16, 8));
 			if (ACCESSING_BITS_24_31)
-				banshee_vga_w(offset*4+3, data >> 24);
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
-			break;
-
-		default:
-			COMBINE_DATA(&m_reg_io[offset]);
-			if (LOG_REGISTERS)
-				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), voodoo_regs::s_banshee_io_reg_name[offset], data, mem_mask);
+				banshee_vga_w(offset * 4 + 3, BIT(data, 24, 8));
 			break;
 	}
+
+	if (LOG_REGISTERS)
+		logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), m_io_regs.name(offset), data, mem_mask);
 }
 
 
@@ -1516,7 +1507,7 @@ void voodoo_3_device::device_start()
  *
  *************************************/
 
-char const *const voodoo_regs::s_banshee_io_reg_name[0x40] =
+char const *const banshee_io_regs::s_names[0x40] =
 {
 	/* 0x000 */
 	"status",       "pciInit0",     "sipMonitor",   "lfbMemoryConfig",

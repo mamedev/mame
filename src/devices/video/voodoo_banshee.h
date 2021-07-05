@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "voodoo.h"
+#include "voodoo_2.h"
 
 
 //**************************************************************************
@@ -23,9 +23,6 @@
 // nominal clock values
 static constexpr u32 STD_VOODOO_BANSHEE_CLOCK = 90000000;
 static constexpr u32 STD_VOODOO_3_CLOCK = 132000000;
-
-#include "voodoo_2.h"
-
 
 
 //**************************************************************************
@@ -87,6 +84,8 @@ protected:
 
 	virtual void texture_w(offs_t offset, u32 data) override;
 
+	void recompute_video();
+
 	// device-level overrides
 	u32 banshee_agp_r(offs_t offset);
 	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -110,7 +109,9 @@ protected:
 	// internal state
 	voodoo::command_fifo m_cmdfifo2;         // second command FIFO
 
-	u32 m_reg_io[0x40];               // I/O registers
+	u32 m_lfb_base;
+
+	voodoo::banshee_io_regs m_io_regs;               // I/O registers
 	u32 m_reg_agp[0x80];              // AGP registers
 	u8 m_reg_vga[0x20];              // VGA registers
 	u8 m_reg_vga_crtc[0x27];             // VGA CRTC registers

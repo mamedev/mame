@@ -714,7 +714,6 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 	m_frontbuf(0),
 	m_backbuf(1),
 	m_video_changed(true),
-	m_lfb_base(0),
 	m_lfb_stride(0),
 	m_width(512),
 	m_height(384),
@@ -748,6 +747,7 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 
 voodoo_1_device::~voodoo_1_device()
 {
+	m_renderer->wait("Destruction");
 }
 
 
@@ -968,7 +968,6 @@ void voodoo_1_device::device_start()
 	m_swaps_pending = 0;
 	m_video_changed = true;
 
-	m_lfb_base = 0;
 	m_lfb_stride = 10;
 
 	m_width = 512;
@@ -1099,7 +1098,6 @@ void voodoo_1_device::register_save(save_proxy &save, u32 total_allocation)
 	save.save_item(NAME(m_backbuf));
 
 	// linear frame buffer access configuration
-	save.save_item(NAME(m_lfb_base));
 	save.save_item(NAME(m_lfb_stride));
 
 	// video configuration

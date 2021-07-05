@@ -655,7 +655,6 @@ protected:
 	bool m_video_changed;                    // did the frontbuffer video change?
 
 	// linear frame buffer access configuration
-	u32 m_lfb_base;                          // base of LFB in memory
 	u8 m_lfb_stride;                         // stride of LFB accesses in bits
 
 	// video configuration

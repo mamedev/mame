@@ -1140,7 +1140,6 @@ private:
 	static u8 const s_alias_map[0x40];
 
 public:
-	static char const *const s_banshee_io_reg_name[0x40];
 	static char const *const s_banshee_agp_reg_name[0x50];
 };
 
@@ -1184,76 +1183,106 @@ static constexpr u32 banshee2D_command =        0x070/4;
  *
  *************************************/
 
-// 0x000
-static constexpr u32 io_status =                       0x000/4;
-static constexpr u32 io_pciInit0 =                     0x004/4;
-static constexpr u32 io_sipMonitor =                   0x008/4;
-static constexpr u32 io_lfbMemoryConfig =              0x00c/4;
-static constexpr u32 io_miscInit0 =                    0x010/4;
-static constexpr u32 io_miscInit1 =                    0x014/4;
-static constexpr u32 io_dramInit0 =                    0x018/4;
-static constexpr u32 io_dramInit1 =                    0x01c/4;
-static constexpr u32 io_agpInit =                      0x020/4;
-static constexpr u32 io_tmuGbeInit =                   0x024/4;
-static constexpr u32 io_vgaInit0 =                     0x028/4;
-static constexpr u32 io_vgaInit1 =                     0x02c/4;
-static constexpr u32 io_dramCommand =                  0x030/4;
-static constexpr u32 io_dramData =                     0x034/4;
+class banshee_io_regs
+{
+public:
+	// 0x000
+	static constexpr u32 status =                       0x000/4;
+	static constexpr u32 pciInit0 =                     0x004/4;
+	static constexpr u32 sipMonitor =                   0x008/4;
+	static constexpr u32 lfbMemoryConfig =              0x00c/4;
+	static constexpr u32 miscInit0 =                    0x010/4;
+	static constexpr u32 miscInit1 =                    0x014/4;
+	static constexpr u32 dramInit0 =                    0x018/4;
+	static constexpr u32 dramInit1 =                    0x01c/4;
+	static constexpr u32 agpInit =                      0x020/4;
+	static constexpr u32 tmuGbeInit =                   0x024/4;
+	static constexpr u32 vgaInit0 =                     0x028/4;
+	static constexpr u32 vgaInit1 =                     0x02c/4;
+	static constexpr u32 dramCommand =                  0x030/4;
+	static constexpr u32 dramData =                     0x034/4;
 
-// 0x040
-static constexpr u32 io_pllCtrl0 =                     0x040/4;
-static constexpr u32 io_pllCtrl1 =                     0x044/4;
-static constexpr u32 io_pllCtrl2 =                     0x048/4;
-static constexpr u32 io_dacMode =                      0x04c/4;
-static constexpr u32 io_dacAddr =                      0x050/4;
-static constexpr u32 io_dacData =                      0x054/4;
-static constexpr u32 io_rgbMaxDelta =                  0x058/4;
-static constexpr u32 io_vidProcCfg =                   0x05c/4;
-static constexpr u32 io_hwCurPatAddr =                 0x060/4;
-static constexpr u32 io_hwCurLoc =                     0x064/4;
-static constexpr u32 io_hwCurC0 =                      0x068/4;
-static constexpr u32 io_hwCurC1 =                      0x06c/4;
-static constexpr u32 io_vidInFormat =                  0x070/4;
-static constexpr u32 io_vidInStatus =                  0x074/4;
-static constexpr u32 io_vidSerialParallelPort =        0x078/4;
-static constexpr u32 io_vidInXDecimDeltas =            0x07c/4;
+	// 0x040
+	static constexpr u32 pllCtrl0 =                     0x040/4;
+	static constexpr u32 pllCtrl1 =                     0x044/4;
+	static constexpr u32 pllCtrl2 =                     0x048/4;
+	static constexpr u32 dacMode =                      0x04c/4;
+	static constexpr u32 dacAddr =                      0x050/4;
+	static constexpr u32 dacData =                      0x054/4;
+	static constexpr u32 rgbMaxDelta =                  0x058/4;
+	static constexpr u32 vidProcCfg =                   0x05c/4;
+	static constexpr u32 hwCurPatAddr =                 0x060/4;
+	static constexpr u32 hwCurLoc =                     0x064/4;
+	static constexpr u32 hwCurC0 =                      0x068/4;
+	static constexpr u32 hwCurC1 =                      0x06c/4;
+	static constexpr u32 vidInFormat =                  0x070/4;
+	static constexpr u32 vidInStatus =                  0x074/4;
+	static constexpr u32 vidSerialParallelPort =        0x078/4;
+	static constexpr u32 vidInXDecimDeltas =            0x07c/4;
 
-// 0x080
-static constexpr u32 io_vidInDecimInitErrs =           0x080/4;
-static constexpr u32 io_vidInYDecimDeltas =            0x084/4;
-static constexpr u32 io_vidPixelBufThold =             0x088/4;
-static constexpr u32 io_vidChromaMin =                 0x08c/4;
-static constexpr u32 io_vidChromaMax =                 0x090/4;
-static constexpr u32 io_vidCurrentLine =               0x094/4;
-static constexpr u32 io_vidScreenSize =                0x098/4;
-static constexpr u32 io_vidOverlayStartCoords =        0x09c/4;
-static constexpr u32 io_vidOverlayEndScreenCoord =     0x0a0/4;
-static constexpr u32 io_vidOverlayDudx =               0x0a4/4;
-static constexpr u32 io_vidOverlayDudxOffsetSrcWidth = 0x0a8/4;
-static constexpr u32 io_vidOverlayDvdy =               0x0ac/4;
-static constexpr u32 io_vgab0 =                        0x0b0/4;
-static constexpr u32 io_vgab4 =                        0x0b4/4;
-static constexpr u32 io_vgab8 =                        0x0b8/4;
-static constexpr u32 io_vgabc =                        0x0bc/4;
+	// 0x080
+	static constexpr u32 vidInDecimInitErrs =           0x080/4;
+	static constexpr u32 vidInYDecimDeltas =            0x084/4;
+	static constexpr u32 vidPixelBufThold =             0x088/4;
+	static constexpr u32 vidChromaMin =                 0x08c/4;
+	static constexpr u32 vidChromaMax =                 0x090/4;
+	static constexpr u32 vidCurrentLine =               0x094/4;
+	static constexpr u32 vidScreenSize =                0x098/4;
+	static constexpr u32 vidOverlayStartCoords =        0x09c/4;
+	static constexpr u32 vidOverlayEndScreenCoord =     0x0a0/4;
+	static constexpr u32 vidOverlayDudx =               0x0a4/4;
+	static constexpr u32 vidOverlayDudxOffsetSrcWidth = 0x0a8/4;
+	static constexpr u32 vidOverlayDvdy =               0x0ac/4;
+	static constexpr u32 vgab0 =                        0x0b0/4;
+	static constexpr u32 vgab4 =                        0x0b4/4;
+	static constexpr u32 vgab8 =                        0x0b8/4;
+	static constexpr u32 vgabc =                        0x0bc/4;
 
-// 0x0c0
-static constexpr u32 io_vgac0 =                        0x0c0/4;
-static constexpr u32 io_vgac4 =                        0x0c4/4;
-static constexpr u32 io_vgac8 =                        0x0c8/4;
-static constexpr u32 io_vgacc =                        0x0cc/4;
-static constexpr u32 io_vgad0 =                        0x0d0/4;
-static constexpr u32 io_vgad4 =                        0x0d4/4;
-static constexpr u32 io_vgad8 =                        0x0d8/4;
-static constexpr u32 io_vgadc =                        0x0dc/4;
-static constexpr u32 io_vidOverlayDvdyOffset =         0x0e0/4;
-static constexpr u32 io_vidDesktopStartAddr =          0x0e4/4;
-static constexpr u32 io_vidDesktopOverlayStride =      0x0e8/4;
-static constexpr u32 io_vidInAddr0 =                   0x0ec/4;
-static constexpr u32 io_vidInAddr1 =                   0x0f0/4;
-static constexpr u32 io_vidInAddr2 =                   0x0f4/4;
-static constexpr u32 io_vidInStride =                  0x0f8/4;
-static constexpr u32 io_vidCurrOverlayStartAddr =      0x0fc/4;
+	// 0x0c0
+	static constexpr u32 vgac0 =                        0x0c0/4;
+	static constexpr u32 vgac4 =                        0x0c4/4;
+	static constexpr u32 vgac8 =                        0x0c8/4;
+	static constexpr u32 vgacc =                        0x0cc/4;
+	static constexpr u32 vgad0 =                        0x0d0/4;
+	static constexpr u32 vgad4 =                        0x0d4/4;
+	static constexpr u32 vgad8 =                        0x0d8/4;
+	static constexpr u32 vgadc =                        0x0dc/4;
+	static constexpr u32 vidOverlayDvdyOffset =         0x0e0/4;
+	static constexpr u32 vidDesktopStartAddr =          0x0e4/4;
+	static constexpr u32 vidDesktopOverlayStride =      0x0e8/4;
+	static constexpr u32 vidInAddr0 =                   0x0ec/4;
+	static constexpr u32 vidInAddr1 =                   0x0f0/4;
+	static constexpr u32 vidInAddr2 =                   0x0f4/4;
+	static constexpr u32 vidInStride =                  0x0f8/4;
+	static constexpr u32 vidCurrOverlayStartAddr =      0x0fc/4;
 
+	// constructor
+	banshee_io_regs()
+	{
+		for (int index = 0; index < std::size(m_regs); index++)
+			m_regs[index] = 0;
+	}
+
+	// state saving
+	void register_save(save_proxy &save);
+
+	// reset
+	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
+
+	// getters
+	char const *name(u32 index) const { return s_names[index & 0x3f]; }
+
+	// simple readers
+	u32 read(u32 index) const { return m_regs[index & 0x3f]; }
+
+	// write access
+	u32 write(u32 index, u32 data, u32 mem_mask = 0xffffffff) { return COMBINE_DATA(&m_regs[index & 0x3f]); }
+
+	// special swap history helper
+private:
+	u32 m_regs[0x40];
+	static char const * const s_names[0x40];
+};
 
 
 /*************************************
