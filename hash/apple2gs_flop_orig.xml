@@ -3290,4 +3290,27 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="chbrabc">
+		<description>Charlie Brown's ABC's</description>
+		<year>1990</year>
+		<publisher>American School Publishers</publisher>
+		<info name="release" value="2021-07-04"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 1 MB Apple IIgs ROM 01 or later. -->
+		<!--"Charlie Brown's ABC's" is a 1990 educational game developed by Susan Mahoney &amp; Associates, and distributed by American School Publishers. It requires a 1 MB Apple IIgs ROM 01 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Startup disk"/>
+			<dataarea name="flop" size="1296195">
+				<rom name="charlie brown's abc's iigs - disk 1 - startup.woz" size="1296195" crc="19dc28dc" sha1="4b69e7c157efbb2041bf1e807995db0e65bbe7c6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program disk"/>
+			<dataarea name="flop" size="1312579">
+				<rom name="charlie brown's abc's iigs - disk 2 - program.woz" size="1312579" crc="fa6a09bd" sha1="0f5ee238fecffcb794102dbcc17879a11de5d7c5"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

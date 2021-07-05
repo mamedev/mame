@@ -42868,4 +42868,228 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="pfootpps">
+		<description>Pro Football Pointspread Prediction System (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Systems Design Lab</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Pro Football Pointspread Prediction System" is a 1982 sports program developed by Ken Perry and distributed by Systems Design Lab. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - System disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pro football pointspread prediction system (4am crack) disk 1 - system.dsk" size="143360" crc="3fbca853" sha1="9adca99f6bf04c45400631768cf71ac02b67abae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pro football pointspread prediction system (4am crack) disk 2 - data.dsk" size="143360" crc="8867facf" sha1="26be3337f12c70ec6407b6b0c6062fd843b246ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbdrawng">
+		<description>Stickybear Drawing (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Stickybear Drawing" is a 1986 graphics program developed by Richard Hefter and David Cunningham, and distributed by Optimum Resource. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stickybear drawing (4am and san inc crack).dsk" size="143360" crc="c084f302" sha1="75217f3a5a60d729cd114a9646b5cbabce07e400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgm14">
+		<description>Bumble Games (Version 1.4) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Bumble Games" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.4. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.4 (4am and san inc crack).dsk" size="143360" crc="ea34ac74" sha1="253236c6da94ed7939afe551685d96d3747738ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beachlnd">
+		<description>Beach Landing (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Beach Landing" is a 1984 action game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="beach landing (4am and san inc crack).dsk" size="143360" crc="5b2034a4" sha1="dbd3bbcb0a2f014b6fbafd27c64b1242d47ddafe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapshai4">
+		<description>Temple of Apshai rev. 4 (cleanly cracked)</description>
+		<year>1979</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Temple of Apshai" is a 1979 roleplaying game designed by Jon Freeman and Jeff Johnson, ported to the Apple II by Michael Farren, and distributed by Automated Simulations. This is the fourth revision.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="temple of apshai rev. 4 (4am and san inc crack).dsk" size="143360" crc="b79ef05c" sha1="37055324e27e563a8e783d31b73f182265ed8aa6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advdbl2">
+		<description>Adventure Double Feature Volume II (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Adventure Double Feature Volume II" is a 1984 pair of adventure games developed by Dan Klassen, David G. Olmon, Pat Relf, Loretta Jones, Deborah Kovacs, Maryellen Kohn, Jeffrey Siegel, Andrew Ragan, Susan Edwards, and Amy McKinley, and distributed by Scholastic.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="adventure double feature volume ii (4am and san inc crack) side a.dsk" size="143360" crc="a23d19ed" sha1="30aa8f1fd09356aeb1e716efc24e83f61085aeb5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="adventure double feature volume ii (4am and san inc crack) side b.dsk" size="143360" crc="1d155dc9" sha1="a1924e1b6440c222e312b512273788e961a4832b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moptp81">
+		<description>Moptown Parade (1981 Version) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Moptown Parade" is a 1981 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is the 1981 release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown parade 1981 (4am and san inc crack).dsk" size="143360" crc="aa354a32" sha1="8830f3f7b9b19c0d7e188878f7b7e6c7b89d45ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crush681">
+		<description>Crush, Crumble and Chomp! (1981-06-22 Version) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Automated Simulations</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Crush, Crumble and Chomp!" is a 1981 simulation game designed by Jon Freeman and Jim Connelley, and distributed by Automated Simulations. This version is dated June 22, 1981.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crush, crumble and chomp 1981-06-22 (4am and san inc crack).dsk" size="143360" crc="d39ad177" sha1="21b9d99e8bbbe459ba5b60ecbb7baad65bb84591"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conput83">
+		<description>Con-Putation (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Softsmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Con-Putation" is a 1980 educational game developed by T.H.E.S.I.S.. This is the 1983 Softsmith re-release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="con-putation (4am and san inc crack).dsk" size="143360" crc="d6ae1de7" sha1="7cb2780b8d5a26d9909924896345d115b69f6f61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dnkondsk">
+		<description>Drinks on a Disk (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Drinks on a Disk" is a 1982 educational program developed by Henny Hall and published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="drinks on a disk (softsmith) (4am and san inc crack).dsk" size="143360" crc="91cc7c59" sha1="afdaf2649db01f07782a88be64b7f81c9134a136"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frndolvr">
+		<description>Friends or Lovers (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Friends or Lovers" is a 1982 educational program developed by Alpine Software and published by SoftSmith. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="friends or lovers (softsmith) (4am and san inc crack).dsk" size="143360" crc="8fad094b" sha1="edde096830d1434c90710ae9011525336b1a399d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltlsplr">
+		<description>Little Speller (Version 2.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Little Speller" is a 1981 educational program developed by John R. Conrad. This is the SoftSmith re-release, based on version 2.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="little speller (softsmith) (4am and san inc crack).dsk" size="143360" crc="5b3c1772" sha1="1f5b7b8c1a88b64876dfd5fb032879550bcb3beb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fnlfrntr">
+		<description>The Final Frontier (Version 1.0) (SoftSmith) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>SoftSmith</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"The Final Frontier" is a 1982 simulation game developed by Wes Huntress. This is the SoftSmith re-release, based on version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the final frontier (softsmith) (4am and san inc crack).dsk" size="143360" crc="641a9d1c" sha1="4daec6541b8e65880b2d822eb4c9e797111a6040"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frmledgp">
+		<description>Farm Ledger Pro (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Harvest Computer Systems</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Farm Ledger Pro" is a 1983 productivity program developed by Gary Randolph, Rich Conrad, Sandra Rybolt, and Kenneth Vint, and distributed by Harvest Computer Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="farm ledger pro (4am crack).dsk" size="143360" crc="b4ddbab7" sha1="60b1c7b53f00353cc2870b90d5d5195e427259cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pyobingo">
+		<description>Print Your Own BINGO Plus (Version 01.23.88) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-07-05"/>
+		<!--"Print Your Own BINGO Plus" is a 1988 productivity program developed by Phil Mansour and distributed by Hartley Courseware. This version is dated 01.23.88. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="print your own bingo plus (4am crack).dsk" size="143360" crc="09c2e5af" sha1="7cc963fe89ef2683ef3b62a469e153a944ef97f6"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
