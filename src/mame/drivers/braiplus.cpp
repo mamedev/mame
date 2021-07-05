@@ -24,7 +24,9 @@ Floppy disk holds 792kb (formatted).
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 
 class braiplus_state : public driver_device
@@ -40,6 +42,12 @@ public:
 	void braiplus(machine_config &config);
 
 private:
+	void bank_w(u8 data);
+	void unknown_w(u8 data);
+	u8 unknown1_r();
+	u8 unknown2_r();
+	u8 unknown_dummy_r();
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
@@ -48,11 +56,42 @@ private:
 };
 
 
+void braiplus_state::bank_w(u8 data)
+{
+	// TODO: bankswitching
+}
+
+void braiplus_state::unknown_w(u8 data)
+{
+	// TODO: unknown (only high nibble used)
+}
+
+u8 braiplus_state::unknown1_r()
+{
+	// TODO: keyboard input? (only high nibble used)
+	return 0;
+}
+
+u8 braiplus_state::unknown2_r()
+{
+	// TODO: keyboard input? (only high nibble used)
+	return 0;
+}
+
+u8 braiplus_state::unknown_dummy_r()
+{
+	// TODO: what is this? (value always discarded)
+	return 0xff;
+}
+
 void braiplus_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8000).r(FUNC(braiplus_state::unknown1_r));
+	map(0x8001, 0x8001).r(FUNC(braiplus_state::unknown2_r));
+	map(0x8002, 0x8002).r(FUNC(braiplus_state::unknown_dummy_r));
 	map(0xa000, 0xbfff).ram();
-	map(0xf200, 0xf2ff).ram(); // non-volatile memory???
+	map(0xf200, 0xf2ff).ram();
 	map(0xf800, 0xffff).ram();
 }
 
@@ -62,7 +101,9 @@ void braiplus_state::io_map(address_map &map)
 	map(0x04, 0x07).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x0c, 0x0d).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x14, 0x14).nopw();
+	map(0x10, 0x10).rw("fdc", FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0x14, 0x14).w(FUNC(braiplus_state::bank_w));
+	map(0x18, 0x18).w(FUNC(braiplus_state::unknown_w));
 }
 
 
@@ -89,7 +130,13 @@ void braiplus_state::braiplus(machine_config &config)
 	Z80PIO(config, m_pio[1], 4'000'000);
 	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	I8251(config, "usart", 2'000'000);
+	i8251_device &usart(I8251(config, "usart", 2'000'000));
+	usart.rxrdy_handler().set(m_pio[1], FUNC(z80pio_device::pa3_w));
+
+	WD2793(config, "fdc", 2'000'000);
+
+	// HACK: what should be driving this?
+	CLOCK(config, "clock_hack", 100).signal_handler().set(m_pio[0], FUNC(z80pio_device::pa7_w));
 }
 
 ROM_START( braiplus )
