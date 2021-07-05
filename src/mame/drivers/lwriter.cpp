@@ -204,15 +204,15 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x400000, 0x5fffff).ram().share("dram").mirror(0x200000); // 2MB DRAM
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
-	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
-	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
-	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
+	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
+	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
+	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
+	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
 
-	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
-	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
-	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
-	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
+	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
+	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
+	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
+	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
 
 	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
 }
