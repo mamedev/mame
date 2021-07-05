@@ -139,7 +139,7 @@ static const nes_mmc mmc_list[] =
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
-	{ 108, UNL_LH28_LH54 }, // 108 is 4 variant boards, loading depends on proper NES 2.0 headers with correct submapper info
+	{ 108, UNL_LH28_LH54 }, // 108 has 4 variant boards
 	// 109 Unused
 	// 110 Unused
 	// 111 Ninja Ryuukenden Chinese? - Unsupported
@@ -483,18 +483,6 @@ void nes_cart_slot_device::call_load_ines()
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
 		}
-		// iNES Mapper 108
-		else if (mapper == 108)
-		{
-			if (submapper == 1)
-				pcb_id = UNL_DH08;
-			else if (submapper == 2)
-				pcb_id = UNL_LH31;
-			else if (submapper == 3)
-				pcb_id = UNL_LH28_LH54;
-			else if (submapper == 4)
-				pcb_id = UNL_LE05;
-		}
 		// iNES Mapper 185
 		else if (mapper == 185)
 		{
@@ -665,6 +653,13 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 89 & 93
 			else
 				m_cart->set_pcb_ctrl_mirror(true);
+			break;
+
+		case UNL_LH28_LH54:
+			if (vrom_size)
+				m_pcb_id = (vrom_size == 0x4000) ? UNL_LE05 : UNL_LH31;
+			else if (!BIT(local_options, 0))
+				m_pcb_id = UNL_DH08;
 			break;
 
 		case HES_BOARD:
@@ -977,6 +972,13 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
 			break;
+		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards
+			if (ROM[5])
+				pcb_id = (ROM[5] == 2) ? UNL_LE05 : UNL_LH31;
+			else if (!BIT(ROM[6], 0))
+				pcb_id = UNL_DH08;
+			break;
+
 	}
 
 	return nes_get_slot(pcb_id);
