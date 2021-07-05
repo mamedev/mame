@@ -15,8 +15,6 @@
 
 #include "voodoo.h"
 
-#define USE_MEMORY_VIEWS (0)
-
 
 //**************************************************************************
 //  CONSTANTS
@@ -175,9 +173,13 @@ DECLARE_DEVICE_TYPE(VOODOO_2, voodoo_2_device)
 // voodoo_2_device represents the 2nd generation of 3dfx Voodoo Graphics devices;
 // these are pretty similar in architecture to the first generation, with the
 // addition of command FIFOs and several other smaller features
-class voodoo_2_device: public voodoo_1_device
+class voodoo_2_device : public voodoo_1_device
 {
 	friend class voodoo::command_fifo;
+
+protected:
+	// internal construction
+	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 public:
 	// construction
@@ -190,38 +192,25 @@ public:
 	virtual void write(offs_t offset, u32 data, u32 mem_mask = ~0) override;
 
 protected:
-	// internal construction
-	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
-
 	// device-level overrides
 	virtual void device_start() override;
-
-	u32 map_register_r(offs_t offset);
-	u32 map_lfb_r(offs_t offset);
-
-	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	// system management
 	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation) override;
 
+	// mapped writes
+	void map_register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	// read/write and FIFO helpers
 	virtual u32 execute_fifos() override;
 
-	virtual void recompute_video_memory() override;
-
-	virtual void vblank_start(void *ptr, s32 param) override;
-	virtual void vblank_stop(void *ptr, s32 param) override;
-
-	virtual s32 banshee_2d_w(offs_t offset, u32 data);
-
-	// Voodoo-2 specific read handlers
+	// register read accessors
 	u32 reg_hvretrace_r(u32 chipmask, u32 regnum);
 	u32 reg_cmdfifoptr_r(u32 chipmask, u32 regnum);
 	u32 reg_cmdfifodepth_r(u32 chipmask, u32 regnum);
 	u32 reg_cmdfifoholes_r(u32 chipmask, u32 regnum);
 
-	// Voodoo-2 specific write handlers
+	// register write accessors
 	u32 reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_video2_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_sargb_w(u32 chipmask, u32 regnum, u32 data);
@@ -234,19 +223,26 @@ protected:
 	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
 
-	// Voodoo-2 specific helpers
+	// command FIFO-specific write handlers
+	virtual u32 cmdfifo_register_w(u32 offset, u32 data);
+	virtual u32 cmdfifo_2d_w(u32 offset, u32 data);
+
+	// VBLANK timing
+	virtual void vblank_start(void *ptr, s32 param) override;
+	virtual void vblank_stop(void *ptr, s32 param) override;
+
+	// video timing and updates
+	virtual void recompute_video_memory() override;
+
+	// rendering
 	s32 begin_triangle();
 	s32 draw_triangle();
 	s32 setup_and_draw_triangle();
-	virtual void update_register_view() { }
 
-	// Voodoo 2 stuff
+	// internal state
 	u8 m_sverts = 0;                         // number of vertices ready
 	voodoo::setup_vertex m_svert[3];         // 3 setup vertices
 	voodoo::command_fifo m_cmdfifo;          // command FIFO
-#if USE_MEMORY_VIEWS
-	memory_view m_regview;                   // switchable register view
-#endif
 
 	// register table
 	static voodoo::static_register_table_entry<voodoo_2_device> const s_register_table[256];

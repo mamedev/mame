@@ -332,6 +332,23 @@ u32 voodoo_banshee_device_base::reg_overbuffer_w(u32 chipmask, u32 regnum, u32 d
 }
 
 
+u32 voodoo_banshee_device_base::cmdfifo_register_w(u32 offset, u32 data)
+{
+	u32 regnum = BIT(offset, 0, 8);
+	if (BIT(offset, 11, 1))
+		return banshee_2d_w(regnum, data);
+
+	u32 chipmask = chipmask_from_offset(offset);
+	return m_regtable[regnum].write(*this, chipmask, regnum, data);
+}
+
+u32 voodoo_banshee_device_base::cmdfifo_2d_w(u32 offset, u32 data)
+{
+	u32 regnum = banshee2D_clip0Min + offset;
+	return banshee_2d_w(regnum, data);
+}
+
+
 s32 voodoo_banshee_device_base::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics

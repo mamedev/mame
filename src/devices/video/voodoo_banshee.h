@@ -53,7 +53,6 @@ public:
 	u8 banshee_vga_r(offs_t offset);
 	void banshee_vga_w(offs_t offset, u8 data);
 
-	virtual s32 banshee_2d_w(offs_t offset, u32 data) override;
 	virtual int update(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	virtual void core_map(address_map &map) override;
@@ -92,6 +91,7 @@ protected:
 	u32 banshee_agp_r(offs_t offset);
 	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	s32 banshee_2d_w(offs_t offset, u32 data);
 	void banshee_blit_2d(u32 data);
 	s32 lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
 
@@ -102,6 +102,10 @@ protected:
 	u32 reg_auxbufstride_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_swappending_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_overbuffer_w(u32 chipmask, u32 regnum, u32 data);
+
+	// command FIFO-specific write handlers
+	virtual u32 cmdfifo_register_w(u32 offset, u32 data) override;
+	virtual u32 cmdfifo_2d_w(u32 offset, u32 data) override;
 
 	// internal state
 	voodoo::command_fifo m_cmdfifo2;         // second command FIFO

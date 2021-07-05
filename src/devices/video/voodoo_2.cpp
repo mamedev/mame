@@ -359,17 +359,8 @@ u32 command_fifo::packet_type_1(u32 command)
 
 	// loop over all registers and write them one at a time
 	u32 cycles = 0;
-	if (m_device.model() >= MODEL_VOODOO_BANSHEE && BIT(target, 11))
-	{
-		for (u32 regbit = 0; regbit < count; regbit++, target += inc)
-			cycles += m_device.banshee_2d_w(target & 0xff, read_next());
-	}
-	else
-	{
-		u32 chipmask = m_device.chipmask_from_offset(target);
-		for (u32 regbit = 0; regbit < count; regbit++, target += inc)
-			cycles += m_device.m_regtable[target & 0xff].write(m_device, chipmask, target & 0xff, read_next());
-	}
+	for (u32 regbit = 0; regbit < count; regbit++, target += inc)
+		cycles += m_device.cmdfifo_register_w(target, read_next());
 	return cycles;
 }
 
@@ -391,21 +382,9 @@ u32 command_fifo::packet_type_2(u32 command)
 
 	// loop over all registers and write them one at a time
 	u32 cycles = 0;
-	if (m_device.model() >= MODEL_VOODOO_BANSHEE)
-	{
-		for (u32 regbit = 3; regbit <= 31; regbit++)
-			if (BIT(command, regbit))
-				cycles += m_device.banshee_2d_w(banshee2D_clip0Min + (regbit - 3), read_next());
-	}
-	else
-	{
-		for (u32 regbit = 3; regbit <= 31; regbit++)
-			if (BIT(command, regbit))
-			{
-				u32 regnum = voodoo_regs::reg_bltSrcBaseAddr + (regbit - 3);
-				cycles += m_device.m_regtable[regnum].write(m_device, 0x1, regnum, read_next());
-			}
-	}
+	for (u32 regbit = 3; regbit <= 31; regbit++)
+		if (BIT(command, regbit))
+				cycles += m_device.cmdfifo_2d_w(regbit - 3, read_next());
 	return cycles;
 }
 
@@ -561,19 +540,9 @@ u32 command_fifo::packet_type_4(u32 command)
 
 	// loop over all registers and write them one at a time
 	u32 cycles = 0;
-	if (m_device.model() >= MODEL_VOODOO_BANSHEE && BIT(target, 11))
-	{
-		for (u32 regbit = 15; regbit <= 28; regbit++, target++)
-			if (BIT(command, regbit))
-				cycles += m_device.banshee_2d_w(target & 0xff, read_next());
-	}
-	else
-	{
-		u32 chipmask = m_device.chipmask_from_offset(target);
-		for (u32 regbit = 15; regbit <= 28; regbit++, target++)
-			if (BIT(command, regbit))
-				cycles += m_device.m_regtable[target & 0xff].write(m_device, chipmask, target & 0xff, read_next());
-	}
+	for (u32 regbit = 15; regbit <= 28; regbit++, target++)
+		if (BIT(command, regbit))
+			cycles += m_device.cmdfifo_register_w(target, read_next());
 
 	// account for the extra dummy words
 	consume(BIT(command, 29, 3));
@@ -687,14 +656,95 @@ voodoo_2_device::voodoo_2_device(const machine_config &mconfig, device_type type
 	voodoo_1_device(mconfig, type, tag, owner, clock, model),
 	m_sverts(0),
 	m_cmdfifo(*this)
-#if USE_MEMORY_VIEWS
-	m_regview(*this, "registers")
-#endif
 {
 	for (int index = 0; index < std::size(m_regtable); index++)
 		m_regtable[index].unpack(s_register_table[index], *this);
 }
 
+
+//-------------------------------------------------
+//  core_map - device map for core memory access
+//-------------------------------------------------
+
+void voodoo_2_device::core_map(address_map &map)
+{
+	// Voodoo-2 memory map:
+	//
+	// cmdfifo = fbi_init7().cmdfifo_enable()
+	//
+	//   00ab----`--ccccrr`rrrrrr-- Register access (if cmdfifo == 0)
+	//                                a = alternate register map if fbi_init3().tri_register_remap()
+	//                                b = byte swizzle data if fbi_init0().swizzle_reg_writes()
+	//                                c = chip mask select
+	//                                r = register index ($00-$FF)
+	//   000-----`------rr`rrrrrr-- Register access (if cmdfifo == 1)
+	//                                r = register index ($00-$FF)
+	//   001--boo`oooooooo`oooooo-- CMDFifo write (if cmdfifo == 1)
+	//                                b = byte swizzle data
+	//                                o = cmdfifo offset
+	//   01-yyyyy`yyyyyxxx`xxxxxxx- Linear frame buffer access (16-bit)
+	//   01yyyyyy`yyyyxxxx`xxxxxx-- Linear frame buffer access (32-bit)
+	//   1-ccllll`tttttttt`sssssss- Texture memory access, where:
+	//                                c = chip mask select
+	//                                l = LOD
+	//                                t = Y index
+	//                                s = X index
+	//
+	map(0x000000, 0x3fffff).rw(FUNC(voodoo_2_device::map_register_r), FUNC(voodoo_2_device::map_register_w));
+	map(0x400000, 0x7fffff).rw(FUNC(voodoo_2_device::map_lfb_r), FUNC(voodoo_2_device::map_lfb_w));
+	map(0x800000, 0xffffff).w(FUNC(voodoo_2_device::map_texture_w));
+}
+
+
+//-------------------------------------------------
+//  read - generic read handler until everyone is
+//  using the memory map
+//-------------------------------------------------
+
+u32 voodoo_2_device::read(offs_t offset, u32 mem_mask)
+{
+	switch (offset >> (22-2))
+	{
+		case 0x000000 >> 22:
+			return map_register_r(offset);
+
+		case 0x400000 >> 22:
+			return map_lfb_r(offset - 0x400000/4);
+
+		default:
+			return 0xffffffff;
+	}
+}
+
+
+//-------------------------------------------------
+//  write - generic write handler until everyone is
+//  using the memory map
+//-------------------------------------------------
+
+void voodoo_2_device::write(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset >> (22-2))
+	{
+		case 0x000000 >> 22:
+			map_register_w(offset, data, mem_mask);
+			break;
+
+		case 0x400000 >> 22:
+			map_lfb_w(offset - 0x400000/4, data, mem_mask);
+			break;
+
+		case 0x800000 >> 22:
+		case 0xc00000 >> 22:
+			map_texture_w(offset - 0x800000/4, data, mem_mask);
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
 
 void voodoo_2_device::device_start()
 {
@@ -709,21 +759,76 @@ void voodoo_2_device::device_start()
 	m_cmdfifo.init(m_fbram, m_fbmask + 1);
 }
 
-void voodoo_2_device::recompute_video_memory()
+
+
+//-------------------------------------------------
+//  map_register_w - handle a mapped write to
+//  regular register space
+//-------------------------------------------------
+
+void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// for backwards compatibility, the triple-buffered bit is still supported
-	u32 config = m_reg.fbi_init2().enable_triple_buf();
+	bool pending = prepare_for_write();
 
-	// but if left at 0, configuration comes from fbiInit5 instead
-	if (config == 0)
-		config = m_reg.fbi_init5().buffer_allocation();
+	// handle cmdfifo writes
+	if (BIT(offset, 21-2) && m_reg.fbi_init7().cmdfifo_enable())
+	{
+		// check for byte swizzling (bit 18)
+		if (BIT(offset, 18-2))
+			data = swapendian_int32(data);
+		m_cmdfifo.write_direct(BIT(offset, 0, 16), data);
+		return;
+	}
 
-	// 6-bit tile count is assembled from various bits; tiles are 32x32
-	u32 xtiles = m_reg.fbi_init6().x_video_tiles_bit0() |
-				 (m_reg.fbi_init1().x_video_tiles() << 1) |
-				 (m_reg.fbi_init1().x_video_tiles_bit5() << 5);
-	recompute_video_memory_common(config, xtiles * 32);
+	// extract chipmask and register
+	u32 chipmask = chipmask_from_offset(offset);
+	u32 regnum = BIT(offset, 0, 8);
+
+	// handle register swizzling
+	if (BIT(offset, 20-2) && m_reg.fbi_init0().swizzle_reg_writes())
+		data = swapendian_int32(data);
+
+	// handle aliasing
+	if (BIT(offset, 21-2) && m_reg.fbi_init3().tri_register_remap())
+		offset = (offset & ~0xff) | m_reg.alias(offset);
+
+	// look up the register
+	auto const &regentry = m_regtable[regnum];
+
+	// if this is non-FIFO command, execute immediately
+	if (!regentry.is_fifo())
+		return void(regentry.write(*this, chipmask, regnum, data));
+
+	// track swap buffers
+	if (regnum == voodoo_regs::reg_swapbufferCMD)
+		m_swaps_pending++;
+
+	// if cmdfifo is enabled, ignore everything else
+	if (m_reg.fbi_init7().cmdfifo_enable())
+	{
+		logerror("Ignoring write to %s when CMDFIFO is enabled\n", regentry.name());
+		return;
+	}
+
+	// if we're busy add to the fifo
+	if (pending && m_init_enable.enable_pci_fifo())
+		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
+
+	// if we get a non-zero number of cycles back, mark things pending
+	int cycles = regentry.write(*this, chipmask, regnum, data);
+	if (cycles > 0)
+	{
+		// if we ended up with cycles, mark the operation pending
+		m_operation_end = machine().time() + clocks_to_attotime(cycles);
+		if (LOG_FIFO_VERBOSE)
+			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
+	}
 }
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
 
 void voodoo_2_device::register_save(save_proxy &save, u32 total_allocation)
 {
@@ -737,6 +842,12 @@ void voodoo_2_device::register_save(save_proxy &save, u32 total_allocation)
 	save.save_class(NAME(m_cmdfifo));
 }
 
+
+//-------------------------------------------------
+//  execute_fifos - execute commands from the FIFOs
+//  until a non-zero cycle count operation is run
+//-------------------------------------------------
+
 u32 voodoo_2_device::execute_fifos()
 {
 	// we might be in CMDFIFO mode
@@ -747,33 +858,6 @@ u32 voodoo_2_device::execute_fifos()
 	return voodoo_1_device::execute_fifos();
 }
 
-
-void voodoo_2_device::vblank_start(void *ptr, s32 param)
-{
-	voodoo_1_device::vblank_start(ptr, param);
-
-	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
-	if (m_reg.intr_ctrl().vsync_rising_enable())
-	{
-		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
-	}
-}
-
-
-void voodoo_2_device::vblank_stop(void *ptr, s32 param)
-{
-	voodoo_1_device::vblank_stop(ptr, param);
-
-	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
-	if (m_reg.intr_ctrl().vsync_falling_enable())
-	{
-		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
-		if (!m_pciint_cb.isnull())
-			m_pciint_cb(true);
-	}
-}
 
 //-------------------------------------------------
 //  reg_hvretrace_r - hvRetrace register read
@@ -790,15 +874,30 @@ u32 voodoo_2_device::reg_hvretrace_r(u32 chipmask, u32 regnum)
 	return result |= screen().hpos() << 16;
 }
 
+
+//-------------------------------------------------
+//  reg_cmdfifoptr_r - cmdFifoRdPtr register read
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_cmdfifoptr_r(u32 chipmask, u32 regnum)
 {
 	return m_cmdfifo.read_pointer();
 }
 
+
+//-------------------------------------------------
+//  reg_cmdfifodepth_r - cmdFifoDepth register read
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_cmdfifodepth_r(u32 chipmask, u32 regnum)
 {
 	return m_cmdfifo.depth();
 }
+
+
+//-------------------------------------------------
+//  reg_cmdfifoholes_r - cmdFifoHoles register read
+//-------------------------------------------------
 
 u32 voodoo_2_device::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
 {
@@ -806,7 +905,10 @@ u32 voodoo_2_device::reg_cmdfifoholes_r(u32 chipmask, u32 regnum)
 }
 
 
-// voodoo 2
+//-------------------------------------------------
+//  reg_intrctrl_w - intrCtrl register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
@@ -819,6 +921,7 @@ u32 voodoo_2_device::reg_intrctrl_w(u32 chipmask, u32 regnum, u32 data)
 	}
 	return 0;
 }
+
 
 //-------------------------------------------------
 //  reg_video2_w -- write to a video configuration
@@ -848,10 +951,16 @@ u32 voodoo_2_device::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-// voodoo 2
+
+//-------------------------------------------------
+//  reg_sargb_w -- sARGB register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
 {
 	rgb_t rgbdata(data);
+
+	// expand ARGB values into their float registers
 	m_reg.write_float(voodoo_regs::reg_sAlpha, float(rgbdata.a()));
 	m_reg.write_float(voodoo_regs::reg_sRed, float(rgbdata.r()));
 	m_reg.write_float(voodoo_regs::reg_sGreen, float(rgbdata.g()));
@@ -859,7 +968,11 @@ u32 voodoo_2_device::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
-// voodoo 2
+
+//-------------------------------------------------
+//  reg_userintr_w -- userIntr register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 {
 	m_renderer->wait("userIntrCMD");
@@ -879,6 +992,12 @@ u32 voodoo_2_device::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
+
+//-------------------------------------------------
+//  reg_cmdfifo_w -- general cmdFifo-related
+//  register writes
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
@@ -893,6 +1012,11 @@ u32 voodoo_2_device::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
+
+//-------------------------------------------------
+//  reg_cmdfifoptr_w -- cmdFifoRdPtr register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
@@ -903,6 +1027,12 @@ u32 voodoo_2_device::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 	}
 	return 0;
 }
+
+
+//-------------------------------------------------
+//  reg_cmdfifodepth_w -- cmdFifoDepth register
+//  write
+//-------------------------------------------------
 
 u32 voodoo_2_device::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 {
@@ -915,6 +1045,12 @@ u32 voodoo_2_device::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
+
+//-------------------------------------------------
+//  reg_cmdfifoholes_w -- cmdFifoHoles register
+//  write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
@@ -926,6 +1062,11 @@ u32 voodoo_2_device::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 	return 0;
 }
 
+
+//-------------------------------------------------
+//  reg_fbiinit5_7_w -- fbiInit5/6/7 register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0) && m_init_enable.enable_hw_init())
@@ -936,19 +1077,113 @@ u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 			recompute_video_memory();
 		m_cmdfifo.set_enable(m_reg.fbi_init7().cmdfifo_enable());
 		m_cmdfifo.set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
-		update_register_view();
 	}
 	return 0;
 }
+
+
+//-------------------------------------------------
+//  reg_draw_tri_w -- sDrawTri register write
+//-------------------------------------------------
 
 u32 voodoo_2_device::reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return draw_triangle();
 }
 
+
+//-------------------------------------------------
+//  reg_begin_tri_w -- sBeginTri register write
+//-------------------------------------------------
+
 u32 voodoo_2_device::reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data)
 {
 	return begin_triangle();
+}
+
+
+//-------------------------------------------------
+//  cmdfifo_register_w -- handle a register write
+//  from the cmdfifo
+//-------------------------------------------------
+
+u32 voodoo_2_device::cmdfifo_register_w(u32 offset, u32 data)
+{
+	u32 chipmask = chipmask_from_offset(offset);
+	u32 regnum = BIT(offset, 0, 8);
+	return m_regtable[regnum].write(*this, chipmask, regnum, data);
+}
+
+
+//-------------------------------------------------
+//  cmdfifo_2d_w -- handle a 2D register write
+//  from the cmdfifo
+//-------------------------------------------------
+
+u32 voodoo_2_device::cmdfifo_2d_w(u32 offset, u32 data)
+{
+	u32 regnum = voodoo_regs::reg_bltSrcBaseAddr + offset;
+	return m_regtable[regnum].write(*this, 0x1, regnum, data);
+}
+
+
+//-------------------------------------------------
+//  vblank_start -- timer callback for the start
+//  of VBLANK
+//-------------------------------------------------
+
+void voodoo_2_device::vblank_start(void *ptr, s32 param)
+{
+	voodoo_1_device::vblank_start(ptr, param);
+
+	// signal PCI VBLANK rising IRQ on Voodoo-2 and later
+	if (m_reg.intr_ctrl().vsync_rising_enable())
+	{
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_RISING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
+	}
+}
+
+
+//-------------------------------------------------
+//  vblank_stop -- timer callback for the end of
+//  VBLANK
+//-------------------------------------------------
+
+void voodoo_2_device::vblank_stop(void *ptr, s32 param)
+{
+	voodoo_1_device::vblank_stop(ptr, param);
+
+	// signal PCI VBLANK falling IRQ on Voodoo-2 and later
+	if (m_reg.intr_ctrl().vsync_falling_enable())
+	{
+		m_reg.clear_set(voodoo_regs::reg_intrCtrl, reg_intr_ctrl::EXTERNAL_PIN_ACTIVE, reg_intr_ctrl::VSYNC_FALLING_GENERATED);
+		if (!m_pciint_cb.isnull())
+			m_pciint_cb(true);
+	}
+}
+
+
+//-------------------------------------------------
+//  recompute_video_memory -- compute the layout
+//  of video memory
+//-------------------------------------------------
+
+void voodoo_2_device::recompute_video_memory()
+{
+	// for backwards compatibility, the triple-buffered bit is still supported
+	u32 config = m_reg.fbi_init2().enable_triple_buf();
+
+	// but if left at 0, configuration comes from fbiInit5 instead
+	if (config == 0)
+		config = m_reg.fbi_init5().buffer_allocation();
+
+	// 6-bit tile count is assembled from various bits; tiles are 32x32
+	u32 xtiles = m_reg.fbi_init6().x_video_tiles_bit0() |
+				 (m_reg.fbi_init1().x_video_tiles() << 1) |
+				 (m_reg.fbi_init1().x_video_tiles_bit5() << 5);
+	recompute_video_memory_common(config, xtiles * 32);
 }
 
 
@@ -1190,275 +1425,6 @@ s32 voodoo_2_device::setup_and_draw_triangle()
 
 	// draw the triangle
 	return triangle();
-}
-
-
-s32 voodoo_2_device::banshee_2d_w(offs_t offset, u32 data)
-{
-	// placeholder for Banshee 2D access
-	return 0;
-}
-
-
-#if USE_MEMORY_VIEWS
-
-//-------------------------------------------------
-//  map_register_cmdfifo_w - handle a mapped write
-//  to regular register space when cmdfifo is
-//  enabled
-//-------------------------------------------------
-
-void voodoo_2_device::map_register_cmdfifo_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// if the register is not writable in cmdfifo mode, ignore it
-	u32 regnum = offset & 0xff;
-	if (!m_reg.is_writethru(regnum))
-	{
-		// track swap buffers regardless
-		if (regnum == voodoo_regs::reg_swapbufferCMD)
-			m_swaps_pending++;
-		logerror("Ignoring write to %s in CMDFIFO mode\n", m_reg.name(offset));
-		return;
-	}
-	map_register_w(offset, data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  map_cmdfifo_w - handle a mapped write to the
-//  cmdfifo
-//-------------------------------------------------
-
-void voodoo_2_device::map_cmdfifo_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	if (BIT(offset, 18-2))
-		data = swapendian_int32(data);
-	m_cmdfifo[0].write_direct(BIT(offset, 0, 16), data);
-}
-
-#endif
-
-
-//**************************************************************************
-//  VOODOO 2 MEMORY MAP
-//**************************************************************************
-
-//-------------------------------------------------
-//  core_map - device map for core memory access
-//-------------------------------------------------
-
-void voodoo_2_device::core_map(address_map &map)
-{
-	printf("voodoo_2_device::core_map\n");
-
-	// Voodoo-2 memory map:
-	//
-	// cmdfifo = fbi_init7().cmdfifo_enable()
-	//
-	//   00ab----`--ccccrr`rrrrrr-- Register access (if cmdfifo == 0)
-	//                                a = alternate register map if fbi_init3().tri_register_remap()
-	//                                b = byte swizzle data if fbi_init0().swizzle_reg_writes()
-	//                                c = chip mask select
-	//                                r = register index ($00-$FF)
-	//   000-----`------rr`rrrrrr-- Register access (if cmdfifo == 1)
-	//                                r = register index ($00-$FF)
-	//   001--boo`oooooooo`oooooo-- CMDFifo write (if cmdfifo == 1)
-	//                                b = byte swizzle data
-	//                                o = cmdfifo offset
-	//   01-yyyyy`yyyyyxxx`xxxxxxx- Linear frame buffer access (16-bit)
-	//   01yyyyyy`yyyyxxxx`xxxxxx-- Linear frame buffer access (32-bit)
-	//   1-ccllll`tttttttt`sssssss- Texture memory access, where:
-	//                                c = chip mask select
-	//                                l = LOD
-	//                                t = Y index
-	//                                s = X index
-	//
-#if USE_MEMORY_VIEWS
-	map(0x000000, 0x3fffff).view(m_regview);
-	// cmdfifo == 0
-	m_regview[0](0x000000, 0x3fffff).rw(FUNC(voodoo_2_device::map_register_r), FUNC(voodoo_2_device::map_register_w));
-	// cmdfifo == 1
-	m_regview[1](0x000000, 0x0003ff).mirror(0x1ffc00).rw(FUNC(voodoo_2_device::map_register_r), FUNC(voodoo_2_device::map_register_cmdfifo_w));
-	m_regview[1](0x200000, 0x27ffff).mirror(0x180000).w(FUNC(voodoo_2_device::map_cmdfifo_w));
-#else
-	map(0x000000, 0x3fffff).rw(FUNC(voodoo_2_device::map_register_r), FUNC(voodoo_2_device::map_register_w));
-#endif
-
-	map(0x400000, 0x7fffff).rw(FUNC(voodoo_2_device::map_lfb_r), FUNC(voodoo_2_device::map_lfb_w));
-	map(0x800000, 0xffffff).w(FUNC(voodoo_2_device::map_texture_w));
-}
-
-u32 voodoo_2_device::read(offs_t offset, u32 mem_mask)
-{
-	switch (offset >> (22-2))
-	{
-		case 0x000000 >> 22:
-			return map_register_r(offset);
-
-		case 0x400000 >> 22:
-			return map_lfb_r(offset - 0x400000/4);
-
-		default:
-			return 0xffffffff;
-	}
-}
-
-void voodoo_2_device::write(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (offset >> (22-2))
-	{
-		case 0x000000 >> 22:
-			map_register_w(offset, data, mem_mask);
-			break;
-
-		case 0x400000 >> 22:
-			map_lfb_w(offset - 0x400000/4, data, mem_mask);
-			break;
-
-		case 0x800000 >> 22:
-		case 0xc00000 >> 22:
-			map_texture_w(offset - 0x800000/4, data, mem_mask);
-			break;
-	}
-}
-
-//-------------------------------------------------
-//  update_register_view - switch the view in
-//  response to changes in relevant bits
-//-------------------------------------------------
-
-#if USE_MEMORY_VIEWS
-void voodoo_2_device::update_register_view()
-{
-	m_regview.select(m_reg.fbi_init7().cmdfifo_enable());
-}
-#endif
-
-
-//-------------------------------------------------
-//  map_register_r - handle a mapped read from
-//  regular register space
-//-------------------------------------------------
-
-u32 voodoo_2_device::map_register_r(offs_t offset)
-{
-	prepare_for_read();
-
-	// extract chipmask and register
-	u32 chipmask = chipmask_from_offset(offset);
-	u32 regnum = BIT(offset, 0, 8);
-
-	// look up the register
-	return m_regtable[regnum].read(*this, chipmask, regnum);
-}
-
-
-//-------------------------------------------------
-//  map_lfb_r - handle a mapped read from LFB space
-//-------------------------------------------------
-
-u32 voodoo_2_device::map_lfb_r(offs_t offset)
-{
-	prepare_for_read();
-	return lfb_r(offset);
-}
-
-
-//-------------------------------------------------
-//  map_register_w - handle a mapped write to
-//  regular register space
-//-------------------------------------------------
-
-void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	bool pending = prepare_for_write();
-
-#if !USE_MEMORY_VIEWS
-	// handle cmdfifo writes
-	if (BIT(offset, 21-2) && m_reg.fbi_init7().cmdfifo_enable())
-	{
-		// check for byte swizzling (bit 18)
-		if (BIT(offset, 18-2))
-			data = swapendian_int32(data);
-		m_cmdfifo.write_direct(BIT(offset, 0, 16), data);
-		return;
-	}
-#endif
-
-	// extract chipmask and register
-	u32 chipmask = chipmask_from_offset(offset);
-	u32 regnum = BIT(offset, 0, 8);
-
-	// handle register swizzling
-	if (BIT(offset, 20-2) && m_reg.fbi_init0().swizzle_reg_writes())
-		data = swapendian_int32(data);
-
-	// handle aliasing
-	if (BIT(offset, 21-2) && m_reg.fbi_init3().tri_register_remap())
-		offset = (offset & ~0xff) | m_reg.alias(offset);
-
-	// look up the register
-	auto const &regentry = m_regtable[regnum];
-
-	// if this is non-FIFO command, execute immediately
-	if (!regentry.is_fifo())
-		return void(regentry.write(*this, chipmask, regnum, data));
-
-	// track swap buffers
-	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_swaps_pending++;
-
-#if !USE_MEMORY_VIEWS
-	// if cmdfifo is enabled, ignore everything else
-	if (m_reg.fbi_init7().cmdfifo_enable())
-	{
-		logerror("Ignoring write to %s when CMDFIFO is enabled\n", regentry.name());
-		return;
-	}
-#endif
-
-	// if we're busy add to the fifo
-	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
-
-	// if we get a non-zero number of cycles back, mark things pending
-	int cycles = regentry.write(*this, chipmask, regnum, data);
-	if (cycles > 0)
-	{
-		// if we ended up with cycles, mark the operation pending
-		m_operation_end = machine().time() + clocks_to_attotime(cycles);
-		if (LOG_FIFO_VERBOSE)
-			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
-	}
-}
-
-
-//-------------------------------------------------
-//  map_lfb_w - handle a mapped write to LFB space
-//-------------------------------------------------
-
-void voodoo_2_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// if we're busy add to the fifo, else just execute immediately
-	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | memory_fifo::TYPE_LFB, data, mem_mask);
-	else
-		lfb_w(offset, data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  map_texture_w - handle a mapped write to
-//  texture space
-//-------------------------------------------------
-
-void voodoo_2_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	// if we're busy add to the fifo, else just execute immediately
-	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
-		add_to_fifo(offset | memory_fifo::TYPE_TEXTURE, data, mem_mask);
-	else
-		texture_w(offset, data);
 }
 
 
