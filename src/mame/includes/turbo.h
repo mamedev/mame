@@ -48,7 +48,7 @@ protected:
 
 	// device / memory pointers
 	required_device<z80_device> m_maincpu;
-	optional_device_array<i8255_device, 3> m_i8255;
+	optional_device_array<i8255_device, 4> m_i8255;
 
 	required_region_ptr<uint8_t> m_spriteroms;
 	required_region_ptr<uint8_t> m_proms;
