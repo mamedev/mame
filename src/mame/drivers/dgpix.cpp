@@ -15,8 +15,12 @@
  [*] the version number is written in the flash roms at the beginning of the game settings
 
 Note: There is known to exist an alternate version of The X-Files titled The Sex Files which is undumped
-An additional game called Beat Player 2000 is undumped, using the VRenderO Minus Rev5 PCB,
-with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+The following additional games are also known to be undumped
+
+- Beat Player 2000, using the VRenderO Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Let's Dance, using the VRenderO Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Fishing Maniac, using the VRenderO Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
+- Fishing Maniac 2, using the VRenderO Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
 
  Original bugs:
  - In King of Dynast Gear, Roger's fast attack shows some blank lines
