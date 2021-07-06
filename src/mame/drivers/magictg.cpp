@@ -940,13 +940,13 @@ void magictg_state::magictg(machine_config &config)
 #endif
 	pcibus.set_device(9, FUNC(magictg_state::zr36120_pci_r), FUNC(magictg_state::zr36120_pci_w)); // TODO: ZR36120 device
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_screen("screen");
 	m_voodoo[0]->set_cpu(m_mips);
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
 	m_voodoo[1]->set_screen("screen");

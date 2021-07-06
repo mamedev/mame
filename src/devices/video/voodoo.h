@@ -29,9 +29,6 @@ enum voodoo_model : u8
 	MODEL_VOODOO_3
 };
 
-// nominal clock values
-static constexpr u32 STD_VOODOO_1_CLOCK = 50000000;
-
 
 //**************************************************************************
 //  DEBUGGING
@@ -49,7 +46,7 @@ static constexpr bool DEBUG_STATS = false;		// \ key to view stats
 static constexpr bool LOG_VBLANK_SWAP = false;
 static constexpr bool LOG_FIFO = false;
 static constexpr bool LOG_FIFO_VERBOSE = false;
-static constexpr bool LOG_REGISTERS = false;
+static constexpr bool LOG_REGISTERS = true;
 static constexpr bool LOG_WAITS = false;
 static constexpr bool LOG_LFB = false;
 static constexpr bool LOG_TEXTURE_RAM = false;
@@ -486,6 +483,9 @@ protected:
 	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 public:
+	// nominal clock values
+	static constexpr u32 NOMINAL_CLOCK = 50000000;
+
 	// construction
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, MODEL_VOODOO_1) { }
@@ -507,6 +507,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_stop() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 

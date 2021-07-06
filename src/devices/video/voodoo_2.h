@@ -17,14 +17,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-// nominal clock values
-static constexpr u32 STD_VOODOO_2_CLOCK = 90000000;
-
-
-//**************************************************************************
 //  INTERNAL CLASSES
 //**************************************************************************
 
@@ -182,6 +174,9 @@ protected:
 	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
 
 public:
+	// nominal clock value
+	static constexpr u32 NOMINAL_CLOCK = 90000000;
+
 	// construction
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, MODEL_VOODOO_2) { }

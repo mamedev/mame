@@ -957,7 +957,7 @@ void gticlub_state::hangplt(machine_config &config)
 
 	K056230(config, m_k056230, "maincpu");
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
 	m_voodoo[0]->set_screen("lscreen");
@@ -965,7 +965,7 @@ void gticlub_state::hangplt(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
 	m_voodoo[1]->set_screen("rscreen");

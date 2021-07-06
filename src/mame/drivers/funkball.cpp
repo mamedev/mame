@@ -781,7 +781,7 @@ void funkball_state::funkball(machine_config &config)
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
-	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
 	m_voodoo->set_screen("screen");

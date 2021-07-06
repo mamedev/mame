@@ -852,7 +852,7 @@ void savquest_state::savquest(machine_config &config)
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
 	m_voodoo->set_screen("screen");

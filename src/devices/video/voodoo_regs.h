@@ -796,6 +796,11 @@ private:
 };
 
 
+
+//**************************************************************************
+//  CORE VOODOO REGISTERS
+//**************************************************************************
+
 // ======================> voodoo_regs
 
 class voodoo_regs
@@ -1138,55 +1143,77 @@ private:
 	s64 m_dwdy;                     // delta W per Y
 	u8 m_revision;
 	static u8 const s_alias_map[0x40];
-
-public:
-	static char const *const s_banshee_agp_reg_name[0x50];
 };
 
 
 
+//**************************************************************************
+//  BANSHEE-SPECIFIC REGISTERS
+//**************************************************************************
+
+// ======================> banshee_2d_regs
+
+class banshee_2d_regs
+{
+public:
+	static constexpr u32 clip0Min =       0x008/4;
+	static constexpr u32 clip0Max =       0x00c/4;
+	static constexpr u32 dstBaseAddr =    0x010/4;
+	static constexpr u32 dstFormat =      0x014/4;
+	static constexpr u32 srcColorkeyMin = 0x018/4;
+	static constexpr u32 srcColorkeyMax = 0x01c/4;
+	static constexpr u32 dstColorkeyMin = 0x020/4;
+	static constexpr u32 dstColorkeyMax = 0x024/4;
+	static constexpr u32 bresError0 =     0x028/4;
+	static constexpr u32 bresError1 =     0x02c/4;
+	static constexpr u32 rop =            0x030/4;
+	static constexpr u32 srcBaseAddr =    0x034/4;
+	static constexpr u32 commandExtra =   0x038/4;
+	static constexpr u32 lineStipple =    0x03c/4;
+	static constexpr u32 lineStyle =      0x040/4;
+	static constexpr u32 pattern0Alias =  0x044/4;
+	static constexpr u32 pattern1Alias =  0x048/4;
+	static constexpr u32 clip1Min =       0x04c/4;
+	static constexpr u32 clip1Max =       0x050/4;
+	static constexpr u32 srcFormat =      0x054/4;
+	static constexpr u32 srcSize =        0x058/4;
+	static constexpr u32 srcXY =          0x05c/4;
+	static constexpr u32 colorBack =      0x060/4;
+	static constexpr u32 colorFore =      0x064/4;
+	static constexpr u32 dstSize =        0x068/4;
+	static constexpr u32 dstXY =          0x06c/4;
+	static constexpr u32 command =        0x070/4;
+
+	// constructor
+	banshee_2d_regs() { reset(); }
+
+	// state saving
+	void register_save(save_proxy &save);
+
+	// reset
+	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
+
+	// getters
+	char const *name(u32 index) const { return s_names[index & 0x3f]; }
+
+	// simple readers
+	u32 read(u32 index) const { return m_regs[index & 0x3f]; }
+
+	// write access
+	u32 write(u32 index, u32 data, u32 mem_mask = 0xffffffff) { return COMBINE_DATA(&m_regs[index & 0x3f]); }
+
+	// special swap history helper
+private:
+	u32 m_regs[0x20];
+	static char const * const s_names[0x20];
+};
 
 
-// 2D registers
-static constexpr u32 banshee2D_clip0Min =       0x008/4;
-static constexpr u32 banshee2D_clip0Max =       0x00c/4;
-static constexpr u32 banshee2D_dstBaseAddr =    0x010/4;
-static constexpr u32 banshee2D_dstFormat =      0x014/4;
-static constexpr u32 banshee2D_srcColorkeyMin = 0x018/4;
-static constexpr u32 banshee2D_srcColorkeyMax = 0x01c/4;
-static constexpr u32 banshee2D_dstColorkeyMin = 0x020/4;
-static constexpr u32 banshee2D_dstColorkeyMax = 0x024/4;
-static constexpr u32 banshee2D_bresError0 =     0x028/4;
-static constexpr u32 banshee2D_bresError1 =     0x02c/4;
-static constexpr u32 banshee2D_rop =            0x030/4;
-static constexpr u32 banshee2D_srcBaseAddr =    0x034/4;
-static constexpr u32 banshee2D_commandExtra =   0x038/4;
-static constexpr u32 banshee2D_lineStipple =    0x03c/4;
-static constexpr u32 banshee2D_lineStyle =      0x040/4;
-static constexpr u32 banshee2D_pattern0Alias =  0x044/4;
-static constexpr u32 banshee2D_pattern1Alias =  0x048/4;
-static constexpr u32 banshee2D_clip1Min =       0x04c/4;
-static constexpr u32 banshee2D_clip1Max =       0x050/4;
-static constexpr u32 banshee2D_srcFormat =      0x054/4;
-static constexpr u32 banshee2D_srcSize =        0x058/4;
-static constexpr u32 banshee2D_srcXY =          0x05c/4;
-static constexpr u32 banshee2D_colorBack =      0x060/4;
-static constexpr u32 banshee2D_colorFore =      0x064/4;
-static constexpr u32 banshee2D_dstSize =        0x068/4;
-static constexpr u32 banshee2D_dstXY =          0x06c/4;
-static constexpr u32 banshee2D_command =        0x070/4;
-
-
-/*************************************
- *
- *  Voodoo Banshee I/O space registers
- *
- *************************************/
+// ======================> banshee_io_regs
 
 class banshee_io_regs
 {
 public:
-	// 0x000
 	static constexpr u32 status =                       0x000/4;
 	static constexpr u32 pciInit0 =                     0x004/4;
 	static constexpr u32 sipMonitor =                   0x008/4;
@@ -1201,8 +1228,6 @@ public:
 	static constexpr u32 vgaInit1 =                     0x02c/4;
 	static constexpr u32 dramCommand =                  0x030/4;
 	static constexpr u32 dramData =                     0x034/4;
-
-	// 0x040
 	static constexpr u32 pllCtrl0 =                     0x040/4;
 	static constexpr u32 pllCtrl1 =                     0x044/4;
 	static constexpr u32 pllCtrl2 =                     0x048/4;
@@ -1219,8 +1244,6 @@ public:
 	static constexpr u32 vidInStatus =                  0x074/4;
 	static constexpr u32 vidSerialParallelPort =        0x078/4;
 	static constexpr u32 vidInXDecimDeltas =            0x07c/4;
-
-	// 0x080
 	static constexpr u32 vidInDecimInitErrs =           0x080/4;
 	static constexpr u32 vidInYDecimDeltas =            0x084/4;
 	static constexpr u32 vidPixelBufThold =             0x088/4;
@@ -1237,8 +1260,6 @@ public:
 	static constexpr u32 vgab4 =                        0x0b4/4;
 	static constexpr u32 vgab8 =                        0x0b8/4;
 	static constexpr u32 vgabc =                        0x0bc/4;
-
-	// 0x0c0
 	static constexpr u32 vgac0 =                        0x0c0/4;
 	static constexpr u32 vgac4 =                        0x0c4/4;
 	static constexpr u32 vgac8 =                        0x0c8/4;
@@ -1257,11 +1278,7 @@ public:
 	static constexpr u32 vidCurrOverlayStartAddr =      0x0fc/4;
 
 	// constructor
-	banshee_io_regs()
-	{
-		for (int index = 0; index < std::size(m_regs); index++)
-			m_regs[index] = 0;
-	}
+	banshee_io_regs() { reset(); }
 
 	// state saving
 	void register_save(save_proxy &save);
@@ -1285,50 +1302,141 @@ private:
 };
 
 
-/*************************************
- *
- *  Voodoo Banshee AGP space registers
- *
- *************************************/
+// ======================> banshee_cmd_agp_regs
 
-// 0x000
-static constexpr u32 agpReqSize =              0x000/4;
-static constexpr u32 agpHostAddressLow =       0x004/4;
-static constexpr u32 agpHostAddressHigh =      0x008/4;
-static constexpr u32 agpGraphicsAddress =      0x00c/4;
-static constexpr u32 agpGraphicsStride =       0x010/4;
-static constexpr u32 agpMoveCMD =              0x014/4;
-static constexpr u32 cmdBaseAddr0 =            0x020/4;
-static constexpr u32 cmdBaseSize0 =            0x024/4;
-static constexpr u32 cmdBump0 =                0x028/4;
-static constexpr u32 cmdRdPtrL0 =              0x02c/4;
-static constexpr u32 cmdRdPtrH0 =              0x030/4;
-static constexpr u32 cmdAMin0 =                0x034/4;
-static constexpr u32 cmdAMax0 =                0x03c/4;
+class banshee_cmd_agp_regs
+{
+public:
+	static constexpr u32 agpReqSize =         0x000/4;
+	static constexpr u32 agpHostAddressLow =  0x004/4;
+	static constexpr u32 agpHostAddressHigh = 0x008/4;
+	static constexpr u32 agpGraphicsAddress = 0x00c/4;
+	static constexpr u32 agpGraphicsStride =  0x010/4;
+	static constexpr u32 agpMoveCMD =         0x014/4;
+	static constexpr u32 cmdBaseAddr0 =       0x020/4;
+	static constexpr u32 cmdBaseSize0 =       0x024/4;
+	static constexpr u32 cmdBump0 =           0x028/4;
+	static constexpr u32 cmdRdPtrL0 =         0x02c/4;
+	static constexpr u32 cmdRdPtrH0 =         0x030/4;
+	static constexpr u32 cmdAMin0 =           0x034/4;
+	static constexpr u32 cmdAMax0 =           0x03c/4;
+	static constexpr u32 cmdFifoDepth0 =      0x044/4;
+	static constexpr u32 cmdHoleCnt0 =        0x048/4;
+	static constexpr u32 cmdBaseAddr1 =       0x050/4;
+	static constexpr u32 cmdBaseSize1 =       0x054/4;
+	static constexpr u32 cmdBump1 =           0x058/4;
+	static constexpr u32 cmdRdPtrL1 =         0x05c/4;
+	static constexpr u32 cmdRdPtrH1 =         0x060/4;
+	static constexpr u32 cmdAMin1 =           0x064/4;
+	static constexpr u32 cmdAMax1 =           0x06c/4;
+	static constexpr u32 cmdFifoDepth1 =      0x074/4;
+	static constexpr u32 cmdHoleCnt1 =        0x078/4;
+	static constexpr u32 cmdFifoThresh =      0x080/4;
+	static constexpr u32 cmdHoleInt =         0x084/4;
+	static constexpr u32 yuvBaseAddress =     0x100/4;
+	static constexpr u32 yuvStride =          0x104/4;
+	static constexpr u32 crc1 =               0x120/4;
+	static constexpr u32 crc2 =               0x130/4;
 
-// 0x040
-static constexpr u32 cmdFifoDepth0 =           0x044/4;
-static constexpr u32 cmdHoleCnt0 =             0x048/4;
-static constexpr u32 cmdBaseAddr1 =            0x050/4;
-static constexpr u32 cmdBaseSize1 =            0x054/4;
-static constexpr u32 cmdBump1 =                0x058/4;
-static constexpr u32 cmdRdPtrL1 =              0x05c/4;
-static constexpr u32 cmdRdPtrH1 =              0x060/4;
-static constexpr u32 cmdAMin1 =                0x064/4;
-static constexpr u32 cmdAMax1 =                0x06c/4;
-static constexpr u32 cmdFifoDepth1 =           0x074/4;
-static constexpr u32 cmdHoleCnt1 =             0x078/4;
+	// constructor
+	banshee_cmd_agp_regs() { reset(); }
 
-// 0x080
-static constexpr u32 cmdFifoThresh =           0x080/4;
-static constexpr u32 cmdHoleInt =              0x084/4;
+	// state saving
+	void register_save(save_proxy &save);
 
-// 0x100
-static constexpr u32 yuvBaseAddress =          0x100/4;
-static constexpr u32 yuvStride =               0x104/4;
-static constexpr u32 crc1 =                    0x120/4;
-static constexpr u32 crc2 =                    0x130/4;
+	// reset
+	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
 
+	// getters
+	char const *name(u32 index) const { return s_names[index & 0x7f]; }
+
+	// simple readers
+	u32 read(u32 index) const { return m_regs[index & 0x7f]; }
+
+	// write access
+	u32 write(u32 index, u32 data, u32 mem_mask = 0xffffffff) { return COMBINE_DATA(&m_regs[index & 0x7f]); }
+
+private:
+	u32 m_regs[0x80];
+	static char const * const s_names[0x80];
+};
+
+
+// ======================> banshee_cmd_agp_regs
+
+class banshee_vga_regs
+{
+public:
+	static constexpr u32 attributeData =       0x3c0 & 0x1f;
+	static constexpr u32 attributeIndex =      0x3c1 & 0x1f;
+	static constexpr u32 inputStatus0 =        0x3c2 & 0x1f;
+	static constexpr u32 miscOutputW =         0x3c2 & 0x1f;
+	static constexpr u32 motherboardEnable =   0x3c3 & 0x1f;
+	static constexpr u32 sequencerIndex =      0x3c4 & 0x1f;
+	static constexpr u32 sequencerData =       0x3c5 & 0x1f;
+	static constexpr u32 pixelMask =           0x3c6 & 0x1f;
+	static constexpr u32 readIndex =           0x3c7 & 0x1f;
+	static constexpr u32 readStatus =          0x3c7 & 0x1f;
+	static constexpr u32 writeIndex =          0x3c8 & 0x1f;
+	static constexpr u32 data =                0x3c9 & 0x1f;
+	static constexpr u32 featureControlR =     0x3ca & 0x1f;
+	static constexpr u32 miscOutputR =         0x3cc & 0x1f;
+	static constexpr u32 gfxControllerIndex =  0x3ce & 0x1f;
+	static constexpr u32 gfxControllerData =   0x3cf & 0x1f;
+	static constexpr u32 crtcIndex =           0x3d4 & 0x1f;
+	static constexpr u32 crtcData =            0x3d5 & 0x1f;
+	static constexpr u32 inputStatus1 =        0x3da & 0x1f;
+	static constexpr u32 featureControlW =     0x3da & 0x1f;
+
+	// constructor
+	banshee_vga_regs() { reset(); }
+
+	// state saving
+	void register_save(save_proxy &save);
+
+	// reset
+	void reset()
+	{
+		std::fill_n(&m_regs[0], std::size(m_regs), 0);
+		std::fill_n(&m_crtc[0], std::size(m_crtc), 0);
+		std::fill_n(&m_seq[0], std::size(m_seq), 0);
+		std::fill_n(&m_gc[0], std::size(m_gc), 0);
+		std::fill_n(&m_attr[0], std::size(m_attr), 0);
+		m_attr_flip_flop = 0;
+	}
+
+	// simple readers
+	u8 read(u32 index) const { return m_regs[index & 0x1f]; }
+	u8 read_crtc(u32 index) const { return (index < std::size(m_crtc)) ? m_crtc[index] : 0xff; }
+	u8 read_seq(u32 index) const { return (index < std::size(m_seq)) ? m_seq[index] : 0xff; }
+	u8 read_gc(u32 index) const { return (index < std::size(m_gc)) ? m_gc[index] : 0xff; }
+	u8 read_attr(u32 index) const { return (index < std::size(m_attr)) ? m_attr[index] : 0xff; }
+
+	// write access
+	void write(u32 index, u8 data) { m_regs[index & 0x1f] = data; }
+	void write_crtc(u32 index, u8 data) { if (index < std::size(m_crtc)) m_crtc[index] = data; }
+	void write_seq(u32 index, u8 data) { if (index < std::size(m_seq)) m_seq[index] = data; }
+	void write_gc(u32 index, u8 data) { if (index < std::size(m_gc)) m_gc[index] = data; }
+	void write_attr(u32 index, u8 data) { if (index < std::size(m_attr)) m_attr[index] = data; }
+
+	// basic accessors
+	u8 attribute_index() const { return m_regs[attributeIndex & 0x1f]; }
+	u8 sequencer_index() const { return m_regs[sequencerIndex & 0x1f]; }
+	u8 gfx_controller_index() const { return m_regs[gfxControllerIndex & 0x1f]; }
+	u8 crtc_index() const { return m_regs[crtcIndex & 0x1f]; }
+
+	// flip flop
+	void clear_flip_flop() { m_attr_flip_flop = 0; }
+	u8 toggle_flip_flop() { u8 old = m_attr_flip_flop; m_attr_flip_flop ^= 1; return old; }
+
+private:
+	u8 m_regs[0x20];        // core VGA registers
+	u8 m_crtc[0x27];        // CRTC registers
+	u8 m_seq[0x05];         // sequencer registers
+	u8 m_gc[0x05];          // graphics controller registers
+	u8 m_attr[0x15];        // attribute registers
+	u8 m_attr_flip_flop;    // attribute flip-flop
+};
 
 }
 

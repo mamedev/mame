@@ -106,6 +106,17 @@ bits(7:4) and bit(24)), X, and Y:
 **************************************************************************/
 
 /*
+
+Remaining work:
+
+Regressions:
+ * mace: 2 hit combo appears over text
+ * mace: one poly seems to be black on first character
+ * sscope2
+
+Maps:
+ * update to use maps
+
 Revision sensitivity:
 
 rasterizer_texture::recompute()
@@ -747,7 +758,6 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 
 voodoo_1_device::~voodoo_1_device()
 {
-	m_renderer->wait("Destruction");
 }
 
 
@@ -1025,6 +1035,16 @@ void voodoo_1_device::device_start()
 	// register for save states
 	save_proxy save(*this);
 	register_save(save, total_allocation);
+}
+
+
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void voodoo_1_device::device_stop()
+{
+	m_renderer->wait("Destruction");
 }
 
 

@@ -1232,7 +1232,7 @@ void hornet_state::sscope2(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::sscope2_map);
 
-	VOODOO_2(config.replace(), m_voodoo[0], STD_VOODOO_2_CLOCK);
+	VOODOO_2(config.replace(), m_voodoo[0], voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
 	m_voodoo[0]->set_screen("lscreen");
@@ -1240,7 +1240,7 @@ void hornet_state::sscope2(machine_config &config)
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_2(config.replace(), m_voodoo[1], STD_VOODOO_2_CLOCK);
+	VOODOO_2(config.replace(), m_voodoo[1], voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
 	m_voodoo[1]->set_screen("rscreen");

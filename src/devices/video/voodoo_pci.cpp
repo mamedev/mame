@@ -8,7 +8,7 @@
 
 void voodoo_1_pci_device::device_add_mconfig(machine_config &config)
 {
-	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
 	m_voodoo->set_cpu(m_cpu);
@@ -17,7 +17,7 @@ void voodoo_1_pci_device::device_add_mconfig(machine_config &config)
 
 void voodoo_2_pci_device::device_add_mconfig(machine_config &config)
 {
-	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
 	m_voodoo->set_cpu(m_cpu);
@@ -26,7 +26,7 @@ void voodoo_2_pci_device::device_add_mconfig(machine_config &config)
 
 void voodoo_banshee_pci_device::device_add_mconfig(machine_config &config)
 {
-	VOODOO_BANSHEE(config, m_voodoo, STD_VOODOO_BANSHEE_CLOCK);
+	VOODOO_BANSHEE(config, m_voodoo, voodoo_banshee_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(16);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
@@ -34,7 +34,7 @@ void voodoo_banshee_pci_device::device_add_mconfig(machine_config &config)
 
 void voodoo_3_pci_device::device_add_mconfig(machine_config &config)
 {
-	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
+	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(16);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
@@ -229,30 +229,11 @@ void voodoo_pci_device::pcictrl_w(offs_t offset, u32 data, u32 mem_mask)
 // VGA legacy accesses
 u32 voodoo_pci_device::vga_r(offs_t offset, u32 mem_mask)
 {
-	u32 result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_r(offset * 4 + 0 + 0xb0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_r(offset * 4 + 1 + 0xb0) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_r(offset * 4 + 2 + 0xb0) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_r(offset * 4 + 3 + 0xb0) << 24;
-	if (0)
-		logerror("%s voodoo_pci_device vga_r from offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4, result, mem_mask);
-	return result;
+	// map to I/O space at offset 0xb0
+	return m_voodoo->read(0xb0/4 + offset, mem_mask);
 }
 void voodoo_pci_device::vga_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (ACCESSING_BITS_0_7)
-		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(offset * 4 + 0 + 0xb0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(offset * 4 + 1 + 0xb0, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(offset * 4 + 2 + 0xb0, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(offset * 4 + 3 + 0xb0, data >> 24);
-
-	if (0)
-		logerror("%s voodoo_pci_device vga_w to offset %04X = %08X & %08X\n", machine().describe_context(), offset * 4, data, mem_mask);
+	// map to I/O space at offset 0xb0
+	m_voodoo->write(0xb0/4 + offset, data, mem_mask);
 }
