@@ -585,38 +585,6 @@ uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &b
 	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-#ifdef UNUSED_FUNCTION
-static inline uint64_t read64le_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return result;
-}
-
-
-static inline uint64_t read64le_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0, mem_mask >> 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
-	return result;
-}
-
-
-static inline void write64le_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_0_31)
-		handler(offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if (ACCESSING_BITS_32_63)
-		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
-}
-#endif
-
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	mem_mask = swapendian_int64(mem_mask);
