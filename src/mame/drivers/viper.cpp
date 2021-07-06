@@ -617,17 +617,6 @@ static inline void write64le_with_32sle_device_handler(write32s_delegate handler
 }
 #endif
 
-static inline uint64_t read64be_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	mem_mask = swapendian_int64(mem_mask);
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result = (uint64_t)(handler)(offset * 2);
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return swapendian_int64(result);
-}
-
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
 {
 	mem_mask = swapendian_int64(mem_mask);

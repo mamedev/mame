@@ -112,16 +112,12 @@ Remaining work:
 Regressions:
  * sscope2
 
-Maps:
- * update to use maps
-
-Revision sensitivity:
-
-rasterizer_texture::recompute()
- - addr shift/mask = 3/0xfffff (1/2) vs 0/0xfffff0 (3)
-
 todo:
  - size the CLUT properly
+ - look at speed on Konami games (nbapbp, racingj, etc)
+ - look at timing issues on IT games
+ - bad textures in some Voodoo 3 games (mocapb for example)
+ - update callers to use maps
 
 */
 
