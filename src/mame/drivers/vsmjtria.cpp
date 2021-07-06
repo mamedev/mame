@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ivan Vangelista, Vas Crabb, Angelo Salese
+// copyright-holders:Vas Crabb, Angelo Salese
 
 /*
 VS Mahjong Triangle (c) 1986 Dyna
@@ -52,12 +52,14 @@ class vsmjtria_state : public driver_device
 {
 public:
 	vsmjtria_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_cpu(*this, "cpu%u", 0U),
-		m_gfxdecode(*this, "gfxdecode%u", 0U),
-		m_colorram(*this, "colorram%u", 0U),
-		m_videoram(*this, "videoram%u", 0U),
-		m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
+		driver_device(mconfig, type, tag)
+		, m_cpu(*this, "cpu%u", 0U)
+		, m_gfxdecode(*this, "gfxdecode%u", 0U)
+		, m_colorram(*this, "colorram%u", 0U)
+		, m_videoram(*this, "videoram%u", 0U)
+		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
+		, m_nvram(*this, "nvram%u", 0U)
+		, m_sw2(*this, "SW2")
 	{ }
 
 	void vsmjtria(machine_config &config);
@@ -66,6 +68,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 private:
@@ -74,6 +77,8 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_ioport_array<5> m_key[2];
+	required_device_array<nvram_device, 2> m_nvram;
+	required_ioport m_sw2;
 
 	tilemap_t *m_bg_tilemap[2];
 	uint8_t m_keyboard_cmd[2];
@@ -447,6 +452,13 @@ static INPUT_PORTS_START( vsmjtria )
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// single slider switch, not read by CPU
+	// grounds NVRAM contents, simulated in machine_reset fn
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x00, "Clear NVRAM at boot" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -476,6 +488,26 @@ void vsmjtria_state::machine_start()
 	save_item(NAME(m_keyboard_cmd));
 }
 
+void vsmjtria_state::machine_reset()
+{
+	if (m_sw2->read() & 1)
+	{
+		// TODO: there's no setter in nvram_device that directly flushes contents for this case scenario
+		// we currently workaround by directly inject to space address
+		const u16 nvram_size = 0x800;
+		address_space &space_main = m_cpu[0]->space(AS_PROGRAM);
+		address_space &space_sub = m_cpu[1]->space(AS_PROGRAM);
+
+		for (int i = 0; i < nvram_size; i++)
+		{
+			space_main.write_byte(0xa000 + i, 0x00);
+			space_sub.write_byte(0xa000 + i, 0x00);
+		}
+
+		logerror("%s: flush NVRAM contents\n", machine().describe_context());
+	}
+}
+
 void vsmjtria_state::vsmjtria(machine_config &config)
 {
 	config.set_perfect_quantum("cpu0"); // crude way to make comms work - does it have FIFOs rather than latches?
@@ -492,8 +524,8 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	m_cpu[1]->set_addrmap(AS_IO, &vsmjtria_state::sub_io_map);
 	m_cpu[1]->set_vblank_int("rscreen", FUNC(vsmjtria_state::irq0_line_hold));
 
-	NVRAM(config, "nvram0", nvram_device::DEFAULT_ALL_0);
-	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram[0], nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram[1], nvram_device::DEFAULT_ALL_0);
 
 	GENERIC_LATCH_8(config, "latch0");
 	GENERIC_LATCH_8(config, "latch1");
