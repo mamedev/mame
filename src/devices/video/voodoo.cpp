@@ -3355,7 +3355,7 @@ static_register_table_entry<voodoo_1_device> const voodoo_1_device::s_register_t
 	REGISTER_ENTRY(vSync,           invalid,     video,       28, FBI,      NOSYNC, NOFIFO)    // 224
 	REGISTER_ENTRY(clutData,        invalid,     clut,        30, FBI,      NOSYNC, NOFIFO)    // 228
 	REGISTER_ENTRY(dacData,         invalid,     dac,         12, FBI,      NOSYNC, NOFIFO)    // 22c
-	REGISTER_ENTRY(maxRgbDelta,     invalid,     unimplemented,24, FBI,      NOSYNC, NOFIFO)    // 230
+	REGISTER_ENTRY(maxRgbDelta,     invalid,     unimplemented,24,FBI,      NOSYNC, NOFIFO)    // 230
 	RESERVED_ENTRY                                                                             // 234
 	RESERVED_ENTRY                                                                             // 238
 	RESERVED_ENTRY                                                                             // 23c
@@ -3368,7 +3368,7 @@ static_register_table_entry<voodoo_1_device> const voodoo_1_device::s_register_t
 	RESERVED_ENTRY_x8                                                                          // 2e0-2fc
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(textureMode,     invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 300
-	REGISTER_ENTRY(tLOD,            invalid,     texture,     28, TREX,     NOSYNC,   FIFO)    // 304
+	REGISTER_ENTRY(tLOD,            invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 304
 	REGISTER_ENTRY(tDetail,         invalid,     texture,     17, TREX,     NOSYNC,   FIFO)    // 308
 	REGISTER_ENTRY(texBaseAddr,     invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 30c
 	REGISTER_ENTRY(texBaseAddr_1,   invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 310

@@ -770,23 +770,6 @@ void voodoo_banshee_device::io_w(offs_t offset, u32 data, u32 mem_mask)
 	u32 oldval = m_io_regs.read(offset);
 	u32 newval = m_io_regs.write(offset, data, mem_mask);
 
-
-if (offset >= banshee_io_regs::vidScreenSize && offset <= banshee_io_regs::vidOverlayDvdy)
-{
-	printf("size=%dx%d start=(%d,%d) end=(%d,%d) dudx=%08X dvdy=%08X dudx_strat=%08X srcwidth=%d\n",
-			BIT(m_io_regs.read(banshee_io_regs::vidScreenSize), 0, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidScreenSize), 12, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayStartCoords), 0, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayStartCoords), 12, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayEndScreenCoord), 0, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayEndScreenCoord), 12, 12),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDudx), 0, 32),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDvdy), 0, 32),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDudxOffsetSrcWidth), 0, 19),
-			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDudxOffsetSrcWidth), 19, 13));
-}
-
-
 	// handle special cases
 	switch (offset)
 	{

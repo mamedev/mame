@@ -52,7 +52,6 @@ static constexpr bool LOG_LFB = false;
 static constexpr bool LOG_TEXTURE_RAM = false;
 static constexpr bool LOG_CMDFIFO = false;
 static constexpr bool LOG_CMDFIFO_VERBOSE = false;
-static constexpr bool LOG_BANSHEE_2D = false;
 
 // Need to turn off cycle eating when debugging MIPS drc
 // otherwise timer interrupts won't match nodrc debug mode.

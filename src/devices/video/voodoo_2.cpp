@@ -1659,7 +1659,7 @@ static_register_table_entry<voodoo_2_device> const voodoo_2_device::s_register_t
 	REGISTER_ENTRY(bltData,         invalid,     passive,     32, FBI,      NOSYNC,   FIFO)    // 2fc
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(textureMode,     invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 300
-	REGISTER_ENTRY(tLOD,            invalid,     texture,     28, TREX,     NOSYNC,   FIFO)    // 304
+	REGISTER_ENTRY(tLOD,            invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 304
 	REGISTER_ENTRY(tDetail,         invalid,     texture,     22, TREX,     NOSYNC,   FIFO)    // 308
 	REGISTER_ENTRY(texBaseAddr,     invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 30c
 	REGISTER_ENTRY(texBaseAddr_1,   invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 310
