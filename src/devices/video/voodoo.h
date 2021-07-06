@@ -157,10 +157,13 @@ class tmu_state
 {
 public:
 	// construction
-	tmu_state(voodoo_model model);
+	tmu_state();
 
 	// initialization
 	void init(int index, shared_tables const &share, u8 *ram, u32 size);
+
+	// configuration
+	void set_baseaddr_mask_shift(u32 mask, u8 shift) { m_basemask = mask; m_baseshift = shift; }
 
 	// state saving
 	void register_save(save_proxy &save);
@@ -182,8 +185,10 @@ public:
 private:
 	// internal state
 	int m_index;                         // index of ourself
-	u8 *m_ram = nullptr;                 // pointer to our RAM
-	u32 m_mask = 0;                      // mask to apply to pointers
+	u8 *m_ram;                           // pointer to our RAM
+	u32 m_mask;                          // mask to apply to pointers
+	u32 m_basemask;                      // mask to apply to the texBaseAddr
+	u8 m_baseshift;                      // shift to apply to the texBaseAddr
 
 	// register state
 	voodoo_regs m_reg;                   // TMU registers

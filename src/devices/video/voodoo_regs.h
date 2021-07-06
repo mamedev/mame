@@ -1001,8 +1001,7 @@ public:
 	static constexpr u32 reg_nccTable =        0x324/4;   //  W  F
 
 	// constructor
-	voodoo_regs(voodoo_model model) :
-		m_revision((model == MODEL_VOODOO_1) ? 1 : (model == MODEL_VOODOO_2) ? 2 : 3)
+	voodoo_regs()
 	{
 		for (int index = 0; index < std::size(m_regs); index++)
 			m_regs[index].u = 0;
@@ -1010,18 +1009,6 @@ public:
 
 	// state saving
 	void register_save(save_proxy &save);
-
-	// revisions:
-	//   1 = original Voodoo
-	//   2 = Voodoo 2
-	//   3 = Banshee/Voodoo 3
-
-	bool rev1() const { return (m_revision == 1); }
-	bool rev2() const { return (m_revision == 2); }
-	bool rev3() const { return (m_revision == 3); }
-
-	bool rev1_or_2() const { return (m_revision <= 2); }
-	bool rev2_or_3() const { return (m_revision >= 2); }
 
 	// register aliasing
 	static u32 alias(u32 regnum) { return (regnum < 0x40) ? s_alias_map[regnum] : regnum; }
@@ -1141,7 +1128,6 @@ private:
 	s64 m_dwdx;                     // delta W per X
 	s64 m_dsdy, m_dtdy;             // delta S,T per Y
 	s64 m_dwdy;                     // delta W per Y
-	u8 m_revision;
 	static u8 const s_alias_map[0x40];
 };
 

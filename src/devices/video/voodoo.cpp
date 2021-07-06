@@ -119,10 +119,6 @@ Revision sensitivity:
 
 rasterizer_texture::recompute()
  - addr shift/mask = 3/0xfffff (1/2) vs 0/0xfffff0 (3)
- - bilinear mask - 0xf0 (1) vs 0xff (2/3)
-
-voodoo_renderer::voodoo_renderer()
- - fogdelta_mask = 0xff (1) vs 0xfc (2/3)
 
 todo:
  - size the CLUT properly
@@ -325,8 +321,12 @@ shared_tables::shared_tables()
 //  tmu_state - constructor
 //-------------------------------------------------
 
-tmu_state::tmu_state(voodoo_model model) :
-	m_reg(model)
+tmu_state::tmu_state() :
+	m_index(0),
+	m_ram(nullptr),
+	m_mask(0),
+	m_basemask(0xfffff),
+	m_baseshift(3)
 {
 }
 
@@ -458,7 +458,7 @@ inline rasterizer_texture &tmu_state::prepare_texture(voodoo_renderer &renderer)
 		}
 
 		// recompute the rasterization parameters
-		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, lookup);
+		renderer.alloc_texture(m_index).recompute(m_reg, m_ram, m_mask, lookup, m_basemask, m_baseshift);
 		m_regdirty = false;
 	}
 	return renderer.last_texture(m_index);
@@ -736,8 +736,6 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 	m_vblank_swap_pending(0),
 	m_vblank_swap(0),
 	m_vblank_dont_swap(0),
-	m_reg(model),
-	m_tmu{ model, model },
 	m_vsync_start_timer(nullptr),
 	m_vsync_stop_timer(nullptr),
 	m_stall_resume_timer(nullptr),

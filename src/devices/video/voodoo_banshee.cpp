@@ -442,6 +442,10 @@ void voodoo_banshee_device::device_start()
 	// start like a Voodoo-2
 	voodoo_2_device::device_start();
 
+	// texture base address/shift is different compared to previous versions
+	m_tmu[0].set_baseaddr_mask_shift(0xfffff0, 0);
+	m_tmu[1].set_baseaddr_mask_shift(0xfffff0, 0);
+
 	// initialize the second cmdfifo
 	m_cmdfifo2.init(m_fbram, m_fbmask + 1);
 

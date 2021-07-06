@@ -871,11 +871,8 @@ color_equation color_equation::from_texmode(reg_texture_mode const texmode, colo
 //  recompute - recompute state based on parameters
 //-------------------------------------------------
 
-void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup)
+void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup, u32 addrmask, u8 addrshift)
 {
-	u32 const addrmask = regs.rev1_or_2() ? 0x0fffff : 0xfffff0;
-	u32 const addrshift = regs.rev1_or_2() ? 3 : 0;
-
 	m_ram = ram;
 	m_mask = mask;
 	m_lookup = lookup;
@@ -957,8 +954,6 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	// check for separate RGBA filtering
 	if (texdetail.separate_rgba_filter())
 		fatalerror("Separate RGBA filters!\n");
-
-	m_bilinear_mask = regs.rev2_or_3() ? 0xff : 0xf0;
 }
 
 
@@ -987,7 +982,7 @@ inline rgb_t rasterizer_texture::lookup_single_texel(u32 format, u32 texbase, s3
 //  the S,T coordinates and LOD
 //-------------------------------------------------
 
-inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod)
+inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod, u8 bilinear_mask)
 {
 	lod = lodbase;
 
@@ -1055,8 +1050,8 @@ inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_m
 		t -= 0x80;
 
 		// extract the fractions
-		u32 sfrac = s & m_bilinear_mask;
-		u32 tfrac = t & m_bilinear_mask;
+		u32 sfrac = s & bilinear_mask;
+		u32 tfrac = t & bilinear_mask;
 
 		// now toss the rest
 		s >>= 8;
@@ -1304,6 +1299,7 @@ void rasterizer_palette::compute_ncc(u32 const *regs)
 
 voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const rgb_t *rgb565, voodoo_regs &fbi_regs, voodoo_regs *tmu0_regs, voodoo_regs *tmu1_regs) :
 	poly_manager(machine),
+	m_bilinear_mask(0xf0),
 	m_tmu_config(tmu_config),
 	m_rowpixels(0),
 	m_yorigin(0),
@@ -1311,7 +1307,7 @@ voodoo_renderer::voodoo_renderer(running_machine &machine, u16 tmu_config, const
 	m_tmu0_reg(tmu0_regs),
 	m_tmu1_reg(tmu1_regs),
 	m_rgb565(rgb565),
-	m_fogdelta_mask(fbi_regs.rev1() ? 0xff : 0xfc),
+	m_fogdelta_mask(0xff),
 	m_thread_stats(WORK_MAX_THREADS)
 {
 	// empty the hash table
@@ -2411,7 +2407,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 			{
 				s32 lod1;
-				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, lodbase1, lod1);
+				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, lodbase1, lod1, m_bilinear_mask);
 				if (GenericFlags & rasterizer_params::GENERIC_TEX1_IDENTITY)
 					texel = texel_t1;
 				else
@@ -2426,7 +2422,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 				if (!texmode0.seq_8_downld())
 				{
 					s32 lod0;
-					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, lodbase0, lod0);
+					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, lodbase0, lod0, m_bilinear_mask);
 					if (GenericFlags & rasterizer_params::GENERIC_TEX0_IDENTITY)
 						texel = texel_t0;
 					else

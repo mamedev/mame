@@ -751,6 +751,12 @@ void voodoo_2_device::device_start()
 	// start like a Voodoo-1
 	voodoo_1_device::device_start();
 
+	// fogDelta skips the low 2 bits
+	m_renderer->set_fogdelta_mask(0xfc);
+
+	// bilinear is full resolution
+	m_renderer->set_bilinear_mask(0xff);
+
 	// TMU configuration has an extra bit
 	m_renderer->set_tmu_config(m_renderer->tmu_config() | 0x800);
 

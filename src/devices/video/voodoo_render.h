@@ -358,13 +358,13 @@ class rasterizer_texture
 {
 public:
 	// recompute internal values based on parameters
-	void recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup);
+	void recompute(voodoo_regs const &regs, u8 *ram, u32 mask, rgb_t const *lookup, u32 addrmask, u8 addrshift);
 
 	// look up a texel at the given coordinate
 	rgb_t lookup_single_texel(u32 format, u32 texbase, s32 s, s32 t);
 
 	// fetch a texel given coordinates and LOD information
-	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod);
+	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod, u8 bilinear_mask);
 
 	// texture-specific color combination unit
 	rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
@@ -383,7 +383,6 @@ private:
 	u8 m_wmask;                 // mask for the current texture width
 	u8 m_hmask;                 // mask for the current texture height
 	u8 m_detailscale;           // detail scale
-	u8 m_bilinear_mask;         // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
 	s16 m_lodmin;               // minimum LOD value
 	s16 m_lodmax;               // maximum LOD value
 	s16 m_lodbias;              // LOD bias
@@ -505,7 +504,7 @@ struct thread_stats_block
 };
 
 
-// ======================> rasterizer_info
+// ======================> voodoo_renderer
 
 class voodoo_renderer : public voodoo_poly_manager
 {
@@ -528,6 +527,8 @@ public:
 
 	// simple setters
 	void set_tmu_config(u16 value) { m_tmu_config = value; }
+	void set_fogdelta_mask(u8 value) { m_fogdelta_mask = value; }
+	void set_bilinear_mask(u8 value) { m_bilinear_mask = value; }
 
 	// allocate a new poly_data and fill in the rasterizer_params
 	poly_data &alloc_poly();
@@ -603,6 +604,7 @@ private:
 	voodoo::rasterizer_info *add_rasterizer(voodoo::rasterizer_params const &params, rasterizer_mfp rasterizer, bool is_generic);
 
 	// internal state
+	u8 m_bilinear_mask;         // mask for bilinear resolution (0xf0 for V1, 0xff for V2)
 	u16 m_tmu_config;           // TMU configuration
 	u32 m_rowpixels;            // current pixels per row
 	s32 m_yorigin;              // current Y origin
