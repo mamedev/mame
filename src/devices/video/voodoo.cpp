@@ -113,6 +113,7 @@ Regressions:
  * mace: 2 hit combo appears over text
  * mace: one poly seems to be black on first character
  * sscope2
+ * bbh: not setting screen size properly?
 
 Maps:
  * update to use maps
