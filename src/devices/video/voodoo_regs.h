@@ -1194,17 +1194,24 @@ public:
 	void reset() { std::fill_n(&m_regs[0], std::size(m_regs), 0); }
 
 	// getters
-	char const *name(u32 index) const { return s_names[index & 0x3f]; }
+	char const *name(u32 index) const
+	{
+		if (index < 0x20)
+			return s_names[index & 0x7f];
+		if (index < 0x40)
+			return "launch";
+		return "pattern";
+	}
 
 	// simple readers
-	u32 read(u32 index) const { return m_regs[index & 0x3f]; }
+	u32 read(u32 index) const { return m_regs[index & 0x7f]; }
 
 	// write access
-	u32 write(u32 index, u32 data, u32 mem_mask = 0xffffffff) { return COMBINE_DATA(&m_regs[index & 0x3f]); }
+	u32 write(u32 index, u32 data, u32 mem_mask = 0xffffffff) { return COMBINE_DATA(&m_regs[index & 0x7f]); }
 
 	// special swap history helper
 private:
-	u32 m_regs[0x20];
+	u32 m_regs[0x80];
 	static char const * const s_names[0x20];
 };
 

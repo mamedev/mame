@@ -744,7 +744,9 @@ u32 voodoo_banshee_device::io_r(offs_t offset, u32 mem_mask)
 				result |= vga_r(offset * 4 + 2) << 16;
 			if (ACCESSING_BITS_24_31)
 				result |= vga_r(offset * 4 + 3) << 24;
-			break;
+
+			// early out to skip extra logging
+			return result;
 	}
 
 	if (LOG_REGISTERS)
@@ -768,7 +770,7 @@ void voodoo_banshee_device::io_w(offs_t offset, u32 data, u32 mem_mask)
 	u32 oldval = m_io_regs.read(offset);
 	u32 newval = m_io_regs.write(offset, data, mem_mask);
 
-/*
+
 if (offset >= banshee_io_regs::vidScreenSize && offset <= banshee_io_regs::vidOverlayDvdy)
 {
 	printf("size=%dx%d start=(%d,%d) end=(%d,%d) dudx=%08X dvdy=%08X dudx_strat=%08X srcwidth=%d\n",
@@ -783,7 +785,7 @@ if (offset >= banshee_io_regs::vidScreenSize && offset <= banshee_io_regs::vidOv
 			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDudxOffsetSrcWidth), 0, 19),
 			BIT(m_io_regs.read(banshee_io_regs::vidOverlayDudxOffsetSrcWidth), 19, 13));
 }
-*/
+
 
 	// handle special cases
 	switch (offset)
@@ -845,7 +847,9 @@ if (offset >= banshee_io_regs::vidScreenSize && offset <= banshee_io_regs::vidOv
 				vga_w(offset * 4 + 2, BIT(data, 16, 8));
 			if (ACCESSING_BITS_24_31)
 				vga_w(offset * 4 + 3, BIT(data, 24, 8));
-			break;
+
+			// early out to skip extra logging
+			return;
 	}
 
 	if (LOG_REGISTERS)
@@ -1156,11 +1160,14 @@ u8 voodoo_banshee_device::vga_r(offs_t offset)
 	u32 result = m_vga_regs.read(offset);
 
 	// handle special offsets
+	char const *logtype = "vga_r";
+	u32 logoffs = offset + 0x3c0;
 	switch (offset)
 	{
 		// attribute access
 		case banshee_vga_regs::attributeData:
-			result = m_vga_regs.read_attr(m_vga_regs.attribute_index());
+			result = m_vga_regs.read_attr(logoffs = m_vga_regs.attribute_index());
+			logtype = "vga_attr_r";
 			break;
 
 		// input status 0
@@ -1174,7 +1181,8 @@ u8 voodoo_banshee_device::vga_r(offs_t offset)
 
 		// sequencer access
 		case banshee_vga_regs::sequencerData:
-			result = m_vga_regs.read_seq(m_vga_regs.sequencer_index());
+			result = m_vga_regs.read_seq(logoffs = m_vga_regs.sequencer_index());
+			logtype = "vga_seq_r";
 			break;
 
 		// feature control
@@ -1190,16 +1198,18 @@ u8 voodoo_banshee_device::vga_r(offs_t offset)
 
 		// graphics controller access
 		case banshee_vga_regs::gfxControllerData:
-			result = m_vga_regs.read_gc(m_vga_regs.gfx_controller_index());
+			result = m_vga_regs.read_gc(logoffs = m_vga_regs.gfx_controller_index());
+			logtype = "vga_gc_r";
 			break;
 
 		// CRTC access
-		case 0x3d5:
-			result = m_vga_regs.read_crtc(m_vga_regs.crtc_index());
+		case banshee_vga_regs::crtcData:
+			result = m_vga_regs.read_crtc(logoffs = m_vga_regs.crtc_index());
+			logtype = "vga_crtc_r";
 			break;
 
 		// input status 1
-		case 0x3da:
+		case banshee_vga_regs::inputStatus1:
 			// bit 7:6 = Reserved. These bits read back 0.
 			// bit 5:4 = Display Status. These 2 bits reflect 2 of the 8 pixel data outputs from the Attribute
 			//             controller, as determined by the Attribute controller index 0x12 bits 4 and 5.
@@ -1212,7 +1222,7 @@ u8 voodoo_banshee_device::vga_r(offs_t offset)
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:vga_r(%X) = %02X\n", machine().describe_context(), 0x3c0 + offset, result);
+		logerror("%s:%s(%X) = %02X\n", machine().describe_context(), logtype, logoffs, result);
 	return result;
 }
 
@@ -1229,6 +1239,8 @@ void voodoo_banshee_device::vga_w(offs_t offset, u8 data)
 	m_vga_regs.write(offset, data);
 
 	// handle special cases
+	char const *logtype = "vga_w";
+	u32 logoffs = offset + 0x3c0;
 	switch (offset)
 	{
 		// attribute access
@@ -1237,27 +1249,33 @@ void voodoo_banshee_device::vga_w(offs_t offset, u8 data)
 			if (m_vga_regs.toggle_flip_flop() == 0)
 				m_vga_regs.write(banshee_vga_regs::attributeIndex, data);
 			else
-				m_vga_regs.write_attr(m_vga_regs.attribute_index(), data);
+			{
+				m_vga_regs.write_attr(logoffs = m_vga_regs.attribute_index(), data);
+				logtype = "vga_crtc_w";
+			}
 			break;
 
 		// sequencer access
 		case banshee_vga_regs::sequencerData:
-			m_vga_regs.write_seq(m_vga_regs.sequencer_index(), data);
+			m_vga_regs.write_seq(logoffs = m_vga_regs.sequencer_index(), data);
+			logtype = "vga_seq_w";
 			break;
 
 		// graphics controller access
 		case banshee_vga_regs::gfxControllerData:
-			m_vga_regs.write_gc(m_vga_regs.gfx_controller_index(), data);
+			m_vga_regs.write_gc(logoffs = m_vga_regs.gfx_controller_index(), data);
+			logtype = "vga_gc_w";
 			break;
 
 		// CRTC access
 		case banshee_vga_regs::crtcData:
-			m_vga_regs.write_crtc(m_vga_regs.crtc_index(), data);
+			m_vga_regs.write_crtc(logoffs = m_vga_regs.crtc_index(), data);
+			logtype = "vga_crtc_w";
 			break;
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:vga_w(%X) = %02X\n", machine().describe_context(), 0x3c0 + offset, data);
+		logerror("%s:%s(%X) = %02X\n", machine().describe_context(), logtype, logoffs, data);
 }
 
 
@@ -1834,9 +1852,9 @@ static_register_table_entry<voodoo_banshee_device> const voodoo_banshee_device::
 	REGISTER_ENTRY(tLOD,            invalid,     texture,     28, TREX,     NOSYNC,   FIFO)    // 304
 	REGISTER_ENTRY(tDetail,         invalid,     texture,     22, TREX,     NOSYNC,   FIFO)    // 308
 	REGISTER_ENTRY(texBaseAddr,     invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 30c
-	REGISTER_ENTRY(texBaseAddr_1,   invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 310
-	REGISTER_ENTRY(texBaseAddr_2,   invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 314
-	REGISTER_ENTRY(texBaseAddr_3_8, invalid,     texture,     19, TREX,     NOSYNC,   FIFO)    // 318
+	REGISTER_ENTRY(texBaseAddr_1,   invalid,     texture,     24, TREX,     NOSYNC,   FIFO)    // 310
+	REGISTER_ENTRY(texBaseAddr_2,   invalid,     texture,     24, TREX,     NOSYNC,   FIFO)    // 314
+	REGISTER_ENTRY(texBaseAddr_3_8, invalid,     texture,     24, TREX,     NOSYNC,   FIFO)    // 318
 	REGISTER_ENTRY(trexInit0,       invalid,     passive,     32, TREX,       SYNC,   FIFO)    // 31c
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(trexInit1,       invalid,     passive,     32, TREX,       SYNC,   FIFO)    // 320
