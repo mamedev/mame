@@ -75,21 +75,11 @@ void nes_ntdec_asder_device::pcb_reset()
 	m_chr_outer = 0;
 }
 
-void nes_ntdec_fh_device::device_start()
-{
-	common_start();
-}
-
 void nes_ntdec_fh_device::pcb_reset()
 {
 	prg32((m_prg_chunks - 1) >> 1);
 	chr8(0, CHRROM);
 	set_nt_mirroring(PPU_MIRROR_VERT);
-}
-
-void nes_ntdec_n715021_device::device_start()
-{
-	common_start();
 }
 
 void nes_ntdec_n715021_device::pcb_reset()
@@ -130,7 +120,7 @@ void nes_ntdec_asder_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("ntdec_asder write_h, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x6001)    // writes only at even addresses
+	switch (offset & 0x6001)    // writes only at even addresses?
 	{
 		case 0x0000:
 			m_latch = data & 0x07;
