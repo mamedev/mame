@@ -1934,27 +1934,30 @@ void dfjail_state::sound_control_w(uint8_t data)
 	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 }
 
-void dfjail_state::dac_data_w(uint8_t data)
+void dfjail_state::dac_data_w(offs_t offset, uint8_t data)
 {
-	// TODO: understand how this is hooked up
-	#if 0
-	switch(offset)
+	/*
+		Z80 code in the NMI handler at 0x6e:
+		Sample in A
+		Copy A to E
+		Shift A left 2 and AND by 3C
+		write A to port 0x80
+		Copy E to A
+		Shift right 4 times
+		write A to ports 0x81, 0x82, and 0x83
+
+		This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
+		and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
+	*/
+	if (offset == 0)
 	{
-		case 0:
-			m_dac_data = (data & 0xf) << 0;
-			break;
-		case 1:
-			m_dac_data |= (data & 0xf) << 4;
-			break;
-		case 2:
-			m_dac_data |= (data & 0xf) << 8;
-			break;
-		case 3:
-			m_dac_data |= (data & 0xf) << 12;
-			m_dac->write(m_dac_data);
-			break;
+		m_dac_data = (data>>2) & 0xf;
 	}
-	#endif
+	else if (offset == 1)
+	{
+		m_dac_data |= (data << 4);
+		m_dac->write(m_dac_data);
+	}
 }
 
 void dfjail_state::dfjail_sound_iomap(address_map &map)
@@ -4278,12 +4281,12 @@ void dfjail_state::dfjail(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dfjail_state::bootleg_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &dfjail_state::dfjail_sound_iomap);
 	// connected to a 74ls74 clock source
-	m_soundcpu->set_periodic_int(FUNC(dfjail_state::soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
+	m_soundcpu->set_periodic_int(FUNC(dfjail_state::soundirq_cb), attotime::from_hz(8000)); // This sets the sample rate of the DAC samples
 
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75); // AD7533KN
 }
 
 
@@ -5170,8 +5173,8 @@ ROM_START( dfjail )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // z80
 	ROM_LOAD( "29.f3",        0x000000, 0x008000, CRC(7f3ebb6a) SHA1(f265c6215ef457202686b31c9b503a0a371a1139) )
-	ROM_LOAD( "28.g3",        0x010000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
-	ROM_LOAD( "27.g1",        0x030000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
+	ROM_LOAD( "28.g3",        0x030000, 0x020000, CRC(ed96d6b9) SHA1(3ad096e466150d0ca36fec8dd649554e7fb9f654) )
+	ROM_LOAD( "27.g1",        0x010000, 0x020000, CRC(7a88e1c1) SHA1(b238b451522819a5a8c1a9e82058b86d33ac2272) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
 	ROM_LOAD( "9.f16",        0x000000, 0x020000, CRC(b2a49d12) SHA1(052b96109abc18c562c09042664738bac68f66b4) )
