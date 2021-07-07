@@ -107,11 +107,6 @@ bits(7:4) and bit(24)), X, and Y:
 
 /*
 
-Remaining work:
-
-Regressions:
- * sscope2
-
 todo:
  - look at speed on Konami games (nbapbp, racingj, etc)
  - look at timing issues on IT games
@@ -1455,13 +1450,13 @@ void voodoo_1_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 	// look up the register
 	auto const &regentry = m_regtable[regnum];
 
-	// track swap buffer commands seen
-	if (regnum == voodoo_regs::reg_swapbufferCMD)
-		m_swaps_pending++;
-
 	// if this is non-FIFO command, execute immediately
 	if (!regentry.is_fifo())
 		return void(regentry.write(*this, chipmask, regnum, data));
+
+	// track swap buffer commands seen
+	if (regnum == voodoo_regs::reg_swapbufferCMD)
+		m_swaps_pending++;
 
 	// if we're busy add to the FIFO
 	if (pending && m_init_enable.enable_pci_fifo())

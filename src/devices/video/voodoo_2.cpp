@@ -796,7 +796,7 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// handle aliasing
 	if (BIT(offset, 21-2) && m_reg.fbi_init3().tri_register_remap())
-		offset = (offset & ~0xff) | m_reg.alias(offset);
+		regnum = voodoo_regs::alias(regnum);
 
 	// look up the register
 	auto const &regentry = m_regtable[regnum];
@@ -818,13 +818,12 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 
 	// if we're busy add to the fifo
 	if (pending && m_init_enable.enable_pci_fifo())
-		return add_to_fifo((chipmask << 8) | regnum | memory_fifo::TYPE_REGISTER, data, mem_mask);
+		return add_to_fifo(memory_fifo::TYPE_REGISTER | (chipmask << 8) | regnum, data, mem_mask);
 
 	// if we get a non-zero number of cycles back, mark things pending
 	int cycles = regentry.write(*this, chipmask, regnum, data);
 	if (cycles > 0)
 	{
-		// if we ended up with cycles, mark the operation pending
 		m_operation_end = machine().time() + clocks_to_attotime(cycles);
 		if (LOG_FIFO_VERBOSE)
 			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
