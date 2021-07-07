@@ -72,9 +72,9 @@
 */
 
 #include "emu.h"
-#include "screen.h"
 #include "cpu/tms32082/tms32082.h"
 #include "video/poly.h"
+#include "screen.h"
 
 struct rollext_polydata
 {

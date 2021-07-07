@@ -4,8 +4,8 @@
 // Taito TC0780FPA Polygon Renderer
 
 #include "emu.h"
-#include "screen.h"
 #include "tc0780fpa.h"
+#include "screen.h"
 
 
 #define POLY_FIFO_SIZE  32

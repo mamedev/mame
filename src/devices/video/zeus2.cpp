@@ -6,8 +6,8 @@
 
 **************************************************************************/
 #include "emu.h"
-#include "screen.h"
 #include "zeus2.h"
+#include "screen.h"
 
 #include <algorithm>
 
@@ -1828,7 +1828,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	}
 
 	//if (numverts == 3)
-	//  render_triangle<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, vert[0], vert[1], vert[2]);
+	//  render_triangle<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert[0], vert[1], vert[2]);
 	render_polygon<4, 4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), vert);
 }
 
