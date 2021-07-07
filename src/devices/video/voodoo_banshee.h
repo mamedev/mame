@@ -45,7 +45,7 @@ protected:
 
 public:
 	// nominal clock values
-	static constexpr u32 NOMINAL_CLOCK = 90000000;
+	static constexpr u32 NOMINAL_CLOCK = 90'000'000;
 
 	// construction
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -172,7 +172,7 @@ class voodoo_3_device : public voodoo_banshee_device
 {
 public:
 	// nominal clock values
-	static constexpr u32 NOMINAL_CLOCK = 132000000;
+	static constexpr u32 NOMINAL_CLOCK = 132'000'000;
 
 	// construction
 	voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

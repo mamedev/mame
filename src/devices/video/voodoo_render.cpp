@@ -441,7 +441,7 @@ public:
 		t = m_t >> shift;
 	}
 
-	inline void add(stw_helper const &other)
+	void add(stw_helper const &other)
 	{
 		m_s += other.m_s;
 		m_t += other.m_t;
@@ -450,7 +450,7 @@ public:
 
 	// Computes s/w and t/w and returns log2 of 1/w
 	// s, t and c are 16.32 values.  The results are 24.8.
-	inline void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
+	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
 	{
 		double recip = double(1ULL << (47 - 39)) / m_w;
 		sow = s32(m_s * recip);
@@ -2589,27 +2589,27 @@ rasterizer_info *voodoo_renderer::add_rasterizer(rasterizer_params const &params
 
 	if (LOG_RASTERIZERS && params.fbzcp().raw() != 0)
 	{
-		printf("Adding rasterizer : gen=%02X cp=%08X am=%08X fog=%08X fbz=%08X tm0=%08X tm1=%08X (hash=%d)\n",
+		osd_printf_info("Adding rasterizer : gen=%02X cp=%08X am=%08X fog=%08X fbz=%08X tm0=%08X tm1=%08X (hash=%d)\n",
 				params.generic(), params.fbzcp().raw(), params.alphamode().raw(), params.fogmode().raw(), params.fbzmode().raw(),
 				params.texmode0().raw(), params.texmode1().raw(), hash);
 
 		// explicitly recompute the equations since static rasterizers don't have them
 		rasterizer_params computed(params);
 		computed.compute_equations();
-		printf("   Color: %s\n", computed.colorpath_equation().as_string().c_str());
+		osd_printf_info("   Color: %s\n", computed.colorpath_equation().as_string().c_str());
 		if (computed.generic() & rasterizer_params::GENERIC_TEX0)
 		{
 			if (computed.generic() & rasterizer_params::GENERIC_TEX0_IDENTITY)
-				printf("    Tex0: Identity\n");
+				osd_printf_info("    Tex0: Identity\n");
 			else
-				printf("    Tex0: %s\n", computed.tex0_equation().as_string().c_str());
+				osd_printf_info("    Tex0: %s\n", computed.tex0_equation().as_string().c_str());
 		}
 		if (computed.generic() & rasterizer_params::GENERIC_TEX1)
 		{
 			if (computed.generic() & rasterizer_params::GENERIC_TEX1_IDENTITY)
-				printf("    Tex1: Identity\n");
+				osd_printf_info("    Tex1: Identity\n");
 			else
-				printf("    Tex1: %s\n", computed.tex1_equation().as_string().c_str());
+				osd_printf_info("    Tex1: %s\n", computed.tex1_equation().as_string().c_str());
 		}
 	}
 	return &info;
@@ -2630,7 +2630,7 @@ void voodoo_renderer::dump_rasterizer_stats()
 	rasterizer_info *cur, *best;
 	int hash;
 
-	printf("----\n");
+	osd_printf_info("----\n");
 	display_index++;
 
 	// loop until we've displayed everything
@@ -2649,7 +2649,7 @@ void voodoo_renderer::dump_rasterizer_stats()
 			break;
 
 		// print it
-		printf("%s RASTERIZER( 0x%02X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) // %8d %10d\n",
+		osd_printf_info("%s RASTERIZER( 0x%02X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X, 0x%08X ) // %8d %10d\n",
 			best->is_generic ? "   " : "// ",
 			best->params.generic(),
 			best->params.fbzcp().raw(),

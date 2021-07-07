@@ -177,7 +177,7 @@ protected:
 
 public:
 	// nominal clock value
-	static constexpr u32 NOMINAL_CLOCK = 90000000;
+	static constexpr u32 NOMINAL_CLOCK = 90'000'000;
 
 	// construction
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :

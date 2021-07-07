@@ -502,24 +502,24 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 	}
 
 	// output global stats
-	printf("Total triangles = %d\n", m_triangles);
-	printf("Total quads = %d\n", m_quads);
+	osd_printf_info("Total triangles = %d\n", m_triangles);
+	osd_printf_info("Total quads = %d\n", m_quads);
 	if (m_pixels > 1000000000)
-		printf("Total pixels   = %d%09d\n", uint32_t(m_pixels / 1000000000), uint32_t(m_pixels % 1000000000));
+		osd_printf_info("Total pixels   = %d%09d\n", uint32_t(m_pixels / 1000000000), uint32_t(m_pixels % 1000000000));
 	else
-		printf("Total pixels   = %d\n", uint32_t(m_pixels));
+		osd_printf_info("Total pixels   = %d\n", uint32_t(m_pixels));
 
-	printf("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
-	printf("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
-	printf("Polygons:    %5d used, %5d allocated, %4d bytes each, %7d total\n", m_polygon.max(), m_polygon.allocated(), int(m_polygon.itemsize()), int(m_polygon.allocated() * m_polygon.itemsize()));
-	printf("Object data: %5d used, %5d allocated, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), int(m_object.itemsize()), int(m_object.allocated() * m_object.itemsize()));
+	osd_printf_info("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
+	osd_printf_info("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
+	osd_printf_info("Polygons:    %5d used, %5d allocated, %4d bytes each, %7d total\n", m_polygon.max(), m_polygon.allocated(), int(m_polygon.itemsize()), int(m_polygon.allocated() * m_polygon.itemsize()));
+	osd_printf_info("Object data: %5d used, %5d allocated, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), int(m_object.itemsize()), int(m_object.allocated() * m_object.itemsize()));
 }
 #endif
 #if TRACK_POLY_WAITS
 {
-	printf("Wait summary:\n");
-	printf("Cause                Cycles  Waits  Actuals Average   <100   100-1k  1k-10k   10k+\n");
-	printf("------------------  ------- ------- ------- ------- ------- ------- ------- -------\n");
+	osd_printf_info("Wait summary:\n");
+	osd_printf_info("Cause                Cycles  Waits  Actuals Average   <100   100-1k  1k-10k   10k+\n");
+	osd_printf_info("------------------  ------- ------- ------- ------- ------- ------- ------- -------\n");
 	while (1)
 	{
 		typename waitmap_t::value_type *biggest = nullptr;
@@ -531,7 +531,7 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 		if (biggest == nullptr)
 			break;
 
-		printf("%-20s%-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
+		osd_printf_info("%-20s%-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
 			biggest->first.c_str(),
 			friendly_number(biggest->second.total_cycles).c_str(),
 			friendly_number(biggest->second.total_waits).c_str(),

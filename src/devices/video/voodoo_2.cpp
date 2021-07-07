@@ -384,7 +384,7 @@ u32 command_fifo::packet_type_2(u32 command)
 	u32 cycles = 0;
 	for (u32 regbit = 3; regbit <= 31; regbit++)
 		if (BIT(command, regbit))
-				cycles += m_device.cmdfifo_2d_w(regbit - 3, read_next());
+			cycles += m_device.cmdfifo_2d_w(regbit - 3, read_next());
 	return cycles;
 }
 
