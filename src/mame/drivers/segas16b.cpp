@@ -1918,13 +1918,8 @@ void dfjail_state::sound_control_w(uint8_t data)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 
-	// NMI and presumably DAC output clear
-	// TODO: identify which is which
+	// NMI enable in bit 6
 	m_nmi_enable = ((data & 0xc0) == 0);
-	if (m_nmi_enable == false)
-		m_dac->write(0);
-	//m_upd7759->start_w(BIT(data, 7));
-	//m_upd7759->reset_w(BIT(data, 6));
 
 	int bankoffs = 0;
 	bankoffs = ((data & 0x08) >> 3) * 0x20000;
@@ -4277,7 +4272,7 @@ void dfjail_state::dfjail(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dfjail_state::dfjail_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dfjail_state::irq4_line_hold));
 
-	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
+	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/2); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dfjail_state::bootleg_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &dfjail_state::dfjail_sound_iomap);
 	// connected to a 74ls74 clock source
@@ -4286,7 +4281,7 @@ void dfjail_state::dfjail(machine_config &config)
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75); // AD7533KN
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // AD7533KN
 }
 
 
