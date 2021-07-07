@@ -20,16 +20,16 @@ Current status of `tinyexr` is:
 
 - OpenEXR v1 image
   - [x] Scanline format
-  - [ ] Tiled format
+  - [x] Tiled format
     - [x] Tile format with no LoD (load).
-    - [ ] Tile format with LoD (load).
-    - [ ] Tile format with no LoD (save).
-    - [ ] Tile format with LoD (save).
+    - [x] Tile format with LoD (load).
+    - [x] Tile format with no LoD (save).
+    - [x] Tile format with LoD (save).
   - [x] Custom attributes
 - OpenEXR v2 image
   - [ ] Multipart format
     - [x] Load multi-part image
-    - [ ] Save multi-part image
+    - [x] Save multi-part image
     - [ ] Load multi-part deep image
     - [ ] Save multi-part deep image
 - OpenEXR v2 deep image
@@ -47,7 +47,8 @@ Current status of `tinyexr` is:
 - Line order.
   - [x] Increasing, decreasing (load)
   - [ ] Random?
-  - [ ] Increasing, decreasing (save)
+  - [x] Increasing (save)
+  - [ ] decreasing (save)
 - Pixel format (UINT, FLOAT).
   - [x] UINT, FLOAT (load)
   - [x] UINT, FLOAT (deep load)
@@ -56,8 +57,8 @@ Current status of `tinyexr` is:
 - Support for big endian machine.
   - [x] Loading scanline image
   - [x] Saving scanline image
-  - [ ] Loading multi-part channel EXR
-  - [ ] Saving multi-part channel EXR
+  - [x] Loading multi-part channel EXR (not tested)
+  - [x] Saving multi-part channel EXR (not tested)
   - [ ] Loading deep image
   - [ ] Saving deep image
 - Optimization
@@ -71,6 +72,25 @@ Current status of `tinyexr` is:
 * C interface.
   * You can easily write language bindings (e.g. golang)
 
+# Supported platform
+
+* [x] x86-64
+  * [x] Windows 7 or later
+  * [x] Linux(posix) system
+  * [x] macOS
+* [x] AARCH64
+  * [x] aarch64 linux(e.g. Raspberry Pi)
+  * [x] Android
+  * [x] iOS
+  * [ ] macOS(Should work)
+* [ ] RISC-V(Should work)
+* [x] Big endian machine(not maintained, but should work)
+  * SPARC, PowerPC, ...
+* [x] WebAssembly(JavaScript)
+  * Loader only(See ![js](experimental/js/))
+* [x] Python binding
+  * Loader only https://pypi.org/project/pytinyexr/
+
 # Requirements
 
 * C++ compiler(C++11 recommended. C++03 may work)
@@ -80,7 +100,7 @@ Current status of `tinyexr` is:
 ## New TinyEXR (v0.9.5+)
 
 * Godot. Multi-platform 2D and 3D game engine https://godotengine.org/
-* Filament. PBR engine. https://github.com/google/filament
+* Filament. PBR engine(used in a converter tool). https://github.com/google/filament
 * PyEXR. Loading OpenEXR (.exr) images using Python. https://github.com/ialhashim/PyEXR
 * The-Forge. The Forge Cross-Platform Rendering Framework PC, Linux, Ray Tracing, macOS / iOS, Android, XBOX, PS4 https://github.com/ConfettiFX/The-Forge
 * Your project here!

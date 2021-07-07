@@ -10,6 +10,7 @@ project "bimg_decode"
 		path.join(BX_DIR, "include"),
 		path.join(BIMG_DIR, "include"),
 		path.join(BIMG_DIR, "3rdparty"),
+		path.join(BIMG_DIR, "3rdparty/tinyexr/deps/miniz"),
 	}
 
 	files {
