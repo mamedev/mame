@@ -947,7 +947,7 @@ void k001005_renderer::render_polygons()
 					vertex3 = &v[2];
 				}
 
-				render_triangle(m_cliprect, rd_scan_tex_gouraud, 10, *vertex1, *vertex2, *vertex3);
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex1, *vertex2, *vertex3);
 
 				memcpy(&m_prev_v[1], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[2], vertex2, sizeof(vertex_t));
@@ -984,8 +984,8 @@ void k001005_renderer::render_polygons()
 					vertex4 = &v[3];
 				}
 
-				render_triangle(m_cliprect, rd_scan_tex_gouraud, 10, *vertex1, *vertex2, *vertex3);
-				render_triangle(m_cliprect, rd_scan_tex_gouraud, 10, *vertex3, *vertex4, *vertex1);
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex1, *vertex2, *vertex3);
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex3, *vertex4, *vertex1);
 
 				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
