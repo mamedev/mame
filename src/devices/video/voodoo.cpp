@@ -131,7 +131,7 @@ using namespace voodoo;
 //  the given number of fractional bits
 //-------------------------------------------------
 
-static inline s32 float_to_int32(u32 data, int fixedbits)
+inline s32 float_to_int32(u32 data, int fixedbits)
 {
 	// compute the effective exponent
 	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
@@ -166,7 +166,7 @@ static inline s32 float_to_int32(u32 data, int fixedbits)
 //  the given number of fractional bits
 //-------------------------------------------------
 
-static inline s64 float_to_int64(u32 data, int fixedbits)
+inline s64 float_to_int64(u32 data, int fixedbits)
 {
 	// compute the effective exponent
 	int exponent = ((data >> 23) & 0xff) - 127 - 23 + fixedbits;
