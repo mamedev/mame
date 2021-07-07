@@ -222,8 +222,8 @@ uint8_t mc10_state::mc6847_videoram_r(offs_t offset)
 	if (offset == ~0) return 0xff;
 
 	uint8_t result = m_ram->read(offset);
- 	m_mc6847->inv_w(BIT(result, 6));
- 	m_mc6847->as_w(BIT(result, 7));
+	m_mc6847->inv_w(BIT(result, 6));
+	m_mc6847->as_w(BIT(result, 7));
 	return result;
 }
 

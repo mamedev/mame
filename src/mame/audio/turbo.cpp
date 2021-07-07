@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/turbo.h"
-#include "sound/samples.h"
 #include "speaker.h"
 
 
@@ -22,19 +21,19 @@
  *
  *************************************/
 
-void turbo_state::turbo_update_samples()
+void turbo_state::update_samples()
 {
-	/* accelerator sounds */
-	/* BSEL == 3 --> off */
-	/* BSEL == 2 --> standard */
-	/* BSEL == 1 --> tunnel */
-	/* BSEL == 0 --> ??? */
-	if (m_turbo_bsel == 3 && m_samples->playing(5))
+	// accelerator sounds
+	// BSEL == 3 --> off
+	// BSEL == 2 --> standard
+	// BSEL == 1 --> tunnel
+	// BSEL == 0 --> ???
+	if (m_bsel == 3 && m_samples->playing(5))
 		m_samples->stop(5);
-	else if (m_turbo_bsel != 3 && !m_samples->playing(5))
+	else if (m_bsel != 3 && !m_samples->playing(5))
 		m_samples->start(5, 7, true);
 	if (m_samples->playing(5))
-		m_samples->set_frequency(5, m_samples->base_frequency(5) * ((m_turbo_accel & 0x3f) / 5.25 + 1));
+		m_samples->set_frequency(5, m_samples->base_frequency(5) * ((m_accel & 0x3f) / 5.25 + 1));
 }
 
 
@@ -45,7 +44,7 @@ TIMER_CALLBACK_MEMBER(turbo_state::update_sound_a)
 	discrete_device *discrete = machine.device<discrete_device>("discrete");
 	int data = param;
 
-	/* missing short crash sample, but I've never seen it triggered */
+	// missing short crash sample, but I've never seen it triggered
 	discrete->write(0, !(data & 0x01));
 	discrete->write(1, (data >> 1) & 1);
 	discrete->write(2, (data >> 2) & 1);
@@ -60,7 +59,7 @@ if (!((data >> 3) & 1)) osd_printf_debug("/TRIG3\n");
 if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
 
 //  osel = (osel & 6) | ((data >> 5) & 1);
-//  turbo_update_samples(samples);
+//  update_samples(samples);
 }
 #endif
 
@@ -72,7 +71,7 @@ if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
  *
  *************************************/
 
-void turbo_state::turbo_sound_a_w(u8 data)
+void turbo_state::sound_a_w(uint8_t data)
 {
 #if (!DISCRETE_TEST)
 #endif
@@ -83,32 +82,32 @@ void turbo_state::turbo_sound_a_w(u8 data)
 
 #if (!DISCRETE_TEST)
 
-	/* /CRASH.S: channel 0 */
+	// /CRASH.S: channel 0
 	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 5);
 
-	/* /TRIG1: channel 1 */
+	// /TRIG1: channel 1
 	if ((diff & 0x02) && !(data & 0x02)) m_samples->start(1, 0);
 
-	/* /TRIG2: channel 1 */
+	// /TRIG2: channel 1
 	if ((diff & 0x04) && !(data & 0x04)) m_samples->start(1, 1);
 
-	/* /TRIG3: channel 1 */
+	// /TRIG3: channel 1
 	if ((diff & 0x08) && !(data & 0x08)) m_samples->start(1, 2);
 
-	/* /TRIG4: channel 1 */
+	// /TRIG4: channel 1
 	if ((diff & 0x10) && !(data & 0x10)) m_samples->start(1, 3);
 
-	/* OSEL0 */
-	m_turbo_osel = (m_turbo_osel & 6) | ((data >> 5) & 1);
+	// OSEL0
+	m_osel = (m_osel & 6) | ((data >> 5) & 1);
 
-	/* /SLIP: channel 2 */
+	// /SLIP: channel 2
 	if ((diff & 0x40) && !(data & 0x40)) m_samples->start(2, 4);
 
-	/* /CRASH.L: channel 3 */
+	// /CRASH.L: channel 3
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(3, 5);
 
-	/* update any samples */
-	turbo_update_samples();
+	// update any samples
+	update_samples();
 
 #else
 
@@ -123,40 +122,40 @@ void turbo_state::turbo_sound_a_w(u8 data)
 }
 
 
-void turbo_state::turbo_sound_b_w(u8 data)
+void turbo_state::sound_b_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
-	/* ACC0-ACC5 */
-	m_turbo_accel = data & 0x3f;
-	output().set_value("tachometer", m_turbo_accel);
+	// ACC0-ACC5
+	m_accel = data & 0x3f;
+	m_tachometer = m_accel;
 
-	/* /AMBU: channel 4 */
+	// /AMBU: channel 4
 	if ((diff & 0x40) && !(data & 0x40) && !m_samples->playing(4)) m_samples->start(4, 8, true);
 	if ((diff & 0x40) &&  (data & 0x40)) m_samples->stop(4);
 
-	/* /SPIN: channel 2 */
+	// /SPIN: channel 2
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(2, 6);
 
-	/* update any samples */
-	turbo_update_samples();
+	// update any samples
+	update_samples();
 }
 
 
-void turbo_state::turbo_sound_c_w(u8 data)
+void turbo_state::sound_c_w(uint8_t data)
 {
-	/* OSEL1-2 */
-	m_turbo_osel = (m_turbo_osel & 1) | ((data & 3) << 1);
+	// OSEL1-2
+	m_osel = (m_osel & 1) | ((data & 3) << 1);
 
-	/* BSEL0-1 */
-	m_turbo_bsel = (data >> 2) & 3;
+	// BSEL0-1
+	m_bsel = (data >> 2) & 3;
 
-	/* SPEED0-3 */
-	output().set_value("speed", (data >> 4) & 0x0f);
+	// SPEED0-3
+	m_speed = (data >> 4) & 0x0f;
 
-	/* update any samples */
-	turbo_update_samples();
+	// update any samples
+	update_samples();
 }
 
 
@@ -170,22 +169,22 @@ void turbo_state::turbo_sound_c_w(u8 data)
 static const char *const turbo_sample_names[] =
 {
 	"*turbo",
-	"01",       /* 0: Trig1 */
-	"02",       /* 1: Trig2 */
-	"03",       /* 2: Trig3 */
-	"04",       /* 3: Trig4 */
-	"05",       /* 4: Screech */
-	"06",       /* 5: Crash */
-	"skidding", /* 6: Spin */
-	"idle",     /* 7: Idle */
-	"ambulanc", /* 8: Ambulance */
+	"01",       // 0: Trig1
+	"02",       // 1: Trig2
+	"03",       // 2: Trig3
+	"04",       // 3: Trig4
+	"05",       // 4: Screech
+	"06",       // 5: Crash
+	"skidding", // 6: Spin
+	"idle",     // 7: Idle
+	"ambulanc", // 8: Ambulance
 	nullptr
 };
 
 
 void turbo_state::turbo_samples(machine_config &config)
 {
-	/* this is the cockpit speaker configuration */
+	// this is the cockpit speaker configuration
 	SPEAKER(config, "fspeaker", 0.0, 0.0, 1.0);     // front
 	SPEAKER(config, "bspeaker",  0.0, 0.0, -0.5);   // back
 	SPEAKER(config, "lspeaker", -0.2, 0.0, 1.0);    // left
@@ -195,39 +194,39 @@ void turbo_state::turbo_samples(machine_config &config)
 	m_samples->set_channels(10);
 	m_samples->set_samples_names(turbo_sample_names);
 
-	/* channel 0 = CRASH.S -> CRASH.S/SM */
+	// channel 0 = CRASH.S -> CRASH.S/SM
 	m_samples->add_route(0, "fspeaker", 0.25);
 
-	/* channel 1 = TRIG1-4 -> ALARM.M/F/R/L */
+	// channel 1 = TRIG1-4 -> ALARM.M/F/R/L
 	m_samples->add_route(1, "fspeaker", 0.25);
 	m_samples->add_route(1, "rspeaker", 0.25);
 	m_samples->add_route(1, "lspeaker",  0.25);
 
-	/* channel 2 = SLIP/SPIN -> SKID.F/R/L/M */
+	// channel 2 = SLIP/SPIN -> SKID.F/R/L/M
 	m_samples->add_route(2, "fspeaker", 0.25);
 	m_samples->add_route(2, "rspeaker", 0.25);
 	m_samples->add_route(2, "lspeaker",  0.25);
 
-	/* channel 3 = CRASH.L -> CRASH.L/LM */
+	// channel 3 = CRASH.L -> CRASH.L/LM
 	m_samples->add_route(3, "bspeaker",  0.25);
 
-	/* channel 4 = AMBU -> AMBULANCE/AMBULANCE.M */
+	// channel 4 = AMBU -> AMBULANCE/AMBULANCE.M
 	m_samples->add_route(4, "fspeaker", 0.25);
 
-	/* channel 5 = ACCEL+BSEL -> MYCAR.F/W/M + MYCAR0.F/M + MYCAR1.F/M */
+	// channel 5 = ACCEL+BSEL -> MYCAR.F/W/M + MYCAR0.F/M + MYCAR1.F/M
 	m_samples->add_route(5, "fspeaker", 0.25);
 	m_samples->add_route(5, "bspeaker",  0.25);
 
-	/* channel 6 = OSEL -> OCAR.F/FM */
+	// channel 6 = OSEL -> OCAR.F/FM
 	m_samples->add_route(6, "fspeaker", 0.25);
 
-	/* channel 7 = OSEL -> OCAR.L/LM */
+	// channel 7 = OSEL -> OCAR.L/LM
 	m_samples->add_route(7, "lspeaker",  0.25);
 
-	/* channel 8 = OSEL -> OCAR.R/RM */
+	// channel 8 = OSEL -> OCAR.R/RM
 	m_samples->add_route(8, "rspeaker", 0.25);
 
-	/* channel 9 = OSEL -> OCAR.W/WM */
+	// channel 9 = OSEL -> OCAR.W/WM
 	m_samples->add_route(9, "bspeaker",  0.25);
 }
 
@@ -286,21 +285,21 @@ void turbo_state::turbo_samples(machine_config &config)
  *
  *************************************/
 
-void turbo_state::subroc3d_sound_a_w(u8 data)
+void subroc3d_state::sound_a_w(uint8_t data)
 {
 	m_sound_state[0] = data;
 
-	/* DIS0-3 contained in bits 0-3 */
-	/* DIR0-2 contained in bits 4-6 */
+	// DIS0-3 contained in bits 0-3
+	// DIR0-2 contained in bits 4-6
 }
 
 
-inline void turbo_state::subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir)
+inline void subroc3d_state::update_volume(int leftchan, uint8_t dis, uint8_t dir)
 {
 	float volume = (float)(15 - dis) / 16.0f;
 	float lvol, rvol;
 
-	/* compute the left/right volume from the data */
+	// compute the left/right volume from the data
 	if (dir != 7)
 	{
 		lvol = volume * (float)(6 - dir) / 6.0f;
@@ -309,98 +308,98 @@ inline void turbo_state::subroc3d_update_volume(int leftchan, uint8_t dis, uint8
 	else
 		lvol = rvol = 0;
 
-	/* if the sample is playing, adjust it */
+	// if the sample is playing, adjust it
 	m_samples->set_volume(leftchan + 0, lvol);
 	m_samples->set_volume(leftchan + 1, rvol);
 }
 
 
-void turbo_state::subroc3d_sound_b_w(u8 data)
+void subroc3d_state::sound_b_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
-	/* bit 0 latches direction/volume for missile */
+	// bit 0 latches direction/volume for missile
 	if ((diff & 0x01) && (data & 0x01))
 	{
-		m_subroc3d_mdis = m_sound_state[0] & 0x0f;
-		m_subroc3d_mdir = (m_sound_state[0] >> 4) & 0x07;
+		m_mdis = m_sound_state[0] & 0x0f;
+		m_mdir = (m_sound_state[0] >> 4) & 0x07;
 		if (!m_samples->playing(0))
 		{
 			m_samples->start(0, 0, true);
 			m_samples->start(1, 0, true);
 		}
-		subroc3d_update_volume(0, m_subroc3d_mdis, m_subroc3d_mdir);
+		update_volume(0, m_mdis, m_mdir);
 	}
 
-	/* bit 1 latches direction/volume for torpedo */
+	// bit 1 latches direction/volume for torpedo
 	if ((diff & 0x02) && (data & 0x02))
 	{
-		m_subroc3d_tdis = m_sound_state[0] & 0x0f;
-		m_subroc3d_tdir = (m_sound_state[0] >> 4) & 0x07;
+		m_tdis = m_sound_state[0] & 0x0f;
+		m_tdir = (m_sound_state[0] >> 4) & 0x07;
 		if (!m_samples->playing(2))
 		{
 			m_samples->start(2, 1, true);
 			m_samples->start(3, 1, true);
 		}
-		subroc3d_update_volume(2, m_subroc3d_tdis, m_subroc3d_tdir);
+		update_volume(2, m_tdis, m_tdir);
 	}
 
-	/* bit 2 latches direction/volume for fighter */
+	// bit 2 latches direction/volume for fighter
 	if ((diff & 0x04) && (data & 0x04))
 	{
-		m_subroc3d_fdis = m_sound_state[0] & 0x0f;
-		m_subroc3d_fdir = (m_sound_state[0] >> 4) & 0x07;
+		m_fdis = m_sound_state[0] & 0x0f;
+		m_fdir = (m_sound_state[0] >> 4) & 0x07;
 		if (!m_samples->playing(4))
 		{
 			m_samples->start(4, 2, true);
 			m_samples->start(5, 2, true);
 		}
-		subroc3d_update_volume(4, m_subroc3d_fdis, m_subroc3d_fdir);
+		update_volume(4, m_fdis, m_fdir);
 	}
 
-	/* bit 3 latches direction/volume for hit */
+	// bit 3 latches direction/volume for hit
 	if ((diff & 0x08) && (data & 0x08))
 	{
-		m_subroc3d_hdis = m_sound_state[0] & 0x0f;
-		m_subroc3d_hdir = (m_sound_state[0] >> 4) & 0x07;
-		subroc3d_update_volume(6, m_subroc3d_hdis, m_subroc3d_hdir);
+		m_hdis = m_sound_state[0] & 0x0f;
+		m_hdir = (m_sound_state[0] >> 4) & 0x07;
+		update_volume(6, m_hdis, m_hdir);
 	}
 }
 
 
-void turbo_state::subroc3d_sound_c_w(u8 data)
+void subroc3d_state::sound_c_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
-	/* /FIRE TRIG */
-	/* FIRE SELECT */
+	// /FIRE TRIG
+	// FIRE SELECT
 	if ((diff & 0x01) && (data & 0x01))
 		m_samples->start(8, (data & 0x02) ? 6 : 5);
 
-	/* /SHIP EXP TRIG -> MY SHIP EXP: channel 9 */
+	// /SHIP EXP TRIG -> MY SHIP EXP: channel 9
 	if ((diff & 0x04) && (data & 0x04))
 		m_samples->start(9, 7);
 
-	/* /HIT TRIG -> HIT.L/R: channels 6+7 */
+	// /HIT TRIG -> HIT.L/R: channels 6+7
 	if ((diff & 0x08) && (data & 0x08))
 	{
 		m_samples->start(6, (m_sound_state[0] & 0x80) ? 4 : 3);
 		m_samples->start(7, (m_sound_state[0] & 0x80) ? 4 : 3);
 	}
 
-	/* /ALARM TRIG -> ALARM.M: channel 10 */
-	/* ALARM SELECT */
+	// /ALARM TRIG -> ALARM.M: channel 10
+	// ALARM SELECT
 	if ((diff & 0x10) && (data & 0x10))
 		m_samples->start(10, (data & 0x20) ? 10 : 9);
 
-	/* /PROLOGUE */
+	// /PROLOGUE
 	if (!m_samples->playing(11))
 		m_samples->start(11, 8, true);
 	m_samples->set_volume(11, (data & 0x40) ? 0 : 1.0);
 
-	/* /GAME START */
+	// /GAME START
 	machine().sound().system_mute(data & 0x80);
 }
 
@@ -415,21 +414,21 @@ void turbo_state::subroc3d_sound_c_w(u8 data)
 static const char *const subroc3d_sample_names[] =
 {
 	"*subroc3d",
-	"01",   /*  0: enemy missile */
-	"02",   /*  1: enemy torpedo */
-	"03",   /*  2: enemy fighter */
-	"04",   /*  3: explosion in sky */
-	"05",   /*  4: explosion on sea */
-	"06",   /*  5: missile shoot */
-	"07",   /*  6: torpedo shoot */
-	"08",   /*  7: my ship expl */
-	"09",   /*  8: prolog sound */
-	"11",   /*  9: alarm 0 */
-	"12",   /* 10: alarm 1 */
+	"01",   //  0: enemy missile
+	"02",   //  1: enemy torpedo
+	"03",   //  2: enemy fighter
+	"04",   //  3: explosion in sky
+	"05",   //  4: explosion on sea
+	"06",   //  5: missile shoot
+	"07",   //  6: torpedo shoot
+	"08",   //  7: my ship expl
+	"09",   //  8: prolog sound
+	"11",   //  9: alarm 0
+	"12",   // 10: alarm 1
 	nullptr
 };
 
-void turbo_state::subroc3d_samples(machine_config &config)
+void subroc3d_state::subroc3d_samples(machine_config &config)
 {
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -438,35 +437,35 @@ void turbo_state::subroc3d_samples(machine_config &config)
 	m_samples->set_channels(12);
 	m_samples->set_samples_names(subroc3d_sample_names);
 
-	/* MISSILE in channels 0 and 1 */
+	// MISSILE in channels 0 and 1
 	m_samples->add_route(0, "lspeaker", 0.25);
 	m_samples->add_route(1, "rspeaker", 0.25);
 
-	/* TORPEDO in channels 2 and 3 */
+	// TORPEDO in channels 2 and 3
 	m_samples->add_route(2, "lspeaker", 0.25);
 	m_samples->add_route(3, "rspeaker", 0.25);
 
-	/* FIGHTER in channels 4 and 5 */
+	// FIGHTER in channels 4 and 5
 	m_samples->add_route(4, "lspeaker", 0.25);
 	m_samples->add_route(5, "rspeaker", 0.25);
 
-	/* HIT in channels 6 and 7 */
+	// HIT in channels 6 and 7
 	m_samples->add_route(6, "lspeaker", 0.25);
 	m_samples->add_route(7, "rspeaker", 0.25);
 
-	/* FIRE sound in channel 8 */
+	// FIRE sound in channel 8
 	m_samples->add_route(8, "lspeaker", 0.25);
 	m_samples->add_route(8, "rspeaker", 0.25);
 
-	/* SHIP EXP sound in channel 9 */
+	// SHIP EXP sound in channel 9
 	m_samples->add_route(9, "lspeaker", 0.25);
 	m_samples->add_route(9, "rspeaker", 0.25);
 
-	/* ALARM TRIG sound in channel 10 */
+	// ALARM TRIG sound in channel 10
 	m_samples->add_route(10, "lspeaker", 0.25);
 	m_samples->add_route(10, "rspeaker", 0.25);
 
-	/* PROLOGUE sound in channel 11 */
+	// PROLOGUE sound in channel 11
 	m_samples->add_route(11, "lspeaker", 0.25);
 	m_samples->add_route(11, "rspeaker", 0.25);
 }
@@ -479,74 +478,74 @@ void turbo_state::subroc3d_samples(machine_config &config)
  *
  *************************************/
 
-void turbo_state::buckrog_update_samples()
+void buckrog_state::update_samples()
 {
-	/* accelerator sounds */
+	// accelerator sounds
 	if (m_samples->playing(5))
-		m_samples->set_frequency(5, m_samples->base_frequency(5) * (m_buckrog_myship / 100.25 + 1));
+		m_samples->set_frequency(5, m_samples->base_frequency(5) * (m_myship / 100.25 + 1));
 }
 
 
-void turbo_state::buckrog_sound_a_w(u8 data)
+void buckrog_state::sound_a_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
-	/* clock HIT DIS from bits 0-2 */
+	// clock HIT DIS from bits 0-2
 	if ((diff & 0x10) && (data & 0x10))
 		m_samples->set_volume(3, (float)(/*7 - */(data & 7)) / 7.0f);
 
-	/* clock ACC from bits 0-3 */
+	// clock ACC from bits 0-3
 	if ((diff & 0x20) && (data & 0x20))
 	{
-		m_buckrog_myship = data & 0x0f;
-		buckrog_update_samples();
+		m_myship = data & 0x0f;
+		update_samples();
 	}
 
-	/* /ALARM0: channel 0 */
+	// /ALARM0: channel 0
 	if ((diff & 0x40) && !(data & 0x40)) m_samples->start(0, 0);
 
-	/* /ALARM1: channel 0 */
+	// /ALARM1: channel 0
 	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(0, 1);
 }
 
 
-void turbo_state::buckrog_sound_b_w(u8 data)
+void buckrog_state::sound_b_w(uint8_t data)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
-	/* /ALARM3: channel 0 */
+	// /ALARM3: channel 0
 	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 2);
 
-	/* /ALARM4: channel 0 */
+	// /ALARM4: channel 0
 	if ((diff & 0x02) && !(data & 0x02)) m_samples->start(0, 3);
 
-	/* /FIRE: channel 1 */
+	// /FIRE: channel 1
 	if ((diff & 0x04) && !(data & 0x04)) m_samples->start(1, 5);
 
-	/* /EXP: channel 2 */
+	// /EXP: channel 2
 	if ((diff & 0x08) && !(data & 0x08)) m_samples->start(2, 4);
 
-	/* /HIT: channel 3 */
+	// /HIT: channel 3
 	if ((diff & 0x10) && !(data & 0x10))
 	{
 		m_samples->start(3, 7);
-		buckrog_update_samples();
+		update_samples();
 	}
 
-	/* /REBOUND: channel 4 */
+	// /REBOUND: channel 4
 	if ((diff & 0x20) && !(data & 0x20)) m_samples->start(4, 6);
 
-	/* SHIP: channel 5 */
+	// SHIP: channel 5
 	if ((diff & 0x40) &&  (data & 0x40) && !m_samples->playing(5))
 	{
 		m_samples->start(5, 8, true);
-		buckrog_update_samples();
+		update_samples();
 	}
 	if ((diff & 0x40) && !(data & 0x40) &&  m_samples->playing(5)) m_samples->stop(5);
 
-	/* GAME ON */
+	// GAME ON
 	machine().sound().system_mute(!BIT(data, 7));
 }
 
@@ -561,22 +560,22 @@ void turbo_state::buckrog_sound_b_w(u8 data)
 static const char *const buckrog_sample_names[]=
 {
 	"*buckrog",
-	"alarm0",   /* 0 */
-	"alarm1",   /* 1 */
-	"alarm2",   /* 2 */
-	"alarm3",   /* 3 */
-	"exp",      /* 4 */
-	"fire",     /* 5 */
-	"rebound",  /* 6 */
-	"hit",      /* 7 */
-	"shipsnd1", /* 8 */
-	"shipsnd2", /* 9 */
-	"shipsnd3", /* 10 */
+	"alarm0",   // 0
+	"alarm1",   // 1
+	"alarm2",   // 2
+	"alarm3",   // 3
+	"exp",      // 4
+	"fire",     // 5
+	"rebound",  // 6
+	"hit",      // 7
+	"shipsnd1", // 8
+	"shipsnd2", // 9
+	"shipsnd3", // 10
 	nullptr
 };
 
 
-void turbo_state::buckrog_samples(machine_config &config)
+void buckrog_state::buckrog_samples(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	SAMPLES(config, m_samples);
@@ -595,7 +594,7 @@ void turbo_state::buckrog_samples(machine_config &config)
 
 #if (DISCRETE_TEST)
 
-/* Nodes - Inputs */
+// Nodes - Inputs
 #define TURBO_CRASH_EN          NODE_01
 #define TURBO_TRIG1_INV         NODE_02
 #define TURBO_TRIG2_INV         NODE_03
@@ -609,7 +608,7 @@ void turbo_state::buckrog_samples(machine_config &config)
 #define TURBO_OSEL_VAL          NODE_11
 #define TURBO_BSEL_VAL          NODE_12
 
-/* Nodes - Sounds */
+// Nodes - Sounds
 #define FIRETRUCK_NOISE         NODE_20
 
 static const discrete_555_desc turbo_alarm_555 =
@@ -623,7 +622,7 @@ DISCRETE_SOUND_START(turbo_discrete)
 	/************************************************/
 	/* Input register mapping for turbo             */
 	/************************************************/
-	/*                  NODE             ADDR  MASK    GAIN    OFFSET  INIT */
+	//                  NODE             ADDR  MASK    GAIN    OFFSET  INIT
 	DISCRETE_INPUT(TURBO_CRASH_EN       ,0x00,0x001f,                  0.0)
 	DISCRETE_INPUT(TURBO_TRIG1_INV      ,0x01,0x001f,                  1.0)
 	DISCRETE_INPUT(TURBO_TRIG2_INV      ,0x02,0x001f,                  1.0)

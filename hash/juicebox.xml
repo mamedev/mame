@@ -14,7 +14,7 @@ license:CC0
 
    (* = dumped and boots in MAME
     B = confirmed bad dump
-	V = validated with 2nd cartridge)
+    V = validated with 2nd cartridge)
 
    The flash ROMs on these cartridges look to be deteriorating, each will likely need verifying against multiple cartridges to verify the integrity of
    the data.
@@ -45,7 +45,7 @@ license:CC0
 *  H6228 - Juice Box Music Video (Avril Lavine, The Calling, Clay Miken, Ruben Studdard)
 *  H6230A- Juice Box Music Video (Baha Men, Jump5, Jump5, Beu Sisters, ZOEgirl)
 *  H6232 - Juice Box Music Video (Zoegirl, Jump5, Jump5, Baha Men, Atomic Kitten)
-   H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'  
+   H6233 - Kenny Chesney - 'Live Those Songs', 'No Shoes, No Shirt, No Problems', 'I Go Back'  Sara Evans - 'Suds in the Bucket, Martina McBride - 'This One's For The Girls'
    H6234 - Juice Box Music Video (Ashlee Simpson, Ashlee Simpson) (same 2 Ashlee Simpson songs as H6226, but without other tracks)
    H6248 - Codename: Kids Next Door - Episode #19
    H6254 - Juice Box Music Video (Liz Flair, Stacie Orrico, Skye Sweetnam, Zoegirl) (full part # H6254-0971G1) (include 'the making of' for Skye Sweetnam Tangled Up in Me)
@@ -64,7 +64,7 @@ license:CC0
          - Brett Favre - The Field General
    H269x - Courage - The Cowardly Dog Volume 1
          - Dexter's Laboratory Episode 51
-		 
+
   (many still missing from this list)
 
 -->
@@ -262,7 +262,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sbcv1" supported="partial">
 		<description>Streetball Classics Volume 1 (H7416)</description>
 		<year>2004</year>
@@ -273,13 +273,13 @@ license:CC0
 				<rom name="jb_streetball-classics-vol1_h7416_matrix11247_9875.smc" size="0x2100400" crc="ada20763" sha1="b973e18d390a7d1a530e3737562722f96163d593" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!--
 	contains:
 	Test Drive
 	All I Wanted Was A Slushie
-	-->	
+	-->
 	<software name="megasv1" supported="partial">
 		<description>Megas XLR Volume 1 (H2697)</description>
 		<year>2004</year>
@@ -290,8 +290,8 @@ license:CC0
 				<rom name="jb_megas-xlr_vol1_h2697_matrix11247_9875.smc" size="0x2100400" crc="385b0402" sha1="fd761af3c8eaa522db0b4c224d37440d47c26c8a" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!--
 	contains:
 	It Feels Like Magic
@@ -352,5 +352,5 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 </softwarelist>

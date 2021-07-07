@@ -1060,6 +1060,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/albazc.cpp",
 	MAME_DIR .. "src/mame/drivers/albazg.cpp",
 	MAME_DIR .. "src/mame/drivers/rmhaihai.cpp",
+	MAME_DIR .. "src/mame/drivers/vsmjtria.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "alliedl")
@@ -3734,6 +3735,7 @@ files {
 createMAMEProjects(_target, _subtarget, "seibu")
 files {
 	MAME_DIR .. "src/mame/drivers/airraid.cpp",
+	MAME_DIR .. "src/mame/drivers/banprestoms.cpp",
 	MAME_DIR .. "src/mame/drivers/bloodbro.cpp",
 	MAME_DIR .. "src/mame/includes/bloodbro.h",
 	MAME_DIR .. "src/mame/video/bloodbro.cpp",

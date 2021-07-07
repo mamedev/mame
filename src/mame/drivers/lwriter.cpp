@@ -97,6 +97,11 @@
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
 
+enum print_state {
+        READING_CMD,
+        WRITING_RESULT
+};
+
 class lwriter_state : public driver_device
 {
 public:
@@ -105,7 +110,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
+		, m_dsw1(*this, "DSW1")
 		, m_overlay(1)
+		, m_via_pb(0)
+		, m_print_sc(1)
+		, m_print_state(READING_CMD)
+		, m_print_bit(0)
+		, m_print_cmd(0)
+		, m_print_result(0)
+		, m_sbsy(0)
+		, m_cbsy(0)
 	{ }
 
 	void lwriter(machine_config &config);
@@ -113,12 +127,15 @@ public:
 private:
 	uint16_t bankedarea_r(offs_t offset);
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t eeprom_r(offs_t offset);
+	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void led_out_w(uint8_t data);
 	void fifo_out_w(uint8_t data);
 	uint8_t via_pa_r();
 	void via_pa_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
 	uint8_t via_pb_r();
+	void write_dtr(int state);
 	void via_pb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
@@ -131,9 +148,18 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 	required_device<via6522_device> m_via;
+	required_ioport m_dsw1;
 
 	uint16_t *m_dram_ptr, *m_sram_ptr, *m_rom_ptr;
 	bool m_overlay;
+	uint8_t m_via_pb;
+	bool m_print_sc;
+	print_state m_print_state;
+	int m_print_bit;
+	int m_print_cmd;
+	int m_print_result;
+	bool m_sbsy;
+	bool m_cbsy;
 };
 
 /*
@@ -202,20 +228,35 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x400000, 0x5fffff).ram().share("dram").mirror(0x200000); // 2MB DRAM
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
-	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
-	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
-	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
-	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
+	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
+	map(0xc00005, 0xc00005).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
+	map(0xa00000, 0xa00000).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
+	map(0xa00004, 0xa00004).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
 
-	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
-	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::db_w)).mirror(0x1ffff8);
-	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
-	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
+	map(0xc00003, 0xc00003).w(m_scc, FUNC(scc8530_device::ca_w)).mirror(0x1ffff8);
+	map(0xc00007, 0xc00007).w(m_scc, FUNC(scc8530_device::da_w)).mirror(0x1ffff8);
+	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::ca_r)).mirror(0x1ffff8);
+	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::da_r)).mirror(0x1ffff8);
 
 	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
+
+	// overlaps with SCC but only uses even addresses
+	map(0xc00000, 0xc00400).rw(FUNC(lwriter_state::eeprom_r), FUNC(lwriter_state::eeprom_w)).umask16(0xff00);
 }
 
 static INPUT_PORTS_START( lwriter )
+	PORT_START("DSW1")
+	// Switch 1 | Switch 2 | switchsetting value | Meaning
+	// Down       Down                         0   serial batch mode 1200 baud (0)
+	// Up         Down                         1   serial batch mode 9600 baud (1)
+	// Down       Up                           2   diablo emulation (special switch = 0)
+	// Down       Up                           2   executive mode (special switch = 1)
+	// Up         Up                           3   apple talk
+	PORT_DIPNAME(0x60, 0x20, "Switch")
+	PORT_DIPSETTING(  0x00, "Serial batch mode 1200 baud")
+	PORT_DIPSETTING(  0x40, "Serial batch mode 9600 baud")
+	PORT_DIPSETTING(  0x20, "Diablo emulation (special switch = 0) / Executive mode (special switch = 1)")
+	PORT_DIPSETTING(  0x60, "AppleTalk")
 INPUT_PORTS_END
 
 /* Start it up */
@@ -265,11 +306,42 @@ void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
 }
 
+uint8_t lwriter_state::eeprom_r(offs_t offset)
+{
+	uint8_t result = 0;
+	// adjust offset to match real hardware mapping
+	switch (offset) {
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83: {
+			uint8_t signature[] = {0x7a, 0x53, 0xda, 0x71};
+			result = signature[offset-0x80];
+			break;
+		}
+		case 0xb0:
+			result = 0x1; // disable printing the test page (dostartpage)
+			break;
+		case 0xf3:
+			result = 0x1; // special switch procedure 1 to invoke executive (58 + 0xb9)
+			break;
+	}
+
+	logerror("eeprom_r! %x %x\n", offset, result);
+	return result;
+}
+
+void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	logerror("eeprom_w! %x %x %x\n", offset, data, mem_mask);
+}
+
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
 void lwriter_state::led_out_w(uint8_t data)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
+	m_cbsy = data & 1;
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
@@ -279,12 +351,25 @@ void lwriter_state::fifo_out_w(uint8_t data)
 	/** TODO: actually emulate this */
 	logerror("FIFO written with: %02X\n", data&0xFF);
 }
-
-/* via stuff */
+/* via port a bits */
+/* 0 - ?
+ * 1 - print sbsy
+ * 2 - ?
+ * 3 - ?
+ * 4 - some print thing
+ * 5 - switch setting low
+ * 6 - switch setting high
+ * 7 - print (STATUS/COMMAND Message Line)
+ */
 uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
-	return 0xFF;
+	uint8_t result = m_dsw1->read();
+	if (m_sbsy) {
+		result |= 2;
+	}
+	result |= (m_print_sc << 7);
+	return result | 0x1C;
 }
 
 void lwriter_state::via_pa_w(uint8_t data)
@@ -309,6 +394,7 @@ void lwriter_state::via_pb_w(uint8_t data)
 	/* Like early Mac models which had VIA A4 control overlaying, the
 	 * LaserWriter II NT overlay is controlled by VIA B3 */
 	m_overlay = BIT(data,3);
+	m_via_pb = data;
 }
 
 WRITE_LINE_MEMBER (lwriter_state::via_cb1_w)
@@ -340,6 +426,76 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
 
+/* These are from LBP-CX Series Video Interface Manual:
+ * http://beefchicken.com/retro/laserwriter/LBP-CX%20Series%20Video%20Interface%20Service%20Manual.pdf
+ */
+#define SR0 1
+#define SR1 2
+#define SR2 4
+#define SR4 8
+#define SR5 0xb
+#define EC0 0x40
+#define EC1 0x43
+#define EC2 0x45
+#define EC3 0x46
+#define EC4 0x49
+#define EC5 0x4a
+#define EC6 0x4c
+#define EC7 0x4f
+#define EC14 0x5d
+
+void lwriter_state::write_dtr(int state) {
+	// DTR seems to be used as a clock for communication with
+	// the print controller. We arbitrarily choose state == 1
+	// to run our code
+	if (state == 1 && (m_cbsy || m_sbsy)) {
+		logerror("pb line %d %d %d!\n", m_via_pb & 1, m_print_state, m_print_bit);
+		switch (m_print_state) {
+			case READING_CMD: {
+				m_print_cmd <<= 1;
+				m_print_cmd |= (m_via_pb & 1);
+				m_print_bit += 1;
+				if (m_print_bit == 8) {
+					logerror("PRINT_CMD %x!\n", m_print_cmd);
+					m_print_bit = 0;
+					m_print_state = WRITING_RESULT;
+					m_sbsy = true;
+					// The status messages have odd parity in the high bit
+					// right now we just manually make sure that's true.
+					switch (m_print_cmd) {
+						case SR1:
+						case SR2:
+						case SR4:
+							m_print_result = 1 << 7; // parity
+							break;
+						case SR5: // paper size
+							m_print_result = 1 << 6; // A4
+							break;
+						case SR0:
+						default:
+							m_print_result = 1 << 1; // print request
+							break;
+					}
+					m_print_cmd = 0;
+				}
+				break;
+			}
+			case WRITING_RESULT: {
+				m_print_sc = m_print_result & 0x1;
+				m_print_result >>= 1;
+				m_print_bit += 1;
+				if (m_print_bit == 8) {
+					logerror("PRINT_RESULT!\n");
+					m_print_bit = 0;
+					m_print_state = READING_CMD;
+					m_sbsy = false;
+				}
+				break;
+			}
+		}
+	}
+}
+
 void lwriter_state::lwriter(machine_config &config)
 {
 	M68000(config, m_maincpu, CPU_CLK);
@@ -353,7 +509,7 @@ void lwriter_state::lwriter(machine_config &config)
 	m_scc->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
 	/* Port B */
 	m_scc->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
-	m_scc->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set(FUNC(lwriter_state::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
 	m_scc->out_int_callback().set("via", FUNC(via6522_device::write_ca1));

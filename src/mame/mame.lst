@@ -1735,6 +1735,7 @@ penpir2                         // (c) 1998
 petshop                         // (c) 1998
 petshopa                        // (c) 1998
 phantpay                        // (c) 1995
+phantpyc                        // (c) 2000
 przfight                        // (c) 1996
 qcash                           // (c) 1998
 qnile                           // (c) 1997
@@ -1755,7 +1756,8 @@ qnileu                          // (c) 1997
 qnileua                         // (c) 1997
 qnilev                          // (c) 1997
 qtbird                          // (c) 1994
-rainwrce                        // (c) 2000
+rainwarr                        // (c) 2001
+rainwarrce                      // (c) 2001
 reelpwr                         // (c) 1996
 reelrock                        // (c) 1998
 reelrockql                      // (c) 2000
@@ -3240,6 +3242,10 @@ bdesignm
 @source:bankp.cpp
 bankp                           // (c) 1984 Sega,  made by Sanritsu
 combh                           // (c) 1987 Sega,  made by Sanritsu
+
+@source:banprestoms.cpp
+marioun                         //
+tvdenwad                        //
 
 @source:baraduke.cpp
 aliensec                        // (c) 1985
@@ -10409,6 +10415,8 @@ unk820501
 
 @source:cirsa910510.cpp
 minimony
+minimonya
+minimonyb
 
 @source:cischeat.cpp
 armchmp2                        // (c) 1992 Jaleco
@@ -11636,6 +11644,7 @@ dai                             // DAI
 
 @source:dai3wksi.cpp
 dai3wksi                        // 1979.09 Dai San Wakusei (The Third Planet)
+runaways                        // 1979.06 Run Away
 warp1                           // 1979.12 Warp-1
 warp1t                          // 1979.12 Warp-1 (Taito license)
 warp1bl                         // bootleg
@@ -11647,6 +11656,7 @@ dambustruk                      // (c) 1981 South West Research
 
 @source:dangbar.cpp
 dangbar                         //
+sspanic                         //
 
 @source:darius.cpp
 darius                          // A96 (c) 1986 Taito Corporation Japan (World)
@@ -13767,6 +13777,7 @@ fex68km3                        //
 fex68km4                        //
 
 @source:fidel_elite.cpp
+feas                            //
 feasbu                          //
 feasbua                         //
 feasgla                         //
@@ -19108,6 +19119,7 @@ kc85_5                          // VEB KC 85/5
 karatedo                        // (c) 1984 Data East Corporation (Japan)
 karatevs                        // (c) 1984 Data East Corporation (Japan)
 kchamp                          // (c) 1984 Data East USA (US)
+kchamptec                       // bootleg (Tecfri)
 kchampvs                        // (c) 1984 Data East USA (US)
 kchampvs2                       // (c) 1984 Data East USA (US)
 kchampvs3                       // (c) 1984 Data East USA (US)
@@ -23024,6 +23036,7 @@ spitboss                        // (c) 1988 Merit
 scrpiond                        // (c) 1999 Merit Industries, Inc.
 scrpionda                       // (c) 1997 Merit Industries, Inc.
 scrpiondb                       // (c) 1993 Merit Industries, Inc.
+scrpiondc                       // (c) 1992 Merit Industries, Inc.
 
 @source:meritsdx.cpp
 scrpndx                        //
@@ -23192,10 +23205,6 @@ mt65                            // 1979 Microtan 65
 micron                          // 1980 Micron
 spinveti                        // 1980 Space Invasion (ETI)
 mt6809                          // 1984 Microtan 65 (6809 CPU)
-
-@source:microterm.cpp
-mt420                           //
-mt5510                          //
 
 @source:microterm_f8.cpp
 act5a                           //
@@ -30878,6 +30887,12 @@ yis503ii                        //
 yis503m                         //
 yis604                          //
 yis60464                        //
+
+@source:mt420.cpp
+mt420                           //
+
+@source:mt5510.cpp
+mt5510                          //
 
 @source:mt735.cpp
 mt735                           //
@@ -40549,6 +40564,8 @@ whousetc                        //
 @source:tetrisp2.cpp
 nndmseal                        // (c) 1997 I'Max/Jaleco
 nndmseala                       // (c) 1997 I'Max/Jaleco
+nndmsealb                       // (c) 1997 I'Max/Jaleco
+nndmsealc                       // (c) 1997 I'Max/Jaleco
 rockn                           // (c) 1999 Jaleco
 rockn2                          // (c) 1999 Jaleco
 rockn3                          // (c) 1999 Jaleco
@@ -41476,6 +41493,7 @@ hishouzab                       // bootleg
 ktiger                          // B30 / TP-011 (c) 1987 Taito Corporation (Japan)
 skyshark                        // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
 skysharka                       // B02 / TP-007 (c) 1987 Taito America Corporation + Romstar license (US)
+skysharkb                       // bootleg
 twincobr                        // B30 / TP-011 (c) 1987 Taito Corporation (World)
 twincobru                       // B30 / TP-011 (c) 1987 Taito America Corporation + Romstar license (US)
 
@@ -42037,6 +42055,9 @@ vpoker                          // (c) 198?
 
 @source:vroulet.cpp
 vroulet                         // (c) 1989 World Game
+
+@source:vsmjtria.cpp
+vsmjtria                        //
 
 @source:vsnes.cpp
 balonfgt                        // (c) 1984 Nintendo

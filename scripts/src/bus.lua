@@ -2833,6 +2833,8 @@ if (BUSES["NES"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes/rexsoft.h",
 		MAME_DIR .. "src/devices/bus/nes/sachen.cpp",
 		MAME_DIR .. "src/devices/bus/nes/sachen.h",
+		MAME_DIR .. "src/devices/bus/nes/sealie.cpp",
+		MAME_DIR .. "src/devices/bus/nes/sealie.h",
 		MAME_DIR .. "src/devices/bus/nes/somari.cpp",
 		MAME_DIR .. "src/devices/bus/nes/somari.h",
 		MAME_DIR .. "src/devices/bus/nes/subor.cpp",

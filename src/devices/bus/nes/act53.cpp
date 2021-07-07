@@ -7,7 +7,7 @@
 
 
  Here we emulate the Multi-Discrete PCB designed by Tepples for
- this homebew multicart [mapper 28]
+ this homebrew multicart [mapper 28]
 
  ***********************************************************************************************************/
 
@@ -71,7 +71,9 @@ void nes_action53_device::pcb_reset()
 
  Board ACTION 53
 
- In MESS: *VERY* preliminary support.
+ iNES: mapper 28
+
+ In MAME: Preliminary supported.
 
  This board uses 4 registers (reg is selected by writes to 0x5xxx)
  Info from nesdev wiki

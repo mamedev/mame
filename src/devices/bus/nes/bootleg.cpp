@@ -560,7 +560,9 @@ void nes_rt01_device::pcb_reset()
 
  Games: Super Mario Bros. Pocker Mali (Crayon Shin-chan pirate hack)
 
- In MESS: Supported
+ NES 2.0: mapper 530
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -633,7 +635,7 @@ void nes_ax5705_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 35
 
- In MESS: Supported
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -702,7 +704,7 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 42
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -760,7 +762,7 @@ uint8_t nes_mbaby_device::read_m(offs_t offset)
 
  iNES: mapper 42 with no IRQ and no NT, but CHR switch
 
- In MESS: Partially Supported.
+ In MAME: Partially supported.
 
  -------------------------------------------------*/
 
@@ -790,7 +792,7 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  iNES: mapper 106
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -865,7 +867,7 @@ void nes_smb3p_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 222
 
- In MESS: Unsupported.
+ In MAME: Unsupported.
 
  -------------------------------------------------*/
 
@@ -953,7 +955,7 @@ uint8_t nes_whirl2706_device::read_m(offs_t offset)
 
  iNES: mapper 43
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1035,7 +1037,7 @@ uint8_t nes_smb2j_device::read_m(offs_t offset)
 
  iNES: mapper 40
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1092,7 +1094,7 @@ uint8_t nes_smb2ja_device::read_m(offs_t offset)
 
  iNES: mapper 50
 
- In MESS: Partially Supported.
+ In MAME: Partially supported.
 
  -------------------------------------------------*/
 
@@ -1162,9 +1164,9 @@ void nes_smb2jb_device::write_ex(offs_t offset, uint8_t data)
  chips and CHRROM.
  Originally dumps were marked as UNL-SMB2J pcb
 
- iNES:
+ NES 2.0: mapper 304
 
- In MESS: Partially Supported. Need to emulate IRQ
+ In MAME: Partially supported. Need to emulate IRQ
  (needed by smb2 conversion?)
 
  -------------------------------------------------*/
@@ -1194,7 +1196,7 @@ uint8_t nes_09034a_device::read_m(offs_t offset)
 
  iNES: mapper 120
 
- In MESS: Partially Supported.
+ In MAME: Partially supported.
 
  -------------------------------------------------*/
 
@@ -1223,9 +1225,9 @@ uint8_t nes_tobidase_device::read_m(offs_t offset)
 
  This PCB maps WRAM in 0xc000-0xdfff and PRG in 0x6000-0x7fff
 
- iNES:
+ iNES: mapper 125
 
- In MESS: Supported.
+ In MAME: Supported.
 
 -------------------------------------------------*/
 
@@ -1273,9 +1275,9 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
  This PCB maps WRAM in 0xc000-0xdfff and PRG in 0x6000-0x7fff
  This is very similar to KS7037 (see kaiser.cpp)
 
- iNES:
+ NES 2.0: mapper 522
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1332,9 +1334,9 @@ void nes_lh10_device::write_h(offs_t offset, uint8_t data)
  This PCB maps WRAM (w/battery) in 0xb800-0xd7ff and
  PRG in 0x6000-0x7fff
 
- iNES:
+ NES 2.0: mapper 535
 
- In MESS: Preliminar Support only.
+ In MAME: Preliminary support only.
 
  -------------------------------------------------*/
 
@@ -1400,15 +1402,15 @@ void nes_lh53_device::write_h(offs_t offset, uint8_t data)
 
  Games: Doki Doki Panic (FDS conversion)
 
- iNES: mapper 103?
-
  This board has a very unique setup, with 8KB of WRAM
  in 0x6000-0x7fff and other 8KB of WRAM in 0xb800-0xd7ff
  which can be switched in 2KB chunks (we attempt to
  emulate this by intercepting reads in that area before
  they get to the PRG banks...)
 
- In MESS: Supported.
+ iNES: mapper 103
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1465,13 +1467,13 @@ void nes_2708_device::write_h(offs_t offset, uint8_t data)
 
  Games: Green Beret (FDS conversions)
 
- iNES:
-
  This board has two PRG chips. The first (128K) is
  connected to 0x6000-0x7fff and switches among the
  16x8K banks; the second (32K) is fixed in 0x8000-0xffff
 
- In MESS: Supported.
+ iNES: ???
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1538,14 +1540,14 @@ void nes_unl_bb_device::write_h(offs_t offset, uint8_t data)
 
  Games: Super Mario Bros Malee 2
 
- iNES:
-
  This PCB has two PRG chips (32K+2K) + one CHR chip (8K)
  + 2KB of WRAM
  The second PRG chip (2K) is connected at 0x6000-0x6800
  while WRAM is at 0x7000-0x7800
 
- In MESS: Supported.
+ iNES: mapper 55
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1575,9 +1577,9 @@ void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
 
  Games: Shui Guan Pipe (Gimmick Pirate)
 
- iNES:
+ iNES: mapper 183
 
- In MESS: Supported, but there are glitches (PPU or IRQ?)
+ In MAME: Supported, but there are glitches (PPU or IRQ?)
 
  -------------------------------------------------*/
 
@@ -1664,9 +1666,9 @@ uint8_t nes_shuiguan_device::read_m(offs_t offset)
  "weak bits", which is tested at some points (info
  from Cah4e3).
 
- iNES:
+ NES 2.0: mapper 328
 
- In MESS:
+ In MAME: Partially supported?
 
  -------------------------------------------------*/
 

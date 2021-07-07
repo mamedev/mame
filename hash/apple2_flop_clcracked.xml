@@ -42408,7 +42408,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="advelec">
+	<software name="advelec">
 		<description>Advanced Electricity (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Educational Materials and Equipment</publisher>
@@ -42422,7 +42422,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="compcirc">
+	<software name="compcirc">
 		<description>Complex Circuits (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Educational Materials and Equipment</publisher>
@@ -42436,13 +42436,13 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="pforth30">
+	<software name="pforth30">
 		<description>PAI Forth (Version 3.0, 12-21-1985) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>Prentice Associates Incorporated</publisher>
 		<info name="release" value="2021-06-10"/>
 		<!--"PAI Forth" is a 1985 development program. This is version 3.0. It is preserved here for the first time.-->
-        <!-- It is uncertain as of now whether this was used internally or released. More research is required. - FH -->
+		<!-- It is uncertain as of now whether this was used internally or released. More research is required. - FH -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -42451,7 +42451,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="rboots82">
+	<software name="rboots82">
 		<description>Rocky's Boots (Unknown 1982 version) (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>The Learning Company</publisher>
@@ -42465,7 +42465,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="prsnr110s">
+	<software name="prsnr110s">
 		<description>The Prisoner (Version 1.10) (SoftSmith) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>SoftSmith</publisher>

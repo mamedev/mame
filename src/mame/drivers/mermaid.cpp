@@ -174,7 +174,7 @@ void mermaid_state::mermaid_map(address_map &map)
 	map(0xe800, 0xe807).w("latch2", FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("P2");
 	map(0xf800, 0xf800).r(FUNC(mermaid_state::mermaid_collision_r));
-	//	map(0xf802, 0xf802).nopw();    // ???
+	//  map(0xf802, 0xf802).nopw();    // ???
 	map(0xf806, 0xf806).w(FUNC(mermaid_state::mermaid_ay8910_write_port_w));
 	map(0xf807, 0xf807).w(FUNC(mermaid_state::mermaid_ay8910_control_port_w));
 }

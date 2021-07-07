@@ -76,13 +76,13 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 {
 	m_sample[m_samples++] = data;
 	m_curcount++;
-	if((m_samples >= 2) || ((m_mode & 0x08) != 0x08))
+	if((m_samples >= 2) || !(m_mode & 0x8))
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
 void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(((m_samples < 2) && ((m_mode & 0x08) == 0x08)) || !m_samples)
+	if(((m_samples < 2) && (m_mode & 8)) || !m_samples)
 		return;
 	switch(m_mode & 0x88)
 	{
@@ -111,7 +111,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 	}
 
-	if(m_sample_byte >= 2)
+	if(m_sample_byte >= (m_mode & 8 ? 4 : 2))
 	{
 		m_sample_byte = 0;
 		m_samples = 0;
@@ -724,7 +724,7 @@ private:
 	uint8_t unk_r(offs_t offset);
 	void unk_w(offs_t offset, uint8_t data);
 	uint8_t unk2_r();
-	uint8_t memcard_r();
+	uint8_t memcard_r(offs_t offset);
 	void memcard_w(offs_t offset, uint8_t data);
 	uint16_t pad_r(offs_t offset);
 	void pad_w(offs_t offset, uint16_t data);
@@ -739,6 +739,7 @@ private:
 	uint8_t m_unkidx;
 	uint8_t m_unk[16];
 	uint8_t m_unk1[4];
+	uint8_t m_cardreg, m_cardval, m_cardcnt;
 	uint16_t m_padctl, m_padstat;
 };
 
@@ -775,17 +776,57 @@ uint8_t vis_state::unk2_r()
 	return 0x40;
 }
 
-//memory card reader?
-uint8_t vis_state::memcard_r()
+uint8_t vis_state::memcard_r(offs_t offset)
 {
-	return m_card->data_r() ? 0x20 : 0;
+	if(offset)
+	{
+		if(m_cardreg & 0x10)
+		{
+			if(m_cardcnt == 8)
+				return 0;
+			if(m_cardreg & 8)
+			{
+				m_card->clock_w(1);
+				m_card->clock_w(0);
+				m_cardval = (m_cardval >> 1) | (m_card->data_r() ? 0x80 : 0);
+			}
+			else
+			{
+				m_card->clock_w(0);
+				m_card->data_w(BIT(m_cardval, 0));
+				m_card->clock_w(1);
+				m_cardval >>= 1;
+			}
+			m_cardcnt++;
+			return 0x80;
+		}
+	}
+	else
+	{
+		m_cardcnt = 0;
+		return m_cardval;
+	}
+	return 0;
 }
 
 void vis_state::memcard_w(offs_t offset, uint8_t data)
 {
-	m_card->clock_w(BIT(data, 0));
-	m_card->data_w(BIT(data, 1));
-	m_card->reset_w(BIT(data, 2));
+	if(offset)
+	{
+		if(!(data & 0x10) && !(m_cardreg & 0x10))
+		{
+			m_card->data_w(BIT(data, 1));
+			m_card->clock_w(BIT(data, 0));
+			m_card->reset_w(!BIT(data, 2));
+		}
+		m_cardreg = data;
+		m_cardcnt = data & 8 ? 0 : 8;
+	}
+	else
+	{
+		m_cardcnt = 0;
+		m_cardval = data;
+	}
 }
 
 uint16_t vis_state::pad_r(offs_t offset)
@@ -878,7 +919,7 @@ void vis_state::io_map(address_map &map)
 	map(0x00e0, 0x00e1).noprw();
 	map(0x023c, 0x023f).rw(FUNC(vis_state::unk1_r), FUNC(vis_state::unk1_w));
 	map(0x0268, 0x026f).rw(FUNC(vis_state::pad_r), FUNC(vis_state::pad_w));
-	map(0x031a, 0x031a).rw(FUNC(vis_state::memcard_r), FUNC(vis_state::memcard_w)).umask16(0x00ff);
+	map(0x0318, 0x031a).rw(FUNC(vis_state::memcard_r), FUNC(vis_state::memcard_w)).umask16(0x00ff);
 }
 
 static void vis_cards(device_slot_interface &device)

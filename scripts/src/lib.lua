@@ -91,8 +91,6 @@ project "utils"
 		MAME_DIR .. "src/lib/util/plaparse.h",
 		MAME_DIR .. "src/lib/util/png.cpp",
 		MAME_DIR .. "src/lib/util/png.h",
-		MAME_DIR .. "src/lib/util/pool.cpp",
-		MAME_DIR .. "src/lib/util/pool.h",
 		MAME_DIR .. "src/lib/util/server_http.hpp",
 		MAME_DIR .. "src/lib/util/server_https.hpp",
 		MAME_DIR .. "src/lib/util/server_ws.hpp",

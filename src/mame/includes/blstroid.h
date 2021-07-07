@@ -38,6 +38,7 @@ public:
 
 protected:
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -47,7 +48,6 @@ private:
 	void video_int_ack_w(uint16_t data = 0);
 	void halt_until_hblank_0_w(uint16_t data = 0);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	DECLARE_VIDEO_START(blstroid);
 	uint32_t screen_update_blstroid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map);

@@ -12148,8 +12148,8 @@ GAME( 2000, bangbead,   neogeo,   bangbead,  neogeo,    mvs_led_state, empty_ini
 GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , MACHINE_SUPPORTS_SAVE )
 
 // Mega Enterprise
-GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mslug4h,    mslug4,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGH-2630)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ms4plus,    mslug4,   ms4plus,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 4 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Evoga

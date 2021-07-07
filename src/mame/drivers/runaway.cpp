@@ -440,4 +440,4 @@ ROM_END
 
 
 GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (Atari, prototype)", MACHINE_SUPPORTS_SAVE )

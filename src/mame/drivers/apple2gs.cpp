@@ -1300,6 +1300,12 @@ u8 apple2gs_state::adb_read_mousedata()
 
 		result = (absolute & 0x80) | (delta & 0x7F);
 	}
+	else
+	{
+		// no mouse axis data, so just return the button status.  used by some 3200 viewers.
+		result = m_adb_mousey->read() & 0x80;
+	}
+
 	return result;
 }
 

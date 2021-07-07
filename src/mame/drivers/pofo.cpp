@@ -235,10 +235,10 @@ uint8_t portfolio_state::irq_status_r()
 {
 	uint8_t data = m_ip;
 	/*
-		The BIOS interrupt 11h (Equipment list) reports that the second floppy drive (B:) is
-		installed if the 3rd bit is set (which is also the external interrupt line).
-		It is not clear if the ~NMD1 line is OR or XORed or muxed with the interrupt line,
-		but this way seems to work.
+	    The BIOS interrupt 11h (Equipment list) reports that the second floppy drive (B:) is
+	    installed if the 3rd bit is set (which is also the external interrupt line).
+	    It is not clear if the ~NMD1 line is OR or XORed or muxed with the interrupt line,
+	    but this way seems to work.
 	*/
 	data |= !m_exp->nmd1_r() << 3;
 
@@ -383,10 +383,10 @@ uint8_t portfolio_state::battery_r()
 	uint8_t data = 0;
 
 	/*
-		Partially stores what has been written into this port.
-		Used by interrupt 61h service 24h (Get ROM/CCM state).
-		Setting bit 1 here causes the BIOS to permanently wedge the external ROM
-		select on, so mask it out as a workaround.
+	    Partially stores what has been written into this port.
+	    Used by interrupt 61h service 24h (Get ROM/CCM state).
+	    Setting bit 1 here causes the BIOS to permanently wedge the external ROM
+	    select on, so mask it out as a workaround.
 	*/
 	data |= (m_rom_b & 0b101);
 

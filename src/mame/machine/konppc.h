@@ -30,6 +30,7 @@ public:
 	int get_cgboard_id(void);
 	void set_cgboard_texture_bank(int board, const char *bank, uint8_t *rom);
 
+	bool output_3d_enabled();
 
 	// read/write
 	uint32_t cgboard_dsp_comm_r_ppc(offs_t offset, uint32_t mem_mask = ~0);
@@ -93,6 +94,8 @@ private:
 	int nwk_fifo_half_full_w;
 	int nwk_fifo_full;
 	int nwk_fifo_mask;
+
+	bool enable_3d[MAX_CG_BOARDS];
 
 	std::unique_ptr<uint32_t[]> nwk_fifo[MAX_CG_BOARDS];
 	int32_t nwk_fifo_read_ptr[MAX_CG_BOARDS];

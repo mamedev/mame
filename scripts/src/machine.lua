@@ -1199,7 +1199,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ds2404.h,MACHINES["DS6417"] = true
+--@src/devices/machine/ds6417.h,MACHINES["DS6417"] = true
 ---------------------------------------------------
 
 if (MACHINES["DS6417"]~=null) then

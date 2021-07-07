@@ -542,8 +542,6 @@ void atarig42_state::atarig42(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 

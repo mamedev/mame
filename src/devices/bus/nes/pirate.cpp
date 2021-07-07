@@ -441,7 +441,9 @@ void nes_agci_device::write_h(offs_t offset, uint8_t data)
 
  Games: Korean Igo
 
- In MESS: Supported
+ NES 2.0: mapper 521
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -462,8 +464,7 @@ void nes_dreamtech_device::write_l(offs_t offset, uint8_t data)
 
  iNES: mapper 186
 
- In MESS: Unsupported.
-
+ In MAME: Unsupported.
 
  -------------------------------------------------*/
 

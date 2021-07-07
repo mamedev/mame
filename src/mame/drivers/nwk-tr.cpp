@@ -378,7 +378,7 @@ uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->update(bitmap, cliprect);
-	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);	// K001604 on slave board doesn't seem to output anything. Bug or intended?
+	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
 
 	return 0;
 }
@@ -439,11 +439,11 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 7:
 			/*
-				0x80 = EXRES1
-				0x40 = EXRES0
-				0x20 = EXID1
-				0x10 = EXID0
-				0x01 = EXRGB
+			    0x80 = EXRES1
+			    0x40 = EXRES0
+			    0x20 = EXID1
+			    0x10 = EXID0
+			    0x01 = EXRGB
 			*/
 			if (data & 0x80) // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -455,7 +455,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
 			// This could mean broadcast to both CG boards?
 
-			m_exrgb = data & 0x1;		// Select which CG Board outputs signal
+			m_exrgb = data & 0x1;       // Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
@@ -709,17 +709,9 @@ void nwktr_state::nwktr(machine_config &config)
 	PALETTE(config, m_palette).set_entries(65536);
 
 	K001604(config, m_k001604[0], 0);
-	m_k001604[0]->set_layer_size(0);
-	m_k001604[0]->set_roz_size(1);
-	m_k001604[0]->set_txt_mem_offset(0);  // correct?
-	m_k001604[0]->set_roz_mem_offset(0);  // correct?
 	m_k001604[0]->set_palette(m_palette);
 
 	K001604(config, m_k001604[1], 0);
-	m_k001604[1]->set_layer_size(0);
-	m_k001604[1]->set_roz_size(1);
-	m_k001604[1]->set_txt_mem_offset(0);  // correct?
-	m_k001604[1]->set_roz_mem_offset(0);  // correct?
 	m_k001604[1]->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -742,10 +734,6 @@ void nwktr_state::nwktr(machine_config &config)
 void nwktr_state::thrilld(machine_config &config)
 {
 	nwktr(config);
-
-	m_k001604[0]->set_layer_size(1);
-
-	m_k001604[1]->set_layer_size(1);
 }
 
 /*****************************************************************************/

@@ -33,7 +33,6 @@ DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")
 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K056230, tag, owner, clock)
-	, m_is_thunderh(0)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 }
@@ -57,19 +56,16 @@ uint8_t k056230_device::read(offs_t offset)
 		{
 			return 0x08;
 		}
+		case 1:		// CRC Error register
+		{
+			return 0x00;
+		}
 	}
 
 //  logerror("k056230_r: %d %s\n", offset, machine().describe_context());
 
 	return 0;
 }
-
-TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
-{
-	if (m_cpu)
-		m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
-}
-
 
 void k056230_device::write(offs_t offset, uint8_t data)
 {
@@ -83,17 +79,15 @@ void k056230_device::write(offs_t offset, uint8_t data)
 		{
 			if(data & 0x20)
 			{
-				// Thunder Hurricane breaks otherwise...
-				if (!m_is_thunderh)
-				{
-					if (m_cpu)
-						m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
-
-					machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(k056230_device::network_irq_clear), this));
-				}
+				if (m_cpu)
+					m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);			
 			}
-//          else
-//              m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+			if ((data & 1) == 0)
+			{
+				if (m_cpu)
+					m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);
+			}
+
 			break;
 		}
 		case 2:     // Sub ID register

@@ -4,14 +4,14 @@
 
     Super A'Can sound driver
 
-	Currently has a number of unknown registers and functionality.
+    Currently has a number of unknown registers and functionality.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "acan.h"
 
-#define VERBOSE		(1)
+#define VERBOSE     (1)
 #include "logmacro.h"
 
 // device type definition

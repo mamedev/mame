@@ -340,7 +340,7 @@ uint8_t schick_state::schick_prot_0a_r(offs_t offset)
 uint8_t schick_state::schick_prot_76_r(offs_t offset)
 {
 	// if you get the ? blocks together on round 6?
-	// will give game over if wrong 
+	// will give game over if wrong
 
 	// FCCD: DB 26       in   a,($76)
 	// FCCF: CB 57       bit  2,a
@@ -406,8 +406,8 @@ void schick_state::schick_map(address_map &map)
 	map(0x9080, 0x90bf).portr("IN1");
 	map(0x90c0, 0x90ff).portr("IN0");
 
-//	map(0xa000, 0xbfff).rom(); // maybe ROM?
-	map(0xa808, 0xa808).r(FUNC(schick_state::schick_prot_a808_r));	
+//  map(0xa000, 0xbfff).rom(); // maybe ROM?
+	map(0xa808, 0xa808).r(FUNC(schick_state::schick_prot_a808_r));
 
 	map(0xe000, 0xffff).rom(); // ROM
 }

@@ -100,6 +100,7 @@ bagman.cpp
 bailey.cpp
 balsente.cpp
 bankp.cpp
+banprestoms.cpp
 baraduke.cpp
 barata.cpp
 barni.cpp
@@ -1429,6 +1430,7 @@ voyager.cpp
 vp101.cpp
 vpoker.cpp
 vroulet.cpp
+vsmjtria.cpp
 vsnes.cpp
 vulgus.cpp
 wacky_gator.cpp

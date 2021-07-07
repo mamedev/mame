@@ -26,16 +26,17 @@ public:
 	virtual image_init_result call_load() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_WRITE_LINE_MEMBER(data_w) { if(m_read) m_data = state; }
+	DECLARE_WRITE_LINE_MEMBER(data_w) { if(!m_read) m_data = state; }
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w) { m_reset = state; if(!state) reset(); }
-	DECLARE_READ_LINE_MEMBER(data_r) { return m_data; }
+	DECLARE_WRITE_LINE_MEMBER(reset_w) { if(!state && m_reset) reset(); m_reset = state; }
+	DECLARE_READ_LINE_MEMBER(data_r) { return m_read ? m_data : 0; }
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	uint8_t calccrc(uint8_t bit, uint8_t crc) const;
 	enum {
 		CMD_READ = 0x06,
 		CMD_WRITE = 0x11,

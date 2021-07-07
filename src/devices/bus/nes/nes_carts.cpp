@@ -51,6 +51,7 @@
 #include "rcm.h"
 #include "rexsoft.h"
 #include "sachen.h"
+#include "sealie.h"
 #include "somari.h"
 #include "subor.h"
 #include "tengen.h"
@@ -248,16 +249,19 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("hengg_shjy3",      NES_HENGG_SHJY3); // mapper 253
 	device.option_add_internal("hes",              NES_HES);
 	device.option_add_internal("hosenkan",         NES_HOSENKAN);
-	device.option_add_internal("ks7058",           NES_KS7058);
 	device.option_add_internal("ks202",            NES_KS202);      // mapper 56
-	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
+	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
+	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)
+	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion)
+	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion)
 	device.option_add_internal("ks7017",           NES_KS7017);
-	device.option_add_internal("ks7032",           NES_KS7032);     //  mapper 142
-	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion);
-	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion);
-	device.option_add_internal("ks7031",           NES_KS7031);     //  used in Dracula II (FDS Conversion);
-	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion);
-	device.option_add_internal("ks7037",           NES_KS7037);     //  used in Metroid (FDS Conversion);
+	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
+	device.option_add_internal("ks7030",           NES_KS7030);     // used in Doki Doki Panic alt (FDS Conversion)
+	device.option_add_internal("ks7031",           NES_KS7031);     // used in Dracula II (FDS Conversion)
+	device.option_add_internal("ks7032",           NES_KS7032);     // mapper 142
+	device.option_add_internal("ks7037",           NES_KS7037);     // used in Metroid (FDS Conversion)
+	device.option_add_internal("ks7057",           NES_KS7057);     // used in Gyruss (FDS Conversion)
+	device.option_add_internal("ks7058",           NES_KS7058);
 	device.option_add_internal("gs2015",           NES_GS2015);
 	device.option_add_internal("gs2004",           NES_GS2004);
 	device.option_add_internal("gs2013",           NES_GS2013);
@@ -296,7 +300,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
-	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55?
+	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
 	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
@@ -310,7 +314,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("sl1632",           NES_REX_SL1632);
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
 	device.option_add_internal("nitra",            NES_NITRA);
-	device.option_add_internal("ks7057",           NES_KS7057); // mapper 196 alt (for Street Fighter VI / Fight Street VI);
+	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);
 	device.option_add_internal("unl_malisb",       NES_MALISB); //  used by Super Mali Splash Bomb
 	device.option_add_internal("family4646",       NES_FAMILY4646);
@@ -397,8 +401,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_830118c",      NES_BMC_830118C);
 	device.option_add_internal("pjoy84",           NES_PJOY84);
 	device.option_add_internal("nocash_nochr",     NES_NOCHR);
-	device.option_add_internal("nes_action53",     NES_ACTION53);
-	device.option_add_internal("nes_2a03pur",      NES_2A03PURITANS);
+	device.option_add_internal("action53",         NES_ACTION53);
+	device.option_add_internal("cufrom",           NES_CUFROM);
+	device.option_add_internal("unrom512",         NES_UNROM512);
+	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
 // other unsupported...
 	device.option_add_internal("ninjaryu",         NES_NROM);    // mapper 111 - UNSUPPORTED
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
