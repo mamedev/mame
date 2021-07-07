@@ -43,10 +43,11 @@ Notes:
  Driver by Tomasz Slanina & David Haywood
  Inputs and Dip Switches by stephh
 
-ToDo:
- there might still be some sprite banking issues
- support screen flipping for sprites
-
+TODO:
+ - Support screen flipping for sprites
+ - If you force-scroll an enemy off the screen rather than fight them, you'll get graphical
+   corruption (bad sprites) before  a new enemy appears, does this happen on the PCB?
+ - BGM tempo is incorrect, but clocks are verfied above? ( see https://www.youtube.com/watch?v=pW9nhx1hcLM )
 
 ****************************************************************************************/
 
@@ -94,7 +95,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	void chanbara_palette(palette_device &palette) const;
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void chanbara_map(address_map &map);
 
 	/* memory pointers */
@@ -179,15 +180,16 @@ void chanbara_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,8, 8, 32, 32);
 	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chanbara_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,16, 16, 16, 32);
 	m_bg_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
 }
 
-void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
 	int offs;
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		if (m_spriteram[offs + 0x80] & 0x80)
+		if ((m_spriteram[offs + 0x80] & 0x80) == pri)
 		{
 			int attr = m_spriteram[offs + 0];
 			int code = m_spriteram[offs + 1];
@@ -227,8 +229,10 @@ void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // ensure bg pen for each tile gets drawn behind sprites
+	draw_sprites(bitmap, cliprect, 0x00);
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0x80);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
