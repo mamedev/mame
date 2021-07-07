@@ -79,7 +79,6 @@ public:
 	static constexpr int POLY_ALTA = 9;
 
 private:
-	screen_device &m_screen;
 	std::unique_ptr<bitmap_rgb32> m_fb[2];
 	std::unique_ptr<bitmap_ind32> m_zb;
 	rectangle m_cliprect;
