@@ -476,6 +476,18 @@ void voodoo_banshee_device::device_start()
 
 
 //-------------------------------------------------
+//  soft_reset - handle reset when initiated by
+//  a register write
+//-------------------------------------------------
+
+void voodoo_banshee_device::soft_reset()
+{
+	voodoo_2_device::soft_reset();
+	m_cmdfifo2.set_enable(0);
+}
+
+
+//-------------------------------------------------
 //  register_save - register for save states
 //-------------------------------------------------
 
@@ -921,7 +933,7 @@ void voodoo_banshee_device::internal_cmd_agp_w(offs_t offset, u32 data, u32 mem_
 			break;
 
 		case banshee_cmd_agp_regs::cmdBump0:
-			fatalerror("cmdBump0\n");
+			fatalerror("%s: Unsupported write to cmdBump0", tag());
 
 		case banshee_cmd_agp_regs::cmdRdPtrL0:
 			m_cmdfifo.set_read_pointer(newval);
@@ -955,7 +967,7 @@ void voodoo_banshee_device::internal_cmd_agp_w(offs_t offset, u32 data, u32 mem_
 			break;
 
 		case banshee_cmd_agp_regs::cmdBump1:
-			fatalerror("cmdBump1\n");
+			fatalerror("%s: Unsupported write to cmdBump1", tag());
 
 		case banshee_cmd_agp_regs::cmdRdPtrL1:
 			m_cmdfifo2.set_read_pointer(newval);
@@ -1398,7 +1410,7 @@ u32 voodoo_banshee_device::reg_auxbufstride_w(u32 chipmask, u32 regnum, u32 data
 		m_reg.write(regnum, data);
 		u32 newpix = BIT(data, 15) ? (BIT(data, 0, 7) << 6) : (BIT(data, 0, 14) >> 1);
 		if (newpix != m_renderer->rowpixels())
-			fatalerror("aux buffer stride differs from color buffer stride\n");
+			fatalerror("%s: Unsupported aux buffer stride (%d) differs from color buffer stride (%d)", tag(), newpix, m_renderer->rowpixels());
 	}
 	return 0;
 }
@@ -1539,7 +1551,7 @@ void voodoo_banshee_device::execute_blit(u32 data)
 			break;
 
 		case 2:         // Screen-to-screen stretch blit
-			fatalerror("   blit_2d:screen_to_screen_stretch: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+			fatalerror("%s: Unsupported blit_2d:screen_to_screen_stretch: src X %d, src Y %d\n", tag(), data & 0xfff, (data >> 16) & 0xfff);
 
 		case 3:         // Host-to-screen blit
 		{
@@ -1588,19 +1600,19 @@ void voodoo_banshee_device::execute_blit(u32 data)
 		}
 
 		case 5:         // Rectangle fill
-			fatalerror("blit_2d:rectangle_fill: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+			fatalerror("%s: Unsupported 2D rectangle_fill: src X %d, src Y %d", tag(), BIT(data, 0, 12), BIT(data, 16, 12));
 
 		case 6:         // Line
-			fatalerror("blit_2d:line: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+			fatalerror("%s: Unsupported 2D line: end X %d, end Y %d", tag(), BIT(data, 0, 12), BIT(data, 16, 12));
 
 		case 7:         // Polyline
-			fatalerror("blit_2d:polyline: end X %d, end Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+			fatalerror("%s: Unsupported 2D polyline: end X %d, end Y %d", tag(), BIT(data, 0, 12), BIT(data, 16, 12));
 
 		case 8:         // Polygon fill
-			fatalerror("blit_2d:polygon_fill\n");
+			fatalerror("%s: Unsupported 2D polygon_fill", tag());
 
 		default:
-			fatalerror("blit_2d: unknown command %d\n", m_blt_cmd);
+			fatalerror("%s: Unsupported 2D unknown command %d", tag(), m_blt_cmd);
 	}
 }
 

@@ -107,7 +107,7 @@ bits(7:4) and bit(24)), X, and Y:
 
 /*
 
-todo:
+TODO:
  - look at speed on Konami games (nbapbp, racingj, etc)
  - look at timing issues on IT games
  - bad textures in some Voodoo 3 games (mocapb for example)
@@ -900,9 +900,9 @@ void voodoo_1_device::device_start()
 
 	// validate configuration
 	if (m_fbmem_in_mb == 0)
-		fatalerror("Invalid Voodoo memory configuration");
+		fatalerror("%s: Invalid Voodoo memory configuration", tag());
 	if (!BIT(m_chipmask, 1) && m_tmumem0_in_mb == 0)
-		fatalerror("Invalid Voodoo memory configuration");
+		fatalerror("%s: Invalid Voodoo memory configuration", tag());
 
 	// create shared tables
 	m_shared = std::make_unique<shared_tables>();
@@ -1251,8 +1251,7 @@ void voodoo_1_device::add_to_fifo(u32 offset, u32 data, u32 mem_mask)
 	// if there's room in the PCI FIFO, add there
 	if (LOG_FIFO_VERBOSE)
 		logerror("VOODOO.%d.FIFO:adding to PCI FIFO @ %08X=%08X\n", this, offset, data);
-	if (m_pci_fifo.full())
-		fatalerror("PCI FIFO full\n");
+	assert(!m_pci_fifo.full());
 
 	// add as offset/data pair
 	m_pci_fifo.add(offset);
@@ -1306,8 +1305,7 @@ void voodoo_1_device::flush_fifos(attotime current_time)
 	m_flush_flag = true;
 
 	// should only be called if something is pending
-	if (!operation_pending())
-		fatalerror("flush_fifos called with no pending operation\n");
+	assert(operation_pending());
 
 	if (LOG_FIFO_VERBOSE)
 		logerror("VOODOO.FIFO:flush_fifos start -- pending=%s cur=%s\n", m_operation_end.as_string(18), current_time.as_string(18));
@@ -1704,7 +1702,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		poly.stipple = m_reg.stipple();
 		poly.alpharef = m_reg.alpha_mode().alpharef();
 		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
-			printf("Warning: rotated stipple pattern\n");
+			logerror("Warning: rotated stipple pattern used in LFB write\n");
 
 		// loop over up to two pixels
 		thread_stats_block &threadstats = m_lfb_stats;
@@ -1921,7 +1919,7 @@ void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 
 	// texture direct not handled (but never seen so far)
 	if (texlod.tdirect_write())
-		fatalerror("Texture direct write!\n");
+		fatalerror("%s: Unsupported texture direct write", tag());
 
 	// swizzle the data
 	if (texlod.tdata_swizzle())
@@ -2763,24 +2761,24 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	attoseconds_t meddiff = std::abs(medperiod - refresh);
 	attoseconds_t vgadiff = std::abs(vgaperiod - refresh);
 
-	osd_printf_debug("hSync=%d-%d, bp=%d, vis=%d  vSync=%d-%d, bp=%d, vis=%d\n", hsyncon, hsyncoff, hbp, hvis, vsyncon, vsyncoff, vbp, vvis);
-	osd_printf_debug("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
+	logerror("hSync=%d-%d, bp=%d, vis=%d  vSync=%d-%d, bp=%d, vis=%d\n", hsyncon, hsyncoff, hbp, hvis, vsyncon, vsyncoff, vbp, vvis);
+	logerror("Horiz: %d-%d (%d total)  Vert: %d-%d (%d total) -- ", visarea.min_x, visarea.max_x, htotal, visarea.min_y, visarea.max_y, vtotal);
 
 	// configure the screen based on which one matches the closest
 	if (stddiff < meddiff && stddiff < vgadiff)
 	{
 		screen().configure(htotal, vtotal, visarea, stdperiod);
-		osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
+		logerror("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 	}
 	else if (meddiff < vgadiff)
 	{
 		screen().configure(htotal, vtotal, visarea, medperiod);
-		osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
+		logerror("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 	}
 	else
 	{
 		screen().configure(htotal, vtotal, visarea, vgaperiod);
-		osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
+		logerror("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 	}
 
 	// configure the new framebuffer info
@@ -2790,7 +2788,7 @@ void voodoo_1_device::recompute_video_timing(u32 hsyncon, u32 hsyncoff, u32 hvis
 	m_yoffs = vbp;
 	m_vsyncstart = vsyncoff;
 	m_vsyncstop = vsyncon;
-	osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
+	logerror("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, m_vsyncstart, m_vsyncstop);
 
 	adjust_vblank_start_timer();
 }
@@ -3152,8 +3150,7 @@ void voodoo_1_device::check_stalled_cpu(attotime current_time)
 void voodoo_1_device::stall_cpu(stall_state state)
 {
 	// sanity check
-	if (!operation_pending())
-		fatalerror("FIFOs not empty, no op pending!\n");
+	assert(operation_pending());
 
 	// set the state and update statistics
 	m_stall_state = state;

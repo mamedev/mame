@@ -272,7 +272,7 @@ u32 command_fifo::words_needed(u32 command)
 			return 2 + BIT(command, 3, 19);
 
 		default:
-			osd_printf_debug("UNKNOWN PACKET TYPE %d\n", command & 7);
+			m_device.logerror("cmdfifo unknown packet type %d\n", command & 7);
 			return 1;
 	}
 }
@@ -307,13 +307,13 @@ u32 command_fifo::packet_type_0(u32 command)
 		case 1:     // JSR
 			if (LOG_CMDFIFO)
 				m_device.logerror("  JSR $%06X\n", target);
-			fatalerror("JSR in CMDFIFO!\n");
+			m_device.logerror("cmdFifo: Unsupported JSR");
 			break;
 
 		case 2:     // RET
 			if (LOG_CMDFIFO)
 				m_device.logerror("  RET $%06X\n", target);
-			fatalerror("RET in CMDFIFO!\n");
+			m_device.logerror("cmdFifo: Unsupported RET");
 			break;
 
 		case 3:     // JMP LOCAL FRAME BUFFER
@@ -325,11 +325,11 @@ u32 command_fifo::packet_type_0(u32 command)
 		case 4:     // JMP AGP
 			if (LOG_CMDFIFO)
 				m_device.logerror("  JMP AGP $%06X\n", target);
-			fatalerror("JMP AGP in CMDFIFO!\n");
+			m_device.logerror("cmdFifo: Unsupported JMP AGP");
 			break;
 
 		default:
-			fatalerror("  INVALID JUMP COMMAND\n");
+			m_device.logerror("cmdFifo: Invalid jump command %d", BIT(command, 3, 3));
 			break;
 	}
 	return 0;
@@ -596,7 +596,7 @@ u32 command_fifo::packet_type_5(u32 command)
 			if (LOG_CMDFIFO)
 				m_device.logerror("  PACKET TYPE 5: Planar YUV count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
-			fatalerror("Unimplemented YUV update in Voodoo");
+			fatalerror("%s: Unsupported planar YUV write via cmdFifo", m_device.tag());
 			break;
 
 		// Texture port
@@ -619,7 +619,7 @@ u32 command_fifo::packet_type_5(u32 command)
 
 u32 command_fifo::packet_type_unknown(u32 command)
 {
-	fatalerror("Unhandled cmdFifo packet type %d\n", BIT(command, 0, 3));
+	fatalerror("%s: Unsupported cmdFifo packet type %d\n", m_device.tag(), BIT(command, 0, 3));
 }
 
 
@@ -828,6 +828,18 @@ void voodoo_2_device::map_register_w(offs_t offset, u32 data, u32 mem_mask)
 		if (LOG_FIFO_VERBOSE)
 			logerror("VOODOO.FIFO:direct write start at %s end at %s\n", machine().time().as_string(18), m_operation_end.as_string(18));
 	}
+}
+
+
+//-------------------------------------------------
+//  soft_reset - handle reset when initiated by
+//  a register write
+//-------------------------------------------------
+
+void voodoo_2_device::soft_reset()
+{
+	voodoo_1_device::soft_reset();
+	m_cmdfifo.set_enable(0);
 }
 
 

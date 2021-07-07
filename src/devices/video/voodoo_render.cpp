@@ -902,7 +902,7 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	// start with the base of LOD 0
 	u32 base = regs.texture_baseaddr();
 	if (addrshift == 0 && BIT(base, 0) != 0)
-		osd_printf_debug("Tiled texture\n");
+		fatalerror("Unsupported tiled texture in Voodoo device");
 	base = (base & addrmask) << addrshift;
 	m_lodoffset[0] = base & mask;
 
@@ -950,10 +950,6 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	m_detailmax = texdetail.detail_max();
 	m_detailbias = s8(texdetail.detail_bias() << 2) << 6;
 	m_detailscale = texdetail.detail_scale();
-
-	// check for separate RGBA filtering
-	if (texdetail.separate_rgba_filter())
-		fatalerror("Separate RGBA filters!\n");
 }
 
 

@@ -510,7 +510,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// system management
-	void soft_reset();
+	virtual void soft_reset();
 	virtual void register_save(voodoo::save_proxy &save, u32 total_allocation);
 
 	// buffer accessors
