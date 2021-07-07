@@ -434,6 +434,9 @@ int voodoo_banshee_device::update(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 void voodoo_banshee_device::device_start()
 {
+	// expand CLUT to 512 entries
+	m_clut.resize(512);
+
 	// pre-set the chipmask and clear the TMU memory to indicate we're shared
 	if (m_chipmask == 0x01)
 		m_chipmask = 0x03;

@@ -702,9 +702,9 @@ protected:
 	u32 m_pci_fifo_mem[64*2];                // memory backing the PCI FIFO
 
 	// pens and CLUT
-	rgb_t m_clut[512];                       // clut gamma data
 	bool m_clut_dirty;                       // do we need to recompute?
-	rgb_t m_pen[65536];                      // mapping from pixels to pens
+	std::vector<rgb_t> m_clut;               // clut gamma data
+	std::vector<rgb_t> m_pen;                // mapping from pixels to pens
 
 	// register table
 	static voodoo::static_register_table_entry<voodoo_1_device> const s_register_table[256];

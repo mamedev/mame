@@ -113,7 +113,6 @@ Regressions:
  * sscope2
 
 todo:
- - size the CLUT properly
  - look at speed on Konami games (nbapbp, racingj, etc)
  - look at timing issues on IT games
  - bad textures in some Voodoo 3 games (mocapb for example)
@@ -737,7 +736,9 @@ voodoo_1_device::voodoo_1_device(const machine_config &mconfig, device_type type
 	m_stall_resume_timer(nullptr),
 	m_last_status_pc(0),
 	m_last_status_value(0),
-	m_clut_dirty(true)
+	m_clut_dirty(true),
+	m_clut(33),
+	m_pen(65536)
 {
 	for (int index = 0; index < std::size(m_regtable); index++)
 		m_regtable[index].unpack(s_register_table[index], *this);
