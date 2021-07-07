@@ -713,7 +713,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_latch1, m_latch2;
+	uint8_t m_reg[2];
 };
 
 
