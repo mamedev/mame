@@ -28,6 +28,7 @@ static constexpr bool LOG_BANSHEE_2D = false;
 
 }
 
+
 //**************************************************************************
 //  VOODOO DEVICES
 //**************************************************************************
@@ -40,7 +41,7 @@ class voodoo_banshee_device : public voodoo_2_device
 {
 protected:
 	// internal construction
-	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock values
@@ -48,7 +49,7 @@ public:
 
 	// construction
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, MODEL_VOODOO_BANSHEE) { }
+		voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, voodoo::MODEL_VOODOO_BANSHEE) { }
 
 	// core address map and read/write helpers
 	virtual void core_map(address_map &map) override;
@@ -94,16 +95,16 @@ protected:
 	void map_yuv_w(offs_t offset, u32 data, u32 mem_mask);
 	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask);
 
-	// reads and writes
-	u32 io_r(offs_t offset, u32 mem_mask = ~0);
-	void io_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 cmd_agp_r(offs_t offset);
-	void cmd_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	s32 r2d_w(offs_t offset, u32 data);
-	virtual void texture_w(offs_t offset, u32 data) override;
-	void lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
-	u8 vga_r(offs_t offset);
-	void vga_w(offs_t offset, u8 data);
+	// internal reads and writes
+	u32 internal_io_r(offs_t offset, u32 mem_mask = ~0);
+	void internal_io_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 internal_cmd_agp_r(offs_t offset);
+	void internal_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	s32 internal_2d_w(offs_t offset, u32 data);
+	virtual void internal_texture_w(offs_t offset, u32 data) override;
+	void internal_lfb_direct_w(offs_t offset, u32 data, u32 mem_mask);
+	u8 internal_vga_r(offs_t offset);
+	void internal_vga_w(offs_t offset, u8 data);
 
 	// read/write and FIFO helpers
 	virtual u32 execute_fifos() override;

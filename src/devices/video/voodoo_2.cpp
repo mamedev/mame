@@ -588,7 +588,7 @@ u32 command_fifo::packet_type_5(u32 command)
 				m_device.logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
 			for (u32 word = 0; word < count; word++)
-				m_device.lfb_w(target++, read_next(), 0xffffffff);
+				m_device.internal_lfb_w(target++, read_next(), 0xffffffff);
 			break;
 
 		// Planar YUV
@@ -605,7 +605,7 @@ u32 command_fifo::packet_type_5(u32 command)
 				m_device.logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
 			for (u32 word = 0; word < count; word++)
-				m_device.texture_w(target++, read_next());
+				m_device.internal_texture_w(target++, read_next());
 			break;
 	}
 	return 0;

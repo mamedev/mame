@@ -1380,7 +1380,7 @@ u32 voodoo_1_device::execute_fifos()
 			}
 
 			case memory_fifo::TYPE_TEXTURE:
-				texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
+				internal_texture_w(offset & ~memory_fifo::FLAGS_MASK, data);
 				break;
 
 			case memory_fifo::TYPE_LFB:
@@ -1390,7 +1390,7 @@ u32 voodoo_1_device::execute_fifos()
 					mem_mask &= 0x0000ffff;
 				if (offset & memory_fifo::NO_0_15)
 					mem_mask &= 0xffff0000;
-				lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
+				internal_lfb_w(offset & ~memory_fifo::FLAGS_MASK, data, mem_mask);
 				break;
 			}
 		}
@@ -1421,7 +1421,7 @@ u32 voodoo_1_device::map_register_r(offs_t offset)
 u32 voodoo_1_device::map_lfb_r(offs_t offset)
 {
 	prepare_for_read();
-	return lfb_r(offset);
+	return internal_lfb_r(offset);
 }
 
 
@@ -1483,7 +1483,7 @@ void voodoo_1_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
 		add_to_fifo(memory_fifo::TYPE_LFB | offset, data, mem_mask);
 	else
-		lfb_w(offset, data, mem_mask);
+		internal_lfb_w(offset, data, mem_mask);
 }
 
 
@@ -1498,16 +1498,16 @@ void voodoo_1_device::map_texture_w(offs_t offset, u32 data, u32 mem_mask)
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
 		add_to_fifo(memory_fifo::TYPE_TEXTURE | offset, data, mem_mask);
 	else
-		texture_w(offset, data);
+		internal_texture_w(offset, data);
 }
 
 
 //-------------------------------------------------
-//  lfb_r - handle a read from the linear frame
-//  buffer
+//  internal_lfb_r - handle a read from the linear
+//  frame buffer
 //-------------------------------------------------
 
-u32 voodoo_1_device::lfb_r(offs_t offset)
+u32 voodoo_1_device::internal_lfb_r(offs_t offset)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -1536,7 +1536,7 @@ u32 voodoo_1_device::lfb_r(offs_t offset)
 	buffer += scry * m_renderer->rowpixels() + x;
 	if (buffer + 1 >= ram_end())
 	{
-		logerror("LFB_R: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X\n", x, y, offset, u32(buffer - lfb_buffer_indirect(lfbmode.read_buffer_select())));
+		logerror("internal_lfb_r: Buffer offset out of bounds x=%i y=%i offset=%08X bufoffs=%08X\n", x, y, offset, u32(buffer - lfb_buffer_indirect(lfbmode.read_buffer_select())));
 		return 0xffffffff;
 	}
 
@@ -1561,11 +1561,11 @@ u32 voodoo_1_device::lfb_r(offs_t offset)
 
 
 //-------------------------------------------------
-//  lfb_w - handle a write to the linear frame
-//  buffer
+//  internal_lfb_w - handle a write to the linear
+//  frame buffer
 //-------------------------------------------------
 
-void voodoo_1_device::lfb_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -1885,17 +1885,18 @@ u32 voodoo_1_device::expand_lfb_data(reg_lfb_mode const lfbmode, u32 data, rgb_t
 			return LFB_DEPTH_PRESENT_0 | LFB_DEPTH_PRESENT_1;
 
 		default:            // reserved
-			logerror("lfb_w: Unknown format\n");
+			logerror("internal_lfb_w: Unknown format\n");
 			return 0;
 	}
 }
 
 
 //-------------------------------------------------
-//  texture_w - handle writes to texture RAM
+//  internal_texture_w - handle writes to texture
+//  RAM
 //-------------------------------------------------
 
-void voodoo_1_device::texture_w(offs_t offset, u32 data)
+void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)

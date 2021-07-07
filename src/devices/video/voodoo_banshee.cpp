@@ -325,7 +325,7 @@ u32 voodoo_banshee_device::read_lfb(offs_t offset, u32 mem_mask)
 
 	// above LFB base goes the traditional route
 	if (offset >= m_lfb_base)
-		return lfb_r(offset - m_lfb_base);
+		return internal_lfb_r(offset - m_lfb_base);
 
 	// reads below the LFB base are direct?
 	u32 addr = offset * 4;
@@ -353,7 +353,7 @@ void voodoo_banshee_device::write_lfb(offs_t offset, u32 data, u32 mem_mask)
 
 	// above LFB base goes the traditional route
 	if (offset >= m_lfb_base)
-		return lfb_direct_w(offset - m_lfb_base, data, mem_mask);
+		return internal_lfb_direct_w(offset - m_lfb_base, data, mem_mask);
 
 	// could be writing to cmdfifo space
 	u32 addr = offset * 4;
@@ -540,7 +540,7 @@ u16 *voodoo_banshee_device::draw_buffer_indirect(int index)
 u32 voodoo_banshee_device::map_io_r(offs_t offset, u32 mem_mask)
 {
 	prepare_for_read();
-	return io_r(offset, mem_mask);
+	return internal_io_r(offset, mem_mask);
 }
 
 
@@ -552,7 +552,7 @@ u32 voodoo_banshee_device::map_io_r(offs_t offset, u32 mem_mask)
 u32 voodoo_banshee_device::map_cmd_agp_r(offs_t offset)
 {
 	prepare_for_read();
-	return cmd_agp_r(offset);
+	return internal_cmd_agp_r(offset);
 }
 
 
@@ -597,7 +597,7 @@ void voodoo_banshee_device::map_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// no mechanism to stall I/O writes
 	prepare_for_write();
-	io_w(offset, data, mem_mask);
+	internal_io_w(offset, data, mem_mask);
 }
 
 
@@ -610,7 +610,7 @@ void voodoo_banshee_device::map_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// no mechanism to stall AGP/CMD writes
 	prepare_for_write();
-	cmd_agp_w(offset, data, mem_mask);
+	internal_cmd_agp_w(offset, data, mem_mask);
 }
 
 
@@ -711,15 +711,16 @@ void voodoo_banshee_device::map_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 	if (prepare_for_write() && m_init_enable.enable_pci_fifo())
 		add_to_fifo(offset | (0x400000/4), data, mem_mask);
 	else
-		lfb_w(offset, data, mem_mask);
+		internal_lfb_w(offset, data, mem_mask);
 }
 
 
 //-------------------------------------------------
-//  io_r - handle reads from the I/O registers
+//  internal_io_r - handle reads from the I/O
+//  registers
 //-------------------------------------------------
 
-u32 voodoo_banshee_device::io_r(offs_t offset, u32 mem_mask)
+u32 voodoo_banshee_device::internal_io_r(offs_t offset, u32 mem_mask)
 {
 	// by default just return regular data
 	offset &= 0x3f;
@@ -744,29 +745,30 @@ u32 voodoo_banshee_device::io_r(offs_t offset, u32 mem_mask)
 		case banshee_io_regs::vgad0: case banshee_io_regs::vgad4: case banshee_io_regs::vgad8: case banshee_io_regs::vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
-				result |= vga_r(offset * 4 + 0) << 0;
+				result |= internal_vga_r(offset * 4 + 0) << 0;
 			if (ACCESSING_BITS_8_15)
-				result |= vga_r(offset * 4 + 1) << 8;
+				result |= internal_vga_r(offset * 4 + 1) << 8;
 			if (ACCESSING_BITS_16_23)
-				result |= vga_r(offset * 4 + 2) << 16;
+				result |= internal_vga_r(offset * 4 + 2) << 16;
 			if (ACCESSING_BITS_24_31)
-				result |= vga_r(offset * 4 + 3) << 24;
+				result |= internal_vga_r(offset * 4 + 3) << 24;
 
 			// early out to skip extra logging
 			return result;
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:io_r(%s) = %08X\n", machine().describe_context(), m_io_regs.name(offset), result);
+		logerror("%s:internal_io_r(%s) = %08X\n", machine().describe_context(), m_io_regs.name(offset), result);
 	return result;
 }
 
 
 //-------------------------------------------------
-//  io_w - handle writes to the I/O registers
+//  internal_io_w - handle writes to the I/O
+//  registers
 //-------------------------------------------------
 
-void voodoo_banshee_device::io_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device::internal_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// need to block if Y origin is changing; everything else can proceed
 	offset &= 0x3f;
@@ -830,29 +832,29 @@ void voodoo_banshee_device::io_w(offs_t offset, u32 data, u32 mem_mask)
 		case banshee_io_regs::vgac0: case banshee_io_regs::vgac4: case banshee_io_regs::vgac8: case banshee_io_regs::vgacc:
 		case banshee_io_regs::vgad0: case banshee_io_regs::vgad4: case banshee_io_regs::vgad8: case banshee_io_regs::vgadc:
 			if (ACCESSING_BITS_0_7)
-				vga_w(offset * 4 + 0, BIT(data, 0, 8));
+				internal_vga_w(offset * 4 + 0, BIT(data, 0, 8));
 			if (ACCESSING_BITS_8_15)
-				vga_w(offset * 4 + 1, BIT(data, 8, 8));
+				internal_vga_w(offset * 4 + 1, BIT(data, 8, 8));
 			if (ACCESSING_BITS_16_23)
-				vga_w(offset * 4 + 2, BIT(data, 16, 8));
+				internal_vga_w(offset * 4 + 2, BIT(data, 16, 8));
 			if (ACCESSING_BITS_24_31)
-				vga_w(offset * 4 + 3, BIT(data, 24, 8));
+				internal_vga_w(offset * 4 + 3, BIT(data, 24, 8));
 
 			// early out to skip extra logging
 			return;
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:io_w(%s) = %08X & %08X\n", machine().describe_context(), m_io_regs.name(offset), data, mem_mask);
+		logerror("%s:internal_io_w(%s) = %08X & %08X\n", machine().describe_context(), m_io_regs.name(offset), data, mem_mask);
 }
 
 
 //-------------------------------------------------
-//  cmd_agp_r - handle reads from the CMD/AGP
-//  registers
+//  internal_cmd_agp_r - handle reads from the
+//  CMD/AGP registers
 //-------------------------------------------------
 
-u32 voodoo_banshee_device::cmd_agp_r(offs_t offset)
+u32 voodoo_banshee_device::internal_cmd_agp_r(offs_t offset)
 {
 	// by default just return regular data
 	offset &= 0x7f;
@@ -887,17 +889,17 @@ u32 voodoo_banshee_device::cmd_agp_r(offs_t offset)
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:cmd_agp_r(%s) = %08X\n", machine().describe_context(), m_cmd_agp_regs.name(offset), result);
+		logerror("%s:internal_cmd_agp_r(%s) = %08X\n", machine().describe_context(), m_cmd_agp_regs.name(offset), result);
 	return result;
 }
 
 
 //-------------------------------------------------
-//  cmd_agp_w - handle writes to the CMD/AGP
-//  registers
+//  internal_cmd_agp_w - handle writes to the
+//  CMD/AGP registers
 //-------------------------------------------------
 
-void voodoo_banshee_device::cmd_agp_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device::internal_cmd_agp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	offset &= 0x7f;
 
@@ -977,15 +979,16 @@ void voodoo_banshee_device::cmd_agp_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%s:cmd_agp_w(%s) = %08X & %08X\n", machine().describe_context(), m_io_regs.name(offset), data, mem_mask);
+		logerror("%s:internal_cmd_agp_w(%s) = %08X & %08X\n", machine().describe_context(), m_io_regs.name(offset), data, mem_mask);
 }
 
 
 //-------------------------------------------------
-//  r2d_w - handle writes to the 2D registers
+//  internal_2d_w - handle writes to the 2D
+//  registers
 //-------------------------------------------------
 
-s32 voodoo_banshee_device::r2d_w(offs_t offset, u32 data)
+s32 voodoo_banshee_device::internal_2d_w(offs_t offset, u32 data)
 {
 	static u8 const s_format_bpp[16] = { 1,1,1,2,3,4,1,1,2,2,1,1,1,1,1,1 };
 
@@ -1032,10 +1035,11 @@ s32 voodoo_banshee_device::r2d_w(offs_t offset, u32 data)
 
 
 //-------------------------------------------------
-//  texture_w - handle writes to texture space
+//  internal_texture_w - handle writes to texture
+//  space
 //-------------------------------------------------
 
-void voodoo_banshee_device::texture_w(offs_t offset, u32 data)
+void voodoo_banshee_device::internal_texture_w(offs_t offset, u32 data)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -1083,13 +1087,13 @@ void voodoo_banshee_device::texture_w(offs_t offset, u32 data)
 
 
 //-------------------------------------------------
-//  lfb_direct_w - handle "direct" writes to LFB
-//  space; this is like previous generations but
-//  ignores the LFB mode and treats everything as
-//  16-bit pixel data
+//  internal_lfb_direct_w - handle "direct" writes
+//  to LFB space; this is like previous generations
+//  but ignores the LFB mode and treats everything
+//  as 16-bit pixel data
 //-------------------------------------------------
 
-void voodoo_banshee_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
+void voodoo_banshee_device::internal_lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// statistics
 	if (DEBUG_STATS)
@@ -1140,17 +1144,18 @@ void voodoo_banshee_device::lfb_direct_w(offs_t offset, u32 data, u32 mem_mask)
 
 
 //-------------------------------------------------
-//  vga_r - handle reads from VGA register space
+//  internal_vga_r - handle reads from VGA register
+//  space
 //-------------------------------------------------
 
-u8 voodoo_banshee_device::vga_r(offs_t offset)
+u8 voodoo_banshee_device::internal_vga_r(offs_t offset)
 {
 	// by default just return regular data
 	offset &= 0x1f;
 	u32 result = m_vga_regs.read(offset);
 
 	// handle special offsets
-	char const *logtype = "vga_r";
+	char const *logtype = "internal_vga_r";
 	u32 logoffs = offset + 0x3c0;
 	switch (offset)
 	{
@@ -1218,10 +1223,11 @@ u8 voodoo_banshee_device::vga_r(offs_t offset)
 
 
 //-------------------------------------------------
-//  vga_w - handle writes to VGA register space
+//  internal_vga_w - handle writes to VGA register
+//  space
 //-------------------------------------------------
 
-void voodoo_banshee_device::vga_w(offs_t offset, u8 data)
+void voodoo_banshee_device::internal_vga_w(offs_t offset, u8 data)
 {
 	offset &= 0x1f;
 
@@ -1229,7 +1235,7 @@ void voodoo_banshee_device::vga_w(offs_t offset, u8 data)
 	m_vga_regs.write(offset, data);
 
 	// handle special cases
-	char const *logtype = "vga_w";
+	char const *logtype = "internal_vga_w";
 	u32 logoffs = offset + 0x3c0;
 	switch (offset)
 	{
@@ -1495,7 +1501,7 @@ u32 voodoo_banshee_device::cmdfifo_register_w(u32 offset, u32 data)
 	// bit 11 indicates a write to 2D register space
 	u32 regnum = BIT(offset, 0, 8);
 	if (BIT(offset, 11, 1))
-		return r2d_w(regnum, data);
+		return internal_2d_w(regnum, data);
 
 	// otherwise, just a normal register write
 	u32 chipmask = chipmask_from_offset(offset);
@@ -1511,7 +1517,7 @@ u32 voodoo_banshee_device::cmdfifo_register_w(u32 offset, u32 data)
 u32 voodoo_banshee_device::cmdfifo_2d_w(u32 offset, u32 data)
 {
 	u32 regnum = banshee_2d_regs::clip0Min + offset;
-	return r2d_w(regnum, data);
+	return internal_2d_w(regnum, data);
 }
 
 

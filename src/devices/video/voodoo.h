@@ -16,9 +16,17 @@
 #include "screen.h"
 
 
+// forward declarations
+class voodoo_1_device;
+namespace voodoo { class save_proxy; }
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+namespace voodoo
+{
 
 // enumeration specifying which model of Voodoo we are emulating
 enum voodoo_model : u8
@@ -28,14 +36,6 @@ enum voodoo_model : u8
 	MODEL_VOODOO_BANSHEE,
 	MODEL_VOODOO_3
 };
-
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-namespace voodoo
-{
 
 // debug
 static constexpr bool DEBUG_DEPTH = false;		// ENTER key to view depthbuf
@@ -64,16 +64,10 @@ static constexpr bool EAT_CYCLES = true;
 //  INTERNAL CLASSES
 //**************************************************************************
 
-class voodoo_1_device;
-
-namespace voodoo
-{
-class save_proxy;
-}
-
 // include register and render classes
 #include "voodoo_regs.h"
 #include "voodoo_render.h"
+
 
 namespace voodoo
 {
@@ -412,7 +406,7 @@ public:
 	auto pciint_callback() { return m_pciint_cb.bind(); }
 
 	// getters
-	voodoo_model model() const { return m_model; }
+	voodoo::voodoo_model model() const { return m_model; }
 
 	// address map and read/write helpers
 	virtual void core_map(address_map &map) = 0;
@@ -427,13 +421,13 @@ public:
 
 protected:
 	// internal construction
-	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	generic_voodoo_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// configuration
-	const voodoo_model m_model;              // which voodoo model
+	const voodoo::voodoo_model m_model;      // which voodoo model
 	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
 	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
 	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
@@ -484,7 +478,7 @@ protected:
 	static constexpr u32 TRIANGLE_SETUP_CLOCKS = 100;
 
 	// internal construction
-	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock values
@@ -492,7 +486,7 @@ public:
 
 	// construction
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, MODEL_VOODOO_1) { }
+		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, voodoo::MODEL_VOODOO_1) { }
 
 	// destruction
 	virtual ~voodoo_1_device();
@@ -545,11 +539,11 @@ protected:
 	void map_lfb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void map_texture_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	// reads and writes
-	u32 lfb_r(offs_t offset);
-	void lfb_w(offs_t offset, u32 data, u32 mem_mask);
+	// internal reads and writes
+	u32 internal_lfb_r(offs_t offset);
+	void internal_lfb_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 expand_lfb_data(voodoo::reg_lfb_mode const lfbmode, u32 data, rgb_t src_color[2], u16 src_depth[2]);
-	virtual void texture_w(offs_t offset, u32 data);
+	virtual void internal_texture_w(offs_t offset, u32 data);
 
 	// register read accessors
 	u32 reg_invalid_r(u32 chipmask, u32 regnum);

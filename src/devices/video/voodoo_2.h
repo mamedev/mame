@@ -16,11 +16,13 @@
 #include "voodoo.h"
 
 
+// forward declarations
+class voodoo_2_device;
+
+
 //**************************************************************************
 //  INTERNAL CLASSES
 //**************************************************************************
-
-class voodoo_2_device;
 
 namespace voodoo
 {
@@ -171,7 +173,7 @@ class voodoo_2_device : public voodoo_1_device
 
 protected:
 	// internal construction
-	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo_model model);
+	voodoo_2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, voodoo::voodoo_model model);
 
 public:
 	// nominal clock value
@@ -179,7 +181,7 @@ public:
 
 	// construction
 	voodoo_2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, MODEL_VOODOO_2) { }
+		voodoo_2_device(mconfig, VOODOO_2, tag, owner, clock, voodoo::MODEL_VOODOO_2) { }
 
 	// address map and read/write helpers
 	virtual void core_map(address_map &map) override;
