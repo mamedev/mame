@@ -855,6 +855,7 @@ void savquest_state::savquest(machine_config &config)
 	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu(m_maincpu);
 	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));

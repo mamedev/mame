@@ -2418,6 +2418,7 @@ void viper_state::viper(machine_config &config)
 	m_voodoo->set_fbmem(8);
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu("maincpu");
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 

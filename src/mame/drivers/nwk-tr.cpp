@@ -688,6 +688,7 @@ void nwktr_state::nwktr(machine_config &config)
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[0]->set_screen("screen");
 	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -696,6 +697,7 @@ void nwktr_state::nwktr(machine_config &config)
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("screen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);

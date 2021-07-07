@@ -2016,6 +2016,7 @@ void seattle_state::seattle_common(machine_config &config)
 	VOODOO_1_PCI(config, m_voodoo, 0, m_maincpu, m_screen);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(seattle_state::vblank_assert));
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->stall_callback().set(m_galileo, FUNC(gt64xxx_device::pci_stall));
@@ -2094,6 +2095,7 @@ void seattle_state::flagstaff(machine_config &config)
 
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 4);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 }
 
 // Per game configurations

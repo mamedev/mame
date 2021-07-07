@@ -784,6 +784,7 @@ void funkball_state::funkball(machine_config &config)
 	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu(m_maincpu);
 

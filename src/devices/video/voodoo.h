@@ -53,10 +53,6 @@ static constexpr bool LOG_TEXTURE_RAM = false;
 static constexpr bool LOG_CMDFIFO = false;
 static constexpr bool LOG_CMDFIFO_VERBOSE = false;
 
-// Need to turn off cycle eating when debugging MIPS drc
-// otherwise timer interrupts won't match nodrc debug mode.
-static constexpr bool EAT_CYCLES = true;
-
 }
 
 
@@ -400,6 +396,7 @@ public:
 	// configuration
 	void set_fbmem(int value) { m_fbmem_in_mb = value; }
 	void set_tmumem(int value1, int value2) { m_tmumem0_in_mb = value1; m_tmumem1_in_mb = value2; }
+	void set_status_cycles(u32 value) { m_status_cycles = value; }
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto vblank_callback() { return m_vblank_cb.bind(); }
 	auto stall_callback() { return m_stall_cb.bind(); }
@@ -431,6 +428,7 @@ protected:
 	u8 m_fbmem_in_mb;                        // framebuffer memory, in MB
 	u8 m_tmumem0_in_mb;                      // TMU0 memory, in MB
 	u8 m_tmumem1_in_mb;                      // TMU1 memory, in MB
+	u32 m_status_cycles;                     // number of cycles to eat on status reads (optimization)
 	required_device<cpu_device> m_cpu;       // the CPU we interact with
 	devcb_write_line m_vblank_cb;            // VBLANK callback
 	devcb_write_line m_stall_cb;             // stalling callback

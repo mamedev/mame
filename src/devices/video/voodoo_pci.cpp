@@ -11,6 +11,7 @@ void voodoo_1_pci_device::device_add_mconfig(machine_config &config)
 	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
+	m_voodoo->set_status_cycles(m_status_cycles);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
 }
@@ -20,6 +21,7 @@ void voodoo_2_pci_device::device_add_mconfig(machine_config &config)
 	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(1, 0);
+	m_voodoo->set_status_cycles(m_status_cycles);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
 }
@@ -28,6 +30,7 @@ void voodoo_banshee_pci_device::device_add_mconfig(machine_config &config)
 {
 	VOODOO_BANSHEE(config, m_voodoo, voodoo_banshee_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(16);
+	m_voodoo->set_status_cycles(m_status_cycles);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
 }
@@ -36,6 +39,7 @@ void voodoo_3_pci_device::device_add_mconfig(machine_config &config)
 {
 	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(16);
+	m_voodoo->set_status_cycles(m_status_cycles);
 	m_voodoo->set_cpu(m_cpu);
 	m_voodoo->set_screen(m_screen);
 }
@@ -81,6 +85,7 @@ void voodoo_pci_device::device_start()
 {
 	m_generic_voodoo->set_fbmem(m_fbmem);
 	m_generic_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
+	m_generic_voodoo->set_status_cycles(m_status_cycles);
 	pci_device::device_start();
 	save_item(NAME(m_pcictrl_reg));
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));

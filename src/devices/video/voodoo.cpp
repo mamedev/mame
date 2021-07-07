@@ -667,6 +667,7 @@ generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, devi
 	m_fbmem_in_mb(0),
 	m_tmumem0_in_mb(0),
 	m_tmumem1_in_mb(0),
+	m_status_cycles(0),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_vblank_cb(*this),
 	m_stall_cb(*this),
@@ -2008,8 +2009,8 @@ u32 voodoo_1_device::reg_status_r(u32 chipmask, u32 regnum)
 	result |= std::min<s32>(m_swaps_pending, 7) << 28;
 
 	// eat some cycles since people like polling here
-	if (EAT_CYCLES)
-		m_cpu->eat_cycles(1000);
+	if (m_status_cycles != 0)
+		m_cpu->eat_cycles(m_status_cycles);
 
 	// bit 31 is PCI interrupt pending (not implemented)
 	return result;
@@ -2033,10 +2034,6 @@ u32 voodoo_1_device::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 
 u32 voodoo_1_device::reg_vretrace_r(u32 chipmask, u32 regnum)
 {
-	// eat some cycles since people like polling here
-	if (EAT_CYCLES)
-		m_cpu->eat_cycles(10);
-
 	// return 0 if vblank is active
 	return m_vblank ? 0 : screen().vpos();
 }

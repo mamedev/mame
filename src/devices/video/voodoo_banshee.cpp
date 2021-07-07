@@ -1339,8 +1339,8 @@ u32 voodoo_banshee_device::reg_status_r(u32 chipmask, u32 offset)
 	result |= std::min<u32>(m_swaps_pending, 7) << 28;
 
 	// eat some cycles since people like polling here
-	if (EAT_CYCLES)
-		m_cpu->eat_cycles(1000);
+	if (m_status_cycles != 0)
+		m_cpu->eat_cycles(m_status_cycles);
 
 	// bit 31 is PCI interrupt pending (not implemented)
 	return result;

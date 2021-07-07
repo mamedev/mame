@@ -18,6 +18,7 @@ public:
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 	void set_fbmem(int fbmem) { m_fbmem = fbmem; }
 	void set_tmumem(int tmumem0, int tmumem1) { m_tmumem0 = tmumem0; m_tmumem1 = tmumem1; }
+	void set_status_cycles(u32 cycles) { m_status_cycles = cycles; }
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u32 vga_r(offs_t offset, u32 mem_mask = ~0);
@@ -40,6 +41,7 @@ protected:
 	optional_device<cpu_device> m_cpu;
 	optional_device<screen_device> m_screen;
 	int m_fbmem, m_tmumem0, m_tmumem1;
+	u32 m_status_cycles;
 
 	u32 m_pcictrl_reg[0x20];
 

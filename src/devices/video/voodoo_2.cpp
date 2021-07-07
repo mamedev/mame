@@ -882,10 +882,6 @@ u32 voodoo_2_device::execute_fifos()
 
 u32 voodoo_2_device::reg_hvretrace_r(u32 chipmask, u32 regnum)
 {
-	// eat some cycles since people like polling here
-	if (EAT_CYCLES)
-		m_cpu->eat_cycles(10);
-
 	// return 0 for vertical if vblank is active
 	u32 result = m_vblank ? 0 : screen().vpos();
 	return result |= screen().hpos() << 16;

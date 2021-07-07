@@ -1124,6 +1124,7 @@ void hornet_state::hornet(machine_config &config)
 	VOODOO_1(config, m_voodoo[0], XTAL(50'000'000));
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[0]->set_screen("screen");
 	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1204,6 +1205,7 @@ void hornet_state::sscope(machine_config &config)
 	VOODOO_1(config, m_voodoo[1], XTAL(50'000'000));
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4, 0);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
@@ -1237,6 +1239,7 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	VOODOO_2(config.replace(), m_voodoo[0], voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(4,0);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[0]->set_screen("lscreen");
 	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1245,6 +1248,7 @@ void hornet_state::sscope_voodoo2(machine_config& config)
 	VOODOO_2(config.replace(), m_voodoo[1], voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(4,0);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo[1]->set_screen("rscreen");
 	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);

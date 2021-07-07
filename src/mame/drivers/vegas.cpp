@@ -1924,6 +1924,7 @@ void vegas_state::vegascore(machine_config &config)
 	voodoo_2_pci_device &voodoo(VOODOO_2_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(2);
 	voodoo.set_tmumem(4, 4);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	M48T37(config, m_timekeeper);
@@ -1968,6 +1969,7 @@ void vegas_state::vegasban(machine_config &config)
 	vegas32m(config);
 	voodoo_banshee_pci_device &voodoo(VOODOO_BANSHEE_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 }
 
@@ -1982,6 +1984,7 @@ void vegas_state::vegasv3(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 }
 
@@ -1999,6 +2002,7 @@ void vegas_state::denver(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(FUNC(vegas_state::vblank_assert));
 
 	// TL16C552 UART
