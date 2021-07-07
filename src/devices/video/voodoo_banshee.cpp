@@ -1616,7 +1616,7 @@ void voodoo_banshee_device::execute_blit(u32 data)
 DEFINE_DEVICE_TYPE(VOODOO_3, voodoo_3_device, "voodoo_3", "3dfx Voodoo 3")
 
 voodoo_3_device::voodoo_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	voodoo_banshee_device(mconfig, VOODOO_3, tag, owner, clock, MODEL_VOODOO_3)
+	voodoo_banshee_device(mconfig, VOODOO_3, tag, owner, clock, voodoo_model::VOODOO_3)
 {
 }
 

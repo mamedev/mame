@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<generic_voodoo_device> m_voodoo;
+	required_device<generic_voodoo_device> m_generic_voodoo;
 	optional_device<cpu_device> m_cpu;
 	optional_device<screen_device> m_screen;
 	int m_fbmem, m_tmumem0, m_tmumem1;
@@ -63,6 +63,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	required_device<voodoo_1_device> m_voodoo;
 };
 
 class voodoo_2_pci_device : public voodoo_pci_device
@@ -81,6 +82,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	required_device<voodoo_2_device> m_voodoo;
 };
 
 class voodoo_banshee_pci_device : public voodoo_pci_device
@@ -102,6 +104,7 @@ protected:
 
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
+	required_device<voodoo_banshee_device> m_voodoo;
 };
 
 class voodoo_3_pci_device : public voodoo_pci_device
@@ -123,6 +126,7 @@ protected:
 
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
+	required_device<voodoo_3_device> m_voodoo;
 };
 
 DECLARE_DEVICE_TYPE(VOODOO_1_PCI, voodoo_1_pci_device)

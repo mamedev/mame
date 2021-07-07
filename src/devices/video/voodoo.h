@@ -29,12 +29,12 @@ namespace voodoo
 {
 
 // enumeration specifying which model of Voodoo we are emulating
-enum voodoo_model : u8
+enum class voodoo_model : u8
 {
-	MODEL_VOODOO_1,
-	MODEL_VOODOO_2,
-	MODEL_VOODOO_BANSHEE,
-	MODEL_VOODOO_3
+	VOODOO_1,
+	VOODOO_2,
+	VOODOO_BANSHEE,
+	VOODOO_3
 };
 
 // debug
@@ -486,7 +486,7 @@ public:
 
 	// construction
 	voodoo_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, voodoo::MODEL_VOODOO_1) { }
+		voodoo_1_device(mconfig, VOODOO_1, tag, owner, clock, voodoo::voodoo_model::VOODOO_1) { }
 
 	// destruction
 	virtual ~voodoo_1_device();

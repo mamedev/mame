@@ -121,8 +121,8 @@ protected:
 		address_map_constructor delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}
-	template <typename T> void add_map(uint64_t size, int flags, device_t &device, void (T::*map)(address_map &map), const char *name) {
-		address_map_constructor delegate(map, name, static_cast<T *>(&device));
+	template <typename T> void add_map(uint64_t size, int flags, T &device, void (T::*map)(address_map &map), const char *name) {
+		address_map_constructor delegate(map, name, &device);
 		add_map(size, flags, delegate, &device);
 	}
 

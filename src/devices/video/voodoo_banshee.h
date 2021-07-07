@@ -17,7 +17,7 @@
 
 
 //**************************************************************************
-//  DEBUGGING
+//  CONSTANTS
 //**************************************************************************
 
 namespace voodoo
@@ -49,7 +49,7 @@ public:
 
 	// construction
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-		voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, voodoo::MODEL_VOODOO_BANSHEE) { }
+		voodoo_banshee_device(mconfig, VOODOO_BANSHEE, tag, owner, clock, voodoo::voodoo_model::VOODOO_BANSHEE) { }
 
 	// core address map and read/write helpers
 	virtual void core_map(address_map &map) override;

@@ -53,34 +53,34 @@ void voodoo_pci_device::config_map(address_map &map)
 
 voodoo_pci_device::voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: pci_device(mconfig, type, tag, owner, clock),
-	  m_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
+	  m_generic_voodoo(*this, "voodoo"), m_cpu(*this, finder_base::DUMMY_TAG), m_screen(*this, finder_base::DUMMY_TAG), m_fbmem(2), m_tmumem0(0), m_tmumem1(0)
 {
 }
 
 voodoo_1_pci_device::voodoo_1_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_1_PCI, tag, owner, clock)
+	: voodoo_pci_device(mconfig, VOODOO_1_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
 voodoo_2_pci_device::voodoo_2_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_2_PCI, tag, owner, clock)
+	: voodoo_pci_device(mconfig, VOODOO_2_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
 voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock)
+	: voodoo_pci_device(mconfig, VOODOO_BANSHEE_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
 voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock)
+	: voodoo_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
 
 void voodoo_pci_device::device_start()
 {
-	m_voodoo->set_fbmem(m_fbmem);
-	m_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
+	m_generic_voodoo->set_fbmem(m_fbmem);
+	m_generic_voodoo->set_tmumem(m_tmumem0, m_tmumem1);
 	pci_device::device_start();
 	save_item(NAME(m_pcictrl_reg));
 	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_pci_device::postload), this));
@@ -127,9 +127,12 @@ void voodoo_3_pci_device::device_start()
 
 	voodoo_pci_device::device_start();
 
-	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_3_device::core_map));
-	add_map(32 * 1024 * 1024, M_MEM, *m_voodoo, FUNC(voodoo_3_device::lfb_map));
-	add_map(256, M_IO, *m_voodoo, FUNC(voodoo_3_device::io_map));
+	// need to downcast to voodoo_banshee_device because the map functions are shared
+	// this will cleaner when the PCI interface is implemented as a mix-in
+	auto &banshee = static_cast<voodoo_banshee_device &>(*m_voodoo);
+	add_map(32 * 1024 * 1024, M_MEM, banshee, FUNC(voodoo_banshee_device::core_map));
+	add_map(32 * 1024 * 1024, M_MEM, banshee, FUNC(voodoo_banshee_device::lfb_map));
+	add_map(256, M_IO, banshee, FUNC(voodoo_banshee_device::io_map));
 	bank_infos[0].adr = 0xf8000000;
 	bank_infos[1].adr = 0xf8000008;
 	bank_infos[2].adr = 0xfffffff0;
@@ -180,7 +183,7 @@ void voodoo_3_pci_device::map_extra(u64 memory_window_start, u64 memory_window_e
 
 u32 voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_generic_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 // PCI bus control
@@ -190,14 +193,17 @@ u32 voodoo_pci_device::pcictrl_r(offs_t offset, u32 mem_mask)
 	// The address map starts at 0x40
 	switch (offset + 0x40 / 4) {
 	case 0x40/4:
+	{
 		// V1: initEnable: 11:0
 		// V2: initEnable: Fab ID=19:16, Graphics Rev=15:12
 		// Banshee/V3: fabID: ScratchPad=31:4 fabID=3:0
-		if (m_voodoo->model() == voodoo::MODEL_VOODOO_2)
+		auto model = m_generic_voodoo->model();
+		if (model == voodoo::voodoo_model::VOODOO_2)
 			result = (result & ~0xff000) | 0x00044000; // Vegas driver needs this value
-		else if (m_voodoo->model() >= voodoo::MODEL_VOODOO_BANSHEE)
+		else if (model >= voodoo::voodoo_model::VOODOO_BANSHEE)
 			result = (result & ~0xf) | 0x1;
 		break;
+	}
 	case 0x54/4:
 		// V2: SiProcess Register: Osc Force On, Osc Ring Sel, Osc Count Reset, 12 bit PCI Counter, 16 bit Oscillator Counter
 		// V3: AGP Capability Register: 8 bit 0, 4 bit AGP Major, 4 bit AGP Minor, 8 bit Next Ptr, 8 bit Capability ID
@@ -217,7 +223,7 @@ void voodoo_pci_device::pcictrl_w(offs_t offset, u32 data, u32 mem_mask)
 	switch (offset + 0x40 / 4) {
 		case 0x40/4:
 			// HW initEnable
-			m_voodoo->set_init_enable(data);
+			m_generic_voodoo->set_init_enable(data);
 			logerror("%s:voodoo_pci_device pcictrl_w (initEnable) offset %02X = %08X & %08X\n", machine().describe_context(), offset * 4 + 0x40, data, mem_mask);
 			break;
 		default:
@@ -230,10 +236,10 @@ void voodoo_pci_device::pcictrl_w(offs_t offset, u32 data, u32 mem_mask)
 u32 voodoo_pci_device::vga_r(offs_t offset, u32 mem_mask)
 {
 	// map to I/O space at offset 0xb0
-	return m_voodoo->read(0xb0/4 + offset, mem_mask);
+	return m_generic_voodoo->read(0xb0/4 + offset, mem_mask);
 }
 void voodoo_pci_device::vga_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// map to I/O space at offset 0xb0
-	m_voodoo->write(0xb0/4 + offset, data, mem_mask);
+	m_generic_voodoo->write(0xb0/4 + offset, data, mem_mask);
 }
