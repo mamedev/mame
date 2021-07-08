@@ -601,10 +601,10 @@ private:
 	required_region_ptr<uint8_t> rom, font_normal, font_bold;
 
 	// floppy
-	uint8_t io_80{};
+	uint8_t floppy_data{};
 	uint8_t io_88{};
 	uint8_t io_98{};
-	uint8_t io_90{}; // stepper motor control
+	uint8_t floppy_control{}; // stepper motor control
 	uint8_t floppy_steps{}; // quarter track
 	uint16_t floppy_track_offset{}; // current offset within track data
 	uint8_t floppy_shifter{}, floppy_latch{};
@@ -710,8 +710,8 @@ private:
 			floppy_shifter++;
 			if((floppy_read_until_zerobit && (floppy_latch & 1) == 0) || (!floppy_read_until_zerobit && floppy_shifter == 8)) {
 				logerror("%s: floppy_timer_callback: floppy_read_until_zerobit=%d latch=%02X\n", machine().describe_context(), floppy_read_until_zerobit, floppy_latch);
-				io_90 |= 0x80; // floppy_data_available = true;
-				io_80 = floppy_latch;
+				floppy_control |= 0x80; // floppy_data_available = true;
+				floppy_data = floppy_latch;
 				floppy_latch = floppy_shifter = 0;
 				floppy_read_until_zerobit = false;
 			}
@@ -721,7 +721,7 @@ private:
 		}
 	#endif
 
-	uint8_t io_80_r() {
+	uint8_t floppy_data_r() { // 80
 		#ifndef FLOPPY_FORMAT
 			auto fd = floppy->get_device();
 			if(!fd->loaded)
@@ -738,13 +738,13 @@ private:
 			floppy_track_offset++;
 			return ret;
 		#endif
-		io_90 &= ~0x80; // floppy_data_available = false;
-		logerror("%s: read %02X from IO 80\n", machine().describe_context(), io_80);
-		return io_80;
+		floppy_control &= ~0x80; // floppy_data_available = false;
+		logerror("%s: read %02X from IO 80\n", machine().describe_context(), floppy_data);
+		return floppy_data;
 	}
-	void io_80_w(uint8_t data) {
+	void floppy_data_w(uint8_t data) {
 		logerror("%s: write %02X to IO 80\n", machine().describe_context(), data);
-		io_80 = data;
+		floppy_data = data;
 	}
 
 	uint8_t io_88_r() {
@@ -757,14 +757,15 @@ private:
 		io_88 = data;
 	}
 
-	uint8_t io_90_r() {
-		logerror("%s: read %02X from IO 90\n", machine().describe_context(), io_90);
+	uint8_t floppy_status_r() { // 90
+		logerror("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
 		// bit 7 set; data ready from floppy
 		// bit 6 clear; unknown meaning
 		// bit 5 clear
-		return io_90;
+		// bit 4-0: stepper motor
+		return floppy_control;
 	}
-	void io_90_w(uint8_t data) {
+	void floppy_stepper_w(uint8_t data) {
 		logerror("%s: write %02X to IO 90\n", machine().describe_context(), data);
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
@@ -776,19 +777,19 @@ private:
 		case 0b0110:
 		case 0b1100:
 		case 0b1001:
-			if((data & 0x0f) == rol4(io_90))
+			if((data & 0x0f) == rol4(floppy_control))
 				floppy_steps--;
-			else if((data & 0x0f) == ror4(io_90))
+			else if((data & 0x0f) == ror4(floppy_control))
 				floppy_steps++;
 			else
-				logerror("%s: illegal step %02x=>%02x\n", machine().describe_context(), io_90, data);
+				logerror("%s: illegal step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		default:
-			logerror("%s: initial step %02x=>%02x\n", machine().describe_context(), io_90, data);
+			logerror("%s: initial step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		}
 		logerror("%s: floppy_steps=%3d => track=%2d\n", machine().describe_context(), floppy_steps, floppy_steps / 4);
-		io_90 = (io_90 & 0xf0) | (data & 0x0f);
+		floppy_control = (floppy_control & 0xf0) | (data & 0x0f);
 	}
 
 	uint8_t io_98_r() {
@@ -907,9 +908,9 @@ private:
 		map(0x77, 0x77).r(FUNC(lw30_state::io_77_r)).nopw(); // NOP just to shut up the log
 
 		// floppy
-		map(0x80, 0x80).rw(FUNC(lw30_state::io_80_r), FUNC(lw30_state::io_80_w));
+		map(0x80, 0x80).rw(FUNC(lw30_state::floppy_data_r), FUNC(lw30_state::floppy_data_w));
 		map(0x88, 0x88).rw(FUNC(lw30_state::io_88_r), FUNC(lw30_state::io_88_w));
-		map(0x90, 0x90).rw(FUNC(lw30_state::io_90_r), FUNC(lw30_state::io_90_w));
+		map(0x90, 0x90).rw(FUNC(lw30_state::floppy_status_r), FUNC(lw30_state::floppy_stepper_w));
 		map(0x98, 0x98).rw(FUNC(lw30_state::io_98_r), FUNC(lw30_state::io_98_w));
 
 		map(0xa8, 0xa8).noprw(); // NOP just to shut up the log
