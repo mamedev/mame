@@ -72194,7 +72194,7 @@ Other
 		</part>
 	</software>
 
-	<software name="angrybr3" supported="no">
+	<software name="angrybr3">
 		<description>Angry Birds 3 (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -72202,11 +72202,11 @@ Other
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="32768">
-				<rom name="angry bird 3.chr" size="32768" crc="03c91a82" sha1="40ffdbd7de4004534065e286e9084844c17d9a5c" offset="00000" status="baddump" />
+			<dataarea name="chr" size="65536">
+				<rom name="angry bird 3.chr" size="65536" crc="8bfe891e" sha1="1dc7fb81dbbfc4d44a56e9656f974a03bef23646" offset="00000" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="65536">
-				<rom name="angry bird 3.prg" size="65536" crc="d3dea6b3" sha1="162262daa614c8b75edf8eb7b31cf0fac427a59f" offset="00000" status="baddump" />
+			<dataarea name="prg" size="32768">
+				<rom name="angry bird 3.prg" size="32768" crc="3e26b2b4" sha1="273ad768a925fcaa330c8d73ce2441a3bce70285" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -73333,15 +73333,14 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="plantzom" supported="partial">
+	<software name="plantzom">
 		<description>Plants Vs. Zombies (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="植物大战僵尸"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="axrom" />
-			<feature name="pcb" value="NES-AOROM" />
-			<feature name="bus_conflict" value="no" />
+		<!-- Header says mapper 4, i.e. txrom, but it seems to work under this MMC3 clone instead. Strange since this clearly shares code with angrybr3 and that one works under txrom. -->
+			<feature name="slot" value="txc_tw" />
 			<dataarea name="chr" size="131072">
 				<rom name="plants vs zomb.chr" size="131072" crc="b41a1d2e" sha1="599a24f0b1eda249b24825afeedef8901f12207a" offset="00000" status="baddump" />
 			</dataarea>
