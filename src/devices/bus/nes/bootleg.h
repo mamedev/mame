@@ -148,28 +148,6 @@ private:
 };
 
 
-// ======================> nes_whirl2706_device
-
-class nes_whirl2706_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_whirl2706_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_latch;
-};
-
-
 // ======================> nes_smb2j_device
 
 class nes_smb2j_device : public nes_nrom_device
@@ -294,6 +272,73 @@ protected:
 
 private:
 	uint8_t m_latch;
+};
+
+
+// ======================> nes_whirlwind_device
+
+class nes_whirlwind_device : public nes_nrom_device
+{
+public:
+	virtual u8 read_m(offs_t offset) override;
+	virtual void pcb_reset() override;
+
+protected:
+	// construction/destruction
+	nes_whirlwind_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	u8 m_reg;
+};
+
+
+// ======================> nes_dh08_device
+
+class nes_dh08_device : public nes_whirlwind_device
+{
+public:
+	// construction/destruction
+	nes_dh08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
+// ======================> nes_le05_device
+
+class nes_le05_device : public nes_whirlwind_device
+{
+public:
+	// construction/destruction
+	nes_le05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
+// ======================> nes_lh28_lh54_device
+
+class nes_lh28_lh54_device : public nes_whirlwind_device
+{
+public:
+	// construction/destruction
+	nes_lh28_lh54_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
+// ======================> nes_lh31_device
+
+class nes_lh31_device : public nes_whirlwind_device
+{
+public:
+	// construction/destruction
+	nes_lh31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -422,26 +467,6 @@ private:
 	uint8_t m_latch;
 };
 
-// ======================> nes_unl_bb_device
-
-class nes_unl_bb_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_unl_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual uint8_t read_m(offs_t offset) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_reg[2];
-};
-
 // ======================> nes_mmalee_device
 
 class nes_mmalee_device : public nes_nrom_device
@@ -514,18 +539,20 @@ DECLARE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device)
 DECLARE_DEVICE_TYPE(NES_ASN,            nes_asn_device)
 DECLARE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device)
 DECLARE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device)
-DECLARE_DEVICE_TYPE(NES_WHIRLWIND_2706, nes_whirl2706_device)
 DECLARE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device)
 DECLARE_DEVICE_TYPE(NES_09034A,         nes_09034a_device)
 DECLARE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device)
-DECLARE_DEVICE_TYPE(NES_LH32,           nes_lh32_device)
+DECLARE_DEVICE_TYPE(NES_DH08,           nes_dh08_device)
+DECLARE_DEVICE_TYPE(NES_LE05,           nes_le05_device)
 DECLARE_DEVICE_TYPE(NES_LH10,           nes_lh10_device)
+DECLARE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device)
+DECLARE_DEVICE_TYPE(NES_LH31,           nes_lh31_device)
+DECLARE_DEVICE_TYPE(NES_LH32,           nes_lh32_device)
 DECLARE_DEVICE_TYPE(NES_LH53,           nes_lh53_device)
 DECLARE_DEVICE_TYPE(NES_2708,           nes_2708_device)
 DECLARE_DEVICE_TYPE(NES_AC08,           nes_ac08_device)
-DECLARE_DEVICE_TYPE(NES_UNL_BB,         nes_unl_bb_device)
 DECLARE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device)
 DECLARE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device)
 DECLARE_DEVICE_TYPE(NES_RT01,           nes_rt01_device)
