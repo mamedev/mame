@@ -66,12 +66,12 @@ void travrusa_state::main_map(address_map &map)
 	map(0xa000, 0xa000).w(FUNC(travrusa_state::travrusa_scroll_x_high_w));
 	map(0xc800, 0xc9ff).writeonly().share("spriteram");
 	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
-	map(0xd001, 0xd001).w(FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
-	map(0xd000, 0xd000).portr("SYSTEM");     /* IN0 */
-	map(0xd001, 0xd001).portr("P1");         /* IN1 */
-	map(0xd002, 0xd002).portr("P2");         /* IN2 */
-	map(0xd003, 0xd003).portr("DSW1");       /* DSW1 */
-	map(0xd004, 0xd004).portr("DSW2");       /* DSW2 */
+	map(0xd001, 0xd001).w(FUNC(travrusa_state::travrusa_flipscreen_w));    // + coin counters - not written by shtrider
+	map(0xd000, 0xd000).portr("SYSTEM");     // IN0
+	map(0xd001, 0xd001).portr("P1");         // IN1
+	map(0xd002, 0xd002).portr("P2");         // IN2
+	map(0xd003, 0xd003).portr("DSW1");       // DSW1
+	map(0xd004, 0xd004).portr("DSW2");       // DSW2
 	map(0xe000, 0xefff).ram();
 }
 
@@ -79,7 +79,7 @@ static INPUT_PORTS_START( travrusa )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	/* coin input must be active for 19 frames to be consistently recognized */
+	// coin input must be active for 19 frames to be consistently recognized
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(19)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -116,12 +116,12 @@ static INPUT_PORTS_START( travrusa )
 	PORT_DIPNAME( 0x04, 0x04, "Fuel Consumption" )      PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, "Hi" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:5,6,7,8")
-	PORT_DIPSETTING(    0x80, "Not Used" )          PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x90, "Not Used" )          PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x80, "Not Used" )              PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x90, "Not Used" )              PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
@@ -134,7 +134,7 @@ static INPUT_PORTS_START( travrusa )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_7C ) )        PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
-	PORT_DIPSETTING(    0x10, "Not Used" )          PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(    0x10, "Not Used" )              PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )    PORT_CONDITION("DSW2", 0x04, EQUALS, 0x04)
 
 	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) )    PORT_CONDITION("DSW2", 0x04, EQUALS, 0x00)
@@ -161,26 +161,26 @@ static INPUT_PORTS_START( travrusa )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )         PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )             PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, "Speed Type" )        PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Speed Type" )            PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, "M/H" ) //mph ?
 	PORT_DIPSETTING(    0x00, "Km/H" )
-	/* In stop mode, press 2 to stop and 1 to restart */
+	// In stop mode, press 2 to stop and 1 to restart
 	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)")      PORT_DIPLOCATION("DSW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Title" )         PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPNAME( 0x20, 0x20, "Title" )                 PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, "Traverse USA" )
 	PORT_DIPSETTING(    0x00, "Zippy Race" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")    PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)") PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x80, 0x80, "DSW2:8")
 INPUT_PORTS_END
 
-/* same as travrusa, no "Title" switch */
+// Same as travrusa, no "Title" switch
 static INPUT_PORTS_START( motorace )
 	PORT_INCLUDE( travrusa )
 
@@ -306,16 +306,15 @@ void travrusa_state::machine_reset()
 
 void travrusa_state::travrusa(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
+	// Basic machine hardware
+	Z80(config, m_maincpu, 4000000);   // 4 MHz (?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::main_map);
 
-	/* video hardware */
+	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(56.75);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */);
-				/* the Lode Runner manual (similar but different hardware) */
-				/* talks about 55Hz and 1790ms vblank duration. */
+				// The Lode Runner manual (similar but different hardware) talks about 55Hz and 1790ms vblank duration.
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(travrusa_state::screen_update_travrusa));
@@ -326,7 +325,7 @@ void travrusa_state::travrusa(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
 	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);
 
-	/* sound hardware */
+	// Sound hardware
 	//m52_sound_c_audio(config);
 	IREM_M52_SOUNDC_AUDIO(config, "irem_audio", 0);
 }
@@ -335,7 +334,7 @@ void travrusa_state::shtrider(machine_config &config)
 {
 	travrusa(config);
 
-	/* video hardware */
+	// Video hardware
 	m_gfxdecode->set_info(gfx_shtrider);
 	m_palette->set_init(FUNC(travrusa_state::shtrider_palette));
 }
@@ -344,7 +343,7 @@ void travrusa_state::shtriderb(machine_config &config)
 {
 	travrusa(config);
 
-	/* video hardware */
+	// Video hardware
 	m_gfxdecode->set_info(gfx_shtrider);
 }
 
@@ -376,12 +375,12 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-10.k3",    0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
+	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Character palette - last $100 are unused
+	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Sprite palette
+	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Sprite lookup table
 ROM_END
 
-	/* Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG */
+// Bootleg - "American Top" printed on title - (c) 1983 I.P. - Zippy Race graphic logo is blanked out - Main ROM0-ROM3 test NG */
 ROM_START( travrusab )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "at4.m3",       0x0000, 0x2000, CRC(704ce6e4) SHA1(77385d853e3d5085c6ab155417e2b42212aff6fc) )
@@ -393,9 +392,9 @@ ROM_START( travrusab )
 	ROM_LOAD( "11.a1",        0x7000, 0x1000, CRC(d2c0bc33) SHA1(3a52ae514daf985d297416301dac0ac6cbe671d7) )
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "zippyrac.001", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) /* at1.e3 */
-	ROM_LOAD( "mr8.3c",       0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) /* at2.c3 */
-	ROM_LOAD( "mr9.3a",       0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) /* at3.a3 */
+	ROM_LOAD( "zippyrac.001", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // at1.e3
+	ROM_LOAD( "mr8.3c",       0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // at2.c3
+	ROM_LOAD( "mr9.3a",       0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // at3.a3
 
 	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "8.n3",         0x0000, 0x2000, CRC(00c0f46b) SHA1(5fccc188af653785f3fc0f9d36dbbbab472f6fdc) )
@@ -403,9 +402,9 @@ ROM_START( travrusab )
 	ROM_LOAD( "10.k3",        0x4000, 0x2000, CRC(fcfeaa69) SHA1(a958caf70d2dc4a80298a395cb48db210e6ca16b) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
+	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Character palette - last $100 are unused
+	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Sprite palette
+	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Sprite lookup table
 ROM_END
 
 ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differently stated
@@ -429,14 +428,14 @@ ROM_START( travrusab2 ) // all ROMs match travrusa but the ones where differentl
 	ROM_LOAD( "10.3k3", 0x4000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "6349-2.1k2",    0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // character palette - last $100 are unused
-	ROM_LOAD( "tbp18s030.3f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // sprite palette
-	ROM_LOAD( "mb7052.3h2",    0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // sprite lookup table
+	ROM_LOAD( "6349-2.1k2",    0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Character palette - last $100 are unused
+	ROM_LOAD( "tbp18s030.3f1", 0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Sprite palette
+	ROM_LOAD( "mb7052.3h2",    0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Sprite lookup table
 ROM_END
 
 ROM_START( motorace )
 	ROM_REGION( 0x12000, "maincpu", 0 )
-	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )    /* encrypted */
+	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )    // Encrypted
 	ROM_LOAD( "mr1.3l",       0x2000, 0x2000, CRC(0904ed58) SHA1(2776e031cb58f99103bc35299bffd7612d954608) )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )
@@ -455,9 +454,9 @@ ROM_START( motorace )
 	ROM_LOAD( "mr6.3k",       0x4000, 0x2000, CRC(518889a0) SHA1(70b417104ce86132cb5542813c1e0509b2260756) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */
-	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
-	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
+	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Character palette - last $100 are unused
+	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Sprite palette
+	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Sprite lookup table
 ROM_END
 
 /*
@@ -466,11 +465,11 @@ Moto Tour is a Tecfri licensed version of Traverse USA/Zippy Race from Irem
 
 This version doesn't have the MSM5202 but still has the sounds produced by the 5202 with a lower quality, I guess it converts the sound data to analog in some way, also this version is unprotected, doesn't have the epoxy block.
 
-Unfortunately the eprom's labels have disappeared, so I name it similar to Traverse USA but with the letters mt (Moto Tour)
+Unfortunately the EPROM's labels have disappeared, so I name it similar to Traverse USA but with the letters mt (Moto Tour)
 
 Rom Info
 
-snd.a1  ------  sound code, 100% identical to Traverse Usa/Zippy race
+snd.a1  ------  Sound code, 100% identical to Traverse Usa/Zippy race
 
 mt1-1.e3 \
 mt1-2.c3  -- Backgrounds?, 100% identical to Traverse Usa/Zippy race
@@ -478,7 +477,7 @@ mt1-3.a3 /
 
 mt1-4.m3  \
 mt1-5.l3  ==
-mt1-6.k3  ==  Main cpu. Different from the other sets
+mt1-6.k3  ==  Main CPU. Different from the other sets
 mt1-7.j3  /
 
 
@@ -487,7 +486,7 @@ mt1-9.m3 --  Sprites. Apparently all different from the other sets
 mt1-10.k3 /
 
 mm6349.k2 \
-prom1.f1  --  color proms, identical to other versions
+prom1.f1  --  color PROMs, identical to other versions
 prom2.h2  /
 
 Ricky2001
@@ -496,32 +495,58 @@ Ricky2001
 
 ROM_START( mototour )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mt1-4.m3",     0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
-	ROM_LOAD( "mt1-5.l3",     0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
-	ROM_LOAD( "mt1-6.k3",     0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
-	ROM_LOAD( "mt1-7.j3",     0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
+	ROM_LOAD( "mt1-4.m3",   0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
+	ROM_LOAD( "mt1-5.l3",   0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
+	ROM_LOAD( "mt1-6.k3",   0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
+	ROM_LOAD( "mt1-7.j3",   0x6000, 0x2000, CRC(ab8a3a33) SHA1(e332b6e727083cf508ccec721ce42ccc3aa54e91) )
 
 	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
-	ROM_LOAD( "snd.a1",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) ) // == mr10.1a
+	ROM_LOAD( "snd.a1",     0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) ) // == mr10.1a
 
 	ROM_REGION( 0x06000, "gfx1", 0 )
-	ROM_LOAD( "mt1-1.e3", 0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // == zippyrac.001
-	ROM_LOAD( "mt1-2.c3", 0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // == mr8.3c
-	ROM_LOAD( "mt1-3.a3", 0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // == mr9.3a
+	ROM_LOAD( "mt1-1.e3",   0x0000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) ) // == zippyrac.001
+	ROM_LOAD( "mt1-2.c3",   0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // == mr8.3c
+	ROM_LOAD( "mt1-3.a3",   0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // == mr9.3a
 
 	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "mt1-8..n3",    0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
-	ROM_LOAD( "mt1-9..m3",    0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
-	ROM_LOAD( "mt1-10..k3",   0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
+	ROM_LOAD( "mt1-8.n3",   0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
+	ROM_LOAD( "mt1-9.m3",   0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
+	ROM_LOAD( "mt1-10.k3",  0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
 
 	ROM_REGION( 0x0320, "proms", 0 )
-	ROM_LOAD( "mmi6349.k2", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */ // == mmi6349.ij
-	ROM_LOAD( "prom1.f1",   0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */ // == tbp18s.2
-	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */ // == tbp24s10.3
+	ROM_LOAD( "mmi6349.k2", 0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Character palette - last $100 are unused // == mmi6349.ij
+	ROM_LOAD( "prom1.f1",   0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Sprite palette // == tbp18s.2
+	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Sprite lookup table // == tbp24s10.3
 ROM_END
 
+// Orignial Tecfri PCB with Assa labeled ROMs
+ROM_START( mototoura )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a-00288_assa_m5_mp1.m3",  0x0000, 0x2000, CRC(fe643567) SHA1(2e47b6de43ff7fc1f070d34376fde697fc719b80) )
+	ROM_LOAD( "a-00288_assa_m5_mp2.l3",  0x2000, 0x2000, CRC(38d9d0f5) SHA1(8b4531a28ff69df04a5eef687383dab57e0aa685) )
+	ROM_LOAD( "a-00288_assa_m5_mp3.k3",  0x4000, 0x2000, CRC(efd325f2) SHA1(0862c0ec87f601b6c1cba2bd25e3186b6ad0c68e) )
+	ROM_LOAD( "a-00288_assa_m5_mp4.j3",  0x6000, 0x2000, CRC(5a69a393) SHA1(b3781ac8e639dcb958443e53ddc2da90cd7d44bc) )
 
-/* it's probably a bootleg of the original Seibu version with the roms decrypted (no epoxy block) */
+	ROM_REGION( 0x8000, "irem_audio:iremsound", 0 )
+	ROM_LOAD( "snd.a1",                 0x7000, 0x1000, CRC(d1385740) SHA1(0475d88f842a6f1b95ea0c66174e6f7880c3d352) ) // label removed // == mr10.1a
+
+	ROM_REGION( 0x06000, "gfx1", 0 )
+	ROM_LOAD( "a-00288_assa_m5_mf1.e3",  0x0000, 0x2000, CRC(65cb269a) SHA1(07f3532e2f42c0375c60632411b12f4002ace4b1) )
+	ROM_LOAD( "a-00288_assa_m5_mf2.c3",  0x2000, 0x2000, CRC(3a046dd1) SHA1(65c1dd1c0b5fb72ac5c04e11a577308245e4b312) ) // == mr8.3c
+	ROM_LOAD( "a-00288_assa_m5_mf3.a3",  0x4000, 0x2000, CRC(1cc3d3f4) SHA1(e7ee365d43d783cb6b7df37c6edeadbed35318d9) ) // == mr9.3a
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "a-00288_assa_m5_mm8.n3",  0x0000, 0x2000, CRC(600a57f5) SHA1(86c2b2efb9392b7eca44510587d2459388c40435) )
+	ROM_LOAD( "a-00288_assa_m5_mm9.m3",  0x2000, 0x2000, CRC(6f9f2a4e) SHA1(8ebdd69895a4dd5de7fe84505359cccaa0aca6f8) )
+	ROM_LOAD( "a-00288_assa_m5_mm10.k3", 0x4000, 0x2000, CRC(d958def5) SHA1(198adf7e87804bd018b8cfa8bbc68623255698a2) )
+
+	ROM_REGION( 0x0320, "proms", 0 )
+	ROM_LOAD( "mmi6349.k2", 0x0000, 0x0200, BAD_DUMP CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) // Not dumped on this set // Character palette - last $100 are unused
+	ROM_LOAD( "prom1.f1",   0x0200, 0x0020, BAD_DUMP CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) // Not dumped on this set // Sprite palette
+	ROM_LOAD( "prom2.h2",   0x0220, 0x0100, BAD_DUMP CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) // Not dumped on this set // Sprite lookup table
+ROM_END
+
+// It's probably a bootleg of the original Seibu version with the ROMs decrypted (no epoxy block)
 ROM_START( shtrider )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sr01a.bin", 0x0000, 0x2000, CRC(de76d537) SHA1(5ad90571c451b0d7b7a569556cfe075ead00fa2b) )
@@ -551,7 +576,7 @@ ROM_END
 
 ROM_START( shtridera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(eb51315c) SHA1(0101c008b6731cd8ec796fee645113e2be79bd08) ) /* was inside epoxy block with cpu, encrypted */
+	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(eb51315c) SHA1(0101c008b6731cd8ec796fee645113e2be79bd08) ) // Was inside epoxy block with CPU, encrypted
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(97675d19) SHA1(774ce4d370fcbbd8a4109df023bf21db92d2e839) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(78d051cd) SHA1(e1dc2dcfc4af35bdd5245d23977e8640d81a43f1) )
 	ROM_LOAD( "4.bin",   0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
@@ -608,7 +633,7 @@ void travrusa_state::init_motorace()
 	uint8_t buffer[0x2000];
 	memcpy(&buffer[0], rom, 0x2000);
 
-	/* The first CPU ROM has the address and data lines scrambled */
+	// The first CPU ROM has the address and data lines scrambled
 	for (int A = 0; A < 0x2000; A++)
 	{
 		int j = bitswap<16>(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
@@ -620,7 +645,7 @@ void travrusa_state::init_shtridra()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* D3/D4  and  D5/D6 swapped */
+	// D3/D4  and  D5/D6 swapped
 	for (int A = 0; A < 0x2000; A++)
 		rom[A] = bitswap<8>(rom[A],7,5,6,3,4,2,1,0);
 }
@@ -639,12 +664,13 @@ void travrusa_state::init_shtridrb()
 }
 
 
-GAME( 1983, travrusa,   0,        travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,  travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab2, travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg",                        "Traverse USA (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
-GAME( 1983, mototour,   travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace,   travrusa, travrusa, motorace, travrusa_state, init_motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa,   0,        travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem",                           "Traverse USA / Zippy Race",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,  travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg, set 1)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab2, travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "bootleg",                        "Traverse USA (bootleg, set 2)",                          MACHINE_SUPPORTS_SAVE ) // still shows both Irem and Tecfri
+GAME( 1983, mototour,   travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mototoura,  travrusa, travrusa, travrusa, travrusa_state, empty_init,    ROT270,                    "Irem (Tecfri license / Assa)",   "MotoTour / Zippy Race (Assa version of Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace,   travrusa, travrusa, motorace, travrusa_state, init_motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA",                                           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider,   0,        shtrider, shtrider, travrusa_state, empty_init,    ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
-GAME( 1984, shtridera,  shtrider, shtrider, shtrider, travrusa_state, init_shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtriderb,  shtrider, shtriderb,shtrider, travrusa_state, init_shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?
+GAME( 1985, shtrider,   0,        shtrider, shtrider, travrusa_state, empty_init,    ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider",                                             MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1984, shtridera,  shtrider, shtrider, shtrider, travrusa_state, init_shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtriderb,  shtrider, shtriderb,shtrider, travrusa_state, init_shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)",                                   MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?
