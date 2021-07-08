@@ -56,6 +56,16 @@ JP3: |
 JP4: /
 
 
+Screen parameters from Lode Runner manual:
+
+15.6 KHz horizontal frequency (64.0 µsec period)
+4.0 µsec horizontal sync pulse, 5.0 µsec delayed from start of blanking
+16.0 µsec horizontal blanking period
+55.0 Hz vertical frequency (18.2 msec period)
+384 µsec vertical sync pulse, 512 µsec delayed from start of blanking
+1.79 msec vertical blanking period
+
+
 2008-08
 Dip locations verified with dips listing for: kungfum, ldrun, kidniki,
 spelunkr, spelunk2.
@@ -963,20 +973,15 @@ void m62_state::machine_reset()
 
 void m62_state::ldrun(machine_config &config)
 {
-
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 24000000/6);
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(m62_state::irq0_line_hold));
 
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */);
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 284, 0, 256);
 	screen.set_screen_update(FUNC(m62_state::screen_update_ldrun));
 
 	GFXDECODE(config, m_spr_decode, m_spr_palette, gfx_m62_sprites);
@@ -997,12 +1002,12 @@ void m62_state::kungfum(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kungfum_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kungfum));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
@@ -1014,14 +1019,14 @@ void m62_state::battroad(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::battroad_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::battroad_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_battroad));
 
 	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_battroad);
@@ -1147,12 +1152,12 @@ void m62_state::youjyudn(machine_config &config)
 	ldrun(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_clock(18.432_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::youjyudn_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_state::youjyudn_io_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_youjyudn));
 
 	m_chr_decode->set_info(gfx_m62_tiles_youjyudn);
@@ -1170,7 +1175,7 @@ void m62_state::horizon(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::horizon_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_horizon));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
