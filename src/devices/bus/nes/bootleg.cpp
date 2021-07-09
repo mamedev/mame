@@ -1290,7 +1290,10 @@ u8 nes_palthena_device::read_m(offs_t offset)
 //  LOG_MMC(("palthena read_m, offset: %04x\n", offset));
 	switch (offset & 0x1f00)
 	{
-		case 0x0000: case 0x0200: case 0x0400: case 0x0500:
+		case 0x0000:
+		case 0x0200:
+		case 0x0400:
+		case 0x0500:
 			return m_prgram[offset | 0x1800];
 		default:
 			return m_prg[0x0d * 0x2000 + offset];    // fixed PRG bank
@@ -1302,7 +1305,10 @@ void nes_palthena_device::write_m(offs_t offset, u8 data)
 	LOG_MMC(("palthena write_m, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x1f00)
 	{
-		case 0x0000: case 0x0200: case 0x0400: case 0x0500:
+		case 0x0000:
+		case 0x0200:
+		case 0x0400:
+		case 0x0500:
 			m_prgram[offset | 0x1800] = data;
 			break;
 	}

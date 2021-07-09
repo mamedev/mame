@@ -469,7 +469,6 @@ private:
 	uint8_t m_latch;
 };
 
-
 // ======================> nes_unl_bb_device
 
 class nes_unl_bb_device : public nes_nrom_device
@@ -489,7 +488,6 @@ protected:
 private:
 	uint8_t m_reg[2];
 };
-
 
 // ======================> nes_mmalee_device
 
