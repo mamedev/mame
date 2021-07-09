@@ -215,9 +215,9 @@ private:
 		PTR         = 0x07ff
 	};
 
+	static constexpr u32 FCS_RESIDUE = 0xdebb20e3;
 	static constexpr unsigned ETHER_BUFFER_SIZE = 256 * 6;
 	static const u8 ETH_BROADCAST[];
-	static const u8 WMS_OUI[];
 
 	// mmu
 
