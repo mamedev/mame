@@ -79718,12 +79718,11 @@ be better to redump them properly. -->
 
 	<software name="mc_76">
 		<description>76 in 1</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<year>1990</year>
+		<publisher>Tsang Hai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_76in1" />
 			<feature name="pcb" value="BMC-76IN1" />
-			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="2097152">
 				<rom name="76 in 1.prg" size="2097152" crc="147733df" sha1="39499923c8970b089e359ac256e71fb75ae3c0de" offset="00000" status="baddump" />
 			</dataarea>
@@ -80885,15 +80884,15 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s42" supported="partial">
-		<description>Super 42 in 1 - 22 Games</description>
+	<software name="mc_s42">
+		<description>Super 42 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_s42in1" />
 			<feature name="pcb" value="BMC-SUPER42IN1" />
 			<dataarea name="prg" size="1048576">
-				<rom name="super 42 in 1 - 22 games.prg" size="1048576" crc="c9f92bd9" sha1="6060eb360b9b4ae7aca024c00ace5b472371d721" offset="00000" status="baddump" />
+				<rom name="super 42 in 1.prg" size="1048576" crc="c9f92bd9" sha1="6060eb360b9b4ae7aca024c00ace5b472371d721" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
