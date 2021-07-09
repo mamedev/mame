@@ -206,7 +206,7 @@ void batman_state::batman(machine_config &config)
 	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(batman_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
-	m_mob->set_xoffset(1);
+	m_mob->set_xoffset(-1);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
