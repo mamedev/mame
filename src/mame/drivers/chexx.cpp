@@ -13,29 +13,29 @@ Electro-mechanical bubble hockey games:
 
 (Some sources indicate these may have been copied from a earlier Sega game called Face-Off)
 
-Olimpic Hockey Spanish clone from Inor (probably unlicensed) runs on an almost
+Olimpic Hockey, Spanish clone from Inor (probably unlicensed), runs on an almost
 exact clone of the 1st generation ICE Chexx hardware (https://www.recreativas.org/olimpic-hockey-1110-inor):
 
  Inor Olympic Hockey PCB
  ________________________________________
  |                                       |
  | : <- Conn P4            ____________  |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLB|  |
  |                        |___________|  |
  |                        ____________   |
  |                        |/B8342 SJLC|  |
  |                        |___________|  |
  |                        ____________   |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLD|  |
  |                        |___________|  |
  |                        ____________   |
- |/o\ <- Conn p5          |/B8342 SJLC|  |
+ |/o\ <- Conn p5          |/B8342 SJLF|  |
  ||o|                     |___________|  |
  ||o|                     ____________   |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLG|  |
  |                        |___________|  |
  | : <- Conn P7           ____________   |
- | :                      |/B8342 SJLC|  |
+ | :                      |/B8342 SJLH|  |
  |                        |___________|  |
  | ____                   ____________   |
  | LM358N                 |EMPTY      |  |
@@ -527,7 +527,7 @@ ROM_END
 // Same PCB as 'chexx83'
 ROM_START( olihockeya )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "inor_2.u4", 0x0000, 0x0800, CRC(bbbabac1) SHA1(bbb31670eb6d1b62ba984f0bac7c6e6067f6ae87) )
+	ROM_LOAD( "inor_2.u4", 0x0000, 0x0800, CRC(038958a4) SHA1(aec5e24eea1829459dd3ef9ffe3e4b8c39071ced) )
 
 	ROM_REGION( 0x4000, "digitalker", ROMREGION_ERASE00 )
 	// bank switched (from samples region)
