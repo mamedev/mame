@@ -5,7 +5,7 @@
 #include "emumem_hep.h"
 #include "emumem_het.h"
 
-template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_tap<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask) const
+template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_tap<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
 {
 	this->ref();
 
@@ -16,18 +16,18 @@ template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::ha
 	return data;
 }
 
-template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_tap<Width, AddrShift, Endian>::name() const
+template<int Width, int AddrShift> std::string handler_entry_read_tap<Width, AddrShift>::name() const
 {
 	return '(' + m_name + ") " + this->m_next->name();
 }
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_tap<Width, AddrShift, Endian> *handler_entry_read_tap<Width, AddrShift, Endian>::instantiate(handler_entry_read<Width, AddrShift, Endian> *next) const
+template<int Width, int AddrShift> handler_entry_read_tap<Width, AddrShift> *handler_entry_read_tap<Width, AddrShift>::instantiate(handler_entry_read<Width, AddrShift> *next) const
 {
-	return new handler_entry_read_tap<Width, AddrShift, Endian>(this->m_space, this->m_mph, next, m_name, m_tap);
+	return new handler_entry_read_tap<Width, AddrShift>(this->m_space, this->m_mph, next, m_name, m_tap);
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write_tap<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask) const
+template<int Width, int AddrShift> void handler_entry_write_tap<Width, AddrShift>::write(offs_t offset, uX data, uX mem_mask) const
 {
 	this->ref();
 
@@ -37,69 +37,43 @@ template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write
 	this->unref();
 }
 
-template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_tap<Width, AddrShift, Endian>::name() const
+template<int Width, int AddrShift> std::string handler_entry_write_tap<Width, AddrShift>::name() const
 {
 	return '(' + m_name + ") " + this->m_next->name();
 }
 
 
-template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_tap<Width, AddrShift, Endian> *handler_entry_write_tap<Width, AddrShift, Endian>::instantiate(handler_entry_write<Width, AddrShift, Endian> *next) const
+template<int Width, int AddrShift> handler_entry_write_tap<Width, AddrShift> *handler_entry_write_tap<Width, AddrShift>::instantiate(handler_entry_write<Width, AddrShift> *next) const
 {
-	return new handler_entry_write_tap<Width, AddrShift, Endian>(this->m_space, this->m_mph, next, m_name, m_tap);
+	return new handler_entry_write_tap<Width, AddrShift>(this->m_space, this->m_mph, next, m_name, m_tap);
 }
 
 
 
-template class handler_entry_read_tap<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_read_tap<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_read_tap<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_read_tap<0,  1>;
+template class handler_entry_read_tap<0,  0>;
+template class handler_entry_read_tap<1,  3>;
+template class handler_entry_read_tap<1,  0>;
+template class handler_entry_read_tap<1, -1>;
+template class handler_entry_read_tap<2,  3>;
+template class handler_entry_read_tap<2,  0>;
+template class handler_entry_read_tap<2, -1>;
+template class handler_entry_read_tap<2, -2>;
+template class handler_entry_read_tap<3,  0>;
+template class handler_entry_read_tap<3, -1>;
+template class handler_entry_read_tap<3, -2>;
+template class handler_entry_read_tap<3, -3>;
 
-template class handler_entry_write_tap<0,  1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<0,  1, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<0,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<0,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<1,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<1,  3, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<1,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<1,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<1, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<1, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<2,  3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<2,  3, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<2,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<2,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<2, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<2, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<2, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<2, -2, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<3,  0, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<3,  0, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<3, -1, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<3, -1, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<3, -2, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<3, -2, ENDIANNESS_BIG>;
-template class handler_entry_write_tap<3, -3, ENDIANNESS_LITTLE>;
-template class handler_entry_write_tap<3, -3, ENDIANNESS_BIG>;
+template class handler_entry_write_tap<0,  1>;
+template class handler_entry_write_tap<0,  0>;
+template class handler_entry_write_tap<1,  3>;
+template class handler_entry_write_tap<1,  0>;
+template class handler_entry_write_tap<1, -1>;
+template class handler_entry_write_tap<2,  3>;
+template class handler_entry_write_tap<2,  0>;
+template class handler_entry_write_tap<2, -1>;
+template class handler_entry_write_tap<2, -2>;
+template class handler_entry_write_tap<3,  0>;
+template class handler_entry_write_tap<3, -1>;
+template class handler_entry_write_tap<3, -2>;
+template class handler_entry_write_tap<3, -3>;
