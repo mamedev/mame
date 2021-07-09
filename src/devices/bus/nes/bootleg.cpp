@@ -537,7 +537,7 @@ void nes_unl_bb_device::pcb_reset()
 {
 	chr8(0, CHRROM);
 	prg32(0xff);
-	// the upper PRG banks never change, but there are 8K of WRAM overlaid to the ROM area based on reg1
+	// the upper PRG banks never change, but there are 8K of WRAM overlayed to the ROM area based on reg1
 	m_reg[0] = 0xff;
 	m_reg[1] = 0;
 }
