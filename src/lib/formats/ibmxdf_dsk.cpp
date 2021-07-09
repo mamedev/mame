@@ -54,14 +54,14 @@ const char *ibmxdf_format::extensions() const
 
 int ibmxdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
 	return 0;
 }
 
-int ibmxdf_format::find_size(io_generic *io, uint32_t form_factor)
+int ibmxdf_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -175,7 +175,7 @@ const ibmxdf_format::format ibmxdf_format::formats_head1_track0[] = {
 
 bool ibmxdf_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 	if(type == -1)
 		return false;
 

@@ -45,7 +45,7 @@ uint32_t trs80m3_state::screen_update_trs80m3(screen_device &screen, bitmap_ind1
 	uint8_t rows = BIT(m_mode, 2) ? 24 : 16;
 	uint8_t lines = BIT(m_mode, 2) ? 10 : 12;
 	uint8_t s_cols = cols;
-	uint8_t mask = BIT(m_mode, 5) ? 0xff : 0xbf;  /* Select Japanese or extended chars */
+	uint8_t mask = BIT(m_mode, 5) ? 0xbf : 0xff;  /* Select Japanese or extended chars */
 
 	if (BIT(m_mode, 0))
 	{

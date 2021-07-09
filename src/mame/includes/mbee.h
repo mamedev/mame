@@ -19,7 +19,6 @@
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
-#include "machine/8530scc.h"
 #include "machine/buffer.h"
 #include "machine/mc146818.h"
 #include "machine/wd_fdc.h"
@@ -115,8 +114,7 @@ private:
 	void premium_palette(palette_device &palette) const;
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);
@@ -142,24 +140,24 @@ private:
 	void mbeett_io(address_map &map);
 	void mbeett_mem(address_map &map);
 
-	u8 m_features;
-	u16 m_size;
-	u32 m_ramsize;
-	bool m_b7_rtc;
-	bool m_b7_vs;
-	bool m_b2;
-	uint8_t m_framecnt;
-	uint8_t m_08;
-	uint8_t m_0a;
-	uint8_t m_0b;
-	uint8_t m_1c;
-	uint8_t m_newkb_was_pressed[15];
-	uint8_t m_newkb_q[20];
-	uint8_t m_newkb_q_pos;
-	uint8_t m_sy6545_reg[32];
-	uint8_t m_sy6545_ind;
-	uint8_t m_fdc_rq;
-	uint8_t m_bank_array[33];
+	u8 m_features = 0;
+	u16 m_size = 0;
+	u32 m_ramsize = 0;
+	bool m_b7_rtc = 0;
+	bool m_b7_vs = 0;
+	bool m_b2 = 0;
+	uint8_t m_framecnt = 0;
+	uint8_t m_08 = 0;
+	uint8_t m_0a = 0;
+	uint8_t m_0b = 0;
+	uint8_t m_1c = 0;
+	uint8_t m_newkb_was_pressed[15] = { 0, };
+	uint8_t m_newkb_q[20] = { 0, };
+	uint8_t m_newkb_q_pos = 0;
+	uint8_t m_sy6545_reg[32] = { 0, };
+	uint8_t m_sy6545_ind = 0;
+	uint8_t m_fdc_rq = 0;
+	uint8_t m_bank_array[33] = { 0, };
 	std::unique_ptr<u8[]> m_dummy; // black hole for writes to rom
 	std::unique_ptr<u8[]> m_ram;   // main banked-switch ram, 128/256/pp
 	std::unique_ptr<u8[]> m_vram;  // video ram, all models

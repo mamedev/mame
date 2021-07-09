@@ -157,10 +157,10 @@ Notes:
       Z80      - Zilog Z80B CPU, running at 5.000MHz [10/2]
       YM2151   - Yamaha YM2151 8-channel 4-operator FM sound chip, running at 4.000MHz [8/2]
       D7759    - NEC uPD7759C ADPCM Speech Synthesizer LSI, clock input of 640kHz (DIP40)
-      65256    - Hitachi HM65256 32K x8 SRAM (DIP28)
-      TC5565   - Toshiba TC5565 8K x8 SRAM (DIP28)
-      2015     - Toshiba TMM2015 2K x8 SRAM (DIP24)
-      2018     - Toshiba TMM2018 2K x8 SRAM (DIP24)
+      65256    - Hitachi HM65256 or NEC uPD42832C-12L or Toshiba TC51832-P-85 32K x8 PSRAM (DIP28)
+      TC5565   - Toshiba TC5565 or Sony CXK5864PS-15L or Fujitsu MB8464-12L 8K x8 SRAM (DIP28)
+      2015     - Toshiba TMM2015 or TMM2115BP-10 or UMC UM6116K-2 2K x8 SRAM (DIP24)
+      2018     - Toshiba TMM2018D-45 or TMM2018AP-35 2K x8 SRAM (DIP24)
       D8751H   - Intel D8751H Microcontroller, running at 8.000MHz. Used on some versions of some games.
       315-5213 - National Semiconductor PAL16R6 stamped '315-5213' (DIP20)
       315-5214 - Signetics CK2605 stamped '315-5214' (DIP20)
@@ -3974,6 +3974,8 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// see note in segas16a.cpp, also used here for consistency
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -4198,6 +4200,8 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// see note in segas16a.cpp, also used here for consistency
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -7419,6 +7423,56 @@ ROM_START( hwchamp )
 ROM_END
 
 //*************************************************************************************************************************
+//  Heavyweight Champ, Sega System 16B (set 2)
+//  CPU: 68000
+//  ROM Board type: 171-5521
+//  Sega ID# for ROM board: 834-6397-02
+//  Notes: Only three different bytes from 'hwchamp', two for modifying the checksum so the ingame ROM test won't fail and
+//         the other it's an actual code value (which is actually readed quite frequently during gameplay, when certain
+//         moves are executed).
+//         This was dumped from an original Sega PCB with original Sega 'EPR' stickers on the ROMs.
+//
+ROM_START( hwchampa )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11239.a7", 0x000000, 0x20000, CRC(42d59e4b) SHA1(c806b7e10519f8885e9b900da9c63fbb74ee19a5) ) // the only different ROM from 'hwchamp' (but same label)
+	ROM_LOAD16_BYTE( "epr-11238.a5", 0x000001, 0x20000, CRC(25180124) SHA1(77b414f8cd88270713c57bddadec5d8dca490e86) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "mpr-11241.a14", 0x00000, 0x20000, CRC(fc586a86) SHA1(2c26ef3ab94089940add3be9952804a6e62f5113) ) // all MPR-11xxx here are 28 pin Fujitsu MB831000 mask ROMs
+	ROM_LOAD( "mpr-11166.b14", 0x20000, 0x20000, CRC(aeaaa9d8) SHA1(6b7e5320f515c1c35445d3320b3edaef911191e1) )
+	ROM_LOAD( "mpr-11242.a15", 0x40000, 0x20000, CRC(7715a742) SHA1(e6040ff0e9c68f3f502e5f6d7e7ca04b14059752) )
+	ROM_LOAD( "mpr-11167.b15", 0x60000, 0x20000, CRC(63a82afa) SHA1(a02bbb6dd84cdf7cdab8e738c6927f5b1e3fcad5) )
+	ROM_LOAD( "mpr-11243.a16", 0x80000, 0x20000, CRC(f30cd5fd) SHA1(df6118ca4b724c37b11e18d9f2ea18e9591ae7aa) )
+	ROM_LOAD( "mpr-11168.b16", 0xA0000, 0x20000, CRC(5b8494a8) SHA1(9e3f09f4037a007b6a188dd81ec8f9c635e87650) )
+
+	ROM_REGION16_BE( 0x200000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "mpr-11158.b1", 0x000001, 0x010000, CRC(fc098a13) SHA1(b4a6e00d4765265bad170dabf0b2a4a58e063b16) ) // all MPR-111xx here are 28 pin Fujitsu MB831000 mask ROMs
+	ROM_CONTINUE(                    0x020001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11162.b5", 0x000000, 0x010000, CRC(5db934a8) SHA1(ba7cc93025af71ad2674b1376b61afbb7ae910ff) )
+	ROM_CONTINUE(                    0x020000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11159.b2", 0x040001, 0x010000, CRC(1f27ee74) SHA1(a60d50a4f501623187c067a3c17bff49151ca3b2) )
+	ROM_CONTINUE(                    0x060001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11163.b6", 0x040000, 0x010000, CRC(8a6a5cf1) SHA1(28b22aa326682ef3b54891dda7aa9a432da12a4d) )
+	ROM_CONTINUE(                    0x060000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11160.b3", 0x080001, 0x010000, CRC(c0b2ba82) SHA1(30349c86a99bbe3dfb423027ad534a9333e27679) )
+	ROM_CONTINUE(                    0x0a0001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11164.b7", 0x080000, 0x010000, CRC(d6c7917b) SHA1(8b313a5634c14f4c90bfa9f9616d600283f72768) )
+	ROM_CONTINUE(                    0x0a0000, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11161.b4", 0x0c0001, 0x010000, CRC(35c9e44b) SHA1(2de32cb684c46d1169d8afcb0d3058d08e452a49) )
+	ROM_CONTINUE(                    0x0e0001, 0x010000 )
+	ROM_LOAD16_BYTE( "mpr-11165.b8", 0x0c0000, 0x010000, CRC(57e8f9d2) SHA1(1804677820d05a421120660f91e3a5f1df1e6a8d) )
+	ROM_CONTINUE(                    0x0e0000, 0x010000 )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11240.a10", 0x00000, 0x08000, CRC(96a12d9d) SHA1(f4ba70c3b5d80a1b6a187c940b922d5182d5ab12) )
+	ROM_LOAD( "mpr-11244.a11", 0x10000, 0x20000, CRC(4191c03d) SHA1(40809fb80527980015d3b5c4ca7cf159bc09cf5a) ) // 28 pin Fujitsu MB831000 mask ROM
+	ROM_LOAD( "mpr-11245.a12", 0x30000, 0x20000, CRC(a4d53f7b) SHA1(71123a8ecfa093897c6f2bb7312e6c755be14521) ) // 28 pin Fujitsu MB831000 mask ROM
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
+ROM_END
+
+//*************************************************************************************************************************
 //  Heavyweight Champ (Japan), Sega System 16B
 //  CPU: FD1094 (317-0046)
 //  ROM Board type: 171-5521
@@ -9883,7 +9937,8 @@ GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,      goldnaxe, segas16b_stat
 GAME( 1989, goldnaxe2,  goldnaxe, system16b_i8751,       goldnaxe, segas16b_state, init_generic_5704,       ROT0,   "Sega", "Golden Axe (set 2, US) (8751 317-0112)", 0 )
 GAME( 1989, goldnaxe1,  goldnaxe, system16b_fd1094_5797, goldnaxe, segas16b_state, init_generic_5797,       ROT0,   "Sega", "Golden Axe (set 1, World) (FD1094 317-0110)", 0 )
 
-GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ", 0 )
+GAME( 1987, hwchamp,    0,        system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 1)", 0 )
+GAME( 1987, hwchampa,   hwchamp,  system16b,             hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (set 2)", 0 )
 GAME( 1987, hwchampj,   hwchamp,  system16b_fd1094,      hwchamp,  segas16b_state, init_hwchamp_5521,       ROT0,   "Sega", "Heavyweight Champ (Japan) (FD1094 317-0046)", 0 )
 
 GAME( 1989, mvp,        0,        system16b_fd1094_5797, mvp,      segas16b_state, init_generic_5797,       ROT0,   "Sega", "MVP (set 2, US) (FD1094 317-0143)", 0 )

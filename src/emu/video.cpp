@@ -1127,21 +1127,9 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = snapstr.find('/', pos + 3);
-			int end2 = snapstr.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = snapstr.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = snapstr.length();
-
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string snapdevname;
@@ -1179,6 +1167,18 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			if (name_found == 0)
 				snapstr.assign("%g/%i");
 		}
+	}
+
+	// handle %t in the template (for timestamp)
+	std::string snaptime("%t");
+	int pos_time = snapstr.find(snaptime);
+
+	if (pos_time != -1)
+	{
+		char t_str[15];
+		const std::time_t cur_time = std::time(nullptr);
+		strftime(t_str, sizeof(t_str), "%Y%m%d_%H%M%S", std::localtime(&cur_time));
+		strreplace(snapstr, "%t", t_str);
 	}
 
 	// add our own extension

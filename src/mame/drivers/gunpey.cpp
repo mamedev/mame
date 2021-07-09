@@ -235,16 +235,22 @@ struct huffman_node_s
 };
 
 
+constexpr u32 get_video_addr(u16 x, u16 y)
+{
+	return (x & 0x7ff) | (u32(y & 0x7ff) << 11);
+}
+
+
 class gunpey_state : public driver_device
 {
 public:
 	gunpey_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 		, m_oki(*this, "oki")
 		, m_wram(*this, "wram")
-		, m_palette(*this, "palette")
-		, m_blit_rom(*this, "blit_data")
+		, m_blit_rom(*this, "blit_rom")
 	{ }
 
 	void gunpey(machine_config &config);
@@ -254,59 +260,76 @@ protected:
 	virtual void video_start() override;
 
 private:
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
+	// memory handlers
+	void status_w(offs_t offset, u8 data);
+	u8 status_r(offs_t offset);
+	u8 inputs_r(offs_t offset);
+	void blitter_w(offs_t offset, u8 data);
+	void blitter_upper_w(offs_t offset, u8 data);
+	void blitter_upper2_w(offs_t offset, u8 data);
+	void output_w(u8 data);
+	void vram_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void vregs_addr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void status_w(offs_t offset, uint8_t data);
-	uint8_t status_r(offs_t offset);
-	uint8_t inputs_r(offs_t offset);
-	void blitter_w(offs_t offset, uint8_t data);
-	void blitter_upper_w(offs_t offset, uint8_t data);
-	void blitter_upper2_w(offs_t offset, uint8_t data);
-	void output_w(uint8_t data);
-	void vram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void vregs_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// video related
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+
+	// draw functions
+	bool draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int count, u8 scene_gradient);
+	void draw_pixel_clut(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int xi, int y, int yi, u8 pix, int color, int alpha, u8 scene_gradient);
+	void draw_pixel(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int xi, int y, int yi, u16 color_data, int alpha, u8 scene_gradient);
+
+	// internal states
+	//std::unique_ptr<u16[]> m_blit_buffer;
+	std::unique_ptr<u8[]> m_vram;
+	u16 m_vram_bank = 0;
+	u16 m_vreg_addr = 0;
+
+	// blitter related
+	u8 m_blit_ram[0x10] = {0};
+	int m_srcx = 0;
+	int m_srcxbase = 0;
+	int m_srcxcount = 0;
+	int m_srcy = 0;
+	int m_srcycount = 0;
+	int m_ysize = 0;
+	int m_xsize = 0;
+	int m_dstx = 0;
+	int m_dsty = 0;
+	int m_dstxbase = 0;
+	int m_dstxcount = 0;
+	int m_dstycount = 0;
+	bool write_dest_byte(u8 usedata);
+
+	// blitter timers
+	emu_timer *m_blitter_end_timer;
 	TIMER_CALLBACK_MEMBER(blitter_end);
 
-	void irq_check(uint8_t irq_type);
-	uint8_t draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int count, uint8_t scene_gradient);
-	uint16_t m_vram_bank;
-	uint16_t m_vreg_addr;
-
-	emu_timer *m_blitter_end_timer;
-
-	// work variables for the decompression
-	int m_srcx;
-	int m_srcxbase;
-	int m_scrxcount;
-	int m_srcy;
-	int m_srcycount;
-	int m_ysize;
-	int m_xsize;
-	int m_dstx;
-	int m_dsty;
-	int m_dstxbase;
-	int m_dstxcount;
-	int m_dstycount;
-	uint16_t m_blit_ram[0x10];
-
-	uint8_t get_vrom_byte(int x, int y);
-	int write_dest_byte(uint8_t usedata);
-	int decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy);
-	int next_node(const huffman_node_s **res, state_s *s);
+	// decompressor functions
+	u8 get_vrom_byte(int x, int y);
+	bool decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy);
+	bool next_node(const huffman_node_s **res, state_s *s);
 	int get_next_bit(state_s *s);
 
-	uint8_t m_irq_cause, m_irq_mask;
-	std::unique_ptr<uint16_t[]> m_blit_buffer;
-	std::unique_ptr<uint8_t[]> m_vram;
+	// interrupt functions
+	u8 m_irq_cause = 0, m_irq_mask = 0;
+	void irq_check(u8 irq_type);
 
+	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	required_shared_ptr<uint16_t> m_wram;
 	required_device<palette_device> m_palette;
-	required_region_ptr<uint8_t> m_blit_rom;
+	required_device<okim6295_device> m_oki;
+
+	// shared pointers
+	required_shared_ptr<u16> m_wram;
+
+	// memory regions
+	required_region_ptr<u8> m_blit_rom;
+
+	// address spaces
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 
@@ -314,6 +337,9 @@ void gunpey_state::machine_start()
 {
 	m_irq_cause = 0;
 	m_irq_mask = 0;
+
+	save_item(NAME(m_irq_cause));
+	save_item(NAME(m_irq_mask));
 }
 
 void gunpey_state::video_start()
@@ -321,14 +347,69 @@ void gunpey_state::video_start()
 	// assumes it can make an address mask from m_blit_rom.length() - 1
 	assert(!(m_blit_rom.length() & (m_blit_rom.length() - 1)));
 
-	m_blit_buffer = std::make_unique<uint16_t[]>(512*512);
-	m_vram = std::make_unique<uint8_t[]>(0x400000);
+	// initialize VRAM
+	//m_blit_buffer = std::make_unique<u16[]>(512*512);
+	m_vram = std::make_unique<u8[]>(0x400000);
 	std::fill_n(&m_vram[0], 0x400000, 0xff);
+
 	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
+
+	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_vreg_addr));
+	save_item(NAME(m_blit_ram));
+	save_item(NAME(m_srcx));
+	save_item(NAME(m_srcxbase));
+	save_item(NAME(m_srcxcount));
+	save_item(NAME(m_srcy));
+	save_item(NAME(m_srcycount));
+	save_item(NAME(m_ysize));
+	save_item(NAME(m_xsize));
+	save_item(NAME(m_dstx));
+	save_item(NAME(m_dsty));
+	save_item(NAME(m_dstxbase));
+	save_item(NAME(m_dstxcount));
+	save_item(NAME(m_dstycount));
 	save_pointer(NAME(m_vram), 0x400000);
 }
 
-uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)
+void gunpey_state::draw_pixel_clut(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int xi, int y, int yi, u8 pix, int color, int alpha, u8 scene_gradient)
+{
+	color += u32(pix);
+
+	// get palette
+	const u32 col_offs = get_video_addr((color & 0xff) << 1, (color >> 8));
+	const u16 color_data = (m_vram[col_offs]) | (m_vram[col_offs + 1] << 8);
+
+	draw_pixel(bitmap, cliprect, x, xi, y, yi, color_data, alpha, scene_gradient);
+}
+
+void gunpey_state::draw_pixel(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int xi, int y, int yi, u16 color_data, int alpha, u8 scene_gradient)
+{
+	if (!(color_data & 0x8000))
+	{
+		if (scene_gradient & 0x40)
+		{
+			s16 r = BIT(color_data, 10, 5);
+			s16 g = BIT(color_data,  5, 5);
+			s16 b = BIT(color_data,  0, 5);
+			r = std::max(0, r - (scene_gradient & 0x1f));
+			g = std::max(0, g - (scene_gradient & 0x1f));
+			b = std::max(0, b - (scene_gradient & 0x1f));
+
+			color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+		}
+
+		if (cliprect.contains(x + xi, y + yi))
+		{
+			if (alpha == 0x00) // a value of 0x00 is solid
+				bitmap.pix(y + yi, x + xi) = color_data & 0x7fff;
+			else
+				bitmap.pix(y + yi, x + xi) = alpha_blend_r16(color_data, bitmap.pix(y + yi, x + xi), alpha) & 0x7fff;
+		}
+	}
+}
+
+bool gunpey_state::draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int count, u8 scene_gradient)
 {
 	const int ZOOM_SHIFT = 15;
 	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
@@ -356,190 +437,96 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	// t = transparency / alpha related? (0x10 on player cursor, 0xf when swapping, other values at other times..)
 	const int debug = 0;
 
-	if(!(m_wram[count+0] & 1))
+	if (!(m_wram[count + 0] & 1))
 	{
-		int x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
-		int y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-		uint32_t zoomheight = (m_wram[count+5] >> 8);
-		uint32_t zoomwidth = (m_wram[count+5] & 0xff);
-		int bpp_sel = (m_wram[count+0] & 0x18);
-		int color = (m_wram[count+0] >> 8);
+		int x                = (m_wram[count + 3] >> 8) | ((m_wram[count + 4] & 0x03) << 8);
+		int y                = (m_wram[count + 4] >> 8) | ((m_wram[count + 4] & 0x30) << 4);
+		const u32 zoomheight = (m_wram[count + 5] >> 8);
+		const u32 zoomwidth  = (m_wram[count + 5] & 0xff);
+		const int bpp_sel    = (m_wram[count + 0] & 0x18);
+		int color            = (m_wram[count + 0] >> 8);
 
-		x-=0x160;
-		y-=0x188;
+		x -= 0x160;
+		y -= 0x188;
 
-		uint32_t sourcewidth  = (m_wram[count+6] & 0xff)<<ZOOM_SHIFT;
-		uint32_t sourceheight = (m_wram[count+7] >> 8)<<ZOOM_SHIFT;
-		int xsource = ((m_wram[count+2] & 0x003f) << 5) | ((m_wram[count+1] & 0xf800) >> 11);
-		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
+		const u32 sourcewidth  = (m_wram[count + 6] & 0xff) << ZOOM_SHIFT;
+		const u32 sourceheight = (m_wram[count + 7] >> 8) << ZOOM_SHIFT;
+		const int xsource = ((m_wram[count + 2] & 0x003f) << 5) | ((m_wram[count + 1] & 0xf800) >> 11);
+		const int ysource = ((m_wram[count + 3] & 0x001f) << 6) | ((m_wram[count + 2] & 0xfc00) >> 10);
 
-		int alpha =  m_wram[count+1] & 0x1f;
+		int alpha = (m_wram[count + 1] & 0x1f) << 3;
 
-		uint32_t widthstep = 1<<ZOOM_SHIFT;
-		uint32_t heightstep = 1<<ZOOM_SHIFT;
+		u32 widthstep = 1 << ZOOM_SHIFT;
+		u32 heightstep = 1 << ZOOM_SHIFT;
 
 		if (zoomwidth) widthstep = sourcewidth / zoomwidth;
 		if (zoomheight) heightstep = sourceheight / zoomheight;
 
-		uint16_t unused;
-		if (debug) logerror("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
+		u16 unused;
+		if (debug) logerror("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count + 0], m_wram[count + 1], m_wram[count + 2], m_wram[count + 3], m_wram[count + 4], m_wram[count + 5], m_wram[count + 6], m_wram[count + 7]);
 
-		unused = m_wram[count+0]&~0xff98; if (unused) logerror("unused bits set in word 0 - %04x\n", unused);
-		unused = m_wram[count+1]&~0xf89f; if (unused) logerror("unused bits set in word 1 - %04x\n", unused);
-		unused = m_wram[count+2]&~0xfc3f; if (unused) logerror("unused bits set in word 2 - %04x\n", unused);
-		unused = m_wram[count+3]&~0xff1f; if (unused) logerror("unused bits set in word 3 - %04x\n", unused);
-		unused = m_wram[count+4]&~0xff77; if (unused) logerror("unused bits set in word 4 - %04x\n", unused);
-		unused = m_wram[count+5]&~0xffff; if (unused) logerror("unused bits set in word 5 - %04x\n", unused);
-		unused = m_wram[count+6]&~0x00ff; if (unused) logerror("unused bits set in word 6 - %04x\n", unused);
-		unused = m_wram[count+7]&~0xff00; if (unused) logerror("unused bits set in word 7 - %04x\n", unused);
+		unused = m_wram[count + 0] & ~0xff98; if (unused) logerror("unused bits set in word 0 - %04x\n", unused);
+		unused = m_wram[count + 1] & ~0xf89f; if (unused) logerror("unused bits set in word 1 - %04x\n", unused);
+		unused = m_wram[count + 2] & ~0xfc3f; if (unused) logerror("unused bits set in word 2 - %04x\n", unused);
+		unused = m_wram[count + 3] & ~0xff1f; if (unused) logerror("unused bits set in word 3 - %04x\n", unused);
+		unused = m_wram[count + 4] & ~0xff77; if (unused) logerror("unused bits set in word 4 - %04x\n", unused);
+		unused = m_wram[count + 5] & ~0xffff; if (unused) logerror("unused bits set in word 5 - %04x\n", unused);
+		unused = m_wram[count + 6] & ~0x00ff; if (unused) logerror("unused bits set in word 6 - %04x\n", unused);
+		unused = m_wram[count + 7] & ~0xff00; if (unused) logerror("unused bits set in word 7 - %04x\n", unused);
 
-		if (((zoomwidth<<ZOOM_SHIFT) != sourcewidth) || ((zoomheight<<ZOOM_SHIFT) != sourceheight))
+		if (((zoomwidth << ZOOM_SHIFT) != sourcewidth) || ((zoomheight << ZOOM_SHIFT) != sourceheight))
 		{
-		//  logerror("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
+		//  logerror("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth << ZOOM_SHIFT, sourceheight, zoomheight << ZOOM_SHIFT, heightstep, widthstep );
 		}
 
-		if(bpp_sel == 0x00)  // 4bpp
+		if (bpp_sel == 0x00)  // 4bpp
 		{
+			color <<= 4;
 			int ysourceoff = 0;
-			for(int yi=0;yi<zoomheight;yi++)
+			for (int yi = 0; yi < zoomheight; yi++)
 			{
-				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				const int yi2 = ysourceoff >> ZOOM_SHIFT;
 				int xsourceoff = 0;
 
-				for(int xi=0;xi<zoomwidth;xi++)
+				for (int xi = 0; xi < zoomwidth; xi++)
 				{
-					int xi2 = xsourceoff>>ZOOM_SHIFT;
-					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
-					uint8_t pix;
+					const int xi2 = xsourceoff >> ZOOM_SHIFT;
 
-					if (xi2 & 1)
-					{
-						pix = (data & 0xf0)>>4;
-					}
-					else
-					{
-						pix = (data & 0x0f);
-					}
+					const u8 data = m_vram[get_video_addr(xsource + (xi2 >> 1), ysource + yi2)];
 
-					uint32_t col_offs = ((pix + color*0x10) & 0xff) << 1;
-					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					uint16_t color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
-
-					if(!(color_data & 0x8000))
-					{
-						if(scene_gradient & 0x40)
-						{
-							int r = (color_data & 0x7c00) >> 10;
-							int g = (color_data & 0x03e0) >> 5;
-							int b = (color_data & 0x001f) >> 0;
-							r-= (scene_gradient & 0x1f);
-							g-= (scene_gradient & 0x1f);
-							b-= (scene_gradient & 0x1f);
-							if(r < 0) r = 0;
-							if(g < 0) g = 0;
-							if(b < 0) b = 0;
-
-							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-						}
-
-						if(cliprect.contains(x+xi, y+yi))
-						{
-							if (alpha==0x00) // a value of 0x00 is solid
-							{
-								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
-							}
-							else
-							{
-								uint16_t basecolor = bitmap.pix(y+yi, x+xi);
-								int base_r = ((basecolor >> 10)&0x1f)*alpha;
-								int base_g = ((basecolor >> 5)&0x1f)*alpha;
-								int base_b = ((basecolor >> 0)&0x1f)*alpha;
-								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
-								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
-								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
-								r = (base_r+r)/0x1f;
-								g = (base_g+g)/0x1f;
-								b = (base_b+b)/0x1f;
-								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
-							}
-						}
-					}
+					draw_pixel_clut(bitmap, cliprect, x, xi, y, yi, BIT(data, BIT(xi2, 0) << 2, 4), color, alpha, scene_gradient);
 					xsourceoff += widthstep;
 				}
 				ysourceoff += heightstep;
 			}
 		}
-		else if(bpp_sel == 0x08) // 6bpp
+		else if (bpp_sel == 0x08) // 6bpp
 		{
 			// not used by Gunpey?
 			logerror("6bpp\n");
 		}
-		else if(bpp_sel == 0x10) // 8bpp
+		else if (bpp_sel == 0x10) // 8bpp
 		{
+			color <<= 8;
 			int ysourceoff = 0;
-			for(int yi=0;yi<zoomheight;yi++)
+			for (int yi = 0; yi < zoomheight; yi++)
 			{
-				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				const int yi2 = ysourceoff >> ZOOM_SHIFT;
 				int xsourceoff = 0;
 
-				for(int xi=0;xi<zoomwidth;xi++)
+				for (int xi = 0; xi < zoomwidth; xi++)
 				{
-					int xi2 = xsourceoff>>ZOOM_SHIFT;
+					const int xi2 = xsourceoff >> ZOOM_SHIFT;
 
-					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
+					const u8 data = m_vram[get_video_addr(xsource + xi2, ysource + yi2)];
 
-					uint8_t pix = (data & 0xff);
-					uint32_t col_offs = ((pix + color*0x100) & 0xff) << 1;
-					col_offs+= ((pix + color*0x100) >> 8)*0x800;
-					uint16_t color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
-
-					if(!(color_data & 0x8000))
-					{
-						if(scene_gradient & 0x40)
-						{
-							int r = (color_data & 0x7c00) >> 10;
-							int g = (color_data & 0x03e0) >> 5;
-							int b = (color_data & 0x001f) >> 0;
-							r-= (scene_gradient & 0x1f);
-							g-= (scene_gradient & 0x1f);
-							b-= (scene_gradient & 0x1f);
-							if(r < 0) r = 0;
-							if(g < 0) g = 0;
-							if(b < 0) b = 0;
-
-							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-						}
-
-						if(cliprect.contains(x+xi,y+yi))
-						{
-							if (alpha==0x00) // a value of 0x00 is solid
-							{
-								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
-							}
-							else
-							{
-								uint16_t basecolor = bitmap.pix(y+yi, x+xi);
-								int base_r = ((basecolor >> 10)&0x1f)*alpha;
-								int base_g = ((basecolor >> 5)&0x1f)*alpha;
-								int base_b = ((basecolor >> 0)&0x1f)*alpha;
-								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
-								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
-								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
-								r = (base_r+r)/0x1f;
-								g = (base_g+g)/0x1f;
-								b = (base_b+b)/0x1f;
-								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix(y+yi, x+xi) = color_data & 0x7fff;
-							}
-						}
-					}
+					draw_pixel_clut(bitmap, cliprect, x, xi, y, yi, data, color, alpha, scene_gradient);
 					xsourceoff += widthstep;
 				}
 				ysourceoff += heightstep;
 			}
 		}
-		else if(bpp_sel == 0x18) // RGB32k
+		else if (bpp_sel == 0x18) // RGB32k
 		{
 			// not used by Gunpey?
 			logerror("32k\n");
@@ -547,94 +534,83 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		}
 	}
 
-	return m_wram[count+0] & 0x80;
+	return m_wram[count + 0] & 0x80;
 }
 
-uint32_t gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//uint16_t *blit_buffer = m_blit_buffer;
-	uint16_t vram_bank = m_vram_bank & 0x7fff;
-	uint16_t vreg_addr = m_vreg_addr & 0x7fff;
-	uint8_t end_mark;
-	int count;
-	int scene_index;
+	//u16 *blit_buffer = m_blit_buffer;
+	const u16 vram_bank = m_vram_bank & 0x7fff;
+	const u16 vreg_addr = m_vreg_addr & 0x7fff;
 
 	bitmap.fill(m_palette->pen(0), cliprect); //black pen
 
-	if((!(m_vreg_addr & 0x8000)) || (!(m_vram_bank & 0x8000)))
+	if ((!(m_vreg_addr & 0x8000)) || (!(m_vram_bank & 0x8000)))
 		return 0;
 
-	for(scene_index = vreg_addr/2;scene_index<(vreg_addr+0x400)/2;scene_index+=0x10/2)
+	for (int scene_index = vreg_addr / 2; scene_index < (vreg_addr + 0x400) / 2; scene_index += 0x10 / 2)
 	{
-		uint16_t start_offs;
-		uint16_t end_offs;
-		uint8_t scene_end_mark;
-		uint8_t scene_enabled;
-		uint8_t scene_gradient;
+		const u16 start_offs = (vram_bank + (m_wram[scene_index + 5] << 8)) / 2;
+		const u16 end_offs = (vram_bank + (m_wram[scene_index + 5] << 8) + 0x1000) / 2; //safety check
+		const bool scene_end_mark = m_wram[scene_index + 0] & 0x80;
+		const bool scene_enabled = m_wram[scene_index + 0] & 0x01;
+		const u8 scene_gradient = m_wram[scene_index + 1] & 0xff;
 
-		start_offs = (vram_bank+(m_wram[scene_index+5] << 8))/2;
-		end_offs = (vram_bank+(m_wram[scene_index+5] << 8)+0x1000)/2; //safety check
-		scene_end_mark = m_wram[scene_index+0] & 0x80;
-		scene_enabled = m_wram[scene_index+0] & 0x01;
-		scene_gradient = m_wram[scene_index+1] & 0xff;
+//      logerror("%08x: %08x %08x %08x %08x | %08x %08x %08x %08x\n",scene_index,m_wram[scene_index + 0],m_wram[scene_index + 1],m_wram[scene_index + 2],m_wram[scene_index + 3],
+//                                                  m_wram[scene_index + 4],m_wram[scene_index + 5],m_wram[scene_index + 6],m_wram[scene_index + 7]);
 
-//      logerror("%08x: %08x %08x %08x %08x | %08x %08x %08x %08x\n",scene_index,m_wram[scene_index+0],m_wram[scene_index+1],m_wram[scene_index+2],m_wram[scene_index+3],
-//                                                  m_wram[scene_index+4],m_wram[scene_index+5],m_wram[scene_index+6],m_wram[scene_index+7]);
-
-		if(scene_enabled)
+		if (scene_enabled)
 		{
-			for(count = start_offs;count<end_offs;count+=0x10/2)
+			for (int count = start_offs; count < end_offs; count += 0x10 / 2)
 			{
-				end_mark = draw_gfx(bitmap,cliprect,count,scene_gradient);
-
-				if(end_mark == 0x80)
+				if (draw_gfx(bitmap, cliprect, count, scene_gradient))
 					break;
 			}
 		}
 
-		if(scene_end_mark == 0x80)
+		if (scene_end_mark)
 			break;
 	}
 
 	return 0;
 }
 
-void gunpey_state::irq_check(uint8_t irq_type)
+void gunpey_state::irq_check(u8 irq_type)
 {
 	m_irq_cause |= irq_type;
 
-	if(m_irq_cause & m_irq_mask)
+	if (m_irq_cause & m_irq_mask)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4); // V30
 	else
 		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4); // V30
 }
 
-void gunpey_state::status_w(offs_t offset, uint8_t data)
+void gunpey_state::status_w(offs_t offset, u8 data)
 {
-	if(offset == 1)
+	if (offset == 1)
 	{
 		m_irq_cause &= ~data;
 		irq_check(0);
 	}
 
-	if(offset == 0)
+	if (offset == 0)
 	{
 		m_irq_mask = data;
 		irq_check(0);
 	}
 }
 
-uint8_t gunpey_state::status_r(offs_t offset)
+u8 gunpey_state::status_r(offs_t offset)
 {
-	if(offset == 1)
+	if (offset == 1)
 		return m_irq_cause;
 
 	return m_irq_mask;
 }
 
-uint8_t gunpey_state::inputs_r(offs_t offset)
+u8 gunpey_state::inputs_r(offs_t offset)
 {
-	switch(offset+0x7f40)
+	switch (offset + 0x7f40)
 	{
 		case 0x7f40: return ioport("DSW1")->read();
 		case 0x7f41: return ioport("DSW2")->read();
@@ -652,31 +628,29 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 }
 
 
-int gunpey_state::write_dest_byte(uint8_t usedata)
+bool gunpey_state::write_dest_byte(u8 usedata)
 {
 	// write the byte we and to destination and increase our counters
-	m_vram[(((m_dsty)&0x7ff)*0x800)+((m_dstx)&0x7ff)] = usedata;
+	m_vram[get_video_addr(m_dstx, m_dsty)] = usedata;
 
 	// increase destination counter and check if we've filled our destination rectangle
 	m_dstx++; m_dstxcount++;
-	if (m_dstxcount==m_xsize)
+	if (m_dstxcount == m_xsize)
 	{
 		m_dstxcount = 0;
 		m_dstx = m_dstxbase;
 		m_dsty++; m_dstycount++;
-		if (m_dstycount==m_ysize)
-		{
-			return -1;
-		}
+		if (m_dstycount == m_ysize)
+			return true;
 	}
 
-	return 1;
+	return false;
 }
 
 
-inline uint8_t gunpey_state::get_vrom_byte(int x, int y)
+inline u8 gunpey_state::get_vrom_byte(int x, int y)
 {
-	return m_blit_rom[((x)+2048 * (y)) & (m_blit_rom.length() - 1)];
+	return m_blit_rom[get_video_addr(x, y) & (m_blit_rom.length() - 1)];
 }
 
 inline int gunpey_state::get_next_bit(state_s *s)
@@ -721,7 +695,7 @@ void state_s::set_o(unsigned char v)
 			break;
 	}
 
-	buf[((dx + ox++) & 0x7ff) + (((dy + oy) & 0x7ff) * 0x800)] = v;
+	buf[get_video_addr(dx + (ox++), dy + oy)] = v;
 }
 
 
@@ -734,7 +708,7 @@ unsigned char state_s::get_o(int x, int y) const
 	assert(y < oh);
 	assert(y < 256);
 
-	return buf[((dx + x) & 0x7ff) + (((dy + y) & 0x7ff) * 0x800)];
+	return buf[get_video_addr(dx + x, dy + y)];
 }
 
 
@@ -851,7 +825,7 @@ static const huffman_node_s hn[] = {
 };
 
 
-int gunpey_state::next_node(const huffman_node_s **res, state_s *s)
+bool gunpey_state::next_node(const huffman_node_s **res, state_s *s)
 {
 	char bits[128];
 
@@ -863,24 +837,25 @@ int gunpey_state::next_node(const huffman_node_s **res, state_s *s)
 
 		for (int j = 0;; j++)
 		{
-			if (!hn[j].bits) return -1;
+			if (!hn[j].bits)
+				return true;
 
 			if (strncmp(bits, hn[j].bits, i + 1) == 0)
 			{
 				if (!hn[j].bits[i + 1])
 				{
 					*res = &hn[j];
-					return 0;
+					return false;
 				}
 				break;
 			}
 		}
 	}
 
-	return -1;
+	return true;
 }
 
-int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy)
+bool gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy)
 {
 	const huffman_node_s *n;
 	state_s s;
@@ -914,13 +889,11 @@ int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, 
 	while (s.ox < s.ow)
 	{
 		if (next_node(&n, &s))
-			return -1;
+			return true;
 
 		v = 0;
 		for (int i = 0; i < n->arg0_bits; i++)
-		{
 			v |= get_next_bit(&s) << i;
-		}
 
 		n->func(s, v, n->arg1_val);
 
@@ -928,34 +901,24 @@ int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, 
 		{
 			s.ox -= 12;
 			if ((s.ox / 12) & 1)
-			{
 				s.oy -= 1;
-			}
 			else
-			{
 				s.oy += 1;
-			}
-			eol = 1;
 
+			eol = 1;
 		}
 		else if (s.ox == s.ow)
 		{
 			s.ox -= s.ow % 12;
 			if ((s.ox / 12) & 1)
-			{
 				s.oy -= 1;
-			}
 			else
-			{
 				s.oy += 1;
-			}
-			eol = 1;
 
+			eol = 1;
 		}
 		else
-		{
 			eol = 0;
-		}
 
 		if (eol)
 		{
@@ -963,49 +926,41 @@ int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, 
 			{
 				s.ox += 12;
 				if ((s.ox / 12) & 1)
-				{
 					s.oy -= 1;
-				}
 				else
-				{
 					s.oy += 1;
-				}
 			}
 		}
 	}
 
-	return 0;
+	return false;
 }
 
-void gunpey_state::blitter_w(offs_t offset, uint8_t data)
+void gunpey_state::blitter_w(offs_t offset, u8 data)
 {
-	uint16_t *blit_ram = m_blit_ram;
+	//logerror("blitter_w offset %01x data %02x\n", offset, data);
 
-	//logerror("gunpey_blitter_w offset %01x data %02x\n", offset,data);
+	m_blit_ram[offset] = data;
 
-	blit_ram[offset] = data;
-
-	if(offset == 0 && data == 2) // blitter trigger, 0->1 transition
+	if ((offset == 0) && (data == 2)) // blitter trigger, 0->1 transition
 	{
-		m_srcx = blit_ram[0x04]|(blit_ram[0x05]<<8);
-		m_srcy = blit_ram[0x06]|(blit_ram[0x07]<<8);
-		m_dstx = blit_ram[0x08]|(blit_ram[0x09]<<8);
-		m_dsty = blit_ram[0x0a]|(blit_ram[0x0b]<<8);
-		m_xsize = blit_ram[0x0c]+1;
-		m_ysize = blit_ram[0x0e]+1;
-		int compression = blit_ram[0x01];
+		m_srcx = m_blit_ram[0x04] | (m_blit_ram[0x05] << 8);
+		m_srcy = m_blit_ram[0x06] | (m_blit_ram[0x07] << 8);
+		m_dstx = m_blit_ram[0x08] | (m_blit_ram[0x09] << 8);
+		m_dsty = m_blit_ram[0x0a] | (m_blit_ram[0x0b] << 8);
+		m_xsize = m_blit_ram[0x0c] + 1;
+		m_ysize = m_blit_ram[0x0e] + 1;
+		int compression = m_blit_ram[0x01];
 
-		m_dstx<<=1;
-		m_xsize<<=1;
+		m_dstx <<= 1;
+		m_xsize <<= 1;
 
-		if(compression)
+		if (compression)
 		{
-			if(compression == 8)
+			if (compression == 8)
 			{
 				if (decompress_sprite(m_vram.get(), m_srcx, m_srcy, m_xsize, m_ysize, m_dstx, m_dsty))
-				{
 					logerror("[-] Failed to decompress sprite at %04x %04x\n", m_srcx, m_srcy);
-				}
 			}
 			else
 				logerror("unknown compression mode %02x\n",compression);
@@ -1016,43 +971,41 @@ void gunpey_state::blitter_w(offs_t offset, uint8_t data)
 			m_dstxcount = 0;
 			m_dstycount = 0;
 			m_srcxbase = m_srcx;
-			m_scrxcount = 0;
+			m_srcxcount = 0;
 			m_srcycount = 0;
 
 			for (;;)
 			{
-				uint8_t usedata = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
-				m_srcx++; m_scrxcount++;
-				if (m_scrxcount==m_xsize)
+				u8 usedata = m_blit_rom[get_video_addr(m_srcx, m_srcy)];
+				m_srcx++; m_srcxcount++;
+				if (m_srcxcount == m_xsize)
 				{
-					m_scrxcount = 0;
+					m_srcxcount = 0;
 					m_srcx = m_srcxbase;
 					m_srcy++; m_srcycount++;
 				}
 
-				if ((write_dest_byte(usedata))==-1)
+				if (write_dest_byte(usedata))
 					break;
 			}
 		}
 
-		m_blitter_end_timer->adjust(m_maincpu->cycles_to_attotime(m_xsize*m_ysize));
+		m_blitter_end_timer->adjust(m_maincpu->cycles_to_attotime(m_xsize * m_ysize));
 	}
 }
 
-void gunpey_state::blitter_upper_w(offs_t offset, uint8_t data)
+void gunpey_state::blitter_upper_w(offs_t offset, u8 data)
 {
-	//logerror("gunpey_blitter_upper_w %02x %02x\n", offset, data);
-
+	//logerror("blitter_upper_w %02x %02x\n", offset, data);
 }
 
-void gunpey_state::blitter_upper2_w(offs_t offset, uint8_t data)
+void gunpey_state::blitter_upper2_w(offs_t offset, u8 data)
 {
-	//logerror("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
-
+	//logerror("blitter_upper2_w %02x %02x\n", offset, data);
 }
 
 
-void gunpey_state::output_w(uint8_t data)
+void gunpey_state::output_w(u8 data)
 {
 	//bit 0 is coin counter
 //  popmessage("%02x",data);
@@ -1060,12 +1013,12 @@ void gunpey_state::output_w(uint8_t data)
 	m_oki->set_rom_bank((data & 0x70) >> 4);
 }
 
-void gunpey_state::vram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gunpey_state::vram_bank_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_bank);
 }
 
-void gunpey_state::vregs_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gunpey_state::vregs_addr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vreg_addr);
 }
@@ -1074,7 +1027,7 @@ void gunpey_state::vregs_addr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void gunpey_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).ram().share("wram");
+	map(0x00000, 0x0ffff).ram().share(m_wram);
 //  map(0x50000, 0x500ff).ram();
 //  map(0x50100, 0x502ff).noprw();
 	map(0x80000, 0xfffff).rom();
@@ -1197,7 +1150,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
 	{
 		//logerror("frame\n");
 		irq_check(0x50);
@@ -1237,10 +1190,10 @@ void gunpey_state::gunpey(machine_config &config)
 
 ROM_START( gunpey )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
-	ROM_LOAD16_BYTE( "gp_rom1.021",  0x00000, 0x80000, CRC(07a589a7) SHA1(06c4140ffd5f74b3d3ddfc424f43fcd08d903490) )
-	ROM_LOAD16_BYTE( "gp_rom2.022",  0x00001, 0x80000, CRC(f66bc4cf) SHA1(54931d878d228c535b9e2bf22a0a3e41756f0fe5) )
+	ROM_LOAD16_BYTE( "gp_rom1.021",  0x00000, 0x80000, CRC(07a589a7) SHA1(06c4140ffd5f74b3d3ddfc424f43fcd08d903490) ) // Gunpey(AC) -Release-
+	ROM_LOAD16_BYTE( "gp_rom2.022",  0x00001, 0x80000, CRC(f66bc4cf) SHA1(54931d878d228c535b9e2bf22a0a3e41756f0fe5) ) // Jan 17 2000 19:10:22 (J)
 
-	ROM_REGION( 0x400000, "blit_data", 0 )
+	ROM_REGION( 0x400000, "blit_rom", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )

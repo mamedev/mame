@@ -5,6 +5,33 @@ license:CC0
 -->
 <softwarelist name="fmtowns_flop_cracked" description="Fujitsu FM Towns cracked floppy disk images">
 
+	<!-- Some graphics issues -->
+	<software name="asuka120" supported="partial">
+		<description>Asuka 120% Burning Fest. (cracked)</description>
+		<year>1994</year>
+		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<info name="alt_title" value="あすか 120% BURNING Fest." />
+		<info name="release" value="199403xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk a).hdm" size="1261568" crc="46a5074d" sha1="8efb863ea0878f9236082f7d7935f494c4522899"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk b).hdm" size="1261568" crc="2a448e8f" sha1="3b57fd0a2fecec56a3362884de0770ec4538f5eb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="asuka 120 burning fest. (disk c).hdm" size="1261568" crc="ac9a582e" sha1="726b05d573e0776006cee6aa8c71009b1e66b5cc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Cracked by cyo.the.vile -->
 	<software name="cameltry">
 		<description>Cameltry (cracked)</description>
@@ -59,8 +86,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- All the files in these images match the original disks, except for an additional CONTENTS.GBX file. It's unclear if they are actually cracked or not. -->
 	<software name="supdaisn">
-		<description>Super Daisenryaku (cracked)</description>
+		<description>Super Daisenryaku (cracked?)</description>
 		<year>1990</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="スーパー大戦略" />

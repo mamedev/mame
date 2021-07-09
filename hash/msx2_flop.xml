@@ -3906,28 +3906,6 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Jpn)</description>
-		<year>1987</year>
-		<publisher>Falcom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="368640">
-				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp).dsk" size="368640" crc="c02d493a" sha1="c98bbe6e898b0af672596e1f52f92cad642cefae"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dslayer4a" cloneof="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Jpn, Alt)</description>
-		<year>1987</year>
-		<publisher>Falcom</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="737280">
-				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp)[a].dsk" size="737280" crc="feabb87b" sha1="fd2011711641bde43bd17416c4103430dc7d79c0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dslayed">
 		<description>Dragon Slayer - Eiyuu Densetsu (Jpn)</description>
 		<year>1990</year>
@@ -16771,8 +16749,6 @@ DISKMAG
 
 -->
 
-
-
 	<software name="goody">
 		<description>Goody (Spa)</description>
 		<year>19??</year>
@@ -16838,8 +16814,6 @@ DISKMAG
  They can be removed as soon as we are 100% no legit disk is among them
 
 -->
-
-
 
 	<software name="1942">
 		<description>1942 (Jpn)</description>
@@ -17277,6 +17251,28 @@ DISKMAG
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="contra. gryzor (1989)(konami)(jp)[a2].dsk" size="737280" crc="ac22c7b7" sha1="6fa567e8a03d0f86ce21a9ee2d4d2a3152339c4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dslayer4">
+		<description>Dragon Slayer IV - Drasle Family (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="368640">
+				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp).dsk" size="368640" crc="c02d493a" sha1="c98bbe6e898b0af672596e1f52f92cad642cefae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dslayer4a" cloneof="dslayer4">
+		<description>Dragon Slayer IV - Drasle Family (Jpn, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="dragon slayer 4 - drasle family (1987)(falcom)(jp)[a].dsk" size="737280" crc="feabb87b" sha1="fd2011711641bde43bd17416c4103430dc7d79c0"/>
 			</dataarea>
 		</part>
 	</software>

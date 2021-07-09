@@ -334,6 +334,72 @@ static const gdb_register_map gdb_register_map_m6809 =
 	}
 };
 
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_score7 =
+{
+	"score7",
+	"mame.score7",
+	{
+		{ "r0",      "r0",      true,  TYPE_DATA_POINTER },
+		{ "r1",      "r1",      false, TYPE_INT },
+		{ "r2",      "r2",      false, TYPE_INT },
+		{ "r3",      "r3",      false, TYPE_INT },
+		{ "r4",      "r4",      false, TYPE_INT },
+		{ "r5",      "r5",      false, TYPE_INT },
+		{ "r6",      "r6",      false, TYPE_INT },
+		{ "r7",      "r7",      false, TYPE_INT },
+		{ "r8",      "r8",      false, TYPE_INT },
+		{ "r9",      "r9",      false, TYPE_INT },
+		{ "r10",     "r10",     false, TYPE_INT },
+		{ "r11",     "r11",     false, TYPE_INT },
+		{ "r12",     "r12",     false, TYPE_INT },
+		{ "r13",     "r13",     false, TYPE_INT },
+		{ "r14",     "r14",     false, TYPE_INT },
+		{ "r15",     "r15",     false, TYPE_INT },
+		{ "r16",     "r16",     false, TYPE_INT },
+		{ "r17",     "r17",     false, TYPE_INT },
+		{ "r18",     "r18",     false, TYPE_INT },
+		{ "r19",     "r19",     false, TYPE_INT },
+		{ "r20",     "r20",     false, TYPE_INT },
+		{ "r21",     "r21",     false, TYPE_INT },
+		{ "r22",     "r22",     false, TYPE_INT },
+		{ "r23",     "r23",     false, TYPE_INT },
+		{ "r24",     "r24",     false, TYPE_INT },
+		{ "r25",     "r25",     false, TYPE_INT },
+		{ "r26",     "r26",     false, TYPE_INT },
+		{ "r27",     "r27",     false, TYPE_INT },
+		{ "r28",     "r28",     false, TYPE_INT },
+		{ "r29",     "r29",     false, TYPE_INT },
+		{ "r30",     "r30",     false, TYPE_INT },
+		{ "r31",     "r31",     false, TYPE_INT },
+		{ "cr0",     "PSR",     false, TYPE_INT },
+		{ "cr1",     "COND",    false, TYPE_INT },
+		{ "cr2",     "ECR",     false, TYPE_INT },
+		{ "cr3",     "EXCPVEC", false, TYPE_INT },
+		{ "cr4",     "CCR",     false, TYPE_INT },
+		{ "cr5",     "EPC",     false, TYPE_INT },
+		{ "cr6",     "EMA",     false, TYPE_INT },
+		{ "cr7",     "TLBLOCK", false, TYPE_INT },
+		{ "cr8",     "TLBPT",   false, TYPE_INT },
+		{ "cr9",     "PEADDR",  false, TYPE_INT },
+		{ "cr10",    "TLBRPT",  false, TYPE_INT },
+		{ "cr11",    "PEVN",    false, TYPE_INT },
+		{ "cr12",    "PECTX",   false, TYPE_INT },
+		{ "cr15",    "LIMPFN",  false, TYPE_INT },
+		{ "cr16",    "LDMPFN",  false, TYPE_INT },
+		{ "cr18",    "PREV",    false, TYPE_INT },
+		{ "cr29",    "DREG",    false, TYPE_INT },
+		{ "PC",      "PC",      true,  TYPE_CODE_POINTER }, // actually Debug exception program counter (DEPC)
+		{ "cr31",    "DSAVE",   false, TYPE_INT },
+		{ "sr0",     "COUNTER", false, TYPE_INT },
+		{ "sr1",     "LDCR",    false, TYPE_INT },
+		{ "sr2",     "STCR",    false, TYPE_INT },
+		{ "ceh",     "CEH",     false, TYPE_INT },
+		{ "cel",     "CEL",     false, TYPE_INT },
+	}
+};
+
 //-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",       gdb_register_map_i486 },
@@ -346,6 +412,7 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "m6502",      gdb_register_map_m6502 },
 	{ "n2a03",      gdb_register_map_m6502 },
 	{ "m6809",      gdb_register_map_m6809 },
+	{ "score7",     gdb_register_map_score7 },
 };
 
 //-------------------------------------------------------------------------

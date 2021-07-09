@@ -129,7 +129,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ OSDOPTION_AUDIO_LATENCY "(0-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifndef NO_USE_PORTAUDIO
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
@@ -231,6 +231,9 @@ void osd_common_t::register_options()
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
+#ifndef NO_USE_PULSEAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
+#endif 
 #else
 	REGISTER_MODULE(m_mod_man, SOUND_RETRO);
 #endif

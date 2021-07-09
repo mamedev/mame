@@ -2,6 +2,11 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0
+
+Compaibility flags:
+3: needs MP1805 fdc
+5: needs MP1802 fdc
+
 -->
 <softwarelist name="bml3_flop" description="Hitachi Basic Master Level 3 disk images">
 
@@ -9,18 +14,13 @@ license:CC0
 		<description>HI-Writer 1.5</description>
 		<year>19??</year>
 		<publisher>Hisoft Pty. Ltd.</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<sharedfeat name="compatibility" value="5" />
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
 				<rom name="hiwriter.d88" size="346800" crc="637f3b94" sha1="0bf7fdb528e03aa2409f386e63e257f5aa013c8f"  />
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="hidata">
-		<description>HI-Writer Data</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="185008">
 				<rom name="hidata.d88" size="185008" crc="bc610e83" sha1="162432ff9be34a87f20a02664c0aa1f8e0cb674b"  />
 			</dataarea>
@@ -32,9 +32,82 @@ license:CC0
 		<year>1991</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="programmer" value="Jonathan Edwards" />
+		<sharedfeat name="compatibility" value="5" />
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="346800">
 				<rom name="tetris.d88" size="346800" crc="f19034fc" sha1="de8385deac89f149837d76d920113c9010182def" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ma5370" supported="no"><!-- mame crashes in the floppy subsystem -->
+		<description>MA5370</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="3" />
+		<part name="disk" interface="floppy_3">
+			<dataarea name="flop" size="0x2d2b0">
+				<rom name="ma5370.d88" size="0x2d2b0" crc="04bfeb8a" sha1="e273c53286144d2cbdc1a9616945bf2c2f5267d5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbu">
+		<description>Disk Basic and Utilities</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="5" />
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="0x54ab0">
+				<rom name="dbu.d88" size="0x54ab0" crc="9af7d68f" sha1="adea7e9b6ada493a9b7a378a43762b0183dacf05" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcg6890">
+		<description>FCG6890</description><!-- some kind of graphics package -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="5" />
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="0x54ab0">
+				<rom name="fcg6890.d88" size="0x54ab0" crc="47e5a35c" sha1="de3da9839de2d5bd760cf5c3120896f34ca020ef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insecth">
+		<description>Insect Hunter</description>
+		<year>1986</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="5" />
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="0x54ab0">
+				<rom name="insecth.d88" size="0x54ab0" crc="cd06a634" sha1="c4a35d229db9f1f09e083c71bd65f41d846db064" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jwp">
+		<description>Japanese Word Processor</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="5" />
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="0x54ab0">
+				<rom name="jwp.d88" size="0x54ab0" crc="26139d53" sha1="561a15859d6da9cb3448277b494c2589c40644fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subtreas">
+		<description>Submarine Treasures Pick Up</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="5" />
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="0x54ab0">
+				<rom name="tetris.d88" size="0x54ab0" crc="484cf520" sha1="adb4d687e8ace9e35b7bc9f9a20a9cc5c5cf6ae7" />
 			</dataarea>
 		</part>
 	</software>

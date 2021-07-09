@@ -77,7 +77,7 @@
 void mcr68_state::xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
-/*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
+//  m_sounds_good->reset_write(~m_control_word & 0x0020);
 	m_sounds_good->write(((m_control_word & 0x000f) << 1) | ((m_control_word & 0x0010) >> 4));
 }
 
@@ -92,7 +92,7 @@ void mcr68_state::xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem
 void mcr68_state::blasted_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
-/*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
+//  m_sounds_good->reset_write(~m_control_word & 0x0020);
 	m_sounds_good->write((m_control_word >> 8) & 0x1f);
 }
 
@@ -124,7 +124,7 @@ void mcr68_state::spyhunt2_control_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	COMBINE_DATA(&m_control_word);
 
-/*  m_turbo_cheap_squeak->reset_write(~m_control_word & 0x0080);*/
+//  m_turbo_cheap_squeak->reset_write(~m_control_word & 0x0080);
 	m_turbo_cheap_squeak->write((m_control_word >> 8) & 0x001f);
 
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
@@ -209,10 +209,10 @@ void mcr68_state::archrivl_control_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void mcr68_state::pigskin_protection_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	/* ignore upper-byte only */
+	// ignore upper-byte only
 	if (ACCESSING_BITS_0_7)
 	{
-		/* track the last 5 bytes */
+		// track the last 5 bytes
 		m_protection_data[0] = m_protection_data[1];
 		m_protection_data[1] = m_protection_data[2];
 		m_protection_data[2] = m_protection_data[3];
@@ -226,16 +226,16 @@ void mcr68_state::pigskin_protection_w(offs_t offset, uint16_t data, uint16_t me
 
 uint16_t mcr68_state::pigskin_protection_r()
 {
-	/* based on the last 5 bytes return a value */
+	// based on the last 5 bytes return a value
 	if (m_protection_data[4] == 0xe3 && m_protection_data[3] == 0x94)
-		return 0x00;    /* must be <= 1 */
+		return 0x00;    // must be <= 1
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x7b && m_protection_data[2] == 0x36)
-		return 0x00;    /* must be <= 1 */
+		return 0x00;    // must be <= 1
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x7b)
-		return 0x07;    /* must be > 5 */
+		return 0x07;    // must be > 5
 	if (m_protection_data[4] == 0xc7 && m_protection_data[3] == 0x1f && m_protection_data[2] == 0x03 &&
 		m_protection_data[1] == 0x25 && m_protection_data[0] == 0x36)
-		return 0x00;    /* must be < 3 */
+		return 0x00;    // must be < 3
 
 	logerror("Protection read after unrecognized sequence: %02X %02X %02X %02X %02X\n",
 			m_protection_data[0], m_protection_data[1], m_protection_data[2], m_protection_data[3], m_protection_data[4]);
@@ -246,7 +246,7 @@ uint16_t mcr68_state::pigskin_protection_r()
 
 uint16_t mcr68_state::pigskin_port_1_r()
 {
-	/* see archrivl_port_1_r for 49-way joystick description */
+	// See archrivl_port_1_r for 49-way joystick description
 	return ioport("IN1")->read() |
 			(translate49[ioport("49WAYX1")->read() >> 4] << 12) |
 			(translate49[ioport("49WAYY1")->read() >> 4] << 8);
@@ -255,7 +255,7 @@ uint16_t mcr68_state::pigskin_port_1_r()
 
 uint16_t mcr68_state::pigskin_port_2_r()
 {
-	/* see archrivl_port_1_r for 49-way joystick description */
+	// See archrivl_port_1_r for 49-way joystick description
 	return ioport("DSW")->read() |
 			(translate49[ioport("49WAYX2")->read() >> 4] << 12) |
 			(translate49[ioport("49WAYY2")->read() >> 4] << 8);
@@ -402,7 +402,7 @@ static INPUT_PORTS_START( xenophob )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")   /* There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen) */
+	PORT_START("DSW")   // There are actually 10 switches, but where do 9 & 10 map to?? (10=Freeze Screen)
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW1:2" )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("SW1:3")
@@ -433,30 +433,30 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* SG status */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) // SG status
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Oddly enough, if you assign this control to a key, it makes both player wheels go left to fifteen */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Oddly enough, if you assign this control to a key, it makes both player wheels go left to fifteen
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME ("P2 1st Gear")/* 1st gear */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME ("P2 2nd Gear")/* 2nd gear */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME ("P2 3rd Gear")/* 3rd gear */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME ("P2 1st Gear") // 1st gear
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME ("P2 2nd Gear") // 2nd gear
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME ("P2 3rd Gear") // 3rd gear
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME ("P1 1st Gear")/* 1st gear */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME ("P1 2nd Gear")/* 2nd gear */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME ("P1 3rd Gear")/* 3rd gear */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM )               /* TCS status */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 L Trigger")/* Left Trigger */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME ("P2 L Button")/* Left Button */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME ("P2 R Trigger")/* Right Trigger */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME ("P2 R Button")/* Right Button */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 L Trigger")/* Left Trigger */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME ("P1 L Button")/* Left Button */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME ("P1 R Trigger")/* Right Trigger */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME ("P1 R Button")/* Right Button */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME ("P1 1st Gear") // 1st gear
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME ("P1 2nd Gear") // 2nd gear
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME ("P1 3rd Gear") // 3rd gear
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM )               // TCS status
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 L Trigger") // Left Trigger
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME ("P2 L Button")  // Left Button
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME ("P2 R Trigger") // Right Trigger
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME ("P2 R Button")  // Right Button
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 L Trigger") // Left Trigger
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME ("P1 L Button")  // Left Button
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME ("P1 R Trigger") // Right Trigger
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME ("P1 R Button")  // Right Button
 
-	PORT_START("DSW")   /* dipswitches */
+	PORT_START("DSW")   // Dipswitches
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( spyhunt2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN1")   /* analog ports for steering and pedals */
+	PORT_START("AN1")   // Analog ports for steering and pedals
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(0x30,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("AN2")
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( blasted )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED/* credit w/bill */ )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED /* credit w/bill */ )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -506,8 +506,8 @@ static INPUT_PORTS_START( blasted )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED/* credit 1 w/bill */ )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED/* credit 2 w/bill */ )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED /* credit 1 w/bill */ )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED /* credit 2 w/bill */ )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -615,9 +615,9 @@ static INPUT_PORTS_START( archrivl )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("IN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1/2 joysticks go here */
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )  // Player 1/2 joysticks go here
 
-	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
+	PORT_START("DSW")   // There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "Preset Time" )
 	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
@@ -643,16 +643,16 @@ static INPUT_PORTS_START( archrivl )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("49WAYX1")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYX1")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY1")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYY1")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYX2")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYX2")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYY2")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYY2")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -692,7 +692,7 @@ static INPUT_PORTS_START( archrivlb )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog on the non-bootleg hardware, unclear here */
+	PORT_START("DSW")   // There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog on the non-bootleg hardware, unclear here
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "Preset Time" )
 	PORT_DIPSETTING(      0x0002, "Preset + 10sec" )
@@ -745,9 +745,9 @@ static INPUT_PORTS_START( pigskin )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 1 joystick goes here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  // Player 1 joystick goes here
 
-	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
+	PORT_START("DSW")   // There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, "Shortest" )
 	PORT_DIPSETTING(      0x0002, "Short" )
@@ -770,18 +770,18 @@ static INPUT_PORTS_START( pigskin )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Joystick ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Rotated" )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* player 2 joystick goes here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  // Player 2 joystick goes here
 
-	PORT_START("49WAYX1")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYX1")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("49WAYY1")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYY1")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(1) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START("49WAYX2")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYX2")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("49WAYY2")   /* converted to standard 49-way inputs */
+	PORT_START("49WAYY2")   // Converted to standard 49-way inputs
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_PLAYER(2) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -802,9 +802,9 @@ static INPUT_PORTS_START( trisport )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  /* analog controls go here */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )  // Analog controls go here
 
-	PORT_START("DSW")   /* There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog */
+	PORT_START("DSW")   // There are actually 10 switches; 9 is unconnected, 10 (freeze) connects to a PAL and disables the watchdog
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_1C ) )
@@ -913,7 +913,7 @@ GFXDECODE_END
 
 void mcr68_state::mcr68(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, 7723800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::mcr68_map);
 
@@ -922,10 +922,10 @@ void mcr68_state::mcr68(machine_config &config)
 	PTM6840(config, m_ptm, 7723800 / 10);
 	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
-	/* video hardware */
+	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(30);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ );
 	m_screen->set_size(32*16, 30*16);
 	m_screen->set_visarea(0, 32*16-1, 0, 30*16-1);
 	m_screen->set_screen_update(FUNC(mcr68_state::screen_update_mcr68));
@@ -936,7 +936,7 @@ void mcr68_state::mcr68(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mcr68);
 	PALETTE(config, "palette").set_format(palette_device::xRBG_333, 64);
 
-	/* sound hardware -- determined by specific machine */
+	// Sound hardware -- determined by specific machine
 	SPEAKER(config, "speaker").front_center();
 }
 
@@ -945,7 +945,7 @@ void mcr68_state::xenophob(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
@@ -953,7 +953,7 @@ void mcr68_state::intlaser(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 800);
@@ -964,7 +964,7 @@ void mcr68_state::spyhunt2(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
 	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -980,7 +980,7 @@ void mcr68_state::archrivl(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	S11_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581 w/o W10/W11 jumpers, older mix resistors
 	// The schematics actually imply on the parts list that this may use the even older mix resistors from the D-1129x board
 	// but the actual schematic shows the D-11581 resistors. This may be worth checking from an original board.
@@ -991,7 +991,7 @@ void mcr68_state::pigskin(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	S11C_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581-4xxx w/ W10/W11 jumpers, newer mix resistors
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::pigskin_map);
@@ -1002,7 +1002,7 @@ void mcr68_state::trisport(machine_config &config)
 {
 	mcr68(config);
 
-	/* basic machine hardware */
+	// Basic machine hardware
 	S11C_BG(config, m_bg).add_route(ALL_OUTPUTS, "speaker", 1.0); // uses a D-11581-4xxx w/ W10/W11 jumpers, newer mix resistors
 	// the above could use verification from the schematics, but based on the fact that it uses 3 roms, two 27512 and one 27256,
 	// and only the S11C_BG/D-11581-4xxx board properly supports that specific combination, it is almost certainly using
@@ -1028,14 +1028,14 @@ void mcr68_state::trisport(machine_config &config)
     Sound Board:     A080-91863-B000
 */
 
-ROM_START( xenophob ) /* Service mode shows "VERSION CO" */
+ROM_START( xenophob ) // Service mode shows "VERSION CO"
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "xeno_pro.3c",  0x00000, 0x10000, CRC(f44c2e60) SHA1(9130b26eb1e0e0a75f9fdec898e1f0976de8a766) )
 	ROM_LOAD16_BYTE( "xeno_pro.3b",  0x00001, 0x10000, CRC(01609a3b) SHA1(9e065bc72f56439a885bfdfc8eb60df666df7c37) )
 	ROM_LOAD16_BYTE( "xeno_pro.2c",  0x20000, 0x10000, CRC(e45bf669) SHA1(52b0ffd2311e4d300410de57fbddacab4b9857a1) )
 	ROM_LOAD16_BYTE( "xeno_pro.2b",  0x20001, 0x10000, CRC(da5d39d5) SHA1(f61b239eb3108faec2f3dbb8139c8d01b0e29873) )
 
-	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  // Sounds Good board
 	ROM_LOAD16_BYTE( "xeno_snd.u7",  0x00000, 0x10000, CRC(77561d15) SHA1(8c23a9270d54be6380f2d23939b6c6d8c31e334b) )
 	ROM_LOAD16_BYTE( "xeno_snd.u17", 0x00001, 0x10000, CRC(837a1a71) SHA1(d7d60ef1fd11e5e84dd1ffb9a077686bd2fb452e) )
 	ROM_LOAD16_BYTE( "xeno_snd.u8",  0x20000, 0x10000, CRC(6e2915c7) SHA1(df1f35f6b743afbab0a3a29adce3639a8c9dc66f) )
@@ -1051,41 +1051,41 @@ ROM_START( xenophob ) /* Service mode shows "VERSION CO" */
 	ROM_LOAD( "xeno_fg.9j",   0x20000, 0x10000, CRC(82fb3e09) SHA1(f06e9df20044244a6c174f4876e615ccc18e1cba) )
 	ROM_LOAD( "xeno_fg.10j",  0x30000, 0x10000, CRC(6a7a3516) SHA1(1def9c134220eac9ba5e46d38282ff18f51b6398) )
 
-	/* PLD's located on the cpu/video board */
+	// PLDs located on the CPU/video board
 	ROM_REGION( 0x000C, "cpu_plds", 0 )
-	ROM_LOAD( "b61a-49aaj-axad.bin", 0x00000, 0x00001, NO_DUMP ) /* PAL20L8 at 9B */
-	ROM_LOAD( "b75a-50aaj-bxad.bin", 0x00001, 0x00001, NO_DUMP ) /* PAL16L8 at 1J */
-	ROM_LOAD( "b75a-50aaj-axad.bin", 0x00002, 0x00001, NO_DUMP ) /* PAL16L8 at 2J */
-	ROM_LOAD( "b75a-41aaj-axad.bin", 0x00003, 0x00001, NO_DUMP ) /* PAL16R4 at 2K */
-	ROM_LOAD( "b75a-41aaj-bxab.bin", 0x00004, 0x00001, NO_DUMP ) /* PAL16R4 at 14K */
-	ROM_LOAD( "a59a26axlaxhd.bin",   0x00005, 0x00001, NO_DUMP ) /* PLS153 at 11J */
-	ROM_LOAD( "a59a26axlbxhd.bin",   0x00006, 0x00001, NO_DUMP ) /* PLS153 at 12J */
-	ROM_LOAD( "a59a26axlcxhd.bin",   0x00007, 0x00001, NO_DUMP ) /* PLS153 at 14H */
-	ROM_LOAD( "0066-316bx-xxqx.bin", 0x00008, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 14E */
-	ROM_LOAD( "0066-314bx-xxqx.bin", 0x00009, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 14F */
-	ROM_LOAD( "0066-315bx-xxqx.bin", 0x0000A, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 15E */
-	ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 15F */
+	ROM_LOAD( "b61a-49aaj-axad.bin", 0x00000, 0x00001, NO_DUMP ) // PAL20L8 at 9B
+	ROM_LOAD( "b75a-50aaj-bxad.bin", 0x00001, 0x00001, NO_DUMP ) // PAL16L8 at 1J
+	ROM_LOAD( "b75a-50aaj-axad.bin", 0x00002, 0x00001, NO_DUMP ) // PAL16L8 at 2J
+	ROM_LOAD( "b75a-41aaj-axad.bin", 0x00003, 0x00001, NO_DUMP ) // PAL16R4 at 2K
+	ROM_LOAD( "b75a-41aaj-bxab.bin", 0x00004, 0x00001, NO_DUMP ) // PAL16R4 at 14K
+	ROM_LOAD( "a59a26axlaxhd.bin",   0x00005, 0x00001, NO_DUMP ) // PLS153 at 11J
+	ROM_LOAD( "a59a26axlbxhd.bin",   0x00006, 0x00001, NO_DUMP ) // PLS153 at 12J
+	ROM_LOAD( "a59a26axlcxhd.bin",   0x00007, 0x00001, NO_DUMP ) // PLS153 at 14H
+	ROM_LOAD( "0066-316bx-xxqx.bin", 0x00008, 0x00001, NO_DUMP ) // 20 Pin PLD? at 14E
+	ROM_LOAD( "0066-314bx-xxqx.bin", 0x00009, 0x00001, NO_DUMP ) // 24 Pin PLD? at 14F
+	ROM_LOAD( "0066-315bx-xxqx.bin", 0x0000A, 0x00001, NO_DUMP ) // 20 Pin PLD? at 15E
+	ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) // 24 Pin PLD? at 15F
 
-	/* PLD located on the "Sounds Good" board */
+	// PLD located on the "Sounds Good" board
 	ROM_REGION( 0x00100, "snd_pld", 0 )
-	ROM_LOAD( "e36a31axnaxad.bin",   0x00000, 0x000cc, CRC(33e62608) SHA1(ab89ce32a5a351914a80e0e11830299425a22874) ) /* PAL20L10 at U15 */
+	ROM_LOAD( "e36a31axnaxad.bin",   0x00000, 0x000cc, CRC(33e62608) SHA1(ab89ce32a5a351914a80e0e11830299425a22874) ) // PAL20L10 at U15
 ROM_END
 
 
-ROM_START( spyhunt2 ) /* Service menu reports as SPY HUNTER II REV 2 */
+ROM_START( spyhunt2 ) // Service menu reports as SPY HUNTER II REV 2
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sh2_3c_rev2.3c", 0x00000, 0x10000, CRC(30b91c90) SHA1(5b76f4e512b17ee80de2694807aa4e2499c2ef8b) )
 	ROM_LOAD16_BYTE( "sh2_3b_rev2.3b", 0x00001, 0x10000, CRC(f64513c6) SHA1(e42cab599e489a0ba422b28c5cfda0f9c3a60601) )
 	ROM_LOAD16_BYTE( "sh2_2c_rev2.2c", 0x20000, 0x10000, CRC(8ee65009) SHA1(6adb00888f739b59e3ace1a6eaf1c58c4583d7fd) )
 	ROM_LOAD16_BYTE( "sh2_2b_rev2.2b", 0x20001, 0x10000, CRC(850c21ad) SHA1(3b944545cb469e2c53166a91eb2834c5f3891ddf) )
 
-	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
-	ROM_LOAD( "spyhunter_ii_u5.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) ) /* Dated 3/5/87 */
-	ROM_LOAD( "spyhunter_ii_u4.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) ) /* Dated 3/5/87 */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  // 64k for the Turbo Cheap Squeak
+	ROM_LOAD( "spyhunter_ii_u5.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) ) // Dated 3/5/87
+	ROM_LOAD( "spyhunter_ii_u4.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) ) // Dated 3/5/87
 
-	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
-	ROM_LOAD16_BYTE( "spyhunter_ii_u7_sound.u7",   0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) ) /* Dated 3/18/87 */
-	ROM_LOAD16_BYTE( "spyhunter_ii_u17_sound.u17", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) ) /* Dated 3/18/87 */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  // Sounds Good board
+	ROM_LOAD16_BYTE( "spyhunter_ii_u7_sound.u7",   0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) ) // Dated 3/18/87
+	ROM_LOAD16_BYTE( "spyhunter_ii_u17_sound.u17", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) ) // Dated 3/18/87
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "sh2_bg0_rev2.11d", 0x00000, 0x08000, CRC(cb3c3d8e) SHA1(5135eefd311e21b62628a6b6dc483ff80e5594fd) )
@@ -1098,14 +1098,14 @@ ROM_START( spyhunt2 ) /* Service menu reports as SPY HUNTER II REV 2 */
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-	/* According to the manual these pal's are located on the Video Game board */
-	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
-	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
-	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
-	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
-	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-	/* According to the manual this pal is located on the "Sounds Good" board */
-	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+	// According to the manual these pal's are located on the Video Game board
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) // marked COLARB in manual
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) // marked IODCD in manual
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) // marked MEMDCD in manual
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) // marked DTACK in manual
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) // marked HSYNC in manual
+	// According to the manual this PAL is located on the "Sounds Good" board
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) // marked SG01R0 in manual, pal type not specified
 ROM_END
 
 
@@ -1116,13 +1116,13 @@ ROM_START( spyhunt2a )
 	ROM_LOAD16_BYTE( "sh2_2c.2c", 0x20000, 0x10000, CRC(bc834f3f) SHA1(05f6ab508ce2ebe55665e97114070e9d81db48c8) )
 	ROM_LOAD16_BYTE( "sh2_2b.2b", 0x20001, 0x10000, CRC(8a9f7ef3) SHA1(353ebb0a3782c183cc9be800584903e23ca507d9) )
 
-	ROM_REGION( 0x10000, "tcs:cpu", 0 )  /* 64k for the Turbo Cheap Squeak */
-	ROM_LOAD( "spyhunter_ii_u5.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) ) /* Dated 3/5/87 */
-	ROM_LOAD( "spyhunter_ii_u4.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) ) /* Dated 3/5/87 */
+	ROM_REGION( 0x10000, "tcs:cpu", 0 )  // 64k for the Turbo Cheap Squeak
+	ROM_LOAD( "spyhunter_ii_u5.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) ) // Dated 3/5/87
+	ROM_LOAD( "spyhunter_ii_u4.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) ) // Dated 3/5/87
 
-	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
-	ROM_LOAD16_BYTE( "spyhunter_ii_u7_sound.u7",   0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) ) /* Dated 3/18/87 */
-	ROM_LOAD16_BYTE( "spyhunter_ii_u17_sound.u17", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) ) /* Dated 3/18/87 */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  // Sounds Good board
+	ROM_LOAD16_BYTE( "spyhunter_ii_u7_sound.u7",   0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) ) // Dated 3/18/87
+	ROM_LOAD16_BYTE( "spyhunter_ii_u17_sound.u17", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) ) // Dated 3/18/87
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "bg0.11d",  0x00000, 0x08000, CRC(81efef7a) SHA1(74a6757b374b9f1e0c5a33a13fa492ae2e4347a0) )
@@ -1135,25 +1135,25 @@ ROM_START( spyhunt2a )
 	ROM_LOAD( "fg3.10j",  0x60000, 0x20000, CRC(d3475ff8) SHA1(aa7a283a190a6c43e365fcd9242c5d0b920dbf32) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-	/* According to the manual these pal's are located on the Video Game board */
-	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
-	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
-	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
-	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
-	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-	/* According to the manual this pal is located on the "Sounds Good" board */
-	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+	// According to the manual these PALs are located on the Video Game board
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) // marked COLARB in manual
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) // marked IODCD in manual
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) // marked MEMDCD in manual
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) // marked DTACK in manual
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) // marked HSYNC in manual
+	// According to the manual this PAL is located on the "Sounds Good" board
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) // marked SG01R0 in manual, pal type not specified
 ROM_END
 
 
-ROM_START( blasted ) /* Service mode shows "prod. code v.1" and the date 4/27/88 */
+ROM_START( blasted ) // Service mode shows "prod. code v.1" and the date 4/27/88
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3c",  0x00000, 0x10000, CRC(b243b7df) SHA1(b44179c30e5286362b0be4e2e9b0742e7e27f7c9) )
 	ROM_LOAD16_BYTE( "3b",  0x00001, 0x10000, CRC(627e30d3) SHA1(c430191dd539a22603e49df4c4cb697747a0cd02) )
 	ROM_LOAD16_BYTE( "2c",  0x20000, 0x10000, CRC(026f30bf) SHA1(de327ab5bd4dc9456fa5a91f3ccd293b3ab8c5c2) )
 	ROM_LOAD16_BYTE( "2b",  0x20001, 0x10000, CRC(8e0e91a9) SHA1(2dc2927a1fd552ead446606a902a2ba0c4595798) )
 
-	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  // Sounds Good board
 	ROM_LOAD16_BYTE( "blasted.u7",  0x00000, 0x10000, CRC(8d7c8ef6) SHA1(a414e91c20202f800f3e01e4c430e3f99e3df5bb) )
 	ROM_LOAD16_BYTE( "blasted.u17", 0x00001, 0x10000, CRC(c79040b9) SHA1(e6fa173ff5fb681ddfef831f1ef237a7c4303f32) )
 	ROM_LOAD16_BYTE( "blasted.u8",  0x20000, 0x10000, CRC(c53094c0) SHA1(8c54cefe8030bf18b9585008a4a6cf8a7dc23f71) )
@@ -1170,24 +1170,24 @@ ROM_START( blasted ) /* Service mode shows "prod. code v.1" and the date 4/27/88
 	ROM_LOAD( "fg3",  0x60000, 0x20000, CRC(18e4a130) SHA1(2412b45ca58b36515c80b0888a5d35303a5ce5a2) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-	/* According to the manual these pal's are located on the Video Game board */
-	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
-	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
-	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
-	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
-	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-	/* According to the manual this pal is located on the "Sounds Good" board */
-	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+	// According to the manual these PALs are located on the Video Game board
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) // marked COLARB in manual
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) // marked IODCD in manual
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) // marked MEMDCD in manual
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) // marked DTACK in manual
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) // marked HSYNC in manual
+	// According to the manual this PAL is located on the "Sounds Good" board
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) // marked SG01R0 in manual, pal type not specified
 ROM_END
 
-ROM_START( intlaser ) /* Service mode shows "TOP SECRET PROJ. #F01" and the date 10/01/87 */
+ROM_START( intlaser ) // Service mode shows "TOP SECRET PROJ. #F01" and the date 10/01/87
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3c.bin",  0x00000, 0x10000, CRC(ddab582a) SHA1(db124e35b7b33d282f71104412a8dab71ce71cb4) )
 	ROM_LOAD16_BYTE( "3b.bin",  0x00001, 0x10000, CRC(e4498eca) SHA1(69cbc80ab9a801e957a74278475869d3b54e9a2a) )
 	ROM_LOAD16_BYTE( "2c.bin",  0x20000, 0x10000, CRC(d2cca853) SHA1(69e4ee8203c6dda7b4ec97c247fbcdc9fdc9ff8d) )
 	ROM_LOAD16_BYTE( "2b.bin",  0x20001, 0x10000, CRC(3802cfe2) SHA1(d10c802500bae14acc3230ca34c2d1806b68ce4a) )
 
-	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sg:cpu", 0 )  // Sounds Good board
 	ROM_LOAD16_BYTE( "u7.bin",  0x00000, 0x10000, CRC(19ad1e45) SHA1(838ad7304248690d3fdf9e4edf3856936bf36d42) )
 	ROM_LOAD16_BYTE( "u17.bin", 0x00001, 0x10000, CRC(d6118949) SHA1(9e059f28d9eb8dee10301662a65588cffaf6fd16) )
 	ROM_LOAD16_BYTE( "u8.bin",  0x20000, 0x10000, CRC(d6cc99aa) SHA1(b970d6e87778959cf7322158b8df26c5028e3f45) )
@@ -1204,26 +1204,26 @@ ROM_START( intlaser ) /* Service mode shows "TOP SECRET PROJ. #F01" and the date
 	ROM_LOAD( "10j.bin", 0x60000, 0x20000, CRC(203b55b8) SHA1(72311af32039d09f3b0f4641b71eaf836302fc9a) )
 
 	ROM_REGION( 0x0006, "plds", 0 )
-	/* According to the manual these pal's are located on the Video Game board */
-	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
-	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
-	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
-	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
-	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-	/* According to the manual this pal is located on the "Sounds Good" board */
-	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+	// According to the manual these PALs are located on the Video Game board
+	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) // marked COLARB in manual
+	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) // marked IODCD in manual
+	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) // marked MEMDCD in manual
+	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) // marked DTACK in manual
+	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) // marked HSYNC in manual
+	// According to the manual this PAL is located on the "Sounds Good" board
+	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) // marked SG01R0 in manual, pal type not specified
 ROM_END
 
 
-ROM_START( archrivl ) /* Reports as rev 4.0 6/29/89 */
+ROM_START( archrivl ) // Reports as rev 4.0 6/29/89
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "arch_rivals_3c_rev4.3c",  0x00000, 0x10000, CRC(60d4b760) SHA1(9c24c72f62310475b0dade85299cb661904f8f41) ) /* "REV4" portion of label is beige */
+	ROM_LOAD16_BYTE( "arch_rivals_3c_rev4.3c",  0x00000, 0x10000, CRC(60d4b760) SHA1(9c24c72f62310475b0dade85299cb661904f8f41) ) // "REV4" portion of label is beige
 	ROM_LOAD16_BYTE( "arch_rivals_3b_rev4.3b",  0x00001, 0x10000, CRC(e0c07a8d) SHA1(ace5b480d4c2cd3d78dff0e284cf13a8d28c40b7) )
 	ROM_LOAD16_BYTE( "arch_rivals_2c_rev4.2c",  0x20000, 0x10000, CRC(cc2893f7) SHA1(44931299cb98e27ac2f11b3922da76895fbfe0a7) )
 	ROM_LOAD16_BYTE( "arch_rivals_2b_rev4.2b",  0x20001, 0x10000, CRC(fa977050) SHA1(67c66995da755401162f7e668b97eb42ac769ec0) )
 
-	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board
+	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) // "REV1" portion of label is brown
 	ROM_RELOAD(                           0x08000, 0x08000 )
 	ROM_RELOAD(                           0x10000, 0x08000 )
 	ROM_RELOAD(                           0x18000, 0x08000 )
@@ -1237,11 +1237,11 @@ ROM_START( archrivl ) /* Reports as rev 4.0 6/29/89 */
 	ROM_RELOAD(                           0x58000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) /* "REV1" portion of label is brown */
+	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) // "REV1" portion of label is brown
 	ROM_LOAD( "arch_rivals_12d_rev1.12d", 0x10000, 0x10000, CRC(31e68050) SHA1(e25871beb08a8706af70d277fa7305a1f4d7d3e2) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "arch_rivals_7j_rev1.7j",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) ) /* "REV1" portion of label is brown */
+	ROM_LOAD( "arch_rivals_7j_rev1.7j",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) ) // "REV1" portion of label is brown
 	ROM_LOAD( "arch_rivals_8j_rev1.8j",   0x20000, 0x20000, CRC(58187ac2) SHA1(0bd58598720c41b3c393d47b3b1d6b30696b3a6f) )
 	ROM_LOAD( "arch_rivals_9j_rev1.9j",   0x40000, 0x20000, CRC(0dd1204e) SHA1(bdc9b74e7ae8f071d2eb3ce957eec484f02ef876) )
 	ROM_LOAD( "arch_rivals_10j_rev1.10j", 0x60000, 0x20000, CRC(eb3d0344) SHA1(9db7c7bca45f56550c9a9623f96565901968d0c3) )
@@ -1250,27 +1250,27 @@ ROM_START( archrivl ) /* Reports as rev 4.0 6/29/89 */
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) // PAL is read protected
 ROM_END
 
 
-ROM_START( archrivla ) /* Reports as rev 2.0 5/03/89 */
+ROM_START( archrivla ) // Reports as rev 2.0 5/03/89
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "arch_rivals_3c_rev2.3c",  0x00000, 0x10000, CRC(3c545740) SHA1(84a467756c959385a3ec3b97026823470bbab7ab) ) /* "REV2" portion of label is red */
+	ROM_LOAD16_BYTE( "arch_rivals_3c_rev2.3c",  0x00000, 0x10000, CRC(3c545740) SHA1(84a467756c959385a3ec3b97026823470bbab7ab) ) // "REV2" portion of label is red
 	ROM_LOAD16_BYTE( "arch_rivals_3b_rev2.3b",  0x00001, 0x10000, CRC(bc4df2b9) SHA1(7314d03d4cf7e8a83135fa67969dda3088e212fb) )
 	ROM_LOAD16_BYTE( "arch_rivals_2c_rev2.2c",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "arch_rivals_2b_rev2.2b",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
-	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) /* "REV1" portion of label is brown */
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board
+	ROM_LOAD( "arch_rivals_u4_rev1.u4",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) ) // "REV1" portion of label is brown
 	ROM_RELOAD(                           0x08000, 0x08000 )
 	ROM_RELOAD(                           0x10000, 0x08000 )
 	ROM_RELOAD(                           0x18000, 0x08000 )
@@ -1284,11 +1284,11 @@ ROM_START( archrivla ) /* Reports as rev 2.0 5/03/89 */
 	ROM_RELOAD(                           0x58000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) /* "REV1" portion of label is brown */
+	ROM_LOAD( "arch_rivals_11d_rev1.11d", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) ) // "REV1" portion of label is brown
 	ROM_LOAD( "arch_rivals_12d_rev1.12d", 0x10000, 0x10000, CRC(31e68050) SHA1(e25871beb08a8706af70d277fa7305a1f4d7d3e2) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD( "arch_rivals_7j_rev1.7j",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) ) /* "REV1" portion of label is brown */
+	ROM_LOAD( "arch_rivals_7j_rev1.7j",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) ) // "REV1" portion of label is brown
 	ROM_LOAD( "arch_rivals_8j_rev1.8j",   0x20000, 0x20000, CRC(58187ac2) SHA1(0bd58598720c41b3c393d47b3b1d6b30696b3a6f) )
 	ROM_LOAD( "arch_rivals_9j_rev1.9j",   0x40000, 0x20000, CRC(0dd1204e) SHA1(bdc9b74e7ae8f071d2eb3ce957eec484f02ef876) )
 	ROM_LOAD( "arch_rivals_10j_rev1.10j", 0x60000, 0x20000, CRC(eb3d0344) SHA1(9db7c7bca45f56550c9a9623f96565901968d0c3) )
@@ -1297,26 +1297,26 @@ ROM_START( archrivla ) /* Reports as rev 2.0 5/03/89 */
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) // PAL is read protected
 ROM_END
 
 
-ROM_START( archrivlb ) /* Reports as rev 2.0 5/03/89 */
+ROM_START( archrivlb ) // Reports as rev 2.0 5/03/89
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "4.bin",  0x00000, 0x10000, CRC(1d99cce6) SHA1(738d651de0bf1b4a1524a1d8835a060bfc4649a8) )
 	ROM_LOAD16_BYTE( "2.bin",  0x00001, 0x10000, CRC(5d58a77b) SHA1(9a42bb89acd4e6b603215b14b4d411d14615f412) )
 	ROM_LOAD16_BYTE( "3.bin",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "1.bin",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "bg:cpu", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board
 	ROM_LOAD( "13.bin",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
 	ROM_RELOAD(                           0x08000, 0x08000 )
 	ROM_RELOAD(                           0x10000, 0x08000 )
@@ -1344,19 +1344,66 @@ ROM_START( archrivlb ) /* Reports as rev 2.0 5/03/89 */
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP ) // PAL is read protected
 ROM_END
 
 
-ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
+ROM_START( basketbal )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4.bin",  0x00000, 0x10000, CRC(0db57977) SHA1(470c6d83f2412f717777870256ce0324dfc8d874) )
+	ROM_LOAD16_BYTE( "2.bin",  0x00001, 0x10000, CRC(181fb328) SHA1(f0122867054993dadb07363f82ed7c0d354ddab4) )
+	ROM_LOAD16_BYTE( "3.bin",  0x20000, 0x10000, CRC(f6b5cb89) SHA1(dc2507fc125f4df4a73dd3ef4b523bccb89c3842) )
+	ROM_LOAD16_BYTE( "1.bin",  0x20001, 0x10000, CRC(283d7995) SHA1(e740a7cbae74b9016183ed7ae7e719b74b332cd4) )
+
+	ROM_REGION( 0x90000, "bg:cpu", 0 )  // Audio System board
+	ROM_LOAD( "13.bin",   0x00000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
+	ROM_RELOAD(                           0x08000, 0x08000 )
+	ROM_RELOAD(                           0x10000, 0x08000 )
+	ROM_RELOAD(                           0x18000, 0x08000 )
+	ROM_LOAD( "12.bin", 0x20000, 0x08000, CRC(c4b3dc23) SHA1(87e6eaec82d749ad28e0fa3d0efecd8a4aaf5cd7) )
+	ROM_RELOAD(                           0x28000, 0x08000 )
+	ROM_RELOAD(                           0x30000, 0x08000 )
+	ROM_RELOAD(                           0x38000, 0x08000 )
+	ROM_LOAD( "11.bin", 0x40000, 0x08000, CRC(f7907a02) SHA1(3fabb2b7fd82e773d7b6db53c5328b5866d70617) )
+	ROM_RELOAD(                           0x48000, 0x08000 )
+	ROM_RELOAD(                           0x50000, 0x08000 )
+	ROM_RELOAD(                           0x58000, 0x08000 )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "5.bin", 0x00000, 0x10000, CRC(7eb3d7c6) SHA1(8544d04929cdb36fa7f0dcb67e0b7fd8c7b0fc2b) )
+	ROM_LOAD( "6.bin", 0x10000, 0x10000, CRC(31e68050) SHA1(e25871beb08a8706af70d277fa7305a1f4d7d3e2) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "7.bin",   0x00000, 0x20000, CRC(148ce28c) SHA1(d7dc59d9ae8dc61ecc58a6172fd40aa3926b1f6f) )
+	ROM_LOAD( "8.bin",   0x20000, 0x20000, CRC(58187ac2) SHA1(0bd58598720c41b3c393d47b3b1d6b30696b3a6f) )
+	ROM_LOAD( "9.bin",   0x40000, 0x20000, CRC(0dd1204e) SHA1(bdc9b74e7ae8f071d2eb3ce957eec484f02ef876) )
+	ROM_LOAD( "10.bin",  0x60000, 0x20000, CRC(eb3d0344) SHA1(9db7c7bca45f56550c9a9623f96565901968d0c3) )
+
+	ROM_REGION( 0x1200, "plds", 0 )
+	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, NO_DUMP )
+	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, NO_DUMP )
+	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, NO_DUMP )
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP )
+	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8a.1j",  0x0a00, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8a.2j",  0x0c00, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal20l8a.9b",  0x0e00, 0x0144, NO_DUMP )
+	ROM_LOAD( "pl20x10a.14f", 0x1000, 0x00cc, NO_DUMP )
+	ROM_LOAD( "pl20x10a.15f", 0x1100, 0x00cc, NO_DUMP )
+ROM_END
+
+
+ROM_START( pigskin ) // Initial boot screen reports KIT CODE REV 1.1K 8/01/90
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pigskin-k_a5_la1.a5",  0x00000, 0x10000, CRC(ab61c29b) SHA1(01cf2d9b3f41442280e614541d5651c6e46b4a4b) )
 	ROM_LOAD16_BYTE( "pigskin-k_b5_la1.b5",  0x00001, 0x10000, CRC(55a802aa) SHA1(a75f54bce5aad3f7375ab15ad204744e2f6fdc92) )
@@ -1383,7 +1430,7 @@ ROM_START( pigskin ) /* Initial boot screen reports KIT CODE REV 1.1K 8/01/90 */
 ROM_END
 
 
-ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
+ROM_START( pigskina ) // Initial boot screen reports REV 2.0 7/06/90
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pigskin_a5_la2.a5", 0x00000, 0x10000, CRC(f75d36dd) SHA1(6afc8fbc900e17f9281ee214097d8ebd651d9291) )
 	ROM_LOAD16_BYTE( "pigskin_b5_la2.b5", 0x00001, 0x10000, CRC(c5ffdfad) SHA1(3b234f3629c8f21199f4845df7f44c43fd775c9b) )
@@ -1410,7 +1457,7 @@ ROM_START( pigskina ) /* Initial boot screen reports REV 2.0 7/06/90 */
 ROM_END
 
 
-ROM_START( pigskinb ) /* Initial boot screen reports REV 1.1 6/05/90 */
+ROM_START( pigskinb ) // Initial boot screen reports REV 1.1 6/05/90
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pigskin_a5_la1.a5", 0x00000, 0x10000, CRC(6c10028d) SHA1(70080b9aa551a543b7b99d46963862f74b6cbd7a) )
 	ROM_LOAD16_BYTE( "pigskin_b5_la1.b5", 0x00001, 0x10000, CRC(2d03fbad) SHA1(445a161bdd6c09193c576c55c6b12b1c017aa188) )
@@ -1465,18 +1512,18 @@ ROM_START( trisport )
 	ROM_LOAD( "tri_sports_h14_la2.h14", 0x60000, 0x20000, CRC(403f9401) SHA1(6ff027943016d894b758dc8f189850bec1ee9360) )
 
 	ROM_REGION( 0x1400, "plds", 0 )
-	ROM_LOAD( "pal20l8.g5",   0x0000, 0x0144, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20x10.f7",  0x0200, 0x00cc, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20x10.e9",  0x0300, 0x00cc, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal20l8.d4",   0x0400, 0x0144, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8.d6",   0x0600, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4a.c11", 0x0800, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r4.e10",  0x0a00, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal20l8.g5",   0x0000, 0x0144, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20x10.f7",  0x0200, 0x00cc, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20x10.e9",  0x0300, 0x00cc, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal20l8.d4",   0x0400, 0x0144, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8.d6",   0x0600, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4a.c11", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r4.e10",  0x0a00, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pls153a.f14",  0x0c00, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153a.f15",  0x0d00, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
-	ROM_LOAD( "pls153a.e19",  0x0e00, 0x00eb, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8.f8",   0x1000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.e11", 0x1200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pls153a.e19",  0x0e00, 0x00eb, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16l8.f8",   0x1000, 0x0104, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal16r6a.e11", 0x1200, 0x0104, NO_DUMP ) // PAL is read protected
 ROM_END
 
 
@@ -1500,10 +1547,10 @@ void mcr68_state::init_xenophob()
 {
 	mcr68_common_init(0, -4);
 
-	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
+	// Xenophobe doesn't care too much about this value; currently taken from Blasted
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* install control port handler */
+	// Install control port handler
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
 }
 
@@ -1512,10 +1559,10 @@ void mcr68_state::init_spyhunt2()
 {
 	mcr68_common_init(0, -6);
 
-	/* Spy Hunter II doesn't care too much about this value; currently taken from Blasted */
+	// Spy Hunter II doesn't care too much about this value; currently taken from Blasted
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* analog port handling is a bit tricky */
+	// Analog port handling is a bit tricky
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16smo_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
@@ -1526,12 +1573,12 @@ void mcr68_state::init_blasted()
 {
 	mcr68_common_init(0, 0);
 
-	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
-	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
-	/* after the 493; we also allow 16 E clocks for latency  */
+	/* Blasted checks the timing of VBLANK relative to the 493 interrupt
+	   VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks)
+	   after the 493; we also allow 16 E clocks for latency. */
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* handle control writes */
+	// Handle control writes
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 }
 
@@ -1539,10 +1586,10 @@ void mcr68_state::init_intlaser()
 {
 	mcr68_common_init(0, 0);
 
-	/* Copied from Blasted */
+	// Copied from Blasted
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* handle control writes */
+	// handle control writes
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 
 }
@@ -1553,13 +1600,13 @@ void mcr68_state::init_archrivl()
 {
 	mcr68_common_init(16, 0);
 
-	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
+	// Arch Rivals doesn't care too much about this value; currently taken from Blasted
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* handle control writes */
+	// Handle control writes
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
-	/* 49-way joystick handling is a bit tricky */
+	// 49-way joystick handling is a bit tricky
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
 }
 
@@ -1572,13 +1619,13 @@ void mcr68_state::init_archrivlb()
 {
 	mcr68_common_init(16, 0);
 
-	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
+	// Arch Rivals doesn't care too much about this value; currently taken from Blasted
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
-	/* handle control writes */
+	// Handle control writes
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16s_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
-	/* 49-way joystick replaced by standard 8way stick */
+	// 49-way joystick replaced by standard 8way stick
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16smo_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
 }
 
@@ -1588,7 +1635,7 @@ void mcr68_state::init_pigskin()
 {
 	mcr68_common_init(16, 0);
 
-	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
+	// Pigskin doesn't care too much about this value; currently taken from Tri-Sports
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * 115;
 
 	save_item(NAME(m_protection_data));
@@ -1599,9 +1646,9 @@ void mcr68_state::init_trisport()
 {
 	mcr68_common_init(0, 0);
 
-	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
-	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
-	/* after the 493 */
+	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt
+	   VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks)
+	   after the 493 */
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * 115;
 }
 
@@ -1613,20 +1660,21 @@ void mcr68_state::init_trisport()
  *
  *************************************/
 
-GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, init_xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xenophob,  0,        xenophob, xenophob,  mcr68_state, init_xenophob, ROT0,   "Bally Midway", "Xenophobe",                                             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2,  0,        spyhunt2, spyhunt2,  mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2a, spyhunt2, spyhunt2, spyhunt2,  mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, init_blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, init_intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, blasted,   0,        xenophob, blasted,   mcr68_state, init_blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, intlaser,  blasted,  intlaser, intlaser,  mcr68_state, init_intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)",                  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivl,  0,        archrivl, archrivl,  mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivla, archrivl, archrivl, archrivl,  mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivlb, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, basketbal, archrivl, archrivl, archrivlb, mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Basket Ball (8-way joystick bootleg of Arch Rivals)",   MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, init_trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, trisport,  0,        trisport, trisport,  mcr68_state, init_trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskin,   0,        pigskin,  pigskin,   mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskina,  pigskin,  pigskin,  pigskin,   mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskinb,  pigskin,  pigskin,  pigskin,   mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)",                       MACHINE_SUPPORTS_SAVE )

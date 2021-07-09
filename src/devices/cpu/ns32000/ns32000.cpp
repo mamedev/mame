@@ -28,24 +28,25 @@ DEFINE_DEVICE_TYPE(NS32032, ns32032_device, "ns32032", "National Semiconductor N
 enum psr_mask : u16
 {
 	// accessible in user mode
-	PSR_C = 0x0001, // carry/borrow condition
-	PSR_T = 0x0002, // trace trap enable
-	PSR_L = 0x0004, // less than condition
-					// unused
-					// unused
-	PSR_F = 0x0020, // general condition
-	PSR_Z = 0x0040, // zero condition
-	PSR_N = 0x0080, // negative condition
+	PSR_C   = 0x0001, // carry/borrow condition
+	PSR_T   = 0x0002, // trace trap enable
+	PSR_L   = 0x0004, // less than condition
+					  // unused
+					  // unused
+	PSR_F   = 0x0020, // general condition
+	PSR_Z   = 0x0040, // zero condition
+	PSR_N   = 0x0080, // negative condition
 
 	// accessible in supervisor mode
-	PSR_U = 0x0100, // user mode
-	PSR_S = 0x0200, // stack pointer select
-	PSR_P = 0x0400, // prevent multiple trace trap
-	PSR_I = 0x0800, // interrupt enable
-					// unused
-					// unused
-					// unused
-					// unused
+	PSR_U   = 0x0100, // user mode
+	PSR_S   = 0x0200, // stack pointer select
+	PSR_P   = 0x0400, // prevent multiple trace trap
+	PSR_I   = 0x0800, // interrupt enable
+					  // unused
+					  // unused
+					  // unused
+					  // unused
+	PSR_MSK = 0x0fe7, // write mask
 };
 
 enum cfg_mask : u32
@@ -163,7 +164,7 @@ template <int Width> void ns32000_device<Width>::device_start()
 template <int Width> void ns32000_device<Width>::device_reset()
 {
 	for (std::pair<int, address_space_config const *> s : memory_space_config())
-		space(has_configured_map(s.first) ? s.first : 0).cache(m_bus[s.first]);
+		space(has_configured_map(s.first) ? s.first : 0).specific(m_bus[s.first]);
 
 	m_pc = 0;
 	m_psr = 0;
@@ -235,6 +236,10 @@ template <int Width> void ns32000_device<Width>::decode(addr_mode *mode, unsigne
 			bytes += 1;
 
 			mode[i].disp = m_r[index & 7] << (mode[i].gen & 3);
+
+			static const unsigned tea[] = { 5, 7, 8, 10 };
+			mode[i].tea = tea[mode[i].gen & 3];
+
 			mode[i].gen = index >> 3;
 			scaled[i] = true;
 		}
@@ -252,33 +257,41 @@ template <int Width> void ns32000_device<Width>::decode(addr_mode *mode, unsigne
 			{
 				mode[i].base = m_r[mode[i].gen];
 				mode[i].type = MEM;
+				mode[i].tea += 5;
 			}
 			else
+			{
 				mode[i].type = REG;
+				mode[i].tea += 2;
+			}
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 			// register relative
 			mode[i].base = m_r[mode[i].gen & 7] + displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 5;
 			break;
 		case 0x10:
 			// frame memory relative disp2(disp1(FP))
 			mode[i].base = m_fp + displacement(bytes);
 			mode[i].disp += displacement(bytes);
 			mode[i].type = IND;
+			mode[i].tea += 7 + top(SIZE_D, mode[i].base);
 			break;
 		case 0x11:
 			// stack memory relative disp2(disp1(SP))
 			mode[i].base = SP + displacement(bytes);
 			mode[i].disp += displacement(bytes);
 			mode[i].type = IND;
+			mode[i].tea += 7 + top(SIZE_D, mode[i].base);
 			break;
 		case 0x12:
 			// static memory relative disp2(disp1(SB))
 			mode[i].base = m_sb + displacement(bytes);
 			mode[i].disp += displacement(bytes);
 			mode[i].type = IND;
+			mode[i].tea += 7 + top(SIZE_D, mode[i].base);
 			break;
 		case 0x13:
 			// reserved
@@ -294,42 +307,60 @@ template <int Width> void ns32000_device<Width>::decode(addr_mode *mode, unsigne
 			}
 			bytes += mode[i].size + 1;
 			mode[i].type = IMM;
+			mode[i].tea += 4;
 			break;
 		case 0x15:
 			// absolute @disp
 			mode[i].base = displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 4;
 			break;
 		case 0x16:
 			// external EXT(disp1) + disp2
 			mode[i].base = displacement(bytes) * 4;
 			mode[i].disp += displacement(bytes);
 			mode[i].type = EXT;
+			mode[i].tea += 11 + top(SIZE_D, m_mod) + top(SIZE_D, mode[i].base);
 			break;
 		case 0x17:
 			// top of stack TOS
 			mode[i].base = SP;
 			mode[i].type = scaled[i] ? MEM : TOS;
+			if (!scaled[i])
+			{
+				if (mode[i].access == WRITE)
+					mode[i].tea += 4;
+				else if (mode[i].access == READ)
+					mode[i].tea += 2;
+				else
+					mode[i].tea += 3;
+			}
+			else
+				mode[i].tea += 4;
 			break;
 		case 0x18:
 			// frame memory disp(FP)
 			mode[i].base = m_fp + displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 5;
 			break;
 		case 0x19:
 			// stack memory disp(SP)
 			mode[i].base = SP + displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 5;
 			break;
 		case 0x1a:
 			// static memory disp(SB)
 			mode[i].base = m_sb + displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 5;
 			break;
 		case 0x1b:
 			// program memory *+disp
 			mode[i].base = m_pc + displacement(bytes);
 			mode[i].type = MEM;
+			mode[i].tea += 5;
 			break;
 		}
 	}
@@ -364,42 +395,28 @@ template <int Width> u32 ns32000_device<Width>::ea(addr_mode const mode)
 
 template <int Width> u64 ns32000_device<Width>::gen_read(addr_mode mode)
 {
+	if (mode.type == IMM)
+		return mode.imm;
+
+	if (mode.type == REG)
+		return m_r[mode.gen] & size_mask[mode.size];
+
+	u32 const address = (mode.type == TOS) ? SP : ea(mode);
 	u64 data = 0;
 
-	switch (mode.type)
+	switch (mode.size)
 	{
-	case IMM:
-		data = mode.imm;
-		break;
-
-	case REG:
-		data = m_r[mode.gen] & size_mask[mode.size];
-		break;
-
-	case TOS:
-		switch (mode.size)
-		{
-		case SIZE_B: data = space(0).read_byte(SP); break;
-		case SIZE_W: data = space(0).read_word_unaligned(SP); break;
-		case SIZE_D: data = space(0).read_dword_unaligned(SP); break;
-		case SIZE_Q: data = space(0).read_qword_unaligned(SP); break;
-		}
-
-		// post-increment stack pointer
-		if (mode.access == READ)
-			SP += mode.size + 1;
-		break;
-
-	default:
-		switch (mode.size)
-		{
-		case SIZE_B: data = space(0).read_byte(ea(mode)); break;
-		case SIZE_W: data = space(0).read_word_unaligned(ea(mode)); break;
-		case SIZE_D: data = space(0).read_dword_unaligned(ea(mode)); break;
-		case SIZE_Q: data = space(0).read_qword_unaligned(ea(mode)); break;
-		}
-		break;
+	case SIZE_B: data = m_bus[mode.access == RMW ? 11 : 10].read_byte(address); break;
+	case SIZE_W: data = m_bus[mode.access == RMW ? 11 : 10].read_word_unaligned(address); break;
+	case SIZE_D: data = m_bus[mode.access == RMW ? 11 : 10].read_dword_unaligned(address); break;
+	case SIZE_Q: data = m_bus[mode.access == RMW ? 11 : 10].read_qword_unaligned(address); break;
 	}
+
+	m_icount -= top(mode.size, address);
+
+	// post-increment stack pointer
+	if (mode.type == TOS && mode.access == READ)
+		SP += mode.size + 1;
 
 	return data;
 }
@@ -421,36 +438,27 @@ template <int Width> s64 ns32000_device<Width>::gen_read_sx(addr_mode mode)
 
 template <int Width> void ns32000_device<Width>::gen_write(addr_mode mode, u64 data)
 {
-	switch (mode.type)
+	if (mode.type == REG)
 	{
-	case REG:
 		m_r[mode.gen] = (m_r[mode.gen] & ~size_mask[mode.size]) | (data & size_mask[mode.size]);
-		break;
-
-	case TOS:
-		// pre-decrement stack pointer
-		if (mode.access == WRITE)
-			SP -= mode.size + 1;
-
-		switch (mode.size)
-		{
-		case SIZE_B: space(0).write_byte(SP, data); break;
-		case SIZE_W: space(0).write_word_unaligned(SP, data); break;
-		case SIZE_D: space(0).write_dword_unaligned(SP, data); break;
-		case SIZE_Q: space(0).write_qword_unaligned(SP, data); break;
-		}
-		break;
-
-	default:
-		switch (mode.size)
-		{
-		case SIZE_B: space(0).write_byte(ea(mode), data); break;
-		case SIZE_W: space(0).write_word_unaligned(ea(mode), data); break;
-		case SIZE_D: space(0).write_dword_unaligned(ea(mode), data); break;
-		case SIZE_Q: space(0).write_qword_unaligned(ea(mode), data); break;
-		}
-		break;
+		return;
 	}
+
+	// pre-decrement stack pointer
+	if (mode.type == TOS && mode.access == WRITE)
+		SP -= mode.size + 1;
+
+	u32 const address = (mode.type == TOS) ? SP : ea(mode);
+
+	switch (mode.size)
+	{
+	case SIZE_B: m_bus[10].write_byte(address, data); break;
+	case SIZE_W: m_bus[10].write_word_unaligned(address, data); break;
+	case SIZE_D: m_bus[10].write_dword_unaligned(address, data); break;
+	case SIZE_Q: m_bus[10].write_qword_unaligned(address, data); break;
+	}
+
+	m_icount -= top(mode.size, address);
 }
 
 template <int Width> bool ns32000_device<Width>::condition(unsigned const cc)
@@ -519,7 +527,7 @@ template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector
 
 	// push psr
 	m_sp0 -= 2;
-	space(0).write_word_unaligned(m_sp0, m_psr);
+	m_bus[10].write_word_unaligned(m_sp0, m_psr);
 
 	// update psr
 	if (trap)
@@ -528,25 +536,28 @@ template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector
 		m_psr &= ~(PSR_I | PSR_P | PSR_S | PSR_U | PSR_T);
 
 	// fetch external procedure descriptor
-	u32 const descriptor = space(0).read_dword_unaligned(m_intbase + vector * 4);
+	u16 const dlo = m_bus[10].read_word_unaligned(m_intbase + vector * 4 + 0);
+	u16 const dhi = m_bus[10].read_word_unaligned(m_intbase + vector * 4 + 2);
 
 	// push mod
 	m_sp0 -= 2;
-	space(0).write_word_unaligned(m_sp0, m_mod);
+	m_bus[10].write_word_unaligned(m_sp0, m_mod);
 
 	// push return address
 	m_sp0 -= 4;
-	space(0).write_dword_unaligned(m_sp0, return_address);
+	m_bus[10].write_dword_unaligned(m_sp0, return_address);
 
 	// update mod, sb, pc
-	m_mod = u16(descriptor);
-	m_sb = space(0).read_dword_unaligned(m_mod + 0);
-	m_pc = space(0).read_dword_unaligned(m_mod + 8) + u16(descriptor >> 16);
+	m_mod = dlo;
+	m_sb = m_bus[10].read_dword_unaligned(m_mod + 0);
+	m_pc = m_bus[10].read_dword_unaligned(m_mod + 8) + dhi;
 
 	// TODO: flush queue
 	m_sequential = false;
 
-	if (trap && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+	m_icount -= top(SIZE_W, m_sp0) * 2 + top(SIZE_W, m_intbase + vector * 4) + top(SIZE_D, m_sp0) + top(SIZE_D, m_mod);
+
+	if (trap && machine().debug_enabled())
 		debug()->exception_hook(vector);
 }
 
@@ -570,7 +581,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			interrupt(NMI, m_pc, false);
 
 			// notify the debugger
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (machine().debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_NMI);
 		}
 		else if (m_int_line && (m_psr & PSR_I))
@@ -590,7 +601,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			interrupt(vector, m_pc, false);
 
 			// notify the debugger
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (machine().debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_IRQ0);
 		}
 
@@ -604,7 +615,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 		u8 const opbyte = space(0).read_byte(m_pc);
 		unsigned bytes = 1;
-		unsigned tcy = 1;
+		unsigned tex = 1;
 		m_sequential = true;
 
 		if ((opbyte & 15) == 10)
@@ -618,10 +629,10 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			{
 				m_pc += dst;
 				m_sequential = false;
-				tcy = 6;
+				tex = 6;
 			}
 			else
-				tcy = 7;
+				tex = 7;
 		}
 		else if ((opbyte & 15) == 2)
 		{
@@ -635,11 +646,11 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					s32 const dst = displacement(bytes);
 
 					SP -= 4;
-					space(0).write_dword_unaligned(SP, m_pc + bytes);
+					m_bus[10].write_dword_unaligned(SP, m_pc + bytes);
 
 					m_pc += dst;
 					m_sequential = false;
-					tcy = 6;
+					tex = top(SIZE_D, SP) + 6;
 				}
 				break;
 			case 0x1:
@@ -648,12 +659,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					s32 const constant = displacement(bytes);
 
-					u32 const addr = space(0).read_dword_unaligned(SP);
-					SP += 4 + constant;
+					u32 const addr = m_bus[10].read_dword_unaligned(SP);
+					SP += 4;
 
 					m_pc = addr;
 					m_sequential = false;
-					tcy = 2;
+					tex = top(SIZE_D, SP) + 2;
+					SP += constant;
 				}
 				break;
 			case 0x2:
@@ -662,19 +674,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					s32 const index = displacement(bytes);
 
-					u32 const link_base = space(0).read_dword_unaligned(m_mod + 4);
-					u32 const descriptor = space(0).read_dword_unaligned(link_base + index * 4);
+					u32 const link_base = m_bus[10].read_dword_unaligned(m_mod + 4);
+					u16 const dlo = m_bus[10].read_word_unaligned(link_base + index * 4 + 0);
+					u16 const dhi = m_bus[10].read_word_unaligned(link_base + index * 4 + 2);
 
 					SP -= 4;
-					space(0).write_dword_unaligned(SP, m_mod);
+					m_bus[10].write_word_unaligned(SP, m_mod);
 					SP -= 4;
-					space(0).write_dword_unaligned(SP, m_pc + bytes);
+					m_bus[10].write_dword_unaligned(SP, m_pc + bytes);
 
-					m_mod = u16(descriptor);
-					m_sb = space(0).read_dword_unaligned(m_mod + 0);
-					m_pc = space(0).read_dword_unaligned(m_mod + 8) + u16(descriptor >> 16);
+					tex = top(SIZE_D, m_mod + 4) + top(SIZE_W, link_base + index * 4) * 2 + top(SIZE_W, SP) + top(SIZE_D, SP) + top(SIZE_D, dlo) * 2 + 16;
+
+					m_mod = dlo;
+					m_sb = m_bus[10].read_dword_unaligned(m_mod + 0);
+					m_pc = m_bus[10].read_dword_unaligned(m_mod + 8) + dhi;
 					m_sequential = false;
-					tcy = 16;
 				}
 				break;
 			case 0x3:
@@ -683,15 +697,15 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					s32 const constant = displacement(bytes);
 
-					m_pc = space(0).read_dword_unaligned(SP);
+					m_pc = m_bus[10].read_dword_unaligned(SP);
 					SP += 4;
-					m_mod = space(0).read_dword_unaligned(SP);
+					m_mod = m_bus[10].read_word_unaligned(SP);
 					SP += 4;
 
-					m_sb = space(0).read_dword_unaligned(m_mod + 0);
+					m_sb = m_bus[10].read_dword_unaligned(m_mod + 0);
+					tex = top(SIZE_D, SP) + top(SIZE_W, SP) + top(SIZE_D, SP) + 2;
 					SP += constant;
 					m_sequential = false;
-					tcy = 2;
 				}
 				break;
 			case 0x4:
@@ -702,18 +716,18 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					s32 const constant = displacement(bytes);
 
 					u32 &sp(SP);
-					m_pc = space(0).read_dword_unaligned(sp);
+					m_pc = m_bus[10].read_dword_unaligned(sp);
 					sp += 4;
-					m_mod = space(0).read_word_unaligned(sp);
+					m_mod = m_bus[10].read_word_unaligned(sp);
 					sp += 2;
-					m_psr = space(0).read_word_unaligned(sp);
+					m_psr = m_bus[10].read_word_unaligned(sp) & PSR_MSK;
 					sp += 2;
 
-					m_sb = space(0).read_dword_unaligned(m_mod);
+					m_sb = m_bus[10].read_dword_unaligned(m_mod);
 
 					SP += constant;
 					m_sequential = false;
-					tcy = 35;
+					tex = top(SIZE_D, sp) + top(SIZE_W, sp) * 2 + top(SIZE_D, m_mod) + 35;
 				}
 				else
 					interrupt(ILL, m_pc);
@@ -726,16 +740,18 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					m_bus[6].read_byte(0xfffe00);
 
 					u32 &sp(SP);
-					m_pc = space(0).read_dword_unaligned(sp);
+					m_pc = m_bus[10].read_dword_unaligned(sp);
 					sp += 4;
-					m_mod = space(0).read_word_unaligned(sp);
+					m_mod = m_bus[10].read_word_unaligned(sp);
 					sp += 2;
-					m_psr = space(0).read_word_unaligned(sp);
+					m_psr = m_bus[10].read_word_unaligned(sp) & PSR_MSK;
 					sp += 2;
 
-					m_sb = space(0).read_dword_unaligned(m_mod);
+					m_sb = m_bus[10].read_dword_unaligned(m_mod);
 					m_sequential = false;
-					tcy = 39;
+
+					// TODO: why three words and dwords?
+					tex = top(SIZE_B) + top(SIZE_W) * 3 + top(SIZE_D) * 3 + 39;
 				}
 				else
 					interrupt(ILL, m_pc);
@@ -746,14 +762,14 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					u8 const reglist = space(0).read_byte(m_pc + bytes++);
 
-					tcy = 13;
+					tex = 13;
 					for (unsigned i = 0; i < 8; i++)
 					{
 						if (BIT(reglist, i))
 						{
 							SP -= 4;
-							space(0).write_dword_unaligned(SP, m_r[i]);
-							tcy += 4;
+							m_bus[10].write_dword_unaligned(SP, m_r[i]);
+							tex += top(SIZE_D, SP) + 4;
 						}
 					}
 				}
@@ -764,14 +780,14 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					u8 const reglist = space(0).read_byte(m_pc + bytes++);
 
-					tcy = 12;
+					tex = 12;
 					for (unsigned i = 0; i < 8; i++)
 					{
 						if (BIT(reglist, i))
 						{
-							m_r[7 - i] = space(0).read_dword_unaligned(SP);
+							m_r[7 - i] = m_bus[10].read_dword_unaligned(SP);
+							tex += top(SIZE_D, SP) + 5;
 							SP += 4;
-							tcy += 5;
 						}
 					}
 				}
@@ -784,18 +800,18 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					s32 const constant = displacement(bytes);
 
 					SP -= 4;
-					space(0).write_dword_unaligned(SP, m_fp);
+					m_bus[10].write_dword_unaligned(SP, m_fp);
+					tex = top(SIZE_D, SP) + 18;
 					m_fp = SP;
 					SP -= constant;
 
-					tcy = 18;
 					for (unsigned i = 0; i < 8; i++)
 					{
 						if (BIT(reglist, i))
 						{
 							SP -= 4;
-							space(0).write_dword_unaligned(SP, m_r[i]);
-							tcy += 4;
+							m_bus[10].write_dword_unaligned(SP, m_r[i]);
+							tex += top(SIZE_D, SP) + 4;
 						}
 					}
 				}
@@ -806,54 +822,55 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 					u8 const reglist = space(0).read_byte(m_pc + bytes++);
 
-					tcy = 17;
+					tex = 17;
 					for (unsigned i = 0; i < 8; i++)
 					{
 						if (BIT(reglist, i))
 						{
-							m_r[7 - i] = space(0).read_dword_unaligned(SP);
+							m_r[7 - i] = m_bus[10].read_dword_unaligned(SP);
+							tex += top(SIZE_D, SP) + 5;
 							SP += 4;
-							tcy += 5;
 						}
 					}
 					SP = m_fp;
-					m_fp = space(0).read_dword_unaligned(SP);
+					m_fp = m_bus[10].read_dword_unaligned(SP);
+					tex += top(SIZE_D, SP);
 					SP += 4;
 				}
 				break;
 			case 0xa:
 				// NOP
-				tcy = 3;
+				tex = 3;
 				break;
 			case 0xb:
 				// WAIT
 				m_wait = true;
-				tcy = 6;
+				tex = 6;
 				break;
 			case 0xc:
 				// DIA
 				m_wait = true;
-				tcy = 3;
+				tex = 3;
 				break;
 			case 0xd:
 				// FLAG
 				if (m_psr & PSR_F)
 				{
 					interrupt(FLG, m_pc);
-					tcy = 44;
+					tex = 44;
 				}
 				else
-					tcy = 6;
+					tex = 6;
 				break;
 			case 0xe:
 				// SVC
 				interrupt(SVC, m_pc);
-				tcy = 40;
+				tex = 40;
 				break;
 			case 0xf:
 				// BPT
 				interrupt(BPT, m_pc);
-				tcy = 40;
+				tex = 40;
 				break;
 			}
 		}
@@ -887,7 +904,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[0], dst);
 
-					tcy = (mode[0].type == REG) ? 4 : 6;
+					tex = (mode[0].type == REG) ? 4 : mode[0].tea + 6;
 				}
 				break;
 			case 1:
@@ -916,7 +933,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 
-					tcy = 3;
+					tex = (mode[0].type == REG) ? 3 : mode[0].tea + 3;
 				}
 				break;
 			case 2:
@@ -928,9 +945,8 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 				switch (quick)
 				{
-				case 0x0: // US
-					// TODO: user stack pointer?
-					gen_write(mode[0], m_sp1);
+				case 0x0: // UPSR
+					gen_write(mode[0], u8(m_psr));
 					break;
 				case 0x8: // FP
 					gen_write(mode[0], m_fp);
@@ -959,7 +975,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				}
 
 				// TODO: tcy 21-27
-				tcy = 21;
+				tex = mode[0].tea + 21;
 				break;
 			case 3:
 				// Scondi dst
@@ -972,7 +988,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					bool const dst = condition(quick);
 					gen_write(mode[0], dst);
 
-					tcy = dst ? 10 : 9;
+					tex = mode[0].tea + (dst ? 10 : 9);
 				}
 				break;
 			case 4:
@@ -995,10 +1011,10 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						m_pc += dst;
 						m_sequential = false;
 
-						tcy = (mode[0].type == REG) ? 17 : 15;
+						tex = (mode[0].type == REG) ? 17 : mode[0].tea + 15;
 					}
 					else
-						tcy = (mode[0].type == REG) ? 18 : 16;
+						tex = (mode[0].type == REG) ? 18 : mode[0].tea + 16;
 				}
 				break;
 			case 5:
@@ -1010,7 +1026,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 				gen_write(mode[0], s32(quick << 28) >> 28);
 
-				tcy = (mode[0].type == REG) ? 3 : 2;
+				tex = (mode[0].type == REG) ? 3 : mode[0].tea + 2;
 				break;
 			case 6:
 				// LPRi procreg,src
@@ -1022,7 +1038,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				switch (quick)
 				{
 				case 0x0: // UPSR
-					m_psr = (m_psr & 0xff00) | u8(gen_read(mode[0]));
+					m_psr = ((m_psr & 0xff00) | u8(gen_read(mode[0]))) & PSR_MSK;
 					break;
 				case 0x8: // FP
 					m_fp = gen_read(mode[0]);
@@ -1039,9 +1055,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						u32 const src = gen_read(mode[0]);
 
 						if (size == SIZE_B)
-							m_psr = (m_psr & 0xff00) | u8(src);
+							m_psr = ((m_psr & 0xff00) | u8(src)) & PSR_MSK;
 						else
-							m_psr = src;
+							m_psr = src & PSR_MSK;
 					}
 					else
 						interrupt(ILL, m_pc);
@@ -1061,7 +1077,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				}
 
 				// TODO: tcy 19-33
-				tcy = 19;
+				tex = mode[0].tea + 19;
 				break;
 			case 7:
 				// format 3: gggg gooo o111 11ii
@@ -1076,19 +1092,20 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].addr();
 						decode(mode, bytes);
 
+						// TODO: actually two word-sized reads
 						u32 const descriptor = gen_read(mode[0]);
 
 						SP -= 4;
-						space(0).write_dword_unaligned(SP, m_mod);
+						m_bus[10].write_word_unaligned(SP, m_mod);
 						SP -= 4;
-						space(0).write_dword_unaligned(SP, m_pc + bytes);
+						m_bus[10].write_dword_unaligned(SP, m_pc + bytes);
+
+						tex = mode[0].tea + top(SIZE_W, SP) * 3 + top(SIZE_D, descriptor) * 2 + 13;
 
 						m_mod = u16(descriptor);
-						m_sb = space(0).read_dword_unaligned(m_mod + 0);
-						m_pc = space(0).read_dword_unaligned(m_mod + 8) + u16(descriptor >> 16);
+						m_sb = m_bus[10].read_dword_unaligned(m_mod + 0);
+						m_pc = m_bus[10].read_dword_unaligned(m_mod + 8) + u16(descriptor >> 16);
 						m_sequential = false;
-
-						tcy = 13;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -1108,7 +1125,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_psr &= ~src;
 
-							tcy = (size == SIZE_B) ? 18 : 30;
+							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
 						}
 						else
 							interrupt(ILL, m_pc);
@@ -1128,7 +1145,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						m_pc = ea(mode[0]);
 						m_sequential = false;
 
-						tcy = 2;
+						tex = mode[0].tea + 2;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -1146,9 +1163,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						{
 							u16 const src = gen_read(mode[0]);
 
-							m_psr |= src;
+							m_psr |= src & PSR_MSK;
 
-							tcy = (size == SIZE_B) ? 18 : 30;
+							tex = mode[0].tea + ((size == SIZE_B) ? 18 : 30);
 						}
 						else
 							interrupt(ILL, m_pc);
@@ -1168,7 +1185,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						SP -= src;
 
-						tcy = 6;
+						tex = mode[0].tea + 6;
 					}
 					break;
 				case 0xc:
@@ -1181,12 +1198,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						decode(mode, bytes);
 
 						SP -= 4;
-						space(0).write_dword_unaligned(SP, m_pc + bytes);
+						m_bus[10].write_dword_unaligned(SP, m_pc + bytes);
 
 						m_pc = ea(mode[0]);
 						m_sequential = false;
 
-						tcy = 5;
+						// TODO: where does the TOPi come from?
+						tex = mode[0].tea + top(SIZE_D, SP) + top(size) + 5;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -1204,7 +1222,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						m_pc += src;
 						m_sequential = false;
 
-						tcy = 4;
+						tex = mode[0].tea + 4;
 					}
 					break;
 				default:
@@ -1242,7 +1260,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0x1:
@@ -1272,7 +1295,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					|| ((size == SIZE_B && u8(src1) > u8(src2)))))
 						m_psr |= PSR_L;
 
-					tcy = 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 3;
+					else
+						tex = 3;
 				}
 				break;
 			case 0x2:
@@ -1289,7 +1317,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], dst & ~src);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0x4:
@@ -1309,7 +1342,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0x5:
@@ -1325,7 +1363,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], src);
 
-					tcy = (mode[1].type == REG) ? 3 : 1;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 1;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 3;
+					else
+						tex = 3;
 				}
 				break;
 			case 0x6:
@@ -1342,7 +1385,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], src | dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0x8:
@@ -1362,7 +1410,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0x9:
@@ -1377,7 +1430,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], ea(mode[0]));
 
-					tcy = (mode[1].type == REG) ? 3 : 2;
+					tex = (mode[1].type == REG) ? mode[0].tea + 3 : mode[0].tea + mode[1].tea + 2;
 				}
 				else
 					interrupt(UND, m_pc);
@@ -1396,7 +1449,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], src & dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0xc:
@@ -1416,7 +1474,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			case 0xd:
@@ -1437,18 +1500,18 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						else
 							m_psr &= ~PSR_F;
 
-						tcy = 4;
+						tex = mode[0].tea + 4;
 					}
 					else
 					{
-						u8 const byte = space(0).read_byte(ea(mode[1]) + (offset >> 3));
+						u8 const byte = m_bus[10].read_byte(ea(mode[1]) + (offset >> 3));
 
 						if (BIT(byte, offset & 7))
 							m_psr |= PSR_F;
 						else
 							m_psr &= ~PSR_F;
 
-						tcy = 14;
+						tex = mode[0].tea + mode[1].tea + top(SIZE_B) + 14;
 					}
 				}
 				break;
@@ -1466,7 +1529,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 					gen_write(mode[1], src ^ dst);
 
-					tcy = (mode[1].type == REG) ? 4 : 3;
+					if (mode[1].type != REG)
+						tex = mode[0].tea + mode[1].tea + 3;
+					else if (mode[0].type != REG)
+						tex = mode[0].tea + 4;
+					else
+						tex = 4;
 				}
 				break;
 			}
@@ -1490,20 +1558,20 @@ template <int Width> void ns32000_device<Width>::execute_run()
 				{
 				case 0:
 					// MOVSi options
-					tcy = (translate || backward || uw) ? 54 : 18;
+					tex = (translate || backward || uw) ? 54 : 18;
 
 					m_psr &= ~PSR_F;
 					while (m_r[0])
 					{
 						u32 data =
-							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
-							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
-							space(0).read_byte(m_r[1]);
+							(size == SIZE_D) ? m_bus[10].read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? m_bus[10].read_word_unaligned(m_r[1]) :
+							m_bus[10].read_byte(m_r[1]);
 
 						if (translate)
-							data = space(0).read_byte(m_r[3] + u8(data));
+							data = m_bus[10].read_byte(m_r[3] + u8(data));
 
-						tcy += translate ? 27 : (backward || uw) ? 24 : 13;
+						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 27 : (backward || uw) ? 24 : 13);
 
 						bool const match = !((m_r[4] ^ data) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1513,11 +1581,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						}
 
 						if (size == SIZE_D)
-							space(0).write_dword_unaligned(m_r[2], data);
+							m_bus[10].write_dword_unaligned(m_r[2], data);
 						else if (size == SIZE_W)
-							space(0).write_word_unaligned(m_r[2], data);
+							m_bus[10].write_word_unaligned(m_r[2], data);
 						else
-							space(0).write_byte(m_r[2], data);
+							m_bus[10].write_byte(m_r[2], data);
+
+						tex += top(size, m_r[2]);
 
 						if (backward)
 						{
@@ -1535,25 +1605,25 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					break;
 				case 1:
 					// CMPSi options
-					tcy = 53;
+					tex = 53;
 
 					m_psr |= PSR_Z;
 					m_psr &= ~(PSR_N | PSR_F | PSR_L);
 					while (m_r[0])
 					{
 						u32 src1 =
-							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
-							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
-							space(0).read_byte(m_r[1]);
+							(size == SIZE_D) ? m_bus[10].read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? m_bus[10].read_word_unaligned(m_r[1]) :
+							m_bus[10].read_byte(m_r[1]);
 						u32 src2 =
-							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[2]) :
-							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[2]) :
-							space(0).read_byte(m_r[2]);
+							(size == SIZE_D) ? m_bus[10].read_dword_unaligned(m_r[2]) :
+							(size == SIZE_W) ? m_bus[10].read_word_unaligned(m_r[2]) :
+							m_bus[10].read_byte(m_r[2]);
 
 						if (translate)
-							src1 = space(0).read_byte(m_r[3] + u8(src1));
+							src1 = m_bus[10].read_byte(m_r[3] + u8(src1));
 
-						tcy += translate ? 38 : 35;
+						tex += top(size, m_r[1]) + top(size, m_r[2]) + (translate ? top(SIZE_B) + 38 : 35);
 
 						bool const match = !((m_r[4] ^ src1) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1600,27 +1670,27 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					{
 						m_cfg = (opword >> 7) & 15;
 
-						tcy = 15;
+						tex = 15;
 					}
 					else
 						interrupt(ILL, m_pc);
 					break;
 				case 3:
 					// SKPSi options
-					tcy = 51;
+					tex = 51;
 
 					m_psr &= ~PSR_F;
 					while (m_r[0])
 					{
 						u32 data =
-							(size == SIZE_D) ? space(0).read_dword_unaligned(m_r[1]) :
-							(size == SIZE_W) ? space(0).read_word_unaligned(m_r[1]) :
-							space(0).read_byte(m_r[1]);
+							(size == SIZE_D) ? m_bus[10].read_dword_unaligned(m_r[1]) :
+							(size == SIZE_W) ? m_bus[10].read_word_unaligned(m_r[1]) :
+							m_bus[10].read_byte(m_r[1]);
 
 						if (translate)
-							data = space(0).read_byte(m_r[3] + u8(data));
+							data = m_bus[10].read_byte(m_r[3] + u8(data));
 
-						tcy += translate ? 30 : 27;
+						tex += top(size, m_r[1]) + (translate ? top(SIZE_B) + 30 : 27);
 
 						bool const match = !((m_r[4] ^ data) & size_mask[size]);
 						if ((uw == 1 && !match) || (uw == 3 && match))
@@ -1671,7 +1741,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 14 + (count & limit);
+						tex = mode[0].tea + mode[1].tea + 14 + (count & limit);
 					}
 					break;
 				case 0x1:
@@ -1690,7 +1760,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 14 + std::abs(count);
+						tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
 					}
 					break;
 				case 0x2:
@@ -1717,21 +1787,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_r[mode[1].gen] &= ~(1U << (offset & 31));
 
-							tcy = 7;
+							tex = mode[0].tea + 7;
 						}
 						else
 						{
 							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = space(0).read_byte(byte_ea);
+							u8 const byte = m_bus[10].read_byte(byte_ea);
 
 							if (BIT(byte, offset & 7))
 								m_psr |= PSR_F;
 							else
 								m_psr &= ~PSR_F;
 
-							space(0).write_byte(byte_ea, byte & ~(1U << (offset & 7)));
+							m_bus[10].write_byte(byte_ea, byte & ~(1U << (offset & 7)));
 
-							tcy = 15;
+							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
 						}
 					}
 					break;
@@ -1754,7 +1824,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 14 + std::abs(count);
+						tex = mode[0].tea + mode[1].tea + 14 + std::abs(count);
 					}
 					break;
 				case 0x6:
@@ -1781,21 +1851,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_r[mode[1].gen] |= (1U << (offset & 31));
 
-							tcy = 7;
+							tex = mode[0].tea + 7;
 						}
 						else
 						{
 							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = space(0).read_byte(byte_ea);
+							u8 const byte = m_bus[10].read_byte(byte_ea);
 
 							if (BIT(byte, offset & 7))
 								m_psr |= PSR_F;
 							else
 								m_psr &= ~PSR_F;
 
-							space(0).write_byte(byte_ea, byte | (1U << (offset & 7)));
+							m_bus[10].write_byte(byte_ea, byte | (1U << (offset & 7)));
 
-							tcy = 15;
+							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 15;
 						}
 					}
 					break;
@@ -1826,7 +1896,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							gen_write(mode[1], src);
 						}
 
-						tcy = 5;
+						tex = mode[0].tea + mode[1].tea + 5;
 					}
 					break;
 				case 0x9:
@@ -1842,7 +1912,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], src ^ 1U);
 
-						tcy = 5;
+						tex = mode[0].tea + mode[1].tea + 5;
 					}
 					break;
 				case 0xa:
@@ -1876,7 +1946,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						else
 							gen_write(mode[1], std::abs(src));
 
-						tcy = (src < 0) ? 9 : 8;
+						tex = mode[0].tea + mode[1].tea + ((src < 0) ? 9 : 8);
 					}
 					break;
 				case 0xd:
@@ -1892,7 +1962,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], ~src);
 
-						tcy = 7;
+						tex = mode[0].tea + mode[1].tea + 7;
 					}
 					break;
 				case 0xe:
@@ -1915,21 +1985,21 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 							m_r[mode[1].gen] ^= (1U << (offset & 31));
 
-							tcy = 9;
+							tex = mode[0].tea + 9;
 						}
 						else
 						{
 							u32 const byte_ea = ea(mode[1]) + (offset >> 3);
-							u8 const byte = space(0).read_byte(byte_ea);
+							u8 const byte = m_bus[10].read_byte(byte_ea);
 
 							if (BIT(byte, offset & 7))
 								m_psr |= PSR_F;
 							else
 								m_psr &= ~PSR_F;
 
-							space(0).write_byte(byte_ea, byte ^ (1U << (offset & 7)));
+							m_bus[10].write_byte(byte_ea, byte ^ (1U << (offset & 7)));
 
-							tcy = 17;
+							tex = mode[0].tea + mode[1].tea + top(SIZE_B) * 2 + 17;
 						}
 					}
 					break;
@@ -1973,9 +2043,9 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						{
 							switch (size)
 							{
-							case SIZE_B: space(0).write_byte(block2, space(0).read_byte(block1)); break;
-							case SIZE_W: space(0).write_word_unaligned(block2, space(0).read_word_unaligned(block1)); break;
-							case SIZE_D: space(0).write_dword_unaligned(block2, space(0).read_dword_unaligned(block1)); break;
+							case SIZE_B: m_bus[10].write_byte(block2, m_bus[10].read_byte(block1)); break;
+							case SIZE_W: m_bus[10].write_word_unaligned(block2, m_bus[10].read_word_unaligned(block1)); break;
+							case SIZE_D: m_bus[10].write_dword_unaligned(block2, m_bus[10].read_dword_unaligned(block1)); break;
 							default:
 								// can't happen
 								break;
@@ -1985,7 +2055,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							block2 += (size + 1);
 						}
 
-						tcy = 20 + 3 * num;
+						tex = mode[0].tea + mode[1].tea + (top(size, block1) + top(size, block2)) * num + 3 * num + 20;
 					}
 					break;
 				case 0x1:
@@ -2001,7 +2071,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						u32 block2 = ea(mode[1]);
 						unsigned const num = displacement(bytes) / (size + 1) + 1;
 
-						tcy = 24;
+						tex = mode[0].tea + mode[1].tea + 24;
 
 						m_psr |= PSR_Z;
 						m_psr &= ~(PSR_N | PSR_L);
@@ -2015,23 +2085,23 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							switch (size)
 							{
 							case SIZE_B:
-								int1 = s8(space(0).read_byte(block1));
-								int2 = s8(space(0).read_byte(block2));
+								int1 = s8(m_bus[10].read_byte(block1));
+								int2 = s8(m_bus[10].read_byte(block2));
 								break;
 							case SIZE_W:
-								int1 = s16(space(0).read_word_unaligned(block1));
-								int2 = s16(space(0).read_word_unaligned(block2));
+								int1 = s16(m_bus[10].read_word_unaligned(block1));
+								int2 = s16(m_bus[10].read_word_unaligned(block2));
 								break;
 							case SIZE_D:
-								int1 = s32(space(0).read_dword_unaligned(block1));
-								int2 = s32(space(0).read_dword_unaligned(block2));
+								int1 = s32(m_bus[10].read_dword_unaligned(block1));
+								int2 = s32(m_bus[10].read_dword_unaligned(block2));
 								break;
 							default:
 								// can't happen
 								break;
 							}
 
-							tcy += 9;
+							tex += top(size, block1) + top(size, block2) + 9;
 
 							if (int1 != int2)
 							{
@@ -2068,7 +2138,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						gen_write(mode[1], (base & ~mask) | ((src << offset) & mask));
 
 						// TODO: tcy 39-49
-						tcy = 39;
+						tex = mode[0].tea + mode[1].tea + 39;
 					}
 					break;
 				case 0x3:
@@ -2090,7 +2160,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						gen_write(mode[1], dst);
 
 						// TODO: tcy 26-36
-						tcy = 26;
+						tex = mode[0].tea + mode[1].tea + 26;
 					}
 					break;
 				case 0x4:
@@ -2108,7 +2178,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 6;
+						tex = mode[0].tea + mode[1].tea + 6;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -2128,7 +2198,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 5;
+						tex = mode[0].tea + mode[1].tea + 5;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -2147,7 +2217,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], src);
 
-						tcy = 5;
+						tex = mode[0].tea + mode[1].tea + 5;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -2167,7 +2237,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 6;
+						tex = mode[0].tea + mode[1].tea + 6;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -2188,7 +2258,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], dst);
 
-						tcy = 15;
+						tex = mode[0].tea + mode[1].tea + 15 + (size + 1) * 16; // 2+2 + 15 + 16 ==
 					}
 					break;
 				case 0x9:
@@ -2197,14 +2267,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					//      read.i,rmw.2i
 					{
 						mode[0].read_i(size);
-						mode[1].rmw_i(size_code(size * 2 + 1));
+						mode[1].rmw_i(size);
 						decode(mode, bytes);
 
 						u32 const src1 = gen_read(mode[0]);
-						u32 const src2 = ((mode[1].type == REG)
-							? m_r[mode[1].gen ^ 0]
-							: gen_read(mode[1])) & size_mask[size];
+						u32 const src2 = gen_read(mode[1]);
 
+						mode[1].rmw_i(size_code(size * 2 + 1));
 						u64 const dst = mulu_32x32(src1, src2);
 
 						if (mode[1].type == REG)
@@ -2213,9 +2282,10 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | ((dst >> ((size + 1) * 8)) & size_mask[size]);
 						}
 						else
+							// TODO: write high dword first
 							gen_write(mode[1], dst);
 
-						tcy = 23;
+						tex = mode[0].tea + mode[1].tea + 23 + (size + 1) * 16;
 					}
 					break;
 				case 0xa:
@@ -2245,13 +2315,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								m_r[mode[1].gen ^ 0] = (m_r[mode[1].gen ^ 0] & ~size_mask[size]) | (remainder & size_mask[size]);
 								m_r[mode[1].gen ^ 1] = (m_r[mode[1].gen ^ 1] & ~size_mask[size]) | (quotient & size_mask[size]);
 
-								tcy = 31;
+								tex = mode[0].tea + 31 + (size + 1) * 16;
 							}
 							else
 							{
 								gen_write(mode[1], (u64(quotient) << ((size + 1) * 8)) | remainder);
 
-								tcy = 38;
+								tex = mode[0].tea + mode[1].tea + 38 + (size + 1) * 16;
 							}
 						}
 						else
@@ -2283,7 +2353,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							gen_write(mode[1], dst);
 
 							// TODO: tcy 49-55
-							tcy = 49;
+							tex = mode[0].tea + mode[1].tea + 49 + (size + 1) * 16;
 						}
 						else
 						{
@@ -2314,7 +2384,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							gen_write(mode[1], dst);
 
 							// TODO: tcy 57-62
-							tcy = 57;
+							tex = mode[0].tea + mode[1].tea + 57 + (size + 1) * 16;
 						}
 						else
 						{
@@ -2345,7 +2415,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							gen_write(mode[1], dst);
 
 							// TODO: tcy 54-73
-							tcy = 54;
+							tex = mode[0].tea + mode[1].tea + 54 + (size + 1) * 16;
 						}
 						else
 						{
@@ -2380,7 +2450,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 								gen_write(mode[1], quotient);
 
 							// TODO: tcy 58-68
-							tcy = 58;
+							tex = mode[0].tea + mode[1].tea + 58 + (size + 1) * 16;
 						}
 						else
 						{
@@ -2423,26 +2493,23 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						s32 const length = displacement(bytes);
 						u32 const mask = (1U << length) - 1;
 
-						u32 dst;
-						if (mode[0].type != REG)
+						if (mode[0].type == REG)
 						{
-							u32 const base_ea = ea(mode[0]) + (offset >> 3);
-							u32 const base = space(0).read_dword_unaligned(base_ea);
-
-							dst = (base >> (offset & 7));
+							gen_write(mode[1], (m_r[mode[0].gen] >> (offset & 31)) & mask);
 
 							// TODO: tcy 17-51
-							tcy = 17;
+							tex = mode[0].tea + mode[1].tea + 17;
 						}
 						else
 						{
-							dst = (m_r[mode[0].gen] >> (offset & 31));
+							u32 const base_ea = ea(mode[0]) + (offset >> 3);
+							u32 const base = m_bus[10].read_dword_unaligned(base_ea);
+
+							gen_write(mode[1], (base >> (offset & 7)) & mask);
 
 							// TODO: tcy 19-29
-							tcy = 19;
+							tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) + 19;
 						}
-
-						gen_write(mode[1], dst & mask);
 					}
 					break;
 				case 1:
@@ -2460,7 +2527,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						gen_write(mode[1], base * 8 + offset);
 
-						tcy = 7;
+						tex = mode[0].tea + mode[1].tea + 7;
 					}
 					else
 						interrupt(UND, m_pc);
@@ -2478,30 +2545,26 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						s32 const length = displacement(bytes);
 						u32 const src = gen_read(mode[0]);
 
-						u32 dst;
 						if (mode[1].type == REG)
 						{
-							u32 const base = m_r[mode[1].gen];
 							u32 const mask = ((1U << length) - 1) << (offset & 31);
 
-							dst = (base & ~mask) | ((src << (offset & 31)) & mask);
+							m_r[mode[1].gen] = (m_r[mode[1].gen] & ~mask) | ((src << (offset & 31)) & mask);
 
-							// TODO: tcy 29-39
-							tcy = 29;
+							// TODO: tcy 28-96
+							tex = mode[0].tea + 28;
 						}
 						else
 						{
 							u32 const base_ea = ea(mode[1]) + (offset >> 3);
-							u32 const base = space(0).read_dword_unaligned(base_ea);
+							u32 const base = m_bus[10].read_dword_unaligned(base_ea);
 							u32 const mask = ((1U << length) - 1) << (offset & 7);
 
-							dst = (base & ~mask) | ((src << (offset & 7)) & mask);
+							m_bus[10].write_dword_unaligned(base_ea, (base & ~mask) | ((src << (offset & 7)) & mask));
 
-							// TODO: tcy 28-96
-							tcy = 28;
+							// TODO: tcy 29-39
+							tex = mode[0].tea + mode[1].tea + top(SIZE_D, base_ea) * 2 + 29;
 						}
-
-						gen_write(mode[1], dst);
 					}
 					break;
 				case 3:
@@ -2521,16 +2584,16 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						switch (size)
 						{
 						case SIZE_B:
-							upper = s8(space(0).read_byte(bounds + 0));
-							lower = s8(space(0).read_byte(bounds + 1));
+							upper = s8(m_bus[10].read_byte(bounds + 0));
+							lower = s8(m_bus[10].read_byte(bounds + 1));
 							break;
 						case SIZE_W:
-							upper = s16(space(0).read_word_unaligned(bounds + 0));
-							lower = s16(space(0).read_word_unaligned(bounds + 2));
+							upper = s16(m_bus[10].read_word_unaligned(bounds + 0));
+							lower = s16(m_bus[10].read_word_unaligned(bounds + 2));
 							break;
 						case SIZE_D:
-							upper = s32(space(0).read_dword_unaligned(bounds + 0));
-							lower = s32(space(0).read_dword_unaligned(bounds + 4));
+							upper = s32(m_bus[10].read_dword_unaligned(bounds + 0));
+							lower = s32(m_bus[10].read_dword_unaligned(bounds + 4));
 							break;
 						default:
 							// can't happen
@@ -2542,13 +2605,13 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							m_psr &= ~PSR_F;
 							m_r[reg] = src - lower;
 
-							tcy = 11;
+							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + 11;
 						}
 						else
 						{
 							m_psr |= PSR_F;
 
-							tcy = (src >= lower) ? 7 : 10;
+							tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
 						}
 					}
 					break;
@@ -2566,7 +2629,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						m_r[reg] = m_r[reg] * (length + 1) + index;
 
-						tcy = 25;
+						tex = mode[0].tea + mode[1].tea + 25 + (size + 1) * 16;
 					}
 					break;
 				case 5:
@@ -2595,7 +2658,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						gen_write(mode[1], offset & (limit - 1));
 
 						// TODO: tcy 24-28
-						tcy = 24;
+						tex = mode[0].tea + mode[1].tea + 24 + (size + 1) * 24;
 					}
 					break;
 				case 6:
@@ -2609,7 +2672,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 
 						fatalerror("unimplemented: movsu/movus (%s)\n", machine().describe_context());
 
-						tcy = 33;
+						//tex = mode[0].tea + mode[1].tea + top[size] * 2 + 33;
 					}
 					break;
 				}
@@ -2895,7 +2958,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].addr();
 						decode(mode, bytes);
 
-						tcy = 21;
+						tex = mode[0].tea + top(SIZE_B) + 21;
 						break;
 					case 1:
 						// WRVAL loc
@@ -2904,7 +2967,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].addr();
 						decode(mode, bytes);
 
-						tcy = 21;
+						tex = mode[0].tea + top(SIZE_B) + 21;
 						break;
 					case 2:
 						// LMR mmureg,src
@@ -2913,7 +2976,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].read_i(size);
 						decode(mode, bytes);
 
-						tcy = 30;
+						tex = mode[0].tea + top(size) + 30;
 						break;
 					case 3:
 						// SMR mmureg,dst
@@ -2922,7 +2985,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].write_i(size);
 						decode(mode, bytes);
 
-						tcy = 25;
+						tex = mode[0].tea + top(size) + 25;
 						break;
 					default:
 						interrupt(UND, m_pc);
@@ -2963,7 +3026,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 		if (m_psr & PSR_P)
 			interrupt(TRC, m_pc);
 
-		m_icount -= tcy;
+		m_icount -= tex;
 	}
 }
 

@@ -46,7 +46,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 // Notes by Jose Tejada (jotego):
 // The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
-// The CPU clock is gated by bus arbitrion logic. The CPU clock is halted until
+// The CPU clock is gated by bus arbitration logic. The CPU clock is halted until
 // video hardware has an opening in memory access, then the CPU is allowed to
 // access common memory. This slows down the CPU but doesn't alter its basic 3MHz frequency.
 //
@@ -59,7 +59,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -278,10 +278,7 @@ void commando_state::commando(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(XTAL / 2, 384, 128, 0, 262, 22, 246);    // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(commando_state::screen_update_commando));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.screen_vblank().append(FUNC(commando_state::vblank_irq));

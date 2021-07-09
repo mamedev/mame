@@ -5609,11 +5609,6 @@
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
 	</element>
-	<element name="debug_vfd">
-		<led16segsc>
-			<color red="0.0" green="1.0" blue="1.0"/>
-		</led16segsc>
-	</element>
 	<element name="debug_stepper_value" defstate="0">
 		<simplecounter maxstate="999" digits="3">
 			<color red="1.0" green="1.0" blue="1.0"/>
@@ -6974,54 +6969,13 @@
 		<element ref="vfd0_background">
 			<bounds x="277" y="381" width="272" height="30"/>
 		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="277" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="294" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="311" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="328" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="345" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="362" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="379" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="396" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="413" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="430" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="447" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="464" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="481" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="498" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="515" y="381" width="17" height="30"/>
-		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="532" y="381" width="17" height="30"/>
-		</element>
+		<repeat count="16">
+			<param name="i" start="0" increment="1"/>
+			<param name="x" start="277" increment="17"/>
+			<element name="vfd~i~" ref="vfd0">
+				<bounds x="~x~" y="381" width="17" height="30"/>
+			</element>
+		</repeat>
 		<element name="label6" ref="label_6">
 			<bounds x="619" y="348" width="15" height="156"/>
 		</element>
@@ -8966,54 +8920,13 @@
 		<element name="debug_button_label_63" ref="debug_button_label_63">
 			<bounds x="1708" y="1007" width="40" height="22"/>
 		</element>
-		<element name="vfd0" ref="debug_vfd" state="0">
-			<bounds x="1150" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd1" ref="debug_vfd" state="0">
-			<bounds x="1182" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd2" ref="debug_vfd" state="0">
-			<bounds x="1214" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd3" ref="debug_vfd" state="0">
-			<bounds x="1246" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd4" ref="debug_vfd" state="0">
-			<bounds x="1278" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd5" ref="debug_vfd" state="0">
-			<bounds x="1310" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd6" ref="debug_vfd" state="0">
-			<bounds x="1342" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd7" ref="debug_vfd" state="0">
-			<bounds x="1374" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd8" ref="debug_vfd" state="0">
-			<bounds x="1406" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd9" ref="debug_vfd" state="0">
-			<bounds x="1438" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd10" ref="debug_vfd" state="0">
-			<bounds x="1470" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd11" ref="debug_vfd" state="0">
-			<bounds x="1502" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd12" ref="debug_vfd" state="0">
-			<bounds x="1534" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd13" ref="debug_vfd" state="0">
-			<bounds x="1566" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd14" ref="debug_vfd" state="0">
-			<bounds x="1598" y="600" width="32" height="48"/>
-		</element>
-		<element name="vfd15" ref="debug_vfd" state="0">
-			<bounds x="1630" y="600" width="32" height="48"/>
-		</element>
+		<repeat count="16">
+			<param name="i" start="0" increment="1"/>
+			<param name="x" start="1150" increment="32"/>
+			<element name="vfd~i~" ref="vfd0">
+				<bounds x="~x~" y="600" width="32" height="48"/>
+			</element>
+		</repeat>
 		<element ref="reel_background">
 			<bounds x="1100" y="32" width="120" height="240"/>
 		</element>

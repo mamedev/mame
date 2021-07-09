@@ -7,7 +7,7 @@ license:CC0
 <softwarelist name="saitek_kso" description="Saitek KSO ROM">
 
 <!-- Extension ROM, sold separately, placed in ROM socket through hatch on top-right -->
-<!-- Used in: Superstar 36K, Turbostar chess computers -->
+<!-- Used in: Superstar 36K, Turbostar chess computers, also in Maestro A module -->
 
 	<software name="kso">
 		<description>Kasparov Selected Openings</description>

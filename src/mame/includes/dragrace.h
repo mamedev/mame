@@ -17,7 +17,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-/* Discrete Sound Input Nodes */
+// Discrete Sound Input Nodes
 #define DRAGRACE_SCREECH1_EN    NODE_01
 #define DRAGRACE_SCREECH2_EN    NODE_02
 #define DRAGRACE_LOTONE_EN      NODE_03
@@ -38,54 +38,67 @@ class dragrace_state : public driver_device
 public:
 	dragrace_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_playfield_ram(*this, "playfield_ram"),
-		m_position_ram(*this, "position_ram"),
-		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_discrete(*this, "discrete"),
+		m_playfield_ram(*this, "playfield_ram"),
+		m_position_ram(*this, "position_ram"),
+		m_p(*this, "P%u", 1U),
+		m_dial(*this, "DIAL%u", 1U),
+		m_in(*this, "IN%u", 0U),
+		m_gear_sel(*this, "P%ugear", 1U),
+		m_tacho_sel(*this, "tachometer%u", 1U)
 	{
 	}
 
 	void dragrace(machine_config &config);
 
-private:
-	void speed1_w(uint8_t data);
-	void speed2_w(uint8_t data);
-	uint8_t dragrace_input_r(offs_t offset);
-	uint8_t dragrace_steering_r();
-	uint8_t dragrace_scanline_r();
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	void dragrace_palette(palette_device &palette) const;
-	uint32_t screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
-	void dragrace_update_misc_flags( address_space &space );
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	void dragrace_map(address_map &map);
 
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_playfield_ram;
-	required_shared_ptr<uint8_t> m_position_ram;
+private:
+	void speed1_w(uint8_t data);
+	void speed2_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	uint8_t steering_r();
+	uint8_t scanline_r();
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(frame_callback);
 
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	void main_map(address_map &map);
 
-	/* misc */
-	int       m_gear[2];
-
-	/* devices */
-	required_device<discrete_sound_device> m_discrete;
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	required_device<discrete_sound_device> m_discrete;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_position_ram;
+
+	// inputs
+	required_ioport_array<2> m_p, m_dial;
+	required_ioport_array<3> m_in;
+
+	// outputs
+	output_finder<2> m_gear_sel, m_tacho_sel;
+
+	// video-related
+	tilemap_t  *m_bg_tilemap;
+
+	// misc
+	uint8_t       m_gear[2];
 };
 
-/*----------- defined in audio/dragrace.c -----------*/
+//----------- defined in audio/dragrace.cpp -----------
 DISCRETE_SOUND_EXTERN( dragrace_discrete );
 
 #endif // MAME_INCLUDES_DRAGRACE_H

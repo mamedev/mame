@@ -30,6 +30,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
+ *MP0220   TMS1000   1980, Tomy Teacher
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
@@ -86,6 +87,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ *MP3407   TMS1100   1979, General Electric The Great Awakening (model 7-4880)
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
@@ -112,6 +114,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
   M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
+ *M34137   TMS1100?  1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
@@ -128,7 +131,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
+ *M95041   TMS2670   1983, Tsukuda Game Pachinko
 
   inconsistent:
 
@@ -3230,7 +3234,6 @@ void qfire_state::write_r(u16 data)
 
 	// R3,R4,R6-R8: leds (direct)
 	m_display->write_row(2, (data >> 3 & 3) | (data >> 4 & 0x1c));
-	m_display->update();
 
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -3242,7 +3245,6 @@ void qfire_state::write_o(u16 data)
 	// O1-O7: 2nd digit segments
 	m_display->write_row(0, (data & 1) ? 6 : 0);
 	m_display->write_row(1, data >> 1 & 0x7f);
-	m_display->update();
 }
 
 u8 qfire_state::read_k()
@@ -3784,13 +3786,12 @@ void ebball3_state::set_clock()
 
 void ebball3_state::update_display()
 {
-	m_display->matrix_partial(0, 10, m_r, m_o, false);
+	m_display->matrix_partial(0, 10, m_r, m_o);
 
 	// R0,R1 are normal 7segs
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display->write_row(10, (m_display->read_row(4) & 0x20) | (m_display->read_row(7) & 0x02));
 	m_display->write_row(11, ((m_display->read_row(4) & 0x10) | (m_display->read_row(7) & 0x01)) << 1);
-	m_display->update();
 }
 
 void ebball3_state::write_r(u16 data)
@@ -5591,7 +5592,6 @@ void fxmcr165_state::update_display()
 
 	// leds from R4-R10
 	m_display->write_row(1, m_r >> 4 & 0x7f);
-	m_display->update();
 }
 
 void fxmcr165_state::write_r(u16 data)
@@ -6177,7 +6177,7 @@ public:
 void elecbowl_state::update_display()
 {
 	// standard 7segs
-	m_display->matrix_partial(0, 4, m_r >> 4, m_o, false);
+	m_display->matrix_partial(0, 4, m_r >> 4, m_o);
 
 	// lamp muxes
 	u8 sel = m_o & 7;
@@ -6189,7 +6189,6 @@ void elecbowl_state::update_display()
 
 	// digit 4 is from mux2 Q7
 	m_display->write_row(4, m_display->read_element(6, 7) ? 6 : 0);
-	m_display->update();
 }
 
 void elecbowl_state::write_r(u16 data)
@@ -6339,13 +6338,11 @@ void horseran_state::lcd_output_w(offs_t offset, u32 data)
 		return;
 
 	// update lcd segments
-	m_display->matrix_partial(0, 3, 1 << offset, data, false);
+	m_display->matrix_partial(0, 3, 1 << offset, data);
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
 		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
-
-	m_display->update();
 }
 
 void horseran_state::write_r(u16 data)
@@ -7704,8 +7701,6 @@ void mbdtower_state::update_display()
 		m_display->write_row(2, (m_o & 0x80) ? o : 0);
 		m_display->write_row(1, (m_o & 0x80) ? 0 : o);
 		m_display->write_row(0, (m_r >> 8 & 1) | (m_r >> 4 & 0xe));
-
-		m_display->update();
 	}
 	else
 	{
@@ -9760,13 +9755,12 @@ public:
 
 void tisr16_state::update_display()
 {
-	m_display->matrix(m_r, m_o, false);
+	m_display->matrix(m_r, m_o);
 
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
 	u8 r10 = m_display->read_row(10);
 	m_display->write_row(11, r10 << 5 & 0x40);
 	m_display->write_row(10, r10 & 0x40);
-	m_display->update();
 }
 
 void tisr16_state::write_r(u16 data)
@@ -10957,14 +10951,13 @@ void lilprof78_state::write_r(u16 data)
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	u16 r = (data & 7) | (data << 1 & 0x1f0);
-	m_display->matrix(r, seg, false);
+	m_display->matrix(r, seg);
 
 	// 3rd digit A/G(equals sign) is from O7
 	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
-	m_display->update();
 }
 
 void lilprof78_state::write_o(u16 data)
@@ -12123,16 +12116,14 @@ void tbreakup_state::set_clock()
 void tbreakup_state::update_display()
 {
 	// 7seg leds from R0,R1 and O0-O6
-	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f, false);
+	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f);
 
 	// 22 round leds from O2-O7 and expander port 7
-	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6], false);
+	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6]);
 
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
 		m_display->write_row(y+8, m_exp_port[y]);
-
-	m_display->update();
 }
 
 void tbreakup_state::expander_w(offs_t offset, u8 data)

@@ -29,7 +29,14 @@
 class laserbat_state_base : public driver_device
 {
 public:
-	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag)
+	void laserbat_base(machine_config &config);
+	void laserbat_io_map(address_map &map);
+	void laserbat_map(address_map &map);
+
+protected:
+	enum { TIMER_SCANLINE };
+
+	laserbat_state_base(const machine_config &mconfig, device_type type, const char *tag, uint8_t eff2_mask)
 		: driver_device(mconfig, type, tag)
 		, m_mux_ports(*this, {"ROW0", "ROW1", "SW1", "SW2"})
 		, m_row1(*this, "ROW1")
@@ -40,38 +47,11 @@ public:
 		, m_gfxmix(*this, "gfxmix")
 		, m_pvi(*this, "pvi%u", 1U)
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_scanline_timer(nullptr)
-		, m_gfx1(nullptr)
-		, m_gfx2(nullptr)
-		, m_input_mux(0)
-		, m_mpx_p_1_2(false)
-		, m_mpx_bkeff(false)
-		, m_nave(false)
-		, m_clr_lum(0)
-		, m_shp(0)
-		, m_wcoh(0)
-		, m_wcov(0)
-		, m_abeff1(false)
-		, m_abeff2(false)
-		, m_mpx_eff2_sh(false)
-		, m_coleff(0)
-		, m_neg1(false)
-		, m_neg2(false)
-		, m_rhsc(0)
-		, m_whsc(0)
-		, m_csound1(0)
-		, m_csound2(0)
+		, m_gfx1(*this, "gfx1")
+		, m_gfx2(*this, "gfx2")
+		, m_eff2_mask(eff2_mask)
 	{
 	}
-
-	void init_laserbat();
-
-	void laserbat_base(machine_config &config);
-	void laserbat_io_map(address_map &map);
-	void laserbat_map(address_map &map);
-
-protected:
-	enum { TIMER_SCANLINE };
 
 	// control ports
 	void ct_io_w(uint8_t data);
@@ -93,7 +73,7 @@ protected:
 	virtual void csound2_w(uint8_t data);
 
 	// running the video
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -102,55 +82,57 @@ protected:
 	TIMER_CALLBACK_MEMBER(video_line);
 
 	// input lines
-	required_ioport_array<4> m_mux_ports;
-	required_ioport m_row1;
-	required_ioport m_row2;
+	required_ioport_array<4>                m_mux_ports;
+	required_ioport                         m_row1;
+	required_ioport                         m_row2;
 
 	// main CPU device
-	required_device<s2650_device> m_maincpu;
+	required_device<s2650_device>           m_maincpu;
 
 	// video devices
-	required_device<screen_device>         m_screen;
-	required_device<palette_device>        m_palette;
-	required_device<pla_device>            m_gfxmix;
-	required_device_array<s2636_device, 3> m_pvi;
-	required_device<gfxdecode_device>      m_gfxdecode;
+	required_device<screen_device>          m_screen;
+	required_device<palette_device>         m_palette;
+	required_device<pla_device>             m_gfxmix;
+	required_device_array<s2636_device, 3>  m_pvi;
+	required_device<gfxdecode_device>       m_gfxdecode;
 
 	// stuff for rendering video
-	emu_timer       *m_scanline_timer;
-	bitmap_ind16    m_bitmap;
-	uint8_t const   *m_gfx1;
-	uint8_t const   *m_gfx2;
+	required_region_ptr<uint8_t>            m_gfx1;
+	required_region_ptr<uint8_t>            m_gfx2;
+	emu_timer                               *m_scanline_timer = nullptr;
+	bitmap_ind16                            m_bitmap;
+	uint16_t                                m_gfx2_base = 0;
+	uint8_t const                           m_eff2_mask;
 
 	// control lines
-	unsigned        m_input_mux;
+	uint8_t         m_input_mux;
 	bool            m_mpx_p_1_2;
 
 	// RAM used by TTL video hardware, writable by CPU
-	uint8_t         m_bg_ram[0x400];    // background tilemap
-	uint8_t         m_eff_ram[0x400];   // per-scanline effects (A8 not wired meaning only half is usable)
-	bool            m_mpx_bkeff;        // select between writing background and effects memory
+	uint8_t         m_bg_ram[0x400];        // background tilemap
+	uint8_t         m_eff_ram[0x400];       // per-scanline effects (A8 not wired meaning only half is usable)
+	bool            m_mpx_bkeff = false;    // select between writing background and effects memory
 
 	// signals affecting the TTL-generated 32x32 sprite
-	bool            m_nave;             // 1-bit enable
-	unsigned        m_clr_lum;          // 3-bit colour/luminance
-	unsigned        m_shp;              // 3-bit shape
-	unsigned        m_wcoh;             // 8-bit offset horizontal
-	unsigned        m_wcov;             // 8-bit offset vertical
+	bool            m_nave = false;         // 1-bit enable
+	uint8_t         m_clr_lum = 0;          // 3-bit colour/luminance
+	uint8_t         m_shp = 0;              // 3-bit shape
+	uint8_t         m_wcoh = 0;             // 8-bit offset horizontal
+	uint8_t         m_wcov = 0;             // 8-bit offset vertical
 
 	// video effects signals
-	bool            m_abeff1;           // 1-bit effect enable
-	bool            m_abeff2;           // 1-bit effect enable
-	bool            m_mpx_eff2_sh;      // 1-bit effect selection
-	unsigned        m_coleff;           // 2-bit colour effect
-	bool            m_neg1;             // 1-bit area selection
-	bool            m_neg2;             // 1-bit area selection
+	bool            m_abeff1 = false;       // 1-bit effect enable
+	bool            m_abeff2 = false;       // 1-bit effect enable
+	bool            m_mpx_eff2_sh = false;  // 1-bit effect selection
+	uint8_t         m_coleff = 0;           // 2-bit colour effect
+	bool            m_neg1 = false;         // 1-bit area selection
+	bool            m_neg2 = false;         // 1-bit area selection
 
 	// sound board I/O signals
-	unsigned        m_rhsc;             // 8-bit input from J7
-	unsigned        m_whsc;             // 8-bit output to J7
-	unsigned        m_csound1;          // bits 1-8 on J3
-	unsigned        m_csound2;          // bits 9-16 on J3
+	uint8_t         m_rhsc = 0;             // 8-bit input from J7
+	uint8_t         m_whsc = 0;             // 8-bit output to J7
+	uint8_t         m_csound1 = 0;          // bits 1-8 on J3
+	uint8_t         m_csound2 = 0;          // bits 9-16 on J3
 };
 
 
@@ -158,11 +140,10 @@ class laserbat_state : public laserbat_state_base
 {
 public:
 	laserbat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: laserbat_state_base(mconfig, type, tag)
+		: laserbat_state_base(mconfig, type, tag, 0x00)
 		, m_csg(*this, "csg")
 		, m_synth_low(*this, "synth_low")
 		, m_synth_high(*this, "synth_high")
-		, m_keys(0)
 	{
 	}
 
@@ -184,7 +165,7 @@ protected:
 	required_device<tms3615_device> m_synth_high;
 
 	// register state
-	unsigned    m_keys;     // low octave keys 1-13 and high octave keys 2-12 (24 bits)
+	uint32_t    m_keys = 0; // low octave keys 1-13 and high octave keys 2-12 (24 bits)
 };
 
 
@@ -192,7 +173,7 @@ class catnmous_state : public laserbat_state_base
 {
 public:
 	catnmous_state(const machine_config &mconfig, device_type type, const char *tag)
-		: laserbat_state_base(mconfig, type, tag)
+		: laserbat_state_base(mconfig, type, tag, 0x03)
 		, m_audiopcb(*this, "audiopcb")
 	{
 	}

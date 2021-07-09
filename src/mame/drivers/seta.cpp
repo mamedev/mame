@@ -1421,11 +1421,10 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
-#include "sound/ym2203.h"
-#include "sound/ym2612.h"
+#include "sound/ymopm.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 
 #include "diserial.h"
 #include "screen.h"
@@ -10908,17 +10907,55 @@ ROM_START( daiohp ) /* Found on the same P0-072-2 PCB as the Blandia prototype *
 	ROM_LOAD( "snd2.u158",  0x040000, 0x020000, CRC(bc8de02a) SHA1(503c2c9f9ce029701e6a5b134d9407ab06e28913) )
 	ROM_LOAD( "snd3.u159",  0x060000, 0x020000, CRC(939777fd) SHA1(3dd1b89a4f81f745c68037c568c885fe1403ed31) )
 	ROM_LOAD( "snd4.u160",  0x080000, 0x020000, CRC(7b97716d) SHA1(6693e81dc008317c6a985558624f5d5cf00785e9) )
-	ROM_LOAD( "snd5.u161",  0x0A0000, 0x020000, CRC(294e1cc9) SHA1(5faef5eb9f15c23686c2f66646c6f6724e7c611f) )
-	ROM_LOAD( "snd6.u162",  0x0C0000, 0x020000, CRC(ecab073b) SHA1(f991fb9d9d4ffe24b67b233850ef0727dc6329b6) )
-	ROM_LOAD( "snd7.u163",  0x0E0000, 0x020000, CRC(1b7ea768) SHA1(7dfa8cbcb839c76f3f9eefd6abbc2b424c3d970a) )
+	ROM_LOAD( "snd5.u161",  0x0a0000, 0x020000, CRC(294e1cc9) SHA1(5faef5eb9f15c23686c2f66646c6f6724e7c611f) )
+	ROM_LOAD( "snd6.u162",  0x0c0000, 0x020000, CRC(ecab073b) SHA1(f991fb9d9d4ffe24b67b233850ef0727dc6329b6) )
+	ROM_LOAD( "snd7.u163",  0x0e0000, 0x020000, CRC(1b7ea768) SHA1(7dfa8cbcb839c76f3f9eefd6abbc2b424c3d970a) )
 
-	ROM_REGION( 0xC00, "pals", 0 )
+	ROM_REGION( 0xc00, "pals", 0 )
 	ROM_LOAD( "con1x.u35",  0x000000, 0x104, CRC(ce8b57d9) SHA1(e433a8cee4f964123595f904170793e152290be1) )
 	ROM_LOAD( "con2x.u36",  0x000200, 0x104, CRC(0b18db9e) SHA1(80e6aacb1455e15c6e665feaec8711070c14a901) )
 	ROM_LOAD( "dec1x.u14",  0x000400, 0x104, CRC(d197abfe) SHA1(93f08d879c339ec00598383723912d7d0eab306c) )
 	ROM_LOAD( "dec2x.u206", 0x000600, 0x104, CRC(35afbba8) SHA1(ce1cc0f75467a1ce6444250d741e70c2ed8d4c14) )
 	ROM_LOAD( "pcon2.u110", 0x000800, 0x104, CRC(082882c2) SHA1(78385047ed8b1e2c11926c5ce8dea40450b0d0b0) )
-	ROM_LOAD( "sc.u116",    0x000A00, 0x104, CRC(e57bfde9) SHA1(33632d007c8e48d756fc920985f82ae32dcd63e6) )
+	ROM_LOAD( "sc.u116",    0x000a00, 0x104, CRC(e57bfde9) SHA1(33632d007c8e48d756fc920985f82ae32dcd63e6) )
+ROM_END
+
+ROM_START( daiohp2 ) /* Found on the same P0-072-2 PCB as the previous Daioh prototype */
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "prg_even.u3",    0x000000, 0x020000, CRC(0079c08f) SHA1(6353c06ec24c9ed28c34c7023557b63471ca2514) )
+	ROM_LOAD16_BYTE( "prg_odd.u4",     0x000001, 0x020000, CRC(d2a843ad) SHA1(1a867740227cbbbf7783cad9de1938508a21e8d3) )
+	ROM_LOAD16_BYTE( "data_even.u103", 0x100000, 0x040000, CRC(a76139bb) SHA1(684c949ac4b652c645ab61be7acb2821fe1b6c8d) )
+	ROM_LOAD16_BYTE( "data_odd.u102",  0x100001, 0x040000, CRC(075c4b30) SHA1(6acd4f21fe06bc4864e87f3174b64d73e33cdf22) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD16_BYTE( "obj_1.u140", 0x000000, 0x080000, CRC(01f12e59) SHA1(8741916643df8f723e1151a966a9e1436ba7b336) )
+	ROM_LOAD16_BYTE( "obj_0.u142", 0x000001, 0x080000, CRC(361d47ae) SHA1(9d76e64087d5193f79036a934fc87387d2909212) )
+	ROM_LOAD16_BYTE( "obj_3.u144", 0x100000, 0x080000, CRC(68b5be19) SHA1(e057773b83f721411782fc275e2cc1e586dfe090) )
+	ROM_LOAD16_BYTE( "obj_2.u146", 0x100001, 0x080000, CRC(85f5a720) SHA1(c1eadb112192b9a5bd5b1efb67c756847b3dc191) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "bg1_0.u148", 0x000001, 0x080000, CRC(bec48d7a) SHA1(9fdcc8f461e48cb4244827bead980ad48acdfbd8) )
+	ROM_LOAD16_BYTE( "bg1_1.u150", 0x000000, 0x080000, CRC(d5793a2f) SHA1(0623d51d405fde69622f1e15512fd8fc41209a59) )
+	ROM_LOAD16_BYTE( "bg1_2.u149", 0x100001, 0x080000, CRC(85761988) SHA1(5602052f5fed5afcedc257b0ee07b4eca25f87cb) )
+	ROM_LOAD16_BYTE( "bg1_3.u151", 0x100000, 0x080000, CRC(f6912766) SHA1(d919f679138bbc2dd7d79d814c220193024c769b) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "bg2_0.u164", 0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
+	ROM_LOAD16_BYTE( "bg2_1.u166", 0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
+	ROM_LOAD16_BYTE( "bg2_2.u165", 0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_3.u167", 0x100000, 0x080000, CRC(533ba782) SHA1(b5f62323be95b2def8d1383b400b4ef0d3b3d6cd) )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "se_0.u69", 0x000000, 0x080000, CRC(21e4f093) SHA1(f0420d158dc5d182e41b6fb2ea3af6baf88bacb8) )
+	ROM_LOAD( "se_1.u70", 0x080000, 0x080000, CRC(593c3c58) SHA1(475fb530a6d23269cb0aea6e294291c7463b57a2) )
+
+	ROM_REGION( 0xc00, "pals", 0 )
+	ROM_LOAD( "fa-023.u35",  0x000000, 0x117, CRC(f187ea2d) SHA1(d2f05b42c0bbc6dc711c525b2a63d4de3ac9de03) )
+	ROM_LOAD( "fa-024.u36",  0x000200, 0x117, CRC(02c87697) SHA1(5ff985ba88f4de677cf13626c95eee0b59fbb96a) )
+	ROM_LOAD( "fa-022.u14",  0x000400, 0x117, CRC(f780fd0e) SHA1(58513fdef8bff5bb32f7de04d2d5f1446c66d108) )
+	ROM_LOAD( "fa-020.u206", 0x000600, 0x117, CRC(cd2cd02c) SHA1(150fdacfc44ea5a2f61c1cf626011d43b75ad618) )
+	ROM_LOAD( "fa-025.u76",  0x000800, 0x117, CRC(875c0c81) SHA1(8c259b75f40bf8ad2971648e4bd3284ef5da30d5) )
+	ROM_LOAD( "fa-021.u116", 0x000a00, 0x117, CRC(e335cf2e) SHA1(35f6fa2fb2da1dc5b1fad93f44947f76d6ef35aa) )
 ROM_END
 
 ROM_START( daiohc ) /* Found on a 93111A PCB - same PCB as War of Areo & J. J. Squawkers */
@@ -12274,9 +12311,9 @@ GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  downtown_state, init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
-GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Seta",                      "Arbalester" , 0) // Country/License: DSW
+GAME( 1989, arbalest,  0,        arbalest,  arbalest,  downtown_state, init_arbalest,  ROT270, "Jordan I.S. / Seta",        "Arbalester" , 0) // Developed by Jordan for Seta, Country/License: DSW
 
-GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Seta",                      "Meta Fox" , 0) // Country/License: DSW
+GAME( 1989, metafox,   0,        metafox,   metafox,   downtown_state, init_metafox,   ROT270, "Jordan I.S. / Seta",        "Meta Fox" , 0) // Developed by Jordan for Seta, Country/License: DSW
 
 /* 68000 */
 
@@ -12324,6 +12361,7 @@ GAME( 1993, atehate,   0,        atehate,   atehate,   seta_state,     empty_ini
 GAME( 1993, daioh,     0,        daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh", 0 )
 GAME( 1993, daioha,    daioh,    daioh,     daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (earlier)", 0 )
 GAME( 1993, daiohp,    daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype)", 0 )
+GAME( 1993, daiohp2,   daioh,    daiohp,    daiohp,    seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (prototype, earlier)", 0 )
 GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_init,     ROT270, "Athena",                    "Daioh (93111A PCB conversion)", 0 )
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )

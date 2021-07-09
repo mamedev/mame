@@ -14,6 +14,7 @@
 
 // standard SDL headers
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
 
 // standard C headers
 #include <cmath>
@@ -681,11 +682,68 @@ int sdl_window_info::complete_create()
 	// get monitor work area for centering
 	osd_rect work = monitor()->usuable_position_size();
 
-	// create the SDL window
-	auto sdlwindow = SDL_CreateWindow(title().c_str(),
+	// create or attach to an existing window
+	SDL_Window *sdlwindow;
+#ifdef SDLMAME_X11
+	const char *attach_window = downcast<sdl_options &>(machine().options()).attach_window();
+#else
+	const char *attach_window = nullptr;
+#endif
+	if (attach_window && *attach_window)
+	{
+		// we're attaching to an existing window; parse the argument
+		unsigned long long attach_window_value;
+		try
+		{
+			attach_window_value = std::stoull(attach_window, nullptr, 0);
+		}
+		catch (std::invalid_argument &)
+		{
+			osd_printf_error("Invalid -attach_window value: %s\n", attach_window);
+			return 1;
+		}
+
+		// and attach to it
+		sdlwindow = SDL_CreateWindowFrom((void *)attach_window_value);
+		if (!sdlwindow)
+		{
+			osd_printf_error("Failed to attach to window \"%s\": %s\n", attach_window, SDL_GetError());
+			return 1;
+		}
+
+		// perform SDL subsystem-specific tasks
+		SDL_SysWMinfo swmi;
+		SDL_VERSION(&swmi.version);
+		if (SDL_GetWindowWMInfo(sdlwindow, &swmi))
+		{
+			switch (swmi.subsystem)
+			{
+#ifdef SDLMAME_X11
+			case SDL_SYSWM_X11:
+				// by default, SDL_CreateWindowFrom() doesn't ensure that we're getting the events that we
+				// expect
+				XSelectInput(swmi.info.x11.display, swmi.info.x11.window,
+					FocusChangeMask | EnterWindowMask | LeaveWindowMask |
+					PointerMotionMask | KeyPressMask | KeyReleaseMask |
+					PropertyChangeMask | StructureNotifyMask |
+					ExposureMask | KeymapStateMask);
+				break;
+#endif // SDLMAME_X11
+
+			default:
+				break;
+			}
+		}
+	}
+	else
+	{
+		// create the SDL window
+		sdlwindow = SDL_CreateWindow(title().c_str(),
 			work.left() + (work.width() - temp.width()) / 2,
 			work.top() + (work.height() - temp.height()) / 2,
 			temp.width(), temp.height(), m_extra_flags);
+	}
+
 	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	//      width, height, m_extra_flags);
 

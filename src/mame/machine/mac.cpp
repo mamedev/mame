@@ -76,9 +76,6 @@
 
 #include "emu.h"
 #include "includes/mac.h"
-#include "machine/sonydriv.h"
-#include "machine/iwm.h"
-#include "machine/swim1.h"
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 
@@ -97,12 +94,6 @@
 #define LOG_KEYBOARD    0
 #define LOG_MEMORY      0
 #endif
-
-// handle disk enable lines
-void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
-{
-	sony_set_enable_lines(device, enable_mask);
-}
 
 void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom)
@@ -477,12 +468,9 @@ uint16_t mac_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
-	if ((reg == 6) && (offset == 0x130))
-	{
-		reg = R5380_CURDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 6) && (offset == 0x130);
 
-	return m_ncr5380->ncr5380_read_reg(reg)<<8;
+	return m_scsihelp->read_wrapper(pseudo_dma, reg)<<8;
 }
 
 uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
@@ -490,13 +478,13 @@ uint32_t mac_state::macii_scsi_drq_r(offs_t offset, uint32_t mem_mask)
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			return m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24;
+			return m_scsihelp->read_wrapper(true, 6)<<24;
 
 		case 0xffff0000:
-			return (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16);
+			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16);
 
 		case 0xffffffff:
-			return (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<24) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<16) | (m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK)<<8) | m_ncr5380->ncr5380_read_reg(R5380_CURDATA_DTACK);
+			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16) | (m_scsihelp->read_wrapper(true, 6)<<8) | m_scsihelp->read_wrapper(true, 6);
 
 		default:
 			logerror("macii_scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
@@ -510,19 +498,19 @@ void mac_state::macii_scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	switch (mem_mask)
 	{
 		case 0xff000000:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
 			break;
 
 		case 0xffff0000:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>16);
 			break;
 
 		case 0xffffffff:
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>24);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>16);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data>>8);
-			m_ncr5380->ncr5380_write_reg(R5380_OUTDATA_DTACK, data&0xff);
+			m_scsihelp->write_wrapper(true, 0, data>>24);
+			m_scsihelp->write_wrapper(true, 0, data>>16);
+			m_scsihelp->write_wrapper(true, 0, data>>8);
+			m_scsihelp->write_wrapper(true, 0, data&0xff);
 			break;
 
 		default:
@@ -537,12 +525,9 @@ void mac_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
-	m_ncr5380->ncr5380_write_reg(reg, data);
+	m_scsihelp->write_wrapper(pseudo_dma, reg, data);
 }
 
 void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -551,12 +536,9 @@ void mac_state::macii_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 //  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
-	if ((reg == 0) && (offset == 0x100))
-	{
-		reg = R5380_OUTDATA_DTACK;
-	}
+	bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
-	m_ncr5380->ncr5380_write_reg(reg, data>>8);
+	m_scsihelp->write_wrapper(pseudo_dma, reg, data>>8);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
@@ -568,6 +550,11 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
         mac->m_scsi_interrupt = state;
         mac->field_interrupts();
     }*/
+}
+
+void mac_state::scsi_berr_w(uint8_t data)
+{
+	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 }
 
 /* *************************************************************************
@@ -1200,8 +1187,6 @@ uint32_t mac_state::mac_read_id()
 	}
 }
 
-#include "cpu/powerpc/ppc.h"
-
 void mac_state::mac_driver_init(model_t model)
 {
 	m_overlay = 1;
@@ -1516,7 +1501,7 @@ const char *lookup_trap(uint16_t opcode)
 		{ 0xA07F, "_InternalWait" },
 		{ 0xA080, "_GetVideoDefault" },
 		{ 0xA081, "_SetVideoDefault" },
-		{ 0xA082, "_`nstall" },
+		{ 0xA082, "_DTInstall" },
 		{ 0xA083, "_SetOSDefault" },
 		{ 0xA084, "_GetOSDefault" },
 		{ 0xA085, "_PMgrOp" },

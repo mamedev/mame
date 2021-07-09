@@ -98,6 +98,9 @@ JoJo no Kimyou na Bouken                                   JJK98c00F  CP300000G 
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
@@ -2772,6 +2775,30 @@ ROM_START( jojojr2 )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
+ROM_START( jojoa )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
+ROM_END
+
+ROM_START( jojoar1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
+ROM_END
+
+ROM_START( jojoar2 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
+ROM_END
+
 
 ROM_START( sfiii3 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
@@ -3954,18 +3981,21 @@ GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,
 // 990128
 GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoa,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990108
 GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 981202
 GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_SUPPORTS_SAVE )
 

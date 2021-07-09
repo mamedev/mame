@@ -320,7 +320,7 @@ license:CC0
 		<part name="rom" interface="pet_b000_rom">
 		<!--
 		TODO: The screen fills with garbage when run like this:
-		    $ mame64 pet2001n32 toolkit2
+		    $ mame pet2001n32 toolkit2
 		and started with:
 		    SYS 45056
 		We need to check this and should add notes with the emulator

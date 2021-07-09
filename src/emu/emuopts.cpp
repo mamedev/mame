@@ -60,6 +60,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SNAPSHOT_DIRECTORY,                         "screenshots/mame",      OPTION_STRING,     "directory to save/load screenshots" },
 	{ OPTION_DIFF_DIRECTORY,                             "system/mame/diff",      OPTION_STRING,     "directory to save hard drive image difference files" },
 	{ OPTION_COMMENT_DIRECTORY,                          "system/mame/comments",  OPTION_STRING,     "directory to save debugger comments" },
+	{ OPTION_SHARE_DIRECTORY,                            "system/mame/share",     OPTION_STRING,     "directory to share with emulated machines" },
 
 	// state/playback options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE STATE/PLAYBACK OPTIONS" },

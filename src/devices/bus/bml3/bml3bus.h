@@ -133,12 +133,15 @@ protected:
 
 	address_space &space() { return m_bml3bus->space(); }
 
-	void raise_slot_nmi() { m_bml3bus->set_nmi_line(ASSERT_LINE); }
-	void lower_slot_nmi() { m_bml3bus->set_nmi_line(CLEAR_LINE); }
-	void raise_slot_irq() { m_bml3bus->set_irq_line(ASSERT_LINE); }
-	void lower_slot_irq() { m_bml3bus->set_irq_line(CLEAR_LINE); }
+	void raise_slot_nmi()  { m_bml3bus->set_nmi_line(ASSERT_LINE); }
+	void lower_slot_nmi()  { m_bml3bus->set_nmi_line(CLEAR_LINE); }
+	void raise_slot_irq()  { m_bml3bus->set_irq_line(ASSERT_LINE); }
+	void lower_slot_irq()  { m_bml3bus->set_irq_line(CLEAR_LINE); }
 	void raise_slot_firq() { m_bml3bus->set_firq_line(ASSERT_LINE); }
 	void lower_slot_firq() { m_bml3bus->set_firq_line(CLEAR_LINE); }
+	void nmi_w(int state)  { m_bml3bus->set_nmi_line(state); }
+	void irq_w(int state)  { m_bml3bus->set_irq_line(state); }
+	void firq_w(int state) { m_bml3bus->set_firq_line(state); }
 
 	device_bml3bus_card_interface(const machine_config &mconfig, device_t &device);
 

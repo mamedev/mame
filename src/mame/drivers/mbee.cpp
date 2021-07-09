@@ -92,18 +92,15 @@ from Brett Selwood and Andrew Davies.
 
     TODO/not working:
 
-    Keyboard:
-    - 256tc: Paste ignores shift key
-    - All others: Paste drops most characters.
-    - Teleterm: keyboard has problems. The schematic shows it using the old-style keyboard,
-                however it actually uses the new keyboard with interrupts.
-                The keyboard has issues in the Offsider Macro Key Editor.
+    Old CRTC-based keyboard:
+    - Paste drops many characters.
+    - Typing can drop the occasional character.
 
     FDC:   (TODO: see if these bugs still exist)
     - B drive doesn't work with most disks.
     - some disks cause MESS to freeze.
 
-    - Simply Write has keyboard problems (in 128k, no keys work).
+    - 128k: Simply Write has no keyboard.
 
     - 256tc: At the menu, if F2 pressed to activate the Monitor, the emulated machine
       crashes due to a bug in z80pio emulation.
@@ -280,7 +277,7 @@ void mbee_state::mbeett_io(address_map &map)
 	map(0x0109, 0x0109).mirror(0xfe00).r(FUNC(mbee_state::speed_high_r));
 	map(0x000a, 0x000a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_low_r), FUNC(mbee_state::port0a_w));
 	map(0x010a, 0x010a).mirror(0xfe00).rw(FUNC(mbee_state::telcom_high_r), FUNC(mbee_state::port0a_w));
-	map(0x0068, 0x006f).mirror(0xff00).rw("scc", FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w));
+	map(0x0068, 0x006f).mirror(0xff00).noprw();    // swallow i/o to SCC which was never fitted to production machines
 }
 
 void mbee_state::mbee56_io(address_map &map)
@@ -682,8 +679,9 @@ void mbee_state::mbee(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee));
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload.set_interface("mbee_quik");
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -695,6 +693,10 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mbee_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
+	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
 }
 
 
@@ -737,8 +739,9 @@ void mbee_state::mbeeic(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bee));
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bin));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload.set_interface("mbee_quik");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -750,6 +753,10 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mbee_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
+	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
 }
 
 void mbee_state::mbeepc(machine_config &config)
@@ -770,6 +777,9 @@ void mbee_state::mbeeppc(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
+
+	config.device_remove("quickload");
+	config.device_remove("quik_list");
 }
 
 void mbee_state::mbee56(machine_config &config)
@@ -784,6 +794,10 @@ void mbee_state::mbee56(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("1");
+	config.device_remove("quickload");
+	config.device_remove("quik_list");
 }
 
 void mbee_state::mbee128(machine_config &config)
@@ -794,6 +808,8 @@ void mbee_state::mbee128(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("2");
 }
 
 void mbee_state::mbee128p(machine_config &config)
@@ -808,6 +824,8 @@ void mbee_state::mbee128p(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("3");
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -821,6 +839,8 @@ void mbee_state::mbee256(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("4");
 }
 
 void mbee_state::mbeett(machine_config &config)
@@ -828,10 +848,8 @@ void mbee_state::mbeett(machine_config &config)
 	mbeeppc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
-	config.device_remove("quickload");
-	config.device_remove("quickload2");
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
-	SCC8530(config, "scc", 4000000); // clock unknown
+	config.device_remove("cass_list"); // mbeett is incompatible with the others
 }
 
 /* Unused roms:
@@ -1127,7 +1145,7 @@ COMP( 1985, mbeepc85,  mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeei
 COMP( 1985, mbeepc85b, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (New version)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, mbeepc85s, mbee,   0,      mbeepc,   mbee,    mbee_state, init_mbeeic,   "Applied Technology", "Microbee PC85 (Swedish)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbeeppc,   mbee,   0,      mbeeppc,  mbee,    mbee_state, init_mbeeppc,  "Applied Technology", "Microbee Premium PC85", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mbeett,    mbee,   0,      mbeett,   mbee256, mbee_state, init_mbeett,   "Applied Technology", "Microbee Teleterm",      MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee56,    mbee,   0,      mbee56,   mbee,    mbee_state, init_mbee56,   "Applied Technology", "Microbee 56k",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128,   mbee,   0,      mbee128,  mbee128, mbee_state, init_mbee128,  "Applied Technology", "Microbee 128k Standard", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mbee128p,  mbee,   0,      mbee128p, mbee128, mbee_state, init_mbee128p, "Applied Technology", "Microbee 128k Premium",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -23,7 +23,7 @@ $208 strikes count
 #include "includes/tryout.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/ym2203.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 

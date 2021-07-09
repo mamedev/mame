@@ -39,6 +39,7 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, RX01_CPU, tag, owner, clock)
 	, m_inst_config("program", ENDIANNESS_LITTLE, 8, 12, 0)
 	, m_data_config("sector data", ENDIANNESS_LITTLE, 8, 10, 0) // actually 1 bit wide
+	, m_interface_callback(*this)
 	, m_pc(0)
 	, m_ppc(0)
 	, m_mb(0)
@@ -51,6 +52,9 @@ rx01_cpu_device::rx01_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_bar(0)
 	, m_crc(0)
 	, m_flags(0)
+	, m_run(false)
+	, m_12_bit(false)
+	, m_data_in(false)
 	, m_unit(false)
 	, m_load_head(false)
 	, m_syn_index(false)
@@ -71,6 +75,11 @@ device_memory_interface::space_config_vector rx01_cpu_device::memory_space_confi
 		std::make_pair(AS_PROGRAM, &m_inst_config),
 		std::make_pair(AS_DATA, &m_data_config)
 	};
+}
+
+void rx01_cpu_device::device_resolve_objects()
+{
+	m_interface_callback.resolve_all_safe();
 }
 
 void rx01_cpu_device::device_start()
@@ -109,6 +118,9 @@ void rx01_cpu_device::device_start()
 	save_item(NAME(m_bar));
 	save_item(NAME(m_crc));
 	save_item(NAME(m_flags));
+	save_item(NAME(m_run));
+	save_item(NAME(m_12_bit));
+	save_item(NAME(m_data_in));
 	save_item(NAME(m_unit));
 	save_item(NAME(m_load_head));
 	save_item(NAME(m_syn_index));
@@ -128,6 +140,29 @@ void rx01_cpu_device::device_reset()
 	m_flags = 0;
 	m_unit = false;
 	m_load_head = false;
+
+	// Clear interface outputs (inactive high)
+	for (auto &cb : m_interface_callback)
+		cb(1);
+}
+
+void rx01_cpu_device::execute_set_input(int linenum, int state)
+{
+	// All inputs (and outputs) are active low
+	switch (linenum)
+	{
+	case RX_RUN:
+		m_run = (state == ASSERT_LINE);
+		break;
+
+	case RX_12_BIT:
+		m_12_bit = (state == ASSERT_LINE);
+		break;
+
+	case RX_DATA:
+		m_data_in = (state == ASSERT_LINE);
+		break;
+	}
 }
 
 u8 rx01_cpu_device::mux_out()
@@ -140,8 +175,17 @@ u8 rx01_cpu_device::mux_out()
 
 bool rx01_cpu_device::data_in()
 {
-	// TODO
-	return false;
+	if (m_data_in)
+		return true;
+	else if (m_flags & FF_IOB3)
+	{
+		if (m_flags & FF_IOB6)
+			return bool(m_data_cache.read_byte(m_bar));
+		else
+			return BIT(m_sr, 7);
+	}
+	else
+		return false;
 }
 
 bool rx01_cpu_device::sep_data()
@@ -181,8 +225,8 @@ bool rx01_cpu_device::test_condition()
 	switch (m_mb & 074)
 	{
 	case 000:
-		// Interface transfer request or command pending (TODO)
-		return false;
+		// Interface transfer request or command pending
+		return m_run;
 
 	case 004:
 		// Output buffer bit 3
@@ -221,8 +265,8 @@ bool rx01_cpu_device::test_condition()
 		return sep_clk();
 
 	case 050:
-		// 12-bit interface mode selected (TODO)
-		return false;
+		// 12-bit interface mode selected
+		return m_12_bit;
 
 	case 054:
 		// Separated data equals shift register MSB
@@ -241,7 +285,7 @@ bool rx01_cpu_device::test_condition()
 		if (m_flags & FF_WRTBUF)
 			return sec_buf_in();
 		else
-			return m_data_cache.read_byte(m_bar) & 1;
+			return bool(m_data_cache.read_byte(m_bar));
 
 	case 074:
 		// Flag state equals one
@@ -327,52 +371,140 @@ void rx01_cpu_device::execute_run()
 			else switch (m_mb & 074)
 			{
 			case 000:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB0) == 0)
+				{
+					LOG("%04o: Drive bus selected\n", m_ppc);
 					m_flags |= FF_IOB0;
-				else
+					for (int i = 0; i < 5; i++)
+						if (m_flags & (FF_IOB1 << i))
+							m_interface_callback[i](1);
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB0) != 0)
+				{
+					LOG("%04o: Interface bus selected\n", m_ppc);
 					m_flags &= ~FF_IOB0;
+					for (int i = 0; i < 5; i++)
+						if (m_flags & (FF_IOB1 << i))
+							m_interface_callback[i](0);
+				}
 				break;
 
 			case 004:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB1) == 0)
+				{
 					m_flags |= FF_IOB1;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX ERROR asserted\n", m_ppc);
+						m_interface_callback[0](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB1) != 0)
+				{
 					m_flags &= ~FF_IOB1;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX ERROR cleared\n", m_ppc);
+						m_interface_callback[0](1);
+					}
+				}
 				break;
 
 			case 010:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB2) == 0)
+				{
 					m_flags |= FF_IOB2;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX TRANSFER REQUEST asserted\n", m_ppc);
+						m_interface_callback[1](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB2) != 0)
+				{
 					m_flags &= ~FF_IOB2;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX TRANSFER REQUEST cleared\n", m_ppc);
+						m_interface_callback[1](1);
+					}
+				}
 				break;
 
 			case 014:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB3) == 0)
+				{
 					m_flags |= FF_IOB3;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX OUT mode selected\n", m_ppc);
+						m_interface_callback[2](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB3) != 0)
+				{
 					m_flags &= ~FF_IOB3;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX IN mode selected\n", m_ppc);
+						m_interface_callback[2](1);
+					}
+				}
 				break;
 
 			case 020:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB4) == 0)
+				{
 					m_flags |= FF_IOB4;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX DONE asserted\n", m_ppc);
+						m_interface_callback[3](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB4) != 0)
+				{
 					m_flags &= ~FF_IOB4;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX DONE cleared\n", m_ppc);
+						m_interface_callback[3](1);
+					}
+				}
 				break;
 
 			case 024:
-				if (BIT(m_mb, 1))
+				if (BIT(m_mb, 1) && (m_flags & FF_IOB5) == 0)
+				{
 					m_flags |= FF_IOB5;
-				else
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX SHIFT asserted\n", m_ppc);
+						m_interface_callback[4](0);
+					}
+				}
+				else if (!BIT(m_mb, 1) && (m_flags & FF_IOB5) != 0)
+				{
 					m_flags &= ~FF_IOB5;
+					if ((m_flags & FF_IOB0) == 0)
+					{
+						LOG("%04o: RX SHIFT cleared\n", m_ppc);
+						m_interface_callback[4](1);
+					}
+				}
 				break;
 
 			case 030:
 				if (BIT(m_mb, 1))
+				{
+					LOG("%04o: SEC BUF selected for output\n", m_ppc);
 					m_flags |= FF_IOB6;
+				}
 				else
+				{
+					LOG("%04o: SR selected for output\n", m_ppc);
 					m_flags &= ~FF_IOB6;
+				}
 				break;
 
 			case 034:

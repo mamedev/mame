@@ -133,13 +133,9 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_memory(*this),
 		m_ioport(*this),
 		m_parameters(*this),
-		m_scheduler(*this),
-		m_dummy_space(_config, "dummy_space", &root_device(), 0)
+		m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
-
-	m_dummy_space.set_machine(*this);
-	m_dummy_space.config_complete();
 
 	// set the machine on all devices
 	device_enumerator iter(root_device());
@@ -355,6 +351,8 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
+		m_hard_reset_pending = false;
+
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
@@ -367,8 +365,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_hard_reset_pending = false;
 
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
@@ -539,21 +535,10 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find('/', pos + 3);
-			int end2 = statename_str.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = statename_str.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = statename_str.length();
 
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string devname_str;
@@ -1053,11 +1038,9 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	m_dummy_space.start();
-
 	// iterate through the devices
 	int last_failed_starts = -1;
-	while (last_failed_starts != 0)
+	do
 	{
 		// iterate over all devices
 		int failed_starts = 0;
@@ -1068,29 +1051,27 @@ void running_machine::start_all_devices()
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device.m_machine == nullptr)
+					if (!device.m_machine)
 						device.set_machine(*this);
 
 					// now start the device
 					osd_printf_verbose("Starting %s '%s'\n", device.name(), device.tag());
 					device.start();
 				}
-
-				// handle missing dependencies by moving the device to the end
-				catch (device_missing_dependencies &)
+				catch (device_missing_dependencies const &)
 				{
-					// if we're the end, fail
+					// handle missing dependencies by moving the device to the end
 					osd_printf_verbose("  (missing dependencies; rescheduling)\n");
 					failed_starts++;
 				}
 			}
 
-		// each iteration should reduce the number of failed starts; error if
-		// this doesn't happen
+		// each iteration should reduce the number of failed starts; error if this doesn't happen
 		if (failed_starts == last_failed_starts)
 			throw emu_fatalerror("Circular dependency in device startup!");
 		last_failed_starts = failed_starts;
 	}
+	while (last_failed_starts);
 }
 
 
@@ -1347,51 +1328,6 @@ void system_time::full_time::set(struct tm &t)
 	is_dst  = t.tm_isdst;
 }
 
-
-
-//**************************************************************************
-//  DUMMY ADDRESS SPACE
-//**************************************************************************
-
-u8 dummy_space_device::read(offs_t offset)
-{
-	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
-}
-
-void dummy_space_device::write(offs_t offset, u8 data)
-{
-	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
-}
-
-void dummy_space_device::dummy(address_map &map)
-{
-	map(0x00000000, 0xffffffff).rw(FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
-}
-
-DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
-
-dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(FUNC(dummy_space_device::dummy), this))
-{
-}
-
-void dummy_space_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector dummy_space_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
 
 
 //**************************************************************************

@@ -168,7 +168,7 @@ TODO
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#include "namcofl.lh"
+#include "finalapr.lh"
 
 #include <algorithm>
 
@@ -799,7 +799,7 @@ void namcofl_state::driver_init()
 }
 
 GAME(  1995, speedrcr,          0, namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1995, finalapr,          0, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
-GAMEL( 1995, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_namcofl )
+GAMEL( 1995, finalapr,          0, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1995, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1995, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1995, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )

@@ -108,6 +108,11 @@ void tigeroad_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(3);
 
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
+
 	save_item(NAME(m_bgcharbank));
 }
 

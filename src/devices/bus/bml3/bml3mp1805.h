@@ -15,7 +15,7 @@
 #pragma once
 
 #include "bml3bus.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/mc6843.h"
 
 //**************************************************************************
@@ -41,13 +41,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	required_device_array<legacy_floppy_image_device, 4> m_floppy;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<mc6843_device> m_mc6843;
 
 private:
-	DECLARE_WRITE_LINE_MEMBER( bml3_mc6843_intrq_w );
-
 	uint8_t *m_rom;
+
+	uint8_t m_control;
+
+	static void floppy_drives(device_slot_interface &device);
 };
 
 // device type definition

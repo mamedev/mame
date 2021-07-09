@@ -11,7 +11,7 @@
 #pragma once
 
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/atarimo.h"
 #include "video/atarivad.h"
 #include "screen.h"

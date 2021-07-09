@@ -16,6 +16,7 @@
 #define SDLOPTION_INIPATH               "inipath"
 #define SDLOPTION_SDLVIDEOFPS           "sdlvideofps"
 #define SDLOPTION_USEALLHEADS           "useallheads"
+#define SDLOPTION_ATTACH_WINDOW         "attach_window"
 #define SDLOPTION_CENTERH               "centerh"
 #define SDLOPTION_CENTERV               "centerv"
 
@@ -89,7 +90,8 @@ public:
 	// full screen options
 #ifdef SDLMAME_X11
 	bool use_all_heads() const { return bool_value(SDLOPTION_USEALLHEADS); }
-#endif
+	const char *attach_window() const { return value(SDLOPTION_ATTACH_WINDOW); }
+#endif // SDLMAME_X11
 
 	// keyboard mapping
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }

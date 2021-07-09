@@ -41,12 +41,11 @@ public:
 		, m_uart(*this, "uart")
 		, m_brg(*this, "brg")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
+		, m_floppy(*this, "fdc%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_config(*this, "CONFIG")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 		, m_mainram(*this, RAM_TAG)
 		, m_m4_bank(*this, "m4_banked_mem")
 		, m_m4p_bank(*this, "m4p_banked_mem")
@@ -130,7 +129,7 @@ private:
 	bool m_wait;
 	bool m_drq_off;
 	bool m_intrq_off;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_fdd;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -142,10 +141,9 @@ private:
 	optional_device<ay31015_device> m_uart;
 	optional_device<com8116_device> m_brg;
 	optional_device<fd1793_device> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	optional_device_array<floppy_connector, 2> m_floppy;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
+	optional_device<cassette_image_device> m_cassette;
 	optional_ioport m_io_config;
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<ram_device>                 m_mainram;

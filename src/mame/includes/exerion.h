@@ -35,10 +35,13 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_maincpu_region(*this, "maincpu"),
+		m_background_mixer(*this, "bg_char_mixer_prom"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_inputs(*this, "P%u", 1U)
 	{ }
 
 	void exerion(machine_config &config);
@@ -48,45 +51,50 @@ public:
 	void init_exerionb();
 	void init_irion();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_region_ptr<uint8_t> m_maincpu_region;
+	required_region_ptr<uint8_t> m_background_mixer;
 
-	/* video-related */
+	// video-related
 	uint8_t    m_cocktail_flip;
 	uint8_t    m_char_palette;
 	uint8_t    m_sprite_palette;
 	uint8_t    m_char_bank;
 	std::unique_ptr<uint16_t[]>  m_background_gfx[4];
-	uint8_t    *m_background_mixer;
 	uint8_t    m_background_latches[13];
 
-	/* protection? */
+	// protection?
 	uint8_t m_porta;
 	uint8_t m_portb;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	uint8_t exerion_protection_r(offs_t offset);
-	void exerion_videoreg_w(uint8_t data);
-	void exerion_video_latch_w(offs_t offset, uint8_t data);
-	uint8_t exerion_video_timing_r();
-	uint8_t exerion_porta_r();
-	void exerion_portb_w(uint8_t data);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void exerion_palette(palette_device &palette) const;
-	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_ioport_array<2> m_inputs;
+
+	uint8_t protection_r(offs_t offset);
+	void videoreg_w(uint8_t data);
+	void video_latch_w(offs_t offset, uint8_t data);
+	uint8_t video_timing_r();
+	uint8_t porta_r();
+	void portb_w(uint8_t data);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 	void sub_map(address_map &map);

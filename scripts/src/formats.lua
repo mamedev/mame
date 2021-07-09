@@ -50,6 +50,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/cqm_dsk.h",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dsk_dsk.h",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.cpp",
+		MAME_DIR .. "src/lib/formats/ipf_dsk.h",
 		MAME_DIR .. "src/lib/formats/td0_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/td0_dsk.h",
 		MAME_DIR .. "src/lib/formats/hxchfe_dsk.cpp",
@@ -72,6 +74,8 @@ project "formats"
 
 		MAME_DIR .. "src/lib/formats/fsmgr.h",
 		MAME_DIR .. "src/lib/formats/fsmgr.cpp",
+		MAME_DIR .. "src/lib/formats/fsblk_vec.h",
+		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.cpp",
 	}
@@ -1495,18 +1499,6 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/ipf_dsk.h,FORMATS["IPF_DSK"] = true
---------------------------------------------------
-
-if opt_tool(FORMATS, "IPF_DSK") then
-	files {
-		MAME_DIR.. "src/lib/formats/ipf_dsk.cpp",
-		MAME_DIR.. "src/lib/formats/ipf_dsk.h",
-	}
-end
-
---------------------------------------------------
---
 --@src/lib/formats/phc25_cas.h,FORMATS["PHC25_CAS"] = true
 --------------------------------------------------
 
@@ -2066,6 +2058,18 @@ if opt_tool(FORMATS, "FS_PRODOS") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_prodos.cpp",
 		MAME_DIR.. "src/lib/formats/fs_prodos.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_oric_jasmin.h,FORMATS["FS_ORIC_JASMIN"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.cpp",
+		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.h",
 	}
 end
 

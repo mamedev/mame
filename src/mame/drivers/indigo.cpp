@@ -214,7 +214,7 @@ void indigo4k_state::indigo4k(machine_config &config)
 {
 	indigo_base(config);
 
-	R4000(config, m_maincpu, 50000000*2);
+	R4000(config, m_maincpu, 50000000);
 	//m_maincpu->set_icache_size(32768);
 	//m_maincpu->set_dcache_size(32768);
 	m_maincpu->set_addrmap(AS_PROGRAM, &indigo4k_state::mem_map);

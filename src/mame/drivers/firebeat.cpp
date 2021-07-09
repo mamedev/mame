@@ -2581,7 +2581,7 @@ ROM_START( bm3core )
 	DISK_IMAGE_READONLY( "a05jca01", 0, SHA1(b89eced8a1325b087e3f875d1a643bebe9bad5c0) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
-	DISK_IMAGE_READONLY( "a05jca02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a05jca02", 0, SHA1(1de7db35d20bbf728732f6a24c19315f9f4ad469) )
 ROM_END
 
 ROM_START( bm36th )
@@ -2598,7 +2598,7 @@ ROM_START( bm36th )
 	DISK_IMAGE_READONLY( "a21jca01", 0, SHA1(d1b888379cc0b2c2ab58fa2c5be49258043c3ea1) )
 
 	DISK_REGION( "spu_ata:0:hdd:image" ) // HDD
-	DISK_IMAGE_READONLY( "a21jca02", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "a21jca02", 0, SHA1(8fa11848af40966e42b6304e37de92be5c1fe3dc) )
 ROM_END
 
 ROM_START( bm37th )
@@ -2665,7 +2665,7 @@ GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_pop
 // Requires ST-224 emulation for optional toggleable external effects, but otherwise is fully playable
 // Core Remix and 6th Mix are marked as MACHINE_NOT_WORKING because of missing HDD dumps
 GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_IMPERFECT_SOUND )
-GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_IMPERFECT_SOUND )
+GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_IMPERFECT_SOUND )
 GAME( 2002, bm37th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 7th Mix", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_IMPERFECT_SOUND )

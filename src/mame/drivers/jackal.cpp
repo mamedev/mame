@@ -75,7 +75,7 @@ Address          Dir Data     Description
 
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -349,7 +349,7 @@ void jackal_state::machine_reset()
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	m_slavecpu->set_clock_scale(1.2f);
+	m_slavecpu->set_clock_scale(1.5);
 
 	m_rambank = rgn;
 	m_spritebank = rgn;

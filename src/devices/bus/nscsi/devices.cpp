@@ -7,6 +7,10 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/cdd2000.h"
 #include "bus/nscsi/cdrn820s.h"
+#include "bus/nscsi/cdu75s.h"
+#include "bus/nscsi/cdu415.h"
+#include "bus/nscsi/cdu561.h"
+#include "bus/nscsi/crd254sh.h"
 #include "bus/nscsi/cw7501.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/s1410.h"
@@ -21,6 +25,16 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("cdr4210", CDR4210);
 	device.option_add("cdrn820s", CDRN820S);
 	device.option_add("cdd2000", CDD2000);
+	device.option_add("cdu75s", CDU75S);
+	device.option_add("cdu415", CDU415);
+	device.option_add("cdu561_25", CDU561_25);
+	device.option_add("crd254sh", CRD254SH);
 	device.option_add("smoc501", SMOC501);
 	device.option_add("aplcd150", APPLECD150);
-};
+}
+
+void mac_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM_APPLE);
+}
