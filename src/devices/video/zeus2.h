@@ -83,7 +83,7 @@ struct zeus2_poly_extra_data
 *************************************/
 class zeus2_device;
 
-class zeus2_renderer : public poly_manager<float, zeus2_poly_extra_data, 4, 10000>
+class zeus2_renderer : public poly_manager<float, zeus2_poly_extra_data, 4>
 {
 public:
 	zeus2_renderer(zeus2_device *state);

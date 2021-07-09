@@ -74,7 +74,7 @@ private:
 		float z0;
 	};
 
-	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1, 2000>
+	class gaelco3d_renderer : public poly_manager<float, gaelco3d_object_data, 1>
 	{
 	public:
 		gaelco3d_renderer(gaelco3d_state &state);

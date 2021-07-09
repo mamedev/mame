@@ -154,7 +154,7 @@ void funkball_state::video_start()
 
 uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask)
@@ -195,7 +195,7 @@ void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32
 			break;
 		case 0x40:
 			m_voodoo_pci_regs.init_enable = data;
-			m_voodoo->voodoo_set_init_enable(data);
+			m_voodoo->set_init_enable(data);
 			break;
 	}
 }
@@ -330,7 +330,7 @@ void funkball_state::funkball_map(address_map &map)
 //  map(0x08000000, 0x0fffffff).noprw();
 	map(0x40008000, 0x400080ff).rw(FUNC(funkball_state::biu_ctrl_r), FUNC(funkball_state::biu_ctrl_w));
 	map(0x40010e00, 0x40010eff).ram().share("unk_ram");
-	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xff000000, 0xfffdffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -781,11 +781,12 @@ void funkball_state::funkball(machine_config &config)
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* video hardware */
-	VOODOO_1(config, m_voodoo, STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu(m_maincpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

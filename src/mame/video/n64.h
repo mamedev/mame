@@ -131,7 +131,7 @@ typedef void (*rdp_command_t)(uint64_t w1);
 
 class n64_state;
 
-class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8, 32000>
+class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8>
 {
 public:
 	n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem);
