@@ -609,7 +609,6 @@ private:
 	uint16_t floppy_track_offset{}; // current offset within track data
 	uint8_t floppy_shifter{}, floppy_latch{};
 	bool floppy_read_until_zerobit{};
-	bool floppy_on{};
 
 	// video
 	uint8_t videoram[0x2000]; // 80 chars * 14 lines; 2 bytes per char (attribute, char)
@@ -684,7 +683,7 @@ private:
 	// Floppy
 	#ifdef FLOPPY_FORMAT
 		TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer_callback) {
-			if(!floppy_on)
+			if(floppy->get_device()->ready_r() != false)
 				return;
 
 			if(floppy_steps / 4 < 0 || floppy_steps / 4 >= lw30_format::num_tracks)
@@ -748,21 +747,27 @@ private:
 	}
 
 	uint8_t io_88_r() {
-		// bit 1: pulsed after 3*0xFF sync 
+		// bit 0: set in start_write; cleared in end_write
+		// bit 1: pulsed after 3*0xFF sync (read next floppydata until zero-bit)
+		// bit 2: cleared in stepper routines, rst28_06
+		// bit 3: set in start_write; cleared in end_write
+		// bit 5: cleared in rst28_06; motor-on?
 		logerror("%s: read %02X from IO 88\n", machine().describe_context(), io_88);
 		return io_88;
 	}
 	void io_88_w(uint8_t data) {
 		logerror("%s: write %02X to IO 88\n", machine().describe_context(), data);
 		io_88 = data;
+		floppy->get_device()->mon_w((io_88 & (1 << 5)) == 0);
 	}
 
 	uint8_t floppy_status_r() { // 90
-		logerror("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
 		// bit 7 set; data ready from floppy
 		// bit 6 clear; unknown meaning
-		// bit 5 clear
-		// bit 4-0: stepper motor
+		// bit 5 clear; unknown meaning
+		// bit 4 clear; unknown meaning
+		// bit 3-0: stepper motor
+		logerror("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
 		return floppy_control;
 	}
 	void floppy_stepper_w(uint8_t data) {
@@ -793,11 +798,15 @@ private:
 	}
 
 	uint8_t io_98_r() {
+		// mirrored in RAM
+		// bit 0: cleared in rst28_06 in mirror
+		// bit 2: cleared before formatting in mirror; set after formatting
+		// bit 3: cleared before formatting in mirror
+		// bit 4: cleared before writing in mirror; set after writing
 		if(io_88 & 0b10)
 			floppy_read_until_zerobit = true;
 		else
 			floppy_read_until_zerobit = false;
-		floppy_on = true;
 
 		logerror("%s: read %02X from IO 98\n", machine().describe_context(), io_98);
 		return io_98;
