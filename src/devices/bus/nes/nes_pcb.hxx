@@ -205,7 +205,9 @@ static const nes_pcb pcb_list[] =
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
+	{ "palthena",         BTL_PALTHENA },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
 	{ "dbz5",             REXSOFT_DBZ5 },
 	{ "sl1632",           REXSOFT_SL1632 },

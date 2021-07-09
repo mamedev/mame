@@ -231,6 +231,28 @@ private:
 };
 
 
+// ======================> nes_0353_device
+
+class nes_0353_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_0353_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_reg;
+};
+
+
 // ======================> nes_09034a_device
 
 class nes_09034a_device : public nes_nrom_device
@@ -250,6 +272,30 @@ protected:
 
 private:
 	uint8_t m_reg;
+};
+
+
+// ======================> nes_palthena_device
+
+class nes_palthena_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_palthena_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	u8 m_reg;
 };
 
 
@@ -445,6 +491,7 @@ private:
 	uint8_t m_reg[2];
 };
 
+
 // ======================> nes_ac08_device
 
 class nes_ac08_device : public nes_nrom_device
@@ -484,6 +531,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 };
+
 
 // ======================> nes_shuiguan_device
 
@@ -542,7 +590,9 @@ DECLARE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device)
 DECLARE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device)
 DECLARE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device)
+DECLARE_DEVICE_TYPE(NES_0353,           nes_0353_device)
 DECLARE_DEVICE_TYPE(NES_09034A,         nes_09034a_device)
+DECLARE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device)
 DECLARE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device)
 DECLARE_DEVICE_TYPE(NES_DH08,           nes_dh08_device)
 DECLARE_DEVICE_TYPE(NES_LE05,           nes_le05_device)
@@ -556,6 +606,5 @@ DECLARE_DEVICE_TYPE(NES_AC08,           nes_ac08_device)
 DECLARE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device)
 DECLARE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device)
 DECLARE_DEVICE_TYPE(NES_RT01,           nes_rt01_device)
-
 
 #endif // MAME_BUS_NES_BOOTLEG_H
