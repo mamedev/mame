@@ -1382,6 +1382,7 @@ end
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 			"/wd4458", -- warning C4458: declaration of 'xxx' hides class member
 			"/wd4459", -- warning C4459: declaration of 'xxx' hides global declaration
+			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4702", -- warning C4702: unreachable code
 			"/wd4706", -- warning C4706: assignment within conditional expression
 			"/wd4804", -- warning C4804: '>>': unsafe use of type 'bool' in operation
