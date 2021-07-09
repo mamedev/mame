@@ -454,7 +454,7 @@ public:
 	{
 		double recip = double(1ULL << (47 - 39)) / m_w;
 		sow = s32(m_s * recip);
-		tow = tow(m_t * recip);
+		tow = s32(m_t * recip);
 		oowlog = fast_log2(recip, 56);
 	}
 
