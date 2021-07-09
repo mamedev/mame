@@ -2034,6 +2034,9 @@ u32 voodoo_1_device::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 
 u32 voodoo_1_device::reg_vretrace_r(u32 chipmask, u32 regnum)
 {
+	// sfrush needs this to be at least 1 extra cycle slower or else it won't boot
+	m_cpu->eat_cycles(1);
+
 	// return 0 if vblank is active
 	return m_vblank ? 0 : screen().vpos();
 }
