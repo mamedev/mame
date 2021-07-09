@@ -95,7 +95,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	void chanbara_palette(palette_device &palette) const;
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void chanbara_map(address_map &map);
 
 	/* memory pointers */
@@ -183,57 +183,57 @@ void chanbara_state::video_start()
 	m_bg2_tilemap->set_transparent_pen(0);
 }
 
-void chanbara_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void chanbara_state::draw_sprites(screen_device &screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	int offs;
-
-	for (offs = 0; offs < 0x80; offs += 4)
+	for (int offs = 0x80 - 4; offs >= 0x00; offs -= 4)
 	{
-		if ((m_spriteram[offs + 0x80] & 0x80) == pri)
+		int pri_mask = (m_spriteram[offs + 0x80] & 0x80) ? 0xfffc : 0xfffe;
+		int attr = m_spriteram[offs + 0];
+		int code = m_spriteram[offs + 1];
+		int color = m_spriteram[offs + 0x80] & 0x1f;
+		int flipx = attr & 4;
+		int flipy = attr & 2;
+		int sx = 240 - m_spriteram[offs + 3];
+		int sy = 232 - m_spriteram[offs + 2];
+
+		sy += 16;
+
+		// could be simplified by rearranging gfx in loading / init
+		if (m_spriteram[offs + 0x80] & 0x10) code += 0x200;
+		if (m_spriteram[offs + 0x80] & 0x20) code += 0x400;
+		if (m_spriteram[offs + 0x80] & 0x40) code += 0x100;
+
+		if (attr & 0x10)
 		{
-			int attr = m_spriteram[offs + 0];
-			int code = m_spriteram[offs + 1];
-			int color = m_spriteram[offs + 0x80] & 0x1f;
-			int flipx = attr & 4;
-			int flipy = attr & 2;
-			int sx = 240 - m_spriteram[offs + 3];
-			int sy = 232 - m_spriteram[offs + 2];
-
-			sy+=16;
-
-			if (m_spriteram[offs + 0x80] & 0x10) code += 0x200;
-			if (m_spriteram[offs + 0x80] & 0x20) code += 0x400;
-			if (m_spriteram[offs + 0x80] & 0x40) code += 0x100;
-
-			if (attr & 0x10)
+			if (!flipy)
 			{
-				if (!flipy)
-				{
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy-16, 0);
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy, 0);
-				}
-				else
-				{
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
-					m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code+1, color, flipx, flipy, sx, sy-16, 0);
-				}
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy - 16, screen.priority(), pri_mask, 0);
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code + 1, color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, sx, sy, 0);
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
+				m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code + 1, color, flipx, flipy, sx, sy - 16, screen.priority(), pri_mask, 0);
 			}
+		}
+		else
+		{
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap, cliprect, code, color, flipx, flipy, sx, sy, screen.priority(), pri_mask, 0);
 		}
 	}
 }
 
 uint32_t chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
+
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
 	m_bg2_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0); // ensure bg pen for each tile gets drawn behind sprites
-	draw_sprites(bitmap, cliprect, 0x00);
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap, cliprect, 0x80);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);
+
+	draw_sprites(screen, bitmap, cliprect);
+
 	return 0;
 }
 
