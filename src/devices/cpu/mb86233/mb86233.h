@@ -120,6 +120,7 @@ private:
 	void ea_post_1(u32 r);
 	void pcs_push();
 	void pcs_pop();
+	inline void stset_set_sz(u32 val);
 
 	u32 read_reg(u32 r);
 	void write_reg(u32 r, u32 v);

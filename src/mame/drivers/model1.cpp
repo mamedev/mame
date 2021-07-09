@@ -7,10 +7,6 @@ Known functional issues:
   * After recent changes, ship models periodically disappear for a frame or two during attract mode
     and while in-game.
   * There are indeterminate issues with the analog controls in-game.
-- Virtua Fighter
-  * Gameplay mechanics - specifically, collision detection - are significantly broken due to
-    imperfect TGP RAM port emulation or hookup. This is observable in both attract mode and
-    in-game. It seems to break when both characters attack at the same time.
 
 Sega Model 1 Hardware Overview
 ------------------------------
