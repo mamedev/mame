@@ -300,7 +300,7 @@ void software_list_device::parse()
 	}
 	else if (filerr == osd_file::error::NOT_FOUND)
 	{
-		osd_printf_verbose("%s: Software list %s not found\n", m_filename);
+		osd_printf_verbose("%s: Software list %s not found\n", tag(), m_filename);
 	}
 	else
 	{

@@ -91,6 +91,7 @@
 #include "video/tc0780fpa.h"
 #include "machine/nvram.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 #define LOG_TLCS_TO_PPC_COMMANDS        1

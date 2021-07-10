@@ -2792,7 +2792,7 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, nv2av
 	NV2A_GL_CULL_FACE face = NV2A_GL_CULL_FACE::FRONT;
 
 	if (backface_culling_enabled == false)
-		return rasterizer.render_triangle(cliprect, render_spans_callback, (int)VERTEX_PARAMETER::ALL, _v1, _v2, _v3);
+		return rasterizer.render_triangle<int(VERTEX_PARAMETER::ALL)>(cliprect, render_spans_callback, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
 	{
 		triangles_bfculled++;
@@ -2818,10 +2818,10 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, nv2av
 	}
 	if (face == NV2A_GL_CULL_FACE::FRONT)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::BACK)
-			return rasterizer.render_triangle(cliprect, render_spans_callback, (int)VERTEX_PARAMETER::ALL, _v1, _v2, _v3);
+			return rasterizer.render_triangle<int(VERTEX_PARAMETER::ALL)>(cliprect, render_spans_callback, _v1, _v2, _v3);
 	if (face == NV2A_GL_CULL_FACE::BACK)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT)
-			return rasterizer.render_triangle(cliprect, render_spans_callback, (int)VERTEX_PARAMETER::ALL, _v1, _v2, _v3);
+			return rasterizer.render_triangle<int(VERTEX_PARAMETER::ALL)>(cliprect, render_spans_callback, _v1, _v2, _v3);
 	triangles_bfculled++;
 	return 0;
 }

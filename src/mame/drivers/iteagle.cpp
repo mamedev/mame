@@ -198,7 +198,8 @@ void iteagle_state::iteagle(machine_config &config)
 
 	voodoo_3_pci_device &voodoo(VOODOO_3_PCI(config, PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(16);
-	subdevice<voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	subdevice<generic_voodoo_device>(PCI_ID_VIDEO":voodoo")->vblank_callback().set(m_fpga, FUNC(iteagle_fpga_device::vblank_update));
 
 	ITEAGLE_EEPROM(config, m_eeprom, 0);
 
@@ -299,6 +300,7 @@ void iteagle_state::virtpool(machine_config &config)
 	voodoo_1_pci_device &voodoo(VOODOO_1_PCI(config.replace(), PCI_ID_VIDEO, 0, m_maincpu, "screen"));
 	voodoo.set_fbmem(4);
 	voodoo.set_tmumem(4, 4);
+	voodoo.set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
 	m_fpga->set_init_info(0x01000202, 0x080808);
 	m_eeprom->set_info(0x0202, 0x7);

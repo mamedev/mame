@@ -354,7 +354,7 @@ some other components. It will be documented at a later date.
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
-#include "video/voodoo.h"
+#include "video/voodoo_banshee.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -582,50 +582,7 @@ private:
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
-}
-
-#ifdef UNUSED_FUNCTION
-static inline uint64_t read64le_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return result;
-}
-
-
-static inline uint64_t read64le_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result |= (uint64_t)(handler)(offset * 2 + 0, mem_mask >> 0) << 0;
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1, mem_mask >> 32) << 32;
-	return result;
-}
-
-
-static inline void write64le_with_32sle_device_handler(write32s_delegate handler, offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-	if (ACCESSING_BITS_0_31)
-		handler(offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if (ACCESSING_BITS_32_63)
-		handler(offset * 2 + 1, data >> 32, mem_mask >> 32);
-}
-#endif
-
-static inline uint64_t read64be_with_32smle_device_handler(read32sm_delegate handler, offs_t offset, uint64_t mem_mask)
-{
-	mem_mask = swapendian_int64(mem_mask);
-	uint64_t result = 0;
-	if (ACCESSING_BITS_0_31)
-		result = (uint64_t)(handler)(offset * 2);
-	if (ACCESSING_BITS_32_63)
-		result |= (uint64_t)(handler)(offset * 2 + 1) << 32;
-	return swapendian_int64(result);
+	return m_voodoo->update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
 static inline uint64_t read64be_with_32sle_device_handler(read32s_delegate handler, offs_t offset, uint64_t mem_mask)
@@ -1744,35 +1701,35 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 
 uint64_t viper_state::voodoo3_io_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read_io)), offset, mem_mask);
 }
 void viper_state::voodoo3_io_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_io_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write_io)), offset, data, mem_mask);
 }
 
 uint64_t viper_state::voodoo3_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read)), offset, mem_mask);
 }
 void viper_state::voodoo3_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write)), offset, data, mem_mask);
 }
 
 uint64_t viper_state::voodoo3_lfb_r(offs_t offset, uint64_t mem_mask)
 {
-	return read64be_with_32smle_device_handler(read32sm_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_r)), offset, mem_mask);
+	return read64be_with_32sle_device_handler(read32s_delegate(*m_voodoo, FUNC(voodoo_3_device::read_lfb)), offset, mem_mask);
 }
 void viper_state::voodoo3_lfb_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
-	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::banshee_fb_w)), offset, data, mem_mask);
+	write64be_with_32sle_device_handler(write32s_delegate(*m_voodoo, FUNC(voodoo_3_device::write_lfb)), offset, data, mem_mask);
 }
 
 
@@ -2457,10 +2414,11 @@ void viper_state::viper(machine_config &config)
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	VOODOO_3(config, m_voodoo, STD_VOODOO_3_CLOCK);
+	VOODOO_3(config, m_voodoo, voodoo_3_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(8);
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag("maincpu");
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu("maincpu");
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 	m_voodoo->vblank_callback().set(FUNC(viper_state::voodoo_vblank));
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 

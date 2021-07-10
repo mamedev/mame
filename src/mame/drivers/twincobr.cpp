@@ -756,8 +756,8 @@ ROM_START( twincobr )
 	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
 /****** The following are from a bootleg board. ******
     A0 and A1 are swapped between the TMS320C10 and these BPROMs on the board.
-    ROM_LOAD16_BYTE( "tc1b",        0x0000, 0x0800, CRC(1757cc33) )
-    ROM_LOAD16_BYTE( "tc2a",        0x0001, 0x0800, CRC(d6d878c9) )
+    ROM_LOAD16_BYTE( "tc1b",        0x0000, 0x0800, CRC(1757cc33) SHA1(1f54e9ddac1a644e9459415a51a0d516008cd4c6) )
+    ROM_LOAD16_BYTE( "tc2a",        0x0001, 0x0800, CRC(d6d878c9) SHA1(fb2dd8dba0b1ce1959e1b6e62840fdd7a97ceb92) )
 */
 
 	ROM_REGION( 0x0c000, "gfx1", 0 )    // Chars
@@ -1269,7 +1269,7 @@ ROM_END
 ROM_START( skysharkb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // Main 68K code
 	ROM_LOAD16_BYTE( "1r.ic18", 0x00000, 0x10000, CRC(ea4bcb43) SHA1(4b5fda235908a9081fdd4cca98294e9e9a34bbf2) )
-	ROM_LOAD16_BYTE( "1q.1ic7", 0x00001, 0x10000, CRC(d1f39ed2) SHA1(2a46a542c29a07b31a6bfa72a2f4d4d26699c13d) )
+	ROM_LOAD16_BYTE( "1q.ic17", 0x00001, 0x10000, CRC(d1f39ed2) SHA1(2a46a542c29a07b31a6bfa72a2f4d4d26699c13d) )
 
 	ROM_REGION( 0x8000, "audiocpu", 0 ) // Sound Z80 code
 	ROM_LOAD( "1p.ic16", 0x0000, 0x8000, CRC(f0b98af2) SHA1(7054029b1955c510a6b693d278dd4d8a384112df) )
@@ -1282,7 +1282,7 @@ ROM_START( skysharkb )
 	ROM_REGION( 0x20000, "gfx2", 0 ) // fg tiles
 	ROM_LOAD( "1l.ic12", 0x00000, 0x08000, CRC(733b9997) SHA1(75e874a1d148fcc8fa09bb724ce8346565ace4e5) )
 	ROM_LOAD( "1o.ic15", 0x08000, 0x08000, CRC(8b70ef32) SHA1(e1f988d650dce17e3bfbea12e5fddbb671df18d4) )
-	ROM_LOAD( "1l.ic12", 0x10000, 0x08000, CRC(f711ba7d) SHA1(49644a264c09fc2d743e4f801b8b82e980f2def9) )
+	ROM_LOAD( "1n.ic14", 0x10000, 0x08000, CRC(f711ba7d) SHA1(49644a264c09fc2d743e4f801b8b82e980f2def9) )
 	ROM_LOAD( "1m.ic13", 0x18000, 0x08000, CRC(62532cd3) SHA1(df483db7604c0135130f92b08bad3fbffb4f5c47) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 ) // bg tiles

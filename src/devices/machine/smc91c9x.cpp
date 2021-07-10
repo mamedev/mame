@@ -71,7 +71,6 @@ smc91c9x_device::smc91c9x_device(const machine_config &mconfig, device_type type
 }
 
 const u8 smc91c9x_device::ETH_BROADCAST[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-const u8 smc91c9x_device::WMS_OUI[] = { 0x00, 0xA0, 0xAF };
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -95,12 +94,19 @@ void smc91c9x_device::device_start()
 	m_reg[B1_IA2_3] = 0x0000;   m_regmask[B1_IA2_3] = 0xffff;
 	m_reg[B1_IA4_5] = 0x0000;   m_regmask[B1_IA4_5] = 0xffff;
 
-	// Revision is set based on chip type
+	// Revision and MIR is based on chip type
 	m_regmask[B3_REVISION] = 0x0000;
+	m_regmask[B0_MIR] = 0x0000;
 	if (m_device_type == dev_type::SMC91C94)
+	{
 		m_reg[B3_REVISION] = 0x3345;
+		m_reg[B0_MIR] = 0x1212;
+	}
 	else if (m_device_type == dev_type::SMC91C96)
+	{
 		m_reg[B3_REVISION] = 0x3346;
+		m_reg[B0_MIR] = 0x1818;
+	}
 	else
 		fatalerror("device_start: Unknown device type\n");
 
@@ -148,12 +154,11 @@ void smc91c9x_device::device_reset()
 	m_tx_retry_count = 0;
 
 	m_reg[B0_TCR]          = 0x0000;   m_regmask[B0_TCR]          = 0x3d87;
-	m_reg[B0_EPH_STATUS]   = 0x0000;   m_regmask[B0_EPH_STATUS]   = 0x0000;
+	m_reg[B0_EPH_STATUS]   = 0x4000;   m_regmask[B0_EPH_STATUS]   = 0x0000;
 	m_reg[B0_RCR]          = 0x0000;   m_regmask[B0_RCR]          = 0xc307;
 	m_reg[B0_COUNTER]      = 0x0000;   m_regmask[B0_COUNTER]      = 0x0000;
-	m_reg[B0_MIR]          = 0x1212;   m_regmask[B0_MIR]          = 0x0000;
 	m_reg[B0_MCR]          = 0x3300;   m_regmask[B0_MCR]          = 0x00ff;
-	m_reg[B0_BANK]         = 0x3300;   m_regmask[B0_BANK]         = 0x0007;
+	m_reg[B0_BANK]         = 0x3330;   m_regmask[B0_BANK]         = 0x0007;
 
 	m_reg[B1_GENERAL_PURP] = 0x0000;   m_regmask[B1_GENERAL_PURP] = 0xffff;
 	m_reg[B1_CONTROL]      = 0x0100;   m_regmask[B1_CONTROL]      = 0x68e7;
@@ -174,6 +179,8 @@ void smc91c9x_device::device_reset()
 
 	m_reg[B3_ERCV]         = 0x331f;   m_regmask[B3_ERCV]         = 0x009f;
 
+	set_promisc(false);
+
 	update_ethernet_irq();
 
 	// Reset MMU
@@ -185,6 +192,10 @@ void smc91c9x_device::mmu_reset()
 	// Reset MMU allocations
 	m_alloc_rx = 0;
 	m_alloc_tx = 0;
+
+	// The register defaults to the MEMORY SIZE upon reset or upon the RESET MMU command.
+	m_reg[B0_MIR] &= 0xff;
+	m_reg[B0_MIR] |= m_reg[B0_MIR] << 8;
 
 	// Reset fifos.
 	reset_tx_fifos();
@@ -394,14 +405,6 @@ int smc91c9x_device::recv_start_cb(u8 *buf, int length)
 		return 0;
 	}
 
-	// discard packets not from WMS
-	if (memcmp(WMS_OUI, &buf[6], 3))
-	{
-		LOGMASKED(LOG_RX, "received non-WMS packet OUI: %02x:%02x:%02x length %d discarded\n", buf[6], buf[7], buf[8], length);
-
-		return 0;
-	}
-
 	// Check for active transmission
 	if (m_tx_active)
 	{
@@ -557,13 +560,14 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 			tx_buffer[length++] = 0x00;
 
 		// Add CRC
-		// TODO: Calculate CRC
-		if (1 && ((control & EBUF_CRC) || !(m_reg[B0_TCR] & NOCRC)))
+		if (((control & EBUF_CRC) || !(m_reg[B0_TCR] & NOCRC)))
 		{
-			tx_buffer[length++] = 0x11;
-			tx_buffer[length++] = 0x22;
-			tx_buffer[length++] = 0x33;
-			tx_buffer[length++] = 0x44;
+			u32 crc = util::crc32_creator::simple(tx_buffer + 4, length - 4);
+
+			tx_buffer[length++] = (crc >> 0) & 0xff;
+			tx_buffer[length++] = (crc >> 8) & 0xff;
+			tx_buffer[length++] = (crc >> 16) & 0xff;
+			tx_buffer[length++] = (crc >> 24) & 0xff;
 		}
 
 		// Remove status, length
@@ -590,7 +594,7 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 		if (m_reg[B0_TCR] & (EPH_LOOP | LOOP))
 			send_complete_cb(length);
 		else
-			send(&tx_buffer[4], length);
+			send(&tx_buffer[4], length, 4);
 
 	}
 }
@@ -841,7 +845,9 @@ u16 smc91c9x_device::read(offs_t offset, u16 mem_mask)
 			else
 				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];
 
-			result = buffer[addr++];
+			result = 0;
+			if ( ACCESSING_BITS_0_7 )
+				result = buffer[addr++];
 			if ( ACCESSING_BITS_8_15 )
 				result |= buffer[addr++] << 8;
 			if ( m_reg[B2_POINTER] & 0x4000 )
@@ -872,8 +878,10 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 	if (offset != B0_BANK && offset < sizeof(m_reg))
 		LOG("%s:smc91c9x_w(%s) = [%04X]<-%04X & (%04X & %04X)\n", machine().describe_context(), ethernet_regname[offset], offset, data, mem_mask , m_regmask[offset]);
 
+	const uint16_t old_reg = m_reg[offset];
 	mem_mask &= m_regmask[offset];
 	COMBINE_DATA(&m_reg[offset]);
+	const uint16_t new_reg = m_reg[offset];
 
 	/* handle it */
 	switch (offset)
@@ -911,7 +919,7 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 				reset();
 			}
 
-			if ( !(data & RXEN) )
+			if ( (old_reg & RXEN) && !(new_reg & RXEN))
 			{
 				reset_completed_rx();
 			}
@@ -919,6 +927,11 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 			{
 				// Set LINK_OK in status
 				m_reg[B0_EPH_STATUS] |= LINK_OK;
+			}
+
+			if ((old_reg ^ new_reg) & PRMS)
+			{
+				set_promisc(new_reg & PRMS);
 			}
 
 			if (VERBOSE & LOG_GENERAL)
@@ -951,14 +964,16 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 			break;
 
 		case B1_IA4_5:
-			set_promisc(m_reg[B0_RCR] & PRMS);
-			set_mac((char *)&m_reg[B1_IA0_1]);
-
+			if ( ACCESSING_BITS_8_15 )
+			{
+				set_promisc(m_reg[B0_RCR] & PRMS);
+				set_mac((char *)&m_reg[B1_IA0_1]);
+			}
 			break;
 
 		case B1_CONTROL:      /* control register */
 			// Clearing LE_EN clears interrupt from LINK_OK status change
-			if (!(data & LE_ENABLE))
+			if ( (old_reg & LE_ENABLE) && !(new_reg & LE_ENABLE))
 			{
 				m_reg[B2_INTERRUPT] &= ~EINT_EPH;
 				update_ethernet_irq();
@@ -1002,7 +1017,8 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 			else
 				buffer = &m_buffer[(m_reg[B2_PNR_ARR] & 0x1f) * ETHER_BUFFER_SIZE];
 
-			buffer[addr++] = data;
+			if ( ACCESSING_BITS_0_7 )
+				buffer[addr++] = data;
 			if ( ACCESSING_BITS_8_15 )
 				buffer[addr++] = data >> 8;
 			if ( m_reg[B2_POINTER] & AUTO_INCR)

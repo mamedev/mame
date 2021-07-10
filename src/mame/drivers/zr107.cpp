@@ -797,7 +797,7 @@ void midnrun_state::midnrun(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midnrun_state::main_memmap);
 
-	config.set_maximum_quantum(attotime::from_hz(750000)); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(15000));
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
@@ -813,7 +813,7 @@ void jetwave_state::jetwave(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jetwave_state::main_memmap);
 
-	config.set_maximum_quantum(attotime::from_hz(2000000)); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(15000));
 
 	// video hardware
 	m_screen->set_size(1024, 1024);
@@ -927,10 +927,10 @@ ROM_END
 
 ROM_START( midnruna2 )
 	ROM_REGION32_BE(0x200000, "prgrom", 0)    // PowerPC program roms
-	ROM_LOAD32_BYTE( "477ab1d01.20u", 0x000003, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // labeled AB1, but still program version AAA, v1.10 (ASA)
-	ROM_LOAD32_BYTE( "477ab1d02.17u", 0x000002, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
-	ROM_LOAD32_BYTE( "477ab1d03.15u", 0x000001, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
-	ROM_LOAD32_BYTE( "477ab1d04.13u", 0x000000, 0x80000, CRC(0eb264b7) SHA1(179a3d58c0f554fd1b283ee3640ce09d5142b288) )
+	ROM_LOAD32_BYTE( "477ab1d01.20u", 0x000000, 0x80000, CRC(3aa31517) SHA1(315d9c3c930493e39bc497ceafa0c4ef6fa64e4d) ) // labeled AB1, but still program version AAA, v1.10 (ASA)
+	ROM_LOAD32_BYTE( "477ab1d02.17u", 0x000001, 0x80000, CRC(c506bd3d) SHA1(d44ed2cb39f0da44f681190132c7603dfca813d9) )
+	ROM_LOAD32_BYTE( "477ab1d03.15u", 0x000002, 0x80000, CRC(53f8e898) SHA1(ba83a60a411bb307cb0e424099716ccf888a4f39) )
+	ROM_LOAD32_BYTE( "477ab1d04.13u", 0x000003, 0x80000, CRC(0eb264b7) SHA1(179a3d58c0f554fd1b283ee3640ce09d5142b288) )
 
 	ROM_REGION(0x20000, "audiocpu", 0)      // M68K program
 	ROM_LOAD16_WORD_SWAP( "477b07.19l", 0x000000, 0x20000, CRC(2d00cf76) SHA1(152bed061c59e29864d735f8beba2a49136f7212) )

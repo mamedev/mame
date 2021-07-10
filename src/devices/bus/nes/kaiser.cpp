@@ -309,12 +309,12 @@ void nes_ks7037_device::device_start()
 void nes_ks7037_device::pcb_reset()
 {
 	prg8_89(0);
-	prg8_ab(0x1e);
+	prg8_ab(0x0e);
 	prg8_cd(0);
-	prg8_ef(0x1f);
+	prg8_ef(0x0f);
 	chr8(0, CHRRAM);
 
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	m_latch = 0;
 }
 
@@ -836,21 +836,19 @@ void nes_ks7016_device::write_h(offs_t offset, uint8_t data)
  but with WRAM split between 0x6000-0x6fff
  and 0xb000-0xbfff.
 
- iNES:
+ NES 2.0: mapper 307
 
- In MESS: Unsupported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_ks7037_device::update_prg()
 {
 	prg8_89(m_reg[6]);
-	prg8_ab(0xfe);
 	prg8_cd(m_reg[7]);
-	prg8_ef(0xff);
 	set_nt_page(0, CIRAM, m_reg[2] & 1, 1);
-	set_nt_page(1, CIRAM, m_reg[3] & 1, 1);
-	set_nt_page(2, CIRAM, m_reg[4] & 1, 1);
+	set_nt_page(2, CIRAM, m_reg[3] & 1, 1);
+	set_nt_page(1, CIRAM, m_reg[4] & 1, 1);
 	set_nt_page(3, CIRAM, m_reg[5] & 1, 1);
 }
 
@@ -858,16 +856,16 @@ uint8_t nes_ks7037_device::read_m(offs_t offset)
 {
 //  LOG_MMC(("ks7037 read_m, offset: %04x\n", offset));
 	if (offset < 0x1000)
-		return m_prgram[offset & 0x0fff];
+		return m_prgram[offset];
 	else
-		return m_prg[(0x1e * 0x1000) + (offset & 0x0fff)];
+		return m_prg[0x0f * 0x1000 + (offset & 0x0fff)]; // 4k PRG bank 15 is fixed
 }
 
 void nes_ks7037_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("ks7037 write_m, offset: %04x, data: %02x\n", offset, data));
 	if (offset < 0x1000)
-		m_prgram[offset & 0x0fff] = data;
+		m_prgram[offset] = data;
 }
 
 uint8_t nes_ks7037_device::read_h(offs_t offset)

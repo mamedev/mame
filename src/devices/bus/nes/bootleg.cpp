@@ -13,7 +13,6 @@
 
  TODO:
  - review all PCBs and fix the starting banks (which are often the main problem of not working games)
- - investigate pcbs listed in FCEUmm but with apparently no dumps available (LE05 and LH53)
 
  ***********************************************************************************************************/
 
@@ -44,18 +43,22 @@ DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "N
 DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_SMB3PIRATE,     nes_smb3p_device,     "nes_smb3p",     "NES Cart Super Mario Bros. 3 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_BTL_DNINJA,     nes_btl_dn_device,    "nes_btl_dn",    "NES Cart DragonNinja Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_WHIRLWIND_2706, nes_whirl2706_device, "nes_whirl2706", "NES Cart Whilwind 2706 PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2J,          nes_smb2j_device,     "nes_smb2j",     "NES Cart Super Mario Bros. 2 Jpn PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "NES Cart Super Mario Bros. 2 Jpn (Alt) PCB")
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
+DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "NES Cart Palthena no Kagami Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH-32 Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "NES Cart LH-10 Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH-53 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_DH08,           nes_dh08_device,      "nes_dh08",      "NES Cart DH-08 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LE05,           nes_le05_device,      "nes_le05",      "NES Cart LE05 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "NES Cart LH10 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
+DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH53 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "NES Cart AC08 Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_UNL_BB,         nes_unl_bb_device,    "nes_unl_bb",    "NES Cart FDS+CHR Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "NES Cart Super Mario Bros. Malee 2 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
@@ -91,11 +94,6 @@ nes_btl_dn_device::nes_btl_dn_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_whirl2706_device::nes_whirl2706_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_WHIRLWIND_2706, tag, owner, clock), m_latch(0)
-{
-}
-
 nes_smb2j_device::nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SMB2J, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
@@ -111,13 +109,48 @@ nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_0353, tag, owner, clock), m_reg(0)
+{
+}
+
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_reg(0)
 {
 }
 
+nes_palthena_device::nes_palthena_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_PALTHENA, tag, owner, clock), m_reg(0)
+{
+}
+
 nes_tobidase_device::nes_tobidase_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_TOBIDASE, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_whirlwind_device::nes_whirlwind_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_dh08_device::nes_dh08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_whirlwind_device(mconfig, NES_DH08, tag, owner, clock)
+{
+}
+
+nes_le05_device::nes_le05_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_whirlwind_device(mconfig, NES_LE05, tag, owner, clock)
+{
+}
+
+nes_lh28_lh54_device::nes_lh28_lh54_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_whirlwind_device(mconfig, NES_LH28_LH54, tag, owner, clock)
+{
+}
+
+nes_lh31_device::nes_lh31_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_whirlwind_device(mconfig, NES_LH31, tag, owner, clock)
 {
 }
 
@@ -143,11 +176,6 @@ nes_2708_device::nes_2708_device(const machine_config &mconfig, const char *tag,
 
 nes_ac08_device::nes_ac08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_AC08, tag, owner, clock), m_latch(0)
-{
-}
-
-nes_unl_bb_device::nes_unl_bb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_UNL_BB, tag, owner, clock)
 {
 }
 
@@ -283,21 +311,6 @@ void nes_btl_dn_device::pcb_reset()
 	m_irq_count = 0;
 }
 
-void nes_whirl2706_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_latch));
-}
-
-void nes_whirl2706_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0xff);
-	chr8(0, m_chr_source);
-
-	m_latch = 0;
-}
-
 void nes_smb2j_device::device_start()
 {
 	common_start();
@@ -367,6 +380,20 @@ void nes_smb2jb_device::pcb_reset()
 	m_irq_count = 0;
 }
 
+void nes_0353_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_0353_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // fixed 32K bank
+	chr8(0, CHRRAM);
+
+	m_reg = 0;
+}
+
 void nes_09034a_device::device_start()
 {
 	common_start();
@@ -378,6 +405,22 @@ void nes_09034a_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+	m_reg = 0;
+}
+
+void nes_palthena_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_palthena_device::pcb_reset()
+{
+	prg8_89(0x0c);
+	// 0xa000-0xbfff switchable bank
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, CHRRAM);
+
 	m_reg = 0;
 }
 
@@ -394,6 +437,21 @@ void nes_tobidase_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
+}
+
+void nes_whirlwind_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_whirlwind_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	prg32((m_prg_chunks >> 1) - 1);      // upper PRG: banks are always fixed
+	chr8(0, m_chr_source);
+
+	m_reg = (m_prg_chunks << 1) - 1;     // lower PRG: ProWres needs this fixed, others modify it
 }
 
 void nes_lh32_device::device_start()
@@ -420,14 +478,15 @@ void nes_lh10_device::device_start()
 
 void nes_lh10_device::pcb_reset()
 {
-	chr8(0, CHRRAM);
-
 	prg8_89(0);
 	prg8_ab(0);
 	// 0xc000-0xdfff reads/writes WRAM
-	prg8_ef(0xff);
-	memset(m_reg, 0, sizeof(m_reg));
+	prg8_ef((m_prg_chunks << 1) - 1);
+	chr8(0, CHRRAM);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+
 	m_latch = 0;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 }
 
 void nes_lh53_device::device_start()
@@ -446,8 +505,8 @@ void nes_lh53_device::pcb_reset()
 	chr8(0, CHRRAM);
 
 	prg8_89(0xc);
-	prg8_ab(0xd);   // last 2K are overlayed by WRAM
-	prg8_cd(0xe);   // first 6K are overlayed by WRAM
+	prg8_ab(0xd);   // last 2K are overlaid by WRAM
+	prg8_cd(0xe);   // first 6K are overlaid by WRAM
 	prg8_ef(0xf);
 	m_reg = 0;
 	m_irq_count = 0;
@@ -465,7 +524,7 @@ void nes_2708_device::pcb_reset()
 	chr8(0, CHRRAM);
 
 	prg32(7);
-	// the upper PRG banks never change, but there are 8K of WRAM overlayed to the ROM area based on reg1
+	// the upper PRG banks never change, but there are 8K of WRAM overlaid to the ROM area based on reg1
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 }
@@ -482,21 +541,6 @@ void nes_ac08_device::pcb_reset()
 	chr8(0, m_chr_source);
 	prg32(0xff);
 	m_latch = 0xff;
-}
-
-void nes_unl_bb_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_unl_bb_device::pcb_reset()
-{
-	chr8(0, CHRROM);
-	prg32(0xff);
-	// the upper PRG banks never change, but there are 8K of WRAM overlayed to the ROM area based on reg1
-	m_reg[0] = 0xff;
-	m_reg[1] = 0;
 }
 
 void nes_mmalee_device::device_start()
@@ -922,29 +966,54 @@ void nes_btl_dn_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- WHIRLWIND-2706
+ Boards DH-08, LE05, LH28, LH31, LH54 (same as LH28)
 
- Games: Meikyuu Jiin Dababa (FDS conversion) and a few
- others
+ Games: Bubble Bobble alt 1, ProWres, Meikyuu Jiin Dababa,
+        Bubble Bobble alt 2, Falsion
 
- This PCB maps PRG in 0x6000-0x7fff
+ Similar PCB variants for FDS conversions by Whirlwind Manu. They
+ map PRG in 0x6000-0x7fff. They vary slightly in the use/nonuse
+ of CHR RAM, switchable banks, and valid register locations.
 
- iNES: mapper 108
+ iNES: mapper 108, 4 submappers
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_whirl2706_device::write_h(offs_t offset, uint8_t data)
+u8 nes_whirlwind_device::read_m(offs_t offset)
 {
-	LOG_MMC(("whirl2706 write_h, offset: %04x, data: %02x\n", offset, data));
-	m_latch = data;
+	LOG_MMC(("whirlwind read_m, offset: %04x\n", offset));
+	return m_prg[((m_reg & m_prg_mask) * 0x2000) + offset];
 }
 
-uint8_t nes_whirl2706_device::read_m(offs_t offset)
+void nes_dh08_device::write_h(offs_t offset, u8 data)      // submapper 1
 {
-	LOG_MMC(("whirl2706 read_m, offset: %04x\n", offset));
-	return m_prg[(m_latch * 0x2000 + (offset & 0x1fff)) & (m_prg_size - 1)];
+	LOG_MMC(("dh08 write_h, offset: %04x, data: %02x\n", offset, data));
+	if (offset >= 0x7000)
+		m_reg = data;
+}
+
+void nes_le05_device::write_h(offs_t offset, u8 data)      // submapper 4
+{
+	LOG_MMC(("le05 write_h, offset: %04x, data: %02x\n", offset, data));
+	chr8(data & 1, m_chr_source);
+}
+
+void nes_lh28_lh54_device::write_h(offs_t offset, u8 data) // submapper 3
+{
+	LOG_MMC(("lh28_lh54 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg = data;
+}
+
+void nes_lh31_device::write_h(offs_t offset, u8 data)      // submapper 2
+{
+	LOG_MMC(("lh31 write_h, offset: %04x, data: %02x\n", offset, data));
+	if (offset >= 0x6000)
+	{
+		m_reg = data;
+		chr8(data & (m_vrom_chunks - 1), m_chr_source);
+	}
 }
 
 /*-------------------------------------------------
@@ -1157,6 +1226,32 @@ void nes_smb2jb_device::write_ex(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ (BTL-)0353
+
+ Games: Lucky Rabbit (Roger Rabbit conversion)
+
+ NES 2.0: mapper 415
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_0353_device::read_m(offs_t offset)
+{
+// LOG_MMC(("0353 read_m, offset: %04x\n", offset));
+	return m_prg[m_reg * 0x2000 + offset];
+}
+
+void nes_0353_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("0353 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_reg = data & 0x0f;
+}
+
+/*-------------------------------------------------
+
  (UNL-)09-034A
 
  Games: Zanac FDS conversion with two PRG chips and
@@ -1188,6 +1283,91 @@ uint8_t nes_09034a_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
+ BTL-PALTHENA
+
+ Games: Palthena no Kagami (FDS conversion)
+
+ This board has fixed 8K PRG banks at 0x6000, 0x8000,
+ 0xc000, and 0xe000. The PRG bank at 0xa000 is switchable
+ by writing to the register in the same 0xa000-0xbfff
+ range. What makes the board interesting is the overlaid
+ 8K of RAM with only 6K addressable:
+
+   8K WRAM:           Addr:
+     0x0000-0x11ff      0xc000-0xd1ff
+     0x1200-0x12ff      0x8200-0x82ff
+     0x1300-0x17ff           N/A
+     0x1800-0x18ff      0x6000-0x60ff
+     0x1900-0x19ff           N/A
+     0x1a00-0x1aff      0x6200-0x62ff
+     0x1b00-0x1bff           N/A
+     0x1c00-0x1dff      0x6400-0x65ff
+     0x1e00-0x1eff           N/A
+     0x1f00-0x1fff      0xdf00-0xdfff
+
+ NES 2.0: mapper 539
+
+ In MAME: Supported.
+
+-------------------------------------------------*/
+
+u8 nes_palthena_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("palthena read_m, offset: %04x\n", offset));
+	switch (offset & 0x1f00)
+	{
+		case 0x0000:
+		case 0x0200:
+		case 0x0400:
+		case 0x0500:
+			return m_prgram[offset | 0x1800];
+		default:
+			return m_prg[0x0d * 0x2000 + offset];    // fixed PRG bank
+	}
+}
+
+void nes_palthena_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("palthena write_m, offset: %04x, data: %02x\n", offset, data));
+	switch (offset & 0x1f00)
+	{
+		case 0x0000:
+		case 0x0200:
+		case 0x0400:
+		case 0x0500:
+			m_prgram[offset | 0x1800] = data;
+			break;
+	}
+}
+
+u8 nes_palthena_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("palthena read_h, offset: %04x\n", offset));
+	u8 page = (offset >> 8);
+	if ((page >= 0x40 && page < 0x52) || page == 0x5f)
+		return m_prgram[offset & 0x1fff];
+	else if (page == 0x02)
+		return m_prgram[offset | 0x1000];
+
+	return hi_access_rom(offset);
+}
+
+void nes_palthena_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("palthena write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 page = (offset >> 8);
+	if ((page >= 0x40 && page < 0x52) || page == 0x5f)
+		m_prgram[offset & 0x1fff] = data;
+	else if (page == 0x02)
+		m_prgram[offset | 0x1000] = data;
+	else if (page >= 0x20 && page < 0x40)
+		prg8_ab(data & 0x0f);
+	else if (offset == 0x7fff)
+		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
  Bootleg Board used for FDS conversion
 
  Games: Tobidase Daisakusen (FDS conversion)
@@ -1202,7 +1382,7 @@ uint8_t nes_09034a_device::read_m(offs_t offset)
 
 void nes_tobidase_device::write_l(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("tobidase write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("tobidase write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
 
 	if ((offset & 0x63c0) == 0x41c0)
@@ -1309,7 +1489,6 @@ void nes_lh10_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		m_prgram[offset & 0x1fff] = data;
-
 	else
 	{
 		switch (offset & 0x6001)
@@ -1498,40 +1677,6 @@ void nes_ac08_device::write_h(offs_t offset, uint8_t data)
 		m_latch = (data >> 1) & 0x0f;
 	else
 		m_latch = data & 0x0f;  // apparently there also is a Castlevania FDS conversion using same board with different banking lines
-}
-
-/*-------------------------------------------------
-
- UNL-BB
-
- Games: Bubble Bobble and other FDS conversions with CHRROM!
-
- iNES:
-
-
- In MESS: Supported.
-
- -------------------------------------------------*/
-
-uint8_t nes_unl_bb_device::read_m(offs_t offset)
-{
-	LOG_MMC(("unl-bb read_m, offset: %04x\n", offset));
-	return m_prg[(((m_reg[0] & 3 & m_prg_mask) * 0x2000) + (offset & 0x1fff))];
-}
-
-void nes_unl_bb_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("unl-bb write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if (!(offset & 0x1000))
-	{
-		m_reg[0] = data;
-		m_reg[1] = data;
-	}
-	else
-		m_reg[1] = data & 1;    // Pro Wrestling uses this
-
-	chr8(m_reg[1] & 3, m_chr_source);
 }
 
 /*-------------------------------------------------

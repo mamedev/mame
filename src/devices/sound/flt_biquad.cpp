@@ -167,10 +167,11 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lowpass_calc(
 	return r;
 }
 
+
 // Multiple-Feedback filters
-// (This is sometimes called a 'Rauch' filter circuit.)
 
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback low-pass filter circuit.
+ * This is sometimes called a "Rauch" filter circuit.
  * NOTE: vRef is not definable when setting up the filter.
  *  If the analog effects caused by vRef are important to the operation of the specific
  *  filter in question, a netlist implementation may work better under those circumstances.
@@ -232,10 +233,15 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc
 }
 
 /* Setup a biquad filter structure based on a single op-amp Multiple-Feedback band-pass filter circuit.
- * NOTE: vRef is not definable when setting up the filter.
+ * This is sometimes called a "modified Deliyannis" or "Deliyannis-friend" filter circuit,
+ *  or an "Infinite Gain Multiple-Feedback [band-pass] Filter", or "IGMF".
+ * NOTE: vRef is not definable when setting up the filter, and is assumed to be grounded.
  *  If the analog effects caused by vRef are important to the operation of the specific filter
  *  in question, a netlist implementation may work better under those circumstances.
- * NOTE2: If r2 is not used, then set it to 0 ohms, the code will ignore it and assume a fixed gain of 1.
+ * TODO: There is a documented modification to this filter which adds a resistor ladder between
+ *  ground and the op-amp output, with the 'rung' of the ladder connecting to the + input of
+ *  the op-amp, and this allows more control of the filter.
+ * NOTE2: If r2 is not used, then set it to 0 ohms, the code will switch to an Infinite Gain MFB Bandpass
  *
  *                             .--------+---------.
  *                             |        |         |
@@ -313,6 +319,58 @@ filter_biquad_device& filter_biquad_device::opamp_mfb_highpass_setup(double r1, 
 	logerror("filter_biquad_device::opamp_mfb_highpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
 #endif
 	return setup(biquad_type::HIGHPASS, fc, q, gain);
+}
+
+/* Setup a biquad filter structure based on a single op-amp Differentiator band-pass filter circuit.
+ * This circuit is sometimes called an "Inverting Band Pass Filter Circuit"
+ * NOTE: vRef is not definable when setting up the filter.
+ *  If the analog effects caused by vRef are important to the operation of the specific filter
+ *  in question, a netlist implementation may work better under those circumstances.
+ *
+ *                           .--------+---------.
+ *                           |        |         |
+ *                          --- c2    Z         |
+ *                          ---       Z r2      |
+ *                           |        Z         |
+ *            r1      c1     |        |  |\     |
+ *   In >----ZZZZ-----||-----+--------+  | \    |
+ *                                    '--|- \   |
+ *                                       |   >--+------> out
+ *                                    .--|+ /
+ *                                    |  | /
+ *                           vRef >---'  |/
+ *
+ */
+filter_biquad_device& filter_biquad_device::opamp_diff_bandpass_setup(double r1, double r2, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	return setup(p);
+}
+
+void filter_biquad_device::opamp_diff_bandpass_modify(double r1, double r2, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_diff_bandpass_calc(r1, r2, c1, c2);
+	modify(p);
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_calc(double r1, double r2, double c1, double c2)
+{
+	filter_biquad_device::biquad_params r;
+	if ((r1 == 0) || (r2 == 0) || (c1 == 0) || (c2 == 0))
+	{
+		fatalerror("filter_biquad_device::opamp_diff_bandpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, c1: %f, c2: %f", r1, r2, c1, c2); /* Filter can not be setup.  Undefined results. */
+	}
+	r.gain = -r2 / r1;
+	double const f1 = 1.0 / (2 * M_PI * r1 * c1);
+	double const f2 = 1.0 / (2 * M_PI * r2 * c2);
+	double const fct = (log10(f1) + log10(f2)) / 2.0;
+	r.fc = pow(10.0, fct);
+	r.q = r.fc / (f2 - f1);
+	r.type = biquad_type::BANDPASS;
+#ifdef FLT_BIQUAD_DEBUG_SETUP
+		logerror("filter_biquad_device::opamp_diff_bandpass_calc(%f, %f, %f, %f) yields:\n\ttype = %d, fc = %f (f1 = %f, f2 = %f), Q = %f, gain = %f\n", r1, r2, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, f1, f2, r.q, r.gain);
+#endif
+	return r;
 }
 
 

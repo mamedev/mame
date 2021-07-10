@@ -629,7 +629,7 @@ static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 }
 
 // 0x10000 = size of the tri_sorted_list array
-class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4, 0x10000>
+class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4>
 {
 public:
 	typedef void (model2_renderer::*scanline_render_func)(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid);
@@ -638,7 +638,7 @@ public:
 	using triangle = model2_state::triangle;
 
 	model2_renderer(model2_state& state)
-		: poly_manager<float, m2_poly_extra_data, 4, 0x10000>(state.machine())
+		: poly_manager<float, m2_poly_extra_data, 4>(state.machine())
 		, m_state(state)
 		, m_destmap(512, 512)
 	{

@@ -15,6 +15,12 @@
  [*] the version number is written in the flash roms at the beginning of the game settings
 
 Note: There is known to exist an alternate version of The X-Files titled The Sex Files which is undumped
+The following additional games are also known to be undumped
+
+- Beat Player 2000, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Let's Dance, using the VRender0 Minus Rev5 PCB, with an undocumented BMkey Flash Rev2 dgPIX Entertainment 1999 subboard.
+- Fishing Maniac, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
+- Fishing Maniac 2, using the VRender0 Minus Rev5 PCB, with a Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999 subboard.
 
  Original bugs:
  - In King of Dynast Gear, Roger's fast attack shows some blank lines
@@ -57,7 +63,7 @@ Elfin
 The X-Files (Korean region)
 Fishing Maniac 3
 
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 |-----------------------------------------------------|
 |TDA1515                C-O-N-N-1                     |
 |   DA1545A                                       C   |
@@ -95,7 +101,7 @@ The X-Files (uncensored version)
 Jump Jump
 King of Dynast Gear
 
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 |-----------------------------------------------------|
 |TDA1515                C-O-N-N-1                     |
 |   DA1545A                                       C   |
@@ -481,7 +487,7 @@ Elfin
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -503,7 +509,7 @@ Jump Jump
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -526,7 +532,7 @@ The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Uncensored World version
@@ -551,7 +557,7 @@ The X-Files
 dgPIX Entertainment Inc. 1999
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 Contrary to what you might think on first hearing the title, this game
@@ -583,7 +589,7 @@ King of Dynast Gear
 EZ Graphics, 1999
 
 PCB combo:
-VRenderO Minus Rev5 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev5 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
 */
@@ -607,7 +613,7 @@ Fishing Maniac 3
 Saero Entertainment, 2002
 
 PCB combo:
-VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+VRender0 Minus Rev4 dgPIX Entertainment Inc. 1999
 Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
 
  U100 18 pin socket for the PIC chip is unused

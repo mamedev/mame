@@ -51386,7 +51386,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- ORIGINAL & HACK PIRATE CARTS -->
 
-	<software name="crimebst" supported="no">
+	<software name="crimebst">
 		<description>Crime Busters</description>
 		<year>1989</year>
 		<publisher>Gradiente ~ Bit Corp.</publisher>
@@ -51395,6 +51395,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="bitcorp_dis" />
 			<feature name="pcb" value="BIT-CORP-74*161/138" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="prg" size="131072">
 				<rom name="0.prg" size="131072" crc="1a8b558e" sha1="e881a8df5352cb21d49a5ab154ba59da2ffc0534" offset="00000" />
 			</dataarea>
@@ -66544,7 +66545,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="bublbfds">
 		<description>Bubble Bobble (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7032" />
 			<feature name="pcb" value="UNL-KS7032" />
@@ -66557,14 +66558,16 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<!-- This has been hacked to run on a different hardware -->
-	<software name="bublbfdsa" cloneof="bublbfds" supported="partial">
-		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB)</description>
+	<!-- This has been hacked to run on different hardware -->
+	<software name="bublbfdsa" cloneof="bublbfds">
+		<description>Bubble Bobble (Asia, FDS conversion, alt PCB)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH31"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="unl_dh08" />
+			<feature name="mirroring" value="horizontal" />
+			<feature name="pcb_model" value="DH-08" />
 			<dataarea name="prg" size="131072">
 				<rom name="bubble bobble (fds conversion, kaiser hacked)(unl)[p1].prg" size="131072" crc="af799590" sha1="71511ecb1e5d99f38a04ec9291b1abd4b512c42d" offset="00000" status="baddump" />
 			</dataarea>
@@ -66574,14 +66577,15 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<!-- This runs on a different hardware -->
+	<!-- This runs on yet another different hardware -->
 	<software name="bublbfdsb" cloneof="bublbfds">
-		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB 2)</description>
+		<description>Bubble Bobble (Asia, FDS conversion, alt PCB 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<!-- Not clear if both or only one dump came from a cart with this serial, NesDev wiki seems to think both and that this is a later release -->
+		<info name="serial" value="LH31"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_bb" />
-			<feature name="pcb" value="UNL-BB" />
+			<feature name="slot" value="unl_lh31" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="chr" size="32768">
 				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u].chr" size="32768" crc="a0f6ee8e" sha1="01e2ebbc9636bfd43876383bde3b1cb2c478f885" offset="00000" status="baddump" />
@@ -66668,9 +66672,9 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<description>Falsion (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH54"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="unl_lh28_lh54" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="falsion (fds conversion, whirlwind manu)(unl).prg" size="131072" crc="80589df6" sha1="12ddd9edb8894c200c9d89b9ee5673f1202aba19" offset="00000" status="baddump" />
@@ -66688,7 +66692,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_lh10" />
 			<feature name="pcb" value="UNL-LH10" />
-			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
 				<rom name="fuuun shaolin kyo (fds conversion) (unl).prg" size="131072" crc="120d5a6c" sha1="4c499a857087e6c121522435786792a2e4105ac1" offset="00000" status="baddump" />
 			</dataarea>
@@ -66767,13 +66770,46 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="meikyfds">
-		<description>Meikyuu Jiin Dababa (Asia, FDS conversion)</description>
+	<software name="hikaris">
+		<description>Hikari Shinwa - Palthena no Kagami (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="whirl2706" />
-			<feature name="pcb" value="WHIRLWIND-2706" />
+			<feature name="slot" value="palthena" />
+			<dataarea name="prg" size="131072">
+				<rom name="hikaris.prg" size="131072" crc="4da80b08" sha1="4f053c37d8bd0808e4edfd3922abb1a0cc1cd4dc" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="luckyrab">
+		<description>Lucky Rabbit (Asia, Roger Rabbit FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="btl_0353" />
+			<dataarea name="prg" size="131072">
+				<rom name="lucky rabbit.prg" size="131072" crc="dd7d6612" sha1="79106176aa04c669cd466963dfe7fdd187b8a9c7" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meikyfds">
+		<description>Meikyuu Jiin Dababa (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH28"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lh28_lh54" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="meikyuu jiin dababa (fds conversion) (unl).prg" size="131072" crc="d8012992" sha1="5f0943dc8145542abc70bf20e4754b3c08653399" offset="00000" status="baddump" />
@@ -66784,10 +66820,11 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="metroidk" supported="partial">
+	<software name="metroidk">
 		<description>Metroid - Jin Ji Zhi Ling (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
+		<info name="alt_title" value="緊急指令"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7037" />
 			<feature name="pcb" value="UNL-KS7037" />
@@ -66843,7 +66880,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="nazomfds" supported="no">
 		<description>Nazo no Murasamejou (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>Whirlwind Manu?</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH53"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_lh53" />
 			<feature name="pcb" value="UNL-LH53" />
@@ -66864,10 +66902,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	<software name="prowrfds">
 		<description>ProWres - Famicom Wrestling Association (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LE05"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_bb" />
-			<feature name="pcb" value="UNL-BB" />
+			<feature name="slot" value="unl_le05" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="16384">
 				<rom name="prowres (fds conversion, le05 simplified)(unl)[u].chr" size="16384" crc="58d4719f" sha1="372c4873696578ab56bdc8ec8133099194a864b7" offset="00000" status="baddump" />
@@ -67061,7 +67099,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="tobidfds">
+	<software name="tobidfds" supported="no">
 		<description>Tobidase Daisakusen (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -72194,7 +72232,7 @@ Other
 		</part>
 	</software>
 
-	<software name="angrybr3" supported="no">
+	<software name="angrybr3">
 		<description>Angry Birds 3 (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -72202,11 +72240,11 @@ Other
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="32768">
-				<rom name="angry bird 3.chr" size="32768" crc="03c91a82" sha1="40ffdbd7de4004534065e286e9084844c17d9a5c" offset="00000" status="baddump" />
+			<dataarea name="chr" size="65536">
+				<rom name="angry bird 3.chr" size="65536" crc="8bfe891e" sha1="1dc7fb81dbbfc4d44a56e9656f974a03bef23646" offset="00000" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="65536">
-				<rom name="angry bird 3.prg" size="65536" crc="d3dea6b3" sha1="162262daa614c8b75edf8eb7b31cf0fac427a59f" offset="00000" status="baddump" />
+			<dataarea name="prg" size="32768">
+				<rom name="angry bird 3.prg" size="32768" crc="3e26b2b4" sha1="273ad768a925fcaa330c8d73ce2441a3bce70285" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -72295,19 +72333,23 @@ Other
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="batman4" cloneof="batmanrj" supported="no">
+	<software name="batman4" cloneof="batmanrj">
 		<description>Batman 4 (Batman - Return of the Joker pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="262144">
 				<rom name="batman 4 (unl).chr" size="262144" crc="5d5f12b7" sha1="73dede39c092b908ee813660c8a46fa0af7219b6" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="batman 4 (unl).prg" size="131072" crc="123b3792" sha1="95b08688c277e5d697f34f44a893918fd091b552" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -72627,14 +72669,15 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="fifa96" cloneof="goal2" supported="no">
+	<software name="fifa96" cloneof="goal2">
 		<description>FIFA International 2' 96 (Goal!! pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="fifa international 2' 96 (unl).chr" size="131072" crc="d2b2f562" sha1="14d378ce21af97e5bb45473322c25c2599366952" offset="00000" status="baddump" />
 			</dataarea>
@@ -73294,14 +73337,15 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-<!-- FIXME: which board should use this game?? -->
-	<software name="pizzamar" cloneof="pizzapop" supported="no">
+	<software name="pizzamar" cloneof="pizzapop">
 		<description>Pizza Pop Mario (Pizza Pop pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A2" />
+			<feature name="vrc4-pin4" value="PRG A3" />
 			<dataarea name="chr" size="131072">
 				<rom name="pizza pop mario (unl).chr" size="131072" crc="37f34d22" sha1="a81956ae321112396bff8649d70a7be7e591e917" offset="00000" status="baddump" />
 			</dataarea>
@@ -73327,15 +73371,14 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-	<software name="plantzom" supported="partial">
+	<software name="plantzom">
 		<description>Plants Vs. Zombies (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="植物大战僵尸"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="axrom" />
-			<feature name="pcb" value="NES-AOROM" />
-			<feature name="bus_conflict" value="no" />
+		<!-- Header says mapper 4, i.e. txrom, but it seems to work under this MMC3 clone instead. Strange since this clearly shares code with angrybr3 and that one works under txrom. -->
+			<feature name="slot" value="txc_tw" />
 			<dataarea name="chr" size="131072">
 				<rom name="plants vs zomb.chr" size="131072" crc="b41a1d2e" sha1="599a24f0b1eda249b24825afeedef8901f12207a" offset="00000" status="baddump" />
 			</dataarea>
@@ -77921,10 +77964,11 @@ be better to redump them properly. -->
 	<software name="mc_20">
 		<description>20 in 1</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_20in1" />
 			<feature name="pcb" value="BMC-20IN1" />
+			<feature name="pcb_model" value="KS-7041" />
 			<dataarea name="prg" size="524288">
 				<rom name="20-in-1 [p1].prg" size="524288" crc="8f4fec56" sha1="0934fcf5f83a6ebef24d43ce577a547a31303615" offset="00000" status="baddump" />
 			</dataarea>
@@ -79708,12 +79752,11 @@ be better to redump them properly. -->
 
 	<software name="mc_76">
 		<description>76 in 1</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<year>1990</year>
+		<publisher>Tsang Hai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_76in1" />
 			<feature name="pcb" value="BMC-76IN1" />
-			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="2097152">
 				<rom name="76 in 1.prg" size="2097152" crc="147733df" sha1="39499923c8970b089e359ac256e71fb75ae3c0de" offset="00000" status="baddump" />
 			</dataarea>
@@ -80875,15 +80918,15 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_s42" supported="partial">
-		<description>Super 42 in 1 - 22 Games</description>
+	<software name="mc_s42">
+		<description>Super 42 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_s42in1" />
 			<feature name="pcb" value="BMC-SUPER42IN1" />
 			<dataarea name="prg" size="1048576">
-				<rom name="super 42 in 1 - 22 games.prg" size="1048576" crc="c9f92bd9" sha1="6060eb360b9b4ae7aca024c00ace5b472371d721" offset="00000" status="baddump" />
+				<rom name="super 42 in 1.prg" size="1048576" crc="c9f92bd9" sha1="6060eb360b9b4ae7aca024c00ace5b472371d721" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

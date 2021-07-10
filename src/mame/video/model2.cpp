@@ -811,28 +811,28 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		//        I was unable to make it work when converting to the new polygon rasterizer interface.
 		switch (renderer)
 		{
-		case 0: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), 3, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 0: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle<3>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
 		}
 	}
 	else
 	{
 		switch (renderer)
 		{
-		case 0: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 1: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 2: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 3: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 4: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 5: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 6: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
-		case 7: render_triangle(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), 0, tri->v[0], tri->v[1], tri->v[2]); break;
+		case 0: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_0, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 1: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_1, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 2: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_2, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 3: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_3, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 4: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_4, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 5: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_5, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 6: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_6, this), tri->v[0], tri->v[1], tri->v[2]); break;
+		case 7: render_triangle<0>(vp, render_delegate(&model2_renderer::model2_3d_render_7, this), tri->v[0], tri->v[1], tri->v[2]); break;
 		}
 	}
 }

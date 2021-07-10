@@ -201,8 +201,8 @@ ROM_START( innotab2 )
 	// this uses a "eMMC" type ROM chip, should it be treated as a CHD, or like a NAND ROM?
 	ROM_REGION( 0x0100000, "emmc_boot", ROMREGION_ERASEFF )
 	// these are both blank, unused, or read protected in some way?
-	//ROM_LOAD( "boot1.bin", 0x000000, 0x0100000, CRC(956bac74) SHA1(bf0b121670df23f2cc64302d9f215e7c81187bbb ) // FIXED BITS (11111111)
-	//ROM_LOAD( "boot2.bin", 0x000000, 0x0100000, CRC(956bac74) SHA1(bf0b121670df23f2cc64302d9f215e7c81187bbb ) // FIXED BITS (11111111)
+	//ROM_LOAD( "boot1.bin", 0x000000, 0x0100000, CRC(956bac74) SHA1(bf0b121670df23f2cc64302d9f215e7c81187bbb) ) // FIXED BITS (11111111)
+	//ROM_LOAD( "boot2.bin", 0x000000, 0x0100000, CRC(956bac74) SHA1(bf0b121670df23f2cc64302d9f215e7c81187bbb) ) // FIXED BITS (11111111)
 
 	ROM_REGION( 0x220, "emmc_misc1", ROMREGION_ERASEFF )
 	ROM_LOAD( "ecsd_csd.bin", 0x000000, 0x220, CRC(a30bcb97) SHA1(ba83c5b2c73f26ad89ac7cc44b0ea6971050cfa4) )

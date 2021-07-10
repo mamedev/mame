@@ -7,7 +7,7 @@
 
 // Polygon rasterizer interface
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
-	: poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>(state.machine())
+	: poly_manager<float, hng64_poly_data, 7>(state.machine())
 	, m_state(state)
 	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
@@ -1441,7 +1441,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].p[2] = color.g();
 			pVert[2].p[3] = color.b();
 
-			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), 4, pVert[0], pVert[1], pVert[2]);
+			render_triangle<4>(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
 	}
 	else
@@ -1497,7 +1497,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].p[5] = pvjp1.texCoords[0];
 			pVert[2].p[6] = pvjp1.texCoords[1];
 
-			render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_texture_scanline, this), 7, pVert[0], pVert[1], pVert[2]);
+			render_triangle<7>(visibleArea, render_delegate(&hng64_poly_renderer::render_texture_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
 	}
 }

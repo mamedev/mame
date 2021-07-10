@@ -1199,13 +1199,13 @@ void cave_state::paccarn_map(address_map &map)
 	map(0x100000, 0x10ffff).ram().share("nvram");                                                    // RAM (battery)
 	map(0x200000, 0x20ffff).ram().share("spriteram.0");                                              // Sprites
 	map(0x300000, 0x307fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                      // Layer 0
-	map(0x400000, 0x40007f).w(FUNC(cave_state::videoregs_w<0>)).share("videoregs.0");                // Video Regs
-	map(0x400000, 0x400007).r(FUNC(cave_state::irq_cause_r));                                        // IRQ Cause
-	map(0x400068, 0x400069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // Watchdog
-	map(0x500000, 0x500001).portr("IN0");                                                            // Inputs + EEPROM + Hopper
-	map(0x500002, 0x500003).portr("IN1");                                                            // Inputs
+	map(0x400000, 0x400001).portr("IN0");                                                            // Inputs + EEPROM + Hopper
+	map(0x400002, 0x400003).portr("IN1");                                                            // Inputs
+	map(0x500000, 0x50ffff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette.0"); // Palette
 	map(0x600000, 0x600005).w(m_tilemap[0], FUNC(tilemap038_device::vregs_w));                       // Layer 0 Control
-	map(0x700000, 0x70ffff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette.0"); // Palette
+	map(0x700000, 0x70007f).w(FUNC(cave_state::videoregs_w<0>)).share("videoregs.0");                // Video Regs
+	map(0x700000, 0x700007).r(FUNC(cave_state::irq_cause_r));                                        // IRQ Cause
+	map(0x700068, 0x700069).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // Watchdog
 	map(0x800001, 0x800001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // M6295
 	map(0xc00000, 0xc00001).w(FUNC(cave_state::pacslot_leds_w));                                     // Leds + Hopper
 	map(0xe00001, 0xe00001).w(FUNC(cave_state::tjumpman_eeprom_w));                                  // EEPROM
@@ -4167,8 +4167,6 @@ ROM_END
 
   28MHz XTAL
 
-  TODO: doesn't boot. Can be tricked via debugger:
-        when stuck at PC 0x16628, do PC = 0x1662a
 ***************************************************************************/
 
 ROM_START( paccarn )
@@ -5355,7 +5353,7 @@ GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_state, init_hotdogst,
 
 GAME( 1996, pacslot,    0,        pacslot,  pacslot,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Slot",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, paceight,   0,        paceight, paceight, cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Eight",    MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paccarn,    0,        paccarn,  paccarn,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Carnival", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // stuck at boot. See ROM_LOAD for infos on how to get it to start via debugger
+GAME( 1996, paccarn,    0,        paccarn,  paccarn,  cave_state, init_tjumpman,  ROT0,   "Namco",                                  "Pac-Carnival", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, ppsatan,    0,        ppsatan,  ppsatan,  cave_state, init_ppsatan,   ROT0,   "Kato Seisakujo Co., Ltd.",               "Poka Poka Satan (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 

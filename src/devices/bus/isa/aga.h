@@ -14,9 +14,9 @@
     // 256 8x8 thick chars
     // 256 8x8 thin chars
     // 256 9x14 in 8x16 chars, line 3 is connected to a10
-    ROM_LOAD("aga.chr",     0x00000, 0x02000, CRC(aca81498))
+	ROM_LOAD("aga.chr",      0x0000, 0x2000, CRC(aca81498) SHA1(0d84c89487ee7a6ac4c9e73fdb30c5fd8aa595f8) )
     // hercules font of above
-    ROM_LOAD("hercules.chr", 0x00000, 0x1000, CRC(7e8c9d76))
+    ROM_LOAD("hercules.chr", 0x0000, 0x1000, CRC(7e8c9d76))
 
 */
 #ifndef MAME_BUS_ISA_AGA_H
