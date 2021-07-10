@@ -42,8 +42,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode%u", 0U),
 		m_colorram(*this, "colorram%u", 0U),
 		m_videoram(*this, "videoram%u", 0U),
-		m_p1_key(*this, "P1_KEY%u", 0U),
-		m_p2_key(*this, "P2_KEY%u", 0U)
+		m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
 	void vsmjtria(machine_config &config);
@@ -59,16 +58,14 @@ private:
 	required_device_array<gfxdecode_device, 2> m_gfxdecode;
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	required_ioport_array<5> m_p1_key;
-	required_ioport_array<5> m_p2_key;
+	required_ioport_array<5> m_key[2];
 
 	tilemap_t *m_bg_tilemap[2];
 	uint8_t m_keyboard_cmd[2];
 
 	template <uint8_t Which> void nmi_w(uint8_t data);
 	template <uint8_t Which> void ctrl_w(uint8_t data);
-	uint8_t p1_keyboard_r();
-	uint8_t p2_keyboard_r();
+	template <uint8_t Which> uint8_t keyboard_r();
 	template <uint8_t Which> void keyboard_w(uint8_t data);
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -107,28 +104,16 @@ void vsmjtria_state::ctrl_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 }
 
-uint8_t vsmjtria_state::p1_keyboard_r()
+template <uint8_t Which>
+uint8_t vsmjtria_state::keyboard_r()
 {
 	uint8_t data = 0x00;
 
-	if (BIT(m_keyboard_cmd[0], 0)) data |= m_p1_key[0]->read();
-	if (BIT(m_keyboard_cmd[0], 1)) data |= m_p1_key[1]->read();
-	if (BIT(m_keyboard_cmd[0], 2)) data |= m_p1_key[2]->read();
-	if (BIT(m_keyboard_cmd[0], 3)) data |= m_p1_key[3]->read();
-	if (BIT(m_keyboard_cmd[0], 4)) data |= m_p1_key[4]->read();
-
-	return data;
-}
-
-uint8_t vsmjtria_state::p2_keyboard_r()
-{
-	uint8_t data = 0x00;
-
-	if (BIT(m_keyboard_cmd[1], 0)) data |= m_p2_key[0]->read();
-	if (BIT(m_keyboard_cmd[1], 1)) data |= m_p2_key[1]->read();
-	if (BIT(m_keyboard_cmd[1], 2)) data |= m_p2_key[2]->read();
-	if (BIT(m_keyboard_cmd[1], 3)) data |= m_p2_key[3]->read();
-	if (BIT(m_keyboard_cmd[1], 4)) data |= m_p2_key[4]->read();
+	if (BIT(m_keyboard_cmd[Which], 0)) data |= m_key[Which][0]->read();
+	if (BIT(m_keyboard_cmd[Which], 1)) data |= m_key[Which][1]->read();
+	if (BIT(m_keyboard_cmd[Which], 2)) data |= m_key[Which][2]->read();
+	if (BIT(m_keyboard_cmd[Which], 3)) data |= m_key[Which][3]->read();
+	if (BIT(m_keyboard_cmd[Which], 4)) data |= m_key[Which][4]->read();
 
 	return data;
 }
@@ -220,7 +205,15 @@ void vsmjtria_state::sub_io_map(address_map &map)
 
 
 static INPUT_PORTS_START( vsmjtria )
-	// TODO: coins?
+	PORT_START("P1_COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
+
+	PORT_START("P2_COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED ) // stored at A38F along with bit 0 - seems to be vestigial, bit 2 tested at 02D1, but result discarded
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // masked out after being read
 
 	PORT_START("P1_KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Single Start")
@@ -467,16 +460,16 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 
 	i8255_device &ppi0(I8255(config, "ppi0"));
 	ppi0.in_pa_callback().set_log("ppi0 pa read");
-	ppi0.in_pb_callback().set(FUNC(vsmjtria_state::p1_keyboard_r));
-	ppi0.in_pc_callback().set_log("ppi0 pc read"); // pending read for latch?
+	ppi0.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<0>));
+	ppi0.in_pc_callback().set_ioport("P1_COIN");
 	ppi0.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<0>));
 	ppi0.out_pb_callback().set_log("ppi0 pb write");
 	ppi0.out_pc_callback().set_log("ppi0 pc write");
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.in_pa_callback().set_log("ppi1 pa read");
-	ppi1.in_pb_callback().set(FUNC(vsmjtria_state::p2_keyboard_r));
-	ppi1.in_pc_callback().set_log("ppi1 pc read"); // pending read for latch?
+	ppi1.in_pb_callback().set(FUNC(vsmjtria_state::keyboard_r<1>));
+	ppi1.in_pc_callback().set_ioport("P2_COIN");
 	ppi1.out_pa_callback().set(FUNC(vsmjtria_state::keyboard_w<1>));
 	ppi1.out_pb_callback().set_log("ppi1 pb write");
 	ppi1.out_pc_callback().set_log("ppi1 pc write");

@@ -26907,6 +26907,7 @@ sold through Takeru vending machines -->
 		</part>
 	</software>
 
+	<!-- missing track 78 which contains copy protection, disabled are original, enabled are cracked -->
 	<software name="lasttemp">
 		<description>The Last Tempest</description>
 		<year>1994</year>
@@ -26915,13 +26916,15 @@ sold through Takeru vending machines -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
-				<rom name="last tempest, the (1994)(koucha kikaku)(disk 1 of 2)(disk a).dim" size="1261824" crc="0fe6ffe9" sha1="3abdc1c7e7a0657c776aa340b40163a78fa5d667" offset="000000" />
+				<!--<rom name="last tempest, the (1994)(koucha kikaku)(disk 1 of 2)(disk a).dim" size="1261824" crc="0fe6ffe9" sha1="3abdc1c7e7a0657c776aa340b40163a78fa5d667" offset="000000" status="baddump" />-->
+				<rom name="Last_Tempest_A.dim" size="1261824" crc="d4f483b5" sha1="6e76f4dd9172174feaac54af6ed813f0cb33e9fb" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261824">
-				<rom name="last tempest, the (1994)(koucha kikaku)(disk 2 of 2)(disk b).dim" size="1261824" crc="6cbba9cd" sha1="3b48f44ea9c2c3b76f32017444f3703359b77174" offset="000000" />
+				<!--<rom name="last tempest, the (1994)(koucha kikaku)(disk 2 of 2)(disk b).dim" size="1261824" crc="6cbba9cd" sha1="3b48f44ea9c2c3b76f32017444f3703359b77174" offset="000000" status="baddump" />-->
+				<rom name="Last_Tempest_B.dim" size="1261824" crc="3d67e52f" sha1="d78d68763971c6a02bfbee9bc083d402b32d3338" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

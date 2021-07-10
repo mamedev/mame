@@ -308,7 +308,7 @@ private:
 	optional_device<k001005_device> m_k001005;
 	optional_device_array<k001006_device, 2> m_k001006;
 	optional_device_array<k001604_device, 2> m_k001604;
-	optional_device_array<voodoo_device, 2> m_voodoo;
+	optional_device_array<generic_voodoo_device, 2> m_voodoo;
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
@@ -559,7 +559,7 @@ void gticlub_state::hangplt_sharc0_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(generic_voodoo_device::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_0_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
@@ -571,7 +571,7 @@ void gticlub_state::hangplt_sharc1_map(address_map &map)
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
 	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(voodoo_device::voodoo_w));
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(generic_voodoo_device::write));
 	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
 	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_1_w));
 	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
@@ -832,7 +832,7 @@ uint32_t gticlub_state::screen_update_two_screens(screen_device &screen, bitmap_
 	bitmap.fill(m_palette->pen(0), cliprect);
 
 //  m_k001604[Which]->draw_back_layer(bitmap, cliprect);
-	m_voodoo[Which]->voodoo_update(bitmap, cliprect);
+	m_voodoo[Which]->update(bitmap, cliprect);
 	m_k001604[Which]->draw_front_layer(screen, bitmap, cliprect);
 
 	return 0;
@@ -913,8 +913,6 @@ void gticlub_state::thunderh(machine_config &config) // Todo: K056230 from the I
 
 	m_adc1038->set_gti_club_hack(false);
 
-	m_k056230->set_thunderh_hack(true);
-
 	M68000(config, m_gn680, XTAL(32'000'000) / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &gticlub_state::gn680_memmap);
 }
@@ -952,19 +950,21 @@ void gticlub_state::hangplt(machine_config &config)
 
 	K056230(config, m_k056230, "maincpu");
 
-	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[0], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[0]->set_fbmem(2);
 	m_voodoo[0]->set_tmumem(2,2);
-	m_voodoo[0]->set_screen_tag("lscreen");
-	m_voodoo[0]->set_cpu_tag(m_dsp[0]);
+	m_voodoo[0]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[0]->set_screen("lscreen");
+	m_voodoo[0]->set_cpu(m_dsp[0]);
 	m_voodoo[0]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_voodoo[0]->stall_callback().set(m_dsp[0], FUNC(adsp21062_device::write_stall));
 
-	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	VOODOO_1(config, m_voodoo[1], voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo[1]->set_fbmem(2);
 	m_voodoo[1]->set_tmumem(2,2);
-	m_voodoo[1]->set_screen_tag("rscreen");
-	m_voodoo[1]->set_cpu_tag(m_dsp[1]);
+	m_voodoo[1]->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo[1]->set_screen("rscreen");
+	m_voodoo[1]->set_cpu(m_dsp[1]);
 	m_voodoo[1]->vblank_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_voodoo[1]->stall_callback().set(m_dsp[1], FUNC(adsp21062_device::write_stall));
 

@@ -65,7 +65,9 @@ void nes_2a03pur_device::pcb_reset()
 
  Board 2A03 Puritans Album
 
- In MESS: supported.
+ iNES: mapper 31
+
+ In MAME: Supported.
 
  This mapper supports up to 1MB of PRG-ROM, in 4k
  banks located at $8000, $9000, $A000, $B000, $C000,

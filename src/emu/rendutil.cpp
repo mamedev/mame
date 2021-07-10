@@ -17,6 +17,9 @@
 #include "jpeglib.h"
 #include "jerror.h"
 
+#include <csetjmp>
+#include <cstdlib>
+
 
 namespace {
 
@@ -112,6 +115,18 @@ void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::core_file &file)
 	src->bytes_in_buffer = 0;
 	src->next_input_byte = nullptr;
 }
+
+
+struct jpeg_setjmp_error_mgr : public jpeg_error_mgr
+{
+	jpeg_setjmp_error_mgr()
+	{
+		jpeg_std_error(this);
+		error_exit = [] (j_common_ptr cinfo) { std::longjmp(static_cast<jpeg_setjmp_error_mgr *>(cinfo->err)->m_jump_buffer, 1); };
+	}
+
+	std::jmp_buf m_jump_buffer;
+};
 
 } // anonymous namespace
 
@@ -672,73 +687,74 @@ void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file)
 	// deallocate previous bitmap
 	bitmap.reset();
 
-	// create a JPEG source for the file
+	// set up context for error handling
 	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
-	cinfo.err = jpeg_std_error(&jerr);
-	jerr.error_exit = [] (j_common_ptr cinfo) { throw cinfo->err; };
+	jpeg_setjmp_error_mgr jerr;
+	cinfo.err = &jerr;
 	JSAMPARRAY buffer = nullptr;
-	try
-	{
-		jpeg_create_decompress(&cinfo);
-		cinfo.mem->max_memory_to_use = 128 * 1024 * 1024;
-		jpeg_corefile_source::source(&cinfo, file);
-
-		// read JPEG header and start decompression
-		jpeg_read_header(&cinfo, TRUE);
-		jpeg_start_decompress(&cinfo);
-
-		// allocates the destination bitmap
-		int w = cinfo.output_width;
-		int h = cinfo.output_height;
-		int s = cinfo.output_components;
-		bitmap.allocate(w, h);
-
-		// allocates a buffer to receive the information and copy them into the bitmap
-		int row_stride = cinfo.output_width * cinfo.output_components;
-		JSAMPARRAY buffer = reinterpret_cast<JSAMPARRAY>(malloc(sizeof(JSAMPROW)));
-		buffer[0] = reinterpret_cast<JSAMPROW>(malloc(sizeof(JSAMPLE) * row_stride));
-
-		while (cinfo.output_scanline < cinfo.output_height)
-		{
-			int j = cinfo.output_scanline;
-			jpeg_read_scanlines(&cinfo, buffer, 1);
-
-			if (s == 1)
-			{
-				for (int i = 0; i < w; ++i)
-					bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i], buffer[0][i], buffer[0][i]);
-
-			}
-			else if (s == 3)
-			{
-				for (int i = 0; i < w; ++i)
-					bitmap.pix(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
-			}
-			else
-			{
-				osd_printf_error("Cannot read JPEG data from file.\n");
-				bitmap.reset();
-				break;
-			}
-		}
-
-		// finish decompression and frees the memory
-		jpeg_finish_decompress(&cinfo);
-	}
-	catch (jpeg_error_mgr *)
+	int w, h, s, row_stride, j, i;
+	if (setjmp(jerr.m_jump_buffer)) // setjmp must be used in control expression
 	{
 		char msg[1024];
 		(cinfo.err->format_message)(reinterpret_cast<j_common_ptr>(&cinfo), msg);
 		osd_printf_error("JPEG error reading data from file: %s\n", msg);
 		bitmap.reset();
+		goto cleanup; // use goto to ensure longjmp can't cross an initialisation
 	}
+
+	// create a JPEG source for the file
+	jpeg_create_decompress(&cinfo);
+	cinfo.mem->max_memory_to_use = 128 * 1024 * 1024;
+	jpeg_corefile_source::source(&cinfo, file);
+
+	// read JPEG header and start decompression
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	// allocates the destination bitmap
+	w = cinfo.output_width;
+	h = cinfo.output_height;
+	s = cinfo.output_components;
+	bitmap.allocate(w, h);
+
+	// allocates a buffer to receive the information and copy them into the bitmap
+	row_stride = cinfo.output_width * cinfo.output_components;
+	buffer = reinterpret_cast<JSAMPARRAY>(std::malloc(sizeof(JSAMPROW)));
+	buffer[0] = reinterpret_cast<JSAMPROW>(std::malloc(sizeof(JSAMPLE) * row_stride));
+
+	while (cinfo.output_scanline < cinfo.output_height)
+	{
+		j = cinfo.output_scanline;
+		jpeg_read_scanlines(&cinfo, buffer, 1);
+
+		if (s == 1)
+		{
+			for (i = 0; i < w; ++i)
+				bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i], buffer[0][i], buffer[0][i]);
+
+		}
+		else if (s == 3)
+		{
+			for (i = 0; i < w; ++i)
+				bitmap.pix(j, i) = rgb_t(0xff, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
+		}
+		else
+		{
+			osd_printf_error("Cannot read JPEG data from file.\n");
+			bitmap.reset();
+			break;
+		}
+	}
+
+	// finish decompression and free the memory
+	jpeg_finish_decompress(&cinfo);
+cleanup:
 	jpeg_destroy_decompress(&cinfo);
 	if (buffer)
 	{
 		if (buffer[0])
-			free(buffer[0]);
-		free(buffer);
+			std::free(buffer[0]);
+		std::free(buffer);
 	}
 }
 
@@ -917,18 +933,21 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info
 ru_imgformat render_detect_image(util::core_file &file)
 {
 	// PNG: check for valid header
-	util::png_error const png = util::png_info::verify_header(file);
-	file.seek(0, SEEK_SET);
-	if (util::png_error::NONE == png)
-		return RENDUTIL_IMGFORMAT_PNG;
+	{
+		util::png_error const png = util::png_info::verify_header(file);
+		file.seek(0, SEEK_SET);
+		if (util::png_error::NONE == png)
+			return RENDUTIL_IMGFORMAT_PNG;
+	}
 
 	// JPEG: attempt to read header with libjpeg
-	jpeg_decompress_struct cinfo;
-	jpeg_error_mgr jerr;
-	cinfo.err = jpeg_std_error(&jerr);
-	jerr.error_exit = [] (j_common_ptr cinfo) { throw cinfo->err; };
-	try
 	{
+		jpeg_decompress_struct cinfo;
+		jpeg_setjmp_error_mgr jerr;
+		cinfo.err = &jerr;
+		if (setjmp(jerr.m_jump_buffer)) // setjmp must be used in control expression
+			goto notjpeg; // use goto to ensure longjmp can't cross an initialisation
+
 		jpeg_create_decompress(&cinfo);
 		cinfo.mem->max_memory_to_use = 128 * 1024 * 1024;
 		jpeg_corefile_source::source(&cinfo, file);
@@ -936,18 +955,19 @@ ru_imgformat render_detect_image(util::core_file &file)
 		jpeg_destroy_decompress(&cinfo);
 		file.seek(0, SEEK_SET);
 		return RENDUTIL_IMGFORMAT_JPEG;
-	}
-	catch (jpeg_error_mgr *)
-	{
+
+	notjpeg:
 		jpeg_destroy_decompress(&cinfo);
 		file.seek(0, SEEK_SET);
 	}
 
 	// Microsoft DIB: check for valid header
-	util::msdib_error const msdib = util::msdib_verify_header(file);
-	file.seek(0, SEEK_SET);
-	if (util::msdib_error::NONE == msdib)
-		return RENDUTIL_IMGFORMAT_MSDIB;
+	{
+		util::msdib_error const msdib = util::msdib_verify_header(file);
+		file.seek(0, SEEK_SET);
+		if (util::msdib_error::NONE == msdib)
+			return RENDUTIL_IMGFORMAT_MSDIB;
+	}
 
 	// TODO: add more as necessary
 	return RENDUTIL_IMGFORMAT_UNKNOWN;

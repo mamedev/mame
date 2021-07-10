@@ -1899,6 +1899,7 @@ files {
 	MAME_DIR .. "src/mame/machine/lynx.cpp",
 	MAME_DIR .. "src/mame/drivers/pofo.cpp",
 	MAME_DIR .. "src/mame/machine/pofo_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/pofo_kbd.h",
 	MAME_DIR .. "src/mame/drivers/tvboy.cpp",
 }
 
@@ -2968,8 +2969,9 @@ files {
 createMESSProjects(_target, _subtarget, "microterm")
 files {
 	MAME_DIR .. "src/mame/drivers/ergo201.cpp",
-	MAME_DIR .. "src/mame/drivers/microterm.cpp",
 	MAME_DIR .. "src/mame/drivers/microterm_f8.cpp",
+	MAME_DIR .. "src/mame/drivers/mt420.cpp",
+	MAME_DIR .. "src/mame/drivers/mt5510.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "mips")

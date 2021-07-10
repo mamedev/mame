@@ -348,10 +348,10 @@ objects have methods used to do drawing
 most methods set parameters, others actually draw
 */
 
-class nv2a_rasterizer : public poly_manager<double, nvidia_object_data, 26, 8192>
+class nv2a_rasterizer : public poly_manager<double, nvidia_object_data, 26>
 {
 public:
-	nv2a_rasterizer(running_machine &machine) : poly_manager<double, nvidia_object_data, 26, 8192>(machine)
+	nv2a_rasterizer(running_machine &machine) : poly_manager<double, nvidia_object_data, 26>(machine)
 	{
 	}
 };

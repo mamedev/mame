@@ -2316,7 +2316,7 @@ license:CC0
 
 	</hash>
 	<hash crc32="579e5bc5" sha1="6654bab6d46f3bffa0bc7b94f08a69fb59450f5f" name="Ai Senshi Nicol [p1]">
-		<extrainfo>42 0 8 16</extrainfo>
+		<extrainfo>42 129 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="37f59450" sha1="1ba180792cd1560dbac295a7a0292b52f458ea0e" name="Aigiina no Yogen - From The Legend of Balubalouk (J)">
@@ -6236,7 +6236,7 @@ license:CC0
 	</hash>
 	<hash crc32="5e153659" sha1="d053c279733aae6cb05b6b841b7a858ff4f4532d" name="Batman 4 (Unl)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>25 0 8 32</extrainfo>
+		<extrainfo>25 128 8 32</extrainfo>
 
 	</hash>
 	<hash crc32="318cc88c" sha1="3e3e7ba813aac70ea4e3d513e07e167c9a759538" name="Batman Easy Mode by deespence2929 (Batman Hack)">
@@ -21377,7 +21377,7 @@ license:CC0
 	</hash>
 	<hash crc32="2ea914fa" sha1="54f6e9c7f59d7a1b961f694716f5d4967bb55aa8" name="FIFA International 2' 96 (Unl)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>25 0 8 16</extrainfo>
+		<extrainfo>25 128 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="d47d6c90" sha1="2c96ce787c403b4a982316dfeb2e5360982fdd34" name="Fighting Golf (J)">
@@ -47737,7 +47737,7 @@ license:CC0
 	</hash>
 	<hash crc32="7075bf5e" sha1="d36e66e863395a20b80d61fb78317a7fd412b381" name="Pizza Pop Mario (Unl)">
 		<status>GoodNES Verified Image</status>
-		<extrainfo>25 0 8 16</extrainfo>
+		<extrainfo>25 128 8 16</extrainfo>
 
 	</hash>
 	<hash crc32="814d5a50" sha1="bfbc4ca688917180caf4ba9c9a6be57b29ac94bd" name="Pizza Pop! (J)">

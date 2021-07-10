@@ -128,7 +128,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="PgUp = 1 or \ = 2. Space to start; Ctrl to accelerate; Left-Right to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="championracer.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
+				<rom name="3128c66-3g1.ic1.bin" size="16384" crc="f32aa1ac" sha1="cfd4454f013af20d4c139af7d965d45a253f695b" />
 			</dataarea>
 		</part>
 	</software>
@@ -140,8 +140,8 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Blue player uses arrows; Red player uses R,D,F,G" /><!-- difficult to hit the ball -->
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="exbaseb1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
-				<rom name="exbaseb2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
+				<rom name="73.ic1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
+				<rom name="72.ic2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -155,7 +155,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Use either Z,X,Space; or Left,Right,Alt" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="gundam.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
+				<rom name="3128c76-3k1.ic1.bin" size="16384" crc="4f90b7c7" sha1="c836f02876533dbd92fbef1b2237d47bd914ab50" />
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,21 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Home = Yes; Backspace = No;Q4 = - or 9; Q5 = \ or pgDn or PgUp; Space to start" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="perfectmahjongg.bin" size="16384" crc="98335879" sha1="b696bb189e3b812fcbd7b2ab798f6e28c76c0fe0" />
+				<rom name="3128c61-3g1.ic1.bin" size="16384" crc="98335879" sha1="b696bb189e3b812fcbd7b2ab798f6e28c76c0fe0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rengo">
+		<description>Rengo Kantai</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="3256d53-4b3.ic1.bin" size="0x2000" crc="23bd3075" sha1="a58b91d62d2e062130ff974b763ebc28867c629c" offset="0x6000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+				<rom size="0x2000" offset="0x2000" loadflag="continue" />
+				<rom size="0x2000" offset="0x4000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +193,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Wait for small beep. Press Space(keyboard) or S(joystick). Press G." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="sekigahara.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
+				<rom name="3256d54-4b1.ic1.bin" size="0x2000" crc="a1a1c686" sha1="5c35750fd2bedae5f5d4d8b4d7bb7b13d22dc3b6" offset="0x6000" />
 				<rom size="0x2000" offset="0x0000" loadflag="continue" />
 				<rom size="0x2000" offset="0x2000" loadflag="continue" />
 				<rom size="0x2000" offset="0x4000" loadflag="continue" />
@@ -207,8 +221,8 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Press Space to begin and fire. QWEADZXC to steer. S toggle guidance system." />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="senemy1.bin" size="0x2000" crc="d9ff07dd" sha1="6397ce1a301e1e2a7d30e1fe76621373e3f74ea8" offset="0x4000" />
-				<rom name="senemy2.bin" size="0x2000" crc="2fee4171" sha1="f06a68b1a844f390378a78b363c8a62d6c161073" offset="0x6000" />
+				<rom name="78.ic1.bin" size="0x2000" crc="d9ff07dd" sha1="6397ce1a301e1e2a7d30e1fe76621373e3f74ea8" offset="0x4000" />
+				<rom name="77.ic2.bin" size="0x2000" crc="2fee4171" sha1="f06a68b1a844f390378a78b363c8a62d6c161073" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +234,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="Ctrl to attack; Arrows to move" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="prowrestling.bin" size="16384" crc="1f1b1b35" sha1="b1efe7cbfb70455d86ff0da1fb3f242593a40ffd" />
+				<rom name="3128d06-3j1.ic1.bin" size="16384" crc="1f1b1b35" sha1="b1efe7cbfb70455d86ff0da1fb3f242593a40ffd" />
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +246,7 @@ The monitor will expect you to load a program from cassette.
 		<info name="usage" value="1 player: Use P[];./ticPGDN to move, Space to fire. 2 players: P1 use Arrows,Ctrl,Alt; P2 use RDFGAS" />
 		<part name="cart" interface="rx78_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="ultraman.bin" size="8192" crc="f7bc2394" sha1="e124c7325044abc615b807c0b670bbaa35d94264" />
+				<rom name="364_c85-3j1.ic1.bin" size="8192" crc="f7bc2394" sha1="e124c7325044abc615b807c0b670bbaa35d94264" />
 			</dataarea>
 		</part>
 	</software>

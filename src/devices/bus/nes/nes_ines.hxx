@@ -86,11 +86,11 @@ static const nes_mmc mmc_list[] =
 	{ 52, BMC_GOLD_7IN1 },
 	{ 53, SVISION16_BOARD },
 	{ 54, BMC_NOVEL1 },
-	// 55 Genius SMB - No info (nor images) available
+	{ 55, UNL_MMALEE },  // Genius SMB
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
-	// 59 Unused
+	// 59 BMC-T3H53 and BMC-D1038
 	// 60 4-in-1, 35-in-1 Reset based
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
@@ -112,7 +112,7 @@ static const nes_mmc mmc_list[] =
 	{ 78, IREM_HOLYDIVR },
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
-	// 81 Unused
+	// 81 NTDEC's Super Gun. Dump available?
 	{ 82, TAITO_X1_017 },
 	{ 83, CONY_BOARD },
 	// 84 Pasofami hacked images?
@@ -139,7 +139,7 @@ static const nes_mmc mmc_list[] =
 	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
-	{ 108, WHIRLWIND_2706 },
+	{ 108, UNL_LH28_LH54 }, // 108 has 4 variant boards
 	// 109 Unused
 	// 110 Unused
 	// 111 Ninja Ryuukenden Chinese? - Unsupported
@@ -155,11 +155,11 @@ static const nes_mmc mmc_list[] =
 	{ 121, KAY_BOARD },
 	// 122 Unused
 	{ 123, UNL_H2288 },
-	// 124 Unused
-	// 125 Unused
+	// 124 Super Game Mega Type III pirate arcade board?
+	{ 125, UNL_LH32 },  // Monty no Doki Doki Daidassou - FDS Conversion
 	{ 126, BMC_PJOY84 },
-	// 127 Unused
-	// 128 Unused
+	// 127 Double Dragon II Japan pirate. Dump available?
+	// 128 1994 Super HiK 4-in-1 pirate. Dump available?
 	// 129 Unused
 	// 130 Unused
 	// 131 Unused
@@ -205,7 +205,7 @@ static const nes_mmc mmc_list[] =
 	{ 171, KAISER_KS7058 },
 	{ 172, TXC_DUMARACING },
 	{ 173, TXC_MJBLOCK },
-	// 174 Unused
+	// 174 Bisqwit's TV GAME multicart (Legend of Kage, Goonies, etc). Dump available?
 	{ 175, KAISER_KS7022},
 	{ 176, UNL_XIAOZY },
 	{ 177, HENGG_SRICH },
@@ -251,7 +251,7 @@ static const nes_mmc mmc_list[] =
 	{ 217, BMC_GOLDENCARD_6IN1 },
 	{ 218, NOCASH_NOCHR },
 	// 219 UNL-A9746 (according to Cah4e3's code, no dump available (yet)
-	// 220 Unused
+	// 220 Unused - reserved for emulator debugging
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },
 	{ 223, WAIXING_TYPE_I },    // (according to NEStopia source, it's MMC3 with more WRAM)
@@ -267,8 +267,8 @@ static const nes_mmc mmc_list[] =
 	{ 233, BMC_SUPER22 },
 	{ 234, AVE_MAXI15 },
 	{ 235, BMC_GOLD150 },   // 235 Golden Game x-in-1 - Unsupported
-	// 236 Game 800-in-1 - Unsupported
-	// 237 Unused
+	// 236 Game 800-in-1 - Unsupported, Realtec boards 8031 and 8155
+	// 237 Teletubbies 420-in-1 multicart. Dump available?
 	{ 238, UNL_603_5052 },
 	// 239 Unused
 	{ 240, CNE_SHLZ },
@@ -498,7 +498,7 @@ void nes_cart_slot_device::call_load_ines()
 		else if (submapper)
 		{
 			submapper = 0;
-			logerror("Undocumented iNES2.0 submapper, please report it to the MESS boards!\n");
+			logerror("Undocumented iNES2.0 submapper, please report it to the MAME boards!\n");
 		}
 	}
 
@@ -653,6 +653,13 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 89 & 93
 			else
 				m_cart->set_pcb_ctrl_mirror(true);
+			break;
+
+		case UNL_LH28_LH54:
+			if (vrom_size)
+				m_pcb_id = (vrom_size == 0x4000) ? UNL_LE05 : UNL_LH31;
+			else if (!BIT(local_options, 0))
+				m_pcb_id = UNL_DH08;
 			break;
 
 		case HES_BOARD:
@@ -965,6 +972,13 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
 			break;
+		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards
+			if (ROM[5])
+				pcb_id = (ROM[5] == 2) ? UNL_LE05 : UNL_LH31;
+			else if (!BIT(ROM[6], 0))
+				pcb_id = UNL_DH08;
+			break;
+
 	}
 
 	return nes_get_slot(pcb_id);

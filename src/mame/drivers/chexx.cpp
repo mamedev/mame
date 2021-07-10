@@ -13,29 +13,29 @@ Electro-mechanical bubble hockey games:
 
 (Some sources indicate these may have been copied from a earlier Sega game called Face-Off)
 
-Olimpic Hockey (UNDUMPED Spanish clone from Inor, probably unlicensed) runs on an almost
+Olimpic Hockey, Spanish clone from Inor (probably unlicensed), runs on an almost
 exact clone of the 1st generation ICE Chexx hardware (https://www.recreativas.org/olimpic-hockey-1110-inor):
 
  Inor Olympic Hockey PCB
  ________________________________________
  |                                       |
  | : <- Conn P4            ____________  |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLB|  |
  |                        |___________|  |
  |                        ____________   |
  |                        |/B8342 SJLC|  |
  |                        |___________|  |
  |                        ____________   |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLD|  |
  |                        |___________|  |
  |                        ____________   |
- |/o\ <- Conn p5          |/B8342 SJLC|  |
+ |/o\ <- Conn p5          |/B8342 SJLF|  |
  ||o|                     |___________|  |
  ||o|                     ____________   |
- |                        |/B8342 SJLC|  |
+ |                        |/B8342 SJLG|  |
  |                        |___________|  |
  | : <- Conn P7           ____________   |
- | :                      |/B8342 SJLC|  |
+ | :                      |/B8342 SJLH|  |
  |                        |___________|  |
  | ____                   ____________   |
  | LM358N                 |EMPTY      |  |
@@ -503,6 +503,48 @@ ROM_START( chexx83 )
 	ROM_LOAD( "chexx83.u19", 0xe000, 0x2000, NO_DUMP )
 ROM_END
 
+// Same PCB as 'chexx83'
+ROM_START( olihockey )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "inor_1.u4", 0x0000, 0x0800, CRC(97716ac9) SHA1(b85ff1401544dc7121babee8adf618f82a2f6a89) )
+
+	ROM_REGION( 0x4000, "digitalker", ROMREGION_ERASE00 )
+	// bank switched (from samples region)
+
+	ROM_REGION( 0x10000, "samples", ROMREGION_ERASE00 )
+	ROM_LOAD( "b8342_sjlb.u19", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlc.u18", 0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjld.u17", 0x4000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlf.u16", 0x6000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlg.u15", 0x8000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlh.u14", 0xa000, 0x2000, NO_DUMP )
+
+	// U13 and U12 unpopulated
+	ROM_FILL(                   0xc000, 0x2000, 0xff )
+	ROM_FILL(                   0xe000, 0x2000, 0xff )
+ROM_END
+
+// Same PCB as 'chexx83'
+ROM_START( olihockeya )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "inor_2.u4", 0x0000, 0x0800, CRC(038958a4) SHA1(aec5e24eea1829459dd3ef9ffe3e4b8c39071ced) )
+
+	ROM_REGION( 0x4000, "digitalker", ROMREGION_ERASE00 )
+	// bank switched (from samples region)
+
+	ROM_REGION( 0x10000, "samples", ROMREGION_ERASE00 )
+	ROM_LOAD( "b8342_sjlb.u19", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlc.u18", 0x2000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjld.u17", 0x4000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlf.u16", 0x6000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlg.u15", 0x8000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b8342_sjlh.u14", 0xa000, 0x2000, NO_DUMP )
+
+	// U13 and U12 unpopulated
+	ROM_FILL(                   0xc000, 0x2000, 0xff )
+	ROM_FILL(                   0xe000, 0x2000, 0xff )
+ROM_END
+
 /***************************************************************************
 
 Face-Off PCB?
@@ -542,5 +584,7 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
-GAME( 1983, chexx83,  0,       chexx,    chexx83, chexx_state,    empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, faceoffh_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )

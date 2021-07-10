@@ -253,7 +253,7 @@ nes_bmc_72in1_device::nes_bmc_72in1_device(const machine_config &mconfig, const 
 }
 
 nes_bmc_76in1_device::nes_bmc_76in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_76IN1, tag, owner, clock), m_latch1(0), m_latch2(0)
+	: nes_nrom_device(mconfig, NES_BMC_76IN1, tag, owner, clock)
 {
 }
 
@@ -822,18 +822,15 @@ void nes_bmc_72in1_device::pcb_reset()
 void nes_bmc_76in1_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_latch1));
-	save_item(NAME(m_latch2));
+	save_item(NAME(m_reg));
 }
 
 void nes_bmc_76in1_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
+	chr8(0, CHRRAM);
 
-	m_latch1 = 0;
-	m_latch2 = 0;
+	m_reg[0] = m_reg[1] = 0;
 }
 
 void nes_bmc_110in1_device::device_start()
@@ -2154,48 +2151,28 @@ void nes_bmc_72in1_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
- BMC-76IN1
+ BMC-76IN1, BMC-SUPER42IN1
 
  Unknown Bootleg Multigame Board
  Games: 76 in 1, Super 42 in 1
 
  iNES: mapper 226
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-// does this work for super42in1 as well?!?
-void nes_bmc_76in1_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_76in1_device::write_h(offs_t offset, u8 data)
 {
-	int hi_bank;
-	int size_16;
-	int bank;
-
 	LOG_MMC(("bmc_76in1 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg[offset & 0x01] = data;
+	set_nt_mirroring(BIT(m_reg[0], 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 
-	if (offset & 0x01)
-		m_latch2 = data;
-	else
-		m_latch1 = data;
-
-	set_nt_mirroring(BIT(m_latch1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	hi_bank = m_latch1 & 0x01;
-	size_16 = m_latch1 & 0x20;
-	bank = ((m_latch1 & 0x1e) >> 1) | ((m_latch1 & 0x80) >> 3) | ((m_latch2 & 0x01) << 5);
-
-	if (size_16)
-	{
-		bank <<= 1;
-		if (hi_bank)
-			bank ++;
-
-		prg16_89ab(bank);
-		prg16_cdef(bank);
-	}
-	else
-		prg32(bank);
+	u8 bank = (m_reg[1] << 6) | ((m_reg[0] & 0x80) >> 2) | (m_reg[0] & 0x1f);
+	u8 mode_16k = BIT(m_reg[0], 5);
+	bank &= 0x7e | mode_16k;
+	prg16_89ab(bank);
+	prg16_cdef(bank | !mode_16k);
 }
 
 /*-------------------------------------------------

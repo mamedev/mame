@@ -698,7 +698,7 @@ DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
   pega notes (paradise)
   build in amstrad pc1640
 
-  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae))
+  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
 
   4 additional dipswitches
   seems to have emulation modes at register level
@@ -731,7 +731,7 @@ DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
   oak vga (oti 037 chip)
   (below bios patch needed for running)
 
-  ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43))
+  ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
 */
 
 

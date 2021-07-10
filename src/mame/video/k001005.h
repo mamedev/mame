@@ -42,7 +42,7 @@ enum k001005_param
 };
 
 
-class k001005_renderer : public poly_manager<float, k001005_polydata, 8, 50000>
+class k001005_renderer : public poly_manager<float, k001005_polydata, 10>
 {
 public:
 	k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006);
@@ -60,6 +60,7 @@ public:
 	void draw_scanline(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
 	void draw_scanline_tex(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
 	void draw_scanline_gouraud_blend(int32_t scanline, const extent_t &extent, const k001005_polydata &extradata, int threadid);
+	void draw_scanline_tex_gouraud(int32_t scanline, const extent_t& extent, const k001005_polydata& extradata, int threadid);
 
 	static constexpr int POLY_Z = 0;
 	static constexpr int POLY_FOG = 1;
@@ -71,6 +72,11 @@ public:
 	static constexpr int POLY_R = 3;
 	static constexpr int POLY_G = 4;
 	static constexpr int POLY_B = 5;
+	// when gouraud and texture are both used
+	static constexpr int POLY_ALTR = 6;
+	static constexpr int POLY_ALTG = 7;
+	static constexpr int POLY_ALTB = 8;
+	static constexpr int POLY_ALTA = 9;
 
 private:
 	std::unique_ptr<bitmap_rgb32> m_fb[2];

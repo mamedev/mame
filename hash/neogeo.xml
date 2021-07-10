@@ -8919,7 +8919,7 @@ license:CC0
 	<software name="mslug4">
 		<description>Metal Slug 4 (NGM-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGM-2630"/>
 		<info name="release" value="20020327"/>
 		<info name="alt_title" value="メタルスラッグ4"/>
@@ -8960,7 +8960,7 @@ license:CC0
 	<software name="mslug4h" cloneof="mslug4">
 		<description>Metal Slug 4 (NGH-2630)</description>
 		<year>2002</year>
-		<publisher>Mega / Playmore</publisher>
+		<publisher>Mega / Noise Factory / Playmore</publisher>
 		<info name="serial" value="NGH-2630"/>
 		<info name="release" value="20020613"/>
 		<info name="alt_title" value="メタルスラッグ4"/>

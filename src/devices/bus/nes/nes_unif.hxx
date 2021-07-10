@@ -127,7 +127,6 @@ static const unif unif_list[] =
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  SVISION16_BOARD}, // mapper 53
 	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
-	{ "UNL-BB",                     0,    0, CHRRAM_0,  UNL_BB},
 	{ "UNL-LH32",                   0,    0, CHRRAM_0,  UNL_LH32},
 	{ "UNL-LH53",                   0,    0, CHRRAM_0,  UNL_LH53},
 	{ "BMC-G-146",                  0,    0, CHRRAM_0,  BMC_G146},
@@ -385,7 +384,7 @@ void nes_cart_slot_device::call_load_unif()
 				else
 				{
 					small_prg = true;
-					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
+					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MAME forums.\n");
 				}
 
 				/* Read in the program chunks */
@@ -411,7 +410,7 @@ void nes_cart_slot_device::call_load_unif()
 			}
 			else
 			{
-				logerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MESS Board.\n");
+				logerror("Unsupported UNIF chunk or corrupted header. Please report the problem at MAME Board.\n");
 				read_length = size;
 			}
 		}
@@ -424,7 +423,7 @@ void nes_cart_slot_device::call_load_unif()
 
 	if (!prg_start)
 	{
-		fatalerror("No PRG found. Please report the problem at MESS Board.\n");
+		fatalerror("No PRG found. Please report the problem at MAME Board.\n");
 	}
 
 	// SETUP step 2: getting PCB and other settings
@@ -489,7 +488,7 @@ void nes_cart_slot_device::call_load_unif()
 	}
 
 	if (small_prg)  // This is not supported yet, so warn users about this
-		osd_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MESS yet.");
+		osd_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MAME yet.");
 
 	if (vrom_size)
 	{

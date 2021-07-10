@@ -198,11 +198,13 @@ TODO:
   Terminator 2's t2.107. I can only assume this was a mistake of the dumper.
 - lots of unknown reads and writes, also in galpanic but particularly in
   the Comad ones.
-- fantasia and newfant have a service mode but they doesn't work well (text
-  is missing or replaced by garbage). This might be just how the games are.
 - Is there a background enable register? Or a background clear. fantasia and
   newfant certainly look ugly as they are.
 
+BTANB:
+- fantasia and newfant have a service mode but it doesn't work well (text
+  is missing or replaced by garbage). This has been verified to happen with
+  New Fantasia (1994 copyright) on a Comad 940630 PCB.
 */
 
 #include "emu.h"
@@ -409,7 +411,7 @@ uint32_t expro02_state::screen_update_zipzap(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-static INPUT_PORTS_START( expro02 )
+static INPUT_PORTS_START( expro02 ) // TODO: at least for the 1994 version of New Fantasia running on the 940630 SWA and SWB should be inverted
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWA:1,2")
@@ -1492,26 +1494,26 @@ ROM_START( newfant )
 	ROM_LOAD( "musc2.02", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
-ROM_START( newfanta )
+ROM_START( newfanta ) // Comad 940630 PCB
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "prog2.12", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
-	ROM_LOAD16_BYTE( "prog1.07", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
-	ROM_LOAD16_BYTE( "iscr2.10", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
-	ROM_LOAD16_BYTE( "iscr1.05", 0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
-	ROM_LOAD16_BYTE( "iscr4.09", 0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
-	ROM_LOAD16_BYTE( "iscr3.04", 0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
-	ROM_LOAD16_BYTE( "iscr6.08", 0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
-	ROM_LOAD16_BYTE( "iscr5.03", 0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
-	ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
-	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
+	ROM_LOAD16_BYTE( "12.ue17",  0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
+	ROM_LOAD16_BYTE( "7.ud17",   0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
+	ROM_LOAD16_BYTE( "10.ue16b", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
+	ROM_LOAD16_BYTE( "5.ue16a",  0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
+	ROM_LOAD16_BYTE( "9.ue15b",  0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
+	ROM_LOAD16_BYTE( "4.ue15a",  0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
+	ROM_LOAD16_BYTE( "8.ue14b",  0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
+	ROM_LOAD16_BYTE( "3.ue14a",  0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
+	ROM_LOAD16_BYTE( "11.ue20b", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
+	ROM_LOAD16_BYTE( "6.ue20a",  0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "kan_spr", 0 ) // sprites
-	ROM_LOAD( "obj1.13", 0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
+	ROM_LOAD( "13.u5", 0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
 	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
-	ROM_LOAD( "musc1.01", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
-	ROM_LOAD( "musc2.02", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
+	ROM_LOAD( "1.ub6", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
+	ROM_LOAD( "2.uc6", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
 ROM_START( missw96 )

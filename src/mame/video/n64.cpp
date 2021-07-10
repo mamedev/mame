@@ -28,6 +28,7 @@ TODO:
 #include "includes/n64.h"
 #include "video/rdpblend.h"
 #include "video/rdptpipe.h"
+#include "screen.h"
 
 #include <algorithm>
 
@@ -3140,7 +3141,7 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8, 32000>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
 {
 	ignore = false;
 	dolog = false;

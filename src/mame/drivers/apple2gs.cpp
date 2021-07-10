@@ -115,6 +115,7 @@
 #include "bus/a2bus/ezcgi.h"
 #include "bus/a2bus/grappler.h"
 //#include "bus/a2bus/hostram.h"
+#include "bus/a2bus/lancegs.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 //#include "bus/a2bus/pc_xporter.h"
@@ -4788,6 +4789,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
 	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 	device.option_add("booti", A2BUS_BOOTI);     /* Booti Card */
+	device.option_add("lancegs", A2BUS_LANCEGS);  /* ///SHH SYSTEME LANceGS Card */
 }
 
 void apple2gs_state::apple2gs(machine_config &config)

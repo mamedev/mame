@@ -396,14 +396,14 @@ ROM_START( jackalr ) // Rotary Joystick: Shot direction is controlled via the ro
 	ROM_LOAD16_BYTE( "631t06.12h", 0x40000, 0x20000, CRC(2d10e56e) SHA1(447b464ea725fb9ef87da067a41bcf463b427cce) ) // Silkscreened MASK1M
 	ROM_LOAD16_BYTE( "631t07.13h", 0x40001, 0x20000, CRC(4961c397) SHA1(b430df58fc3bb722d6fb23bed7d04afdb7e5d9c1) ) // Silkscreened MASK1M
 		// These roms are on a tiny riser board - two smaller roms instead of MASK1M roms
-//  ROM_LOAD16_BYTE( "631_q04.7h",  0x20000, 0x10000, CRC(0) SHA1(0) )
-//  ROM_LOAD16_BYTE( "631_q05.7h",  0x00000, 0x10000, CRC(0) SHA1(0) )
-//  ROM_LOAD16_BYTE( "631_q06.8h",  0x20001, 0x10000, CRC(0) SHA1(0) )
-//  ROM_LOAD16_BYTE( "631_q07.8h",  0x00001, 0x10000, CRC(0) SHA1(0) ) // 631 Q04 through 631 Q11 need to be redumped and verified. Should be the same data
-//  ROM_LOAD16_BYTE( "631_q08.12h", 0x40000, 0x10000, CRC(0) SHA1(0) ) // until then we are going to use the standard MASK1M roms - Will fixed when dumped
-//  ROM_LOAD16_BYTE( "631_q09.12h", 0x60000, 0x10000, CRC(0) SHA1(0) )
-//  ROM_LOAD16_BYTE( "631_q10.13h", 0x40001, 0x10000, CRC(0) SHA1(0) )
-//  ROM_LOAD16_BYTE( "631_q11.13h", 0x60001, 0x10000, CRC(0) SHA1(0) )
+//  ROM_LOAD16_BYTE( "631_q04.7h",  0x20000, 0x10000, NO_DUMP )
+//  ROM_LOAD16_BYTE( "631_q05.7h",  0x00000, 0x10000, NO_DUMP )
+//  ROM_LOAD16_BYTE( "631_q06.8h",  0x20001, 0x10000, NO_DUMP )
+//  ROM_LOAD16_BYTE( "631_q07.8h",  0x00001, 0x10000, NO_DUMP ) // 631 Q04 through 631 Q11 need to be redumped and verified. Should be the same data
+//  ROM_LOAD16_BYTE( "631_q08.12h", 0x40000, 0x10000, NO_DUMP ) // until then we are going to use the standard MASK1M roms - Will fixed when dumped
+//  ROM_LOAD16_BYTE( "631_q09.12h", 0x60000, 0x10000, NO_DUMP )
+//  ROM_LOAD16_BYTE( "631_q10.13h", 0x40001, 0x10000, NO_DUMP )
+//  ROM_LOAD16_BYTE( "631_q11.13h", 0x60001, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x0200, "proms", 0 )    // color lookup tables
 	ROM_LOAD( "631r08.9h",  0x0000, 0x0100, CRC(7553a172) SHA1(eadf1b4157f62c3af4602da764268df954aa0018) ) // MMI 63S141AN or compatible (silkscreened 6301)

@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 #include "emu.h"
 #include "k001005.h"
+#include "screen.h"
 
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
@@ -24,7 +25,7 @@
 
 
 k001005_renderer::k001005_renderer(device_t &parent, screen_device &screen, device_t *k001006)
-	: poly_manager<float, k001005_polydata, 8, 50000>(screen)
+	: poly_manager<float, k001005_polydata, 10>(screen.machine())
 {
 	m_k001006 = k001006;
 
@@ -153,6 +154,7 @@ void k001005_renderer::render_polygons()
 	render_delegate rd_scan = render_delegate(&k001005_renderer::draw_scanline, this);
 	render_delegate rd_scan_tex = render_delegate(&k001005_renderer::draw_scanline_tex, this);
 	render_delegate rd_scan_gour_blend = render_delegate(&k001005_renderer::draw_scanline_gouraud_blend, this);
+	render_delegate rd_scan_tex_gouraud = render_delegate(&k001005_renderer::draw_scanline_tex_gouraud, this);
 
 	do
 	{
@@ -292,7 +294,7 @@ void k001005_renderer::render_polygons()
 					vertex3 = &v[2];
 				}
 
-				render_triangle(m_cliprect, rd_scan_tex, 6, *vertex1, *vertex2, *vertex3);
+				render_triangle<6>(m_cliprect, rd_scan_tex, *vertex1, *vertex2, *vertex3);
 
 				memcpy(&m_prev_v[1], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[2], vertex2, sizeof(vertex_t));
@@ -329,8 +331,8 @@ void k001005_renderer::render_polygons()
 					vertex4 = &v[3];
 				}
 
-				render_triangle(m_cliprect, rd_scan_tex, 6, *vertex1, *vertex2, *vertex3);
-				render_triangle(m_cliprect, rd_scan_tex, 6, *vertex3, *vertex4, *vertex1);
+				render_triangle<6>(m_cliprect, rd_scan_tex, *vertex1, *vertex2, *vertex3);
+				render_triangle<6>(m_cliprect, rd_scan_tex, *vertex3, *vertex4, *vertex1);
 
 				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
@@ -417,7 +419,7 @@ void k001005_renderer::render_polygons()
 
 				if (new_verts == 1)
 				{
-					render_triangle(m_cliprect, rd_scan_tex, 6, v[0], v[1], v[2]);
+					render_triangle<6>(m_cliprect, rd_scan_tex, v[0], v[1], v[2]);
 
 					memcpy(&m_prev_v[1], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[2], &v[1], sizeof(vertex_t));
@@ -425,8 +427,8 @@ void k001005_renderer::render_polygons()
 				}
 				else if (new_verts == 2)
 				{
-					render_triangle(m_cliprect, rd_scan_tex, 6, v[0], v[1], v[2]);
-					render_triangle(m_cliprect, rd_scan_tex, 6, v[2], v[3], v[0]);
+					render_triangle<6>(m_cliprect, rd_scan_tex, v[0], v[1], v[2]);
+					render_triangle<6>(m_cliprect, rd_scan_tex, v[2], v[3], v[0]);
 
 					memcpy(&m_prev_v[0], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[1], &v[1], sizeof(vertex_t));
@@ -514,7 +516,7 @@ void k001005_renderer::render_polygons()
 					vertex3 = &v[2];
 				}
 
-				render_triangle(m_cliprect, rd_scan, 3, *vertex1, *vertex2, *vertex3);
+				render_triangle<3>(m_cliprect, rd_scan, *vertex1, *vertex2, *vertex3);
 
 				memcpy(&m_prev_v[1], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[2], vertex2, sizeof(vertex_t));
@@ -551,8 +553,8 @@ void k001005_renderer::render_polygons()
 					vertex4 = &v[3];
 				}
 
-				render_triangle(m_cliprect, rd_scan, 3, *vertex1, *vertex2, *vertex3);
-				render_triangle(m_cliprect, rd_scan, 3, *vertex3, *vertex4, *vertex1);
+				render_triangle<3>(m_cliprect, rd_scan, *vertex1, *vertex2, *vertex3);
+				render_triangle<3>(m_cliprect, rd_scan, *vertex3, *vertex4, *vertex1);
 
 				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
 				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
@@ -621,7 +623,7 @@ void k001005_renderer::render_polygons()
 
 				if (new_verts == 1)
 				{
-					render_triangle(m_cliprect, rd_scan, 3, v[0], v[1], v[2]);
+					render_triangle<3>(m_cliprect, rd_scan, v[0], v[1], v[2]);
 
 					memcpy(&m_prev_v[1], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[2], &v[1], sizeof(vertex_t));
@@ -629,8 +631,8 @@ void k001005_renderer::render_polygons()
 				}
 				else if (new_verts == 2)
 				{
-					render_triangle(m_cliprect, rd_scan, 3, v[0], v[1], v[2]);
-					render_triangle(m_cliprect, rd_scan, 3, v[2], v[3], v[0]);
+					render_triangle<3>(m_cliprect, rd_scan, v[0], v[1], v[2]);
+					render_triangle<3>(m_cliprect, rd_scan, v[2], v[3], v[0]);
 
 					memcpy(&m_prev_v[0], &v[0], sizeof(vertex_t));
 					memcpy(&m_prev_v[1], &v[1], sizeof(vertex_t));
@@ -683,12 +685,12 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(m_cliprect, rd_scan_2d, 0, v[0], v[1], v[2]);
+				render_triangle<0>(m_cliprect, rd_scan_2d, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(m_cliprect, rd_scan_2d, 0, v[0], v[1], v[2]);
-				render_triangle(m_cliprect, rd_scan_2d, 0, v[2], v[3], v[0]);
+				render_triangle<0>(m_cliprect, rd_scan_2d, v[0], v[1], v[2]);
+				render_triangle<0>(m_cliprect, rd_scan_2d, v[2], v[3], v[0]);
 			}
 		}
 		else if (cmd == 0x8000008b)
@@ -772,12 +774,12 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[0], v[1], v[2]);
+				render_triangle<5>(m_cliprect, rd_scan_tex2d, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[0], v[1], v[2]);
-				render_triangle(m_cliprect, rd_scan_tex2d, 5, v[2], v[3], v[0]);
+				render_triangle<5>(m_cliprect, rd_scan_tex2d, v[0], v[1], v[2]);
+				render_triangle<5>(m_cliprect, rd_scan_tex2d, v[2], v[3], v[0]);
 			}
 		}
 		else if (cmd == 0x80000106 || cmd == 0x80000121 || cmd == 0x80000126)
@@ -812,9 +814,9 @@ void k001005_renderer::render_polygons()
 				v[vert_num].x = ((float)(x) / 16.0f) + 256.0f;
 				v[vert_num].y = ((float)(-y) / 16.0f) + 192.0f + 8;
 				v[vert_num].p[POLY_Z] = *(float*)(&z);
-				v[vert_num].p[POLY_R] = (color >> 16) & 0xff;
+				v[vert_num].p[POLY_B] = (color >> 16) & 0xff;
 				v[vert_num].p[POLY_G] = (color >> 8) & 0xff;
-				v[vert_num].p[POLY_B] = color & 0xff;
+				v[vert_num].p[POLY_R] = color & 0xff;
 				v[vert_num].p[POLY_A] = (color >> 24) & 0xff;
 				vert_num++;
 			}
@@ -825,15 +827,170 @@ void k001005_renderer::render_polygons()
 
 			if (poly_type == 0)
 			{
-				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
+				render_triangle<6>(m_cliprect, rd_scan_gour_blend, v[0], v[1], v[2]);
 			}
 			else
 			{
-				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[0], v[1], v[2]);
-				render_triangle(m_cliprect, rd_scan_gour_blend, 6, v[2], v[3], v[0]);
+				render_triangle<6>(m_cliprect, rd_scan_gour_blend, v[0], v[1], v[2]);
+				render_triangle<6>(m_cliprect, rd_scan_gour_blend, v[2], v[3], v[0]);
 			}
 
 			// TODO: can this poly type form strips?
+		}
+		else if (cmd == 0x8000010e)
+		{
+			// texture, color gouraud, Z (color gouraud is shown where texture is transparent, used by midnrun/windheat CG board test)
+			int tex_x, tex_y;
+			uint32_t color = 0;
+			k001005_polydata& extra = object_data_alloc();
+
+			uint32_t header = fifo[index++];
+
+			int last_vertex = 0;
+			int vert_num = 0;
+			do
+			{
+				int x, y, z;
+				int16_t tu, tv;
+
+				x = (fifo[index] >> 0) & 0x3fff;
+				y = (fifo[index] >> 16) & 0x1fff;
+				x |= ((x & 0x2000) ? 0xffffc000 : 0);
+				y |= ((y & 0x1000) ? 0xffffe000 : 0);
+
+				poly_type = fifo[index] & 0x4000;       // 0 = triangle, 1 = quad
+				last_vertex = fifo[index] & 0x8000;
+				index++;
+
+				z = fifo[index] & 0xffffff00;
+				brightness = fifo[index] & 0xff;
+				index++;
+
+				color = fifo[index];
+				index++;
+
+				tu = (fifo[index] >> 16) & 0xffff;
+				tv = (fifo[index] & 0xffff);
+				index++;
+
+				v[vert_num].x = ((float)(x) / 16.0f) + 256.0f;
+				v[vert_num].y = ((float)(-y) / 16.0f) + 192.0f + 8;
+				v[vert_num].p[POLY_Z] = *(float*)(&z);
+				v[vert_num].p[POLY_W] = 1.0f / v[vert_num].p[POLY_Z];
+				v[vert_num].p[POLY_U] = tu * v[vert_num].p[POLY_W];
+				v[vert_num].p[POLY_V] = tv * v[vert_num].p[POLY_W];
+				v[vert_num].p[POLY_BRI] = brightness;
+				v[vert_num].p[POLY_FOG] = (1.0f / (exp(((v[vert_num].p[POLY_Z] * fog_density) / m_far_z) * ((v[vert_num].p[POLY_Z] * fog_density) / m_far_z)))) * 65536.0f;
+				//v[vert_num].p[POLY_FOG] = (1.0f / (exp( ((v[vert_num].p[POLY_Z] * fog_density) / far_z) ))) * 65536.0f;
+				if (v[vert_num].p[POLY_FOG] < 0.0f) v[vert_num].p[POLY_FOG] = 0.0f;
+				if (v[vert_num].p[POLY_FOG] > 65536.0f) v[vert_num].p[POLY_FOG] = 65536.0f;
+				v[vert_num].p[POLY_ALTB] = (color >> 16) & 0xff;
+				v[vert_num].p[POLY_ALTG] = (color >> 8) & 0xff;
+				v[vert_num].p[POLY_ALTR] = color & 0xff;
+				v[vert_num].p[POLY_ALTA] = (color >> 24) & 0xff;
+				vert_num++;
+			} while (!last_vertex && vert_num < 4);
+
+			tex_y = ((header & 0x400) >> 5) |
+				((header & 0x100) >> 4) |
+				((header & 0x040) >> 3) |
+				((header & 0x010) >> 2) |
+				((header & 0x004) >> 1) |
+				((header & 0x001) >> 0);
+
+			tex_x = ((header & 0x800) >> 6) |
+				((header & 0x200) >> 5) |
+				((header & 0x080) >> 4) |
+				((header & 0x020) >> 3) |
+				((header & 0x008) >> 2) |
+				((header & 0x002) >> 1);
+
+			extra.texture_x = tex_x * 8;
+			extra.texture_y = tex_y * 8;
+			extra.texture_width = (header >> 23) & 0x7;
+			extra.texture_height = (header >> 20) & 0x7;
+			extra.texture_page = (header >> 12) & 0x1f;
+			extra.texture_palette = (header >> 28) & 0xf;
+			extra.texture_mirror_x = ((cmd & 0x10) ? 0x1 : 0);
+			extra.texture_mirror_y = ((cmd & 0x10) ? 0x1 : 0);
+			extra.color = 0xffffffff;
+			extra.light_r = m_light_r;     extra.light_g = m_light_g;     extra.light_b = m_light_b;
+			extra.ambient_r = m_ambient_r; extra.ambient_g = m_ambient_g; extra.ambient_b = m_ambient_b;
+			extra.fog_r = m_fog_r;         extra.fog_g = m_fog_g;         extra.fog_b = m_fog_b;
+			extra.flags = cmd;
+
+			if ((cmd & 0x20) == 0)      // possibly enable flag for gouraud shading (fixes some shading errors)
+			{
+				v[0].p[POLY_BRI] = brightness;
+				v[1].p[POLY_BRI] = brightness;
+			}
+
+			if (poly_type == 0)     // triangle
+			{
+				if (vert_num == 1)
+				{
+					vertex1 = &m_prev_v[2];
+					vertex2 = &m_prev_v[3];
+					vertex3 = &v[0];
+				}
+				else if (vert_num == 2)
+				{
+					vertex1 = &m_prev_v[3];
+					vertex2 = &v[0];
+					vertex3 = &v[1];
+				}
+				else
+				{
+					vertex1 = &v[0];
+					vertex2 = &v[1];
+					vertex3 = &v[2];
+				}
+
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex1, *vertex2, *vertex3);
+
+				memcpy(&m_prev_v[1], vertex1, sizeof(vertex_t));
+				memcpy(&m_prev_v[2], vertex2, sizeof(vertex_t));
+				memcpy(&m_prev_v[3], vertex3, sizeof(vertex_t));
+			}
+			else                    // quad
+			{
+				if (vert_num == 1)
+				{
+					vertex1 = &m_prev_v[1];
+					vertex2 = &m_prev_v[2];
+					vertex3 = &m_prev_v[3];
+					vertex4 = &v[0];
+				}
+				else if (vert_num == 2)
+				{
+					vertex1 = &m_prev_v[2];
+					vertex2 = &m_prev_v[3];
+					vertex3 = &v[0];
+					vertex4 = &v[1];
+				}
+				else if (vert_num == 3)
+				{
+					vertex1 = &m_prev_v[3];
+					vertex2 = &v[0];
+					vertex3 = &v[1];
+					vertex4 = &v[2];
+				}
+				else
+				{
+					vertex1 = &v[0];
+					vertex2 = &v[1];
+					vertex3 = &v[2];
+					vertex4 = &v[3];
+				}
+
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex1, *vertex2, *vertex3);
+				render_triangle<10>(m_cliprect, rd_scan_tex_gouraud, *vertex3, *vertex4, *vertex1);
+
+				memcpy(&m_prev_v[0], vertex1, sizeof(vertex_t));
+				memcpy(&m_prev_v[1], vertex2, sizeof(vertex_t));
+				memcpy(&m_prev_v[2], vertex3, sizeof(vertex_t));
+				memcpy(&m_prev_v[3], vertex4, sizeof(vertex_t));
+			}
 		}
 		else if (cmd == 0x80000000)
 		{
@@ -1148,6 +1305,150 @@ void k001005_renderer::draw_scanline_gouraud_blend(int32_t scanline, const exten
 		}
 
 		z += dz;
+		r += dr;
+		g += dg;
+		b += db;
+		a += da;
+	}
+}
+
+
+void k001005_renderer::draw_scanline_tex_gouraud(int32_t scanline, const extent_t& extent, const k001005_polydata& extradata, int threadid)
+{
+	k001006_device* k001006 = downcast<k001006_device*>(m_k001006);
+
+	int tex_page = extradata.texture_page * 0x40000;
+	int palette_index = (extradata.texture_palette & 0x7) * 256;
+	float z = extent.param[POLY_Z].start;
+	float u = extent.param[POLY_U].start;
+	float v = extent.param[POLY_V].start;
+	float w = extent.param[POLY_W].start;
+	float dz = extent.param[POLY_Z].dpdx;
+	float du = extent.param[POLY_U].dpdx;
+	float dv = extent.param[POLY_V].dpdx;
+	float dw = extent.param[POLY_W].dpdx;
+	float bri = extent.param[POLY_BRI].start;
+	float dbri = extent.param[POLY_BRI].dpdx;
+	float fog = extent.param[POLY_FOG].start;
+	float dfog = extent.param[POLY_FOG].dpdx;
+	float r = extent.param[POLY_ALTR].start;
+	float dr = extent.param[POLY_ALTR].dpdx;
+	float g = extent.param[POLY_ALTG].start;
+	float dg = extent.param[POLY_ALTG].dpdx;
+	float b = extent.param[POLY_ALTB].start;
+	float db = extent.param[POLY_ALTB].dpdx;
+	float a = extent.param[POLY_ALTA].start;
+	float da = extent.param[POLY_ALTA].dpdx;
+	int texture_mirror_x = extradata.texture_mirror_x;
+	int texture_mirror_y = extradata.texture_mirror_y;
+	int texture_x = extradata.texture_x;
+	int texture_y = extradata.texture_y;
+	int texture_width = extradata.texture_width;
+	int texture_height = extradata.texture_height;
+
+	int poly_light_r = extradata.light_r + extradata.ambient_r;
+	int poly_light_g = extradata.light_g + extradata.ambient_g;
+	int poly_light_b = extradata.light_b + extradata.ambient_b;
+	if (poly_light_r > 255) poly_light_r = 255;
+	if (poly_light_g > 255) poly_light_g = 255;
+	if (poly_light_b > 255) poly_light_b = 255;
+	int poly_fog_r = extradata.fog_r;
+	int poly_fog_g = extradata.fog_g;
+	int poly_fog_b = extradata.fog_b;
+
+	uint32_t* const fb = &m_fb[m_fb_page]->pix(scanline);
+	float* const zb = (float*)&m_zb->pix(scanline);
+
+	int* x_mirror_table = m_tex_mirror_table[texture_mirror_x][texture_width].get();
+	int* y_mirror_table = m_tex_mirror_table[texture_mirror_y][texture_height].get();
+
+	for (int x = extent.startx; x < extent.stopx; x++)
+	{
+		int ibri = (int)(bri);
+		int ifog = (int)(fog);
+
+		if (ibri < 0) ibri = 0;
+		if (ibri > 255) ibri = 255;
+		if (ifog < 0) ifog = 0;
+		if (ifog > 65536) ifog = 65536;
+
+		int ir = (int)(r);
+		int ig = (int)(g);
+		int ib = (int)(b);
+		int ia = (int)(a);
+
+		if (z <= zb[x])
+		{
+			float oow = 1.0f / w;
+			uint32_t color;
+			int iu, iv;
+			int iiv, iiu;
+
+			iu = u * oow * 0.0625f;
+			iv = v * oow * 0.0625f;
+
+			iiu = texture_x + x_mirror_table[iu & 0x7f];
+			iiv = texture_y + y_mirror_table[iv & 0x7f];
+
+			color = k001006->fetch_texel(tex_page, palette_index, iiu, iiv);
+
+			if (color & 0xff000000)
+			{
+				// texture
+				int r = (color >> 16) & 0xff;
+				int g = (color >> 8) & 0xff;
+				int b = color & 0xff;
+
+				r = ((((r * poly_light_r * ibri) >> 16) * ifog) + (poly_fog_r * (65536 - ifog))) >> 16;
+				g = ((((g * poly_light_g * ibri) >> 16) * ifog) + (poly_fog_g * (65536 - ifog))) >> 16;
+				b = ((((b * poly_light_b * ibri) >> 16) * ifog) + (poly_fog_b * (65536 - ifog))) >> 16;
+
+				if (r < 0) r = 0;
+				if (r > 255) r = 255;
+				if (g < 0) g = 0;
+				if (g > 255) g = 255;
+				if (b < 0) b = 0;
+				if (b > 255) b = 255;
+
+				fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
+				zb[x] = z;
+			}
+			else
+			{
+				// gouraud color
+				if (ia != 0xff)
+				{
+					int sr = (fb[x] >> 16) & 0xff;
+					int sg = (fb[x] >> 8) & 0xff;
+					int sb = fb[x] & 0xff;
+
+					ir = ((ir * ia) >> 8) + ((sr * (0xff - ia)) >> 8);
+					ig = ((ig * ia) >> 8) + ((sg * (0xff - ia)) >> 8);
+					ib = ((ib * ia) >> 8) + ((sb * (0xff - ia)) >> 8);
+				}
+
+				ir = ((((ir * poly_light_r * ibri) >> 16) * ifog) + (poly_fog_r * (65536 - ifog))) >> 16;
+				ig = ((((ig * poly_light_g * ibri) >> 16) * ifog) + (poly_fog_g * (65536 - ifog))) >> 16;
+				ib = ((((ib * poly_light_b * ibri) >> 16) * ifog) + (poly_fog_b * (65536 - ifog))) >> 16;
+
+				if (ir < 0) ir = 0;
+				if (ir > 255) ir = 255;
+				if (ig < 0) ig = 0;
+				if (ig > 255) ig = 255;
+				if (ib < 0) ib = 0;
+				if (ib > 255) ib = 255;
+
+				fb[x] = 0xff000000 | (ir << 16) | (ig << 8) | ib;
+				zb[x] = z;
+			}
+		}
+
+		u += du;
+		v += dv;
+		z += dz;
+		w += dw;
+		bri += dbri;
+		fog += dfog;
 		r += dr;
 		g += dg;
 		b += db;

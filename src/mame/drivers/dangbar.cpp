@@ -5,16 +5,20 @@
 Dangerous Bar by Namco (1994)
 https://www.youtube.com/watch?v=XwZoXtkZ9qo
 
+Same Same Panic by Namco (1993)
+https://www.youtube.com/watch?v=YDJW7ch45Yw
+
 Hardware notes:
 Main PCB named Hi-Pric P41 B 8813960102 (8813970102)
 - MC68HC11K1 (main CPU)
 - HD68B09P (audio CPU)
 - CY7C132 DPRAM
 - C140 (custom Namco audio chip)
-- C121 (custom Namco YM2151 compatible)
+- C121 (custom Namco glue logic for the 6809)
 - OSC1 49.1520MHz
 - 1 4-dip bank
 
+For Dangerous Bar:
 Led display PCB named Namco ST-M4
 Pic too blurry to read the chip markings
 */
@@ -23,7 +27,6 @@ Pic too blurry to read the chip markings
 #include "cpu/m6809/m6809.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/c140.h"
-#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -102,8 +105,6 @@ void dangbar_state::dangbar(machine_config &config)
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
 
 	C140(config, "c140", 49.152_MHz_XTAL / 384 / 6).add_route(ALL_OUTPUTS, "mono", 0.75); // 21.333kHz, copied from other Namco drivers
-
-	YM2151(config, "ymsnd", 49.152_MHz_XTAL / 24).add_route(ALL_OUTPUTS, "mono", 0.75); // actually Namco C121, divider guessed
 }
 
 
@@ -122,7 +123,20 @@ ROM_START( dangbar )
 	ROM_LOAD( "drb1_dot0.bin", 0x00000, 0x20000, BAD_DUMP CRC(e77b9919) SHA1(2479fbdff9b570061dbdc2906c2d4fc0152998f7) ) // FIXED BITS (xxxx1xxx)
 ROM_END
 
+ROM_START( sspanic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jp1_mpr0.2c.", 0x00000, 0x10000, CRC(04e16a89) SHA1(6211d901cf723ed03a583b38813ee77329e15eea) ) // 0xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "jp1_snd.8a", 0x00000, 0x20000, CRC(46e2401c) SHA1(0edddd42e17da67c57f9c778c5fbf7a76ed287f5) ) // x11xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION16_BE( 0x200000, "c140", 0 )
+	ROM_LOAD16_BYTE( "jp0_voi1.14a",  0x000000, 0x080000, CRC(49a943ee) SHA1(fae4bdc2812a8f90de980845185161c14608ca5a) )
+	ROM_LOAD16_BYTE( "jp0_voi2.13a",  0x100000, 0x080000, CRC(55bb4550) SHA1(961e50366159afd25cd38e3a37c3a06fcfdff1a7) )
+ROM_END
+
 } // Anonymous namespace
 
 
+GAME( 1993, sspanic, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Same Same Panic", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1994, dangbar, 0, dangbar, dangbar, dangbar_state, empty_init, ROT0, "Namco", "Dangerous Bar", MACHINE_IS_SKELETON_MECHANICAL )

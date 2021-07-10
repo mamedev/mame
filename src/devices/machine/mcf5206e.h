@@ -23,6 +23,13 @@ class mcf5206e_peripheral_device :  public device_t,
 {
 public:
 	// construction/destruction
+	template <typename T>
+	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: mcf5206e_peripheral_device(mconfig, tag, owner, clock)
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+	}
+
 	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t dev_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -160,7 +167,7 @@ private:
 		MAX_ICR
 	};
 
-	cpu_device* m_cpu;
+	required_device<cpu_device> m_maincpu;
 
 	address_space_config m_space_config;
 

@@ -98,7 +98,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 //      , m_mainram(*this, RAM_TAG)
 	{ }
 
