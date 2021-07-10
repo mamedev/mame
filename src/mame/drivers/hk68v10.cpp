@@ -378,6 +378,7 @@ ROM_START (hk68v10)
 	 *  'bw'       Boot from Winchester
 	 *  'bf'       Boot from floppy (MIO, SBX-FDIO)
 	 *  'bsf'      Boot from floppy (SCSI)
+	 *  'x'        Display registers
 	 *
 	 * Setup sequence channel B
 	 * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity
