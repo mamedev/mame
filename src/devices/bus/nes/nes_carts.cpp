@@ -253,8 +253,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
 	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)
 	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion)
-	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion)
+	device.option_add_internal("ks7016",           NES_KS7016);     // used in Exciting Basket (FDS Conversion)
+	device.option_add_internal("ks7016b",          NES_KS7016B);    // used in Meikyu Jiin Dababa alt (FDS Conversion)
 	device.option_add_internal("ks7017",           NES_KS7017);
+	device.option_add_internal("ks7021a",          NES_KS7021A);    // Getsufuu Maden pirate cart
 	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
 	device.option_add_internal("ks7030",           NES_KS7030);     // used in Doki Doki Panic alt (FDS Conversion)
 	device.option_add_internal("ks7031",           NES_KS7031);     // used in Dracula II (FDS Conversion)
