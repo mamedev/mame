@@ -16,16 +16,6 @@
 #include "video/poly.h"
 #include "video/rgbutil.h"
 
-//
-// To do:
-//   - split rasterizer into setup (clip/flip) and inner part
-//   - templatize texture pipeline helpers
-//   - determine color scale factors up front as start/delta values and use those
-//   - incorporate type/memory? into constant flags
-//   - use type for: fog delta mask, bilinear mask
-//   - multiple rasterizer_textures to save stalls
-//   - leverage poly clipping?
-//
 
 namespace voodoo
 {
