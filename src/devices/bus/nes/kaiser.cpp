@@ -86,18 +86,18 @@ nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mask(0)
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mask(mask)
 {
 }
 
 nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_ks7016_device(mconfig, NES_KS7016, tag, owner, clock)
+	: nes_ks7016_device(mconfig, NES_KS7016, tag, owner, clock, 0x00)
 {
 }
 
 nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_ks7016_device(mconfig, NES_KS7016B, tag, owner, clock)
+	: nes_ks7016_device(mconfig, NES_KS7016B, tag, owner, clock, 0x04)
 {
 }
 
@@ -207,13 +207,6 @@ void nes_ks7016_device::device_start()
 {
 	common_start();
 	save_item(NAME(m_latch));
-	save_item(NAME(m_mask));
-}
-
-void nes_ks7016b_device::device_start()
-{
-	nes_ks7016_device::device_start();
-	m_mask = 0x04;
 }
 
 void nes_ks7016_device::pcb_reset()

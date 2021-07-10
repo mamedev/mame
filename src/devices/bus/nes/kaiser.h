@@ -110,12 +110,15 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);
 
 	// device-level overrides
 	virtual void device_start() override;
 
-	u8 m_latch, m_mask;
+	u8 m_latch;
+
+private:
+	u8 m_mask;
 };
 
 
@@ -126,10 +129,6 @@ class nes_ks7016b_device : public nes_ks7016_device
 public:
 	// construction/destruction
 	nes_ks7016b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
