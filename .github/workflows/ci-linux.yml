@@ -7,11 +7,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        compiler: [gcc, gcc10, clang]
         include:
           - compiler: gcc
             cc: gcc
             cxx: g++
+            archopts: -U_FORTIFY_SOURCE
+          - compiler: gcc10
+            cc: gcc-10
+            cxx: g++-10
             archopts: -U_FORTIFY_SOURCE
           - compiler: clang
             cc: clang
