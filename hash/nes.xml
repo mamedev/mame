@@ -14494,7 +14494,7 @@ license:CC0
 	</software>
 
 	<software name="getsumad">
-		<description>Getsufuu Maden (Jpn)</description>
+		<description>GetsuFumaDen (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC819"/>
@@ -46856,7 +46856,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="getsumads" cloneof="getsumad">
-		<description>Getsufuu Maden (Jpn, sample)</description>
+		<description>GetsuFumaDen (Japan, sample)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="月風魔伝"/>
@@ -62593,7 +62593,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="getsumadk" cloneof="getsumad">
-		<description>Getsufuu Maden (Kaiser)</description>
+		<description>GetsuFumaDen (Kaiser)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
 		<info name="serial" value="LH17"/> <!-- This game is also on a LH13 cart -->

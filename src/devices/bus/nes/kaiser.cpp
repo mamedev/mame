@@ -678,7 +678,7 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 
  Kaiser Board KS7021A
 
- Games: Getsufuu Maden
+ Games: GetsuFumaDen
 
  This board has a 16K fixed PRG bank at 0xc000 and
  a swappable 16K PRG bank at 0x8000. CHR banks are
