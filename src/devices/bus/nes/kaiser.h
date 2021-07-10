@@ -115,10 +115,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	u8 m_latch;
-
 private:
-	u8 m_mask;
+	u8 m_latch, m_mask;
 };
 
 
