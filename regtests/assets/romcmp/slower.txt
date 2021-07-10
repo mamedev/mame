@@ -1,0 +1,183 @@
+4 files
+fill00.bin                                      FIXED BITS (00000000)
+fill01.bin                                      FIXED BITS (0000000011111111)
+fill10.bin                                      FIXED BITS (1111111100000000)
+fill11.bin                                      FIXED BITS (11111111)
+fill00.bin   [1/2]      fill01.bin   [even]     IDENTICAL
+fill00.bin   [2/2]      fill01.bin   [even]     IDENTICAL
+fill00.bin   [1/4]      fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [1/4]      fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [1/4]      fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [1/4]      fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [2/4]      fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [2/4]      fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [2/4]      fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [2/4]      fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [3/4]      fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [3/4]      fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [3/4]      fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [3/4]      fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [4/4]      fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [4/4]      fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [4/4]      fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [4/4]      fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [even]     fill01.bin   [even]     IDENTICAL
+fill00.bin   [odd]      fill01.bin   [even]     IDENTICAL
+fill00.bin   [even 1/2] fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [even 1/2] fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [even 1/2] fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [even 1/2] fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [odd 1/2]  fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [odd 1/2]  fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [odd 1/2]  fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [odd 1/2]  fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [even 2/2] fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [even 2/2] fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [even 2/2] fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [even 2/2] fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [odd 2/2]  fill01.bin   [1/4]      IDENTICAL
+fill00.bin   [odd 2/2]  fill01.bin   [3/4]      IDENTICAL
+fill00.bin   [odd 2/2]  fill01.bin   [even 1/2] IDENTICAL
+fill00.bin   [odd 2/2]  fill01.bin   [even 2/2] IDENTICAL
+fill00.bin   [1/2]      fill10.bin   [odd]      IDENTICAL
+fill00.bin   [2/2]      fill10.bin   [odd]      IDENTICAL
+fill00.bin   [1/4]      fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [1/4]      fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [1/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [1/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [2/4]      fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [2/4]      fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [2/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [2/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [3/4]      fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [3/4]      fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [3/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [3/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [4/4]      fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [4/4]      fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [4/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [4/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [even]     fill10.bin   [odd]      IDENTICAL
+fill00.bin   [odd]      fill10.bin   [odd]      IDENTICAL
+fill00.bin   [even 1/2] fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [even 1/2] fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [even 1/2] fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [even 1/2] fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [odd 1/2]  fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [odd 1/2]  fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [odd 1/2]  fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [odd 1/2]  fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [even 2/2] fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [even 2/2] fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [even 2/2] fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [even 2/2] fill10.bin   [odd 2/2]  IDENTICAL
+fill00.bin   [odd 2/2]  fill10.bin   [2/4]      IDENTICAL
+fill00.bin   [odd 2/2]  fill10.bin   [4/4]      IDENTICAL
+fill00.bin   [odd 2/2]  fill10.bin   [odd 1/2]  IDENTICAL
+fill00.bin   [odd 2/2]  fill10.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [1/4]      fill10.bin   [2/4]      IDENTICAL
+fill01.bin   [1/4]      fill10.bin   [4/4]      IDENTICAL
+fill01.bin   [1/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [1/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [2/4]      fill10.bin   [1/4]      IDENTICAL
+fill01.bin   [2/4]      fill10.bin   [3/4]      IDENTICAL
+fill01.bin   [2/4]      fill10.bin   [even 1/2] IDENTICAL
+fill01.bin   [2/4]      fill10.bin   [even 2/2] IDENTICAL
+fill01.bin   [3/4]      fill10.bin   [2/4]      IDENTICAL
+fill01.bin   [3/4]      fill10.bin   [4/4]      IDENTICAL
+fill01.bin   [3/4]      fill10.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [3/4]      fill10.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [4/4]      fill10.bin   [1/4]      IDENTICAL
+fill01.bin   [4/4]      fill10.bin   [3/4]      IDENTICAL
+fill01.bin   [4/4]      fill10.bin   [even 1/2] IDENTICAL
+fill01.bin   [4/4]      fill10.bin   [even 2/2] IDENTICAL
+fill01.bin   [even]     fill10.bin   [odd]      IDENTICAL
+fill01.bin   [odd]      fill10.bin   [even]     IDENTICAL
+fill01.bin   [even 1/2] fill10.bin   [2/4]      IDENTICAL
+fill01.bin   [even 1/2] fill10.bin   [4/4]      IDENTICAL
+fill01.bin   [even 1/2] fill10.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [even 1/2] fill10.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [odd 1/2]  fill10.bin   [1/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill10.bin   [3/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill10.bin   [even 1/2] IDENTICAL
+fill01.bin   [odd 1/2]  fill10.bin   [even 2/2] IDENTICAL
+fill01.bin   [even 2/2] fill10.bin   [2/4]      IDENTICAL
+fill01.bin   [even 2/2] fill10.bin   [4/4]      IDENTICAL
+fill01.bin   [even 2/2] fill10.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [even 2/2] fill10.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [odd 2/2]  fill10.bin   [1/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill10.bin   [3/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill10.bin   [even 1/2] IDENTICAL
+fill01.bin   [odd 2/2]  fill10.bin   [even 2/2] IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [1/4]      IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [2/4]      IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [3/4]      IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [4/4]      IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [even 1/2] IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [even 2/2] IDENTICAL
+fill01.bin   [2/4]      fill11.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [1/4]      IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [2/4]      IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [3/4]      IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [4/4]      IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [even 1/2] IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [even 2/2] IDENTICAL
+fill01.bin   [4/4]      fill11.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [odd]      fill11.bin   [1/2]      IDENTICAL
+fill01.bin   [odd]      fill11.bin   [2/2]      IDENTICAL
+fill01.bin   [odd]      fill11.bin   [even]     IDENTICAL
+fill01.bin   [odd]      fill11.bin   [odd]      IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [1/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [2/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [3/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [4/4]      IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [even 1/2] IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [even 2/2] IDENTICAL
+fill01.bin   [odd 1/2]  fill11.bin   [odd 2/2]  IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [1/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [2/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [3/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [4/4]      IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [even 1/2] IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [odd 1/2]  IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [even 2/2] IDENTICAL
+fill01.bin   [odd 2/2]  fill11.bin   [odd 2/2]  IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [1/4]      IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [2/4]      IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [3/4]      IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [4/4]      IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [even 1/2] IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [odd 1/2]  IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [even 2/2] IDENTICAL
+fill10.bin   [1/4]      fill11.bin   [odd 2/2]  IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [1/4]      IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [2/4]      IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [3/4]      IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [4/4]      IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [even 1/2] IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [odd 1/2]  IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [even 2/2] IDENTICAL
+fill10.bin   [3/4]      fill11.bin   [odd 2/2]  IDENTICAL
+fill10.bin   [even]     fill11.bin   [1/2]      IDENTICAL
+fill10.bin   [even]     fill11.bin   [2/2]      IDENTICAL
+fill10.bin   [even]     fill11.bin   [even]     IDENTICAL
+fill10.bin   [even]     fill11.bin   [odd]      IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [1/4]      IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [2/4]      IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [3/4]      IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [4/4]      IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [even 1/2] IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [odd 1/2]  IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [even 2/2] IDENTICAL
+fill10.bin   [even 1/2] fill11.bin   [odd 2/2]  IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [1/4]      IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [2/4]      IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [3/4]      IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [4/4]      IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [even 1/2] IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [odd 1/2]  IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [even 2/2] IDENTICAL
+fill10.bin   [even 2/2] fill11.bin   [odd 2/2]  IDENTICAL
