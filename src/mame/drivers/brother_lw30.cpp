@@ -27,8 +27,7 @@
 // -log -debug -window -intscalex 2 -intscaley 2 lw30 -resolution 960x256 -flop roms\lw30\tetris.img
 // -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img
 
-// bp 6a2c,1,{logerror "expect AB; A=%02X\n",a; g}
-// bp 6617,1,{logerror "expect DE; A=%02X\n",a; g}
+// floppy: see src\devices\bus\vtech\memexp\floppy.cpp
 
 //////////////////////////////////////////////////////////////////////////
 // LW-30
@@ -693,7 +692,7 @@ private:
 			static int cache_track = -1;
 			static std::vector<bool> cache;
 
-			auto track = floppy_steps / 4;
+			auto track = floppy->get_device()->get_cyl();
 			if(track != cache_track) {
 				class floppy_image_device_friend : public floppy_image_device { friend class lw30_state; };
 				class floppy_format_friend : public floppy_image_format_t { friend class lw30_state; };
@@ -777,6 +776,7 @@ private:
 		// a rotation to the right means increase quarter-track
 		auto rol4 = [](uint8_t d) { return ((d << 1) & 0b1111) | ((d >> 3) & 0b0001); };
 		auto ror4 = [](uint8_t d) { return ((d >> 1) & 0b0111) | ((d << 3) & 0b1000); };
+		auto old_track = floppy_steps / 4;
 		switch(data & 0xf) {
 		case 0b0011:
 		case 0b0110:
@@ -793,7 +793,15 @@ private:
 			logerror("%s: initial step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		}
-		logerror("%s: floppy_steps=%3d => track=%2d\n", machine().describe_context(), floppy_steps, floppy_steps / 4);
+		auto new_track = floppy_steps / 4;
+		auto floppy_device = floppy->get_device();
+		if(new_track != old_track) {
+			floppy_device->dir_w(new_track < old_track);
+			floppy_device->stp_w(true);
+			floppy_device->stp_w(false);
+		}
+		logerror("%s: floppy_steps=%3d => old_track=%2d new_track=%2d cyl=%2d\n", machine().describe_context(), floppy_steps, old_track, new_track, floppy_device->get_cyl());
+		assert(floppy_device->get_cyl() == new_track);
 		floppy_control = (floppy_control & 0xf0) | (data & 0x0f);
 	}
 
