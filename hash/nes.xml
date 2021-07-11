@@ -66671,7 +66671,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="UNL-KS7031" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="dracula ii - noroi no fuuin (fds conversion).prg" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" offset="00000" status="baddump" />
+				<rom name="ks128" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

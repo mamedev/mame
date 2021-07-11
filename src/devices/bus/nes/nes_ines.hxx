@@ -288,6 +288,55 @@ static const nes_mmc mmc_list[] =
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_110IN1 },
+
+	// NES 2.0
+	{ 264, YOKO_BOARD },
+
+	{ 302, KAISER_KS7057 },        // Gyruss FDS conversion
+	{ 303, KAISER_KS7017 },        // Almana no Kiseki FDS conversion
+	{ 304, BTL_09034A },           // various FDS conversions
+	{ 305, KAISER_KS7031 },        // Dracula II FDS conversion
+	// { 306, KAISER_KS7016 },        // Exciting Basket FDS conversion
+	{ 307, KAISER_KS7037 },        // Metroid FDS conversion
+	// 308 Batman (Sunsoft) pirate on VRC2 clone hardware
+	// { 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion (dump available?)
+	// 310 variant of mapper 125?
+	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
+	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
+
+	{ 328, UNL_RT01 },             // test cart (Russia)
+
+	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
+	{ 347, KAISER_KS7030 },
+
+	// { 389, CALTRON_9IN1 },
+
+	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
+
+	// { 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
+	// { 520, UNKNOWN }, TODO: this is probably 2yudb
+	{ 521, DREAMTECH_BOARD },      // Korean Igo
+	{ 522, UNL_LH10 },             // Fuuun Shaolin Kyo FDS conversion
+	// { 523, UNKNOWN } TODO: likely fengshnb or a clone not yet in nes.xml
+	// { 524, BTL_900218 } TODO: this seems to be lordkinga
+	// { 525, KAISER_KS7021A },
+	// 526 sangochu clone not yet in nes.xml?
+	// 527 demnswrd/fudomyod clone not yet in nes.xml
+	// 528, 1995 New Series Super 2-in-1 multicart not in nes.xml
+	// 529 Datach Dragon Ball Z bootleg?
+	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
+	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
+	// 532 Emulator only mapper for Chinese version of sangoht2?
+	// 533 Used by dongdng2 which is a CNROM variant with protection?
+	// 534 Are these all PnPs? Is one mc_101 or a clone not in nes.xml?
+	{ 535, UNL_LH53 },             // Nazo no Murasamejo FDS conversion
+	// 536 and 537 Waixing FS303, mapper 195 variants?
+	// { 538, BTL_60106416L } TODO: Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
+	{ 539, BTL_PALTHENA },         // Hikari Shinwa (Kid Icarus) FDS conversion
+
+	// { 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
+
+	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 };
 
 const nes_mmc *nes_mapper_lookup( int mapper )
@@ -341,7 +390,8 @@ void nes_cart_slot_device::call_load_ines()
 	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	uint32_t prg_size, vrom_size;
 	uint8_t header[0x10];
-	uint8_t mapper, submapper = 0, local_options;
+	uint16_t mapper;
+	uint8_t submapper = 0, local_options;
 	bool ines20 = false, prg16k;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -369,7 +419,7 @@ void nes_cart_slot_device::call_load_ines()
 			// probably the header got corrupted: don't trust upper bits for mapper
 			break;
 
-		case 0x8:   // it's iNES 2.0 format
+		case 0x8:   // it's NES 2.0 format
 			ines20 = true;
 			[[fallthrough]];
 		case 0x0:
@@ -402,7 +452,7 @@ void nes_cart_slot_device::call_load_ines()
 		logerror("NES: No extrainfo found\n");
 	}
 
-	// use extended iNES2.0 info if available!
+	// use extended NES 2.0 info if available!
 	if (ines20)
 	{
 		mapper |= (header[8] & 0x0f) << 8;
@@ -420,7 +470,7 @@ void nes_cart_slot_device::call_load_ines()
 		if (mapper == 1 && submapper == 3)
 			pcb_id = STD_SXROM_A;
 		else if (mapper == 1 && submapper == 5)
-			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 002, 003, 007: UxROM, CNROM, AxROM
 		else if (mapper == 2 && submapper == 2)
 			bus_conflict = true;
@@ -469,7 +519,7 @@ void nes_cart_slot_device::call_load_ines()
 		else if (mapper == 68 && submapper == 1)
 		{
 			submapper = 0;
-			logerror("Unimplemented iNES2.0 submapper: SUNSOFT-DCS.\n");
+			logerror("Unimplemented NES 2.0 submapper: SUNSOFT-DCS.\n");
 		}
 		// iNES Mapper 071
 		else if (mapper == 71 && submapper == 1)
@@ -494,12 +544,12 @@ void nes_cart_slot_device::call_load_ines()
 		else if (mapper == 210 && submapper == 1)
 		{
 			submapper = 0;
-			logerror("Unimplemented iNES2.0 submapper: CAMERICA-BF9096.\n");
+			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
 		else if (submapper)
 		{
 			submapper = 0;
-			logerror("Undocumented iNES2.0 submapper, please report it to the MAME boards!\n");
+			logerror("Undocumented NES 2.0 submapper, please report it to the MAME boards!\n");
 		}
 	}
 
@@ -852,7 +902,8 @@ void nes_cart_slot_device::call_load_ines()
 
 const char * nes_cart_slot_device::get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const
 {
-	uint8_t mapper, submapper = 0;
+	uint16_t mapper;
+	uint8_t submapper = 0;
 	bool ines20 = false;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -867,7 +918,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			// probably the header got corrupted: don't trust upper bits for mapper
 			break;
 
-		case 0x8:   // it's iNES 2.0 format
+		case 0x8:   // it's NES 2.0 format
 			ines20 = true;
 			[[fallthrough]];
 		case 0x0:
@@ -887,7 +938,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		}
 	}
 
-	// use extended iNES2.0 info if available!
+	// use extended NES 2.0 info if available!
 	if (ines20)
 	{
 		mapper |= (ROM[8] & 0x0f) << 8;
@@ -904,7 +955,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		if (mapper == 1 && submapper == 3)
 			pcb_id = STD_SXROM_A;
 		else if (mapper == 1 && submapper == 5)
-			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 021, 023, 025: VRC4 / VRC2
 		else if (mapper == 21 || mapper == 23 || mapper == 25)
 		{
