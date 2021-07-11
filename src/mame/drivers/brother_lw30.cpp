@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Bartman/Abyss
 
-#define FLOPPY_FORMAT
-
 #include "emu.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "machine/timer.h"
 #include "cpu/z180/z180.h"
-#include "debug/debugcpu.h"
-#include "debugger.h" // for debugging only
-#include "debug/debugcmd.h"
-#ifdef FLOPPY_FORMAT
-	#include "imagedev/floppy.h"
-#endif
+#include "imagedev/floppy.h"
 
 #include "sound/beep.h"
 #include "video/mc6845.h"
+
+#define LOG_FLOPPY (1U << 1)
+#define LOGFLOPPY(...) LOGMASKED(LOG_FLOPPY, __VA_ARGS__)
+
+//#define VERBOSE (LOG_GENERAL | LOG_FLOPPY)
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 // if updating project, c:\msys64\win32env.bat
 // cd \schreibmaschine\mame_src
@@ -28,6 +28,7 @@
 // -debug -autoboot_script c:\schreibmaschine\mame_src\lw30.lua -log -window -intscalex 8 -intscaley 8 -resolution 1920x512 lw30 -flop c:\brothers\mame\disks\lw30\tetris.img
 
 // floppy: see src\devices\bus\vtech\memexp\floppy.cpp
+
 
 //////////////////////////////////////////////////////////////////////////
 // LW-30
@@ -119,72 +120,6 @@ TODO: find self-test; verify RAM address map
 
 ***************************************************************************/
 
-#ifndef FLOPPY_FORMAT
-	class lw30_floppy_image_device;
-
-	class lw30_floppy_connector : public device_t, public device_slot_interface
-	{
-	public:
-		lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-		lw30_floppy_image_device *get_device();
-
-	protected:
-		void device_start() override {}
-		void device_config_complete() override {}
-	};
-
-	class lw30_floppy_image_device : public device_t, public device_image_interface
-	{
-	public:
-		lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	public:
-		iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
-		bool is_readable() const noexcept override { return true; }
-		bool is_writeable() const noexcept override { return true; }
-		bool is_creatable() const noexcept override { return true; }
-		bool must_be_loaded() const noexcept override { return false; }
-		bool is_reset_on_load() const noexcept override { return false; }
-		const char *file_extensions() const noexcept override { return "img"; }
-		const char *image_interface() const noexcept override { return "lw30_floppy_35"; }
-		image_init_result call_load() override;
-		void call_unload() override;
-
-		bool loaded = false;
-		bool dirty = false;
-
-		// from write_format, write_sector_data_header_data_footer
-		constexpr static auto sector_length = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/;
-		constexpr static auto track_length = 2/*0xaa*/ + 48/*0xaa*/ + 12 * sector_length;
-
-		std::array<std::array<uint8_t, track_length + 1024/*safety, temporary*/>, 78> tracks;
-
-	protected:
-		void device_start() override { }
-	};
-
-	DEFINE_DEVICE_TYPE(LW30_FLOPPY_CONNECTOR, lw30_floppy_connector, "lw30_floppy_connector", "LW-30 Floppy drive connector abstraction")
-	DEFINE_DEVICE_TYPE(LW30_FLOPPY, lw30_floppy_image_device, "lw30_floppy_35", "LW-30 3.5\" floppy drive")
-
-	lw30_floppy_connector::lw30_floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, LW30_FLOPPY_CONNECTOR, tag, owner, clock),
-		device_slot_interface(mconfig, *this)
-	{
-	}
-
-	lw30_floppy_image_device *lw30_floppy_connector::get_device()
-	{
-		return dynamic_cast<lw30_floppy_image_device *>(get_card_device());
-	}
-
-	lw30_floppy_image_device::lw30_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, LW30_FLOPPY, tag, owner, clock),
-		device_image_interface(mconfig, *this)
-	{
-	}
-#endif // FLOPPY_FORMAT
-
 namespace {
 	constexpr uint16_t sync_table[]{
 		0xDAEF, 0xB7AD, 0xFBBE, 0xEADF, 0xBFFA, 0xAEB6, 0xF5D7, 0xDBEE, 0xBAAB, 0xFDBD, 
@@ -202,20 +137,13 @@ namespace {
 		0xBA, 0xBB, 0xBD, 0xBE, 0xBF, 0xD5, 0xD6, 0xD7,
 		0xDA, 0xDB, 0xDD, 0xDE, 0xDF, 0xEA, 0xEB, 0xED,
 		0xEE, 0xEF, 0xF5, 0xF6, 0xF7, 0xFA, 0xFB, 0xFD,
-		0xFE, 0xFF // reserved
+		0xFE, 0xFF // FE, FF are reserved
 	};
 
 	// format
 	constexpr uint8_t sector_prefix[]{
 		0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xAB
 	};
-
-	// format
-/*	constexpr uint8_t sector_predata[]{
-		0xDD, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
-		0xBF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE, 0xED //, 0xAD, 0xEE, 0xF5, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD,
-		//0xDD, 0xDD, 0xDD, 0xDD, 0xDD
-	};*/
 
 	// write
 	constexpr uint8_t sector_header[]{
@@ -225,7 +153,6 @@ namespace {
 
 	// write
 	constexpr uint8_t sector_footer[]{
-//		0xF5, 0xDD, 0x00, 0x00, 0x00, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD // 0x00 is not good for flux encoding
 		0xF5, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD
 	};
 
@@ -295,176 +222,93 @@ namespace {
 	}
 }
 
-#ifdef FLOPPY_FORMAT
-	class lw30_format : public floppy_image_format_t {
-	public:
-		static constexpr int tracks_per_disk = 78;
-		static constexpr int sectors_per_track = 12;
-		static constexpr int sector_size = 256;
+class lw30_format : public floppy_image_format_t {
+public:
+	static constexpr int tracks_per_disk = 78;
+	static constexpr int sectors_per_track = 12;
+	static constexpr int sector_size = 256;
 
-		// format track: 0xaa (2), 0xaa (48), 12*sector
-		// format sector: sector_prefix (8), track_sync (2), sector_sync (2), predata (19), payload=0xaa (414), postdata (13), 0xaa (42), should come out to ~4,000 bits
-		// write sector: (after sector_sync, 0xdd) sector_header (2+14), payload (416), sector_footer (11)
+	static constexpr int rpm = 300;
+	static constexpr int cells_per_rev = 250'000 / (rpm / 60);
 
-		#ifdef FLOPPY_FORMAT
-			// from write_format, write_sector_data_header_data_footer
-			static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/ + 42/*0xaa*/;
-			static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + sectors_per_track * raw_sector_size;
-		#else
-			// as long as we're doing high-level emulation, this is fine; TODO: go low level and use *_real
-			static constexpr int raw_sector_size = 5/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/;
-			static constexpr int raw_track_size = sectors_per_track * raw_sector_size;
-		#endif
+	// format track: 0xaa (2), 0xaa (48), 12*sector
+	// format sector: sector_prefix (8), track_sync (2), sector_sync (2), predata (19), payload=0xaa (414), postdata (13), 0xaa (42), should come out to ~4,000 bits
+	// write sector: (after sector_sync, 0xdd) sector_header (2+14), payload (416), sector_footer (11)
 
-		int identify(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants) override {
-			uint64_t size = io_generic_size(io);
-			if(size == tracks_per_disk * sectors_per_track * sector_size)
-				return 50; // identified by size
+	// from write_format, write_sector_data_header_data_footer
+	static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/ + 42/*0xaa*/;
+	static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + sectors_per_track * raw_sector_size;
 
-			return 0;
-		}
+	int identify(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants) override {
+		uint64_t size = io_generic_size(io);
+		if(size == tracks_per_disk * sectors_per_track * sector_size)
+			return 50; // identified by size
 
-		bool load(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants, floppy_image* image) override {
-			static constexpr int rpm = 300;
-			static constexpr int cells_per_rev = 250000 / (rpm / 60);
-			uint8_t trackdata[sectors_per_track * sector_size], rawdata[cells_per_rev / 8];
-			memset(rawdata, 0xaa, sizeof(rawdata));
-			for(int track = 0; track < tracks_per_disk; track++) {
-				io_generic_read(io, trackdata, track * sectors_per_track * sector_size, sectors_per_track * sector_size);
-				size_t i = 0;
-				#ifdef FLOPPY_FORMAT
-					for(int x = 0; x < 2 + 48; x++)
-						rawdata[i++] = 0xaa;
-				#endif
-				auto interleave_offset = (track % 4) * 4;
-				for(size_t s = interleave_offset; s < interleave_offset + sectors_per_track; s++) {
-					auto sector = sector_interleave1[s % sectors_per_track] - 1;
-					// according to check_track_and_sector
-					#ifdef FLOPPY_FORMAT
-						for(const auto& d : sector_prefix) // 8 bytes
-							rawdata[i++] = d;
-					#else
-						for(size_t j = 0; j < 5; j++)
-							rawdata[i++] = 0xff;
-						rawdata[i++] = 0xab;
-					#endif
-					rawdata[i++] = sync_table[track] & 0xff;
-					rawdata[i++] = sync_table[track] >> 8;
-					rawdata[i++] = sync_table[sector] & 0xff;
-					rawdata[i++] = sync_table[sector] >> 8;
-					rawdata[i++] = 0xdd;
-					for(const auto& d : sector_header) // 16 bytes
-						rawdata[i++] = d;
-					auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 256 -> 416 bytes
-					for(const auto& d : payload)
-						rawdata[i++] = d;
-					for(const auto& d : sector_footer) // 11 bytes
-						rawdata[i++] = d;
-					#ifdef FLOPPY_FORMAT
-						for(int x = 0; x < 42; x++)
-							rawdata[i++] = 0xaa;
-					#endif
-				}
-				#ifdef FLOPPY_FORMAT
-					assert(i == raw_track_size);
-					assert(i <= cells_per_rev / 8);
-					generate_track_from_bitstream(track, 0, rawdata, cells_per_rev, image);
+		return 0;
+	}
 
-					// TEST
-	/*				auto bitstream = generate_bitstream_from_track(track, 0, 200'000'000 / 50000, image);
-					//assert(bitstream.size() <= 50000);
-					uint8_t decoded[50000 / 8]{};
-					for(size_t i = 0; i < std::min<size_t>(50000, bitstream.size()); i++)
-						if(bitstream[i])
-							decoded[i / 8] |= 0x80 >> (i % 8);
-
-					//auto rawtrack = generate_nibbles_from_bitstream(bitstream); // <- not good!
-					FILE* f = fopen("c:/__/1.bin", "wb");
-					fwrite(rawdata, 1, 50000 / 8, f);
-					fclose(f);
-					f = fopen("c:/__/2.bin", "wb");
-					fwrite(decoded, 1, 50000 / 8, f);
-					fclose(f);
-					assert(memcmp(rawdata, decoded, 50000 / 8) == 0);*/
-				#endif
-			}
-
-			image->set_variant(floppy_image::SSDD);
-
-			return true;
-		}
-
-		bool save(io_generic* io, const std::vector<uint32_t>& variants, floppy_image* image) override {
-			return false;
-		}
-
-		const char* name() const override {
-			return "lw30";
-		}
-
-		const char* description() const override {
-			return "Brother LW-30 floppy disk image";
-		}
-
-		const char* extensions() const override {
-			return "img";
-		}
-
-		bool supports_save() const override {
-			// TODO
-			return false;
-		}
-	};
-
-	const floppy_format_type FLOPPY_LW30_FORMAT = &floppy_image_format_creator<lw30_format>;
-#else
-	image_init_result lw30_floppy_image_device::call_load()
-	{
-		// create raw data from disk image
-		auto p = reinterpret_cast<uint8_t*>(ptr());
-		auto l = length();
-
-		if(l != 78 * 12 * 256)
-			return image_init_result::FAIL;
-
-		for(size_t track = 0; track < 78; track++) {
-			auto& data = tracks[track];
+	bool load(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants, floppy_image* image) override {
+		uint8_t trackdata[sectors_per_track * sector_size], rawdata[cells_per_rev / 8];
+		memset(rawdata, 0xaa, sizeof(rawdata));
+		for(int track = 0; track < tracks_per_disk; track++) {
+			io_generic_read(io, trackdata, track * sectors_per_track * sector_size, sectors_per_track * sector_size);
 			size_t i = 0;
-			for(size_t sector = 0; sector < 12; sector++) {
+			for(int x = 0; x < 2 + 48; x++)
+				rawdata[i++] = 0xaa;
+			auto interleave_offset = (track % 4) * 4;
+			for(size_t s = interleave_offset; s < interleave_offset + sectors_per_track; s++) {
+				auto sector = sector_interleave1[s % sectors_per_track] - 1;
 				// according to check_track_and_sector
-				for(size_t j = 0; j < 5; j++)
-					data[i++] = 0xff;
-				data[i++] = 0xab;
-				data[i++] = sync_table[track] & 0xff;
-				data[i++] = sync_table[track] >> 8;
-				data[i++] = sync_table[sector] & 0xff;
-				data[i++] = sync_table[sector] >> 8;
-				data[i++] = 0xdd;
+				for(const auto& d : sector_prefix) // 8 bytes
+					rawdata[i++] = d;
+				rawdata[i++] = sync_table[track] & 0xff;
+				rawdata[i++] = sync_table[track] >> 8;
+				rawdata[i++] = sync_table[sector] & 0xff;
+				rawdata[i++] = sync_table[sector] >> 8;
+				rawdata[i++] = 0xdd;
 				for(const auto& d : sector_header) // 16 bytes
-					data[i++] = d;
-				auto payload = gcr_encode_and_checksum(p + (track * 12 + sector) * 256); // 416 bytes
+					rawdata[i++] = d;
+				auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 256 -> 416 bytes
 				for(const auto& d : payload)
-					data[i++] = d;
+					rawdata[i++] = d;
 				for(const auto& d : sector_footer) // 11 bytes
-					data[i++] = d;
+					rawdata[i++] = d;
+				for(int x = 0; x < 42; x++)
+					rawdata[i++] = 0xaa;
 			}
+			assert(i == raw_track_size);
+			assert(i <= cells_per_rev / 8);
+			generate_track_from_bitstream(track, 0, rawdata, cells_per_rev, image);
 		}
 
-		loaded = true;
-		return image_init_result::PASS;
+		image->set_variant(floppy_image::SSDD);
+
+		return true;
 	}
 
-	void lw30_floppy_image_device::call_unload()
-	{
-		if(dirty && !is_readonly()) {
-			//#todo
-			//if(reopen_for_write(filename()) == IMAGE_ERROR_SUCCESS)
-			//	fwrite(image.get(), image_length);
-		}
-
-		loaded = false;
+	bool save(io_generic* io, const std::vector<uint32_t>& variants, floppy_image* image) override {
+		return false;
 	}
-#endif // FLOPPY_FORMAT
+
+	const char* name() const override {
+		return "lw30";
+	}
+
+	const char* description() const override {
+		return "Brother LW-30 floppy disk image";
+	}
+
+	const char* extensions() const override {
+		return "img";
+	}
+
+	bool supports_save() const override {
+		// TODO
+		return false;
+	}
+};
+
+const floppy_format_type FLOPPY_LW30_FORMAT = &floppy_image_format_creator<lw30_format>;
 
 class brother_beep_device : public device_t, public device_sound_interface
 {
@@ -607,11 +451,7 @@ private:
 	required_device<hd64180rp_device> maincpu;
 	required_device<screen_device> screen;
 
-	#ifdef FLOPPY_FORMAT
-		required_device<floppy_connector> floppy;
-	#else
-		required_device<lw30_floppy_connector> floppy;
-	#endif
+	required_device<floppy_connector> floppy;
 	required_device<brother_beep_device> beeper;
 	optional_ioport_array<9> m_io_kbrow;
 	required_region_ptr<uint8_t> rom, font_normal, font_bold;
@@ -622,7 +462,6 @@ private:
 	uint8_t io_98{};
 	uint8_t floppy_control{}; // stepper motor control
 	uint8_t floppy_steps{}; // quarter track
-	uint16_t floppy_track_offset{}; // current offset within track data
 	uint8_t floppy_shifter{}, floppy_latch{};
 	bool floppy_read_until_zerobit{};
 
@@ -635,11 +474,11 @@ private:
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	uint8_t illegal_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
+		LOG("%s: unmapped memory read from %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, mem_mask);
 		return 0;
 	}
 	void illegal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
+		LOG("%s: unmapped memory write to %0*X = %0*X & %0*X\n", machine().describe_context(), 6, offset, 2, data, 2, mem_mask);
 	}
 
 	// ROM
@@ -665,7 +504,7 @@ private:
 		if(video_pos_y < 0x20)
 			data = videoram[video_pos_y * 256 + video_pos_x];
 		else
-			logerror("%s: video_data_r out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+			LOG("%s: video_data_r out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
 
 		return data;
 	}
@@ -674,7 +513,7 @@ private:
 		if(video_pos_y < 0x20)
 			videoram[video_pos_y * 256 + video_pos_x] = data;
 		else
-			logerror("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
+			LOG("%s: video_data_w out of range: x=%u, y=%u\n", machine().describe_context(), video_pos_x, video_pos_y);
 
 		video_pos_x++;
 		if(video_pos_x == 0)
@@ -697,68 +536,38 @@ private:
 	}
 
 	// Floppy
-	#ifdef FLOPPY_FORMAT
-		TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer_callback) {
-			if(floppy->get_device()->ready_r() != false)
-				return;
+	TIMER_DEVICE_CALLBACK_MEMBER(floppy_timer_callback) {
+		auto floppy_device = floppy->get_device();
+		if(floppy_device->ready_r() != false)
+			return;
 
-			if(floppy_steps / 4 < 0 || floppy_steps / 4 >= lw30_format::tracks_per_disk)
-				return;
+		floppy_latch <<= 1;
 
-			// HACK, until low-level format is working
-			static int cache_track = -1;
-			static std::vector<bool> cache;
+		attotime now = machine().time();
+		attotime when = now - attotime::from_usec(4);
+		attotime reversal = floppy_device->get_next_transition(when);
+		if(reversal > when && reversal <= now)
+			floppy_latch |= 1;
 
-			auto track = floppy->get_device()->get_cyl();
-			if(track != cache_track) {
-				class floppy_image_device_friend : public floppy_image_device { friend class lw30_state; };
-				class floppy_format_friend : public floppy_image_format_t { friend class lw30_state; };
-				if(auto image = static_cast<floppy_image_device_friend*>(floppy->get_device())->image.get())
-					cache = floppy_format_friend::generate_bitstream_from_track(track, 0, 200'000'000 / 50000, image);
-				cache_track = track;
-			}
-
-			floppy_latch <<= 1;
-			if(cache[floppy_track_offset % cache.size()])
-				floppy_latch |= 1;
-
-			floppy_shifter++;
-			if((floppy_read_until_zerobit && (floppy_latch & 1) == 0) || (!floppy_read_until_zerobit && floppy_shifter == 8)) {
-				logerror("%s: floppy_timer_callback: floppy_read_until_zerobit=%d latch=%02X\n", machine().describe_context(), floppy_read_until_zerobit, floppy_latch);
-				floppy_control |= 0x80; // floppy_data_available = true;
-				floppy_data = floppy_latch;
-				floppy_latch = floppy_shifter = 0;
-				floppy_read_until_zerobit = false;
-			}
-			//logerror("%s: floppy_timer_callback: IO_80=%02X, shifter=%u offset=%u\n", machine().describe_context(), io_80, floppy_shifter, floppy_track_offset % cache.size());
-			//logerror("%s: read_io_80 track=%d,offset=%4x => %02x\n", callstack(), floppy_steps / 4, floppy_track_offset, ret);
-			floppy_track_offset++;
+		floppy_shifter++;
+		if((floppy_read_until_zerobit && (floppy_latch & 1) == 0) || (!floppy_read_until_zerobit && floppy_shifter == 8)) {
+			//LOGFLOPPY("%s: floppy_timer_callback: floppy_read_until_zerobit=%d latch=%02X\n", machine().describe_context(), floppy_read_until_zerobit, floppy_latch);
+			floppy_control |= 0x80; // floppy_data_available = true;
+			floppy_data = floppy_latch;
+			floppy_latch = floppy_shifter = 0;
+			floppy_read_until_zerobit = false;
 		}
-	#endif
+		//LOGFLOPPY("%s: floppy_timer_callback: IO_80=%02X, shifter=%u offset=%u\n", machine().describe_context(), io_80, floppy_shifter, floppy_track_offset % cache.size());
+		//LOGFLOPPY("%s: read_io_80 track=%d,offset=%4x => %02x\n", callstack(), floppy_steps / 4, floppy_track_offset, ret);
+	}
 
 	uint8_t floppy_data_r() { // 80
-		#ifndef FLOPPY_FORMAT
-			auto fd = floppy->get_device();
-			if(!fd->loaded)
-				return 0;
-
-			if(floppy_steps / 4 < 0 || floppy_steps / 4 >= fd->tracks.size())
-				return 0;
-
-			auto& track = fd->tracks[floppy_steps / 4];
-			floppy_track_offset %= track.size();
-
-			auto ret = track[floppy_track_offset];
-			//logerror("%s: read_io_80 track=%d,offset=%4x => %02x\n", callstack(), floppy_steps / 4, floppy_track_offset, ret);
-			floppy_track_offset++;
-			return ret;
-		#endif
 		floppy_control &= ~0x80; // floppy_data_available = false;
-		logerror("%s: read %02X from IO 80\n", machine().describe_context(), floppy_data);
+		LOGFLOPPY("%s: read %02X from IO 80\n", machine().describe_context(), floppy_data);
 		return floppy_data;
 	}
 	void floppy_data_w(uint8_t data) {
-		logerror("%s: write %02X to IO 80\n", machine().describe_context(), data);
+		LOGFLOPPY("%s: write %02X to IO 80\n", machine().describe_context(), data);
 		floppy_data = data;
 	}
 
@@ -768,11 +577,11 @@ private:
 		// bit 2: cleared in stepper routines, rst28_06
 		// bit 3: set in start_write; cleared in end_write
 		// bit 5: cleared in rst28_06; motor-on?
-		logerror("%s: read %02X from IO 88\n", machine().describe_context(), io_88);
+		LOGFLOPPY("%s: read %02X from IO 88\n", machine().describe_context(), io_88);
 		return io_88;
 	}
 	void io_88_w(uint8_t data) {
-		logerror("%s: write %02X to IO 88\n", machine().describe_context(), data);
+		LOGFLOPPY("%s: write %02X to IO 88\n", machine().describe_context(), data);
 		io_88 = data;
 		floppy->get_device()->mon_w((io_88 & (1 << 5)) == 0);
 	}
@@ -783,11 +592,11 @@ private:
 		// bit 5 clear; unknown meaning
 		// bit 4 clear; unknown meaning
 		// bit 3-0: stepper motor
-		logerror("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
+		LOGFLOPPY("%s: read %02X from IO 90\n", machine().describe_context(), floppy_control);
 		return floppy_control;
 	}
 	void floppy_stepper_w(uint8_t data) {
-		logerror("%s: write %02X to IO 90\n", machine().describe_context(), data);
+		LOGFLOPPY("%s: write %02X to IO 90\n", machine().describe_context(), data);
 		// write directly to 4-wire bipolar stepper motor (see stepper_table)
 		// a rotation to the left means decrease quarter-track
 		// a rotation to the right means increase quarter-track
@@ -804,10 +613,10 @@ private:
 			else if((data & 0x0f) == ror4(floppy_control))
 				floppy_steps++;
 			else
-				logerror("%s: illegal step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
+				LOGFLOPPY("%s: illegal step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		default:
-			logerror("%s: initial step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
+			LOGFLOPPY("%s: initial step %02x=>%02x\n", machine().describe_context(), floppy_control, data);
 			break;
 		}
 		auto new_track = floppy_steps / 4;
@@ -817,7 +626,7 @@ private:
 			floppy_device->stp_w(true);
 			floppy_device->stp_w(false);
 		}
-		logerror("%s: floppy_steps=%3d => old_track=%2d new_track=%2d cyl=%2d\n", machine().describe_context(), floppy_steps, old_track, new_track, floppy_device->get_cyl());
+		LOGFLOPPY("%s: floppy_steps=%3d => old_track=%2d new_track=%2d cyl=%2d\n", machine().describe_context(), floppy_steps, old_track, new_track, floppy_device->get_cyl());
 		assert(floppy_device->get_cyl() == new_track);
 		floppy_control = (floppy_control & 0xf0) | (data & 0x0f);
 	}
@@ -833,20 +642,20 @@ private:
 		else
 			floppy_read_until_zerobit = false;
 
-		logerror("%s: read %02X from IO 98\n", machine().describe_context(), io_98);
+		LOGFLOPPY("%s: read %02X from IO 98\n", machine().describe_context(), io_98);
 		return io_98;
 	}
 	void io_98_w(uint8_t data) {
-		logerror("%s: write %02X to IO 98\n", machine().describe_context(), data);
+		LOGFLOPPY("%s: write %02X to IO 98\n", machine().describe_context(), data);
 		io_98 = data;
 	}
 
 	uint8_t illegal_io_r(offs_t offset, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO read from %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, mem_mask);
+		LOGFLOPPY("%s: unmapped IO read from %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, mem_mask);
 		return 0;
 	}
 	void illegal_io_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0) {
-		logerror("%s: unmapped IO write to %0*X = %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, data, 2, mem_mask);
+		LOGFLOPPY("%s: unmapped IO write to %0*X = %0*X & %0*X\n", machine().describe_context(), 4, offset + 0x40, 2, data, 2, mem_mask);
 	}
 
 	uint8_t io_b0_r() {
@@ -884,7 +693,7 @@ private:
 			static attotime lastDifferent{};
 			attotime cur{ maincpu->local_time() };
 
-			logerror("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
+			LOG("beeper_w(%02X) @ %s (delta=%sµs diff_delta=%sµs)\n", data, cur.as_string(), ((cur - last) * 1000000).as_string(0), ((cur - lastDifferent) * 1000000).as_string(0));
 			if(data != lastData)
 				lastDifferent = cur;
 			last = cur;
@@ -898,18 +707,21 @@ private:
 		maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 
-	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(cursor_timer_callback);
+	TIMER_DEVICE_CALLBACK_MEMBER(int1_timer_callback) {
+		maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
 
-	#ifdef FLOPPY_FORMAT
-		static void floppy_formats(format_registration& fr) {
-			fr.add(FLOPPY_LW30_FORMAT);
-		}
+	TIMER_DEVICE_CALLBACK_MEMBER(cursor_timer_callback) {
+		cursor_state = !cursor_state;
+	}
 
-		static void lw30_floppies(device_slot_interface& device) {
-			device.option_add("35ssdd", FLOPPY_35_SSDD);
-		}
-	#endif
+	static void floppy_formats(format_registration& fr) {
+		fr.add(FLOPPY_LW30_FORMAT);
+	}
+
+	static void lw30_floppies(device_slot_interface& device) {
+		device.option_add("35ssdd", FLOPPY_35_SSDD);
+	}
 
 	// driver_device overrides
 	void machine_start() override;
@@ -960,11 +772,6 @@ private:
 
 void lw30_state::video_start()
 {
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::cursor_timer_callback)
-{
-	cursor_state = !cursor_state;
 }
 
 uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
@@ -1108,8 +915,6 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 				uint32_t* p = &bitmap.pix(y);
 				for(auto x = 0; x < 640; x += 8) {
 					auto gfx = pixmap[y * 80 + x / 8];
-					//*p++ = palette[BIT(gfx, 7)];
-					//*p++ = palette[BIT(gfx, 6)];
 					*p++ = palette[BIT(gfx, 5)];
 					*p++ = palette[BIT(gfx, 4)];
 					*p++ = palette[BIT(gfx, 3)];
@@ -1132,12 +937,6 @@ uint32_t lw30_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, 
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lw30_state::int1_timer_callback)
-{
-	maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-}
-
-
 // Keyboard
 //////////////////////////////////////////////////////////////////////////
 
@@ -1154,10 +953,10 @@ void lw30_state::machine_start()
 	rom[0x28103] = 0xc3;
 
 	// floppy debugging
-	if(machine().debug_enabled()) {
-		machine().debugger().console().execute_command(R"(bp 6a2c,1,{logerror "expect AB; A=%02X\n",a; g})", false);
-		machine().debugger().console().execute_command(R"(bp 6617,1,{logerror "expect DE; A=%02X\n",a; g})", false);
-	}
+	//if(machine().debug_enabled()) {
+	//	machine().debugger().console().execute_command(R"(bp 6a2c,1,{logerror "expect AB; A=%02X\n",a; g})", false);
+	//	machine().debugger().console().execute_command(R"(bp 6617,1,{logerror "expect DE; A=%02X\n",a; g})", false);
+	//}
 }
 
 void lw30_state::machine_reset()
@@ -1166,6 +965,7 @@ void lw30_state::machine_reset()
 	video_cursor_x = video_cursor_y = 0;
 	video_pos_x = video_pos_y = 0;
 	video_control = 0;
+	// TODO more reset variables
 
 	memcpy(&videoram[0x1000], font_normal, 0x800);
 }
@@ -1267,10 +1067,6 @@ void lw30_state::lw30(machine_config& config) {
 	HD64180RP(config, maincpu, 12'000'000 / 2);
 	maincpu->set_addrmap(AS_PROGRAM, &lw30_state::map_program);
 	maincpu->set_addrmap(AS_IO, &lw30_state::map_io);
-	TIMER(config, "timer_1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
-	#ifdef FLOPPY_FORMAT
-		TIMER(config, "timer_floppy").configure_periodic(FUNC(lw30_state::floppy_timer_callback), attotime::from_hz(250000));
-	#endif
 
 	// video hardware
 	SCREEN(config, screen, SCREEN_TYPE_RASTER);
@@ -1280,20 +1076,17 @@ void lw30_state::lw30(machine_config& config) {
 	screen->set_screen_update(FUNC(lw30_state::screen_update));
 	screen->set_size(480, 128);
 
-	TIMER(config, "timer_cursor").configure_periodic(FUNC(lw30_state::cursor_timer_callback), attotime::from_msec(512));
-
 	// floppy disk
-	#ifdef FLOPPY_FORMAT
-		FLOPPY_CONNECTOR(config, floppy, lw30_state::lw30_floppies, "35ssdd", lw30_state::floppy_formats).enable_sound(true);
-	#else
-		LW30_FLOPPY_CONNECTOR(config, floppy, 0);
-		floppy->option_add("35dd", LW30_FLOPPY);
-		floppy->set_default_option("35dd");
-	#endif
+	FLOPPY_CONNECTOR(config, floppy, lw30_state::lw30_floppies, "35ssdd", lw30_state::floppy_formats).enable_sound(true);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BROTHER_BEEP(config, beeper, 4'000).add_route(ALL_OUTPUTS, "mono", 1.0); // 4.0 kHz
+
+	// timers
+	TIMER(config, "timer_1khz").configure_periodic(FUNC(lw30_state::int1_timer_callback), attotime::from_hz(1000));
+	TIMER(config, "timer_floppy").configure_periodic(FUNC(lw30_state::floppy_timer_callback), attotime::from_usec(4));
+	TIMER(config, "timer_cursor").configure_periodic(FUNC(lw30_state::cursor_timer_callback), attotime::from_msec(512));
 }
 
 /***************************************************************************
@@ -1303,7 +1096,6 @@ void lw30_state::lw30(machine_config& config) {
 ROM_START( lw30 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("ua5362-a", 0x00000, 0x40000, CRC(DAC77867) SHA1(5c7ab30dec55a24eb1b7f241e5015e3836ebf077))
-//	ROM_LOAD("patched", 0x00000, 0x40000, CRC(DAC77867) SHA1(5c7ab30dec55a24eb1b7f241e5015e3836ebf077))
 	ROM_REGION(0x80000, "dictionary", 0)
 	ROM_LOAD("ua2849-a", 0x00000, 0x80000, CRC(FA8712EB) SHA1(2d3454138c79e75604b30229c05ed8fb8e7d15fe))
 	ROM_REGION(0x800, "font_normal", 0)
