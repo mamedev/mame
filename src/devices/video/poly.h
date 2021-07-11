@@ -622,6 +622,10 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(const char *debug_reason)
 {
+	// early out if no units outstanding
+	if (m_unit.count() == 0)
+		return;
+
 #if TRACK_POLY_WAITS
 	int items = osd_work_queue_items(m_queue);
 	osd_ticks_t time = get_profile_ticks();
