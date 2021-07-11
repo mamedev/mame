@@ -1428,11 +1428,8 @@ inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &
 //  the caller
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &threadstats, poly_data const &poly, reg_fbz_mode const fbzmode, s32 depthdest, s32 depthval)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, s32 depthdest, s32 depthsource)
 {
-	// the source depth is either the iterated W/Z+bias or a constant value
-	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(poly.zacolor);
-
 	// test against the depth buffer
 	switch (fbzmode.depth_function())
 	{
@@ -1884,10 +1881,10 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 //  the caller
 //-------------------------------------------------
 
-inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, poly_data const &poly, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
+inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, rgb_t fogcolor, u32 depthbias, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
 {
 	// constant fog bypasses everything else
-	rgbaint_t fog_color_local(poly.fogcolor);
+	rgbaint_t fog_color_local(fogcolor);
 	if (fogmode.fog_constant())
 	{
 		// if fog_mult is 0, we add this to the original color
@@ -1921,7 +1918,7 @@ inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, p
 
 				// add the bias for fog selection
 				if (fbzmode.enable_depth_bias())
-					fog_depth = std::clamp(fog_depth + s16(poly.zacolor), 0, 0xffff);
+					fog_depth = std::clamp(fog_depth + s16(depthbias), 0, 0xffff);
 
 				// perform the multiply against lower 8 bits of wfloat
 				s32 delta = m_fogdelta[fog_depth >> 10];
@@ -2140,23 +2137,15 @@ inline void ATTR_FORCE_INLINE voodoo_renderer::write_pixel(thread_stats_block &t
 //  pipeline
 //-------------------------------------------------
 
-void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data const &poly, reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t src_color, u16 sz)
+void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, u16 *dest, u16 *depth, s32 x, s32 scry, rgb_t src_color, u16 sz)
 {
-	auto const fbzcp = poly.raster.fbzcp();
-	auto const alphamode = poly.raster.alphamode();
-	auto const fbzmode = poly.raster.fbzmode();
-	auto const fogmode = poly.raster.fogmode();
-	dither_helper dither(scry, fbzmode, fogmode);
-	u16 *depth = poly.depthbase;
-	u16 *dest = poly.destbase;
-	u32 stipple = poly.stipple;
-
 	threadstats.pixels_in++;
 
 	// apply clipping
+	auto const fbzmode = m_fbi_reg.fbz_mode();
 	if (fbzmode.enable_clipping())
 	{
-		if (x < poly.clipleft || x >= poly.clipright || scry < poly.cliptop || scry >= poly.clipbottom)
+		if (x < m_fbi_reg.clip_left() || x >= m_fbi_reg.clip_right() || scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
 		{
 			threadstats.clip_fail++;
 			return;
@@ -2164,21 +2153,25 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 	}
 
 	// handle stippling
-	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry, stipple))
-		return;
+	if (fbzmode.enable_stipple())
+	{
+		u32 stipple = m_fbi_reg.stipple();
+		if (!stipple_test(threadstats, fbzmode, x, scry, stipple))
+			return;
+	}
 
 	// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 	s32 depthval = u32(sz);
 
 	// Perform depth testing
-	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
+	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], (fbzmode.depth_source_compare() == 0) ? depthval : u16(m_fbi_reg.za_color())))
 		return;
 
 	// use the RGBA we stashed above
 	rgbaint_t color(src_color);
 
 	// handle chroma key
-	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, poly.chromakey))
+	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, m_fbi_reg.chroma_key().argb()))
 		return;
 
 	// handle alpha mask
@@ -2186,16 +2179,19 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 		return;
 
 	// handle alpha test
-	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), poly.alpharef))
+	auto const alphamode = m_fbi_reg.alpha_mode();
+	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), alphamode.alpharef()))
 		return;
 
 	// perform fogging
+	auto const fogmode = m_fbi_reg.fog_mode();
+	dither_helper dither(scry, fbzmode, fogmode);
 	rgbaint_t prefog(color);
 	if (fogmode.enable_fog())
 	{
 		s32 iterz = sz << 12;
-		s64 iterw = lfbmode.write_w_select() ? u32(poly.zacolor << 16) : u32(sz << 16);
-		apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, rgbaint_t(0));
+		s64 iterw = m_fbi_reg.lfb_mode().write_w_select() ? u32(m_fbi_reg.za_color() << 16) : u32(sz << 16);
+		apply_fogging(color, m_fbi_reg.fog_color().argb(), m_fbi_reg.za_color(), fbzmode, fogmode, m_fbi_reg.fbz_colorpath(), x, dither, depthval, iterz, iterw, rgbaint_t(0));
 	}
 
 	// wait for any outstanding work to finish
@@ -2334,7 +2330,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			s32 depthval = compute_depthval(poly, fbzmode, fbzcp, wfloat, iterz);
 
 			// depth testing
-			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
+			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], (fbzmode.depth_source_compare() == 0) ? depthval : u16(poly.zacolor)))
 				break;
 
 			// run the texture pipeline on TMU1 to produce a value in texel
@@ -2379,7 +2375,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			// perform fogging
 			rgbaint_t prefog(color);
 			if (fogmode.enable_fog())
-				apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
+				apply_fogging(color, poly.fogcolor, poly.zacolor, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
 
 			// perform alpha blending
 			if (alphamode.alphablend())

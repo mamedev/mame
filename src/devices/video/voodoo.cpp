@@ -1687,22 +1687,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_renderer->rowpixels();
 
 		// make a dummy poly_extra_data structure with some cached values
-		poly_data poly;
-		poly.raster.compute(m_reg, nullptr, nullptr);
-		poly.destbase = dest;
-		poly.depthbase = depth;
-		poly.clipleft = m_reg.clip_left();
-		poly.clipright = m_reg.clip_right();
-		poly.cliptop = m_reg.clip_top();
-		poly.clipbottom = m_reg.clip_bottom();
-		poly.color0 = m_reg.color0().argb();
-		poly.color1 = m_reg.color1().argb();
-		poly.chromakey = m_reg.chroma_key().argb();
-		poly.fogcolor = m_reg.fog_color().argb();
-		poly.zacolor = m_reg.za_color();
-		poly.stipple = m_reg.stipple();
-		poly.alpharef = m_reg.alpha_mode().alpharef();
-		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
+		if (m_reg.fbz_mode().enable_stipple() && !m_reg.fbz_mode().stipple_pattern())
 			logerror("Warning: rotated stipple pattern used in LFB write\n");
 
 		// loop over up to two pixels
@@ -1712,7 +1697,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			// make sure we care about this pixel
 			if ((mask & LFB_PIXEL0_MASK) != 0)
-				m_renderer->pixel_pipeline(threadstats, poly, lfbmode, x, y, src_color[pix], src_depth[pix]);
+				m_renderer->pixel_pipeline(threadstats, dest, depth, x, y, src_color[pix], src_depth[pix]);
 
 			// advance our pointers
 			x++;
