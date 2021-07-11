@@ -229,15 +229,15 @@ namespace {
 		0xF5, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD, 0xDD
 	};
 
-	constexpr uint8_t sector_interleave1[]{
+	constexpr uint8_t sector_interleave1[]{ // 1-based
 		1, 6, 11, 4, 9, 2, 7, 12, 5, 10, 3, 8
 	};
 
-	constexpr uint8_t sector_interleave2[]{
+	constexpr uint8_t sector_interleave2[]{ // 1-based
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 	};
 
-	constexpr uint8_t sector_interleave3[]{
+	constexpr uint8_t sector_interleave3[]{ // 1-based
 		1, 4, 7, 10, 6, 9, 12, 3, 11, 2, 5, 8
 	};
 
@@ -298,23 +298,27 @@ namespace {
 #ifdef FLOPPY_FORMAT
 	class lw30_format : public floppy_image_format_t {
 	public:
-		static constexpr int num_tracks = 78;
-		static constexpr int num_sectors = 12;
+		static constexpr int tracks_per_disk = 78;
+		static constexpr int sectors_per_track = 12;
 		static constexpr int sector_size = 256;
+
+		// format track: 0xaa (2), 0xaa (48), 12*sector
+		// format sector: sector_prefix (8), track_sync (2), sector_sync (2), predata (19), payload=0xaa (414), postdata (13), 0xaa (42), should come out to ~4,000 bits
+		// write sector: (after sector_sync, 0xdd) sector_header (2+14), payload (416), sector_footer (11)
 
 		#ifdef FLOPPY_FORMAT
 			// from write_format, write_sector_data_header_data_footer
-			static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/;
-			static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + num_sectors * raw_sector_size;
+			static constexpr int raw_sector_size = 8/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/ + 42/*0xaa*/;
+			static constexpr int raw_track_size = 2/*0xaa*/ + 48/*0xaa*/ + sectors_per_track * raw_sector_size;
 		#else
 			// as long as we're doing high-level emulation, this is fine; TODO: go low level and use *_real
 			static constexpr int raw_sector_size = 5/*sector_prefix*/ + 2/*track_sync*/ + 2/*sector_sync*/ + 1/*0xdd*/ + 16/*sector_header*/ + 416/*payload*/ + 11/*sector_footer*/;
-			static constexpr int raw_track_size = num_sectors * raw_sector_size;
+			static constexpr int raw_track_size = sectors_per_track * raw_sector_size;
 		#endif
 
 		int identify(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants) override {
 			uint64_t size = io_generic_size(io);
-			if(size == num_tracks * num_sectors * sector_size)
+			if(size == tracks_per_disk * sectors_per_track * sector_size)
 				return 50; // identified by size
 
 			return 0;
@@ -323,12 +327,18 @@ namespace {
 		bool load(io_generic* io, uint32_t form_factor, const std::vector<uint32_t>& variants, floppy_image* image) override {
 			static constexpr int rpm = 300;
 			static constexpr int cells_per_rev = 250000 / (rpm / 60);
-			uint8_t trackdata[12 * 256], rawdata[50000 / 8]; // 50000 from https://github.com/BartmanAbyss/brother-diskconv/blob/main/brotherdisk.cpp#L293
+			uint8_t trackdata[sectors_per_track * sector_size], rawdata[cells_per_rev / 8];
 			memset(rawdata, 0xaa, sizeof(rawdata));
-			for(int track = 0; track < 78; track++) {
-				io_generic_read(io, trackdata, track * num_sectors * sector_size, num_sectors * sector_size);
-				size_t i = 0; //  2 + 48; // test
-				for(size_t sector = 0; sector < num_sectors; sector++) {
+			for(int track = 0; track < tracks_per_disk; track++) {
+				io_generic_read(io, trackdata, track * sectors_per_track * sector_size, sectors_per_track * sector_size);
+				size_t i = 0;
+				#ifdef FLOPPY_FORMAT
+					for(int x = 0; x < 2 + 48; x++)
+						rawdata[i++] = 0xaa;
+				#endif
+				auto interleave_offset = (track % 4) * 4;
+				for(size_t s = interleave_offset; s < interleave_offset + sectors_per_track; s++) {
+					auto sector = sector_interleave1[s % sectors_per_track] - 1;
 					// according to check_track_and_sector
 					#ifdef FLOPPY_FORMAT
 						for(const auto& d : sector_prefix) // 8 bytes
@@ -345,31 +355,38 @@ namespace {
 					rawdata[i++] = 0xdd;
 					for(const auto& d : sector_header) // 16 bytes
 						rawdata[i++] = d;
-					auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 416 bytes
+					auto payload = gcr_encode_and_checksum(trackdata + sector * sector_size); // 256 -> 416 bytes
 					for(const auto& d : payload)
 						rawdata[i++] = d;
 					for(const auto& d : sector_footer) // 11 bytes
 						rawdata[i++] = d;
+					#ifdef FLOPPY_FORMAT
+						for(int x = 0; x < 42; x++)
+							rawdata[i++] = 0xaa;
+					#endif
 				}
-				//assert(i == raw_track_size_fake);
-				generate_track_from_bitstream(track, 0, rawdata, 50000, image);
+				#ifdef FLOPPY_FORMAT
+					assert(i == raw_track_size);
+					assert(i <= cells_per_rev / 8);
+					generate_track_from_bitstream(track, 0, rawdata, cells_per_rev, image);
 
-				// TEST
-/*				auto bitstream = generate_bitstream_from_track(track, 0, 200'000'000 / 50000, image);
-				//assert(bitstream.size() <= 50000);
-				uint8_t decoded[50000 / 8]{};
-				for(size_t i = 0; i < std::min<size_t>(50000, bitstream.size()); i++)
-					if(bitstream[i])
-						decoded[i / 8] |= 0x80 >> (i % 8);
+					// TEST
+	/*				auto bitstream = generate_bitstream_from_track(track, 0, 200'000'000 / 50000, image);
+					//assert(bitstream.size() <= 50000);
+					uint8_t decoded[50000 / 8]{};
+					for(size_t i = 0; i < std::min<size_t>(50000, bitstream.size()); i++)
+						if(bitstream[i])
+							decoded[i / 8] |= 0x80 >> (i % 8);
 
-				//auto rawtrack = generate_nibbles_from_bitstream(bitstream); // <- not good!
-				FILE* f = fopen("c:/__/1.bin", "wb");
-				fwrite(rawdata, 1, 50000 / 8, f);
-				fclose(f);
-				f = fopen("c:/__/2.bin", "wb");
-				fwrite(decoded, 1, 50000 / 8, f);
-				fclose(f);
-				assert(memcmp(rawdata, decoded, 50000 / 8) == 0);*/
+					//auto rawtrack = generate_nibbles_from_bitstream(bitstream); // <- not good!
+					FILE* f = fopen("c:/__/1.bin", "wb");
+					fwrite(rawdata, 1, 50000 / 8, f);
+					fclose(f);
+					f = fopen("c:/__/2.bin", "wb");
+					fwrite(decoded, 1, 50000 / 8, f);
+					fclose(f);
+					assert(memcmp(rawdata, decoded, 50000 / 8) == 0);*/
+				#endif
 			}
 
 			image->set_variant(floppy_image::SSDD);
@@ -685,7 +702,7 @@ private:
 			if(floppy->get_device()->ready_r() != false)
 				return;
 
-			if(floppy_steps / 4 < 0 || floppy_steps / 4 >= lw30_format::num_tracks)
+			if(floppy_steps / 4 < 0 || floppy_steps / 4 >= lw30_format::tracks_per_disk)
 				return;
 
 			// HACK, until low-level format is working
