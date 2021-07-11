@@ -153,8 +153,6 @@ public:
 	// allocate a return a new item
 	ArrayType &next(int index = 0)
 	{
-		assert(index < TrackingCount);
-
 		// track the maximum
 		if (m_next > m_max)
 			m_max = m_next;
@@ -175,7 +173,10 @@ public:
 		// set the last item
 		m_next++;
 		if (TrackingCount > 0)
+		{
+			assert(index < TrackingCount);
 			m_last[index] = item;
+		}
 		return *item;
 	}
 
