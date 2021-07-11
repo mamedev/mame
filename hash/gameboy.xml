@@ -21414,7 +21414,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sokoban" cloneof="boxxlea">
+	<software name="sokoban" cloneof="boxxle">
 		<description>Soukoban (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
