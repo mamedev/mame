@@ -24,7 +24,6 @@ namespace voodoo
 struct rasterizer_info;
 struct poly_data;
 class dither_helper;
-class stw_helper;
 
 // base class for our renderer
 using voodoo_poly_manager = poly_manager<float, poly_data, 0, POLY_FLAG_NO_CLIPPING>;
@@ -354,7 +353,7 @@ public:
 	rgb_t lookup_single_texel(u32 format, u32 texbase, s32 s, s32 t);
 
 	// fetch a texel given coordinates and LOD information
-	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod, u8 bilinear_mask);
+	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, double iters, double itert, double iterw, s32 &lod, u8 bilinear_mask);
 
 	// texture-specific color combination unit
 	rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
@@ -612,40 +611,6 @@ private:
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;
 	std::vector<thread_stats_block> m_thread_stats;
 };
-
-
-
-//**************************************************************************
-//  MATH HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  fast_log2 - computes the log2 of a double-
-//  precision value as a 24.8 value
-//-------------------------------------------------
-
-inline s32 fast_log2(double value, int offset)
-{
-	// negative values return 0
-	if (UNEXPECTED(value < 0))
-		return 0;
-
-	// convert the value to a raw integer
-	union { double d; u64 i; } temp;
-	temp.d = value;
-
-	// we only care about the 11-bit exponent and top 4 bits of mantissa
-	// (sign is already assured to be 0)
-	u32 ival = temp.i >> 48;
-
-	// exponent in the upper bits, plus an 8-bit log value from 4 bits of mantissa
-	s32 exp = (ival >> 4) - 1023 + 32 - offset;
-
-	// the maximum error using a 4 bit lookup from the mantissa is 0.0875, which is
-	// less than 1/2 lsb (0.125) for 2 bits of fraction
-	static u8 const s_log2_table[16] = { 0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244 };
-	return (exp << 8) | s_log2_table[ival & 15];
-}
 
 }
 
