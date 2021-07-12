@@ -222,7 +222,6 @@ Towns Drill Shougaku Sansuu 2-nen Gear V2.1                         Kyouiku Soft
 Towns Drill Shougaku Sansuu 3-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
 Towns Drill Shougaku Sansuu 3-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1989/9     FD
 Towns Drill Shougaku Sansuu 4-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
-Towns Drill Shougaku Sansuu 4-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1989/9     FD
 Towns Drill Shougaku Sansuu 4-nen~6-nen                             Kyouiku Soft Kenkyuusho           1994/3     FD×03
 Towns Drill Shougaku Sansuu 5-nen Gear V1.1L20                      Kyouiku Soft Kenkyuusho           1992/3     FD
 Towns Drill Shougaku Sansuu 5-nen Gear V2.1                         Kyouiku Soft Kenkyuusho           1990/2     FD
@@ -666,6 +665,32 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 			<feature name="part_id" value="Shinkonsan Monogatari" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drill4">
+		<description>Towns Drill - Shougaku Sansuu Series - Sansuu 4-nen (TownsGEAR V2.1 version)</description>
+		<year>1992</year>
+		<publisher>教育ソフト研究所 (Kyouiku Soft Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＯＷＮＳドリル　小学算数シリーズ　算数４年" />
+		<info name="usage" value="Requires 2 MB RAM. Run TownsGEAR V2.1 and switch the active drive to A: to start the software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="towns_drill_shougaku_sansuu_4-nen_gear_v2.1.hdm" size="1261568" crc="2dcbb79b" sha1="81de3ed14da4ca341594072ee21ac95cf0d0ff9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drill5">
+		<description>Towns Drill - Shougaku Sansuu Series - Sansuu 5-nen (TownsGEAR V2.1 version)</description>
+		<year>1992</year>
+		<publisher>教育ソフト研究所 (Kyouiku Soft Kenkyuusho)</publisher>
+		<info name="alt_title" value="ＴＯＷＮＳドリル　小学算数シリーズ　算数５年" />
+		<info name="usage" value="Requires 2 MB RAM. Run TownsGEAR V2.1 and switch the active drive to A: to start the software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="towns_drill_shougaku_sansuu_5-nen_gear_v2.1.hdm" size="1261568" crc="6eb42679" sha1="25ebbc26a0affb3b62d5df80187728e12727023c"/>
 			</dataarea>
 		</part>
 	</software>
