@@ -1217,7 +1217,7 @@ Language:
 		</part>
 	</software>
 
-	<software name="snowparkcge" cloneof="snowparkc">
+	<software name="snowparkcge" cloneof="snowparkcm">
 		<description>Wintersport (Germany)</description>
 		<year>2009?</year>
 		<publisher>VTech</publisher>
@@ -1332,8 +1332,8 @@ Language:
 		<part name="cart" interface="vsmile_cart">
 			<feature name="u1" value="" />
 			<dataarea name="rom" size="0x1000000">
-				<rom name="Super WHY! - The Beach Day Mystery 80-084540(US) (Motion) LOW.bin" size="0x800000" crc="84a81df8" sha1="2b161b8e709d4dc1517fb57d346d72ec28338ef7" offset="0x000000" />
-				<rom name="Super WHY! - The Beach Day Mystery 80-084540(US) (Motion) HIGH.bin" size="0x800000" crc="3021694d" sha1="5b9c8391d421a0e936de27c7f51642745d165c7c" offset="0x800000" />
+				<rom name="Super WHY - The Beach Day Mystery 80-084540(US) (Motion) LOW.bin" size="0x800000" crc="84a81df8" sha1="2b161b8e709d4dc1517fb57d346d72ec28338ef7" offset="0x000000" />
+				<rom name="Super WHY - The Beach Day Mystery 80-084540(US) (Motion) HIGH.bin" size="0x800000" crc="3021694d" sha1="5b9c8391d421a0e936de27c7f51642745d165c7c" offset="0x800000" />
 			</dataarea>
 		</part>
 	</software>
