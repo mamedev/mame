@@ -290,21 +290,84 @@ static const nes_mmc mmc_list[] =
 	{ 255, BMC_110IN1 },
 
 	// NES 2.0
+	// 256 OneBus Famiclones
+	// 257 UNIF MAPR PEC-586?
+	// 258 UNIF MAPR 158B?
+	// 259 UNIF MAPR F-15?
+	// 260 HP10xx/HP20xx multicarts?
+	{ 261, BMC_810544 },
+	{ 262, SACHEN_SHERO },
+	{ 263, UNL_KOF97 },
 	{ 264, YOKO_BOARD },
-
+	{ 265, BMC_T262 },
+	{ 266, UNL_CITYFIGHT },
+	// 267 8 in 1 JY-119 multicart, not in nes.xml?
+	// 268 COOLBOY and MINDKIDS
+	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
+	// 270 multicarts on OneBus Famiclones
+	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
+	// 272 Akumajo Special bootleg not in nes.xml
+	// 273 Gremlins 2 bootleg, related to pirate gremlin2h or unk2?
+	// 274 BMC_80013B multicarts, not in nes.xml?
+	// 275 Unused
+	// 276 Unused
+	// 277 Unused
+	// 278 Unused
+	// 279 Unused
+	// 280 Unused
+	// 281 seems to be mc_sh4b and many other JY multicarts not in nes.xml?
+	// 282 more JY multicarts not in nes.xml?
+	// 283 RCM_GS2004 and RCM_GS2013 (why are these RCM?), these are in nes.xml
+	// 284 UNL_DRIPGAME, not in nes.xml
+	{ 285, BMC_A65AS },
+	{ 286, BMC_BENSHIENG },
+	{ 287, BMC_411120C }, // also BMC-K-3088, not in nes.xml?
+	// 288 GKCX1 21 in 1 multicarts, not in nes.xml?
+	// { 289, BMC_60311C }, not in nes.xml?
+	{ 290, BMC_NTD_03 },
+	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
+	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
+	// 293 NewStar multicarts, do we have these in nes.xml?
+	// 294 variant of mapper 134?
+	// 295 JY multicarts not yet in nes.xml
+	// 296 VT3x handhelds
+	// 297 2-in-1 Uzi Lightgun not in nes.xml
+	{ 298, UNL_TF1201 },           // Lethal Weapon (Enforcers) pirate
+	{ 299, BMC_11160 },
+	{ 300, BMC_190IN1 },
+	{ 301, BMC_8157 },
 	{ 302, KAISER_KS7057 },        // Gyruss FDS conversion
 	{ 303, KAISER_KS7017 },        // Almana no Kiseki FDS conversion
 	{ 304, BTL_09034A },           // various FDS conversions
 	{ 305, KAISER_KS7031 },        // Dracula II FDS conversion
-	// { 306, KAISER_KS7016 },        // Exciting Basket FDS conversion
+	{ 306, KAISER_KS7016 },        // Exciting Basket FDS conversion
 	{ 307, KAISER_KS7037 },        // Metroid FDS conversion
 	// 308 Batman (Sunsoft) pirate on VRC2 clone hardware
 	// { 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion (dump available?)
 	// 310 variant of mapper 125?
 	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
 	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
-
+	// { 313, BMC_RESETTXROM }, various multicarts, not in nes.xml?
+	{ 314, BMC_64IN1NR },
+	// 315 820732C and 830134C multicarts, not in nes.xml?
+	// 316 Unused
+	// 317 Unused
+	// 318 Unused
+	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
+	// 320 BMC-830425C-4391T, not in nes.xml?
+	// 321 duplicate of 287?
+	// 322 BMC-K-3033 35-in-1, related to mc_35?
+	// 323 Farid SLROM homebrew 8-in-1
+	// 324 Farid UNROM homebrew 8-in-1
+	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
+	// 326 yet another Contra bootleg, dump available?
+	// 327 BMC-10-24-C-A1 6-in-1
 	{ 328, UNL_RT01 },             // test cart (Russia)
+	{ 329, UNL_EDU2K },
+	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
+	{ 331, BMC_12IN1 },
+	{ 332, BMC_WS },
+	// BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
 
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },
@@ -314,15 +377,15 @@ static const nes_mmc mmc_list[] =
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 
 	// { 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
-	// { 520, UNKNOWN }, TODO: this is probably 2yudb
+	// { 520, UNKNOWN }, this is probably 2yudb
 	{ 521, DREAMTECH_BOARD },      // Korean Igo
 	{ 522, UNL_LH10 },             // Fuuun Shaolin Kyo FDS conversion
-	// { 523, UNKNOWN } TODO: likely fengshnb or a clone not yet in nes.xml
-	// { 524, BTL_900218 } TODO: this seems to be lordkinga
-	// { 525, KAISER_KS7021A },
+	// { 523, UNKNOWN }, likely fengshnb or a clone not yet in nes.xml
+	// { 524, BTL_900218 }, this seems to be lordkinga
+	// { 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
 	// 526 sangochu clone not yet in nes.xml?
 	// 527 demnswrd/fudomyod clone not yet in nes.xml
-	// 528, 1995 New Series Super 2-in-1 multicart not in nes.xml
+	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
 	// 529 Datach Dragon Ball Z bootleg?
 	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
 	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
@@ -331,12 +394,28 @@ static const nes_mmc mmc_list[] =
 	// 534 Are these all PnPs? Is one mc_101 or a clone not in nes.xml?
 	{ 535, UNL_LH53 },             // Nazo no Murasamejo FDS conversion
 	// 536 and 537 Waixing FS303, mapper 195 variants?
-	// { 538, BTL_60106416L } TODO: Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
+	// { 538, BTL_60106416L }, Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
 	{ 539, BTL_PALTHENA },         // Hikari Shinwa (Kid Icarus) FDS conversion
-
+	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
+	// 541 LittleCom 160 in 1 multicart, not in nes.xml?
+	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
+	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
+	// 544 another alt of sango2ht/sanguo2a?
+	// 545 4 in 1 (ST-80) multicart, not in nes.xml?
+	// 546 10 in 1 Tenchi wo Kurau multicart, not in nes.xml?
+	// 547 Konami QTa adapter games
+	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
 	// { 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
-
+	// 550 JY-015 multicart
+	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
+	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
+	// 553 Sachen board only used for dongdong, and it's an easy fix!
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
+	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
+	// 556 JY-215 multicart
+	// { 557, KAISER_KS7??? },        // Kaiser Moero TwinBee FDS conversion
+	// 558 some games on YC-03-09 board (related to mappers 162-164)
+	// 559... Unused
 };
 
 const nes_mmc *nes_mapper_lookup( int mapper )

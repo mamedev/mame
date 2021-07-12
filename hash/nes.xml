@@ -62997,7 +62997,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="lweaponc" cloneof="lweapon" supported="no">
+	<software name="lweaponc" supported="no">
 		<description>Lethal Weapon (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
