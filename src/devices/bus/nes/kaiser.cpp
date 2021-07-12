@@ -684,7 +684,7 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
  a swappable 16K PRG bank at 0x8000. CHR banks are
  selectable by 1K page.
 
- iNES: mapper 525
+ NES 2.0: mapper 525
 
  In MAME: Supported.
 
