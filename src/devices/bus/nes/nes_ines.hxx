@@ -367,7 +367,7 @@ static const nes_mmc mmc_list[] =
 	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
-	// BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
+	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
 
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },
@@ -376,6 +376,22 @@ static const nes_mmc mmc_list[] =
 
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 
+	// 429 Unused
+	// 430 Unused
+	// 431 Realtec GN-91B
+	// 432 Realtec 8090
+	// 433 NC-20MB 20 in 1 (CA-006)
+	// 434...442 Unused
+	// 443 NC3000M multicart
+	// 444 NC7000M multicart
+	// 445...511 Unused
+	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
+	{ 513, SACHEN_SA9602B },
+	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
+	// 515 Korean Family Noraebang karaoke cart with expansion cart, mic, and YM2413!
+	// 516 is this for brillco2 and another related title not in nes.xml?
+	// 517 another Korean karaoke cart with mic
+	// 518 Subor UNL-DANCE2000 and a few others
 	// { 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
 	// { 520, UNKNOWN }, this is probably 2yudb
 	{ 521, DREAMTECH_BOARD },      // Korean Igo
@@ -415,7 +431,7 @@ static const nes_mmc mmc_list[] =
 	// 556 JY-215 multicart
 	// { 557, KAISER_KS7??? },        // Kaiser Moero TwinBee FDS conversion
 	// 558 some games on YC-03-09 board (related to mappers 162-164)
-	// 559... Unused
+	// 559...4095 Unused
 };
 
 const nes_mmc *nes_mapper_lookup( int mapper )
