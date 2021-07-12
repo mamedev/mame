@@ -258,7 +258,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="87670">
-				<rom name="AcroJet_Side_1.tap" size="87670" crc="f699f9ab" sha1="111c112984204980bfcd24fe3d3fcaea4e907ae7"/>
+				<rom name="AcroJet_Side_2.tap" size="87670" crc="f699f9ab" sha1="111c112984204980bfcd24fe3d3fcaea4e907ae7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -506,7 +506,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="489454">
-				<rom name="Alleykat.tap" size="489454" crc="f8b33ba9" sha1="78392282306e82d5885a6291b1984dbdf0365156"/>
+				<rom name="Alleykat.tap (alt)" size="489454" crc="f8b33ba9" sha1="78392282306e82d5885a6291b1984dbdf0365156"/>
 			</dataarea>
 		</part>
 	</software>
@@ -601,7 +601,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="386234">
-				<rom name="Anarchy.tap" size="386234" crc="84bd0b2c" sha1="e281f3369a74c3639192d213f37698d0ee72a729"/>
+				<rom name="Anarchy (alt).tap" size="386234" crc="84bd0b2c" sha1="e281f3369a74c3639192d213f37698d0ee72a729"/>
 			</dataarea>
 		</part>
 	</software>
@@ -676,7 +676,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="399703">
-				<rom name="Annihilator.tap" size="399703" crc="d8a74325" sha1="ecb76cb9377936ab6b3f9cbb90c10970960742a5"/>
+				<rom name="Annihilator (rabbit).tap" size="399703" crc="d8a74325" sha1="ecb76cb9377936ab6b3f9cbb90c10970960742a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -721,14 +721,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="582695">
-				<rom name="APB_Side_1.tap" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
+				<rom name="APB_Side_1.tap (alt)" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="591908">
-				<rom name="APB_Side_2.tap" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
+				<rom name="APB_Side_2.tap (alt)" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -854,13 +854,13 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="640955">
-				<rom name="Arkanoid.tap" size="640955" crc="b142b68c" sha1="1b91d4ceb51cbead83ee92ce046036e2c0481852"/>
+				<rom name="Arkanoid (imagine).tap" size="640955" crc="b142b68c" sha1="1b91d4ceb51cbead83ee92ce046036e2c0481852"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="640955">
-				<rom name="Arkanoid_a1.tap" size="640955" crc="bf774a67" sha1="a567a77a37f35ac00f38ad9f4511d8706ecd3767"/>
+				<rom name="Arkanoid_a1.tap (imagine)" size="640955" crc="bf774a67" sha1="a567a77a37f35ac00f38ad9f4511d8706ecd3767"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1035,14 +1035,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="281694">
-				<rom name="Attack_of_the_Mutant_Camels.tap" size="281694" crc="832623e9" sha1="a0599d6df71e94dfc54e704c72fa0c667813205a"/>
+				<rom name="Attack_of_the_Mutant_Camels (alt).tap" size="281694" crc="832623e9" sha1="a0599d6df71e94dfc54e704c72fa0c667813205a"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="281695">
-				<rom name="Attack_of_the_Mutant_Camels_a1.tap" size="281695" crc="c2b94853" sha1="61fc913a287ae06268a28282125cf52a60ff4678"/>
+				<rom name="Attack_of_the_Mutant_Camels_a1 (alt).tap" size="281695" crc="c2b94853" sha1="61fc913a287ae06268a28282125cf52a60ff4678"/>
 			</dataarea>
 		</part>
 	</software>
