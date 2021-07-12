@@ -578,7 +578,7 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_NAME("P1 Shift") PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // if this is ACTIVE_HIGH gear in Service mode will always show low gear, but your start will be slow as if in high gear regardless of above
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 2")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 1")
