@@ -370,7 +370,7 @@ static const nes_mmc mmc_list[] =
 	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
 
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
-	{ 347, KAISER_KS7030 },
+	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 
 	// { 389, CALTRON_9IN1 },
 
