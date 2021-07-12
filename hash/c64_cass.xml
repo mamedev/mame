@@ -39,14 +39,14 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Superpipeline 2 / Mutant Monty / Henrys House / Gribblys Day Out / Snooker"/>
 			<dataarea name="cass" size="1756359">
-				<rom name="10_Computer_Hits_2_Tape_A.tap" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
+				<rom name="10_Computer_Hits_2_Tape_A.tap (alt)" size="1756359" crc="a72d0c19" sha1="6cab4ab2a3f491d13670089a9b250249cd3079ed"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Mama Llama / Raskel / Aqua Racer / Frenzy / Circus"/>
 			<dataarea name="cass" size="1767233">
-				<rom name="10_Computer_Hits_2_Tape_B.tap" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
+				<rom name="10_Computer_Hits_2_Tape_B.tap (alt)" size="1767233" crc="a4171a8f" sha1="22e60c455e7f764db3b4f632dd49e81f8f5b53f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,15 +58,15 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Geoff Capes Strongman / Elidon / Blagger Goes To Hollywood / Cauldron / 3D Lunattack"/>
-			<dataarea name="cass" size="1627377">
-				<rom name="10_Computer_Hits_3_Tape_1.tap" size="1627377" crc="b32d52df" sha1="c0da12e89bf2a78e4c42f9e4ee97776d36746ba4"/>
+			<dataarea name="cass" size="2323293">
+				<rom name="10_Computer_Hits_3_Tape_1.tap" size="2323293" crc="b108b920" sha1="c0da12e89bf2a78e4c42f9e4ee97776d36746ba4"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Crazy Comets / Dynamite Dan / Herberts Dummy Run / Attack Of The Mutant Camels / Basildon Bond"/>
-			<dataarea name="cass" size="2323293">
-				<rom name="10_Computer_Hits_3_Tape_2.tap" size="2323293" crc="b108b920" sha1="0a4e5ea9df2d4a5d2d6c6362c61f369b3a20bfc6"/>
+			<dataarea name="cass" size="1627377">
+				<rom name="10_Computer_Hits_3_Tape_2.tap" size="1627377" crc="b32d52df" sha1="0a4e5ea9df2d4a5d2d6c6362c61f369b3a20bfc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718105">
-				<rom name="1942_a1.tap" size="718105" crc="1a156870" sha1="ef8fd74086dbbfe10935f096e6839ab48dc7d5b8"/>
+				<rom name="1942_a1.tap" size="718105" crc="1a156870" sha1="ef99ae65f2c4b9d4d3b66cc09328b64cb7489a98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +227,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="217093">
-				<rom name="3D_Pool.tap" size="217093" crc="3114cd62" sha1="2c77dddf4165f49ca517a6e0908da3815cd46218"/>
+				<rom name="3D_Pool.tap (kixx)" size="217093" crc="3114cd62" sha1="2c77dddf4165f49ca517a6e0908da3815cd46218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -344,7 +344,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="557418">
-				<rom name="5th_Gear.tap" size="557418" crc="dd8af099" sha1="795512a880f8812799f4baa674eac1ea6fae52d7"/>
+				<rom name="5th_Gear.tap (prism)" size="557418" crc="dd8af099" sha1="795512a880f8812799f4baa674eac1ea6fae52d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<feature name="part_id" value="Side B: Jet Set Willy II / Sacred Armour of Antiriad / Fighting Warrior / Split Personalities"/>
 			<dataarea name="cass" size="2419415">
-				<rom name="6_Pak_Side_1.tap" size="2419415" crc="0ba93379" sha1="a3ae97aa38974642ee391002351882d1aeaa72c3"/>
+				<rom name="6_Pak_Side_2.tap" size="2419415" crc="0ba93379" sha1="a3ae97aa38974642ee391002351882d1aeaa72c3"/>
 			</dataarea>
 		</part>
 	</software>
