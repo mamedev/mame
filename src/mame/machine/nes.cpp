@@ -75,7 +75,7 @@ void nes_state::machine_start()
 			|| m_cartslot->get_pcb_id() == BANDAI_DATACH || m_cartslot->get_pcb_id() == BANDAI_KARAOKE || m_cartslot->get_pcb_id() == UNL_2A03PURITANS || m_cartslot->get_pcb_id() == AVE_MAXI15 || m_cartslot->get_pcb_id() == BTL_PALTHENA
 			|| m_cartslot->get_pcb_id() == KAISER_KS7010 || m_cartslot->get_pcb_id() == KAISER_KS7022 || m_cartslot->get_pcb_id() == KAISER_KS7030 || m_cartslot->get_pcb_id() == KAISER_KS7031 || m_cartslot->get_pcb_id() == KAISER_KS7037 || m_cartslot->get_pcb_id() == KAISER_KS7057 || m_cartslot->get_pcb_id() == BMC_VT5201
 			|| m_cartslot->get_pcb_id() == UNL_LH32 || m_cartslot->get_pcb_id() == UNL_LH10 || m_cartslot->get_pcb_id() == UNL_2708 || m_cartslot->get_pcb_id() == UNL_RT01
-			|| m_cartslot->get_pcb_id() == UNL_43272 || m_cartslot->get_pcb_id() == BMC_G63IN1 || m_cartslot->get_pcb_id() == BMC_8157
+			|| m_cartslot->get_pcb_id() == UNL_43272 || m_cartslot->get_pcb_id() == UNL_EH8813A || m_cartslot->get_pcb_id() == BMC_G63IN1 || m_cartslot->get_pcb_id() == BMC_8157
 			|| m_cartslot->get_pcb_id() == BMC_GOLD150 || m_cartslot->get_pcb_id() == BMC_CH001
 			|| m_cartslot->get_pcb_id() == BMC_70IN1 || m_cartslot->get_pcb_id() == BMC_800IN1)
 		{
