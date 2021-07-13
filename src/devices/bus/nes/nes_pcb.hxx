@@ -166,7 +166,9 @@ static const nes_pcb pcb_list[] =
 	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
 	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
+	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
 	{ "ks7017",           KAISER_KS7017 },
+	{ "ks7021a",          KAISER_KS7021A }, // GetsuFumaDen pirate cart
 	{ "ks7022",           KAISER_KS7022 },  // mapper 175
 	{ "ks7030",           KAISER_KS7030 },  // used in Doki Doki Panic alt (FDS Conversion)
 	{ "ks7031",           KAISER_KS7031 },  // used in Dracula II (FDS Conversion)
