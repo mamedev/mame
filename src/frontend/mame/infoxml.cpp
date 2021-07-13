@@ -969,6 +969,7 @@ void output_rom(std::ostream &out, driver_enumerator *drivlist, const game_drive
 			{
 				// for non-disk entries, print offset
 				out << util::string_format(" offset=\"%x\"", ROM_GETOFFSET(rom));
+				out << util::string_format(" flags=\"%x\"", ROM_GETFLAGS(rom));
 			}
 			else
 			{
