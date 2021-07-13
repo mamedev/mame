@@ -29,6 +29,7 @@ private slots:
 	void formatChanged(QAction *changedTo);
 	void addressChanged(QAction *changedTo);
 	void reverseChanged(bool changedTo);
+	void decimalChanged(bool changedTo);
 	void increaseBytesPerLine(bool changedTo);
 	void decreaseBytesPerLine(bool checked = false);
 
@@ -78,6 +79,7 @@ public:
 	MemoryWindowQtConfig() :
 		WindowQtConfig(WIN_TYPE_MEMORY),
 		m_reverse(0),
+		m_decimalAddr(0),
 		m_addressMode(0),
 		m_dataFormat(0),
 		m_memoryRegion(0)
@@ -88,6 +90,7 @@ public:
 
 	// Settings
 	int m_reverse;
+	int m_decimalAddr;
 	int m_addressMode;
 	int m_dataFormat;
 	int m_memoryRegion;

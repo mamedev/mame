@@ -111,6 +111,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 		m_reverse_view(false),
 		m_ascii_view(true),
 		m_no_translation(false),
+		m_decimal_addr(false),
 		m_edit_enabled(true),
 		m_maxaddr(0),
 		m_bytes_per_row(16),
@@ -591,11 +592,16 @@ void debug_view_memory::recompute()
 		addrchars = string_format("%X", m_maxaddr).size();
 	}
 
-	// generate an 8-byte aligned format for the address
-	if (!m_reverse_view)
-		m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
+	if (m_decimal_addr)
+		m_addrformat = m_reverse_view ? "%-10d" : "%10d";
 	else
-		m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+	{
+		// generate an 8-byte aligned format for the address
+		if (!m_reverse_view)
+			m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
+		else
+			m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+	}
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
 	// BAD
@@ -621,6 +627,8 @@ void debug_view_memory::recompute()
 
 	// compute the section widths
 	m_section[0].m_width = 1 + 8 + 1;
+	if (m_decimal_addr)
+		m_section[0].m_width += 2;
 	if (m_data_format <= 8)
 		m_section[1].m_width = 1 + 3 * m_bytes_per_row + 1;
 	else {
@@ -1038,6 +1046,20 @@ void debug_view_memory::set_reverse(bool reverse)
 {
 	cursor_pos pos = begin_update_and_get_cursor_pos();
 	m_reverse_view = reverse;
+	m_recompute = m_update_pending = true;
+	end_update_and_set_cursor_pos(pos);
+}
+
+
+//-------------------------------------------------
+//  set_decimal_addr - specify true if the memory
+//  view should display addresses in decimal
+//-------------------------------------------------
+
+void debug_view_memory::set_decimal_addr(bool decimal)
+{
+	cursor_pos pos = begin_update_and_get_cursor_pos();
+	m_decimal_addr = decimal;
 	m_recompute = m_update_pending = true;
 	end_update_and_set_cursor_pos(pos);
 }

@@ -63,6 +63,7 @@ public:
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
+	bool decimal_addr() const { return m_decimal_addr; }
 	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
@@ -72,6 +73,7 @@ public:
 	void set_reverse(bool reverse);
 	void set_ascii(bool reverse);
 	void set_physical(bool physical);
+	void set_decimal_addr(bool decimal);
 
 protected:
 	// view overrides
@@ -115,6 +117,7 @@ private:
 	bool                m_reverse_view;         // reverse-endian view?
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
+	bool                m_decimal_addr;         // display addresses as decimal numbers
 	bool                m_edit_enabled;         // can modify contents ?
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	u32                 m_bytes_per_row;        // (derived) number of bytes displayed per line
