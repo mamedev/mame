@@ -368,11 +368,52 @@ static const nes_mmc mmc_list[] =
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
 	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
-
+	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
+	// 335 BMC-CTC-09 10-in-1, not in nes.xml?
+	// 336 BMC-K-3046 11-in-1, not in nes.xml?
+	// 337 BMC-CTC-12IN1 multicart, not in nes.xml?
+	// 338 BMC-SA005-A multicarts, not in nes.xml?
+	// 339 BMC-K-3006 21-in-1, not in nes.xml?
+	// 340 BMC-K-3036 35-in-1, not in nes.xml?
+	// 341 BMC-TJ-03 4-in-1, not in nes.xml?
+	// 342 COOLGIRL homebrew
+	// 343 reset-based 4-in-1 pirate?
+	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
+	// 345 BMC-L6IN1 multicart, not in nes.xml?
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
+	{ 348, BMC_830118C },
+	{ 349, BMC_G146 },
+	// 350 BMC-891227 multicart
+	// 351 JY/Techline 9-in-1
+	// 352 Kaiser 4-in-1 KS106C
+	// 353 Super Mario Family multicart
+	// 354 250-in-1 multicart with FDS Bubble Bobble
+	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
+	// 356 7-in-1 Rockman (JY-208)
+	// 357 Bit Corp 4-in-1 (ID 4602)
+	// 358 JY multicarts, variant of mapper 282
+	// 359 BMC-SB-5013 multicarts
+	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
+	// 361 JY multicarts
+	// 362 JY-005 multicart
+	// 363 variant of mapper 358?
+	// 364 JY-007, is this ttoons6 in nes.xml?
+	// 365 is this asderp95 in nes.xml?
+	// 366 K-3131GS and K-3131SS 4-in-1 carts
+	// 367 7-in-1 cart that is a close variant of mapper 205
 
+	// 385 NTDEC 2779 5-in-1, not in nes.xml?
+	// 386 JY-090 multicart only
+	// 387 various JY multicarts
+	// 388 various JY multicarts
 	// { 389, CALTRON_9IN1 },
+	// 390 variant of mapper 236?
+	// 391 BS-110 MMC3 clone
+	// 392 8-in-1 variant of mc_sv16
+	// 393 820720C multicart
+	// 394 Realtec HSK007 multicart
+	// 395 Realtec 8210 multicarts
 
 	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
 
