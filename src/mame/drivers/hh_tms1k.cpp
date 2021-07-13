@@ -11085,7 +11085,7 @@ public:
 
 void ti1680_state::update_display()
 {
-	// note the extra segment on R9 and R3
+	// note the extra segments on R9 and R3
 	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80) | (m_r << 5 & 0x100));
 }
 
@@ -11190,7 +11190,7 @@ ROM_START( ti1680 )
 	ROM_REGION( 2127, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
 	ROM_REGION( 525, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1980_dataman_output.pla", 0, 525, CRC(188af340) SHA1(eaf707266dde0d708870ef5d8f985ce88d35b43e) )
+	ROM_LOAD( "tms1980_ti1680_output.pla", 0, 525, CRC(188af340) SHA1(eaf707266dde0d708870ef5d8f985ce88d35b43e) )
 ROM_END
 
 
