@@ -519,8 +519,8 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 #if TRACK_POLY_WAITS
 {
 	osd_printf_info("Wait summary:\n");
-	osd_printf_info("Cause                Cycles  Waits  Actuals Average   <100   100-1k  1k-10k   10k+\n");
-	osd_printf_info("------------------  ------- ------- ------- ------- ------- ------- ------- -------\n");
+	osd_printf_info("Cause                        Cycles  Waits  Actuals Average   <100   100-1k  1k-10k   10k+\n");
+	osd_printf_info("--------------------------  ------- ------- ------- ------- ------- ------- ------- -------\n");
 	while (1)
 	{
 		typename waitmap_t::value_type *biggest = nullptr;
@@ -532,7 +532,7 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 		if (biggest == nullptr)
 			break;
 
-		osd_printf_info("%-20s%-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
+		osd_printf_info("%-28s%-7s %-7s %-7s %-7s %-7s %-7s %-7s %-7s\n",
 			biggest->first.c_str(),
 			friendly_number(biggest->second.total_cycles).c_str(),
 			friendly_number(biggest->second.total_waits).c_str(),

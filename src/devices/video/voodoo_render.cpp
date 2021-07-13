@@ -2195,7 +2195,7 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, u16 *dest,
 	}
 
 	// wait for any outstanding work to finish
-	wait("LFB Write");
+	wait("pixel_pipeline");
 
 	// perform alpha blending
 	if (alphamode.alphablend())

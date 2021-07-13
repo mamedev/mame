@@ -578,6 +578,7 @@ u32 command_fifo::packet_type_5(u32 command)
 			if (LOG_CMDFIFO)
 				m_device.logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, BIT(command, 26, 4), BIT(command, 22, 4));
 
+			m_device.renderer().wait("packet_type_5(0)");
 			for (u32 word = 0; word < count; word++)
 				m_ram[target++ & m_mask] = little_endianize_int32(read_next());
 			break;
@@ -945,7 +946,7 @@ u32 voodoo_2_device::reg_video2_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("video_configuration");
+		m_renderer->wait("reg_video2_w");
 		m_reg.write(regnum, data);
 
 		auto const hsync = m_reg.hsync<false>();
@@ -988,7 +989,7 @@ u32 voodoo_2_device::reg_sargb_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_2_device::reg_userintr_w(u32 chipmask, u32 regnum, u32 data)
 {
-	m_renderer->wait("userIntrCMD");
+	m_renderer->wait("reg_userintr_w");
 
 	// Bit 5 of intrCtrl enables user interrupts
 	if (m_reg.intr_ctrl().user_interrupt_enable())
@@ -1015,7 +1016,7 @@ u32 voodoo_2_device::reg_cmdfifo_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("cmdFifo write");
+		m_renderer->wait("reg_cmdfifo_w");
 		m_reg.write(regnum, data);
 		m_cmdfifo.set_base(BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 0, 10) << 12);
 		m_cmdfifo.set_end((BIT(m_reg.read(voodoo_regs::reg_cmdFifoBaseAddr), 16, 10) + 1) << 12);
@@ -1034,7 +1035,6 @@ u32 voodoo_2_device::reg_cmdfifoptr_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("cmdFifoReadPtr");
 		m_reg.write(regnum, data);
 		m_cmdfifo.set_read_pointer(data);
 	}
@@ -1051,7 +1051,6 @@ u32 voodoo_2_device::reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("cmdFifoDepth");
 		m_reg.write(regnum, data);
 		m_cmdfifo.set_depth(data);
 	}
@@ -1068,7 +1067,6 @@ u32 voodoo_2_device::reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("cmdFifoHoles");
 		m_reg.write(regnum, data);
 		m_cmdfifo.set_holes(data);
 	}
@@ -1084,10 +1082,16 @@ u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0) && m_init_enable.enable_hw_init())
 	{
-		m_renderer->wait("fbiInit5-7");
+		u32 delta = m_reg.read(regnum) ^ data;
 		m_reg.write(regnum, data);
-		if (regnum == voodoo_regs::reg_fbiInit5 || regnum == voodoo_regs::reg_fbiInit6)
+
+		// a few bits affect video memory configuration
+		if ((regnum == voodoo_regs::reg_fbiInit5 && BIT(delta, 9, 2) != 0) ||
+			(regnum == voodoo_regs::reg_fbiInit6 && BIT(delta, 30, 1) != 0))
+		{
+			m_renderer->wait("reg_fbiinit5_7_w");
 			recompute_video_memory();
+		}
 		m_cmdfifo.set_enable(m_reg.fbi_init7().cmdfifo_enable());
 		m_cmdfifo.set_count_holes(!m_reg.fbi_init7().disable_cmdfifo_holes());
 	}
