@@ -2456,6 +2456,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_desdis.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_eag68k.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_eldorado.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_elite.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_excel.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_msc.cpp",

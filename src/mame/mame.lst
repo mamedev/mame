@@ -13840,6 +13840,9 @@ fex68km2a                       //
 fex68km3                        //
 fex68km4                        //
 
+@source:fidel_eldorado.cpp
+feldo
+
 @source:fidel_elite.cpp
 feas                            //
 feasbu                          //
