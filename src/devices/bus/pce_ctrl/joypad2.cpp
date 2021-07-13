@@ -233,7 +233,7 @@ u8 pce_joypad2_turbo_device::buttons_r()
 			}
 			else // Slow
 			{
-				if (BIT(m_counter, 2)) // OC pin from 74xx163
+				if (BIT(m_counter, 2)) // QC pin from 74xx163
 					ret |= (1 << i);
 			}
 		}
