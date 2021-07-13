@@ -35,6 +35,7 @@ Year + Game                       System    Protection
 91  Avenging Spirit (World)         B       Inputs
     Earth Defense Force (Prototype) A             Encryption (key 1)
     Earth Defense Force             B       Inputs
+    In Your Face (Prototype)        A             Encryption (key 1)
     64th Street  (World) /          C       Inputs
     64th Street  (Japan)            C       Inputs
 92  Soldam (Japan)                  A             Encryption (key 2)
@@ -61,7 +62,7 @@ MS1 - D     68000       -           -             OKI-M6295
 
 Main CPU    RW      MS1-A/Z         MS1-B           MS1-C           MS1-D
 -----------------------------------------------------------------------------------
-ROM         R   000000-03ffff   000000-03ffff   000000-07ffff   000000-03ffff
+ROM         R   000000-07ffff   000000-03ffff   000000-07ffff   000000-03ffff
                                 080000-0bffff
 Video Regs   W  084000-0843ff   044000-0443ff   0c0000-0cffff   0c0000-0cffff
 Palette     RW  088000-0887ff   048000-0487ff   0f8000-0f87ff   0d8000-0d87ff
@@ -89,9 +90,9 @@ Latch #2         W      060000-060001       <           <
 6295 #1 status      R       0a0000-0a0001       <           <
 6295 #2 data         W      0c0000-0c0003       <           <
 6295 #2 status      R       0c0000-0c0001       <           <
-RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
+RAM         RW      0f0000-0f3fff       0e0000-0effff*      <
 -----------------------------------------------------------------------------------
-
+*Mirror at 0xf0000 (verified on hardware)
 
                                 Issues / To Do
                                 --------------
@@ -180,6 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 	// plusalph: irq 1 & 3 RTE, irq 2 valid
 	// rodland: irq 1 & 3 RTE, irq 2 valid (sets palette, vregs ...)
 	// soldam: irq 1 & 3 RTE, irq 2 valid
+	// edfp: irq 1?, 2 sets vregs etc, 3 RTE
 
 	if(scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
@@ -208,7 +210,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
 void megasys1_state::megasys1Z_map(address_map &map)
 {
 	map.global_mask(0xfffff);
-	map(0x000000, 0x05ffff).rom();
+	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x080001).portr("SYSTEM");
 	map(0x080002, 0x080003).portr("P1");
 	map(0x080004, 0x080005).portr("P2");
@@ -228,6 +230,7 @@ void megasys1_state::megasys1A_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	megasys1Z_map(map);
+	map(0x000000, 0x07ffff).rom();
 	map(0x080008, 0x080009).r(m_soundlatch[1], FUNC(generic_latch_16_device::read));    /* from sound cpu */
 	map(0x084000, 0x084001).w(FUNC(megasys1_state::active_layers_w));
 	map(0x084008, 0x08400d).rw("scroll2", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
@@ -528,7 +531,7 @@ void megasys1_state::megasys1A_sound_map(address_map &map)
 	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_r<1>));
 	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0e0000, 0x0fffff).ram();
+	map(0x0e0000, 0x0effff).ram().mirror(0x10000);
 }
 
 // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
@@ -589,7 +592,7 @@ void megasys1_state::megasys1B_sound_map(address_map &map)
 	map(0x0a0000, 0x0a0003).w(m_oki[0], FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x0c0001, 0x0c0001).r(FUNC(megasys1_state::oki_status_r<1>));
 	map(0x0c0000, 0x0c0003).w(m_oki[1], FUNC(okim6295_device::write)).umask16(0x00ff);
-	map(0x0e0000, 0x0effff).ram();
+	map(0x0e0000, 0x0effff).ram().mirror(0x10000);
 }
 
 
@@ -2158,7 +2161,7 @@ interrupts: 1] 1aa  2] 1b4
 
 
 ROM_START( astyanax )  // EPROM version
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "astyan2.bin", 0x00000, 0x20000, CRC(1b598dcc) SHA1(f6b733d9b0e81226eb784aaddda1791e3e95b816) )
 	ROM_LOAD16_BYTE( "astyan1.bin", 0x00001, 0x20000, CRC(1a1ad3cf) SHA1(e094b4528e6f36eb30bfc148f2ad50d876e9280a) )
 	ROM_LOAD16_BYTE( "astyan3.bin", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
@@ -2205,7 +2208,7 @@ ROM_START( astyanax )  // EPROM version
 ROM_END
 
 ROM_START( astyanaxa ) // mask ROM version, same content as the EPROM version, here for completeness
-	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "astyan2.bin", 0x00000, 0x20000, CRC(1b598dcc) SHA1(f6b733d9b0e81226eb784aaddda1791e3e95b816) )
 	ROM_LOAD16_BYTE( "astyan1.bin", 0x00001, 0x20000, CRC(1a1ad3cf) SHA1(e094b4528e6f36eb30bfc148f2ad50d876e9280a) )
 	ROM_LOAD16_BYTE( "astyan3.bin", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
@@ -2291,7 +2294,7 @@ ROM_END
 
 
 ROM_START( lordofkb )
-	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "maincpu.12",  0x20001, 0x10000, CRC(f618b0e4) SHA1(7e5a665f834df457c5ae117191adfd50433a0848) )
 	ROM_LOAD16_BYTE( "maincpu.a12", 0x00000, 0x10000, CRC(36e4de06) SHA1(69db06bbf0818be7ed37087314773b3463b24ef6) )
 	ROM_LOAD16_BYTE( "maincpu.13",  0x00001, 0x10000, CRC(c0e1076f) SHA1(e6171194b2e2bcbb62dfe4e6f5e102c52dbe2408) )
@@ -2426,7 +2429,7 @@ ROM_END
 
 
 ROM_START( phantasm )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "phntsm02.bin", 0x000000, 0x020000, CRC(d96a3584) SHA1(3ae62c5785b6249f1921d914c1f094bcf850d8d1) )
 	ROM_LOAD16_BYTE( "phntsm01.bin", 0x000001, 0x020000, CRC(a54b4b87) SHA1(92745c53d8550189c3b0ce55be9027447817a2dc) )
 	ROM_LOAD16_BYTE( "phntsm03.bin", 0x040000, 0x010000, CRC(1d96ce20) SHA1(2fb79160ea0dd18b5713691e4cf195d27ac4e3c3) )
@@ -2981,7 +2984,7 @@ ROM_END
 
 
 ROM_START( hachoo )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "hacho02.rom", 0x000000, 0x020000, CRC(49489c27) SHA1(21c31e1b41ca6c7e78803e5a2e7c49f7b885d0e3) )
 	ROM_LOAD16_BYTE( "hacho01.rom", 0x000001, 0x020000, CRC(97fc9515) SHA1(192660061af6a5bddccf7cfffcbfa368c4030de9) )
 
@@ -3116,7 +3119,7 @@ f010c.w     credits
 
 
 ROM_START( kazan )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "kazan.2",    0x000000, 0x020000, CRC(072aa3d6) SHA1(49fd03d72f647dcda140d0a507f23a80911427e1) )
 	ROM_LOAD16_BYTE( "kazan.1",    0x000001, 0x020000, CRC(b9801e2d) SHA1(72f0ca6da5177625073ee2687ddba3647af5e9e8) )
 	ROM_LOAD16_BYTE( "iga_03.bin", 0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
@@ -3162,7 +3165,7 @@ ROM_END
 
 
 ROM_START( iganinju )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "iga_02.bin", 0x000000, 0x020000, CRC(bd00c280) SHA1(d4e074bb25fc7295b1a39aa22e966cf471a6789f) )
 	ROM_LOAD16_BYTE( "iga_01.bin", 0x000001, 0x020000, CRC(fa416a9e) SHA1(c81405037366c93754d8eed1c70128091f9b3e3f) )
 	ROM_LOAD16_BYTE( "iga_03.bin", 0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
@@ -3198,7 +3201,7 @@ ROM_START( iganinju )
 ROM_END
 
 ROM_START( iganinjub )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, c and b identical to the original */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code, c and b identical to the original */
 	ROM_LOAD16_BYTE( "19.a12", 0x000000, 0x010000, CRC(6b4c16ac) SHA1(edb5fe3b3e4e94e59348c0a7034df9df6ef157d3) )
 	ROM_LOAD16_BYTE( "23.13",  0x000001, 0x010000, CRC(03bfda29) SHA1(ced6ddcbb86d3109bcfb8e1982a5f666ca7dc10e) )
 	ROM_LOAD16_BYTE( "20.a13", 0x020000, 0x010000, CRC(fa0705fb) SHA1(110ebca62a57f9d8e355a339a99819faf1fe57f1) )
@@ -3249,7 +3252,7 @@ ROM_START( iganinjub )
 ROM_END
 
 ROM_START( inyourfa )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "02.27c1001",    0x000000, 0x020000, CRC(ae77e5b7) SHA1(222e1f4c3d82cdedb88ec524ea11500145bc8c87) )
 	ROM_LOAD16_BYTE( "01.27c1001",    0x000001, 0x020000, CRC(e5ea92ef) SHA1(0afcaa1451572aee7486b76c21bdd4617d2b25d2) )
 	ROM_LOAD16_BYTE( "03.27c512", 0x040000, 0x010000, CRC(a1efe9be) SHA1(3f49c337f0cd8634d0049c80631e32ea887d8fef) )
@@ -3320,7 +3323,7 @@ BS.BPR       [85b30ac4] (82S131)
 
 
 ROM_START( jitsupro )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jp_2.bin", 0x000000, 0x020000, CRC(5d842ff2) SHA1(69032601c0e67c5c78fad1cb2bb4f1b59014fe5a) )
 	ROM_LOAD16_BYTE( "jp_1.bin", 0x000001, 0x020000, CRC(0056edec) SHA1(529a5181f7d791930e238bc115daeae1ab9a63ad) )
 
@@ -3388,7 +3391,7 @@ Notes:
 
 
 ROM_START( kickoff )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "kioff03.rom", 0x000000, 0x010000, CRC(3b01be65) SHA1(110b4e02053073c0315aba1eca8c19afe5fafb33) )
 	ROM_LOAD16_BYTE( "kioff01.rom", 0x000001, 0x010000, CRC(ae6e68a1) SHA1(aac54e13dd33420712a869e6f46fb9b94fde9e34) )
 
@@ -3436,7 +3439,7 @@ V-SYNC @56.24Hz
 */
 
 ROM_START( kickoffb )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "k-14.1b", 0x000000, 0x010000, CRC(b728c1af) SHA1(3575c113b442e3864c1575709ac410a8da1bc969) )
 	ROM_LOAD16_BYTE( "k-13.1a", 0x000001, 0x010000, CRC(93a8483f) SHA1(c4e60fc05232624fcb95147df845a44bfbfd04dc) )
 
@@ -3492,7 +3495,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( lomakai )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "lom_30.rom", 0x000000, 0x020000, CRC(ba6d65b8) SHA1(4c83e57c977b2be82a99a4a61ab8fd5f7099ae38) )
 	ROM_LOAD16_BYTE( "lom_20.rom", 0x000001, 0x020000, CRC(56a00dc2) SHA1(5d97f89d384e12d70cbb5aabd6ce309e5cfb5497) )
 
@@ -3515,7 +3518,7 @@ ROM_END
 
 
 ROM_START( makaiden )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "makaiden.3a", 0x000000, 0x020000, CRC(87cf81d1) SHA1(c4410a86a01c683368dbc3daca61e21931885650) )
 	ROM_LOAD16_BYTE( "makaiden.2a", 0x000001, 0x020000, CRC(d40e0fea) SHA1(0f8a0440f63f52508ab44c3a8eb5b7f03ccca49d) )
 
@@ -3593,7 +3596,7 @@ f0018.w     *** level ***
 ***************************************************************************/
 
 ROM_START( p47 )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "p47us3.bin", 0x000000, 0x020000, CRC(022e58b8) SHA1(87db59e409977358d9a7b689f2d69bef056328d9) )
 	ROM_LOAD16_BYTE( "p47us1.bin", 0x000001, 0x020000, CRC(ed926bd8) SHA1(5cf3e7b9b23667eaa8ebcff0803a7b881c7b83cf) )
 
@@ -3634,7 +3637,7 @@ ROM_END
 
 
 ROM_START( p47j )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "p47j_3.bin", 0x000000, 0x020000, CRC(11c655e5) SHA1(a2bfd6538ac81a5f20fa77460ba045584313413a) )
 	ROM_LOAD16_BYTE( "p47j_1.bin", 0x000001, 0x020000, CRC(0a5998de) SHA1(9f474c6c9b125fc7c41a44dbaacf3ba3800df8b5) )
 
@@ -3686,7 +3689,7 @@ It contains enemy sprites without the German "Iron Cross" emblem.
 ***************************************************************************/
 
 ROM_START( p47je )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "export_p-47_3.rom2", 0x000000, 0x020000, CRC(37185412) SHA1(02c4c7dcc448d9ac85a699bd2cee9a060ad9e088) )
 	ROM_LOAD16_BYTE( "export_p-47_1.rom1", 0x000001, 0x020000, CRC(3925dd4f) SHA1(687bac19e5786d09addb313123f2c32d9601c0ff) )
 
@@ -3726,7 +3729,7 @@ ROM_START( p47je )
 ROM_END
 
 ROM_START( p47b ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
 	ROM_LOAD16_BYTE( "12.bin", 0x000000, 0x010000, CRC(cc81abd8) SHA1(223d205ee5120d16b997b0788fcb81c0de52da04) )
 	ROM_LOAD16_BYTE( "13.bin", 0x020000, 0x010000, CRC(f3ea8a3e) SHA1(b2ea6661f7a3653ac6d92e07176546a41178eaff) )
 	ROM_LOAD16_BYTE( "10.bin", 0x000001, 0x010000, CRC(8ebff1d8) SHA1(48c9c686fe77087ca122707f99598947b3ef675b) )
@@ -3931,7 +3934,7 @@ f30a4.l     *** score (BCD) ***
 
 
 ROM_START( plusalph )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "pa-rom2.bin", 0x000000, 0x020000, CRC(33244799) SHA1(686fb7fa8a6c25b5aff78bc509f35c69492d7d1e) )
 	ROM_LOAD16_BYTE( "pa-rom1.bin", 0x000001, 0x020000, CRC(a32fdcae) SHA1(c2315a7142e5499e9325f5a8361cb25e83747a3e) )
 	ROM_LOAD16_BYTE( "pa-rom3.bin", 0x040000, 0x010000, CRC(1b739835) SHA1(3aaa9545a7f578a9775311dcd44504870f3b1544) )
@@ -4011,7 +4014,7 @@ f0012->84204    f0014->8420c    f0016->8400c
 
 
 ROM_START( rodland )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jaleco_rod_land_2.rom2", 0x000000, 0x020000, CRC(c7e00593) SHA1(055b7bcabf90ed6d5edc2797d0f85a5d49b8693b) )
 	ROM_LOAD16_BYTE( "jaleco_rod_land_1.rom1", 0x000001, 0x020000, CRC(2e748ca1) SHA1(285414af11aad36f3bd7020365ff90eb696d2de3) )
 	ROM_LOAD16_BYTE( "jaleco_rod_land_3.rom3", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
@@ -4044,7 +4047,7 @@ ROM_START( rodland )
 ROM_END
 
 ROM_START( rodlanda ) // JALECO MB-M02A EB-88003-3001-1, with jumper wire from a PAL to one of the connectors
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jaleco_rod_land_2.rom2", 0x000000, 0x020000, CRC(797ad124) SHA1(66076f0a1c18cb4fdf239b387f903d81df863740) ) //sldh
 	ROM_LOAD16_BYTE( "jaleco_rod_land_1.rom1", 0x000001, 0x020000, CRC(030b116f) SHA1(7928daf2296a292a951f393fb48977972a3487c7) ) //sldh
 	ROM_LOAD16_BYTE( "jaleco_rod_land_3.rom3", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
@@ -4077,7 +4080,7 @@ ROM_START( rodlanda ) // JALECO MB-M02A EB-88003-3001-1, with jumper wire from a
 ROM_END
 
 ROM_START( rodlandj )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jaleco_rod_land_2.rom2", 0x000000, 0x020000, CRC(b1d2047e) SHA1(75d282b7614c5f4b76ab44e34fea9e87ab8b992c) )
 	ROM_LOAD16_BYTE( "jaleco_rod_land_1.rom1", 0x000001, 0x020000, CRC(3c47c2a3) SHA1(62e66a2f53aeacf92551ba64ae4ce14c2e982bb0) )
 	ROM_LOAD16_BYTE( "jaleco_rod_land_3.rom3", 0x040000, 0x010000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
@@ -4123,7 +4126,7 @@ To access the hidden Location Test Table, during the attaction mode at the title
 
  */
 ROM_START( rittam )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "2.rom2", 0x000000, 0x020000, CRC(93085af2) SHA1(e49dc1e62c1cec75f192ac4608f69c4361ad739a) )
 	ROM_LOAD16_BYTE( "r+t_1.rom1", 0x000001, 0x020000, CRC(20446c34) SHA1(10753b8c3826468f42c5b1da8cfa60658db60401) )
 
@@ -4167,7 +4170,7 @@ ROM_END
 
 /* 100% identical to rodlandj, but not encrypted */
 ROM_START( rodlandjb )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "rl19.bin", 0x000000, 0x010000, CRC(028de21f) SHA1(04c88a0138dd119655b4a8a965617781a9a6ff71) )
 	ROM_LOAD16_BYTE( "rl17.bin", 0x000001, 0x010000, CRC(9c720046) SHA1(8543f0942863b4aa5329572dd1f374ea18c29851) )
 	ROM_LOAD16_BYTE( "rl20.bin", 0x020000, 0x010000, CRC(3f536d07) SHA1(cfcf47c42677fae204b3a7d70786d157279ba6e5) )
@@ -4214,7 +4217,7 @@ interrupts: 1] rte  2] 620  3] 5e6
 
 
 ROM_START( stdragon )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jsd-02.bin", 0x000000, 0x020000, CRC(cc29ab19) SHA1(e145eeb01fad313e300f0c614c0e7a5c1d75d7d9) )
 	ROM_LOAD16_BYTE( "jsd-01.bin", 0x000001, 0x020000, CRC(67429a57) SHA1(f3c20fabed97ac5c2fe3e891f9c8c86478453a6c) )
 
@@ -4282,7 +4285,7 @@ Dumped by tirino73
 ***************************************************************************/
 
 ROM_START( stdragona )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "jsda-02.bin", 0x000000, 0x020000, CRC(d65d4154) SHA1(f77886590a092743c829fb52b5de0ca8ef51c122) )
 	ROM_LOAD16_BYTE( "jsda-01.bin", 0x000001, 0x020000, CRC(c40c8ee1) SHA1(346b16519f35d7bdb283d87f6f89f54d3b7eefe2) )
 
@@ -4332,7 +4335,7 @@ No ASICs just logic chips.
 ***************************************************************************/
 
 ROM_START( stdragonb )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "a-4.bin", 0x00000, 0x10000, CRC(c58fe5c2) SHA1(221767e995e05b076e256b1818c4b5d85f58e7e6) )
 	ROM_LOAD16_BYTE( "a-2.bin", 0x00001, 0x10000, CRC(46a7cdbb) SHA1(b90a0c10a5e7584e565f61b7bb143fb5800ae039) )
 	ROM_LOAD16_BYTE( "a-3.bin", 0x20000, 0x10000, CRC(f6a268c4) SHA1(106184fb18ad8018e9a4aad383c7243c254bfab1) )
@@ -4403,7 +4406,7 @@ text in english.
 
 
 ROM_START( soldam )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "2ver1j.bin",0x000000, 0x020000, CRC(45444b07) SHA1(d991dd52904671fbd8cfcfe07c956d9fd45b3470) )
 	ROM_LOAD16_BYTE( "1euro.bin", 0x000001, 0x020000, CRC(9f9da28a) SHA1(8ce9cd72d12cf66f0b1611ec3933383d2995e5f2) )
 	ROM_LOAD16_BYTE( "3ver1.bin", 0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
@@ -4437,7 +4440,7 @@ ROM_END
 
 
 ROM_START( soldamj )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "soldam2.bin", 0x000000, 0x020000, CRC(c73d29e4) SHA1(2a6bffd6835506a0a1449047dec69445d2242fca) )
 	ROM_LOAD16_BYTE( "soldam1.bin", 0x000001, 0x020000, CRC(e7cb0c20) SHA1(7b1adf439cd4022ec110ec18359fb50ac137f253) )
 	ROM_LOAD16_BYTE( "3ver1.bin",   0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
@@ -4478,7 +4481,7 @@ ROM_END
 
 
 ROM_START( tshingena )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "takeda2.bin", 0x000000, 0x020000, CRC(6ddfc9f3) SHA1(0ce1b8eae31453db0b2081717d7dbda9ea7d5a60) )
 	ROM_LOAD16_BYTE( "takeda1.bin", 0x000001, 0x020000, CRC(1afc6b7d) SHA1(b56da1b8c5b417a88a2952491c2d5472bb783945) )
 
@@ -4521,7 +4524,7 @@ ROM_END
 
 
 ROM_START( tshingen )
-	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
 	ROM_LOAD16_BYTE( "shing_02.rom", 0x000000, 0x020000, CRC(d9ab5b78) SHA1(c7622ec11a636dc7a6bcad02556a98aa0a9fb043) )
 	ROM_LOAD16_BYTE( "shing_01.rom", 0x000001, 0x020000, CRC(a9d2de20) SHA1(b53205722ae19305a1c373abbbac4fbcbcb0b0f0) )
 
