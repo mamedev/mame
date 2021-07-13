@@ -21,6 +21,7 @@ TODO:
   protection (in rmhaisei the failure is more explicit, in rmhaijin it's
   deviously delayed to a later part of the game).
   In themj the checks are patched out, maybe it's a bootleg?
+  ETA: it uses IOX, which is shared with speedatk.cpp and srmp2.cpp as well.
 
 - some unknown reads and writes.
 
