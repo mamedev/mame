@@ -3,9 +3,8 @@
 // thanks-to:Berger, yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory 12 Chess Challenger (SC12-B, 6086)
-4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
----------------------------------
+Fidelity Sensory 12 Chess Challenger (SC12, 6086)
+------------------------------------
 RE information from netlist by Berger
 
 8*(8+1) buttons, 8+8+2 red LEDs
@@ -273,5 +272,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME     PARENT  CMP MACHINE  INPUT  STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
-CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\"", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12,  0,       0, sc12,    sc12,  sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12\" (model SC12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, fscc12b, fscc12,  0, sc12b,   sc12b, sc12_state, empty_init, "Fidelity Electronics", "Sensory Chess Challenger \"12 B\" (model 6086)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
