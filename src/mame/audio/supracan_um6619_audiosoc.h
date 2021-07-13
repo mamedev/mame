@@ -2,26 +2,24 @@
 // copyright-holders:Ryan Holtz, superctr
 /**********************************************************************
 
-    Super A'Can sound driver
+    Super A'Can sound driver (UM6619)
 
 **********************************************************************/
 
-#ifndef MAME_AUDIO_ACAN_H
-#define MAME_AUDIO_ACAN_H
+#ifndef MAME_AUDIO_SUPRACAN_UM6619_AUDIOSOC_H
+#define MAME_AUDIO_SUPRACAN_UM6619_AUDIOSOC_H
 
 #pragma once
 
-class acan_sound_device : public device_t, public device_sound_interface
+#include "supracan_um6619_cpu.h"
+
+class supracan_um6619_audiosoc : public supracan_um6619_cpu_device, public device_sound_interface
 {
 public:
-	acan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	supracan_um6619_audiosoc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto ram_read() { return m_ram_read.bind(); }
-	auto timer_irq_handler() { return m_timer_irq_handler.bind(); }
-	auto dma_irq_handler() { return m_dma_irq_handler.bind(); }
-
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	virtual uint8_t sound_read(offs_t offset) override;
+	virtual void sound_write(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -54,9 +52,6 @@ private:
 
 	sound_stream *m_stream;
 	emu_timer *m_timer;
-	devcb_write_line m_timer_irq_handler;
-	devcb_write_line m_dma_irq_handler;
-	devcb_read8 m_ram_read;
 	uint16_t m_active_channels;
 	uint16_t m_dma_channels;
 	acan_channel m_channels[16];
@@ -64,6 +59,6 @@ private:
 	std::unique_ptr<int32_t[]> m_mix;
 };
 
-DECLARE_DEVICE_TYPE(ACANSND, acan_sound_device)
+DECLARE_DEVICE_TYPE(SUPRACAN_UM6619_AUDIOSOC, supracan_um6619_audiosoc)
 
-#endif // MAME_AUDIO_ACAN_H
+#endif // MAME_AUDIO_SUPRACAN_UM6619_AUDIOSOC_H
