@@ -16964,4 +16964,84 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="playroom">
+		<description>The Playroom (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296728">
+				<rom name="the playroom 800k.woz" size="1296728" crc="c50a8b4b" sha1="1fe3d624330d5dac35a239b30a46a6149c7a4b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprprnt">
+		<description>SuperPrint! (Version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"SuperPrint!" is a 1987 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer, and distributed by Pelican Software. This is version 1.4. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296712">
+				<rom name="superprint 800k.woz" size="1296712" crc="68fb210a" sha1="d69ff7120adea572833ba6253e18ed10ac4c5619"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampag35">
+		<description>Rampage (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Rampage" is a 1988 action game ported to the Apple II by Ken Hurley, J. David Koch, Kelly Flock, Steve Imes, and Alex Edelstein, and distributed by Activision. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312571">
+				<rom name="rampage 800k.woz" size="1312571" crc="07fda4cd" sha1="ace041dfef6127957d1d33f0d33e5678863c6bfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hegira">
+		<description>Hegira: Tale of a Galactic Exile</description>
+		<year>1983</year>
+		<publisher>Ted Butler</publisher>
+		<info name="release" value="2021-07-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Hegira: Tale of a Galactic Exile" is a 1983 adventure game developed and distributed by Ted Butler. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234844">
+				<rom name="hegira.woz" size="234844" crc="f3085081" sha1="d6b14bd804a675e12d06abb0c6ee1217e7b2b869"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbmath35">
+		<description>Stickybear Math (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Math" is a 1984 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1302813">
+				<rom name="stickybear math 800k.woz" size="1302813" crc="93214eec" sha1="4dac3752e1575658fe0d10910a4a0f3ea8518af9"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
