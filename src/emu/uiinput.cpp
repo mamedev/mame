@@ -41,6 +41,9 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 	, m_current_mouse_y(-1)
 	, m_current_mouse_down(false)
 	, m_current_mouse_field(nullptr)
+	, m_current_mouse_drag_item(nullptr)
+	, m_current_mouse_target_dx(0)
+	, m_current_mouse_target_dy(0)
 	, m_events_start(0)
 	, m_events_end(0)
 {
@@ -81,20 +84,44 @@ void ui_input_manager::frame_update()
 		}
 	}
 
-	// perform mouse hit testing
-	ioport_field *mouse_field = m_current_mouse_down ? find_mouse_field() : nullptr;
-	if (m_current_mouse_field != mouse_field)
+	// if dragging, update based solely on position
+	if (m_current_mouse_down && m_current_mouse_drag_item != nullptr)
 	{
-		// clear the old field if there was one
-		if (m_current_mouse_field != nullptr)
-			m_current_mouse_field->set_value(0);
+		m_current_mouse_field->set_value(m_current_mouse_target->interpolated_value(m_current_mouse_x, m_current_mouse_y, m_current_mouse_drag_item, m_current_mouse_target_dx, m_current_mouse_target_dy));
+	}
+	else
+	{
+		// perform mouse hit testing
+		float xoffs = 0, yoffs = 0;
+		render_target::item_handle item = nullptr;
+		ioport_field *mouse_field = m_current_mouse_down ? find_mouse_field(xoffs, yoffs, item) : nullptr;
+		if (m_current_mouse_field != mouse_field)
+		{
+			// clear the old field if there was one
+			if (m_current_mouse_field != nullptr && !m_current_mouse_field->is_analog() && m_current_mouse_field->type() != IPT_ADJUSTER)
+				m_current_mouse_field->set_value(0);
+			m_current_mouse_drag_item = nullptr;
 
-		// set the new field if it exists and isn't already being pressed
-		if (mouse_field != nullptr && !mouse_field->digital_value())
-			mouse_field->set_value(1);
+			if (mouse_field != nullptr)
+			{
+				if (!mouse_field->is_analog() && mouse_field->type() != IPT_ADJUSTER)
+				{
+					// set the new field if it exists and isn't already being pressed
+					if (!mouse_field->digital_value())
+						mouse_field->set_value(1);
+				}
+				else
+				{
+					// if analog, treat as the start of a dragging operation
+					m_current_mouse_drag_item = item;
+					m_current_mouse_target_dx = xoffs;
+					m_current_mouse_target_dy = yoffs;
+				}
+			}
 
-		// update internal state
-		m_current_mouse_field = mouse_field;
+			// update internal state
+			m_current_mouse_field = mouse_field;
+		}
 	}
 }
 
@@ -208,15 +235,14 @@ render_target *ui_input_manager::find_mouse(s32 *x, s32 *y, bool *button) const
     the mouse is currently pointing at
 -------------------------------------------------*/
 
-ioport_field *ui_input_manager::find_mouse_field() const
+ioport_field *ui_input_manager::find_mouse_field(float &xoffs, float &yoffs, render_target::item_handle &item) const
 {
 	// map the point and determine what was hit
 	if (m_current_mouse_target != nullptr)
 	{
 		ioport_port *port = nullptr;
 		ioport_value mask;
-		float x, y;
-		if (m_current_mouse_target->map_point_input(m_current_mouse_x, m_current_mouse_y, port, mask, x, y))
+		if (m_current_mouse_target->map_point_input(m_current_mouse_x, m_current_mouse_y, port, mask, item, xoffs, yoffs))
 		{
 			if (port != nullptr)
 				return port->field(mask);

@@ -656,6 +656,8 @@ void ioport_field::set_value(ioport_value value)
 {
 	if (is_analog())
 		live().analog->set_value(s32(value));
+	else if (type() == IPT_ADJUSTER)
+		live().value = s32(value);
 	else
 		m_digital_value = value != 0;
 }
