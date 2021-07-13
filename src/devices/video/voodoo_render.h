@@ -93,7 +93,7 @@ public:
 	// return the subtractive dither value for alpha blending
 	u32 subtract(s32 x) const
 	{
-		return (m_dither_raw != nullptr) ? (15 - (m_dither_raw[x & 3] >> 1)) : 0;
+		return (m_dither_raw != nullptr) ? ((15 - m_dither_raw[x & 3]) >> 1) : 0;
 	}
 
 	// allocate and initialize static tables
