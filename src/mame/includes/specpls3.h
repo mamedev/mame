@@ -36,11 +36,11 @@ protected:
 private:
 	void bank1_w(offs_t offset, uint8_t data);
 	uint8_t bank1_r(offs_t offset);
-	void port_3ffd_w(uint8_t data);
+	void port_3ffd_w(offs_t offset, uint8_t data);
 	uint8_t port_3ffd_r();
 	uint8_t port_2ffd_r();
-	void port_7ffd_w(uint8_t data);
-	void port_1ffd_w(uint8_t data);
+	void port_7ffd_w(offs_t offset, uint8_t data);
+	void port_1ffd_w(offs_t offset, uint8_t data);
 	void plus3_us_w(uint8_t data);
 
 	void plus3_io(address_map &map);

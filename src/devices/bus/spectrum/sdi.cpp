@@ -127,7 +127,7 @@ uint8_t spectrum_sdi_device::mreq_r(offs_t offset)
 
 uint8_t spectrum_sdi_device::iorq_r(offs_t offset)
 {
-	uint8_t data = 0xff;
+	uint8_t data = offset & 1 ? m_slot->fb_r() : 0xff;
 
 	if ((offset & 0x9f) == 0x9f)
 		data = m_ppi->read((offset >> 5) & 3);
