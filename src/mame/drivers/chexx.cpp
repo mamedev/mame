@@ -87,7 +87,7 @@ appears to run on very similar hardware, with a AY8912 but no Digitalker.
 #include "chexx.lh"
 
 
-#define MAIN_CLOCK XTAL(4'000'000)
+namespace {
 
 class chexx_state : public driver_device
 {
@@ -426,8 +426,7 @@ void chexx_state::update()
 		m_digitalker->digitalker_0_cms_w(CLEAR_LINE);
 		m_digitalker->digitalker_0_cs_w(CLEAR_LINE);
 
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		m_digitalker->digitalker_data_w(space, 0, sample, 0);
+		m_digitalker->digitalker_data_w(sample);
 
 		m_digitalker->digitalker_0_wr_w(ASSERT_LINE);
 		m_digitalker->digitalker_0_wr_w(CLEAR_LINE);
@@ -438,11 +437,11 @@ void chexx_state::update()
 
 void chexx_state::chexx(machine_config &config)
 {
-	M6502(config, m_maincpu, MAIN_CLOCK/2);
+	M6502(config, m_maincpu, XTAL(4'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chexx_state::mem);
 
 	// via
-	MOS6522(config, m_via, MAIN_CLOCK/4);
+	MOS6522(config, m_via, XTAL(4'000'000) / 4);
 
 	m_via->readpa_handler().set(FUNC(chexx_state::via_a_in));
 	m_via->readpb_handler().set(FUNC(chexx_state::via_b_in));
@@ -460,7 +459,7 @@ void chexx_state::chexx(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	DIGITALKER(config, m_digitalker, MAIN_CLOCK);
+	DIGITALKER(config, m_digitalker, XTAL(4'000'000));
 	m_digitalker->add_route(ALL_OUTPUTS, "mono", 0.16);
 }
 
@@ -469,7 +468,7 @@ void faceoffh_state::faceoffh(machine_config &config)
 	chexx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &faceoffh_state::mem);
 
-	AY8910(config, m_aysnd, MAIN_CLOCK/2);
+	AY8910(config, m_aysnd, XTAL(4'000'000) / 2);
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
@@ -584,7 +583,10 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
+} // Anonymous namespace
+
+
 GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
 GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

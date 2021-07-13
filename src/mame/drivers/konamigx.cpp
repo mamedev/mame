@@ -4039,7 +4039,7 @@ GAME( 1994, gokuparo,  fantjour, gokuparo,     gokuparo, konamigx_state, init_ko
 GAME( 1994, crzcross,  konamigx, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, puzldama,  crzcross, gokuparo,     puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, mtwinbee,  konamigx, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Magical Twin Bee! (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, mtwinbee,  konamigx, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Magical Twin Bee (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, tbyahhoo,  mtwinbee, tbyahhoo,     gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1995, tkmmpzdm,  konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
