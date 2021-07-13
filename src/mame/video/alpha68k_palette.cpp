@@ -8,7 +8,6 @@
     - URL reference: https://wiki.neogeodev.org/index.php?title=Palettes
 
     TODO:
-    - Make mods to support NeoGeo HW (palette bank, shadows);
     - Are alpha68k.cpp/snk68.cpp with or without shadows?
     - Reference color, research exact consequences about this wiki claim:
       "It always has to be pure black ($8000)(*) otherwise monitors won't
@@ -50,6 +49,14 @@ DEFINE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device, "alpha68k_palette"
 alpha68k_palette_device::alpha68k_palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ALPHA68K_PALETTE, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
+	, m_sync_color_shift(nullptr)
+	, m_banknum(1)
+	, m_has_shadow(false)
+	, m_entries(4096)
+	, m_bank(0)
+	, m_bank_base(0)
+	, m_shadow(false)
+	, m_shadow_base(m_entries)
 {
 }
 
@@ -108,10 +115,29 @@ void alpha68k_palette_device::create_rgb_lookups()
 
 void alpha68k_palette_device::device_start()
 {
-	m_paletteram.resize(m_entries);
+	// set shadow base
+	if (m_has_shadow)
+		m_shadow_base = m_entries * m_banknum;
+
+	m_paletteram.resize(m_entries * m_banknum);
+	m_sync_color_shift = make_unique_clear<int[]>(m_banknum);
 
 	create_rgb_lookups();
+
+	// initialize to black, neogeo only?
+	for (int i = 0; i < m_entries; i++)
+	{
+		for (int b = m_banknum - 1; b >= 0; b--)
+		{
+			set_bank(b);
+			write(i, 0x8000);
+		}
+	}
+
 	save_item(NAME(m_paletteram));
+	save_pointer(NAME(m_sync_color_shift), m_banknum);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_bank_base));
 }
 
 
@@ -130,28 +156,14 @@ void alpha68k_palette_device::device_reset()
 
 uint16_t alpha68k_palette_device::read(offs_t offset)
 {
-	return m_paletteram[offset];
-}
-
-inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data, int shift)
-{
-	int dark = pal_data >> 15;
-	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
-	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
-	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
-
-	r >>= shift;
-	g >>= shift;
-	b >>= shift;
-
-	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]);
+	return m_paletteram[offset + m_bank_base];
 }
 
 void alpha68k_palette_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_paletteram[offset]);
-	u16 pal_data = m_paletteram[offset];
-	set_color_entry(offset, pal_data, 0);
+	COMBINE_DATA(&m_paletteram[offset + m_bank_base]);
+	u16 pal_data = m_paletteram[offset + m_bank_base];
+	set_color_entry(offset, pal_data);
 
 	// reference color
 	if (offset == 0)
@@ -160,7 +172,28 @@ void alpha68k_palette_device::write(offs_t offset, u16 data, u16 mem_mask)
 		bool is_sync_color = (pal_data & 0x7fff) == 0;
 		int sync_color_shift = is_sync_color ? 0 : 2;
 
-		for (int i=0; i<m_entries; i++)
-			set_color_entry(i, m_paletteram[i], sync_color_shift);
+		if (sync_color_shift != m_sync_color_shift[m_bank])
+		{
+			m_sync_color_shift[m_bank] = sync_color_shift;
+			for (int i=0; i<m_entries; i++)
+				set_color_entry(i, m_paletteram[i + m_bank_base]);
+		}
 	}
+}
+
+inline void alpha68k_palette_device::set_color_entry(u16 offset, u16 pal_data)
+{
+	offset += m_bank_base;
+	int dark = pal_data >> 15;
+	int r = ((pal_data >> 14) & 0x1) | ((pal_data >> 7) & 0x1e);
+	int g = ((pal_data >> 13) & 0x1) | ((pal_data >> 3) & 0x1e);
+	int b = ((pal_data >> 12) & 0x1) | ((pal_data << 1) & 0x1e);
+
+	r >>= m_sync_color_shift[m_bank];
+	g >>= m_sync_color_shift[m_bank];
+	b >>= m_sync_color_shift[m_bank];
+
+	set_pen_color(offset, m_palette_lookup[r][dark], m_palette_lookup[g][dark], m_palette_lookup[b][dark]);
+	if (m_has_shadow)
+		set_pen_color(offset + m_shadow_base, m_palette_lookup[r][dark+2], m_palette_lookup[g][dark+2], m_palette_lookup[b][dark+2]);
 }
