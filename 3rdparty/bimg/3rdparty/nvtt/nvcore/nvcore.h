@@ -1,4 +1,4 @@
-// This code is in the public domain -- Ignacio Castaño <castano@gmail.com>
+// This code is in the public domain -- Ignacio CastaÃ±o <castano@gmail.com>
 
 #ifndef NV_CORE_H
 #define NV_CORE_H
@@ -357,7 +357,7 @@ NV_COMPILER_CHECK(sizeof(uint32) == 4);
 #       include "defsgnuclinux.h"
 #   elif NV_OS_DARWIN || NV_OS_FREEBSD || NV_OS_OPENBSD
 #       include "defsgnucdarwin.h"
-#   elif NV_OS_MINGW
+#   elif NV_OS_MINGW || (NV_CC_CLANG && NV_OS_WIN32)
 #       include "defsgnucwin32.h"
 #   elif NV_OS_CYGWIN
 #       error "GCC: Cygwin not supported"

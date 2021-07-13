@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -90,7 +90,7 @@ namespace bx
 
 		Blk remove()
 		{
-			BX_CHECK(0 == m_used, "");
+			BX_ASSERT(0 == m_used, "");
 
 			if (0 < m_free.size() )
 			{
@@ -134,7 +134,7 @@ namespace bx
 
 		void free(const Blk& _blk)
 		{
-			BX_CHECK(isValid(_blk), "Freeing invalid block!");
+			BX_ASSERT(isValid(_blk), "Freeing invalid block!");
 
 			m_used -= _blk.size;
 

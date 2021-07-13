@@ -3,10 +3,10 @@ bx
 
 Base library.
 
-[![Build Status](https://travis-ci.org/bkaradzic/bx.svg?branch=master)](https://travis-ci.org/bkaradzic/bx)
+[![Build Status](https://travis-ci.com/bkaradzic/bx.svg?branch=master)](https://travis-ci.com/bkaradzic/bx)
 [![Build status](https://ci.appveyor.com/api/projects/status/edras3mltmoy31g5?svg=true)](https://ci.appveyor.com/project/bkaradzic/bx)
 [![License](https://img.shields.io/badge/license-BSD--2%20clause-blue.svg)](https://bkaradzic.github.io/bgfx/license.html)
-[![Join the chat at https://gitter.im/bkaradzic/bgfx](https://badges.gitter.im/bkaradzic/bgfx.svg)](https://gitter.im/bkaradzic/bgfx)
+[![Join the chat at https://discord.gg/9eMbv7J](https://img.shields.io/discord/712512073522872352?color=%237289DA&label=bx&logo=discord&logoColor=white)](https://discord.gg/9eMbv7J)
 
 Contact
 -------
@@ -23,7 +23,7 @@ https://github.com/bkaradzic/bx
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-	Copyright 2010-2019 Branimir Karadzic
+	Copyright 2010-2021 Branimir Karadzic
 	
 	Redistribution and use in source and binary forms, with or without modification,
 	are permitted provided that the following conditions are met:

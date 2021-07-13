@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -541,6 +541,7 @@ namespace bimg
 		, uint32_t _depth
 		, uint8_t _numMips
 		, uint32_t _numLayers
+		, bool _srgb
 		, const void* _src
 		, bx::Error* _err = NULL
 		);

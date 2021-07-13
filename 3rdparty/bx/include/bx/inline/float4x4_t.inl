@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -40,10 +40,99 @@ namespace bx
 
 	BX_SIMD_INLINE void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
 	{
+#if BX_CONFIG_SUPPORTS_SIMD
 		_result->col[0] = simd_mul(_a->col[0], _b);
 		_result->col[1] = simd_mul(_a->col[1], _b);
 		_result->col[2] = simd_mul(_a->col[2], _b);
 		_result->col[3] = simd_mul(_a->col[3], _b);
+#else
+		const float* aa = (const float*)_a;
+		const float* bb = (const float*)_b;
+		float *rr = (float*)_result;
+
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8] + aa[ 3]*bb[12];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9] + aa[ 3]*bb[13];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10] + aa[ 3]*bb[14];
+		rr[ 3] = aa[ 0]*bb[ 3] + aa[ 1]*bb[ 7] + aa[ 2]*bb[11] + aa[ 3]*bb[15];
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8] + aa[ 7]*bb[12];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9] + aa[ 7]*bb[13];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10] + aa[ 7]*bb[14];
+		rr[ 7] = aa[ 4]*bb[ 3] + aa[ 5]*bb[ 7] + aa[ 6]*bb[11] + aa[ 7]*bb[15];
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8] + aa[11]*bb[12];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9] + aa[11]*bb[13];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10] + aa[11]*bb[14];
+		rr[11] = aa[ 8]*bb[ 3] + aa[ 9]*bb[ 7] + aa[10]*bb[11] + aa[11]*bb[15];
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + aa[15]*bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + aa[15]*bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + aa[15]*bb[14];
+		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + aa[15]*bb[15];
+#endif // BX_CONFIG_SUPPORTS_SIMD
+	}
+
+	BX_SIMD_INLINE void model4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b)
+	{
+#if BX_CONFIG_SUPPORTS_SIMD
+		// With SIMD faster to do the general 4x4 form:
+		float4x4_mul(_result, _a, _b);
+#else
+		const float* aa = (const float*)_a; // aa[ 3] == aa[ 7] == aa[11] == 0.0f, aa[15] = 1.0f
+		const float* bb = (const float*)_b; // bb[ 3] == bb[ 7] == bb[11] == 0.0f, bb[15] = 1.0f
+		float *rr = (float*)_result;
+
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10];
+		rr[ 3] = 0.0f;
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10];
+		rr[ 7] = 0.0f;
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10];
+		rr[11] = 0.0f;
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
+		rr[15] = 1.0f;
+#endif // BX_CONFIG_SUPPORTS_SIMD
+	}
+
+	BX_SIMD_INLINE void model4x4_mul_viewproj4x4(float4x4_t* _result, const float4x4_t* _model, const float4x4_t* _viewProj)
+	{
+#if BX_CONFIG_SUPPORTS_SIMD
+		// With SIMD faster to do the general 4x4 form:
+		float4x4_mul(_result, _model, _viewProj);
+#else
+		const float* aa = (const float*)_model; // aa[ 3] == aa[ 7] == aa[11] == 0.0f, aa[15] == 1.0f
+		const float* bb = (const float*)_viewProj;
+		float *rr = (float*)_result;
+		rr[ 0] = aa[ 0]*bb[ 0] + aa[ 1]*bb[ 4] + aa[ 2]*bb[ 8];
+		rr[ 1] = aa[ 0]*bb[ 1] + aa[ 1]*bb[ 5] + aa[ 2]*bb[ 9];
+		rr[ 2] = aa[ 0]*bb[ 2] + aa[ 1]*bb[ 6] + aa[ 2]*bb[10];
+		rr[ 3] = aa[ 0]*bb[ 3] + aa[ 1]*bb[ 7] + aa[ 2]*bb[11];
+
+		rr[ 4] = aa[ 4]*bb[ 0] + aa[ 5]*bb[ 4] + aa[ 6]*bb[ 8];
+		rr[ 5] = aa[ 4]*bb[ 1] + aa[ 5]*bb[ 5] + aa[ 6]*bb[ 9];
+		rr[ 6] = aa[ 4]*bb[ 2] + aa[ 5]*bb[ 6] + aa[ 6]*bb[10];
+		rr[ 7] = aa[ 4]*bb[ 3] + aa[ 5]*bb[ 7] + aa[ 6]*bb[11];
+
+		rr[ 8] = aa[ 8]*bb[ 0] + aa[ 9]*bb[ 4] + aa[10]*bb[ 8];
+		rr[ 9] = aa[ 8]*bb[ 1] + aa[ 9]*bb[ 5] + aa[10]*bb[ 9];
+		rr[10] = aa[ 8]*bb[ 2] + aa[ 9]*bb[ 6] + aa[10]*bb[10];
+		rr[11] = aa[ 8]*bb[ 3] + aa[ 9]*bb[ 7] + aa[10]*bb[11];
+
+		rr[12] = aa[12]*bb[ 0] + aa[13]*bb[ 4] + aa[14]*bb[ 8] + bb[12];
+		rr[13] = aa[12]*bb[ 1] + aa[13]*bb[ 5] + aa[14]*bb[ 9] + bb[13];
+		rr[14] = aa[12]*bb[ 2] + aa[13]*bb[ 6] + aa[14]*bb[10] + bb[14];
+		rr[15] = aa[12]*bb[ 3] + aa[13]*bb[ 7] + aa[14]*bb[11] + bb[15];
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	BX_SIMD_FORCE_INLINE void float4x4_transpose(float4x4_t* _result, const float4x4_t* _mtx)

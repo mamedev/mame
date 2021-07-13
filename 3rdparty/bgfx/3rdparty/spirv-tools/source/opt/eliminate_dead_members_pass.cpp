@@ -19,7 +19,8 @@
 
 namespace {
 const uint32_t kRemovedMember = 0xFFFFFFFF;
-}
+const uint32_t kSpecConstOpOpcodeIdx = 0;
+}  // namespace
 
 namespace spvtools {
 namespace opt {
@@ -40,7 +41,22 @@ void EliminateDeadMembersPass::FindLiveMembers() {
   // we have to mark them as fully used just to be safe.
   for (auto& inst : get_module()->types_values()) {
     if (inst.opcode() == SpvOpSpecConstantOp) {
-      MarkTypeAsFullyUsed(inst.type_id());
+      switch (inst.GetSingleWordInOperand(kSpecConstOpOpcodeIdx)) {
+        case SpvOpCompositeExtract:
+          MarkMembersAsLiveForExtract(&inst);
+          break;
+        case SpvOpCompositeInsert:
+          // Nothing specific to do.
+          break;
+        case SpvOpAccessChain:
+        case SpvOpInBoundsAccessChain:
+        case SpvOpPtrAccessChain:
+        case SpvOpInBoundsPtrAccessChain:
+          assert(false && "Not implemented yet.");
+          break;
+        default:
+          break;
+      }
     } else if (inst.opcode() == SpvOpVariable) {
       switch (inst.GetSingleWordInOperand(0)) {
         case SpvStorageClassInput:
@@ -153,13 +169,17 @@ void EliminateDeadMembersPass::MarkMembersAsLiveForCopyMemory(
 
 void EliminateDeadMembersPass::MarkMembersAsLiveForExtract(
     const Instruction* inst) {
-  assert(inst->opcode() == SpvOpCompositeExtract);
+  assert(inst->opcode() == SpvOpCompositeExtract ||
+         (inst->opcode() == SpvOpSpecConstantOp &&
+          inst->GetSingleWordInOperand(kSpecConstOpOpcodeIdx) ==
+              SpvOpCompositeExtract));
 
-  uint32_t composite_id = inst->GetSingleWordInOperand(0);
+  uint32_t first_operand = (inst->opcode() == SpvOpSpecConstantOp ? 1 : 0);
+  uint32_t composite_id = inst->GetSingleWordInOperand(first_operand);
   Instruction* composite_inst = get_def_use_mgr()->GetDef(composite_id);
   uint32_t type_id = composite_inst->type_id();
 
-  for (uint32_t i = 1; i < inst->NumInOperands(); ++i) {
+  for (uint32_t i = first_operand + 1; i < inst->NumInOperands(); ++i) {
     Instruction* type_inst = get_def_use_mgr()->GetDef(type_id);
     uint32_t member_idx = inst->GetSingleWordInOperand(i);
     switch (type_inst->opcode()) {
@@ -208,15 +228,10 @@ void EliminateDeadMembersPass::MarkMembersAsLiveForAccessChain(
             const_mgr->FindDeclaredConstant(inst->GetSingleWordInOperand(i))
                 ->AsIntConstant();
         assert(member_idx);
-        if (member_idx->type()->AsInteger()->width() == 32) {
-          used_members_[type_id].insert(member_idx->GetU32());
-          type_id = type_inst->GetSingleWordInOperand(member_idx->GetU32());
-        } else {
-          used_members_[type_id].insert(
-              static_cast<uint32_t>(member_idx->GetU64()));
-          type_id = type_inst->GetSingleWordInOperand(
-              static_cast<uint32_t>(member_idx->GetU64()));
-        }
+        uint32_t index =
+            static_cast<uint32_t>(member_idx->GetZeroExtendedValue());
+        used_members_[type_id].insert(index);
+        type_id = type_inst->GetSingleWordInOperand(index);
       } break;
       case SpvOpTypeArray:
       case SpvOpTypeRuntimeArray:
@@ -295,10 +310,22 @@ bool EliminateDeadMembersPass::RemoveDeadMembers() {
         modified |= UpdateOpArrayLength(inst);
         break;
       case SpvOpSpecConstantOp:
-        assert(false && "Not yet implemented.");
-        // with OpCompositeExtract, OpCompositeInsert
-        // For kernels: OpAccessChain, OpInBoundsAccessChain, OpPtrAccessChain,
-        // OpInBoundsPtrAccessChain
+        switch (inst->GetSingleWordInOperand(kSpecConstOpOpcodeIdx)) {
+          case SpvOpCompositeExtract:
+            modified |= UpdateCompsiteExtract(inst);
+            break;
+          case SpvOpCompositeInsert:
+            modified |= UpdateCompositeInsert(inst);
+            break;
+          case SpvOpAccessChain:
+          case SpvOpInBoundsAccessChain:
+          case SpvOpPtrAccessChain:
+          case SpvOpInBoundsPtrAccessChain:
+            assert(false && "Not implemented yet.");
+            break;
+          default:
+            break;
+        }
         break;
       default:
         break;
@@ -393,7 +420,8 @@ bool EliminateDeadMembersPass::UpdateOpGroupMemberDecorate(Instruction* inst) {
 }
 
 bool EliminateDeadMembersPass::UpdateConstantComposite(Instruction* inst) {
-  assert(inst->opcode() == SpvOpConstantComposite ||
+  assert(inst->opcode() == SpvOpSpecConstantComposite ||
+         inst->opcode() == SpvOpConstantComposite ||
          inst->opcode() == SpvOpCompositeConstruct);
   uint32_t type_id = inst->type_id();
 
@@ -444,12 +472,8 @@ bool EliminateDeadMembersPass::UpdateAccessChain(Instruction* inst) {
             const_mgr->FindDeclaredConstant(inst->GetSingleWordInOperand(i))
                 ->AsIntConstant();
         assert(member_idx);
-        uint32_t orig_member_idx;
-        if (member_idx->type()->AsInteger()->width() == 32) {
-          orig_member_idx = member_idx->GetU32();
-        } else {
-          orig_member_idx = static_cast<uint32_t>(member_idx->GetU64());
-        }
+        uint32_t orig_member_idx =
+            static_cast<uint32_t>(member_idx->GetZeroExtendedValue());
         uint32_t new_member_idx = GetNewMemberIndex(type_id, orig_member_idx);
         assert(new_member_idx != kRemovedMember);
         if (orig_member_idx != new_member_idx) {
@@ -506,14 +530,25 @@ uint32_t EliminateDeadMembersPass::GetNewMemberIndex(uint32_t type_id,
 }
 
 bool EliminateDeadMembersPass::UpdateCompsiteExtract(Instruction* inst) {
-  uint32_t object_id = inst->GetSingleWordInOperand(0);
+  assert(inst->opcode() == SpvOpCompositeExtract ||
+         (inst->opcode() == SpvOpSpecConstantOp &&
+          inst->GetSingleWordInOperand(kSpecConstOpOpcodeIdx) ==
+              SpvOpCompositeExtract));
+
+  uint32_t first_operand = 0;
+  if (inst->opcode() == SpvOpSpecConstantOp) {
+    first_operand = 1;
+  }
+  uint32_t object_id = inst->GetSingleWordInOperand(first_operand);
   Instruction* object_inst = get_def_use_mgr()->GetDef(object_id);
   uint32_t type_id = object_inst->type_id();
 
   Instruction::OperandList new_operands;
   bool modified = false;
-  new_operands.emplace_back(inst->GetInOperand(0));
-  for (uint32_t i = 1; i < inst->NumInOperands(); ++i) {
+  for (uint32_t i = 0; i < first_operand + 1; i++) {
+    new_operands.emplace_back(inst->GetInOperand(i));
+  }
+  for (uint32_t i = first_operand + 1; i < inst->NumInOperands(); ++i) {
     uint32_t member_idx = inst->GetSingleWordInOperand(i);
     uint32_t new_member_idx = GetNewMemberIndex(type_id, member_idx);
     assert(new_member_idx != kRemovedMember);
@@ -526,8 +561,6 @@ bool EliminateDeadMembersPass::UpdateCompsiteExtract(Instruction* inst) {
     Instruction* type_inst = get_def_use_mgr()->GetDef(type_id);
     switch (type_inst->opcode()) {
       case SpvOpTypeStruct:
-        assert(i != 1 || (inst->opcode() != SpvOpPtrAccessChain &&
-                          inst->opcode() != SpvOpInBoundsPtrAccessChain));
         // The type will have already been rewriten, so use the new member
         // index.
         type_id = type_inst->GetSingleWordInOperand(new_member_idx);
@@ -552,15 +585,27 @@ bool EliminateDeadMembersPass::UpdateCompsiteExtract(Instruction* inst) {
 }
 
 bool EliminateDeadMembersPass::UpdateCompositeInsert(Instruction* inst) {
-  uint32_t composite_id = inst->GetSingleWordInOperand(1);
+  assert(inst->opcode() == SpvOpCompositeInsert ||
+         (inst->opcode() == SpvOpSpecConstantOp &&
+          inst->GetSingleWordInOperand(kSpecConstOpOpcodeIdx) ==
+              SpvOpCompositeInsert));
+
+  uint32_t first_operand = 0;
+  if (inst->opcode() == SpvOpSpecConstantOp) {
+    first_operand = 1;
+  }
+
+  uint32_t composite_id = inst->GetSingleWordInOperand(first_operand + 1);
   Instruction* composite_inst = get_def_use_mgr()->GetDef(composite_id);
   uint32_t type_id = composite_inst->type_id();
 
   Instruction::OperandList new_operands;
   bool modified = false;
-  new_operands.emplace_back(inst->GetInOperand(0));
-  new_operands.emplace_back(inst->GetInOperand(1));
-  for (uint32_t i = 2; i < inst->NumInOperands(); ++i) {
+
+  for (uint32_t i = 0; i < first_operand + 2; ++i) {
+    new_operands.emplace_back(inst->GetInOperand(i));
+  }
+  for (uint32_t i = first_operand + 2; i < inst->NumInOperands(); ++i) {
     uint32_t member_idx = inst->GetSingleWordInOperand(i);
     uint32_t new_member_idx = GetNewMemberIndex(type_id, member_idx);
     if (new_member_idx == kRemovedMember) {

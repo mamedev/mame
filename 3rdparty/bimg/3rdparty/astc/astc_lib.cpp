@@ -53,6 +53,7 @@ namespace
         { 0, 1, 2, 3 }, // ASTC_RGBA
         { 2, 1, 0, 3 }, // ASTC_BGRA
         { 0, 0, 0, 1 }, // ASTC_ENC_NORMAL_RA
+        { 0, 0, 0, 1 }, // ASTC_ENC_NORMAL_RA_PCPT
         { 0, 3, 6, 5 }, // ASTC_DEC_RA_NORMAL
     };
 

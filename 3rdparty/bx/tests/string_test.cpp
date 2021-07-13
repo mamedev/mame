@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -225,6 +225,18 @@ TEST_CASE("strFind", "")
 		REQUIRE(&test[4] == bx::strFind(test, "Quick").getPtr() );
 
 		REQUIRE(bx::strFind("vgd", 'a').isEmpty() );
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", "a");
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", bx::StringView("a ", 1) );
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
 	}
 }
 
@@ -480,6 +492,33 @@ TEST_CASE("Trim", "")
 
 	bx::FilePath uri("/555333/podmac/");
 	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
+}
+
+TEST_CASE("TrimSpace", "")
+{
+	REQUIRE(bx::strLTrimSpace("").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "").isEmpty() );
+
+	const bx::StringView t0("1389");
+	const bx::StringView t1("    1389");
+	const bx::StringView t2("1389    ");
+	const bx::StringView t3("  1389  ");
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t2), t2) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t3), "1389  ") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t1), t1) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t3), "  1389") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t3), t0) );
 }
 
 TEST_CASE("strWord", "")

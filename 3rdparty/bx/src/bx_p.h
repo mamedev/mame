@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -13,7 +13,7 @@
 #if BX_CONFIG_DEBUG
 #	define BX_TRACE _BX_TRACE
 #	define BX_WARN  _BX_WARN
-#	define BX_CHECK _BX_CHECK
+#	define BX_ASSERT _BX_ASSERT
 #	define BX_CONFIG_ALLOCATOR_DEBUG 1
 #endif // BX_CONFIG_DEBUG
 
@@ -30,7 +30,7 @@
 					}                                             \
 				BX_MACRO_BLOCK_END
 
-#define _BX_CHECK(_condition, _format, ...)                        \
+#define _BX_ASSERT(_condition, _format, ...)                        \
 				BX_MACRO_BLOCK_BEGIN                               \
 					if (!BX_IGNORE_C4127(_condition) )             \
 					{                                              \

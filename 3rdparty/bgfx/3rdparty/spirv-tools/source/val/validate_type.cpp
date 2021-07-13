@@ -19,29 +19,25 @@
 #include "source/val/instruction.h"
 #include "source/val/validate.h"
 #include "source/val/validation_state.h"
+#include "spirv/unified1/spirv.h"
 
 namespace spvtools {
 namespace val {
 namespace {
 
-// True if the integer constant is > 0. |const_words| are words of the
-// constant-defining instruction (either OpConstant or
-// OpSpecConstant). typeWords are the words of the constant's-type-defining
-// OpTypeInt.
-bool AboveZero(const std::vector<uint32_t>& const_words,
-               const std::vector<uint32_t>& type_words) {
-  const uint32_t width = type_words[2];
-  const bool is_signed = type_words[3] > 0;
+// Returns, as an int64_t, the literal value from an OpConstant or the
+// default value of an OpSpecConstant, assuming it is an integral type.
+// For signed integers, relies the rule that literal value is sign extended
+// to fill out to word granularity.  Assumes that the constant value
+// has
+int64_t ConstantLiteralAsInt64(uint32_t width,
+                               const std::vector<uint32_t>& const_words) {
   const uint32_t lo_word = const_words[3];
-  if (width > 32) {
-    // The spec currently doesn't allow integers wider than 64 bits.
-    const uint32_t hi_word = const_words[4];  // Must exist, per spec.
-    if (is_signed && (hi_word >> 31)) return false;
-    return (lo_word | hi_word) > 0;
-  } else {
-    if (is_signed && (lo_word >> 31)) return false;
-    return lo_word > 0;
-  }
+  if (width <= 32) return int32_t(lo_word);
+  assert(width <= 64);
+  assert(const_words.size() > 4);
+  const uint32_t hi_word = const_words[4];  // Must exist, per spec.
+  return static_cast<int64_t>(uint64_t(lo_word) | uint64_t(hi_word) << 32);
 }
 
 // Validates that type declarations are unique, unless multiple declarations
@@ -229,7 +225,7 @@ spv_result_t ValidateTypeArray(ValidationState_t& _, const Instruction* inst) {
            << "' is a void type.";
   }
 
-  if (spvIsVulkanOrWebGPUEnv(_.context()->target_env) &&
+  if (spvIsVulkanEnv(_.context()->target_env) &&
       element_type->opcode() == SpvOpTypeRuntimeArray) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "OpTypeArray Element Type <id> '" << _.getIdName(element_type_id)
@@ -258,14 +254,21 @@ spv_result_t ValidateTypeArray(ValidationState_t& _, const Instruction* inst) {
 
   switch (length->opcode()) {
     case SpvOpSpecConstant:
-    case SpvOpConstant:
-      if (AboveZero(length->words(), const_result_type->words())) break;
-    // Else fall through!
-    case SpvOpConstantNull: {
+    case SpvOpConstant: {
+      auto& type_words = const_result_type->words();
+      const bool is_signed = type_words[3] > 0;
+      const uint32_t width = type_words[2];
+      const int64_t ivalue = ConstantLiteralAsInt64(width, length->words());
+      if (ivalue == 0 || (ivalue < 0 && is_signed)) {
+        return _.diag(SPV_ERROR_INVALID_ID, inst)
+               << "OpTypeArray Length <id> '" << _.getIdName(length_id)
+               << "' default value must be at least 1: found " << ivalue;
+      }
+    } break;
+    case SpvOpConstantNull:
       return _.diag(SPV_ERROR_INVALID_ID, inst)
              << "OpTypeArray Length <id> '" << _.getIdName(length_id)
              << "' default value must be at least 1.";
-    }
     case SpvOpSpecConstantOp:
       // Assume it's OK, rather than try to evaluate the operation.
       break;
@@ -292,7 +295,7 @@ spv_result_t ValidateTypeRuntimeArray(ValidationState_t& _,
            << _.getIdName(element_id) << "' is a void type.";
   }
 
-  if (spvIsVulkanOrWebGPUEnv(_.context()->target_env) &&
+  if (spvIsVulkanEnv(_.context()->target_env) &&
       element_type->opcode() == SpvOpTypeRuntimeArray) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "OpTypeRuntimeArray Element Type <id> '"
@@ -364,7 +367,7 @@ spv_result_t ValidateTypeStruct(ValidationState_t& _, const Instruction* inst) {
              << ".";
     }
 
-    if (spvIsVulkanOrWebGPUEnv(_.context()->target_env) &&
+    if (spvIsVulkanEnv(_.context()->target_env) &&
         member_type->opcode() == SpvOpTypeRuntimeArray) {
       const bool is_last_member =
           member_type_index == inst->operands().size() - 1;
@@ -424,7 +427,8 @@ spv_result_t ValidateTypeStruct(ValidationState_t& _, const Instruction* inst) {
   if (spvIsVulkanEnv(_.context()->target_env) &&
       !_.options()->before_hlsl_legalization && ContainsOpaqueType(_, inst)) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
-           << "In " << spvLogStringForEnv(_.context()->target_env)
+           << _.VkErrorID(4667) << "In "
+           << spvLogStringForEnv(_.context()->target_env)
            << ", OpTypeStruct must not contain an opaque type.";
   }
 
@@ -459,6 +463,7 @@ spv_result_t ValidateTypePointer(ValidationState_t& _,
 
   if (!_.IsValidStorageClass(storage_class)) {
     return _.diag(SPV_ERROR_INVALID_BINARY, inst)
+           << _.VkErrorID(4643)
            << "Invalid storage class for target environment";
   }
 
@@ -506,7 +511,7 @@ spv_result_t ValidateTypeFunction(ValidationState_t& _,
   for (auto& pair : inst->uses()) {
     const auto* use = pair.first;
     if (use->opcode() != SpvOpFunction && !spvOpcodeIsDebug(use->opcode()) &&
-        !spvOpcodeIsDecoration(use->opcode())) {
+        !use->IsNonSemantic() && !spvOpcodeIsDecoration(use->opcode())) {
       return _.diag(SPV_ERROR_INVALID_ID, use)
              << "Invalid use of function type result id "
              << _.getIdName(inst->id()) << ".";
@@ -525,8 +530,8 @@ spv_result_t ValidateTypeForwardPointer(ValidationState_t& _,
            << "Pointer type in OpTypeForwardPointer is not a pointer type.";
   }
 
-  if (inst->GetOperandAs<uint32_t>(1) !=
-      pointer_type_inst->GetOperandAs<uint32_t>(1)) {
+  const auto storage_class = inst->GetOperandAs<SpvStorageClass>(1);
+  if (storage_class != pointer_type_inst->GetOperandAs<uint32_t>(1)) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "Storage class in OpTypeForwardPointer does not match the "
            << "pointer definition.";
@@ -537,6 +542,15 @@ spv_result_t ValidateTypeForwardPointer(ValidationState_t& _,
   if (!pointee_type || pointee_type->opcode() != SpvOpTypeStruct) {
     return _.diag(SPV_ERROR_INVALID_ID, inst)
            << "Forward pointers must point to a structure";
+  }
+
+  if (spvIsVulkanEnv(_.context()->target_env)) {
+    if (storage_class != SpvStorageClassPhysicalStorageBuffer) {
+      return _.diag(SPV_ERROR_INVALID_ID, inst)
+             << _.VkErrorID(4711)
+             << "In Vulkan, OpTypeForwardPointer must have "
+             << "a storage class of PhysicalStorageBuffer.";
+    }
   }
 
   return SPV_SUCCESS;

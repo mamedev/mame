@@ -53,13 +53,23 @@ class InstructionList : public utils::IntrusiveList<Instruction> {
   }
 
   // Destroy this list and any instructions in the list.
-  inline virtual ~InstructionList();
+  inline ~InstructionList() override;
 
   class iterator : public utils::IntrusiveList<Instruction>::iterator {
    public:
     iterator(const utils::IntrusiveList<Instruction>::iterator& i)
         : utils::IntrusiveList<Instruction>::iterator(i) {}
     iterator(Instruction* i) : utils::IntrusiveList<Instruction>::iterator(i) {}
+
+    iterator& operator++() {
+      utils::IntrusiveList<Instruction>::iterator::operator++();
+      return *this;
+    }
+
+    iterator& operator--() {
+      utils::IntrusiveList<Instruction>::iterator::operator--();
+      return *this;
+    }
 
     // DEPRECATED: Please use MoveBefore with an InstructionList instead.
     //

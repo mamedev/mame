@@ -1108,7 +1108,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 			m_filelist_refresh = true;
 		ImGui::Separator();
 		{
-			ImGui::ListBoxHeader("##filelist",m_filelist.size(),15);
+			ImGui::BeginListBox("##filelist",ImVec2(0, 0));
 			for(auto f = m_filelist.begin();f != m_filelist.end();++f)
 			{
 				std::string txt_name;
@@ -1135,7 +1135,7 @@ void debug_imgui::draw_mount_dialog(const char* label)
 						mount_image();
 				}
 			}
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 		ImGui::Separator();
 		if(ImGui::Button("Cancel##mount"))

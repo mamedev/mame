@@ -19,6 +19,7 @@
 #include <entry/cmd.h>
 #include <entry/dialog.h>
 #include <imgui/imgui.h>
+#include <debugdraw/debugdraw.h>
 #include <bgfx_utils.h>
 
 #include <tinystl/allocator.h>
@@ -44,6 +45,30 @@ static const bgfx::EmbeddedShader s_embeddedShaders[] =
 
 	BGFX_EMBEDDED_SHADER_END()
 };
+
+static const char* s_attribShortNames[] =
+{
+	"P",   // Position
+	"N",   // Normal
+	"T",   // Tangent
+	"B",   // Bitangent
+	"C0",  // Color0
+	"C1",  // Color1
+	"C2",  // Color2
+	"C3",  // Color3
+	"I",   // Indices
+	"W",   // Weight
+	"TC0", // TexCoord0
+	"TC1", // TexCoord1
+	"TC2", // TexCoord2
+	"TC3", // TexCoord3
+	"TC4", // TexCoord4
+	"TC5", // TexCoord5
+	"TC6", // TexCoord6
+	"TC7", // TexCoord7
+};
+BX_STATIC_ASSERT(BX_COUNTOF(s_attribShortNames) == bgfx::Attrib::Count);
+
 
 static const char* s_supportedExt[] =
 {
@@ -90,7 +115,7 @@ static const InputBinding s_bindingView[] =
 	{ entry::Key::KeyS,      entry::Modifier::None,       1, NULL, "view orbit y +0.1"         },
 	{ entry::Key::KeyA,      entry::Modifier::None,       1, NULL, "view orbit x +0.1"         },
 	{ entry::Key::KeyD,      entry::Modifier::None,       1, NULL, "view orbit x -0.1"         },
-	
+
 	{ entry::Key::Up,        entry::Modifier::None,       1, NULL, "view file-up"            },
 	{ entry::Key::Down,      entry::Modifier::None,       1, NULL, "view file-down"          },
 
@@ -144,21 +169,24 @@ struct Camera
 {
 	Camera()
 	{
-		init(bx::Vec3(0.0f,0.0f,0.0f), 2.0f);
+		init(bx::Vec3(0.0f,0.0f,0.0f), 2.0f, 0.01f, 100.0f);
 	}
 
-	void init(const bx::Vec3& _center, float _distance)
+	void init(const bx::Vec3& _center, float _distance, float _near, float _far)
 	{
 		m_target.curr = _center;
 		m_target.dest = _center;
 
 		m_pos.curr = _center;
-		m_pos.curr.z -= _distance; 
+		m_pos.curr.z += _distance;
 		m_pos.dest = _center;
-		m_pos.dest.z -= _distance; 
+		m_pos.dest.z += _distance;
 
 		m_orbit[0] = 0.0f;
 		m_orbit[1] = 0.0f;
+
+		m_near = _near;
+		m_far  = _far;
 	}
 
 	void mtxLookAt(float* _outViewMtx)
@@ -171,34 +199,29 @@ struct Camera
 		m_orbit[0] += _dx;
 		m_orbit[1] += _dy;
 	}
-	
+
 	void distance(float _z)
 	{
-		const float cnear = 1.0f;
-		const float cfar  = 100.0f;
-		
-		_z = bx::clamp(_z, cnear, cfar);
-		
+		_z = bx::clamp(_z, m_near, m_far);
+
 		bx::Vec3 toTarget     = bx::sub(m_target.dest, m_pos.dest);
 		bx::Vec3 toTargetNorm = bx::normalize(toTarget);
-		
+
 		m_pos.dest = bx::mad(toTargetNorm, -_z, m_target.dest);
 	}
-	
+
 	void dolly(float _dz)
 	{
-		const float cnear = 1.0f;
-		const float cfar  = 100.0f;
-
 		const bx::Vec3 toTarget     = bx::sub(m_target.dest, m_pos.dest);
 		const float toTargetLen     = bx::length(toTarget);
 		const float invToTargetLen  = 1.0f / (toTargetLen + bx::kFloatMin);
 		const bx::Vec3 toTargetNorm = bx::mul(toTarget, invToTargetLen);
 
 		float delta  = toTargetLen * _dz;
-		float newLen = toTargetLen + delta;
-		if ( (cnear  < newLen || _dz < 0.0f)
-			&&   (newLen < cfar   || _dz > 0.0f) )
+		float newLen = toTargetLen - delta;
+
+		if ( (m_near  < newLen || _dz < 0.0f)
+			&&   (newLen < m_far   || _dz > 0.0f) )
 		{
 			m_pos.dest = bx::mad(toTargetNorm, delta, m_pos.dest);
 		}
@@ -249,6 +272,7 @@ struct Camera
 	Interp3f m_target;
 	Interp3f m_pos;
 	float m_orbit[2];
+	float m_near, m_far;
 };
 
 struct Mouse
@@ -298,6 +322,7 @@ struct View
 		, m_about(false)
 		, m_info(false)
 		, m_files(false)
+		, m_axes(false)
 		, m_meshCenter(0.0f,0.0f,0.0f)
 		, m_meshRadius(1.0f)
 		, m_idleTimer(0.0f)
@@ -368,20 +393,24 @@ struct View
 					int axis = (_argv[2][0] == 'x' ? 0 : 1);
 					float orbit[2] = { 0.0f, 0.0f};
 					bx::fromString(&orbit[axis], _argv[3]);
-					
+
 					m_camera.orbit(orbit[0], orbit[1]);
 					m_idleTimer = 0.0f;
 				}
 				else
 				{
 					m_camera.m_target.dest = m_meshCenter;
-						
+
 					m_camera.m_pos.dest = m_meshCenter;
 					m_camera.m_pos.dest.z -= m_meshRadius * 2.0f;
-						
+
 					m_camera.m_orbit[0] = 0.0f;
 					m_camera.m_orbit[1] = 0.0f;
 				}
+			}
+			else if (0 == bx::strCmp(_argv[1], "axes") )
+			{
+				m_axes ^= true;
 			}
 		}
 
@@ -539,6 +568,7 @@ struct View
 	bool     m_about;
 	bool     m_info;
 	bool     m_files;
+	bool 	 m_axes;
 
 	Camera	m_camera;
 	Mouse   m_mouse;
@@ -546,7 +576,7 @@ struct View
 	float	 m_meshRadius;
 	float	 m_idleTimer;
 
-}; 
+};
 
 int cmdView(CmdContext* /*_context*/, void* _userData, int _argc, char const* const* _argv)
 {
@@ -610,24 +640,24 @@ struct InterpolatorT
 	}
 };
 
-typedef InterpolatorT<bx::lerp,      bx::easeInOutQuad>  Interpolator;
+typedef InterpolatorT<bx::lerp, bx::easeInOutQuad> Interpolator;
 
 void keyBindingHelp(const char* _bindings, const char* _description)
 {
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), _bindings);
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "%s", _bindings);
 	ImGui::SameLine(140);
-	ImGui::Text(_description);
+	ImGui::Text("%s", _description);
 }
 
 void help(const char* _error = NULL)
 {
 	if (NULL != _error)
 	{
-		fprintf(stderr, "Error:\n%s\n\n", _error);
+		bx::printf("Error:\n%s\n\n", _error);
 	}
 
-	fprintf(stderr
-		, "geometryv, bgfx geometry viewer tool, version %d.%d.%d.\n"
+	bx::printf(
+		  "geometryv, bgfx geometry viewer tool, version %d.%d.%d.\n"
 		  "Copyright 2019-2019 Attila Kocsis. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		, BGFX_GEOMETRYV_VERSION_MAJOR
@@ -635,19 +665,19 @@ void help(const char* _error = NULL)
 		, BGFX_API_VERSION
 		);
 
-	fprintf(stderr
-		, "Usage: geometryv <file path>\n"
+	bx::printf(
+		  "Usage: geometryv <file path>\n"
 		  "\n"
 		  "Supported input file types:\n"
 		  );
 
 	for (uint32_t ii = 0; ii < BX_COUNTOF(s_supportedExt); ++ii)
 	{
-		fprintf(stderr, "    *.%s\n", s_supportedExt[ii]);
+		bx::printf("    *.%s\n", s_supportedExt[ii]);
 	}
 
-	fprintf(stderr
-		, "\n"
+	bx::printf(
+		  "\n"
 		  "Options:\n"
 		  "  -h, --help               Help.\n"
 		  "  -v, --version            Version information only.\n"
@@ -662,8 +692,8 @@ int _main_(int _argc, char** _argv)
 
 	if (cmdLine.hasArg('v', "version") )
 	{
-		fprintf(stderr
-			, "geometryv, bgfx geometry viewer tool, version %d.%d.%d.\n"
+		bx::printf(
+			  "geometryv, bgfx geometry viewer tool, version %d.%d.%d.\n"
 			, BGFX_GEOMETRYV_VERSION_MAJOR
 			, BGFX_GEOMETRYV_VERSION_MINOR
 			, BGFX_API_VERSION
@@ -707,6 +737,8 @@ int _main_(int _argc, char** _argv)
 		);
 
 	imguiCreate();
+
+	ddInit();
 
 	const bgfx::Caps* caps = bgfx::getCaps();
 	bgfx::RendererType::Enum type = caps->rendererType;
@@ -839,6 +871,14 @@ int _main_(int _argc, char** _argv)
 
 					ImGui::Separator();
 
+					bool axes = view.m_axes;
+					if (ImGui::MenuItem("XYZ Axes", NULL, &axes) )
+					{
+						cmdExec("view axes");
+					}
+
+					ImGui::Separator();
+
 					if (ImGui::MenuItem("Save Options") )
 					{
 						cmdExec("view save");
@@ -868,6 +908,7 @@ int _main_(int _argc, char** _argv)
 					ImGui::Separator();
 					ImGui::TextColored(
 						  ImVec4(0.0f, 1.0f, 1.0f, 1.0f)
+						, "%s"
 						, view.m_fileList[view.m_fileIndex].c_str()
 						);
 				}
@@ -937,7 +978,7 @@ int _main_(int _argc, char** _argv)
 			if (view.m_info)
 			{
 				ImGui::SetNextWindowSize(
-					  ImVec2(300.0f, 320.0f)
+					  ImVec2(450.0f, 320.0f)
 					, ImGuiCond_FirstUseEver
 					);
 
@@ -951,16 +992,27 @@ int _main_(int _argc, char** _argv)
 						}
 						else
 						{
-							ImGui::Text("Name: %s", view.m_fileList[view.m_fileIndex].c_str() );
+							char layout[128] = {0};
+							for(int32_t attrib = bgfx::Attrib::Position; attrib < bgfx::Attrib::Count; attrib++)
+							{
+								if ( mesh->m_layout.has(bgfx::Attrib::Enum(attrib)) )
+									bx::strCat(layout, sizeof(layout), s_attribShortNames[attrib]);
+							}
+
+							ImGui::Text("Name: %s %s", view.m_fileList[view.m_fileIndex].c_str(), layout);
 
 							ImGui::Indent();
 							for (GroupArray::const_iterator itGroup = mesh->m_groups.begin(), itGroupEnd = mesh->m_groups.end(); itGroup != itGroupEnd; ++itGroup)
 							{
-								ImGui::Text("Group v %d i %d", itGroup->m_numVertices, itGroup->m_numIndices);
+								ImGui::Text("Group v %d i %d c %.2f %.2f %.2f r %.2f", itGroup->m_numVertices, itGroup->m_numIndices,
+											itGroup->m_sphere.center.x, itGroup->m_sphere.center.y, itGroup->m_sphere.center.z,
+											itGroup->m_sphere.radius);
 								ImGui::Indent();
 								for (PrimitiveArray::const_iterator itPrim = itGroup->m_prims.begin(), itPrimEnd = itGroup->m_prims.end(); itPrim != itPrimEnd; ++itPrim)
 								{
-									ImGui::Text("Primitive v %d i %d", itPrim->m_numVertices, itPrim->m_numIndices);
+									ImGui::Text("Primitive v %d i %d c %.2f %.2f %.2f r %.2f", itPrim->m_numVertices, itPrim->m_numIndices,
+												itPrim->m_sphere.center.x, itPrim->m_sphere.center.y, itPrim->m_sphere.center.z,
+												itPrim->m_sphere.radius);
 								}
 								ImGui::Unindent();
 							}
@@ -999,7 +1051,7 @@ int _main_(int _argc, char** _argv)
 							;
 
 						ImGui::PushItemWidth(-1);
-						if (ImGui::ListBoxHeader("##empty", ImVec2(0.0f, listHeight) ) )
+						if (ImGui::BeginListBox("##empty", ImVec2(0.0f, listHeight) ) )
 						{
 							const int32_t itemCount = int32_t(view.m_fileList.size() );
 
@@ -1016,24 +1068,28 @@ int _main_(int _argc, char** _argv)
 								ImGui::SetScrollY(ImGui::GetScrollY() + (index-end+1)*itemHeight);
 							}
 
-							ImGuiListClipper clipper(itemCount, itemHeight);
+							ImGuiListClipper clipper;
+							clipper.Begin(itemCount, itemHeight);
 
-							for (int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+							while (clipper.Step() )
 							{
-								ImGui::PushID(pos);
-
-								bool isSelected = uint32_t(pos) == view.m_fileIndex;
-								if (ImGui::Selectable(view.m_fileList[pos].c_str(), &isSelected) )
+								for (int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
 								{
-									view.m_fileIndex = pos;
-								}
+									ImGui::PushID(pos);
 
-								ImGui::PopID();
+									bool isSelected = uint32_t(pos) == view.m_fileIndex;
+									if (ImGui::Selectable(view.m_fileList[pos].c_str(), &isSelected) )
+									{
+										view.m_fileIndex = pos;
+									}
+
+									ImGui::PopID();
+								}
 							}
 
 							clipper.End();
 
-							ImGui::ListBoxFooter();
+							ImGui::EndListBox();
 						}
 
 						ImGui::PopFont();
@@ -1152,18 +1208,20 @@ int _main_(int _argc, char** _argv)
 						numIndices += (uint32_t)it->m_numIndices;
 					}
 
-					bx::stringPrintf(title, "%s (g %d, p %d, v %d, i %d)"
+					bx::stringPrintf(
+						  title
+						, "%s (g %d, p %d, v %d, i %d)"
 						, fp.getCPtr()
 						, mesh->m_groups.size()
 						, numPrimitives
 						, numVertices
 						, numIndices
-					);
+						);
 
 					view.m_meshCenter = getCenter(boundingBox);
 					view.m_meshRadius = bx::length(getExtents(boundingBox));
 
-					view.m_camera.init( view.m_meshCenter, view.m_meshRadius * 2.0f);
+					view.m_camera.init( view.m_meshCenter, view.m_meshRadius * 2.0f, 0.01f, view.m_meshRadius * 10.0f);
 				}
 				else
 				{
@@ -1190,12 +1248,21 @@ int _main_(int _argc, char** _argv)
 
 			float projMatrix[16];
 			const float aspect = float(view.m_width)/float(view.m_height);
-			bx::mtxProj(projMatrix, 60.0f, aspect, 0.1f, 1000.0f, caps->homogeneousDepth);
+			bx::mtxProj(projMatrix, 60.0f, aspect, 0.01f, 1000.0f, caps->homogeneousDepth);
 
 			bgfx::setViewTransform(SCENE_VIEW_ID, viewMatrix, projMatrix);
 			bgfx::setViewRect(SCENE_VIEW_ID, 0, 0, uint16_t(view.m_width), uint16_t(view.m_height) );
 
 			bgfx::touch(SCENE_VIEW_ID);
+
+			if ( view.m_axes )
+			{
+				DebugDrawEncoder dde;
+				dde.begin(SCENE_VIEW_ID);
+				dde.drawAxis(0.0f, 0.0f, 0.0f);
+				dde.drawGrid(Axis::Y, {0.0f, 0.0f, 0.0f});
+				dde.end();
+			}
 
 			bgfx::dbgTextClear();
 
@@ -1233,6 +1300,8 @@ int _main_(int _argc, char** _argv)
 	}
 
 	bgfx::destroy(meshProgram);
+
+	ddShutdown();
 
 	imguiDestroy();
 

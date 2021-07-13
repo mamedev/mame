@@ -1,12 +1,14 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#ifndef BX_H_HEADER_GUARD
+#	error "Do not include macros.h directly #include <bx/bx.h> instead."
+#endif // BX_H_HEADER_GUARD
+
 #ifndef BX_MACROS_H_HEADER_GUARD
 #define BX_MACROS_H_HEADER_GUARD
-
-#include "bx.h"
 
 ///
 #if BX_COMPILER_MSVC
@@ -39,12 +41,6 @@
 
 ///
 #define BX_FILE_LINE_LITERAL "" __FILE__ "(" BX_STRINGIZE(__LINE__) "): "
-
-///
-#define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
-#define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
-#define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
-#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
 
 ///
 #define BX_ALIGNOF(_type) __alignof(_type)
@@ -81,11 +77,9 @@
 #	define BX_NO_VTABLE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
 
-#	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
-#		define BX_THREAD_LOCAL __thread
-#	endif // BX_COMPILER_CLANG
-
-#	if (!BX_PLATFORM_OSX && (BX_COMPILER_GCC >= 40200)) || (BX_COMPILER_GCC >= 40500)
+#	if BX_CLANG_HAS_FEATURE(cxx_thread_local) \
+	|| (!BX_PLATFORM_OSX && (BX_COMPILER_GCC >= 40200) ) \
+	|| (BX_COMPILER_GCC >= 40500)
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_GCC
 
@@ -234,9 +228,9 @@
 #	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__)(_class, __VA_ARGS__)
 #endif // BX_COMPILER_MSVC
 
-#ifndef BX_CHECK
-#	define BX_CHECK(_condition, ...) BX_NOOP()
-#endif // BX_CHECK
+#ifndef BX_ASSERT
+#	define BX_ASSERT(_condition, ...) BX_NOOP()
+#endif // BX_ASSERT
 
 #ifndef BX_TRACE
 #	define BX_TRACE(...) BX_NOOP()
@@ -244,7 +238,7 @@
 
 #ifndef BX_WARN
 #	define BX_WARN(_condition, ...) BX_NOOP()
-#endif // BX_CHECK
+#endif // BX_ASSERT
 
 // static_assert sometimes causes unused-local-typedef...
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")

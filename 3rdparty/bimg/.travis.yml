@@ -29,4 +29,4 @@ branches:
 notifications:
   email: false
 
-osx_image: xcode9.3
+osx_image: xcode11

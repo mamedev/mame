@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -41,21 +41,21 @@ namespace bx
 				return (_mask) == (_mm_movemask_ps(_test)&(_mask) );             \
 			}
 
-BX_SIMD128_IMPLEMENT_TEST(x    , 0x1);
-BX_SIMD128_IMPLEMENT_TEST(y    , 0x2);
-BX_SIMD128_IMPLEMENT_TEST(xy   , 0x3);
-BX_SIMD128_IMPLEMENT_TEST(z    , 0x4);
-BX_SIMD128_IMPLEMENT_TEST(xz   , 0x5);
-BX_SIMD128_IMPLEMENT_TEST(yz   , 0x6);
-BX_SIMD128_IMPLEMENT_TEST(xyz  , 0x7);
-BX_SIMD128_IMPLEMENT_TEST(w    , 0x8);
-BX_SIMD128_IMPLEMENT_TEST(xw   , 0x9);
-BX_SIMD128_IMPLEMENT_TEST(yw   , 0xa);
-BX_SIMD128_IMPLEMENT_TEST(xyw  , 0xb);
-BX_SIMD128_IMPLEMENT_TEST(zw   , 0xc);
-BX_SIMD128_IMPLEMENT_TEST(xzw  , 0xd);
-BX_SIMD128_IMPLEMENT_TEST(yzw  , 0xe);
-BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
+BX_SIMD128_IMPLEMENT_TEST(x    , 0x1)
+BX_SIMD128_IMPLEMENT_TEST(y    , 0x2)
+BX_SIMD128_IMPLEMENT_TEST(xy   , 0x3)
+BX_SIMD128_IMPLEMENT_TEST(z    , 0x4)
+BX_SIMD128_IMPLEMENT_TEST(xz   , 0x5)
+BX_SIMD128_IMPLEMENT_TEST(yz   , 0x6)
+BX_SIMD128_IMPLEMENT_TEST(xyz  , 0x7)
+BX_SIMD128_IMPLEMENT_TEST(w    , 0x8)
+BX_SIMD128_IMPLEMENT_TEST(xw   , 0x9)
+BX_SIMD128_IMPLEMENT_TEST(yw   , 0xa)
+BX_SIMD128_IMPLEMENT_TEST(xyw  , 0xb)
+BX_SIMD128_IMPLEMENT_TEST(zw   , 0xc)
+BX_SIMD128_IMPLEMENT_TEST(xzw  , 0xd)
+BX_SIMD128_IMPLEMENT_TEST(yzw  , 0xe)
+BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf)
 
 #undef BX_SIMD128_IMPLEMENT_TEST
 
@@ -306,6 +306,12 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd_cmpeq(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		return _mm_cmpeq_ps(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd_cmpneq(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		return _mm_cmpneq_ps(_a, _b);
 	}
 
 	template<>

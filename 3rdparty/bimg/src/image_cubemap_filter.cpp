@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -336,15 +336,17 @@ namespace bimg
 		if (_input.m_depth     != 1
 		&&  _input.m_numLayers != 1
 		&&  _input.m_format    != TextureFormat::RGBA32F
-		&&  _input.m_width/6   != _input.m_height)
+		&& ( (_input.m_width   != _input.m_height*6) || (_input.m_width*6 != _input.m_height) ) )
 		{
 			BX_ERROR_SET(_err, BIMG_ERROR, "Input image format is not strip projection.");
 			return NULL;
 		}
 
+		const bool   horizontal = _input.m_width == _input.m_height*6;
 		const uint32_t srcPitch = _input.m_width*16;
-		const uint32_t dstWidth = _input.m_height;
+		const uint32_t dstWidth = horizontal ? _input.m_height : _input.m_width;
 		const uint32_t dstPitch = dstWidth*16;
+		const uint32_t step     = horizontal ? dstPitch : dstPitch*dstWidth;
 
 		ImageContainer* output = imageAlloc(_allocator
 			, _input.m_format
@@ -358,7 +360,7 @@ namespace bimg
 
 		const uint8_t* srcData = (const uint8_t*)_input.m_data;
 
-		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += dstPitch)
+		for (uint8_t side = 0; side < 6 && _err->isOk(); ++side, srcData += step)
 		{
 			ImageMip dstMip;
 			imageGetRawData(*output, side, 0, output->m_data, output->m_size, dstMip);

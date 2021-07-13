@@ -1,4 +1,4 @@
-/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/  
 /**
  *	This confidential and proprietary software may be used only as
  *	authorised by a licensing agreement from ARM Limited
@@ -10,8 +10,8 @@
  *	by a licensing agreement from ARM Limited.
  *
  *	@brief	Library of math functions.
- */
-/*----------------------------------------------------------------------------*/
+ */ 
+/*----------------------------------------------------------------------------*/ 
 
 #define _USE_MATH_DEFINES    // for M_PI on windows
 
@@ -116,7 +116,7 @@ float4 fmin(float4 p, float4 q)
 	return float4(fmin(p.x, q.x), fmin(p.y, q.y), fmin(p.z, q.z), fmin(p.w, q.w));
 }
 
-/*
+/* 
    float dot( float2 p, float2 q ) { return p.x*q.x + p.y*q.y; } float dot( float3 p, float3 q ) { return p.x*q.x + p.y*q.y + p.z*q.z; } float dot( float4 p, float4 q ) { return p.x*q.x + p.y*q.y +
    p.z*q.z + p.w*q.w; } */
 
@@ -225,7 +225,7 @@ float4 normalize(float4 p)
 
 *************************************************/
 
-/*
+/* 
 	struct mat2 { float2 v[2]; };
 	struct mat3 { float3 v[3]; };
 	struct mat4 { float4 v[4]; };
@@ -265,7 +265,7 @@ float determinant(mat4 p)
 }
 
 
-/*
+/* 
    characteristic polynomials for matrices. These polynomials are monic, meaning that the coefficient of the highest component is 1; this component is omitted. The first component is the constant
    part. */
 
@@ -293,7 +293,7 @@ float4 characteristic_poly(mat4 p)
 }
 
 
-/*
+/* 
 	Root finders for monic polynomials (highest coefficient is equal to 1)
 
 	Returns a vector with length equal to the number of roots that the polynomial has;
@@ -362,7 +362,7 @@ float3 solve_monic(float3 p)
 }
 
 
-/*
+/* 
  * This function is not overflow-safe. Use with care.
  */
 float4 solve_monic(float4 p)

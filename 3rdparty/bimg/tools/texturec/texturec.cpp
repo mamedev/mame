@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
@@ -195,20 +195,19 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 		}
 		else if (_options.strip)
 		{
-			if (outputDepth   == 1
-			&&  outputWidth/6 == outputHeight)
+			if (outputDepth == 1
+			&& ( (outputWidth == outputHeight*6) || (outputWidth*6 == outputHeight) ) )
 			{
-				if (outputWidth/6 > _options.maxSize)
-				{
-					outputWidth  = _options.maxSize*6;
-					outputHeight = _options.maxSize;
-				}
+				const bool horizontal = outputWidth == outputHeight*6;
+
+				outputWidth  = bx::min(outputWidth,  horizontal ? _options.maxSize*6 : _options.maxSize);
+				outputHeight = bx::min(outputHeight, horizontal ? _options.maxSize   : _options.maxSize*6);
 			}
 			else
 			{
 				bimg::imageFree(input);
 
-				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal strip.");
+				BX_ERROR_SET(_err, TEXTRUREC_ERROR, "Input image format is not horizontal or vertical strip.");
 				return NULL;
 			}
 		}
@@ -325,7 +324,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 
 			bimg::ImageContainer* dst;
 
-			if (outputWidth/2 == outputHeight)
+			if (outputWidth == outputHeight*2)
 			{
 				dst = bimg::imageCubemapFromLatLongRgba32F(_allocator, *src, true, _err);
 				bimg::imageFree(src);
@@ -897,7 +896,7 @@ void help(const char* _error = NULL, bool _showHelp = true)
 
 	bx::printf(
 		  "texturec, bgfx texture compiler tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2019 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bimg#license-bsd-2-clause\n\n"
 		, BIMG_TEXTUREC_VERSION_MAJOR
 		, BIMG_TEXTUREC_VERSION_MINOR
@@ -931,16 +930,16 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		  "  -q <quality>             Encoding quality (default, fastest, highest).\n"
 		  "  -m, --mips               Generate mip-maps.\n"
 		  "      --mipskip <N>        Skip <N> number of mips.\n"
-		  "  -n, --normalmap          Input texture is normal map.\n"
+		  "  -n, --normalmap          Input texture is normal map. (Implies --linear)\n"
 		  "      --equirect           Input texture is equirectangular projection of cubemap.\n"
-		  "      --strip              Input texture is horizontal strip of cubemap.\n"
+		  "      --strip              Input texture is horizontal or vertical strip of cubemap.\n"
 		  "      --sdf                Compute SDF texture.\n"
 		  "      --ref <alpha>        Alpha reference value.\n"
 		  "      --iqa                Image Quality Assessment\n"
 		  "      --pma                Premultiply alpha into RGB channel.\n"
 		  "      --linear             Input and output texture is linear color space (gamma correction won't be applied).\n"
 		  "      --max <max size>     Maximum width/height (image will be scaled down and\n"
-		  "                           aspect ratio will be preserved.\n"
+		  "                           aspect ratio will be preserved)\n"
 		  "      --radiance <model>   Radiance cubemap filter. (Lighting model: Phong, PhongBrdf, Blinn, BlinnBrdf, GGX)\n"
 		  "      --as <extension>     Save as.\n"
 		  "      --formats            List all supported formats.\n"
@@ -951,17 +950,19 @@ void help(const char* _error = NULL, bool _showHelp = true)
 		);
 }
 
-void help(const char* _str, const bx::Error& _err)
+void help(const bx::StringView _str, const bx::Error& _err)
 {
 	std::string str;
-	if (_str != NULL)
+	if (!_str.isEmpty() )
 	{
-		str.append(_str);
-		str.append(" ");
+		str.append(_str.getPtr(), _str.getTerm() - _str.getPtr() );
+		str.append(": ");
 	}
 
 	const bx::StringView& sv = _err.getMessage();
+	str.append("'");
 	str.append(sv.getPtr(), sv.getTerm() - sv.getPtr() );
+	str.append("'");
 
 	help(str.c_str(), false);
 }
@@ -1089,6 +1090,12 @@ int main(int _argc, const char* _argv[])
 		return bx::kExitFailure;
 	}
 
+	// Normal maps are always linear
+	if (options.normalMap)
+	{
+		options.linear = true;
+	}
+
 	const char* maxSize = cmdLine.findOption("max");
 	if (NULL != maxSize)
 	{
@@ -1213,6 +1220,8 @@ int main(int _argc, const char* _argv[])
 
 	if (NULL != output)
 	{
+		output->m_srgb = !options.linear;
+
 		bx::FileWriter writer;
 		if (bx::open(&writer, outputFileName, false, &err) )
 		{
@@ -1277,7 +1286,7 @@ int main(int _argc, const char* _argv[])
 
 			if (!err.isOk() )
 			{
-				help(NULL, err);
+				help("", err);
 				return bx::kExitFailure;
 			}
 		}

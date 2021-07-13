@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -14,21 +14,21 @@
 #include "string.h"
 #include "uint32_t.h"
 
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_READ,         BX_MAKEFOURCC('R', 'W', 0, 2) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_WRITE,        BX_MAKEFOURCC('R', 'W', 0, 3) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_EOF,          BX_MAKEFOURCC('R', 'W', 0, 4) );
-BX_ERROR_RESULT(BX_ERROR_READERWRITER_ALREADY_OPEN, BX_MAKEFOURCC('R', 'W', 0, 5) );
-
 namespace bx
 {
+	BX_ERROR_RESULT(kErrorReaderWriterOpen,        BX_MAKEFOURCC('b', 'x', 2, 1) );
+	BX_ERROR_RESULT(kErrorReaderWriterRead,        BX_MAKEFOURCC('b', 'x', 2, 2) );
+	BX_ERROR_RESULT(kErrorReaderWriterWrite,       BX_MAKEFOURCC('b', 'x', 2, 3) );
+	BX_ERROR_RESULT(kErrorReaderWriterEof,         BX_MAKEFOURCC('b', 'x', 2, 4) );
+	BX_ERROR_RESULT(kErrorReaderWriterAlreadyOpen, BX_MAKEFOURCC('b', 'x', 2, 5) );
+
 	/// The position from where offset is added.
 	struct Whence
 	{
 		/// Whence values:
 		enum Enum
 		{
-			Begin,   //!< From begining of file.
+			Begin,   //!< From beginning of file.
 			Current, //!< From current position of file.
 			End,     //!< From end of file.
 		};
@@ -285,13 +285,13 @@ namespace bx
 	/// Write string view.
 	int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
 
-	/// Write formated string.
+	/// Write formatted string.
 	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err);
 
-	/// Write formated string.
+	/// Write formatted string.
 	int32_t write(WriterI* _writer, Error* _err, const StringView* _format, ...);
 
-	/// Write formated string.
+	/// Write formatted string.
 	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...);
 
 	/// Write repeat the same value.
@@ -337,7 +337,7 @@ namespace bx
 	/// Open for read.
 	bool open(ReaderOpenI* _reader, const FilePath& _filePath, Error* _err = NULL);
 
-	/// Open fro write.
+	/// Open for write.
 	bool open(WriterOpenI* _writer, const FilePath& _filePath, bool _append = false, Error* _err = NULL);
 
 	/// Open process.

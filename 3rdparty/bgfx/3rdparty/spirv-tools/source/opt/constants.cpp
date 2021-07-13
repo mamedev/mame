@@ -156,7 +156,7 @@ Type* ConstantManager::GetType(const Instruction* inst) const {
 }
 
 std::vector<const Constant*> ConstantManager::GetOperandConstants(
-    Instruction* inst) const {
+    const Instruction* inst) const {
   std::vector<const Constant*> constants;
   for (uint32_t i = 0; i < inst->NumInOperands(); i++) {
     const Operand* operand = &inst->GetInOperand(i);
@@ -393,6 +393,12 @@ uint32_t ConstantManager::GetFloatConst(float val) {
   Type* float_type = context()->get_type_mgr()->GetFloatType();
   utils::FloatProxy<float> v(val);
   const Constant* c = GetConstant(float_type, v.GetWords());
+  return GetDefiningInstruction(c)->result_id();
+}
+
+uint32_t ConstantManager::GetSIntConst(int32_t val) {
+  Type* sint_type = context()->get_type_mgr()->GetSIntType();
+  const Constant* c = GetConstant(sint_type, {static_cast<uint32_t>(val)});
   return GetDefiningInstruction(c)->result_id();
 }
 
