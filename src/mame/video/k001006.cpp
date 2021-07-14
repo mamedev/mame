@@ -137,6 +137,7 @@ void k001006_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		if (ACCESSING_BITS_16_31)
 		{
 			m_device_sel = (data >> 16) & 0xf;
+			m_enable_bilinear = (data & 0x100000) ? true : false;
 		}
 	}
 }
@@ -145,7 +146,7 @@ uint32_t k001006_device::fetch_texel(int page, int pal_index, int u, int v)
 {
 	uint8_t *tex = m_texrom.get() + page;
 	int texel = tex[((v & 0x1ff) * 512) + (u & 0x1ff)];
-	return m_palette[pal_index + texel];
+	return texel == 0 ? 0 : m_palette[pal_index + texel];
 }
 
 
