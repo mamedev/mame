@@ -1313,15 +1313,12 @@ void input_manager::seq_from_tokens(input_seq &seq, std::string_view string)
 //  controller based on device map table
 //-------------------------------------------------
 
-bool input_manager::map_device_to_controller(const devicemap_table_type *devicemap_table)
+bool input_manager::map_device_to_controller(const devicemap_table_type &devicemap_table)
 {
-	if (nullptr == devicemap_table)
-		return true;
-
-	for (devicemap_table_type::const_iterator it = devicemap_table->begin(); it != devicemap_table->end(); it++)
+	for (const auto &it : devicemap_table)
 	{
-		std::string_view deviceid = it->first;
-		std::string_view controllername = it->second;
+		std::string_view deviceid = it.first;
+		std::string_view controllername = it.second;
 
 		// tokenize the controller name into device class and index (i.e. controller name should be of the form "GUNCODE_1")
 		std::string token[2];
@@ -1360,7 +1357,7 @@ bool input_manager::map_device_to_controller(const devicemap_table_type *devicem
 		for (int devnum = 0; devnum <= input_devclass->maxindex(); devnum++)
 		{
 			input_device *device = input_devclass->device(devnum);
-			if (device != nullptr && device->match_device_id(deviceid))
+			if (device && device->match_device_id(deviceid))
 			{
 				// remap devindex
 				input_devclass->remap_device_index(device->devindex(), devindex);

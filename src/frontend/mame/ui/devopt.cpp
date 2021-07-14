@@ -221,7 +221,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			{
 				dips++;
 				bool def(false);
-				for (ioport_setting &setting : field.settings())
+				for (ioport_setting const &setting : field.settings())
 				{
 					if (setting.value() == field.defvalue())
 					{
@@ -237,7 +237,7 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 			{
 				confs++;
 				bool def(false);
-				for (ioport_setting &setting : field.settings())
+				for (ioport_setting const &setting : field.settings())
 				{
 					if (setting.value() == field.defvalue())
 					{

@@ -26,7 +26,10 @@
 network_manager::network_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	machine.configuration().config_register("network", config_load_delegate(&network_manager::config_load, this), config_save_delegate(&network_manager::config_save, this));
+	machine.configuration().config_register(
+			"network",
+			configuration_manager::load_delegate(&network_manager::config_load, this),
+			configuration_manager::save_delegate(&network_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -34,9 +37,9 @@ network_manager::network_manager(running_machine &machine)
 //  configuration file
 //-------------------------------------------------
 
-void network_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void network_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::SYSTEM) && parentnode)
 	{
 		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
@@ -71,13 +74,13 @@ void network_manager::config_load(config_type cfg_type, util::xml::data_node con
 
 void network_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	/* only care about game-specific data */
-	if (cfg_type == config_type::GAME)
+	// only save about system-specific data
+	if (cfg_type == config_type::SYSTEM)
 	{
 		for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 		{
 			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
-			if (node != nullptr)
+			if (node)
 			{
 				node->set_attribute("tag", network.device().tag());
 				node->set_attribute_int("interface", network.get_interface());
