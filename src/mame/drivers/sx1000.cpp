@@ -105,6 +105,7 @@ void sx1000_state::cpu_map(address_map &map)
 
 	map(0xf00000, 0xf07fff).rom().region("eprom", 0x8000);
 	map(0xf08000, 0xf0ffff).rom().region("eprom", 0x0000);
+	map(0xf20000, 0xf23fff).ram();                         // Likely nvram
 }
 
 void sx1000_state::common(machine_config &config)
