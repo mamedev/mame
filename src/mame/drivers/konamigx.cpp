@@ -2209,6 +2209,9 @@ ROM_START( mtwinbee )
 	ROM_REGION( 0x400000, "k054539", 0 )
 	ROM_LOAD( "424a17.9g", 0x000000, 2*1024*1024, CRC(e9dd9692) SHA1(c289019c8d1dd71b3cec26479c39b649de804707) )
 	ROM_LOAD( "424a18.7g", 0x200000, 2*1024*1024, CRC(0f0d9f3a) SHA1(57f6b113b80f06964b7e672ad517c1654c5569c5) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting with error
+	ROM_LOAD( "mtwinbee.nv", 0x0000, 0x080, CRC(942b4323) SHA1(2f6799bf187510355df5e52c4d416f5c5e70fa05) )
 ROM_END
 
 /* Twinbee Yahhoo! */
