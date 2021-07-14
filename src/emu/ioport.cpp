@@ -422,8 +422,7 @@ void input_type_entry::restore_default_seq() noexcept
 //-------------------------------------------------
 
 digital_joystick::digital_joystick(int player, int number)
-	:   m_next(nullptr),
-		m_player(player),
+	:   m_player(player),
 		m_number(number),
 		m_current(0),
 		m_current4way(0),
@@ -529,7 +528,7 @@ bool ioport_condition::eval() const
 		return true;
 
 	// otherwise, read the referenced port and switch off the condition type
-	ioport_value condvalue = m_port->read();
+	ioport_value const condvalue = m_port->read();
 	switch (m_condition)
 	{
 		case ALWAYS:            return true;
@@ -565,8 +564,7 @@ void ioport_condition::initialize(device_t &device)
 //-------------------------------------------------
 
 ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const char *_name)
-	: m_next(nullptr),
-		m_field(field),
+	: m_field(field),
 		m_value(_value),
 		m_name(_name)
 {
@@ -583,8 +581,7 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 //-------------------------------------------------
 
 ioport_diplocation::ioport_diplocation(const char *name, u8 swnum, bool invert)
-	: m_next(nullptr),
-		m_name(name),
+	: m_name(name),
 		m_number(swnum),
 		m_invert(invert)
 {
@@ -926,7 +923,7 @@ void ioport_field::set_user_settings(const user_settings &settings) noexcept
 	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
 		m_live->value = settings.value;
 
-	if (m_live->analog != nullptr)
+	if (m_live->analog)
 	{
 		// if there's analog data, extract the analog settings
 		m_live->analog->m_sensitivity = settings.sensitivity;
@@ -953,7 +950,7 @@ const char *ioport_field::setting_name() const
 	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting &setting : m_settinglist)
+	for (ioport_setting const &setting : m_settinglist)
 		if (setting.enabled())
 			if (setting.value() == m_live->value)
 				return setting.name();
@@ -973,7 +970,7 @@ bool ioport_field::has_previous_setting() const
 	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting &setting : m_settinglist)
+	for (ioport_setting const &setting : m_settinglist)
 		if (setting.enabled())
 			return (setting.value() != m_live->value);
 
@@ -992,30 +989,32 @@ void ioport_field::select_previous_setting()
 	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	ioport_setting *prevsetting = nullptr;
+	auto prevsetting = m_settinglist.end();
 	bool found_match = false;
-	for (ioport_setting &setting : m_settinglist)
-		if (setting.enabled())
+	for (auto setting = m_settinglist.begin(); m_settinglist.end() != setting; ++setting)
+	{
+		if (setting->enabled())
 		{
-			if (setting.value() == m_live->value)
+			if (setting->value() == m_live->value)
 			{
 				found_match = true;
-				if (prevsetting != nullptr)
+				if (m_settinglist.end() != prevsetting)
 					break;
 			}
-			prevsetting = &setting;
+			prevsetting = setting;
 		}
+	}
 
 	// if we didn't find a matching value, select the first
 	if (!found_match)
 	{
-		for (prevsetting = m_settinglist.first(); prevsetting != nullptr; prevsetting = prevsetting->next())
-			if (prevsetting->enabled())
-				break;
+		prevsetting = m_settinglist.begin();
+		while ((m_settinglist.end() != prevsetting) && !prevsetting->enabled())
+			++prevsetting;
 	}
 
 	// update the value to the previous one
-	if (prevsetting != nullptr)
+	if (m_settinglist.end() != prevsetting)
 		m_live->value = prevsetting->value();
 }
 
@@ -1032,7 +1031,8 @@ bool ioport_field::has_next_setting() const
 
 	// scan the list of settings looking for a match on the current value
 	bool found = false;
-	for (ioport_setting &setting : m_settinglist)
+	for (ioport_setting const &setting : m_settinglist)
+	{
 		if (setting.enabled())
 		{
 			if (found)
@@ -1040,7 +1040,7 @@ bool ioport_field::has_next_setting() const
 			if (setting.value() == m_live->value)
 				found = true;
 		}
-
+	}
 	return false;
 }
 
@@ -1056,27 +1056,29 @@ void ioport_field::select_next_setting()
 	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	ioport_setting *nextsetting = nullptr;
-	ioport_setting *setting;
-	for (setting = m_settinglist.first(); setting != nullptr; setting = setting->next())
-		if (setting->enabled())
-			if (setting->value() == m_live->value)
-				break;
+	auto setting = m_settinglist.begin();
+	while ((m_settinglist.end() != setting) && (!setting->enabled() || (setting->value() != m_live->value)))
+		++setting;
 
 	// if we found one, scan forward for the next valid one
-	if (setting != nullptr)
-		for (nextsetting = setting->next(); nextsetting != nullptr; nextsetting = nextsetting->next())
-			if (nextsetting->enabled())
-				break;
+	auto nextsetting = setting;
+	if (m_settinglist.end() != nextsetting)
+	{
+		++nextsetting;
+		while ((m_settinglist.end() != nextsetting) && !nextsetting->enabled())
+			++nextsetting;
+	}
 
 	// if we hit the end, search from the beginning
-	if (nextsetting == nullptr)
-		for (nextsetting = m_settinglist.first(); nextsetting != nullptr; nextsetting = nextsetting->next())
-			if (nextsetting->enabled())
-				break;
+	if (m_settinglist.end() == nextsetting)
+	{
+		nextsetting = m_settinglist.begin();
+		while ((m_settinglist.end() != nextsetting) && !nextsetting->enabled())
+			++nextsetting;
+	}
 
 	// update the value to the previous one
-	if (nextsetting != nullptr)
+	if (m_settinglist.end() != nextsetting)
 		m_live->value = nextsetting->value();
 }
 
@@ -1142,7 +1144,7 @@ void ioport_field::frame_update(ioport_value &result)
 		// toggle controls: flip the toggle state or advance to the next setting
 		if (m_live->toggle)
 		{
-			if (m_settinglist.count() == 0)
+			if (m_settinglist.empty())
 				m_live->value ^= m_mask;
 			else
 				select_next_setting();
@@ -1199,7 +1201,7 @@ void ioport_field::frame_update(ioport_value &result)
 //  position
 //-------------------------------------------------
 
-float ioport_field::crosshair_read()
+float ioport_field::crosshair_read() const
 {
 	float value = m_live->analog->crosshair_read();
 
@@ -1227,10 +1229,10 @@ float ioport_field::crosshair_read()
 void ioport_field::expand_diplocation(const char *location, std::string &errorbuf)
 {
 	// if nothing present, bail
-	if (location == nullptr)
+	if (!location)
 		return;
 
-	m_diploclist.reset();
+	m_diploclist.clear();
 
 	// parse the string
 	std::string name; // Don't move this variable inside the loop, lastname's lifetime depends on it being outside
@@ -1245,23 +1247,21 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 			comma = curentry + strlen(curentry);
 
 		// extract it to tempbuf
-		std::string tempstr;
-		tempstr.assign(curentry, comma - curentry);
+		std::string tempstr(curentry, comma - curentry);
 
 		// first extract the switch name if present
 		const char *number = tempstr.c_str();
 		const char *colon = strchr(tempstr.c_str(), ':');
 
-		// allocate and copy the name if it is present
 		if (colon != nullptr)
 		{
+			// allocate and copy the name if it is present
 			lastname = name.assign(number, colon - number).c_str();
 			number = colon + 1;
 		}
-
-		// otherwise, just copy the last name
 		else
 		{
+			// otherwise, just copy the last name
 			if (lastname == nullptr)
 			{
 				errorbuf.append(string_format("Switch location '%s' missing switch name!\n", location));
@@ -1284,7 +1284,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
-		m_diploclist.append(*new ioport_diplocation(name.c_str(), swnum, invert));
+		m_diploclist.emplace_back(name.c_str(), swnum, invert);
 		entries++;
 
 		// advance to the next item
@@ -1492,7 +1492,7 @@ void ioport_port::frame_update()
 	m_live->digital = 0;
 
 	// now loop back and modify based on the inputs
-	for (ioport_field &field : fields())
+	for (ioport_field &field : m_fieldlist)
 		field.frame_update(m_live->digital);
 }
 
@@ -1620,15 +1620,15 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		// allocate analog state if it's analog
 		analog_field *analog = nullptr;
 		if (field.is_analog())
-			analog = &analoglist.append(*new analog_field(field));
+			analog = &analoglist.emplace_back(field);
 
 		// allocate a dynamic field for reading
 		if (field.has_dynamic_read())
-			readlist.append(*new dynamic_field(field));
+			readlist.emplace_back(field);
 
 		// allocate a dynamic field for writing
 		if (field.has_dynamic_write())
-			writelist.append(*new dynamic_field(field));
+			writelist.emplace_back(field);
 
 		// let the field initialize its live state
 		field.init_live_state(analog);
@@ -1726,7 +1726,7 @@ time_t ioport_manager::initialize()
 	const char *joystick_map_default = machine().options().joystick_map();
 	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
 		for (auto &port : m_portlist)
-			for (ioport_field &field : port.second->fields())
+			for (ioport_field const &field : port.second->fields())
 				if (field.live().joystick != nullptr && field.rotated())
 				{
 					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
@@ -1735,7 +1735,10 @@ time_t ioport_manager::initialize()
 				}
 
 	// register callbacks for when we load configurations
-	machine().configuration().config_register("input", config_load_delegate(&ioport_manager::load_config, this), config_save_delegate(&ioport_manager::save_config, this));
+	machine().configuration().config_register(
+			"input",
+			configuration_manager::load_delegate(&ioport_manager::load_config, this),
+			configuration_manager::save_delegate(&ioport_manager::save_config, this));
 
 	// open playback and record files if specified
 	time_t basetime = playback_init();
@@ -1800,7 +1803,7 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 	// only scan the list if we haven't already enabled this class of control
 	if (!autoenable_class->enabled())
 		for (auto &port : m_portlist)
-			for (ioport_field &field : port.second->fields())
+			for (ioport_field const &field : port.second->fields())
 
 				// if this port type is in use, apply the autoselect criteria
 				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
@@ -1921,7 +1924,7 @@ bool ioport_manager::type_pressed(ioport_type type, int player)
 bool ioport_manager::type_class_present(ioport_type_class inputclass) const noexcept
 {
 	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (field.type_class() == inputclass)
 				return true;
 	return false;
@@ -1937,7 +1940,7 @@ int ioport_manager::count_players() const noexcept
 {
 	int max_player = 0;
 	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (field.type_class() == INPUT_CLASS_CONTROLLER && max_player <= field.player() + 1)
 				max_player = field.player() + 1;
 
@@ -1958,7 +1961,7 @@ digital_joystick &ioport_manager::digjoystick(int player, int number)
 			return joystick;
 
 	// create a new one
-	return m_joystick_list.append(*new digital_joystick(player, number));
+	return m_joystick_list.emplace_back(player, number);
 }
 
 
@@ -2045,7 +2048,7 @@ s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 //  data from the XML nodes
 //-------------------------------------------------
 
-void ioport_manager::load_config(config_type cfg_type, util::xml::data_node const *parentnode)
+void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// in the completion phase, we finish the initialization with the final ports
 	if (cfg_type == config_type::FINAL)
@@ -2062,24 +2065,20 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 	if (cfg_type == config_type::CONTROLLER)
 	{
 		// iterate over all the remap nodes
-		load_remap_table(parentnode);
+		load_remap_table(*parentnode);
 
-		std::unique_ptr<devicemap_table_type> devicemap_table = std::make_unique<devicemap_table_type>();
+		devicemap_table_type devicemap_table;
 		for (util::xml::data_node const *mapdevice_node = parentnode->get_child("mapdevice"); mapdevice_node != nullptr; mapdevice_node = mapdevice_node->get_next_sibling("mapdevice"))
 		{
-			const char *devicename = mapdevice_node->get_attribute_string("device", nullptr);
-			const char *controllername = mapdevice_node->get_attribute_string("controller", nullptr);
-			if (devicename != nullptr && controllername != nullptr)
-			{
-				devicemap_table->insert(std::make_pair(std::string(devicename), std::string(controllername)));
-			}
+			char const *const devicename = mapdevice_node->get_attribute_string("device", nullptr);
+			char const *const controllername = mapdevice_node->get_attribute_string("controller", nullptr);
+			if (devicename && controllername)
+				devicemap_table.emplace(devicename, controllername);
 		}
 
 		// map device to controller if we have a device map
-		if (!devicemap_table->empty())
-		{
-			machine().input().map_device_to_controller(devicemap_table.get());
-		}
+		if (!devicemap_table.empty())
+			machine().input().map_device_to_controller(devicemap_table);
 	}
 
 	// iterate over all the port nodes
@@ -2099,20 +2098,22 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 		{
 			// with a valid type, parse out the new sequence
 			input_seq_type seqtype = token_to_seq_type(seqnode->get_attribute_string("type", ""));
-			if (seqtype != -1 && seqnode->get_value() != nullptr)
+			if ((seqtype != -1) && seqnode->get_value())
 			{
-				if (strcmp(seqnode->get_value(), "NONE") == 0)
+				if (!strcmp(seqnode->get_value(), "NONE"))
 					newseq[seqtype].reset();
 				else
 					machine().input().seq_from_tokens(newseq[seqtype], seqnode->get_value());
 			}
 		}
 
-		// if we're loading default ports, apply to the defaults
-		if (cfg_type != config_type::GAME)
-			load_default_config(portnode, type, player, newseq);
+		// load into the appropriate place for the config type/level
+		if (config_type::SYSTEM == cfg_type)
+			load_system_config(*portnode, type, player, newseq);
+		else if ((config_type::CONTROLLER == cfg_type) && (config_level::DEFAULT != cfg_level))
+			load_controller_config(*portnode, type, player, newseq);
 		else
-			load_game_config(portnode, type, player, newseq);
+			load_default_config(type, player, newseq);
 	}
 
 	// after applying the controller config, push that back into the backup, since that is
@@ -2123,7 +2124,7 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 				entry.defseq(seqtype) = entry.seq(seqtype);
 
 	// load keyboard enable/disable state
-	if (cfg_type == config_type::GAME)
+	if (cfg_type == config_type::SYSTEM)
 	{
 		std::vector<bool> kbd_enable_set;
 		bool keyboard_enabled = false, missing_enabled = false;
@@ -2191,11 +2192,11 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 //  global remapping table
 //-------------------------------------------------
 
-void ioport_manager::load_remap_table(util::xml::data_node const *parentnode)
+void ioport_manager::load_remap_table(util::xml::data_node const &parentnode)
 {
 	// count items first so we can allocate
 	int count = 0;
-	for (util::xml::data_node const *remapnode = parentnode->get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
+	for (util::xml::data_node const *remapnode = parentnode.get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
 		count++;
 
 	// if we have some, deal with them
@@ -2207,7 +2208,7 @@ void ioport_manager::load_remap_table(util::xml::data_node const *parentnode)
 
 		// build up the remap table
 		count = 0;
-		for (util::xml::data_node const *remapnode = parentnode->get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
+		for (util::xml::data_node const *remapnode = parentnode.get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
 		{
 			input_code origcode = machine().input().code_from_token(remapnode->get_attribute_string("origcode", ""));
 			input_code newcode = machine().input().code_from_token(remapnode->get_attribute_string("newcode", ""));
@@ -2228,14 +2229,15 @@ void ioport_manager::load_remap_table(util::xml::data_node const *parentnode)
 
 
 //-------------------------------------------------
-//  load_default_config - apply configuration
-//  data to the default mappings
+//  load_default_config - apply input settings
+//  to defaults for all systems
 //-------------------------------------------------
 
-bool ioport_manager::load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
+bool ioport_manager::load_default_config(int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
 {
 	// find a matching port in the list
 	for (input_type_entry &entry : m_typelist)
+	{
 		if (entry.type() == type && entry.player() == player)
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -2243,115 +2245,196 @@ bool ioport_manager::load_default_config(util::xml::data_node const *portnode, i
 					entry.set_seq(seqtype, newseq[seqtype]);
 			return true;
 		}
-
+	}
 	return false;
 }
 
 
 //-------------------------------------------------
-//  load_game_config - apply configuration
-//  data to the current set of input ports
+//  load_controller_config - apply controler
+//  profile settings to defaults
 //-------------------------------------------------
 
-void ioport_manager::load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
+bool ioport_manager::load_controller_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
 {
-	// read the mask and defvalue attributes
-	ioport_value mask = portnode->get_attribute_int("mask", 0);
-	ioport_value defvalue = portnode->get_attribute_int("defvalue", 0);
+	// without a tag, apply to the defaults for all systems
+	char const *const tag = portnode.get_attribute_string("tag", nullptr);
+	if (!tag)
+		return load_default_config(type, player, newseq);
 
-	auto const apply =
-		[portnode, type, player, newseq, mask, defvalue] (ioport_port &port) -> bool
+	// ensure the port actually exists
+	auto const port(m_portlist.find(tag));
+	if (m_portlist.end() == port)
+		return false;
+	ioport_value const mask = portnode.get_attribute_int("mask", 0);
+	if (!mask)
+		return false;
+
+	// find the matching field
+	ioport_value const defvalue = portnode.get_attribute_int("defvalue", 0);
+	for (ioport_field &field : port->second->fields())
+	{
+		// find the matching mask and default value
+		if (field.type() == type && field.player() == player &&
+			field.mask() == mask && (field.defvalue() & mask) == (defvalue & mask))
 		{
-			for (ioport_field &field : port.fields())
+			// if a sequence was specified, override the developer-specified default for the field
+			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
-				// find the matching mask and default value
-				if (field.type() == type && field.player() == player &&
-					field.mask() == mask && (field.defvalue() & mask) == (defvalue & mask))
+				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
+					field.set_defseq(seqtype, newseq[seqtype]);
+			}
+
+			// fetch configurable attributes
+			if (!field.live().analog)
+			{
+				// for non-analog fields
+
+				// can't practically set value here
+
+				// fetch yes/no for toggle setting
+				char const *const togstring = portnode.get_attribute_string("toggle", nullptr);
+				if (togstring && !strcmp(togstring, "yes"))
 				{
-					// if a sequence was specified, copy it in
-					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-						if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-							field.live().seq[seqtype] = newseq[seqtype];
-
-					// fetch configurable attributes
-					if (!field.live().analog)
-					{
-						// for non-analog fields
-
-						// fetch the value
-						field.live().value = portnode->get_attribute_int("value", field.defvalue());
-
-						// fetch yes/no for toggle setting
-						char const *const togstring = portnode->get_attribute_string("toggle", nullptr);
-						if (togstring)
-							field.live().toggle = !strcmp(togstring, "yes");
-					}
-					else
-					{
-						// for analog fields
-
-						// get base attributes
-						field.live().analog->m_delta = portnode->get_attribute_int("keydelta", field.delta());
-						field.live().analog->m_centerdelta = portnode->get_attribute_int("centerdelta", field.centerdelta());
-						field.live().analog->m_sensitivity = portnode->get_attribute_int("sensitivity", field.sensitivity());
-
-						// fetch yes/no for reverse setting
-						const char *revstring = portnode->get_attribute_string("reverse", nullptr);
-						if (revstring)
-							field.live().analog->m_reverse = !strcmp(revstring, "yes");
-					}
-					return true;
+					field.live().toggle = true;
+					field.m_flags |= ioport_field::FIELD_FLAG_TOGGLE;
+				}
+				else if (togstring && !strcmp(togstring, "no"))
+				{
+					field.live().toggle = false;
+					field.m_flags &= ~ioport_field::FIELD_FLAG_TOGGLE;
 				}
 			}
-			return false;
-		};
+			else
+			{
+				// for analog fields
+
+#if 0 // changing this stuff causes issues because of the way it's tied up with the analog_field object
+				// get base attributes
+				field.live().analog->m_delta = field.m_delta = portnode.get_attribute_int("keydelta", field.delta());
+				field.live().analog->m_centerdelta = field.m_centerdelta = portnode.get_attribute_int("centerdelta", field.centerdelta());
+				field.live().analog->m_sensitivity = field.m_sensitivity = portnode.get_attribute_int("sensitivity", field.sensitivity());
+
+				// fetch yes/no for reverse setting
+				char const *const revstring = portnode.get_attribute_string("reverse", nullptr);
+				if (revstring && !strcmp(revstring, "yes"))
+				{
+					field.live().analog->m_reverse = true;
+					field.m_flags |= ioport_field::ANALOG_FLAG_REVERSE;
+				}
+				else if (revstring && !strcmp(revstring, "no"))
+				{
+					field.live().analog->m_reverse = false;
+					field.m_flags &= ~ioport_field::ANALOG_FLAG_REVERSE;
+				}
+#endif
+			}
+
+			// successfully applied
+			return true;
+		}
+	}
+
+	// no matching field
+	return false;
+}
+
+
+//-------------------------------------------------
+//  load_system_config - apply saved input
+//  configuration for the current system
+//-------------------------------------------------
+
+void ioport_manager::load_system_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
+{
+	// system-specific configuration should always apply by port/field
+	char const *const tag = portnode.get_attribute_string("tag", nullptr);
+	ioport_value const mask = portnode.get_attribute_int("mask", 0);
+	ioport_value const defvalue = portnode.get_attribute_int("defvalue", 0);
+	if (!tag || !mask)
+		return;
 
 	// find the port we want
-	char const *const tag = portnode->get_attribute_string("tag", nullptr);
-	if (tag)
+	auto const port(m_portlist.find(tag));
+	if (m_portlist.end() != port)
 	{
-		auto const port(m_portlist.find(tag));
-		if (m_portlist.end() != port)
+		for (ioport_field &field : port->second->fields())
 		{
-			apply(*port->second);
-		}
-		else
-		{
-			// see if this belongs to a slot card that isn't inserted
-			std::string_view parent_tag(tag);
-			auto pos(parent_tag.rfind(':'));
-			if (pos && (std::string_view::npos != pos))
+			// find the matching mask and default value
+			if (field.type() == type && field.player() == player &&
+				field.mask() == mask && (field.defvalue() & mask) == (defvalue & mask))
 			{
-				parent_tag = parent_tag.substr(0, pos);
-				if (!machine().root_device().subdevice(parent_tag))
+				// if a sequence was specified, copy it in
+				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
-					for (pos = parent_tag.rfind(':'); pos && (std::string_view::npos != pos); pos = parent_tag.rfind(':'))
-					{
-						std::string_view const child_tag(parent_tag.substr(pos + 1));
-						parent_tag = parent_tag.substr(0, pos);
-						device_t const *const parent_device(machine().root_device().subdevice(parent_tag));
-						if (parent_device)
-						{
-							device_slot_interface const *slot;
-							if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
-							{
-								if (!m_deselected_card_config)
-									m_deselected_card_config = util::xml::file::create().release();
-								portnode->copy_into(*m_deselected_card_config);
-							}
-							break;
-						}
-					}
+					if (newseq[seqtype][0] != INPUT_CODE_INVALID)
+						field.live().seq[seqtype] = newseq[seqtype];
 				}
+
+				// fetch configurable attributes
+				if (!field.live().analog)
+				{
+					// for non-analog fields
+
+					// fetch the value
+					field.live().value = portnode.get_attribute_int("value", field.defvalue());
+
+					// fetch yes/no for toggle setting
+					char const *const togstring = portnode.get_attribute_string("toggle", nullptr);
+					if (togstring && !strcmp(togstring, "yes"))
+						field.live().toggle = true;
+					else if (togstring && !strcmp(togstring, "no"))
+						field.live().toggle = false;
+				}
+				else
+				{
+					// for analog fields
+
+					// get base attributes
+					field.live().analog->m_delta = portnode.get_attribute_int("keydelta", field.delta());
+					field.live().analog->m_centerdelta = portnode.get_attribute_int("centerdelta", field.centerdelta());
+					field.live().analog->m_sensitivity = portnode.get_attribute_int("sensitivity", field.sensitivity());
+
+					// fetch yes/no for reverse setting
+					char const *const revstring = portnode.get_attribute_string("reverse", nullptr);
+					if (revstring && !strcmp(revstring, "yes"))
+						field.live().analog->m_reverse = true;
+					else if (revstring && !strcmp(revstring, "no"))
+						field.live().analog->m_reverse = false;
+				}
+				break;
 			}
 		}
 	}
 	else
 	{
-		// if no tag, search them all
-		for (auto &port : m_portlist)
-			if (apply(*port.second))
-				break;
+		// see if this belongs to a slot card that isn't inserted
+		std::string_view parent_tag(tag);
+		auto pos(parent_tag.rfind(':'));
+		if (pos && (std::string_view::npos != pos))
+		{
+			parent_tag = parent_tag.substr(0, pos);
+			if (!machine().root_device().subdevice(parent_tag))
+			{
+				for (pos = parent_tag.rfind(':'); pos && (std::string_view::npos != pos); pos = parent_tag.rfind(':'))
+				{
+					std::string_view const child_tag(parent_tag.substr(pos + 1));
+					parent_tag = parent_tag.substr(0, pos);
+					device_t const *const parent_device(machine().root_device().subdevice(parent_tag));
+					if (parent_device)
+					{
+						device_slot_interface const *slot;
+						if (parent_device->interface(slot) && (slot->option_list().find(std::string(child_tag)) != slot->option_list().end()))
+						{
+							if (!m_deselected_card_config)
+								m_deselected_card_config = util::xml::file::create().release();
+							portnode.copy_into(*m_deselected_card_config);
+						}
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -2369,13 +2452,13 @@ void ioport_manager::load_game_config(util::xml::data_node const *portnode, int 
 void ioport_manager::save_config(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// if no parentnode, ignore
-	if (parentnode == nullptr)
+	if (!parentnode)
 		return;
 
 	// default ports save differently
 	if (cfg_type == config_type::DEFAULT)
 		save_default_inputs(*parentnode);
-	else
+	else if (cfg_type == config_type::SYSTEM)
 		save_game_inputs(*parentnode);
 }
 
@@ -2481,7 +2564,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 
 	// iterate over ports
 	for (auto &port : m_portlist)
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 			if (save_this_input_field_type(field.type()))
 			{
 				// determine if we changed
@@ -2489,16 +2572,15 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 					changed |= (field.seq(seqtype) != field.defseq(seqtype));
 
-				// non-analog changes
 				if (!field.is_analog())
 				{
+					// non-analog changes
 					changed |= ((field.live().value & field.mask()) != (field.defvalue() & field.mask()));
 					changed |= (field.live().toggle != field.toggle());
 				}
-
-				// analog changes
 				else
 				{
+					// analog changes
 					changed |= (field.live().analog->m_delta != field.delta());
 					changed |= (field.live().analog->m_centerdelta != field.centerdelta());
 					changed |= (field.live().analog->m_sensitivity != field.sensitivity());
@@ -2510,7 +2592,7 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 				{
 					// add a new port node
 					util::xml::data_node *const portnode = parentnode.add_child("port", nullptr);
-					if (portnode != nullptr)
+					if (portnode)
 					{
 						// add the identifying information and attributes
 						portnode->set_attribute("tag", port.second->tag());
@@ -2523,18 +2605,17 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 							if (field.seq(seqtype) != field.defseq(seqtype))
 								save_sequence(*portnode, seqtype, field.type(), field.seq(seqtype));
 
-						// write out non-analog changes
 						if (!field.is_analog())
 						{
+							// write out non-analog changes
 							if ((field.live().value & field.mask()) != (field.defvalue() & field.mask()))
 								portnode->set_attribute_int("value", field.live().value & field.mask());
 							if (field.live().toggle != field.toggle())
 								portnode->set_attribute("toggle", field.live().toggle ? "yes" : "no");
 						}
-
-						// write out analog changes
 						else
 						{
+							// write out analog changes
 							if (field.live().analog->m_delta != field.delta())
 								portnode->set_attribute_int("keydelta", field.live().analog->m_delta);
 							if (field.live().analog->m_centerdelta != field.centerdelta())
@@ -3190,12 +3271,11 @@ ioport_configurer& ioport_configurer::field_add_code(input_seq_type which, input
 ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const char *name)
 {
 	// make sure we have a field
-	if (m_curfield == nullptr)
+	if (!m_curfield)
 		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
 
-	m_cursetting = new ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name));
 	// append a new setting
-	m_curfield->m_settinglist.append(*m_cursetting);
+	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), string_from_token(name));
 	return *this;
 }
 
@@ -3207,7 +3287,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 
 ioport_configurer& ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
-	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
+	ioport_condition &target = m_cursetting ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);
 	return *this;
 }
@@ -3245,8 +3325,7 @@ ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value
 //-------------------------------------------------
 
 dynamic_field::dynamic_field(ioport_field &field)
-	: m_next(nullptr),
-		m_field(field),
+	: m_field(field),
 		m_shift(0),
 		m_oldval(field.defvalue())
 {
@@ -3265,15 +3344,15 @@ dynamic_field::dynamic_field(ioport_field &field)
 void dynamic_field::read(ioport_value &result)
 {
 	// skip if not enabled
-	if (!m_field.enabled())
-		return;
+	if (m_field.enabled())
+	{
+		// call the callback to read a new value
+		ioport_value newval = m_field.m_read();
+		m_oldval = newval;
 
-	// call the callback to read a new value
-	ioport_value newval = m_field.m_read();
-	m_oldval = newval;
-
-	// merge in the bits (don't invert yet, as all digitals are inverted together)
-	result = (result & ~m_field.mask()) | ((newval << m_shift) & m_field.mask());
+		// merge in the bits (don't invert yet, as all digitals are inverted together)
+		result = (result & ~m_field.mask()) | ((newval << m_shift) & m_field.mask());
+	}
 }
 
 
@@ -3285,15 +3364,15 @@ void dynamic_field::read(ioport_value &result)
 void dynamic_field::write(ioport_value newval)
 {
 	// skip if not enabled
-	if (!m_field.enabled())
-		return;
-
-	// if the bits have changed, call the handler
-	newval = (newval & m_field.mask()) >> m_shift;
-	if (m_oldval != newval)
+	if (m_field.enabled())
 	{
-		m_field.m_write(m_field, m_field.m_write_param, m_oldval, newval);
-		m_oldval = newval;
+		// if the bits have changed, call the handler
+		newval = (newval & m_field.mask()) >> m_shift;
+		if (m_oldval != newval)
+		{
+			m_field.m_write(m_field, m_field.m_write_param, m_oldval, newval);
+			m_oldval = newval;
+		}
 	}
 }
 
@@ -3303,8 +3382,7 @@ void dynamic_field::write(ioport_value newval)
 //-------------------------------------------------
 
 analog_field::analog_field(ioport_field &field)
-	: m_next(nullptr),
-		m_field(field),
+	: m_field(field),
 		m_shift(0),
 		m_adjdefvalue(field.defvalue() & field.mask()),
 		m_adjmin(field.minval() & field.mask()),

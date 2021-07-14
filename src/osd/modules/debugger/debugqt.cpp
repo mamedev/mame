@@ -79,21 +79,17 @@ MainWindow *mainQtWindow = nullptr;
 std::vector<std::unique_ptr<WindowQtConfig> > xmlConfigurations;
 
 
-void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
+void xml_configuration_load(running_machine &machine, config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// We only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// Might not have any data
-	if (!parentnode)
+	// We only care about system configuration files
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	xmlConfigurations.clear();
 
 	// Configuration load
 	util::xml::data_node const *wnode = nullptr;
-	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
+	for (wnode = parentnode->get_child("window"); wnode; wnode = wnode->get_next_sibling("window"))
 	{
 		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
@@ -114,8 +110,8 @@ void xml_configuration_load(running_machine &machine, config_type cfg_type, util
 
 void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// We only write to game configurations
-	if (cfg_type != config_type::GAME)
+	// We only save system configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -269,8 +265,8 @@ void debug_qt::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
-			config_load_delegate(&xml_configuration_load, &machine),
-			config_save_delegate(&xml_configuration_save, &machine));
+			configuration_manager::load_delegate(&xml_configuration_load, &machine),
+			configuration_manager::save_delegate(&xml_configuration_save, &machine));
 }
 
 

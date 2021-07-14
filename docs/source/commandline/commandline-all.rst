@@ -32,7 +32,6 @@ patterns to avoid having your shell try to expand them against filenames (e.g.
 
 .. _mame-commandline-paths:
 
-
 File Names and Directory Paths
 ------------------------------
 
@@ -1087,7 +1086,7 @@ Core Search Path Options
 
 .. _mame-commandline-artpath:
 
-**-artpath** *<path>* *<path>*
+**-artpath** *<path>*
 
     Specifies one or more paths within which to find external layout and artwork
     files.  Multiple paths can be specified by separating them with semicolons.
@@ -1104,8 +1103,9 @@ Core Search Path Options
 
 **-ctrlrpath** *<path>*
 
-    Specifies one or more paths within which to find default input configuration
+    Specifies one or more paths within which to find controller configuration
     files.  Multiple paths can be specified by separating them with semicolons.
+    Used in conjunction with the ``-ctrlr`` option.
 
     The default is ``ctrlr`` (that is, a directory ``ctrlr`` in the current
     working directory).
@@ -2942,11 +2942,13 @@ Core Input Options
 
 **-ctrlr** *<controller>*
 
-    Enables support for special controllers. Configuration files are loaded from
-    the ctrlrpath.  They are in the same format as the .cfg files that are
-    saved, but only control configuration data is read from the file.
+    Specifies a controller configuration file, typically used to set more
+    suitable default input assignments for special controllers. Directories
+    specified using the ``ctrlrpath`` option are searched.  Controller
+    configuration files use a similar format to ``.cfg`` used to save system
+    settings. See :ref:`ctrlrcfg` for more details.
 
-    The default is ``NULL`` (no controller file).
+    The default is ``NULL`` (no controller configuration file).
 
     Example:
         .. code-block:: bash

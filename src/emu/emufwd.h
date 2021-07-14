@@ -69,7 +69,8 @@ class address_map_entry;
 class bookkeeping_manager;
 
 // declared in config.h
-enum class config_type;
+enum class config_type : int;
+enum class config_level : int;
 class configuration_manager;
 
 // declared in crsshair.h

@@ -4659,7 +4659,7 @@ void layout_view::item::resolve_tags()
 		if (m_input_port)
 		{
 			// if there's a matching unconditional field, cache it
-			for (ioport_field &field : m_input_port->fields())
+			for (ioport_field const &field : m_input_port->fields())
 			{
 				if (field.mask() & m_input_mask)
 				{
