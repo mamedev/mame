@@ -85,6 +85,12 @@ private:
 	// devices
 	required_device<m68010_device> m_cpu;
 	required_device<ram_device> m_ram;
+
+	u8 m_reg_sel;
+
+	void reg_sel_w(u8 data);
+	u8 reg_r();
+	void reg_w(u8 data);
 };
 
 void sx1000_state::machine_start()
@@ -105,7 +111,26 @@ void sx1000_state::cpu_map(address_map &map)
 
 	map(0xf00000, 0xf07fff).rom().region("eprom", 0x8000);
 	map(0xf08000, 0xf0ffff).rom().region("eprom", 0x0000);
+	map(0xf13801, 0xf13801).w(FUNC(sx1000_state::reg_sel_w));
+	map(0xf13901, 0xf13901).rw(FUNC(sx1000_state::reg_r), FUNC(sx1000_state::reg_w));
+	
 	map(0xf20000, 0xf23fff).ram();                         // Likely nvram
+}
+	
+void sx1000_state::reg_sel_w(u8 data)
+{
+	m_reg_sel = data;
+}
+	
+void sx1000_state::reg_w(u8 data)
+{
+	logerror("reg[%02x] = %02x (%s)\n", m_reg_sel, data, machine().describe_context());
+}
+	
+u8 sx1000_state::reg_r()
+{
+	logerror("reg read %02x (%s)\n", m_reg_sel, machine().describe_context());
+	return 0x00;
 }
 
 void sx1000_state::common(machine_config &config)
