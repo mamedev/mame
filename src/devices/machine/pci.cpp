@@ -7,27 +7,27 @@ DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual roo
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
 
 
-void pci_device::pci_config_map(address_map &map)
+void device_pci_interface::pci_config_map(address_map &map)
 {
-	map(0x00, 0x01).r(FUNC(pci_device::pci_vendor_r));
-	map(0x02, 0x03).r(FUNC(pci_device::pci_device_r));
-	map(0x04, 0x05).rw(FUNC(pci_device::pci_command_r), FUNC(pci_device::pci_command_w));
-	map(0x06, 0x07).r(FUNC(pci_device::pci_status_r));
-	map(0x08, 0x0b).r(FUNC(pci_device::pci_class_rev_r));
-	map(0x0c, 0x0c).r(FUNC(pci_device::pci_cache_line_size_r));
-	map(0x0d, 0x0d).r(FUNC(pci_device::pci_latency_timer_r));
-	map(0x0e, 0x0e).r(FUNC(pci_device::pci_header_type_r));
-	map(0x0f, 0x0f).r(FUNC(pci_device::pci_bist_r));
+	map(0x00, 0x01).r(FUNC(device_pci_interface::pci_vendor_r));
+	map(0x02, 0x03).r(FUNC(device_pci_interface::pci_device_r));
+	map(0x04, 0x05).rw(FUNC(device_pci_interface::pci_command_r), FUNC(device_pci_interface::pci_command_w));
+	map(0x06, 0x07).r(FUNC(device_pci_interface::pci_status_r));
+	map(0x08, 0x0b).r(FUNC(device_pci_interface::pci_class_rev_r));
+	map(0x0c, 0x0c).r(FUNC(device_pci_interface::pci_cache_line_size_r));
+	map(0x0d, 0x0d).r(FUNC(device_pci_interface::pci_latency_timer_r));
+	map(0x0e, 0x0e).r(FUNC(device_pci_interface::pci_header_type_r));
+	map(0x0f, 0x0f).r(FUNC(device_pci_interface::pci_bist_r));
 	map(0x0c, 0x0f).nopw();
-	map(0x10, 0x27).rw(FUNC(pci_device::pci_address_base_r), FUNC(pci_device::pci_address_base_w));
+	map(0x10, 0x27).rw(FUNC(device_pci_interface::pci_address_base_r), FUNC(device_pci_interface::pci_address_base_w));
 	// Cardbus CIS pointer at 28
-	map(0x2c, 0x2d).r(FUNC(pci_device::pci_subvendor_r));
-	map(0x2e, 0x2f).r(FUNC(pci_device::pci_subsystem_r));
+	map(0x2c, 0x2d).r(FUNC(device_pci_interface::pci_subvendor_r));
+	map(0x2e, 0x2f).r(FUNC(device_pci_interface::pci_subsystem_r));
 	map(0x2c, 0x2f).nopw();
-	map(0x30, 0x33).rw(FUNC(pci_device::pci_expansion_base_r), FUNC(pci_device::pci_expansion_base_w));
-	map(0x34, 0x34).r(FUNC(pci_device::pci_capptr_r));
-	map(0x3c, 0x3c).rw(FUNC(pci_device::pci_interrupt_line_r), FUNC(pci_device::pci_interrupt_line_w));
-	map(0x3d, 0x3d).rw(FUNC(pci_device::pci_interrupt_pin_r), FUNC(pci_device::pci_interrupt_pin_w));
+	map(0x30, 0x33).rw(FUNC(device_pci_interface::pci_expansion_base_r), FUNC(device_pci_interface::pci_expansion_base_w));
+	map(0x34, 0x34).r(FUNC(device_pci_interface::pci_capptr_r));
+	map(0x3c, 0x3c).rw(FUNC(device_pci_interface::pci_interrupt_line_r), FUNC(device_pci_interface::pci_interrupt_line_w));
+	map(0x3d, 0x3d).rw(FUNC(device_pci_interface::pci_interrupt_pin_r), FUNC(device_pci_interface::pci_interrupt_pin_w));
 }
 
 void pci_bridge_device::pci_config_map(address_map &map)
@@ -66,6 +66,16 @@ void pci_bridge_device::pci_config_map(address_map &map)
 
 pci_device::pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_pci_interface(mconfig, *this)
+{
+}
+
+void pci_device::device_start()
+{
+}
+
+device_pci_interface::device_pci_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "pci")
 	, m_pci_region(*this, DEVICE_SELF)
 {
 	m_pci_main_id = 0xffffffff;
@@ -87,7 +97,7 @@ pci_device::pci_device(const machine_config &mconfig, device_type type, const ch
 	}
 }
 
-void pci_device::pci_set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
+void device_pci_interface::pci_set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pclass, uint32_t _subsystem_id)
 {
 	m_pci_main_id = _main_id;
 	m_pci_revision = _revision;
@@ -95,7 +105,7 @@ void pci_device::pci_set_ids(uint32_t _main_id, uint8_t _revision, uint32_t _pcl
 	m_pci_subsystem_id = _subsystem_id;
 }
 
-void pci_device::device_start()
+void device_pci_interface::interface_pre_start()
 {
 	m_pci_command = 0x0080;
 	m_pci_command_mask = 0x01bf;
@@ -104,33 +114,33 @@ void pci_device::device_start()
 	m_pci_bank_count = 0;
 	m_pci_bank_reg_count = 0;
 
-	save_item(STRUCT_MEMBER(m_pci_bank_info, adr));
-	save_item(NAME(m_pci_command));
-	save_item(NAME(m_pci_command_mask));
-	save_item(NAME(m_pci_status));
-	save_item(NAME(m_pci_intr_line));
-	save_item(NAME(m_pci_intr_pin));
+	device().save_item(STRUCT_MEMBER(m_pci_bank_info, adr));
+	device().save_item(NAME(m_pci_command));
+	device().save_item(NAME(m_pci_command_mask));
+	device().save_item(NAME(m_pci_status));
+	device().save_item(NAME(m_pci_intr_line));
+	device().save_item(NAME(m_pci_intr_pin));
 }
 
-void pci_device::device_reset()
+void device_pci_interface::interface_pre_reset()
 {
 }
 
 template<int N>
-uint32_t pci_device::pci_unmapped_r(offs_t offset, uint32_t mem_mask)
+uint32_t device_pci_interface::pci_unmapped_r(offs_t offset, uint32_t mem_mask)
 {
-	logerror("%s: unmapped read from %08x & %08x (%s)\n", machine().describe_context(), offset*4, mem_mask, m_pci_bank_info[N].map.name());
+	device().logerror("%s: unmapped read from %08x & %08x (%s)\n", device().machine().describe_context(), offset*4, mem_mask, m_pci_bank_info[N].map.name());
 	return 0;
 }
 
 template<int N>
-void pci_device::pci_unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void device_pci_interface::pci_unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	logerror("%s: unmapped write to %08x = %08x & %08x (%s)\n", machine().describe_context(), offset*4, data, mem_mask, m_pci_bank_info[N].map.name());
+	device().logerror("%s: unmapped write to %08x = %08x & %08x (%s)\n", device().machine().describe_context(), offset*4, data, mem_mask, m_pci_bank_info[N].map.name());
 }
 
 
-uint32_t pci_device::pci_address_base_r(offs_t offset)
+uint32_t device_pci_interface::pci_address_base_r(offs_t offset)
 {
 	if(m_pci_bank_reg_info[offset].bank == -1)
 		return 0;
@@ -141,10 +151,10 @@ uint32_t pci_device::pci_address_base_r(offs_t offset)
 	return (m_pci_bank_info[bid].adr & ~(m_pci_bank_info[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
 }
 
-void pci_device::pci_address_base_w(offs_t offset, uint32_t data)
+void device_pci_interface::pci_address_base_w(offs_t offset, uint32_t data)
 {
 	if(m_pci_bank_reg_info[offset].bank == -1) {
-		logerror("write to address base (%d, %08x) not linked to any bank\n", offset, data);
+		device().logerror("write to address base (%d, %08x) not linked to any bank\n", offset, data);
 		return;
 	}
 
@@ -157,84 +167,84 @@ void pci_device::pci_address_base_w(offs_t offset, uint32_t data)
 	m_pci_remap_cb();
 }
 
-uint16_t pci_device::pci_vendor_r()
+uint16_t device_pci_interface::pci_vendor_r()
 {
 	return m_pci_main_id >> 16;
 }
 
-uint16_t pci_device::pci_device_r()
+uint16_t device_pci_interface::pci_device_r()
 {
 	return m_pci_main_id;
 }
 
-uint16_t pci_device::pci_command_r()
+uint16_t device_pci_interface::pci_command_r()
 {
 	return m_pci_command;
 }
 
-void pci_device::pci_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void device_pci_interface::pci_command_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_pci_command;
 
 	mem_mask &= m_pci_command_mask;
 	COMBINE_DATA(&m_pci_command);
-	logerror("command = %04x\n", m_pci_command);
+	device().logerror("command = %04x\n", m_pci_command);
 	if ((old ^ m_pci_command) & 3)
 		m_pci_remap_cb();
 }
 
-uint16_t pci_device::pci_status_r()
+uint16_t device_pci_interface::pci_status_r()
 {
 	return m_pci_status;
 }
 
-uint32_t pci_device::pci_class_rev_r()
+uint32_t device_pci_interface::pci_class_rev_r()
 {
 	return (m_pci_pclass << 8) | m_pci_revision;
 }
 
-uint8_t pci_device::pci_cache_line_size_r()
+uint8_t device_pci_interface::pci_cache_line_size_r()
 {
 	return 0x00;
 }
 
-uint8_t pci_device::pci_latency_timer_r()
+uint8_t device_pci_interface::pci_latency_timer_r()
 {
 	return 0x00;
 }
 
-void pci_device::pci_set_multifunction_device(bool enable)
+void device_pci_interface::pci_set_multifunction_device(bool enable)
 {
 	m_pci_is_multifunction_device = enable;
 }
 
-uint8_t pci_device::pci_header_type_r()
+uint8_t device_pci_interface::pci_header_type_r()
 {
 	return m_pci_is_multifunction_device ? 0x80 : 0x00;
 }
 
-uint8_t pci_device::pci_bist_r()
+uint8_t device_pci_interface::pci_bist_r()
 {
 	return 0x00;
 }
 
-uint16_t pci_device::pci_subvendor_r()
+uint16_t device_pci_interface::pci_subvendor_r()
 {
 	return m_pci_subsystem_id >> 16;
 }
 
-uint16_t pci_device::pci_subsystem_r()
+uint16_t device_pci_interface::pci_subsystem_r()
 {
 	return m_pci_subsystem_id;
 }
 
-uint32_t pci_device::pci_expansion_base_r()
+uint32_t device_pci_interface::pci_expansion_base_r()
 {
 	return m_pci_expansion_rom_base;
 }
 
 
-void pci_device::pci_expansion_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void device_pci_interface::pci_expansion_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pci_expansion_rom_base);
 	if(!m_pci_expansion_rom_size)
@@ -246,45 +256,45 @@ void pci_device::pci_expansion_base_w(offs_t offset, uint32_t data, uint32_t mem
 	m_pci_remap_cb();
 }
 
-uint8_t pci_device::pci_capptr_r()
+uint8_t device_pci_interface::pci_capptr_r()
 {
 	return 0x00;
 }
 
-uint8_t pci_device::pci_interrupt_line_r()
+uint8_t device_pci_interface::pci_interrupt_line_r()
 {
-	logerror("interrupt_line_r = %02x\n", m_pci_intr_line);
+	device().logerror("interrupt_line_r = %02x\n", m_pci_intr_line);
 	return m_pci_intr_line;
 }
 
-void pci_device::pci_interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void device_pci_interface::pci_interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pci_intr_line);
-	logerror("interrupt_line_w %02x\n", data);
+	device().logerror("interrupt_line_w %02x\n", data);
 }
 
-uint8_t pci_device::pci_interrupt_pin_r()
+uint8_t device_pci_interface::pci_interrupt_pin_r()
 {
-	logerror("interrupt_pin_r = %02x\n", m_pci_intr_pin);
+	device().logerror("interrupt_pin_r = %02x\n", m_pci_intr_pin);
 	return m_pci_intr_pin;
 }
 
-void pci_device::pci_interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void device_pci_interface::pci_interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&m_pci_intr_pin);
-	logerror("interrupt_pin_w = %02x\n", data);
+	device().logerror("interrupt_pin_w = %02x\n", data);
 }
 
-void pci_device::pci_set_remap_cb(pci_mapper_cb _remap_cb)
+void device_pci_interface::pci_set_remap_cb(pci_mapper_cb _remap_cb)
 {
 	m_pci_remap_cb = _remap_cb;
 }
 
-void pci_device::pci_reset_all_mappings()
+void device_pci_interface::pci_reset_all_mappings()
 {
 }
 
-void pci_device::pci_map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void device_pci_interface::pci_map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	for(int i=0; i<m_pci_bank_count; i++) {
@@ -313,23 +323,23 @@ void pci_device::pci_map_device(uint64_t memory_window_start, uint64_t memory_wi
 		}
 		uint64_t end = start + bi.size-1;
 		switch(i) {
-		case 0: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<0>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<0>))); break;
-		case 1: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<1>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<1>))); break;
-		case 2: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<2>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<2>))); break;
-		case 3: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<3>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<3>))); break;
-		case 4: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<4>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<4>))); break;
-		case 5: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(pci_device::pci_unmapped_r<5>)), write32s_delegate(*this, FUNC(pci_device::pci_unmapped_w<5>))); break;
+		case 0: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<0>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<0>))); break;
+		case 1: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<1>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<1>))); break;
+		case 2: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<2>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<2>))); break;
+		case 3: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<3>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<3>))); break;
+		case 4: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<4>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<4>))); break;
+		case 5: space->install_readwrite_handler(start, end, read32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_r<5>)), write32s_delegate(*this, FUNC(device_pci_interface::pci_unmapped_w<5>))); break;
 		}
 
 		space->install_device_delegate(start, end, *bi.device, bi.map);
-		logerror("map %s at %0*x-%0*x\n", bi.map.name(), bi.flags & M_IO ? 4 : 8, uint32_t(start), bi.flags & M_IO ? 4 : 8, uint32_t(end));
+		device().logerror("map %s at %0*x-%0*x\n", bi.map.name(), bi.flags & M_IO ? 4 : 8, uint32_t(start), bi.flags & M_IO ? 4 : 8, uint32_t(end));
 	}
 
 	pci_map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
 				io_window_start, io_window_end, io_offset, io_space);
 
 	if(m_pci_expansion_rom_base & 1) {
-		logerror("map expansion rom at %08x-%08x\n", m_pci_expansion_rom_base & ~1, (m_pci_expansion_rom_base & ~1) + m_pci_expansion_rom_size - 1);
+		device().logerror("map expansion rom at %08x-%08x\n", m_pci_expansion_rom_base & ~1, (m_pci_expansion_rom_base & ~1) + m_pci_expansion_rom_size - 1);
 		uint32_t start = (m_pci_expansion_rom_base & ~1) + memory_offset;
 		uint32_t end = start + m_pci_expansion_rom_size - 1;
 		if(end > memory_window_end)
@@ -338,29 +348,29 @@ void pci_device::pci_map_device(uint64_t memory_window_start, uint64_t memory_wi
 	}
 }
 
-void pci_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void device_pci_interface::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 }
 
-void pci_device::pci_map_config(uint8_t device, address_space *config_space)
+void device_pci_interface::pci_map_config(uint8_t device, address_space *config_space)
 {
-	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &pci_device::pci_config_map);
+	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &device_pci_interface::pci_config_map);
 }
 
-void pci_device::pci_skip_map_regs(int count)
+void device_pci_interface::pci_skip_map_regs(int count)
 {
 	m_pci_bank_reg_count += count;
 	assert(m_pci_bank_reg_count <= 6);
 }
 
-void pci_device::pci_add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to)
+void device_pci_interface::pci_add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to)
 {
 	assert(m_pci_bank_count < 6);
 	assert((size & 3) == 0);
 	int bid = m_pci_bank_count++;
 	m_pci_bank_info[bid].map = map;
-	m_pci_bank_info[bid].device = relative_to ? relative_to : this;
+	m_pci_bank_info[bid].device = relative_to ? relative_to : &device();
 	m_pci_bank_info[bid].adr = 0;
 	m_pci_bank_info[bid].size = size;
 	m_pci_bank_info[bid].flags = flags;
@@ -380,34 +390,34 @@ void pci_device::pci_add_map(uint64_t size, int flags, const address_map_constru
 		m_pci_bank_reg_info[breg].hi = 0;
 	}
 
-	logerror("Device %s (%s) has 0x%x bytes of %s named %s\n", tag(), name(), size, flags & M_IO ? "io" : "memory", m_pci_bank_info[bid].map.name());
+	device().logerror("Device %s (%s) has 0x%x bytes of %s named %s\n", device().tag(), device().name(), size, flags & M_IO ? "io" : "memory", m_pci_bank_info[bid].map.name());
 }
 
-void pci_device::pci_add_rom(const uint8_t *rom, uint32_t size)
+void device_pci_interface::pci_add_rom(const uint8_t *rom, uint32_t size)
 {
 	m_pci_expansion_rom = rom;
 	m_pci_expansion_rom_size = size;
-	logerror("Device %s (%s) has 0x%x bytes of expansion rom\n", tag(), name(), size);
+	device().logerror("Device %s (%s) has 0x%x bytes of expansion rom\n", device().tag(), device().name(), size);
 }
 
-void pci_device::pci_add_rom_from_region()
+void device_pci_interface::pci_add_rom_from_region()
 {
 	pci_add_rom(m_pci_region->base(), m_pci_region->bytes());
 }
 
-void pci_device::pci_set_map_address(int id, uint64_t adr)
+void device_pci_interface::pci_set_map_address(int id, uint64_t adr)
 {
 	m_pci_bank_info[id].adr = adr;
 	m_pci_remap_cb();
 }
 
-void pci_device::pci_set_map_size(int id, uint64_t size)
+void device_pci_interface::pci_set_map_size(int id, uint64_t size)
 {
 	m_pci_bank_info[id].size = size;
 	m_pci_remap_cb();
 }
 
-void pci_device::pci_set_map_flags(int id, int flags)
+void device_pci_interface::pci_set_map_flags(int id, int flags)
 {
 	m_pci_bank_info[id].flags = flags;
 	m_pci_remap_cb();

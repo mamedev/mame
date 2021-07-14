@@ -6,7 +6,8 @@
 #pragma once
 
 
-class pci_device : public device_t {
+class device_pci_interface : public device_interface
+{
 public:
 	typedef delegate<void ()> pci_mapper_cb;
 
@@ -58,7 +59,7 @@ public:
 	void pci_interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
-	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	device_pci_interface(const machine_config &mconfig, device_t &device);
 
 	optional_memory_region m_pci_region;
 
@@ -98,8 +99,8 @@ protected:
 	bool m_pci_is_multifunction_device;
 	uint8_t m_pci_intr_line, m_pci_intr_pin;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual void interface_pre_start() override;
+	virtual void interface_pre_reset() override;
 
 	void pci_skip_map_regs(int count);
 	void pci_add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
@@ -119,6 +120,15 @@ protected:
 	void pci_set_map_size(int id, uint64_t size);
 	void pci_set_map_flags(int id, int flags);
 };
+
+class pci_device : public device_t, public device_pci_interface
+{
+protected:
+	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+};
+
 
 class agp_device : public pci_device {
 protected:
