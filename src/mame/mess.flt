@@ -1008,6 +1008,7 @@ swtpc.cpp
 swtpc09.cpp
 swtpc8212.cpp
 swyft.cpp
+sx1000.cpp
 sym1.cpp
 symbolics.cpp
 synthex.cpp

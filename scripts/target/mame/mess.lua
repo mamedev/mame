@@ -2023,6 +2023,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv2000.cpp",
 	MAME_DIR .. "src/mame/drivers/sk1.cpp",
+	MAME_DIR .. "src/mame/drivers/sx1000.cpp",
 	MAME_DIR .. "src/mame/drivers/rz1.cpp",
 	MAME_DIR .. "src/mame/drivers/casio_rompack.cpp",
 }

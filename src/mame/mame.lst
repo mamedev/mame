@@ -39784,6 +39784,9 @@ swtpc8212                       // Terminal
 @source:swyft.cpp
 swyft                           //
 
+@source:sx1000.cpp
+sx1010                          // Casio SX1010
+
 @source:sym1.cpp
 sym1                            // Synertek SYM-1
 
