@@ -101,6 +101,8 @@ private:
 
 	required_device<screen_device> m_screen;
 	required_device<hd6345_device> m_crtc;
+
+	u16 f14000_r();
 };
 
 void sx1000_state::machine_start()
@@ -123,10 +125,24 @@ void sx1000_state::cpu_map(address_map &map)
 	map(0xf13801, 0xf13801).w(m_crtc, FUNC(hd6345_device::address_w));
 	map(0xf13901, 0xf13901).rw(m_crtc, FUNC(hd6345_device::register_r), FUNC(hd6345_device::register_w));
 
+	// reads of f14000.w don't entirely pan out as pic, let's cheat a little
 	map(0xf14001, 0xf14001).lrw8([this]() { return m_pic->read(0); }, "pic_r0", [this](u8 data) { m_pic->write(0, data); }, "pic_w0");
 	map(0xf14101, 0xf14101).lrw8([this]() { return m_pic->read(1); }, "pic_r1", [this](u8 data) { m_pic->write(1, data); }, "pic_w1");
 
+	map(0xf14000, 0xf14001).r(FUNC(sx1000_state::f14000_r));
+
 	map(0xf20000, 0xf23fff).ram().share(m_vram);
+}
+
+u16 sx1000_state::f14000_r()
+{
+	u8 res = 0x00;
+	// 0x02 triggers special behaviour
+
+	if(m_crtc->vsync_r())
+		res |= 0x20;
+
+	return res;
 }
 
 MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
