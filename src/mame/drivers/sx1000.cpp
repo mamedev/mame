@@ -162,7 +162,7 @@ void sx1000_state::common(machine_config &config)
 	PIC8259(config, m_pic);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(48'800'000 / 2, 80*8, 0, 80*8, 25*16, 0, 25*16);
+	m_screen->set_raw(48'800'000, 80*16, 0, 80*16, 25*16, 0, 25*16);
 	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 
 	// htotal = 117
