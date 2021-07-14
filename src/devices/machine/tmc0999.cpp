@@ -57,7 +57,8 @@ void tmc0999_device::di_w(u8 data)
 
 u8 tmc0999_device::do_r()
 {
-	return m_rd ? m_ram[m_ram_address] : 0;
+	u8 data = m_rd ? m_ram[m_ram_address] : 0;
+	return data & 0xf;
 }
 
 void tmc0999_device::wr_w(int state)
