@@ -207,6 +207,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
+	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
 	{ "09034a",           BTL_09034A },
 	{ "batmanfs",         BTL_BATMANFS },

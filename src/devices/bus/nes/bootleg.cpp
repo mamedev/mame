@@ -13,6 +13,9 @@
 
  TODO:
  - review all PCBs and fix the starting banks (which are often the main problem of not working games)
+ - SMB2 bootlegs all seem to have timing issues. This is apparent on worlds A-D as the bottom of the
+   world letter scrolls. Hardware footage of the mapper 50 version shows the letter bottoms flickering
+   (though it could be a video/compression artifact).
 
  ***********************************************************************************************************/
 
@@ -65,6 +68,7 @@ DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "N
 DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "NES Cart Super Mario Bros. Malee 2 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
+DEFINE_DEVICE_TYPE(NES_YUNG08,         nes_yung08_device,    "nes_yung08",    "NES Cart Super Mario Bros. 2 YUNG-08 PCB")
 
 
 nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -209,6 +213,11 @@ nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const ch
 
 nes_rt01_device::nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_RT01, tag, owner, clock)
+{
+}
+
+nes_yung08_device::nes_yung08_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_YUNG08, tag, owner, clock), m_irq_count(0), m_irq_latch(0), irq_timer(nullptr)
 {
 }
 
@@ -648,7 +657,6 @@ void nes_shuiguan_device::pcb_reset()
 	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
 }
 
-
 void nes_rt01_device::device_start()
 {
 	common_start();
@@ -662,6 +670,28 @@ void nes_rt01_device::pcb_reset()
 	chr2_6(0, CHRROM);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_yung08_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
+}
+
+void nes_yung08_device::pcb_reset()
+{
+	prg8_89(1);
+	prg8_ab(0);
+	prg8_cd(0);    // switchable bank
+	prg8_ef(8);
+	chr8(0, CHRROM);
+
+	m_irq_count = 0;
+	m_irq_latch = 0;
 }
 
 
@@ -2021,7 +2051,6 @@ uint8_t nes_shuiguan_device::read_m(offs_t offset)
 	return m_prg[offset & 0x1fff];
 }
 
-
 /*-------------------------------------------------
 
  RT-01
@@ -2048,4 +2077,74 @@ uint8_t nes_rt01_device::read_h(offs_t offset)
 		return 0xf2 | (machine().rand() & 0x0d);
 
 	return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
+ YUNG-08
+
+ Games: Super Mario Bros. 2 Pirate (YUNG-08)
+
+ NES 2.0: mapper 368
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_yung08_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (BIT(m_irq_latch, 0))
+		{
+			m_irq_count = (m_irq_count + 1) & 0x0fff;
+			if (!m_irq_count)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_yung08_device::write_45(offs_t offset, u8 data)
+{
+	switch (offset & 0x51ff)
+	{
+		case 0x4022:
+			prg8_cd(data & 1 ? 3 : 4 + ((data & 0x07) >> 1));
+			break;
+		case 0x4122:
+			m_irq_latch = data & 0x35;
+			if (!BIT(m_irq_latch, 0))
+			{
+				set_irq_line(CLEAR_LINE);
+				m_irq_count = 0;
+			}
+			break;
+	}
+}
+
+void nes_yung08_device::write_ex(offs_t offset, u8 data)
+{
+	LOG_MMC(("yung08 write_ex, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4020, data);
+}
+
+void nes_yung08_device::write_l(offs_t offset, u8 data)
+{
+	LOG_MMC(("yung08 write_l, offset: %04x, data: %02x\n", offset, data));
+	write_45(offset + 0x4100, data);
+}
+
+u8 nes_yung08_device::read_l(offs_t offset)
+{
+	LOG_MMC(("yung08 read_l, offset: %04x\n", offset));
+	offset += 0x100;
+	if ((offset & 0x11ff) == 0x0122)    // 0x4122
+		return m_irq_latch | 0x8a;
+	return get_open_bus();
+}
+
+u8 nes_yung08_device::read_m(offs_t offset)
+{
+	LOG_MMC(("yung08 read_m, offset: %04x\n", offset));
+	return m_prg[0x02 * 0x2000 + offset];    // fixed to bank #2
 }
