@@ -46,6 +46,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
 
 // video
 #include "screen.h"
@@ -74,6 +75,9 @@ public:
 		, m_pic(*this, "pic")
 		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
+		, m_serial1(*this, "i8251_1")
+		, m_serial2(*this, "i8251_2")
+		, m_sw2(*this, "SW2")
 	{
 	}
 
@@ -101,7 +105,10 @@ private:
 
 	required_device<screen_device> m_screen;
 	required_device<hd6345_device> m_crtc;
+	required_device<i8251_device>  m_serial1;
+	required_device<i8251_device>  m_serial2;
 
+	required_ioport m_sw2;
 	u16 f14000_r();
 };
 
@@ -121,7 +128,16 @@ void sx1000_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region(m_eprom, 0); // FIXME: probably mapped/unmapped during reset
 
+	map(0x1fe000, 0x1fffff).ram();
+
+	map(0xa00000, 0xbfffff).ram(); // Banking on f00000 writes, if it makes any sense? Would provide up to 32M of ram, bank is 4 bits
+
 	map(0xf00000, 0xf0ffff).rom().region(m_eprom, 0);
+
+	map(0xf11001, 0xf11001).rw(m_serial1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf11003, 0xf11003).rw(m_serial1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf11004, 0xf11005).lr16(NAME([this]() { return m_serial1->txrdy_r() ? 2 : 0; }));
+
 	map(0xf13801, 0xf13801).w(m_crtc, FUNC(hd6345_device::address_w));
 	map(0xf13901, 0xf13901).rw(m_crtc, FUNC(hd6345_device::register_r), FUNC(hd6345_device::register_w));
 
@@ -131,13 +147,16 @@ void sx1000_state::cpu_map(address_map &map)
 
 	map(0xf14000, 0xf14001).r(FUNC(sx1000_state::f14000_r));
 
+	map(0xf1a001, 0xf1a001).rw(m_serial2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf1a003, 0xf1a003).rw(m_serial2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf1a004, 0xf1a005).lr16(NAME([this]() { return m_serial2->txrdy_r() ? 2 : 0; }));
+
 	map(0xf20000, 0xf23fff).ram().share(m_vram);
 }
 
 u16 sx1000_state::f14000_r()
 {
-	u8 res = 0x00;
-	// 0x02 triggers special behaviour
+	u8 res = m_sw2->read();
 
 	if(m_crtc->vsync_r())
 		res |= 0x20;
@@ -163,6 +182,22 @@ MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
 		}
 	}
 }
+
+static DEVICE_INPUT_DEFAULTS_START( terminal1 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( terminal2 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
+DEVICE_INPUT_DEFAULTS_END
 
 void sx1000_state::common(machine_config &config)
 {
@@ -191,6 +226,32 @@ void sx1000_state::common(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 	m_crtc->set_hpixels_per_column(16);
+
+	auto &rs232_1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
+	rs232_1.rxd_handler().set(m_serial1, FUNC(i8251_device::write_rxd));
+	rs232_1.dsr_handler().set(m_serial1, FUNC(i8251_device::write_dsr));
+	rs232_1.cts_handler().set(m_serial1, FUNC(i8251_device::write_cts));
+	rs232_1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal1));
+
+	I8251(config, m_serial1, 4'000'000);
+	m_serial1->txd_handler().set(rs232_1, FUNC(rs232_port_device::write_txd));
+	m_serial1->dtr_handler().set(rs232_1, FUNC(rs232_port_device::write_dtr));
+	m_serial1->rts_handler().set(rs232_1, FUNC(rs232_port_device::write_rts));
+
+	CLOCK(config, "clock1", 19200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
+
+	auto &rs232_2(RS232_PORT(config, "serial2", default_rs232_devices, nullptr));
+	rs232_2.rxd_handler().set(m_serial2, FUNC(i8251_device::write_rxd));
+	rs232_2.dsr_handler().set(m_serial2, FUNC(i8251_device::write_dsr));
+	rs232_2.cts_handler().set(m_serial2, FUNC(i8251_device::write_cts));
+	rs232_2.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal2));
+
+	I8251(config, m_serial2, 4'000'000);
+	m_serial2->txd_handler().set(rs232_2, FUNC(rs232_port_device::write_txd));
+	m_serial2->dtr_handler().set(rs232_2, FUNC(rs232_port_device::write_dtr));
+	m_serial2->rts_handler().set(rs232_2, FUNC(rs232_port_device::write_rts));
+
+	CLOCK(config, "clock2", 19200*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
 }
 
 void sx1000_state::sx1010(machine_config &config)
@@ -199,6 +260,10 @@ void sx1000_state::sx1010(machine_config &config)
 }
 
 static INPUT_PORTS_START(sx1010)
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x02, 0x00, "Serial console" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x02, "On" )
 INPUT_PORTS_END
 
 ROM_START(sx1010)
