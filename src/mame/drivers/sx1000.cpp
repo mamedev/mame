@@ -101,9 +101,9 @@ void sx1000_state::init_common()
 
 void sx1000_state::cpu_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom().region("eprom", 0); // FIXME: probably mapped/unmapped during reset
+	map(0x000000, 0x007fff).rom().region("eprom", 0x8000); // FIXME: probably mapped/unmapped during reset
 
-	map(0xf00000, 0xf0ffff).rom().region("eprom", 0);
+	map(0xf00000, 0xf07fff).rom().region("eprom", 0x8000);
 }
 
 void sx1000_state::common(machine_config &config)
