@@ -757,7 +757,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="amoudan2a">
+	<software name="amoudan2">
 		<description>America Oudan Ultra Quiz Part 2 (Japan, Rev 1)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
@@ -771,7 +771,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="amoudan2" cloneof="amoudan2a">
+	<software name="amoudan2a" cloneof="amoudan2">
 		<description>America Oudan Ultra Quiz Part 2 (Japan)</description>
 		<year>1991</year>
 		<publisher>Tomy</publisher>
@@ -2740,7 +2740,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="boxxlea">
+	<software name="boxxle">
 		<!--    European release is a relabeled USA version -->
 		<description>Boxxle (Europe, USA, Rev 1)</description>
 		<year>1990</year>
@@ -2755,7 +2755,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="boxxle" cloneof="boxxlea">
+	<software name="boxxlea" cloneof="boxxle">
 		<description>Boxxle (USA)</description>
 		<year>1990</year>
 		<publisher>FCI</publisher>
@@ -3196,7 +3196,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bbros">
+	<software name="bbros" cloneof="pang">
 		<description>Buster Brothers (USA)</description>
 		<year>1993</year>
 		<publisher>Hudson Soft</publisher>
@@ -7288,7 +7288,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gargoylea">
+	<software name="gargoyle">
 		<!--    European release is a relabeled USA version -->
 		<!--    Unreleased in USA?  -->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, Rev 1)</description>
@@ -7304,7 +7304,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gargoyle">
+	<software name="gargoylea" cloneof="gargoyle">
 		<!--    European release is a relabeled USA version -->
 		<description>Gargoyle's Quest - Ghosts'n Goblins (Europe, USA)</description>
 		<year>1990</year>
@@ -9391,7 +9391,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hyperloda">
+	<software name="hyperlod">
 		<!--    Region code "A" -->
 		<description>Hyper Lode Runner (World, Rev 1)</description>
 		<year>1989</year>
@@ -9407,7 +9407,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hyperlod" cloneof="hyperloda">
+	<software name="hyperloda" cloneof="hyperlod">
 		<!--    Region code "A" -->
 		<description>Hyper Lode Runner (Japan?)</description>
 		<year>1989</year>
@@ -10087,7 +10087,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jetsonsa">
+	<software name="jetsons">
 		<description>The Jetsons - Robot Panic (USA, Rev 1)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -10100,7 +10100,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jetsons" cloneof="jetsonsa">
+	<software name="jetsonsa" cloneof="jetsons">
 		<!--    European release is a relabeled USA version -->
 		<description>The Jetsons - Robot Panic (Europe, USA)</description>
 		<year>1992</year>
@@ -10626,7 +10626,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kasekia">
+	<software name="kaseki">
 		<description>Kaseki Sousei Reborn (Japan, Rev 1)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
@@ -10643,7 +10643,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kaseki" cloneof="kasekia">
+	<software name="kasekia" cloneof="kaseki">
 		<description>Kaseki Sousei Reborn (Japan)</description>
 		<year>1998</year>
 		<publisher>Starfish</publisher>
@@ -11013,7 +11013,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kininkoa">
+	<software name="kininko">
 		<description>Kinin Koumaroku Oni (Japan, Rev 1)</description>
 		<year>1990</year>
 		<publisher>Banpresto</publisher>
@@ -11029,7 +11029,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kininko" cloneof="kininkoa">
+	<software name="kininkoa" cloneof="kininko">
 <!-- does it have the battery? -->
 		<description>Kinin Koumaroku Oni (Japan)</description>
 		<year>1990</year>
@@ -16255,7 +16255,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintima">
+	<software name="pacintim">
 		<description>Pac-In-Time (Europe, Rev 1)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -16269,7 +16269,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintimu" cloneof="pacintima">
+	<software name="pacintimu" cloneof="pacintim">
 		<description>Pac-In-Time (USA)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -16286,7 +16286,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintimj" cloneof="pacintima">
+	<software name="pacintimj" cloneof="pacintim">
 		<description>Pac-In-Time (Japan)</description>
 		<year>1995</year>
 		<publisher>Namcot</publisher>
@@ -16302,7 +16302,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pacintim" cloneof="pacintima">
+	<software name="pacintima" cloneof="pacintim">
 		<description>Pac-In-Time (Europe)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
@@ -17745,7 +17745,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="poktpuyoa">
+	<software name="poktpuyo">
 		<!-- NP only -->
 		<!--    Planned for physical release?   -->
 		<description>Pocket Puyo Puyo Tsuu (Japan, Rev 1, NP)</description>
@@ -17763,7 +17763,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="poktpuyo" cloneof="poktpuyoa">
+	<software name="poktpuyoa" cloneof="poktpuyo">
 		<description>Pocket Puyo Puyo Tsuu (Japan)</description>
 		<year>1996</year>
 		<publisher>Compile</publisher>
@@ -18673,7 +18673,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="purikuraa">
+	<software name="purikura">
 		<!-- NP only -->
 		<!--    Planned for physical release?   -->
 		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan, Rev 1, NP)</description>
@@ -18692,7 +18692,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="purikura" cloneof="purikuraa">
+	<software name="purikuraa" cloneof="purikura">
 		<!-- Notes: Also released by NP in 2000-03 -->
 		<description>Purikura Pocket - Fukanzen Joshikousei Manual (Japan)</description>
 		<year>1997</year>
@@ -19832,7 +19832,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mvpbbj" cloneof="mvpbba">
+	<software name="mvpbbj" cloneof="mvpbb">
 		<description>Roger Clemens MVP Baseball (Japan)</description>
 		<year>1993</year>
 		<publisher>Acclaim Japan</publisher>
@@ -19847,7 +19847,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mvpbba">
+	<software name="mvpbb">
 		<description>Roger Clemens' MVP Baseball (USA, Rev 1)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -19861,7 +19861,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mvpbb" cloneof="mvpbba">
+	<software name="mvpbba" cloneof="mvpbb">
 		<description>Roger Clemens' MVP Baseball (USA)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
@@ -21414,7 +21414,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sokoban" cloneof="boxxlea">
+	<software name="sokoban" cloneof="boxxle">
 		<description>Soukoban (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
@@ -23755,7 +23755,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetris2a">
+	<software name="tetris2">
 		<description>Tetris 2 (Europe, Rev 1)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -23768,7 +23768,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetris2" cloneof="tetris2a">
+	<software name="tetris2a" cloneof="tetris2">
 		<!--    USA rerelease is a relabeled European cartridge?    -->
 		<description>Tetris 2 (Europe, USA)</description>
 		<year>1994</year>
@@ -23786,7 +23786,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetris2u" cloneof="tetris2a">
+	<software name="tetris2u" cloneof="tetris2">
 		<!--    Original USA-only release   -->
 		<description>Tetris 2 (USA)</description>
 		<year>1994</year>
@@ -23842,7 +23842,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisfl" cloneof="tetris2a">
+	<software name="tetrisfl" cloneof="tetris2">
 		<description>Tetris Flash (Japan)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
