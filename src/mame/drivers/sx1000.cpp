@@ -39,6 +39,7 @@
 
 // memory
 #include "machine/ram.h"
+#include "machine/nvram.h"
 
 // various hardware
 #include "machine/i8251.h"
@@ -48,6 +49,7 @@
 
 // video
 #include "screen.h"
+#include "video/mc6845.h"
 //#include "video/hd63484.h"
 
 // busses and connectors
@@ -67,6 +69,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
+		, m_pic(*this, "pic")
+		, m_screen(*this, "screen")
+		, m_crtc(*this, "crtc")
 	{
 	}
 
@@ -82,15 +87,16 @@ protected:
 	void common(machine_config &config);
 
 private:
+	MC6845_UPDATE_ROW(crtc_update_row) {}
+
 	// devices
 	required_device<m68010_device> m_cpu;
 	required_device<ram_device> m_ram;
 
-	u8 m_reg_sel;
+	required_device<pic8259_device> m_pic;
 
-	void reg_sel_w(u8 data);
-	u8 reg_r();
-	void reg_w(u8 data);
+	required_device<screen_device> m_screen;
+	required_device<hd6345_device> m_crtc;
 };
 
 void sx1000_state::machine_start()
@@ -111,26 +117,13 @@ void sx1000_state::cpu_map(address_map &map)
 
 	map(0xf00000, 0xf07fff).rom().region("eprom", 0x8000);
 	map(0xf08000, 0xf0ffff).rom().region("eprom", 0x0000);
-	map(0xf13801, 0xf13801).w(FUNC(sx1000_state::reg_sel_w));
-	map(0xf13901, 0xf13901).rw(FUNC(sx1000_state::reg_r), FUNC(sx1000_state::reg_w));
-	
-	map(0xf20000, 0xf23fff).ram();                         // Likely nvram
-}
-	
-void sx1000_state::reg_sel_w(u8 data)
-{
-	m_reg_sel = data;
-}
-	
-void sx1000_state::reg_w(u8 data)
-{
-	logerror("reg[%02x] = %02x (%s)\n", m_reg_sel, data, machine().describe_context());
-}
-	
-u8 sx1000_state::reg_r()
-{
-	logerror("reg read %02x (%s)\n", m_reg_sel, machine().describe_context());
-	return 0x00;
+	map(0xf13801, 0xf13801).w(m_crtc, FUNC(hd6345_device::address_w));
+	map(0xf13901, 0xf13901).rw(m_crtc, FUNC(hd6345_device::register_r), FUNC(hd6345_device::register_w));
+
+	map(0xf14001, 0xf14001).lrw8([this]() { return m_pic->read(0); }, "pic_r0", [this](u8 data) { m_pic->write(0, data); }, "pic_w0");
+	map(0xf14101, 0xf14101).lrw8([this]() { return m_pic->read(1); }, "pic_r1", [this](u8 data) { m_pic->write(1, data); }, "pic_w1");
+
+	map(0xf20000, 0xf23fff).ram().share("nvram");
 }
 
 void sx1000_state::common(machine_config &config)
@@ -141,6 +134,25 @@ void sx1000_state::common(machine_config &config)
 	// 36 x D41256C-15 (256Kb DRAM) on CPU board
 	RAM(config, m_ram);
 	m_ram->set_default_size("1M");
+
+	NVRAM(config, "nvram");
+
+	PIC8259(config, m_pic);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(48'800'000, 80*16, 0, 80*16, 25*16, 0, 25*16);
+	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
+
+	// htotal = 117
+	// hdisp = 80
+	// vtotal = 26
+	// vdisp = 25
+	// mrast = 15
+	HD6345(config, m_crtc, 4'000'000);
+	m_crtc->set_screen(m_screen);
+	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
+	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	m_crtc->set_hpixels_per_column(16);
 }
 
 void sx1000_state::sx1010(machine_config &config)
