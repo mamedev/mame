@@ -50,7 +50,7 @@ TODO:
     Metal Hawk
     - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
 
-	Burning Force, Suzuka 8 Hours 2 (+ maybe others)
+	Burning Force (+ maybe others)
 	- POSIRQ is off-by-one, but adjusting it makes other cases worse
 	  (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
 
