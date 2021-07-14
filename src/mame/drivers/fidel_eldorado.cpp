@@ -103,7 +103,7 @@ u8 eldorado_state::mux_r()
 void eldorado_state::control_w(u8 data)
 {
 	// P24: speaker out
-	m_dac->write(BIT(data, 4));
+	m_dac->write(BIT(~data, 4));
 
 	// P25,P26: led select
 	m_led_select = ~data >> 5 & 3;
@@ -191,7 +191,7 @@ void eldorado_state::eldorado(machine_config &config)
 
 ROM_START( feldo )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD("100-1027a01", 0x0000, 0x0800, CRC(66419b29) SHA1(8f91e56cb3fcc9bb738946ade34d34c611e983f0) )
+	ROM_LOAD("100-1027a01", 0x0000, 0x0800, CRC(3b93b6d2) SHA1(353a741624b4c7fd74a0cf601e2e52f9914b58b8) )
 ROM_END
 
 } // anonymous namespace
