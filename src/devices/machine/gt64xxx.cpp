@@ -150,9 +150,9 @@
 DEFINE_DEVICE_TYPE(GT64010, gt64010_device, "gt64010", "Galileo GT-64010 System Controller")
 DEFINE_DEVICE_TYPE(GT64111, gt64111_device, "gt64111", "Galileo GT-64111 System Controller")
 
-void gt64xxx_device::config_map(address_map &map)
+void gt64xxx_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 }
 
 // cpu i/f map
@@ -202,7 +202,7 @@ void gt64xxx_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
-	status = 0x0;
+	m_pci_status = 0x0;
 
 	// DMA timer
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::perform_dma), this));
@@ -257,7 +257,7 @@ void gt64xxx_device::device_start()
 void gt64xxx_device::device_post_load()
 {
 	map_cpu_space();
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 void gt64xxx_device::device_reset()
@@ -410,7 +410,7 @@ void gt64xxx_device::map_cpu_space()
 	}
 }
 
-void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void gt64xxx_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	int ramIndex;
@@ -454,9 +454,9 @@ void gt64xxx_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	LOGGALILEO("map_extra RAS3 start=%08X end=%08X size=%08X\n", winStart, winEnd, winSize);
 }
 
-void gt64xxx_device::reset_all_mappings()
+void gt64xxx_device::pci_reset_all_mappings()
 {
-	pci_device::reset_all_mappings();
+	pci_device::pci_reset_all_mappings();
 }
 
 // PCI Stalling
@@ -706,7 +706,7 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 		case GREG_PCI_MEM1_HI:
 		case GREG_CS3_HI:
 			map_cpu_space();
-			remap_cb();
+			m_pci_remap_cb();
 			LOGGALILEO("%s Galileo Memory Map data write to offset %03X = %08X & %08X\n", machine().describe_context(), offset*4, data, mem_mask);
 			break;
 

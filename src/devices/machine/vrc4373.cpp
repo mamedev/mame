@@ -70,9 +70,9 @@
 
 DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Controller")
 
-void vrc4373_device::config_map(address_map &map)
+void vrc4373_device::pci_config_map(address_map &map)
 {
-	pci_bridge_device::config_map(map);
+	pci_bridge_device::pci_config_map(map);
 	map(0x40, 0x43).rw(FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
 }
 
@@ -101,7 +101,7 @@ vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, d
 	, m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32), m_pci1_laddr(0), m_pci2_laddr(0), m_pci_io_laddr(0), m_target1_laddr(0), m_target2_laddr(0)
 	, m_romRegion(*this, "rom")
 {
-	set_ids_host(0x1033005B, 0x00, 0x00000000);
+	pci_set_ids_host(0x1033005B, 0x00, 0x00000000);
 }
 
 device_memory_interface::space_config_vector vrc4373_device::memory_space_config() const
@@ -119,7 +119,7 @@ void vrc4373_device::device_start()
 	m_cpu_space = &m_cpu->space(AS_PCI_CONFIG);
 	memory_space = &space(AS_PCI_MEM);
 	io_space = &space(AS_PCI_IO);
-	is_multifunction_device = false;
+	pci_set_multifunction_device(false);
 
 	std::fill(std::begin(m_cpu_regs), std::end(m_cpu_regs), 0);
 
@@ -129,7 +129,7 @@ void vrc4373_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
-	status = 0x0280;
+	m_pci_status = 0x0280;
 
 	m_irq_cb.resolve();
 
@@ -145,7 +145,7 @@ void vrc4373_device::device_start()
 	// Nile register mapppings
 	m_cpu_space->install_device(0x0f000000, 0x0f0000ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::cpu_map);
 	// PCI Configuration also mapped at 0x0f000100
-	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::config_map);
+	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::pci_config_map);
 
 	// MIPS drc
 	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, true, m_romRegion->base());
@@ -259,7 +259,7 @@ void vrc4373_device::map_cpu_space()
 	}
 }
 
-void vrc4373_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void vrc4373_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	uint32_t winStart, winEnd, winSize;
@@ -284,9 +284,9 @@ void vrc4373_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	}
 }
 
-void vrc4373_device::reset_all_mappings()
+void vrc4373_device::pci_reset_all_mappings()
 {
-	pci_device::reset_all_mappings();
+	pci_device::pci_reset_all_mappings();
 }
 
 // PCI bus control
@@ -472,11 +472,11 @@ void vrc4373_device::cpu_if_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			break;
 		case NREG_PCITW1:
 				m_target1_laddr = 0x00000000 | ((data&0x7FF)<<21);
-				remap_cb();
+				m_pci_remap_cb();
 			break;
 		case NREG_PCITW2:
 				m_target2_laddr = 0x00000000 | ((data&0x7FF)<<21);
-				remap_cb();
+				m_pci_remap_cb();
 			break;
 		case NREG_PCICAR:
 			// Bits in reserved area are used for device selection of type 0 config transactions

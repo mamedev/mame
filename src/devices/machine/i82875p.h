@@ -15,7 +15,7 @@ public:
 	i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id, T &&cpu_tag, int ram_size)
 		: i82875p_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x80862578, 0x02, subdevice_id);
+		pci_set_ids_host(0x80862578, 0x02, subdevice_id);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
@@ -25,18 +25,18 @@ public:
 	template <typename T> void set_cpu_tag(T &&tag) { cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int ram_size);
 
-	virtual uint8_t capptr_r() override;
+	virtual uint8_t pci_capptr_r() override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void reset_all_mappings() override;
+	virtual void pci_reset_all_mappings() override;
 
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	void agp_translation_map(address_map &map);
@@ -109,7 +109,7 @@ public:
 	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
 		: i82875p_overflow_device(mconfig, tag, owner, clock)
 	{
-		set_ids(0x8086257e, 0x02, 0x088000, subdevice_id);
+		pci_set_ids(0x8086257e, 0x02, 0x088000, subdevice_id);
 	}
 	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

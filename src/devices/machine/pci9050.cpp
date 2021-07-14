@@ -43,7 +43,7 @@ pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, d
 	: pci_device(mconfig, PCI9050, tag, owner, clock)
 	, m_user_input_handler(*this), m_user_output_handler(*this)
 {
-	set_ids(0x10b59050, 0x01, 0x06800000, 0x10b59050);
+	pci_set_ids(0x10b59050, 0x01, 0x06800000, 0x10b59050);
 	for(int i=0; i<4; i++) {
 		m_devices[i] = nullptr;
 		m_names[i] = nullptr;
@@ -60,14 +60,14 @@ void pci9050_device::device_start()
 {
 	pci_device::device_start();
 
-	add_map(0x80, M_MEM, FUNC(pci9050_device::map));           // map 0 is our config registers, mem space
-	add_map(0x80, M_IO,  FUNC(pci9050_device::map));           // map 1 is our config registers, i/o space
+	pci_add_map(0x80, M_MEM, FUNC(pci9050_device::map));           // map 0 is our config registers, mem space
+	pci_add_map(0x80, M_IO,  FUNC(pci9050_device::map));           // map 1 is our config registers, i/o space
 
 	for(int i=0; i<4; i++)
 		if(!m_maps[i].isnull())
-			add_map(0, M_MEM | M_DISABLED, m_maps[i], m_devices[i]);
+			pci_add_map(0, M_MEM | M_DISABLED, m_maps[i], m_devices[i]);
 		else
-			add_map(0, M_MEM | M_DISABLED, address_map_constructor(), nullptr);
+			pci_add_map(0, M_MEM | M_DISABLED, address_map_constructor(), nullptr);
 
 	m_user_input_handler.resolve();
 	m_user_output_handler.resolve();
@@ -93,14 +93,14 @@ void pci9050_device::device_post_load()
 void pci9050_device::device_reset()
 {
 	pci_device::device_reset();
-	set_map_address(0, 0);
-	set_map_address(1, 0);
+	pci_set_map_address(0, 0);
+	pci_set_map_address(1, 0);
 	for(int i=0; i<4; i++) {
 		m_lasrr[i] = i ? 0 : 0x0ff00000;
 		m_lasba[i] = 0;
 		m_lasbrd[i] = 0x00800000;
 		m_csbase[i] = 0;
-		set_map_flags(i+2, M_MEM | M_DISABLED);
+		pci_set_map_flags(i+2, M_MEM | M_DISABLED);
 	}
 	m_eromrr = 0x07ff8000;
 	m_eromba = 0x00080000;
@@ -116,20 +116,20 @@ void pci9050_device::remap_local(int id)
 	logerror("local bus %d csbase=%08x lasrr=%08x\n", id, csbase, lasrr);
 
 	if(!(csbase & 1)) {
-		set_map_flags(id+2, M_MEM | M_DISABLED);
+		pci_set_map_flags(id+2, M_MEM | M_DISABLED);
 		return;
 	}
 	int lsize;
 	for(lsize=1; lsize<28 && !(csbase & (1<<lsize)); lsize++) {};
 	if(lsize == 28) {
-		set_map_flags(id+2, M_MEM | M_DISABLED);
+		pci_set_map_flags(id+2, M_MEM | M_DISABLED);
 		return;
 	}
 	int size = 2 << lsize;
 	// Address map is directly connected to PCI address space so post-decode mapping is not needed. (Ted Green)
 	if(0 & csbase & 0x0fffffff & ~(size-1)) {
 		logerror("PCI9050 local bus %d size=%08x csbase=%08X disabled due to unimplemented post-decode remapping\n", id, size, csbase);
-		set_map_flags(id+2, M_MEM | M_DISABLED);
+		pci_set_map_flags(id+2, M_MEM | M_DISABLED);
 		return;
 	}
 
@@ -145,8 +145,8 @@ void pci9050_device::remap_local(int id)
 		//      return;
 	}
 
-	set_map_size(id+2, size);
-	set_map_flags(id+2, lasrr & 1 ? M_IO : lasrr & 8 ? M_MEM | M_PREF : M_MEM);
+	pci_set_map_size(id+2, size);
+	pci_set_map_flags(id+2, lasrr & 1 ? M_IO : lasrr & 8 ? M_MEM | M_PREF : M_MEM);
 }
 
 void pci9050_device::remap_rom()
@@ -154,16 +154,16 @@ void pci9050_device::remap_rom()
 	switch ((m_cntrl >> 12) & 0x3) {
 	case 0:
 	case 3:
-		set_map_flags(0, M_MEM);
-		set_map_flags(1, M_IO);
+		pci_set_map_flags(0, M_MEM);
+		pci_set_map_flags(1, M_IO);
 		break;
 	case 1:
-		set_map_flags(0, M_MEM);
-		set_map_flags(1, M_IO | M_DISABLED);
+		pci_set_map_flags(0, M_MEM);
+		pci_set_map_flags(1, M_IO | M_DISABLED);
 		break;
 	case 2:
-		set_map_flags(0, M_MEM | M_DISABLED);
-		set_map_flags(1, M_IO);
+		pci_set_map_flags(0, M_MEM | M_DISABLED);
+		pci_set_map_flags(1, M_IO);
 		break;
 	}
 }
@@ -287,7 +287,7 @@ void pci9050_device::cntrl_w(uint32_t data)
 	m_cntrl = data;
 	remap_rom();
 	if ((oldData ^ m_cntrl) & 0x3000)
-		remap_cb();
+		m_pci_remap_cb();
 	if (!m_user_output_handler.isnull()) {
 		int userData = 0;
 		for (int userIndex = 0; userIndex < 4; userIndex++)

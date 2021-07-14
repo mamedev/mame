@@ -22,10 +22,10 @@ nv2a_host_device::nv2a_host_device(const machine_config &mconfig, const char *ta
 	pci_host_device(mconfig, NV2A_HOST, tag, owner, clock),
 	cpu(*this, finder_base::DUMMY_TAG)
 {
-	set_ids_host(0x10de02a5, 0, 0);
+	pci_set_ids_host(0x10de02a5, 0, 0);
 }
 
-void nv2a_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void nv2a_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
@@ -58,16 +58,16 @@ void nv2a_host_device::device_reset()
 
 DEFINE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device, "nv2a_ram", "NV2A Memory Controller - SDRAM")
 
-void nv2a_ram_device::config_map(address_map &map)
+void nv2a_ram_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x6c, 0x6f).rw(FUNC(nv2a_ram_device::config_register_r), FUNC(nv2a_ram_device::config_register_w));
 }
 
 nv2a_ram_device::nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, NV2A_RAM, tag, owner, clock)
 {
-	set_ids(0x10de02a6, 0, 0, 0);
+	pci_set_ids(0x10de02a6, 0, 0, 0);
 }
 
 void nv2a_ram_device::device_start()
@@ -85,7 +85,7 @@ void nv2a_ram_device::config_register_w(uint32_t data)
 {
 }
 
-void nv2a_ram_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void nv2a_ram_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	memory_space->install_ram(0x00000000, ram_size * 1024 * 1024 - 1, &ram[0]);
@@ -113,7 +113,7 @@ void mcpx_isalpc_device::internal_io_map(address_map &map)
 	map(0x00e0, 0x00e3).nopw();
 }
 
-void mcpx_isalpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void mcpx_isalpc_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *this, &mcpx_isalpc_device::internal_io_map);
@@ -127,7 +127,7 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 {
 	// revision id must be at least 0xb4 in the xbox, otherwise usb will require a hub
 	// in the a7n266-c motherboard it has revision 0xc3
-	set_ids(0x10de01b2, 0xb4, 0x060100, subsystem_id);
+	pci_set_ids(0x10de01b2, 0xb4, 0x060100, subsystem_id);
 }
 
 mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -157,15 +157,15 @@ mcpx_isalpc_device::mcpx_isalpc_device(const machine_config &mconfig, const char
 void mcpx_isalpc_device::device_start()
 {
 	pci_device::device_start();
-	set_multifunction_device(true);
+	pci_set_multifunction_device(true);
 	m_smi_callback.resolve_safe();
 	m_interrupt_output.resolve_safe();
 	m_boot_state_hook.resolve_safe();
-	add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
-	bank_infos[0].adr = 0x8000;
-	status = 0x00b0;
-	command = 0x0001;
-	command_mask = 0x01be;
+	pci_add_map(0x00000100, M_IO, FUNC(mcpx_isalpc_device::lpc_io));
+	m_pci_bank_info[0].adr = 0x8000;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0001;
+	m_pci_command_mask = 0x01be;
 	for (int a = 0; a < 16; a++)
 		lpcdevices[a] = nullptr;
 	for (device_t &d : subdevices())
@@ -240,7 +240,7 @@ void mcpx_isalpc_device::update_smi_line()
 
 uint32_t mcpx_isalpc_device::acpi_r(offs_t offset, uint32_t mem_mask)
 {
-	logerror("Acpi read from %04X mask %08X\n", (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
+	logerror("Acpi read from %04X mask %08X\n", (m_pci_bank_info[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	if ((offset == 0xa) && ACCESSING_BITS_0_15)
 		return m_global_smi_control;
 	if ((offset == 0xb) && ACCESSING_BITS_16_23)
@@ -250,7 +250,7 @@ uint32_t mcpx_isalpc_device::acpi_r(offs_t offset, uint32_t mem_mask)
 
 void mcpx_isalpc_device::acpi_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	logerror("Acpi write %08X to %04X mask %08X\n", data, (bank_infos[0].adr & 0xfffffffe) + offset * 4, mem_mask);
+	logerror("Acpi write %08X to %04X mask %08X\n", data, (m_pci_bank_info[0].adr & 0xfffffffe) + offset * 4, mem_mask);
 	// Seen using word registers at offsets
 	// 0x00 0x02 0x04 0x08 0x20 0x22 0x28 0xa0 0xa2 0xc0-0xd8
 	// Byte access at 0x2e
@@ -484,7 +484,7 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 
 void mcpx_isalpc_device::remap()
 {
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 /*
@@ -493,9 +493,9 @@ void mcpx_isalpc_device::remap()
 
 DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Controller")
 
-void mcpx_smbus_device::config_map(address_map &map)
+void mcpx_smbus_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x3e, 0x3e).r(FUNC(mcpx_smbus_device::minimum_grant_r));
 	map(0x3f, 0x3f).r(FUNC(mcpx_smbus_device::maximum_latency_r));
 }
@@ -518,7 +518,7 @@ void mcpx_smbus_device::smbus_io2(address_map &map)
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_smbus_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01b4, 0xc1, 0x0c0500, subsystem_id);
+	pci_set_ids(0x10de01b4, 0xc1, 0x0c0500, subsystem_id);
 }
 
 mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -530,19 +530,19 @@ mcpx_smbus_device::mcpx_smbus_device(const machine_config &mconfig, const char *
 void mcpx_smbus_device::device_start()
 {
 	pci_device::device_start();
-	set_multifunction_device(true);
+	pci_set_multifunction_device(true);
 	m_interrupt_handler.resolve_safe();
-	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io0));
-	bank_infos[0].adr = 0x1000;
-	add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io1));
-	bank_infos[1].adr = 0xc000;
-	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
-	bank_infos[2].adr = 0xc200;
-	status = 0x00b0;
-	command = 0x0001;
+	pci_add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io0));
+	m_pci_bank_info[0].adr = 0x1000;
+	pci_add_map(0x00000010, M_IO, FUNC(mcpx_smbus_device::smbus_io1));
+	m_pci_bank_info[1].adr = 0xc000;
+	pci_add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
+	m_pci_bank_info[2].adr = 0xc200;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0001;
 	// Min Grant 3
 	// Max Latency 1
-	intr_pin = 1;
+	m_pci_intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
 		for (int a = 0; a < 128; a++)
@@ -671,9 +671,9 @@ void mcpx_smbus_device::smbus1_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Controller")
 
-void mcpx_ohci_device::config_map(address_map &map)
+void mcpx_ohci_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x3e, 0x3e).r(FUNC(mcpx_ohci_device::minimum_grant_r));
 	map(0x3f, 0x3f).r(FUNC(mcpx_ohci_device::maximum_latency_r));
 }
@@ -686,7 +686,7 @@ void mcpx_ohci_device::ohci_mmio(address_map &map)
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_ohci_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01c2, 0xc3, 0x0c0310, subsystem_id);
+	pci_set_ids(0x10de01c2, 0xc3, 0x0c0310, subsystem_id);
 }
 
 mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -709,11 +709,11 @@ void mcpx_ohci_device::device_start()
 {
 	pci_device::device_start();
 	m_interrupt_handler.resolve_safe();
-	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
-	bank_infos[0].adr = 0xfed00000;
-	status = 0x00b0;
-	command = 0x0002;
-	intr_pin = 1;
+	pci_add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
+	m_pci_bank_info[0].adr = 0xfed00000;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0002;
+	m_pci_intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
 	ohci_usb->set_irq_callback(
@@ -799,16 +799,16 @@ void mcpx_eth_device::eth_io(address_map &map)
 mcpx_eth_device::mcpx_eth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_ETH, tag, owner, clock)
 {
-	set_ids(0x10de01c3, 0, 0, 0);
+	pci_set_ids(0x10de01c3, 0, 0, 0);
 }
 
 void mcpx_eth_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x00001000, M_MEM, FUNC(mcpx_eth_device::eth_mmio));
-	bank_infos[0].adr = 0xfef00000;
-	add_map(0x00000100, M_IO, FUNC(mcpx_eth_device::eth_io));
-	bank_infos[1].adr = 0xe000;
+	pci_add_map(0x00001000, M_MEM, FUNC(mcpx_eth_device::eth_mmio));
+	m_pci_bank_info[0].adr = 0xfef00000;
+	pci_add_map(0x00000100, M_IO, FUNC(mcpx_eth_device::eth_io));
+	m_pci_bank_info[1].adr = 0xe000;
 }
 
 void mcpx_eth_device::device_reset()
@@ -840,9 +840,9 @@ void mcpx_eth_device::eth_io_w(uint32_t data)
 
 DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 
-void mcpx_apu_device::config_map(address_map &map)
+void mcpx_apu_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x3e, 0x3e).r(FUNC(mcpx_apu_device::minimum_grant_r));
 	map(0x3f, 0x3f).r(FUNC(mcpx_apu_device::maximum_latency_r));
 }
@@ -861,11 +861,11 @@ mcpx_apu_device::mcpx_apu_device(const machine_config &mconfig, const char *tag,
 void mcpx_apu_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
-	bank_infos[0].adr = 0xfe800000;
-	status = 0x00b0;
-	command = 0x0002;
-	intr_pin = 1;
+	pci_add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
+	m_pci_bank_info[0].adr = 0xfe800000;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0002;
+	m_pci_intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
 	memset(apust.voices_active, 0, sizeof(apust.voices_active));
@@ -1037,9 +1037,9 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "MCPX AC'97 Audio Codec Interface")
 
-void mcpx_ac97_audio_device::config_map(address_map &map)
+void mcpx_ac97_audio_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x3e, 0x3e).r(FUNC(mcpx_ac97_audio_device::minimum_grant_r));
 	map(0x3f, 0x3f).r(FUNC(mcpx_ac97_audio_device::maximum_latency_r));
 }
@@ -1062,7 +1062,7 @@ void mcpx_ac97_audio_device::ac97_io1(address_map &map)
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_ac97_audio_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01b1, 0xc2, 0x040100, subsystem_id);
+	pci_set_ids(0x10de01b1, 0xc2, 0x040100, subsystem_id);
 }
 
 mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1073,16 +1073,16 @@ mcpx_ac97_audio_device::mcpx_ac97_audio_device(const machine_config &mconfig, co
 void mcpx_ac97_audio_device::device_start()
 {
 	pci_device::device_start();
-	set_multifunction_device(true);
-	add_map(0x00000100, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io0));
-	bank_infos[0].adr = 0xd000;
-	add_map(0x00000080, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io1));
-	bank_infos[1].adr = 0xd200;
-	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
-	bank_infos[2].adr = 0xfec00000;
-	status = 0x00b0;
-	command = 0x0003;
-	intr_pin = 1;
+	pci_set_multifunction_device(true);
+	pci_add_map(0x00000100, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io0));
+	m_pci_bank_info[0].adr = 0xd000;
+	pci_add_map(0x00000080, M_IO, FUNC(mcpx_ac97_audio_device::ac97_io1));
+	m_pci_bank_info[1].adr = 0xd200;
+	pci_add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
+	m_pci_bank_info[2].adr = 0xfec00000;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0003;
+	m_pci_intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
 
@@ -1165,7 +1165,7 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device, "mcpx_ac97_modem", "
 mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, MCPX_AC97_MODEM, tag, owner, clock)
 {
-	set_ids(0x10de01c1, 0, 0, 0);
+	pci_set_ids(0x10de01c1, 0, 0, 0);
 }
 
 /*
@@ -1174,10 +1174,10 @@ mcpx_ac97_modem_device::mcpx_ac97_modem_device(const machine_config &mconfig, co
 
 DEFINE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device, "mcpx_ide", "MCPX IDE Controller")
 
-void mcpx_ide_device::config_map(address_map &map)
+void mcpx_ide_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
-	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
+	pci_device::pci_config_map(map);
+	map(0x08, 0x0b).rw(FUNC(pci_device::pci_class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
 	map(0x3e, 0x3e).r(FUNC(mcpx_ide_device::minimum_grant_r));
 	map(0x3f, 0x3f).r(FUNC(mcpx_ide_device::maximum_latency_r));
 }
@@ -1213,7 +1213,7 @@ void mcpx_ide_device::ide_io(address_map &map)
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id)
 	: mcpx_ide_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01bc, 0xc3, 0x01018a, subsystem_id);
+	pci_set_ids(0x10de01bc, 0xc3, 0x01018a, subsystem_id);
 }
 
 mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1228,14 +1228,14 @@ mcpx_ide_device::mcpx_ide_device(const machine_config &mconfig, const char *tag,
 void mcpx_ide_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_command)); // primary command block
-	add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_control)); // primary control block
-	add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_command)); // secondary command block
-	add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_control)); // secondary control block
-	add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::ide_io));
-	bank_infos[4].adr = 0xff60;
-	status = 0x00b0;
-	command = 0x0001;
+	pci_add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_command)); // primary command block
+	pci_add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_pri_control)); // primary control block
+	pci_add_map(0x00000008, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_command)); // secondary command block
+	pci_add_map(0x00000004, M_IO | M_DISABLED, FUNC(mcpx_ide_device::ide_sec_control)); // secondary control block
+	pci_add_map(0x00000010, M_IO, FUNC(mcpx_ide_device::ide_io));
+	m_pci_bank_info[4].adr = 0xff60;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0001;
 	m_pri_interrupt_handler.resolve_safe();
 	m_sec_interrupt_handler.resolve_safe();
 }
@@ -1256,21 +1256,21 @@ void mcpx_ide_device::device_add_mconfig(machine_config &config)
 	ide2.set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
-void mcpx_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void mcpx_ide_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	// in compatibility mode the addresses are fixed, but the io enable bit in the command register is still used
-	if (~pclass & 1) // compatibility mode
+	if (~m_pci_pclass & 1) // compatibility mode
 	{
-		if (command & 1)
+		if (m_pci_command & 1)
 		{
 			io_space->install_device(0x1f0, 0x1f7, *this, &mcpx_ide_device::ide_pri_command);
 			io_space->install_device(0x3f4, 0x3f7, *this, &mcpx_ide_device::ide_pri_control);
 		}
 	}
-	if (~pclass & 4)
+	if (~m_pci_pclass & 4)
 	{
-		if (command & 1)
+		if (m_pci_command & 1)
 		{
 			io_space->install_device(0x170, 0x177, *this, &mcpx_ide_device::ide_sec_command);
 			io_space->install_device(0x374, 0x377, *this, &mcpx_ide_device::ide_sec_control);
@@ -1282,33 +1282,33 @@ void mcpx_ide_device::class_rev_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		uint32_t old = pclass;
+		uint32_t old = m_pci_pclass;
 		// bit 0 specifies if the primary channel is in compatibility or native-pci mode
 		// bit 2 specifies if the secondary channel is in compatibility or native-pci mode
-		pclass = (pclass & 0xfffffffa) | ((data >> 8) & 5);
-		if (old ^ pclass)
+		m_pci_pclass = (m_pci_pclass & 0xfffffffa) | ((data >> 8) & 5);
+		if (old ^ m_pci_pclass)
 		{
-			if (~pclass & 1) // compatibility mode
+			if (~m_pci_pclass & 1) // compatibility mode
 			{
-				bank_infos[0].flags |= M_DISABLED;
-				bank_infos[1].flags |= M_DISABLED;
+				m_pci_bank_info[0].flags |= M_DISABLED;
+				m_pci_bank_info[1].flags |= M_DISABLED;
 			}
 			else
 			{
-				bank_infos[0].flags &= ~M_DISABLED;
-				bank_infos[1].flags &= ~M_DISABLED;
+				m_pci_bank_info[0].flags &= ~M_DISABLED;
+				m_pci_bank_info[1].flags &= ~M_DISABLED;
 			}
-			if (~pclass & 4) // compatibility mode
+			if (~m_pci_pclass & 4) // compatibility mode
 			{
-				bank_infos[2].flags |= M_DISABLED;
-				bank_infos[3].flags |= M_DISABLED;
+				m_pci_bank_info[2].flags |= M_DISABLED;
+				m_pci_bank_info[3].flags |= M_DISABLED;
 			}
 			else
 			{
-				bank_infos[2].flags &= ~M_DISABLED;
-				bank_infos[3].flags &= ~M_DISABLED;
+				m_pci_bank_info[2].flags &= ~M_DISABLED;
+				m_pci_bank_info[3].flags &= ~M_DISABLED;
 			}
-			remap_cb();
+			m_pci_remap_cb();
 		}
 	}
 }
@@ -1349,9 +1349,9 @@ WRITE_LINE_MEMBER(mcpx_ide_device::ide_sec_interrupt)
 
 DEFINE_DEVICE_TYPE(NV2A_AGP, nv2a_agp_device, "nv2a_agp", "NV2A AGP Host to PCI Bridge")
 
-void nv2a_agp_device::config_map(address_map& map)
+void nv2a_agp_device::pci_config_map(address_map& map)
 {
-	agp_bridge_device::config_map(map);
+	agp_bridge_device::pci_config_map(map);
 	map(0x40, 0xff).rw(FUNC(nv2a_agp_device::unknown_r), FUNC(nv2a_agp_device::unknown_w));
 }
 
@@ -1411,17 +1411,17 @@ nv2a_gpu_device::nv2a_gpu_device(const machine_config &mconfig, const char *tag,
 	m_interrupt_handler(*this),
 	m_program(nullptr)
 {
-	set_ids(0x10de02a0, 0, 0, 0);
+	pci_set_ids(0x10de02a0, 0, 0, 0);
 }
 
 void nv2a_gpu_device::device_start()
 {
 	agp_device::device_start();
 	m_interrupt_handler.resolve_safe();
-	add_map(0x01000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mmio));
-	bank_infos[0].adr = 0xfd000000;
-	add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));
-	bank_infos[1].adr = 0xf0000000;
+	pci_add_map(0x01000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mmio));
+	m_pci_bank_info[0].adr = 0xfd000000;
+	pci_add_map(0x08000000, M_MEM, FUNC(nv2a_gpu_device::nv2a_mirror));
+	m_pci_bank_info[1].adr = 0xf0000000;
 	m_program = &cpu->space(AS_PROGRAM); // FIXME: isn't there a proper way to map stuff or do DMA via the PCI device interface?
 	nvidia_nv2a = new nv2a_renderer(machine());
 	nvidia_nv2a->set_irq_callbaclk(

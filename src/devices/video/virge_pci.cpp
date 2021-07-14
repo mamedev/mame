@@ -48,9 +48,9 @@ void virge_pci_device::lfb_map(address_map& map)
 		mmio_map(map);
 }
 
-void virge_pci_device::config_map(address_map &map)
+void virge_pci_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x10, 0x13).rw(FUNC(virge_pci_device::base_address_r),FUNC(virge_pci_device::base_address_w));
 }
 
@@ -58,32 +58,32 @@ void virge_pci_device::refresh_linear_window()
 {
 	if(downcast<s3virge_vga_device *>(m_vga.target())->is_linear_address_active())
 	{
-		set_map_flags(0, M_MEM);
+		pci_set_map_flags(0, M_MEM);
 		switch(downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address_size() & 0x03)
 		{
 			case LAW_64K:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000);
+				pci_set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000);
 				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffff0000);
 				break;
 			case LAW_1MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000);
+				pci_set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000);
 				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xfff00000);
 				break;
 			case LAW_2MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000);
+				pci_set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000);
 				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffe00000);
 				break;
 			case LAW_4MB:
-				set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000);
+				pci_set_map_address(0,downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000);
 				logerror("Linear window set to 0x%08x\n",downcast<s3virge_vga_device *>(m_vga.target())->get_linear_address() & 0xffc00000);
 				break;
 		}
-		remap_cb();
+		m_pci_remap_cb();
 	}
 	else
 	{
-		set_map_flags(0, M_MEM | M_DISABLED);
-		remap_cb();
+		pci_set_map_flags(0, M_MEM | M_DISABLED);
+		m_pci_remap_cb();
 	}
 }
 
@@ -94,7 +94,7 @@ uint32_t virge_pci_device::base_address_r()
 
 void virge_pci_device::base_address_w(offs_t offset, uint32_t data)
 {
-	pci_device::address_base_w(offset,data);
+	pci_device::pci_address_base_w(offset,data);
 	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(data & 0xffff0000);
 	refresh_linear_window();
 }
@@ -129,12 +129,12 @@ void virge_pci_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 			if(m_current_crtc_reg == 0x58)
 			{
 				refresh_linear_window();
-				remap_cb();
+				m_pci_remap_cb();
 			}
 			else if(m_current_crtc_reg == 0x59 || m_current_crtc_reg == 0x5a)
 			{
 				refresh_linear_window();
-				remap_cb();
+				m_pci_remap_cb();
 			}
 		}
 	}
@@ -221,42 +221,42 @@ void virge_pci_device::vram_w(offs_t offset, uint8_t data)
 
 void virge_pci_device::postload()
 {
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 void virge_pci_device::device_start()
 {
-	set_ids(0x53335631, 0x00, 0x030000, 0x000000);
+	pci_set_ids(0x53335631, 0x00, 0x030000, 0x000000);
 	pci_device::device_start();
 
-	add_rom(m_bios->base(),0x8000);
-	expansion_rom_base = 0xc0000;
+	pci_add_rom(m_bios->base(),0x8000);
+	m_pci_expansion_rom_base = 0xc0000;
 
-	add_map(32 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
-	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
+	pci_add_map(32 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	pci_set_map_address(0, 0x70000000);
+	pci_set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
-	remap_cb();
+	m_pci_remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
 }
 
 void virgedx_pci_device::device_start()
 {
-	set_ids(0x53338a01, 0x00, 0x030000, 0x000000);
+	pci_set_ids(0x53338a01, 0x00, 0x030000, 0x000000);
 	pci_device::device_start();
 
-	add_rom(m_bios->base(),0x8000);
-	expansion_rom_base = 0xc0000;
+	pci_add_rom(m_bios->base(),0x8000);
+	m_pci_expansion_rom_base = 0xc0000;
 
-	add_map(4 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
-	set_map_address(0, 0x70000000);
-	set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
+	pci_add_map(4 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
+	pci_set_map_address(0, 0x70000000);
+	pci_set_map_size(0, 0x01100000);  // Linear addressing maps to a 32MB address space
 
-	remap_cb();
+	m_pci_remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
 }
 
-void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void virge_pci_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(virge_pci_device::vram_r)), write8sm_delegate(*this, FUNC(virge_pci_device::vram_w)));

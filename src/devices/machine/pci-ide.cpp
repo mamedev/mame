@@ -17,9 +17,9 @@ ide_pci_device::ide_pci_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-void ide_pci_device::config_map(address_map &map)
+void ide_pci_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x09, 0x09).w(FUNC(ide_pci_device::prog_if_w));
 	map(0x10, 0x1f).rw(FUNC(ide_pci_device::address_base_r), FUNC(ide_pci_device::address_base_w));
 	map(0x2c, 0x2f).w(FUNC(ide_pci_device::subsystem_id_w));
@@ -70,14 +70,14 @@ void ide_pci_device::device_start()
 	pci_device::device_start();
 
 	// always keep this device memory ranges active
-	command |= 3;
-	command_mask &= ~3;
+	m_pci_command |= 3;
+	m_pci_command_mask &= ~3;
 
-	add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
-	add_map(4,    M_IO,  FUNC(ide_pci_device::chan1_control_map));
-	add_map(8,    M_IO,  FUNC(ide_pci_device::chan2_data_command_map));
-	add_map(4,    M_IO,  FUNC(ide_pci_device::chan2_control_map));
-	add_map(16,   M_IO,  FUNC(ide_pci_device::bus_master_map));
+	pci_add_map(8,    M_IO,  FUNC(ide_pci_device::chan1_data_command_map));
+	pci_add_map(4,    M_IO,  FUNC(ide_pci_device::chan1_control_map));
+	pci_add_map(8,    M_IO,  FUNC(ide_pci_device::chan2_data_command_map));
+	pci_add_map(4,    M_IO,  FUNC(ide_pci_device::chan2_control_map));
+	pci_add_map(16,   M_IO,  FUNC(ide_pci_device::bus_master_map));
 
 	// Setup stored BARs
 	pci_bar[0] = 0x1f0;
@@ -88,8 +88,8 @@ void ide_pci_device::device_start()
 
 	m_irq_handler.resolve_safe();
 
-	intr_pin = 0x1;
-	intr_line = 0xe;
+	m_pci_intr_pin = 0x1;
+	m_pci_intr_line = 0xe;
 
 	// Save states
 	save_item(NAME(pci_bar));
@@ -100,16 +100,16 @@ void ide_pci_device::device_start()
 void ide_pci_device::device_reset()
 {
 	pci_device::device_reset();
-	bank_infos[0].adr = (m_legacy_top << 20) | 0x1f0;
-	bank_infos[1].adr = (m_legacy_top << 20) | 0x3f4;
-	bank_infos[2].adr = (m_legacy_top << 20) | 0x170;
-	bank_infos[3].adr = (m_legacy_top << 20) | 0x374;
-	bank_infos[4].adr = 0xf00;
-	pclass = 0x010100 | m_pif;
-	remap_cb();
+	m_pci_bank_info[0].adr = (m_legacy_top << 20) | 0x1f0;
+	m_pci_bank_info[1].adr = (m_legacy_top << 20) | 0x3f4;
+	m_pci_bank_info[2].adr = (m_legacy_top << 20) | 0x170;
+	m_pci_bank_info[3].adr = (m_legacy_top << 20) | 0x374;
+	m_pci_bank_info[4].adr = 0xf00;
+	m_pci_pclass = 0x010100 | m_pif;
+	m_pci_remap_cb();
 
 	// PCI0646U allow BAR
-	if (main_id == 0x10950646)
+	if (m_pci_main_id == 0x10950646)
 		m_config_data[0x10 / 4] |= 0x0C40;
 	m_ide->reset();
 	m_ide2->reset();
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 	m_irq_handler(state);
 
 	// PCI646U2 Offset 0x50 is interrupt status
-	if (main_id == 0x10950646) {
+	if (m_pci_main_id == 0x10950646) {
 		if (state)
 			m_config_data[0x10 / 4] |= 0x4;
 		else
@@ -163,34 +163,34 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 
 void ide_pci_device::prog_if_w(uint8_t data)
 {
-	uint32_t oldVal = pclass;
-	pclass = (pclass & ~(0xff)) | (data & 0xff);
+	uint32_t oldVal = m_pci_pclass;
+	m_pci_pclass = (m_pci_pclass & ~(0xff)) | (data & 0xff);
 	// Check for switch to/from compatibility (legacy) mode from/to pci mode
-	if ((oldVal ^ pclass) & 0x5) {
+	if ((oldVal ^ m_pci_pclass) & 0x5) {
 		// Map Primary IDE Channel
-		if (pclass & 0x1) {
+		if (m_pci_pclass & 0x1) {
 			// PCI Mode
-			pci_device::address_base_w(0, pci_bar[0]);
-			pci_device::address_base_w(1, pci_bar[1]);
+			pci_device::pci_address_base_w(0, pci_bar[0]);
+			pci_device::pci_address_base_w(1, pci_bar[1]);
 		} else {
 			// Legacy Mode
-			pci_device::address_base_w(0, (m_legacy_top << 20) | 0x1f0);
-			pci_device::address_base_w(1, (m_legacy_top << 20) | 0x3f4);
+			pci_device::pci_address_base_w(0, (m_legacy_top << 20) | 0x1f0);
+			pci_device::pci_address_base_w(1, (m_legacy_top << 20) | 0x3f4);
 		}
 		// Map Primary IDE Channel
-		if (pclass & 0x4) {
+		if (m_pci_pclass & 0x4) {
 			// PCI Mode
-			pci_device::address_base_w(2, pci_bar[2]);
-			pci_device::address_base_w(3, pci_bar[3]);
+			pci_device::pci_address_base_w(2, pci_bar[2]);
+			pci_device::pci_address_base_w(3, pci_bar[3]);
 		}
 		else {
 			// Legacy Mode
-			pci_device::address_base_w(2, (m_legacy_top << 20) | 0x170);
-			pci_device::address_base_w(3, (m_legacy_top << 20) | 0x374);
+			pci_device::pci_address_base_w(2, (m_legacy_top << 20) | 0x170);
+			pci_device::pci_address_base_w(3, (m_legacy_top << 20) | 0x374);
 		}
 	}
 	if (1)
-		logerror("%s:prog_if_w pclass = %06X\n", machine().describe_context(), pclass);
+		logerror("%s:prog_if_w pclass = %06X\n", machine().describe_context(), m_pci_pclass);
 }
 
 uint32_t ide_pci_device::pcictrl_r(offs_t offset)
@@ -202,7 +202,7 @@ void ide_pci_device::pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_config_data[offset]);
 	// PCI646U2 Offset 0x50 is interrupt status
-	if (main_id == 0x10950646 && offset == (0x10 / 4) && (data & 0x4)) {
+	if (m_pci_main_id == 0x10950646 && offset == (0x10 / 4) && (data & 0x4)) {
 		m_config_data[0x10 / 4] &= ~0x4;
 		if (0)
 			logerror("%s:ide_pci_device::pcictrl_w Clearing interrupt status\n", machine().describe_context());
@@ -211,13 +211,13 @@ void ide_pci_device::pcictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint32_t ide_pci_device::address_base_r(offs_t offset)
 {
-	if (bank_reg_infos[offset].bank == -1)
+	if (m_pci_bank_reg_info[offset].bank == -1)
 		return 0;
-	int bid = bank_reg_infos[offset].bank;
-	if (bank_reg_infos[offset].hi)
-		return bank_infos[bid].adr >> 32;
-	int flags = bank_infos[bid].flags;
-	return (pci_bar[offset] & ~(bank_infos[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
+	int bid = m_pci_bank_reg_info[offset].bank;
+	if (m_pci_bank_reg_info[offset].hi)
+		return m_pci_bank_info[bid].adr >> 32;
+	int flags = m_pci_bank_info[bid].flags;
+	return (pci_bar[offset] & ~(m_pci_bank_info[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
 
 }
 
@@ -228,16 +228,16 @@ void ide_pci_device::address_base_w(offs_t offset, uint32_t data)
 	// Bits 0 (primary) and 2 (secondary) control if the mapping is legacy or BAR
 	switch (offset) {
 	case 0: case 1:
-		if (pclass & 0x1)
-			pci_device::address_base_w(offset, data);
+		if (m_pci_pclass & 0x1)
+			pci_device::pci_address_base_w(offset, data);
 		break;
 	case 2: case 3:
-		if (pclass & 0x4)
-			pci_device::address_base_w(offset, data);
+		if (m_pci_pclass & 0x4)
+			pci_device::pci_address_base_w(offset, data);
 		break;
 	default:
 		// Only the first 4 bars are controlled by pif
-		pci_device::address_base_w(offset, data);
+		pci_device::pci_address_base_w(offset, data);
 	}
 	logerror("Mapping bar[%i] = %08x\n", offset, data);
 }
@@ -246,5 +246,5 @@ void ide_pci_device::subsystem_id_w(uint32_t data)
 {
 	// Config register 0x4f enables subsystem id writing for CMD646
 	if (m_config_data[0xc / 4] & 0x01000000)
-		subsystem_id = (data << 16) | (data >> 16);
+		m_pci_subsystem_id = (data << 16) | (data >> 16);
 }

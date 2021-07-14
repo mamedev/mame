@@ -9,9 +9,9 @@
 
 DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 82371 southbridge ISA bridge")
 
-void i82371sb_isa_device::config_map(address_map &map)
+void i82371sb_isa_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x4c, 0x4c).rw(FUNC(i82371sb_isa_device::iort_r), FUNC(i82371sb_isa_device::iort_w));
 	map(0x4e, 0x4f).rw(FUNC(i82371sb_isa_device::xbcs_r), FUNC(i82371sb_isa_device::xbcs_w));
 	map(0x60, 0x63).rw(FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
@@ -141,7 +141,7 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const ch
 	m_speaker(*this, "speaker"),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_eisa_irq_mode(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
-	set_ids(0x80867000, 0x03, 0x060100, 0x00000000);
+	pci_set_ids(0x80867000, 0x03, 0x060100, 0x00000000);
 }
 
 void i82371sb_isa_device::device_start()
@@ -184,9 +184,9 @@ void i82371sb_isa_device::device_reset()
 	m_refresh = false;
 }
 
-void i82371sb_isa_device::reset_all_mappings()
+void i82371sb_isa_device::pci_reset_all_mappings()
 {
-	pci_device::reset_all_mappings();
+	pci_device::pci_reset_all_mappings();
 }
 
 void i82371sb_isa_device::boot_state_w(uint8_t data)
@@ -390,11 +390,11 @@ void i82371sb_isa_device::cthtmr_w(uint8_t data)
 
 void i82371sb_isa_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
 {
-	uint32_t mask = m_region->bytes() - 1;
-	memory_space->install_rom(start, end, m_region->base() + (start & mask));
+	uint32_t mask = m_pci_region->bytes() - 1;
+	memory_space->install_rom(start, end, m_pci_region->base() + (start & mask));
 }
 
-void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i82371sb_isa_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
@@ -895,9 +895,9 @@ void i82371sb_isa_device::update_smireq_line()
 
 DEFINE_DEVICE_TYPE(I82371SB_IDE, i82371sb_ide_device, "i82371sb_ide", "Intel 82371 southbridge IDE interface")
 
-void i82371sb_ide_device::config_map(address_map &map)
+void i82371sb_ide_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x04, 0x05).rw(FUNC(i82371sb_ide_device::command_r), FUNC(i82371sb_ide_device::command_w));
 	map(0x20, 0x23).rw(FUNC(i82371sb_ide_device::bmiba_r), FUNC(i82371sb_ide_device::bmiba_w));
 	map(0x40, 0x41).rw(FUNC(i82371sb_ide_device::idetim_primary_r), FUNC(i82371sb_ide_device::idetim_primary_w));
@@ -936,7 +936,7 @@ i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const ch
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
 {
-	set_ids(0x80867010, 0, 0x010180, 0x00000000);
+	pci_set_ids(0x80867010, 0, 0x010180, 0x00000000);
 }
 
 void i82371sb_ide_device::device_start()
@@ -949,11 +949,11 @@ void i82371sb_ide_device::device_reset()
 {
 }
 
-void i82371sb_ide_device::reset_all_mappings()
+void i82371sb_ide_device::pci_reset_all_mappings()
 {
 }
 
-void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i82371sb_ide_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0x3ff, *this, &i82371sb_ide_device::internal_io_map);
@@ -986,7 +986,7 @@ void i82371sb_ide_device::command_w(offs_t offset, uint16_t data, uint16_t mem_m
 	mem_mask &= 5;
 	COMBINE_DATA(&command);
 	if (mem_mask & 1)
-		remap_cb();
+		m_pci_remap_cb();
 }
 
 uint32_t i82371sb_ide_device::bmiba_r()
@@ -999,7 +999,7 @@ void i82371sb_ide_device::bmiba_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	mem_mask &= 0xfff0;
 	COMBINE_DATA(&bmiba);
 	if (command & 1)
-		remap_cb();
+		m_pci_remap_cb();
 }
 
 uint16_t i82371sb_ide_device::idetim_primary_r()

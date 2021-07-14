@@ -89,7 +89,7 @@ es1373_device::es1373_device(const machine_config &mconfig, const char *tag, dev
 	, device_sound_interface(mconfig, *this), m_stream(nullptr)
 	, m_eslog(nullptr), m_tempCount(0), m_timer(nullptr), m_memory_space(nullptr), m_irq_handler(*this)
 {
-	set_ids(0x12741371, 0x04, 0x040100, 0x12741371);
+	pci_set_ids(0x12741371, 0x04, 0x040100, 0x12741371);
 }
 
 void es1373_device::device_resolve_objects()
@@ -117,7 +117,7 @@ void es1373_device::device_stop()
 void es1373_device::device_start()
 {
 	pci_device::device_start();
-	add_map(0x40, M_IO, FUNC(es1373_device::map));
+	pci_add_map(0x40, M_IO, FUNC(es1373_device::map));
 
 	// create the stream
 	m_stream = stream_alloc(0, 2, 44100/2);
@@ -174,7 +174,7 @@ void es1373_device::device_start()
 void es1373_device::device_post_load()
 {
 	pci_device::device_post_load();
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 void es1373_device::device_reset()
@@ -215,7 +215,7 @@ void es1373_device::device_reset()
 	m_stream->update();
 }
 
-void es1373_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void es1373_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	m_memory_space = memory_space;
@@ -276,7 +276,7 @@ void es1373_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						m_adc.buf_wptr -= 0x10;
 					}
 					// PCI Write Transfer
-					if (command & 0x4) {
+					if (m_pci_command & 0x4) {
 						if ((m_adc.buf_rptr&8)^(m_adc.buf_wptr&8)) {
 							transfer_pci_audio(m_adc, ES_PCI_WRITE);
 						}
@@ -299,7 +299,7 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 {
 	// Only transfer PCI data if bus mastering is enabled
 	// Fill initial half buffer
-	if (1 && (command & 0x4) && (!chan.initialized)) {
+	if (1 && (m_pci_command & 0x4) && (!chan.initialized)) {
 		chan.initialized = true;
 		transfer_pci_audio(chan, ES_PCI_READ);
 	}
@@ -313,7 +313,7 @@ void es1373_device::send_audio_out(chan_info& chan, uint32_t intr_mask, write_st
 			// Only transfer PCI data if bus mastering is enabled
 			// Fill half-buffer when read pointer is at start of next half
 			//if ((command & 0x4) && ((chan.buf_rptr&8)^(chan.buf_wptr&8)) && !(m_es_regs[ES_INT_CS_STATUS] & intr_mask)) {
-			if ((command & 0x4) && ((chan.buf_rptr&8)^(chan.buf_wptr&8))) {
+			if ((m_pci_command & 0x4) && ((chan.buf_rptr&8)^(chan.buf_wptr&8))) {
 				transfer_pci_audio(chan, ES_PCI_READ);
 			}
 			if (LOG_ES && i==0)

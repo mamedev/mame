@@ -25,8 +25,8 @@ public:
 	required_device<ns16550_device> m_uart;
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void reset_all_mappings() override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_reset_all_mappings() override;
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	virtual void device_post_load() override;
 
@@ -35,7 +35,7 @@ public:
 
 	void set_map(int id, const address_map_constructor &map, device_t *device);
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 	uint32_t sdram_addr_r();
 	void sdram_addr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 

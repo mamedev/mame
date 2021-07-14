@@ -11,9 +11,9 @@ void i82875p_host_device::agp_translation_map(address_map &map)
 {
 }
 
-void i82875p_host_device::config_map(address_map &map)
+void i82875p_host_device::pci_config_map(address_map &map)
 {
-	pci_host_device::config_map(map);
+	pci_host_device::pci_config_map(map);
 	map(0x51, 0x51).rw(FUNC(i82875p_host_device::agpm_r), FUNC(i82875p_host_device::agpm_w));
 	map(0x52, 0x52).r(FUNC(i82875p_host_device::gc_r));
 	map(0x53, 0x53).r(FUNC(i82875p_host_device::csabcont_r));
@@ -54,7 +54,7 @@ void i82875p_host_device::set_ram_size(int _ram_size)
 	ram_size = _ram_size;
 }
 
-uint8_t i82875p_host_device::capptr_r()
+uint8_t i82875p_host_device::pci_capptr_r()
 {
 	return 0xe4;
 }
@@ -71,12 +71,12 @@ void i82875p_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	m_pci_status = 0x0010;
 
 	ram.resize(ram_size/4);
 
 	// Resizeable with the apsize register
-	add_map(256*1024*1024, M_MEM, FUNC(i82875p_host_device::agp_translation_map));
+	pci_add_map(256*1024*1024, M_MEM, FUNC(i82875p_host_device::agp_translation_map));
 }
 
 uint8_t i82875p_host_device::agpm_r()
@@ -135,7 +135,7 @@ void i82875p_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset] = data;
 	logerror("%s: pam[%d] = %02x\n", tag(), offset, data);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82875p_host_device::smram_r()
@@ -148,7 +148,7 @@ void i82875p_host_device::smram_w(uint8_t data)
 	if(!(smram & 0x10))
 		smram = (data & 0xfe) | 0x02;
 	logerror("%s: smram = %02x\n", tag(), smram);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82875p_host_device::esmramc_r()
@@ -161,7 +161,7 @@ void i82875p_host_device::esmramc_w(uint8_t data)
 	if(!(smram & 0x10))
 		esmramc = (data & 0x87) | 0x38;
 	logerror("%s: esmramc = %02x\n", tag(), smram);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint32_t i82875p_host_device::acapid_r()
@@ -242,7 +242,7 @@ void i82875p_host_device::toud_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	COMBINE_DATA(&toud);
 	toud &= ~7;
 	logerror("%s: toud = %08x\n", tag(), toud << 16);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i82875p_host_device::mchcfg_r()
@@ -310,9 +310,9 @@ uint8_t i82875p_host_device::capreg2_r()
 	return 0x00;
 }
 
-void i82875p_host_device::reset_all_mappings()
+void i82875p_host_device::pci_reset_all_mappings()
 {
-	pci_host_device::reset_all_mappings();
+	pci_host_device::pci_reset_all_mappings();
 
 	toud = 0x0400;
 	smram = 0x02;
@@ -338,7 +338,7 @@ void i82875p_host_device::device_reset()
 	skpd = 0x0000;
 }
 
-void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i82875p_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
@@ -426,7 +426,7 @@ void i82875p_host_device::map_extra(uint64_t memory_window_start, uint64_t memor
 i82875p_agp_device::i82875p_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: agp_bridge_device(mconfig, I82875P_AGP, tag, owner, clock)
 {
-	set_ids_bridge(0x80862579, 0x02);
+	pci_set_ids_bridge(0x80862579, 0x02);
 }
 
 void i82875p_agp_device::device_start()
@@ -457,7 +457,7 @@ void i82875p_overflow_device::device_start()
 {
 	pci_device::device_start();
 
-	add_map(4*1024, M_MEM, FUNC(i82875p_overflow_device::overflow_map));
+	pci_add_map(4*1024, M_MEM, FUNC(i82875p_overflow_device::overflow_map));
 }
 
 void i82875p_overflow_device::device_reset()

@@ -5,9 +5,9 @@
 
 DEFINE_DEVICE_TYPE(I82439HX, i82439hx_host_device, "i82439hx", "Intel 82439HX northbridge")
 
-void i82439hx_host_device::config_map(address_map &map)
+void i82439hx_host_device::pci_config_map(address_map &map)
 {
-	pci_host_device::config_map(map);
+	pci_host_device::pci_config_map(map);
 	map(0x10, 0x4f).noprw();
 	map(0x50, 0x50).rw(FUNC(i82439hx_host_device::pcon_r), FUNC(i82439hx_host_device::pcon_w));
 	map(0x52, 0x52).rw(FUNC(i82439hx_host_device::cc_r), FUNC(i82439hx_host_device::cc_w));
@@ -47,16 +47,16 @@ void i82439hx_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	command = 0x0006;
-	command_mask = 0x0106;
-	status = 0x0200;
+	m_pci_command = 0x0006;
+	m_pci_command_mask = 0x0106;
+	m_pci_status = 0x0200;
 
 	ram.resize(ram_size/4);
 }
 
-void i82439hx_host_device::reset_all_mappings()
+void i82439hx_host_device::pci_reset_all_mappings()
 {
-	pci_host_device::reset_all_mappings();
+	pci_host_device::pci_reset_all_mappings();
 }
 
 void i82439hx_host_device::device_reset()
@@ -79,7 +79,7 @@ void i82439hx_host_device::device_reset()
 	smiact_n = 1;
 }
 
-void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i82439hx_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
@@ -163,7 +163,7 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 }
 
 
-uint8_t i82439hx_host_device::header_type_r()
+uint8_t i82439hx_host_device::pci_header_type_r()
 {
 	return 0x00; // from datasheet
 }
@@ -210,7 +210,7 @@ void i82439hx_host_device::dramc_w(uint8_t data)
 {
 	dramc = data;
 	logerror("dramc = %02x\n", dramc);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439hx_host_device::dramt_r()
@@ -233,7 +233,7 @@ void i82439hx_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset - 1] = data;
 	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439hx_host_device::drb_r(offs_t offset)
@@ -278,7 +278,7 @@ void i82439hx_host_device::smram_w(uint8_t data)
 {
 	smram = data;
 	logerror("smram = %02x\n", smram);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439hx_host_device::errcmd_r()
@@ -316,5 +316,5 @@ WRITE_LINE_MEMBER(i82439hx_host_device::smi_act_w)
 		smiact_n = 1;
 	else
 		smiact_n = 0;
-	remap_cb();
+	m_pci_remap_cb();
 }

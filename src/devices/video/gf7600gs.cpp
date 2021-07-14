@@ -25,10 +25,10 @@ geforce_7600gs_device::geforce_7600gs_device(const machine_config &mconfig, cons
 void geforce_7600gs_device::device_start()
 {
 	pci_device::device_start();
-	add_map( 16*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map1));
-	add_map(256*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map2));
-	add_map( 16*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map3));
-	add_rom_from_region();
+	pci_add_map( 16*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map1));
+	pci_add_map(256*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map2));
+	pci_add_map( 16*1024*1024, M_MEM, FUNC(geforce_7600gs_device::map3));
+	pci_add_rom_from_region();
 }
 
 void geforce_7600gs_device::device_reset()

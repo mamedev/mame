@@ -8,73 +8,59 @@
 
 class pci_device : public device_t {
 public:
-	typedef delegate<void ()> mapper_cb;
+	typedef delegate<void ()> pci_mapper_cb;
 
-	mapper_cb remap_cb, remap_config_cb;
+	pci_mapper_cb m_pci_remap_cb, m_pci_remap_config_cb;
 
-	void set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
-	void set_ids_host(uint32_t main_id, uint32_t revision, uint64_t subsystem_id) { set_ids(main_id, revision, 0x060000, subsystem_id); }
-	void set_ids_bridge(uint32_t main_id, uint32_t revision) { set_ids(main_id, revision, 0x060400, 0x00000000); }
-	void set_ids_agp(uint64_t main_id, uint32_t revision, uint32_t subsystem_id) { set_ids(main_id, revision, 0x030000, subsystem_id); }
-	void set_multifunction_device(bool enable);
+	void pci_set_ids(uint32_t main_id, uint8_t revision, uint32_t pclass, uint32_t subsystem_id);
+	void pci_set_ids_host(uint32_t main_id, uint32_t revision, uint64_t subsystem_id) { pci_set_ids(main_id, revision, 0x060000, subsystem_id); }
+	void pci_set_ids_bridge(uint32_t main_id, uint32_t revision) { pci_set_ids(main_id, revision, 0x060400, 0x00000000); }
+	void pci_set_ids_agp(uint64_t main_id, uint32_t revision, uint32_t subsystem_id) { pci_set_ids(main_id, revision, 0x030000, subsystem_id); }
+	void pci_set_multifunction_device(bool enable);
 
-	virtual void set_remap_cb(mapper_cb _remap_cb);
-	virtual void reset_all_mappings();
-	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_set_remap_cb(pci_mapper_cb _remap_cb);
+	virtual void pci_reset_all_mappings();
+	virtual void pci_map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
 	// Specify if this device must be mapped before all the others on the pci bus
-	virtual bool map_first() const { return false; }
+	virtual bool pci_map_first() const { return false; }
 
-	void map_config(uint8_t device, address_space *config_space);
+	void pci_map_config(uint8_t device, address_space *config_space);
 
-	virtual void config_map(address_map &map);
+	virtual void pci_config_map(address_map &map);
 
-	uint32_t unmapped_r(offs_t offset, uint32_t mem_mask, int bank);
-	void unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask, int bank);
+	template<int N> uint32_t pci_unmapped_r(offs_t offset, uint32_t mem_mask);
+	template<int N> void pci_unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	uint32_t unmapped0_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t unmapped1_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t unmapped2_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t unmapped3_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped3_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t unmapped4_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped4_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t unmapped5_r(offs_t offset, uint32_t mem_mask = ~0);
-	void unmapped5_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-
-	uint16_t vendor_r();
-	uint16_t device_r();
-	uint16_t command_r();
-	void command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t status_r();
-	uint32_t class_rev_r();
-	virtual uint8_t cache_line_size_r();
-	virtual uint8_t latency_timer_r();
-	virtual uint8_t header_type_r();
-	virtual uint8_t bist_r();
-	uint32_t address_base_r(offs_t offset);
-	void address_base_w(offs_t offset, uint32_t data);
-	uint16_t subvendor_r();
-	uint16_t subsystem_r();
-	uint32_t expansion_base_r();
-	void expansion_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual uint8_t capptr_r();
-	uint8_t interrupt_line_r();
-	void interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	uint8_t interrupt_pin_r();
-	void interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint16_t pci_vendor_r();
+	uint16_t pci_device_r();
+	uint16_t pci_command_r();
+	void pci_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t pci_status_r();
+	uint32_t pci_class_rev_r();
+	virtual uint8_t pci_cache_line_size_r();
+	virtual uint8_t pci_latency_timer_r();
+	virtual uint8_t pci_header_type_r();
+	virtual uint8_t pci_bist_r();
+	uint32_t pci_address_base_r(offs_t offset);
+	void pci_address_base_w(offs_t offset, uint32_t data);
+	uint16_t pci_subvendor_r();
+	uint16_t pci_subsystem_r();
+	uint32_t pci_expansion_base_r();
+	void pci_expansion_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	virtual uint8_t pci_capptr_r();
+	uint8_t pci_interrupt_line_r();
+	void pci_interrupt_line_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint8_t pci_interrupt_pin_r();
+	void pci_interrupt_pin_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
 protected:
 	pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	optional_memory_region m_region;
+	optional_memory_region m_pci_region;
 
 	enum {
 		M_MEM = 0,
@@ -85,7 +71,7 @@ protected:
 		M_DISABLED = 16
 	};
 
-	struct bank_info {
+	struct pci_bank_info {
 		address_map_constructor map;
 		device_t *device;
 
@@ -94,44 +80,44 @@ protected:
 		int flags;
 	};
 
-	struct bank_reg_info {
+	struct pci_bank_reg_info {
 		int bank, hi;
 	};
 
-	bank_info bank_infos[6];
-	int bank_count, bank_reg_count;
-	bank_reg_info bank_reg_infos[6];
+	pci_bank_info m_pci_bank_info[6];
+	int m_pci_bank_count, m_pci_bank_reg_count;
+	pci_bank_reg_info m_pci_bank_reg_info[6];
 
-	uint32_t main_id, subsystem_id;
-	uint32_t pclass;
-	uint8_t revision;
-	uint16_t command, command_mask, status;
-	const uint8_t *expansion_rom;
-	uint32_t expansion_rom_size;
-	uint32_t expansion_rom_base;
-	bool is_multifunction_device;
-	uint8_t intr_line, intr_pin;
+	uint32_t m_pci_main_id, m_pci_subsystem_id;
+	uint32_t m_pci_pclass;
+	uint8_t m_pci_revision;
+	uint16_t m_pci_command, m_pci_command_mask, m_pci_status;
+	const uint8_t *m_pci_expansion_rom;
+	uint32_t m_pci_expansion_rom_size;
+	uint32_t m_pci_expansion_rom_base;
+	bool m_pci_is_multifunction_device;
+	uint8_t m_pci_intr_line, m_pci_intr_pin;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void skip_map_regs(int count);
-	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
-	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
+	void pci_skip_map_regs(int count);
+	void pci_add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
+	template <typename T> void pci_add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
 		address_map_constructor delegate(map, name, static_cast<T *>(this));
-		add_map(size, flags, delegate);
+		pci_add_map(size, flags, delegate);
 	}
-	template <typename T> void add_map(uint64_t size, int flags, T &device, void (T::*map)(address_map &map), const char *name) {
+	template <typename T> void pci_add_map(uint64_t size, int flags, T &device, void (T::*map)(address_map &map), const char *name) {
 		address_map_constructor delegate(map, name, &device);
-		add_map(size, flags, delegate, &device);
+		pci_add_map(size, flags, delegate, &device);
 	}
 
-	void add_rom(const uint8_t *data, uint32_t size);
-	void add_rom_from_region();
+	void pci_add_rom(const uint8_t *data, uint32_t size);
+	void pci_add_rom_from_region();
 
-	void set_map_address(int id, uint64_t adr);
-	void set_map_size(int id, uint64_t size);
-	void set_map_flags(int id, int flags);
+	void pci_set_map_address(int id, uint64_t adr);
+	void pci_set_map_size(int id, uint64_t size);
+	void pci_set_map_flags(int id, int flags);
 };
 
 class agp_device : public pci_device {
@@ -147,18 +133,18 @@ public:
 	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision)
 		: pci_bridge_device(mconfig, tag, owner, clock)
 	{
-		set_ids_bridge(main_id, revision);
+		pci_set_ids_bridge(main_id, revision);
 	}
 	pci_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void set_remap_cb(mapper_cb _remap_cb) override;
-	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_set_remap_cb(pci_mapper_cb _remap_cb) override;
+	virtual void pci_map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	virtual void reset_all_mappings() override;
+	virtual void pci_reset_all_mappings() override;
 
-	virtual uint8_t header_type_r() override;
+	virtual uint8_t pci_header_type_r() override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 	uint32_t b_address_base_r(offs_t offset);
 	void b_address_base_w(offs_t offset, uint32_t data);

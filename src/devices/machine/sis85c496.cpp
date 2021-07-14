@@ -19,9 +19,9 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-void sis85c496_host_device::config_map(address_map &map)
+void sis85c496_host_device::pci_config_map(address_map &map)
 {
-	pci_host_device::config_map(map);
+	pci_host_device::pci_config_map(map);
 	map(0x40, 0x40).rw(FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
 	map(0x44, 0x45).rw(FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
 	map(0x5a, 0x5a).rw(FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
@@ -157,7 +157,7 @@ void sis85c496_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	m_pci_status = 0x0010;
 
 	m_bios_config = 0x78;
 	m_dram_config = 0;
@@ -168,9 +168,9 @@ void sis85c496_host_device::device_start()
 	ram.resize(ram_size/4);
 }
 
-void sis85c496_host_device::reset_all_mappings()
+void sis85c496_host_device::pci_reset_all_mappings()
 {
-	pci_host_device::reset_all_mappings();
+	pci_host_device::pci_reset_all_mappings();
 }
 
 void sis85c496_host_device::device_reset()
@@ -193,8 +193,8 @@ void sis85c496_host_device::device_reset()
 
 void sis85c496_host_device::map_bios(address_space *memory_space, uint32_t start, uint32_t end)
 {
-	uint32_t mask = m_region->bytes() - 1;
-	memory_space->install_rom(start, end, m_region->base() + (start & mask));
+	uint32_t mask = m_pci_region->bytes() - 1;
+	memory_space->install_rom(start, end, m_pci_region->base() + (start & mask));
 }
 
 void sis85c496_host_device::map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr)
@@ -209,7 +209,7 @@ void sis85c496_host_device::map_shadowram(address_space *memory_space, offs_t ad
 	}
 }
 
-void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void sis85c496_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	logerror("SiS496: mapping!\n");

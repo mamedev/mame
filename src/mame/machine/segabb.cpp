@@ -20,15 +20,15 @@ void sega_lindbergh_baseboard_device::map3(address_map &map)
 sega_lindbergh_baseboard_device::sega_lindbergh_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, SEGA_LINDBERGH_BASEBOARD, tag, owner, clock)
 {
-	set_ids(0x105718c1, 0x10, 0x068000, 0x11db067b);
+	pci_set_ids(0x105718c1, 0x10, 0x068000, 0x11db067b);
 }
 
 void sega_lindbergh_baseboard_device::device_start()
 {
 	pci_device::device_start();
-	add_map(   128*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map1));
-	add_map(  1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map2));
-	add_map(2*1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map3));
+	pci_add_map(   128*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map1));
+	pci_add_map(  1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map2));
+	pci_add_map(2*1024*1024, M_MEM, FUNC(sega_lindbergh_baseboard_device::map3));
 }
 
 void sega_lindbergh_baseboard_device::device_reset()

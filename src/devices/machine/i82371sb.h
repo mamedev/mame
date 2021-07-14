@@ -59,13 +59,13 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void reset_all_mappings() override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_reset_all_mappings() override;
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual bool map_first() const override { return true; }
+	virtual bool pci_map_first() const override { return true; }
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
@@ -210,11 +210,11 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void reset_all_mappings() override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_reset_all_mappings() override;
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 	DECLARE_WRITE_LINE_MEMBER(primary_int);
 	DECLARE_WRITE_LINE_MEMBER(secondary_int);

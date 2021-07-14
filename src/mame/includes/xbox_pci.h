@@ -19,11 +19,11 @@ public:
 	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
 		: nv2a_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x10de02a5, 0, 0);
+		pci_set_ids_host(0x10de02a5, 0, 0);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 	nv2a_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 			uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { cpu.set_tag(std::forward<T>(cpu_tag)); }
 
@@ -50,9 +50,9 @@ public:
 	}
 	nv2a_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 protected:
@@ -114,7 +114,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
@@ -183,7 +183,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	devcb_write_line m_interrupt_handler;
@@ -230,7 +230,7 @@ protected:
 	virtual void device_config_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	ohci_usb_controller *ohci_usb;
@@ -284,7 +284,7 @@ public:
 	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, T &&cpu_tag)
 		: mcpx_apu_device(mconfig, tag, owner, clock)
 	{
-		set_ids(0x10de01b0, 0xc2, 0x040100, subsystem_id);
+		pci_set_ids(0x10de01b0, 0xc2, 0x040100, subsystem_id);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
 	mcpx_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -298,7 +298,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	required_device<device_memory_interface> cpu;
@@ -351,7 +351,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	struct ac97_state {
@@ -400,10 +400,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 		uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	required_device<bus_master_ide_controller_device> m_pri;
@@ -433,11 +433,11 @@ public:
 	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t main_id, uint32_t revision)
 		: nv2a_agp_device(mconfig, tag, owner, clock)
 	{
-		set_ids_bridge(main_id, revision);
+		pci_set_ids_bridge(main_id, revision);
 	}
 	nv2a_agp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void config_map(address_map& map) override;
+	void pci_config_map(address_map& map) override;
 
 	uint32_t unknown_r(offs_t offset, uint32_t mem_mask = ~0);
 	void unknown_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

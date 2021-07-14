@@ -20,15 +20,15 @@ DECLARE_DEVICE_TYPE(GT64111, gt64111_device)
  *************************************/
 class gt64xxx_device : public pci_host_device {
 public:
-	virtual void reset_all_mappings() override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_reset_all_mappings() override;
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_be(int be) { m_be = be; }
 	void set_autoconfig(int autoconfig) { m_autoconfig = autoconfig; }
 	void set_irq_num(int irq_num) { m_irq_num = irq_num; }
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 	void set_simm_size(int index, int size) { m_simm_size[index] = size; };
 	void set_simm0_size(int size) { m_simm_size[0] = size; };
 	void set_simm1_size(int size) { m_simm_size[1] = size; };
@@ -156,7 +156,7 @@ public:
 	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
 		: gt64010_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x11ab0146, 0x03, 0x00000000);
+		pci_set_ids_host(0x11ab0146, 0x03, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_irq_num(irq_num);
 	}
@@ -174,7 +174,7 @@ public:
 	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
 		: gt64111_device(mconfig, tag, owner, clock)
 	{
-		set_ids(0x414611ab, 0x10, 0x058000, 0x00000000);
+		pci_set_ids(0x414611ab, 0x10, 0x058000, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_irq_num(irq_num);
 	}

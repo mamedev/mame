@@ -124,7 +124,7 @@ class iteagle_eeprom_device : public pci_device {
 public:
 	iteagle_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	// optional information overrides
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	void set_info(int sw_version, int hw_version) {m_sw_version=sw_version; m_hw_version=hw_version;}

@@ -45,12 +45,12 @@ protected:
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 	void map_shadowram(address_space *memory_space, offs_t addrstart, offs_t addrend, void *baseptr);
 
-	virtual void reset_all_mappings() override;
+	virtual void pci_reset_all_mappings() override;
 
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -88,17 +88,17 @@ private:
 	void internal_io_map(address_map &map);
 
 	uint8_t dram_config_r() { return m_dram_config; }
-	void dram_config_w(uint8_t data) { m_dram_config = data; remap_cb(); }
+	void dram_config_w(uint8_t data) { m_dram_config = data; m_pci_remap_cb(); }
 	uint8_t bios_config_r() { return m_bios_config; }
-	void bios_config_w(uint8_t data) { m_bios_config = data; remap_cb(); }
+	void bios_config_w(uint8_t data) { m_bios_config = data; m_pci_remap_cb(); }
 	uint32_t mailbox_r()     { return m_mailbox; }
 	void mailbox_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0)    { COMBINE_DATA(&m_mailbox); }
 	uint8_t isa_decoder_r() { return m_isa_decoder; }
-	void isa_decoder_w(uint8_t data) { m_isa_decoder = data; remap_cb(); }
+	void isa_decoder_w(uint8_t data) { m_isa_decoder = data; m_pci_remap_cb(); }
 	uint16_t shadow_config_r() { return m_shadctrl; }
-	void shadow_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); remap_cb(); }
+	void shadow_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_shadctrl); logerror("SiS496: %04x to shadow control\n", m_shadctrl); m_pci_remap_cb(); }
 	uint8_t smram_ctrl_r() { return m_smramctrl; }
-	void smram_ctrl_w(uint8_t data) { m_smramctrl = data; remap_cb(); }
+	void smram_ctrl_w(uint8_t data) { m_smramctrl = data; m_pci_remap_cb(); }
 
 	// southbridge
 	uint8_t at_page8_r(offs_t offset);

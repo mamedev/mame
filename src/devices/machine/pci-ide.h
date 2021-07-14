@@ -25,7 +25,7 @@ public:
 		, const char *bmtag = ":pci:00.0", uint32_t bmspace = AS_DATA)
 		: ide_pci_device(mconfig, tag, owner, clock)
 	{
-		set_ids(main_id, revision, 0x01018a, subdevice_id);
+		pci_set_ids(main_id, revision, 0x01018a, subdevice_id);
 		m_bus_master_tag = bmtag;
 		m_bus_master_space = bmspace;
 	}
@@ -46,7 +46,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);

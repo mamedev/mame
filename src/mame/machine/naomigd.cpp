@@ -418,21 +418,21 @@ idegdrom_device::idegdrom_device(const machine_config &mconfig, const char *tag,
 	m_ide(*this, "ide"),
 	irq_cb(*this)
 {
-	set_ids(0x11db189d, 0, 0, 0); // 0x10221000 or 0x00011172 possible too
+	pci_set_ids(0x11db189d, 0, 0, 0); // 0x10221000 or 0x00011172 possible too
 }
 
 void idegdrom_device::device_start()
 {
 	pci_device::device_start();
 	irq_cb.resolve_safe();
-	add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
-	bank_infos[0].adr = 0x01c0;
+	pci_add_map(0x00000020, M_IO, FUNC(idegdrom_device::map_command));
+	m_pci_bank_info[0].adr = 0x01c0;
 	// pci system does not support base addresses not multiples of size
-	add_map(0x00000020, M_IO | M_DISABLED, FUNC(idegdrom_device::map_control));
-	bank_infos[1].adr = 0x03b0;
-	add_map(0x00000010, M_IO, FUNC(idegdrom_device::map_dma));
-	bank_infos[2].adr = 0xcc00;
-	command = 0x0083;
+	pci_add_map(0x00000020, M_IO | M_DISABLED, FUNC(idegdrom_device::map_control));
+	m_pci_bank_info[1].adr = 0x03b0;
+	pci_add_map(0x00000010, M_IO, FUNC(idegdrom_device::map_dma));
+	m_pci_bank_info[2].adr = 0xcc00;
+	m_pci_command = 0x0083;
 }
 
 void idegdrom_device::device_reset()
@@ -440,7 +440,7 @@ void idegdrom_device::device_reset()
 	pci_device::device_reset();
 }
 
-void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void idegdrom_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(io_offset + 0x03b0, io_offset + 0x03cf, *static_cast<idegdrom_device*>(this), &idegdrom_device::map_control);

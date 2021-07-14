@@ -25,9 +25,9 @@ i82541_device::i82541_device(const machine_config &mconfig, const char *tag, dev
 void i82541_device::device_start()
 {
 	pci_device::device_start();
-	add_map(128*1024, M_MEM, FUNC(i82541_device::registers_map));
-	add_map(128*1024, M_MEM, FUNC(i82541_device::flash_map));
-	add_map(32,       M_IO,  FUNC(i82541_device::registers_io_map));
+	pci_add_map(128*1024, M_MEM, FUNC(i82541_device::registers_map));
+	pci_add_map(128*1024, M_MEM, FUNC(i82541_device::flash_map));
+	pci_add_map(32,       M_IO,  FUNC(i82541_device::registers_io_map));
 }
 
 void i82541_device::device_reset()

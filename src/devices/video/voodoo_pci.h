@@ -27,10 +27,10 @@ public:
 protected:
 	voodoo_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 	void postload(void);
 
@@ -104,7 +104,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 	required_device<voodoo_banshee_device> m_voodoo;
 };
@@ -126,7 +126,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 							u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 	required_device<voodoo_3_device> m_voodoo;
 };

@@ -5,9 +5,9 @@
 
 DEFINE_DEVICE_TYPE(I82439TX, i82439tx_host_device, "i82439tx", "Intel 82439TX northbridge")
 
-void i82439tx_host_device::config_map(address_map &map)
+void i82439tx_host_device::pci_config_map(address_map &map)
 {
-	pci_host_device::config_map(map);
+	pci_host_device::pci_config_map(map);
 	map(0x50, 0x50).rw(FUNC(i82439tx_host_device::pcon_r), FUNC(i82439tx_host_device::pcon_w));
 	map(0x52, 0x52).rw(FUNC(i82439tx_host_device::cc_r), FUNC(i82439tx_host_device::cc_w));
 	map(0x56, 0x56).rw(FUNC(i82439tx_host_device::dramec_r), FUNC(i82439tx_host_device::dramec_w));
@@ -46,14 +46,14 @@ void i82439tx_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	m_pci_status = 0x0010;
 
 	ram.resize(ram_size/4);
 }
 
-void i82439tx_host_device::reset_all_mappings()
+void i82439tx_host_device::pci_reset_all_mappings()
 {
-	pci_host_device::reset_all_mappings();
+	pci_host_device::pci_reset_all_mappings();
 }
 
 void i82439tx_host_device::device_reset()
@@ -75,7 +75,7 @@ void i82439tx_host_device::device_reset()
 	errsyn = 0x00;
 }
 
-void i82439tx_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i82439tx_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									 uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
@@ -191,7 +191,7 @@ void i82439tx_host_device::dramc_w(uint8_t data)
 {
 	dramc = data;
 	logerror("dramc = %02x\n", dramc);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439tx_host_device::dramt_r()
@@ -214,7 +214,7 @@ void i82439tx_host_device::pam_w(offs_t offset, uint8_t data)
 {
 	pam[offset - 1] = data;
 	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439tx_host_device::drb_r(offs_t offset)
@@ -259,7 +259,7 @@ void i82439tx_host_device::smram_w(uint8_t data)
 {
 	smram = data;
 	logerror("smram = %02x\n", smram);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i82439tx_host_device::errcmd_r()

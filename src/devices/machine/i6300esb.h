@@ -14,11 +14,11 @@ class i6300esb_lpc_device : public pci_device {
 public:
 	i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void reset_all_mappings() override;
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_reset_all_mappings() override;
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 protected:
 	virtual void device_start() override;
@@ -141,7 +141,7 @@ public:
 	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
 		: i6300esb_watchdog_device(mconfig, tag, owner, clock)
 	{
-		set_ids(0x808625ab, 0x02, 0x088000, subdevice_id);
+		pci_set_ids(0x808625ab, 0x02, 0x088000, subdevice_id);
 	}
 	i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

@@ -120,9 +120,9 @@
 
 DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Controller")
 
-void vrc5074_device::config_map(address_map &map)
+void vrc5074_device::pci_config_map(address_map &map)
 {
-	pci_bridge_device::config_map(map);
+	pci_bridge_device::pci_config_map(map);
 	map(0x00000018, 0x00000027).rw(FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
 }
 
@@ -166,7 +166,7 @@ vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, d
 	m_romRegion(*this, "rom"),
 	m_updateRegion(*this, "update")
 {
-	set_ids_host(0x1033005a, 0x04, 0x00000000);
+	pci_set_ids_host(0x1033005a, 0x04, 0x00000000);
 
 	for (int i = 0; i < 2; i++)
 		m_sdram_size[i] = 0x0;
@@ -205,7 +205,7 @@ void vrc5074_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffffffff;
 	io_offset       = 0x00000000;
-	status = 0x0280;
+	m_pci_status = 0x0280;
 	// Size SDRAM
 	m_sdram[0].resize(m_sdram_size[0]);
 	m_sdram[1].resize(m_sdram_size[1]);
@@ -222,7 +222,7 @@ void vrc5074_device::device_start()
 	// Nile cpu register mapppings
 	m_cpu_space->install_device(0x1fa00000, 0x1fa001ff, *static_cast<vrc5074_device *>(this), &vrc5074_device::cpu_map);
 	// PCI Configuration also mapped at 0x1fa00200
-	m_cpu_space->install_device(0x1fa00200, 0x1fa002ff, *static_cast<vrc5074_device *>(this), &vrc5074_device::config_map);
+	m_cpu_space->install_device(0x1fa00200, 0x1fa002ff, *static_cast<vrc5074_device *>(this), &vrc5074_device::pci_config_map);
 	// Nile serial register mapppings
 	m_cpu_space->install_device(0x1fa00300, 0x1fa0033f, *static_cast<vrc5074_device *>(this), &vrc5074_device::serial_map);
 
@@ -347,7 +347,7 @@ void vrc5074_device::map_cpu_space()
 	}
 }
 
-void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void vrc5074_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	uint32_t winStart, winEnd, winSize;
@@ -379,9 +379,9 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	//}
 }
 
-void vrc5074_device::reset_all_mappings()
+void vrc5074_device::pci_reset_all_mappings()
 {
-	pci_device::reset_all_mappings();
+	pci_device::pci_reset_all_mappings();
 }
 
 uint32_t vrc5074_device::sdram_addr_r()

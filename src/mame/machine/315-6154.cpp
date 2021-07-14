@@ -65,7 +65,7 @@ void sega_315_6154_device::regenerate_config_mapping()
 		{
 			const int s = i >> 3;
 			const int o = (i & 7) << 8;
-			config_space->install_device((0x800 << s) + o, ((0x800 << s) + o) | 0xff, *sub_devices[i], &pci_device::config_map);
+			config_space->install_device((0x800 << s) + o, ((0x800 << s) + o) | 0xff, *sub_devices[i], &pci_device::pci_config_map);
 		}
 }
 

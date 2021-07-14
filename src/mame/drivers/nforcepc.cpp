@@ -68,15 +68,15 @@ static const uint8_t test_spd_data[] = {
 
 DEFINE_DEVICE_TYPE(CRUSH11, crush11_host_device, "crush11", "NVIDIA Corporation nForce CPU bridge")
 
-void crush11_host_device::config_map(address_map &map)
+void crush11_host_device::pci_config_map(address_map &map)
 {
-	pci_host_device::config_map(map);
-	map(0x10, 0x27).rw(FUNC(pci_device::address_base_r), FUNC(pci_device::address_base_w));
+	pci_host_device::pci_config_map(map);
+	map(0x10, 0x27).rw(FUNC(pci_device::pci_address_base_r), FUNC(pci_device::pci_address_base_w));
 	map(0x84, 0x87).rw(FUNC(crush11_host_device::ram_size_r), FUNC(crush11_host_device::ram_size_w));
 	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::unknown_r), FUNC(crush11_host_device::unknown_w));
 }
 
-uint8_t crush11_host_device::header_type_r()
+uint8_t crush11_host_device::pci_header_type_r()
 {
 	return 0x80; // from lspci dump
 }
@@ -92,7 +92,7 @@ crush11_host_device::crush11_host_device(const machine_config &mconfig, const ch
 void crush11_host_device::device_start()
 {
 	pci_host_device::device_start();
-	set_multifunction_device(true);
+	pci_set_multifunction_device(true);
 	memory_space = &cpu->space(AS_DATA);
 	io_space = &cpu->space(AS_IO);
 
@@ -102,15 +102,15 @@ void crush11_host_device::device_start()
 	io_window_start = 0;
 	io_window_end = 0xffff;
 	io_offset = 0;
-	status = 0x00b0;
-	command = 0x0000;
+	m_pci_status = 0x00b0;
+	m_pci_command = 0x0000;
 
-	add_map(64 * 1024 * 1024, M_MEM | M_PREF, FUNC(crush11_host_device::aperture_map));
+	pci_add_map(64 * 1024 * 1024, M_MEM | M_PREF, FUNC(crush11_host_device::aperture_map));
 }
 
-void crush11_host_device::reset_all_mappings()
+void crush11_host_device::pci_reset_all_mappings()
 {
-	pci_host_device::reset_all_mappings();
+	pci_host_device::pci_reset_all_mappings();
 }
 
 void crush11_host_device::device_reset()
@@ -118,7 +118,7 @@ void crush11_host_device::device_reset()
 	pci_host_device::device_reset();
 }
 
-void crush11_host_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void crush11_host_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	io_space->install_device(0, 0xffff, *static_cast<pci_host_device *>(this), &pci_host_device::io_configuration_access_map);
@@ -155,9 +155,9 @@ void crush11_host_device::ram_size_w(uint32_t data)
 
 DEFINE_DEVICE_TYPE(CRUSH11_MEMORY, crush11_memory_device, "crush11_memory", "nForce memory")
 
-void crush11_memory_device::config_map(address_map &map)
+void crush11_memory_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	/*
 	bit 31 of a0,a4,a8,ac,b0 and b4 must be 0
 	bit 0 of c4 and c8 must be 0
@@ -175,7 +175,7 @@ void crush11_memory_device::config_map(address_map &map)
 crush11_memory_device::crush11_memory_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subsystem_id, int ram_size)
 	: crush11_memory_device(mconfig, tag, owner, clock)
 {
-	set_ids(0x10de01ac, 0xb2, 0x050000, subsystem_id);
+	pci_set_ids(0x10de01ac, 0xb2, 0x050000, subsystem_id);
 	set_ram_size(ram_size);
 }
 
@@ -189,12 +189,12 @@ void crush11_memory_device::device_start()
 	device_t *r = owner()->subdevice("00.0");
 
 	pci_device::device_start();
-	set_multifunction_device(true);
+	pci_set_multifunction_device(true);
 	ram.resize(ddr_ram_size * 1024 * 1024 / 4);
 	host = dynamic_cast<crush11_host_device *>(r);
 	ram_space = host->get_cpu_space(AS_PROGRAM);
-	status = 0x0020;
-	command = 0x0000;
+	m_pci_status = 0x0020;
+	m_pci_command = 0x0000;
 }
 
 void crush11_memory_device::device_reset()
@@ -210,7 +210,7 @@ void crush11_memory_device::set_ram_size(int ram_size)
 		ddr_ram_size = 16;
 }
 
-void crush11_memory_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void crush11_memory_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 	uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	ram_space->install_ram(0x00000000, ddr_ram_size * 1024 * 1024 - 1, &ram[0]);

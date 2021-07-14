@@ -48,7 +48,7 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 	m_version(0),
 	m_seq_init(0)
 {
-	set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
+	pci_set_ids(0x55cc33aa, 0xaa, 0xaaaaaa, 0x00);
 }
 
 void iteagle_fpga_device::device_add_mconfig(machine_config &config)
@@ -84,24 +84,24 @@ void iteagle_fpga_device::device_start()
 	m_e1_nvram->set_base(m_e1_nv_data, sizeof(m_e1_nv_data));
 
 	pci_device::device_start();
-	status = 0x5555;
-	command = 0x5555;
+	m_pci_status = 0x5555;
+	m_pci_command = 0x5555;
 
 	// always keep this device memory ranges active
-	command |= 3;
-	command_mask &= ~3;
+	m_pci_command |= 3;
+	m_pci_command_mask &= ~3;
 
-	add_map(sizeof(m_fpga_regs), M_IO, FUNC(iteagle_fpga_device::fpga_map));
+	pci_add_map(sizeof(m_fpga_regs), M_IO, FUNC(iteagle_fpga_device::fpga_map));
 	// fpga defaults to base address 0x00000300
-	bank_infos[0].adr = 0x00000300 & (~(bank_infos[0].size - 1));
+	m_pci_bank_info[0].adr = 0x00000300 & (~(m_pci_bank_info[0].size - 1));
 
-	add_map(sizeof(m_rtc_regs), M_MEM, FUNC(iteagle_fpga_device::rtc_map));
+	pci_add_map(sizeof(m_rtc_regs), M_MEM, FUNC(iteagle_fpga_device::rtc_map));
 	// RTC defaults to base address 0x000c0000
-	bank_infos[1].adr = 0x000c0000 & (~(bank_infos[1].size - 1));
+	m_pci_bank_info[1].adr = 0x000c0000 & (~(m_pci_bank_info[1].size - 1));
 
-	add_map(0x20000, M_MEM, FUNC(iteagle_fpga_device::ram_map));
+	pci_add_map(0x20000, M_MEM, FUNC(iteagle_fpga_device::ram_map));
 	// RAM defaults to base address 0x000e0000
-	bank_infos[2].adr = 0x000e0000 & (~(bank_infos[2].size - 1));
+	m_pci_bank_info[2].adr = 0x000e0000 & (~(m_pci_bank_info[2].size - 1));
 
 	m_timer = timer_alloc(0, nullptr);
 
@@ -128,7 +128,7 @@ void iteagle_fpga_device::device_start()
 
 void iteagle_fpga_device::device_reset()
 {
-	remap_cb();
+	m_pci_remap_cb();
 	memset(m_fpga_regs, 0, sizeof(m_fpga_regs));
 	m_seq = m_seq_init;
 	m_seq_rem1 = 0;
@@ -683,7 +683,7 @@ iteagle_eeprom_device::iteagle_eeprom_device(const machine_config &mconfig, cons
 	: pci_device(mconfig, ITEAGLE_EEPROM, tag, owner, clock)
 	, m_sw_version(0), m_hw_version(0), m_eeprom(*this, "eeprom")
 {
-	set_ids(0x80861229, 0x02, 0x020000, 0x00);
+	pci_set_ids(0x80861229, 0x02, 0x020000, 0x00);
 
 	// When corrupt writes 0x3=2, 0x3e=2, 0xa=0, 0x30=0
 	// 0x4 = HW Version - 6-8 is GREEN board PCB, 9 is RED board PCB
@@ -722,12 +722,12 @@ void iteagle_eeprom_device::device_start()
 	m_eeprom->default_data(m_iteagle_default_eeprom.data(), 0x80);
 
 	pci_device::device_start();
-	skip_map_regs(1);
-	add_map(0x10, M_IO, FUNC(iteagle_eeprom_device::eeprom_map));
+	pci_skip_map_regs(1);
+	pci_add_map(0x10, M_IO, FUNC(iteagle_eeprom_device::eeprom_map));
 
 	// always keep this device memory ranges active
-	command |= 3;
-	command_mask &= ~3;
+	m_pci_command |= 3;
+	m_pci_command_mask &= ~3;
 }
 
 void iteagle_eeprom_device::device_reset()
@@ -735,7 +735,7 @@ void iteagle_eeprom_device::device_reset()
 	pci_device::device_reset();
 }
 
-void iteagle_eeprom_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void iteagle_eeprom_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	m_memory_space = memory_space;
@@ -811,24 +811,24 @@ iteagle_periph_device::iteagle_periph_device(const machine_config &mconfig, cons
 	: pci_device(mconfig, ITEAGLE_PERIPH, tag, owner, clock)
 	, m_rtc(*this, "eagle1_rtc")
 {
-	set_ids(0x1080c693, 0x00, 0x060100, 0x00);
+	pci_set_ids(0x1080c693, 0x00, 0x060100, 0x00);
 }
 
 void iteagle_periph_device::device_start()
 {
 	pci_device::device_start();
-	pci_device::set_multifunction_device(true);
-	add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_periph_device::ctrl_map));
+	pci_device::pci_set_multifunction_device(true);
+	pci_add_map(sizeof(m_ctrl_regs), M_IO, FUNC(iteagle_periph_device::ctrl_map));
 	// ctrl defaults to base address 0x00000000
-	bank_infos[0].adr = 0x000;
+	m_pci_bank_info[0].adr = 0x000;
 
 	m_rtc_regs[0xa] = 0x20; // 32.768 MHz
 	m_rtc_regs[0xb] = 0x02; // 24-hour format
 	m_rtc->set_base(m_rtc_regs, sizeof(m_rtc_regs));
 
 	// always keep this device memory ranges active
-	command |= 3;
-	command_mask &= ~3;
+	m_pci_command |= 3;
+	m_pci_command_mask &= ~3;
 
 	// Save states
 	save_item(NAME(m_ctrl_regs));

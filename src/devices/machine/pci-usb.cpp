@@ -19,7 +19,7 @@ usb_ohci_device::usb_ohci_device(const machine_config &mconfig, const char *tag,
 void usb_ohci_device::device_start()
 {
 	pci_device::device_start();
-	add_map(4096, M_MEM, FUNC(usb_ohci_device::map));
+	pci_add_map(4096, M_MEM, FUNC(usb_ohci_device::map));
 }
 
 void usb_ohci_device::device_reset()
@@ -39,7 +39,7 @@ usb_uhci_device::usb_uhci_device(const machine_config &mconfig, const char *tag,
 void usb_uhci_device::device_start()
 {
 	pci_device::device_start();
-	add_map(32, M_IO, FUNC(usb_uhci_device::map));
+	pci_add_map(32, M_IO, FUNC(usb_uhci_device::map));
 }
 
 void usb_uhci_device::device_reset()
@@ -59,7 +59,7 @@ usb_ehci_device::usb_ehci_device(const machine_config &mconfig, const char *tag,
 void usb_ehci_device::device_start()
 {
 	pci_device::device_start();
-	add_map(1024, M_MEM, FUNC(usb_ehci_device::map));
+	pci_add_map(1024, M_MEM, FUNC(usb_ehci_device::map));
 }
 
 void usb_ehci_device::device_reset()

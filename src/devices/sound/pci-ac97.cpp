@@ -29,10 +29,10 @@ ac97_device::ac97_device(const machine_config &mconfig, const char *tag, device_
 void ac97_device::device_start()
 {
 	pci_device::device_start();
-	add_map(256, M_IO, FUNC(ac97_device::native_audio_mixer_map));
-	add_map(64,  M_IO, FUNC(ac97_device::native_audio_bus_mastering_map));
-	add_map(512, M_MEM, FUNC(ac97_device::mixer_map));
-	add_map(256, M_MEM, FUNC(ac97_device::bus_mastering_map));
+	pci_add_map(256, M_IO, FUNC(ac97_device::native_audio_mixer_map));
+	pci_add_map(64,  M_IO, FUNC(ac97_device::native_audio_bus_mastering_map));
+	pci_add_map(512, M_MEM, FUNC(ac97_device::mixer_map));
+	pci_add_map(256, M_MEM, FUNC(ac97_device::bus_mastering_map));
 }
 
 void ac97_device::device_reset()

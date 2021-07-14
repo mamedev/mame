@@ -17,7 +17,7 @@ sb0400_device::sb0400_device(const machine_config &mconfig, const char *tag, dev
 void sb0400_device::device_start()
 {
 	pci_device::device_start();
-	add_map(64, M_IO, FUNC(sb0400_device::map));
+	pci_add_map(64, M_IO, FUNC(sb0400_device::map));
 }
 
 void sb0400_device::device_reset()

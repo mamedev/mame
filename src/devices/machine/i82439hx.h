@@ -15,7 +15,7 @@ public:
 	i82439hx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int ram_size)
 		: i82439hx_host_device(mconfig, tag, owner, clock)
 	{
-		set_ids_host(0x80861250, 0x03, 0x00000000);
+		pci_set_ids_host(0x80861250, 0x03, 0x00000000);
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_ram_size(ram_size);
 	}
@@ -30,12 +30,12 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void reset_all_mappings() override;
+	virtual void pci_reset_all_mappings() override;
 
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+	virtual void pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual void config_map(address_map &map) override;
+	virtual void pci_config_map(address_map &map) override;
 
 private:
 	int ram_size;
@@ -47,7 +47,7 @@ private:
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 	int smiact_n;
 
-	virtual uint8_t header_type_r() override;
+	virtual uint8_t pci_header_type_r() override;
 	uint8_t pcon_r();
 	void pcon_w(uint8_t data);
 	uint8_t cc_r();

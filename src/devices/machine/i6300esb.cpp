@@ -18,21 +18,21 @@ i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig
 void i6300esb_watchdog_device::device_start()
 {
 	pci_device::device_start();
-	add_map(16, M_MEM, FUNC(i6300esb_watchdog_device::map));
+	pci_add_map(16, M_MEM, FUNC(i6300esb_watchdog_device::map));
 }
 
 void i6300esb_watchdog_device::device_reset()
 {
 	pci_device::device_reset();
-	command = 0x000f;
-	command_mask = 0x0140;
-	status = 0x0280;
+	m_pci_command = 0x000f;
+	m_pci_command_mask = 0x0140;
+	m_pci_status = 0x0280;
 }
 
 
-void i6300esb_lpc_device::config_map(address_map &map)
+void i6300esb_lpc_device::pci_config_map(address_map &map)
 {
-	pci_device::config_map(map);
+	pci_device::pci_config_map(map);
 	map(0x40, 0x43).rw(FUNC(i6300esb_lpc_device::pmbase_r), FUNC(i6300esb_lpc_device::pmbase_w));
 	map(0x44, 0x44).rw(FUNC(i6300esb_lpc_device::acpi_cntl_r), FUNC(i6300esb_lpc_device::acpi_cntl_w));
 	map(0x4e, 0x4f).rw(FUNC(i6300esb_lpc_device::bios_cntl_r), FUNC(i6300esb_lpc_device::bios_cntl_w));
@@ -96,7 +96,7 @@ i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const ch
 	, pit (*this, "pit")
 	, m_region(*this, DEVICE_SELF)
 {
-	set_ids(0x808625a1, 0x02, 0x060100, 0x00000000);
+	pci_set_ids(0x808625a1, 0x02, 0x060100, 0x00000000);
 }
 
 void i6300esb_lpc_device::device_start()
@@ -131,9 +131,9 @@ void i6300esb_lpc_device::device_reset()
 	gen_sta = 0x00;
 }
 
-void i6300esb_lpc_device::reset_all_mappings()
+void i6300esb_lpc_device::pci_reset_all_mappings()
 {
-	pci_device::reset_all_mappings();
+	pci_device::pci_reset_all_mappings();
 
 	pmbase = 0;
 	acpi_cntl = 0;
@@ -162,7 +162,7 @@ void i6300esb_lpc_device::pmbase_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	COMBINE_DATA(&pmbase);
 	pmbase &= 0x0000ff80;
 	logerror("%s: pmbase = %08x\n", tag(), pmbase);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::acpi_cntl_r()
@@ -174,7 +174,7 @@ void i6300esb_lpc_device::acpi_cntl_w(uint8_t data)
 {
 	acpi_cntl = data;
 	logerror("%s: acpi_cntl = %08x\n", tag(), acpi_cntl);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::bios_cntl_r()
@@ -186,7 +186,7 @@ void i6300esb_lpc_device::bios_cntl_w(offs_t offset, uint16_t data, uint16_t mem
 {
 	COMBINE_DATA(&bios_cntl);
 	logerror("%s: bios_cntl = %08x\n", tag(), bios_cntl);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::tco_cntl_r()
@@ -210,7 +210,7 @@ void i6300esb_lpc_device::gpio_base_w(offs_t offset, uint32_t data, uint32_t mem
 	COMBINE_DATA(&gpio_base);
 	gpio_base &= 0x0000ffc0;
 	logerror("%s: gpio_base = %08x\n", tag(), gpio_base);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::gpio_cntl_r()
@@ -222,7 +222,7 @@ void i6300esb_lpc_device::gpio_cntl_w(uint8_t data)
 {
 	gpio_cntl = data;
 	logerror("%s: gpio_cntl = %02x\n", tag(), gpio_cntl);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::pirq_rout_r(offs_t offset)
@@ -431,7 +431,7 @@ void i6300esb_lpc_device::back_cntl_w(uint8_t data)
 {
 	back_cntl = data;
 	logerror("%s: back_cntl = %02x\n", tag(), back_cntl);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::rtc_conf_r()
@@ -443,7 +443,7 @@ void i6300esb_lpc_device::rtc_conf_w(uint8_t data)
 {
 	rtc_conf = data;
 	logerror("%s: rtc_conf = %02x\n", tag(), rtc_conf);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::lpc_if_com_range_r()
@@ -455,7 +455,7 @@ void i6300esb_lpc_device::lpc_if_com_range_w(uint8_t data)
 {
 	lpc_if_com_range = data;
 	logerror("%s: lpc_if_com_range = %02x\n", tag(), lpc_if_com_range);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::lpc_if_fdd_lpt_range_r()
@@ -467,7 +467,7 @@ void i6300esb_lpc_device::lpc_if_fdd_lpt_range_w(offs_t offset, uint8_t data, ui
 {
 	COMBINE_DATA(&lpc_if_fdd_lpt_range);
 	logerror("%s: lpc_if_fdd_lpt_range  = %02x\n", tag(), lpc_if_fdd_lpt_range);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::lpc_if_sound_range_r()
@@ -479,7 +479,7 @@ void i6300esb_lpc_device::lpc_if_sound_range_w(offs_t offset, uint8_t data, uint
 {
 	COMBINE_DATA(&lpc_if_sound_range);
 	logerror("%s: lpc_if_sound_range  = %02x\n", tag(), lpc_if_sound_range);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::fwh_dec_en1_r()
@@ -491,7 +491,7 @@ void i6300esb_lpc_device::fwh_dec_en1_w(uint8_t data)
 {
 	fwh_dec_en1 = data | 0x80;
 	logerror("%s: fwh_dec_en1  = %02x\n", tag(), fwh_dec_en1);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::gen1_dec_r()
@@ -503,7 +503,7 @@ void i6300esb_lpc_device::gen1_dec_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	COMBINE_DATA(&gen1_dec);
 	logerror("%s: gen1_dec = %04x\n", tag(), gen1_dec);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::lpc_en_r()
@@ -515,7 +515,7 @@ void i6300esb_lpc_device::lpc_en_w(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	COMBINE_DATA(&lpc_en);
 	logerror("%s: lpc_en = %04x\n", tag(), lpc_en);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint32_t i6300esb_lpc_device::fwh_sel1_r()
@@ -527,7 +527,7 @@ void i6300esb_lpc_device::fwh_sel1_w(offs_t offset, uint32_t data, uint32_t mem_
 {
 	COMBINE_DATA(&fwh_sel1);
 	logerror("%s: fwh_sel1 = %08x\n", tag(), fwh_sel1);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::gen2_dec_r()
@@ -539,7 +539,7 @@ void i6300esb_lpc_device::gen2_dec_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	COMBINE_DATA(&gen2_dec);
 	logerror("%s: gen2_dec = %04x\n", tag(), gen2_dec);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::fwh_sel2_r()
@@ -551,7 +551,7 @@ void i6300esb_lpc_device::fwh_sel2_w(offs_t offset, uint16_t data, uint16_t mem_
 {
 	COMBINE_DATA(&fwh_sel2);
 	logerror("%s: fwh_sel2 = %04x\n", tag(), fwh_sel2);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint8_t i6300esb_lpc_device::fwh_dec_en2_r()
@@ -563,7 +563,7 @@ void i6300esb_lpc_device::fwh_dec_en2_w(uint8_t data)
 {
 	fwh_dec_en2 = data;
 	logerror("%s: fwh_dec_en2  = %02x\n", tag(), fwh_dec_en2);
-	remap_cb();
+	m_pci_remap_cb();
 }
 
 uint16_t i6300esb_lpc_device::func_dis_r()
@@ -673,7 +673,7 @@ void i6300esb_lpc_device::map_bios(address_space *memory_space, uint32_t start, 
 	memory_space->install_rom(start, end, m_region->base() + (start & mask));
 }
 
-void i6300esb_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+void i6300esb_lpc_device::pci_map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	if(fwh_dec_en1 & 0x80) {

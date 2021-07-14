@@ -12,7 +12,7 @@ public:
 	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t subdevice_id)
 		: geforce_7600gs_device(mconfig, tag, owner, clock)
 	{
-		set_ids_agp(0x10de02e1, 0xa1, subdevice_id);
+		pci_set_ids_agp(0x10de02e1, 0xa1, subdevice_id);
 	}
 	geforce_7600gs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
