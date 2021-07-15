@@ -117,8 +117,8 @@ nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_reg(0)
+nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_reg(0), irq_timer(nullptr)
 {
 }
 
@@ -434,6 +434,11 @@ void nes_0353_device::pcb_reset()
 void nes_09034a_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
 	save_item(NAME(m_reg));
 }
 
@@ -442,6 +447,9 @@ void nes_09034a_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
 	m_reg = 0;
 }
 
@@ -1304,30 +1312,76 @@ void nes_0353_device::write_h(offs_t offset, u8 data)
  (UNL-)09-034A
 
  Games: Zanac FDS conversion with two PRG chips and
- no CHRROM and Volleyball FDS conversion with two PRG
- chips and CHRROM.
- Originally dumps were marked as UNL-SMB2J pcb
+ no CHRROM, and SMB2 and Volleyball FDS conversions
+ with two PRG chips and CHRROM. Originally dumps
+ were marked as UNL-SMB2J PCB.
+
+ Only SMB2 uses the IRQ and it has been documented as
+ being broken on real hardware. Most notably the status
+ bar scrolls with the rest of the screen and the game
+ completely crashes between the "our princess" scene of
+ world 4-4 and the beginning of world 5-1. How the IRQ
+ functions is to be confirmed but it likely uses a 12-bit
+ counter just like the other SMB2 bootlegs.  That is how
+ we presently emulate it here.
 
  NES 2.0: mapper 304
 
- In MAME: Partially supported. Need to emulate IRQ
- (needed by smb2 conversion?)
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_09034a_device::write_ex(offs_t offset, uint8_t data)
+void nes_09034a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			m_irq_count = (m_irq_count + 1) & 0x0fff;
+			if (!m_irq_count)
+				set_irq_line(ASSERT_LINE);
+		}
+	}
+}
+
+void nes_09034a_device::write_ex(offs_t offset, u8 data)
 {
 	LOG_MMC(("09-034a write_ex, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 7)    // $4027
-		m_reg = data & 1;
+	offset += 0x20;
+	switch (offset)
+	{
+		case 0x0027:
+			m_reg = data & 1;
+			break;
+		case 0x0068:
+			m_irq_enable = BIT(data, 0);
+			if (!m_irq_enable)
+			{
+				m_irq_count = 0;
+				set_irq_line(CLEAR_LINE);
+			}
+			break;
+	}
 }
 
-uint8_t nes_09034a_device::read_m(offs_t offset)
+u8 nes_09034a_device::read_ex(offs_t offset)
+{
+	LOG_MMC(("09-034a read_ex, offset: %04x, data: %02x\n", offset));
+
+	offset += 0x20;
+	// SMB2 does not boot with the default open bus reads in this range
+	if (offset >= 0x42 && offset <= 0x55)
+		return 0xff;
+	else
+		return get_open_bus();
+}
+
+u8 nes_09034a_device::read_m(offs_t offset)
 {
 	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
 	// in 0x6000-0x7fff is mapped the 2nd PRG chip which starts after 32K (hence the +4)
-	return m_prg[((m_reg + 4) * 0x2000) + offset];
+	return m_prg[(((m_reg + 4) * 0x2000) + offset) & (m_prg_size - 1)];
 }
 
 /*-------------------------------------------------

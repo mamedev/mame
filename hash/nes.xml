@@ -67226,8 +67226,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Whirlwind Manu has at least two version: LE10 and LF36. This earlier version apparently hangs at the end of world 4-4 on real hardware. -->
-	<software name="smb2fdse" cloneof="smb2fds" supported="no">
+<!-- Whirlwind Manu has at least two versions: LE10 and LF36. This earlier version has a broken status bar that scrolls with the game. It also crashes at the end of world 4-4 on real hardware (and in MAME). -->
+	<software name="smb2fdse" cloneof="smb2fds">
 		<description>Super Mario Bros. 2 (LE10)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
