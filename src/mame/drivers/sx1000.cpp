@@ -52,6 +52,7 @@
 
 // video
 #include "screen.h"
+#include "emupal.h"
 #include "video/mc6845.h"
 #include "video/hd63484.h"
 
@@ -75,12 +76,15 @@ public:
 		, m_vram(*this, "vram")
 		, m_eprom(*this, "eprom")
 		, m_pic(*this, "pic")
-		, m_screen(*this, "screen")
+		, m_screen_crtc(*this, "screen_crtc")
+		, m_screen_acrtc(*this, "screen_acrtc")
+		, m_palette_acrtc(*this, "palette_acrtc")
 		, m_crtc(*this, "crtc")
 		, m_acrtc(*this, "acrtc")
 		, m_serial1(*this, "i8251_1")
 		, m_serial2(*this, "i8251_2")
 		, m_fontram(*this, "fontram")
+		, m_sw1(*this, "SW1")
 		, m_sw2(*this, "SW2")
 	{
 	}
@@ -108,7 +112,9 @@ private:
 
 	required_device<pic8259_device> m_pic;
 
-	required_device<screen_device> m_screen;
+	required_device<screen_device> m_screen_crtc;
+	required_device<screen_device> m_screen_acrtc;
+	required_device<palette_device> m_palette_acrtc;
 	required_device<hd6345_device> m_crtc;
 	required_device<hd63484_device> m_acrtc;
 	required_device<i8251_device>  m_serial1;
@@ -116,8 +122,10 @@ private:
 
 	required_shared_ptr<u16> m_fontram;
 
+	required_ioport m_sw1;
 	required_ioport m_sw2;
 	u16 f14000_r();
+	u16 f16000_r();
 };
 
 void sx1000_state::machine_start()
@@ -155,7 +163,7 @@ void sx1000_state::cpu_map(address_map &map)
 	map(0xf14101, 0xf14101).lrw8([this]() { return m_pic->read(1); }, "pic_r1", [this](u8 data) { m_pic->write(1, data); }, "pic_w1");
 
 	map(0xf14000, 0xf14001).r(FUNC(sx1000_state::f14000_r));
-	map(0xf16000, 0xf16001).lr16([this]() { return 0x20; }, "sw2_r"); // FIXME: this "disables" the keyboard
+	map(0xf16000, 0xf16001).r(FUNC(sx1000_state::f16000_r));
 
 	map(0xf1a001, 0xf1a001).rw(m_serial2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf1a003, 0xf1a003).rw(m_serial2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -180,6 +188,13 @@ u16 sx1000_state::f14000_r()
 
 	if(m_crtc->vsync_r())
 		res |= 0x20;
+
+	return res;
+}
+
+u16 sx1000_state::f16000_r()
+{
+	u8 res = m_sw1->read();
 
 	return res;
 }
@@ -229,9 +244,18 @@ void sx1000_state::common(machine_config &config)
 
 	PIC8259(config, m_pic);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(48'800'000, 80*8, 0, 80*8, 25*16, 0, 25*16);
-	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
+	// M6845 config screen: HTOTAL: 944  VTOTAL: 444  MAX_X: 639  MAX_Y: 399  HSYNC: 720-823  VSYNC: 416-425  Freq: 76.347534fps
+	SCREEN(config, m_screen_crtc, SCREEN_TYPE_RASTER);
+	m_screen_crtc->set_raw(48'800'000, 944, 0, 640, 444, 0, 400);
+	m_screen_crtc->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
+
+	// ACRTC: full 944x449 vis (200, 18)-(847, 417)
+	SCREEN(config, m_screen_acrtc, SCREEN_TYPE_RASTER);
+	m_screen_acrtc->set_raw(48'800'000, 944, 200, 847, 449, 18, 417);
+	m_screen_acrtc->set_screen_update(m_acrtc, FUNC(hd63484_device::update_screen));
+	m_screen_acrtc->set_palette(m_palette_acrtc);
+
+	PALETTE(config, m_palette_acrtc).set_entries(16);
 
 	// htotal = 117
 	// hdisp = 80
@@ -240,15 +264,13 @@ void sx1000_state::common(machine_config &config)
 	// mrast = 15
 	// MB89321A
 	HD6345(config, m_crtc, 4'000'000);
-	m_crtc->set_screen(m_screen);
+	m_crtc->set_screen(m_screen_crtc);
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 	m_crtc->set_hpixels_per_column(8);
 
 	HD63484(config, m_acrtc, 8'000'000);
-	m_acrtc->set_screen(m_screen);
-	// FIXME: don't let the acrtc reconfigure the screen because it's currently shared
-	m_acrtc->set_auto_configure_screen(false);
+	m_acrtc->set_screen(m_screen_acrtc);
 	m_acrtc->set_addrmap(0, &sx1000_state::acrtc_map);
 
 	auto &rs232_1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
@@ -284,6 +306,11 @@ void sx1000_state::sx1010(machine_config &config)
 }
 
 static INPUT_PORTS_START(sx1010)
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x20, 0x00, "Ignore keyboard error" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "Off" )
+	PORT_DIPSETTING(    0x20, "On" )
+
 	PORT_START("SW2")
 	PORT_DIPNAME( 0x02, 0x00, "Serial console" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, "Off" )
