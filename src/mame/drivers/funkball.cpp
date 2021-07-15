@@ -105,17 +105,19 @@ private:
 	uint32_t m_biu_ctrl_reg[256/4];
 
 	uint32_t flashbank_addr;
+	uint16_t m_latched_timer;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
 
 	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
-	required_ioport_array<16> m_inputs;
+	required_ioport_array<14> m_inputs;
 
 	void flash_w (offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 //  void bios_ram_w(offs_t offset, uint8_t data);
 	uint8_t in_r(offs_t offset);
+	uint8_t timer_r(offs_t offset);
 
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
@@ -147,6 +149,19 @@ private:
 	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
 	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
+
+uint8_t funkball_state::timer_r(offs_t offset)
+{
+	if (offset == 0)
+	{
+		m_latched_timer = machine().time().as_ticks(20000);
+		return m_latched_timer >> 8;
+	}
+
+	// the game polls this timer frequently; eat cycles as a cheap speedup
+	m_maincpu->eat_cycles(500);
+	return m_latched_timer;
+}
 
 void funkball_state::video_start()
 {
@@ -357,7 +372,8 @@ void funkball_state::funkball_io(address_map &map)
 	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
 //  map(0x0320, 0x0323).r(FUNC(funkball_state::test_r));
-	map(0x0360, 0x036f).r(FUNC(funkball_state::in_r)); // inputs
+	map(0x0360, 0x036d).r(FUNC(funkball_state::in_r)); // inputs
+	map(0x036e, 0x036f).r(FUNC(funkball_state::timer_r)); // inputs
 }
 
 static INPUT_PORTS_START( funkball )
@@ -656,56 +672,6 @@ static INPUT_PORTS_START( funkball )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_START("IN.13")
 	PORT_DIPNAME( 0x01, 0x01, "13" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.14")
-	PORT_DIPNAME( 0x01, 0x01, "14" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN.15")
-	PORT_DIPNAME( 0x01, 0x01, "15" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
