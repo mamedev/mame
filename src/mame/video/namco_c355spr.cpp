@@ -356,7 +356,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	const u16 palette = pSource[6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 linkno   = pSource[0] & 0x3ff; /* LINKNO     0x000..0x3ff for format table entry, verified in finalapr code */
+	const u16 linkno   = pSource[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
 	sprite_ptr->offset = pSource[1];         /* OFFSET */
 	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
 	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
