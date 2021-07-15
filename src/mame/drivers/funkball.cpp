@@ -809,4 +809,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1998, funkball, 0, funkball, funkball, funkball_state, empty_init, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", MACHINE_NOT_WORKING)
