@@ -432,11 +432,8 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	}
 	u32 zoomy = (vsize << 16) / (num_rows * 16);
 	dy = (dy * zoomy + 0x8000) >> 16;
-	if (flipy)
-	{
-		vpos += dy;
-	}
-	else
+
+	if (!flipy)
 	{
 		vpos -= dy;
 	}
