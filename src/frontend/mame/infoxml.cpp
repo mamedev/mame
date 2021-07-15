@@ -97,26 +97,6 @@ private:
 };
 
 
-template<class T>
-class message_queue
-{
-public:
-	message_queue() { }
-	message_queue(const message_queue &) = delete;
-	message_queue(message_queue &&) = delete;
-
-	// methods
-	void push(T &&value);
-	void push(const T &value);
-	T pop();
-
-private:
-	std::queue<T>			m_queue;
-	std::mutex				m_mutex;
-	std::condition_variable	m_cond;
-};
-
-
 typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 std::string normalize_string(const char *string);
@@ -449,6 +429,11 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 {
 	struct prepared_info
 	{
+		prepared_info() = default;
+		prepared_info(const prepared_info &) = delete;
+		prepared_info(prepared_info &&) = default;
+		prepared_info &operator=(const prepared_info &) = delete;
+
 		std::string     m_xml_snippet;
 		device_type_set m_dev_set;
 	};
@@ -459,6 +444,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	filtered_driver_enumerator filtered_drivlist(drivlist, devfilter);
 	bool header_outputted = false;
 
+	// essentially a local method to emit the header if necessary
 	auto output_header_if_necessary = [this, &header_outputted](std::ostream &out)
 	{
 		if (!header_outputted)
@@ -473,28 +459,33 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 	if (include_devices && filter)
 		devset.emplace();
 
-	// prepare a vector of tasks
-	std::vector<std::future<prepared_info>> tasks;
-	unsigned int active_task_count = 0;
-	unsigned int maximum_task_count = std::thread::hardware_concurrency() + 4;
-	size_t next_task_index = 0;
+	// prepare a queue of tasks - this is a FIFO queue because of the
+	// need to be deterministic
+	std::queue<std::future<prepared_info>> tasks;
 
-	// and maintain a message queue
-	message_queue<size_t> msgque;
+	// while we want to be deterministic, asynchronous task scheduling is not; so we want to
+	// track the amount of active tasks so that we can keep on spawning tasks even if we're
+	// waiting on the task in the front of the queue
+	std::atomic<unsigned int> active_task_count = 0;
+	unsigned int maximum_active_task_count = std::thread::hardware_concurrency() + 10;
+	unsigned int maximum_outstanding_task_count = maximum_active_task_count + 20;
 
 	// loop until we're done enumerating drivers, and until there are no outstanding tasks
-	while (!filtered_drivlist.done() || active_task_count > 0)
+	while (!filtered_drivlist.done() || tasks.size() > 0)
 	{
-		// loop until there are as many outstanding tasks as possible
-		while (!filtered_drivlist.done() && active_task_count < maximum_task_count)
+		// loop until there are as many outstanding tasks as possible (we want to separately cap outstanding
+		// tasks and active tasks)
+		while (!filtered_drivlist.done()
+			&& active_task_count < maximum_active_task_count
+			&& tasks.size() < maximum_outstanding_task_count)
 		{
 			// we want to launch a task; grab a packet of drivers to process
 			std::vector<std::reference_wrapper<const game_driver>> drivers = filtered_drivlist.next(20);
 			if (drivers.size() <= 0)
 				break;
 
-			// do the dirty work in a future
-			std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, drivers{ std::move(drivers) }, include_devices, &msgque, next_task_index]
+			// do the dirty work asychronously
+			auto task_proc = [&drivlist, drivers{ std::move(drivers) }, include_devices, &active_task_count]
 			{
 				prepared_info result;
 				std::ostringstream stream;
@@ -506,32 +497,23 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 				// capture the XML snippet
 				result.m_xml_snippet = stream.str();
 
-				// signal that this task has completed
-				msgque.push(next_task_index);
-
-				// and return
+				// we're done with the task; decrement the counter and return
+				active_task_count--;
 				return result;
-			});
+			};
 
-			// and put the future in the vector
-			if (next_task_index < tasks.size())
-				tasks[next_task_index] = std::move(future_pi);
-			else if (next_task_index == tasks.size())
-				tasks.push_back(std::move(future_pi));
-			else
-				throw false;
-			next_task_index = tasks.size();
+			// add this task to the queue
 			active_task_count++;
+			tasks.emplace(std::async(std::launch::async, std::move(task_proc)));
 		}
 
-		// we've put as many outstanding tasks out as we can; are there any tasks?
-		if (active_task_count > 0)
+		// we've put as many outstanding tasks out as we can; are there any tasks outstanding?
+		if (tasks.size() > 0)
 		{
-			// if so, lets wait for a signal that one of them completed
-			size_t completed_task_index = msgque.pop();
-
-			// one of the tasks completed; get the result
-			prepared_info pi = tasks[completed_task_index].get();
+			// wait for the task at the front of the queue to complete and get the info, in the
+			// spirit of determinism
+			prepared_info pi = tasks.front().get();
+			tasks.pop();
 
 			// emit whatever XML we accumulated in the task
 			output_header_if_necessary(out);
@@ -543,10 +525,6 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 				for (const auto &x : pi.m_dev_set)
 					devset->insert(x);
 			}
-
-			// we'll reuse this slot next time
-			next_task_index = completed_task_index;
-			active_task_count--;
 		}
 	}
 
@@ -645,50 +623,6 @@ std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerato
 		}
 	}
 	return results;
-}
-
-
-//-------------------------------------------------
-//  message_queue<T>::push - pushes a message onto
-//	the queue
-//-------------------------------------------------
-
-template<class T>
-void message_queue<T>::push(T &&value)
-{
-	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		m_queue.push(std::move(value));
-	}
-	m_cond.notify_one();
-}
-
-
-//-------------------------------------------------
-//  message_queue<T>::push - pushes a message onto
-//	the queue
-//-------------------------------------------------
-
-template<class T>
-void message_queue<T>::push(const T &value)
-{
-	push(T(value));
-}
-
-
-//-------------------------------------------------
-//  message_queue<T>::pop - pops a message from the
-//	queue, blocking if necessary
-//-------------------------------------------------
-
-template<class T>
-T message_queue<T>::pop()
-{
-	std::unique_lock<std::mutex> lock(m_mutex);
-	m_cond.wait(lock, [this] { return m_queue.size() > 0; });
-	T result = m_queue.front();
-	m_queue.pop();
-	return result;
 }
 
 
