@@ -1947,7 +1947,10 @@ void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 
 u32 voodoo_1_device::reg_invalid_r(u32 chipmask, u32 regnum)
 {
-	return 0xffffffff;
+	// funkball does invalid reads of textureMode and will leave
+	// improper bits set if this returns 0xffffffff
+	logerror("%s: Unexpected read from register %s[%X.%02X]\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum);
+	return 0x00000000;
 }
 
 
@@ -2045,7 +2048,7 @@ u32 voodoo_1_device::reg_stats_r(u32 chipmask, u32 regnum)
 
 u32 voodoo_1_device::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 {
-	logerror("%s: Unexpected write to register %02X[%X] = %08X\n", machine().describe_context(), regnum, chipmask, data);
+	logerror("%s: Unexpected write to register %s[%X.%02X] = %08X\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum, data);
 	return 0;
 }
 
@@ -2056,7 +2059,7 @@ u32 voodoo_1_device::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_1_device::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
 {
-	logerror("%s: Unimplemented write to register %02X(%X) = %08X\n", machine().describe_context(), regnum, chipmask, data);
+	logerror("%s: Unimplemented write to register %s[%X.%02X] = %08X\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum, data);
 	return 0;
 }
 
