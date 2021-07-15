@@ -1760,8 +1760,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	{
 		m_master_intc->pos_irq_trigger();
 		m_slave_intc->pos_irq_trigger();
-		// TODO: wrong place!
-		m_screen->update_partial(param);
+		// TODO: should be when video registers are updated (and/or latched) but that makes things worse
+		m_screen->update_partial(m_update_to_line_before_posirq ? param-1 : param);
 	}
 }
 
@@ -5488,6 +5488,7 @@ void namcos2_state::init_assaultp()
 void namcos2_state::init_burnforc()
 {
 	m_gametype = NAMCOS2_BURNING_FORCE;
+	m_update_to_line_before_posirq = true; // prevents bad line on horizon
 }
 
 void namcos2_state::init_cosmogng()
@@ -5680,6 +5681,7 @@ void namcos2_state::init_suzuka8h()
 void namcos2_state::init_suzuk8h2()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS_2;
+	m_update_to_line_before_posirq = true; // needed for tunnels, see 2nd attract demo
 }
 
 void namcos2_state::init_valkyrie()
