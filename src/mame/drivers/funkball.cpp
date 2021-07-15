@@ -154,7 +154,9 @@ uint8_t funkball_state::timer_r(offs_t offset)
 {
 	if (offset == 0)
 	{
-		m_latched_timer = machine().time().as_ticks(20000);
+		// exact frequency unknown, but the code checks against 32539 for a timeout
+		// so guessing that could be it
+		m_latched_timer = machine().time().as_ticks(32539);
 		return m_latched_timer >> 8;
 	}
 
