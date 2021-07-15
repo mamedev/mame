@@ -372,7 +372,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	*/
 	const int link_mask = 0x7ff;
 
-	const u16 linkno = pSource[0] & link_mask;     /* LINKNO     0x000..0x3ff */
+	const u16 linkno = pSource[0] & link_mask; /* LINKNO (see note above) */
 	sprite_ptr->offset = pSource[1];         /* OFFSET */
 	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
 	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
