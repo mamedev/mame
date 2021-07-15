@@ -33,6 +33,8 @@
  * MB81464-12    262144x1 DRAM, x16 == 512K video RAM?
  * HM6264ALSP-12 8192-word 8-bit High Speed CMOS Static RAM, x2 == 16K non-volatile RAM?
  */
+// WIP: keyboard test at f040ae, if bypassed continues with more interesting tests
+
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
@@ -134,7 +136,8 @@ void sx1000_state::cpu_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region(m_eprom, 0); // FIXME: probably mapped/unmapped during reset
 
-	map(0x1fe000, 0x1fffff).ram();
+	// FIXME: additional 1M RAM board seems to be mandatory?
+	map(0x010000, 0x1fffff).ram();
 
 	map(0xa00000, 0xbfffff).ram(); // Banking on f00000 writes, if it makes any sense? Would provide up to 32M of ram, bank is 4 bits
 
@@ -152,6 +155,7 @@ void sx1000_state::cpu_map(address_map &map)
 	map(0xf14101, 0xf14101).lrw8([this]() { return m_pic->read(1); }, "pic_r1", [this](u8 data) { m_pic->write(1, data); }, "pic_w1");
 
 	map(0xf14000, 0xf14001).r(FUNC(sx1000_state::f14000_r));
+	map(0xf16000, 0xf16001).lr16([this]() { return 0x20; }, "sw2_r"); // FIXME: this "disables" the keyboard
 
 	map(0xf1a001, 0xf1a001).rw(m_serial2, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf1a003, 0xf1a003).rw(m_serial2, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -197,16 +201,16 @@ MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal1 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( terminal2 )
-	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -226,7 +230,7 @@ void sx1000_state::common(machine_config &config)
 	PIC8259(config, m_pic);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(48'800'000, 80*16, 0, 80*16, 25*16, 0, 25*16);
+	m_screen->set_raw(48'800'000, 80*8, 0, 80*8, 25*16, 0, 25*16);
 	m_screen->set_screen_update(m_crtc, FUNC(hd6345_device::screen_update));
 
 	// htotal = 117
@@ -239,7 +243,7 @@ void sx1000_state::common(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
-	m_crtc->set_hpixels_per_column(16);
+	m_crtc->set_hpixels_per_column(8);
 
 	HD63484(config, m_acrtc, 8'000'000);
 	m_acrtc->set_screen(m_screen);
@@ -258,7 +262,7 @@ void sx1000_state::common(machine_config &config)
 	m_serial1->dtr_handler().set(rs232_1, FUNC(rs232_port_device::write_dtr));
 	m_serial1->rts_handler().set(rs232_1, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock1", 19200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock1", 1200*16).signal_handler().set(m_serial1, FUNC(i8251_device::write_txc));
 
 	auto &rs232_2(RS232_PORT(config, "serial2", default_rs232_devices, nullptr));
 	rs232_2.rxd_handler().set(m_serial2, FUNC(i8251_device::write_rxd));
@@ -271,7 +275,7 @@ void sx1000_state::common(machine_config &config)
 	m_serial2->dtr_handler().set(rs232_2, FUNC(rs232_port_device::write_dtr));
 	m_serial2->rts_handler().set(rs232_2, FUNC(rs232_port_device::write_rts));
 
-	CLOCK(config, "clock2", 19200*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
+	CLOCK(config, "clock2", 9600*16).signal_handler().set(m_serial2, FUNC(i8251_device::write_txc));
 }
 
 void sx1000_state::sx1010(machine_config &config)
