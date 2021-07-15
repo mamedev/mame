@@ -80,7 +80,9 @@ Notes:
 #include "machine/pckeybrd.h"
 #include "machine/pcshare.h"
 #include "video/voodoo.h"
+#include "sound/ks0164.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 class funkball_state : public pcat_base_state
@@ -89,6 +91,7 @@ public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_voodoo(*this, "voodoo_0")
+		, m_sound(*this, "ks0164")
 		, m_unk_ram(*this, "unk_ram")
 		, m_flashbank(*this, "flashbank")
 		, m_inputs(*this, "IN.%u", 0)
@@ -109,6 +112,7 @@ private:
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
+	required_device<ks0164_device> m_sound;
 
 	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
@@ -370,6 +374,9 @@ void funkball_state::funkball_io(address_map &map)
 	map(0x03f8, 0x03ff).rw("uart", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w)).umask32(0x000000ff);
+	map(0x0320, 0x0323).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w)).umask32(0x0000ff00);
 
 	map(0x0360, 0x0363).w(FUNC(funkball_state::flash_w));
 
@@ -778,13 +785,20 @@ void funkball_state::funkball(machine_config &config)
 	INTEL_28F320J5(config, "u29");
 	INTEL_28F320J5(config, "u30");
 	INTEL_28F320J5(config, "u3");
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	KS0164(config, m_sound, 16.9344_MHz_XTAL);
+	m_sound->add_route(0, "lspeaker", 1.0);
+	m_sound->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION16_BE(0x400000, "u3", ROMREGION_ERASE00) // Sound Program / Samples
+	ROM_REGION(0x400000, "ks0164", ROMREGION_ERASE00) // Sound Program / Samples
 	ROM_LOAD16_WORD_SWAP( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
 	ROM_REGION16_BE(0x400000, "u29", ROMREGION_ERASE00) // Main Program
