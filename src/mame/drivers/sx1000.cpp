@@ -51,7 +51,7 @@
 // video
 #include "screen.h"
 #include "video/mc6845.h"
-//#include "video/hd63484.h"
+#include "video/hd63484.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -75,6 +75,7 @@ public:
 		, m_pic(*this, "pic")
 		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
+		, m_acrtc(*this, "acrtc")
 		, m_serial1(*this, "i8251_1")
 		, m_serial2(*this, "i8251_2")
 		, m_sw2(*this, "SW2")
@@ -105,6 +106,7 @@ private:
 
 	required_device<screen_device> m_screen;
 	required_device<hd6345_device> m_crtc;
+	required_device<hd63484_device> m_acrtc;
 	required_device<i8251_device>  m_serial1;
 	required_device<i8251_device>  m_serial2;
 
@@ -152,6 +154,9 @@ void sx1000_state::cpu_map(address_map &map)
 	map(0xf1a004, 0xf1a005).lr16(NAME([this]() { return m_serial2->txrdy_r() ? 2 : 0; }));
 
 	map(0xf20000, 0xf23fff).ram().share(m_vram);
+
+	map(0xf28000, 0xf28001).lrw16([this]() { return m_acrtc->read16(0); }, "acrtc_status_r", [this](u16 data) { m_acrtc->write16(0, data); }, "acrtc_address_w");
+	map(0xf28100, 0xf28101).lrw16([this]() { return m_acrtc->read16(1); }, "acrtc_data_r", [this](u16 data) { m_acrtc->write16(1, data); }, "acrtc_data_w");
 }
 
 u16 sx1000_state::f14000_r()
@@ -221,11 +226,15 @@ void sx1000_state::common(machine_config &config)
 	// vtotal = 26
 	// vdisp = 25
 	// mrast = 15
+	// MB89321A
 	HD6345(config, m_crtc, 4'000'000);
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_update_row_callback(FUNC(sx1000_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 	m_crtc->set_hpixels_per_column(16);
+
+	HD63484(config, m_acrtc, 8'000'000);
+	m_acrtc->set_screen(m_screen);
 
 	auto &rs232_1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
 	rs232_1.rxd_handler().set(m_serial1, FUNC(i8251_device::write_rxd));
