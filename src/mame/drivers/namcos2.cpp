@@ -3088,8 +3088,8 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3146,8 +3146,8 @@ ROM_START( finalap3a )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x20000, "unknown", 0 ) /* unknown rom */
 	ROM_LOAD( "341.bin", 0x00000, 0x20000, CRC(8c90ca97) SHA1(dce2a680a5bc213f2f48d4baffc86ea27fe90209) ) // was read as 27c010
@@ -3207,8 +3207,8 @@ ROM_START( finalap3j )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3264,8 +3264,8 @@ ROM_START( finalap3jc )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3320,8 +3320,8 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_LOAD16_BYTE( "fltvoi1",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "fltvoi2",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration and machine ID code that passes protection */
 	ROM_LOAD( "finalap3bl.nv",  0x000000, 0x2000, CRC(60226586) SHA1(d66afd1149c3c95cbb0108337c530cab78327d97) )
