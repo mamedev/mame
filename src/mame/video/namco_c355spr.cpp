@@ -10,6 +10,11 @@
     namcos21.cpp (Driver's Eyes, Solvalou, Starblade, Air Combat, Cyber Sled) (everything except Winning Run series)
     namcos2.cpp (Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours, Suzuka 8 Hours 2)
 
+	TODO:
+	- rgb32 rendering path (or render to bitmap and mix externally if any cases need it?)
+	- bad sprite in top left of vshoot
+	- badly positioned sprites in finalapr
+	- understand buffering behavior, is it a feature of the chip, or external?
 */
 
 #include "emu.h"
@@ -356,7 +361,18 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	const u16 palette = pSource[6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 linkno   = pSource[0] & 0x3ff; /* LINKNO     0x000..0x3ff for format table entry, verified in finalapr code */
+	/* finalapr leaves bits set in 0x1000 (rarely) / 0x4000 (common) / 0x8000 (common)
+	   these must be masked out or some trackside objects which are verified to appear
+	   on hardware are lost
+
+	   finalapr only needs 0x000-0x3ff for valid sprites (verified in game code)
+	   vshoot needs 0x000 - 0x7ff (so bit 0x400 is needed, finalapr never leaves it set, so causes no issue)
+
+	   finalapr never leaves bit 0x800 set, so could potentially be used too (haven't seen any game needing it)
+	*/
+	const int link_mask = 0x7ff;
+
+	const u16 linkno = pSource[0] & link_mask;     /* LINKNO     0x000..0x3ff */
 	sprite_ptr->offset = pSource[1];         /* OFFSET */
 	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
 	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
