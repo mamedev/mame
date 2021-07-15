@@ -78,6 +78,7 @@ public:
 		, m_acrtc(*this, "acrtc")
 		, m_serial1(*this, "i8251_1")
 		, m_serial2(*this, "i8251_2")
+		, m_fontram(*this, "fontram")
 		, m_sw2(*this, "SW2")
 	{
 	}
@@ -90,6 +91,7 @@ protected:
 	virtual void machine_reset() override;
 
 	void cpu_map(address_map &map);
+	void acrtc_map(address_map &map);
 
 	void common(machine_config &config);
 
@@ -109,6 +111,8 @@ private:
 	required_device<hd63484_device> m_acrtc;
 	required_device<i8251_device>  m_serial1;
 	required_device<i8251_device>  m_serial2;
+
+	required_shared_ptr<u16> m_fontram;
 
 	required_ioport m_sw2;
 	u16 f14000_r();
@@ -157,6 +161,13 @@ void sx1000_state::cpu_map(address_map &map)
 
 	map(0xf28000, 0xf28001).lrw16([this]() { return m_acrtc->read16(0); }, "acrtc_status_r", [this](u16 data) { m_acrtc->write16(0, data); }, "acrtc_address_w");
 	map(0xf28100, 0xf28101).lrw16([this]() { return m_acrtc->read16(1); }, "acrtc_data_r", [this](u16 data) { m_acrtc->write16(1, data); }, "acrtc_data_w");
+
+	map(0xf2e000, 0xf2ffff).ram().share(m_fontram);
+}
+
+void sx1000_state::acrtc_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
 }
 
 u16 sx1000_state::f14000_r()
@@ -171,15 +182,12 @@ u16 sx1000_state::f14000_r()
 
 MC6845_UPDATE_ROW( sx1000_state::crtc_update_row )
 {
-	//	logerror("ma=%x ra=%d y=%d x_count=%d cursor_x=%d de=%d hbp=%d vbp=%d\n", ma*2, ra, y, x_count, cursor_x, de, hbp, vbp);
-	const u16 *charset = reinterpret_cast<const u16 *>(m_eprom->base() + 0x5c40);
+	//  logerror("ma=%x ra=%d y=%d x_count=%d cursor_x=%d de=%d hbp=%d vbp=%d\n", ma*2, ra, y, x_count, cursor_x, de, hbp, vbp);
 	const u16 *vram = m_vram + ma;
 	u32 *dest = &bitmap.pix(y);
 	for(u32 x0 = 0; x0 != x_count; x0 ++) {
-		u16 data = *vram++;
-		u16 bitmap = charset[((data & 0xff) << 3) | (ra >> 1)];
-		if(!(ra & 1))
-			bitmap >>= 8;
+		u16 const data = *vram++;
+		u16 const bitmap = m_fontram[((data & 0xff) << 4) | (ra)];
 		for(u32 x1 = 0; x1 != 8; x1 ++) {
 			u32 color = BIT(bitmap, 7-x1) ? 0xffffff : 0x000000;
 			*dest ++ = color;
@@ -213,7 +221,7 @@ void sx1000_state::common(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("1M");
 
-	//	NVRAM(config, "nvram");
+	//  NVRAM(config, "nvram");
 
 	PIC8259(config, m_pic);
 
@@ -235,6 +243,9 @@ void sx1000_state::common(machine_config &config)
 
 	HD63484(config, m_acrtc, 8'000'000);
 	m_acrtc->set_screen(m_screen);
+	// FIXME: don't let the acrtc reconfigure the screen because it's currently shared
+	m_acrtc->set_auto_configure_screen(false);
+	m_acrtc->set_addrmap(0, &sx1000_state::acrtc_map);
 
 	auto &rs232_1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
 	rs232_1.rxd_handler().set(m_serial1, FUNC(i8251_device::write_rxd));
