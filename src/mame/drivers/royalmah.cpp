@@ -25,6 +25,9 @@ Year + Game               Board(s)               CPU      Company            Not
 86  Don Den Mahjong       D039198L-0             Z80      Dyna Electronics
 86  Jong Shin             D8702158L1-0           Z80      Dyna Electronics
 86  Watashiha Suzumechan  D8803288L1-0           Z80      Dyna Electronics
+86  Mahjong Shiyou (BET)  S-0086-001-00          Z80      Visco              Extra Z80 + MSM5205
+86  Mahjong Yarou         FRM-00 (modified)      Z80      Visco
+86  Mahjong Senka         FRM-00?                Z80      Visco
 87  Mahjong Diplomat      D0706088L1-0           Z80      Dynax
 87  Mahjong Studio 101    D1708228L1             Z80      Dynax
 87  Tonton                D0908288L1-0           Z80      Dynax
@@ -104,6 +107,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/msm5205.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -157,6 +161,7 @@ public:
 	void makaijan(machine_config &config);
 	void janyoup2(machine_config &config);
 	void chalgirl(machine_config &config);
+	void mjsiyoub(machine_config &config);
 
 	void init_tahjong();
 	void init_dynax();
@@ -298,6 +303,9 @@ private:
 	void mjdiplob_iomap(address_map &map);
 	void mjifb_map(address_map &map);
 	void mjsenka_opcodes_map(address_map &map);
+	void mjsiyoub_audio_prg_map(address_map &map);
+	void mjsiyoub_iomap(address_map &map);
+	void mjsiyoub_map(address_map &map);
 	void mjtensin_map(address_map &map);
 	void mjvegasa_map(address_map &map);
 	void mjyarou_iomap(address_map &map);
@@ -707,6 +715,15 @@ void royalmah_state::chalgirl_map(address_map &map) // TODO: guesswork, needs ve
 	map(0x8000, 0xffff).writeonly().share("videoram");
 }
 
+void royalmah_state::mjsiyoub_map(address_map &map)
+{
+	map(0x0000, 0x6bff).rom().nopw();
+	map(0x6c00, 0x6fff).bankr(m_mainbank);
+	map(0x7000, 0x77ff).ram().share("nvram");
+	map(0x7800, 0x7fff).rom().nopw();
+	map(0x8000, 0xffff).nopr().writeonly().share("videoram");
+}
+
 void royalmah_state::mjsenka_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x6bff).rom().share(m_decrypted_opcodes);
@@ -812,6 +829,13 @@ void royalmah_state::mjyarou_iomap(address_map &map)
 	map(0x11, 0x11).portr("SYSTEM").w(FUNC(royalmah_state::input_port_select_w));
 	map(0x12, 0x12).portr("DSW2");
 	map(0x50, 0x55).w(FUNC(royalmah_state::mjyarou_bank_w));
+}
+
+void royalmah_state::mjsiyoub_iomap(address_map &map)
+{
+	royalmah_iomap(map);
+	map(0x13, 0x13).portr("DSW2");
+	map(0x40, 0x49).w(FUNC(royalmah_state::mjyarou_bank_w));
 }
 
 void royalmah_state::dondenmj_iomap(address_map &map)
@@ -940,6 +964,11 @@ void royalmah_state::janoh_sub_map(address_map &map)
 
 void royalmah_state::janoh_sub_iomap(address_map &map)
 {
+}
+
+void royalmah_state::mjsiyoub_audio_prg_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 }
 
 /****************************************************************************
@@ -3721,6 +3750,21 @@ void royalmah_state::mjsenka(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &royalmah_state::mjsenka_opcodes_map);
 }
 
+void royalmah_state::mjsiyoub(machine_config &config)
+{
+	royalmah(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::mjsiyoub_map);
+	m_maincpu->set_addrmap(AS_IO, &royalmah_state::mjsiyoub_iomap);
+
+	// TODO: implement extra sound chips. Z80 ROM is scrambled.
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 6); // divider not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &royalmah_state::mjsiyoub_audio_prg_map);
+	m_audiocpu->set_disable(); // until it's decrypted, to avoid clogging the error log
+
+
+	MSM5205(config, "msm", 400_kHz_XTAL);
+}
+
 void royalmah_state::ippatsu(machine_config &config)
 {
 	dondenmj(config);
@@ -5053,7 +5097,7 @@ ROM_START( mjsiyoub )
 	ROM_LOAD( "4.3f", 0x08000, 0x8000, CRC(6cd6a200) SHA1(1c53e5caacdb9c660bd98f5331bf5354581f74c9) )
 
 	/*encrypted z80*/
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.1k", 0x00000, 0x8000, CRC(a1083321) SHA1(b36772e90be60270234df16cf92d87f8d950190d) )
 	ROM_LOAD( "2.1g", 0x08000, 0x4000, CRC(cfe5de1d) SHA1(4acf9a752aa3c02b0889b0b49d3744359fa24460) )
 
@@ -5471,7 +5515,10 @@ void royalmah_state::init_mjsenka()
 
 void royalmah_state::init_mjsiyoub()
 {
-	m_mainbank->set_base(memregion("maincpu")->base() + 0x8000);
+	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x8000, 0x400);
+
+	save_item(NAME(m_mjyarou_bank));
+	m_mjyarou_bank = 0;
 }
 
 void royalmah_state::init_chalgirl()
@@ -5504,7 +5551,7 @@ GAME( 1986,  dondenmj, 0,        dondenmj, majs101b, royalmah_state, init_dynax,
 GAME( 1986,  ippatsu,  0,        ippatsu,  ippatsu,  royalmah_state, init_ippatsu,  ROT0,   "Public Software / Paradais", "Ippatsu Gyakuten [BET] (Japan)",        0 )
 GAME( 1986,  suzume,   0,        suzume,   suzume,   royalmah_state, init_suzume,   ROT0,   "Dyna Electronics",           "Watashiha Suzumechan (Japan)",          0 )
 GAME( 1986,  jongshin, 0,        jongshin, jongshin, royalmah_state, init_jongshin, ROT0,   "Dyna Electronics",           "Jong Shin (Japan)",                     0 )
-GAME( 1986,  mjsiyoub, 0,        royalmah, royalmah, royalmah_state, init_mjsiyoub, ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_NOT_WORKING )
+GAME( 1986,  mjsiyoub, 0,        mjsiyoub, mjyarou,  royalmah_state, init_mjsiyoub, ROT0,   "Visco",                      "Mahjong Shiyou (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // MSM5205 isn't hooked up, colors need to be verified against original
 GAME( 1986,  mjsenka,  0,        mjsenka,  mjyarou,  royalmah_state, init_mjsenka,  ROT0,   "Visco",                      "Mahjong Senka (Japan)",                 MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // never seems to set the palette bank?
 GAME( 1986,  mjyarou,  0,        mjyarou,  mjyarou,  royalmah_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 1)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986,  mjyarou2, mjyarou,  mjyarou,  mjyarou,  royalmah_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou [BET] (Japan, set 2)",    MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
