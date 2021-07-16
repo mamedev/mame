@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 
+#include "sound/ymz280b.h"
 #include "machine/gen_latch.h"
 #include "machine/jaleco_ms32_sysctrl.h"
 #include "video/ms32_sprite.h"
 #include "emupal.h"
 #include "tilemap.h"
-#include "sound/ymz280b.h"
 
 class tetrisp2_state : public driver_device
 {
