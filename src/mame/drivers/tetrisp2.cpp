@@ -131,7 +131,7 @@ void tetrisp2_state::rockn2_adpcmbank_w(u16 data)
 
 u16 tetrisp2_state::rockn_soundvolume_r()
 {
-	return 0xff;
+	return 0xffff;
 }
 
 void tetrisp2_state::rockn_soundvolume_w(u16 data)
@@ -519,7 +519,7 @@ void stepstag_state::stepstag_b00000_w(u16 data)
 void  stepstag_state::stepstag_main2pc_w(u16 data)
 {
 	m_stepstag_main2pc = data;
-	popmessage("cmd to pc: 0x%4x\n", data);	// printf
+//	logerror("cmd to pc: 0x%4x\n", data);	// printf	// popmessage
 	stepstag_state::simulate_pc();
 }
 
@@ -614,21 +614,21 @@ void stepstag_state::stepstag_map(address_map &map)
 	map(0x100000, 0x103fff).ram().share("spriteram");									// Object RAM
 	map(0x108000, 0x10ffff).ram();														// Work RAM
 	map(0x200000, 0x23ffff).rw(FUNC(stepstag_state::tetrisp2_priority_r), FUNC(stepstag_state::tetrisp2_priority_w));
-	map(0x300000, 0x31ffff).ram().w(FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");		// Palette
-	map(0x400000, 0x403fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");			// Foreground
-	map(0x404000, 0x407fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");			// Background
+	map(0x300000, 0x31ffff).ram().w(FUNC(stepstag_state::tetrisp2_palette_w)).share("paletteram");
+	map(0x400000, 0x403fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_fg_w)).share("vram_fg");
+	map(0x404000, 0x407fff).ram().w(FUNC(stepstag_state::tetrisp2_vram_bg_w)).share("vram_bg");
 //  map(0x408000, 0x409fff).ram();														// ???
 	map(0x500000, 0x50ffff).ram();														// Line
 	map(0x600000, 0x60ffff).ram().w(FUNC(stepstag_state::tetrisp2_vram_rot_w)).share("vram_rot");		// Rotation
 	map(0x900000, 0x903fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w)).share("nvram"); // NVRAM
 //  map(0x904000, 0x907fff).rw(FUNC(stepstag_state::rockn_nvram_r), FUNC(stepstag_state::tetrisp2_nvram_w);                 // NVRAM (mirror)
-	map(0xa00000, 0xa00001).nopr().w(FUNC(stepstag_state::stepstag_neon_w));					// Neon
-	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));		// I/O
-	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));				// I/O
-	map(0xa30000, 0xa30001).portr("VOLUME").w(FUNC(stepstag_state::rockn_soundvolume_w));		// Sound Volume
-	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));				// PC Comm r
+	map(0xa00000, 0xa00001).nopr().w(FUNC(stepstag_state::stepstag_neon_w));
+	map(0xa10000, 0xa10001).portr("RHYTHM").w(FUNC(stepstag_state::stepstag_step_leds_w));
+	map(0xa20000, 0xa20001).nopr().w(FUNC(stepstag_state::stepstag_button_leds_w));		
+	map(0xa30000, 0xa30001).portr("VOLUME").w(FUNC(stepstag_state::rockn_soundvolume_w));
+	map(0xa42000, 0xa42001).r(FUNC(stepstag_state::stepstag_pc2main_r));
 	map(0xa44000, 0xa44001).nopr();														// watchdog
-	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));				// PC Comm w
+	map(0xa48000, 0xa48001).w(FUNC(stepstag_state::stepstag_main2pc_w));
 //  map(0xa4c000, 0xa4c001).nopw();														// PC?
 	map(0xa50000, 0xa50001).r(m_soundlatch, FUNC(generic_latch_16_device::read)).w(FUNC(stepstag_state::stepstag_soundlatch_word_w));
 
@@ -637,15 +637,15 @@ void stepstag_state::stepstag_map(address_map &map)
 
 	map(0xb00000, 0xb00001).w(FUNC(stepstag_state::stepstag_b00000_w));					// init xilinx uploading??
 	map(0xb20000, 0xb20001).w(FUNC(stepstag_state::stepstag_b20000_w));					// 98343 interface board xilinx uploading?
-	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");								// Foreground Scrolling
-	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");								// Background Scrolling
+	map(0xb40000, 0xb4000b).writeonly().share("scroll_fg");
+	map(0xb40010, 0xb4001b).writeonly().share("scroll_bg");
 	map(0xb4003e, 0xb4003f).ram();														// scr_size
-	map(0xb60000, 0xb6002f).writeonly().share("rotregs");								// Rotation Registers
+	map(0xb60000, 0xb6002f).writeonly().share("rotregs");
 	map(0xba0000, 0xba001f).m(m_sysctrl, FUNC(jaleco_ms32_sysctrl_device::amap));
 	map(0xbe0000, 0xbe0001).nopr();														// INT-level1 dummy read
-	map(0xbe0002, 0xbe0003).portr("BUTTONS");											// Inputs
+	map(0xbe0002, 0xbe0003).portr("BUTTONS");
 	map(0xbe0004, 0xbe0005).r(FUNC(stepstag_state::stepstag_coins_r));					// Inputs & protection
-	map(0xbe0008, 0xbe0009).portr("DSW");												// Inputs
+	map(0xbe0008, 0xbe0009).portr("DSW");
 	map(0xbe000a, 0xbe000b).r("watchdog", FUNC(watchdog_timer_device::reset16_r));		// Watchdog
 }
 
@@ -1144,7 +1144,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( stepstag )
 	PORT_START("VOLUME")	// $a30000.w
 	PORT_DIPNAME( 0x00ff, 0x0000, "Sound Volume")	// Potentiometer output sampled by 8-bit A/D, then read by main CPU
-	PORT_DIPSETTING(      0x0000, "max")			// TODO, 256 steps
+	PORT_DIPSETTING(      0x0000, "max")			// TODO, use PORT_ADJUSTER()
 	PORT_DIPSETTING(      0x007f, "mid")
 	PORT_DIPSETTING(      0x00ff, "min")
 
@@ -1839,7 +1839,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(stepstag_state::field_cb)
 	// irq 4 is definitely a 30 Hz-ish here as well,
 	// except we have a multi-screen arrangement setup and no way to pinpoint source
 	m_subcpu->set_input_line(4, HOLD_LINE);
-	stepstag_state::simulate_pc();	// any better place to put it into schedule?
+//	stepstag_state::simulate_pc();	// TODO: put it into schedule
 }
 
 void stepstag_state::setup_non_sysctrl_screen(machine_config &config, screen_device *screen, const XTAL xtal)
@@ -1863,114 +1863,85 @@ void stepstag_state::simulate_pc()
 		$072x sample set for music selection
 		$07ff clear music sample region?
 	*/
-	FILE *inFile;
-	unsigned int size, position;	// position2
-	const unsigned int total_ram = 0x1000000;	// full 16MB for each ymz280b
-	if(strcmp(machine().system().name,"vjdash") == 0)
-		position = 0x400000;
-	//	position2 = 0xa00000;	// bass?
-	else
+	/*
+	YMZ RAM address where musin sample files are loaded:
+	For VJ:
+		position = 0x400000;	// treble/midrange?
+		position2 = 0xa00000;	// bass?
+	For Stepping Stage:
 		position = 0x900000;
-
-	if((m_stepstag_main2pc & 0xff0) == 0x700)
-	{
-		inFile = fopen("bgm_l", "rb");
-		if( inFile )
-		{
-			fseek(inFile, 0, SEEK_END);
-			size = ftell(inFile);
-			rewind(inFile);
-			if(size > total_ram - position)
-				size = total_ram - position;
-			fread(m_ymzram + position, 1, size, inFile);
-			fclose(inFile);
-		}
-//		else
-//			printf("BGM file of Left Channel not found!\n");
-
-		inFile = fopen("bgm_r", "rb");
-		if( inFile )
-		{
-			fseek(inFile, 0, SEEK_END);
-			size = ftell(inFile);
-			rewind(inFile);
-			if(size > total_ram - position)
-				size = total_ram - position;
-			fread(m_ymzram1 + position, 1, size, inFile);
-			fclose(inFile);
-		}
-//		else
-//			printf("BGM file of Right Channel not found!\n");
-	}
-	else if((m_stepstag_main2pc & 0x0ff0)==0x720)	//music selection
-	{
-		position += 0x100000;
-
-		inFile=fopen("bgm_sample", "rb");
-		if( inFile )
-		{
-			fseek(inFile, 0, SEEK_END);
-			size = ftell(inFile);
-			rewind(inFile);
-			if(size > total_ram - position)
-				size = total_ram - position;
-			fread(m_ymzram + position, 1, size, inFile);
-			fclose(inFile);
-			memcpy(m_ymzram1 + position, m_ymzram + position, size);
-		}
-	}
-	else if((m_stepstag_main2pc & 0x0fff)==0x714)	//sound effects
-	{
-		position = 0;
-
-		inFile=fopen("sound_effects", "rb");
-		if( inFile )
-		{
-			fseek(inFile, 0, SEEK_END);
-			size = ftell(inFile);
-			rewind(inFile);
-			if(size > total_ram - position)
-				size = total_ram - position;
-			fread(m_ymzram + position, 1, size, inFile);
-			fclose(inFile);
-			memcpy(m_ymzram1 + position, m_ymzram + position, size);
-		}
-	}
-	else if((m_stepstag_main2pc & 0x0fff)==0x715)	//sound effects 2
-	{
-		position = 0x400000;
-
-		inFile=fopen("vjs02.vjs", "rb");
-		if( inFile )
-		{
-			fseek(inFile, 0, SEEK_END);
-			size = ftell(inFile);
-			rewind(inFile);
-			if(size > total_ram - position)
-				size = total_ram - position;
-			fread(m_ymzram + position, 1, size, inFile);
-			fclose(inFile);
-			memcpy(m_ymzram1 + position, m_ymzram + position, size);
-		}
-	}
-	else if((m_stepstag_main2pc & 0x0f00)==0x7ff)
-	{
-	}
-	else if((m_stepstag_main2pc & 0x0f00)==0x700)	 printf(" cmd 0x%x !! unknown !!!\n", m_stepstag_main2pc);
+	*/
 
 	m_stepstag_main2pc = 0;
 }
 
-/*void stepstag_state::simulate_vj_sub()
-{
-}*/
+/*
+VJ and Stepping Stage Hardware consist of three parts: 
+ - a tetrisp2-like board, connected to 2x ymz280b audio ICs. The audio ICs fetch sample data from RAM, not ROM;
+ - a sub 68000 board. It has 3 video output channels, each channel contains a MPEG-1 hardware decoder plus a sprite front layer;
+ - a windows pc, for storing audio samples and FMV files, loading them to audio RAM and MPEG decoder, and controlling the 3 MPEG decoders.
+ 	the vga of the pc is not used.
+
+Diagram of Video System Configuration:
+There're totally four video outputs: 3 on the sub-cpu-board, and 1 on the main-cpu-board
+For stepping stage, however, only three monitors are installed -- the centre one has a video source selector, to choose 
+	between sub-mid source and main-board source.
+
+/------------------\            /------------------\            /------------------\
+|                  |            |                  |            |                  |
+|   Left Screen    |            |    Mid Screen    |            |   Right Screen   |
+|                  |            |                  |            |                  |
+|                  |            |   for stepstag:  |            |                  |
+\------------------/            \--Source Selector-/            \------------------/
+         |                               |    |                          |
+         |                               |    |-<<--From Main BD.        |
+         |                               |   for Service Mode Text Only  |
+         |                               |                               |
+    YUV2RGB Conv.                   YUV2RGB Conv.                   YUV2RGB Conv.
+         |                               |                               |
+ ------------------              ------------------              ------------------
+ | MPEG-1 Decoder |              | MPEG-1 Decoder |              | MPEG-1 Decoder |
+ |   & Overlay    |              |   & Overlay    |              |   & Overlay    |<------Controlled by PC
+ ------------------              ------------------              ------------------
+         |                               |                               |
+         \----------------------\        |        /----------------------/
+                                |        |        |
+                       ------------------------------------
+                       |  3x Video Channels, YUV Format   |
+                       |    352*240p*59.94Hz(or 480i?)    |
+                       |   29.97Hz IRQ for video update   |
+                       |                                  |
+                       |          Sub-CPU Board           |
+                       |                                  |
+                       ------------------------------------
+
+
+                               /------------------\
+                               |       Main       |
+                               |   Game Screen    |
+                               |    (Dumb in      |
+                               | Stepping Stage)  |
+                               \------------------/
+                                        |
+                                        |---->in stepstag, routing to a source selector of Mid-Screen
+                                        |        only for output some diag. text, 
+                                        |
+                       ------------------------------------
+                       |              Video               |
+                       | Sysctrl Programmable Resolution  |
+                       |                                  |
+                       |          Main-CPU Board          |
+                       |    Tetrisp2/Rockn Like Board     |
+                       |                                  |
+                       ------------------------------------
+*/
 
 void stepstag_state::stepstag(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000));	// unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	constexpr XTAL subxtal = XTAL(13'500'000);	// 2x ntsc mpeg-1 clock
+	constexpr XTAL subxtal = XTAL(13'500'000);	// NTSC MPEG-1
 	constexpr XTAL sub_pixel_clock = subxtal/2;
 
 	M68000(config, m_subcpu, subxtal);
@@ -1983,15 +1954,17 @@ void stepstag_state::stepstag(machine_config &config)
 
 	// video hardware
 
-	// The mid-CRT is supposed to have a video switcher to choose one from two sources:
-	// In normal game operation mode, a 352*240*29.97Hz video from the sub cpu board;
-	// While in POST/test mode, a 320x224*60.6Hz from the main cpu board, similar to Rock'n Tread series
-	// TODO: Where is the switching signal from, sysctrl?
+	// The m_screen has a video input selector (2-to-1 MUX) to choose from two sources with different scanning rate:
+	// In normal game operation mode, a 352*240*59.94Hz mpeg-1 standard video from the sub-cpu-board;
+	// While in POST/test mode, from the main-cpu-board, a board similar to Rock'n Tread series
+	// TODO: Where is the selection signal from, sysctrl?
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_orientation(ROT0);
 	// TODO: connected to the non sysctrl CRTC anyway?
+	// TODO: the real resolution is supposed to be doubled to 352*480 interlaced, since each palette entry contains 2 pixels (UYVY).
+	// 		it needs a new tile-drawing routine
 	m_screen->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224);
-///	m_screen->set_raw(sub_pixel_clock, 429, 0, 352, 525, 0, 240);	// should be 0-479 interlaced
+//	m_screen->set_raw(sub_pixel_clock, 429, 0, 352, 525, 0, 240);	// should be 0-479 interlaced
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
@@ -1999,11 +1972,6 @@ void stepstag_state::stepstag(machine_config &config)
 	setup_non_sysctrl_screen(config, &lscreen, sub_pixel_clock);
 	lscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_left));
 
-/*	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
-	mscreen.set_orientation(ROT0);
-	setup_non_sysctrl_screen(config, &mscreen, sub_pixel_clock);
-	mscreen.set_screen_update(FUNC(stepstag_state::screen_update_stepstag_mid));
-*/
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_orientation(ROT270);
 	setup_non_sysctrl_screen(config, &rscreen, sub_pixel_clock);
