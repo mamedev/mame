@@ -4,9 +4,7 @@
 
 "Sega Shooting Zone" aka "Sega Sharp Shooter"
 
-This is an SMS with a timer system, official Sega product.  Cabinet has a lightgun, it runs the SMS light gun games.
-
-It has 2 IO controllers, and 1 VDP, so I'm guessing the BIOS just displays to some kind of Segment LED display.
+This is an SMS with a timer system, official Sega product.
 
 ---------------------------------
 
@@ -32,32 +30,38 @@ GAMES for this system :
 
 Black Belt (mpr10150.ic1)
 
-Shooting Gallery(2)
+Shooting Gallery
 
 Gangster Town
 
 Marksman Shooting / Trap Shooting / Safari Hunt (315-5028.ic1 + Mpr10157.ic2)
 
-Fantasy Zone(1)
+Fantasy Zone
 
 ---------------------------------
 
 Notes:
-(1) apparently.... seems a bit odd, because it's not a gun game
-(2) an auction has been observed with Out Run instead of this
+Apparently the first revision only had a gun, the second (the one dumped) had both a gun and a joystick.
+Multiple auctions and pics on the web show different cartridge configurations, so the driver lets you select the whole SMS library.
+To try the selection listed above use the following command:
+mame shtzone -cart1 blackblt -cart2 shooting -cart3 gangster -cart4 marksman -cart5 fantzone
 
-Stuck at 'set cartridge', currently only the VDP and basic inputs for the timer CPU are hooked up.
-It's possible to enter test mode.
 
 TODO:
-- hook up SMS CPU and carts reading, SMS-side inputs;
-- outputs (test mode lists LED lamp, gun solenoid and buzzer);
+- very similar to smssdisp in sms.cpp, merge?
+- gun?
+- actual timer doesn't seem to match what's set by the dips. Communications problem?
+- outputs (test mode lists LED lamp, gun solenoid and buzzer). Lamp is done, buzzer maybe, gun solenoid isn't.
+- the driver currently assumes the buzzer is used to acknowledge when a coin is inserted.
+- should also have 1 card slot according to forum posts.
+- layout for the led.
 */
 
 #include "emu.h"
+#include "includes/sms.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "video/315_5124.h"
+#include "sound/beep.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -65,52 +69,124 @@ TODO:
 
 namespace {
 
-class shtzone_state : public driver_device
+class shtzone_state : public sms_state
 {
 public:
 	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: sms_state(mconfig, type, tag),
+		m_timercpu(*this, "timercpu"),
+		m_buzzer(*this, "buzzer"),
+		m_slots(*this, {"slot", "slot2", "slot3", "slot4", "slot5"}),
+		m_led(*this, "led")
+		{ }
 
 	void shtzone(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void device_post_load() override;
 
 private:
+	required_device<cpu_device> m_timercpu;
+	required_device<beep_device> m_buzzer;
+	required_device_array<sega8_cart_slot_device, 5> m_slots;
+	output_finder<> m_led;
+
+	uint8_t m_control;
+	uint8_t m_selected_cart;
+
+	uint8_t cart_select_r();
+	void cart_select_w(uint8_t data);
+	void select_cart(uint8_t data);
+	void control_w(uint8_t data);
+	uint8_t cart_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(int_callback);
+
 	void prg_map(address_map &map);
-	void io_map(address_map &map);
 };
+
+
+uint8_t shtzone_state::cart_r(offs_t offset)
+{
+	if (m_mem_device_enabled != 0x00)
+	{
+		uint8_t data = 0xff;
+
+		if (BIT(m_mem_device_enabled, 2))
+			data &= m_cartslot->read_cart(0x6000 + (offset & 0x1fff));
+
+		return data;
+	}
+	else
+	{
+		return m_region_maincpu->base()[offset];
+	}
+}
+
+uint8_t shtzone_state::cart_select_r()
+{
+	return m_selected_cart;
+}
+
+void shtzone_state::cart_select_w(uint8_t data)
+{
+	select_cart(data);
+	m_selected_cart = data;
+	setup_media_slots();
+}
+
+void shtzone_state::select_cart(uint8_t data)
+{
+	m_cartslot = m_slots[data >> 4].target();
+}
+
+void shtzone_state::control_w(uint8_t data)
+{
+	switch (data & 0xf0)
+	{
+		case 0x00: m_led = 0x06; break;
+		case 0x10: m_led = 0x5b; break;
+		case 0x20: m_led = 0x4f; break;
+		case 0x40: m_led = 0x66; break;
+		case 0x80: m_led = 0x6d; break;
+	}
+
+	if (BIT(data, 1))
+	{
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+	else
+	{
+		// Pull reset line of CPU #0 low
+		m_maincpu->reset();
+		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
+	}
+
+	m_control = data;
+}
+
+WRITE_LINE_MEMBER(shtzone_state::int_callback)
+{
+	if (BIT(m_control, 0))
+		m_timercpu->set_input_line(0, state);
+	else
+		m_maincpu->set_input_line(0, state);
+}
+
 
 void shtzone_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4fff).ram();
 	map(0x5000, 0x5fff).ram().share("nvram");
-	map(0x8000, 0x8000).portr("DSW2");
+	map(0x6000, 0x7fff).r(FUNC(shtzone_state::cart_r));
+	map(0x8000, 0x8000).portr("DSW2").w(FUNC(shtzone_state::control_w));
 	map(0x8001, 0x8001).portr("DSW1");
-	// TODO: everything below
-	map(0x7ff0, 0x7ff0).nopr(); // checks for cart here?
-	map(0x8000, 0x8000).nopw();
-	map(0xa000, 0xa000).nopw();
-	map(0xc000, 0xc000).nopw(); // bits 4-6 slot selection?
-	map(0xc400, 0xc400).nopw();
-	// end of TODO
+	map(0xa000, 0xa000).lw8(NAME([this] (uint8_t data) { m_buzzer->set_state(BIT(data, 0)); })); // TODO: is it? or is it coin counter? other bits are also used
+	map(0xc000, 0xc000).rw(FUNC(shtzone_state::cart_select_r), FUNC(shtzone_state::cart_select_w));
 	map(0xd800, 0xd800).portr("IN0");
 	map(0xdc00, 0xdc00).portr("IN1");
-}
-
-void shtzone_state::io_map(address_map &map)
-{
-	map.global_mask(0xff);
-
-	map(0x3e, 0x3f).nopw(); // TODO
-	map(0x7e, 0x7e).r("vdp", FUNC(sega315_5124_device::vcount_read));
-	map(0x7e, 0x7f).w("vdp", FUNC(sega315_5124_device::psg_w));
-	map(0xbe, 0xbe).rw("vdp", FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
-	map(0xbf, 0xbf).rw("vdp", FUNC(sega315_5124_device::control_read), FUNC(sega315_5124_device::control_write));
-	map(0xc0, 0xc0).nopr(); // TODO
 }
 
 
@@ -206,54 +282,79 @@ INPUT_PORTS_END
 
 void shtzone_state::machine_start()
 {
+	sms_state::machine_start();
+
+	m_led.resolve();
+
+	save_item(NAME(m_control));
+	save_item(NAME(m_selected_cart));
 }
 
 void shtzone_state::machine_reset()
 {
+	sms_state::machine_reset();
+
+	m_control = 0;
+	m_selected_cart = 0;
+	select_cart(m_selected_cart);
 }
 
-void shtzone_state::video_start()
+void shtzone_state::device_post_load()
 {
+	select_cart(m_selected_cart);
 }
+
 
 void shtzone_state::shtzone(machine_config &config)
 {
-	/* basic machine hardware */
-	z80_device &timercpu(Z80(config, "timercpu", 10.738_MHz_XTAL / 4));
-	timercpu.set_addrmap(AS_PROGRAM, &shtzone_state::prg_map);
-	timercpu.set_addrmap(AS_IO, &shtzone_state::io_map);
+	// basic machine hardware
+	Z80(config, m_timercpu, 10.738_MHz_XTAL / 3); // divider not verified
+	m_timercpu->set_addrmap(AS_PROGRAM, &shtzone_state::prg_map);
+	m_timercpu->set_addrmap(AS_IO, &shtzone_state::sms_io);
 
-	/* + SMS CPU */
-
+	// + SMS CPU
+	sms_ntsc_base(config);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(10.738_MHz_XTAL / 2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192);
-	screen.set_screen_update("vdp", FUNC(sega315_5124_device::screen_update));
+	screen.set_screen_update(m_vdp, FUNC(sega315_5124_device::screen_update));
 
 	PALETTE(config, "palette").set_entries(0x100);
 
-	sega315_5124_device &vdp(SEGA315_5124(config, "vdp", 10.738_MHz_XTAL));
-	vdp.set_screen("screen");
-	vdp.set_is_pal(false);
-	vdp.n_int().set_inputline("timercpu", 0);
-	vdp.n_nmi().set_inputline("timercpu", INPUT_LINE_NMI);
-	vdp.add_route(ALL_OUTPUTS, "mono", 1.00);
+	SEGA315_5124(config, m_vdp, 10.738_MHz_XTAL);
+	m_vdp->set_screen("screen");
+	m_vdp->set_is_pal(false);
+	m_vdp->n_int().set(FUNC(shtzone_state::int_callback));
+	m_vdp->n_nmi().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_buzzer, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	for (int i = 1; i < 5; i++)
+		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
+
+	m_has_bios_full = false;
+	m_has_pwr_led = false;
 }
 
 
 ROM_START( shtzone )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_FILL(0x0000, 0x4000, 0x00)
+
 	ROM_REGION( 0x4000, "timercpu", 0 )
 	ROM_LOAD( "epr10894a.20", 0x00000, 0x04000, CRC(ea8901d9) SHA1(43fd8bfc395e3b2e3fbe9645d692a5eb04783d9c) )
+
+	ROM_REGION(0x4000, "user1", 0)
+	ROM_FILL(0x0000, 0x4000, 0xff)
 ROM_END
 
 } // Anonymous namespace
 
 
-GAME( 1987, shtzone, 0, shtzone, shtzone, shtzone_state, empty_init, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )
+GAME( 1987, shtzone, 0, shtzone, shtzone, shtzone_state, empty_init, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
