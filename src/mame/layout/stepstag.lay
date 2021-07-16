@@ -9,10 +9,10 @@ license:CC0
 			<bounds x="0" y="0" width="9" height="13.2" />
 		</screen>
 		<screen tag="screen">
-			<bounds x="9.1" y="0" width="16" height="13.2" />
+			<bounds x="9.1" y="0" width="19.36" height="13.2" />
 		</screen>
 		<screen tag="rscreen">
-			<bounds x="25.2" y="0" width="9" height="13.2" />
+			<bounds x="28.56" y="0" width="9" height="13.2" />
 		</screen>
 	</view>
 
