@@ -647,9 +647,9 @@ u32 rocknms_state::screen_update_rocknms_right(screen_device &screen, bitmap_rgb
 // even-byte-tile seems to hava a higher priority (uses 0x0 instead of 0x20 as space code, for transparency?)
 //
 // When in game status(VJDash), the fg layer changes back to normal mode
-// fg layer might also have a clip window
-//
-// TODO: the mode-switching signal and clip data?
+// TODO: pinpoint how it swaps mode
+// TODO: fg layer might also have a clip window. pinpoint how it enables clipping, and clipping left/right/top/bottom data
+
 TILE_GET_INFO_MEMBER(stepstag_state::stepstag_get_tile_info_fg)
 {
 	u16 const code_hi = m_vram_fg[ 2 * tile_index ] >> 8;
@@ -676,7 +676,7 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 
 u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);	// m_vj_palette_l->pen(0x0000)	// chroma key green, for mixing with mpeg FMV underlayer
+	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
 	tetrisp2_draw_sprites(
