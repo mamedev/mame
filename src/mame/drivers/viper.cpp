@@ -82,12 +82,13 @@
         code1d,b            RTC self check bad
         gticlub2,ea         Attract mode works. Coins up. Hangs in car selection.
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC) - with IRQ3 crashes at first 3d frame
-        mocapglf            Security code error
+        mocapglf            Sensor I/O error
         mocapb,j            Crash after self checks
         p911                "Distribution error"
         p911e,j,uc,kc       Hangs at POST, with IRQ3 it crashes at first 3d frame
         p9112               RTC self check bad
         sscopex/sogeki      Security code error
+        sscopefh            Needs gun inputs.
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
         tsurugi             Goes to attract mode when ran with memory card check. Coins up.
@@ -2635,10 +2636,10 @@ ROM_START(mocapglf) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(4d9d7178) SHA1(97215aa13136c1393363a0ebd1e5b885ca602293))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x1ff8, BAD_DUMP CRC(0f0ba988) SHA1(5618c03b21fc2ba14b2e159cee3aab7f53c2c34d)) //data looks plain bad (compared to the other games)
+	ROM_LOAD("b33uaa_nvram.u39", 0x00000, 0x2000, CRC(5eece882) SHA1(945e5e9882bd16513a2947f6823b985d51501fad))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b33a02", 0, SHA1(819d8fac5d2411542c1b989105cffe38a5545fc2) )
@@ -2793,10 +2794,10 @@ ROM_START(sscopefh)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, NO_DUMP )
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(9271c24f) SHA1(f194fea15969b322c96cce8f0335dccd3475a3e6) )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("nvram.u39", 0x000000, 0x2000, NO_DUMP )
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2dd07bdf) SHA1(dadc189625e11c98f68afd988700a842c78b0ca7) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "ccca02", 0, SHA1(ec0d9a1520f17c73750de71dba8b31bc8c9d0409) )
