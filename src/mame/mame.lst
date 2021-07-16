@@ -33218,6 +33218,9 @@ supremo
 @source:ns5652.cpp
 ns5652                          //
 
+@source:ns32kdb.cpp
+db32016                         // National Semiconductor DB32016
+
 @source:nsg6809.cpp
 pitchhit                        //
 

@@ -3068,6 +3068,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/hh_cop400.cpp",
 	MAME_DIR .. "src/mame/drivers/hh_cops1.cpp",
 	MAME_DIR .. "src/mame/drivers/ns5652.cpp",
+	MAME_DIR .. "src/mame/drivers/ns32kdb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ncd")
