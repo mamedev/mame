@@ -107,9 +107,9 @@ class nes_smb3p_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -119,7 +119,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	uint16_t m_irq_count;
+	u16 m_irq_count;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -513,6 +513,7 @@ protected:
 private:
 	uint8_t m_latch;
 };
+
 
 // ======================> nes_mmalee_device
 
