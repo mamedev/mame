@@ -133,6 +133,10 @@ boss_se70.cpp
 boss_sx700.cpp
 bpmmicro.cpp
 br8641.cpp
+brother_ax145.cpp
+brother_lw30.cpp
+brother_lw350.cpp
+brother_lw840.cpp
 braiplus.cpp
 bullet.cpp
 busicom.cpp
