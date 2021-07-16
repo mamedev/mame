@@ -350,6 +350,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("benshieng",        NES_BENSHIENG);
 	device.option_add_internal("action52",         NES_ACTION52);
 	device.option_add_internal("caltron6in1",      NES_CALTRON6IN1);
+	device.option_add_internal("caltron9in1",      NES_CALTRON9IN1);
 	device.option_add_internal("maxi15",           NES_MAXI15);        //  mapper 234
 	device.option_add_internal("rumblestation",    NES_RUMBLESTATION);    // mapper 46
 	device.option_add_internal("svision16",        NES_SVISION16);  // mapper 53
