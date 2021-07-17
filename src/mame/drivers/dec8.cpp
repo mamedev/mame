@@ -3648,6 +3648,43 @@ ROM_START( cobracomb )
 	ROM_LOAD( "pt-0.16h", 0x0000, 0x0117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
 ROM_END
 
+ROM_START( cobracomc )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "el-11.5j",  0x08000, 0x08000, CRC(c6a102e3) SHA1(51d9781d13a8a98c9bbdf34fa79ebfd8a152567e) )
+	ROM_LOAD( "el-12.7j",  0x10000, 0x10000, CRC(72b2dab4) SHA1(ff84a04cfe920a0d8105fbbd1f44ee86822cf0d3) )
+	ROM_LOAD( "el-13.9j",  0x20000, 0x10000, CRC(04505acb) SHA1(2220efb277884588859375dab9960f04f07273a7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "el-10.1f",  0x08000, 0x08000, CRC(62ca5e89) SHA1(b04acaccc58846e0d277868a873a440b7f8071b0) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // Characters
+	ROM_LOAD( "el-14.14j", 0x00000, 0x08000, CRC(47246177) SHA1(51b025740dc03b04009ac97d8d110ab521894386) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )    // Sprites
+	ROM_LOAD( "el-00.2a",  0x00000, 0x10000, CRC(d96b6797) SHA1(01c4a9f2bebb13cba14636690cd5356db73f045e) )
+	ROM_LOAD( "el-01.3a",  0x20000, 0x10000, CRC(3fef9c02) SHA1(e4b731faf6a2f4e5fed8ba9bd07e0f203981ffec) )
+	ROM_LOAD( "el-02.5a",  0x40000, 0x10000, CRC(bfae6c34) SHA1(9503a120e11e9466cd9a2931fd44a631d72ca5f0) )
+	ROM_LOAD( "el-03.6a",  0x60000, 0x10000, CRC(d56790f8) SHA1(1cc7cb9f7102158de14a737e9317a54f01790ba8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )    // Tiles 1
+	ROM_LOAD( "el-05.15a", 0x00000, 0x10000, CRC(129fcfb2) SHA1(2c2d103f2b7bc173c73b911c6c52c6a9019c03e0) )
+	ROM_LOAD( "el-06.16a", 0x20000, 0x10000, CRC(27ba9e3f) SHA1(3c96781ff8746439988a860a2d2b0d62247250ca) )
+	ROM_LOAD( "el-04.13a", 0x40000, 0x10000, CRC(923fb7bd) SHA1(0cc4599ab1905dc9890420615a7d1ce356ac1b0f) )
+	ROM_LOAD( "el-07.18a", 0x60000, 0x10000, CRC(f0bc66b5) SHA1(912621fa10c7803f40dffe5c4cce375ab650e808) )
+
+	ROM_REGION( 0x80000, "gfx4", 0 )    // Tiles 2
+	ROM_LOAD( "el-08.7d",  0x00000, 0x08000, CRC(e642d5e3) SHA1(44ae6021d6745163f07dfdebc582a591b8b97149) )
+	ROM_CONTINUE(          0x40000, 0x08000 )
+	ROM_LOAD( "el-09.9d",  0x20000, 0x08000, CRC(701187a4) SHA1(edd3cd75e4ecd512b01fbf457b402052fbc743c4) )
+	ROM_CONTINUE(          0x60000, 0x08000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "eh-15.12f", 0x00000, 0x00200, CRC(279e540c) SHA1(9e5e707da9f7c403c63d77fa378f22da9906d4e5) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pt-0.16h",  0x00000, 0x00117, CRC(add5074f) SHA1(352d984ba4d50c437ee9e5d8e8d00b0da6b3b8f3) )
+ROM_END
+
 ROM_START( cobracomj )
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "eh11.5j", 0x08000, 0x08000, CRC(868637e1) SHA1(8b1e3e045e341bb94b1f6c7d89198b22e6c19de7) )
@@ -3731,36 +3768,37 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisn,   0,        lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (World revision 8)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu6, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 6)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnu5, lastmisn, lastmisn, lastmisn,  dec8_state,    empty_init, ROT270, "Data East USA",         "Last Mission (US revision 5)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lastmisnj,  lastmisn, lastmisn, lastmisnj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Last Mission (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shackled,   0,        shackled, shackled,  dec8_state,    empty_init, ROT0,   "Data East USA",         "Shackled (US)",                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, breywood,   shackled, shackled, breywood,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Breywood (Japan revision 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondo,      0,        gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Gondomania (World)",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gondou,     gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East USA",         "Gondomania (US)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state,    empty_init, ROT270, "Data East Corporation", "Makyou Senshi (Japan)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
-GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state,    empty_init, ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
+GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state,    empty_init, ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilver,    0,        csilver,  csilver,   csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (World)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverj,   csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 3)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, csilverja,  csilver,  csilver,  csilverj,  csilver_state, empty_init, ROT0,   "Data East Corporation", "Captain Silver (Japan, revision 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscar,      0,        oscar,    oscar,     dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (World revision 0)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, oscaru,     oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East USA",         "Psycho-Nics Oscar (US)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj1,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, oscarj2,    oscar,    oscar,    oscarj,    dec8_state,    empty_init, ROT0,   "Data East Corporation", "Psycho-Nics Oscar (Japan revision 2)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwin,   0,        srdarwin, srdarwin,  dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (World)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srdarwinj,  srdarwin, srdarwin, srdarwinj, dec8_state,    empty_init, ROT270, "Data East Corporation", "Super Real Darwin (Japan)",                          MACHINE_SUPPORTS_SAVE )
 
 // Unlike most Deco games of this period Cobra Command does not seem to have a Data East USA release.  Instead the Data East Corporation release
 // was used in the US as evidenced by boards with the EL romset bearing AAMA seal stickers (American Amusement Machine Association)
 GAME( 1988, cobracom,   0,        cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 5)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cobracoma,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US revision 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomb,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomc,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (World/US, alt)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomj,  cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "Data East Corporation", "Cobra-Command (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, cobracomjb, cobracom, cobracom, cobracom,  dec8_state,    empty_init, ROT0,   "bootleg",               "Cobra-Command (Japan, bootleg)",      MACHINE_SUPPORTS_SAVE )
