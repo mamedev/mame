@@ -859,6 +859,8 @@ public:
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);
 
+	void rf5c400_map(address_map& map);
+
 	uint32_t mpc106_pci_r(int function, int reg, uint32_t mem_mask);
 	void mpc106_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 
@@ -3306,6 +3308,7 @@ void cobra_state::cobra(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));
+	rfsnd.set_addrmap(0, &cobra_state::rf5c400_map);
 	rfsnd.add_route(0, "lspeaker", 1.0);
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
@@ -3322,6 +3325,11 @@ void cobra_state::cobra(machine_config &config)
 	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
 	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
+}
+
+void cobra_state::rf5c400_map(address_map& map)
+{
+	map(0x000000, 0xffffff).ram().share("rf5c400_ram");
 }
 
 /*****************************************************************************/
@@ -3567,8 +3575,6 @@ ROM_START(bujutsu)
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
 
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
-
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "645c04", 0, SHA1(c0aabe69f6eb4e4cf748d606ae50674297af6a04) )
 ROM_END
@@ -3585,8 +3591,6 @@ ROM_START(racjamdx)
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	ROM_LOAD( "m48t58-70pc1.17l", 0x000000, 0x002000, NO_DUMP )
-
-	ROM_REGION16_LE(0x1000000, "rfsnd", ROMREGION_ERASE00)
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
