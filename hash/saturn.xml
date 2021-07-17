@@ -4179,7 +4179,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Fighting Vipers (Korea)... -->
 	<software name="fvipersk" cloneof="fvipers" supported="no">
 		<description>Fighting Vipers (Kor)</description>
-		<year>1996?</year>
+		<year>1996</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="MK81041-08"/>
 		<info name="alt_title" value="파이팅바이퍼즈"/>
@@ -6002,7 +6002,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Myst (Korea)... -->
 	<software name="mystk" cloneof="myst" supported="no">
 		<description>Myst (Kor)</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>Wooyoung</publisher>
 		<info name="serial" value="T-26801H-08"/>
 		<info name="alt_title" value="미스트"/>
@@ -9842,7 +9842,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blam! - MachineHead (JAP) (DW0613)... -->
 	<software name="blamj" cloneof="blam" supported="no">
-		<description>Blam! -MachineHead (Jpn)</description>
+		<description>Blam! Machinehead (Jpn)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7015G"/>
@@ -15419,7 +15419,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blam Machinehead (T-7015G)... -->
 	<software name="blamja" cloneof="blam" supported="no">
-		<description>Blam! -MachineHead (Jpn, Alt)</description>
+		<description>Blam! Machinehead (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7015G"/>
@@ -25237,7 +25237,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Resurrection Rise 2 (J) (T-8104G)... -->
 	<software name="rise2j" cloneof="rise2" supported="no">
-		<description>Resurrection - Rise 2 (Jpn)</description>
+		<description>Rise 2: Resurrection (Jpn)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
 		<info name="serial" value="T-8104G"/>
@@ -29987,7 +29987,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying WWF Wrestlemania The Arcade Game (T-8112G)... -->
-	<software name="wwfagj" supported="no">
+	<software name="wwfagj" cloneof="wwfag" supported="no">
 		<description>WWF Wrestlemania - The Arcade Game (Jpn)</description>
 		<year>1996</year>
 		<publisher>Acclaim Japan</publisher>
@@ -30389,7 +30389,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blam! -Machinehead v1.000 (1996)(EIDOS)(PAL)[!]... -->
 	<software name="blam" supported="no">
-		<description>Blam! -MachineHead (UK)</description>
+		<description>Blam! Machinehead (UK)</description>
 		<year>1997</year>
 		<publisher>Core</publisher>
 		<info name="serial" value="T-11505H-50"/>
@@ -30403,7 +30403,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying 0693-Blam_MachineHead-fre... -->
 	<software name="blamf" cloneof="blam" supported="no">
-		<description>Blam! -MachineHead (Fra)</description>
+		<description>Blam! Machinehead (Fra)</description>
 		<year>1997</year>
 		<publisher>Core</publisher>
 		<info name="serial" value="T-11505H-09"/>
@@ -30417,7 +30417,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Blam! -Machinehead v1.000 (1996)(EIDOS)(PAL)(De)[!]... -->
 	<software name="blamg" cloneof="blam" supported="no">
-		<description>Blam! -MachineHead (Ger)</description>
+		<description>Blam! Machinehead (Ger)</description>
 		<year>1997</year>
 		<publisher>Core</publisher>
 		<info name="serial" value="T-11505H-18"/>
@@ -31096,7 +31096,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Digital Pinball v1.004 (1995)(Sega)(PAL)[!][MK-81680P-426 9-95 7SB4]... -->
 	<software name="digipin" supported="no">
 		<description>Digital Pinball (Euro)</description>
-		<year>1997</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81680-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -31408,7 +31408,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying dw-fvip... -->
 	<software name="fvipers" supported="no">
 		<description>Fighting Vipers (Euro)</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81041-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -31870,7 +31870,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Keio Flying Squadron 2 EUR ... -->
 	<software name="keio2" supported="no">
-		<description>Keio 2 - Flying Squadron (Euro)</description>
+		<description>Keio Flying Squadron 2 (Euro)</description>
 		<year>1997</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="T-6008H-50"/>
@@ -31884,7 +31884,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<software name="kof95" supported="no">
 		<description>The King of Fighters '95 (Euro)</description>
-		<year>1995?</year>
+		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81088-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32213,7 +32213,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Myst v1.100 (1995)(Sunsoft)(PAL)(M4)[!]... -->
 	<software name="myst" supported="no">
 		<description>Myst (Euro)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81081-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32479,7 +32479,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying NHL All-Star Hockey v1.001 (1995)(Sega)(PAL)[!]... -->
 	<software name="nhlas" supported="no">
 		<description>NHL All-Star Hockey (Euro)</description>
-		<year>1996</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81102-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32763,7 +32763,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying QUAKE... -->
 	<software name="quake" supported="no">
 		<description>Quake (Euro)</description>
-		<year>1996</year>
+		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81066-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32805,7 +32805,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying RESIDENT_EVIL... -->
 	<software name="revil" supported="no">
 		<description>Resident Evil (Euro)</description>
-		<year>1995</year>
+		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81092-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -32818,7 +32818,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying RISE_2_RESURRECTION... -->
 	<software name="rise2" supported="no">
-		<description>Resurrection - Rise 2 (Euro)</description>
+		<description>Rise 2: Resurrection (Euro)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8114H-50"/>
@@ -32921,7 +32921,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying DW-380-Sat-Robotica-Cybernation Revolt(E)-Redump... -->
 	<software name="robotica" supported="no">
 		<description>Robotica - Cybernation Revolt (Euro)</description>
-		<year>1997</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81008-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -33425,7 +33425,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying STREET_FIGHTER_COLLECTION... -->
 	<software name="sf2" supported="no">
 		<description>Street Fighter 2 (Street Fighter Collection Disc 1) (Euro)</description>
-		<year>1995</year>
+		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-7033H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -33439,7 +33439,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying STREET_FIGHTER_ALPHA2_DASH... -->
 	<software name="sfa2d" supported="no">
 		<description>Street Fighter Alpha 2 Dash (Street Fighter Collection Disc 2) (Euro)</description>
-		<year>1997</year>
+		<year>1998</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-7033H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -33823,7 +33823,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Virtua Fighter 2 v1.001 (1996)(Sega)(PAL)[!][MK-81014P-00623A]... -->
 	<software name="vf2" supported="no">
 		<description>Virtua Fighter 2 (Euro, v1.001)</description>
-		<year>1997</year>
+		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81014-50?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -33837,7 +33837,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying VIRTUA_FIGHTER_2... -->
 	<software name="vf2a" cloneof="vf2" supported="no">
 		<description>Virtua Fighter 2 (Euro, v1.000)</description>
-		<year>1997</year>
+		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81014-50?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -34103,7 +34103,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying WORMS... -->
 	<software name="worms" supported="no">
 		<description>Worms (Euro)</description>
-		<year>1997</year>
+		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16403H-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -34273,7 +34273,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Saturn Power N.1 EUR [610-6576] - Core Demo Disc EUR [790-0002-50]... -->
 	<software name="satpowr1" supported="no">
 		<description>Saturn Power No. 1 (Euro) ~ Core Demo Disc (Euro)</description>
-		<year>199?</year>
+		<year>1997</year>
 		<publisher>Sega?</publisher>
 		<info name="serial" value="610-6576, 790-0002-50"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -36817,7 +36817,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying NHL Powerplay '96 (U) (T-7013H)... -->
 	<software name="nhlpoweru" cloneof="nhlpower" supported="no">
 		<description>NHL Powerplay '96 (USA)</description>
-		<year>1996</year>
+		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7013H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -37140,7 +37140,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying dw-sat-0736-Resurrection_Rise_2-usa... -->
 	<software name="rise2u" cloneof="rise2" supported="no">
-		<description>Resurrection - Rise 2 (USA)</description>
+		<description>Rise 2: Resurrection (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8114H"/>
@@ -38270,7 +38270,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Worms_-_Sega_Saturn_T-16403H... -->
 	<software name="wormsu" cloneof="worms" supported="no">
 		<description>Worms (USA)</description>
-		<year>1997</year>
+		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="T-16403H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
