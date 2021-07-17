@@ -14494,7 +14494,7 @@ license:CC0
 	</software>
 
 	<software name="getsumad">
-		<description>Getsufuu Maden (Jpn)</description>
+		<description>GetsuFumaDen (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC819"/>
@@ -46856,7 +46856,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="getsumads" cloneof="getsumad">
-		<description>Getsufuu Maden (Jpn, sample)</description>
+		<description>GetsuFumaDen (Japan, sample)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="月風魔伝"/>
@@ -62148,22 +62148,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="drmario2" supported="no">
-		<description>Dr. Mario II</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_eh8813a" />
-			<feature name="pcb" value="UNL-EH8813A" />
-			<dataarea name="chr" size="131072">
-				<rom name="dr. mario ii (unl)[u].chr" size="131072" crc="6b10fa72" sha1="d0b498e61ce66ee9584567c3e3dcdf7c00c2f3ae" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="dr. mario ii (unl)[u].prg" size="262144" crc="6be58daa" sha1="c4b9ee3dfe756f73e70d6d8e9197cebc0bda0698" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dbparty">
 		<description>Dragon Ball 4 in 1 (Asia)</description>
 		<year>19??</year>
@@ -62442,6 +62426,31 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- from cah4e3 -->
+	<software name="drmario2">
+		<description>Fāngkuài Zǒngdòngyuán (China)</description>
+		<year>1996</year>
+		<publisher>Waixing?</publisher>
+		<info name="serial" value="EH009"/>
+		<info name="alt_title" value="方塊總動員"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_eh8813a" />
+			<feature name="pcb" value="UNL-EH8813A" />
+			<dataarea name="chr" size="131072">
+				<rom name="dr. mario ii (unl)[u].chr" size="131072" crc="6b10fa72" sha1="d0b498e61ce66ee9584567c3e3dcdf7c00c2f3ae" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="dr. mario ii (unl)[u].prg" size="131072" crc="2df21b64" sha1="4c2bbeafcc1c4e684a7820a3d575a6d7a3e3d9b6" offset="00000" status="baddump" />
+			</dataarea>
+			<dipswitch name="Menu type" tag="DSW" mask="3">
+				<dipvalue name="2-in-1" value="0" default="yes"/>
+				<dipvalue name="8-in-1" value="1"/>
+				<dipvalue name="9-in-1" value="2"/>
+				<dipvalue name="2-in-1 (alt)" value="3"/>
+			</dipswitch>
+		</part>
+	</software>
+
 	<software name="felixh">
 		<description>Felix The Cat (Asia)</description>
 		<year>1998</year>
@@ -62588,6 +62597,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="getsumadk" cloneof="getsumad">
+		<description>GetsuFumaDen (Kaiser)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH17"/> <!-- This game is also on a LH13 cart -->
+		<info name="alt_title" value="月風魔伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7021a" />
+			<feature name="pcb_model" value="7021A" />
+			<dataarea name="prg" size="131072">
+				<rom name="5928-p" size="131072" crc="ec20d132" sha1="a522792f289ca1320a4d9a2fa3c1ef41b8f82e71" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="5929-c" size="131072" crc="1cb3a964" sha1="fff889c134947eccfa25b4c9a1a8573a22bc907c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -62934,9 +62961,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- nointro & cah4e3 -->
-	<software name="koreaigo" supported="no">
-		<description>Korean Igo (Kor)</description>
-		<year>199?</year>
+	<software name="koreaigo">
+		<description>Korean Igo (Korea)</description>
+		<year>1993</year>
 		<publisher>DreamTech</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="dreamtech01" />
@@ -65618,8 +65645,8 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="nryukendc" cloneof="shadwarr" supported="no">
-		<description>Ninja Ryukenden (Chi)</description>
+	<software name="nryukendc" cloneof="shadwarr">
+		<description>Ninja Ryukenden (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66652,13 +66679,13 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="exbasket" supported="no">
+	<software name="exbasket">
 		<description>Exciting Basket (Asia, FDS conversion)</description>
 		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
+		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7016" />
-			<feature name="pcb" value="UNL-KS7016" />
+			<feature name="pcb" value="KAISER-KS7016" />
 			<dataarea name="prg" size="131072">
 				<rom name="exciting basket (fds conversion)[u].prg" size="131072" crc="6aa23323" sha1="3fb2ef872b2c18ce5b39c478d6bfd8084bb07f25" offset="00000" status="baddump" />
 			</dataarea>
@@ -66813,6 +66840,23 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="meikyuu jiin dababa (fds conversion) (unl).prg" size="131072" crc="d8012992" sha1="5f0943dc8145542abc70bf20e4754b3c08653399" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="meikyfdsa" cloneof="meikyfds">
+		<description>Meikyuu Jiin Dababa (Asia, FDS conversion, alt PCB)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7016b" />
+			<feature name="pcb" value="KAISER-KS7016B" />
+			<dataarea name="prg" size="131072">
+				<rom name="ks115" size="131072" crc="2ec5f4c2" sha1="64564bab6cac5e5dbc9dc40457e5d8391dcda07e" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

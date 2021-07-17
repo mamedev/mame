@@ -3282,6 +3282,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tmc0999.h,MACHINES["TMC0999"] = true
+---------------------------------------------------
+
+if (MACHINES["TMC0999"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tmc0999.cpp",
+		MAME_DIR .. "src/devices/machine/tmc0999.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tmc208k.h,MACHINES["TMC208K"] = true
 ---------------------------------------------------
 

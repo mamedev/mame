@@ -5584,17 +5584,19 @@ license:CC0
 		<info name="release" value="2019-06-16"/>
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It requires a 64K Apple II+ or later. -->
+		<!-- Redumped on July 3rd, 2021 to fix side 2, which
+		should not have write protection. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - program disk.woz" size="234759" crc="5b42e1f6" sha1="1f6ce95fccd334e8faaf9217735f14da3c9e8d99" />
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - program disk.woz" size="234834" crc="54e443c6" sha1="7ff4c81a96d18d89609e3e1d2ed7e79c7cc10597" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Player disk"/>
-			<dataarea name="flop" size="234759">
-				<rom name="2400 a.d. - player disk.woz" size="234759" crc="98271568" sha1="a0a2546b2b1e7328000aa51de2024233ad06e410" />
+			<feature name="part_id" value="Side B - Player disk"/>
+			<dataarea name="flop" size="234834">
+				<rom name="2400 a.d. - player disk.woz" size="234834" crc="6c1893b0" sha1="d82a0833180147b967eee6cf954b8a7939ca5a02" />
 			</dataarea>
 		</part>
 	</software>
@@ -12131,10 +12133,18 @@ license:CC0
 		<info name="release" value="2020-04-11"/>
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a 128K Apple //e or later. -->
+		<!-- Updated on June 30th, 2021 to fix missing side B -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241429">
-				<rom name="aliens.woz" size="241429" crc="2ccbad87" sha1="d254d20ef3095666ada034ea47327ef08375a672"/>
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="241454">
+				<rom name="aliens side a.woz" size="241454" crc="b2c5a729" sha1="61c4390f38e22f10944d08b22b2cfb8b2a15f433" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241512">
+				<rom name="aliens side b.woz" size="241512" crc="679750d7" sha1="6cebf1e969058e9fc0dd45b8641bdf0affb6160c" />
 			</dataarea>
 		</part>
 	</software>
@@ -16880,6 +16890,156 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234815">
 				<rom name="teddy's playground 1989.woz" size="234815" crc="3adfcaa3" sha1="852e2457948c44681c5e3b598166ce410e3f7b51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pop35">
+		<description>Prince of Persia (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card -->
+		<!--"Prince of Persia" is a 1989 action game developed by Jordan Mechner and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K enhanced Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297161">
+				<rom name="prince of persia 800k.woz" size="1297161" crc="e166d56a" sha1="d9558d25a3d3d91542f32abba9e6b0e2f2c75b09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwlybdy">
+		<description>Woolly's Birthday (Version 1.0) (800K 3.5")</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-06-30"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Woolly's Birthday" is a 1994 educational game developed by Dee Dee Daus, Ruth Kivisto, Pat Korn, Claudio Valenzuela, and Ju Chang Wang, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296222">
+				<rom name="woolly's birthday 800k.woz" size="1296222" crc="a38217f8" sha1="18fdd8d2e5903d0959545de4c7103d35ec997ef8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trlspmth">
+		<description>Troll Sports Math (800K 3.5")</description>
+		<year>1991</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-07-01"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or
+        Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a
+        Liron or other compatible drive controller card.
+
+        Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or
+        Apple SuperDrive (G7287), will not work due to
+        incompatibilities created by the copy protection. -->
+		<!--"Troll Sports Math" is a 1991 educational program developed by Millicent Sabater, Gregory Truex, Thomas Whiting, and Toby Shack, and distributed by Troll Associates. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a Liron or other compatible drive controller card. Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or Apple SuperDrive (G7287), will not work due to incompatibilities created by the copy protection.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296310">
+				<rom name="troll sports math 800k.woz" size="1296310" crc="911766c4" sha1="94362e66024c4a0b2ff924d939972f20f5add785"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmneu35">
+		<description>Where in Europe is Carmen Sandiego? (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-06"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296766">
+				<rom name="where in europe is carmen sandiego 800k.woz" size="1296766" crc="4e240e26" sha1="0bb5bb51acc719cb34d1e8063f12c396e738b6af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="playroom">
+		<description>The Playroom (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296728">
+				<rom name="the playroom 800k.woz" size="1296728" crc="c50a8b4b" sha1="1fe3d624330d5dac35a239b30a46a6149c7a4b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprprnt">
+		<description>SuperPrint! (Version 1.4) (800K 3.5")</description>
+		<year>1987</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"SuperPrint!" is a 1987 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer, and distributed by Pelican Software. This is version 1.4. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296712">
+				<rom name="superprint 800k.woz" size="1296712" crc="68fb210a" sha1="d69ff7120adea572833ba6253e18ed10ac4c5619"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampag35">
+		<description>Rampage (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2021-07-07"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
+		<!--"Rampage" is a 1988 action game ported to the Apple II by Ken Hurley, J. David Koch, Kelly Flock, Steve Imes, and Alex Edelstein, and distributed by Activision. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312571">
+				<rom name="rampage 800k.woz" size="1312571" crc="07fda4cd" sha1="ace041dfef6127957d1d33f0d33e5678863c6bfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hegira">
+		<description>Hegira: Tale of a Galactic Exile</description>
+		<year>1983</year>
+		<publisher>Ted Butler</publisher>
+		<info name="release" value="2021-07-08"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Hegira: Tale of a Galactic Exile" is a 1983 adventure game developed and distributed by Ted Butler. It runs on any Apple II with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234844">
+				<rom name="hegira.woz" size="234844" crc="f3085081" sha1="d6b14bd804a675e12d06abb0c6ee1217e7b2b869"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbmath35">
+		<description>Stickybear Math (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-13"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Math" is a 1984 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1302813">
+				<rom name="stickybear math 800k.woz" size="1302813" crc="93214eec" sha1="4dac3752e1575658fe0d10910a4a0f3ea8518af9"/>
 			</dataarea>
 		</part>
 	</software>

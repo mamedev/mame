@@ -803,6 +803,7 @@ BUSES["NSCSI"] = true
 --BUSES["O2"] = true
 --BUSES["ORICEXT"] = true
 --BUSES["PCE"] = true
+--BUSES["PCE_CTRL"] = true
 BUSES["PC_JOY"] = true
 BUSES["PC_KBD"] = true
 --BUSES["PET"] = true

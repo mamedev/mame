@@ -416,7 +416,7 @@ void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int 
 
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t const start_address = m_80store ? 0x400 : m_page2 ? 0x0800 : 0x0400;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -730,7 +730,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	uint32_t const start_address = m_80col ? 0x400 : m_page2 ? 0x800 : 0x400;
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);

@@ -38,6 +38,7 @@ public:
 
 	// configuration helpers
 	auto scanline_int_cb() { return m_scanline_int_cb.bind(); }
+	void set_xoffsets(int xoffset, int xoffset2) { m_pf_xoffset = xoffset; m_pf2_xoffset = xoffset2; }
 
 	// getters
 	tilemap_device &alpha() const { return *m_alpha_tilemap; }
@@ -102,6 +103,9 @@ private:
 	uint32_t              m_mo_yscroll;              // sprite xscroll
 
 	uint16_t              m_control[0x40/2];          // control data
+
+	int m_pf_xoffset;
+	int m_pf2_xoffset;
 };
 
 

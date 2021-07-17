@@ -46,7 +46,8 @@ public:
 		m_spritebank32(*this, "spritebank32"),
 		m_tilebank32(*this, "tilebank32"),
 		m_rozbank32(*this, "rozbank32"),
-		m_namconb_shareram(*this, "namconb_share")
+		m_namconb_shareram(*this, "namconb_share"),
+		m_update_to_line_before_posirq(false)
 	{ }
 
 	void namconb1(machine_config &config);
@@ -118,6 +119,7 @@ private:
 	u8 m_port6;
 	u32 m_tilemap_tile_bank[4];
 	std::unique_ptr<u32[]> m_spritebank32_delayed;
+	bool m_update_to_line_before_posirq;
 
 	u32 randgen_r();
 	void srand_w(u32 data);

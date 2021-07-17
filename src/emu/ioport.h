@@ -20,8 +20,9 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
-#include <vector>
 #include <ctime>
+#include <list>
+#include <vector>
 
 
 //**************************************************************************
@@ -32,19 +33,19 @@
 typedef u32 ioport_value;
 
 // active high/low values for input ports
-const ioport_value IP_ACTIVE_HIGH = 0x00000000;
-const ioport_value IP_ACTIVE_LOW = 0xffffffff;
+constexpr ioport_value IP_ACTIVE_HIGH = 0x00000000;
+constexpr ioport_value IP_ACTIVE_LOW = 0xffffffff;
 
 // maximum number of players supported
-const int MAX_PLAYERS = 10;
+constexpr int MAX_PLAYERS = 10;
 
 // unicode constants
-const char32_t UCHAR_PRIVATE = 0x100000;
-const char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
-const char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
-const char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
-const char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
-const char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
+constexpr char32_t UCHAR_PRIVATE = 0x100000;
+constexpr char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
+constexpr char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
+constexpr char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
+constexpr char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
+constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
 
 
 // sequence types for input_port_seq() call
@@ -825,7 +826,6 @@ private:
 class digital_joystick
 {
 	DISABLE_COPYING(digital_joystick);
-	friend class simple_list<digital_joystick>;
 
 public:
 	// directions
@@ -848,7 +848,6 @@ public:
 	digital_joystick(int player, int number);
 
 	// getters
-	digital_joystick *next() const noexcept { return m_next; }
 	int player() const noexcept { return m_player; }
 	int number() const noexcept { return m_number; }
 	u8 current() const noexcept { return m_current; }
@@ -862,7 +861,6 @@ public:
 
 private:
 	// internal state
-	digital_joystick *          m_next;                                         // next joystick in the list
 	int                         m_player;                                       // player number represented
 	int                         m_number;                                       // joystick number represented
 	std::forward_list<std::reference_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
@@ -933,15 +931,11 @@ private:
 // a single setting for a configuration or DIP switch
 class ioport_setting
 {
-	DISABLE_COPYING(ioport_setting);
-	friend class simple_list<ioport_setting>;
-
 public:
 	// construction/destruction
 	ioport_setting(ioport_field &field, ioport_value value, const char *name);
 
 	// getters
-	ioport_setting *next() const { return m_next; }
 	ioport_field &field() const { return m_field; }
 	device_t &device() const;
 	running_machine &machine() const;
@@ -951,15 +945,14 @@ public:
 	const char *name() const { return m_name; }
 
 	// helpers
-	bool enabled() { return m_condition.eval(); }
+	bool enabled() const { return m_condition.eval(); }
 
 private:
 	// internal state
-	ioport_setting *    m_next;             // pointer to next setting in sequence
-	ioport_field &      m_field;            // pointer back to the field that owns us
-	ioport_value        m_value;            // value of the bits in this setting
-	const char *        m_name;             // user-friendly name to display
-	ioport_condition    m_condition;        // condition under which this setting is valid
+	ioport_field &      m_field;        // pointer back to the field that owns us
+	ioport_value        m_value;        // value of the bits in this setting
+	const char *        m_name;         // user-friendly name to display
+	ioport_condition    m_condition;    // condition under which this setting is valid
 };
 
 
@@ -968,24 +961,19 @@ private:
 // a mapping from a bit to a physical DIP switch description
 class ioport_diplocation
 {
-	DISABLE_COPYING(ioport_diplocation);
-	friend class simple_list<ioport_diplocation>;
-
 public:
 	// construction/destruction
 	ioport_diplocation(const char *name, u8 swnum, bool invert);
 
 	// getters
-	ioport_diplocation *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
 	u8 number() const { return m_number; }
 	bool inverted() const { return m_invert; }
 
 private:
-	ioport_diplocation *    m_next;         // pointer to the next bit
-	std::string             m_name;         // name of the physical DIP switch
-	u8                      m_number;       // physical switch number
-	bool                    m_invert;       // is this an active-high DIP?
+	std::string         m_name;         // name of the physical DIP switch
+	u8                  m_number;       // physical switch number
+	bool                m_invert;       // is this an active-high DIP?
 };
 
 
@@ -996,18 +984,19 @@ class ioport_field
 {
 	DISABLE_COPYING(ioport_field);
 	friend class simple_list<ioport_field>;
+	friend class ioport_manager;
 	friend class ioport_configurer;
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_OPTIONAL = 0x0001;    // set if this field is not required but recognized by hw
-	static const int FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
-	static const int FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
-	static const int FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
-	static const int ANALOG_FLAG_REVERSE = 0x0010;    // analog only: reverse the sense of the axis
-	static const int ANALOG_FLAG_RESET =   0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
-	static const int ANALOG_FLAG_WRAPS =   0x0040;    // analog only: positional count wraps around
-	static const int ANALOG_FLAG_INVERT =  0x0080;    // analog only: bitwise invert bits
+	static inline constexpr u32 FIELD_FLAG_OPTIONAL = 0x0001;    // set if this field is not required but recognized by hw
+	static inline constexpr u32 FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
+	static inline constexpr u32 FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
+	static inline constexpr u32 FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
+	static inline constexpr u32 ANALOG_FLAG_REVERSE = 0x0010;    // analog only: reverse the sense of the axis
+	static inline constexpr u32 ANALOG_FLAG_RESET =   0x0020;    // analog only: always preload in->default for relative axes, returning only deltas
+	static inline constexpr u32 ANALOG_FLAG_WRAPS =   0x0040;    // analog only: positional count wraps around
+	static inline constexpr u32 ANALOG_FLAG_INVERT =  0x0080;    // analog only: bitwise invert bits
 
 public:
 	// construction/destruction
@@ -1021,8 +1010,8 @@ public:
 	ioport_manager &manager() const;
 	running_machine &machine() const;
 	int modcount() const { return m_modcount; }
-	const simple_list<ioport_setting> &settings() const { return m_settinglist; }
-	const simple_list<ioport_diplocation> &diplocations() const { return m_diploclist; }
+	const std::vector<ioport_setting> &settings() const { return m_settinglist; }
+	const std::vector<ioport_diplocation> &diplocations() const { return m_diploclist; }
 
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
@@ -1087,7 +1076,7 @@ public:
 	void select_previous_setting();
 	bool has_next_setting() const;
 	void select_next_setting();
-	float crosshair_read();
+	float crosshair_read() const;
 	void init_live_state(analog_field *analog);
 	void frame_update(ioport_value &result);
 	void reduce_mask(ioport_value bits_to_remove) { m_mask &= ~bits_to_remove; }
@@ -1112,10 +1101,10 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	std::unique_ptr<ioport_field_live> m_live;         // live state of field (nullptr if not live)
+	std::unique_ptr<ioport_field_live> m_live;      // live state of field (nullptr if not live)
 	int                         m_modcount;         // modification count
-	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
-	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
+	std::vector<ioport_setting> m_settinglist;      // list of input_setting_configs
+	std::vector<ioport_diplocation> m_diploclist;   // list of locations for various bits
 
 	// generally-applicable data
 	ioport_value                m_mask;             // mask of bits belonging to the field
@@ -1246,7 +1235,6 @@ private:
 // live analog field information
 class analog_field
 {
-	friend class simple_list<analog_field>;
 	friend class ioport_manager;
 	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings) noexcept;
 
@@ -1255,7 +1243,6 @@ public:
 	analog_field(ioport_field &field);
 
 	// getters
-	analog_field *next() const noexcept { return m_next; }
 	ioport_manager &manager() const noexcept { return m_field.manager(); }
 	ioport_field &field() const noexcept { return m_field; }
 	s32 sensitivity() const noexcept { return m_sensitivity; }
@@ -1279,7 +1266,6 @@ private:
 	s32 apply_inverse_sensitivity(s32 value) const;
 
 	// internal state
-	analog_field *      m_next;                 // link to the next analog state for this port
 	ioport_field &      m_field;                // pointer to the input field referenced
 
 	// adjusted values (right-justified and tweaked)
@@ -1329,14 +1315,11 @@ private:
 // live device field information
 class dynamic_field
 {
-	friend class simple_list<dynamic_field>;
-
 public:
 	// construction/destruction
 	dynamic_field(ioport_field &field);
 
 	// getters
-	dynamic_field *next() const { return m_next; }
 	ioport_field &field() const { return m_field; }
 
 	// read/write
@@ -1345,7 +1328,6 @@ public:
 
 private:
 	// internal state
-	dynamic_field *         m_next;             // linked list of info for this port
 	ioport_field &          m_field;            // reference to the input field
 	u8                      m_shift;            // shift to apply to the final result
 	ioport_value            m_oldval;           // last value
@@ -1361,9 +1343,9 @@ struct ioport_port_live
 	ioport_port_live(ioport_port &port);
 
 	// public state
-	simple_list<analog_field> analoglist;       // list of analog port info
-	simple_list<dynamic_field> readlist;        // list of dynamic read fields
-	simple_list<dynamic_field> writelist;       // list of dynamic write fields
+	std::list<analog_field> analoglist;         // list of analog port info
+	std::vector<dynamic_field> readlist;        // list of dynamic read fields
+	std::vector<dynamic_field> writelist;       // list of dynamic write fields
 	ioport_value            defvalue;           // combined default value across the port
 	ioport_value            digital;            // current value from all digital inputs
 	ioport_value            outputvalue;        // current value for outputs
@@ -1420,10 +1402,11 @@ private:
 	input_seq_type token_to_seq_type(const char *string);
 	static const char *const seqtypestrings[];
 
-	void load_config(config_type cfg_type, util::xml::data_node const *parentnode);
-	void load_remap_table(util::xml::data_node const *parentnode);
-	bool load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
-	void load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
+	void load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
+	void load_remap_table(util::xml::data_node const &parentnode);
+	bool load_default_config(int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
+	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
+	void load_system_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
 
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
 	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
@@ -1457,7 +1440,7 @@ private:
 	input_type_entry *      m_type_to_entry[IPT_COUNT][MAX_PLAYERS]; // map from type/player to type state
 
 	// specific special global input states
-	simple_list<digital_joystick> m_joystick_list;  // list of digital joysticks
+	std::list<digital_joystick> m_joystick_list;    // list of digital joysticks
 
 	// frame time tracking
 	attotime                m_last_frame_time;      // time of the last frame callback

@@ -166,7 +166,9 @@ static const nes_pcb pcb_list[] =
 	{ "ks7012",           KAISER_KS7012 },  // used in Zanac (FDS Conversion)
 	{ "ks7013b",          KAISER_KS7013B }, // used in Highway Star (FDS Conversion)
 	{ "ks7016",           KAISER_KS7016 },  // used in Exciting Basketball (FDS Conversion)
+	{ "ks7016b",          KAISER_KS7016B }, // used in Meikyuu Jiin Dababa alt (FDS Conversion)
 	{ "ks7017",           KAISER_KS7017 },
+	{ "ks7021a",          KAISER_KS7021A }, // GetsuFumaDen pirate cart
 	{ "ks7022",           KAISER_KS7022 },  // mapper 175
 	{ "ks7030",           KAISER_KS7030 },  // used in Doki Doki Panic alt (FDS Conversion)
 	{ "ks7031",           KAISER_KS7031 },  // used in Dracula II (FDS Conversion)
@@ -315,6 +317,8 @@ static const nes_pcb pcb_list[] =
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
+	{ "ninjaryu",         UNL_NINJARYU },
+	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II
 	{ "nocash_nochr",     NOCASH_NOCHR },
 	{ "action53",         UNL_ACTION53 },
 	{ "cufrom",           UNL_CUFROM },
@@ -324,7 +328,6 @@ static const nes_pcb pcb_list[] =
 	{ "ffe4",             FFE4_BOARD },
 	{ "ffe8",             FFE8_BOARD },
 	{ "8237a",            UNSUPPORTED_BOARD },
-	{ "ninjaryu",         UNSUPPORTED_BOARD },
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
@@ -335,7 +338,6 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_f15",          UNSUPPORTED_BOARD },  // 150-in-1 Unchained Melody
 	{ "bmc_hp898f",       UNSUPPORTED_BOARD },  // Primasoft 9999999-in-1
 	{ "bmc_8in1",         UNSUPPORTED_BOARD },  // Super 8-in-1 (Incl. Rockin' Kats)
-	{ "unl_eh8813a",      UNSUPPORTED_BOARD },  // Dr. Mario II
 	{ "unl_158b",         UNSUPPORTED_BOARD },  // Blood of Jurassic
 	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },

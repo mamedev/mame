@@ -356,20 +356,14 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	const u16 palette = pSource[6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 linkno   = pSource[0]; /* LINKNO */
-	sprite_ptr->offset = pSource[1]; /* OFFSET */
-	int hpos           = pSource[2]; /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = pSource[3]; /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = pSource[4]; /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = pSource[5]; /* VSIZE      max 0x3ff pixels */
+	const u16 linkno   = pSource[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = pSource[1];         /* OFFSET */
+	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = pSource[4];         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = pSource[5];         /* VSIZE      max 0x3ff pixels */
 	/* pSource[6] contains priority/palette */
 	/* pSource[7] is used in Lucky & Wild, possibly for sprite-road priority */
-
-	if (linkno * 4 >= 0x4000 / 2) /* avoid garbage memory reads */
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
@@ -438,11 +432,8 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	}
 	u32 zoomy = (vsize << 16) / (num_rows * 16);
 	dy = (dy * zoomy + 0x8000) >> 16;
-	if (flipy)
-	{
-		vpos += dy;
-	}
-	else
+
+	if (!flipy)
 	{
 		vpos -= dy;
 	}

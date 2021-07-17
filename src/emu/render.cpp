@@ -3057,7 +3057,10 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_container(new render_container(*this))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
+	machine.configuration().config_register(
+			"video",
+			configuration_manager::load_delegate(&render_manager::config_load, this),
+			configuration_manager::save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
@@ -3312,10 +3315,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void render_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files with matching nodes
-	if ((cfg_type != config_type::GAME) || !parentnode)
+	// we only care about system-specific configuration with matching nodes
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// check the UI target
@@ -3368,8 +3371,8 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 
 void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// write out the interface target

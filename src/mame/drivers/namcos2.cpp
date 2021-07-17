@@ -20,12 +20,14 @@ Final Lap Notes:
     To move through self test options, press gas pedal and change gear shift from low to high
     To change an option, move gear shift from low to high without touching the gas pedal
 
-known issues:
+TODO:
+	- Verify below still occur
+
+	General
     - sprite/tilemap orthogonality needed
-    - bad road colors in Final Lap and Suzuka series
 
     Final Lap & Final Lap 2:
-    - by default, the graphics are way too bright if compared to original PCB/monitor output
+    - by default, the graphics are way too bright if compared to original PCB/monitor output (just an overall gamma issue?)
 
     Finest Hour:
     - roz plane colors are bad in-game
@@ -45,7 +47,11 @@ known issues:
     - no artwork
 
     Metal Hawk
-    - ROZ wraparound isn't implemented
+    - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
+
+	Burning Force (+ maybe others)
+	- POSIRQ is off-by-one, but adjusting it makes other cases worse
+	  (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
@@ -809,7 +815,7 @@ void namcos2_state::common_suzuka8h_am(address_map &map)
 	namcos2_68k_default_cpu_board_am(map);
 	map(0x800000, 0x8141ff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
 	map(0x818000, 0x818001).noprw(); /* enable? */
-	map(0x81a000, 0x81a001).nopw(); /* enable? */
+	map(0x81a000, 0x81a001).nopw(); /* enable? - or maybe sprite DMA / buffering which is currently done automatically by setting m_c355spr->set_buffer(1); */
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
@@ -1754,8 +1760,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	{
 		m_master_intc->pos_irq_trigger();
 		m_slave_intc->pos_irq_trigger();
-		// TODO: wrong place!
-		m_screen->update_partial(param);
+		// TODO: should be when video registers are updated (and/or latched) but that makes things worse
+		m_screen->update_partial(m_update_to_line_before_posirq ? param-1 : param);
 	}
 }
 
@@ -2050,8 +2056,11 @@ void namcos2_state::suzuka8h(machine_config &config)
 	configure_c116_standard(config);
 
 	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
+	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 
 	configure_c355spr_standard(config);
+	m_c355spr->set_buffer(1);
+
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
@@ -3079,8 +3088,8 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3137,8 +3146,8 @@ ROM_START( finalap3a )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x20000, "unknown", 0 ) /* unknown rom */
 	ROM_LOAD( "341.bin", 0x00000, 0x20000, CRC(8c90ca97) SHA1(dce2a680a5bc213f2f48d4baffc86ea27fe90209) ) // was read as 27c010
@@ -3198,8 +3207,8 @@ ROM_START( finalap3j )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3255,8 +3264,8 @@ ROM_START( finalap3jc )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "finalap3.nv",  0x000000, 0x2000, CRC(efbc6274) SHA1(f542012e467027b7bd5d7102096ff91d8c9adee3) )
@@ -3311,8 +3320,8 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_LOAD16_BYTE( "fltvoi1",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "fltvoi2",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 8*1024, "user2", 0 ) /* zoom */
-	ROM_LOAD( "04544191.6r", 0, 8*1024, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration and machine ID code that passes protection */
 	ROM_LOAD( "finalap3bl.nv",  0x000000, 0x2000, CRC(60226586) SHA1(d66afd1149c3c95cbb0108337c530cab78327d97) )
@@ -5479,6 +5488,7 @@ void namcos2_state::init_assaultp()
 void namcos2_state::init_burnforc()
 {
 	m_gametype = NAMCOS2_BURNING_FORCE;
+	m_update_to_line_before_posirq = true; // prevents bad line on horizon
 }
 
 void namcos2_state::init_cosmogng()
@@ -5671,6 +5681,7 @@ void namcos2_state::init_suzuka8h()
 void namcos2_state::init_suzuk8h2()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS_2;
+	m_update_to_line_before_posirq = true; // needed for tunnels, see 2nd attract demo
 }
 
 void namcos2_state::init_valkyrie()

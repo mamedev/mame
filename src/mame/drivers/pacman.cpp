@@ -6563,15 +6563,15 @@ ROM_START( painter )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "pain5.5e", 0x0000, 0x1000, CRC(bd819afc) SHA1(2e8762c3c480aa669f7e87651ddfdbb965ea4211) )
-	ROM_LOAD( "pain6.5f", 0x1000, 0x1000, BAD_DUMP CRC(014e5ed3) SHA1(8e01c640457515da89723215b19684ceb4556997) ) // BADADDR            xx-xxxxxxxxx, dumped with 2 different programmers with same result, but probably damaged ROM
+	ROM_LOAD( "pain6.5f", 0x1000, 0x1000, BAD_DUMP CRC(014e5ed3) SHA1(8e01c640457515da89723215b19684ceb4556997) ) // BADADDR            xx-xxxxxxxxx, dumped with 3 different programmers with same result, but probably damaged ROM
 
-	ROM_REGION( 0x0120, "proms", 0 ) // not dumped for this set
-	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, BAD_DUMP CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
-	ROM_LOAD( "2s140.4a",  0x0020, 0x0100, BAD_DUMP CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "mb7051.7f",   0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
+	ROM_LOAD( "n82s129n.4a", 0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
 
-	ROM_REGION( 0x0200, "namco", 0 ) // not dumped for this set
-	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, BAD_DUMP CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
-	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, BAD_DUMP CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "mb7052.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "mb7052.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    // Timing - not used
 ROM_END
 
 /*

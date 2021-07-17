@@ -16,16 +16,6 @@
 #include "video/poly.h"
 #include "video/rgbutil.h"
 
-//
-// To do:
-//   - split rasterizer into setup (clip/flip) and inner part
-//   - templatize texture pipeline helpers
-//   - determine color scale factors up front as start/delta values and use those
-//   - incorporate type/memory? into constant flags
-//   - use type for: fog delta mask, bilinear mask
-//   - multiple rasterizer_textures to save stalls
-//   - leverage poly clipping?
-//
 
 namespace voodoo
 {
@@ -34,7 +24,6 @@ namespace voodoo
 struct rasterizer_info;
 struct poly_data;
 class dither_helper;
-class stw_helper;
 
 // base class for our renderer
 using voodoo_poly_manager = poly_manager<float, poly_data, 0, POLY_FLAG_NO_CLIPPING>;
@@ -104,7 +93,7 @@ public:
 	// return the subtractive dither value for alpha blending
 	u32 subtract(s32 x) const
 	{
-		return (m_dither_raw != nullptr) ? (15 - (m_dither_raw[x & 3] >> 1)) : 0;
+		return (m_dither_raw != nullptr) ? ((15 - m_dither_raw[x & 3]) >> 1) : 0;
 	}
 
 	// allocate and initialize static tables
@@ -364,7 +353,7 @@ public:
 	rgb_t lookup_single_texel(u32 format, u32 texbase, s32 s, s32 t);
 
 	// fetch a texel given coordinates and LOD information
-	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, const voodoo::stw_helper &iterstw, s32 lodbase, s32 &lod, u8 bilinear_mask);
+	rgbaint_t fetch_texel(voodoo::reg_texture_mode const texmode, voodoo::dither_helper const &dither, s32 x, double iters, double itert, double iterw, s32 &lod, u8 bilinear_mask);
 
 	// texture-specific color combination unit
 	rgbaint_t combine_texture(voodoo::reg_texture_mode const texmode, rgbaint_t const &c_local, rgbaint_t const &c_other, s32 lod);
@@ -542,29 +531,35 @@ public:
 	void rasterizer(s32 y, const voodoo::voodoo_renderer::extent_t &extent, const voodoo::poly_data &extra, int threadid);
 
 	// run the pixel pipeline for LFB writes
-	void pixel_pipeline(thread_stats_block &threadstats, voodoo::poly_data const &extra, voodoo::reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t color, u16 sz);
+	void pixel_pipeline(thread_stats_block &threadstats, u16 *dest, u16 *depth, s32 x, s32 scry, rgb_t color, u16 sz);
 
 	// update the fog tables
 	void write_fog(u32 base, u32 data)
 	{
-		wait("Fog write");
-		m_fogdelta[base + 0] = (data >> 0) & 0xff;
-		m_fogblend[base + 0] = (data >> 8) & 0xff;
-		m_fogdelta[base + 1] = (data >> 16) & 0xff;
-		m_fogblend[base + 1] = (data >> 24) & 0xff;
+		u32 oldval = m_fogdelta[base + 0] | (m_fogblend[base + 0] << 8) | (m_fogdelta[base + 1] << 16) | (m_fogblend[base + 1] << 24);
+		if (oldval != data)
+		{
+			wait("write_fog");
+			m_fogdelta[base + 0] = BIT(data, 0, 8);
+			m_fogblend[base + 0] = BIT(data, 8, 8);
+			m_fogdelta[base + 1] = BIT(data, 16, 8);
+			m_fogblend[base + 1] = BIT(data, 24, 8);
+		}
 	}
 
 	// update the Y origin
 	void set_yorigin(s32 yorigin)
 	{
-		wait("Y origin write");
+		if (m_yorigin != yorigin)
+			wait("set_yorigin");
 		m_yorigin = yorigin;
 	}
 
 	// update the rowpixels
 	void set_rowpixels(u32 rowpixels)
 	{
-		wait("Rowpixels write");
+		if (m_rowpixels != rowpixels)
+			wait("set_rowpixels");
 		m_rowpixels = rowpixels;
 	}
 
@@ -587,12 +582,12 @@ private:
 	// pipeline stages, in order
 	bool stipple_test(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, s32 x, s32 y, u32 &stipple);
 	s32 compute_depthval(voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fbz_colorpath const fbzcp, s32 wfloat, s32 iterz);
-	bool depth_test(thread_stats_block &stats, voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, s32 destDepth, s32 biasdepth);
+	bool depth_test(thread_stats_block &stats, voodoo::reg_fbz_mode const fbzmode, s32 depth_dest, s32 depth_source);
 	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, const voodoo::poly_data &extradata, voodoo::reg_fbz_colorpath const fbzcp, voodoo::reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw, rgb_t chromakey);
 	bool alpha_mask_test(thread_stats_block &stats, u32 alpha);
 	bool alpha_test(thread_stats_block &stats, voodoo::reg_alpha_mode const alphamode, u32 alpha, u32 alpharef);
 	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &colorin, rgb_t chromakey);
-	void apply_fogging(rgbaint_t &color, voodoo::poly_data const &extra, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
+	void apply_fogging(rgbaint_t &color, rgb_t fogcolor, u32 depthbias, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 	void alpha_blend(rgbaint_t &color, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
 	void write_pixel(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);
 
@@ -622,40 +617,6 @@ private:
 	std::list<voodoo::rasterizer_info> m_rasterizer_list;
 	std::vector<thread_stats_block> m_thread_stats;
 };
-
-
-
-//**************************************************************************
-//  MATH HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  fast_log2 - computes the log2 of a double-
-//  precision value as a 24.8 value
-//-------------------------------------------------
-
-inline s32 fast_log2(double value, int offset)
-{
-	// negative values return 0
-	if (UNEXPECTED(value < 0))
-		return 0;
-
-	// convert the value to a raw integer
-	union { double d; u64 i; } temp;
-	temp.d = value;
-
-	// we only care about the 11-bit exponent and top 4 bits of mantissa
-	// (sign is already assured to be 0)
-	u32 ival = temp.i >> 48;
-
-	// exponent in the upper bits, plus an 8-bit log value from 4 bits of mantissa
-	s32 exp = (ival >> 4) - 1023 + 32 - offset;
-
-	// the maximum error using a 4 bit lookup from the mantissa is 0.0875, which is
-	// less than 1/2 lsb (0.125) for 2 bits of fraction
-	static u8 const s_log2_table[16] = { 0, 22, 44, 63, 82, 100, 118, 134, 150, 165, 179, 193, 207, 220, 232, 244 };
-	return (exp << 8) | s_log2_table[ival & 15];
-}
 
 }
 

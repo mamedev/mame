@@ -548,7 +548,7 @@ void output_header(std::ostream &out, bool dtd)
 			"\" mameconfig=\"%d\">\n",
 			XML_ROOT,
 			normalize_string(emulator_info::get_build_version()),
-			CONFIG_VERSION);
+			configuration_manager::CONFIG_VERSION);
 }
 
 
@@ -1269,7 +1269,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	{
 		int ctrl_type = CTRL_DIGITAL_BUTTONS;
 		bool ctrl_analog = false;
-		for (ioport_field &field : port.second->fields())
+		for (ioport_field const &field : port.second->fields())
 		{
 			// track the highest player number
 			if (nplayer < field.player() + 1)

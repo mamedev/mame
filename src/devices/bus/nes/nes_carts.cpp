@@ -253,8 +253,10 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("ks7010",           NES_KS7010);     // used in Akumajo Dracula (FDS Conversion)
 	device.option_add_internal("ks7012",           NES_KS7012);     // used in Zanac (FDS Conversion)
 	device.option_add_internal("ks7013b",          NES_KS7013B);    // used in Highway Star (FDS Conversion)
-	device.option_add_internal("ks7016",           NES_KS7016);     //  used in Exciting Basket (FDS Conversion)
+	device.option_add_internal("ks7016",           NES_KS7016);     // used in Exciting Basket (FDS Conversion)
+	device.option_add_internal("ks7016b",          NES_KS7016B);    // used in Meikyu Jiin Dababa alt (FDS Conversion)
 	device.option_add_internal("ks7017",           NES_KS7017);
+	device.option_add_internal("ks7021a",          NES_KS7021A);    // GetsuFumaDen pirate cart
 	device.option_add_internal("ks7022",           NES_KS7022);     // mapper 175
 	device.option_add_internal("ks7030",           NES_KS7030);     // used in Doki Doki Panic alt (FDS Conversion)
 	device.option_add_internal("ks7031",           NES_KS7031);     // used in Dracula II (FDS Conversion)
@@ -285,7 +287,9 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_whero",        NES_WHERO);     // mapper 27
 	device.option_add_internal("unl_43272",        NES_43272);     // used in Gaau Hok Gwong Cheung
 	device.option_add_internal("tf1201",           NES_TF1201);
-	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); //  used by City Fighter IV
+	device.option_add_internal("unl_cfight",       NES_CITYFIGHT); // used by City Fighter IV
+	device.option_add_internal("ninjaryu",         NES_NINJARYU);  // used by Ninja Ryukenden Chinese
+	device.option_add_internal("unl_eh8813a",      NES_EH8813A);   // used by Dr. Mario II
 	device.option_add_internal("zemina",           NES_ZEMINA);    // mapper 190 - Magic Kid GooGoo
 // misc bootleg boards
 	device.option_add_internal("ax5705",           NES_AX5705);
@@ -410,7 +414,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
 // other unsupported...
-	device.option_add_internal("ninjaryu",         NES_NROM);    // mapper 111 - UNSUPPORTED
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
@@ -418,7 +421,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_f15",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_hp898f",       NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("bmc_8in1",         NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("unl_eh8813a",      NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_158b",         NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?

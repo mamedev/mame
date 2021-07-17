@@ -2820,6 +2820,10 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							{
 								m_psr |= PSR_F;
 
+								// updating the destination when out of bounds
+								// is undefined, but required by DB32016
+								m_r[reg] = src - lower;
+
 								tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
 							}
 						}

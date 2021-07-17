@@ -37,6 +37,8 @@
 
 #include <algorithm>
 #include <new>
+#include <set>
+#include <tuple>
 #include <cctype>
 
 
@@ -547,53 +549,82 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 					osd_printf_info("\n");
 
 				// iterate through ROMs
-				bool hasroms = false;
+				std::list<std::tuple<std::string, int64_t, std::string>> entries;
+				std::set<std::string_view> devnames;
 				for (device_t const &device : device_enumerator(root))
 				{
+					bool hasroms = false;
 					for (const rom_entry *region = rom_first_region(device); region; region = rom_next_region(region))
 					{
 						for (const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 						{
-							// print a header
 							if (!hasroms)
-								osd_printf_info(
-									"ROMs required for %s \"%s\".\n"
-									"%-32s %10s %s\n",
-									type, root.shortname(), "Name", "Size", "Checksum");
-							hasroms = true;
+							{
+								hasroms = true;
+								if (&device != &root)
+									devnames.insert(device.shortname());
+							}
 
 							// accumulate the total length of all chunks
 							int64_t length = -1;
 							if (ROMREGION_ISROMDATA(region))
 								length = rom_file_size(rom);
 
-							// start with the name
-							osd_printf_info("%-32s ", rom->name());
-
-							// output the length next
-							if (length >= 0)
-								osd_printf_info("%10u", unsigned(uint64_t(length)));
-							else
-								osd_printf_info("%10s", "");
-
-							// output the hash data
-							util::hash_collection hashes(rom->hashdata());
-							if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
-							{
-								if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
-									osd_printf_info(" BAD");
-								osd_printf_info(" %s", hashes.macro_string());
-							}
-							else
-								osd_printf_info(" NO GOOD DUMP KNOWN");
-
-							// end with a CR
-							osd_printf_info("\n");
+							entries.emplace_back(rom->name(), length, rom->hashdata());
 						}
 					}
 				}
-				if (!hasroms)
+
+				// print results
+				if (entries.empty())
 					osd_printf_info("No ROMs required for %s \"%s\".\n", type, root.shortname());
+				else
+				{
+					// print a header
+					osd_printf_info("ROMs required for %s \"%s\"", type, root.shortname());
+					if (!devnames.empty())
+					{
+						osd_printf_info(" (including device%s", devnames.size() > 1 ? "s" : "");
+						bool first = true;
+						for (const std::string_view &devname : devnames)
+						{
+							if (first)
+								first = false;
+							else
+								osd_printf_info(",");
+							osd_printf_info(" \"%s\"", devname);
+						}
+						osd_printf_info(")");
+					}
+					osd_printf_info(".\n%-32s %10s %s\n", "Name", "Size", "Checksum");
+
+					for (auto &entry : entries)
+					{
+						// start with the name
+						osd_printf_info("%-32s ", std::get<0>(entry));
+
+						// output the length next
+						int64_t length = std::get<1>(entry);
+						if (length >= 0)
+							osd_printf_info("%10u", unsigned(uint64_t(length)));
+						else
+							osd_printf_info("%10s", "");
+
+						// output the hash data
+						util::hash_collection hashes(std::get<2>(entry));
+						if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
+						{
+							if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
+								osd_printf_info(" BAD");
+							osd_printf_info(" %s", hashes.macro_string());
+						}
+						else
+							osd_printf_info(" NO GOOD DUMP KNOWN");
+
+						// end with a CR
+						osd_printf_info("\n");
+					}
+				}
 			});
 }
 

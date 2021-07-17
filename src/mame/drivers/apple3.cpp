@@ -28,6 +28,7 @@
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/titan3plus2.h"
 #include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/softcard3.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -50,7 +51,8 @@ static void apple3_cards(device_slot_interface &device)
 	device.option_add("focusdrive", A2BUS_FOCUSDRIVE);  // Focus Drive IDE card
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);        // CMS Apple II SCSI Card
 	device.option_add("titan3plus2", A2BUS_TITAN3PLUS2); // Titan /// Plus 2 card
-	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);
+	device.option_add("mockingboard", A2BUS_MOCKINGBOARD); // Sweet Micro Systems Mockingboard (experimental on ///)
+	device.option_add("softcard3", A2BUS_SOFTCARD3);	// Microsoft SoftCard ///
 }
 
 static void a3_floppies(device_slot_interface &device)

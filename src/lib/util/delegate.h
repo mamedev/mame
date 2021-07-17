@@ -350,7 +350,7 @@ public:
 
 	// copy constructor
 	delegate_mfp(const delegate_mfp &src)
-		: m_function(src.m_function), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(0)
+		: m_function(src.m_function), m_this_delta(src.m_this_delta), m_dummy1(src.m_dummy1), m_dummy2(src.m_dummy2), m_size(src.m_size)
 	{
 	}
 
@@ -358,7 +358,7 @@ public:
 	template <typename MemberFunctionType, class MemberFunctionClass, typename ReturnType, typename StaticFunctionType>
 	delegate_mfp(MemberFunctionType mfp, MemberFunctionClass *, ReturnType *, StaticFunctionType)
 	{
-		//assert(sizeof(mfp) == 12 || sizeof(mfp) == 16);
+		static_assert(sizeof(mfp) == sizeof(void *) || sizeof(mfp) == 2 * sizeof(void *));
 		m_size = sizeof(mfp);
 		*reinterpret_cast<MemberFunctionType *>(this) = mfp;
 	}
@@ -375,7 +375,7 @@ public:
 	void update_after_bind(FunctionType &funcptr, delegate_generic_class *&object)
 	{
 		funcptr = reinterpret_cast<FunctionType>(m_function);
-		if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
+		if (m_size > SINGLE_MEMFUNCPTR_SIZE)
 			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 	}
 

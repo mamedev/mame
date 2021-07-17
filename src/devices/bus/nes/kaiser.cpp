@@ -13,7 +13,9 @@
  * Kaiser KS7012
  * Kaiser KS7013B
  * Kaiser KS7016
+ * Kaiser KS7016B
  * Kaiser KS7017
+ * Kaiser KS7021A
  * Kaiser KS7022
  * Kaiser KS7030
  * Kaiser KS7031
@@ -42,19 +44,21 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device,  "nes_ks7058",  "NES Cart Kaiser KS-7058 PCB")
-DEFINE_DEVICE_TYPE(NES_KS7022,  nes_ks7022_device,  "nes_ks7022",  "NES Cart Kaiser KS-7022 PCB")
-DEFINE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device,  "nes_ks7032",  "NES Cart Kaiser KS-7032 PCB")
 DEFINE_DEVICE_TYPE(NES_KS202,   nes_ks202_device,   "nes_ks202",   "NES Cart Kaiser KS-202 PCB")
-DEFINE_DEVICE_TYPE(NES_KS7017,  nes_ks7017_device,  "nes_ks7017",  "NES Cart Kaiser KS-7017 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7010,  nes_ks7010_device,  "nes_ks7010",  "NES Cart Kaiser KS-7010 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7012,  nes_ks7012_device,  "nes_ks7012",  "NES Cart Kaiser KS-7012 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7013B, nes_ks7013b_device, "nes_ks7013b", "NES Cart Kaiser KS-7013B PCB")
+DEFINE_DEVICE_TYPE(NES_KS7016,  nes_ks7016_device,  "nes_ks7016",  "NES Cart Kaiser KS-7016 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7016B, nes_ks7016b_device, "nes_ks7016b", "NES Cart Kaiser KS-7016B PCB")
+DEFINE_DEVICE_TYPE(NES_KS7017,  nes_ks7017_device,  "nes_ks7017",  "NES Cart Kaiser KS-7017 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7021A, nes_ks7021a_device, "nes_ks7021a", "NES Cart Kaiser KS-7021A PCB")
+DEFINE_DEVICE_TYPE(NES_KS7022,  nes_ks7022_device,  "nes_ks7022",  "NES Cart Kaiser KS-7022 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7030,  nes_ks7030_device,  "nes_ks7030",  "NES Cart Kaiser KS-7030 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7031,  nes_ks7031_device,  "nes_ks7031",  "NES Cart Kaiser KS-7031 PCB")
-DEFINE_DEVICE_TYPE(NES_KS7016,  nes_ks7016_device,  "nes_ks7016",  "NES Cart Kaiser KS-7016 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device,  "nes_ks7032",  "NES Cart Kaiser KS-7032 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device,  "nes_ks7037",  "NES Cart Kaiser KS-7037 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device,  "nes_ks7057",  "NES Cart Kaiser KS-7057 PCB")
+DEFINE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device,  "nes_ks7058",  "NES Cart Kaiser KS-7058 PCB")
 
 
 nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -82,8 +86,28 @@ nes_ks202_device::nes_ks202_device(const machine_config &mconfig, const char *ta
 {
 }
 
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mask(mask)
+{
+}
+
+nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_ks7016_device(mconfig, NES_KS7016, tag, owner, clock, 0x00)
+{
+}
+
+nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_ks7016_device(mconfig, NES_KS7016B, tag, owner, clock, 0x04)
+{
+}
+
 nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
+{
+}
+
+nes_ks7021a_device::nes_ks7021a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KS7021A, tag, owner, clock)
 {
 }
 
@@ -109,11 +133,6 @@ nes_ks7030_device::nes_ks7030_device(const machine_config &mconfig, const char *
 
 nes_ks7031_device::nes_ks7031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KS7031, tag, owner, clock)
-{
-}
-
-nes_ks7016_device::nes_ks7016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_KS7016, tag, owner, clock)
 {
 }
 
@@ -184,6 +203,24 @@ void nes_ks7032_device::pcb_reset()
 	prg_update();
 }
 
+void nes_ks7016_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_ks7016_device::pcb_reset()
+{
+	prg8_89(0x0c ^ m_mask);
+	prg8_ab(0x0d ^ m_mask);
+	prg8_cd(0x0e ^ m_mask);
+	prg8_ef(0x0f ^ m_mask);
+	chr8(0, CHRRAM);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+
+	m_latch = 0;
+}
+
 void nes_ks7017_device::device_start()
 {
 	common_start();
@@ -207,6 +244,18 @@ void nes_ks7017_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_irq_status = 0;
+}
+
+void nes_ks7021a_device::device_start()
+{
+	common_start();
+}
+
+void nes_ks7021a_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);
+	chr8(0, CHRROM);
 }
 
 void nes_ks7010_device::device_start()
@@ -280,23 +329,6 @@ void nes_ks7031_device::pcb_reset()
 	m_reg[1] = 0;
 	m_reg[2] = 0;
 	m_reg[3] = 0;
-}
-
-void nes_ks7016_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_ks7016_device::pcb_reset()
-{
-	prg8_89(0xc);
-	prg8_ab(0xd);
-	prg8_cd(0xe);
-	prg8_ef(0xf);
-	chr8(0, CHRRAM);
-
-	m_reg = 4;
 }
 
 void nes_ks7037_device::device_start()
@@ -530,6 +562,44 @@ uint8_t nes_ks202_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
+ Kaiser Boards KS7016, KS7016B
+
+ Games: Exciting Basket, Meikyuu Jiin Dababa FDS Conversions
+
+ These two variants have fixed upper 32K PRG and switchable
+ 8K PRG at 0x6000-0x7fff. The only difference appears to be
+ a flipped bit in the bank numbers. KS7016 puts banks 0x0c
+ through 0x0f in the upper PRG; KS7016B uses 0x08 to 0x0b.
+ For the switchable 8K PRG the latched bank # patterns are:
+
+   KS7016:  0 1 2 3 4 5 6 7 8 9 A B 8 9 A B
+   KS7016B: 0 1 2 3 4 5 6 7 C D E F C D E F
+
+ (NB: only KS7016B has been verified against PCB, KS7016 is a surmise.)
+
+ NES 2.0: mapper 306, mapper 549
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_ks7016_device::read_m(offs_t offset)
+{
+//  LOG_MMC(("ks7016 read_m, offset: %04x\n", offset));
+	return m_prg[m_latch * 0x2000 + offset];
+}
+
+void nes_ks7016_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("ks7016 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	m_latch = (offset >> 2) & 0x0f;
+	if (m_latch & 0x08)
+		m_latch = (m_latch & 0x0b) | m_mask;
+}
+
+/*-------------------------------------------------
+
  Kaiser Board KS7017
 
  Games: Almana no Kiseki FDS conversion
@@ -602,6 +672,40 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 	}
 
 	return get_open_bus();   // open bus
+}
+
+/*-------------------------------------------------
+
+ Kaiser Board KS7021A
+
+ Games: GetsuFumaDen
+
+ This board has a 16K fixed PRG bank at 0xc000 and
+ a swappable 16K PRG bank at 0x8000. CHR banks are
+ selectable by 1K page.
+
+ NES 2.0: mapper 525
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_ks7021a_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("ks7021a write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			prg16_89ab((data >> 1) & 0x07);
+			break;
+		case 0x1000:
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+		case 0x3000:
+			chr1_x(offset & 0x07, data & 0x7f, CHRROM);
+			break;
+	}
 }
 
 /*-------------------------------------------------
@@ -795,34 +899,6 @@ void nes_ks7031_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("ks7031 write_h, offset: %04x, data: %02x\n", offset, data));
 	m_reg[(offset >> 11) & 3] = data & 0x3f;
-}
-
-/*-------------------------------------------------
-
- Kaiser Board KS7016
-
- Games: Exciting Basket FDS Conversion
-
- NES 2.0: mapper 306
-
- In MAME: Unsupported.
-
- -------------------------------------------------*/
-
-uint8_t nes_ks7016_device::read_m(offs_t offset)
-{
-//  LOG_MMC(("ks7016 read_m, offset: %04x\n", offset));
-	return m_prg[((m_reg * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
-}
-
-void nes_ks7016_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("ks7016 write_h, offset: %04x, data: %02x\n", offset, data));
-	uint8_t mask = offset & 0x30;
-	if ((offset & 0x5943) == 0x5943)
-		m_reg = (mask == 0x30) ? 0xb : (((offset >> 2) & 0x0f) << 1);
-	if ((offset & 0x5943) == 0x5903)
-		m_reg = (mask != 0x30) ? 0xb : (((offset >> 2) & 0x0f) << 1);
 }
 
 /*-------------------------------------------------

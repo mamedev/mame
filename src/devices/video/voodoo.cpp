@@ -1033,7 +1033,7 @@ void voodoo_1_device::device_start()
 
 void voodoo_1_device::device_stop()
 {
-	m_renderer->wait("Destruction");
+	m_renderer->wait("device_stop");
 }
 
 
@@ -1540,7 +1540,7 @@ u32 voodoo_1_device::internal_lfb_r(offs_t offset)
 	}
 
 	// wait for any outstanding work to finish before reading
-	m_renderer->wait("LFB read");
+	m_renderer->wait("internal_lfb_r");
 
 	// read and assemble two pixels
 	u32 data = buffer[0] | (buffer[1] << 16);
@@ -1629,7 +1629,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_renderer->rowpixels() + x;
 
 		// wait for any outstanding work to finish
-		m_renderer->wait("LFB Write");
+		m_renderer->wait("internal_lfb_w(raw)");
 
 		// loop over up to two pixels
 		voodoo::dither_helper dither(scry, fbzmode);
@@ -1687,22 +1687,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 			depth += scry * m_renderer->rowpixels();
 
 		// make a dummy poly_extra_data structure with some cached values
-		poly_data poly;
-		poly.raster.compute(m_reg, nullptr, nullptr);
-		poly.destbase = dest;
-		poly.depthbase = depth;
-		poly.clipleft = m_reg.clip_left();
-		poly.clipright = m_reg.clip_right();
-		poly.cliptop = m_reg.clip_top();
-		poly.clipbottom = m_reg.clip_bottom();
-		poly.color0 = m_reg.color0().argb();
-		poly.color1 = m_reg.color1().argb();
-		poly.chromakey = m_reg.chroma_key().argb();
-		poly.fogcolor = m_reg.fog_color().argb();
-		poly.zacolor = m_reg.za_color();
-		poly.stipple = m_reg.stipple();
-		poly.alpharef = m_reg.alpha_mode().alpharef();
-		if (poly.raster.fbzmode().enable_stipple() && !poly.raster.fbzmode().stipple_pattern())
+		if (m_reg.fbz_mode().enable_stipple() && !m_reg.fbz_mode().stipple_pattern())
 			logerror("Warning: rotated stipple pattern used in LFB write\n");
 
 		// loop over up to two pixels
@@ -1712,7 +1697,7 @@ void voodoo_1_device::internal_lfb_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			// make sure we care about this pixel
 			if ((mask & LFB_PIXEL0_MASK) != 0)
-				m_renderer->pixel_pipeline(threadstats, poly, lfbmode, x, y, src_color[pix], src_depth[pix]);
+				m_renderer->pixel_pipeline(threadstats, dest, depth, x, y, src_color[pix], src_depth[pix]);
 
 			// advance our pointers
 			x++;
@@ -1906,9 +1891,6 @@ void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 	if (!BIT(m_chipmask, 1 + tmunum))
 		return;
 
-	// wait for any outstanding work to finish
-	m_renderer->wait("Texture write");
-
 	// the seq_8_downld flag seems to always come from TMU #0
 	bool seq_8_downld = m_tmu[0].regs().texture_mode().seq_8_downld();
 
@@ -1939,6 +1921,9 @@ void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 		return;
 	u8 *dest = texture.write_ptr(lod, ts, tt, bytes_per_texel);
 
+	// wait for any outstanding work to finish
+	m_renderer->wait("internal_texture_w");
+
 	// write the four bytes in little-endian order
 	if (bytes_per_texel == 1)
 	{
@@ -1962,7 +1947,10 @@ void voodoo_1_device::internal_texture_w(offs_t offset, u32 data)
 
 u32 voodoo_1_device::reg_invalid_r(u32 chipmask, u32 regnum)
 {
-	return 0xffffffff;
+	// funkball does invalid reads of textureMode and will leave
+	// improper bits set if this returns 0xffffffff
+	logerror("%s: Unexpected read from register %s[%X.%02X]\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum);
+	return 0x00000000;
 }
 
 
@@ -2035,7 +2023,8 @@ u32 voodoo_1_device::reg_fbiinit2_r(u32 chipmask, u32 regnum)
 u32 voodoo_1_device::reg_vretrace_r(u32 chipmask, u32 regnum)
 {
 	// sfrush needs this to be at least 1 extra cycle slower or else it won't boot
-	m_cpu->eat_cycles(1);
+	// mace needs this to be at least 2 extra cycles
+	m_cpu->eat_cycles(2);
 
 	// return 0 if vblank is active
 	return m_vblank ? 0 : screen().vpos();
@@ -2059,7 +2048,7 @@ u32 voodoo_1_device::reg_stats_r(u32 chipmask, u32 regnum)
 
 u32 voodoo_1_device::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 {
-	logerror("%s: Unexpected write to register %02X[%X] = %08X\n", machine().describe_context(), regnum, chipmask, data);
+	logerror("%s: Unexpected write to register %s[%X.%02X] = %08X\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum, data);
 	return 0;
 }
 
@@ -2070,7 +2059,7 @@ u32 voodoo_1_device::reg_invalid_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_1_device::reg_unimplemented_w(u32 chipmask, u32 regnum, u32 data)
 {
-	logerror("%s: Unimplemented write to register %02X(%X) = %08X\n", machine().describe_context(), regnum, chipmask, data);
+	logerror("%s: Unimplemented write to register %s[%X.%02X] = %08X\n", machine().describe_context(), m_regtable[regnum].name(), chipmask, regnum, data);
 	return 0;
 }
 
@@ -2296,6 +2285,12 @@ u32 voodoo_1_device::reg_triangle_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_1_device::reg_nop_w(u32 chipmask, u32 regnum, u32 data)
 {
+	// NOP should synchronize the pipeline; in theory we can mostly get away without
+	// it, but gtfore06 shows flicker on some golfers if we don't respect it; some
+	// games (notably gradius4) take a noticeable hit when this is present, so it
+	// may be worth adding an option to not block here
+	m_renderer->wait("reg_nop_w");
+
 	if (BIT(data, 0))
 		reset_counters();
 	if (BIT(data, 1))
@@ -2335,8 +2330,6 @@ u32 voodoo_1_device::reg_fastfill_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_1_device::reg_swapbuffer_w(u32 chipmask, u32 regnum, u32 data)
 {
-	m_renderer->wait("swapbufferCMD");
-
 	// the don't swap value is Voodoo 2-only, masked off by the register engine
 	m_vblank_swap_pending = true;
 	m_vblank_swap = BIT(data, 1, 8);
@@ -2374,7 +2367,7 @@ u32 voodoo_1_device::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0) && m_init_enable.enable_hw_init())
 	{
-		m_renderer->wait("fbi_init");
+		m_renderer->wait("reg_fbiinit_w");
 		m_reg.write(regnum, data);
 
 		// handle resets written to fbiInit0
@@ -2408,7 +2401,7 @@ u32 voodoo_1_device::reg_video_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("video_configuration");
+		m_renderer->wait("reg_video_w");
 		m_reg.write(regnum, data);
 
 		auto const hsync = m_reg.hsync<true>();
@@ -2437,12 +2430,12 @@ u32 voodoo_1_device::reg_clut_w(u32 chipmask, u32 regnum, u32 data)
 {
 	if (BIT(chipmask, 0))
 	{
-		m_renderer->wait("clut");
 		if (m_reg.fbi_init1().video_timing_reset() == 0)
 		{
 			int index = BIT(data, 24, 8);
 			if (index <= 32 && m_clut[index] != data)
 			{
+				screen().update_partial(screen().vpos());
 				m_clut[index] = data;
 				m_clut_dirty = true;
 			}
@@ -2621,6 +2614,7 @@ void voodoo_1_device::swap_buffers()
 		logerror("--- swap_buffers @ %d\n", screen().vpos());
 
 	// force a partial update
+	m_renderer->wait("swap_buffers");
 	screen().update_partial(screen().vpos());
 	m_video_changed = true;
 
@@ -2691,6 +2685,16 @@ void voodoo_1_device::rotate_buffers()
 
 int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t const *pens)
 {
+	// flush the pipes
+	if (operation_pending())
+	{
+		if (LOG_VBLANK_SWAP)
+			logerror("---- update flush begin\n");
+		flush_fifos(machine().time());
+		if (LOG_VBLANK_SWAP)
+			logerror("---- update flush end\n");
+	}
+
 	// reset the video changed flag
 	bool changed = m_video_changed;
 	m_video_changed = false;
@@ -2701,9 +2705,9 @@ int voodoo_1_device::update_common(bitmap_rgb32 &bitmap, const rectangle &clipre
 		drawbuf = m_backbuf;
 
 	// copy from the current front buffer
-	if (LOG_VBLANK_SWAP) logerror("--- update_common @ %d from %08X\n", screen().vpos(), m_rgboffs[m_frontbuf]);
 	u32 rowpixels = m_renderer->rowpixels();
 	u16 *buffer_base = draw_buffer(drawbuf);
+	if (LOG_VBLANK_SWAP) logerror("--- update_common %d-%d @ %d from %08X\n", cliprect.min_y, cliprect.max_y, screen().vpos(), u32((u8 *)buffer_base - m_fbram));
 	for (s32 y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		if (y < m_yoffs)

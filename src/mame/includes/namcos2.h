@@ -39,6 +39,7 @@ public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_gametype(0),
+		m_update_to_line_before_posirq(false),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"),
@@ -174,6 +175,8 @@ enum
 	};
 
 	int m_gametype;
+	bool m_update_to_line_before_posirq;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;

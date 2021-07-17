@@ -187,7 +187,7 @@ void tms0980_cpu_device::read_opcode()
 u8 tms0980_cpu_device::read_k_input()
 {
 	u8 k = m_read_k(0, 0xff) & 0x1f;
-	u8 k3 = (k & 0x10) ? 3: 0; // the TMS0980 K3 line is simply K1|K2
+	u8 k3 = (k & 0x10) ? 3: 0; // the K3 line is simply K1|K2
 	return (k & 0xf) | k3;
 }
 

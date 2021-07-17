@@ -16,7 +16,6 @@ namespace voodoo
 
 static constexpr bool LOG_RASTERIZERS = false;
 
-
 struct static_rasterizer_info
 {
 	voodoo_renderer::rasterizer_mfp mfp;
@@ -60,7 +59,7 @@ static const rectangle global_cliprect(-4096, 4095, -4096, 4095);
 //  point version of the iterated W value
 //-------------------------------------------------
 
-static inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
+inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
 {
 	int exp = count_leading_zeros_64(iterw) - 16;
 	if (exp < 0)
@@ -78,7 +77,7 @@ static inline s32 ATTR_FORCE_INLINE compute_wfloat(s64 iterw)
 //  manual
 //-------------------------------------------------
 
-static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, reg_fbz_colorpath const fbzcp)
+inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb, reg_fbz_colorpath const fbzcp)
 {
 	rgbaint_t result(iterargb);
 	result.shr_imm(20);
@@ -113,7 +112,7 @@ static inline rgbaint_t ATTR_FORCE_INLINE clamped_argb(const rgbaint_t &iterargb
 //  described in the Voodoo manual
 //-------------------------------------------------
 
-static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const fbzcp)
+inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const fbzcp)
 {
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
@@ -135,7 +134,7 @@ static inline s32 ATTR_FORCE_INLINE clamped_z(s32 iterz, reg_fbz_colorpath const
 //  described in the Voodoo manual
 //-------------------------------------------------
 
-static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const fbzcp)
+inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const fbzcp)
 {
 	// clamped case is easy
 	if (fbzcp.rgbzw_clamp() != 0)
@@ -152,28 +151,71 @@ static inline s32 ATTR_FORCE_INLINE clamped_w(s64 iterw, reg_fbz_colorpath const
 
 
 //-------------------------------------------------
+//  fast_log2 - computes the log2 of a double-
+//  precision value as a 24.8 value; if the double
+//  was converted from a fixed-point integer, the
+//  number of fractional bits should be specified
+//  by fracbits
+//-------------------------------------------------
+
+inline s32 ATTR_FORCE_INLINE fast_log2(double value, int fracbits = 0)
+{
+	// negative values return 0
+	if (UNEXPECTED(value < 0))
+		return 0;
+
+	// convert the value to a raw integer
+	union { double d; u64 i; } temp;
+	temp.d = value;
+
+	// we only care about the 11-bit exponent and top 7 bits of mantissa
+	// (sign is already assured to be 0)
+	u32 ival = temp.i >> 45;
+
+	// extract exponent, unbias, and adjust for fixed-point fraction
+	s32 exp = (ival >> 7) - 1023 - fracbits;
+
+	// use top 7 bits of mantissa to look up fractional log
+	static u8 const s_log2_table[128] =
+	{
+		  0,   2,   5,   8,  11,  14,  16,  19,  22,  25,  27,  30,  33,  35,  38,  40,
+		 43,  46,  48,  51,  53,  56,  58,  61,  63,  65,  68,  70,  73,  75,  77,  80,
+		 82,  84,  87,  89,  91,  93,  96,  98, 100, 102, 104, 106, 109, 111, 113, 115,
+		117, 119, 121, 123, 125, 127, 129, 132, 134, 136, 138, 140, 141, 143, 145, 147,
+		149, 151, 153, 155, 157, 159, 161, 162, 164, 166, 168, 170, 172, 173, 175, 177,
+		179, 181, 182, 184, 186, 188, 189, 191, 193, 194, 196, 198, 200, 201, 203, 205,
+		206, 208, 209, 211, 213, 214, 216, 218, 219, 221, 222, 224, 225, 227, 229, 230,
+		232, 233, 235, 236, 238, 239, 241, 242, 244, 245, 247, 248, 250, 251, 253, 254
+	};
+
+	// combine the integral and fractional parts
+	return (exp << 8) | s_log2_table[ival & 127];
+}
+
+
+
+//-------------------------------------------------
 //  compute_lodbase - compute the base LOD value
 //-------------------------------------------------
 
-static inline s32 ATTR_FORCE_INLINE compute_lodbase(s64 dsdx, s64 dsdy, s64 dtdx, s64 dtdy)
+inline s32 ATTR_FORCE_INLINE compute_lodbase(s64 dsdx, s64 dsdy, s64 dtdx, s64 dtdy)
 {
-	// compute (ds^2 + dt^2) in both X and Y as 28.36 numbers
-	dsdx >>= 14;
-	dsdy >>= 14;
-	dtdx >>= 14;
-	dtdy >>= 14;
-	s64 texdx = dsdx * dsdx + dtdx * dtdx;
-	s64 texdy = dsdy * dsdy + dtdy * dtdy;
+	// compute (ds^2 + dt^2) in both X and Y; note that these values are
+	// each .32, so the square is a .64 fixed point value
+	double fdsdx = double(dsdx);
+	double fdsdy = double(dsdy);
+	double fdtdx = double(dtdx);
+	double fdtdy = double(dtdy);
+	double texdx = fdsdx * fdsdx + fdtdx * fdtdx;
+	double texdy = fdsdy * fdsdy + fdtdy * fdtdy;
 
-	// pick whichever is larger and shift off some high bits -> 28.20
-	s64 maxval = std::max(texdx, texdy) >> 16;
+	// pick whichever is larger
+	double maxval = std::max(texdx, texdy);
 
-	// use our fast reciprocal/log on this value; it expects input as a
-	// 16.32 number, and returns the log of the reciprocal, so we have to
-	// adjust the result: negative to get the log of the original value
-	// plus 12 to account for the extra exponent, and divided by 2 to
-	// get the log of the square root of texdx
-	return (fast_log2(double(maxval), 0) + (12 << 8)) / 2;
+	// use our fast reciprocal/log on this value; 64 to indicate how many
+	// bits of fractional resolution in the source, and divide by 2 because
+	// we really want the log of the square root
+	return fast_log2(maxval, 64) / 2;
 }
 
 
@@ -349,121 +391,6 @@ void dither_helper::init_static()
 			s_nodither_lookup[val] = color >> 2;
 	}
 }
-
-
-
-//**************************************************************************
-//  STW HELPER
-//**************************************************************************
-
-// use SSE on 64-bit implementations, where it can be assumed
-#if 1 && ((!defined(MAME_DEBUG) || defined(__OPTIMIZE__)) && (defined(__SSE2__) || defined(_MSC_VER)) && defined(PTR64))
-
-#include <emmintrin.h>
-#ifdef __SSE4_1__
-#include <smmintrin.h>
-#endif
-
-class stw_helper
-{
-public:
-	stw_helper() { }
-	stw_helper(stw_helper const &other) = default;
-	stw_helper &operator=(stw_helper const &other) = default;
-
-	void set(s64 s, s64 t, s64 w)
-	{
-		m_st = _mm_set_pd(s << 8, t << 8);
-		m_w = _mm_set1_pd(w);
-	}
-
-	bool is_w_neg() const
-	{
-		return _mm_comilt_sd(m_w, _mm_set1_pd(0.0));
-	}
-
-	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
-	{
-		shift += 8;
-		s = _mm_cvtsd_si64(_mm_shuffle_pd(m_st, _mm_setzero_pd(), 1)) >> shift;
-		t = _mm_cvtsd_si64(m_st) >> shift;
-	}
-
-	void add(stw_helper const &delta)
-	{
-		m_st = _mm_add_pd(m_st, delta.m_st);
-		m_w = _mm_add_pd(m_w, delta.m_w);
-	}
-
-	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
-	{
-		__m128d tmp = _mm_div_pd(m_st, m_w);
-		__m128i tmp2 = _mm_cvttpd_epi32(tmp);
-#ifdef __SSE4_1__
-		sow = _mm_extract_epi32(tmp2, 1);
-		tow = _mm_extract_epi32(tmp2, 0);
-#else
-		sow = _mm_cvtsi128_si32(_mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 0, 1)));
-		tow = _mm_cvtsi128_si32(tmp2);
-#endif
-		oowlog = -fast_log2(_mm_cvtsd_f64(m_w), 0);
-	}
-
-private:
-	__m128d m_st;
-	__m128d m_w;
-};
-
-#else
-
-class stw_helper
-{
-public:
-	stw_helper() {}
-	stw_helper(stw_helper const &other) = default;
-	stw_helper &operator=(stw_helper const &other) = default;
-
-	void set(s64 s, s64 t, s64 w)
-	{
-		m_s = s;
-		m_t = t;
-		m_w = w;
-	}
-
-	bool is_w_neg() const
-	{
-		return (m_w < 0) ? true : false;
-	}
-
-	void get_st_shiftr(s32 &s, s32 &t, s32 shift) const
-	{
-		s = m_s >> shift;
-		t = m_t >> shift;
-	}
-
-	void add(stw_helper const &other)
-	{
-		m_s += other.m_s;
-		m_t += other.m_t;
-		m_w += other.m_w;
-	}
-
-	// Computes s/w and t/w and returns log2 of 1/w
-	// s, t and c are 16.32 values.  The results are 24.8.
-	void calc_stow(s32 &sow, s32 &tow, s32 &oowlog) const
-	{
-		double recip = double(1ULL << (47 - 39)) / m_w;
-		sow = s32(m_s * recip);
-		tow = s32(m_t * recip);
-		oowlog = fast_log2(recip, 56);
-	}
-
-private:
-	s64 m_s, m_t, m_w;
-};
-
-#endif
-
 
 
 //**************************************************************************
@@ -978,26 +905,36 @@ inline rgb_t rasterizer_texture::lookup_single_texel(u32 format, u32 texbase, s3
 //  the S,T coordinates and LOD
 //-------------------------------------------------
 
-inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, const stw_helper &iterstw, s32 lodbase, s32 &lod, u8 bilinear_mask)
+inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_mode const texmode, dither_helper const &dither, s32 x, double iters, double itert, double iterw, s32 &lod, u8 bilinear_mask)
 {
-	lod = lodbase;
-
-	// determine the S/T/LOD values for this texture
+	// determine the S/T/LOD values for this texture; iterated S/T are
+	// in 32.32 format and we want final S/T in 24.8 format
 	s32 s, t;
 	if (texmode.enable_perspective())
 	{
-		s32 wlog;
-		iterstw.calc_stow(s, t, wlog);
-		lod += wlog;
+		// iterws is also 32.32, so division would leave no fractional bits;
+		// the 256 factor is there to produce 8 bits of fraction
+		double recip = 256.0 / iterw;
+		s = s32(iters * recip);
+		t = s32(itert * recip);
+
+		// compute the log2 of the non-reciprocal W value; negating it gives
+		// the log2 of the reciprocal, so we subtract instead of add it
+		lod -= fast_log2(iterw, 32);
 	}
 	else
-		iterstw.get_st_shiftr(s, t, 14 + 10);
+	{
+		// scale the .32 values down to .8 values as doubles to avoid 64-bit
+		// integers
+		s = s32(iters * (1.0 / (1 << 24)));
+		t = s32(itert * (1.0 / (1 << 24)));
+	}
 
-	// clamp W
-	if (texmode.clamp_neg_w() && iterstw.is_w_neg())
+	// clamp S/T if the iterated W is negative
+	if (texmode.clamp_neg_w() && iterw < 0)
 		s = t = 0;
 
-	// clamp the LOD
+	// clamp the LOD after applying bias and dither
 	lod += m_lodbias;
 	if (texmode.enable_lod_dither())
 		lod += dither.raw_4x4(x) << 4;
@@ -1018,8 +955,8 @@ inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_m
 	rgbaint_t result;
 	if ((lod == m_lodmin && !texmode.magnification_filter()) || (lod != m_lodmin && !texmode.minification_filter()))
 	{
-		// adjust S/T for the LOD and strip off the fractions
-		ilod += 18 - 10;
+		// incorporate the fraction shift into ilod
+		ilod += 8;
 		s >>= ilod;
 		t >>= ilod;
 
@@ -1491,11 +1428,8 @@ inline s32 ATTR_FORCE_INLINE voodoo_renderer::compute_depthval(poly_data const &
 //  the caller
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &threadstats, poly_data const &poly, reg_fbz_mode const fbzmode, s32 depthdest, s32 depthval)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::depth_test(thread_stats_block &threadstats, reg_fbz_mode const fbzmode, s32 depthdest, s32 depthsource)
 {
-	// the source depth is either the iterated W/Z+bias or a constant value
-	s32 depthsource = (fbzmode.depth_source_compare() == 0) ? depthval : u16(poly.zacolor);
-
 	// test against the depth buffer
 	switch (fbzmode.depth_function())
 	{
@@ -1947,10 +1881,10 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_bloc
 //  the caller
 //-------------------------------------------------
 
-inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, poly_data const &poly, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
+inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, rgb_t fogcolor, u32 depthbias, reg_fbz_mode const fbzmode, reg_fog_mode const fogmode, reg_fbz_colorpath const fbzcp, s32 x, dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, rgbaint_t const &iterargb)
 {
 	// constant fog bypasses everything else
-	rgbaint_t fog_color_local(poly.fogcolor);
+	rgbaint_t fog_color_local(fogcolor);
 	if (fogmode.fog_constant())
 	{
 		// if fog_mult is 0, we add this to the original color
@@ -1984,7 +1918,7 @@ inline void ATTR_FORCE_INLINE voodoo_renderer::apply_fogging(rgbaint_t &color, p
 
 				// add the bias for fog selection
 				if (fbzmode.enable_depth_bias())
-					fog_depth = std::clamp(fog_depth + s16(poly.zacolor), 0, 0xffff);
+					fog_depth = std::clamp(fog_depth + s16(depthbias), 0, 0xffff);
 
 				// perform the multiply against lower 8 bits of wfloat
 				s32 delta = m_fogdelta[fog_depth >> 10];
@@ -2203,23 +2137,15 @@ inline void ATTR_FORCE_INLINE voodoo_renderer::write_pixel(thread_stats_block &t
 //  pipeline
 //-------------------------------------------------
 
-void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data const &poly, reg_lfb_mode const lfbmode, s32 x, s32 scry, rgb_t src_color, u16 sz)
+void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, u16 *dest, u16 *depth, s32 x, s32 scry, rgb_t src_color, u16 sz)
 {
-	auto const fbzcp = poly.raster.fbzcp();
-	auto const alphamode = poly.raster.alphamode();
-	auto const fbzmode = poly.raster.fbzmode();
-	auto const fogmode = poly.raster.fogmode();
-	dither_helper dither(scry, fbzmode, fogmode);
-	u16 *depth = poly.depthbase;
-	u16 *dest = poly.destbase;
-	u32 stipple = poly.stipple;
-
 	threadstats.pixels_in++;
 
 	// apply clipping
+	auto const fbzmode = m_fbi_reg.fbz_mode();
 	if (fbzmode.enable_clipping())
 	{
-		if (x < poly.clipleft || x >= poly.clipright || scry < poly.cliptop || scry >= poly.clipbottom)
+		if (x < m_fbi_reg.clip_left() || x >= m_fbi_reg.clip_right() || scry < m_fbi_reg.clip_top() || scry >= m_fbi_reg.clip_bottom())
 		{
 			threadstats.clip_fail++;
 			return;
@@ -2227,21 +2153,25 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 	}
 
 	// handle stippling
-	if (fbzmode.enable_stipple() && !stipple_test(threadstats, fbzmode, x, scry, stipple))
-		return;
+	if (fbzmode.enable_stipple())
+	{
+		u32 stipple = m_fbi_reg.stipple();
+		if (!stipple_test(threadstats, fbzmode, x, scry, stipple))
+			return;
+	}
 
 	// Depth testing value for lfb pipeline writes is directly from write data, no biasing is used
 	s32 depthval = u32(sz);
 
 	// Perform depth testing
-	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
+	if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], (fbzmode.depth_source_compare() == 0) ? depthval : u16(m_fbi_reg.za_color())))
 		return;
 
 	// use the RGBA we stashed above
 	rgbaint_t color(src_color);
 
 	// handle chroma key
-	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, poly.chromakey))
+	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, m_fbi_reg.chroma_key().argb()))
 		return;
 
 	// handle alpha mask
@@ -2249,20 +2179,23 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, poly_data 
 		return;
 
 	// handle alpha test
-	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), poly.alpharef))
+	auto const alphamode = m_fbi_reg.alpha_mode();
+	if (alphamode.alphatest() && !alpha_test(threadstats, alphamode, color.get_a(), alphamode.alpharef()))
 		return;
 
 	// perform fogging
+	auto const fogmode = m_fbi_reg.fog_mode();
+	dither_helper dither(scry, fbzmode, fogmode);
 	rgbaint_t prefog(color);
 	if (fogmode.enable_fog())
 	{
 		s32 iterz = sz << 12;
-		s64 iterw = lfbmode.write_w_select() ? u32(poly.zacolor << 16) : u32(sz << 16);
-		apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, depthval, iterz, iterw, rgbaint_t(0));
+		s64 iterw = m_fbi_reg.lfb_mode().write_w_select() ? u32(m_fbi_reg.za_color() << 16) : u32(sz << 16);
+		apply_fogging(color, m_fbi_reg.fog_color().argb(), m_fbi_reg.za_color(), fbzmode, fogmode, m_fbi_reg.fbz_colorpath(), x, dither, depthval, iterz, iterw, rgbaint_t(0));
 	}
 
 	// wait for any outstanding work to finish
-	wait("LFB Write");
+	wait("pixel_pipeline");
 
 	// perform alpha blending
 	if (alphamode.alphablend())
@@ -2287,8 +2220,8 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	reg_alpha_mode const alphamode(AlphaMode, poly.raster.alphamode());
 	reg_fbz_mode const fbzmode(FbzMode, poly.raster.fbzmode());
 	reg_fog_mode const fogmode(FogMode, poly.raster.fogmode());
-	stw_helper iterstw0, iterstw1;
-	stw_helper deltastw0, deltastw1;
+	double iters0, itert0, iterw0, iters1, itert1, iterw1;
+	double deltas0, deltat0, deltaw0, deltas1, deltat1, deltaw1;
 	u32 stipple = poly.stipple;
 
 	// determine the screen Y
@@ -2359,21 +2292,23 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 	s32 lodbase0 = 0;
 	if (GenericFlags & rasterizer_params::GENERIC_TEX0)
 	{
-		iterstw0.set(
-			poly.starts0 + dy * poly.ds0dy + dx * poly.ds0dx,
-			poly.startt0 + dy * poly.dt0dy + dx * poly.dt0dx,
-			poly.startw0 + dy * poly.dw0dy + dx * poly.dw0dx);
-		deltastw0.set(poly.ds0dx, poly.dt0dx, poly.dw0dx);
+		deltas0 = double(poly.ds0dx);
+		deltat0 = double(poly.dt0dx);
+		deltaw0 = double(poly.dw0dx);
+		iters0 = double(poly.starts0 + dy * poly.ds0dy + dx * poly.ds0dx);
+		itert0 = double(poly.startt0 + dy * poly.dt0dy + dx * poly.dt0dx);
+		iterw0 = double(poly.startw0 + dy * poly.dw0dy + dx * poly.dw0dx);
 		lodbase0 = compute_lodbase(poly.ds0dx, poly.ds0dy, poly.dt0dx, poly.dt0dy);
 	}
 	s32 lodbase1 = 0;
 	if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 	{
-		iterstw1.set(
-			poly.starts1 + dy * poly.ds1dy + dx * poly.ds1dx,
-			poly.startt1 + dy * poly.dt1dy + dx * poly.dt1dx,
-			poly.startw1 + dy * poly.dw1dy + dx * poly.dw1dx);
-		deltastw1.set(poly.ds1dx, poly.dt1dx, poly.dw1dx);
+		deltas1 = double(poly.ds1dx);
+		deltat1 = double(poly.dt1dx);
+		deltaw1 = double(poly.dw1dx);
+		iters1 = double(poly.starts1 + dy * poly.ds1dy + dx * poly.ds1dx);
+		itert1 = double(poly.startt1 + dy * poly.dt1dy + dx * poly.dt1dx);
+		iterw1 = double(poly.startw1 + dy * poly.dw1dy + dx * poly.dw1dx);
 		lodbase1 = compute_lodbase(poly.ds1dx, poly.ds1dy, poly.dt1dx, poly.dt1dy);
 	}
 	poly.info->scanlines++;
@@ -2395,15 +2330,15 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			s32 depthval = compute_depthval(poly, fbzmode, fbzcp, wfloat, iterz);
 
 			// depth testing
-			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, poly, fbzmode, depth[x], depthval))
+			if (fbzmode.enable_depthbuf() && !depth_test(threadstats, fbzmode, depth[x], (fbzmode.depth_source_compare() == 0) ? depthval : u16(poly.zacolor)))
 				break;
 
 			// run the texture pipeline on TMU1 to produce a value in texel
 			rgbaint_t texel(0);
 			if (GenericFlags & rasterizer_params::GENERIC_TEX1)
 			{
-				s32 lod1;
-				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iterstw1, lodbase1, lod1, m_bilinear_mask);
+				s32 lod1 = lodbase1;
+				rgbaint_t texel_t1 = poly.tex1->fetch_texel(texmode1, dither, x, iters1, itert1, iterw1, lod1, m_bilinear_mask);
 				if (GenericFlags & rasterizer_params::GENERIC_TEX1_IDENTITY)
 					texel = texel_t1;
 				else
@@ -2417,8 +2352,8 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 				// we should send the configuration byte
 				if (!texmode0.seq_8_downld())
 				{
-					s32 lod0;
-					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iterstw0, lodbase0, lod0, m_bilinear_mask);
+					s32 lod0 = lodbase0;
+					rgbaint_t texel_t0 = poly.tex0->fetch_texel(texmode0, dither, x, iters0, itert0, iterw0, lod0, m_bilinear_mask);
 					if (GenericFlags & rasterizer_params::GENERIC_TEX0_IDENTITY)
 						texel = texel_t0;
 					else
@@ -2440,7 +2375,7 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 			// perform fogging
 			rgbaint_t prefog(color);
 			if (fogmode.enable_fog())
-				apply_fogging(color, poly, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
+				apply_fogging(color, poly.fogcolor, poly.zacolor, fbzmode, fogmode, fbzcp, x, dither, wfloat, iterz, iterw, iterargb);
 
 			// perform alpha blending
 			if (alphamode.alphablend())
@@ -2455,9 +2390,17 @@ void voodoo_renderer::rasterizer(s32 y, const voodoo_renderer::extent_t &extent,
 		iterz += poly.dzdx;
 		iterw += iterw_delta;
 		if (GenericFlags & rasterizer_params::GENERIC_TEX0)
-			iterstw0.add(deltastw0);
+		{
+			iters0 += deltas0;
+			itert0 += deltat0;
+			iterw0 += deltaw0;
+		}
 		if (GenericFlags & rasterizer_params::GENERIC_TEX1)
-			iterstw1.add(deltastw1);
+		{
+			iters1 += deltas1;
+			itert1 += deltat1;
+			iterw1 += deltaw1;
+		}
 	}
 }
 
@@ -2946,6 +2889,12 @@ static_rasterizer_info s_predef_raster_table[] =
     RASTERIZER( 0x0B, 0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x00000A0D ) //  2116043   18259224
     RASTERIZER( 0x0B, 0x00002429, 0x00000000, 0x000000C1, 0x00010FF9, 0x00000A09, 0x00000A0F ) //    43784    3594532
     RASTERIZER( 0x0B, 0x00002425, 0x00045110, 0x000000C1, 0x00010FF9, 0x00000ACD, 0x00000ACD ) //    14899    1391390
+
+	// gtfore02
+	RASTERIZER( 0x0B, 0x00002425, 0x00045119, 0x000000C1, 0x00010F79, 0x0C224A0D, 0x00000ACD ) //   776841   12879143
+
+	// gtfore06
+    RASTERIZER( 0x05, 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0xFFFFFFFF ) //    51144    2582597
 
 	{ nullptr, rasterizer_params(0xffffffff) }
 };
