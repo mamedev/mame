@@ -874,9 +874,7 @@ void nes_ks7030_device::write_h(offs_t offset, u8 data)
  of the 0x8000-0xffff region. Main bank is fixed, while
  the 8K mapped at 0x6000-0x7fff varies with reg writes.
 
- TODO: understand how SRAM is handled...
-
- NES 2.0: mapper 302
+ NES 2.0: mapper 305
 
  In MAME: Supported.
 

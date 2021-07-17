@@ -288,6 +288,237 @@ static const nes_mmc mmc_list[] =
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
 	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_110IN1 },
+
+	// NES 2.0
+	// 256 OneBus Famiclones
+	// 257 UNIF MAPR PEC-586?
+	// 258 UNIF MAPR 158B?
+	// 259 UNIF MAPR F-15?
+	// 260 HP10xx/HP20xx multicarts?
+	{ 261, BMC_810544 },
+	{ 262, SACHEN_SHERO },
+	{ 263, UNL_KOF97 },
+	{ 264, YOKO_BOARD },
+	{ 265, BMC_T262 },
+	{ 266, UNL_CITYFIGHT },
+	// 267 8 in 1 JY-119 multicart, not in nes.xml?
+	// 268 COOLBOY and MINDKIDS
+	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
+	// 270 multicarts on OneBus Famiclones
+	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
+	// 272 Akumajo Special bootleg not in nes.xml
+	// 273 Gremlins 2 bootleg, related to pirate gremlin2h or unk2?
+	// 274 BMC_80013B multicarts, not in nes.xml?
+	// 275 Unused
+	// 276 Unused
+	// 277 Unused
+	// 278 Unused
+	// 279 Unused
+	// 280 Unused
+	// 281 seems to be mc_sh4b and many other JY multicarts not in nes.xml?
+	// 282 more JY multicarts not in nes.xml?
+	// 283 RCM_GS2004 and RCM_GS2013 (why are these RCM?), these are in nes.xml
+	// 284 UNL_DRIPGAME, not in nes.xml
+	{ 285, BMC_A65AS },
+	{ 286, BMC_BENSHIENG },
+	{ 287, BMC_411120C }, // also BMC-K-3088, not in nes.xml?
+	// 288 GKCX1 21 in 1 multicarts, not in nes.xml?
+	// { 289, BMC_60311C }, not in nes.xml?
+	{ 290, BMC_NTD_03 },
+	// 291 Kasheng 2-in-1 multicarts not yet in nes.xml?
+	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
+	// 293 NewStar multicarts, do we have these in nes.xml?
+	// 294 variant of mapper 134?
+	// 295 JY multicarts not yet in nes.xml
+	// 296 VT3x handhelds
+	// 297 2-in-1 Uzi Lightgun not in nes.xml
+	{ 298, UNL_TF1201 },           // Lethal Weapon (Enforcers) pirate
+	{ 299, BMC_11160 },
+	{ 300, BMC_190IN1 },
+	{ 301, BMC_8157 },
+	{ 302, KAISER_KS7057 },        // Gyruss FDS conversion
+	{ 303, KAISER_KS7017 },        // Almana no Kiseki FDS conversion
+	{ 304, BTL_09034A },           // various FDS conversions
+	{ 305, KAISER_KS7031 },        // Dracula II FDS conversion
+	{ 306, KAISER_KS7016 },        // Exciting Basket FDS conversion
+	{ 307, KAISER_KS7037 },        // Metroid FDS conversion
+	// 308 Batman (Sunsoft) pirate on VRC2 clone hardware
+	// { 309, UNL_LH51 },             // Ai Senshi Nicol alt FDS conversion (dump available?)
+	// 310 variant of mapper 125?
+	// 311 Unused (previously assigned in error to a bad SMB2 pirate dump)
+	{ 312, KAISER_KS7013B },       // Highway Star FDS conversion
+	// { 313, BMC_RESETTXROM }, various multicarts, not in nes.xml?
+	{ 314, BMC_64IN1NR },
+	// 315 820732C and 830134C multicarts, not in nes.xml?
+	// 316 Unused
+	// 317 Unused
+	// 318 Unused
+	// 319 HP-898F (has different bank order than UNIF!) and KD-7/9-E boards
+	// 320 BMC-830425C-4391T, not in nes.xml?
+	// 321 duplicate of 287?
+	// 322 BMC-K-3033 35-in-1, related to mc_35?
+	// 323 Farid SLROM homebrew 8-in-1
+	// 324 Farid UNROM homebrew 8-in-1
+	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
+	// 326 yet another Contra bootleg, dump available?
+	// 327 BMC-10-24-C-A1 6-in-1
+	{ 328, UNL_RT01 },             // test cart (Russia)
+	{ 329, UNL_EDU2K },
+	// 330 Sangokushi II - Haou no Tairiku hack - N163 bootleg
+	{ 331, BMC_12IN1 },
+	{ 332, BMC_WS },
+	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
+	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
+	// 335 BMC-CTC-09 10-in-1, not in nes.xml?
+	// 336 BMC-K-3046 11-in-1, not in nes.xml?
+	// 337 BMC-CTC-12IN1 multicart, not in nes.xml?
+	// 338 BMC-SA005-A multicarts, not in nes.xml?
+	// 339 BMC-K-3006 21-in-1, not in nes.xml?
+	// 340 BMC-K-3036 35-in-1, not in nes.xml?
+	// 341 BMC-TJ-03 4-in-1, not in nes.xml?
+	// 342 COOLGIRL homebrew
+	// 343 reset-based 4-in-1 pirate?
+	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
+	// 345 BMC-L6IN1 multicart, not in nes.xml?
+	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
+	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
+	{ 348, BMC_830118C },
+	{ 349, BMC_G146 },
+	// 350 BMC-891227 multicart
+	// 351 JY/Techline 9-in-1
+	// 352 Kaiser 4-in-1 KS106C
+	// 353 Super Mario Family multicart
+	// 354 250-in-1 multicart with FDS Bubble Bobble
+	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
+	// 356 7-in-1 Rockman (JY-208)
+	// 357 Bit Corp 4-in-1 (ID 4602)
+	// 358 JY multicarts, variant of mapper 282
+	// 359 BMC-SB-5013 multicarts
+	// 360 Bit Corp 31-in-1 (ID 3150) (has five accessible DIP switches!)
+	// 361 JY multicarts
+	// 362 JY-005 multicart
+	// 363 variant of mapper 358?
+	// 364 JY-007, is this ttoons6 in nes.xml?
+	// 365 is this asderp95 in nes.xml?
+	// 366 K-3131GS and K-3131SS 4-in-1 carts
+	// 367 7-in-1 cart that is a close variant of mapper 205
+	// { 368, BTL_YUNG08 }            // SMB2 FDS conversion
+	// 369 Super Mario Bros Party multicart
+	// 370 Golden Mario Party II multicart
+	// 371 Spanish PEC-586 computer main cart
+	// 372 Rockman 1-6 multicart very close to mapper 45
+	// 373 Super 4-in-1, not in nes.xml?
+	// 374 various JY multicarts
+	// 375 135-in-1 2MB multicart
+	// 376 JY-041 multicart
+	// 377 JY-111 multicart, similar to mapper 367
+	// 378 8-in-1 multicart, which one?
+	// 379 35-in-1 multicart, similar to mapper 38
+	// 380 970630C multicart
+	// 381 KN-42 2-in-1 with the Big Nose games
+	// 382 830928C 5-in-1 and 9-in-1 multicarts
+	// 383 JY-014 multicart
+	// 384 4-in-1 VRC4 clone with Crisis Force
+	// 385 NTDEC 2779 5-in-1, not in nes.xml?
+	// 386 JY-090 multicart
+	// 387 various JY multicarts
+	// 388 various JY multicarts
+	// { 389, CALTRON_9IN1 },
+	// 390 variant of mapper 236?
+	// 391 BS-110 MMC3 clone
+	// 392 8-in-1 variant of mc_sv16
+	// 393 820720C multicart
+	// 394 Realtec HSK007 multicart
+	// 395 Realtec 8210 multicarts
+	// 396 various JY multicarts
+	// 397 JY-082 multicart, not in nes.xml?
+	// 398 JY-048 multicart, not in nes.xml?
+	// 399 homebrew game Star Versus
+	// 400 retroUSB (Sealie?) 8-bit XMAS 2017
+	// 401 Super 19-in-1 VIP 19, not in nes.xml?
+	// 402 22-in-1 Olympic Games, not in nes.xml?
+	// 403 Tetris Family 19-in-1 that only works on Famiclones with 6502's BCD mode
+	// 404 JY-021B multicart, not in nes.xml?
+	// 405 UMC UM6578 NES-on-a-chip games...PnPs?
+	// 406 homebrew game Haradius Zero
+	// 407 VT03 PnP
+	// 408 Konami PnP
+	// 409 (Sealie) homebrew game A Winner is You, 64MB music cart, easy to support if dump is available
+	// 410 Unused or JY?
+	// 411 various JY multicarts
+	// 412 INTV 10-in-1 PnP 2nd edition
+	// 413 homebrew game Super Russian Roulette
+	// 414 9999999-in-1 multicart
+	{ 415, BTL_0353 },             // Lucky (Roger) Rabbit FDS conversion
+	// 416 4-in-1 that includes mapper 50 SMB2j pirate
+	// 417 "Fine Studio" Batman bootleg
+	// { 418, UNL_LH42 }              // Highway Star alt FDS conversion
+	// 419 VT03 PnPs
+	// 420 Kasheng A971210 board
+	// 421 JY SC871115C board
+	// 422 BS-300 etc multicarts related to mappers 126 and 534
+	// 423 Lexibook PnP
+	// 424 Lexibook PnP
+	// 425 Cube Tech PnP
+	// 426 PnP
+	// 427 PnP
+	// 428 a couple multicarts
+	// 429 Unused
+	// 430 Unused
+	// 431 Realtec GN-91B
+	// 432 Realtec 8090
+	// 433 NC-20MB 20 in 1 (CA-006)
+	// 434...442 Unused
+	// 443 NC3000M multicart
+	// 444 NC7000M multicart
+	// 445...511 Unused
+	// 512 probably the correct MMC3 clone for chuugokt in nes.xml
+	{ 513, SACHEN_SA9602B },
+	// 514 seems to be for skaraok, currently set to UNKNOWN in nes.xml
+	// 515 Korean Family Noraebang karaoke cart with expansion cart, mic, and YM2413!
+	// 516 is this for brillco2 and another related title not in nes.xml?
+	// 517 another Korean karaoke cart with mic
+	// 518 Subor UNL-DANCE2000 and a few others
+	{ 519, UNL_EH8813A },          // Dr Mario II Chinese pirate
+	// { 520, UNKNOWN }, this is probably 2yudb
+	{ 521, DREAMTECH_BOARD },      // Korean Igo
+	{ 522, UNL_LH10 },             // Fuuun Shaolin Kyo FDS conversion
+	// { 523, UNKNOWN }, likely fengshnb or a clone not yet in nes.xml
+	// { 524, BTL_900218 }, this seems to be lordkinga
+	{ 525, KAISER_KS7021A },       // GetsuFumaDen pirate (and maybe a Contra?)
+	// 526 sangochu clone not yet in nes.xml?
+	// 527 demnswrd/fudomyod clone not yet in nes.xml
+	// 528 1995 New Series Super 2-in-1 multicart not in nes.xml
+	// 529 Datach Dragon Ball Z bootleg?
+	{ 530, UNL_AX5705 },           // Super Mario Bros Pocker Mali
+	// 531 Used by Asder PC-95 Famicom clone built into a keyboard
+	// 532 Emulator only mapper for Chinese version of sangoht2?
+	// 533 Used by dongdng2 which is a CNROM variant with protection?
+	// 534 Are these all PnPs? Is one mc_101 or a clone not in nes.xml?
+	{ 535, UNL_LH53 },             // Nazo no Murasamejo FDS conversion
+	// 536 and 537 Waixing FS303, mapper 195 variants?
+	// { 538, BTL_60106416L }, Exciting Soccer bootleg, not in nes.xml (available baddump needs banks rearranged?)
+	{ 539, BTL_PALTHENA },         // Hikari Shinwa (Kid Icarus) FDS conversion
+	// 540 for mstrfgt6 in nes.xml or a variant of it not in nes.xml?
+	// 541 LittleCom 160 in 1 multicart, not in nes.xml?
+	// 542 Chairman Mao's 100th anniversary cart? You've got to be kidding me.
+	// 543 5 in 1 (CH-501) multicart, not in nes.xml?
+	// 544 another alt of sango2ht/sanguo2a?
+	// 545 4 in 1 (ST-80) multicart, not in nes.xml?
+	// 546 10 in 1 Tenchi wo Kurau multicart, not in nes.xml?
+	// 547 Konami QTa adapter games
+	// { 548, BTL_CTC15 },            // Almana no Kiseki alt FDS conversion (dump available?)
+	{ 549, KAISER_KS7016B },       // Meikyuu Jiin Dababa alt FDS conversion
+	// 550 JY-015 multicart
+	// 551 variant of mapper 178, likely shenghuo, jingkzx, xiaokecq, zgfyun in nes.xml
+	// 552 TAITO_X1_017, this is a correction of mapper 82. We should drop 82 and only support the accurate dumps of 552?
+	// { 553, SACHEN_3013 },          // Dong Dong Nao 1
+	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
+	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
+	// 556 JY-215 multicart
+	// { 557, KAISER_KS7xxx or UNL_LG25? },        // Kaiser Moero TwinBee FDS conversion
+	// 558 some games on YC-03-09 board (related to mappers 162-164)
+	// 559...4095 Unused
 };
 
 const nes_mmc *nes_mapper_lookup( int mapper )
@@ -341,7 +572,8 @@ void nes_cart_slot_device::call_load_ines()
 	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
 	uint32_t prg_size, vrom_size;
 	uint8_t header[0x10];
-	uint8_t mapper, submapper = 0, local_options;
+	uint16_t mapper;
+	uint8_t submapper = 0, local_options;
 	bool ines20 = false, prg16k;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -369,7 +601,7 @@ void nes_cart_slot_device::call_load_ines()
 			// probably the header got corrupted: don't trust upper bits for mapper
 			break;
 
-		case 0x8:   // it's iNES 2.0 format
+		case 0x8:   // it's NES 2.0 format
 			ines20 = true;
 			[[fallthrough]];
 		case 0x0:
@@ -402,7 +634,7 @@ void nes_cart_slot_device::call_load_ines()
 		logerror("NES: No extrainfo found\n");
 	}
 
-	// use extended iNES2.0 info if available!
+	// use extended NES 2.0 info if available!
 	if (ines20)
 	{
 		mapper |= (header[8] & 0x0f) << 8;
@@ -420,7 +652,7 @@ void nes_cart_slot_device::call_load_ines()
 		if (mapper == 1 && submapper == 3)
 			pcb_id = STD_SXROM_A;
 		else if (mapper == 1 && submapper == 5)
-			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 002, 003, 007: UxROM, CNROM, AxROM
 		else if (mapper == 2 && submapper == 2)
 			bus_conflict = true;
@@ -469,7 +701,7 @@ void nes_cart_slot_device::call_load_ines()
 		else if (mapper == 68 && submapper == 1)
 		{
 			submapper = 0;
-			logerror("Unimplemented iNES2.0 submapper: SUNSOFT-DCS.\n");
+			logerror("Unimplemented NES 2.0 submapper: SUNSOFT-DCS.\n");
 		}
 		// iNES Mapper 071
 		else if (mapper == 71 && submapper == 1)
@@ -494,12 +726,12 @@ void nes_cart_slot_device::call_load_ines()
 		else if (mapper == 210 && submapper == 1)
 		{
 			submapper = 0;
-			logerror("Unimplemented iNES2.0 submapper: CAMERICA-BF9096.\n");
+			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
 		else if (submapper)
 		{
 			submapper = 0;
-			logerror("Undocumented iNES2.0 submapper, please report it to the MAME boards!\n");
+			logerror("Undocumented NES 2.0 submapper, please report it to the MAME boards!\n");
 		}
 	}
 
@@ -852,7 +1084,8 @@ void nes_cart_slot_device::call_load_ines()
 
 const char * nes_cart_slot_device::get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const
 {
-	uint8_t mapper, submapper = 0;
+	uint16_t mapper;
+	uint8_t submapper = 0;
 	bool ines20 = false;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
@@ -867,7 +1100,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 			// probably the header got corrupted: don't trust upper bits for mapper
 			break;
 
-		case 0x8:   // it's iNES 2.0 format
+		case 0x8:   // it's NES 2.0 format
 			ines20 = true;
 			[[fallthrough]];
 		case 0x0:
@@ -887,7 +1120,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		}
 	}
 
-	// use extended iNES2.0 info if available!
+	// use extended NES 2.0 info if available!
 	if (ines20)
 	{
 		mapper |= (ROM[8] & 0x0f) << 8;
@@ -904,7 +1137,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		if (mapper == 1 && submapper == 3)
 			pcb_id = STD_SXROM_A;
 		else if (mapper == 1 && submapper == 5)
-			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
+			logerror("Unimplemented NES 2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 021, 023, 025: VRC4 / VRC2
 		else if (mapper == 21 || mapper == 23 || mapper == 25)
 		{
