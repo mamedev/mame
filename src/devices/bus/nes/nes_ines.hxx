@@ -402,9 +402,25 @@ static const nes_mmc mmc_list[] =
 	// 365 is this asderp95 in nes.xml?
 	// 366 K-3131GS and K-3131SS 4-in-1 carts
 	// 367 7-in-1 cart that is a close variant of mapper 205
-
+	// { 368, BTL_YUNG08 }            // SMB2 FDS conversion
+	// 369 Super Mario Bros Party multicart
+	// 370 Golden Mario Party II multicart
+	// 371 Spanish PEC-586 computer main cart
+	// 372 Rockman 1-6 multicart very close to mapper 45
+	// 373 Super 4-in-1, not in nes.xml?
+	// 374 various JY multicarts
+	// 375 135-in-1 2MB multicart
+	// 376 JY-041 multicart
+	// 377 JY-111 multicart, similar to mapper 367
+	// 378 8-in-1 multicart, which one?
+	// 379 35-in-1 multicart, similar to mapper 38
+	// 380 970630C multicart
+	// 381 KN-42 2-in-1 with the Big Nose games
+	// 382 830928C 5-in-1 and 9-in-1 multicarts
+	// 383 JY-014 multicart
+	// 384 4-in-1 VRC4 clone with Crisis Force
 	// 385 NTDEC 2779 5-in-1, not in nes.xml?
-	// 386 JY-090 multicart only
+	// 386 JY-090 multicart
 	// 387 various JY multicarts
 	// 388 various JY multicarts
 	// { 389, CALTRON_9IN1 },
