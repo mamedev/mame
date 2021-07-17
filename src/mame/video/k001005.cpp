@@ -575,7 +575,7 @@ int k001005_renderer::parse_polygon(int index, uint32_t cmd)
 		extra.diffuse_light = rgb_t(m_light_r, m_light_g, m_light_b);
 		extra.ambient_light = rgb_t(m_ambient_r, m_ambient_g, m_ambient_b);
 		extra.fog_color = rgb_t(m_fog_r, m_fog_g, m_fog_b);		
-		extra.fog_enable = m_reg_fog_start != 0xffff;
+		extra.fog_enable = (m_reg_fog_start != 0xffff) && !(cmd & 1);
 		extra.cmd = cmd;
 
 		extra.poly_color = rgb_t((polygon_color >> 24) & 0xff, polygon_color & 0xff, (polygon_color >> 8) & 0xff, (polygon_color >> 16) & 0xff);
