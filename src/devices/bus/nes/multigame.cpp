@@ -562,11 +562,6 @@ void nes_studyngame_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
-void nes_sgun20in1_device::device_start()
-{
-	common_start();
-}
-
 void nes_sgun20in1_device::pcb_reset()
 {
 	prg16_89ab(0);
@@ -727,28 +722,6 @@ void nes_bmc_ws_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
-}
-
-void nes_bmc_11160_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_11160_device::pcb_reset()
-{
-	prg32(0);
-	chr8(0, CHRROM);
-}
-
-void nes_bmc_g146_device::device_start()
-{
-	common_start();
-}
-
-void nes_bmc_g146_device::pcb_reset()
-{
-	prg32(0);
-	chr8(0, CHRRAM);
 }
 
 void nes_bmc_2751_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)

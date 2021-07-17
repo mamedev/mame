@@ -266,9 +266,6 @@ public:
 
 protected:
 	nes_sgun20in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -527,12 +524,6 @@ public:
 	nes_bmc_11160_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -545,12 +536,6 @@ public:
 	nes_bmc_g146_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 

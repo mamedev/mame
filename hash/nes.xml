@@ -65669,6 +65669,7 @@ All musics were removed in this game.
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="magicseries" />
 			<feature name="pcb" value="MAGICSERIES" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="65536">
 				<rom name="magic dragon (unl).chr" size="65536" crc="4937921d" sha1="bf9b79c09fcf821a27090394a8c3f1de0ac0584c" offset="00000" status="baddump" />
 			</dataarea>
