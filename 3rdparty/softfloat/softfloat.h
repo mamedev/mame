@@ -244,6 +244,9 @@ int floatx80_fsin(floatx80 &a);
 int floatx80_fcos(floatx80 &a);
 int floatx80_ftan(floatx80 &a);
 
+floatx80 floatx80_fpatan(floatx80 a, floatx80 b);
+floatx80 floatx80_fatan(floatx80 a);
+
 floatx80 floatx80_flognp1(floatx80 a);
 floatx80 floatx80_flogn(floatx80 a);
 floatx80 floatx80_flog2(floatx80 a);
