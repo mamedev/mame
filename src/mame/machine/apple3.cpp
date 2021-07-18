@@ -633,7 +633,6 @@ void apple3_state::apple3_via_0_out_b(uint8_t data)
 
 void apple3_state::apple3_via_1_out_a(uint8_t data)
 {
-	printf("via 1 out: A2 mode %02x\n", data & 0x40);
 	apple3_via_out(&m_via_1_a, data);
 }
 
