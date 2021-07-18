@@ -525,6 +525,7 @@ void namco_c355spr_device::get_sprites(const rectangle cliprect)
 
 //  if (offs == 0)  // boot
 	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
+	// drawing this is what causes the bad tile in vshoot, do any games need 2 lists at the same time or should 1 list be configurable?
 		get_list(0, &m_spriteram[buffer][0x02000/2], &m_spriteram[buffer][0x00000/2]);
 //  else
 		get_list(1, &m_spriteram[buffer][0x14000/2], &m_spriteram[buffer][0x10000/2]);
