@@ -111,6 +111,9 @@ public:
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
 		, m_dsw1(*this, "DSW1")
+		, m_dram_ptr(*this, "dram")
+		, m_sram_ptr(*this, "sram")
+		, m_rom_ptr(*this, "rom")
 		, m_overlay(1)
 		, m_via_pb(0)
 		, m_print_sc(1)
@@ -129,6 +132,7 @@ private:
 	void bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t eeprom_r(offs_t offset);
 	void eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	void dram_or_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void led_out_w(uint8_t data);
 	void fifo_out_w(uint8_t data);
 	uint8_t via_pa_r();
@@ -150,7 +154,8 @@ private:
 	required_device<via6522_device> m_via;
 	required_ioport m_dsw1;
 
-	uint16_t *m_dram_ptr, *m_sram_ptr, *m_rom_ptr;
+	required_shared_ptr<uint16_t> m_dram_ptr;
+	required_region_ptr<uint16_t> m_sram_ptr, m_rom_ptr;
 	bool m_overlay;
 	uint8_t m_via_pb;
 	bool m_print_sc;
@@ -225,7 +230,11 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//map(0x300000, 0x3fffff) // open bus?
-	map(0x400000, 0x5fffff).ram().share("dram").mirror(0x200000); // 2MB DRAM
+	map(0x400000, 0x5fffff).ram().share("dram"); // 2MB DRAM
+	// DRAM appears to mirrored through 0x600000 but when written to does a bitwise-or with the existing data
+	// instead of replacing it. This presumeably improves the performance of these operations by avoiding
+	// an extra memory read.
+	map(0x600000, 0x7fffff).readonly().share("dram").w(FUNC(lwriter_state::dram_or_w));
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
@@ -262,9 +271,6 @@ INPUT_PORTS_END
 /* Start it up */
 void lwriter_state::machine_start()
 {
-	m_rom_ptr = (uint16_t*)memregion("rom")->base();
-	m_dram_ptr = (uint16_t*)memshare("dram")->ptr();
-	m_sram_ptr = (uint16_t*)memregion("sram")->base();
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
 }
 
@@ -304,6 +310,11 @@ void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		return;
 	}
 	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+}
+
+void lwriter_state::dram_or_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_dram_ptr[offset] |= ((m_dram_ptr[offset] & ~mem_mask) | (data & mem_mask));
 }
 
 uint8_t lwriter_state::eeprom_r(offs_t offset)
