@@ -398,8 +398,8 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 
 	int tile_index   = spriteformat16[linkno * 4 + 0];
 	const u16 format = spriteformat16[linkno * 4 + 1];
-	int dx           = spriteformat16[linkno * 4 + 2];
-	int dy           = spriteformat16[linkno * 4 + 3];
+	int dx           = spriteformat16[linkno * 4 + 2]; // should this also be masked and have a sign bit like dy?
+	const int dy     = spriteformat16[linkno * 4 + 3] & 0x1ff;
 	int num_cols     = (format >> 4) & 0xf;
 	int num_rows     = (format) & 0xf;
 
@@ -431,29 +431,16 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 		return;
 	}
 	u32 zoomy = (vsize << 16) / (num_rows * 16);
-	int dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
+	s32 dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
+	if (dy & 0x100) dy_zoomed = -dy_zoomed;
 
 	if (!flipy)
 	{
-		if (dy & 0x100)
-		{
-			vpos += dy_zoomed;
-		}
-		else
-		{
-			vpos -= dy_zoomed;
-		}
+		vpos -= dy_zoomed;
 	}
 	else
 	{
-		if (dy & 0x100)
-		{
-			vpos -= dy_zoomed;
-		}
-		else
-		{
-			vpos += dy_zoomed;
-		}
+		vpos += dy_zoomed;
 	}
 
 	sprite_ptr->flipx = flipx;
