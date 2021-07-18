@@ -303,6 +303,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
 	device.option_add_internal("09034a",           NES_09034A);
+	device.option_add_internal("batmanfs",         NES_BATMANFS);
 	device.option_add_internal("palthena",         NES_PALTHENA);   // used by Palthena no Kagami FDS conversion
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
 	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55

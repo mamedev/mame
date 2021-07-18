@@ -48,6 +48,7 @@ DEFINE_DEVICE_TYPE(NES_SMB2JA,         nes_smb2ja_device,    "nes_smb2ja",    "N
 DEFINE_DEVICE_TYPE(NES_SMB2JB,         nes_smb2jb_device,    "nes_smb2jb",    "NES Cart Super Mario Bros. 2 Jpn (Alt 2) PCB")
 DEFINE_DEVICE_TYPE(NES_0353,           nes_0353_device,      "nes_0353",      "NES Cart 0353 PCB")
 DEFINE_DEVICE_TYPE(NES_09034A,         nes_09034a_device,    "nes_09034a",    "NES Cart 09-034A PCB")
+DEFINE_DEVICE_TYPE(NES_BATMANFS,       nes_batmanfs_device,  "nes_batmanfs",  "NES Cart Batman Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "NES Cart Palthena no Kagami Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_DH08,           nes_dh08_device,      "nes_dh08",      "NES Cart DH-08 Pirate PCB")
@@ -116,6 +117,11 @@ nes_0353_device::nes_0353_device(const machine_config &mconfig, const char *tag,
 
 nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_09034A, tag, owner, clock), m_reg(0)
+{
+}
+
+nes_batmanfs_device::nes_batmanfs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BATMANFS, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
@@ -290,6 +296,25 @@ void nes_smb3p_device::pcb_reset()
 	prg8_cd(0);
 	prg8_ef((m_prg_chunks << 1) - 1);
 	chr8(0, m_chr_source);
+
+	m_irq_enable = 0;
+	m_irq_count = 0;
+}
+
+void nes_batmanfs_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+}
+
+void nes_batmanfs_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // Last 8K bank is fixed, the rest are swappable
+	chr8(0, CHRROM);
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
@@ -827,7 +852,6 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 	return m_prg[((m_latch * 0x2000) + (offset & 0x1fff)) & (m_prg_size - 1)];
 }
 
-
 /*-------------------------------------------------
 
  BTL-SMB3
@@ -1279,6 +1303,56 @@ uint8_t nes_09034a_device::read_m(offs_t offset)
 	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
 	// in 0x6000-0x7fff is mapped the 2nd PRG chip which starts after 32K (hence the +4)
 	return m_prg[((m_reg + 4) * 0x2000) + offset];
+}
+
+/*-------------------------------------------------
+
+ BTL-BATMANFS
+
+ Games: Batman "Fine Studio" pirate
+
+ NES 2.0: mapper 417
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_batmanfs_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		// 10-bit counter does not stop when interrupts are disabled
+		m_irq_count = (m_irq_count + 1) & 0x3ff;
+		if (m_irq_enable && !m_irq_count)
+			set_irq_line(ASSERT_LINE);
+	}
+}
+
+void nes_batmanfs_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("batmanfs write_h, offset: %04x, data: %02x\n", offset, data));
+	switch (offset & 0x70)
+	{
+		case 0x00:
+			if ((offset & 0x03) != 0x03)
+				prg8_x(offset & 0x03, data & 0x0f);
+			break;
+		case 0x10:
+		case 0x20:
+			chr1_x((offset & 0x03) + 4 * BIT(offset, 5), data, CHRROM);
+			break;
+		case 0x30:
+			m_irq_enable = 1;
+			m_irq_count = 0;
+			break;
+		case 0x40:
+			m_irq_enable = 0;
+			set_irq_line(CLEAR_LINE);
+			break;
+		case 0x50:
+			set_nt_page(offset & 0x03, CIRAM, data & 1, 1);
+			break;
+	}
 }
 
 /*-------------------------------------------------
