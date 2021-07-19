@@ -73783,7 +73783,7 @@ resulting in tons of glitches? -->
 
 <!-- Hardware depends on NTSC timing and glitches heavily on PAL. -->
 	<software name="smb3h" cloneof="smb3">
-		<description>Super Mario Bros. 3 (Pirate)</description>
+		<description>Super Chaoji Sandai 3 (Super Mario Bros. 3 pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<info name="alt_title" value="Super 超級三代 3"/>
