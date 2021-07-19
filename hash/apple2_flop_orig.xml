@@ -17044,4 +17044,132 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sbmth235">
+		<description>Stickybear Math 2 (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Math 2" is a 1986 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1286445">
+				<rom name="stickybear math 2 800k.woz" size="1286445" crc="5c477869" sha1="fbf6e23ace6d2d039b299403ffd81b59ee74cd45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sboppo35">
+		<description>Stickybear Opposites (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Opposites" is a 1983 educational game developed by Richard Hefter, Janie Worthington, and Steve Worthington, and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1300806">
+				<rom name="stickybear opposites 800k.woz" size="1300806" crc="884c1592" sha1="9ed4190274892efa75e7db4e11ba097913b7b43e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbtown35">
+		<description>Stickybear Town Builder (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Town Builder" is a 1984 educational game developed by Richard Hefter and Dave Lusby, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1286448">
+				<rom name="stickybear town builder 800k.woz" size="1286448" crc="22df05ac" sha1="88e37f808dddcc70908767aee6a9ed3cd419ae82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbtype35">
+		<description>Stickybear Typing (1988 Re-release) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Stickybear Typing" is a 1985 educational game developed by Richard Hefter and Susan Dubicki, and distributed by Optimum Resource. This 1988 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297197">
+				<rom name="stickybear typing 800k.woz" size="1297197" crc="0a465825" sha1="a212e98ef52877c3bd45f239de64373b71f4579e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprule35">
+		<description>Spelling Rules (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Spelling Rules" is a 1986 educational program developed and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1297155">
+				<rom name="spelling rules 800k.woz" size="1297155" crc="824e437b" sha1="0cf88bf109922357ed217533d772ce3af30ffff2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sentf35">
+		<description>Sentence Fun (1989 Re-release) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card. -->
+		<!--"Sentence Fun" is a 1987 educational program developed by Richard Hefter and Dave Cunningham, and distributed by Optimum Resource. This 1989 re-release is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e, or 64K Apple ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296707">
+				<rom name="sentence fun 800k.woz" size="1296707" crc="78438b83" sha1="2184bd6fd27eda6ae43926ddf97e2a1539c69cb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpls135">
+		<description>Alge-Blaster Plus! (Version 1.0) (800K 3.5")</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Alge-Blaster Plus!" is a 1989 educational program developed by Julie Baumgartner, Anne Hertz, David Ely, and Louis X. Savain, and distributed by Davidson &amp; Associates. This is version 1.0, distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296215">
+				<rom name="alge-blaster plus v1.0 800k.woz" size="1296215" crc="e3cdd077" sha1="c8654d483ac58e75789106da606ed7b7484511e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckcrswd">
+		<description>Mickey's Crossword Puzzle Maker (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Walt Disney Computer Software</publisher>
+		<info name="release" value="2021-07-15"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
+		<!--"Mickey's Crossword Puzzle Maker" is a 1990 educational game developed by David Mullich, Rick Ferreira, Ariella Lehrer, Stan Wojtysiak, Kathleen Parades, Stan Wojtysiak, John Miller, Pat Campbell, Tine Sloan, Annelise Falk, Michael Mroz, Beverly Ellman, and Fran Peskoff, and distributed by Walt Disney Computer Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1312716">
+				<rom name="mickey's crossword puzzle maker 800k.woz" size="1312716" crc="f5fc7370" sha1="471126107352b52ec5643a97f2893b951d40309d"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
