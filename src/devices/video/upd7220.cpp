@@ -1012,7 +1012,7 @@ void upd7220_device::draw_char(int x, int y)
 
 	for(int pi = 0; pi < psize; pi++)
 	{
-		tile_data = (m_ra[((psize-1-pi) & 7) | 8] << 8) | m_ra[((psize-1-pi) & 7) | 8];
+		tile_data = (m_ra[15-(pi & 7)] << 8) | m_ra[15-(pi & 7)];
 		for(int pz = 0; pz <= m_gchr; pz++)
 		{
 			int ii = 0, curpixel = 0;
