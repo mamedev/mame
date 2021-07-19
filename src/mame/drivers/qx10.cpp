@@ -212,13 +212,13 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 	int gfx[3];
 	if(m_color_mode)
 	{
-		gfx[0] = m_video_ram[((address) + 0x00000) >> 1];
-		gfx[1] = m_video_ram[((address) + 0x20000) >> 1];
-		gfx[2] = m_video_ram[((address) + 0x40000) >> 1];
+		gfx[0] = m_video_ram[(address >> 1) + 0x00000];
+		gfx[1] = m_video_ram[(address >> 1) + 0x20000];
+		gfx[2] = m_video_ram[(address >> 1) + 0x40000];
 	}
 	else
 	{
-		gfx[0] = m_video_ram[(address) >> 1];
+		gfx[0] = m_video_ram[(address >> 1)];
 		gfx[1] = 0;
 		gfx[2] = 0;
 	}
