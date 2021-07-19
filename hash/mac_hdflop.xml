@@ -685,7 +685,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="part_id" value="System Additions" />
+			<feature name="part_id" value="System Additions" />
 			<dataarea name="flop" size="1474560">
 				<rom name="System Additions.img" size="1474560" crc="e6a1cdc7" sha1="b8447e06e4dee8740e48b93eba9bfdde4c94f0ea" />
 			</dataarea>
@@ -727,7 +727,7 @@ license:CC0
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-		<feature name="part_id" value="Disk Tools" />
+			<feature name="part_id" value="Disk Tools" />
 			<dataarea name="flop" size="1474560">
 				<rom name="Disk Tools.img" size="1474560" crc="461c1408" sha1="0e7f8b491b08f7d0037fd9bf9d56c7b7299ee27b" />
 			</dataarea>
