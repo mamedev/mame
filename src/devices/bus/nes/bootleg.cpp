@@ -56,6 +56,7 @@ DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "N
 DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
 DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH32,           nes_lh32_device,      "nes_lh32",      "NES Cart LH32 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LH51,           nes_lh51_device,      "nes_lh51",      "NES Cart LH51 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "NES Cart LH53 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "NES Cart AC08 Pirate PCB")
@@ -161,6 +162,11 @@ nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag,
 
 nes_lh10_device::nes_lh10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_LH10, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_lh51_device::nes_lh51_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_LH51, tag, owner, clock)
 {
 }
 
@@ -487,6 +493,17 @@ void nes_lh10_device::pcb_reset()
 
 	m_latch = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
+}
+
+void nes_lh51_device::device_start()
+{
+	common_start();
+}
+
+void nes_lh51_device::pcb_reset()
+{
+	prg32((m_prg_chunks >> 1) - 1);    // first 8K is switchable, the rest fixed
+	chr8(0, CHRRAM);
 }
 
 void nes_lh53_device::device_start()
@@ -1506,12 +1523,45 @@ void nes_lh10_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ UNL-LH51
+
+ Games: Ai Senshi Nicol (Whirlwind Manu FDS conversion)
+
+ A simple board with swappable 8K PRG at 0x8000-0x9fff,
+ fixed PRG above that, and 8K WRAM at 0x6000-0x7fff.
+ The game's sound code is broken and does not work on
+ real hardware.
+
+ NES 2.0: mapper 309
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_lh51_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("lh51 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6000)
+	{
+		case 0x0000:
+		case 0x1000:
+			prg8_89(data & 0x0f);
+			break;
+		case 0x6000:
+		case 0x7000:
+			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
  UNL-LH53
 
  Games: Nazo no Murasamejou (FDS conversion)
 
- This PCB maps WRAM (w/battery) in 0xb800-0xd7ff and
- PRG in 0x6000-0x7fff
+ This PCB maps WRAM in 0xb800-0xd7ff and PRG in 0x6000-0x7fff
 
  NES 2.0: mapper 535
 
@@ -1538,7 +1588,7 @@ void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int par
 uint8_t nes_lh53_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lh53 read_m, offset: %04x\n", offset));
-	return m_prg[(m_reg * 0x2000) + (offset & 0x1fff)];
+	return m_prg[m_reg * 0x2000 + offset];
 }
 
 uint8_t nes_lh53_device::read_h(offs_t offset)
@@ -1546,7 +1596,7 @@ uint8_t nes_lh53_device::read_h(offs_t offset)
 //  LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
 
 	if (offset >= 0x3800 && offset < 0x5800)
-		return m_battery[offset & 0x1fff];
+		return m_prgram[offset - 0x3800];
 
 	return hi_access_rom(offset);
 }
@@ -1556,8 +1606,7 @@ void nes_lh53_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("lh53 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset >= 0x3800 && offset < 0x5800)
-		m_battery[offset & 0x1fff] = data;
-
+		m_prgram[offset - 0x3800] = data;
 	else
 	{
 		switch (offset & 0x7000)
