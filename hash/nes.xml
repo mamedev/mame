@@ -61818,11 +61818,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Built-in level select at title screen. Press in sequence: A, B, B, followed by A 1 to 5 times for stages 1-1, 2-1, 3-1, 4-1, and 5-1, respectively. -->
 	<software name="batmanfs" cloneof="batman">
 		<description>Batman - The Video Game (pirate)</description>
 		<year>199?</year>
-		<publisher>Fine Studio</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Built-in level select at title screen. Press in sequence: A, B, B, followed by A 1 to 5 times for stages 1-1, 2-1, 3-1, 4-1, and 5-1, respectively."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="batmanfs" />
 			<dataarea name="prg" size="131072">
