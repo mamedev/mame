@@ -13,7 +13,7 @@
  */
 
 #include "emu.h"
-#include "ncr5380n.h"
+#include "ncr5380.h"
 
 #define LOG_GENERAL  (1U << 0)
 #define LOG_REGW     (1U << 1)
@@ -25,13 +25,13 @@
 //#define VERBOSE (LOG_GENERAL|LOG_REGW|LOG_REGR|LOG_SCSI|LOG_ARB|LOG_DMA)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new)")
-DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80",    "NCR 53C80 SCSI")
-DEFINE_DEVICE_TYPE(CXD1180,  cxd1180_device,  "cxd1180",     "Sony CXD1180")
+DEFINE_DEVICE_TYPE(NCR5380,  ncr5380_device,  "ncr5380",  "NCR 5380 SCSI")
+DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80", "NCR 53C80 SCSI")
+DEFINE_DEVICE_TYPE(CXD1180,  cxd1180_device,  "cxd1180",  "Sony CXD1180")
 
-ALLOW_SAVE_TYPE(ncr5380n_device::state);
+ALLOW_SAVE_TYPE(ncr5380_device::state);
 
-ncr5380n_device::ncr5380n_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
+ncr5380_device::ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, m_irq_handler(*this)
@@ -40,39 +40,39 @@ ncr5380n_device::ncr5380n_device(machine_config const &mconfig, device_type type
 {
 }
 
-ncr5380n_device::ncr5380n_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380n_device(mconfig, NCR5380N, tag, owner, clock)
+ncr5380_device::ncr5380_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: ncr5380_device(mconfig, NCR5380, tag, owner, clock)
 {
 }
 
 ncr53c80_device::ncr53c80_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380n_device(mconfig, NCR53C80, tag, owner, clock, true)
+	: ncr5380_device(mconfig, NCR53C80, tag, owner, clock, true)
 {
 }
 
 cxd1180_device::cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: ncr5380n_device(mconfig, CXD1180, tag, owner, clock, true)
+	: ncr5380_device(mconfig, CXD1180, tag, owner, clock, true)
 {
 }
 
-void ncr5380n_device::map(address_map &map)
+void ncr5380_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(ncr5380n_device::csdata_r), FUNC(ncr5380n_device::odata_w));
-	map(0x1, 0x1).rw(FUNC(ncr5380n_device::icmd_r), FUNC(ncr5380n_device::icmd_w));
-	map(0x2, 0x2).rw(FUNC(ncr5380n_device::mode_r), FUNC(ncr5380n_device::mode_w));
-	map(0x3, 0x3).rw(FUNC(ncr5380n_device::tcmd_r), FUNC(ncr5380n_device::tcmd_w));
-	map(0x4, 0x4).rw(FUNC(ncr5380n_device::csstat_r), FUNC(ncr5380n_device::selen_w));
-	map(0x5, 0x5).rw(FUNC(ncr5380n_device::bas_r), FUNC(ncr5380n_device::sds_w));
-	map(0x6, 0x6).rw(FUNC(ncr5380n_device::idata_r), FUNC(ncr5380n_device::sdtr_w));
-	map(0x7, 0x7).rw(FUNC(ncr5380n_device::rpi_r), FUNC(ncr5380n_device::sdir_w));
+	map(0x0, 0x0).rw(FUNC(ncr5380_device::csdata_r), FUNC(ncr5380_device::odata_w));
+	map(0x1, 0x1).rw(FUNC(ncr5380_device::icmd_r), FUNC(ncr5380_device::icmd_w));
+	map(0x2, 0x2).rw(FUNC(ncr5380_device::mode_r), FUNC(ncr5380_device::mode_w));
+	map(0x3, 0x3).rw(FUNC(ncr5380_device::tcmd_r), FUNC(ncr5380_device::tcmd_w));
+	map(0x4, 0x4).rw(FUNC(ncr5380_device::csstat_r), FUNC(ncr5380_device::selen_w));
+	map(0x5, 0x5).rw(FUNC(ncr5380_device::bas_r), FUNC(ncr5380_device::sds_w));
+	map(0x6, 0x6).rw(FUNC(ncr5380_device::idata_r), FUNC(ncr5380_device::sdtr_w));
+	map(0x7, 0x7).rw(FUNC(ncr5380_device::rpi_r), FUNC(ncr5380_device::sdir_w));
 }
 
-void ncr5380n_device::device_start()
+void ncr5380_device::device_start()
 {
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
 
-	m_state_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ncr5380n_device::state_timer), this));
+	m_state_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ncr5380_device::state_timer), this));
 
 	save_item(NAME(m_state));
 
@@ -88,7 +88,7 @@ void ncr5380n_device::device_start()
 	save_item(NAME(m_drq_state));
 }
 
-void ncr5380n_device::device_reset()
+void ncr5380_device::device_reset()
 {
 	m_state = IDLE;
 
@@ -113,7 +113,7 @@ void ncr5380n_device::device_reset()
 	set_drq(false);
 }
 
-void ncr5380n_device::scsi_ctrl_changed()
+void ncr5380_device::scsi_ctrl_changed()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
 
@@ -196,7 +196,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 	m_scsi_ctrl = ctrl;
 }
 
-u8 ncr5380n_device::csdata_r()
+u8 ncr5380_device::csdata_r()
 {
 	u8 const data = scsi_bus->data_r();
 	LOGMASKED(LOG_REGR, "csdata_r 0x%02x (%s)\n", data, machine().describe_context());
@@ -204,7 +204,7 @@ u8 ncr5380n_device::csdata_r()
 	return data;
 }
 
-void ncr5380n_device::odata_w(u8 data)
+void ncr5380_device::odata_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "odata_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -215,14 +215,14 @@ void ncr5380n_device::odata_w(u8 data)
 	m_odata = data;
 }
 
-u8 ncr5380n_device::icmd_r()
+u8 ncr5380_device::icmd_r()
 {
 	LOGMASKED(LOG_REGR, "icmd_r 0x%02x (%s)\n", m_icmd, machine().describe_context());
 
 	return m_icmd;
 }
 
-void ncr5380n_device::icmd_w(u8 data)
+void ncr5380_device::icmd_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "icmd_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -263,14 +263,14 @@ void ncr5380n_device::icmd_w(u8 data)
 	m_icmd = (m_icmd & ~IC_WRITE) | (data & IC_WRITE);
 }
 
-u8 ncr5380n_device::mode_r()
+u8 ncr5380_device::mode_r()
 {
 	LOGMASKED(LOG_REGR, "mode_r 0x%02x (%s)\n", m_mode, machine().describe_context());
 
 	return m_mode;
 }
 
-void ncr5380n_device::mode_w(u8 data)
+void ncr5380_device::mode_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "mode_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -315,14 +315,14 @@ void ncr5380n_device::mode_w(u8 data)
 	m_mode = data;
 }
 
-u8 ncr5380n_device::tcmd_r()
+u8 ncr5380_device::tcmd_r()
 {
 	LOGMASKED(LOG_REGR, "tcmd_r 0x%02x (%s)\n", m_tcmd, machine().describe_context());
 
 	return m_tcmd;
 }
 
-void ncr5380n_device::tcmd_w(u8 data)
+void ncr5380_device::tcmd_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "tcmd_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -332,7 +332,7 @@ void ncr5380n_device::tcmd_w(u8 data)
 		m_tcmd = data;
 }
 
-u8 ncr5380n_device::csstat_r()
+u8 ncr5380_device::csstat_r()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
 	u8 const data =
@@ -348,12 +348,12 @@ u8 ncr5380n_device::csstat_r()
 	return data;
 }
 
-void ncr5380n_device::selen_w(u8 data)
+void ncr5380_device::selen_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "selen_w 0x%02x (%s)\n", data, machine().describe_context());
 }
 
-u8 ncr5380n_device::bas_r()
+u8 ncr5380_device::bas_r()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
 	u8 const data = m_bas |
@@ -366,7 +366,7 @@ u8 ncr5380n_device::bas_r()
 	return data;
 }
 
-void ncr5380n_device::sds_w(u8 data)
+void ncr5380_device::sds_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "sds_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -377,19 +377,19 @@ void ncr5380n_device::sds_w(u8 data)
 	}
 }
 
-u8 ncr5380n_device::idata_r()
+u8 ncr5380_device::idata_r()
 {
 	LOGMASKED(LOG_REGR, "idata_r 0x%02x (%s)\n", m_idata, machine().describe_context());
 
 	return m_idata;
 }
 
-void ncr5380n_device::sdtr_w(u8 data)
+void ncr5380_device::sdtr_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "sdtr_w 0x%02x (%s)\n", data, machine().describe_context());
 }
 
-u8 ncr5380n_device::rpi_r()
+u8 ncr5380_device::rpi_r()
 {
 	LOGMASKED(LOG_REGR, "rpi_r (%s)\n", machine().describe_context());
 
@@ -399,7 +399,7 @@ u8 ncr5380n_device::rpi_r()
 	return 0;
 }
 
-void ncr5380n_device::sdir_w(u8 data)
+void ncr5380_device::sdir_w(u8 data)
 {
 	LOGMASKED(LOG_REGW, "sdir_w 0x%02x (%s)\n", data, machine().describe_context());
 
@@ -410,7 +410,7 @@ void ncr5380n_device::sdir_w(u8 data)
 	}
 }
 
-void ncr5380n_device::state_timer(void *ptr, s32 param)
+void ncr5380_device::state_timer(void *ptr, s32 param)
 {
 	// step state machine
 	int const delay = state_step();
@@ -424,7 +424,7 @@ void ncr5380n_device::state_timer(void *ptr, s32 param)
 		m_state_timer->adjust(attotime::from_nsec(delay));
 }
 
-int ncr5380n_device::state_step()
+int ncr5380_device::state_step()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
 	int delay = 0;
@@ -552,7 +552,7 @@ int ncr5380n_device::state_step()
 	return delay;
 }
 
-void ncr5380n_device::eop_w(int state)
+void ncr5380_device::eop_w(int state)
 {
 	LOGMASKED(LOG_DMA, "eop_w %d\n", state);
 	if (state && (m_mode & MODE_DMA))
@@ -569,7 +569,7 @@ void ncr5380n_device::eop_w(int state)
 	}
 }
 
-void ncr5380n_device::dma_w(u8 data)
+void ncr5380_device::dma_w(u8 data)
 {
 	set_drq(false);
 
@@ -581,7 +581,7 @@ void ncr5380n_device::dma_w(u8 data)
 	}
 }
 
-u8 ncr5380n_device::dma_r()
+u8 ncr5380_device::dma_r()
 {
 	set_drq(false);
 
@@ -591,7 +591,7 @@ u8 ncr5380n_device::dma_r()
 	return m_idata;
 }
 
-void ncr5380n_device::scsi_data_w(u8 data)
+void ncr5380_device::scsi_data_w(u8 data)
 {
 	// TODO: release data bus when any of the prerequisite conditions expire
 	u32 const ctrl = scsi_bus->ctrl_r();
@@ -603,7 +603,7 @@ void ncr5380n_device::scsi_data_w(u8 data)
 	}
 }
 
-void ncr5380n_device::set_irq(bool irq_state)
+void ncr5380_device::set_irq(bool irq_state)
 {
 	if (irq_state != m_irq_state)
 	{
@@ -619,7 +619,7 @@ void ncr5380n_device::set_irq(bool irq_state)
 	}
 }
 
-void ncr5380n_device::set_drq(bool drq_state)
+void ncr5380_device::set_drq(bool drq_state)
 {
 	if (drq_state != m_drq_state)
 	{
@@ -635,7 +635,7 @@ void ncr5380n_device::set_drq(bool drq_state)
 	}
 }
 
-u8 ncr5380n_device::read(offs_t offset)
+u8 ncr5380_device::read(offs_t offset)
 {
 	switch (offset & 7)
 	{
@@ -653,7 +653,7 @@ u8 ncr5380n_device::read(offs_t offset)
 	return 0;
 }
 
-void ncr5380n_device::write(offs_t offset, u8 data)
+void ncr5380_device::write(offs_t offset, u8 data)
 {
 	switch (offset & 7)
 	{

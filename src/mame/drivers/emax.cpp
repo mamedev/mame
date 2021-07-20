@@ -11,7 +11,7 @@
 #include "cpu/ns32000/ns32000.h"
 #include "machine/6850acia.h"
 #include "machine/eepromser.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/pit8253.h"
 #include "machine/wd_fdc.h"
 #include "video/hd44780.h"
@@ -56,7 +56,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8254_device> m_ctc;
 	required_device<wd1772_device> m_fdc;
-	optional_device<ncr5380n_device> m_hdc;
+	optional_device<ncr5380_device> m_hdc;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -157,7 +157,7 @@ void emax_state::emax2_map(address_map &map)
 	map(0x0b0002, 0x0b0002).r(m_lcdc, FUNC(hd44780_device::control_r));
 	map(0x0b0004, 0x0b0004).w(m_lcdc, FUNC(hd44780_device::data_w));
 	map(0x0b0006, 0x0b0006).r(m_lcdc, FUNC(hd44780_device::data_r));
-	map(0x1f8000, 0x1f800f).rw(m_hdc, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
+	map(0x1f8000, 0x1f800f).rw(m_hdc, FUNC(ncr5380_device::read), FUNC(ncr5380_device::write)).umask16(0x00ff);
 	map(0x3f8000, 0x3f8007).rw(m_ctc, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x8e8000, 0x8e82ff).ram();
 	map(0xae2000, 0xae2000).w(m_fdc, FUNC(wd1772_device::cmd_w));
@@ -193,7 +193,7 @@ void emax_state::scsihd(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("hdc", NCR5380N);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("hdc", NCR5380);
 }
 
 void emax_state::emax(machine_config &config)
