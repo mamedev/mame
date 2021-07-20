@@ -92,10 +92,14 @@
  */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
+
+
+namespace {
 
 enum print_state {
         READING_CMD,
@@ -230,11 +234,11 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
 	//map(0x300000, 0x3fffff) // open bus?
-	map(0x400000, 0x5fffff).ram().share("dram"); // 2MB DRAM
+	map(0x400000, 0x5fffff).ram().share(m_dram_ptr); // 2MB DRAM
 	// DRAM appears to mirrored through 0x600000 but when written to does a bitwise-or with the existing data
 	// instead of replacing it. This presumeably improves the performance of these operations by avoiding
 	// an extra memory read.
-	map(0x600000, 0x7fffff).readonly().share("dram").w(FUNC(lwriter_state::dram_or_w));
+	map(0x600000, 0x7fffff).readonly().share(m_dram_ptr).w(FUNC(lwriter_state::dram_or_w));
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0xc00001, 0xc00001).w(m_scc, FUNC(scc8530_device::cb_w)).mirror(0x1ffff8);
@@ -292,7 +296,7 @@ uint16_t lwriter_state::bankedarea_r(offs_t offset)
 		if ((offset > 0x7ff) && !machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X!\n",offset<<1); }
 		return m_sram_ptr[offset&0x7FF];
 	}
-	if(!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
+	if (!machine().side_effects_disabled()) { logerror("Attempt to read banked area (with overlay off) past end of SRAM from offset %08X! Returning 0xFFFF!\n",offset<<1); }
 	return 0xFFFF;
 }
 
@@ -309,24 +313,25 @@ void lwriter_state::bankedarea_w(offs_t offset, uint16_t data, uint16_t mem_mask
 		COMBINE_DATA(&m_sram_ptr[offset&0x7FF]);
 		return;
 	}
-	if(!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
+	if (!machine().side_effects_disabled()) { logerror("Attempt to write banked area (with overlay off) with data %04X to offset %08X IGNORED!\n", data, offset<<1); }
 }
 
 void lwriter_state::dram_or_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_dram_ptr[offset] |= ((m_dram_ptr[offset] & ~mem_mask) | (data & mem_mask));
+	m_dram_ptr[offset] |= data & mem_mask;
 }
 
 uint8_t lwriter_state::eeprom_r(offs_t offset)
 {
 	uint8_t result = 0;
 	// adjust offset to match real hardware mapping
-	switch (offset) {
+	switch (offset)
+	{
 		case 0x80:
 		case 0x81:
 		case 0x82:
 		case 0x83: {
-			uint8_t signature[] = {0x7a, 0x53, 0xda, 0x71};
+			constexpr uint8_t signature[] = {0x7a, 0x53, 0xda, 0x71};
 			result = signature[offset-0x80];
 			break;
 		}
@@ -376,7 +381,8 @@ uint8_t lwriter_state::via_pa_r()
 {
 	logerror(" VIA: Port A read!\n");
 	uint8_t result = m_dsw1->read();
-	if (m_sbsy) {
+	if (m_sbsy)
+	{
 		result |= 2;
 	}
 	result |= (m_print_sc << 7);
@@ -455,25 +461,30 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 #define EC7 0x4f
 #define EC14 0x5d
 
-void lwriter_state::write_dtr(int state) {
+void lwriter_state::write_dtr(int state)
+{
 	// DTR seems to be used as a clock for communication with
 	// the print controller. We arbitrarily choose state == 1
 	// to run our code
-	if (state == 1 && (m_cbsy || m_sbsy)) {
+	if (state == 1 && (m_cbsy || m_sbsy))
+	{
 		logerror("pb line %d %d %d!\n", m_via_pb & 1, m_print_state, m_print_bit);
-		switch (m_print_state) {
+		switch (m_print_state)
+		{
 			case READING_CMD: {
 				m_print_cmd <<= 1;
 				m_print_cmd |= (m_via_pb & 1);
 				m_print_bit += 1;
-				if (m_print_bit == 8) {
+				if (m_print_bit == 8)
+				{
 					logerror("PRINT_CMD %x!\n", m_print_cmd);
 					m_print_bit = 0;
 					m_print_state = WRITING_RESULT;
 					m_sbsy = true;
 					// The status messages have odd parity in the high bit
 					// right now we just manually make sure that's true.
-					switch (m_print_cmd) {
+					switch (m_print_cmd)
+					{
 						case SR1:
 						case SR2:
 						case SR4:
@@ -495,7 +506,8 @@ void lwriter_state::write_dtr(int state) {
 				m_print_sc = m_print_result & 0x1;
 				m_print_result >>= 1;
 				m_print_bit += 1;
-				if (m_print_bit == 8) {
+				if (m_print_bit == 8)
+				{
 					logerror("PRINT_RESULT!\n");
 					m_print_bit = 0;
 					m_print_state = READING_CMD;
@@ -523,16 +535,16 @@ void lwriter_state::lwriter(machine_config &config)
 	m_scc->out_dtrb_callback().set(FUNC(lwriter_state::write_dtr));
 	m_scc->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
 	/* Interrupt */
-	m_scc->out_int_callback().set("via", FUNC(via6522_device::write_ca1));
+	m_scc->out_int_callback().set(m_via, FUNC(via6522_device::write_ca1));
 	//m_scc->out_int_callback().set(FUNC(lwriter_state::scc_int));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
-	rs232a.rxd_handler().set("scc", FUNC(scc8530_device::rxa_w));
-	rs232a.cts_handler().set("scc", FUNC(scc8530_device::ctsa_w));
+	rs232a.rxd_handler().set(m_scc, FUNC(scc8530_device::rxa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
-	rs232b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
-	rs232b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
+	rs232b.rxd_handler().set(m_scc, FUNC(scc8530_device::rxb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(scc8530_device::ctsb_w));
 
 	R65NC22(config, m_via, CPU_CLK/10); // 68000 E clock presumed
 	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
@@ -590,6 +602,8 @@ ROM_START(lwriter)
 	ROM_REGION16_BE( 0x1000, "sram", ROMREGION_ERASEFF )
 
 ROM_END
+
+} // anonymous namespace
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT        COMPANY            FULLNAME                    FLAGS */
 CONS( 1988, lwriter, 0,      0,      lwriter, lwriter, lwriter_state, empty_init, "Apple Computer",  "Apple Laser Writer II NT", MACHINE_IS_SKELETON)

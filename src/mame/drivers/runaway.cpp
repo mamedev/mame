@@ -13,17 +13,101 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/runaway.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
+namespace {
+
+class qwak_state : public driver_device
 {
-	/* assume Centipede-style interrupt timing */
+public:
+	qwak_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_video_ram(*this, "video_ram")
+		, m_sprite_ram(*this, "sprite_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_inputs(*this, { "3000D6", "3000D7" })
+		, m_pot(*this, "7000")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
+
+	void qwak(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void qwak_map(address_map &map);
+
+	tilemap_t *m_bg_tilemap;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_sprite_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+private:
+	uint8_t input_r(offs_t offset);
+	void irq_ack_w(uint8_t data);
+	void paletteram_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	uint8_t pot_r(offs_t offset);
+	virtual TILE_GET_INFO_MEMBER(get_tile_info);
+	virtual void get_sprite_info(int n, unsigned &code, int &flipx, int &flipy);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+
+	emu_timer *m_interrupt_timer;
+	required_ioport_array<2> m_inputs;
+	required_ioport m_pot;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+};
+
+
+class runaway_state : public qwak_state
+{
+public:
+	runaway_state(const machine_config &mconfig, device_type type, const char *tag)
+		: qwak_state(mconfig, type, tag)
+		, m_earom(*this, "earom")
+	{ }
+
+	void runaway(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void runaway_map(address_map &map);
+
+private:
+	uint8_t earom_read();
+	void earom_write(offs_t offset, uint8_t data);
+	void earom_control_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(tile_bank_w);
+	virtual TILE_GET_INFO_MEMBER(get_tile_info) override;
+	virtual void get_sprite_info(int n, unsigned &code, int &flipx, int &flipy) override;
+
+	required_device<er2055_device> m_earom;
+
+	uint8_t m_tile_bank;
+};
+
+
+TIMER_CALLBACK_MEMBER(qwak_state::interrupt_callback)
+{
+	// assume Centipede-style interrupt timing
 	int scanline = param;
 
 	m_maincpu->set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
@@ -36,43 +120,48 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
-void runaway_state::machine_start()
+void qwak_state::machine_start()
 {
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(qwak_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 30);
+}
+
+void runaway_state::machine_start()
+{
+	qwak_state::machine_start();
+
+	save_item(NAME(m_tile_bank));
+}
+
+void qwak_state::machine_reset()
+{
+	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
 }
 
 void runaway_state::machine_reset()
 {
-	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
-	if (m_earom.found())
-		earom_control_w(0);
+	qwak_state::machine_reset();
+
+	earom_control_w(0);
 }
 
 
-uint8_t runaway_state::runaway_input_r(offs_t offset)
+uint8_t qwak_state::input_r(offs_t offset)
 {
-	uint8_t val = 0;
-
-	if (ioport("3000D7")->read() & (1 << offset))
-	{
-		val |= 0x80;
-	}
-	if (ioport("3000D6")->read() & (1 << offset))
-	{
-		val |= 0x40;
-	}
-
-	return val;
+	return
+			(BIT(m_inputs[1]->read(), offset) << 7) |
+			(BIT(m_inputs[0]->read(), offset) << 6);
 }
 
 
-uint8_t runaway_state::runaway_pot_r(offs_t offset)
+uint8_t qwak_state::pot_r(offs_t offset)
 {
-	return (ioport("7000")->read() << (7 - offset)) & 0x80;
+	return BIT(m_pot->read(), offset) << 7;
 }
 
 
-void runaway_state::runaway_irq_ack_w(uint8_t data)
+void qwak_state::irq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -97,26 +186,141 @@ void runaway_state::earom_control_w(uint8_t data)
 }
 
 
-void runaway_state::qwak_map(address_map &map)
+void qwak_state::paletteram_w(offs_t offset, uint8_t data)
+{
+	int const b =
+			0x21 * 0 +
+			0x47 * BIT(~data, 0) +
+			0x97 * BIT(~data, 1);
+
+	int const r =
+			0x21 * BIT(~data, 2) +
+			0x47 * BIT(~data, 3) +
+			0x97 * BIT(~data, 4);
+
+	int const g =
+			0x21 * BIT(~data, 5) +
+			0x47 * BIT(~data, 6) +
+			0x97 * BIT(~data, 7);
+
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+}
+
+
+
+void qwak_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+
+WRITE_LINE_MEMBER(runaway_state::tile_bank_w)
+{
+	if (state != m_tile_bank)
+	{
+		m_tile_bank = state;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+
+TILE_GET_INFO_MEMBER(qwak_state::get_tile_info)
+{
+	uint8_t const code = m_video_ram[tile_index];
+
+	tileinfo.set(
+			0, // gfx
+			((code & 0x7f) << 1) | ((code & 0x80) >> 7), // code
+			0, // color
+			0); // flags
+}
+
+
+TILE_GET_INFO_MEMBER(runaway_state::get_tile_info)
+{
+	uint8_t const code = m_video_ram[tile_index];
+
+	tileinfo.set(
+			0, // gfx
+			((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), // code
+			0, // color
+			(code & 0x80) ? TILE_FLIPY : 0); // flags
+}
+
+
+
+void qwak_state::get_sprite_info(int n, unsigned &code, int &flipx, int &flipy)
+{
+	code = m_sprite_ram[n] & 0x7f;
+
+	flipx = 0;
+	flipy = m_sprite_ram[n] & 0x80;
+
+	code |= (m_sprite_ram[n + 0x30] << 2) & 0x1c0;
+}
+
+void runaway_state::get_sprite_info(int n, unsigned &code, int &flipx, int &flipy)
+{
+	code = m_sprite_ram[n] & 0x3f;
+
+	flipx = m_sprite_ram[n] & 0x40;
+	flipy = m_sprite_ram[n] & 0x80;
+
+	code |= (m_sprite_ram[n + 0x30] << 2) & 0x1c0;
+}
+
+uint32_t qwak_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (int i = 0; i < 16; i++)
+	{
+		unsigned code;
+		int flipx, flipy;
+		get_sprite_info(i, code, flipx, flipy);
+
+		int const x = m_sprite_ram[i + 0x20];
+		int const y = m_sprite_ram[i + 0x10];
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				0,
+				flipx, flipy,
+				x, 240 - y, 0);
+
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+				code,
+				0,
+				flipx, flipy,
+				x - 256, 240 - y, 0);
+	}
+	return 0;
+}
+
+
+void qwak_state::qwak_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07bf).ram().w(FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
-	map(0x07c0, 0x07ff).ram().share("sprite_ram");
-	map(0x1000, 0x1000).w(FUNC(runaway_state::runaway_irq_ack_w));
-	map(0x1c00, 0x1c0f).w(FUNC(runaway_state::runaway_paletteram_w));
+	map(0x0400, 0x07bf).ram().w(FUNC(qwak_state::video_ram_w)).share(m_video_ram);
+	map(0x07c0, 0x07ff).ram().share(m_sprite_ram);
+	map(0x1000, 0x1000).w(FUNC(qwak_state::irq_ack_w));
+	map(0x1c00, 0x1c0f).w(FUNC(qwak_state::paletteram_w));
 	map(0x2000, 0x2007).w("mainlatch", FUNC(ls259_device::write_d0));
 
-	map(0x3000, 0x3007).r(FUNC(runaway_state::runaway_input_r));
+	map(0x3000, 0x3007).r(FUNC(qwak_state::input_r));
 	map(0x4000, 0x4000).portr("4000");
 	map(0x6000, 0x600f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7000, 0x700f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xcfff).rom();
-	map(0xf000, 0xffff).rom(); /* for the interrupt vectors */
+	map(0xf000, 0xffff).rom(); // for the interrupt vectors
 }
 
 void runaway_state::runaway_map(address_map &map)
 {
 	qwak_map(map);
+
 	map(0x1400, 0x143f).w(FUNC(runaway_state::earom_write));
 	map(0x1800, 0x1800).w(FUNC(runaway_state::earom_control_w));
 	map(0x5000, 0x5000).r(FUNC(runaway_state::earom_read));
@@ -345,33 +549,31 @@ static GFXDECODE_START( gfx_qwak )
 GFXDECODE_END
 
 
-void runaway_state::runaway(machine_config &config)
+void qwak_state::qwak(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 12096000 / 8); /* ? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::runaway_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qwak_state::qwak_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // coin counter?
 	mainlatch.q_out_cb<1>().set_nop(); // coin counter?
 	mainlatch.q_out_cb<3>().set_output("led0").invert();
 	mainlatch.q_out_cb<4>().set_output("led1").invert();
-	mainlatch.q_out_cb<5>().set(FUNC(runaway_state::tile_bank_w));
+	mainlatch.q_out_cb<5>().set_nop();
 
-	ER2055(config, m_earom);
-
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 263);
 	m_screen->set_visarea(0, 255, 0, 239);
-	m_screen->set_screen_update(FUNC(runaway_state::screen_update_runaway));
+	m_screen->set_screen_update(FUNC(qwak_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_runaway);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_qwak);
 	PALETTE(config, m_palette).set_entries(16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	pokey_device &pokey1(POKEY(config, "pokey1", 12096000 / 8));
@@ -379,32 +581,30 @@ void runaway_state::runaway(machine_config &config)
 	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pokey_device &pokey2(POKEY(config, "pokey2", 12096000 / 8));
-	pokey2.pot_r<0>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<1>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<2>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<3>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<4>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<5>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<6>().set(FUNC(runaway_state::runaway_pot_r));
-	pokey2.pot_r<7>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<0>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<1>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<2>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<3>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<4>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<5>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<6>().set(FUNC(qwak_state::pot_r));
+	pokey2.pot_r<7>().set(FUNC(qwak_state::pot_r));
 	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void runaway_state::qwak(machine_config &config)
+void runaway_state::runaway(machine_config &config)
 {
-	runaway(config);
+	qwak(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::qwak_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::runaway_map);
 
-	config.device_remove("earom");
+	subdevice<ls259_device>("mainlatch")->q_out_cb<5>().set(FUNC(runaway_state::tile_bank_w));
 
-	/* video hardware */
-	m_gfxdecode->set_info(gfx_qwak);
+	ER2055(config, m_earom);
 
-	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
-
-	m_screen->set_screen_update(FUNC(runaway_state::screen_update_qwak));
+	// video hardware
+	m_gfxdecode->set_info(gfx_runaway);
 }
 
 ROM_START( runaway )
@@ -438,6 +638,8 @@ ROM_START( qwak )
 	ROM_LOAD( "qwakgfx3.bin", 0x3000, 0x1000, CRC(e8416f2b) SHA1(171f6539575f2c06b431ab5118e5cbaf740f557d) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1982, qwak,    0, qwak,    qwak,    qwak_state,    empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (Atari, prototype)", MACHINE_SUPPORTS_SAVE )
