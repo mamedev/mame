@@ -282,6 +282,14 @@ void nes_smb3p_device::device_start()
 	save_item(NAME(m_irq_count));
 }
 
+void nes_smb3p_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
+{
+	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
+	// registers reliably boot up with all 1s according to hardware tests
+	for (int i = 0; i < 4; i++)
+		prg8_x(i, 0x1f);
+}
+
 void nes_smb3p_device::pcb_reset()
 {
 	// registers not cleared or initialized at reset

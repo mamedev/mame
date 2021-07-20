@@ -112,6 +112,7 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+	virtual void pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted) override;
 
 protected:
 	// device-level overrides
