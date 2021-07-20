@@ -42,9 +42,13 @@ DEFINE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device,      "nes_sgun20in1
 DEFINE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device,         "nes_vt5201",         "NES Cart VT5201 PCB")
 DEFINE_DEVICE_TYPE(NES_810544C,        nes_810544c_device,        "nes_810544c",        "NES Cart 810544-C-A1 PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device,       "nes_bmc_tj03",       "NES Cart BMC TJ-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device,         "nes_bmc_ws",         "NES Cart BMC WS PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device,      "nes_bmc_1160",       "NES Cart BMC-1160 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_G146,       nes_bmc_g146_device,       "nes_bmc_g146",       "NES Cart BMC-G-146 PCB")
@@ -147,6 +151,11 @@ nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, const char *ta
 {
 }
 
+nes_bmc_ctc09_device::nes_bmc_ctc09_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_CTC09, tag, owner, clock)
+{
+}
+
 nes_bmc_gb63_device::nes_bmc_gb63_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_GB63, tag, owner, clock), m_latch(0), m_dipsetting(0), m_vram_disable(0)
 {
@@ -159,6 +168,21 @@ nes_bmc_gka_device::nes_bmc_gka_device(const machine_config &mconfig, const char
 
 nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKB, tag, owner, clock)
+{
+}
+
+nes_bmc_k3046_device::nes_bmc_k3046_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_K3046, tag, owner, clock)
+{
+}
+
+nes_bmc_sa005a_device::nes_bmc_sa005a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_SA005A, tag, owner, clock)
+{
+}
+
+nes_bmc_tj03_device::nes_bmc_tj03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_TJ03, tag, owner, clock)
 {
 }
 
@@ -519,6 +543,14 @@ void nes_ntd03_device::pcb_reset()
 	chr8(0, m_chr_source);
 }
 
+void nes_bmc_ctc09_device::pcb_reset()
+{
+// nes_slot's pcb_start sets us up in the main menu. Soft reset is empty so
+// that games reset to their own title screens. This seems to be this cart's
+// intended behavior as trying to reset to the menu here crashes (due to RAM
+// contents?). Soft reset can similarly crash the main menu (BTANB?).
+}
+
 void nes_bmc_gb63_device::device_start()
 {
 	common_start();
@@ -570,6 +602,20 @@ void nes_bmc_gkb_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr8(0, m_chr_source);
+}
+
+void nes_bmc_k3046_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+}
+
+void nes_bmc_sa005a_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(0);
+	chr8(0, CHRROM);
 }
 
 void nes_bmc_ws_device::device_start()
@@ -1425,6 +1471,38 @@ void nes_ntd03_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ BMC-CTC-09
+
+ Games: 10 in 1
+
+ NES 2.0: mapper 335
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_ctc09_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_ctc09 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 14))
+	{
+		if (BIT(data, 4))
+		{
+			u8 bank = ((data & 0x07) << 1) | BIT(data, 3);
+			prg16_89ab(bank);
+			prg16_cdef(bank);
+		}
+		else
+			prg32(data & 0x07);
+		set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+	else
+		chr8(data & 0x0f, CHRROM);
+}
+
+/*-------------------------------------------------
+
  BMC-GHOSTBUSTERS63IN1
 
  in MESS: only preliminar support
@@ -1535,6 +1613,73 @@ void nes_bmc_gkb_device::write_h(offs_t offset, uint8_t data)
 	prg16_cdef(offset | bank);
 	chr8(offset >> 3, m_chr_source);
 	set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC-K-3046
+
+ Games: 11 in 1
+
+ NES 2.0: mapper 336
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_k3046_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_k3046 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	data &= 0x1f;
+	prg16_89ab(data);
+	prg16_cdef(data | 0x07);
+}
+
+/*-------------------------------------------------
+
+ BMC-SA005-A
+
+ Games: 16 in 1
+
+ NES 2.0: mapper 338
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_sa005a_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_sa005a write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = offset & 0x0f;
+	prg16_89ab(bank);
+	prg16_cdef(bank);
+	chr8(bank, CHRROM);
+	set_nt_mirroring(BIT(offset, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+}
+
+/*-------------------------------------------------
+
+ BMC-TJ-03
+
+ Games: 4 in 1
+
+ NES 2.0: mapper 341
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_tj03_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_tj03 write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = (offset >> 8) & 0x03;
+	prg32(bank);
+	chr8(bank, CHRROM);
+	set_nt_mirroring(BIT(offset, 9) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------

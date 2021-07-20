@@ -248,9 +248,13 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_d1038",        BMC_VT5201 },  // mapper 60?
 	{ "810544c",          BMC_810544 },
 	{ "ntd03",            BMC_NTD_03 },
+	{ "bmc_ctc09",        BMC_CTC09 },
 	{ "bmc_gb63",         BMC_G63IN1 },
 	{ "bmc_gka",          BMC_GKA },
 	{ "bmc_gkb",          BMC_GKB },
+	{ "bmc_k3046",        BMC_K3046 },
+	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
 	{ "bmc_s700",         BMC_SUPER_700IN1 },
