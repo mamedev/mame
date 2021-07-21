@@ -1024,7 +1024,6 @@ void namconb1_state::namconb2(machine_config &config)
 
 	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
-	m_c169roz->set_disable_custom_draw(false);
 	m_c169roz->set_ram_words(0x20000 / 2);
 	m_c169roz->set_color_base(0x1800);
 }
