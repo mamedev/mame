@@ -74,7 +74,7 @@ copyright-holders:Golden Child
 
 	<element name="buffersize">
 		<rect>
-			<color red="0.9" green="0.9" blue="0.9" />
+			<color red="0.8" green="0.8" blue="0.8" />
 		</rect>
 	</element>
 
@@ -127,10 +127,10 @@ copyright-holders:Golden Child
 		</repeat>
 
 		<element id="bufheadtaildisplay0" ref="buffersize">
-			<bounds x="1" y="1" width="38" height="1" />
+			<bounds x="1" y="13" width="38" height="1" />
 		</element>
 		<element id="bufheadtaildisplay1" ref="buffersize">
-					<bounds x="1" y="1" width="38" height="1" />
+			<bounds x="1" y="13" width="38" height="1" />
 		</element>
 
 	</view>
@@ -172,8 +172,8 @@ file:set_resolve_tags_callback(
 	local bufferfull = nil
 	local boundx0 = 0.1
 	local boundx1 = 0.9
-	local boundy0 = 0.01
-	local boundy1 = 0.05
+	local boundy0 = 0.90
+	local boundy1 = 0.95
 	local bufheadx = boundx0
 	local buftailx = boundx0
 	local middleboundx0 = boundx0
