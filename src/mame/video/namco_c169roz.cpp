@@ -99,13 +99,65 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 {
 	const int xoffset = 36, yoffset = 3;
 
-	/**
-	 * x-------.-------- disable layer
-	 * ----x---.-------- wrap?
-	 * ------xx.-------- size
-	 * --------.xxxx---- priority
-	 * --------.----xxxx color
-	 */
+
+	/*
+
+	These tables are at
+	0x70e000  on NamcoNB1 (68k based)
+	0x30c0e000 on NamcoFL (i960 based)
+
+	the format seems to be the same as
+	m_control when not in line mode
+
+	is it possible the first line is taken from m_control?
+	as Final Lap R populates the final line as 'disbled'
+	this results in bad background tiles being visible.
+	 
+	source[0]
+
+	0x4000 = zoom only?
+	0x6000 = full roz?
+	0x0000 = ignore params? maybe use base params (probably not)
+
+	source[1]
+
+	x------- -------- disable layer
+	----x--- -------- wrap?
+	------xx -------- size
+	-------- xxxx---- priority
+	-------- ----xxxx color
+
+	source[2]
+
+	x------- -------- incxx sign bit
+	-xxx---- -------- left
+	----xxxx xxxxxxxx incxx magnitude
+
+	source[3]
+
+	x------- -------- incxy sign bit
+	-xxx---- -------- top
+	----xxxx xxxxxxxx incxy
+
+	source[4]
+
+	x------- -------- incyx sign bit
+	----xxxx xxxxxxxx inxyx
+
+	source[5]
+
+	x------- -------- incyy sign bit
+	----xxxx xxxxxxxx incyy
+
+	source[6]
+
+	xxxxxxxx xxxxxxxx xscroll
+
+	source[7]
+
+	yyyyyyyy yyyyyyyy yscroll
+
+	*/
 
 	uint16_t temp = source[1];
 	params.wrap = BIT(~temp, 11);
