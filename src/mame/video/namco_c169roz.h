@@ -15,7 +15,10 @@ public:
 	// construction/destruction
 	namco_c169roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_is_namcofl(bool state) { m_is_namcofl = state; }
+	void set_disable_custom_draw(bool state) { m_disable_custom_draw = state; }
+	void set_roz_tilemap_for_linemap(int num) { m_roz_tilemap_for_linemap = num; }
+	void set_palette_mask(int mask) { m_palette_mask = mask; }
+
 	void set_ram_words(uint32_t size) { m_ramsize = size; }
 	void set_color_base(int color) { m_color_base = color; }
 
@@ -61,7 +64,9 @@ private:
 	uint32_t m_ramsize;
 
 	// per-game hacks
-	bool m_is_namcofl;
+	bool m_disable_custom_draw;
+	bool m_roz_tilemap_for_linemap;
+	uint8_t m_palette_mask;
 
 	required_region_ptr<uint8_t> m_mask;
 };

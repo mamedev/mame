@@ -35,6 +35,7 @@ public:
 		m_shareram(*this, "shareram") { }
 
 	void namcofl(machine_config &config);
+	void finalapr(machine_config &config);
 
 	void driver_init() override;
 

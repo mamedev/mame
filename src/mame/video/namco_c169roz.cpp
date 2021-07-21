@@ -40,7 +40,9 @@ namco_c169roz_device::namco_c169roz_device(const machine_config &mconfig, const 
 	device_t(mconfig, NAMCO_C169ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_color_base(0),
-	m_is_namcofl(false),
+	m_disable_custom_draw(false),
+	m_roz_tilemap_for_linemap(1),
+	m_palette_mask(0xf),
 	m_mask(*this, "mask")
 {
 }
@@ -108,10 +110,7 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 	uint16_t temp = source[1];
 	params.wrap = BIT(~temp, 11);
 	params.size = 512 << ((temp & 0x0300) >> 8);
-	if (m_is_namcofl)
-		params.color = (temp & 0x0007) * 256;
-	else
-		params.color = (temp & 0x000f) * 256;
+	params.color = (temp & m_palette_mask) * 256;
 	params.priority = (temp & 0x00f0) >> 4;
 
 	temp = source[2];
@@ -151,8 +150,7 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 
 void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
 {
-	if (!m_is_namcofl)
-//  if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
+	if (!m_disable_custom_draw)
 	{
 		uint32_t size_mask = params.size - 1;
 		bitmap_ind16 &srcbitmap = tmap.pixmap();
@@ -224,7 +222,6 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 
 void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	int special = (m_is_namcofl) ? 0 : 1;
 	int mode = m_control[0]; // 0x8000 or 0x1000
 
 	for (int which = 1; which >= 0; which--)
@@ -236,7 +233,15 @@ void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 		if ((attrs & 0x8000) == 0)
 		{
 			// second ROZ layer is configured to use per-scanline registers
-			if (which == special && mode == 0x8000)
+
+			// Mach Breakers sets mode 0x8000 on the tilemap used by the first attract race
+			// and even populates the linetable, but these values don't appear to be correct
+			// as it expects it to be drawn as a simple zooming tilemap.
+			// m_roz_tilemap_for_linemap is used to only allow per-line effects on the 2nd
+			// ROZ layer.  For Final Lap R and Speed Racer we need the first ROZ layer to be
+			// the one with per-line effects.
+
+			if (which == m_roz_tilemap_for_linemap && mode == 0x8000)
 			{
 				for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 					draw_scanline(screen, bitmap, line, which, pri, cliprect);

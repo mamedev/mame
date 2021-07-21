@@ -554,10 +554,11 @@ void namcofl_state::namcofl(machine_config &config)
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);
 	m_c169roz->set_palette(m_c116);
-	m_c169roz->set_is_namcofl(true);
 	m_c169roz->set_ram_words(0x20000/2);
 	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcofl_state::RozCB, this));
 	m_c169roz->set_color_base(0x1800);
+	m_c169roz->set_roz_tilemap_for_linemap(0);
+	m_c169roz->set_palette_mask(0x7);
 
 	NAMCO_C355SPR(config, m_c355spr, 0);
 	m_c355spr->set_screen(m_screen);
@@ -584,6 +585,14 @@ void namcofl_state::namcofl(machine_config &config)
 	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
 	//c352.add_route(3, "rspeaker", 1.00);
 }
+
+void namcofl_state::finalapr(machine_config &config)
+{
+	namcofl(config);
+	m_c169roz->set_disable_custom_draw(true); // bad gfx on titlescreen otherwise (because custom draw doesn't support wraparound disable?)
+}
+
+
 
 ROM_START( speedrcr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
@@ -801,7 +810,7 @@ void namcofl_state::driver_init()
 GAME(  1995, speedrcr,          0, namcofl, speedrcr, namcofl_state, driver_init, ROT0, "Namco", "Speed Racer",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
 // Final Lap R was released 02/94, a 1993 copyright date is displayed on the title screen
-GAMEL( 1994, finalapr,          0, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalapr1,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalaprj,  finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
-GAMEL( 1994, finalaprj1, finalapr, namcofl, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalapr,          0, finalapr, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Rev. B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalapr1,  finalapr, finalapr, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalaprj,  finalapr, finalapr, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )
+GAMEL( 1994, finalaprj1, finalapr, finalapr, finalapr, namcofl_state, driver_init, ROT0, "Namco", "Final Lap R (Japan Rev. B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finalapr )

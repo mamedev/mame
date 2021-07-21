@@ -1777,7 +1777,6 @@ void namcos2_state::configure_c169roz_standard(machine_config &config)
 {
 	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
-	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
 	m_c169roz->set_color_base(0*256);
 }
