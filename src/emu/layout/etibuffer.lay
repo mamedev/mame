@@ -218,7 +218,7 @@ file:set_resolve_tags_callback(
 	-- led digits
 
 	for digit=0,3 do
-		file.views["Control Panel"].items["digit"..tostring(digit)]:set_element_state_callback(
+		file.views["Control Panel"].items["digit"..string.format("%d",digit)]:set_element_state_callback(
 			function ()
 				local pc = file.device:subdevice("maincpu").state["PC"].value
 				if (not(pc >= 0x100 and pc <= 0x106) and
