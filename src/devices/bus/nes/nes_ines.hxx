@@ -361,7 +361,7 @@ static const nes_mmc mmc_list[] =
 	// 323 Farid SLROM homebrew 8-in-1
 	// 324 Farid UNROM homebrew 8-in-1
 	{ 325, UNL_MALISB },           // Super Mali Splash Bomb pirate hack
-	// 326 yet another Contra bootleg, dump available?
+	{ 326, BTL_CONTRAJ },
 	// 327 BMC-10-24-C-A1 6-in-1
 	{ 328, UNL_RT01 },             // test cart (Russia)
 	{ 329, UNL_EDU2K },

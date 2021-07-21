@@ -204,6 +204,7 @@ static const nes_pcb pcb_list[] =
 	{ "mariobaby",        BTL_MARIOBABY },
 	{ "asnicol",          BTL_AISENSHINICOL },
 	{ "smb3pirate",       BTL_SMB3 },
+	{ "btl_contraj",      BTL_CONTRAJ },
 	{ "btl_dninja",       BTL_DRAGONNINJA },
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
