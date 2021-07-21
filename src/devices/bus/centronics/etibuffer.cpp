@@ -135,9 +135,11 @@ void etiprintbuffer_device::device_start()
 
 void etiprintbuffer_device::device_reset()
 {
+	// Setup 16k blocks in address space
+
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	u16 ram16kblocks = ioport("CONFIG")->read() & 0x03;
-	mem.unmap_readwrite(0x4000,0xffff);
+	mem.unmap_readwrite(0x4000, 0xffff);
 	if (ram16kblocks) mem.install_ram(0x4000, 0x4000 + (ram16kblocks * 0x4000) - 1, m_ram);
 
 	// Initialize printer input port
