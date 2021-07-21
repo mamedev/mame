@@ -53,9 +53,6 @@
 
 #pragma once
 
-// enable DEBUG_ETI_BUFFER for a screen display of buffer head, tail and size.
-//#define DEBUG_ETI_BUFFER
-
 #include "ctronics.h"
 #include "screen.h"
 #include "cpu/z80/z80.h"
@@ -92,14 +89,6 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	required_device<z80_device> m_maincpu;
-	optional_device<screen_device> m_screen;
-	required_device<centronics_device> m_ctx;
-	required_device<output_latch_device> m_ctx_data_out;
-
-	output_finder<> m_printerready_led;
-	output_finder<> m_bufferready_led;
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -108,17 +97,24 @@ protected:
 	void etiprintbuffer_device_memmap(address_map &map);
 	void etiprintbuffer_device_iomap(address_map &map);
 
-
 	uint8_t eti_status_r(offs_t offset);
 	uint8_t eti_read_1000(offs_t offset);
 	void    eti_write_2000(offs_t offset, uint8_t data);
 	void    eti_write_3000(offs_t offset, uint8_t data);
 
-	u8 m_data;
+	required_device<z80_device> m_maincpu;
+	optional_device<screen_device> m_screen;
+	required_device<centronics_device> m_ctx;
+	required_device<output_latch_device> m_ctx_data_out;
+
+	output_finder<> m_printerready_led;
+	output_finder<> m_bufferready_led;
+
+	u8 m_data;              // data from centronics input
 	u8 m_datalatch;         // latch data when strobed
-	bool m_strobereceived;  // flip flop to handle strobe
-	bool m_strobe;          // flip flop to handle ack status
-	bool m_busy;
+	bool m_strobereceived;  // flip flop to handle input strobe
+	bool m_strobe;          // current state of input strobe line
+	bool m_busy;            // current state of output busy line
 
 	emu_timer *m_ack_timer;
 	emu_timer *m_strobeout_timer;
@@ -127,15 +123,6 @@ protected:
 
 	u8 m_ram[48 * 1024];  // 48k ram
 
-#ifdef DEBUG_ETI_BUFFER
-	uint32_t screen_update_etibuffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void drawbar(double xval1, double xval2, double x1, double x2, double y1, double y2, int width, bitmap_rgb32 &bitmap, u32 color);
-	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor = 0x1);
-
-	u16 m_buffersize = 0;  // used to draw graphic representation of buffer
-	u16 m_bufferhead = 0;
-	u16 m_buffertail = 0;
-#endif
 };
 
 // device type definition

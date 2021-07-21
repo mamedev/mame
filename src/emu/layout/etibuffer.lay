@@ -46,58 +46,222 @@ copyright-holders:Golden Child
 	<element name="printerready_str" defstate="0">
 		<text string="Printer Ready">
 			<color red="0" green="0" blue="0" />
-			<bounds x="0" y="0" width="25" height="4" />
 		</text>
 	</element>
 	<element name="clear_str" defstate="0">
 		<text string="CLEAR">
 			<color red="0" green="0" blue="0" />
-			<bounds x="0" y="0" width="35" height="4" />
 		</text>
 	</element>
 	<element name="test_str" defstate="0">
 		<text string="TEST">
 			<color red="0" green="0" blue="0" />
-			<bounds x="0" y="0" width="35" height="4" />
 		</text>
 	</element>
 	<element name="bufferready_str" defstate="0">
 		<text string="Buffer Ready">
 			<color red="0" green="0" blue="0" />
-			<bounds x="0" y="0" width="35" height="4" />
 		</text>
 	</element>
 
-	<view name="Control panel">
+	<element name="leddigit">
+		  <led7seg></led7seg>
+	</element>
+
+	<element name="ledback">
+		<rect></rect>
+	</element>
+
+	<element name="buffersize">
+		<rect>
+			<color red="0.9" green="0.9" blue="0.9" />
+		</rect>
+	</element>
+
+	<view name="Control Panel">
+			<bounds x="0" y="0" width="40" height="15" />
 		<element ref="background">
-			<bounds x="0" y="0" width="40" height="13" />
+			<bounds x="0" y="0" width="40" height="15" />
 		</element>
-		<element name="devicetag_str" ref="devicetag_str">
+		<element id="devicetag_str" ref="devicetag_str">
 			<bounds xc="20" y="1" width="40" height="2" />
 		</element>
-		<element name="printerready_led" ref="red_led">
+		<element id="printerready_led" name="printerready_led" ref="red_led">
 			<bounds xc="5" yc="9" width="4" height="4" />
 		</element>
-		<element name="printerready_str" ref="printerready_str">
+		<element id="printerready_str" ref="printerready_str">
 			<bounds xc="5" yc="5" width="8" height="2" />
 		</element>
-		<element inputtag="CLEAR" inputmask="0x01" ref="pushbutton">
+		<element id="CLEAR" inputtag="CLEAR" inputmask="0x01" ref="pushbutton">
 			<bounds xc="15" yc="9" width="4" height="4" />
 		</element>
-		<element name="clear_str" ref="clear_str">
+		<element id="clear_str" ref="clear_str">
 			<bounds xc="15" yc="5" width="5" height="2" />
 		</element>
-		<element inputtag="TEST" inputmask="0x01" ref="pushbutton">
+		<element id="TEST" inputtag="TEST" inputmask="0x01" ref="pushbutton">
 			<bounds xc="25" yc="9" width="4" height="4" />
 		</element>
-		<element name="test_str" ref="test_str">
+		<element id="test_str" ref="test_str">
 			<bounds xc="25" yc="5" width="5" height="2" />
 		</element>
-		<element name="bufferready_led" ref="red_led">
+		<element id="bufferready_led" name="bufferready_led" ref="red_led">
 			<bounds xc="35" yc="9" width="4" height="4" />
 		</element>
-		<element name="bufferready_str" ref="bufferready_str">
+		<element id="bufferready_str" ref="bufferready_str">
 			<bounds xc="35" yc="5" width="8" height="2" />
 		</element>
+
+		<element id="ledback" ref="ledback">
+		   <bounds x="17.75" width="4.5" y="9.75" height="2.0" />
+		   <color red="0" green="0" blue="0" />
+		</element>
+
+		<repeat count="4">
+		<param name="digitno" start="0" increment="1" />
+		<param name="xpos" start="21.12" increment="-1" />
+		<param name="ypos" start="10" increment="0" />
+		<element id="digit~digitno~" ref="leddigit">
+		  <bounds x="~xpos~" y="~ypos~" width=".75" height="1.5"/>
+		  <color red="0.8" green="0.0" blue="0.0" />
+		</element>
+		</repeat>
+
+		<element id="bufheadtaildisplay0" ref="buffersize">
+			<bounds x="1" y="1" width="38" height="1" />
+		</element>
+		<element id="bufheadtaildisplay1" ref="buffersize">
+					<bounds x="1" y="1" width="38" height="1" />
+		</element>
+
 	</view>
+
+<!-- the content of the script element will be called as a function by the layout plugin -->
+<!-- use CDATA block to avoid the need to escape angle brackets and ampersands -->
+
+<script><![CDATA[
+
+-- file is the layout file object
+print("LAYOUT LOADED  file.device.name = "..file.device.name)
+print("LAYOUT LOADED  file.device.shortname = "..file.device.shortname)
+print("LAYOUT LOADED  file.device.tag = = "..file.device.tag)
+
+function min(a,b) if a<b then return a else return b end end
+function max(a,b) if a>b then return a else return b end end
+
+function scalevalue(xval1, x1, x2, y1, y2)
+	local pct1 = (xval1 - x1) / (x2-x1);
+	-- clamp range to 0,1.0
+	pct1 = min(max(0.0, pct1), 1.0);
+	local yval1 = pct1 * (y2 - y1) + y1;
+	return yval1
+end
+
+function scale2value(xval1, xval2, x1, x2, y1, y2)
+	return scalevalue(xval1, x1, x2, y1, y2),
+		   scalevalue(xval2, x1, x2, y1, y2)
+end
+
+function iif(a,b,c) if a then return b else return c end end
+
+file:set_resolve_tags_callback(
+	function ()
+
+	local buffersize = 0
+	local bufferhead = 0
+	local buffertail = 0
+	local bufferfull = nil
+	local boundx0 = 0.1
+	local boundx1 = 0.9
+	local boundy0 = 0.01
+	local boundy1 = 0.05
+	local bufheadx = boundx0
+	local buftailx = boundx0
+	local middleboundx0 = boundx0
+	local middleboundx1 = boundx0
+	local middlecolor = 0xffffff
+	local fullcolor = 0x000000
+	local rgbtorender_color = function (c) return emu.render_color(1.0, (c>>16) & 0xff, (c>>8) & 0xff,(c>>0) & 0xff) end  -- 1.0 is opaque
+
+	local updatebufferdetails = function()
+		local pc = file.device:subdevice("maincpu").state["PC"].value
+		if (not(pc >= 0x100 and pc <= 0x106) and -- avoid updating when pc is in these ranges due to EXX / EXX
+			not(pc >= 0x11a and pc <= 0x11c) and
+			not(pc >= 0x134 and pc <= 0x137) and
+			not(pc >= 0x159 and pc <= 0x15b)) then
+			bufferhead = file.device:subdevice("maincpu").state["BC"].value
+			buffertail = file.device:subdevice("maincpu").state["DE"].value
+			buffersize = file.device:subdevice("maincpu").state["HL"].value
+			local minsize = 512
+			if bufferhead >= buffertail then
+				bufferhead = max(buffertail + minsize, bufferhead)   -- minimum size or you can't see it
+				bufferfull = nil
+			else
+				bufferfull = iif (buffertail - bufferhead < minsize,1,nil)
+				buffertail = max(buffertail, bufferhead + minsize)  -- minimum size
+			end
+		end
+
+		bufheadx = scalevalue(bufferhead,0x4000,0xffff,boundx0,boundx1)
+		buftailx = scalevalue(buffertail,0x4000,0xffff,boundx0,boundx1)
+		if bufheadx >= buftailx then
+				middleboundx0 = buftailx
+				middleboundx1 = bufheadx
+				middlecolor,fullcolor = 0xffffff,0x000000  -- middle bar white, full bar black
+		else
+				middleboundx0 = bufheadx
+				middleboundx1 = buftailx
+				middlecolor,fullcolor = iif(bufferfull,0xff0000,0x000000),iif(bufferfull,0xffffff,0xffffff)
+				-- full bar white, middle bar black/red
+		end
+	end -- updatebufferdetails
+
+	-- led digits
+
+	for digit=0,3 do
+		file.views["Control Panel"].items["digit"..tostring(digit)]:set_element_state_callback(
+			function ()
+				local pc = file.device:subdevice("maincpu").state["PC"].value
+				if (not(pc >= 0x100 and pc <= 0x106) and
+					not(pc >= 0x11a and pc <= 0x11c) and
+					not(pc >= 0x134 and pc <= 0x137) and
+					not(pc >= 0x159 and pc <= 0x15b))
+				then buffersize = file.device:subdevice("maincpu").state["HL"].value end
+				return ({ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 })
+						[ (buffersize >> (digit * 4) & 0x0f) + 1 ]
+			end)
+	end
+
+	-- buffer head amd tail bars
+
+	file.views["Control Panel"].items["bufheadtaildisplay0"]:set_color_callback(
+		function ()
+			updatebufferdetails()
+			return rgbtorender_color(fullcolor)
+		end)
+
+	file.views["Control Panel"].items["bufheadtaildisplay0"]:set_bounds_callback(
+		function ()
+			updatebufferdetails()
+			local b = emu.render_bounds()
+			b:set_xy(boundx0,boundy0,boundx1,boundy1)
+			return b
+		end)
+
+	file.views["Control Panel"].items["bufheadtaildisplay1"]:set_color_callback(
+		function ()
+			updatebufferdetails()
+			return rgbtorender_color(middlecolor)
+		end)
+
+	file.views["Control Panel"].items["bufheadtaildisplay1"]:set_bounds_callback(
+		function ()
+			updatebufferdetails()
+			local b = emu.render_bounds()
+			b:set_xy(middleboundx0,boundy0,middleboundx1,boundy1)
+			return b
+		end)
+ end)
+
+]]></script>
+
 </mamelayout>
