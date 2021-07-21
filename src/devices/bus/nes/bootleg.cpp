@@ -86,7 +86,7 @@ nes_asn_device::nes_asn_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-nes_smb3p_device::nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_smb3p_device::nes_smb3p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SMB3PIRATE, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
@@ -294,17 +294,17 @@ void nes_smb3p_device::device_start()
 	save_item(NAME(m_irq_count));
 }
 
+void nes_smb3p_device::pcb_start(running_machine &machine, u8 *ciram_ptr, bool cart_mounted)
+{
+	device_nes_cart_interface::pcb_start(machine, ciram_ptr, cart_mounted);
+	// registers reliably boot up with all 1s according to hardware tests
+	for (int i = 0; i < 4; i++)
+		prg8_x(i, 0x1f);
+}
+
 void nes_smb3p_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg8_89((m_prg_chunks << 1) - 1);
-	prg8_ab(0);
-	prg8_cd(0);
-	prg8_ef((m_prg_chunks << 1) - 1);
-	chr8(0, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_count = 0;
+	// registers not cleared or initialized at reset
 }
 
 void nes_batmanfs_device::device_start()
@@ -885,54 +885,41 @@ void nes_smb3p_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 {
 	if (id == TIMER_IRQ)
 	{
-		if (m_irq_enable)
-		{
-			if (m_irq_count == 0xffff)
-			{
-				hold_irq_line();
-				m_irq_enable = 0;
-			}
-			else
-				m_irq_count++;
-		}
+		// counter does not stop when interrupts are disabled
+		if (m_irq_count != 0xffff)
+			m_irq_count++;
+		else if (m_irq_enable)
+			set_irq_line(ASSERT_LINE);
 	}
 }
 
-void nes_smb3p_device::write_h(offs_t offset, uint8_t data)
+void nes_smb3p_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("btl_smb3_w, offset: %04x, data: %02x\n", offset, data));
+
 	switch (offset & 0x0f)
 	{
-		case 0x00:
-		case 0x02:
-			chr1_x(offset & 0x07, data & 0xfe, CHRROM);
+		case 0x00: case 0x01: case 0x02: case 0x03:
+			chr1_x(offset & 0x07, (data & 0x7e) | BIT(offset, 0), CHRROM);
 			break;
-		case 0x01:
-		case 0x03:
-			chr1_x(offset & 0x07, data | 0x01, CHRROM);
-			break;
-		case 0x04: case 0x05:
-		case 0x06: case 0x07:
-			chr1_x(offset & 0x07, data, CHRROM);
+		case 0x04: case 0x05: case 0x06: case 0x07:
+			chr1_x(offset & 0x07, data & 0x7f, CHRROM);
 			break;
 		case 0x08:
-			prg8_89(data | 0x10);
+		case 0x0b:
+			prg8_x(offset & 0x03, (data | 0x10) & 0x1f);
 			break;
 		case 0x09:
-			prg8_ab(data);
-			break;
 		case 0x0a:
-			prg8_cd(data);
-			break;
-		case 0x0b:
-			prg8_ef(data | 0x10);
+			prg8_x(offset & 0x03, data & 0x1f);
 			break;
 		case 0x0c:
-			set_nt_mirroring(BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x0d:
 			m_irq_count = 0;
 			m_irq_enable = 0;
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x0e:
 			m_irq_count = (m_irq_count & 0xff00) | data;
