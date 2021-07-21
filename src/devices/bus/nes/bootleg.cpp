@@ -347,11 +347,6 @@ void nes_batmanfs_device::pcb_reset()
 	m_irq_count = 0;
 }
 
-void nes_btl_cj_device::device_start()
-{
-	common_start();
-}
-
 void nes_btl_cj_device::pcb_reset()
 {
 	prg32((m_prg_chunks >> 1) - 1);    // Last 8K bank is fixed, the rest are swappable
@@ -1015,6 +1010,12 @@ void nes_smb3p_device::write_h(offs_t offset, u8 data)
 
  NES 2.0: mapper 326
 
+ This PCB has swappable 8K banks at 0x8000-0x9fff,
+ 0xa000-0xbfff, and 0xc000-0xdfff and associated
+ registers in those ranges. Selectable 1K banks for
+ both CHRROM and CIRAM are also in registers across
+ upper memory, 0x8000-0xffff, with mask 0x8010.
+
  In MAME: Supported.
 
  TODO: Find out why this crashes in the intro story.
@@ -1030,11 +1031,10 @@ void nes_btl_cj_device::write_h(offs_t offset, u8 data)
 
 	if (BIT(offset, 4))
 	{
-		offset &= 0x0f;
-		if (offset < 0x08)
-			chr1_x(offset, data, CHRROM);
-		else
+		if (BIT(offset, 3))
 			set_nt_page(offset & 0x03, CIRAM, data & 1, 1);
+		else
+			chr1_x(offset & 0x07, data, CHRROM);
 	}
 	else
 	{
