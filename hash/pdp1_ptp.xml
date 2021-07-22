@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Note that there are multiple versions of Spacewar and Munching. The ones used here were chosen at random after confirming they worked.
+
+-->
+<softwarelist name="pdp1_ptp" description="PDP-1 Paper Tape Reader images">
+
+<!-- Spacewar!
+
+Load with Ctrl-Enter
+
+
+Action            Fat Ship    Thin Ship
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Turn Left         S           Right-arrow
+Turn Right        A           Left-arrow
+Thrust            D           Up-arrow
+Fire              F           Down-arrow
+Hyperspace        Z           /
+
+
+Miscellaneous
+~~~~~~~~~~~~~
+Toggle on/off main star and its gravity: Num-6
+Toggle on/off background stars: Num-4  -->
+
+	<software name="spacewar">
+		<description>Spacewar!</description>
+		<year>1962</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Hold Ctrl, hit Enter. Fat ship = S,A,D,F,Z. Thin ship = arrows and slash. See software list for more info." />
+		<part name="ptp" interface="pdp1_ptp">
+			<dataarea name="ptap" size="0x3b0c">
+				<rom name="spacewar.rim" size="0x3b0c" crc="dd16c4c9" sha1="7ab31f3330362b993097ed0d57ad0d6e83c17c6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Munching Squares
+
+Load with Ctrl-Enter
+
+
+At start, it will appear to do nothing. You need to adjust one or more
+of the test-word switches (Ctrl+A/S/D/F/G/H/J/K/L/;/\/Z/X/C/V/B/N).
+
+Ctrl+J,K or L will produce the "expected" square patterns. -->
+
+	<software name="munching">
+		<description>Munching Squares</description>
+		<year>1962</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Hold Ctrl, hit Enter. Press Ctrl J to see patterns. See software list for more info." />
+		<part name="ptp" interface="pdp1_ptp">
+			<dataarea name="ptap" size="0x0036">
+				<rom name="munching.rim" size="0x0036" crc="f0c4436e" sha1="e0ca64612744470107ee3c4fb761a6c2ada96854"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- World's first interactive debugger. Operation is quite complex, recommended to download the manual and go from there. -->
+	<software name="ddt">
+		<description>DDT debugger</description>
+		<year>1964</year>
+		<publisher>DEC</publisher>
+		<info name="usage" value="Hold Ctrl, hit Enter. Download and read the manual." />
+		<part name="ptp" interface="pdp1_ptp">
+			<dataarea name="ptap" size="0x1a6b">
+				<rom name="ddt.rim" size="0x1a6b" crc="1f63add7" sha1="ce6ec048a7523b49af3d59763a47cd6a84cc0d67"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
