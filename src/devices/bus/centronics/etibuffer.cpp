@@ -6,8 +6,6 @@
 #include <cstdlib>
 
 #define ETI_CENTRONICS_TAG "prn"
-#define SCREEN_WIDTH  16
-#define SCREEN_HEIGHT 384
 
 #define STROBE_DELAY 1  // in usec
 #define ACK_DELAY 1     // in usec
@@ -15,22 +13,26 @@
 
 ROM_START( etiprintbuffer_device )
 	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "etibuffer.rom",  0x0000, 0x800, CRC(bd31d7b6) SHA1(cd76a9a53c6b9994c5721f8c393bc782143c6d3f))
+	ROM_LOAD( "etibuffer.rom",  0x0, 0x800, CRC(bd31d7b6) SHA1(cd76a9a53c6b9994c5721f8c393bc782143c6d3f))
 ROM_END
 
 static INPUT_PORTS_START ( etiprintbuffer_device )
 	PORT_START("TEST")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Test Buffer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, test_sw, 0)
+
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Test Buffer") PORT_CODE(KEYCODE_2_PAD)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, test_sw, 0)
+
 	PORT_START("CLEAR")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear Buffer") PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, clear_sw, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Clear Buffer") PORT_CODE(KEYCODE_5_PAD)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, etiprintbuffer_device, clear_sw, 0)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x03, 0x03, "Ram Size")
-//  PORT_CONFSETTING(0x00, "0K (buffer ram test fail)")  // ram size of 0k will pass only 0xFF on to printer, use for ram test failure
+//  ram size of 0k will pass only 0xFF on to printer, use for ram test failure
+//  PORT_CONFSETTING(0x00, "0K (buffer ram test fail)")
 	PORT_CONFSETTING(0x01, "16K")
 	PORT_CONFSETTING(0x02, "32K")
 	PORT_CONFSETTING(0x03, "48K")
-
 INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(ETIPRINTBUFFER, etiprintbuffer_device, "etiprintbuffer", "Electronics Today International Print Buffer 48K")

@@ -141,9 +141,11 @@ copyright-holders:Golden Child
 <script><![CDATA[
 
 -- file is the layout file object
+--[[
 print("LAYOUT LOADED  file.device.name = "..file.device.name)
 print("LAYOUT LOADED  file.device.shortname = "..file.device.shortname)
 print("LAYOUT LOADED  file.device.tag = = "..file.device.tag)
+--]]
 
 function min(a,b) if a<b then return a else return b end end
 function max(a,b) if a>b then return a else return b end end
@@ -206,12 +208,13 @@ file:set_resolve_tags_callback(
 		if bufheadx >= buftailx then
 				middleboundx0 = buftailx
 				middleboundx1 = bufheadx
-				middlecolor,fullcolor = 0xffffff,0x000000  -- middle bar white, full bar black
+				-- choose bar colors: middle bar white, full bar black
+				middlecolor,fullcolor = 0xffffff,0x000000
 		else
 				middleboundx0 = bufheadx
 				middleboundx1 = buftailx
-				middlecolor,fullcolor = iif(bufferfull,0xff0000,0x000000),iif(bufferfull,0xffffff,0xffffff)
-				-- full bar white, middle bar black/red
+				-- choose bar colors: full bar white/pink, middle bar black/red
+				middlecolor,fullcolor = iif(bufferfull,0xff0000,0x000000),iif(bufferfull,0xffcccc,0xffffff)
 		end
 	end -- updatebufferdetails
 
