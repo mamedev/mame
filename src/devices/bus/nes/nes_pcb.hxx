@@ -305,6 +305,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_2708",         UNL_2708 },
 	{ "unl_dh08",         UNL_DH08 },
 	{ "unl_le05",         UNL_LE05 },
+	{ "unl_lg25",         UNL_LG25 },
 	{ "unl_lh10",         UNL_LH10 },
 	{ "unl_lh28_lh54",    UNL_LH28_LH54 },
 	{ "unl_lh31",         UNL_LH31 },

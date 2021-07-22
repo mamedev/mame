@@ -516,7 +516,7 @@ static const nes_mmc mmc_list[] =
 	{ 554, KAISER_KS7010 },        // Akumajo Dracula FDS conversion
 	// 555 retroUSB re-release of 1991 Nintendo Campus Challenge
 	// 556 JY-215 multicart
-	// { 557, KAISER_KS7xxx or UNL_LG25? },        // Kaiser Moero TwinBee FDS conversion
+	{ 557, UNL_LG25 },             // Moero TwinBee FDS conversion
 	// 558 some games on YC-03-09 board (related to mappers 162-164)
 	// 559...4095 Unused
 };

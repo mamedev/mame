@@ -53,6 +53,7 @@ DEFINE_DEVICE_TYPE(NES_PALTHENA,       nes_palthena_device,  "nes_palthena",  "N
 DEFINE_DEVICE_TYPE(NES_TOBIDASE,       nes_tobidase_device,  "nes_tobidase",  "NES Cart Tobidase Daisakusen Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_DH08,           nes_dh08_device,      "nes_dh08",      "NES Cart DH-08 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LE05,           nes_le05_device,      "nes_le05",      "NES Cart LE05 Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_LG25,           nes_lg25_device,      "nes_lg25",      "NES Cart LG25 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH10,           nes_lh10_device,      "nes_lh10",      "NES Cart LH10 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_LH28_LH54,      nes_lh28_lh54_device, "nes_lh28_lh54", "NES Cart LH28/LH54 Pirate PCBs")
 DEFINE_DEVICE_TYPE(NES_LH31,           nes_lh31_device,      "nes_lh31",      "NES Cart LH31 Pirate PCB")
@@ -163,6 +164,11 @@ nes_lh31_device::nes_lh31_device(const machine_config &mconfig, const char *tag,
 
 nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_LH32, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_lg25_device::nes_lg25_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_LG25, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -498,6 +504,21 @@ void nes_lh32_device::pcb_reset()
 	prg32((m_prg_chunks - 1) >> 1);
 	// 0xc000-0xdfff reads/writes WRAM
 	m_latch = 0xf;
+}
+
+void nes_lg25_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_lg25_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(m_prg_chunks - 1);    // Last 16K is fixed
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
 }
 
 void nes_lh10_device::device_start()
@@ -1522,6 +1543,42 @@ void nes_lh32_device::write_h(offs_t offset, uint8_t data)
 
 	if (offset >= 0x4000 && offset < 0x6000)
 		m_prgram[offset & 0x1fff] = data;
+}
+
+/*-------------------------------------------------
+
+ UNL-LG25
+
+ Games: Moero TwinBee Cinnamon Hakase o Sukue! (FDS conversion)
+
+ In addition to the two swappable 8K PRG banks at
+ 0x8000 and 0xa000, this board has 8K WRAM at 0x6000.
+
+ NES 2.0: mapper 557
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_lg25_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("lg25 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 0))
+	{
+		switch (m_latch)
+		{
+			case 1:
+				set_nt_mirroring(BIT(data, 2) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				break;
+			case 2:
+			case 3:
+				prg8_x(m_latch & 1, data & 0x0f);
+				break;
+		}
+	}
+	else
+		m_latch = data & 0x03;
 }
 
 /*-------------------------------------------------

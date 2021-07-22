@@ -66922,6 +66922,26 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="moetwfds">
+		<description>Moero TwinBee - Cinnamon Hakase o Sukue! (FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LG25"/>
+		<info name="alt_title" value="もえろツインビー シナモン博士を救え!"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lg25" />
+			<dataarea name="prg" size="131072">
+				<rom name="moetwfds.prg" size="131072" crc="55f24a46" sha1="b995f2fa2e1723a6e14b824a2e9a112668ced9db" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="montyfds">
 		<description>Monty no Doki Doki Daidassou (Asia, FDS conversion)</description>
 		<year>19??</year>
