@@ -182,7 +182,12 @@ file:set_resolve_tags_callback(
 	local middleboundx1 = boundx0
 	local middlecolor = 0xffffff
 	local fullcolor = 0x000000
-	local rgbtorender_color = function (c) return emu.render_color(1.0, (c>>16) & 0xff, (c>>8) & 0xff,(c>>0) & 0xff) end  -- 1.0 is opaque
+	local rgbtorender_color = function (c)
+		return emu.render_color(1.0, -- 1.0 is opaque
+								((c>>16) & 0xff) / 255.0, -- red from 0.0 to 1.0
+								((c>>8)  & 0xff) / 255.0, -- green
+								((c>>0)  & 0xff) / 255.0) -- blue
+		end
 
 	local updatebufferdetails = function()
 		local pc = file.device:subdevice("maincpu").state["PC"].value
@@ -209,12 +214,13 @@ file:set_resolve_tags_callback(
 				middleboundx0 = buftailx
 				middleboundx1 = bufheadx
 				-- choose bar colors: middle bar white, full bar black
-				middlecolor,fullcolor = 0xffffff,0x000000
+				middlecolor, fullcolor = 0xffffff, 0x000000
 		else
 				middleboundx0 = bufheadx
 				middleboundx1 = buftailx
-				-- choose bar colors: full bar white/pink, middle bar black/red
-				middlecolor,fullcolor = iif(bufferfull,0xff0000,0x000000),iif(bufferfull,0xffcccc,0xffffff)
+				-- choose bar colors: full bar white   (reddish white when buffer full),
+				--                    middle bar black (red when buffer full)
+				middlecolor,fullcolor = iif(bufferfull, 0xff0000, 0x000000), iif(bufferfull, 0xffaaaa, 0xffffff)
 		end
 	end -- updatebufferdetails
 
