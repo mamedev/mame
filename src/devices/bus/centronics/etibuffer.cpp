@@ -88,8 +88,8 @@ void etiprintbuffer_device::etiprintbuffer_device_iomap(address_map &map)
 
 uint8_t etiprintbuffer_device::eti_status_r(offs_t offset)
 {
-	return ((m_strobereceived ? 1 : 0 ) << 6) | // d6 is m_strobe status
-			((m_busy          ? 0 : 1 ) << 7);  // d7 is not busy output
+	return  ((m_strobereceived ? 1 : 0 ) << 6) | // d6 is m_strobe status
+			((m_busy           ? 0 : 1 ) << 7);  // d7 is not busy output
 }
 
 uint8_t etiprintbuffer_device::eti_read_1000(offs_t offset)
@@ -218,13 +218,13 @@ INPUT_CHANGED_MEMBER(etiprintbuffer_device::test_sw)
 
 WRITE_LINE_MEMBER( etiprintbuffer_device::busy_w )
 {
-	m_busy = (state == 1) ? true : false;
+	m_busy = state;
 	m_printerready_led = !m_busy;
 }
 
 WRITE_LINE_MEMBER( etiprintbuffer_device::input_strobe )
 {
-	if (m_strobe == true && state == 0)
+	if (m_strobe && !state)
 	{
 		m_datalatch = m_data;
 
