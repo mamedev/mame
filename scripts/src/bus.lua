@@ -1692,6 +1692,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx_cart/disk.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/dooly.cpp",
 		MAME_DIR .. "src/devices/bus/msx_cart/dooly.h",
+		MAME_DIR .. "src/devices/bus/msx_cart/easi_speech.cpp",
+		MAME_DIR .. "src/devices/bus/msx_cart/easi_speech.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/fmpac.cpp",
 		MAME_DIR .. "src/devices/bus/msx_cart/fmpac.h",
 		MAME_DIR .. "src/devices/bus/msx_cart/fs_sr022.cpp",

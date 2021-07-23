@@ -9,6 +9,7 @@
 #include "crossblaim.h"
 #include "disk.h"
 #include "dooly.h"
+#include "easi_speech.h"
 #include "fmpac.h"
 #include "fs_sr022.h"
 #include "halnote.h"
@@ -47,6 +48,7 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("fs_sr022", MSX_CART_FS_SR022);
 	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
+	device.option_add_internal("easispeech", MSX_CART_EASISPEECH);
 	device.option_add_internal("cross_blaim", MSX_CART_CROSSBLAIM);
 	device.option_add_internal("korean_80in1", MSX_CART_KOREAN_80IN1);
 	device.option_add_internal("korean_90in1", MSX_CART_KOREAN_90IN1);
