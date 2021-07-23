@@ -916,6 +916,9 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 			m_mask = data & 0x0f;
 
 			LOG("AM9517A Mask Register: %01x\n", m_mask);
+
+			// tek4132 firmware indicates setting mask bits also sets status
+			m_status |= (data & 0x0f) << 4;
 			break;
 		}
 	}
