@@ -861,7 +861,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only Euro is confirmed -->
 	<software name="barkley">
 		<description>Barkley Shut Up and Jam! (Euro, USA)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="ACSGPC291 REV B"/>
@@ -966,7 +966,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="beavis">
 		<description>Beavis and Butt-Head (Euro)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>
@@ -1956,7 +1956,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Both Euro and USA are confirmed -->
 	<software name="desrtdem">
 		<description>Desert Demolition (Euro, USA)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="Desert Demolition Starring Road Runner and Wile E. Coyote (Box)"/>
 		<part name="cart" interface="megadriv_cart">
@@ -3259,7 +3259,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only Euro is confirmed -->
 	<software name="genchaos">
 		<description>General Chaos (Euro, USA)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H"/>
@@ -4713,7 +4713,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only Euro confirmed -->
 	<software name="madden94">
 		<description>Madden NFL '94 (Euro, USA)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -5254,7 +5254,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="muhammad">
 		<description>Muhammad Ali Heavyweight Boxing (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -5834,7 +5834,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="mansell">
 		<description>Nigel Mansell's World Championship Racing (Euro)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536"/>
@@ -9003,7 +9003,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only Euro is confirmed -->
 	<software name="warlock">
 		<description>Warlock (Euro, USA)</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128 REV 1"/>
@@ -9076,7 +9076,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="wimbled">
 		<description>Wimbledon Championship Tennis (Euro)</description>
-		<year>1994</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5979-A"/>
@@ -11773,8 +11773,8 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="bestofp" cloneof="bestof">
-		<description>Best of the Best - Championship Karate (Euro, Prototype)</description>
-		<year>1993</year>
+		<description>Best of the Best - Championship Karate (Euro, prototype)</description>
+		<year>1992</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -32319,7 +32319,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="cnc">
 		<description>Command &amp; Conquer (Prototype)</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1598086">
