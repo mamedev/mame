@@ -11,11 +11,16 @@
 
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*
-    driver init function
+
+TODO:
+- due to no known software, it is unknown if this system is capable of running anything.
+
 */
+
 void tx0_state::init_tx0()
 {
 	static const unsigned char fontdata6x8[tx0_fontdata_size] =
@@ -372,6 +377,8 @@ public:
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+	virtual const char *image_interface() const noexcept override { return "tx0_ptp"; }
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
 	// device-level overrides
@@ -1577,6 +1584,8 @@ void tx0_state::tx0_64kw(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
+
+	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp");
 }
 
 void tx0_state::tx0_8kw(machine_config &config)
