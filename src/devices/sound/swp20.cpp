@@ -69,10 +69,12 @@ u8 swp20_device::snd_r(offs_t offset)
 
 void swp20_device::snd_w(offs_t offset, u8 data)
 {
+	// Registers 0-f are global, 10-3f per-voice
 	switch(offset) {
 	case 0x01:
 		m_voice = data & 0x1f;
 		break;
+
 	case 0x04: case 0x05: case 0x06: case 0x07: {
 		int off = 8*(offset & 3);
 		u32 mask = 0xff << off;
@@ -87,6 +89,13 @@ void swp20_device::snd_w(offs_t offset, u8 data)
 		logerror("keyoff %08x\n", m_keyoff);
 		break;
 	}
+
+
+	case 0x10: // freq high
+		break;
+	case 0x11: // freq low
+		break;
+
 	default:
 		logerror("w %02x.%02x, %02x %s\n", m_voice, offset, data, machine().describe_context());
 	}
