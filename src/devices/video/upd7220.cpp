@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation
@@ -189,25 +189,6 @@ const tiny_rom_entry *upd7220_device::device_rom_region() const
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
-
-//-------------------------------------------------
-//  readbyte - read a byte at the given address
-//-------------------------------------------------
-
-inline uint8_t upd7220_device::readbyte(offs_t address)
-{
-	return space().read_byte(address);
-}
-
-
-//-------------------------------------------------
-//  writebyte - write a byte at the given address
-//-------------------------------------------------
-
-inline void upd7220_device::writebyte(offs_t address, uint8_t data)
-{
-	space().write_byte(address, data);
-}
 
 inline uint16_t upd7220_device::readword(offs_t address)
 {
@@ -455,7 +436,7 @@ inline void upd7220_device::reset_figs_param()
 //-------------------------------------------------
 inline uint16_t upd7220_device::read_vram()
 {
-	uint16_t const data = readword(m_ead*2);
+	uint16_t const data = readword(m_ead);
 	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 	m_ead &= 0x3ffff;
 
@@ -502,41 +483,44 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 //-------------------------------------------------
 inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data)
 {
+	uint16_t current = readword(m_ead);
+
 	switch(mod & 3)
 	{
 		case 0x00: //replace
 			if(type == 0)
-				writeword(m_ead*2+0, data);
+				current = data;
 			if(type == 2)
-				writebyte(m_ead*2+0, data & 0xff);
+				current = (current & 0xff00) | (data & 0xff);
 			if(type == 3)
-				writebyte(m_ead*2+1, data >> 8);
+				current = (current & 0xff) | (data & 0xff00);
 			break;
 		case 0x01: //complement
 			if(type == 0)
-				writeword(m_ead*2+0, readword(m_ead*2+0) ^ data);
+				current = current ^ data;
 			if(type == 2)
-				writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (data & 0xff));
+				current = current ^ (data & 0xff);
 			if(type == 3)
-				writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (data >> 8));
+				current = current ^ (data & 0xff00);
 			break;
 		case 0x02: //reset to zero
 			if(type == 0)
-				writeword(m_ead*2+0, readword(m_ead*2+0) & ~data);
+				current = current & ~data;
 			if(type == 2)
-				writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(data & 0xff));
+				current = current & ~(data & 0xff);
 			if(type == 3)
-				writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(data >> 8));
+				current = current & ~(data & 0xff00);
 			break;
 		case 0x03: //set to one
 			if(type == 0)
-				writeword(m_ead*2+0, readword(m_ead*2+0) | data);
+				current = current | data;
 			if(type == 2)
-				writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (data & 0xff));
+				current = current | (data & 0xff);
 			if(type == 3)
-				writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (data >> 8));
+				current = current | (data & 0xff00);
 			break;
 	}
+	writeword(m_ead, current);
 
 	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 	m_ead &= 0x3ffff;
@@ -656,7 +640,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, 0, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
+	m_space_config("videoram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(upd7220_device::upd7220_vram), this))
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -814,25 +798,26 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void upd7220_device::draw_pixel(int x, int y, int xi, uint16_t tile_data)
 {
-	uint32_t addr = ((y * (m_pitch << (m_figs.m_gd ? 0 : 1))) + (x >> 3)) & 0x3ffff;
+	uint32_t addr = (((y * (m_pitch >> m_figs.m_gd)) + (x >> 4))) & 0x3ffff;
 	uint16_t data = readword(addr);
 	uint16_t new_pixel = (tile_data & (1 << (xi & 0xf))) ? (1 << (x & 0xf)) : 0;
 
 	switch(m_bitmap_mod)
 	{
 		case 0: //replace
-			writeword(addr, (data & ~(1 << (x & 0xf))) | new_pixel);
+			data = (data & ~(1 << (x & 0xf))) | new_pixel;
 			break;
 		case 1: //complement
-			writeword(addr, data ^ new_pixel);
+			data = data ^ new_pixel;
 			break;
 		case 2: //reset
-			writeword(addr, data & ~new_pixel);
+			data = data & ~new_pixel;
 			break;
 		case 3: //set
-			writeword(addr, data | new_pixel);
+			data = data | new_pixel;
 			break;
 	}
+	writeword(addr, data);
 }
 
 
@@ -1706,7 +1691,7 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int
 		if((sx << 4) < m_aw * 16 && y < al)
 			m_display_cb(bitmap, y, sx << 4, addr);
 
-		addr+= (wd + 1) * 2;
+		addr+= (wd + 1);
 	}
 }
 
@@ -1754,12 +1739,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
 				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
-				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
+				uint32_t const addr = (sad & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch >> (mixed ? 1 : 0)));
 				for(int z = 0; z <= m_disp; ++z)
 				{
 					int yval = (y*zoom)+z + (bsy + m_vbp);
 					if(!m_display_cb.isnull() && yval <= cliprect.bottom())
-						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch << interlace));
+						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch >> (mixed ? 1 : 0)));
 				}
 			}
 		}

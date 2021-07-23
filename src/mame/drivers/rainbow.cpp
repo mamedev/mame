@@ -844,18 +844,18 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 	if (m_gdc_mode_register & GDC_MODE_HIGHRES)
 	{
 		address = ( m_gdc_scroll_buffer[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-		plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
-		plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
+		plane0 = m_video_ram[((address & 0x3fff) + 0x0000)];
+		plane1 = m_video_ram[((address & 0x3fff) + 0x8000)];
 		plane2 = plane3 = 0;
 	}
 	else
 	{
 		address = ( m_gdc_scroll_buffer[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 		// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 -or 4- MONOCHROME SHADES)
-		plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
-		plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
-		plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
-		plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
+		plane0 = m_video_ram[((address & 0x1fff) + 0x00000)];
+		plane1 = m_video_ram[((address & 0x1fff) + 0x08000)];
+		plane2 = m_video_ram[((address & 0x1fff) + 0x10000)];
+		plane3 = m_video_ram[((address & 0x1fff) + 0x18000)];
 	}
 
 	bool mono = (m_monitor_suggested == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR; 4 = AUTO

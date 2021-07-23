@@ -51,7 +51,7 @@ private:
 UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	int const gfx[3] = { m_vram[(address + 0x00000) >> 1], m_vram[(address + 0x10000) >> 1], m_vram[(address + 0x20000) >> 1] };
+	int const gfx[3] = { m_vram[(address + 0x00000)], m_vram[(address + 0x8000)], m_vram[(address + 0x10000)] };
 
 	for(u8 i=0; i<16; i++)
 	{

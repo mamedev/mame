@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl
+// copyright-holders:Angelo Salese, Miodrag Milanovic, Carl, Brian Johnson
 /**********************************************************************
 
     NEC uPD7220 Graphics Display Controller emulation
@@ -100,8 +100,6 @@ private:
 		TIMER_BLANK
 	};
 
-	inline uint8_t readbyte(offs_t address);
-	inline void writebyte(offs_t address, uint8_t data);
 	inline uint16_t readword(offs_t address);
 	inline void writeword(offs_t address, uint16_t data);
 	inline void fifo_clear();
