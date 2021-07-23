@@ -49,7 +49,8 @@ namespace ymfm
 // OPM register map:
 //
 //      System-wide registers:
-//           01 xxxxxxxx Test register
+//           01 xxxxxx-x Test register
+//              ------x- LFO reset
 //           08 -x------ Key on/off operator 4
 //              --x----- Key on/off operator 3
 //              ---x---- Key on/off operator 2
@@ -172,6 +173,7 @@ public:
 
 	// system-wide registers
 	uint32_t test() const                            { return byte(0x01, 0, 8); }
+	uint32_t lfo_reset() const                       { return byte(0x01, 1, 1); }
 	uint32_t noise_frequency() const                 { return byte(0x0f, 0, 5); }
 	uint32_t noise_enable() const                    { return byte(0x0f, 7, 1); }
 	uint32_t timer_a_value() const                   { return word(0x10, 0, 8, 0x11, 0, 2); }

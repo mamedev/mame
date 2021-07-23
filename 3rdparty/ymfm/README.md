@@ -11,39 +11,42 @@ It has been tested on gcc, clang, and Microsoft Visual C++ 2019.
 
 Currently, support is present for the following chips (organized by header file):
 
+* ymfm_misc.h:
+	* YM2149 (SSG) [1983: MSX; Atari ST]
 * ymfm_opm.h:
-	* YM2151 (OPM)
-	* YM2164 (OPP)
+	* YM2151 (OPM) [1983: Sharp X1, X68000; MSX; synths: DX21, DX27, DX100]
+	* YM2164 (OPP) [1985: FB-01 MIDI Expander; IBM Music Feature Card; MSX; synths: Korg DS-8, 707]
 * ymfm_opn.h:
-	* YM2149 (SSG)
-	* YM2203 (OPN)
-	* YM2608 (OPNA)
-	* YM2610 (OPNB)
+	* YM2203 (OPN) [1984: NEC PC-88, PC-98, NEC PC-6001mkII SR, PC-6601 SR]
+	* YM2608 (OPNA) [1985: NEC PC-88, PC-98]
+	* YM2610 (OPNB) [1987: Neo Geo]
 	* YM2610B (OPNB2)
-	* YM2612 (OPN2)
+	* YM2612 (OPN2) [1988: Sega Mega Drive/Genesis; FM Towns]
 	* YM3438 (OPN2C)
 	* YMF276 (OPN2L)
-	* YMF288 (OPN3L)
+	* YMF288 (OPN3L) [1995: NEC PC-98]
 * ymfm_opl.h:
-	* YM3526 (OPL)
-	* Y8950 (MSX-Audio)
-	* YM3812 (OPL2)
-	* YMF262 (OPL3)
+	* YM3526 (OPL) [1984: C64 SFX Sound Expander]
+	* Y8950 (MSX-Audio) [1984: MSX]
+	* YM3812 (OPL2) [1985: AdLib, Sound Blaster; synths: some Portasound keyboards]
+	* YMF262 (OPL3) [1988: Sound Blaster Pro 2.0, SB16]
 	* YMF289B (OPL3L)
-	* YMF278B (OPL4)
-	* YM2413 (OPLL)
+	* YMF278B (OPL4) [1993: MSX Moonsound cartridge]
+	* YM2413 (OPLL) [1986: Sega Master System, Mark III; MSX; synths: Portasound PSS-140, PSS-170, PSS-270]
 	* YM2423 (OPLL-X)
 	* YMF281 (OPLLP)
-	* DS1001 (Konami 053982)
+	* DS1001 (Konami 053982/VRC7) [1991: Famicom cartridge Lagrange Point]
 * ymfm_opq.h:
-	* YM3806 (OPQ) -- preliminary
+	* YM3806 (OPQ) [synths: PSR-60/70]
 * ymfm_opz.h:
-	* YM2414 (OPZ) -- preliminary
+	* YM2414 (OPZ) [1987: synths: TX81Z, DX11, YS200; Korg Z3 guitar synth]
 
 There are some obviously-related chips that also are on my horizon but have no implementation as yet:
 
 * YMW-258-F 'GEW8' (aka Sega 315-5560 aka Sega Multi-PCM)
 * YMF271 (OPX)
+* YM21280 (OPS) / YM21290 (EGS) [synths: DX7, DX1, DX5, DX9, TX7, TX216, TX416, TX816]
+* OPK?
 
 ## History
 

@@ -557,14 +557,14 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d", chnum, opnum);
+	end += sprintf(end, "%u.%02u", chnum, opnum);
 
 	if (op_fix_mode(opoffs))
 		end += sprintf(end, " fixfreq=%X fine=%X shift=%X", op_fix_frequency(opoffs), op_fine(opoffs), op_fix_range(opoffs));
 	else
-		end += sprintf(end, " freq=%04X dt2=%d fine=%X", ch_block_freq(choffs), op_detune2(opoffs), op_fine(opoffs));
+		end += sprintf(end, " freq=%04X dt2=%u fine=%X", ch_block_freq(choffs), op_detune2(opoffs), op_fine(opoffs));
 
-	end += sprintf(end, " dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += sprintf(end, " dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		op_detune(opoffs),
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
@@ -580,30 +580,30 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		ch_output_1(choffs) ? 'R' : '-');
 
 	if (op_eg_shift(opoffs) != 0)
-		end += sprintf(end, " egshift=%d", op_eg_shift(opoffs));
+		end += sprintf(end, " egshift=%u", op_eg_shift(opoffs));
 
 	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
+		end += sprintf(end, " am=%u/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
 	bool pm = (lfo_pm_depth() != 0 && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
+		end += sprintf(end, " pm=%u/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
 
 	bool am2 = (lfo2_am_depth() != 0 && ch_lfo2_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am2)
-		end += sprintf(end, " am2=%d/%02X", ch_lfo2_am_sens(choffs), lfo2_am_depth());
+		end += sprintf(end, " am2=%u/%02X", ch_lfo2_am_sens(choffs), lfo2_am_depth());
 	bool pm2 = (lfo2_pm_depth() != 0 && ch_lfo2_pm_sens(choffs) != 0);
 	if (pm2)
-		end += sprintf(end, " pm2=%d/%02X", ch_lfo2_pm_sens(choffs), lfo2_pm_depth());
+		end += sprintf(end, " pm2=%u/%02X", ch_lfo2_pm_sens(choffs), lfo2_pm_depth());
 	if (am2 || pm2)
 		end += sprintf(end, " lfo2=%02X/%c", lfo2_rate(), "WQTN"[lfo2_waveform()]);
 
 	if (op_reverb_rate(opoffs) != 0)
-		end += sprintf(end, " rev=%d", op_reverb_rate(opoffs));
+		end += sprintf(end, " rev=%u", op_reverb_rate(opoffs));
 	if (op_waveform(opoffs) != 0)
-		end += sprintf(end, " wf=%d", op_waveform(opoffs));
+		end += sprintf(end, " wf=%u", op_waveform(opoffs));
 	if (noise_enable() && opoffs == 31)
 		end += sprintf(end, " noise=1");
 
