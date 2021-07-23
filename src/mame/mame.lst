@@ -40586,6 +40586,7 @@ tek4109a                        //
 tek4404                         // (c) 1984 Tektronix
 
 @source:tekigw.cpp
+tek4132                         // Tektronix 4132
 tek6130                         // Tektronix 6130
 
 @source:tekxp33x.cpp
