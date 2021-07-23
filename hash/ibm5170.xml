@@ -11631,15 +11631,73 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="krustyfh">
-		<description>Krusty's Fun House</description>
+	<software name="f15se3">
+		<description>F-15 Strike Eagle III (3.5")</description>
 		<year>1993</year>
-		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
-		<info name="developer" value="Audiogenic Software" />
-		<info name="ported by" value="Denton Designs" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Krusty's Fun House [Acclaim] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4a41461f" sha1="21e1ef6a7806d3620366baf1b84fa43e71c13617"/>
+		<publisher>MicroProse</publisher>
+		<info name="version" value="4108.03" />
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="736c95a6" sha1="a368f0e6675d3dbc888cfd938f09ab91392bb470"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="da5843d6" sha1="f3d28523c2dd5fe9002e08aae93c4ad5531047fb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="e162c4a8" sha1="b7ca8b1333987c6ed6f9bd2d5e5ce07ff8a5b2b8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="c5aef7a6" sha1="adeff1091f7e23ebf63a69aca0c61cdeb6fae9a9"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1474560">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="f73c888c" sha1="8b4a9c99a6ca4ca5e02928c82b511b371ff9d351"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f15se3_525" cloneof="f15se3">
+		<description>F-15 Strike Eagle III (5.25")</description>
+		<year>1993</year>
+		<publisher>MicroProse</publisher>
+		<info name="version" value="4108.01" />
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 1 of 6].img" size="1228800" crc="0bf0d6c3" sha1="51b109c7242adbfef56cc3210ca0c46bd90fccc1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 2 of 6].img" size="1228800" crc="59c5b7c7" sha1="fb19f56a3e6c09c8ff9ccfdf05035a58047e5c0a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 3 of 6].img" size="1228800" crc="bebf6d4c" sha1="248091f7b81a67e502a2cfc062b9abb391dd10ff"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 4 of 6].img" size="1228800" crc="bc6bdaf9" sha1="86204f3b741069824a0add17f368d2fe1b541313"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 5 of 6].img" size="1228800" crc="e465eb9e" sha1="c645e0915c78fb989a1307c76d1e62c9e07d50cb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 6 of 6].img" size="1228800" crc="d1cd9a0e" sha1="55ce734443ae1a3915204c76fafc48b67a01cd1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11825,6 +11883,29 @@ license:CC0
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa">
+		<description>FIFA International Soccer</description>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="FIFA International Soccer [Electronic Arts] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="b4d88c47" sha1="b6f4e91bb50de79afa991c6871f9113e485e33db" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="FIFA International Soccer [Electronic Arts] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="d4f6b4b7" sha1="c4a07cb44656d62ae3542afbd052c16fdcea1651" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="FIFA International Soccer [Electronic Arts] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="ace0bd64" sha1="7ff2c4fcbe305f057a3095a1d03cabee486e50b3" />
 			</dataarea>
 		</part>
 	</software>
@@ -13500,6 +13581,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="krustyfh">
+		<description>Krusty's Fun House</description>
+		<year>1993</year>
+		<publisher>Virgin Interactive Entertainment (Europe)</publisher>
+		<info name="developer" value="Audiogenic Software" />
+		<info name="ported by" value="Denton Designs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Krusty's Fun House [Acclaim] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="4a41461f" sha1="21e1ef6a7806d3620366baf1b84fa43e71c13617"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="legacy">
 		<description>The Legacy: Realm of Terror (Euro)</description>
 		<year>1993</year>
@@ -14408,6 +14502,90 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mightmg4">
+		<description>Might and Magic: Clouds of Xeen</description>
+		<year>1992</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="New World Computing" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 1 of 6].img" size="1474560" crc="aaab2595" sha1="f7b2ad8ba831adf771135f3e68f7ceeb7814a08b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 2 of 6].img" size="1474560" crc="7f7d68cc" sha1="82f9531f050ddc85eb0ec144b0b269adc5c3f065"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 3 of 6].img" size="1474560" crc="bd2e01d7" sha1="526601654f9af138d89a1e0f8d1c90bda4d4f7ab"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 4 of 6].img" size="1474560" crc="a6b8f744" sha1="2dc5d47d22a1effaa26d77118ea3974032d9fff0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 5 of 6].img" size="1474560" crc="a2fe2d23" sha1="61e7c8ec3d95517912a68aa96e1f19b2786a7bdb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Clouds of Xeen [NWC] [1992] [1992] [Disk 6 of 6].img" size="1474560" crc="06d0b688" sha1="726a6a453b8e748bfd37b6594d8424948e034d42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmg5">
+		<description>Might and Magic: Darkside of Xeen</description>
+		<year>1993</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="New World Computing" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="39864a48" sha1="26fbe387d88a49098bc6e9ba162af00575b1127c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 2 of 8].img" size="1474560" crc="ee6b46fe" sha1="ae34ae6f8b3a4252b8275d9d7d67cd9331a7286b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 3 of 8].img" size="1474560" crc="e30cd5a9" sha1="fb16d242a3814c528236e7062f5262f62e32004b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 4 of 8].img" size="1474560" crc="214a0304" sha1="18889806a4574b5f482749244c90e55366f90e55"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 5 of 8].img" size="1474560" crc="e7dd86ce" sha1="7f12f2b5c1c4d3a1ddb1e188649fa14924b9b2d2"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 6 of 8].img" size="1474560" crc="d0257a15" sha1="0dec5e38e59b7d2bb9e1d15e6850eb5fe898e4cd"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 7 of 8].img" size="1474560" crc="874fd074" sha1="45b6170b37731f07a1559d9d087059a85de02b93"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Might and Magic - Darkside of Xeen [NWC] [1993] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="b4bf3f18" sha1="645ff70bda55a7d39da285916ebfac487160d32a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mission">
 		<!-- converted from DDI format -->
 		<description>Mission (Traditional Chinese)</description>
@@ -14630,6 +14808,22 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Monster Bash [Apogee Software] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="a0a74726" sha1="939a65b36dc258a4d7746701f6eed4f74eeef709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonston">
+		<description>Moonstone - A Hard Days Knight</description>
+		<year>1992</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Moonstone [Mindscape] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="0be422b0" sha1="97d8799913fe9717818190337d540ec2620db23d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Moonstone [Mindscape] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5e79cd01" sha1="22026083c67db0fd1257814ab4b284cb9c1e8520"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14904,6 +15098,39 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="panzergn">
+		<description>Panzer General</description>
+		<year>1994</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="Version 1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Panzer General [SSI] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="dce3f66b" sha1="a0e7aa12f608d86bfde955c99ea6339f06ac33e3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Panzer General [SSI] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="5f41b4d2" sha1="420cdee3b52450915659556ae6eed5733f6efa90"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Panzer General [SSI] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="e5f164ea" sha1="c349813f671052aedcfffd33966d6ffdbf22797e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Panzer General [SSI] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="5513427d" sha1="405167fa3bb8cf82b69e4ff35c3e28eeac47893a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Panzer General [SSI] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="e880f856" sha1="f55bec3813ce0ef74e04eb55ebf3592a0968f88c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pbfant">
 		<description>Pinball Fantasies</description>
 		<year>1994</year>
@@ -15032,6 +15259,65 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Police Quest in Pursuit of the Death Angel (VGA) [Sierra] [1992] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="2d5eedea" sha1="effb9ca42378507ac7880882d927460b8ae61249"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="populus2">
+		<description>Populous 2: Trials of the Olympian Gods (3.5")</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Populous 2 [Electronic Arts] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="ecb0a260" sha1="e4abbc29415440cb352f963c88e9c01184acfd08"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Populous 2 [Electronic Arts] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="50e3a8e5" sha1="08051367f78d1ecab5246faeccd9f1871b61cc16"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Populous 2 [Electronic Arts] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="1fa04187" sha1="1a660ae72336e6f1a8b5bcf539fd89a7bfb4bdaa"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Populous 2 [Electronic Arts] [1993] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="04bb96ca" sha1="2d2bc30ebe4cb050188977f831f2ecd9e9ab7f1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="populus2_525" cloneof="populus2">
+		<description>Populous 2: Trials of the Olympian Gods (5.25")</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Populous 2 [Electronic Arts] [1993] [5.25HD] [Disk 1 of 5].img" size="1228800" crc="613d13aa" sha1="2ea8fc8688b70a6ef858ae3457e87a7a8ca62aec"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Populous 2 [Electronic Arts] [1993] [5.25HD] [Disk 2 of 5].img" size="1228800" crc="4962b1d6" sha1="0c6432b595916c45ec912820c1b7de4a2d887605"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Populous 2 [Electronic Arts] [1993] [5.25HD] [Disk 3 of 5].img" size="1228800" crc="d063f139" sha1="e2b1fe80e757dccf28941d225771e21686842d34"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Populous 2 [Electronic Arts] [1993] [5.25HD] [Disk 4 of 5].img" size="1228800" crc="be650c1a" sha1="091b311405be674e27cc750abbc49f697f2232b0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Populous 2 [Electronic Arts] [1993] [5.25HD] [Disk 5 of 5].img" size="1228800" crc="3e9e8f85" sha1="e123d4543ab5d5895e0f9ab65dc73a3f8fa25fff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15401,6 +15687,33 @@ license:CC0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Rise of the Triad [Apogee] [1995] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="6652c413" sha1="d45dee8251dbcb20e96397905f823642ac00624f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop3">
+		<description>Robocop 3"</description>
+		<year>1992</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="Digital Image Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 1 of 4] [Disk A].img" size="1474560" crc="7cbfe1fa" sha1="ceb0753583af8e79dd8d327aec9311518f91d261"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 2 of 4] [Disk B].img" size="1474560" crc="1f121e28" sha1="9fd78576e7e45b8f41f4d56dd524197c841ce780"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 3 of 4] [Disk C].img" size="1474560" crc="4fc50a60" sha1="4af0ab94e05e99f7041fde74dd7c09e680dafb2d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Robocop 3 [Ocean] [1992] [3.5HD] [Disk 4 of 4] [Disk D].img" size="1474560" crc="f8b8cc0b" sha1="21ae96f4bdb9c0e88b8dfd2dffc3ba6a1cb247f4"/>
 			</dataarea>
 		</part>
 	</software>
