@@ -24,7 +24,8 @@ license:CC0
 	</software>
 
 	<software name="nextstep_0_9" supported="no">
-		<!-- hangs while loading from disk -->
+		<!-- next hangs while loading from disk -->
+		<!-- nexts panics during loading from disk with a zero divide -->
 		<description>NeXTSTEP 0.9</description>
 		<year>1988</year>
 		<publisher>NeXT</publisher>
@@ -37,7 +38,8 @@ license:CC0
 	</software>
 
 	<software name="nextstep_1_0" supported="no">
-		<!-- never completes loading from disk -->
+		<!-- next never completes loading from disk -->
+		<!-- nexts panics during loading from disk with a zero divide -->
 		<description>NeXTSTEP 1.0</description>
 		<year>1989</year>
 		<publisher>NeXT</publisher>
@@ -50,7 +52,8 @@ license:CC0
 	</software>
 
 	<software name="nextstep_1_0a" supported="no">
-	  <!-- never completes loading from disk -->
+		<!-- next never completes loading from disk -->
+		<!-- nexts panics during loading from disk with a zero divide -->
 		<description>NeXTSTEP 1.0a</description>
 		<year>1989</year>
 		<publisher>NeXT</publisher>
@@ -110,8 +113,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nextstep_3_1" supported="no">
-		<!-- never completes checking system files -->
+	<software name="nextstep_3_1">
 		<description>NeXTSTEP 3.1</description>
 		<year>1993</year>
 		<publisher>NeXT</publisher>
@@ -123,8 +125,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="nextstep_3_2" supported="no">
-		<!-- Fatal error: M680x0: FMOVEM: mode 3 unimplemented at 06033FFE -->
+	<software name="nextstep_3_2">
 		<description>NeXTSTEP 3.2</description>
 		<year>1993</year>
 		<publisher>NeXT</publisher>
