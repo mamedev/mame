@@ -369,13 +369,13 @@ static const nes_mmc mmc_list[] =
 	{ 332, BMC_WS },
 	// 333 BMC_8IN1 and BMC-NEWSTAR-GRM070-8IN1 multicarts
 	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
-	// 335 BMC-CTC-09 10-in-1, not in nes.xml?
-	// 336 BMC-K-3046 11-in-1, not in nes.xml?
-	// 337 BMC-CTC-12IN1 multicart, not in nes.xml?
-	// 338 BMC-SA005-A multicarts, not in nes.xml?
+	{ 335, BMC_CTC09 },
+	{ 336, BMC_K3046 },
+	// { 337, BMC_CTC_12IN1 }, not in nes.xml
+	{ 338, BMC_SA005A },
 	// 339 BMC-K-3006 21-in-1, not in nes.xml?
 	// 340 BMC-K-3036 35-in-1, not in nes.xml?
-	// 341 BMC-TJ-03 4-in-1, not in nes.xml?
+	{ 341, BMC_TJ03 },
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?
 	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
@@ -384,7 +384,7 @@ static const nes_mmc mmc_list[] =
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 	{ 348, BMC_830118C },
 	{ 349, BMC_G146 },
-	// 350 BMC-891227 multicart
+	// { 350, BMC_891227 }, not in nes.xml
 	// 351 JY/Techline 9-in-1
 	// 352 Kaiser 4-in-1 KS106C
 	// 353 Super Mario Family multicart

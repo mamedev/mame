@@ -362,9 +362,13 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_d1038",        NES_VT5201); // mapper 60?
 	device.option_add_internal("810544c",          NES_810544C);
 	device.option_add_internal("ntd03",            NES_NTD03);
+	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
 	device.option_add_internal("bmc_gb63",         NES_BMC_GB63);
 	device.option_add_internal("bmc_gka",          NES_BMC_GKA);
 	device.option_add_internal("bmc_gkb",          NES_BMC_GKB);
+	device.option_add_internal("bmc_k3046",        NES_BMC_K3046);
+	device.option_add_internal("bmc_sa005a",       NES_BMC_SA005A);
+	device.option_add_internal("bmc_tj03",         NES_BMC_TJ03);
 	device.option_add_internal("bmc_ws",           NES_BMC_WS);
 	device.option_add_internal("bmc_g146",         NES_BMC_G146);
 	device.option_add_internal("bmc_11160",        NES_BMC_11160);

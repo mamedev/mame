@@ -77377,6 +77377,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_10c09">
+		<description>10 in 1 (CTC-09)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_ctc09" />
+			<dataarea name="prg" size="262144">
+				<rom name="10-in-1 (ctc-09)(unl).prg" size="262144" crc="bc585bd0" sha1="22f208ffefe9b0e6675e605a55ed12542ca1b7c9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="10-in-1 (ctc-09)(unl).chr" size="131072" crc="f9242c9d" sha1="c838cd75a1bc62ca93cf0dd69bad5246962ada1d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_10m">
 		<description>10000000 in 1</description>
 		<year>19??</year>
@@ -77440,6 +77455,22 @@ be better to redump them properly. -->
 			<feature name="pcb" value="BMC-BALLGAMES-11IN1" />
 			<dataarea name="prg" size="524288">
 				<rom name="11-in-1 ball games.prg" size="524288" crc="1b177d1e" sha1="489f344a61ed71ae6223be605c16993e23454d30" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_11k46">
+		<description>11 in 1 (K-3046)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3046" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="11-in-1 (k-3046)(unl).prg" size="524288" crc="d330cd7e" sha1="100553175ed21bb30db95377caeb9314dee5b6f7" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -77806,6 +77837,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_16sa5">
+		<description>16 in 1 (SA005-A)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_sa005a" />
+			<dataarea name="prg" size="262144">
+				<rom name="16-in-1 (sa005-a)(unl).prg" size="262144" crc="cd0afbe2" sha1="3a4d033fb4bfbd13699e4bae6633e70a5c2b5ba9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="16-in-1 (sa005-a)(unl).chr" size="131072" crc="cd62b4f9" sha1="b0bc49645dbd0e1dd22bc74a21327437d5f500d8" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78891,6 +78937,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4tj03">
+		<description>4 in 1 (TJ-03)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tj03" />
+			<dataarea name="prg" size="131072">
+				<rom name="4-in-1 (tj-03)(unl).prg" size="131072" crc="09f4de0b" sha1="06bf299ce068166ab0f6041a1625bf96f1cc9f2d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="4-in-1 (tj-03)(unl).chr" size="32768" crc="c0b5369f" sha1="f90eb3125ec73d0f65d0257792f51815d7339252" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
