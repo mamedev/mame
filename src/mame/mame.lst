@@ -16468,7 +16468,6 @@ bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
 cmsport                         // Conic
-cmulti8                         // Canon
 cnbaskb                         // Conic
 cnfball                         // Conic
 cnfball2                        // Conic
@@ -16515,6 +16514,8 @@ mdndclab                        // Mattel
 merlin                          // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
+palmf31                         // Canon
+palmmd8                         // Canon
 pbmastm                         // Parker Bros
 phpball                         // Tomy
 qfire                           // Electroplay
