@@ -1334,6 +1334,11 @@ ampscarp                        // Motorola Amps Car Phone
 amspdwy                         // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 amspdwya                        // no copyright notice, but (c) 1987 Enerdyne Technologies, Inc.
 
+@source:amstr_megapc.cpp
+megapc                          // 1992 Amstrad plc Mega PC
+megapcpl                        // Amstrad  Mega PC
+megapcpla                       // AMI BIOS version with Winbond WINBUS chipset, 486SLC
+
 @source:amstr_pc.cpp
 pc20                            // 1988 Amstrad PC20
 pc200                           // 1988 Sinclair PC200

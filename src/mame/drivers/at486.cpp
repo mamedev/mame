@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Miodrag Milanovic
 /***************************************************************************
+
+IBM AT compatibles using a 486 class CPU
+split from at.cpp
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -23,7 +27,7 @@
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
-#include "machine/wd7600.h"
+// #include "machine/wd7600.h"
 #include "emupal.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -61,57 +65,6 @@ protected:
 	void ficpio_map(address_map &map);
 };
 
-class at486_vrom_fix_state : public at486_state
-{
-public:
-	using at486_state::at486_state;
-
-	void init_megapcpla();
-
-	// void ibmps1(machine_config &config);
-	void megapcpla(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-};
-
-class megapc_state : public driver_device
-{
-public:
-	megapc_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_wd7600(*this, "wd7600"),
-		m_isabus(*this, "isabus"),
-		m_speaker(*this, "speaker")
-	{ }
-
-	void megapcpl(machine_config &config);
-	void megapc(machine_config &config);
-
-	void init_megapc();
-	void init_megapcpl();
-
-private:
-	required_device<cpu_device> m_maincpu;
-	required_device<ram_device> m_ram;
-	required_device<wd7600_device> m_wd7600;
-	required_device<isa16_device> m_isabus;
-	required_device<speaker_sound_device> m_speaker;
-
-	uint16_t wd7600_ior(offs_t offset);
-	void wd7600_iow(offs_t offset, uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
-	void wd7600_tc(offs_t offset, uint8_t data) { m_isabus->eop_w(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
-	void megapc_io(address_map &map);
-	void megapc_map(address_map &map);
-	void megapcpl_io(address_map &map);
-	void megapcpl_map(address_map &map);
-};
-
-
 void at486_state::at486_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -147,33 +100,6 @@ void at486_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-void megapc_state::init_megapc()
-{
-	uint8_t* ROM = memregion("bios")->base();
-	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
-	ROM[0x1fea0] = 0x20;  // to correct checksum
-}
-
-void megapc_state::init_megapcpl()
-{
-	uint8_t* ROM = memregion("bios")->base();
-	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
-	ROM[0x1fea0] = 0x20;  // to correct checksum
-}
-
-void at486_vrom_fix_state::init_megapcpla()
-{
-	uint8_t* ROM = memregion("bios")->base();
-
-	init_at486_common(0xa0000);
-
-	ROM[0x33c2a] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
-	ROM[0x3af37] = 0x45;
-	ROM[0x3cf1b] = 0x54;  // this will allow the keyboard to work during the POST memory test
-	ROM[0x3fffe] = 0x1c;
-	ROM[0x3ffff] = 0x41;  // to correct checksum
-}
-
 void at486_state::at486l_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -181,49 +107,6 @@ void at486_state::at486l_map(address_map &map)
 	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
 	map(0x00800000, 0x00800bff).ram().share("nvram");
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0x20000);
-}
-
-uint16_t megapc_state::wd7600_ior(offs_t offset)
-{
-	if (offset < 4)
-		return m_isabus->dack_r(offset);
-	else
-		return m_isabus->dack16_r(offset);
-}
-
-void megapc_state::wd7600_iow(offs_t offset, uint16_t data)
-{
-	if (offset < 4)
-		m_isabus->dack_w(offset, data);
-	else
-		m_isabus->dack16_w(offset, data);
-}
-
-WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
-{
-	// halt cpu
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	// and acknowledge hold
-	m_wd7600->hlda_w(state);
-}
-
-void megapc_state::megapc_map(address_map &map)
-{
-}
-
-void megapc_state::megapcpl_map(address_map &map)
-{
-}
-
-void megapc_state::megapc_io(address_map &map)
-{
-	map.unmap_value_high();
-}
-
-void megapc_state::megapcpl_io(address_map &map)
-{
-	map.unmap_value_high();
 }
 
 /**********************************************************
@@ -244,14 +127,6 @@ void at486_state::init_at486_common(int xmsbase)
 		offs_t ram_limit = 0x100000 + m_ram->size() - xmsbase;
 		space.install_ram(0x100000,  ram_limit - 1, m_ram->pointer() + xmsbase);
 	}
-}
-
-void at486_vrom_fix_state::machine_start()
-{
-	at486_state::machine_start();
-
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_rom(0xc0000, 0xcffff, machine().root_device().memregion("bios")->base());
 }
 
 void at486_state::init_at486()
@@ -362,138 +237,9 @@ void at486_state::ficpio2(machine_config &config)
 	chipset.set_isatag("isa");
 }
 
-void at486_vrom_fix_state::megapcpla(machine_config &config)
-{
-	i486_device &maincpu(I486(config, m_maincpu, 66'000'000 / 2));  // 486SLC
-	maincpu.set_addrmap(AS_PROGRAM, &at486_vrom_fix_state::at486l_map);
-	maincpu.set_addrmap(AS_IO, &at486_vrom_fix_state::at486_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	AT_MB(config, m_mb).at_softlists(config);
-	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);
-	// ISA cards
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", false);  // closest to the CL-GD5420
-	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
-	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("4M").set_extra_options("2M,8M,15M,16M,32M,64M,128M,256M");
-
-	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("megapc");
-}
-
-void megapc_state::megapc(machine_config &config)
-{
-	i386sx_device &maincpu(I386SX(config, m_maincpu, 50_MHz_XTAL / 2));
-	maincpu.set_addrmap(AS_PROGRAM, &megapc_state::megapc_map);
-	maincpu.set_addrmap(AS_IO, &megapc_state::megapc_io);
-	maincpu.set_irq_acknowledge_callback("wd7600", FUNC(wd7600_device::intack_cb));
-
-	WD7600(config, m_wd7600, 50_MHz_XTAL / 2);
-	m_wd7600->set_cputag(m_maincpu);
-	m_wd7600->set_isatag("isa");
-	m_wd7600->set_ramtag(m_ram);
-	m_wd7600->set_biostag("bios");
-	m_wd7600->set_keybctag("keybc");
-	m_wd7600->hold_callback().set(FUNC(megapc_state::wd7600_hold));
-	m_wd7600->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_wd7600->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_wd7600->cpureset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
-	m_wd7600->a20m_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
-	// isa dma
-	m_wd7600->ior_callback().set(FUNC(megapc_state::wd7600_ior));
-	m_wd7600->iow_callback().set(FUNC(megapc_state::wd7600_iow));
-	m_wd7600->tc_callback().set(FUNC(megapc_state::wd7600_tc));
-	// speaker
-	m_wd7600->spkr_callback().set(FUNC(megapc_state::wd7600_spkr));
-
-	// on board devices
-	ISA16(config, m_isabus, 0);
-	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
-	m_isabus->set_iospace(m_maincpu, AS_IO);
-	m_isabus->iochck_callback().set(m_wd7600, FUNC(wd7600_device::iochck_w));
-	m_isabus->irq2_callback().set(m_wd7600, FUNC(wd7600_device::irq09_w));
-	m_isabus->irq3_callback().set(m_wd7600, FUNC(wd7600_device::irq03_w));
-	m_isabus->irq4_callback().set(m_wd7600, FUNC(wd7600_device::irq04_w));
-	m_isabus->irq5_callback().set(m_wd7600, FUNC(wd7600_device::irq05_w));
-	m_isabus->irq6_callback().set(m_wd7600, FUNC(wd7600_device::irq06_w));
-	m_isabus->irq7_callback().set(m_wd7600, FUNC(wd7600_device::irq07_w));
-	m_isabus->irq10_callback().set(m_wd7600, FUNC(wd7600_device::irq10_w));
-	m_isabus->irq11_callback().set(m_wd7600, FUNC(wd7600_device::irq11_w));
-	m_isabus->irq12_callback().set(m_wd7600, FUNC(wd7600_device::irq12_w));
-	m_isabus->irq14_callback().set(m_wd7600, FUNC(wd7600_device::irq14_w));
-	m_isabus->irq15_callback().set(m_wd7600, FUNC(wd7600_device::irq15_w));
-	m_isabus->drq0_callback().set(m_wd7600, FUNC(wd7600_device::dreq0_w));
-	m_isabus->drq1_callback().set(m_wd7600, FUNC(wd7600_device::dreq1_w));
-	m_isabus->drq2_callback().set(m_wd7600, FUNC(wd7600_device::dreq2_w));
-	m_isabus->drq3_callback().set(m_wd7600, FUNC(wd7600_device::dreq3_w));
-	m_isabus->drq5_callback().set(m_wd7600, FUNC(wd7600_device::dreq5_w));
-	m_isabus->drq6_callback().set(m_wd7600, FUNC(wd7600_device::dreq6_w));
-	m_isabus->drq7_callback().set(m_wd7600, FUNC(wd7600_device::dreq7_w));
-
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
-	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
-	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
-	ISA16_SLOT(config, "board5", 0, "isabus", pc_isa16_cards, "vga", true);
-	// ISA cards
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, nullptr, false);
-
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", 12_MHz_XTAL));
-	keybc.hot_res().set("wd7600", FUNC(wd7600_device::kbrst_w));
-	keybc.gate_a20().set("wd7600", FUNC(wd7600_device::gatea20_w));
-	keybc.kbd_irq().set("wd7600", FUNC(wd7600_device::irq01_w));
-	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
-
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
-	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	// video hardware
-	PALETTE(config, "palette").set_entries(256); // todo: really needed?
-
-	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("megapc");
-}
-
-void megapc_state::megapcpl(machine_config &config)
-{
-	megapc(config);
-	i486_device &maincpu(I486(config.replace(), m_maincpu, 66'000'000 / 2));
-	maincpu.set_addrmap(AS_PROGRAM, &megapc_state::megapcpl_map);
-	maincpu.set_addrmap(AS_IO, &megapc_state::megapcpl_io);
-	maincpu.set_irq_acknowledge_callback("wd7600", FUNC(wd7600_device::intack_cb));
-}
-
-//**************************************************************************
-//  ROM DEFINITIONS
-//**************************************************************************
+/***************************************************************************
+  ROM definitions
+***************************************************************************/
 
 //**************************************************************************
 //  IBM systems
@@ -530,34 +276,6 @@ void megapc_state::megapcpl(machine_config &config)
 ROM_START( ibm2133 )
 	ROM_REGION32_LE( 0x20000, "bios", 0 )
 	ROM_LOAD( "ps1_2133_52g2974_rom.bin", 0x00000, 0x20000, CRC(89fc7600) SHA1(758e161353f6781c39ac67f1ba293c14038b17dc))
-ROM_END
-
-
-//**************************************************************************
-//  Amstrad systems
-//**************************************************************************
-
-// Amstrad MegaPC
-ROM_START( megapc )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD16_BYTE( "41651-bios lo.u18",  0x00000, 0x10000, CRC(1e9bd3b7) SHA1(14fd39ec12df7fae99ccdb0484ee097d93bf8d95))
-	ROM_LOAD16_BYTE( "211253-bios hi.u19", 0x00001, 0x10000, CRC(6acb573f) SHA1(376d483db2bd1c775d46424e1176b24779591525))
-ROM_END
-
-// Amstrad MegaPC Plus
-ROM_START( megapcpl )
-	ROM_REGION(0x40000, "isa", ROMREGION_ERASEFF)
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD16_BYTE( "41652.u18",  0x00000, 0x10000, CRC(6f5b9a1c) SHA1(cae981a35a01234fcec99a96cb38075d7bf23474))
-	ROM_LOAD16_BYTE( "486slc.u19", 0x00001, 0x10000, CRC(6fb7e3e9) SHA1(c439cb5a0d83176ceb2a3555e295dc1f84d85103))
-ROM_END
-
-// Amstrad MegaPC Plus (Winbond chipset)
-ROM_START( megapcpla )
-	ROM_REGION32_LE(0x40000, "bios", 0)
-	ROM_LOAD( "megapc_bios.bin",  0x00000, 0x10000, CRC(b84938a2) SHA1(cecab72a96993db4f7c648c229b4211a8c53a380))
-	ROM_CONTINUE(0x30000, 0x10000)
 ROM_END
 
 //**************************************************************************
@@ -2504,166 +2222,163 @@ ROM_END
   Game driver(s)
 ***************************************************************************/
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT  CLASS         INIT           COMPANY        FULLNAME                FLAGS
-COMP( 1993, megapc,    0,       0,       megapc,    0,     megapc_state, init_megapc,    "Amstrad plc", "MegaPC", MACHINE_NOT_WORKING )
-COMP( 199?, megapcpl,  megapc,  0,       megapcpl,  0,     megapc_state, init_megapcpl,  "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
-COMP( 199?, megapcpla, megapc,  0,       megapcpla, 0,     at486_vrom_fix_state, init_megapcpla, "Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
-COMP( 199?, 486apio,   at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "486 APIO", MACHINE_NOT_WORKING )
-COMP( 199?, 486ccv,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Diamond Flower, Inc. (DFI)", "486-CCV", MACHINE_NOT_WORKING )
-COMP( 199?, 486igb21,  at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486IG-B-2-1", MACHINE_NOT_WORKING )
-COMP( 199?, 486wb6a3,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Silicon Valley Computer, Inc.", "486WB6A3.B1", MACHINE_NOT_WORKING )
-COMP( 199?, 4dmshl3g,  at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "4DMS HL3G-L4-VI", MACHINE_NOT_WORKING )
-COMP( 199?, 4dmuhl3s,  at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "4DMU HL3S", MACHINE_NOT_WORKING )
-COMP( 1992, a433cc,    at486, 0,       at486,     0,     at486_state,     init_at486,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
-COMP( 1994, a486ap4,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PVI-486AP4", MACHINE_NOT_WORKING )
-COMP( 199?, a486isa,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486", MACHINE_NOT_WORKING )
-COMP( 199?, a486sio,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486SIO rev. 1.2", MACHINE_NOT_WORKING )
-COMP( 1994, a486sp3,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PVI-486SP3", MACHINE_NOT_WORKING )
-COMP( 1994, a486sp3g,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PCI/I-486SP3G", MACHINE_NOT_WORKING )
-COMP( 199?, a486sv2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486SV2", MACHINE_NOT_WORKING )
-COMP( 1994, a486sv2g,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "VL/I-486SV2G", MACHINE_NOT_WORKING )
-COMP( 1994, a486sv1,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "VL/EISA-486SV1", MACHINE_NOT_WORKING )
-COMP( 1995, aa486s,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PCI/I-A486S", MACHINE_NOT_WORKING )
-COMP( 199?, abae4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "486 EISA-AE4", MACHINE_NOT_WORKING )
-COMP( 199?, abah4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
-COMP( 199?, abav4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AV4", MACHINE_NOT_WORKING )
-COMP( 199?, abax4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AX4", MACHINE_NOT_WORKING )
-COMP( 199?, abpb4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )
-COMP( 199?, abpi4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PI4", MACHINE_NOT_WORKING )
-COMP( 199?, abpm4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PM4", MACHINE_NOT_WORKING )
-COMP( 199?, abpv4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PV4", MACHINE_NOT_WORKING )
-COMP( 199?, abpw4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PW4", MACHINE_NOT_WORKING )
-COMP( 199?, alator2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Alaris",      "Tornado 2", MACHINE_NOT_WORKING )
-COMP( 199?, alim1489,  at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the ALi 1487/1489 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, amient2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-II", MACHINE_NOT_WORKING )
-COMP( 199?, amient3,   at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-III", MACHINE_NOT_WORKING )
-COMP( 199?, amient4,   at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-IV", MACHINE_NOT_WORKING )
-COMP( 199?, amisvpci2, at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager PCI-II", MACHINE_NOT_WORKING )
-COMP( 199?, amisvvlb,  at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB", MACHINE_NOT_WORKING )
-COMP( 199?, amisvvlb2, at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB-II", MACHINE_NOT_WORKING )
-COMP( 199?, amisvvlb3, at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB-III", MACHINE_NOT_WORKING )
-COMP( 199?, aoap43,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Aopen", "AP43",  MACHINE_NOT_WORKING )
-COMP( 199?, aovi15g,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Aopen", "VI15G", MACHINE_NOT_WORKING )
-COMP( 1992, aplsbon,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1992, aplscar,   at486, 0,       at486l,    0,     at486_state,     init_at486,        "Apricot",     "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1991, aprfte,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1992, aprpand,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
-COMP( 1989, apvxft,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot VX FT server", MACHINE_NOT_WORKING )
-COMP( 1993, apxena1,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1991, apxenls3,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1993, apxenp2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
-COMP( 1993, apxlsam,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
-COMP( 199?, ar4glx3,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Addtech Research", "4GLX3 Green-B 4GPV3.1", MACHINE_NOT_WORKING )
-COMP( 199?, as496,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Arstoria",    "AS496", MACHINE_NOT_WORKING )
-COMP( 1990, at486,     0,     ibm5150, at486,     0,     at486_state,     init_at486,        "<generic>",   "PC/AT 486 (25 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
-COMP( 199?, atc1415,   at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1415", MACHINE_NOT_WORKING )
-COMP( 199?, atc1425a,  at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425A", MACHINE_NOT_WORKING )
-COMP( 199?, atc1425b,  at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425B", MACHINE_NOT_WORKING )
-COMP( 199?, bluenote,  at486,       0, at486,  0,     at486_state,  init_at486,    "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
-COMP( 199?, ch48633c,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-486-33C", MACHINE_NOT_WORKING )
-COMP( 199?, ch486spm,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "486SPM", MACHINE_NOT_WORKING )
-COMP( 199?, ch491e,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-491E", MACHINE_NOT_WORKING )
-COMP( 199?, ch4slez1,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "486SLE M106 4SLE-Z1", MACHINE_NOT_WORKING )
-COMP( 199?, ch4spi,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "4SPI", MACHINE_NOT_WORKING )
-COMP( 199?, comt486,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines",  "Tower 486", MACHINE_NOT_WORKING )
-COMP( 199?, dt486,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines", "DT486", MACHINE_NOT_WORKING )
-COMP( 199?, ec4913,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UC4913 REV:1.1", MACHINE_NOT_WORKING )
-COMP( 199?, ec4915aio, at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UC4915 A AIO", MACHINE_NOT_WORKING )
-COMP( 199?, ed486vl3h, at486, 0,       at486,     0,     at486_state,     init_at486,        "Edom", "486VL3H", MACHINE_NOT_WORKING )
-COMP( 199?, edmv035f,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Edom", "MV035F", MACHINE_NOT_WORKING )
-COMP( 199?, exp4044,   at486, 0,       at486,     0,     at486_state,     init_at486,        "ExpertChip", "EXP4044", MACHINE_NOT_WORKING )
-COMP( 199?, f4dxluc4,  at486, 0,       at486,     0,     at486_state,     init_at486,        "ADI", "F4DXL-UC4", MACHINE_NOT_WORKING )
-COMP( 199?, fic4386vchd,at486,0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
-COMP( 199?, fic4386vcv,at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "4386-VC-V", MACHINE_NOT_WORKING )
-COMP( 199?, fic486gvt, at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-GVT", MACHINE_NOT_WORKING )
-COMP( 199?, fic486kvd, at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486 KVD", MACHINE_NOT_WORKING )
-COMP( 199?, fic486vchd,at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VC-HD", MACHINE_NOT_WORKING )
-COMP( 199?, ficeli6ii, at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "FIC ELI6-II", MACHINE_NOT_WORKING )
-COMP( 1994, ficgiovt2, at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-GIO-VT2", MACHINE_NOT_WORKING )
-COMP( 1995, ficpio2,   at486, 0,       ficpio2,   0,     at486_state,     init_at486pci,     "First International Computer", "486-PIO-2", MACHINE_NOT_WORKING )
-COMP( 1994, ficvipio,  at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
-COMP( 199?, ficvipio2, at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
-COMP( 1995, ft486f55,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Freetech", "486FT55", MACHINE_NOT_WORKING )
-COMP( 1991, ftsserv,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
-COMP( 199?, ga486am,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486AM/S", MACHINE_NOT_WORKING )
-COMP( 199?, ga486vf,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486VF", MACHINE_NOT_WORKING )
-COMP( 199?, ga486vs,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486VS", MACHINE_NOT_WORKING )
-COMP( 199?, gc10a,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Eagle", "EAGLEN486 GC10A", MACHINE_NOT_WORKING )
-COMP( 199?, gete486vl, at486, 0,       at486,     0,     at486_state,     init_at486,        "GENOA",       "TurboExpress 486 VL", MACHINE_NOT_WORKING )
-COMP( 199?, gmb486sg,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Gemlight", "GMB-486SG v2.2", MACHINE_NOT_WORKING )
-COMP( 199?, gmb486unp, at486, 0,       at486,     0,     at486_state,     init_at486,        "Gemlight", "GMB-486UNP v2.1", MACHINE_NOT_WORKING )
-COMP( 199?, hot409,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
-COMP( 199?, hot419,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-419", MACHINE_NOT_WORKING )
-COMP( 199?, hot433,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-433", MACHINE_NOT_WORKING )
-COMP( 199?, ibm2133,   at486, 0,       at486,     0,     at486_state,     init_at486,        "International Business Machines",  "PS/1 2133", MACHINE_NOT_WORKING )
-COMP( 199?, jakms41,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Jamicon", "KM-S4-1 VER 1.1", MACHINE_NOT_WORKING )
-COMP( 199?, jwj403tg,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Jetway", "J-403TG", MACHINE_NOT_WORKING )
-COMP( 199?, jwj446a,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Jetway",      "J-446A", MACHINE_NOT_WORKING )
-COMP( 1993, lion3500,  at486, 0,       at486,  0,     at486_state,  init_at486,    "Lion",        "3500", MACHINE_NOT_WORKING )
-COMP( 199?, ls486e,    at486, 0,       at486,     0,     at486_state,     init_at486,        "LuckyStar",   "LS-486E Rev:C", MACHINE_NOT_WORKING )
-COMP( 199?, lsucm486v30,at486,0,       at486,     0,     at486_state,     init_at486,        "Lucky Star", "UCM-486V30", MACHINE_NOT_WORKING )
-COMP( 199?, mb1433aeap,at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433/50 AEA-P - V:1", MACHINE_NOT_WORKING )
-COMP( 199?, mb1433ucv, at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433UCV", MACHINE_NOT_WORKING )
-COMP( 199?, mb1433uiv, at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433UIV", MACHINE_NOT_WORKING )
-COMP( 199?, mb4d33,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
-COMP( 199?, mb8433uud, at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB8433-UUD-A", MACHINE_NOT_WORKING ) // boots to Award BootBlock BIOS
-COMP( 199?, mba029,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "MBA-029", MACHINE_NOT_WORKING )
-COMP( 199?, md4duvc,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Aquarius System (ASI)", "MD-4DUV VER:2.1", MACHINE_NOT_WORKING )
-COMP( 199?, mijx30gp,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Micronics",   "JX30GP, Motherboard P/N: 09-00189-10 REV B1", MACHINE_NOT_WORKING )
-COMP( 199?, ms4125,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4125", MACHINE_NOT_WORKING )
-COMP( 199?, ms4132,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4132 G VER:1", MACHINE_NOT_WORKING )
-COMP( 199?, ms4134,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4134", MACHINE_NOT_WORKING )
-COMP( 199?, ms4138,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4138", MACHINE_NOT_WORKING )
-COMP( 199?, ms4144,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4144", MACHINE_NOT_WORKING )
-COMP( 199?, ms4145,    at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4145", MACHINE_NOT_WORKING )
-COMP( 199?, nat48pv,   at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "NAT48PV-1.00 VL", MACHINE_NOT_WORKING )
-COMP( 199?, ncr3433,   at486, 0,       at486,  0,     at486_state,  init_at486,    "NCR", "Class 3433", MACHINE_NOT_WORKING )
-COMP( 199?, ochawk,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hawk", MACHINE_NOT_WORKING )
-COMP( 199?, ochipcom,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo COM", MACHINE_NOT_WORKING )
-COMP( 1994, ochipdca2, at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo DCA2", MACHINE_NOT_WORKING )
-COMP( 199?, ochipvlp,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo VL+", MACHINE_NOT_WORKING )
-COMP( 199?, op82c392,  at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, pc70iii,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
-COMP( 199?, pc9486,    at486, 0,       at486,  0,     at486_state,  init_at486,    "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
-COMP( 199?, pccm912,   at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M912", MACHINE_NOT_WORKING )
-COMP( 199?, pccm915i,  at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M915i", MACHINE_NOT_WORKING )
-COMP( 199?, pccm919,   at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
-COMP( 1993, pcd4nd,    at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
-COMP( 1995, pcd4nl,    at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
-COMP( 199?, pcd4x,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
-COMP( 199?, pci48af,   at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC Research Corporation", "PCI48AF", MACHINE_NOT_WORKING )
-COMP( 199?, pck486dx,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Peacock",  "PCK 486 DX", MACHINE_NOT_WORKING )
-COMP( 199?, pg750eisa, at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
-COMP( 199?, pkm0038s,  at486, 0,       at486,     0,     at486_state,     init_at486,        "DTK", "PKM-0038S aka Gemlight GMB-486SG", MACHINE_NOT_WORKING )
-COMP( 199?, pm486pu,   at486, 0,       at486,     0,     at486_state,     init_at486,        "PROTECH",  "PM486PU-S7", MACHINE_NOT_WORKING )
-COMP( 199?, pt430,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Pine Technology", "PT-430", MACHINE_NOT_WORKING )
-COMP( 199?, pt432b,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Pine Technology", "PT-432b aka SR-M401-A", MACHINE_NOT_WORKING )
-COMP( 199?, ptmb457,   at486, 0,       at486,     0,     at486_state,     init_at486,        "PowerTech", "MB457", MACHINE_NOT_WORKING )
-COMP( 199?, pwaih4077c,at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "PWA-IH4077C", MACHINE_NOT_WORKING )
-COMP( 199?, pwaih4077d,at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "PWA-IH4077D", MACHINE_NOT_WORKING )
-COMP( 199?, px486p3,   at486, 0,       at486,     0,     at486_state,     init_at486,        "QDI", "PX486P3", MACHINE_NOT_WORKING )
-COMP( 1990, qi900,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
-COMP( 199?, sis85c471, at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, sis85c496, at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, sm48650usc,at486, 0,       at486,     0,     at486_state,     init_at486,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
-COMP( 199?, so025d2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025D2", MACHINE_NOT_WORKING )
-COMP( 199?, so025k2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025K2", MACHINE_NOT_WORKING )
-COMP( 199?, so025r2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025R2", MACHINE_NOT_WORKING )
-COMP( 199?, so30h,     at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "30H", MACHINE_NOT_WORKING )
-COMP( 199?, so4saw2,   at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "SY-4SAW2", MACHINE_NOT_WORKING )
-COMP( 199?, sto486wb,  at486, 0,       at486,     0,     at486_state,     init_at486,        "See-Thru", "Sto486Wb aka AUVA Cam-33-P2", MACHINE_NOT_WORKING )
-COMP( 199?, td4ipaio,  at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "TD-4IP-UMC-AIO", MACHINE_NOT_WORKING )
-COMP( 199?, tmpat48pg4,at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48PG4", MACHINE_NOT_WORKING )
-COMP( 199?, tmpat48av, at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48AV", MACHINE_NOT_WORKING )
-COMP( 199?, ts34t25,   at486, 0,       at486,  0,     at486_state,  init_at486,    "Highscreen",  "486-25", MACHINE_NOT_WORKING )
-COMP( 199?, um486,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
-COMP( 199?, um486v,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
-COMP( 199?, um8810paio,at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM8810 PAIO", MACHINE_NOT_WORKING )
-COMP( 199?, um8886,    at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, um8498f,   at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
-COMP( 199?, uni4800,   at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UNI4800 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, uniwb4407, at486, 0,       at486,     0,     at486_state,     init_at486,        "UNICHIP", "486 WB 4407 REV 1.0", MACHINE_NOT_WORKING )
-COMP( 199?, v4p895p3,  at486, 0,       at486,     0,     at486_state,     init_at486,        "QDI", "V4P895P3/SMT V5.0", MACHINE_NOT_WORKING )
-COMP( 199?, via4386vio,at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "Via 4386 VIO / Highscreen universal board", MACHINE_NOT_WORKING )
-COMP( 199?, zi4dvs,    at486, 0,       at486,     0,     at486_state,     init_at486,        "ZIDA", "4DVS", MACHINE_NOT_WORKING )
-COMP( 199?, zito4dps,  at486, 0,       at486,     0,     at486_state,     init_at486,        "ZIDA", "Tomato board 4DPS", MACHINE_NOT_WORKING )
+//    YEAR  NAME          PARENT   COMPAT   MACHINE    INPUT  CLASS         INIT           COMPANY        FULLNAME                FLAGS
+COMP( 199?, 486apio,      at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "486 APIO", MACHINE_NOT_WORKING )
+COMP( 199?, 486ccv,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Diamond Flower, Inc. (DFI)", "486-CCV", MACHINE_NOT_WORKING )
+COMP( 199?, 486igb21,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486IG-B-2-1", MACHINE_NOT_WORKING )
+COMP( 199?, 486wb6a3,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Silicon Valley Computer, Inc.", "486WB6A3.B1", MACHINE_NOT_WORKING )
+COMP( 199?, 4dmshl3g,     at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "4DMS HL3G-L4-VI", MACHINE_NOT_WORKING )
+COMP( 199?, 4dmuhl3s,     at486, 0,       at486,     0,     at486_state,     init_at486,        "EFA",   "4DMU HL3S", MACHINE_NOT_WORKING )
+COMP( 1992, a433cc,       at486, 0,       at486,     0,     at486_state,     init_at486,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
+COMP( 1994, a486ap4,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PVI-486AP4", MACHINE_NOT_WORKING )
+COMP( 199?, a486isa,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486", MACHINE_NOT_WORKING )
+COMP( 199?, a486sio,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486SIO rev. 1.2", MACHINE_NOT_WORKING )
+COMP( 1994, a486sp3,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PVI-486SP3", MACHINE_NOT_WORKING )
+COMP( 1994, a486sp3g,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PCI/I-486SP3G", MACHINE_NOT_WORKING )
+COMP( 199?, a486sv2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "ISA-486SV2", MACHINE_NOT_WORKING )
+COMP( 1994, a486sv2g,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "VL/I-486SV2G", MACHINE_NOT_WORKING )
+COMP( 1994, a486sv1,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "VL/EISA-486SV1", MACHINE_NOT_WORKING )
+COMP( 1995, aa486s,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Asus",        "PCI/I-A486S", MACHINE_NOT_WORKING )
+COMP( 199?, abae4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "486 EISA-AE4", MACHINE_NOT_WORKING )
+COMP( 199?, abah4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
+COMP( 199?, abav4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AV4", MACHINE_NOT_WORKING )
+COMP( 199?, abax4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-AX4", MACHINE_NOT_WORKING )
+COMP( 199?, abpb4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )
+COMP( 199?, abpi4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PI4", MACHINE_NOT_WORKING )
+COMP( 199?, abpm4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PM4", MACHINE_NOT_WORKING )
+COMP( 199?, abpv4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PV4", MACHINE_NOT_WORKING )
+COMP( 199?, abpw4,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Abit", "AB-PW4", MACHINE_NOT_WORKING )
+COMP( 199?, alator2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Alaris",      "Tornado 2", MACHINE_NOT_WORKING )
+COMP( 199?, alim1489,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the ALi 1487/1489 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, amient2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-II", MACHINE_NOT_WORKING )
+COMP( 199?, amient3,      at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-III", MACHINE_NOT_WORKING )
+COMP( 199?, amient4,      at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "EISA Enterprise-IV", MACHINE_NOT_WORKING )
+COMP( 199?, amisvpci2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager PCI-II", MACHINE_NOT_WORKING )
+COMP( 199?, amisvvlb,     at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB", MACHINE_NOT_WORKING )
+COMP( 199?, amisvvlb2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB-II", MACHINE_NOT_WORKING )
+COMP( 199?, amisvvlb3,    at486, 0,       at486,     0,     at486_state,     init_at486,        "AMI",         "Super Voyager VLB-III", MACHINE_NOT_WORKING )
+COMP( 199?, aoap43,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Aopen", "AP43",  MACHINE_NOT_WORKING )
+COMP( 199?, aovi15g,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Aopen", "VI15G", MACHINE_NOT_WORKING )
+COMP( 1992, aplsbon,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot LS Pro (Bonsai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1992, aplscar,      at486, 0,       at486l,    0,     at486_state,     init_at486,        "Apricot",     "Apricot LS Pro (Caracal Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1991, aprfte,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FT//ex 486 (J3 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1992, aprpand,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FTs (Panther Rev F 1.02.26)", MACHINE_NOT_WORKING )
+COMP( 1989, apvxft,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot VX FT server", MACHINE_NOT_WORKING )
+COMP( 1993, apxena1,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN PC (A1 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1991, apxenls3,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN-LS (Venus IV Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxenp2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN PC (P2 Motherboard)", MACHINE_NOT_WORKING )
+COMP( 1993, apxlsam,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot XEN-LS II (Samurai Motherboard)", MACHINE_NOT_WORKING )
+COMP( 199?, ar4glx3,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Addtech Research", "4GLX3 Green-B 4GPV3.1", MACHINE_NOT_WORKING )
+COMP( 199?, as496,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Arstoria",    "AS496", MACHINE_NOT_WORKING )
+COMP( 1990, at486,        0,     ibm5150, at486,     0,     at486_state,     init_at486,        "<generic>",   "PC/AT 486 (25 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
+COMP( 199?, atc1415,      at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1415", MACHINE_NOT_WORKING )
+COMP( 199?, atc1425a,     at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425A", MACHINE_NOT_WORKING )
+COMP( 199?, atc1425b,     at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425B", MACHINE_NOT_WORKING )
+COMP( 199?, bluenote,     at486, 0,       at486,     0,     at486_state,     init_at486,    "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
+COMP( 199?, ch48633c,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-486-33C", MACHINE_NOT_WORKING )
+COMP( 199?, ch486spm,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "486SPM", MACHINE_NOT_WORKING )
+COMP( 199?, ch491e,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-491E", MACHINE_NOT_WORKING )
+COMP( 199?, ch4slez1,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "486SLE M106 4SLE-Z1", MACHINE_NOT_WORKING )
+COMP( 199?, ch4spi,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "4SPI", MACHINE_NOT_WORKING )
+COMP( 199?, comt486,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines",  "Tower 486", MACHINE_NOT_WORKING )
+COMP( 199?, dt486,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines", "DT486", MACHINE_NOT_WORKING )
+COMP( 199?, ec4913,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UC4913 REV:1.1", MACHINE_NOT_WORKING )
+COMP( 199?, ec4915aio,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UC4915 A AIO", MACHINE_NOT_WORKING )
+COMP( 199?, ed486vl3h,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Edom", "486VL3H", MACHINE_NOT_WORKING )
+COMP( 199?, edmv035f,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Edom", "MV035F", MACHINE_NOT_WORKING )
+COMP( 199?, exp4044,      at486, 0,       at486,     0,     at486_state,     init_at486,        "ExpertChip", "EXP4044", MACHINE_NOT_WORKING )
+COMP( 199?, f4dxluc4,     at486, 0,       at486,     0,     at486_state,     init_at486,        "ADI", "F4DXL-UC4", MACHINE_NOT_WORKING )
+COMP( 199?, fic4386vchd,  at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
+COMP( 199?, fic4386vcv,   at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "4386-VC-V", MACHINE_NOT_WORKING )
+COMP( 199?, fic486gvt,    at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-GVT", MACHINE_NOT_WORKING )
+COMP( 199?, fic486kvd,    at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486 KVD", MACHINE_NOT_WORKING )
+COMP( 199?, fic486vchd,   at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VC-HD", MACHINE_NOT_WORKING )
+COMP( 199?, ficeli6ii,    at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "FIC ELI6-II", MACHINE_NOT_WORKING )
+COMP( 1994, ficgiovt2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-GIO-VT2", MACHINE_NOT_WORKING )
+COMP( 1995, ficpio2,      at486, 0,       ficpio2,   0,     at486_state,     init_at486pci,     "First International Computer", "486-PIO-2", MACHINE_NOT_WORKING )
+COMP( 1994, ficvipio,     at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
+COMP( 199?, ficvipio2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
+COMP( 1995, ft486f55,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Freetech", "486FT55", MACHINE_NOT_WORKING )
+COMP( 1991, ftsserv,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot FTs (Scorpion)", MACHINE_NOT_WORKING )
+COMP( 199?, ga486am,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486AM/S", MACHINE_NOT_WORKING )
+COMP( 199?, ga486vf,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486VF", MACHINE_NOT_WORKING )
+COMP( 199?, ga486vs,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Gigabyte",    "GA-486VS", MACHINE_NOT_WORKING )
+COMP( 199?, gc10a,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Eagle", "EAGLEN486 GC10A", MACHINE_NOT_WORKING )
+COMP( 199?, gete486vl,    at486, 0,       at486,     0,     at486_state,     init_at486,        "GENOA",       "TurboExpress 486 VL", MACHINE_NOT_WORKING )
+COMP( 199?, gmb486sg,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Gemlight", "GMB-486SG v2.2", MACHINE_NOT_WORKING )
+COMP( 199?, gmb486unp,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Gemlight", "GMB-486UNP v2.1", MACHINE_NOT_WORKING )
+COMP( 199?, hot409,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
+COMP( 199?, hot419,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-419", MACHINE_NOT_WORKING )
+COMP( 199?, hot433,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Shuttle Computer International", "HOT-433", MACHINE_NOT_WORKING )
+COMP( 199?, ibm2133,      at486, 0,       at486,     0,     at486_state,     init_at486,        "International Business Machines",  "PS/1 2133", MACHINE_NOT_WORKING )
+COMP( 199?, jakms41,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Jamicon", "KM-S4-1 VER 1.1", MACHINE_NOT_WORKING )
+COMP( 199?, jwj403tg,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Jetway", "J-403TG", MACHINE_NOT_WORKING )
+COMP( 199?, jwj446a,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Jetway",      "J-446A", MACHINE_NOT_WORKING )
+COMP( 1993, lion3500,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Lion",        "3500", MACHINE_NOT_WORKING )
+COMP( 199?, ls486e,       at486, 0,       at486,     0,     at486_state,     init_at486,        "LuckyStar",   "LS-486E Rev:C", MACHINE_NOT_WORKING )
+COMP( 199?, lsucm486v30,  at486, 0,       at486,     0,     at486_state,     init_at486,        "Lucky Star", "UCM-486V30", MACHINE_NOT_WORKING )
+COMP( 199?, mb1433aeap,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433/50 AEA-P - V:1", MACHINE_NOT_WORKING )
+COMP( 199?, mb1433ucv,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433UCV", MACHINE_NOT_WORKING )
+COMP( 199?, mb1433uiv,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB-1433UIV", MACHINE_NOT_WORKING )
+COMP( 199?, mb4d33,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
+COMP( 199?, mb8433uud,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Biostar",     "MB8433-UUD-A", MACHINE_NOT_WORKING ) // boots to Award BootBlock BIOS
+COMP( 199?, mba029,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "MBA-029", MACHINE_NOT_WORKING )
+COMP( 199?, md4duvc,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Aquarius System (ASI)", "MD-4DUV VER:2.1", MACHINE_NOT_WORKING )
+COMP( 199?, mijx30gp,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Micronics",   "JX30GP, Motherboard P/N: 09-00189-10 REV B1", MACHINE_NOT_WORKING )
+COMP( 199?, ms4125,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4125", MACHINE_NOT_WORKING )
+COMP( 199?, ms4132,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4132 G VER:1", MACHINE_NOT_WORKING )
+COMP( 199?, ms4134,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4134", MACHINE_NOT_WORKING )
+COMP( 199?, ms4138,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4138", MACHINE_NOT_WORKING )
+COMP( 199?, ms4144,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4144", MACHINE_NOT_WORKING )
+COMP( 199?, ms4145,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4145", MACHINE_NOT_WORKING )
+COMP( 199?, nat48pv,      at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "NAT48PV-1.00 VL", MACHINE_NOT_WORKING )
+COMP( 199?, ncr3433,      at486, 0,       at486,     0,     at486_state,  init_at486,    "NCR", "Class 3433", MACHINE_NOT_WORKING )
+COMP( 199?, ochawk,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hawk", MACHINE_NOT_WORKING )
+COMP( 199?, ochipcom,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo COM", MACHINE_NOT_WORKING )
+COMP( 1994, ochipdca2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo DCA2", MACHINE_NOT_WORKING )
+COMP( 199?, ochipvlp,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo VL+", MACHINE_NOT_WORKING )
+COMP( 199?, op82c392,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, pc70iii,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
+COMP( 199?, pc9486,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
+COMP( 199?, pccm912,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M912", MACHINE_NOT_WORKING )
+COMP( 199?, pccm915i,     at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M915i", MACHINE_NOT_WORKING )
+COMP( 199?, pccm919,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
+COMP( 1993, pcd4nd,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
+COMP( 1995, pcd4nl,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
+COMP( 199?, pcd4x,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
+COMP( 199?, pci48af,      at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC Research Corporation", "PCI48AF", MACHINE_NOT_WORKING )
+COMP( 199?, pck486dx,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Peacock",  "PCK 486 DX", MACHINE_NOT_WORKING )
+COMP( 199?, pg750eisa,    at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
+COMP( 199?, pkm0038s,     at486, 0,       at486,     0,     at486_state,     init_at486,        "DTK", "PKM-0038S aka Gemlight GMB-486SG", MACHINE_NOT_WORKING )
+COMP( 199?, pm486pu,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PROTECH",  "PM486PU-S7", MACHINE_NOT_WORKING )
+COMP( 199?, pt430,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Pine Technology", "PT-430", MACHINE_NOT_WORKING )
+COMP( 199?, pt432b,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Pine Technology", "PT-432b aka SR-M401-A", MACHINE_NOT_WORKING )
+COMP( 199?, ptmb457,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PowerTech", "MB457", MACHINE_NOT_WORKING )
+COMP( 199?, pwaih4077c,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "PWA-IH4077C", MACHINE_NOT_WORKING )
+COMP( 199?, pwaih4077d,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Mitac", "PWA-IH4077D", MACHINE_NOT_WORKING )
+COMP( 199?, px486p3,      at486, 0,       at486,     0,     at486_state,     init_at486,        "QDI", "PX486P3", MACHINE_NOT_WORKING )
+COMP( 1990, qi900,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Apricot",     "Apricot Qi 900 (Scorpion Motherboard)", MACHINE_NOT_WORKING )
+COMP( 199?, sis85c471,    at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, sis85c496,    at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the SiS 85C496/85C497 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, sm48650usc,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
+COMP( 199?, so025d2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025D2", MACHINE_NOT_WORKING )
+COMP( 199?, so025k2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025K2", MACHINE_NOT_WORKING )
+COMP( 199?, so025r2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "025R2", MACHINE_NOT_WORKING )
+COMP( 199?, so30h,        at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "30H", MACHINE_NOT_WORKING )
+COMP( 199?, so4saw2,      at486, 0,       at486,     0,     at486_state,     init_at486,        "SOYO", "SY-4SAW2", MACHINE_NOT_WORKING )
+COMP( 199?, sto486wb,     at486, 0,       at486,     0,     at486_state,     init_at486,        "See-Thru", "Sto486Wb aka AUVA Cam-33-P2", MACHINE_NOT_WORKING )
+COMP( 199?, td4ipaio,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "TD-4IP-UMC-AIO", MACHINE_NOT_WORKING )
+COMP( 199?, tmpat48pg4,   at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48PG4", MACHINE_NOT_WORKING )
+COMP( 199?, tmpat48av,    at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48AV", MACHINE_NOT_WORKING )
+COMP( 199?, ts34t25,      at486, 0,       at486,  0,     at486_state,  init_at486,    "Highscreen",  "486-25", MACHINE_NOT_WORKING )
+COMP( 199?, um486,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
+COMP( 199?, um486v,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
+COMP( 199?, um8810paio,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM8810 PAIO", MACHINE_NOT_WORKING )
+COMP( 199?, um8886,       at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, um8498f,      at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
+COMP( 199?, uni4800,      at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the UNI4800 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, uniwb4407,    at486, 0,       at486,     0,     at486_state,     init_at486,        "UNICHIP", "486 WB 4407 REV 1.0", MACHINE_NOT_WORKING )
+COMP( 199?, v4p895p3,     at486, 0,       at486,     0,     at486_state,     init_at486,        "QDI", "V4P895P3/SMT V5.0", MACHINE_NOT_WORKING )
+COMP( 199?, via4386vio,   at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "Via 4386 VIO / Highscreen universal board", MACHINE_NOT_WORKING )
+COMP( 199?, zi4dvs,       at486, 0,       at486,     0,     at486_state,     init_at486,        "ZIDA", "4DVS", MACHINE_NOT_WORKING )
+COMP( 199?, zito4dps,     at486, 0,       at486,     0,     at486_state,     init_at486,        "ZIDA", "Tomato board 4DPS", MACHINE_NOT_WORKING )

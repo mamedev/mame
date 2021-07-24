@@ -102,7 +102,6 @@ Mass storage: Floppy: 5.25" 1.2MB, MFM HDD
 #include "machine/at.h"
 #include "machine/cs8221.h"
 #include "machine/ds128x.h"
-#include "machine/idectrl.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "emupal.h"
@@ -185,10 +184,7 @@ class at_vrom_fix_state : public at_state
 public:
 	using at_state::at_state;
 
-	// void init_megapcpla();
-
 	void ibmps1(machine_config &config);
-	// void megapcpla(machine_config &config);
 
 protected:
 	virtual void machine_start() override;

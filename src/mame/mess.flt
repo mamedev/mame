@@ -64,6 +64,7 @@ ampro.cpp
 ampscarp.cpp
 amstrad.cpp
 amstr_pc.cpp
+amstr_megapc.cpp
 amust.cpp
 anzterm.cpp
 apc.cpp
