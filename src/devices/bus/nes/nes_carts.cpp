@@ -310,6 +310,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
 	device.option_add_internal("unl_dh08",         NES_DH08);       // used in Bubble Bobble alt (FDS Conversion);
 	device.option_add_internal("unl_le05",         NES_LE05);       // used in ProWres (FDS Conversion);
+	device.option_add_internal("unl_lg25",         NES_LG25);       // used in Moero TwinBee (FDS Conversion);
 	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
 	device.option_add_internal("unl_lh28_lh54",    NES_LH28_LH54);  // used in Falsion, Meikyuu Jiin Dababa FDS conversions
 	device.option_add_internal("unl_lh31",         NES_LH31);       // used in Bubble Bobble alt FDS conversion
