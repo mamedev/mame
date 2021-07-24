@@ -10,7 +10,6 @@
 #define STROBE_DELAY 1  // in usec
 #define ACK_DELAY 1     // in usec
 
-
 ROM_START( etiprintbuffer_device )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "etibuffer.rom",  0x0, 0x800, CRC(bd31d7b6) SHA1(cd76a9a53c6b9994c5721f8c393bc782143c6d3f))
@@ -40,7 +39,6 @@ DEFINE_DEVICE_TYPE(ETIPRINTBUFFER, etiprintbuffer_device, "etiprintbuffer", "Ele
 //--------------------------------------------------
 //  device constructor
 //--------------------------------------------------
-
 
 etiprintbuffer_device::etiprintbuffer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	etiprintbuffer_device(mconfig, ETIPRINTBUFFER, tag, owner, clock)
@@ -119,7 +117,6 @@ void etiprintbuffer_device::eti_write_3000(offs_t offset, uint8_t data)
 //  device init
 //--------------------------------------------------
 
-
 void etiprintbuffer_device::device_start()
 {
 	m_printerready_led.resolve();
@@ -152,7 +149,7 @@ void etiprintbuffer_device::device_reset()
 	output_busy(0);
 	output_ack(1);
 	output_select(1);  // (line not actually connected to etibuffer) set this to 1 for grappler cards
-	output_fault(0);   // (line not actually connected)
+	output_fault(1);   // (line not actually connected)
 	output_perror(0);  // (line not actually connected)
 
 	// Initialize printer output port
@@ -182,7 +179,6 @@ void etiprintbuffer_device::device_add_mconfig(machine_config &config)
 //--------------------------------------------------
 //  tiny rom entry
 //--------------------------------------------------
-
 
 const tiny_rom_entry *etiprintbuffer_device::device_rom_region() const
 {

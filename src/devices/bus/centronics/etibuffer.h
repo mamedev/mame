@@ -83,7 +83,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(clear_sw); // clear buffer switch
 
 protected:
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
+	DECLARE_WRITE_LINE_MEMBER( busy_w );  // centronics output busy
 
 	etiprintbuffer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
