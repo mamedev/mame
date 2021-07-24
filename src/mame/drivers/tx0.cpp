@@ -1595,25 +1595,30 @@ void tx0_state::tx0_8kw(machine_config &config)
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
+	TX0_8KW(config.replace(), m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+	/* dummy interrupt: handles input */
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
 	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8");
 }
 
 ROM_START(tx0_64kw)
-	/*CPU memory space*/
-	ROM_REGION(0x10000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
-
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
 
 ROM_START(tx0_8kw)
-	/*CPU memory space*/
-	ROM_REGION(0x2000 * sizeof(uint32_t),"maincpu",ROMREGION_ERASEFF)
-		/* Note this computer has no ROM... */
-
 	ROM_REGION(tx0_fontdata_size, "gfx1", ROMREGION_ERASEFF)
 		/* space filled with our font */
 ROM_END
