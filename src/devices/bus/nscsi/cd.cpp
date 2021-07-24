@@ -430,7 +430,8 @@ void nscsi_cdrom_device::scsi_command()
 					};
 
 					LOG("Apple special MODE SENSE page\n");
-					memcpy(scsi_cmdbuf, apple_magic, 0x24);
+					scsi_cmdbuf[pos++] = 0x30; // PS, page id
+					memcpy(&scsi_cmdbuf[pos], apple_magic, 0x24);
 					pos += 0x24;
 				}
 				break;
