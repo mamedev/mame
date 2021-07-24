@@ -22,13 +22,13 @@ Notes:
 - CPU seems a bit too slow when deciding about what tile to discard,
   it also takes a bit too much to sync when a player takes a tile from the pond in
   a VS play. It's most likely btanb unless a gameplay video proves otherwise;
+- Position 11m on PCB has a single slider switch.
+  It is not read by the CPUs at all, but instead zaps the nearby NVRAM contents if active.
 
 TODO:
 - Upper byte of I/O access seems to be some extra comms state machine
   (i.e. it more or less mimic the commands that CPUs send between each other).
   Maybe just a debug port that is read thru external HW?
-- Pinpoint how HW reads SW2 (position 11m) single slider switch.
-  It may not be read by the CPUs at all, but just act as a NVRAM clear given the position;
 - Pinpoint how HW reads the three lead-filled marked as SW1 (position 1b).
   It's located next to the key matrix, maybe just ext debugging?
 
@@ -51,14 +51,15 @@ namespace {
 class vsmjtria_state : public driver_device
 {
 public:
-	vsmjtria_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag)
+	vsmjtria_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
 		, m_cpu(*this, "cpu%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode%u", 0U)
 		, m_colorram(*this, "colorram%u", 0U)
 		, m_videoram(*this, "videoram%u", 0U)
 		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 		, m_nvram(*this, "nvram%u", 0U)
+		, m_nvram_data(*this, "nvram%u", 0U)
 		, m_sw2(*this, "SW2")
 	{ }
 
@@ -78,6 +79,7 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_ioport_array<5> m_key[2];
 	required_device_array<nvram_device, 2> m_nvram;
+	required_shared_ptr_array<u8, 2> m_nvram_data;
 	required_ioport m_sw2;
 
 	tilemap_t *m_bg_tilemap[2];
@@ -492,19 +494,11 @@ void vsmjtria_state::machine_reset()
 {
 	if (m_sw2->read() & 1)
 	{
-		// TODO: there's no setter in nvram_device that directly flushes contents for this case scenario
-		// we currently workaround by directly inject to space address
-		const u16 nvram_size = 0x800;
-		address_space &space_main = m_cpu[0]->space(AS_PROGRAM);
-		address_space &space_sub = m_cpu[1]->space(AS_PROGRAM);
+		// Note: there's no direct setter in nvram_device that directly flushes contents for this case scenario
+	    for (auto &nvram : m_nvram_data)
+			std::fill_n(&nvram[0], nvram.length(), 0);
 
-		for (int i = 0; i < nvram_size; i++)
-		{
-			space_main.write_byte(0xa000 + i, 0x00);
-			space_sub.write_byte(0xa000 + i, 0x00);
-		}
-
-		logerror("%s: flush NVRAM contents\n", machine().describe_context());
+		logerror("machine_reset: flush NVRAM contents\n");
 	}
 }
 
