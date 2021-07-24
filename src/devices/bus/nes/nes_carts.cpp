@@ -303,16 +303,19 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
 	device.option_add_internal("09034a",           NES_09034A);
+	device.option_add_internal("batmanfs",         NES_BATMANFS);
 	device.option_add_internal("palthena",         NES_PALTHENA);   // used by Palthena no Kagami FDS conversion
 	device.option_add_internal("tobidase",         NES_TOBIDASE);   // mapper 120
 	device.option_add_internal("mmalee2",          NES_MMALEE);     // mapper 55
 	device.option_add_internal("unl_2708",         NES_2708);       // mapper 103
 	device.option_add_internal("unl_dh08",         NES_DH08);       // used in Bubble Bobble alt (FDS Conversion);
 	device.option_add_internal("unl_le05",         NES_LE05);       // used in ProWres (FDS Conversion);
+	device.option_add_internal("unl_lg25",         NES_LG25);       // used in Moero TwinBee (FDS Conversion);
 	device.option_add_internal("unl_lh10",         NES_LH10);       // used in Fuuun Shaolin Kyo (FDS Conversion);
 	device.option_add_internal("unl_lh28_lh54",    NES_LH28_LH54);  // used in Falsion, Meikyuu Jiin Dababa FDS conversions
 	device.option_add_internal("unl_lh31",         NES_LH31);       // used in Bubble Bobble alt FDS conversion
 	device.option_add_internal("unl_lh32",         NES_LH32);       // used by Monty no Doki Doki Daidassou FDS conversion
+	device.option_add_internal("unl_lh51",         NES_LH51);       // used in Ai Senshi Nicol alt FDS conversion
 	device.option_add_internal("unl_lh53",         NES_LH53);       // used in Nazo no Murasamejou (FDS Conversion);
 	device.option_add_internal("unl_ac08",         NES_AC08);       // used by Green Beret FDS conversion
 	device.option_add_internal("sgpipe",           NES_SHUIGUAN);   // mapper 183
@@ -360,9 +363,13 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_d1038",        NES_VT5201); // mapper 60?
 	device.option_add_internal("810544c",          NES_810544C);
 	device.option_add_internal("ntd03",            NES_NTD03);
+	device.option_add_internal("bmc_ctc09",        NES_BMC_CTC09);
 	device.option_add_internal("bmc_gb63",         NES_BMC_GB63);
 	device.option_add_internal("bmc_gka",          NES_BMC_GKA);
 	device.option_add_internal("bmc_gkb",          NES_BMC_GKB);
+	device.option_add_internal("bmc_k3046",        NES_BMC_K3046);
+	device.option_add_internal("bmc_sa005a",       NES_BMC_SA005A);
+	device.option_add_internal("bmc_tj03",         NES_BMC_TJ03);
 	device.option_add_internal("bmc_ws",           NES_BMC_WS);
 	device.option_add_internal("bmc_g146",         NES_BMC_G146);
 	device.option_add_internal("bmc_11160",        NES_BMC_11160);
@@ -393,7 +400,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_power255",     NES_BMC_CH001);      // mapper 63?
 	device.option_add_internal("bmc_s22games",     NES_BMC_SUPER22);    // mapper 233
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
-	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 60? or 226? or 233?
+	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
 // misc multigame cart MMC3 clone boards
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);

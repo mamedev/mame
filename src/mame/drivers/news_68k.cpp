@@ -26,7 +26,7 @@
 #include "machine/upd765.h"
 #include "machine/dmac_0266.h"
 #include "machine/news_hid.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 // video
 #include "screen.h"
@@ -187,7 +187,7 @@ void news_68k_state::cpu_map(address_map &map)
 	// 0xe0c40000 // centronics
 	map(0xe0c80000, 0xe0c80003).m(m_fdc, FUNC(upd72067_device::map));
 	map(0xe0c80100, 0xe0c80100).rw(m_fdc, FUNC(upd72067_device::dma_r), FUNC(upd72067_device::dma_w));
-	map(0xe0cc0000, 0xe0cc0007).m(m_scsi, FUNC(ncr5380n_device::map));
+	map(0xe0cc0000, 0xe0cc0007).m(m_scsi, FUNC(ncr5380_device::map));
 
 	map(0xe0d00000, 0xe0d00007).m(m_hid, FUNC(news_hid_hle_device::map_68k));
 	map(0xe0d40000, 0xe0d40003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));

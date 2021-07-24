@@ -14,7 +14,7 @@
 #pragma once
 
 #include "a2bus.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,7 +46,7 @@ protected:
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
 
-	required_device<ncr5380n_device> m_ncr5380;
+	required_device<ncr5380_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_region_ptr<u8> m_rom;
 

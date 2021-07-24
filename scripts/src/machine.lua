@@ -3814,13 +3814,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5380n.h,MACHINES["NCR5380N"] = true
+--@src/devices/machine/ncr5380.h,MACHINES["NCR5380"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR5380N"]~=null) then
+if (MACHINES["NCR5380"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr5380n.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5380n.h",
+		MAME_DIR .. "src/devices/machine/ncr5380.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5380.h",
 	}
 end
 

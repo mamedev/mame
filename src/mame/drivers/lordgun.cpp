@@ -734,9 +734,9 @@ void lordgun_state::aliencha(machine_config &config)
 	ymf.add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki, XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH); // ? 5MHz can't be right
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki2", XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // ? 5MHz can't be right
+	OKIM6295(config, "oki2", XTAL(20'000'000) / 20, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // ? 5MHz can't be right
 }
 
 

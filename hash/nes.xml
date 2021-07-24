@@ -61818,6 +61818,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="batmanfs" cloneof="batman">
+		<description>Batman - The Video Game (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="usage" value="Built-in level select at title screen. Press in sequence: A, B, B, followed by A 1 to 5 times for stages 1-1, 2-1, 3-1, 4-1, and 5-1, respectively."/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="batmanfs" />
+			<dataarea name="prg" size="131072">
+				<rom name="batmanfs.prg" size="131072" crc="9b6c71d5" sha1="29dddb0bb280f742cecc062d382b20eb22e74b5d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="batmanfs.chr" size="131072" crc="f3b41c18" sha1="04c7ccb51c0a2b211c84289650ebba448d6f5413" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -62997,7 +63013,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="lweaponc" cloneof="lweapon" supported="no">
+	<software name="lweaponc" supported="no">
 		<description>Lethal Weapon (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66480,6 +66496,26 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+<!-- BTANB: Game's sound code is broken and terrible on real hardware. -->
+	<software name="aisenshia" cloneof="aisenshi">
+		<description>Ai Senshi Nicol (Asia, FDS conversion, alt)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH51"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lh51" />
+			<dataarea name="prg" size="131072">
+				<rom name="aisenshi.prg" size="131072" crc="ed3e1526" sha1="7b46c6bd9bfe1c2b405f7ede8b974ce519c966f4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="akumafds">
 		<description>Akumajou Dracula (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -66538,6 +66574,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<description>Almana no Kiseki (Asia, FDS conversion, Alt 2)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH29"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ks7017" />
 			<feature name="pcb" value="UNL-KS7017" />
@@ -66671,7 +66708,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="UNL-KS7031" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="dracula ii - noroi no fuuin (fds conversion).prg" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" offset="00000" status="baddump" />
+				<rom name="ks128" size="131072" crc="8b7c2f62" sha1="759801bc77163613a21840591b69a336a8e0a06a" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -66735,6 +66772,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<description>Green Beret (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LH09"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unl_ac08" />
 			<feature name="pcb" value="UNL-AC08" />
@@ -66884,6 +66922,26 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="moetwfds">
+		<description>Moero TwinBee - Cinnamon Hakase o Sukue! (FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<info name="serial" value="LG25"/>
+		<info name="alt_title" value="もえろツインビー シナモン博士を救え!"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lg25" />
+			<dataarea name="prg" size="131072">
+				<rom name="moetwfds.prg" size="131072" crc="55f24a46" sha1="b995f2fa2e1723a6e14b824a2e9a112668ced9db" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="montyfds">
 		<description>Monty no Doki Doki Daidassou (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -66936,9 +66994,8 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM (battery backed) on cartridge -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -73781,23 +73838,25 @@ resulting in tons of glitches? -->
 		</part>
 	</software>
 
-<!-- could this be a hack?!? -->
+<!-- Hardware depends on NTSC timing and glitches heavily on PAL. -->
 	<software name="smb3h" cloneof="smb3">
-		<description>Super Mario Bros. 3 (Pirate)</description>
+		<description>Super Chaoji Sandai 3 (Super Mario Bros. 3 pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="Super 超級三代 3"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="smb3pirate" />
 			<feature name="pcb" value="BTL-SMB3" />
-			<dataarea name="chr" size="131072">
-				<rom name="super mario bros 3.chr" size="131072" crc="ee863734" sha1="cdd8f5aab615a58a8f5a8c679d7d9b22b7dc57cf" offset="00000" status="baddump" />
-			</dataarea>
+			<feature name="pcb_model" value="890418" />
 			<dataarea name="prg" size="262144">
-				<rom name="super mario bros 3.prg" size="262144" crc="50a2a17c" sha1="ee61c47097cf73753444b87a205993e4a1c6c992" offset="00000" status="baddump" />
+				<rom name="5601.rom-2" size="131072" crc="10f8a950" sha1="314964ca8adc79eb87f57c74fe3fc5df100b523f" offset="0x00000" status="baddump" />
+				<rom name="5602.rom-1" size="131072" crc="b9efea0b" sha1="26c5bd5f4dece2ad1250a3da2d3a8db6d70d8182" offset="0x20000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<dataarea name="chr" size="131072">
+				<rom name="5600.rom-3" size="131072" crc="ee863734" sha1="cdd8f5aab615a58a8f5a8c679d7d9b22b7dc57cf" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -77338,6 +77397,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_10c09">
+		<description>10 in 1 (CTC-09)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_ctc09" />
+			<dataarea name="prg" size="262144">
+				<rom name="10-in-1 (ctc-09)(unl).prg" size="262144" crc="bc585bd0" sha1="22f208ffefe9b0e6675e605a55ed12542ca1b7c9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="10-in-1 (ctc-09)(unl).chr" size="131072" crc="f9242c9d" sha1="c838cd75a1bc62ca93cf0dd69bad5246962ada1d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_10m">
 		<description>10000000 in 1</description>
 		<year>19??</year>
@@ -77401,6 +77475,22 @@ be better to redump them properly. -->
 			<feature name="pcb" value="BMC-BALLGAMES-11IN1" />
 			<dataarea name="prg" size="524288">
 				<rom name="11-in-1 ball games.prg" size="524288" crc="1b177d1e" sha1="489f344a61ed71ae6223be605c16993e23454d30" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_11k46">
+		<description>11 in 1 (K-3046)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_k3046" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="11-in-1 (k-3046)(unl).prg" size="524288" crc="d330cd7e" sha1="100553175ed21bb30db95377caeb9314dee5b6f7" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -77767,6 +77857,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_16sa5">
+		<description>16 in 1 (SA005-A)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_sa005a" />
+			<dataarea name="prg" size="262144">
+				<rom name="16-in-1 (sa005-a)(unl).prg" size="262144" crc="cd0afbe2" sha1="3a4d033fb4bfbd13699e4bae6633e70a5c2b5ba9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="16-in-1 (sa005-a)(unl).chr" size="131072" crc="cd62b4f9" sha1="b0bc49645dbd0e1dd22bc74a21327437d5f500d8" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78533,13 +78638,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4c" supported="no">
+	<software name="mc_4c">
 		<description>4 in 1 (Alt 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- Header says mapper 60 (not supported yet) -->
+			<feature name="slot" value="bmc_reset4" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="4-in-1 (bomberman+f-1 race+circus charlie+star force).chr" size="32768" crc="2abfe1d5" sha1="db148e7158a97b96e4f74f11b1cf31b5e9bb1e11" offset="00000" status="baddump" />
 			</dataarea>
@@ -78549,13 +78654,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4d" supported="no">
+	<software name="mc_4d">
 		<description>4 in 1 (Alt 3)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- Header says mapper 60 (not supported yet) -->
+			<feature name="slot" value="bmc_reset4" />
 			<dataarea name="chr" size="32768">
 				<rom name="no menu 4-in-1 (mr mary+battle city+exerion+yie ar kung-fu).chr" size="32768" crc="72ece2a8" sha1="483f09401d6269bcfb7752e3a79658ce8d882eb1" offset="00000" status="baddump" />
 			</dataarea>
@@ -78853,6 +78957,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="4-in-1 (ok-411)[p1].prg" size="524288" crc="08ad4796" sha1="96f57a5e8f352d9545ebb259e9c15e581d01cb43" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4tj03">
+		<description>4 in 1 (TJ-03)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_tj03" />
+			<dataarea name="prg" size="131072">
+				<rom name="4-in-1 (tj-03)(unl).prg" size="131072" crc="09f4de0b" sha1="06bf299ce068166ab0f6041a1625bf96f1cc9f2d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="4-in-1 (tj-03)(unl).chr" size="32768" crc="c0b5369f" sha1="f90eb3125ec73d0f65d0257792f51815d7339252" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -80574,7 +80693,7 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_4rb" supported="no">
+	<software name="mc_4rb">
 		<description>Reset Based 4 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>

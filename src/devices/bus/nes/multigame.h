@@ -285,6 +285,20 @@ protected:
 };
 
 
+// ======================> nes_bmc_ctc09_device
+
+class nes_bmc_ctc09_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_ctc09_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
 // ======================> nes_bmc_gb63_device
 
 class nes_bmc_gb63_device : public nes_nrom_device
@@ -309,6 +323,7 @@ private:
 	uint8_t m_reg[2];
 	int m_vram_disable;
 };
+
 
 // ======================> nes_bmc_gka_device
 
@@ -346,6 +361,46 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+};
+
+
+// ======================> nes_bmc_k3046_device
+
+class nes_bmc_k3046_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_k3046_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
+// ======================> nes_bmc_sa005a_device
+
+class nes_bmc_sa005a_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_sa005a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+};
+
+
+// ======================> nes_bmc_tj03_device
+
+class nes_bmc_tj03_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_tj03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
 };
 
 
@@ -951,9 +1006,13 @@ DECLARE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device)
 DECLARE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device)
 DECLARE_DEVICE_TYPE(NES_810544C,        nes_810544c_device)
 DECLARE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device)
+DECLARE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device)
+DECLARE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device)
+DECLARE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device)
+DECLARE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device)
 DECLARE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_G146,       nes_bmc_g146_device)

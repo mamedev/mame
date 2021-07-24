@@ -616,14 +616,12 @@ void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	{
 		if (m_irq_enable)
 		{
-			if (!m_irq_count)
+			if (--m_irq_count == 0)
 			{
-				hold_irq_line();
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 				m_irq_status |= 0x01;
 			}
-			else
-				m_irq_count--;
 		}
 	}
 }
@@ -668,6 +666,7 @@ uint8_t nes_ks7017_device::read_ex(offs_t offset)
 	{
 		int temp = m_irq_status;
 		m_irq_status &= ~0x01;
+		set_irq_line(CLEAR_LINE);
 		return temp;
 	}
 
@@ -874,9 +873,7 @@ void nes_ks7030_device::write_h(offs_t offset, u8 data)
  of the 0x8000-0xffff region. Main bank is fixed, while
  the 8K mapped at 0x6000-0x7fff varies with reg writes.
 
- TODO: understand how SRAM is handled...
-
- NES 2.0: mapper 302
+ NES 2.0: mapper 305
 
  In MAME: Supported.
 

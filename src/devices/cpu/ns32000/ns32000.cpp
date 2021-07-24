@@ -2812,7 +2812,6 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							if (src >= lower && src <= upper)
 							{
 								m_psr &= ~PSR_F;
-								m_r[reg] = src - lower;
 
 								tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + 11;
 							}
@@ -2820,12 +2819,12 @@ template <int Width> void ns32000_device<Width>::execute_run()
 							{
 								m_psr |= PSR_F;
 
-								// updating the destination when out of bounds
-								// is undefined, but required by DB32016
-								m_r[reg] = src - lower;
-
 								tex = mode[0].tea + mode[1].tea + top(size, bounds) * 2 + ((src >= lower) ? 7 : 10);
 							}
+
+							// updating the destination when out of bounds
+							// is undefined, but required by DB32016 firmware
+							m_r[reg] = (src - lower) & size_mask[size];
 						}
 						break;
 					case 4:

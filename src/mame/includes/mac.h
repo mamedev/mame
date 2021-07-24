@@ -14,7 +14,7 @@
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"

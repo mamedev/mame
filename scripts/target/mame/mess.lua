@@ -625,7 +625,7 @@ MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 --MACHINES["MSM6253"] = true
 MACHINES["MYB3K_KEYBOARD"] = true
-MACHINES["NCR5380N"] = true
+MACHINES["NCR5380"] = true
 MACHINES["NCR5385"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
@@ -3128,7 +3128,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/elf.cpp",
 	MAME_DIR .. "src/mame/includes/elf.h",
 	MAME_DIR .. "src/mame/drivers/exp85.cpp",
-	MAME_DIR .. "src/mame/includes/exp85.h",
 }
 
 createMESSProjects(_target, _subtarget, "next")

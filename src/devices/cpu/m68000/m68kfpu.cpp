@@ -1454,6 +1454,13 @@ void m68000_base_device::fpgen_rm_reg(u16 w2)
 			m_icount -= 594; // for MC68881
 			break;
 		}
+		case 0x0a:      // FATAN
+		{
+			m_fpr[dst] = floatx80_fatan (source);
+			SET_CONDITION_CODES(m_fpr[dst]);
+			m_icount -= 426; // for MC68881
+			break;
+		}
 		case 0x0e:      // FSIN
 		{
 			m_fpr[dst] = source;

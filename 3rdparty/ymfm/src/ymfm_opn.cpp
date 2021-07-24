@@ -396,7 +396,7 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
+	end += sprintf(end, "%u.%02u freq=%04X dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X",
 		chnum, opnum,
 		block_freq,
 		op_detune(opoffs),
@@ -419,10 +419,10 @@ std::string opn_registers_base<IsOpnA>::log_keyon(uint32_t choffs, uint32_t opof
 		end += sprintf(end, " ssg=%X", op_ssg_eg_mode(opoffs));
 	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d", ch_lfo_am_sens(choffs));
+		end += sprintf(end, " am=%u", ch_lfo_am_sens(choffs));
 	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d", ch_lfo_pm_sens(choffs));
+		end += sprintf(end, " pm=%u", ch_lfo_pm_sens(choffs));
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X", lfo_rate());
 	if (multi_freq() && choffs == 2)

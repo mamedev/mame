@@ -384,11 +384,6 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-/*
- * FIXME: RDVAL/WRVAL don't trigger abort on protection failures, but it's not
- * clear if the memory access is cancelled on a protection failure or invalid
- * level 2 page table entry. Also not clear if MSR/EIA are updated.
- */
 ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool debug)
 {
 	// check translation required

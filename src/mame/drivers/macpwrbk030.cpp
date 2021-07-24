@@ -107,7 +107,7 @@
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "machine/macscsi.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "sound/asc.h"

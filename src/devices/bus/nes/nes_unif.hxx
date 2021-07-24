@@ -54,7 +54,7 @@ enum
 static const unif unif_list[] =
 {
 /*       UNIF                       NVW  WRAM  CRAM     IDX*/
-	{ "DREAMTECH01",                0,    0, CHRRAM_8,  DREAMTECH_BOARD},       //UNIF only!
+	{ "DREAMTECH01",                0,    0, CHRRAM_8,  DREAMTECH_BOARD},
 	{ "NES-ANROM",                  0,    0, CHRRAM_8,  STD_AXROM},
 	{ "NES-AOROM",                  0,    0, CHRRAM_8,  STD_AXROM},
 	{ "NES-CNROM",                  0,    0, CHRRAM_0,  STD_CNROM},
@@ -93,15 +93,15 @@ static const unif unif_list[] =
 	{ "UNL-SACHEN-8259A",           0,    0, CHRRAM_0,  SACHEN_8259A},
 	{ "UNL-SACHEN-8259B",           0,    0, CHRRAM_0,  SACHEN_8259B},
 	{ "BMC-190IN1",                 0,    0, CHRRAM_0,  BMC_190IN1},
-	{ "BMC-64IN1NOREPEAT",          0,    0, CHRRAM_0,  BMC_64IN1NR},       //UNIF only!
-	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},     //UNIF only!
-	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},        //UNIF only!
-	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},        //UNIF only!
+	{ "BMC-64IN1NOREPEAT",          0,    0, CHRRAM_0,  BMC_64IN1NR},
+	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  BMC_A65AS},
+	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},
+	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},
 	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_NOVEL1},
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  BMC_HIK8IN1},
-	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},      //UNIF only!
-	{ "BMC-WS",                     0,    0, CHRRAM_0,  BMC_WS},        //UNIF only!
+	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},
+	{ "BMC-WS",                     0,    0, CHRRAM_0,  BMC_WS},
 	{ "BMC-N625092",                0,    0, CHRRAM_0,  UNL_N625092},
 	// below are boards which are not yet supported, but are used by some UNIF files. they are here as a reminder to what is missing to be added
 	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  JYCOMPANY_A}, // JY Company A (is TEK90 the real PCB name?)

@@ -16435,6 +16435,7 @@ trobocop3                       // Tiger
 trockteer                       // Tiger
 trshutvoy                       // Tronica
 trspacmis                       // Tronica
+trspider                        // Tronica
 trsrescue                       // Tronica
 tsddragon                       // Tiger
 tsf2010                         // Tiger
@@ -16468,7 +16469,6 @@ bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
 cmsport                         // Conic
-cmulti8                         // Canon
 cnbaskb                         // Conic
 cnfball                         // Conic
 cnfball2                        // Conic
@@ -16515,6 +16515,8 @@ mdndclab                        // Mattel
 merlin                          // Parker Bros
 mmerlin                         // Parker Bros
 monkeysee                       // Tandy Corporation
+palmf31                         // Canon
+palmmd8                         // Canon
 pbmastm                         // Parker Bros
 phpball                         // Tomy
 qfire                           // Electroplay
@@ -31588,6 +31590,7 @@ danceyes                        // 1996.10 Dancing Eyes (US, DC3/VER.C)
 danceyesj                       // 1996.09 Dancing Eyes (Japan, DC1/VER.A)
 dunkmnia                        // 1996.05 Dunk Mania (World, DM2/VER.C)
 dunkmniajc                      // 1996.05 Dunk Mania (Japan, DM1/VER.C)
+gunbarla                        // 1999.?? Gunbarl (Japan, GNB1/VER.A)
 myangel3                        // 1998.03 Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)
 pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
 primglex                        // 1996.03 Prime Goal EX (Japan, PG1/VER.A)
@@ -32583,7 +32586,7 @@ rbffspeck                       // 0124 (c) 1996 SNK
 ridhero                         // 0006 (c) 1990 SNK
 ridheroh                        // 0006 (c) 1990 SNK
 roboarmy                        // 0032 (c) 1991 SNK
-roboarma                        // 0032 (c) 1991 SNK
+roboarmya                       // 0032 (c) 1991 SNK
 rotd                            // 0264 (c) 2002 Evoga
 rotdh                           // 0264 (c) 2002 Evoga
 s1945p                          // 0254 (c) 1999 Psikyo
@@ -40585,6 +40588,7 @@ tek4109a                        //
 tek4404                         // (c) 1984 Tektronix
 
 @source:tekigw.cpp
+tek4132                         // Tektronix 4132
 tek6130                         // Tektronix 6130
 
 @source:tekxp33x.cpp

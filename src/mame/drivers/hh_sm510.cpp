@@ -9240,10 +9240,18 @@ ROM_END
 
 /***************************************************************************
 
-  Tronica Space Mission (model SM-11)
-  * PCB label SM-11 250582
-  * Sharp SM5A label 0126 228B TRONICA (no decap)
+  Tronica: Space Mission (model SM-11), Spider (model SG-21)
+  * PCB labels: SPACE MISSION SM-11 250582 (SM-11)
+                SPACE MISSION SM-11 220982 (SG-21)
+  * Sharp SM5A labels (no decap): 0126 228B TRONICA (SM-11)
+                                  0126 22YC TRONICA (SG-21)
   * lcd screen with custom segments, 1-bit sound
+
+  SM-11 and SG-21 are the exact same MCU, but with different graphics.
+
+  In 1983, Tronica released a second revision of SG-21 with different graphic
+  overlays. This version can be distinguished by having the year 1983 labeled
+  on the backside of the unit.
 
 ***************************************************************************/
 
@@ -9255,6 +9263,7 @@ public:
 	{ }
 
 	void trspacmis(machine_config &config);
+	void trspider(machine_config & config);
 };
 
 // config
@@ -9292,6 +9301,11 @@ void trspacmis_state::trspacmis(machine_config &config)
 	sm5a_common(config, 1601, 1080); // R mask option confirmed
 }
 
+void trspacmis_state::trspider(machine_config &config)
+{
+	sm5a_common(config, 1597, 1080); // R mask option confirmed
+}
+
 // roms
 
 ROM_START( trspacmis )
@@ -9300,6 +9314,14 @@ ROM_START( trspacmis )
 
 	ROM_REGION( 106675, "screen", 0)
 	ROM_LOAD( "trspacmis.svg", 0, 106675, CRC(45d7b798) SHA1(db08fef21462507a115547ecf8eac38260a0c868) )
+ROM_END
+
+ROM_START( trspider )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "0126_22yc", 0x0000, 0x0740, CRC(3d319537) SHA1(007d376cfd29574554caa59ed9163178179ae9c5) )
+
+	ROM_REGION( 130534, "screen", 0)
+	ROM_LOAD( "trspider.svg", 0, 130534, CRC(d3f00245) SHA1(348c47dbe87ce8537c9b1c91d0d8bbf0809546e8) )
 ROM_END
 
 
@@ -9617,6 +9639,7 @@ CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

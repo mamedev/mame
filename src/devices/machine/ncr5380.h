@@ -1,19 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_NCR5380N_H
-#define MAME_MACHINE_NCR5380N_H
+#ifndef MAME_MACHINE_NCR5380_H
+#define MAME_MACHINE_NCR5380_H
 
 #pragma once
 
 #include "machine/nscsi_bus.h"
 
-class ncr5380n_device
+class ncr5380_device
 	: public nscsi_device
 	, public nscsi_slot_card_interface
 {
 public:
-	ncr5380n_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	ncr5380_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// device configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
@@ -30,7 +30,7 @@ public:
 	void dma_w(u8 val);
 
 protected:
-	ncr5380n_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);
+	ncr5380_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs = false);
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -167,20 +167,20 @@ private:
 	bool const m_has_lbs;
 };
 
-class ncr53c80_device : public ncr5380n_device
+class ncr53c80_device : public ncr5380_device
 {
 public:
 	ncr53c80_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
-class cxd1180_device : public ncr5380n_device
+class cxd1180_device : public ncr5380_device
 {
 public:
 	cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
-DECLARE_DEVICE_TYPE(NCR5380N, ncr5380n_device)
+DECLARE_DEVICE_TYPE(NCR5380, ncr5380_device)
 DECLARE_DEVICE_TYPE(NCR53C80, ncr53c80_device)
 DECLARE_DEVICE_TYPE(CXD1180, cxd1180_device)
 
-#endif // MAME_MACHINE_NCR5380N_H
+#endif // MAME_MACHINE_NCR5380_H

@@ -589,7 +589,7 @@ MACHINES["MSM5832"] = true
 MACHINES["MSM58321"] = true
 MACHINES["MSM6242"] = true
 MACHINES["MSM6253"] = true
-MACHINES["NCR5380N"] = true
+MACHINES["NCR5380"] = true
 MACHINES["NCR5390"] = true
 MACHINES["NCR539x"] = true
 MACHINES["NETLIST"] = true
@@ -1324,8 +1324,6 @@ files {
 	MAME_DIR .. "src/mame/includes/relief.h",
 	MAME_DIR .. "src/mame/video/relief.cpp",
 	MAME_DIR .. "src/mame/drivers/runaway.cpp",
-	MAME_DIR .. "src/mame/includes/runaway.h",
-	MAME_DIR .. "src/mame/video/runaway.cpp",
 	MAME_DIR .. "src/mame/drivers/sbrkout.cpp",
 	MAME_DIR .. "src/mame/drivers/shuuz.cpp",
 	MAME_DIR .. "src/mame/includes/shuuz.h",

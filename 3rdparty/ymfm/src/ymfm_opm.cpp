@@ -152,10 +152,6 @@ bool opm_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 	else if (index != 0x1a)
 		m_regdata[index] = data;
 
-	// check test register writes for the LFO reset bit
-	if (index == 0x01 && bitfield(data, 1))
-		m_lfo_counter = 0;
-
 	// handle writes to the key on index
 	if (index == 0x08)
 	{
@@ -200,6 +196,13 @@ int32_t opm_registers::clock_noise_and_lfo()
 	// manual, though it might not be implemented exactly this way on chip
 	uint32_t rate = lfo_rate();
 	m_lfo_counter += (0x10 | bitfield(rate, 0, 4)) << bitfield(rate, 4, 4);
+
+	// bit 1 of the test register is officially undocumented but has been
+	// discovered to hold the LFO in reset while active
+	if (lfo_reset())
+		m_lfo_counter = 0;
+
+	// now pull out the non-fractional LFO value
 	uint32_t lfo = bitfield(m_lfo_counter, 22, 8);
 
 	// fill in the noise entry 1 ahead of our current position; this
@@ -352,7 +355,7 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	end += sprintf(end, "%u.%02u freq=%04X dt2=%u dt=%u fb=%u alg=%X mul=%X tl=%02X ksr=%u adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		op_detune2(opoffs),
@@ -372,10 +375,10 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 
 	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am)
-		end += sprintf(end, " am=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
+		end += sprintf(end, " am=%u/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
 	bool pm = (lfo_pm_depth() != 0 && ch_lfo_pm_sens(choffs) != 0);
 	if (pm)
-		end += sprintf(end, " pm=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
+		end += sprintf(end, " pm=%u/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
 	if (noise_enable() && opoffs == 31)

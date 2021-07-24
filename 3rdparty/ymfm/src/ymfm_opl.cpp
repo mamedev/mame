@@ -383,7 +383,7 @@ std::string opl_registers_base<Revision>::log_keyon(uint32_t choffs, uint32_t op
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%2d.%02d freq=%04X fb=%d alg=%X mul=%X tl=%02X ksr=%d ns=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d",
+	end += sprintf(end, "%2u.%02u freq=%04X fb=%u alg=%X mul=%X tl=%02X ksr=%u ns=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_feedback(choffs),
@@ -406,11 +406,11 @@ std::string opl_registers_base<Revision>::log_keyon(uint32_t choffs, uint32_t op
 			ch_output_2(choffs) ? '0' : '-',
 			ch_output_3(choffs) ? '1' : '-');
 	if (op_lfo_am_enable(opoffs) != 0)
-		end += sprintf(end, " am=%d", lfo_am_depth());
+		end += sprintf(end, " am=%u", lfo_am_depth());
 	if (op_lfo_pm_enable(opoffs) != 0)
-		end += sprintf(end, " pm=%d", lfo_pm_depth());
+		end += sprintf(end, " pm=%u", lfo_pm_depth());
 	if (waveform_enable() && op_waveform(opoffs) != 0)
-		end += sprintf(end, " wf=%d", op_waveform(opoffs));
+		end += sprintf(end, " wf=%u", op_waveform(opoffs));
 	if (is_rhythm(choffs))
 		end += sprintf(end, " rhy=1");
 	if (DYNAMIC_OPS)
@@ -682,7 +682,7 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X inst=%X fb=%d mul=%X",
+	end += sprintf(end, "%u.%02u freq=%04X inst=%X fb=%u mul=%X",
 		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_instrument(choffs),
@@ -694,7 +694,7 @@ std::string opll_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	else
 		end += sprintf(end, " tl=%02X", ch_total_level(choffs));
 
-	end += sprintf(end, " ksr=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d/%d",
+	end += sprintf(end, " ksr=%u ksl=%u adr=%X/%X/%X sl=%X sus=%u/%u",
 		op_ksr(opoffs),
 		op_ksl(opoffs),
 		op_attack_rate(opoffs),
@@ -1804,11 +1804,6 @@ void ymf278b::write_address_pcm(uint8_t data)
 {
 	// just set the address
 	m_address = data | 0x200;
-
-	// YMF262, in compatibility mode, treats the upper bit as masked
-	// except for register 0x105; assuming YMF278B works the same way?
-	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
-		m_address &= 0xff;
 }
 
 
@@ -1819,14 +1814,21 @@ void ymf278b::write_address_pcm(uint8_t data)
 
 void ymf278b::write_data_pcm(uint8_t data)
 {
+	// ignore data writes if new2 is not yet set
+	if (m_fm.regs().new2flag() == 0)
+		return;
+
 	// write to FM
 	if (bitfield(m_address, 9) != 0)
-		m_pcm.write(m_address & 0xff, data);
+	{
+		uint8_t addr = m_address & 0xff;
+		m_pcm.write(addr, data);
 
-	// writes to the waveform number cause loads to happen for "about 300usec"
-	// which is ~13 samples at the nominal output frequency of 44.1kHz
-	if (m_address >= 0x08 && m_address <= 0x1f)
-		m_load_remaining = 13;
+		// writes to the waveform number cause loads to happen for "about 300usec"
+		// which is ~13 samples at the nominal output frequency of 44.1kHz
+		if (addr >= 0x08 && addr <= 0x1f)
+			m_load_remaining = 13;
+	}
 
 	// BUSY goes for 88 clocks on PCM writes
 	m_fm.intf().ymfm_set_busy_end(88);

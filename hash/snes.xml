@@ -1983,7 +1983,85 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="mk2up" cloneof="mk2" supported="no">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release -->
+		<description>Mortal Kombat II (USA, final prototype)</description>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u8" value="U8 4/8M EPROM(J)" /> <!-- empty socket -->
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157 [74LS157N]" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''..') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="u1" size="524288" crc="4e4ad9c7" sha1="ba6a1867867ba92eeea8761ffa3ea68189052e1d" offset="0x000000" />
+				<rom name="snes mkii 1.u2" size="524288" crc="d1277689" sha1="5d56b64ca3bcb12349818ef8d380923e2d5ada32" offset="0x080000" />
+				<rom name="snes mkii 2.u3" size="524288" crc="2a3cc624" sha1="70442c3a803b500e0f530129e4c6d6ef772b4322" offset="0x100000" />
+				<rom name="snes mkii 3.u4" size="524288" crc="ee2bd9de" sha1="bbc7fe2f6d434261bda12d8f27f94498dc5e6283" offset="0x180000" />
+				<rom name="u5" size="524288" crc="c1f9231c" sha1="f4b2e59239cd99735ae1db53e2c4b8d2d0c26e8e" offset="0x200000" />
+				<rom name="snes mkii 5.u6" size="524288" crc="bfb54c50" sha1="702d9edd06e44a1c49b1d7aa27a5b63ab857cb8b" offset="0x280000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mk3up" cloneof="mk3">
+		<!-- 64history.net -->
+		<!-- Notes: identical to the final release -->
+		<description>Mortal Kombat 3 (USA, final prototype)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-8PV5B-01" />
+			<feature name="u1" value="U1 4/8M EPROM(J)" />
+			<feature name="u2" value="U2 4/8M EPROM(J)" />
+			<feature name="u3" value="U3 4/8M EPROM(J)" />
+			<feature name="u4" value="U4 4/8M EPROM(J)" />
+			<feature name="u5" value="U5 4/8M EPROM(J)" />
+			<feature name="u6" value="U6 4/8M EPROM(J)" />
+			<feature name="u7" value="U7 4/8M EPROM(J)" />
+			<feature name="u8" value="U8 4/8M EPROM(J)" />
+			<feature name="u9" value="U9 16/64/256K SRAM" /> <!-- empty socket -->
+			<feature name="u10" value="U10 MM1134 [1134B]" />
+			<feature name="u11" value="U11 EP330 [EP330-15CN]" />
+			<feature name="u12" value="U12 EP330 [EP330-15CN]" />
+			<feature name="u13" value="U13 LS157 [74LS157N]" />
+			<feature name="u14" value="U14 CIC" />
+			<feature name="lockout" value="D411A" />
+			<feature name="dipswitch" value="DSW1" /> <!-- (''.''..') -->
+			<feature name="battery" value="BATT1 CR2032" />
+			<feature name="cart_model" value="n/a" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mk3 a 8-16.u1" size="524288" crc="c21ee1ac" sha1="12fc526e39b0b998b39d558fbe5660e72c7fad14" offset="0x000000" />
+				<rom name="mk3 b.u2" size="524288" crc="0e064323" sha1="a11175516892beb862c7cc1e186034ef1b55ee8f" offset="0x080000" />
+				<rom name="mk3 c.u3" size="524288" crc="7db6b7be" sha1="a7653c04f5321fd83062425a492c7ed0a4f1fdb0" offset="0x100000" />
+				<rom name="mk3 d.u4" size="524288" crc="28771750" sha1="d6c469ca2640935b6687f5bf5f6e85275157abb0" offset="0x180000" />
+				<rom name="mk3 e.u5" size="524288" crc="4cab6332" sha1="3c417ba6d35532b4e2ca9ae4a3b730c589d26aee" offset="0x200000" />
+				<rom name="mk3 f.u6" size="524288" crc="0327999b" sha1="dc6bb11a925e893453e0e5e5d88b8ace8d6cf859" offset="0x280000" />
+				<rom name="mk3 g.u7" size="524288" crc="229af2de" sha1="1bbb02aec08afab979ffbe4b68a48dc4cc923f73" offset="0x300000" />
+				<rom name="mk3 h.u8" size="524288" crc="a55f853b" sha1="eb978c64952e571c0bbc7f46ee537945ed924c26" offset="0x380000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk3up2" cloneof="mk3">
 		<!-- legrospixel.com -->
 		<description>Mortal Kombat 3 (USA, Prototype 19950713)</description>
 		<year>1995</year>
@@ -18995,28 +19073,6 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="mk2u" cloneof="mk2">
-		<description>Mortal Kombat II (USA, Rev. A)</description>
-		<year>1994</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="serial" value="SNS-28-USA" />
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-BJ0N-01" />
-			<feature name="u1" value="U1 P0" />
-			<feature name="u2" value="U2 P1" />
-			<feature name="u3" value="U3 LS00" />
-			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A 9403 BA" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="3145728">
-				<rom name="sns-28-0 p0.u1" size="2097152" crc="2e67ea27" sha1="ad0b75a058c16f257fc2a4421c1fc1bca1241b1d" offset="0x000000" />
-				<rom name="sns-28-0 p3.u2" size="1048576" crc="a5048535" sha1="707f7d275399ab348616550fc51ff5b0e18df30a" offset="0x200000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mother2" cloneof="earthbnd">
 		<description>Mother 2 - Gyiyg no Gyakushuu (Jpn)</description>
 		<year>1994</year>
@@ -34344,6 +34400,18 @@ List of unclassified roms
 		</part>
 	</software>
 
+	<software name="addfamvp" cloneof="addfamv">
+		<description>Addams Family Values (prototype)</description>
+		<year>199?</year>
+		<publisher>Ocean</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="addams family values (prototype).sfc" size="2097152" crc="557e987e" sha1="cf3f72dffeece71a92ef7dbae090ffd7aa343fcc" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="addfamj" cloneof="addfam">
 		<description>The Addams Family (Jpn)</description>
 		<year>1992</year>
@@ -37121,6 +37189,18 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
 				<rom name="congo's caper (europe).sfc" size="524288" crc="549a163e" sha1="b5f1917a8844724d6a8a8a366966263e1f84e84d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congocapp" cloneof="congocap">
+		<description>Congo's Caper (prototype)</description>
+		<year>1993</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="congo's caper (prototype).sfc" size="524288" crc="603c748c" sha1="7226ca652b823cc9db50cad57fa51c02d3a2fa6d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48079,6 +48159,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="metaljckp" cloneof="metaljck">
+		<description>Armored Police Metal Jack (USA, early prototype)</description>
+		<year>1992</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="metal jack (early localization prototype).sfc" size="1048576" crc="53ac5727" sha1="5f68f64437466358998cecdb129b53536b83b80f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="metalmx2">
 		<description>Metal Max 2 (Jpn)</description>
 		<year>1993</year>
@@ -48321,6 +48413,34 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="might and magic ii - gates to another world (europe).sfc" size="1048576" crc="4062244b" sha1="84031c687ef2a1784f6f49b1b304ff5952dfd0b6" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmg2up" cloneof="mightmg2">
+		<description>Might and Magic II - Gates to Another World (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="might and magic ii.sfc" size="1048576" crc="9ec5c2c2" sha1="4fc88d52e66308f1df37682c65aaf875dbae0ceb" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightmg2up1" cloneof="mightmg2">
+		<description>Might and Magic II - Gates to Another World (USA, earlier prototype)</description>
+		<year>1992</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="might &amp; magic ii (earlier usa prototype).sfc" size="1048576" crc="566c43ec" sha1="01a0a13b6d8efdd4ec82485d6161ed1a3442174e" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -48669,7 +48789,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="mk3upa" cloneof="mk3">
+	<software name="mk3up1" cloneof="mk3">
 		<description>Mortal Kombat 3 (USA, Prototype, Alt)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -48677,19 +48797,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="4194304">
 				<rom name="mortal kombat 3 (usa) (beta).sfc" size="4194304" crc="ffcbf355" sha1="d3030a0a80ff173dd07a3e7362efeb31d4553543" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- European or US proto? fix setname accordingly -->
-	<software name="mk3p1" cloneof="mk3">
-		<description>Mortal Kombat 3 (Prototype 19950713)</description>
-		<year>1995</year>
-		<publisher>Williams Entertainment</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="hirom" />
-			<dataarea name="rom" size="4194304">
-				<rom name="mortal kombat 3 r21.sfc" size="4194304" crc="8db650f1" sha1="1fa8c39e5d904ff68d095785ce611b96d4c2809c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48702,6 +48809,27 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mortal kombat ii (europe).sfc" size="3145728" crc="1cc0c6ef" sha1="5e078f59779dc4d26fea5b5b38292f30e1e64961" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk2u" cloneof="mk2">
+		<description>Mortal Kombat II (USA, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="SNS-28-USA" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-BJ0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9439 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mortal kombat ii (usa) (rev 1).sfc" size="3145728" crc="70bb5513" sha1="f6aa5291759e982ea249c4b76f729ca2f4ab1cf4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50465,6 +50593,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1310720">
 				<rom name="operation thunderbolt (usa).sfc" size="1310720" crc="3042b049" sha1="204b7e98053ca51d6539198379c3fa025c7cb9fb" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othunderp" cloneof="othunder">
+		<description>Operation Thunderbolt (prototype)</description>
+		<year>1994</year>
+		<publisher>Taito</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="operation thunderbolt (prototype).sfc" size="1572864" crc="1ca9d815" sha1="2859d4f88318a1b24c858eb431f525da63b4e8de" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53481,8 +53622,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="rnrracinup" cloneof="rnrracin">
-		<description>Rock n' Roll Racing (USA, Prototype)</description>
+		<description>Rock n' Roll Racing (USA, prototype)</description>
 		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rock n roll racing prototype.sfc" size="1048576" crc="40685b41" sha1="9a2ad21b8c727fd497636210772d1a0fbb0f89f6" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rnrracinup1" cloneof="rnrracin">
+		<description>Rock n' Roll Racing (USA, prototype, alt)</description>
+		<year>199?</year> <!-- Does not show copyright info like other prototypes -->
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -56648,6 +56801,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="street racer (usa) (beta).sfc" size="1048576" crc="1934f184" sha1="7cfc9262740bfaec99c22141f01ff2fa67f24206" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sracerp" cloneof="sracer">
+		<!-- Notes: Prototype has no sound -->
+		<description>Street Racer (prototype)</description>
+		<year>1994</year>
+		<publisher>Ubi Soft</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="street racer prototype.sfc" size="1048576" crc="b707b062" sha1="e67e3f69a90e8b584395ee5132edf2255df0cd95" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61523,6 +61689,18 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="tomjerryup1" cloneof="tomjerry">
+		<description>Tom &amp; Jerry (USA, prototype, alt)</description>
+		<year>199?</year>
+		<publisher>Hi Tech Expressions</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="tomjerry.sfc" size="524288" crc="50422852" sha1="62ad2eab36de09064458c415ce4248f3ce66b133" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tonymeol" cloneof="worldsoc">
 		<description>Tony Meola's Sidekicks Soccer (USA)</description>
 		<year>1993</year>
@@ -63894,6 +64072,20 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="world cup usa 94 (usa) (en,fr,de,es,it,nl,pt,sv).sfc" size="1572864" crc="fb1c9082" sha1="aefc74b282101896737245513e7c0a718f122f54" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcup94up" cloneof="wcup94">
+		<description>World Cup USA 94 (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>U.S. Gold</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="hirom" />
+			<dataarea name="rom" size="1572864">
+				<rom name="world cup usa 94 (prototype).sfc" size="1572864" crc="1b26735f" sha1="390227a70ffada6b3cd81efb48eca5b718300159" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>

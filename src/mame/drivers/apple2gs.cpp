@@ -4869,8 +4869,9 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
-	m_doc->add_route(0, "lspeaker", 1.0);
-	m_doc->add_route(1, "rspeaker", 1.0);
+	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
+	m_doc->add_route(0, "rspeaker", 1.0);
+	m_doc->add_route(1, "lspeaker", 1.0);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);
