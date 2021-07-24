@@ -1,3 +1,4 @@
+
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
 /**********************************************************************
@@ -395,7 +396,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_power255",     NES_BMC_CH001);      // mapper 63?
 	device.option_add_internal("bmc_s22games",     NES_BMC_SUPER22);    // mapper 233
 	device.option_add_internal("bmc_reset4",       NES_BMC_4IN1RESET);  // mapper 60 with 64k prg and 32k chr
-	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 60? or 226? or 233?
+	device.option_add_internal("bmc_reset42",      NES_BMC_42IN1RESET); // mapper 226? or 233?
 // misc multigame cart MMC3 clone boards
 	device.option_add_internal("fk23c",            NES_FK23C);
 	device.option_add_internal("fk23ca",           NES_FK23CA);

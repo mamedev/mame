@@ -78572,13 +78572,13 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4c" supported="no">
+	<software name="mc_4c">
 		<description>4 in 1 (Alt 2)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- Header says mapper 60 (not supported yet) -->
+			<feature name="slot" value="bmc_reset4" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="32768">
 				<rom name="4-in-1 (bomberman+f-1 race+circus charlie+star force).chr" size="32768" crc="2abfe1d5" sha1="db148e7158a97b96e4f74f11b1cf31b5e9bb1e11" offset="00000" status="baddump" />
 			</dataarea>
@@ -78588,13 +78588,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_4d" supported="no">
+	<software name="mc_4d">
 		<description>4 in 1 (Alt 3)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- Header says mapper 60 (not supported yet) -->
+			<feature name="slot" value="bmc_reset4" />
 			<dataarea name="chr" size="32768">
 				<rom name="no menu 4-in-1 (mr mary+battle city+exerion+yie ar kung-fu).chr" size="32768" crc="72ece2a8" sha1="483f09401d6269bcfb7752e3a79658ce8d882eb1" offset="00000" status="baddump" />
 			</dataarea>
@@ -80613,7 +80612,7 @@ to check why this is different -->
 		</part>
 	</software>
 
-	<software name="mc_4rb" supported="no">
+	<software name="mc_4rb">
 		<description>Reset Based 4 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
