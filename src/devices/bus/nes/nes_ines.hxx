@@ -91,7 +91,7 @@ static const nes_mmc mmc_list[] =
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
 	// 59 BMC-T3H53 and BMC-D1038
-	// 60 4-in-1, 35-in-1 Reset based
+	{ 60, BMC_4IN1RESET },
 	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
 	{ 63, BMC_CH001 },  // Powerful 255
