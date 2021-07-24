@@ -1804,11 +1804,6 @@ void ymf278b::write_address_pcm(uint8_t data)
 {
 	// just set the address
 	m_address = data | 0x200;
-
-	// YMF262, in compatibility mode, treats the upper bit as masked
-	// except for register 0x105; assuming YMF278B works the same way?
-	if (m_fm.regs().newflag() == 0 && m_address != 0x105)
-		m_address &= 0xff;
 }
 
 
@@ -1819,14 +1814,21 @@ void ymf278b::write_address_pcm(uint8_t data)
 
 void ymf278b::write_data_pcm(uint8_t data)
 {
+	// ignore data writes if new2 is not yet set
+	if (m_fm.regs().new2flag() == 0)
+		return;
+
 	// write to FM
 	if (bitfield(m_address, 9) != 0)
-		m_pcm.write(m_address & 0xff, data);
+	{
+		uint8_t addr = m_address & 0xff;
+		m_pcm.write(addr, data);
 
-	// writes to the waveform number cause loads to happen for "about 300usec"
-	// which is ~13 samples at the nominal output frequency of 44.1kHz
-	if (m_address >= 0x08 && m_address <= 0x1f)
-		m_load_remaining = 13;
+		// writes to the waveform number cause loads to happen for "about 300usec"
+		// which is ~13 samples at the nominal output frequency of 44.1kHz
+		if (addr >= 0x08 && addr <= 0x1f)
+			m_load_remaining = 13;
+	}
 
 	// BUSY goes for 88 clocks on PCM writes
 	m_fm.intf().ymfm_set_busy_end(88);
