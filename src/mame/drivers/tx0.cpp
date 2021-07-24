@@ -1585,7 +1585,7 @@ void tx0_state::tx0_64kw(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
 	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
 
-	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp");
+	SOFTWARE_LIST(config, "ptp_list").set_original("tx0_ptp").set_filter("64");
 }
 
 void tx0_state::tx0_8kw(machine_config &config)
@@ -1596,6 +1596,8 @@ void tx0_state::tx0_8kw(machine_config &config)
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+
+	SOFTWARE_LIST(config.replace(), "ptp_list").set_original("tx0_ptp").set_filter("8");
 }
 
 ROM_START(tx0_64kw)
