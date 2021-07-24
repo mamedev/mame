@@ -2641,7 +2641,6 @@ alim1429                        // motherboards using the ALi M1429 A1 and M1431
 amibaby                         // AMI Mark V Baby Screamer motherboard (386)
 aplanst                         // 1990 Apricot LANstation (Krypton Motherboard)
 aplannb                         // 1990 Apricot LANstation (Novell Remote Boot)
-aplscar                         // 1992 Apricot LS Pro (Caracal Motherboard)
 apxeni                          // 1987 Apricot XEN-i 386 (Leopard Motherboard)
 at386                           // 19?? IBM AT 386
 ataripc5                        // Atari PC5 (386)
@@ -2655,7 +2654,6 @@ ecs38632                        // Elitegroup ECS-386/32 mainboard
 ecs386a                         // ECS (Elitegroup) 386A
 ecsfx3000                       // Elitegroup FX-3000 motherboard (386)
 ecsum386                        // Elitegroup UM386 mainboard
-fic4386vchd                     // FIC 4386-VC-HD motherboard (386)
 frx386c                         // Micro-Express Inc. Forex 386 Cache
 frxc402                         // 386 motherboards using FOREX FRX46C402/FRX36C300/SIS85C206 chips
 fu340                           // Abit FU340
@@ -2707,6 +2705,8 @@ walk386dx                       // 1992 Triumph-Adler Walkstation 386 DX
 xb42663                         // 1988 Apricot Qi 300 (Rev D,E & F Motherboard)
 xb42664                         // 1989 Apricot XEN-S (Venus I Motherboard 386) (Bios:3.10.17i)
 xb42664a                        // 1990 Apricot XEN-S (Venus II Motherboard 386) (Bios:1.02.17) ab hier 486
+
+@source:at486.cpp
 486apio                         // EFA 486 APIO motherboard
 486ccv                          // Diamond Flower, Inc. (DFI) 486-CCV motherboard (486)
 486igb21                        // 486IG-B-2-1 motherboard (486)
@@ -2744,6 +2744,7 @@ amisvvlb3                       // AMI Super Voyager VLB-III motherboard (486)
 aoap43                          // Aopen AP43 motherboard (486)
 aovi15g                         // Aopen VI15G motherboard (486)
 aplsbon                         // 1992 Apricot LS Pro (Bonsai Motherboard)
+aplscar                         // 1992 Apricot LS Pro (Caracal Motherboard)
 aprfte                          // Apricot FT//ex (J3 motherboard)
 aprpand                         // Apricot FTs (Panther Rev F 1.02.26)
 apvxft                          // 1989 Apricot VX FT server
@@ -2771,6 +2772,8 @@ ed486vl3h                       // Edom 486VL3H motherboard (486)
 edmv035f                        // Edom MV035F motherboard (486)
 exp4044                         // ExpertChip EXP4044 motherboard (486)
 f4dxluc4                        // ADI F4DXL-UC4
+fic4386vchd                     // FIC 4386-VC-HD motherboard (386)
+fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 fic486gvt                       // FIC 486-GVT
 fic486kvd                       // FIC 486 KVD motherboard (486)
 fic486vchd                      // FIC 486-VC-HD motherboard (486)
@@ -2779,7 +2782,6 @@ ficgiovt2                       // FIC 486-GIO-VT2
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
-fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 ft486f55                        // Freetech 486FT55 motherboard (486)
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 ga486vf                         // Gigabyte GA-486VF motherboard (486)
@@ -2796,7 +2798,6 @@ ibm2133                         // IBM PS/1 2133
 jakms41                         // Jamicon KM-S4-1 VER 1.1
 jwj403tg                        // JETWAY J-403TG motherboard (486)
 jwj446a                         // Jetway J-446A motherboard (486)
-lion3500                        // 1993 Lion 3500C/T notebook
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
 lsucm486v30                     // Lucky Star UCM-486V30
 mb1433aeap                      // BIOSTAR - MB-1433/50 AEA-P - V:1
@@ -2813,8 +2814,9 @@ ms4134                          // MSI MS-4134 motherboard (486)
 ms4138                          // MSI MS-4138 motherboard (486)
 ms4144                          // MSI MS-4144 motherboard (486)
 ms4145                          // MSI MS-4145 motherboard (486)
+lion3500                        // 1993 Lion 3500C/T notebook
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
-ncr3433                         // NCR Class 3433
+ncr3433                         // NCR Class 3433 notebook
 ochawk                          // Octek Hawk motherboard (486)
 ochipdca2                       // Octek Hippo DCA2 motherboard (486)
 ochipcom                        // Octek Hippo COM motherboard (486)
