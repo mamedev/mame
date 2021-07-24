@@ -9639,7 +9639,7 @@ CONS( 1983, trshutvoy,    0,           0, trshutvoy,    trshutvoy,    trshutvoy_
 CONS( 1983, tigarden,     trshutvoy,   0, tigarden,     trshutvoy,    trshutvoy_state,    empty_init, "Tronica", "Thief in Garden", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trsrescue,    0,           0, trsrescue,    trsrescue,    trsrescue_state,    empty_init, "Tronica", "Space Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
 CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
