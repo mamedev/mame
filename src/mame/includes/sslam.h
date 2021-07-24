@@ -62,6 +62,8 @@ protected:
 	uint8_t m_oki_command;
 	uint8_t m_oki_bank;
 
+	uint32_t m_unk_458;
+
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_md_tilemap;
