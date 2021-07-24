@@ -383,7 +383,7 @@ public:
 	{
 		m_status = (m_status | set) & ~(reset | STATUS_BUSY);
 		m_intf.ymfm_sync_check_interrupts();
-		return m_status;
+		return m_status & ~m_regs.status_mask();
 	}
 
 	// set the IRQ mask
