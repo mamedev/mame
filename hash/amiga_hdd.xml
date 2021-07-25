@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="amiga_hdd" description="Amiga hard disk images">
+	<!--
+	Unless otherwise specified, all images are based on default installs of the
+	corresponding amiga_workbench sets.
+	-->
+
+	<software name="wbenc205">
+		<description>Workbench 2.05</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="wbenc205" sha1="f40aa55f379f567a052cb10a26b06eee558d06ca" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wbenc21">
+		<description>Workbench 2.1</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="wbenc21" sha1="d9ac194bc0927c4daf1f81a2bea267c8bf4fcbe5" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wbenc30">
+		<description>Workbench 3.0</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="wbenc30" sha1="85ddeb4182686c6c785a0fbec88aeee005176efb" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="wbenc31">
+		<description>Workbench 3.1</description>
+		<year>1995</year>
+		<publisher>ESCOM</publisher>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="wbenc31" sha1="a79eecab8a7e8e4a1696382591c12830905d2760" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
