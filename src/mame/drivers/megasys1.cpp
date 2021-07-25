@@ -2940,7 +2940,7 @@ ROM_START( edfbl )
 	ROM_LOAD16_BYTE( "01.bin",  0x000001, 0x020000, CRC(fc893ad0) SHA1(6d7be560e2343f3943f52ccdae7bd255b7720b6e) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) // PIC, 28 pin, part number scratched off
+	ROM_REGION( 0x2000, "mcu", 0 ) // PIC, 28 pin, part number scratched off
 	ROM_LOAD( "pic", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
