@@ -164,7 +164,7 @@ void vsmjtria_state::nmi_ack_w(uint8_t data)
 template <uint8_t Which>
 void vsmjtria_state::ctrl_w(uint8_t data)
 {
-//	flip_screen_set(data & 0x01);
+//  flip_screen_set(data & 0x01);
 	m_bg_tilemap[Which]->set_flip((data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	// (data & 0x02) is switched on and off in service mode
@@ -495,7 +495,7 @@ void vsmjtria_state::machine_reset()
 	if (m_sw2->read() & 1)
 	{
 		// Note: there's no direct setter in nvram_device that directly flushes contents for this case scenario
-	    for (auto &nvram : m_nvram_data)
+		for (auto &nvram : m_nvram_data)
 			std::fill_n(&nvram[0], nvram.length(), 0);
 
 		logerror("machine_reset: flush NVRAM contents\n");

@@ -720,7 +720,7 @@ u16 swp30_device::internal_r()
 	case 4:
 		// used at 44c4
 		// tests & 0x4000 only
-		//		logerror("read %02x.4\n", chan);
+		//      logerror("read %02x.4\n", chan);
 		return 0xffff;
 
 	case 6:
@@ -847,7 +847,7 @@ void swp30_device::change_mode(int channel, u8 mode)
 				 mode == SUSTAIN ? "sustain" :
 				 mode == RELEASE ? "release" :
 				 "?");
-		
+
 	m_mode[channel] = mode;
 	if(mode == IDLE || mode == SUSTAIN) {
 		m_step_volume[channel] = 0;
@@ -999,7 +999,7 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				   (step > 0 && raw_vol >= target)) {
 					raw_vol = target;
 					m_current_volume[channel] = raw_vol;
-					
+
 					// IDLE and SUSTAIN have zero step.
 					// current volume must be updated before calling change_mode
 

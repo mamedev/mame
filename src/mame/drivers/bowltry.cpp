@@ -10,18 +10,18 @@
     - Decompress YGV631 GFXs (RGB555/RGB565 format?)
     - Add base YGV631 display parsing;
     - TT5665 sound interface doesn't quite work, also definitely missing bankswitching behaviour.
-	  Notice that TT5665 works in 0x100000 data ROM banks, but only the first part seems to
-	  have a valid table header?
+      Notice that TT5665 works in 0x100000 data ROM banks, but only the first part seems to
+      have a valid table header?
     - serial comms, very verbose;
     - I/O, we currently add aggressive hookups for debugging reasons;
-	- Understand how exactly the mechanical part comes into play.
-	  The only thing available from the net is a cabinet picture, depicting a long bowling lane.
-	  There's no video of this in action, the speculation is that there's a physical ball and pins
-	  that are drawn OSD, and touchscreen sensors that determines hitting point.
-	- Are we missing an irq event here? 
-	  Whatever is happening with rand hookups it doesn't seem to have much impact on the game logic
-	  (i.e. serial always sends a P1 0000, never a P2 or an actual positive score), or even acknowledge the 
-	  likely coin insertions, definitely needs some video display to verify.
+    - Understand how exactly the mechanical part comes into play.
+      The only thing available from the net is a cabinet picture, depicting a long bowling lane.
+      There's no video of this in action, the speculation is that there's a physical ball and pins
+      that are drawn OSD, and touchscreen sensors that determines hitting point.
+    - Are we missing an irq event here?
+      Whatever is happening with rand hookups it doesn't seem to have much impact on the game logic
+      (i.e. serial always sends a P1 0000, never a P2 or an actual positive score), or even acknowledge the
+      likely coin insertions, definitely needs some video display to verify.
 
     ATLUS PCB  BT-208001
     ------------------------
@@ -104,7 +104,7 @@ u16 bowltry_state::vregs_r(offs_t offset, u16 mem_mask)
 	// ---- ---- ---- x---: unknown, may be DMA mode
 	if (offset == 0x092/2)
 		return (m_vregs[offset] & ~0x20) | (machine().rand() & 0x20);
-	
+
 	// other registers sets up stuff like cliprect coords (no CRTC?)
 	// hard to say without decoded GFXs.
 
@@ -123,7 +123,7 @@ u16 bowltry_state::fake_io_r(offs_t offset)
 
 void bowltry_state::bowltry_map(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x083fff).ram();
 	// These two are clearly 8-bit inputs
@@ -146,8 +146,8 @@ void bowltry_state::bowltry_map(address_map &map)
 void bowltry_state::bowltry_io(address_map &map)
 {
 	// these looks either EEPROM or touchscreen style writes, with chip select etc.
-//	map(0x09, 0x09).r(FUNC(bowltry_state::fake_io_r));
-//	map(0x0a, 0x0a).r(FUNC(bowltry_state::fake_io_r));
+//  map(0x09, 0x09).r(FUNC(bowltry_state::fake_io_r));
+//  map(0x0a, 0x0a).r(FUNC(bowltry_state::fake_io_r));
 }
 
 static INPUT_PORTS_START( bowltry )

@@ -90,7 +90,7 @@ public:
 	constexpr u32 cca_subpixel_adjust() const     { return BIT(m_value, 26, 1); }
 	constexpr u32 texture_enable() const          { return BIT(m_value, 27, 1); }
 	constexpr u32 rgbzw_clamp() const             { return BIT(m_value, 28, 1); }
-	constexpr u32 antialias() const               { return BIT(m_value, 29, 1); }	// not implemented
+	constexpr u32 antialias() const               { return BIT(m_value, 29, 1); }   // not implemented
 
 	constexpr u32 normalize()
 	{
@@ -135,7 +135,7 @@ public:
 	constexpr u32 enable_alpha_planes() const   { return BIT(m_value, 18, 1); }
 	constexpr u32 alpha_dither_subtract() const { return BIT(m_value, 19, 1); }
 	constexpr u32 depth_source_compare() const  { return BIT(m_value, 20, 1); }
-	constexpr u32 depth_float_select() const    { return BIT(m_value, 21, 1); }	// voodoo 2 only
+	constexpr u32 depth_float_select() const    { return BIT(m_value, 21, 1); } // voodoo 2 only
 
 	constexpr u32 normalize()
 	{
@@ -165,7 +165,7 @@ public:
 	constexpr u32 alphatest() const     { return BIT(m_value, 0, 1); }
 	constexpr u32 alphafunction() const { return BIT(m_value, 1, 3); }
 	constexpr u32 alphablend() const    { return BIT(m_value, 4, 1); }
-	constexpr u32 antialias() const     { return BIT(m_value, 5, 1); }	// not implemented
+	constexpr u32 antialias() const     { return BIT(m_value, 5, 1); }  // not implemented
 	constexpr u32 srcrgbblend() const   { return BIT(m_value, 8, 4); }
 	constexpr u32 dstrgbblend() const   { return BIT(m_value, 12, 4); }
 	constexpr u32 srcalphablend() const { return BIT(m_value, 16, 4); }
@@ -212,8 +212,8 @@ public:
 	constexpr u32 fog_mult() const     { return BIT(m_value, 2, 1); }
 	constexpr u32 fog_zalpha() const   { return BIT(m_value, 3, 2); }
 	constexpr u32 fog_constant() const { return BIT(m_value, 5, 1); }
-	constexpr u32 fog_dither() const   { return BIT(m_value, 6, 1); }	// voodoo 2 only
-	constexpr u32 fog_zones() const    { return BIT(m_value, 7, 1); }	// voodoo 2 only
+	constexpr u32 fog_dither() const   { return BIT(m_value, 6, 1); }   // voodoo 2 only
+	constexpr u32 fog_zones() const    { return BIT(m_value, 7, 1); }   // voodoo 2 only
 
 	constexpr u32 normalize()
 	{
@@ -272,8 +272,8 @@ public:
 	constexpr u32 tca_reverse_blend() const    { return BIT(m_value, 26, 1); }
 	constexpr u32 tca_add_aclocal() const      { return BIT(m_value, 27, 2); }
 	constexpr u32 tca_invert_output() const    { return BIT(m_value, 29, 1); }
-	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }	// not implemented
-	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }	// repurposed as send_config
+	constexpr u32 trilinear() const            { return BIT(m_value, 30, 1); }  // not implemented
+	constexpr u32 seq_8_downld() const         { return BIT(m_value, 31, 1); }  // repurposed as send_config
 
 	constexpr u32 normalize()
 	{
@@ -450,13 +450,13 @@ public:
 	constexpr u32 snoop1_readwrite_match() const   { return BIT(m_value, 9, 1); }
 	constexpr u32 sli_bus_owner() const            { return BIT(m_value, 10, 1); }
 	constexpr u32 sli_odd_even() const             { return BIT(m_value, 11, 1); }
-	constexpr u32 secondary_rev_id() const         { return BIT(m_value, 12, 4); }	// voodoo 2 only
-	constexpr u32 mfctr_fab_id() const             { return BIT(m_value, 16, 4); }	// voodoo 2 only
-	constexpr u32 enable_pci_interrupt() const     { return BIT(m_value, 20, 1); }	// voodoo 2 only
-	constexpr u32 pci_interrupt_timeout() const    { return BIT(m_value, 21, 1); }	// voodoo 2 only
-	constexpr u32 enable_nand_tree_test() const    { return BIT(m_value, 22, 1); }	// voodoo 2 only
-	constexpr u32 enable_sli_address_snoop() const { return BIT(m_value, 23, 1); }	// voodoo 2 only
-	constexpr u32 sli_snoop_address() const        { return BIT(m_value, 24, 8); }	// voodoo 2 only
+	constexpr u32 secondary_rev_id() const         { return BIT(m_value, 12, 4); }  // voodoo 2 only
+	constexpr u32 mfctr_fab_id() const             { return BIT(m_value, 16, 4); }  // voodoo 2 only
+	constexpr u32 enable_pci_interrupt() const     { return BIT(m_value, 20, 1); }  // voodoo 2 only
+	constexpr u32 pci_interrupt_timeout() const    { return BIT(m_value, 21, 1); }  // voodoo 2 only
+	constexpr u32 enable_nand_tree_test() const    { return BIT(m_value, 22, 1); }  // voodoo 2 only
+	constexpr u32 enable_sli_address_snoop() const { return BIT(m_value, 23, 1); }  // voodoo 2 only
+	constexpr u32 sli_snoop_address() const        { return BIT(m_value, 24, 8); }  // voodoo 2 only
 
 private:
 	u32 m_value;
@@ -498,7 +498,7 @@ public:
 
 	constexpr u32 pci_dev_function() const       { return BIT(m_value, 0, 1); }
 	constexpr u32 pci_write_wait_states() const  { return BIT(m_value, 1, 1); }
-	constexpr u32 multi_sst1() const             { return BIT(m_value, 2, 1); }	// not on voodoo 2
+	constexpr u32 multi_sst1() const             { return BIT(m_value, 2, 1); } // not on voodoo 2
 	constexpr u32 enable_lfb() const             { return BIT(m_value, 3, 1); }
 	constexpr u32 x_video_tiles() const          { return BIT(m_value, 4, 4); }
 	constexpr u32 video_timing_reset() const     { return BIT(m_value, 8, 1); }
@@ -515,7 +515,7 @@ public:
 	constexpr u32 video_timing_source() const    { return BIT(m_value, 20, 2); }
 	constexpr u32 enable_24bpp_output() const    { return BIT(m_value, 22, 1); }
 	constexpr u32 enable_sli() const             { return BIT(m_value, 23, 1); }
-	constexpr u32 x_video_tiles_bit5() const     { return BIT(m_value, 24, 1); }	// voodoo 2 only
+	constexpr u32 x_video_tiles_bit5() const     { return BIT(m_value, 24, 1); }    // voodoo 2 only
 	constexpr u32 enable_edge_filter() const     { return BIT(m_value, 25, 1); }
 	constexpr u32 invert_vid_clk_2x() const      { return BIT(m_value, 26, 1); }
 	constexpr u32 vid_clk_2x_sel_delay() const   { return BIT(m_value, 27, 2); }
@@ -590,7 +590,7 @@ public:
 	constexpr u32 memory_fifo_lwm() const       { return BIT(m_value, 2, 6); }
 	constexpr u32 memory_fifo_start_row() const { return BIT(m_value, 8, 10); }
 	constexpr u32 memory_fifo_stop_row() const  { return BIT(m_value, 18, 10); }
-	constexpr u32 video_clocking_delay() const  { return BIT(m_value, 29, 7); }	// voodoo 2 only
+	constexpr u32 video_clocking_delay() const  { return BIT(m_value, 29, 7); } // voodoo 2 only
 
 private:
 	u32 m_value;
@@ -605,31 +605,31 @@ public:
 	constexpr reg_fbi_init5(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 disable_pci_stop() const      { return BIT(m_value, 0, 1); }	// voodoo 2 only
-	constexpr u32 pci_slave_speed() const       { return BIT(m_value, 1, 1); }	// voodoo 2 only
-	constexpr u32 dac_data_output_width() const { return BIT(m_value, 2, 1); }	// voodoo 2 only
-	constexpr u32 dac_data_17_output() const    { return BIT(m_value, 3, 1); }	// voodoo 2 only
-	constexpr u32 dac_data_18_output() const    { return BIT(m_value, 4, 1); }	// voodoo 2 only
-	constexpr u32 generic_strapping() const     { return BIT(m_value, 5, 4); }	// voodoo 2 only
-	constexpr u32 buffer_allocation() const     { return BIT(m_value, 9, 2); }	// voodoo 2 only
-	constexpr u32 drive_vid_clk_slave() const   { return BIT(m_value, 11, 1); }	// voodoo 2 only
-	constexpr u32 drive_dac_data_16() const     { return BIT(m_value, 12, 1); }	// voodoo 2 only
-	constexpr u32 vclk_input_select() const     { return BIT(m_value, 13, 1); }	// voodoo 2 only
-	constexpr u32 multi_cvg_detect() const      { return BIT(m_value, 14, 1); }	// voodoo 2 only
-	constexpr u32 sync_retrace_reads() const    { return BIT(m_value, 15, 1); }	// voodoo 2 only
-	constexpr u32 enable_rhborder_color() const { return BIT(m_value, 16, 1); }	// voodoo 2 only
-	constexpr u32 enable_lhborder_color() const { return BIT(m_value, 17, 1); }	// voodoo 2 only
-	constexpr u32 enable_bvborder_color() const { return BIT(m_value, 18, 1); }	// voodoo 2 only
-	constexpr u32 enable_tvborder_color() const { return BIT(m_value, 19, 1); }	// voodoo 2 only
-	constexpr u32 double_horiz() const          { return BIT(m_value, 20, 1); }	// voodoo 2 only
-	constexpr u32 double_vert() const           { return BIT(m_value, 21, 1); }	// voodoo 2 only
-	constexpr u32 enable_16bit_gamma() const    { return BIT(m_value, 22, 1); }	// voodoo 2 only
-	constexpr u32 invert_dac_hsync() const      { return BIT(m_value, 23, 1); }	// voodoo 2 only
-	constexpr u32 invert_dac_vsync() const      { return BIT(m_value, 24, 1); }	// voodoo 2 only
-	constexpr u32 enable_24bit_dacdata() const  { return BIT(m_value, 25, 1); }	// voodoo 2 only
-	constexpr u32 enable_interlacing() const    { return BIT(m_value, 26, 1); }	// voodoo 2 only
-	constexpr u32 dac_data_18_control() const   { return BIT(m_value, 27, 1); }	// voodoo 2 only
-	constexpr u32 rasterizer_unit_mode() const  { return BIT(m_value, 30, 2); }	// voodoo 2 only
+	constexpr u32 disable_pci_stop() const      { return BIT(m_value, 0, 1); }  // voodoo 2 only
+	constexpr u32 pci_slave_speed() const       { return BIT(m_value, 1, 1); }  // voodoo 2 only
+	constexpr u32 dac_data_output_width() const { return BIT(m_value, 2, 1); }  // voodoo 2 only
+	constexpr u32 dac_data_17_output() const    { return BIT(m_value, 3, 1); }  // voodoo 2 only
+	constexpr u32 dac_data_18_output() const    { return BIT(m_value, 4, 1); }  // voodoo 2 only
+	constexpr u32 generic_strapping() const     { return BIT(m_value, 5, 4); }  // voodoo 2 only
+	constexpr u32 buffer_allocation() const     { return BIT(m_value, 9, 2); }  // voodoo 2 only
+	constexpr u32 drive_vid_clk_slave() const   { return BIT(m_value, 11, 1); } // voodoo 2 only
+	constexpr u32 drive_dac_data_16() const     { return BIT(m_value, 12, 1); } // voodoo 2 only
+	constexpr u32 vclk_input_select() const     { return BIT(m_value, 13, 1); } // voodoo 2 only
+	constexpr u32 multi_cvg_detect() const      { return BIT(m_value, 14, 1); } // voodoo 2 only
+	constexpr u32 sync_retrace_reads() const    { return BIT(m_value, 15, 1); } // voodoo 2 only
+	constexpr u32 enable_rhborder_color() const { return BIT(m_value, 16, 1); } // voodoo 2 only
+	constexpr u32 enable_lhborder_color() const { return BIT(m_value, 17, 1); } // voodoo 2 only
+	constexpr u32 enable_bvborder_color() const { return BIT(m_value, 18, 1); } // voodoo 2 only
+	constexpr u32 enable_tvborder_color() const { return BIT(m_value, 19, 1); } // voodoo 2 only
+	constexpr u32 double_horiz() const          { return BIT(m_value, 20, 1); } // voodoo 2 only
+	constexpr u32 double_vert() const           { return BIT(m_value, 21, 1); } // voodoo 2 only
+	constexpr u32 enable_16bit_gamma() const    { return BIT(m_value, 22, 1); } // voodoo 2 only
+	constexpr u32 invert_dac_hsync() const      { return BIT(m_value, 23, 1); } // voodoo 2 only
+	constexpr u32 invert_dac_vsync() const      { return BIT(m_value, 24, 1); } // voodoo 2 only
+	constexpr u32 enable_24bit_dacdata() const  { return BIT(m_value, 25, 1); } // voodoo 2 only
+	constexpr u32 enable_interlacing() const    { return BIT(m_value, 26, 1); } // voodoo 2 only
+	constexpr u32 dac_data_18_control() const   { return BIT(m_value, 27, 1); } // voodoo 2 only
+	constexpr u32 rasterizer_unit_mode() const  { return BIT(m_value, 30, 2); } // voodoo 2 only
 
 private:
 	u32 m_value;
@@ -644,18 +644,18 @@ public:
 	constexpr reg_fbi_init6(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 window_active_counter() const { return BIT(m_value, 0, 3); }	// voodoo 2 only
-	constexpr u32 window_drag_counter() const   { return BIT(m_value, 3, 5); }	// voodoo 2 only
-	constexpr u32 sli_sync_master() const       { return BIT(m_value, 8, 1); }	// voodoo 2 only
-	constexpr u32 dac_data_22_output() const    { return BIT(m_value, 9, 2); }	// voodoo 2 only
-	constexpr u32 dac_data_23_output() const    { return BIT(m_value, 11, 2); }	// voodoo 2 only
-	constexpr u32 sli_syncin_output() const     { return BIT(m_value, 13, 2); }	// voodoo 2 only
-	constexpr u32 sli_syncout_output() const    { return BIT(m_value, 15, 2); }	// voodoo 2 only
-	constexpr u32 dac_rd_output() const         { return BIT(m_value, 17, 2); }	// voodoo 2 only
-	constexpr u32 dac_wr_output() const         { return BIT(m_value, 19, 2); }	// voodoo 2 only
-	constexpr u32 pci_fifo_lwm_rdy() const      { return BIT(m_value, 21, 7); }	// voodoo 2 only
-	constexpr u32 vga_pass_n_output() const     { return BIT(m_value, 28, 2); }	// voodoo 2 only
-	constexpr u32 x_video_tiles_bit0() const    { return BIT(m_value, 30, 1); }	// voodoo 2 only
+	constexpr u32 window_active_counter() const { return BIT(m_value, 0, 3); }  // voodoo 2 only
+	constexpr u32 window_drag_counter() const   { return BIT(m_value, 3, 5); }  // voodoo 2 only
+	constexpr u32 sli_sync_master() const       { return BIT(m_value, 8, 1); }  // voodoo 2 only
+	constexpr u32 dac_data_22_output() const    { return BIT(m_value, 9, 2); }  // voodoo 2 only
+	constexpr u32 dac_data_23_output() const    { return BIT(m_value, 11, 2); } // voodoo 2 only
+	constexpr u32 sli_syncin_output() const     { return BIT(m_value, 13, 2); } // voodoo 2 only
+	constexpr u32 sli_syncout_output() const    { return BIT(m_value, 15, 2); } // voodoo 2 only
+	constexpr u32 dac_rd_output() const         { return BIT(m_value, 17, 2); } // voodoo 2 only
+	constexpr u32 dac_wr_output() const         { return BIT(m_value, 19, 2); } // voodoo 2 only
+	constexpr u32 pci_fifo_lwm_rdy() const      { return BIT(m_value, 21, 7); } // voodoo 2 only
+	constexpr u32 vga_pass_n_output() const     { return BIT(m_value, 28, 2); } // voodoo 2 only
+	constexpr u32 x_video_tiles_bit0() const    { return BIT(m_value, 30, 1); } // voodoo 2 only
 
 private:
 	u32 m_value;
@@ -670,17 +670,17 @@ public:
 	constexpr reg_fbi_init7(u32 value) :
 		m_value(value) { }
 
-	constexpr u32 generic_strapping() const     { return BIT(m_value, 0, 8); }	// voodoo 2 only
-	constexpr u32 cmdfifo_enable() const        { return BIT(m_value, 8, 1); }	// voodoo 2 only
-	constexpr u32 cmdfifo_memory_store() const  { return BIT(m_value, 9, 1); }	// voodoo 2 only
-	constexpr u32 disable_cmdfifo_holes() const { return BIT(m_value, 10, 1); }	// voodoo 2 only
-	constexpr u32 cmdfifo_read_thresh() const   { return BIT(m_value, 11, 5); }	// voodoo 2 only
-	constexpr u32 sync_cmdfifo_writes() const   { return BIT(m_value, 16, 1); }	// voodoo 2 only
-	constexpr u32 sync_cmdfifo_reads() const    { return BIT(m_value, 17, 1); }	// voodoo 2 only
-	constexpr u32 reset_pci_packer() const      { return BIT(m_value, 18, 1); }	// voodoo 2 only
-	constexpr u32 enable_chroma_stuff() const   { return BIT(m_value, 19, 1); }	// voodoo 2 only
-	constexpr u32 cmdfifo_pci_timeout() const   { return BIT(m_value, 20, 7); }	// voodoo 2 only
-	constexpr u32 enable_texture_burst() const  { return BIT(m_value, 27, 1); }	// voodoo 2 only
+	constexpr u32 generic_strapping() const     { return BIT(m_value, 0, 8); }  // voodoo 2 only
+	constexpr u32 cmdfifo_enable() const        { return BIT(m_value, 8, 1); }  // voodoo 2 only
+	constexpr u32 cmdfifo_memory_store() const  { return BIT(m_value, 9, 1); }  // voodoo 2 only
+	constexpr u32 disable_cmdfifo_holes() const { return BIT(m_value, 10, 1); } // voodoo 2 only
+	constexpr u32 cmdfifo_read_thresh() const   { return BIT(m_value, 11, 5); } // voodoo 2 only
+	constexpr u32 sync_cmdfifo_writes() const   { return BIT(m_value, 16, 1); } // voodoo 2 only
+	constexpr u32 sync_cmdfifo_reads() const    { return BIT(m_value, 17, 1); } // voodoo 2 only
+	constexpr u32 reset_pci_packer() const      { return BIT(m_value, 18, 1); } // voodoo 2 only
+	constexpr u32 enable_chroma_stuff() const   { return BIT(m_value, 19, 1); } // voodoo 2 only
+	constexpr u32 cmdfifo_pci_timeout() const   { return BIT(m_value, 20, 7); } // voodoo 2 only
+	constexpr u32 enable_texture_burst() const  { return BIT(m_value, 27, 1); } // voodoo 2 only
 
 private:
 	u32 m_value;

@@ -17,7 +17,7 @@
    * Foreground tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37C 34C 32C 29C filled
        - NWK-TR: 34A 31A filled, no empty solder pads
-	   - Cobra: 6F 6H
+       - Cobra: 6F 6H
    * Background tiles 2x or 4x 1Mbit SRAM in a 16-bit bus.
        - GTI Club: 37A 34A filled, 32A 29A empty
        - NWK-TR: 34C 31C 28C 25C empty

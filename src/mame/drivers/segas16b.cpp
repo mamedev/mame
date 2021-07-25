@@ -1932,17 +1932,17 @@ void dfjail_state::sound_control_w(uint8_t data)
 void dfjail_state::dac_data_w(offs_t offset, uint8_t data)
 {
 	/*
-		Z80 code in the NMI handler at 0x6e:
-		Sample in A
-		Copy A to E
-		Shift A left 2 and AND by 3C
-		write A to port 0x80
-		Copy E to A
-		Shift right 4 times
-		write A to ports 0x81, 0x82, and 0x83
+	    Z80 code in the NMI handler at 0x6e:
+	    Sample in A
+	    Copy A to E
+	    Shift A left 2 and AND by 3C
+	    write A to port 0x80
+	    Copy E to A
+	    Shift right 4 times
+	    write A to ports 0x81, 0x82, and 0x83
 
-		This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
-		and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
+	    This means port 0x80 gets the bottom 4 bits of the 8-bit sample, offset by 2 bits,
+	    and ports 81/82/83 get the top 4 bits of the sample, shifted right 4 bits.
 	*/
 	if (offset == 0)
 	{

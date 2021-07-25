@@ -27,7 +27,7 @@ TODO:
   service mode enables "bright", it is actually same as NeoGeo device;
 - II & V board: Fix sound CPU crashes properly (nested NMIs);
 - Sky Soldiers: According to various references bosses should really time out after some time (reportedly ~80 secs.).
-  This is actually handled by the MCU, not unlike Gold Medalist;  
+  This is actually handled by the MCU, not unlike Gold Medalist;
 - Sky Soldiers: BGM Fade out before boss battle isn't implemented;
 - Sky Adventure, probably others: on a real PCB reference BGM stutters when using
   30 Hz autofire (not enough sound resources?);
@@ -347,10 +347,10 @@ u16 alpha68k_II_state::alpha_II_trigger_r(offs_t offset)
 					// Notice that there are additional shared RAM checks (i.e. 0x1e6a, 0x1e32, 0x1e3a), which causes the game to soft lock if not satisfied.
 					// Apparently bosses should time out in ~80 seconds.
 					m_microcontroller_data = 0x00;
-					
+
 					// Notice that a similar system is also used by Time Soldiers but most threads are actually NOP-ed out.
 					// (basically anything that is >0x24)
-					// Most likely left-overs that eventually were completed with aforementioned Sky Soldiers.  
+					// Most likely left-overs that eventually were completed with aforementioned Sky Soldiers.
 				}
 				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
 			}

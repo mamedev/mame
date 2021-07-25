@@ -173,17 +173,17 @@ WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z1_w)
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z0_w)
 {
-//	printf("ctc1_z0_w %d\n", state);
+//  printf("ctc1_z0_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z1_w)
 {
-//	printf("ctc1_z1_w %d\n", state);
+//  printf("ctc1_z1_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc1_z2_w)
 {
-//	printf("ctc1_z2_w %d\n", state);
+//  printf("ctc1_z2_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(efo_zsu_device::ctc0_z2_w)

@@ -233,11 +233,11 @@ u32 voodoo_banshee_device::read(offs_t offset, u32 mem_mask)
 	case 0x0080000 >> 19:
 		return map_cmd_agp_r(offset - 0x0080000/4);
 
-	case 0x0100000 >> 19:	case 0x0180000 >> 19:
+	case 0x0100000 >> 19:   case 0x0180000 >> 19:
 		return map_2d_r(offset - 0x0100000/4);
 
-	case 0x0200000 >> 19:	case 0x0280000 >> 19:	case 0x0300000 >> 19:	case 0x0380000 >> 19:
-	case 0x0400000 >> 19:	case 0x0480000 >> 19:	case 0x0500000 >> 19:	case 0x0580000 >> 19:
+	case 0x0200000 >> 19:   case 0x0280000 >> 19:   case 0x0300000 >> 19:   case 0x0380000 >> 19:
+	case 0x0400000 >> 19:   case 0x0480000 >> 19:   case 0x0500000 >> 19:   case 0x0580000 >> 19:
 		return map_register_r(offset - 0x0200000/4);
 
 	default:
@@ -264,37 +264,37 @@ void voodoo_banshee_device::write(offs_t offset, u32 data, u32 mem_mask)
 		map_cmd_agp_w(offset - 0x0080000/4, data, mem_mask);
 		break;
 
-	case 0x0100000 >> 19:	case 0x0180000 >> 19:
+	case 0x0100000 >> 19:   case 0x0180000 >> 19:
 		map_2d_w(offset - 0x0100000/4, data, mem_mask);
 		break;
 
-	case 0x0200000 >> 19:	case 0x0280000 >> 19:	case 0x0300000 >> 19:	case 0x0380000 >> 19:
-	case 0x0400000 >> 19:	case 0x0480000 >> 19:	case 0x0500000 >> 19:	case 0x0580000 >> 19:
+	case 0x0200000 >> 19:   case 0x0280000 >> 19:   case 0x0300000 >> 19:   case 0x0380000 >> 19:
+	case 0x0400000 >> 19:   case 0x0480000 >> 19:   case 0x0500000 >> 19:   case 0x0580000 >> 19:
 		map_register_w(offset - 0x0200000/4, data, mem_mask);
 		break;
 
-	case 0x0600000 >> 19:	case 0x0680000 >> 19:	case 0x0700000 >> 19:	case 0x0780000 >> 19:
+	case 0x0600000 >> 19:   case 0x0680000 >> 19:   case 0x0700000 >> 19:   case 0x0780000 >> 19:
 		map_texture_w<0>(offset - 0x0600000, data, mem_mask);
 		break;
 
-	case 0x0800000 >> 19:	case 0x0880000 >> 19:	case 0x0900000 >> 19:	case 0x0980000 >> 19:
+	case 0x0800000 >> 19:   case 0x0880000 >> 19:   case 0x0900000 >> 19:   case 0x0980000 >> 19:
 		if (BIT(m_chipmask, 2))
 			map_texture_w<1>(offset - 0x0800000, data, mem_mask);
 		break;
 
-	case 0xc000000 >> 19:	case 0xc800000 >> 19:	case 0xd000000 >> 19:	case 0xd800000 >> 19:
-	case 0xe000000 >> 19:	case 0xe800000 >> 19:	case 0xf000000 >> 19:	case 0xf800000 >> 19:
+	case 0xc000000 >> 19:   case 0xc800000 >> 19:   case 0xd000000 >> 19:   case 0xd800000 >> 19:
+	case 0xe000000 >> 19:   case 0xe800000 >> 19:   case 0xf000000 >> 19:   case 0xf800000 >> 19:
 		map_yuv_w(offset - 0xc000000/4, data, mem_mask);
 		break;
 
-	case 0x1000000 >> 19:	case 0x1080000 >> 19:	case 0x1100000 >> 19:	case 0x1180000 >> 19:
-	case 0x1200000 >> 19:	case 0x1280000 >> 19:	case 0x1300000 >> 19:	case 0x1380000 >> 19:
-	case 0x1400000 >> 19:	case 0x1480000 >> 19:	case 0x1500000 >> 19:	case 0x1580000 >> 19:
-	case 0x1600000 >> 19:	case 0x1680000 >> 19:	case 0x1700000 >> 19:	case 0x1780000 >> 19:
-	case 0x1800000 >> 19:	case 0x1880000 >> 19:	case 0x1900000 >> 19:	case 0x1980000 >> 19:
-	case 0x1a00000 >> 19:	case 0x1a80000 >> 19:	case 0x1b00000 >> 19:	case 0x1b80000 >> 19:
-	case 0x1c00000 >> 19:	case 0x1c80000 >> 19:	case 0x1d00000 >> 19:	case 0x1d80000 >> 19:
-	case 0x1e00000 >> 19:	case 0x1e80000 >> 19:	case 0x1f00000 >> 19:	case 0x1f80000 >> 19:
+	case 0x1000000 >> 19:   case 0x1080000 >> 19:   case 0x1100000 >> 19:   case 0x1180000 >> 19:
+	case 0x1200000 >> 19:   case 0x1280000 >> 19:   case 0x1300000 >> 19:   case 0x1380000 >> 19:
+	case 0x1400000 >> 19:   case 0x1480000 >> 19:   case 0x1500000 >> 19:   case 0x1580000 >> 19:
+	case 0x1600000 >> 19:   case 0x1680000 >> 19:   case 0x1700000 >> 19:   case 0x1780000 >> 19:
+	case 0x1800000 >> 19:   case 0x1880000 >> 19:   case 0x1900000 >> 19:   case 0x1980000 >> 19:
+	case 0x1a00000 >> 19:   case 0x1a80000 >> 19:   case 0x1b00000 >> 19:   case 0x1b80000 >> 19:
+	case 0x1c00000 >> 19:   case 0x1c80000 >> 19:   case 0x1d00000 >> 19:   case 0x1d80000 >> 19:
+	case 0x1e00000 >> 19:   case 0x1e80000 >> 19:   case 0x1f00000 >> 19:   case 0x1f80000 >> 19:
 		map_lfb_w(offset - 0x1000000/4, data, mem_mask);
 		break;
 

@@ -21,9 +21,9 @@ Final Lap Notes:
     To change an option, move gear shift from low to high without touching the gas pedal
 
 TODO:
-	- Verify below still occur
+    - Verify below still occur
 
-	General
+    General
     - sprite/tilemap orthogonality needed
 
     Final Lap & Final Lap 2:
@@ -49,9 +49,9 @@ TODO:
     Metal Hawk
     - ROZ wraparound isn't implemented (see large battleship in 2nd stage)
 
-	Burning Force (+ maybe others)
-	- POSIRQ is off-by-one, but adjusting it makes other cases worse
-	  (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
+    Burning Force (+ maybe others)
+    - POSIRQ is off-by-one, but adjusting it makes other cases worse
+      (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
