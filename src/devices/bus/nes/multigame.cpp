@@ -40,7 +40,8 @@ DEFINE_DEVICE_TYPE(NES_NOVEL2,         nes_novel2_device,         "nes_novel2", 
 DEFINE_DEVICE_TYPE(NES_STUDYNGAME,     nes_studyngame_device,     "nes_studyngame",     "NES Cart Study n Game PCB")
 DEFINE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device,      "nes_sgun20in1",      "NES Cart Supergun 20 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device,         "nes_vt5201",         "NES Cart VT5201 PCB")
-DEFINE_DEVICE_TYPE(NES_810544C,        nes_810544c_device,        "nes_810544c",        "NES Cart 810544-C-A1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device,     "nes_bmc_80013b",     "NES Cart BMC 80013-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_810544c",    "NES Cart BMC 810544-C-A1 PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GB63,       nes_bmc_gb63_device,       "nes_bmc_gb63",       "NES Cart BMC Ghostbusters 63 in 1 PCB")
@@ -141,8 +142,13 @@ nes_vt5201_device::nes_vt5201_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_810544c_device::nes_810544c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_810544C, tag, owner, clock)
+nes_bmc_80013b_device::nes_bmc_80013b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_80013B, tag, owner, clock), m_latch(0)
+{
+}
+
+nes_bmc_810544c_device::nes_bmc_810544c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_810544C, tag, owner, clock)
 {
 }
 
@@ -517,18 +523,32 @@ void nes_vt5201_device::pcb_reset()
 	m_dipsetting = 0;
 }
 
-void nes_810544c_device::device_start()
+void nes_bmc_80013b_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_80013b_device::pcb_reset()
+{
+	chr8(0, CHRRAM);
+
+	m_latch = 0x80;
+	m_reg[0] = m_reg[1] = 0;
+	update_prg();
+}
+
+void nes_bmc_810544c_device::device_start()
 {
 	common_start();
 }
 
-void nes_810544c_device::pcb_reset()
+void nes_bmc_810544c_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(0);
-	chr8(0, m_chr_source);
-	set_nt_mirroring(PPU_MIRROR_VERT);
+	chr8(0, CHRROM);
 }
 
 void nes_ntd03_device::device_start()
@@ -1420,16 +1440,54 @@ uint8_t nes_vt5201_device::read_h(offs_t offset)
 
 /*-------------------------------------------------
 
+ BMC-80013-B
+
+ Games: Cartridge Story I, II, and III
+
+ NES 2.0: mapper 274
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_80013b_device::update_prg()
+{
+	prg16_89ab(m_latch | (m_reg[1] & 0x70) | m_reg[0]);
+	prg16_cdef(m_reg[1]);
+}
+
+void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_80013b write_h, offset: %04x, data: %02x\n", offset, data));
+	if (offset & 0x6000)
+	{
+		m_reg[1] = data & 0x7f;
+		m_latch = !BIT(offset, 14) << 7;
+	}
+	else
+	{
+		m_reg[0] = data & 0x0f;
+		set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+	update_prg();
+}
+
+/*-------------------------------------------------
+
  BMC-810544-C-A1
 
  Games: 200-in-1 Elfland
 
+ NES 2.0: mapper 261
+
+ In MAME: Supported.
+
  -------------------------------------------------*/
 
-void nes_810544c_device::write_h(offs_t offset, uint8_t data)
+void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 {
-	uint8_t bank = (offset >> 7);
-	LOG_MMC(("810544 write_h, offset: %04x, data: %02x\n", offset, data));
+	u8 bank = (offset >> 7);
+	LOG_MMC(("bmc_810544c write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (!BIT(offset, 6))
 	{

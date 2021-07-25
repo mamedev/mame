@@ -295,7 +295,7 @@ static const nes_mmc mmc_list[] =
 	// 258 UNIF MAPR 158B?
 	// 259 UNIF MAPR F-15?
 	// 260 HP10xx/HP20xx multicarts?
-	{ 261, BMC_810544 },
+	{ 261, BMC_810544C },
 	{ 262, SACHEN_SHERO },
 	{ 263, UNL_KOF97 },
 	{ 264, YOKO_BOARD },
@@ -308,7 +308,7 @@ static const nes_mmc mmc_list[] =
 	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
 	// 272 Akumajo Special bootleg not in nes.xml
 	// 273 Gremlins 2 bootleg, related to pirate gremlin2h or unk2?
-	// 274 BMC_80013B multicarts, not in nes.xml?
+	{ 274, BMC_80013B },
 	// 275 Unused
 	// 276 Unused
 	// 277 Unused
