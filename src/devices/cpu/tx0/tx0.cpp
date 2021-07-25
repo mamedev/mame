@@ -783,6 +783,7 @@ void tx0_8kw_device::execute_instruction_8kw()
 					/* (5 is undefined) */
 					int index = (MAR & 0007000) >> 9;
 
+					m_ios = 0;
 					call_io_handler(index);
 					m_ioh = 1;
 				}
