@@ -32,6 +32,7 @@ DEFINE_DEVICE_TYPE(NES_ACTION52,       nes_action52_device,       "nes_action52"
 DEFINE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron_device,        "nes_caltron",        "NES Cart Caltron 6 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_RUMBLESTATION,  nes_rumblestat_device,     "nes_rumblestat",     "NES Cart Rumblestation PCB")
 DEFINE_DEVICE_TYPE(NES_SVISION16,      nes_svision16_device,      "nes_svision16",      "NES Cart Supervision 16 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_KN42,           nes_kn42_device,           "nes_kn42",           "NES Cart KN-42 PCB")
 DEFINE_DEVICE_TYPE(NES_N625092,        nes_n625092_device,        "nes_n625092",        "NES Cart N625092 PCB")
 DEFINE_DEVICE_TYPE(NES_A65AS,          nes_a65as_device,          "nes_a65as",          "NES Cart A65AS PCB")
 DEFINE_DEVICE_TYPE(NES_T262,           nes_t262_device,           "nes_t262",           "NES Cart T-262 PCB")
@@ -99,6 +100,11 @@ nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, cons
 
 nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SVISION16, tag, owner, clock), m_latch1(0), m_latch2(0)
+{
+}
+
+nes_kn42_device::nes_kn42_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_KN42, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -404,6 +410,20 @@ void nes_svision16_device::pcb_reset()
 
 	m_latch1 = 0;
 	m_latch2 = 0;
+}
+
+void nes_kn42_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_kn42_device::pcb_reset()
+{
+	m_latch ^= 0x10;
+	prg16_89ab(m_latch);
+	prg16_cdef(m_latch | 0x0f);    // fixed to last bank for either game
+	chr8(0, CHRRAM);
 }
 
 void nes_n625092_device::device_start()
@@ -1217,6 +1237,32 @@ void nes_svision16_device::write_h(offs_t offset, uint8_t data)
 
 /*-------------------------------------------------
 
+ Bootleg Board KN-42
+
+ Games: 2 in 1 - Big Nose & Big Nose Freaks Out
+
+ NES 2.0: mapper 381
+
+ In MAME: Supported.
+
+ TODO: Big Nose Freaks Out has timing issues like
+ many Camerica games. It happens with the singleton
+ dump and is unrelated to the bootleg board here.
+
+ -------------------------------------------------*/
+
+void nes_kn42_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("kn42 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	prg16_89ab(m_latch | (data & 0x07) << 1 | BIT(data, 4));
+}
+
+/*-------------------------------------------------
+
  Bootleg Board N625092
 
  Games: 400 in 1, 700 in 1, 1000 in 1
@@ -1264,7 +1310,6 @@ void nes_n625092_device::write_h(offs_t offset, uint8_t data)
 		}
 	}
 }
-
 
 /*-------------------------------------------------
 
