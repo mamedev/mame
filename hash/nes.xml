@@ -61307,8 +61307,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="n625092" />
-			<feature name="pcb" value="UNL-N625092" /> <!-- Mapper 221 -->
+			<feature name="slot" value="jyc_b" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="262144">
 				<rom name="2-in-1 donkey kong + jungle book (unl).chr" size="262144" crc="52ea0000" sha1="7d437a553c7498e637c231dd1df51e73defc0905" offset="00000" status="baddump" />
 			</dataarea>
