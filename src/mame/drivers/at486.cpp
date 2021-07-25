@@ -27,7 +27,6 @@ split from at.cpp
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
-// #include "machine/wd7600.h"
 #include "emupal.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -42,11 +41,9 @@ public:
 		m_ram(*this, RAM_TAG)
 	{ }
 
-
 	void at486(machine_config &config);
 	void at486l(machine_config &config);
 	void ficpio2(machine_config &config);
-
 
 	void init_at486();
 	void init_at486pci();
@@ -241,9 +238,9 @@ void at486_state::ficpio2(machine_config &config)
   ROM definitions
 ***************************************************************************/
 
-//**************************************************************************
-//  IBM systems
-//**************************************************************************
+/**************************************************************************
+  IBM systems
+***************************************************************************/
 
 // https://en.wikipedia.org/wiki/IBM_PS/1
 // http://ps-2.kev009.com/pcpartnerinfo/ctstips/937e.htm
@@ -278,12 +275,12 @@ ROM_START( ibm2133 )
 	ROM_LOAD( "ps1_2133_52g2974_rom.bin", 0x00000, 0x20000, CRC(89fc7600) SHA1(758e161353f6781c39ac67f1ba293c14038b17dc))
 ROM_END
 
-//**************************************************************************
-//  Apricot systems
-//
-// http://bbs.actapricot.org/files/ , http://insight.actapricot.org/insight/products/main.htm
-//
-//**************************************************************************
+/**************************************************************************
+  Apricot systems
+
+  http://bbs.actapricot.org/files/ , http://insight.actapricot.org/insight/products/main.htm
+
+**************************************************************************/
 
 // Apricot LS Pro (Bonsai Motherboard, on board: ethernet (Intel 82596), Chipset: VLSI SCAMP VL82C311 / VL82C333, ROM: 128KB)
 ROM_START( aplsbon )
@@ -384,9 +381,10 @@ ROM_START( qi900 )
 	ROM_LOAD16_BYTE( "qi910224.hi", 0x00001, 0x10000, CRC(36e66d56) SHA1(0900c5272ec3ced550f18fb08db59ab7f67a621e))
 ROM_END
 
-//**************************************************************************
-//  Commodore systems
-//**************************************************************************
+
+/***************************************************************************
+  Commodore systems
+***************************************************************************/
 
 // Commodore Tower 486
 ROM_START( comt486 )
@@ -426,12 +424,12 @@ ROM_START( pc70iii )
 ROM_END
 
 
-//**************************************************************************
-//  80486 BIOS
-//
-//  BIOS files that show "original.tmp" near the beginning are compressed
-//  and can be unpacked using, e.g., 7-ZIP.
-//**************************************************************************
+/***************************************************************************
+  80486 BIOS
+
+  BIOS files that show "original.tmp" near the beginning are compressed
+  and can be unpacked using, e.g., 7-ZIP.
+***************************************************************************/
 
 ROM_START( at486 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
@@ -569,9 +567,9 @@ ROM_START( at486 )
 ROM_END
 
 
-//**************************************************************************
-//  80486 motherboard
-//************************************************************************//
+/***************************************************************************
+  80486 motherboard
+***************************************************************************/
 
 // Chicony CH-486-33C REV 1.0 - Chipset: UMC UM82C481, UM82C482, Chips P82C206 - CPU: Intel Overdrive DX2ODPR66, FPU socket provided
 // RAM: 16xSIMM30, Cache: 8xW24256AK-25, P4C188-20PC - BIOS: AMI - Keyboard-BIOS: Intel/AMI
@@ -930,7 +928,7 @@ ROM_START( pcd4x )
 ROM_END
 
 
-// ***** 486 motherboards using the ALi M1487 M1489 chipset
+/***** 486 motherboards using the ALi M1487 M1489 chipset *****/
 
 // Abit AB-PB4 REV.:1.2 - Chipset: ALi M1487 M1489, Winbond W83787F, W83768F - On board: Floppy, 2xser, 2xIDE, par
 // ISA16: 3, PCI: 3, PISA: 1 - OSC: 14.3F5P - CPU: Socket 3 - BIOS: Award D2317569, 32pin
@@ -1001,7 +999,7 @@ ROM_START( alim1489 ) // no display
 ROM_END
 
 
-// ***** 486 motherboards using the CONTAQ 82C596 chipset
+/***** 486 motherboards using the CONTAQ 82C596 chipset *****/
 
 // MSI MS-4125 - Chipset: CONTAQ 82C596 SiS 85C206 - ISA8: 1, ISA16: 3, ISA16/VL: 2 - BIOS: AMI 486DX ISA BIOS AA65441044 (28pin) - Keyboard-BIOS: AMI/Intel P8942AHP
 // BIOS-String: 40-0104-001169-00101111-111192-CTQ596-0 / AC5E 052193
@@ -1018,7 +1016,7 @@ ROM_START( 486ccv )
 ROM_END
 
 
-// ***** 486 motherboards using the OPTi495SLC chipset
+/***** 486 motherboards using the OPTi495SLC chipset *****/
 
 // QDI PX486P3 - Chipset: OPTi 82C495SLC, F82C206 - CPU: 486 - BIOS: 11/11/92 AMI (28pin)
 // Keyboard-BIOS: AMIKEY - ISA8: 1, ISA16: 3, ISA16/VL: 3 (one marked MASTER/SLAVE, two marked SLAVE)
@@ -1041,7 +1039,7 @@ ROM_START( nat48pv )
 ROM_END
 
 
-// ***** 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
+/***** 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset *****/
 
 // Auva-Cam-33-P2 = See-Thru Sto486Wb - CPU: 486 - ISA8: 1, ISA16: 7 - Chipset: OPTi 82C392, 82C493, 82C206
 // MR BIOS (tm) V1.30
@@ -1074,7 +1072,7 @@ ROM_START( op82c392 )
 ROM_END
 
 
-// motherboards using the OPTi 82C802A, 82C602A chipset
+/***** motherboards using the OPTi 82C802A, 82C602A chipset *****/
 
 // Edom MV035F - Chipset: OPTi 82C802A, 82C602A - CPU: TI 486DX2-80 - RAM: 4xSIMM30, 3xSIMM72, Cache: 4x32pin, 4x28pin, TAG
 // BIOS: 28pin - Keyboard-BIOS: VIA - ISA16: 5, ISA16/VL: 3
@@ -1106,7 +1104,7 @@ ROM_START( ochipdca2 )
 ROM_END
 
 
-// Motherboards using the Opti 82C895 82C602A chipset
+/**** Motherboards using the Opti 82C895 82C602A chipset *****/
 
 // ExpertChip EXP4044 - CPU: Socket3 - Chipset: OPTi 82C895, 82C602 - RAM: 4xSIMM30, 2xSIMM72, Cache: 4x28pin, 4x32pin + TAG
 // Keyboard-BIOS: MEGAKEY or Winbond W83C42 - ISA16: 3, ISA16/VL: 3
@@ -1163,7 +1161,7 @@ ROM_START( tmpat48pg4 ) // BIOS-String: 10/13/95-OPTI-802G-2C4UKM21-00.00-00 / 4
 ROM_END
 
 
-// Motherboards using the SiS 85C461 chipset
+/***** Motherboards using the SiS 85C461 chipset *****/
 
 // Abit AB-AV4 (aka VL-BUS 486) - Chipset: SiS 85C461, HM5818A - BIOS Version: AMI 11/11/92 486DX ISA BIOS AA7247480
 // Keyboard BIOS: AMI-KB-H-WP - CPU: socket for 80486PGA, solder pads for QFP486sx - RAM: 8xSIMM30, Cache: 7xW24257AK-20, 1xEm81256B-20P, 1x71256S20TP
@@ -1201,7 +1199,7 @@ ROM_START( so025d2 )
 	ROM_LOAD( "soyo-486-vesa.bin", 0x10000, 0x10000, CRC(da798d7b) SHA1(15a8c1e244ee29ef5c61e05659f8ec7f8eaa8ab7))
 ROM_END
 
-// ***** 486 motherboards using the SiS BTQ 85C401/85C402 + 85C206 chipset
+/***** 486 motherboards using the SiS BTQ 85C401/85C402 + 85C206 chipset *****/
 
 // ABIT AB-AX4 - Chipset: SIS BTQ 85C401, 85C402, 85C206 - BIOS: AMIBIOS 06/06/92 - Keyboard BIOS: AMI - CPU: socket for 80486
 // RAM: 8xSIMM30, Cache: 8xEtronTech Em51256A-20P, 1X AS7C256-20PC - ISA8: 1, ISA16: 6 - OSC: 33.333MHz, 14.31818
@@ -1229,7 +1227,8 @@ ROM_START( mba029 ) // BIOS-String: 30-0200-ZZ1594-00101111-070791-SISAUTO-0
 	ROM_LOAD( "mba-029_bios_27c512.bin", 0x10000, 0x10000, CRC(8d660697) SHA1(6b2be9ec9a2d12c9348c26ac25514af406fa752e))
 ROM_END
 
-// ***** 486 motherboards using the SiS 85C496/85C497 chipset
+
+/***** 486 motherboards using the SiS 85C496/85C497 chipset *****/
 
 // A-Trend ATC-1425A - Chipset: SiS 85C496, 85C497 - RAM: 4xSIMM72, Cache: 4x32pin + TAG - ISA16: 4, PCI: 3
 // on board: 2xIDE, Floppy, 2xser, par - BIOS: 32pin
@@ -1511,7 +1510,7 @@ ROM_START( sis85c496 )
 ROM_END
 
 
-// ***** 486 motherboards using the SiS 85C471 + 85C407 chipset
+/***** 486 motherboards using the SiS 85C471 + 85C407 chipset *****/
 
 // 486IG-B-2-1 - CPU: 486 - RAM: 8xSIMM30, Cache: 4x32pin, 4x28pin, TAG - Chipset: SIS85C471/407 - BIOS: AMI WIN BIOS 07/25/94
 // Keyboard-BIOS: AMIKEY - BIOS-String: 40-0002-428020-00101111-080893-SIS471B-F - ISA8: 1, ISA16: 3, ISA16/VL: 3
@@ -1673,7 +1672,7 @@ ROM_START( sis85c471 )
 ROM_END
 
 
-// ***** 486 motherboards using the UMC UM8498F, UM8496F chipset
+/***** 486 motherboards using the UMC UM8498F, UM8496F chipset *****/
 
 // Aquarius MD-4DUVC VER:2.1 / Aquarius MD-4DUV VER:2.1
 ROM_START( md4duvc ) // "Memory test fail"
@@ -1763,7 +1762,7 @@ ROM_START( um8498f ) // no display
 ROM_END
 
 
-// ***** 486 motherboards using the UM82C482A UM82C481A chipset
+/***** 486 motherboards using the UM82C482A UM82C481A chipset *****/
 
 // Elitegroup UM486/UM486sx Rev.1.4. - Chipset: UMC UM82C482A UM82C481A UM82C206F - ISA8: 2, ISA16: 6 - CPU: i486DX-50, FPU socket provided
 // RAM: 8xSIMM30 in 2 banks, Cache: 8xW24256AK-25+4xCY7C164-20PC - OSC: 33.000MHz, 14.31818MHz - BIOS: AMI 486 BIOS ZZ364969 - Keyboard-BIOS: AMI KB-BIOS-VER-F
@@ -1782,7 +1781,7 @@ ROM_START( um486v )
 ROM_END
 
 
-// ***** 486 motherboards using the UM8886BF, UM8881F chipset
+/***** 486 motherboards using the UM8886BF, UM8881F chipset *****/
 
 // A-Trend ATC-1415 - Chipset: UMC UM8881F/UM8886BF, OEC12C885, VT8235N - ISA8: 1, ISA16: 3, PCI: 3
 // CPU: Socket 3 - BIOS: Award C 0247007 UMC8881/6 BIS VER : 3.20 95-12-08 / M271001 (128k)
@@ -1951,7 +1950,7 @@ ROM_START( um8810paio )
 ROM_END
 
 
-// ***** 486 motherboards using the UMC UM82C491F UM82C493F or clones (BIOTEQ) chipset
+/***** 486 motherboards using the UMC UM82C491F UM82C493F or clones (BIOTEQ) chipset */
 
 // Chicony CH-491E Rev. 1.4 - Chipset: UMC UM82C491F UM82C493F - BIOS: 04/04/93 AMI AB1987679 28pin - Keyboard-BIOS: AMIKEY
 // BIOS-String: 40-0102-001116-00101111-040493-UMC491F-0 / UMC 491 for 80486 AUTO - ISA16: 4, ISA16/VL: 3
@@ -2014,7 +2013,7 @@ ROM_START( pwaih4077c )
 ROM_END
 
 
-// ***** motherboards using the Unichip U4800 chipset
+/***** motherboards using the Unichip U4800 chipset *****/
 
 // Gemlight GMB-486UNP v2.1 - Chipset: Unichip U4800-VLX, SIS85C206 - CPU: solder pads for 486FQFP, i486DX2-66 - RAM: 8xSIMM30, Cache: 8xUM61256AK-15
 // BIOS: AMI 486DX ISA BIOS - ISA16: 4, ISA16/VLB: 3
@@ -2037,7 +2036,7 @@ ROM_START( uni4800 )
 ROM_END
 
 
-// ***** 486 motherboards using the VIA VT82C495 VT82C481 chipset
+/***** 486 motherboards using the VIA VT82C495 VT82C481 chipset *****/
 
 // FIC 4386-VC-V - CPU: 486 - Chipset: VIA VT82C495 VT82C481 - ISA8: 2, ISA16: 3, ISA16/VL: 2 - OSC: 33.333MHz - BIOS: AMI 486DX ISA BIOS AA6387315 (28pin) -
 // BIOS-String: X0-0100-001121-00101111-021993-VIA-0 / Version 1.02 - Keyboard-BIOS: Lance LT38C41
@@ -2082,7 +2081,7 @@ ROM_START( fic486vchd ) // BIOS ID String: 40-04C1-ZZ1124-00101111-050591-ET/486
 ROM_END
 
 
-// ***** 486 motherboards using the VIA VT82C505 + VT82C496G + VT82C406MV chipset
+/***** 486 motherboards using the VIA VT82C505 + VT82C496G + VT82C406MV chipset *****/
 
 // FIC 486-PIO-2 (4 ISA, 4 PCI)
 // VIA VT82C505 (ISA/VL to PCI bridge) + VT82C496G (system chipset) + VT82C406MV (keyboard controller, RTC, CMOS), NS311/312 or NS332 I/O
@@ -2115,9 +2114,9 @@ ROM_START( ficvipio2 )
 ROM_END
 
 
-//**************************************************************************
-//  80486 Desktop
-//**************************************************************************
+/***************************************************************************
+  80486 Desktop
+***************************************************************************/
 
 // NCR Class 3433 - CPU: 486SX/DX 25/33, coprocessor socket provided - Chipset: NCR WPD CLEMSON 006-2001325 CQO1842 9209N
 // LSI LOGIC L1A5840 006-2000654B NAR 9212Delta WG35494 GERMANY, NCR 006-2001895 WPD FALCON E CQO 2291 9218N,
@@ -2147,9 +2146,9 @@ ROM_START( pc9486 )
 	ROM_LOAD ( "9486_saverom.bin", 0x00000, 0x20000, CRC(cbc35a4e) SHA1(dfa614c8255a1407c9850fa4ff99a6b2a52e1a4f) )
 ROM_END
 
-//**************************************************************************
-//  80486 Laptop/Notebook
-//**************************************************************************
+/**************************************************************************
+  80486 Laptop/Notebook
+**************************************************************************/
 
 // Highscreen Colani Blue Note
 // Chipset: Cirrus Logic CL-GD6235-65QC-A, CL-PD6720-QC-A ETEQ ET6000 A, Appian ADI2, SMC FDC37C651 QF P, DIA UA0300-QA, Chips F82C206J
@@ -2274,7 +2273,7 @@ COMP( 1990, at486,        0,     ibm5150, at486,     0,     at486_state,     ini
 COMP( 199?, atc1415,      at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1415", MACHINE_NOT_WORKING )
 COMP( 199?, atc1425a,     at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425A", MACHINE_NOT_WORKING )
 COMP( 199?, atc1425b,     at486, 0,       at486,     0,     at486_state,     init_at486,        "A-Trend", "ATC-1425B", MACHINE_NOT_WORKING )
-COMP( 199?, bluenote,     at486, 0,       at486,     0,     at486_state,     init_at486,    "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
+COMP( 199?, bluenote,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Highscreen",  "Colani Blue Note", MACHINE_NOT_WORKING )
 COMP( 199?, ch48633c,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-486-33C", MACHINE_NOT_WORKING )
 COMP( 199?, ch486spm,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Chaintech", "486SPM", MACHINE_NOT_WORKING )
 COMP( 199?, ch491e,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Chicony",   "CH-491E", MACHINE_NOT_WORKING )
@@ -2332,23 +2331,23 @@ COMP( 199?, ms4138,       at486, 0,       at486,     0,     at486_state,     ini
 COMP( 199?, ms4144,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4144", MACHINE_NOT_WORKING )
 COMP( 199?, ms4145,       at486, 0,       at486,     0,     at486_state,     init_at486,        "MSI",         "MS-4145", MACHINE_NOT_WORKING )
 COMP( 199?, nat48pv,      at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "NAT48PV-1.00 VL", MACHINE_NOT_WORKING )
-COMP( 199?, ncr3433,      at486, 0,       at486,     0,     at486_state,  init_at486,    "NCR", "Class 3433", MACHINE_NOT_WORKING )
+COMP( 199?, ncr3433,      at486, 0,       at486,     0,     at486_state,     init_at486,        "NCR", "Class 3433", MACHINE_NOT_WORKING )
 COMP( 199?, ochawk,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hawk", MACHINE_NOT_WORKING )
 COMP( 199?, ochipcom,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo COM", MACHINE_NOT_WORKING )
 COMP( 1994, ochipdca2,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo DCA2", MACHINE_NOT_WORKING )
 COMP( 199?, ochipvlp,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Octek",       "Hippo VL+", MACHINE_NOT_WORKING )
 COMP( 199?, op82c392,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, pc70iii,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
-COMP( 199?, pc9486,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
+COMP( 199?, pc9486,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
 COMP( 199?, pccm912,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M912", MACHINE_NOT_WORKING )
 COMP( 199?, pccm915i,     at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M915i", MACHINE_NOT_WORKING )
 COMP( 199?, pccm919,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
-COMP( 1993, pcd4nd,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
-COMP( 1995, pcd4nl,       at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
+COMP( 1993, pcd4nd,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
+COMP( 1995, pcd4nl,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens-Nixdorf", "PCD-4NL", MACHINE_NOT_WORKING )
 COMP( 199?, pcd4x,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens-Nixdorf", "PCD-4H, PCD-4M", MACHINE_NOT_WORKING )
 COMP( 199?, pci48af,      at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC Research Corporation", "PCI48AF", MACHINE_NOT_WORKING )
 COMP( 199?, pck486dx,     at486, 0,       at486,     0,     at486_state,     init_at486,        "Peacock",  "PCK 486 DX", MACHINE_NOT_WORKING )
-COMP( 199?, pg750eisa,    at486, 0,       at486,  0,     at486_state,  init_at486,    "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
+COMP( 199?, pg750eisa,    at486, 0,       at486,     0,     at486_state,     init_at486,        "Siemens", "PG-750 486 EISA", MACHINE_NOT_WORKING )
 COMP( 199?, pkm0038s,     at486, 0,       at486,     0,     at486_state,     init_at486,        "DTK", "PKM-0038S aka Gemlight GMB-486SG", MACHINE_NOT_WORKING )
 COMP( 199?, pm486pu,      at486, 0,       at486,     0,     at486_state,     init_at486,        "PROTECH",  "PM486PU-S7", MACHINE_NOT_WORKING )
 COMP( 199?, pt430,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Pine Technology", "PT-430", MACHINE_NOT_WORKING )
@@ -2370,7 +2369,7 @@ COMP( 199?, sto486wb,     at486, 0,       at486,     0,     at486_state,     ini
 COMP( 199?, td4ipaio,     at486, 0,       at486,     0,     at486_state,     init_at486,        "<unknown>", "TD-4IP-UMC-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, tmpat48pg4,   at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48PG4", MACHINE_NOT_WORKING )
 COMP( 199?, tmpat48av,    at486, 0,       at486,     0,     at486_state,     init_at486,        "TMC", "PAT48AV", MACHINE_NOT_WORKING )
-COMP( 199?, ts34t25,      at486, 0,       at486,  0,     at486_state,  init_at486,    "Highscreen",  "486-25", MACHINE_NOT_WORKING )
+COMP( 199?, ts34t25,      at486, 0,       at486,     0,     at486_state,     init_at486,        "Highscreen",  "486-25", MACHINE_NOT_WORKING )
 COMP( 199?, um486,        at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
 COMP( 199?, um486v,       at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, um8810paio,   at486, 0,       at486,     0,     at486_state,     init_at486,        "Elitegroup", "UM8810 PAIO", MACHINE_NOT_WORKING )
