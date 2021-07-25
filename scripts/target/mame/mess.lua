@@ -1756,6 +1756,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/amstrad.cpp",
 	MAME_DIR .. "src/mame/includes/amstrad.h",
 	MAME_DIR .. "src/mame/machine/amstrad.cpp",
+	MAME_DIR .. "src/mame/drivers/amstr_megapc.cpp",
 	MAME_DIR .. "src/mame/drivers/amstr_pc.cpp",
 	MAME_DIR .. "src/mame/drivers/nc.cpp",
 	MAME_DIR .. "src/mame/includes/nc.h",
